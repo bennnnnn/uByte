@@ -69,7 +69,7 @@ export default function InteractiveTutorial({
   prev,
   next,
 }: Props) {
-  const { user, profile, toggleProgress, progress } = useAuth();
+  const { user, profile, toggleProgress, progress, logout } = useAuth();
   const router = useRouter();
 
   // ── Tutorial state ──
@@ -85,7 +85,9 @@ export default function InteractiveTutorial({
   const [tutorialDone, setTutorialDone] = useState(false);
   const [countdown, setCountdown] = useState(3);
   const [showNav, setShowNav] = useState(false);
+  const [showUserMenu, setShowUserMenu] = useState(false);
   const [expandedSlug, setExpandedSlug] = useState<string>(tutorialSlug);
+  const userMenuRef = useRef<HTMLDivElement>(null);
   const [mobileTab, setMobileTab] = useState<"instructions" | "code">("instructions");
   const [isMobile, setIsMobile] = useState(false);
 
@@ -132,6 +134,18 @@ export default function InteractiveTutorial({
     dragState.current = { type: "v", startX: 0, startY: e.clientY, startValue: outputHeight };
     setIsDragging("v");
   }
+
+  // ── Close user menu on outside click ──
+  useEffect(() => {
+    if (!showUserMenu) return;
+    function handleClickOutside(e: MouseEvent) {
+      if (userMenuRef.current && !userMenuRef.current.contains(e.target as Node)) {
+        setShowUserMenu(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [showUserMenu]);
 
   // ── Detect mobile (post-hydration only) ──
   useEffect(() => {
@@ -355,11 +369,68 @@ export default function InteractiveTutorial({
 
         <div className="flex items-center gap-3">
           <ThemeToggle className="flex h-8 w-8 items-center justify-center rounded text-zinc-500 transition-colors hover:bg-zinc-200 hover:text-zinc-800 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-200" />
-          {user && (
-            <Link href="/profile" title="Your profile" className="flex items-center justify-center rounded-full transition-opacity hover:opacity-80">
-              <Avatar avatarKey={profile?.avatar ?? "gopher"} size="sm" />
-            </Link>
-          )}
+
+          {/* User icon — always visible; opens dropdown */}
+          <div className="relative" ref={userMenuRef}>
+            <button
+              onClick={() => setShowUserMenu((v) => !v)}
+              title={user ? "Account" : "Log in"}
+              className="flex h-8 w-8 items-center justify-center rounded-full transition-opacity hover:opacity-75"
+            >
+              {user ? (
+                <Avatar avatarKey={profile?.avatar ?? "gopher"} size="sm" />
+              ) : (
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="text-zinc-500 dark:text-zinc-400">
+                  <circle cx="12" cy="8" r="4" />
+                  <path d="M4 20c0-4 3.582-7 8-7s8 3 8 7" />
+                </svg>
+              )}
+            </button>
+
+            {showUserMenu && (
+              <div className="absolute right-0 top-10 z-[60] w-44 overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-lg dark:border-zinc-700 dark:bg-zinc-900">
+                {user ? (
+                  <>
+                    <div className="border-b border-zinc-100 px-3 py-2.5 dark:border-zinc-800">
+                      <p className="truncate text-xs font-semibold text-zinc-800 dark:text-zinc-200">{user.name}</p>
+                      <p className="truncate text-[11px] text-zinc-400 dark:text-zinc-500">{user.email}</p>
+                    </div>
+                    <Link
+                      href="/profile"
+                      onClick={() => setShowUserMenu(false)}
+                      className="flex items-center px-3 py-2 text-sm text-zinc-700 hover:bg-zinc-50 dark:text-zinc-300 dark:hover:bg-zinc-800"
+                    >
+                      My Profile
+                    </Link>
+                    <button
+                      onClick={async () => { setShowUserMenu(false); await logout(); }}
+                      className="flex w-full items-center px-3 py-2 text-sm text-red-500 hover:bg-zinc-50 dark:text-red-400 dark:hover:bg-zinc-800"
+                    >
+                      Log out
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <p className="border-b border-zinc-100 px-3 py-2 text-xs text-zinc-400 dark:border-zinc-800 dark:text-zinc-500">Not signed in</p>
+                    <Link
+                      href="/"
+                      onClick={() => setShowUserMenu(false)}
+                      className="flex items-center px-3 py-2 text-sm text-zinc-700 hover:bg-zinc-50 dark:text-zinc-300 dark:hover:bg-zinc-800"
+                    >
+                      Log in
+                    </Link>
+                    <Link
+                      href="/"
+                      onClick={() => setShowUserMenu(false)}
+                      className="flex items-center px-3 py-2 text-sm text-zinc-700 hover:bg-zinc-50 dark:text-zinc-300 dark:hover:bg-zinc-800"
+                    >
+                      Sign up
+                    </Link>
+                  </>
+                )}
+              </div>
+            )}
+          </div>
         </div>
       </header>
 
