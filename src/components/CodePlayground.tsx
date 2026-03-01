@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useMemo, useEffect } from "react";
+import { useState, useRef, useMemo, useEffect, useCallback } from "react";
 import { usePathname } from "next/navigation";
 import { highlightGo } from "@/lib/highlight-go";
 import { useAuth } from "./AuthProvider";
@@ -10,7 +10,7 @@ interface CodePlaygroundProps {
   title?: string;
 }
 
-// Stable short hash of initial code — used as storage key when no title is provided
+// Stable short hash of initial code — used as editor key when no title is set
 function codeHash(str: string): string {
   let h = 0;
   for (let i = 0; i < Math.min(str.length, 200); i++) {
@@ -23,14 +23,35 @@ export default function CodePlayground({ code: initialCode, title }: CodePlaygro
   const pathname = usePathname();
   const { user } = useAuth();
 
-  const storageKey = `pg:${pathname}:${title ?? codeHash(initialCode)}`;
+  // slug: "variables" from "/golang/variables"
+  const slug = pathname.replace(/^\/golang\//, "");
+  // Stable identifier for this editor on the page
+  const editorKey = title ?? codeHash(initialCode);
+  // localStorage key
+  const storageKey = `pg:${pathname}:${editorKey}`;
 
   const [code, setCode] = useState<string>(() => {
     if (typeof window === "undefined") return initialCode;
     return localStorage.getItem(storageKey) ?? initialCode;
   });
 
-  // Persist user edits; remove entry when code matches the original (reset)
+  // On mount: load from DB if user is logged in (DB is source of truth for cross-device)
+  useEffect(() => {
+    if (!user) return;
+    fetch(`/api/code-drafts?slug=${encodeURIComponent(slug)}&key=${encodeURIComponent(editorKey)}`)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => {
+        if (data?.code != null && data.code !== initialCode) {
+          setCode(data.code);
+          localStorage.setItem(storageKey, data.code);
+        }
+      })
+      .catch(() => {});
+  // run once when the user session is established
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id]);
+
+  // Keep localStorage in sync on every change
   useEffect(() => {
     if (code === initialCode) {
       localStorage.removeItem(storageKey);
@@ -38,6 +59,36 @@ export default function CodePlayground({ code: initialCode, title }: CodePlaygro
       localStorage.setItem(storageKey, code);
     }
   }, [code, storageKey, initialCode]);
+
+  // Debounced DB save for logged-in users — 1 s after last keystroke
+  const apiTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => {
+    if (!user || code === initialCode) return;
+    if (apiTimer.current) clearTimeout(apiTimer.current);
+    apiTimer.current = setTimeout(() => {
+      fetch("/api/code-drafts", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ slug, key: editorKey, code }),
+      }).catch(() => {});
+    }, 1000);
+    return () => { if (apiTimer.current) clearTimeout(apiTimer.current); };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [code, user?.id]);
+
+  // Delete DB draft and clear localStorage when resetting to starter code
+  const handleReset = useCallback(() => {
+    setCode(initialCode);
+    localStorage.removeItem(storageKey);
+    if (user) {
+      fetch("/api/code-drafts", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ slug, key: editorKey }),
+      }).catch(() => {});
+    }
+  }, [user, slug, editorKey, storageKey, initialCode]);
+
   const [output, setOutput] = useState<string | null>(null);
   const [isRunning, setIsRunning] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -130,7 +181,7 @@ export default function CodePlayground({ code: initialCode, title }: CodePlaygro
           {/* Reset button — only shows when code is modified */}
           {isModified && (
             <button
-              onClick={() => setCode(initialCode)}
+              onClick={handleReset}
               className="flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-xs font-medium text-zinc-400 transition-colors hover:bg-zinc-700 hover:text-zinc-200"
               title="Reset to original"
             >
