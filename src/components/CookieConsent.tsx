@@ -32,7 +32,7 @@ export default function CookieConsent() {
         <div className="flex shrink-0 gap-2">
           <button
             onClick={accept}
-            className="rounded-lg bg-cyan-600 px-4 py-2 text-sm font-medium text-white hover:bg-cyan-700"
+            className="rounded-lg bg-cyan-700 px-4 py-2 text-sm font-medium text-white hover:bg-cyan-800"
           >
             Accept
           </button>

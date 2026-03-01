@@ -78,7 +78,7 @@ export default function Home() {
           <div className="mt-7 flex flex-wrap gap-3">
             <Link
               href={`/golang/${tutorials[0].slug}`}
-              className="inline-flex items-center gap-2 rounded-xl bg-cyan-600 px-6 py-3 text-sm font-semibold text-white shadow-sm transition-all hover:bg-cyan-500 hover:shadow-md"
+              className="inline-flex items-center gap-2 rounded-xl bg-cyan-700 px-6 py-3 text-sm font-semibold text-white shadow-sm transition-all hover:bg-cyan-800 hover:shadow-md"
             >
               Start Learning →
             </Link>

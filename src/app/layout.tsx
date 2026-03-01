@@ -93,7 +93,7 @@ export default function RootLayout({
         {/* Skip to content — keyboard / screen-reader navigation */}
         <a
           href="#main-content"
-          className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[100] focus:rounded-lg focus:bg-cyan-600 focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-white focus:outline-none"
+          className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[100] focus:rounded-lg focus:bg-cyan-700 focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-white focus:outline-none"
         >
           Skip to content
         </a>
@@ -117,7 +117,7 @@ export default function RootLayout({
                   <ErrorBoundary>{children}</ErrorBoundary>
                 </main>
                 <footer className="border-t border-zinc-100 bg-white px-6 py-3 dark:border-zinc-800 dark:bg-zinc-950">
-                  <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-xs text-zinc-400 dark:text-zinc-500">
+                  <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-xs text-zinc-500 dark:text-zinc-400">
                     <span>© {new Date().getFullYear()} uByte</span>
                     <Link href="/privacy" className="transition-colors hover:text-cyan-600">Privacy</Link>
                     <Link href="/terms" className="transition-colors hover:text-cyan-600">Terms</Link>

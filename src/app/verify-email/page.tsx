@@ -72,7 +72,7 @@ function VerifyEmailContent() {
             <p className="mb-6 text-sm text-zinc-500 dark:text-zinc-400">{message}</p>
             <Link
               href="/profile"
-              className="inline-block rounded-lg bg-cyan-600 px-4 py-2 text-sm font-medium text-white hover:bg-cyan-700"
+              className="inline-block rounded-lg bg-cyan-700 px-4 py-2 text-sm font-medium text-white hover:bg-cyan-800"
             >
               Go to profile
             </Link>

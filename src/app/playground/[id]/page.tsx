@@ -146,7 +146,7 @@ export default function SharedPlaygroundPage() {
         </div>
 
         <div className="flex shrink-0 items-center gap-2 border-t border-zinc-200 bg-zinc-50 px-4 py-2 dark:border-zinc-800 dark:bg-zinc-900">
-          <button onClick={handleRun} disabled={running} title="Run (Ctrl+Enter)" className="flex items-center gap-1.5 rounded-md bg-cyan-600 px-4 py-1.5 text-sm font-medium text-white hover:bg-cyan-500 disabled:opacity-50">
+          <button onClick={handleRun} disabled={running} title="Run (Ctrl+Enter)" className="flex items-center gap-1.5 rounded-md bg-cyan-700 px-4 py-1.5 text-sm font-medium text-white hover:bg-cyan-800 disabled:opacity-50">
             {running ? "Running…" : "▶ Run"}
           </button>
           <span className="ml-auto hidden text-xs text-zinc-400 dark:text-zinc-600 lg:block">

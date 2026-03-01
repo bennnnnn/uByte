@@ -194,7 +194,7 @@ export default function SettingsTab({ profile, onSave, onChangePassword, onDelet
           <button
             onClick={handleSave}
             disabled={saving}
-            className="rounded-lg bg-cyan-600 px-6 py-2.5 text-sm font-medium text-white hover:bg-cyan-700 disabled:opacity-50"
+            className="rounded-lg bg-cyan-700 px-6 py-2.5 text-sm font-medium text-white hover:bg-cyan-800 disabled:opacity-50"
           >
             {saving ? "Saving..." : "Save Changes"}
           </button>

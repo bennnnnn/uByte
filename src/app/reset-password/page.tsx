@@ -32,7 +32,7 @@ function ResetPasswordForm() {
         <p className="mb-6 text-zinc-500 dark:text-zinc-400">You can now log in with your new password.</p>
         <button
           onClick={() => router.push("/")}
-          className="rounded-lg bg-cyan-600 px-6 py-2.5 text-sm font-medium text-white hover:bg-cyan-700"
+          className="rounded-lg bg-cyan-700 px-6 py-2.5 text-sm font-medium text-white hover:bg-cyan-800"
         >
           Go to homepage
         </button>
@@ -113,7 +113,7 @@ function ResetPasswordForm() {
         <button
           type="submit"
           disabled={submitting}
-          className="w-full rounded-lg bg-cyan-600 py-2.5 text-sm font-medium text-white transition-colors hover:bg-cyan-700 disabled:opacity-50"
+          className="w-full rounded-lg bg-cyan-700 py-2.5 text-sm font-medium text-white transition-colors hover:bg-cyan-800 disabled:opacity-50"
         >
           {submitting ? "Updating..." : "Update password"}
         </button>

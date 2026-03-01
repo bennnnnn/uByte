@@ -201,7 +201,7 @@ function ProfilePage() {
     return (
       <div className="flex h-full flex-col items-center justify-center gap-4">
         <p className="text-sm text-red-500">{error}</p>
-        <button onClick={fetchProfile} className="rounded-lg bg-cyan-600 px-4 py-2 text-sm font-medium text-white hover:bg-cyan-700">Retry</button>
+        <button onClick={fetchProfile} className="rounded-lg bg-cyan-700 px-4 py-2 text-sm font-medium text-white hover:bg-cyan-800">Retry</button>
       </div>
     );
   }

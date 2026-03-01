@@ -201,7 +201,7 @@ export default function PlaygroundPage() {
             onClick={handleRun}
             disabled={running}
             title="Run code (Ctrl+Enter)"
-            className="flex items-center gap-1.5 rounded-md bg-cyan-600 px-4 py-1.5 text-sm font-medium text-white transition-colors hover:bg-cyan-500 disabled:opacity-50"
+            className="flex items-center gap-1.5 rounded-md bg-cyan-700 px-4 py-1.5 text-sm font-medium text-white transition-colors hover:bg-cyan-800 disabled:opacity-50"
           >
             {running ? "Running…" : "▶ Run"}
           </button>

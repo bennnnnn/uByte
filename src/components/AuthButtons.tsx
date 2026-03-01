@@ -142,7 +142,7 @@ export default function AuthButtons() {
     <>
       <div className="flex items-center gap-2">
         <button onClick={() => { setShowModal("login"); resetForm(); }} className="rounded-lg px-4 py-2 text-sm font-medium text-zinc-600 transition-colors hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-200">Log in</button>
-        <button onClick={() => { setShowModal("signup"); resetForm(); }} className="rounded-lg bg-cyan-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-cyan-700">Sign up</button>
+        <button onClick={() => { setShowModal("signup"); resetForm(); }} className="rounded-lg bg-cyan-700 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-cyan-800">Sign up</button>
       </div>
 
       {showModal && (
@@ -196,23 +196,23 @@ export default function AuthButtons() {
                 <div className="mb-1 flex items-center justify-between">
                   <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Password</label>
                   {showModal === "login" && (
-                    <Link href="/reset-password" onClick={() => setShowModal(null)} className="text-xs text-cyan-600 hover:text-cyan-700">
+                    <Link href="/reset-password" onClick={() => setShowModal(null)} className="text-xs text-cyan-700 hover:text-cyan-800">
                       Forgot password?
                     </Link>
                   )}
                 </div>
                 <input type="password" required minLength={8} value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" className="w-full rounded-lg border border-zinc-300 bg-white px-4 py-2.5 text-sm text-zinc-900 placeholder-zinc-400 focus:border-cyan-500 focus:outline-none focus:ring-1 focus:ring-cyan-500 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100" />
               </div>
-              <button type="submit" disabled={submitting} className="w-full rounded-lg bg-cyan-600 py-2.5 text-sm font-medium text-white transition-colors hover:bg-cyan-700 disabled:opacity-50">
+              <button type="submit" disabled={submitting} className="w-full rounded-lg bg-cyan-700 py-2.5 text-sm font-medium text-white transition-colors hover:bg-cyan-800 disabled:opacity-50">
                 {submitting ? "Please wait..." : showModal === "login" ? "Log in" : "Sign up"}
               </button>
             </form>
 
             <p className="mt-4 text-center text-sm text-zinc-500">
               {showModal === "login" ? (
-                <>Don&apos;t have an account?{" "}<button onClick={() => { setShowModal("signup"); resetForm(); }} className="font-medium text-cyan-600 hover:text-cyan-700">Sign up</button></>
+                <>Don&apos;t have an account?{" "}<button onClick={() => { setShowModal("signup"); resetForm(); }} className="font-medium text-cyan-700 hover:text-cyan-800">Sign up</button></>
               ) : (
-                <>Already have an account?{" "}<button onClick={() => { setShowModal("login"); resetForm(); }} className="font-medium text-cyan-600 hover:text-cyan-700">Log in</button></>
+                <>Already have an account?{" "}<button onClick={() => { setShowModal("login"); resetForm(); }} className="font-medium text-cyan-700 hover:text-cyan-800">Log in</button></>
               )}
             </p>
           </div>

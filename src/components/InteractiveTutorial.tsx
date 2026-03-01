@@ -544,7 +544,7 @@ export default function InteractiveTutorial({
               onClick={handleCheck}
               disabled={status === "running"}
               title="Check answer (Ctrl+Shift+Enter)"
-              className="flex items-center gap-1.5 rounded-md bg-cyan-600 px-3 py-1.5 text-sm font-medium text-white transition-colors hover:bg-cyan-500 disabled:opacity-50"
+              className="flex items-center gap-1.5 rounded-md bg-cyan-700 px-3 py-1.5 text-sm font-medium text-white transition-colors hover:bg-cyan-800 disabled:opacity-50"
             >
               ✓ Check
             </button>
@@ -744,11 +744,11 @@ export default function InteractiveTutorial({
                 url={typeof window !== "undefined" ? `${window.location.origin}/golang/${tutorialSlug}` : ""}
               />
               {next ? (
-                <Link href={`/golang/${next.slug}`} className="rounded-lg bg-cyan-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-cyan-500">
+                <Link href={`/golang/${next.slug}`} className="rounded-lg bg-cyan-700 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-cyan-800">
                   Next: {next.title} →
                 </Link>
               ) : (
-                <Link href="/" className="rounded-lg bg-cyan-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-cyan-500">
+                <Link href="/" className="rounded-lg bg-cyan-700 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-cyan-800">
                   All Tutorials
                 </Link>
               )}
