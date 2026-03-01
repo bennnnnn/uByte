@@ -90,6 +90,9 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        {/* Blocking inline script — runs before first paint to apply saved theme class.
+            Prevents the flash of light theme on refresh when dark mode is preferred. */}
+        <script dangerouslySetInnerHTML={{ __html: `(function(){try{var t=localStorage.getItem('theme'),d=window.matchMedia('(prefers-color-scheme: dark)').matches;document.documentElement.classList.add(t==='light'||t==='dark'?t:d?'dark':'light')}catch(e){}})()` }} />
         {/* Skip to content — keyboard / screen-reader navigation */}
         <a
           href="#main-content"

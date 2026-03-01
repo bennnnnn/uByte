@@ -20,8 +20,12 @@ export default function ThemeToggle({ className }: { className?: string }) {
   const [theme, setTheme] = useState<"light" | "dark">("dark");
 
   useEffect(() => {
-    const syncTheme = () => setTheme(getStoredTheme());
-    syncTheme();
+    const t = getStoredTheme();
+    setTheme(t);
+    // Re-apply the html class in case the inline script in layout.tsx didn't run
+    // (e.g., during development HMR or unusual render paths).
+    document.documentElement.classList.remove("light", "dark");
+    document.documentElement.classList.add(t);
   }, []);
 
   function toggle() {
