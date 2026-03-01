@@ -61,7 +61,7 @@ export default function CodePlayground({ code: initialCode, title }: CodePlaygro
   };
 
   return (
-    <div className="not-prose my-6 overflow-hidden rounded-xl border border-zinc-200 dark:border-zinc-800">
+    <div className="my-6 overflow-hidden rounded-xl border border-zinc-200 dark:border-zinc-800">
       {/* Header */}
       <div className="flex items-center justify-between bg-zinc-800 px-4 py-2 dark:bg-zinc-900">
         <div className="flex items-center gap-2">

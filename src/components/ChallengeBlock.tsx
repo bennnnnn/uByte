@@ -14,7 +14,7 @@ export default function ChallengeBlock({ title, description, hint, starter }: Ch
   const [showHint, setShowHint] = useState(false);
 
   return (
-    <div className="not-prose my-8 overflow-hidden rounded-xl border-2 border-amber-300 dark:border-amber-700">
+    <div className="my-8 overflow-hidden rounded-xl border-2 border-amber-300 dark:border-amber-700">
       {/* Header */}
       <div className="flex items-center gap-3 bg-amber-50 px-5 py-3 dark:bg-amber-950/40">
         <span className="text-xl">🏆</span>

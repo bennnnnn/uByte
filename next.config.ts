@@ -1,6 +1,5 @@
 import type { NextConfig } from "next";
 import { withSentryConfig } from "@sentry/nextjs";
-import path from "path";
 
 const securityHeaders = [
   { key: "X-Frame-Options",           value: "DENY" },
@@ -34,10 +33,10 @@ const nextConfig: NextConfig = {
     if (!isServer) {
       config.resolve.alias = {
         ...config.resolve.alias,
-        // polyfill-module.js contains inline polyfills for Array.at, Object.hasOwn, etc.
-        // All are natively supported by our target browsers (Chrome 93+, Safari 15.4+, Firefox 92+).
-        // Aliasing to false resolves to an empty webpack module, eliminating ~13 KiB.
-        [path.resolve("node_modules/next/dist/build/polyfills/polyfill-module.js")]: false,
+        // Eliminate Next.js's hardcoded polyfills for Array.at, Object.hasOwn, etc.
+        // All are natively supported by Chrome 93+, Safari 15.4+, Firefox 92+.
+        // Must use the bare module path (how Next.js registers it), not an absolute path.
+        "next/dist/build/polyfills/polyfill-module": false,
       };
     }
     return config;
