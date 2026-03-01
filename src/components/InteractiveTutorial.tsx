@@ -102,7 +102,7 @@ export default function InteractiveTutorial({
   const [tutorialDone, setTutorialDone] = useState(false);
   const [countdown, setCountdown] = useState(3);
   const [showNav, setShowNav] = useState(false);
-  const [showChat, setShowChat] = useState(false);
+  const [showInlineChat, setShowInlineChat] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [expandedSlug, setExpandedSlug] = useState<string>(tutorialSlug);
   const userMenuRef = useRef<HTMLDivElement>(null);
@@ -783,20 +783,6 @@ export default function InteractiveTutorial({
                 {bookmarked ? "Saved!" : "Bookmark"}
               </button>
             )}
-            <button
-              onClick={() => setShowChat((v) => !v)}
-              title="Community chat & AI tutor"
-              className={`ml-auto flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-sm transition-colors ${
-                showChat
-                  ? "border-indigo-400 bg-indigo-50 text-indigo-600 dark:border-indigo-600 dark:bg-indigo-950/40 dark:text-indigo-400"
-                  : "border-zinc-300 text-zinc-500 hover:border-zinc-400 hover:text-zinc-800 dark:border-zinc-700 dark:text-zinc-400 dark:hover:border-zinc-600 dark:hover:text-zinc-200"
-              }`}
-            >
-              <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-                <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" />
-              </svg>
-              Chat
-            </button>
           </div>
 
           {/* ── Vertical resize handle ── */}
@@ -846,11 +832,39 @@ export default function InteractiveTutorial({
               </p>
             )}
             {status === "failed" && output !== null && (
-              <div className="mt-3 flex items-start gap-2 rounded-lg border border-zinc-200/70 bg-white/70 px-3 py-2 font-sans backdrop-blur-sm dark:border-zinc-700/40 dark:bg-zinc-900/50">
-                <span className="mt-px shrink-0 text-[11px] text-indigo-400 dark:text-indigo-500">✦</span>
-                <p className={`text-xs leading-relaxed text-zinc-500 dark:text-zinc-400 ${!aiFeedback ? "animate-pulse" : ""}`}>
-                  {aiFeedback ?? "Analyzing your code…"}
-                </p>
+              <div className="mt-3 rounded-lg border border-zinc-200/70 bg-white/70 font-sans backdrop-blur-sm dark:border-zinc-700/40 dark:bg-zinc-900/50">
+                <div className="flex items-center gap-2 px-3 py-2">
+                  <span className="shrink-0 text-[11px] text-indigo-400 dark:text-indigo-500">✦</span>
+                  <p className={`flex-1 text-xs leading-relaxed text-zinc-500 dark:text-zinc-400 ${!aiFeedback ? "animate-pulse" : ""}`}>
+                    {aiFeedback ?? "Analyzing your code…"}
+                  </p>
+                  {aiFeedback && (
+                    <button
+                      onClick={() => setShowInlineChat((v) => !v)}
+                      title="Ask a follow-up question"
+                      className="shrink-0 animate-bounce text-indigo-400 transition-colors hover:text-indigo-600 dark:text-indigo-500 dark:hover:text-indigo-300"
+                    >
+                      <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" />
+                      </svg>
+                    </button>
+                  )}
+                </div>
+                {showInlineChat && (
+                  <div className="border-t border-zinc-200/70 dark:border-zinc-700/40">
+                    <TutorialChat
+                      tutorialSlug={tutorialSlug}
+                      onClose={() => setShowInlineChat(false)}
+                      stepContext={{
+                        title: currentStep.title,
+                        instruction: currentStep.instruction,
+                        expectedOutput: currentStep.expectedOutput,
+                        currentCode: code,
+                      }}
+                      inline
+                    />
+                  </div>
+                )}
               </div>
             )}
           </div>
@@ -954,26 +968,6 @@ export default function InteractiveTutorial({
         </nav>
       </div>
 
-      {/* ── Chat Panel ── */}
-      {showChat && (
-        <div className="fixed inset-0 z-[54] bg-black/30" onClick={() => setShowChat(false)} />
-      )}
-      <div
-        className={`fixed right-0 top-12 bottom-0 z-[55] flex w-80 flex-col border-l border-zinc-200 bg-white transition-transform duration-200 dark:border-zinc-800 dark:bg-zinc-950 ${
-          showChat ? "translate-x-0" : "translate-x-full"
-        }`}
-      >
-        <TutorialChat
-          tutorialSlug={tutorialSlug}
-          onClose={() => setShowChat(false)}
-          stepContext={{
-            title: currentStep.title,
-            instruction: currentStep.instruction,
-            expectedOutput: currentStep.expectedOutput,
-            currentCode: code,
-          }}
-        />
-      </div>
 
       {/* ── Congratulations Modal ── */}
       {tutorialDone && (

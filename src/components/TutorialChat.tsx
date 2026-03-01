@@ -16,6 +16,7 @@ interface Props {
   tutorialSlug: string;
   onClose: () => void;
   stepContext: StepContext;
+  inline?: boolean;
 }
 
 function MessageBubble({ msg }: { msg: TutorialMessage }) {
@@ -67,7 +68,7 @@ function MessageBubble({ msg }: { msg: TutorialMessage }) {
   );
 }
 
-export default function TutorialChat({ tutorialSlug, onClose, stepContext }: Props) {
+export default function TutorialChat({ tutorialSlug, onClose, stepContext, inline = false }: Props) {
   const { user } = useAuth();
   const [messages, setMessages] = useState<TutorialMessage[]>([]);
   const [input, setInput] = useState("");
@@ -143,28 +144,30 @@ export default function TutorialChat({ tutorialSlug, onClose, stepContext }: Pro
 
   return (
     <div className="flex h-full flex-col">
-      {/* Header */}
-      <div className="flex shrink-0 items-center justify-between border-b border-zinc-200 px-4 py-3 dark:border-zinc-800">
-        <div className="flex items-center gap-2">
-          <div className="flex h-6 w-6 items-center justify-center rounded-full bg-indigo-600 text-[10px] font-bold text-white">AI</div>
-          <div>
-            <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">Community Chat</p>
-            <p className="text-[10px] text-zinc-400">Ask a question — uByte AI answers instantly</p>
+      {/* Header — hidden in inline mode */}
+      {!inline && (
+        <div className="flex shrink-0 items-center justify-between border-b border-zinc-200 px-4 py-3 dark:border-zinc-800">
+          <div className="flex items-center gap-2">
+            <div className="flex h-6 w-6 items-center justify-center rounded-full bg-indigo-600 text-[10px] font-bold text-white">AI</div>
+            <div>
+              <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">Community Chat</p>
+              <p className="text-[10px] text-zinc-400">Ask a question — uByte AI answers instantly</p>
+            </div>
           </div>
+          <button
+            onClick={onClose}
+            className="flex h-7 w-7 items-center justify-center rounded text-zinc-400 transition-colors hover:bg-zinc-100 hover:text-zinc-700 dark:hover:bg-zinc-800 dark:hover:text-zinc-200"
+            aria-label="Close chat"
+          >
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+              <line x1="1" y1="1" x2="13" y2="13" /><line x1="13" y1="1" x2="1" y2="13" />
+            </svg>
+          </button>
         </div>
-        <button
-          onClick={onClose}
-          className="flex h-7 w-7 items-center justify-center rounded text-zinc-400 transition-colors hover:bg-zinc-100 hover:text-zinc-700 dark:hover:bg-zinc-800 dark:hover:text-zinc-200"
-          aria-label="Close chat"
-        >
-          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-            <line x1="1" y1="1" x2="13" y2="13" /><line x1="13" y1="1" x2="1" y2="13" />
-          </svg>
-        </button>
-      </div>
+      )}
 
       {/* Messages */}
-      <div className="flex-1 space-y-3 overflow-y-auto p-4">
+      <div className={`space-y-3 overflow-y-auto p-3 ${inline ? "max-h-52" : "flex-1 p-4"}`}>
         {loading && (
           <p className="text-center text-xs text-zinc-400">Loading messages…</p>
         )}
@@ -203,8 +206,8 @@ export default function TutorialChat({ tutorialSlug, onClose, stepContext }: Pro
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder="Ask a question… (Enter to send)"
-              rows={2}
+              placeholder={inline ? "Ask a follow-up…" : "Ask a question… (Enter to send)"}
+              rows={inline ? 1 : 2}
               disabled={sending}
               className="flex-1 resize-none rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 placeholder-zinc-400 outline-none transition-colors focus:border-indigo-400 focus:ring-1 focus:ring-indigo-400 disabled:opacity-50 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100 dark:placeholder-zinc-500 dark:focus:border-indigo-500"
             />
