@@ -54,3 +54,12 @@ export interface ActivityItem {
   detail: string;
   created_at: string;
 }
+
+export interface Notification {
+  id: number;
+  type: string;
+  title: string;
+  message: string;
+  read: boolean;
+  created_at: string;
+}

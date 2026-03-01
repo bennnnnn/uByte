@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { updateUserPlan, getUserByPaddleCustomerId, getUserById } from "@/lib/db";
+import { updateUserPlan, getUserByPaddleCustomerId, getUserById, createNotification } from "@/lib/db";
 
 const WEBHOOK_SECRET = process.env.PADDLE_WEBHOOK_SECRET ?? "";
 
@@ -74,7 +74,10 @@ export async function POST(request: NextRequest) {
     case "subscription.activated": {
       const userId = customData?.["userId"];
       if (userId && paddleCustomerId) {
-        await updateUserPlan(parseInt(userId, 10), activatedPlan, paddleCustomerId);
+        const uid = parseInt(userId, 10);
+        await updateUserPlan(uid, activatedPlan, paddleCustomerId);
+        const planLabel = activatedPlan === "yearly" ? "Yearly Pro" : "Monthly Pro";
+        await createNotification(uid, "plan", `You're now on ${planLabel}!`, "All tutorials and features are now unlocked. Enjoy!");
       }
       break;
     }

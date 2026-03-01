@@ -7,10 +7,13 @@ import { apiFetch } from "@/lib/api-client";
 import ProfileHeader from "@/components/profile/ProfileHeader";
 import StatsRow from "@/components/profile/StatsRow";
 import OverviewTab from "@/components/profile/OverviewTab";
+import ProgressTab from "@/components/profile/ProgressTab";
+import PlanTab from "@/components/profile/PlanTab";
 import AchievementsTab from "@/components/profile/AchievementsTab";
+import NotificationsTab from "@/components/profile/NotificationsTab";
 import BookmarksTab from "@/components/profile/BookmarksTab";
 import SettingsTab from "@/components/profile/SettingsTab";
-import type { Profile, Stats, Badge, Achievement, Bookmark } from "@/components/profile/types";
+import type { Profile, Stats, Badge, Achievement, Bookmark, Notification } from "@/components/profile/types";
 
 export default function ProfilePageWrapper() {
   return (
@@ -23,7 +26,6 @@ export default function ProfilePageWrapper() {
 function ProfileSkeleton() {
   return (
     <div className="mx-auto max-w-4xl animate-pulse px-6 py-12">
-      {/* Header skeleton */}
       <div className="mb-8 flex items-start gap-5">
         <div className="h-16 w-16 rounded-full bg-zinc-200 dark:bg-zinc-800" />
         <div className="flex-1 space-y-2 pt-1">
@@ -32,7 +34,6 @@ function ProfileSkeleton() {
           <div className="h-3 w-72 rounded bg-zinc-200 dark:bg-zinc-800" />
         </div>
       </div>
-      {/* Stats skeleton */}
       <div className="mb-8 grid grid-cols-2 gap-4 sm:grid-cols-4">
         {[...Array(4)].map((_, i) => (
           <div key={i} className="rounded-xl border border-zinc-200 p-4 dark:border-zinc-800">
@@ -41,13 +42,7 @@ function ProfileSkeleton() {
           </div>
         ))}
       </div>
-      {/* Tabs skeleton */}
-      <div className="mb-6 flex gap-1 rounded-lg bg-zinc-100 p-1 dark:bg-zinc-900">
-        {[...Array(4)].map((_, i) => (
-          <div key={i} className="h-9 flex-1 rounded-md bg-zinc-200 dark:bg-zinc-800" />
-        ))}
-      </div>
-      {/* Content skeleton */}
+      <div className="mb-6 h-11 rounded-xl bg-zinc-100 dark:bg-zinc-900" />
       <div className="space-y-4">
         {[...Array(3)].map((_, i) => (
           <div key={i} className="h-20 rounded-xl bg-zinc-100 dark:bg-zinc-900" />
@@ -57,8 +52,18 @@ function ProfileSkeleton() {
   );
 }
 
-const VALID_TABS = ["overview", "achievements", "bookmarks", "settings"] as const;
+const VALID_TABS = ["overview", "progress", "plan", "achievements", "notifications", "bookmarks", "settings"] as const;
 type Tab = (typeof VALID_TABS)[number];
+
+const TAB_LABELS: Record<Tab, string> = {
+  overview: "Overview",
+  progress: "Progress",
+  plan: "Plan",
+  achievements: "Achievements",
+  notifications: "Notifications",
+  bookmarks: "Bookmarks",
+  settings: "Settings",
+};
 
 function ProfilePage() {
   const { user, loading, logout, logoutAll } = useAuth();
@@ -73,6 +78,8 @@ function ProfilePage() {
   const [bmHasMore, setBmHasMore] = useState(false);
   const [bmLoading, setBmLoading] = useState(false);
   const [bmTotal, setBmTotal] = useState(0);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [unreadCount, setUnreadCount] = useState(0);
   const [error, setError] = useState("");
 
   const paramTab = searchParams.get("tab") as Tab | null;
@@ -82,10 +89,11 @@ function ProfilePage() {
 
   const fetchProfile = useCallback(async () => {
     try {
-      const [profRes, statsRes, bmRes] = await Promise.all([
+      const [profRes, statsRes, bmRes, notifRes] = await Promise.all([
         fetch("/api/profile", { credentials: "same-origin" }),
         fetch("/api/profile/stats", { credentials: "same-origin" }),
         fetch("/api/bookmarks", { credentials: "same-origin" }),
+        fetch("/api/notifications", { credentials: "same-origin" }),
       ]);
 
       if (profRes.status === 401 || statsRes.status === 401) {
@@ -97,9 +105,12 @@ function ProfilePage() {
         return;
       }
 
-      const profData = await profRes.json();
-      const statsData = await statsRes.json();
-      const bmData = bmRes.ok ? await bmRes.json() : { bookmarks: [] };
+      const [profData, statsData, bmData, notifData] = await Promise.all([
+        profRes.json(),
+        statsRes.json(),
+        bmRes.ok ? bmRes.json() : { bookmarks: [] },
+        notifRes.ok ? notifRes.json() : { notifications: [], unreadCount: 0 },
+      ]);
 
       if (profData.profile) setProfile(profData.profile);
       if (statsData.stats) {
@@ -112,6 +123,10 @@ function ProfilePage() {
         setBmHasMore(bmData.hasMore ?? false);
         setBmTotal(bmData.total ?? 0);
       }
+      if (notifData.notifications) {
+        setNotifications(notifData.notifications);
+        setUnreadCount(notifData.unreadCount ?? 0);
+      }
     } catch (err) {
       console.error("Profile fetch error:", err);
       setError("Failed to load profile data.");
@@ -122,8 +137,6 @@ function ProfilePage() {
     if (!loading && !user) { router.push("/"); return; }
     if (user) startTransition(() => { void fetchProfile(); });
   }, [user, loading, router, fetchProfile]);
-
-  // --- Callbacks passed to child components ---
 
   const saveProfile = async (data: { name: string; bio: string; avatar: string; theme: string }): Promise<boolean> => {
     const res = await fetch("/api/profile", {
@@ -141,7 +154,6 @@ function ProfilePage() {
     return false;
   };
 
-  // Returns null on success, error string on failure
   const changePassword = async (currentPw: string, newPw: string): Promise<string | null> => {
     const res = await fetch("/api/profile", {
       method: "PUT",
@@ -163,7 +175,6 @@ function ProfilePage() {
   const resetProgress = async () => {
     const res = await apiFetch("/api/progress/reset", { method: "DELETE" });
     if (!res.ok) throw new Error("Reset failed");
-    // Refresh profile to reflect zeroed XP/streak
     await fetchProfile();
   };
 
@@ -193,7 +204,11 @@ function ProfilePage() {
     setBmLoading(false);
   };
 
-  // --- Render ---
+  const markNotificationsRead = async () => {
+    await fetch("/api/notifications", { method: "PATCH", credentials: "same-origin" });
+    setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
+    setUnreadCount(0);
+  };
 
   if (loading || (!profile && !error)) return <ProfileSkeleton />;
 
@@ -201,7 +216,9 @@ function ProfilePage() {
     return (
       <div className="flex h-full flex-col items-center justify-center gap-4">
         <p className="text-sm text-red-500">{error}</p>
-        <button onClick={fetchProfile} className="rounded-lg bg-indigo-700 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-800">Retry</button>
+        <button onClick={fetchProfile} className="rounded-lg bg-indigo-700 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-800">
+          Retry
+        </button>
       </div>
     );
   }
@@ -222,24 +239,45 @@ function ProfilePage() {
       <StatsRow stats={stats} />
 
       {/* Tabs */}
-      <div className="mb-6 flex gap-1 rounded-lg bg-zinc-100 p-1 dark:bg-zinc-900">
-        {VALID_TABS.map((t) => (
-          <button
-            key={t}
-            onClick={() => setTab(t)}
-            className={`flex-1 rounded-md px-3 py-2 text-sm font-medium capitalize transition-colors ${
-              tab === t
-                ? "bg-white text-zinc-900 shadow dark:bg-zinc-800 dark:text-zinc-100"
-                : "text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-300"
-            }`}
-          >
-            {t}
-          </button>
-        ))}
+      <div className="mb-6 overflow-x-auto">
+        <div className="flex min-w-max gap-1 rounded-xl bg-zinc-100 p-1 dark:bg-zinc-900">
+          {VALID_TABS.map((t) => (
+            <button
+              key={t}
+              onClick={() => setTab(t)}
+              className={`relative flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium whitespace-nowrap transition-colors ${
+                tab === t
+                  ? "bg-white text-zinc-900 shadow dark:bg-zinc-800 dark:text-zinc-100"
+                  : "text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-300"
+              }`}
+            >
+              {TAB_LABELS[t]}
+              {t === "notifications" && unreadCount > 0 && (
+                <span className="rounded-full bg-indigo-600 px-1.5 py-0.5 text-[10px] font-bold leading-none text-white">
+                  {unreadCount}
+                </span>
+              )}
+            </button>
+          ))}
+        </div>
       </div>
 
-      {tab === "overview" && <OverviewTab stats={stats} badges={badges} achievements={achievements} userId={profile.id} />}
-      {tab === "achievements" && <AchievementsTab badges={badges} achievements={achievements} />}
+      {/* Tab content */}
+      {tab === "overview" && (
+        <OverviewTab stats={stats} badges={badges} achievements={achievements} userId={profile.id} />
+      )}
+      {tab === "progress" && (
+        <ProgressTab stats={stats} userId={profile.id} />
+      )}
+      {tab === "plan" && (
+        <PlanTab plan={profile.plan} />
+      )}
+      {tab === "achievements" && (
+        <AchievementsTab badges={badges} achievements={achievements} />
+      )}
+      {tab === "notifications" && (
+        <NotificationsTab notifications={notifications} onMarkRead={markNotificationsRead} />
+      )}
       {tab === "bookmarks" && (
         <BookmarksTab
           bookmarks={bookmarks}
