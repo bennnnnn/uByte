@@ -12,6 +12,7 @@ import ThemeToggle from "@/components/ThemeToggle";
 import Avatar from "@/components/Avatar";
 import TutorialRating from "@/components/TutorialRating";
 import ShareButton from "@/components/ShareButton";
+import TutorialChat from "@/components/TutorialChat";
 
 interface Props {
   tutorialTitle: string;
@@ -86,6 +87,7 @@ export default function InteractiveTutorial({
   const [tutorialDone, setTutorialDone] = useState(false);
   const [countdown, setCountdown] = useState(3);
   const [showNav, setShowNav] = useState(false);
+  const [showChat, setShowChat] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [expandedSlug, setExpandedSlug] = useState<string>(tutorialSlug);
   const userMenuRef = useRef<HTMLDivElement>(null);
@@ -688,6 +690,20 @@ export default function InteractiveTutorial({
                 {bookmarked ? "Saved!" : "Bookmark"}
               </button>
             )}
+            <button
+              onClick={() => setShowChat((v) => !v)}
+              title="Community chat & AI tutor"
+              className={`flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-sm transition-colors ${
+                showChat
+                  ? "border-indigo-400 bg-indigo-50 text-indigo-600 dark:border-indigo-600 dark:bg-indigo-950/40 dark:text-indigo-400"
+                  : "border-zinc-300 text-zinc-500 hover:border-zinc-400 hover:text-zinc-800 dark:border-zinc-700 dark:text-zinc-400 dark:hover:border-zinc-600 dark:hover:text-zinc-200"
+              }`}
+            >
+              <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+                <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" />
+              </svg>
+              Chat
+            </button>
             <span className="ml-auto hidden text-xs text-zinc-400 dark:text-zinc-600 lg:block">
               Tab = indent · Ctrl+Enter = Run · Ctrl+Shift+Enter = Check
             </span>
@@ -829,6 +845,18 @@ export default function InteractiveTutorial({
             })}
           </ul>
         </nav>
+      </div>
+
+      {/* ── Chat Panel ── */}
+      {showChat && (
+        <div className="fixed inset-0 z-[54] bg-black/30" onClick={() => setShowChat(false)} />
+      )}
+      <div
+        className={`fixed right-0 top-12 bottom-0 z-[55] flex w-80 flex-col border-l border-zinc-200 bg-white transition-transform duration-200 dark:border-zinc-800 dark:bg-zinc-950 ${
+          showChat ? "translate-x-0" : "translate-x-full"
+        }`}
+      >
+        <TutorialChat tutorialSlug={tutorialSlug} onClose={() => setShowChat(false)} />
       </div>
 
       {/* ── Congratulations Modal ── */}
