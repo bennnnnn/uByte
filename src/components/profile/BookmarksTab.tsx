@@ -48,7 +48,7 @@ export default function BookmarksTab({ bookmarks, hasMore, total, onDelete, onLo
               <div className="mb-2 flex items-center justify-between">
                 <Link
                   href={`/golang/${bm.tutorial_slug}`}
-                  className="text-sm font-medium text-cyan-600 hover:text-cyan-700"
+                  className="text-sm font-medium text-indigo-600 hover:text-indigo-700"
                 >
                   {bm.tutorial_slug}
                 </Link>

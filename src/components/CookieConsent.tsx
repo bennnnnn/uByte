@@ -25,14 +25,14 @@ export default function CookieConsent() {
       <div className="mx-auto flex max-w-6xl flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between">
         <p className="text-sm text-zinc-600 dark:text-zinc-400">
           We use cookies to keep you signed in and remember your preferences.{" "}
-          <Link href="/privacy" className="underline hover:text-cyan-600">
+          <Link href="/privacy" className="underline hover:text-indigo-600">
             Privacy Policy
           </Link>
         </p>
         <div className="flex shrink-0 gap-2">
           <button
             onClick={accept}
-            className="rounded-lg bg-cyan-700 px-4 py-2 text-sm font-medium text-white hover:bg-cyan-800"
+            className="rounded-lg bg-indigo-700 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-800"
           >
             Accept
           </button>

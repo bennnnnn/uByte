@@ -84,7 +84,7 @@ export default function TermsPage() {
       </Section>
 
       <Section title="Governing Law">
-        <p>These Terms are governed by applicable law. Any disputes shall be resolved through good-faith negotiation. If you have a complaint, contact us at <a href="mailto:support@ubyte.dev" className="text-cyan-600 hover:underline">support@ubyte.dev</a>.</p>
+        <p>These Terms are governed by applicable law. Any disputes shall be resolved through good-faith negotiation. If you have a complaint, contact us at <a href="mailto:support@ubyte.dev" className="text-indigo-600 hover:underline">support@ubyte.dev</a>.</p>
       </Section>
     </div>
   );

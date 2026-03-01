@@ -93,7 +93,7 @@ export default function SharedPlaygroundPage() {
   if (loading) {
     return (
       <div className="flex h-screen items-center justify-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-zinc-200 border-t-cyan-500" />
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-zinc-200 border-t-indigo-500" />
       </div>
     );
   }
@@ -102,7 +102,7 @@ export default function SharedPlaygroundPage() {
     return (
       <div className="flex h-screen flex-col items-center justify-center gap-4">
         <p className="text-zinc-500">{error}</p>
-        <Link href="/playground" className="text-sm text-cyan-600 hover:text-cyan-700">Open Playground</Link>
+        <Link href="/playground" className="text-sm text-indigo-600 hover:text-indigo-700">Open Playground</Link>
       </div>
     );
   }
@@ -118,7 +118,7 @@ export default function SharedPlaygroundPage() {
           </Link>
           <span className="text-zinc-300 dark:text-zinc-700">/</span>
           <span className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">Shared Snippet</span>
-          <span className="rounded bg-cyan-100 px-1.5 py-0.5 text-[10px] font-semibold text-cyan-700 dark:bg-cyan-950 dark:text-cyan-400">
+          <span className="rounded bg-indigo-100 px-1.5 py-0.5 text-[10px] font-semibold text-indigo-700 dark:bg-indigo-950 dark:text-indigo-400">
             shared
           </span>
         </div>
@@ -141,12 +141,12 @@ export default function SharedPlaygroundPage() {
           </div>
           <div className="relative flex-1 overflow-hidden">
             <pre ref={preRef} aria-hidden className="pointer-events-none absolute inset-0 overflow-auto whitespace-pre py-4 pl-4 pr-8 text-zinc-100" dangerouslySetInnerHTML={{ __html: highlightGo(code) + "\n" }} />
-            <textarea ref={textareaRef} value={code} onChange={(e) => setCode(e.target.value)} onScroll={syncScroll} onKeyDown={handleKeyDown} spellCheck={false} autoCorrect="off" autoCapitalize="off" aria-label="Go code editor" className="absolute inset-0 resize-none overflow-auto whitespace-pre bg-transparent py-4 pl-4 pr-8 text-transparent caret-white outline-none selection:bg-cyan-900/50" />
+            <textarea ref={textareaRef} value={code} onChange={(e) => setCode(e.target.value)} onScroll={syncScroll} onKeyDown={handleKeyDown} spellCheck={false} autoCorrect="off" autoCapitalize="off" aria-label="Go code editor" className="absolute inset-0 resize-none overflow-auto whitespace-pre bg-transparent py-4 pl-4 pr-8 text-transparent caret-white outline-none selection:bg-indigo-900/50" />
           </div>
         </div>
 
         <div className="flex shrink-0 items-center gap-2 border-t border-zinc-200 bg-zinc-50 px-4 py-2 dark:border-zinc-800 dark:bg-zinc-900">
-          <button onClick={handleRun} disabled={running} title="Run (Ctrl+Enter)" className="flex items-center gap-1.5 rounded-md bg-cyan-700 px-4 py-1.5 text-sm font-medium text-white hover:bg-cyan-800 disabled:opacity-50">
+          <button onClick={handleRun} disabled={running} title="Run (Ctrl+Enter)" className="flex items-center gap-1.5 rounded-md bg-indigo-700 px-4 py-1.5 text-sm font-medium text-white hover:bg-indigo-800 disabled:opacity-50">
             {running ? "Running…" : "▶ Run"}
           </button>
           <span className="ml-auto hidden text-xs text-zinc-400 dark:text-zinc-600 lg:block">

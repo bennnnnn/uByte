@@ -48,7 +48,7 @@ export default async function CertificatePage({ params }: { params: Promise<{ us
       <div className="flex min-h-[60vh] items-center justify-center">
         <div className="text-center">
           <p className="mb-4 text-zinc-500">User not found.</p>
-          <Link href="/" className="text-sm text-cyan-600 hover:text-cyan-700">Back to tutorials</Link>
+          <Link href="/" className="text-sm text-indigo-600 hover:text-indigo-700">Back to tutorials</Link>
         </div>
       </div>
     );
@@ -66,11 +66,11 @@ export default async function CertificatePage({ params }: { params: Promise<{ us
           </p>
           <div className="mb-4 h-2 overflow-hidden rounded-full bg-zinc-200 dark:bg-zinc-800">
             <div
-              className="h-full rounded-full bg-cyan-500"
+              className="h-full rounded-full bg-indigo-500"
               style={{ width: `${(data.completedCount / data.totalTutorials) * 100}%` }}
             />
           </div>
-          <Link href="/" className="text-sm text-cyan-600 hover:text-cyan-700">Start learning</Link>
+          <Link href="/" className="text-sm text-indigo-600 hover:text-indigo-700">Start learning</Link>
         </div>
       </div>
     );
@@ -80,15 +80,15 @@ export default async function CertificatePage({ params }: { params: Promise<{ us
     <div className="flex min-h-[80vh] items-center justify-center px-4 py-12">
       <div className="w-full max-w-2xl">
         {/* Certificate card */}
-        <div className="rounded-2xl border-4 border-cyan-500 bg-white p-10 text-center shadow-2xl dark:border-cyan-600 dark:bg-zinc-900">
+        <div className="rounded-2xl border-4 border-indigo-500 bg-white p-10 text-center shadow-2xl dark:border-indigo-600 dark:bg-zinc-900">
           {/* Header decoration */}
           <div className="mb-6 flex items-center justify-center gap-3">
-            <div className="h-px flex-1 bg-cyan-200 dark:bg-cyan-800" />
+            <div className="h-px flex-1 bg-indigo-200 dark:bg-indigo-800" />
             <span className="text-3xl">🐹</span>
-            <div className="h-px flex-1 bg-cyan-200 dark:bg-cyan-800" />
+            <div className="h-px flex-1 bg-indigo-200 dark:bg-indigo-800" />
           </div>
 
-          <p className="mb-2 text-sm font-semibold uppercase tracking-widest text-cyan-600 dark:text-cyan-400">
+          <p className="mb-2 text-sm font-semibold uppercase tracking-widest text-indigo-600 dark:text-indigo-400">
             Certificate of Completion
           </p>
 
@@ -108,18 +108,18 @@ export default async function CertificatePage({ params }: { params: Promise<{ us
 
           {/* Footer decoration */}
           <div className="flex items-center justify-center gap-3">
-            <div className="h-px flex-1 bg-cyan-200 dark:bg-cyan-800" />
+            <div className="h-px flex-1 bg-indigo-200 dark:bg-indigo-800" />
             <p className="text-xs text-zinc-400">
               Issued {data.issuedAt ? formatDate(data.issuedAt) : ""}
             </p>
-            <div className="h-px flex-1 bg-cyan-200 dark:bg-cyan-800" />
+            <div className="h-px flex-1 bg-indigo-200 dark:bg-indigo-800" />
           </div>
         </div>
 
         {/* Share hint */}
         <p className="mt-6 text-center text-sm text-zinc-400">
           Share this page to show off your achievement.{" "}
-          <Link href="/" className="text-cyan-600 hover:text-cyan-700">
+          <Link href="/" className="text-indigo-600 hover:text-indigo-700">
             Back to tutorials
           </Link>
         </p>

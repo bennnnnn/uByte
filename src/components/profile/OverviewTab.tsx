@@ -19,7 +19,7 @@ export default function OverviewTab({ stats, badges, achievements, userId }: Pro
     <div>
       <h2 className="mb-4 text-lg font-semibold text-zinc-900 dark:text-zinc-100">Tutorial Progress</h2>
       <div className="mb-3 h-3 overflow-hidden rounded-full bg-zinc-200 dark:bg-zinc-800">
-        <div className="h-full rounded-full bg-cyan-600 transition-all" style={{ width: `${pct}%` }} />
+        <div className="h-full rounded-full bg-indigo-600 transition-all" style={{ width: `${pct}%` }} />
       </div>
       <p className="mb-2 text-sm text-zinc-500">
         {stats.completed_count} of {stats.total_tutorials} tutorials completed
@@ -29,7 +29,7 @@ export default function OverviewTab({ stats, badges, achievements, userId }: Pro
         <div className="mb-6 flex flex-wrap items-center gap-3">
           <Link
             href={`/certificate/${userId}`}
-            className="inline-flex items-center gap-2 rounded-lg bg-cyan-700 px-4 py-2 text-sm font-medium text-white hover:bg-cyan-800"
+            className="inline-flex items-center gap-2 rounded-lg bg-indigo-700 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-800"
           >
             View Certificate
           </Link>

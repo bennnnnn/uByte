@@ -36,21 +36,21 @@ export default function ContinueBanner({ tutorials }: { tutorials: Tutorial[] })
   const completedCount = tutorials.filter((t) => progress.includes(t.slug)).length;
 
   return (
-    <div className="mb-8 flex items-center justify-between rounded-xl border border-cyan-200 bg-cyan-50 px-5 py-3 dark:border-cyan-900 dark:bg-cyan-950/30">
+    <div className="mb-8 flex items-center justify-between rounded-xl border border-indigo-200 bg-indigo-50 px-5 py-3 dark:border-indigo-900 dark:bg-indigo-950/30">
       <div className="flex items-center gap-3">
         <span className="text-xl">📖</span>
         <div>
-          <p className="text-sm font-medium text-cyan-900 dark:text-cyan-200">
+          <p className="text-sm font-medium text-indigo-900 dark:text-indigo-200">
             Continue where you left off
           </p>
-          <p className="text-xs text-cyan-600 dark:text-cyan-400">
+          <p className="text-xs text-indigo-600 dark:text-indigo-400">
             {completedCount} of {tutorials.length} completed
           </p>
         </div>
       </div>
       <Link
         href={`/golang/${nextTutorial.slug}`}
-        className="rounded-lg bg-cyan-700 px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-cyan-800"
+        className="rounded-lg bg-indigo-700 px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-indigo-800"
       >
         {nextTutorial.title} →
       </Link>

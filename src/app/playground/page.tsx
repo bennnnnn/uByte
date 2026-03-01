@@ -190,7 +190,7 @@ export default function PlaygroundPage() {
               autoCorrect="off"
               autoCapitalize="off"
               aria-label="Go code editor"
-              className="absolute inset-0 resize-none overflow-auto whitespace-pre bg-transparent py-4 pl-4 pr-8 text-transparent caret-white outline-none selection:bg-cyan-900/50"
+              className="absolute inset-0 resize-none overflow-auto whitespace-pre bg-transparent py-4 pl-4 pr-8 text-transparent caret-white outline-none selection:bg-indigo-900/50"
             />
           </div>
         </div>
@@ -201,7 +201,7 @@ export default function PlaygroundPage() {
             onClick={handleRun}
             disabled={running}
             title="Run code (Ctrl+Enter)"
-            className="flex items-center gap-1.5 rounded-md bg-cyan-700 px-4 py-1.5 text-sm font-medium text-white transition-colors hover:bg-cyan-800 disabled:opacity-50"
+            className="flex items-center gap-1.5 rounded-md bg-indigo-700 px-4 py-1.5 text-sm font-medium text-white transition-colors hover:bg-indigo-800 disabled:opacity-50"
           >
             {running ? "Running…" : "▶ Run"}
           </button>
@@ -221,12 +221,12 @@ export default function PlaygroundPage() {
             onClick={handleShare}
             disabled={sharing}
             title="Share a link to this snippet"
-            className="rounded-md border border-zinc-300 px-3 py-1.5 text-sm text-zinc-500 transition-colors hover:border-cyan-400 hover:text-cyan-700 disabled:opacity-50 dark:border-zinc-700 dark:text-zinc-400 dark:hover:border-cyan-700 dark:hover:text-cyan-400"
+            className="rounded-md border border-zinc-300 px-3 py-1.5 text-sm text-zinc-500 transition-colors hover:border-indigo-400 hover:text-indigo-700 disabled:opacity-50 dark:border-zinc-700 dark:text-zinc-400 dark:hover:border-indigo-700 dark:hover:text-indigo-400"
           >
             {sharing ? "Sharing…" : "Share"}
           </button>
           {shareUrl && (
-            <span className="max-w-xs truncate text-xs text-cyan-600 dark:text-cyan-400" title={shareUrl}>
+            <span className="max-w-xs truncate text-xs text-indigo-600 dark:text-indigo-400" title={shareUrl}>
               Copied: {shareUrl}
             </span>
           )}

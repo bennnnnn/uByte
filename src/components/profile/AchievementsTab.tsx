@@ -17,7 +17,7 @@ export default function AchievementsTab({ badges, achievements }: Props) {
             key={badge.key}
             className={`rounded-xl border p-4 transition-colors ${
               unlocked
-                ? "border-cyan-200 bg-cyan-50/50 dark:border-cyan-900 dark:bg-cyan-950/30"
+                ? "border-indigo-200 bg-indigo-50/50 dark:border-indigo-900 dark:bg-indigo-950/30"
                 : "border-zinc-200 opacity-50 dark:border-zinc-800"
             }`}
           >
@@ -29,7 +29,7 @@ export default function AchievementsTab({ badges, achievements }: Props) {
               </div>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-xs text-cyan-600 dark:text-cyan-400">+{badge.xpReward} XP</span>
+              <span className="text-xs text-indigo-600 dark:text-indigo-400">+{badge.xpReward} XP</span>
               {unlocked && (
                 <span className="text-xs font-medium text-green-600 dark:text-green-400">Unlocked ✓</span>
               )}

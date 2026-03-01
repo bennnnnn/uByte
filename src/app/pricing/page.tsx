@@ -105,9 +105,9 @@ export default function PricingPage() {
         </div>
 
         {/* Pro */}
-        <div className="flex flex-col rounded-2xl border-2 border-cyan-500 bg-white p-8 shadow-lg dark:bg-zinc-900">
+        <div className="flex flex-col rounded-2xl border-2 border-indigo-500 bg-white p-8 shadow-lg dark:bg-zinc-900">
           <div className="mb-6">
-            <p className="mb-1 text-sm font-semibold uppercase tracking-wider text-cyan-600 dark:text-cyan-400">Pro</p>
+            <p className="mb-1 text-sm font-semibold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">Pro</p>
             <p className="text-4xl font-bold text-zinc-900 dark:text-zinc-100">$9<span className="text-lg font-normal text-zinc-400">/mo</span></p>
             <p className="mt-1 text-sm text-zinc-400">Cancel anytime</p>
           </div>
@@ -120,7 +120,7 @@ export default function PricingPage() {
               "Pro badge on leaderboard",
             ].map((f) => (
               <li key={f} className="flex items-center gap-2">
-                <svg className="h-4 w-4 shrink-0 text-cyan-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg className="h-4 w-4 shrink-0 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
                 </svg>
                 {f}
@@ -128,13 +128,13 @@ export default function PricingPage() {
             ))}
           </ul>
           {isPro ? (
-            <div className="rounded-xl bg-cyan-50 py-3 text-center text-sm font-semibold text-cyan-700 dark:bg-cyan-950 dark:text-cyan-300">
+            <div className="rounded-xl bg-indigo-50 py-3 text-center text-sm font-semibold text-indigo-700 dark:bg-indigo-950 dark:text-indigo-300">
               Current plan — Active
             </div>
           ) : !user ? (
             <Link
               href="/signup"
-              className="block rounded-xl bg-cyan-700 py-3 text-center text-sm font-semibold text-white transition-colors hover:bg-cyan-800"
+              className="block rounded-xl bg-indigo-700 py-3 text-center text-sm font-semibold text-white transition-colors hover:bg-indigo-800"
             >
               Sign up to upgrade
             </Link>
@@ -145,7 +145,7 @@ export default function PricingPage() {
           ) : (
             <button
               onClick={handleUpgrade}
-              className="rounded-xl bg-cyan-700 py-3 text-sm font-semibold text-white transition-colors hover:bg-cyan-800"
+              className="rounded-xl bg-indigo-700 py-3 text-sm font-semibold text-white transition-colors hover:bg-indigo-800"
             >
               Upgrade to Pro
             </button>

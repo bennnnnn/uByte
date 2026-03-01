@@ -47,7 +47,7 @@ export default function TutorialGrid({ tutorials }: { tutorials: Tutorial[] }) {
           </div>
           <div className="h-3 overflow-hidden rounded-full bg-zinc-200 dark:bg-zinc-800">
             <div
-              className="h-full rounded-full bg-cyan-600 transition-all duration-500"
+              className="h-full rounded-full bg-indigo-600 transition-all duration-500"
               style={{ width: `${(completedCount / totalCount) * 100}%` }}
             />
           </div>
@@ -69,7 +69,7 @@ export default function TutorialGrid({ tutorials }: { tutorials: Tutorial[] }) {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Search tutorials..."
-          className="w-full rounded-xl border border-zinc-200 bg-white py-2.5 pl-10 pr-4 text-sm text-zinc-900 placeholder-zinc-400 focus:border-cyan-500 focus:outline-none focus:ring-1 focus:ring-cyan-500 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:placeholder-zinc-500"
+          className="w-full rounded-xl border border-zinc-200 bg-white py-2.5 pl-10 pr-4 text-sm text-zinc-900 placeholder-zinc-400 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:placeholder-zinc-500"
         />
       </div>
 
@@ -88,14 +88,14 @@ export default function TutorialGrid({ tutorials }: { tutorials: Tutorial[] }) {
               <Link
                 key={tutorial.slug}
                 href={`/golang/${tutorial.slug}`}
-                className="group relative rounded-xl border border-zinc-200 p-5 transition-all hover:border-cyan-300 hover:shadow-md dark:border-zinc-800 dark:hover:border-cyan-800"
+                className="group relative rounded-xl border border-zinc-200 p-5 transition-all hover:border-indigo-300 hover:shadow-md dark:border-zinc-800 dark:hover:border-indigo-800"
               >
                 <div className="mb-2 flex items-center gap-3">
                   <span
                     className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-bold ${
                       isCompleted
                         ? "bg-green-100 text-green-700 dark:bg-green-950 dark:text-green-400"
-                        : "bg-cyan-50 text-cyan-700 dark:bg-cyan-950 dark:text-cyan-400"
+                        : "bg-indigo-50 text-indigo-700 dark:bg-indigo-950 dark:text-indigo-400"
                     }`}
                   >
                     {isCompleted ? (
@@ -106,7 +106,7 @@ export default function TutorialGrid({ tutorials }: { tutorials: Tutorial[] }) {
                       (query ? originalIndex : i) + 1
                     )}
                   </span>
-                  <h3 className="text-base font-semibold text-zinc-900 group-hover:text-cyan-700 dark:text-zinc-100 dark:group-hover:text-cyan-400">
+                  <h3 className="text-base font-semibold text-zinc-900 group-hover:text-indigo-700 dark:text-zinc-100 dark:group-hover:text-indigo-400">
                     {tutorial.title}
                   </h3>
                 </div>

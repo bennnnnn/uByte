@@ -104,9 +104,9 @@ export default function AuthButtons() {
                 <Link
                   href="/admin"
                   onClick={() => setMenuOpen(false)}
-                  className="flex items-center gap-3 px-4 py-2.5 text-sm text-cyan-700 transition-colors hover:bg-cyan-50 dark:text-cyan-400 dark:hover:bg-cyan-950/40"
+                  className="flex items-center gap-3 px-4 py-2.5 text-sm text-indigo-700 transition-colors hover:bg-indigo-50 dark:text-indigo-400 dark:hover:bg-indigo-950/40"
                 >
-                  <svg className="h-4 w-4 text-cyan-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
+                  <svg className="h-4 w-4 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
                   Admin
                 </Link>
               )}
@@ -164,7 +164,7 @@ export default function AuthButtons() {
     <>
       <div className="flex items-center gap-2">
         <button onClick={() => { setShowModal("login"); resetForm(); }} className="rounded-lg px-4 py-2 text-sm font-medium text-zinc-600 transition-colors hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-200">Log in</button>
-        <button onClick={() => { setShowModal("signup"); resetForm(); }} className="rounded-lg bg-cyan-700 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-cyan-800">Sign up</button>
+        <button onClick={() => { setShowModal("signup"); resetForm(); }} className="rounded-lg bg-indigo-700 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-indigo-800">Sign up</button>
       </div>
 
       {showModal && createPortal(
@@ -185,7 +185,7 @@ export default function AuthButtons() {
                   <div className="text-center">
                     <div className="mb-3 text-4xl">📬</div>
                     <p className="text-sm text-zinc-600 dark:text-zinc-400">If that email has an account, you&apos;ll receive a reset link shortly. Check your inbox.</p>
-                    <button onClick={() => { setShowModal("login"); resetForm(); }} className="mt-4 text-sm font-medium text-cyan-700 hover:text-cyan-800">
+                    <button onClick={() => { setShowModal("login"); resetForm(); }} className="mt-4 text-sm font-medium text-indigo-700 hover:text-indigo-800">
                       Back to log in
                     </button>
                   </div>
@@ -196,9 +196,9 @@ export default function AuthButtons() {
                     <form onSubmit={handleSubmit} className="space-y-4">
                       <div>
                         <label className="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300">Email</label>
-                        <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com" className="w-full rounded-lg border border-zinc-300 bg-white px-4 py-2.5 text-sm text-zinc-900 placeholder-zinc-400 focus:border-cyan-500 focus:outline-none focus:ring-1 focus:ring-cyan-500 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100" />
+                        <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com" className="w-full rounded-lg border border-zinc-300 bg-white px-4 py-2.5 text-sm text-zinc-900 placeholder-zinc-400 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100" />
                       </div>
-                      <button type="submit" disabled={submitting} className="w-full rounded-lg bg-cyan-700 py-2.5 text-sm font-medium text-white transition-colors hover:bg-cyan-800 disabled:opacity-50">
+                      <button type="submit" disabled={submitting} className="w-full rounded-lg bg-indigo-700 py-2.5 text-sm font-medium text-white transition-colors hover:bg-indigo-800 disabled:opacity-50">
                         {submitting ? "Sending..." : "Send reset link"}
                       </button>
                     </form>
@@ -237,34 +237,34 @@ export default function AuthButtons() {
                     {showModal === "signup" && (
                       <div>
                         <label className="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300">Name</label>
-                        <input type="text" required value={name} onChange={(e) => setName(e.target.value)} placeholder="Your name" className="w-full rounded-lg border border-zinc-300 bg-white px-4 py-2.5 text-sm text-zinc-900 placeholder-zinc-400 focus:border-cyan-500 focus:outline-none focus:ring-1 focus:ring-cyan-500 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100" />
+                        <input type="text" required value={name} onChange={(e) => setName(e.target.value)} placeholder="Your name" className="w-full rounded-lg border border-zinc-300 bg-white px-4 py-2.5 text-sm text-zinc-900 placeholder-zinc-400 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100" />
                       </div>
                     )}
                     <div>
                       <label className="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300">Email</label>
-                      <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com" className="w-full rounded-lg border border-zinc-300 bg-white px-4 py-2.5 text-sm text-zinc-900 placeholder-zinc-400 focus:border-cyan-500 focus:outline-none focus:ring-1 focus:ring-cyan-500 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100" />
+                      <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com" className="w-full rounded-lg border border-zinc-300 bg-white px-4 py-2.5 text-sm text-zinc-900 placeholder-zinc-400 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100" />
                     </div>
                     <div>
                       <div className="mb-1 flex items-center justify-between">
                         <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Password</label>
                         {showModal === "login" && (
-                          <button type="button" onClick={() => { setShowModal("forgot"); setError(""); }} className="text-xs text-cyan-700 hover:text-cyan-800">
+                          <button type="button" onClick={() => { setShowModal("forgot"); setError(""); }} className="text-xs text-indigo-700 hover:text-indigo-800">
                             Forgot password?
                           </button>
                         )}
                       </div>
-                      <input type="password" required minLength={8} value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" className="w-full rounded-lg border border-zinc-300 bg-white px-4 py-2.5 text-sm text-zinc-900 placeholder-zinc-400 focus:border-cyan-500 focus:outline-none focus:ring-1 focus:ring-cyan-500 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100" />
+                      <input type="password" required minLength={8} value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" className="w-full rounded-lg border border-zinc-300 bg-white px-4 py-2.5 text-sm text-zinc-900 placeholder-zinc-400 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100" />
                     </div>
-                    <button type="submit" disabled={submitting} className="w-full rounded-lg bg-cyan-700 py-2.5 text-sm font-medium text-white transition-colors hover:bg-cyan-800 disabled:opacity-50">
+                    <button type="submit" disabled={submitting} className="w-full rounded-lg bg-indigo-700 py-2.5 text-sm font-medium text-white transition-colors hover:bg-indigo-800 disabled:opacity-50">
                       {submitting ? "Please wait..." : showModal === "login" ? "Log in" : "Sign up"}
                     </button>
                   </form>
 
                   <p className="mt-4 text-center text-sm text-zinc-500">
                     {showModal === "login" ? (
-                      <>Don&apos;t have an account?{" "}<button onClick={() => { setShowModal("signup"); resetForm(); }} className="font-medium text-cyan-700 hover:text-cyan-800">Sign up</button></>
+                      <>Don&apos;t have an account?{" "}<button onClick={() => { setShowModal("signup"); resetForm(); }} className="font-medium text-indigo-700 hover:text-indigo-800">Sign up</button></>
                     ) : (
-                      <>Already have an account?{" "}<button onClick={() => { setShowModal("login"); resetForm(); }} className="font-medium text-cyan-700 hover:text-cyan-800">Log in</button></>
+                      <>Already have an account?{" "}<button onClick={() => { setShowModal("login"); resetForm(); }} className="font-medium text-indigo-700 hover:text-indigo-800">Log in</button></>
                     )}
                   </p>
                 </>

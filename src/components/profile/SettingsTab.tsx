@@ -139,7 +139,7 @@ export default function SettingsTab({ profile, plan = "free", onSave, onChangePa
             <input
               value={editName}
               onChange={(e) => setEditName(e.target.value)}
-              className="w-full rounded-lg border border-zinc-300 bg-white px-4 py-2.5 text-sm text-zinc-900 focus:border-cyan-500 focus:outline-none focus:ring-1 focus:ring-cyan-500 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"
+              className="w-full rounded-lg border border-zinc-300 bg-white px-4 py-2.5 text-sm text-zinc-900 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"
             />
           </div>
           <div>
@@ -149,7 +149,7 @@ export default function SettingsTab({ profile, plan = "free", onSave, onChangePa
               onChange={(e) => setEditBio(e.target.value)}
               maxLength={200}
               rows={2}
-              className="w-full rounded-lg border border-zinc-300 bg-white px-4 py-2.5 text-sm text-zinc-900 focus:border-cyan-500 focus:outline-none focus:ring-1 focus:ring-cyan-500 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"
+              className="w-full rounded-lg border border-zinc-300 bg-white px-4 py-2.5 text-sm text-zinc-900 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"
               placeholder="Tell us about yourself..."
             />
             <p className="mt-1 text-xs text-zinc-400">{editBio.length}/200</p>
@@ -165,7 +165,7 @@ export default function SettingsTab({ profile, plan = "free", onSave, onChangePa
                   aria-pressed={editAvatar === key}
                   className={`rounded-full ring-2 ring-offset-2 transition-all ${
                     editAvatar === key
-                      ? "ring-cyan-500"
+                      ? "ring-indigo-500"
                       : "ring-transparent hover:ring-zinc-300 dark:hover:ring-zinc-600"
                   }`}
                 >
@@ -183,7 +183,7 @@ export default function SettingsTab({ profile, plan = "free", onSave, onChangePa
                   onClick={() => { setEditTheme(t); applyTheme(t); }}
                   className={`flex items-center gap-2 rounded-lg border px-4 py-2 text-sm font-medium capitalize transition-colors ${
                     editTheme === t
-                      ? "border-cyan-500 bg-cyan-50 text-cyan-700 dark:bg-cyan-950 dark:text-cyan-300"
+                      ? "border-indigo-500 bg-indigo-50 text-indigo-700 dark:bg-indigo-950 dark:text-indigo-300"
                       : "border-zinc-300 text-zinc-600 hover:border-zinc-400 dark:border-zinc-700 dark:text-zinc-400 dark:hover:border-zinc-500"
                   }`}
                 >
@@ -195,7 +195,7 @@ export default function SettingsTab({ profile, plan = "free", onSave, onChangePa
           <button
             onClick={handleSave}
             disabled={saving}
-            className="rounded-lg bg-cyan-700 px-6 py-2.5 text-sm font-medium text-white hover:bg-cyan-800 disabled:opacity-50"
+            className="rounded-lg bg-indigo-700 px-6 py-2.5 text-sm font-medium text-white hover:bg-indigo-800 disabled:opacity-50"
           >
             {saving ? "Saving..." : "Save Changes"}
           </button>
@@ -236,7 +236,7 @@ export default function SettingsTab({ profile, plan = "free", onSave, onChangePa
                 value={currentPw}
                 onChange={(e) => setCurrentPw(e.target.value)}
                 placeholder="Current password"
-                className="w-full rounded-lg border border-zinc-300 bg-white px-4 py-2.5 text-sm text-zinc-900 focus:border-cyan-500 focus:outline-none focus:ring-1 focus:ring-cyan-500 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"
+                className="w-full rounded-lg border border-zinc-300 bg-white px-4 py-2.5 text-sm text-zinc-900 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"
               />
               <div>
                 <input
@@ -244,7 +244,7 @@ export default function SettingsTab({ profile, plan = "free", onSave, onChangePa
                   value={newPw}
                   onChange={(e) => setNewPw(e.target.value)}
                   placeholder="New password"
-                  className="w-full rounded-lg border border-zinc-300 bg-white px-4 py-2.5 text-sm text-zinc-900 focus:border-cyan-500 focus:outline-none focus:ring-1 focus:ring-cyan-500 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"
+                  className="w-full rounded-lg border border-zinc-300 bg-white px-4 py-2.5 text-sm text-zinc-900 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"
                 />
                 {newPw.length > 0 && (
                   <div className="mt-1.5">
@@ -273,7 +273,7 @@ export default function SettingsTab({ profile, plan = "free", onSave, onChangePa
         <div className="flex items-center gap-3">
           <span className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-wider ${
             plan === "pro"
-              ? "bg-cyan-100 text-cyan-700 dark:bg-cyan-900/40 dark:text-cyan-300"
+              ? "bg-indigo-100 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-300"
               : "bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400"
           }`}>
             {plan === "pro" ? "Pro" : "Free"}
@@ -281,7 +281,7 @@ export default function SettingsTab({ profile, plan = "free", onSave, onChangePa
           {plan !== "pro" && (
             <a
               href="/pricing"
-              className="text-sm font-medium text-cyan-700 hover:underline dark:text-cyan-400"
+              className="text-sm font-medium text-indigo-700 hover:underline dark:text-indigo-400"
             >
               Upgrade to Pro →
             </a>

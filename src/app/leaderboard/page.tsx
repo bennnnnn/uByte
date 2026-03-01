@@ -90,7 +90,7 @@ export default function LeaderboardPage() {
                 </div>
 
                 <div className="text-right">
-                  <p className="font-mono font-semibold text-cyan-600 dark:text-cyan-400">
+                  <p className="font-mono font-semibold text-indigo-600 dark:text-indigo-400">
                     {u.xp.toLocaleString()} XP
                   </p>
                 </div>

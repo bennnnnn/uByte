@@ -1,5 +1,5 @@
 const AVATARS: Record<string, { emoji: string; bg: string }> = {
-  gopher:  { emoji: "🐹", bg: "bg-cyan-100 dark:bg-cyan-950" },
+  gopher:  { emoji: "🐹", bg: "bg-indigo-100 dark:bg-indigo-950" },
   cool:    { emoji: "😎", bg: "bg-yellow-100 dark:bg-yellow-950" },
   ninja:   { emoji: "🥷", bg: "bg-zinc-200 dark:bg-zinc-800" },
   party:   { emoji: "🥳", bg: "bg-pink-100 dark:bg-pink-950" },

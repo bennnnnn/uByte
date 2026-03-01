@@ -98,7 +98,7 @@ export default function SignupWall({ slug }: { slug: string }) {
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="Your name"
-              className="w-full rounded-lg border border-zinc-300 bg-white px-4 py-2.5 text-sm text-zinc-900 placeholder-zinc-400 focus:border-cyan-500 focus:outline-none focus:ring-1 focus:ring-cyan-500 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"
+              className="w-full rounded-lg border border-zinc-300 bg-white px-4 py-2.5 text-sm text-zinc-900 placeholder-zinc-400 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"
             />
           )}
           <input
@@ -107,7 +107,7 @@ export default function SignupWall({ slug }: { slug: string }) {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="Email address"
-            className="w-full rounded-lg border border-zinc-300 bg-white px-4 py-2.5 text-sm text-zinc-900 placeholder-zinc-400 focus:border-cyan-500 focus:outline-none focus:ring-1 focus:ring-cyan-500 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"
+            className="w-full rounded-lg border border-zinc-300 bg-white px-4 py-2.5 text-sm text-zinc-900 placeholder-zinc-400 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"
           />
           <input
             type="password"
@@ -116,12 +116,12 @@ export default function SignupWall({ slug }: { slug: string }) {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             placeholder="Password (min. 6 characters)"
-            className="w-full rounded-lg border border-zinc-300 bg-white px-4 py-2.5 text-sm text-zinc-900 placeholder-zinc-400 focus:border-cyan-500 focus:outline-none focus:ring-1 focus:ring-cyan-500 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"
+            className="w-full rounded-lg border border-zinc-300 bg-white px-4 py-2.5 text-sm text-zinc-900 placeholder-zinc-400 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"
           />
           <button
             type="submit"
             disabled={submitting}
-            className="w-full rounded-lg bg-cyan-700 py-2.5 text-sm font-medium text-white transition-colors hover:bg-cyan-800 disabled:opacity-50"
+            className="w-full rounded-lg bg-indigo-700 py-2.5 text-sm font-medium text-white transition-colors hover:bg-indigo-800 disabled:opacity-50"
           >
             {submitting
               ? "Please wait..."
@@ -140,7 +140,7 @@ export default function SignupWall({ slug }: { slug: string }) {
                   setMode("signup");
                   resetForm();
                 }}
-                className="font-medium text-cyan-700 hover:text-cyan-800"
+                className="font-medium text-indigo-700 hover:text-indigo-800"
               >
                 Sign up
               </button>
@@ -153,7 +153,7 @@ export default function SignupWall({ slug }: { slug: string }) {
                   setMode("login");
                   resetForm();
                 }}
-                className="font-medium text-cyan-700 hover:text-cyan-800"
+                className="font-medium text-indigo-700 hover:text-indigo-800"
               >
                 Log in
               </button>
