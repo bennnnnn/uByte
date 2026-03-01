@@ -76,6 +76,7 @@ export default function InteractiveTutorial({
   const [stepIndex, setStepIndex] = useState(0);
   const [code, setCode] = useState(steps[0]?.starter ?? "");
   const [output, setOutput] = useState<string | null>(null);
+  const [outputIsError, setOutputIsError] = useState(false);
   const [status, setStatus] = useState<Status>("idle");
   const [showHint, setShowHint] = useState(false);
   const [completedSteps, setCompletedSteps] = useState<Set<number>>(new Set());
@@ -271,9 +272,11 @@ export default function InteractiveTutorial({
     setStatus("running"); setOutput(null);
     try {
       const { output: out, hasError } = await runCodeRequest(code);
+      setOutputIsError(hasError);
       setOutput(out || (hasError ? "Compilation error (see above)" : "(no output)"));
       setStatus("idle");
     } catch {
+      setOutputIsError(true);
       setOutput("Could not reach the Go compiler. Please try again.");
       setStatus("idle");
     }
@@ -283,6 +286,7 @@ export default function InteractiveTutorial({
     setStatus("running"); setOutput(null);
     try {
       const { output: out, hasError } = await runCodeRequest(code);
+      setOutputIsError(hasError);
       setOutput(out || (hasError ? "Compilation error" : "(no output)"));
       if (hasError) { setStatus("failed"); return; }
       if (checkOutput(out, currentStep.expectedOutput)) {
@@ -536,7 +540,7 @@ export default function InteractiveTutorial({
               onClick={handleRun}
               disabled={status === "running"}
               title="Run code (Ctrl+Enter)"
-              className="flex items-center gap-1.5 rounded-md bg-zinc-200 px-3 py-1.5 text-sm font-medium text-zinc-800 transition-colors hover:bg-zinc-300 disabled:opacity-50 dark:bg-zinc-700 dark:text-zinc-100 dark:hover:bg-zinc-600"
+              className="flex items-center gap-1.5 rounded-md bg-green-100 px-3 py-1.5 text-sm font-medium text-green-800 transition-colors hover:bg-green-200 disabled:opacity-50 dark:bg-green-900/40 dark:text-green-300 dark:hover:bg-green-900/70"
             >
               {status === "running" ? "Running…" : "▶ Run"}
             </button>
@@ -587,7 +591,7 @@ export default function InteractiveTutorial({
                 Click Run to execute, or Check to validate.
               </p>
             ) : (
-              <pre className="whitespace-pre-wrap text-zinc-800 dark:text-zinc-200">{output}</pre>
+              <pre className={`whitespace-pre-wrap ${outputIsError ? "text-red-600 dark:text-red-400" : "text-green-600 dark:text-green-400"}`}>{output}</pre>
             )}
             {status === "passed" && (
               <p className="mt-2 text-sm font-medium text-emerald-600 dark:text-emerald-400">
