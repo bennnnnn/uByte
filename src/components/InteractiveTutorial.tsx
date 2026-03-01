@@ -734,94 +734,82 @@ export default function InteractiveTutorial({
             className="flex h-7 w-7 items-center justify-center rounded text-zinc-400 transition-colors hover:bg-zinc-200 hover:text-zinc-700 dark:text-zinc-500 dark:hover:bg-zinc-800 dark:hover:text-zinc-200"
           >✕</button>
         </div>
-        <nav className="flex-1 overflow-y-auto py-2">
-          {allTutorials.map((t) => {
-            const isCurrent = t.slug === tutorialSlug;
-            const isDone = progress.includes(t.slug);
-            const isExpanded = expandedSlug === t.slug;
-            const subSteps = allTutorialSteps[t.slug] ?? [];
-            return (
-              <div key={t.slug}>
-                {/* Tutorial row — click title to navigate, chevron to expand */}
-                <div
-                  className={`flex items-center justify-between pr-2 transition-colors ${
-                    isCurrent
-                      ? "border-l-2 border-indigo-500 bg-indigo-50 dark:bg-indigo-950/40"
-                      : "border-l-2 border-transparent hover:bg-zinc-100 dark:hover:bg-zinc-800"
-                  }`}
-                >
+        <nav className="flex-1 overflow-y-auto px-3 py-3">
+          <ul className="space-y-0.5">
+            {allTutorials.map((t) => {
+              const isCurrent = t.slug === tutorialSlug;
+              const isDone = progress.includes(t.slug);
+              const isExpanded = expandedSlug === t.slug;
+              const subSteps = allTutorialSteps[t.slug] ?? [];
+              return (
+                <li key={t.slug}>
+                  {/* Main row — same style as Sidebar */}
                   <Link
                     href={`/golang/${t.slug}`}
-                    onClick={() => setShowNav(false)}
-                    className={`flex flex-1 flex-col py-2 pl-3.5 text-base ${
+                    onClick={() => {
+                      if (subSteps.length > 0) setExpandedSlug(isExpanded ? "" : t.slug);
+                      else setShowNav(false);
+                    }}
+                    className={`flex items-center justify-between rounded-lg px-3 py-2 text-sm transition-all duration-150 ${
                       isCurrent
-                        ? "text-indigo-700 dark:text-indigo-300"
-                        : "text-zinc-800 hover:text-zinc-900 dark:text-zinc-100 dark:hover:text-white"
+                        ? "bg-white font-semibold text-indigo-700 shadow-sm dark:bg-zinc-800 dark:text-indigo-400"
+                        : "font-medium text-zinc-800 hover:bg-zinc-200/70 hover:text-zinc-900 dark:text-zinc-200 dark:hover:bg-zinc-800 dark:hover:text-white"
                     }`}
                   >
-                    <span className="flex items-center gap-1">
-                      <span className="text-xs text-zinc-400 dark:text-zinc-500">{t.order}.</span>
-                      <span className="flex-1">{t.title}</span>
-                      {isDone && <span className="ml-1 shrink-0 text-xs text-emerald-500">✓</span>}
-                    </span>
-                    <span className="mt-0.5 pl-4 text-xs capitalize text-zinc-500 dark:text-zinc-400">
-                      {t.difficulty}
-                    </span>
-                  </Link>
-                  {subSteps.length > 0 && (
-                    <button
-                      onClick={() => setExpandedSlug(isExpanded ? "" : t.slug)}
-                      aria-label={isExpanded ? "Collapse" : "Expand"}
-                      className="flex h-7 w-7 shrink-0 items-center justify-center rounded text-zinc-400 transition-colors hover:bg-zinc-200 hover:text-zinc-700 dark:text-zinc-500 dark:hover:bg-zinc-700 dark:hover:text-zinc-200"
-                    >
-                      <svg
-                        width="12" height="12" viewBox="0 0 12 12" fill="none"
-                        stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"
-                        className={`transition-transform duration-150 ${isExpanded ? "rotate-90" : ""}`}
-                      >
-                        <polyline points="4 2 8 6 4 10" />
+                    <span className="flex-1 leading-snug">{t.title}</span>
+                    {isDone && !isCurrent && (
+                      <svg className="mr-1 h-3.5 w-3.5 shrink-0 text-emerald-500 dark:text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
                       </svg>
-                    </button>
-                  )}
-                </div>
+                    )}
+                    {subSteps.length > 0 && (
+                      <svg
+                        className={`h-3.5 w-3.5 shrink-0 transition-transform duration-200 ${isExpanded ? "rotate-90" : ""} ${isCurrent ? "text-indigo-500 dark:text-indigo-400" : "text-zinc-400 dark:text-zinc-500"}`}
+                        fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
+                      </svg>
+                    )}
+                  </Link>
 
-                {/* Sub-steps (accordion) */}
-                {isExpanded && subSteps.length > 0 && (
-                  <ul className="bg-zinc-100/60 dark:bg-zinc-800/40">
-                    {subSteps.map((step) => {
-                      const isActiveStep = isCurrent && step.index === stepIndex;
-                      const isStepDone = isCurrent && completedSteps.has(step.index);
-                      return (
-                        <li key={step.index}>
-                          {isCurrent ? (
-                            <button
-                              onClick={() => { goToStep(step.index); setShowNav(false); }}
-                              className={`flex w-full items-center justify-between py-2 pl-8 pr-3 text-left text-sm transition-colors ${
-                                isActiveStep
-                                  ? "bg-indigo-100 font-medium text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-300"
-                                  : "text-zinc-700 hover:bg-zinc-200 hover:text-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-700 dark:hover:text-white"
-                              }`}
-                            >
-                              <span>{step.title}</span>
-                              {isStepDone && <span className="shrink-0 text-emerald-500">✓</span>}
-                            </button>
-                          ) : (
-                            <Link
-                              href={`/golang/${t.slug}?step=${step.index}`}
-                              onClick={() => setShowNav(false)}
-                              className="flex w-full items-center py-2 pl-8 pr-3 text-sm text-zinc-700 transition-colors hover:bg-zinc-200 hover:text-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-700 dark:hover:text-white"
-                            >
-                              {step.title}
-                            </Link>
-                          )}
-                        </li>
-                      );
-                    })}
-                  </ul>
-                )}
-              </div>
-            );
-          })}
+                  {/* Sub-steps — same style as Sidebar subtopics */}
+                  {isExpanded && subSteps.length > 0 && (
+                    <ul className="ml-3 mt-0.5 space-y-0.5 border-l border-zinc-200 pl-3 dark:border-zinc-700">
+                      {subSteps.map((step) => {
+                        const isActiveStep = isCurrent && step.index === stepIndex;
+                        const isStepDone = isCurrent && completedSteps.has(step.index);
+                        return (
+                          <li key={step.index}>
+                            {isCurrent ? (
+                              <button
+                                onClick={() => { goToStep(step.index); setShowNav(false); }}
+                                className={`flex w-full items-center justify-between rounded-md px-2 py-1.5 text-xs transition-all duration-150 ${
+                                  isActiveStep
+                                    ? "font-medium text-indigo-600 dark:text-indigo-400"
+                                    : "text-zinc-400 hover:bg-zinc-200/70 hover:text-zinc-700 dark:text-zinc-500 dark:hover:bg-zinc-800 dark:hover:text-zinc-300"
+                                }`}
+                              >
+                                <span>{step.title}</span>
+                                {isStepDone && <span className="shrink-0 text-emerald-500 dark:text-emerald-400">✓</span>}
+                              </button>
+                            ) : (
+                              <Link
+                                href={`/golang/${t.slug}?step=${step.index}`}
+                                onClick={() => setShowNav(false)}
+                                className="block rounded-md px-2 py-1.5 text-xs text-zinc-400 transition-all duration-150 hover:bg-zinc-200/70 hover:text-zinc-700 dark:text-zinc-500 dark:hover:bg-zinc-800 dark:hover:text-zinc-300"
+                              >
+                                {step.title}
+                              </Link>
+                            )}
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  )}
+                </li>
+              );
+            })}
+          </ul>
         </nav>
       </div>
 
