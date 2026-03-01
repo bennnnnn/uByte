@@ -797,7 +797,7 @@ export default function InteractiveTutorial({
             <button
               onClick={() => setShowChat((v) => !v)}
               title="Community chat & AI tutor"
-              className={`flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-sm transition-colors ${
+              className={`ml-auto flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-sm transition-colors ${
                 showChat
                   ? "border-indigo-400 bg-indigo-50 text-indigo-600 dark:border-indigo-600 dark:bg-indigo-950/40 dark:text-indigo-400"
                   : "border-zinc-300 text-zinc-500 hover:border-zinc-400 hover:text-zinc-800 dark:border-zinc-700 dark:text-zinc-400 dark:hover:border-zinc-600 dark:hover:text-zinc-200"
@@ -808,9 +808,6 @@ export default function InteractiveTutorial({
               </svg>
               Chat
             </button>
-            <span className="ml-auto hidden text-xs text-zinc-400 dark:text-zinc-600 lg:block">
-              Tab = indent · Ctrl+Enter = Run · Ctrl+Shift+Enter = Check · Shift+Alt+F = Format
-            </span>
           </div>
 
           {/* ── Vertical resize handle ── */}
