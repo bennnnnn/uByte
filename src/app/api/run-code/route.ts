@@ -26,24 +26,36 @@ export async function POST(request: NextRequest) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         language: "go",
-        version: "*",
+        version: "1.16.2",
         files: [{ name: "main.go", content: code }],
       }),
     });
 
     const data = await response.json();
 
-    // Map Piston response to the shape CodePlayground.tsx expects
-    const compileErr: string = data.compile?.stderr ?? "";
-    const runErr: string = data.run?.stderr ?? "";
-    const stdout: string = data.run?.stdout ?? "";
-    const stderr = compileErr || runErr;
+    // Piston API-level error (e.g. runtime not found)
+    if (data.message) {
+      return NextResponse.json({ Errors: data.message });
+    }
 
-    if (stderr) {
-      return NextResponse.json({ Errors: stderr });
+    // Compile failure — use exit code, not presence of stderr
+    if (data.compile && data.compile.code !== 0) {
+      return NextResponse.json({ Errors: data.compile.stderr || data.compile.stdout || "Compilation failed" });
+    }
+
+    // Runtime output
+    const stdout: string = data.run?.stdout ?? "";
+    const runStderr: string = data.run?.stderr ?? "";
+    const runCode: number = data.run?.code ?? 0;
+
+    if (runCode !== 0 && runStderr) {
+      return NextResponse.json({ Errors: runStderr });
     }
     if (stdout) {
       return NextResponse.json({ Events: [{ Message: stdout }] });
+    }
+    if (runStderr) {
+      return NextResponse.json({ Events: [{ Message: runStderr }] });
     }
     return NextResponse.json({ Events: [] });
   } catch {
