@@ -21,43 +21,16 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const response = await fetch("https://emkc.org/api/v2/piston/execute", {
+    const body = new URLSearchParams({ version: "2", body: code, withVet: "true" });
+    const response = await fetch("https://go.dev/_/compile", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        language: "go",
-        version: "1.16.2",
-        files: [{ name: "main.go", content: code }],
-      }),
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: body.toString(),
     });
 
     const data = await response.json();
-
-    // Piston API-level error (e.g. runtime not found)
-    if (data.message) {
-      return NextResponse.json({ Errors: data.message });
-    }
-
-    // Compile failure — use exit code, not presence of stderr
-    if (data.compile && data.compile.code !== 0) {
-      return NextResponse.json({ Errors: data.compile.stderr || data.compile.stdout || "Compilation failed" });
-    }
-
-    // Runtime output
-    const stdout: string = data.run?.stdout ?? "";
-    const runStderr: string = data.run?.stderr ?? "";
-    const runCode: number = data.run?.code ?? 0;
-
-    if (runCode !== 0 && runStderr) {
-      return NextResponse.json({ Errors: runStderr });
-    }
-    if (stdout) {
-      return NextResponse.json({ Events: [{ Message: stdout }] });
-    }
-    if (runStderr) {
-      return NextResponse.json({ Events: [{ Message: runStderr }] });
-    }
-    return NextResponse.json({ Events: [] });
+    // Response is already { Errors?: string, Events?: { Message, Kind, Delay }[] }
+    return NextResponse.json(data);
   } catch {
     return NextResponse.json(
       { Errors: "Failed to compile code. Please try again." },

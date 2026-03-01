@@ -14,8 +14,8 @@ const securityHeaders = [
       "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://cdn.paddle.com",
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
       "font-src 'self' https://fonts.gstatic.com",
-      // Piston API (code execution) + Vercel Analytics
-      "connect-src 'self' https://emkc.org https://*.sentry.io https://va.vercel-scripts.com vitals.vercel-insights.com https://paddle.com https://*.paddle.com",
+      // Go Playground (code execution) + Vercel Analytics
+      "connect-src 'self' https://go.dev https://*.sentry.io https://va.vercel-scripts.com vitals.vercel-insights.com https://paddle.com https://*.paddle.com",
       // Google OAuth redirect
       "form-action 'self' https://accounts.google.com",
       "img-src 'self' data: https:",
