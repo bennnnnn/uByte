@@ -13,6 +13,8 @@ import Avatar from "@/components/Avatar";
 import TutorialRating from "@/components/TutorialRating";
 import ShareButton from "@/components/ShareButton";
 import TutorialChat from "@/components/TutorialChat";
+import UpgradeWall from "@/components/UpgradeWall";
+import { hasPaidAccess } from "@/lib/plans";
 
 interface Props {
   tutorialTitle: string;
@@ -24,6 +26,7 @@ interface Props {
   next: { slug: string; title: string } | null;
   currentOrder: number;
   totalTutorials: number;
+  isFree: boolean;
 }
 
 type Status = "idle" | "running" | "passed" | "failed";
@@ -78,8 +81,9 @@ export default function InteractiveTutorial({
   allTutorialSteps,
   prev,
   next,
+  isFree,
 }: Props) {
-  const { user, profile, toggleProgress, progress, logout } = useAuth();
+  const { user, profile, toggleProgress, progress, logout, loading } = useAuth();
   const router = useRouter();
 
   // ── Tutorial state ──
@@ -415,6 +419,11 @@ export default function InteractiveTutorial({
         No steps found for this tutorial.
       </div>
     );
+  }
+
+  // Gate locked tutorials — show upgrade wall for free users (wait for auth to load first)
+  if (!isFree && !loading && !hasPaidAccess(profile?.plan)) {
+    return <UpgradeWall tutorialTitle={tutorialTitle} />;
   }
 
   return (

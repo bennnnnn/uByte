@@ -1,11 +1,10 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import type { Metadata } from "next";
 import Link from "next/link";
 import { useAuth } from "@/components/AuthProvider";
+import { hasPaidAccess } from "@/lib/plans";
 
-// Paddle.js v2 types (minimal)
 declare global {
   interface Window {
     Paddle?: {
@@ -22,6 +21,7 @@ declare global {
 }
 
 const CLIENT_TOKEN = process.env.NEXT_PUBLIC_PADDLE_CLIENT_TOKEN ?? "";
+const EARLY_BIRD_PRICE_ID = process.env.NEXT_PUBLIC_PADDLE_EARLY_BIRD_PRICE_ID ?? "";
 const PRO_PRICE_ID = process.env.NEXT_PUBLIC_PADDLE_PRO_PRICE_ID ?? "";
 
 export default function PricingPage() {
@@ -30,7 +30,6 @@ export default function PricingPage() {
 
   useEffect(() => {
     if (!CLIENT_TOKEN || paddleReady.current) return;
-
     const script = document.createElement("script");
     script.src = "https://cdn.paddle.com/paddle/v2/paddle.js";
     script.onload = () => {
@@ -40,125 +39,128 @@ export default function PricingPage() {
       }
     };
     document.head.appendChild(script);
-
-    return () => {
-      document.head.removeChild(script);
-    };
+    return () => { document.head.removeChild(script); };
   }, []);
 
-  function handleUpgrade() {
-    if (!window.Paddle || !PRO_PRICE_ID) return;
+  function openCheckout(priceId: string) {
+    if (!window.Paddle || !priceId) return;
     window.Paddle.Checkout.open({
-      items: [{ priceId: PRO_PRICE_ID, quantity: 1 }],
+      items: [{ priceId, quantity: 1 }],
       customData: user ? { userId: String(user.id) } : undefined,
       customer: user ? { email: user.email } : undefined,
     });
   }
 
+  const isPaid = hasPaidAccess(profile?.plan);
+  const isEarlyBird = profile?.plan === "early_bird";
   const isPro = profile?.plan === "pro";
 
+  function PlanButton({ priceId, label }: { priceId: string; label: string }) {
+    if (!user) {
+      return (
+        <Link href="/" className="block rounded-xl bg-indigo-700 py-3 text-center text-sm font-semibold text-white transition-colors hover:bg-indigo-800">
+          Sign up to upgrade
+        </Link>
+      );
+    }
+    if (!priceId) {
+      return <div className="rounded-xl bg-zinc-100 py-3 text-center text-sm text-zinc-400 dark:bg-zinc-800">Coming soon</div>;
+    }
+    return (
+      <button onClick={() => openCheckout(priceId)} className="w-full rounded-xl bg-indigo-700 py-3 text-sm font-semibold text-white transition-colors hover:bg-indigo-800">
+        {label}
+      </button>
+    );
+  }
+
   return (
-    <div className="mx-auto max-w-4xl px-6 py-16">
+    <div className="mx-auto max-w-5xl px-6 py-16">
       <div className="mb-12 text-center">
         <h1 className="mb-3 text-4xl font-bold text-zinc-900 dark:text-zinc-100">Simple pricing</h1>
-        <p className="text-lg text-zinc-500 dark:text-zinc-400">
-          Learn Go for free. Upgrade for extra features.
-        </p>
+        <p className="text-lg text-zinc-500 dark:text-zinc-400">Start free. Upgrade when you&apos;re ready.</p>
       </div>
 
-      <div className="grid gap-8 md:grid-cols-2">
+      <div className="grid gap-6 md:grid-cols-3">
+
         {/* Free */}
-        <div className="flex flex-col rounded-2xl border border-zinc-200 bg-white p-8 dark:border-zinc-800 dark:bg-zinc-900">
-          <div className="mb-6">
-            <p className="mb-1 text-sm font-semibold uppercase tracking-wider text-zinc-500">Free</p>
-            <p className="text-4xl font-bold text-zinc-900 dark:text-zinc-100">$0</p>
-            <p className="mt-1 text-sm text-zinc-400">Forever free</p>
-          </div>
-          <ul className="mb-8 flex-1 space-y-3 text-sm text-zinc-600 dark:text-zinc-400">
-            {[
-              "All Go tutorials",
-              "Interactive code playground",
-              "Progress tracking",
-              "Leaderboard",
-              "Certificate of completion",
-            ].map((f) => (
+        <div className="flex flex-col rounded-2xl border border-zinc-200 bg-white p-7 dark:border-zinc-800 dark:bg-zinc-900">
+          <p className="mb-1 text-xs font-bold uppercase tracking-wider text-zinc-500">Free</p>
+          <p className="text-4xl font-bold text-zinc-900 dark:text-zinc-100">$0</p>
+          <p className="mt-1 mb-6 text-sm text-zinc-400">Forever free</p>
+          <ul className="mb-8 flex-1 space-y-2.5 text-sm text-zinc-600 dark:text-zinc-400">
+            {["First 5 tutorials", "Interactive code editor", "Progress tracking", "Leaderboard"].map((f) => (
               <li key={f} className="flex items-center gap-2">
-                <svg className="h-4 w-4 shrink-0 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
-                </svg>
+                <svg className="h-4 w-4 shrink-0 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" /></svg>
                 {f}
               </li>
             ))}
           </ul>
           {!user ? (
-            <Link
-              href="/signup"
-              className="block rounded-xl border border-zinc-300 py-3 text-center text-sm font-semibold text-zinc-700 transition-colors hover:bg-zinc-50 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800"
-            >
+            <Link href="/" className="block rounded-xl border border-zinc-300 py-3 text-center text-sm font-semibold text-zinc-700 transition-colors hover:bg-zinc-50 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800">
               Get started free
             </Link>
           ) : (
             <div className="rounded-xl border border-zinc-200 py-3 text-center text-sm font-semibold text-zinc-400 dark:border-zinc-700">
-              {isPro ? "Previous plan" : "Current plan"}
+              {isPaid ? "Previous plan" : "Current plan"}
             </div>
           )}
         </div>
 
-        {/* Pro */}
-        <div className="flex flex-col rounded-2xl border-2 border-indigo-500 bg-white p-8 shadow-lg dark:bg-zinc-900">
-          <div className="mb-6">
-            <p className="mb-1 text-sm font-semibold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">Pro</p>
-            <p className="text-4xl font-bold text-zinc-900 dark:text-zinc-100">$9<span className="text-lg font-normal text-zinc-400">/mo</span></p>
-            <p className="mt-1 text-sm text-zinc-400">Cancel anytime</p>
+        {/* Early Bird */}
+        <div className="relative flex flex-col rounded-2xl border-2 border-indigo-500 bg-white p-7 shadow-xl dark:bg-zinc-900">
+          <span className="absolute -top-3.5 left-1/2 -translate-x-1/2 rounded-full bg-indigo-600 px-3 py-1 text-xs font-bold text-white">
+            🔥 Limited time
+          </span>
+          <p className="mb-1 text-xs font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">Early Bird</p>
+          <div className="flex items-baseline gap-2">
+            <p className="text-4xl font-bold text-zinc-900 dark:text-zinc-100">$4.50<span className="text-lg font-normal text-zinc-400">/mo</span></p>
+            <span className="text-sm font-medium text-zinc-400 line-through">$9</span>
           </div>
-          <ul className="mb-8 flex-1 space-y-3 text-sm text-zinc-600 dark:text-zinc-400">
-            {[
-              "Everything in Free",
-              "Priority support",
-              "Early access to new languages",
-              "Remove view limits",
-              "Pro badge on leaderboard",
-            ].map((f) => (
+          <p className="mt-1 mb-6 text-sm font-medium text-indigo-600 dark:text-indigo-400">50% off — lock in forever</p>
+          <ul className="mb-8 flex-1 space-y-2.5 text-sm text-zinc-600 dark:text-zinc-400">
+            {["All 20 tutorials", "AI code feedback", "Community chat", "Certificate of completion", "Price locked forever"].map((f) => (
               <li key={f} className="flex items-center gap-2">
-                <svg className="h-4 w-4 shrink-0 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
-                </svg>
+                <svg className="h-4 w-4 shrink-0 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" /></svg>
+                {f}
+              </li>
+            ))}
+          </ul>
+          {isEarlyBird ? (
+            <div className="rounded-xl bg-indigo-50 py-3 text-center text-sm font-semibold text-indigo-700 dark:bg-indigo-950 dark:text-indigo-300">Current plan ✓</div>
+          ) : isPro ? (
+            <div className="rounded-xl border border-zinc-200 py-3 text-center text-sm text-zinc-400 dark:border-zinc-700">You&apos;re on Pro</div>
+          ) : (
+            <PlanButton priceId={EARLY_BIRD_PRICE_ID} label="Get Early Bird — $4.50/mo" />
+          )}
+        </div>
+
+        {/* Pro */}
+        <div className="flex flex-col rounded-2xl border border-zinc-200 bg-white p-7 dark:border-zinc-800 dark:bg-zinc-900">
+          <p className="mb-1 text-xs font-bold uppercase tracking-wider text-zinc-500">Pro</p>
+          <p className="text-4xl font-bold text-zinc-900 dark:text-zinc-100">$9<span className="text-lg font-normal text-zinc-400">/mo</span></p>
+          <p className="mt-1 mb-6 text-sm text-zinc-400">Cancel anytime</p>
+          <ul className="mb-8 flex-1 space-y-2.5 text-sm text-zinc-600 dark:text-zinc-400">
+            {["All 20 tutorials", "AI code feedback", "Community chat", "Certificate of completion", "Priority support"].map((f) => (
+              <li key={f} className="flex items-center gap-2">
+                <svg className="h-4 w-4 shrink-0 text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" /></svg>
                 {f}
               </li>
             ))}
           </ul>
           {isPro ? (
-            <div className="rounded-xl bg-indigo-50 py-3 text-center text-sm font-semibold text-indigo-700 dark:bg-indigo-950 dark:text-indigo-300">
-              Current plan — Active
-            </div>
-          ) : !user ? (
-            <Link
-              href="/signup"
-              className="block rounded-xl bg-indigo-700 py-3 text-center text-sm font-semibold text-white transition-colors hover:bg-indigo-800"
-            >
-              Sign up to upgrade
-            </Link>
-          ) : !PRO_PRICE_ID ? (
-            <div className="rounded-xl bg-zinc-100 py-3 text-center text-sm text-zinc-400 dark:bg-zinc-800">
-              Coming soon
-            </div>
+            <div className="rounded-xl bg-zinc-100 py-3 text-center text-sm font-semibold text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300">Current plan ✓</div>
+          ) : isEarlyBird ? (
+            <div className="rounded-xl border border-zinc-200 py-3 text-center text-sm text-zinc-400 dark:border-zinc-700">You&apos;re on Early Bird</div>
           ) : (
-            <button
-              onClick={handleUpgrade}
-              className="rounded-xl bg-indigo-700 py-3 text-sm font-semibold text-white transition-colors hover:bg-indigo-800"
-            >
-              Upgrade to Pro
-            </button>
+            <PlanButton priceId={PRO_PRICE_ID} label="Upgrade to Pro" />
           )}
         </div>
       </div>
 
       <p className="mt-8 text-center text-xs text-zinc-400">
-        Payments are processed securely by{" "}
-        <a href="https://paddle.com" target="_blank" rel="noopener noreferrer" className="hover:underline">
-          Paddle
-        </a>
-        . Paddle is the Merchant of Record — taxes handled automatically.
+        Payments processed securely by{" "}
+        <a href="https://paddle.com" target="_blank" rel="noopener noreferrer" className="hover:underline">Paddle</a>.
+        Taxes handled automatically.
       </p>
     </div>
   );

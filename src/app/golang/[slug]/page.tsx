@@ -7,6 +7,7 @@ import {
 import InteractiveTutorial from "@/components/InteractiveTutorial";
 import TutorialRating from "@/components/TutorialRating";
 import { allSteps } from "@/lib/tutorial-steps";
+import { FREE_TUTORIAL_LIMIT } from "@/lib/plans";
 import type { Metadata } from "next";
 
 export function generateStaticParams() {
@@ -115,6 +116,7 @@ export default async function TutorialPage({
         next={next ? { slug: next.slug, title: next.title } : null}
         currentOrder={tutorial.order}
         totalTutorials={allTutorials.length}
+        isFree={tutorial.order <= FREE_TUTORIAL_LIMIT}
       />
       <div className="px-6 pb-8">
         <TutorialRating tutorialSlug={slug} />
