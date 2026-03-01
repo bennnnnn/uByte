@@ -720,6 +720,22 @@ export async function getChatMessages(tutorialSlug: string, limit = 50): Promise
   return rows.map((r) => ({ ...r, is_ai: !!r.is_ai })) as TutorialMessage[];
 }
 
+export async function getChatParticipants(
+  tutorialSlug: string,
+  excludeUserId: number
+): Promise<number[]> {
+  await ensureChatTable();
+  const sql = getSql();
+  const rows = await sql`
+    SELECT DISTINCT user_id FROM tutorial_messages
+    WHERE tutorial_slug = ${tutorialSlug}
+      AND user_id IS NOT NULL
+      AND user_id != ${excludeUserId}
+      AND is_ai = FALSE
+  `;
+  return rows.map((r) => r.user_id as number);
+}
+
 export async function saveChatMessage(
   tutorialSlug: string,
   userId: number | null,

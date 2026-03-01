@@ -7,6 +7,7 @@ const TYPE_ICONS: Record<string, string> = {
   badge: "🏆",
   streak: "🔥",
   welcome: "👋",
+  chat: "💬",
   info: "ℹ️",
 };
 
