@@ -70,7 +70,7 @@ export default function MobileNav({ tutorials }: { tutorials: NavItem[] }) {
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Search lessons..."
-              className="w-full rounded-lg border border-zinc-200 bg-white py-2 pl-9 pr-8 text-sm text-zinc-700 placeholder-zinc-400 focus:border-cyan-500 focus:outline-none dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300 dark:placeholder-zinc-500"
+              className="w-full rounded-lg border border-zinc-200 bg-white py-2 pl-9 pr-8 text-sm text-zinc-700 placeholder-zinc-400 focus:border-indigo-500 focus:outline-none dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300 dark:placeholder-zinc-500"
             />
             {query && (
               <button
@@ -112,7 +112,7 @@ export default function MobileNav({ tutorials }: { tutorials: NavItem[] }) {
                       }}
                       className={`flex items-center justify-between rounded-lg px-3 py-2 text-sm transition-all duration-150 ${
                         isOnThisPage
-                          ? "bg-white font-semibold text-cyan-700 shadow-sm dark:bg-zinc-800 dark:text-cyan-400"
+                          ? "bg-white font-semibold text-indigo-700 shadow-sm dark:bg-zinc-800 dark:text-indigo-400"
                           : "font-medium text-zinc-800 hover:bg-zinc-200/70 hover:text-zinc-900 dark:text-zinc-200 dark:hover:bg-zinc-800"
                       }`}
                     >
@@ -125,7 +125,7 @@ export default function MobileNav({ tutorials }: { tutorials: NavItem[] }) {
                       {t.subtopics.length > 0 && (
                         <svg
                           className={`h-3.5 w-3.5 shrink-0 transition-transform duration-200 ${isExpanded ? "rotate-90" : ""} ${
-                            isOnThisPage ? "text-cyan-500 dark:text-cyan-400" : "text-zinc-400 dark:text-zinc-500"
+                            isOnThisPage ? "text-indigo-500 dark:text-indigo-400" : "text-zinc-400 dark:text-zinc-500"
                           }`}
                           fill="none"
                           viewBox="0 0 24 24"
@@ -148,7 +148,7 @@ export default function MobileNav({ tutorials }: { tutorials: NavItem[] }) {
                                 onClick={() => setOpen(false)}
                                 className={`block rounded-md px-2 py-1.5 text-xs transition-all duration-150 ${
                                   isSubActive
-                                    ? "font-medium text-cyan-600 dark:text-cyan-400"
+                                    ? "font-medium text-indigo-600 dark:text-indigo-400"
                                     : "text-zinc-400 hover:bg-zinc-200/70 hover:text-zinc-700 dark:text-zinc-500 dark:hover:bg-zinc-800 dark:hover:text-zinc-300"
                                 }`}
                               >
