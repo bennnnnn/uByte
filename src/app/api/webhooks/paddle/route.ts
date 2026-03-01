@@ -64,11 +64,11 @@ export async function POST(request: NextRequest) {
   const paddleCustomerId = data["customer_id"] as string | undefined;
   const status = data["status"] as string | undefined;
 
-  const earlyBirdPriceId = process.env.NEXT_PUBLIC_PADDLE_EARLY_BIRD_PRICE_ID;
+  const yearlyPriceId = process.env.NEXT_PUBLIC_PADDLE_YEARLY_PRICE_ID;
   const items = data["items"] as { price?: { id?: string } }[] | undefined;
   const purchasedPriceId = items?.[0]?.price?.id;
   const activatedPlan =
-    earlyBirdPriceId && purchasedPriceId === earlyBirdPriceId ? "early_bird" : "pro";
+    yearlyPriceId && purchasedPriceId === yearlyPriceId ? "yearly" : "pro";
 
   switch (event.event_type) {
     case "subscription.activated": {
