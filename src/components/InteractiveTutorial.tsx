@@ -278,11 +278,7 @@ export default function InteractiveTutorial({
   }
 
   function handleKeyDown(e: React.KeyboardEvent<HTMLTextAreaElement>) {
-    if (e.key === "F" && e.shiftKey && e.altKey) {
-      e.preventDefault();
-      handleFormat();
-      return;
-    }
+
     if (e.key === "Tab") {
       e.preventDefault();
       const ta = textareaRef.current!;
@@ -770,14 +766,7 @@ export default function InteractiveTutorial({
             >
               Reset
             </button>
-            <button
-              onClick={handleFormat}
-              disabled={formatting}
-              title="Format code (Shift+Alt+F)"
-              className="rounded-md border border-zinc-300 px-3 py-1.5 text-sm text-zinc-500 transition-colors hover:border-zinc-400 hover:text-zinc-800 disabled:opacity-40 dark:border-zinc-700 dark:text-zinc-400 dark:hover:border-zinc-600 dark:hover:text-zinc-200"
-            >
-              {formatting ? "Formatting…" : "Format"}
-            </button>
+
             {user && (
               <button
                 onClick={handleBookmark}
