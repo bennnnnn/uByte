@@ -8,6 +8,7 @@ import { hasPaidAccess } from "@/lib/plans";
 declare global {
   interface Window {
     Paddle?: {
+      Environment: { set: (env: "sandbox" | "production") => void };
       Setup: (opts: { token: string; eventCallback?: (ev: unknown) => void }) => void;
       Checkout: {
         open: (opts: {
@@ -34,6 +35,9 @@ export default function PricingPage() {
     script.src = "https://cdn.paddle.com/paddle/v2/paddle.js";
     script.onload = () => {
       if (window.Paddle) {
+        if (CLIENT_TOKEN.startsWith("test_")) {
+          window.Paddle.Environment.set("sandbox");
+        }
         window.Paddle.Setup({ token: CLIENT_TOKEN });
         paddleReady.current = true;
       }
