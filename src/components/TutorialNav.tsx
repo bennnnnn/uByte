@@ -33,7 +33,7 @@ export default function TutorialNav({
           <span className="text-xs text-zinc-400 group-hover:text-zinc-600 dark:group-hover:text-zinc-300">
             &larr; Previous
           </span>
-          <span className="font-medium text-zinc-700 group-hover:text-cyan-700 dark:text-zinc-300 dark:group-hover:text-cyan-400">
+          <span className="font-medium text-zinc-700 group-hover:text-indigo-700 dark:text-zinc-300 dark:group-hover:text-indigo-400">
             {prev.title}
           </span>
         </Link>
@@ -49,7 +49,7 @@ export default function TutorialNav({
           <span className="text-xs text-zinc-400 group-hover:text-zinc-600 dark:group-hover:text-zinc-300">
             Next &rarr;
           </span>
-          <span className="font-medium text-zinc-700 group-hover:text-cyan-700 dark:text-zinc-300 dark:group-hover:text-cyan-400">
+          <span className="font-medium text-zinc-700 group-hover:text-indigo-700 dark:text-zinc-300 dark:group-hover:text-indigo-400">
             {next.title}
           </span>
         </Link>
@@ -63,7 +63,7 @@ export default function TutorialNav({
             <span className="text-xs text-zinc-400 group-hover:text-zinc-600 dark:group-hover:text-zinc-300">
               Finish ✓
             </span>
-            <span className="font-medium text-zinc-700 group-hover:text-cyan-700 dark:text-zinc-300 dark:group-hover:text-cyan-400">
+            <span className="font-medium text-zinc-700 group-hover:text-indigo-700 dark:text-zinc-300 dark:group-hover:text-indigo-400">
               Mark as Complete
             </span>
           </button>

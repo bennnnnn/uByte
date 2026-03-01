@@ -39,7 +39,7 @@ function InstructionText({ text }: { text: string }) {
     <>
       {parts.map((part, i) =>
         part.startsWith("`") && part.endsWith("`") ? (
-          <code key={i} className="rounded bg-zinc-200 px-1 py-0.5 text-xs font-mono text-cyan-700 dark:bg-zinc-800 dark:text-cyan-300">
+          <code key={i} className="rounded bg-zinc-200 px-1 py-0.5 text-xs font-mono text-indigo-700 dark:bg-zinc-800 dark:text-indigo-300">
             {part.slice(1, -1)}
           </code>
         ) : (
@@ -365,7 +365,7 @@ export default function InteractiveTutorial({
           onClick={() => setMobileTab("instructions")}
           className={`flex-1 py-2 text-sm font-medium transition-colors ${
             mobileTab === "instructions"
-              ? "border-b-2 border-cyan-500 text-cyan-600 dark:text-cyan-400"
+              ? "border-b-2 border-indigo-500 text-indigo-600 dark:text-indigo-400"
               : "text-zinc-500 dark:text-zinc-400"
           }`}
         >
@@ -375,7 +375,7 @@ export default function InteractiveTutorial({
           onClick={() => setMobileTab("code")}
           className={`flex-1 py-2 text-sm font-medium transition-colors ${
             mobileTab === "code"
-              ? "border-b-2 border-cyan-500 text-cyan-600 dark:text-cyan-400"
+              ? "border-b-2 border-indigo-500 text-indigo-600 dark:text-indigo-400"
               : "text-zinc-500 dark:text-zinc-400"
           }`}
         >
@@ -395,7 +395,7 @@ export default function InteractiveTutorial({
           suppressHydrationWarning
         >
           <div className="flex-1 overflow-y-auto p-6">
-            <p className="mb-1 text-xs font-semibold uppercase tracking-widest text-cyan-600 dark:text-cyan-500">
+            <p className="mb-1 text-xs font-semibold uppercase tracking-widest text-indigo-600 dark:text-indigo-500">
               Step {stepIndex + 1} of {steps.length}
             </p>
             <h2 className="mb-4 text-lg font-bold text-zinc-900 dark:text-zinc-100">
@@ -411,14 +411,14 @@ export default function InteractiveTutorial({
               <div className="mt-6">
                 <button
                   onClick={() => setShowHint((v) => !v)}
-                  className="flex items-center gap-1.5 text-sm text-cyan-600 transition-colors hover:text-cyan-500 dark:text-cyan-500 dark:hover:text-cyan-400"
+                  className="flex items-center gap-1.5 text-sm text-indigo-600 transition-colors hover:text-indigo-500 dark:text-indigo-500 dark:hover:text-indigo-400"
                 >
                   <span>{showHint ? "▾" : "▸"}</span>
                   {showHint ? "Hide hint" : "Show hint"}
                 </button>
                 {showHint && (
-                  <div className="mt-2 rounded-lg border border-cyan-200 bg-cyan-50 p-3 dark:border-cyan-900 dark:bg-cyan-950/40">
-                    <code className="break-all text-xs text-cyan-700 dark:text-cyan-300">{currentStep.hint}</code>
+                  <div className="mt-2 rounded-lg border border-indigo-200 bg-indigo-50 p-3 dark:border-indigo-900 dark:bg-indigo-950/40">
+                    <code className="break-all text-xs text-indigo-700 dark:text-indigo-300">{currentStep.hint}</code>
                   </div>
                 )}
               </div>
@@ -474,7 +474,7 @@ export default function InteractiveTutorial({
                   aria-label={`Step ${i + 1}: ${s.title}${completedSteps.has(i) ? " (completed)" : ""}`}
                   onClick={() => goToStep(i)}
                   className={`h-2.5 w-2.5 rounded-full transition-colors ${
-                    i === stepIndex ? "bg-cyan-500"
+                    i === stepIndex ? "bg-indigo-500"
                     : completedSteps.has(i) ? "bg-emerald-500"
                     : "bg-zinc-300 hover:bg-zinc-400 dark:bg-zinc-600 dark:hover:bg-zinc-400"
                   }`}
@@ -487,7 +487,7 @@ export default function InteractiveTutorial({
         {/* ── Horizontal resize handle ── */}
         <div
           onMouseDown={startDragH}
-          className="group relative hidden w-1 shrink-0 cursor-col-resize bg-zinc-200 transition-colors hover:bg-cyan-400 dark:bg-zinc-800 dark:hover:bg-cyan-600 md:block"
+          className="group relative hidden w-1 shrink-0 cursor-col-resize bg-zinc-200 transition-colors hover:bg-indigo-400 dark:bg-zinc-800 dark:hover:bg-indigo-600 md:block"
         >
           <GripDots vertical />
         </div>
@@ -525,7 +525,7 @@ export default function InteractiveTutorial({
                 autoCorrect="off"
                 autoCapitalize="off"
                 aria-label="Code editor"
-                className="absolute inset-0 resize-none overflow-auto whitespace-pre bg-transparent py-4 pl-4 pr-8 text-transparent caret-white outline-none selection:bg-cyan-900/50"
+                className="absolute inset-0 resize-none overflow-auto whitespace-pre bg-transparent py-4 pl-4 pr-8 text-transparent caret-white outline-none selection:bg-indigo-900/50"
               />
             </div>
           </div>
@@ -544,7 +544,7 @@ export default function InteractiveTutorial({
               onClick={handleCheck}
               disabled={status === "running"}
               title="Check answer (Ctrl+Shift+Enter)"
-              className="flex items-center gap-1.5 rounded-md bg-cyan-700 px-3 py-1.5 text-sm font-medium text-white transition-colors hover:bg-cyan-800 disabled:opacity-50"
+              className="flex items-center gap-1.5 rounded-md bg-indigo-700 px-3 py-1.5 text-sm font-medium text-white transition-colors hover:bg-indigo-800 disabled:opacity-50"
             >
               ✓ Check
             </button>
@@ -568,7 +568,7 @@ export default function InteractiveTutorial({
           {/* ── Vertical resize handle ── */}
           <div
             onMouseDown={startDragV}
-            className="group relative h-1 shrink-0 cursor-row-resize bg-zinc-200 transition-colors hover:bg-cyan-400 dark:bg-zinc-800 dark:hover:bg-cyan-600"
+            className="group relative h-1 shrink-0 cursor-row-resize bg-zinc-200 transition-colors hover:bg-indigo-400 dark:bg-zinc-800 dark:hover:bg-indigo-600"
           >
             <GripDots />
           </div>
@@ -636,7 +636,7 @@ export default function InteractiveTutorial({
                 <div
                   className={`flex items-center justify-between pr-2 transition-colors ${
                     isCurrent
-                      ? "border-l-2 border-cyan-500 bg-cyan-50 dark:bg-cyan-950/40"
+                      ? "border-l-2 border-indigo-500 bg-indigo-50 dark:bg-indigo-950/40"
                       : "border-l-2 border-transparent hover:bg-zinc-100 dark:hover:bg-zinc-800"
                   }`}
                 >
@@ -645,7 +645,7 @@ export default function InteractiveTutorial({
                     onClick={() => setShowNav(false)}
                     className={`flex flex-1 flex-col py-2 pl-3.5 text-base ${
                       isCurrent
-                        ? "text-cyan-700 dark:text-cyan-300"
+                        ? "text-indigo-700 dark:text-indigo-300"
                         : "text-zinc-800 hover:text-zinc-900 dark:text-zinc-100 dark:hover:text-white"
                     }`}
                   >
@@ -688,7 +688,7 @@ export default function InteractiveTutorial({
                               onClick={() => { goToStep(step.index); setShowNav(false); }}
                               className={`flex w-full items-center justify-between py-2 pl-8 pr-3 text-left text-sm transition-colors ${
                                 isActiveStep
-                                  ? "bg-cyan-100 font-medium text-cyan-700 dark:bg-cyan-900/50 dark:text-cyan-300"
+                                  ? "bg-indigo-100 font-medium text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-300"
                                   : "text-zinc-700 hover:bg-zinc-200 hover:text-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-700 dark:hover:text-white"
                               }`}
                             >
@@ -744,11 +744,11 @@ export default function InteractiveTutorial({
                 url={typeof window !== "undefined" ? `${window.location.origin}/golang/${tutorialSlug}` : ""}
               />
               {next ? (
-                <Link href={`/golang/${next.slug}`} className="rounded-lg bg-cyan-700 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-cyan-800">
+                <Link href={`/golang/${next.slug}`} className="rounded-lg bg-indigo-700 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-indigo-800">
                   Next: {next.title} →
                 </Link>
               ) : (
-                <Link href="/" className="rounded-lg bg-cyan-700 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-cyan-800">
+                <Link href="/" className="rounded-lg bg-indigo-700 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-indigo-800">
                   All Tutorials
                 </Link>
               )}
