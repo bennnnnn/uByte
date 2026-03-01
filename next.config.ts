@@ -1,5 +1,6 @@
 import type { NextConfig } from "next";
 import { withSentryConfig } from "@sentry/nextjs";
+import path from "path";
 
 const securityHeaders = [
   { key: "X-Frame-Options",           value: "DENY" },
@@ -28,6 +29,18 @@ const nextConfig: NextConfig = {
   experimental: {
     optimizeCss: true,
     optimizePackageImports: ["@sentry/nextjs", "canvas-confetti"],
+  },
+  webpack(config, { isServer }) {
+    if (!isServer) {
+      config.resolve.alias = {
+        ...config.resolve.alias,
+        // polyfill-module.js contains inline polyfills for Array.at, Object.hasOwn, etc.
+        // All are natively supported by our target browsers (Chrome 93+, Safari 15.4+, Firefox 92+).
+        // Aliasing to false resolves to an empty webpack module, eliminating ~13 KiB.
+        [path.resolve("node_modules/next/dist/build/polyfills/polyfill-module.js")]: false,
+      };
+    }
+    return config;
   },
   compiler: {
     removeConsole: process.env.NODE_ENV === "production",
