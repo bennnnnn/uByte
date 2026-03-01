@@ -92,83 +92,76 @@ export default function MobileNav({ tutorials }: { tutorials: NavItem[] }) {
           <ul className="space-y-0.5">
             {(() => {
               const q = query.toLowerCase();
-              const filtered = tutorials
-                .map((t, i) => ({ t, i }))
-                .filter(({ t }) => t.title.toLowerCase().includes(q));
+              const filtered = tutorials.filter((t) => t.title.toLowerCase().includes(q));
               if (filtered.length === 0) {
                 return <li className="px-3 py-4 text-center text-xs text-zinc-400 dark:text-zinc-500">No lessons found</li>;
               }
-              return filtered.map(({ t, i }) => {
-              const href = `/golang/${t.slug}`;
-              const isOnThisPage = pathname === href;
-              const isExpanded = expanded === t.slug;
-              const isCompleted = progress.includes(t.slug);
-              return (
-                <li key={t.slug}>
-                  <div className="flex items-center">
+              return filtered.map((t) => {
+                const href = `/golang/${t.slug}`;
+                const isOnThisPage = pathname === href;
+                const isExpanded = expanded === t.slug;
+                const isCompleted = progress.includes(t.slug);
+                return (
+                  <li key={t.slug}>
+                    {/* Main topic row */}
                     <Link
                       href={href}
-                      onClick={() => setOpen(false)}
-                      className={`flex flex-1 items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-150 ${
+                      onClick={() => {
+                        if (t.subtopics.length > 0) toggleExpand(t.slug);
+                        else setOpen(false);
+                      }}
+                      className={`flex items-center justify-between rounded-lg px-3 py-2 text-sm transition-all duration-150 ${
                         isOnThisPage
-                          ? "bg-white font-semibold text-cyan-700 shadow-sm dark:bg-zinc-800 dark:text-cyan-300"
-                          : "text-zinc-700 hover:bg-zinc-200/70 hover:text-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800"
+                          ? "bg-white font-semibold text-cyan-700 shadow-sm dark:bg-zinc-800 dark:text-cyan-400"
+                          : "font-medium text-zinc-800 hover:bg-zinc-200/70 hover:text-zinc-900 dark:text-zinc-200 dark:hover:bg-zinc-800"
                       }`}
                     >
-                      <span className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-bold ${
-                        isCompleted
-                          ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/60 dark:text-emerald-400"
-                          : isOnThisPage
-                          ? "bg-cyan-100 text-cyan-700 dark:bg-cyan-900/60 dark:text-cyan-300"
-                          : "bg-zinc-200 text-zinc-600 dark:bg-zinc-700 dark:text-zinc-300"
-                      }`}>
-                        {isCompleted ? "✓" : i + 1}
-                      </span>
-                      {t.title}
-                    </Link>
-                    {t.subtopics.length > 0 && (
-                      <button
-                        onClick={() => toggleExpand(t.slug)}
-                        className="mr-1 rounded p-1 text-zinc-400 transition-colors hover:bg-zinc-200 hover:text-zinc-600 dark:text-zinc-500 dark:hover:bg-zinc-700"
-                      >
+                      <span className="flex-1 leading-snug">{t.title}</span>
+                      {isCompleted && !isOnThisPage && (
+                        <svg className="mr-1 h-3.5 w-3.5 shrink-0 text-emerald-500 dark:text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                        </svg>
+                      )}
+                      {t.subtopics.length > 0 && (
                         <svg
-                          className={`h-3.5 w-3.5 transition-transform duration-200 ${isExpanded ? "rotate-90" : ""}`}
+                          className={`h-3.5 w-3.5 shrink-0 transition-transform duration-200 ${isExpanded ? "rotate-90" : ""} ${
+                            isOnThisPage ? "text-cyan-500 dark:text-cyan-400" : "text-zinc-400 dark:text-zinc-500"
+                          }`}
                           fill="none"
                           viewBox="0 0 24 24"
                           stroke="currentColor"
                         >
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
                         </svg>
-                      </button>
-                    )}
-                  </div>
+                      )}
+                    </Link>
 
-                  {/* Sub-topics — indented under the topic title */}
-                  {isExpanded && t.subtopics.length > 0 && (
-                    <ul className="ml-[2.85rem] mt-0.5 space-y-0.5 border-l-2 border-zinc-200 pl-3 dark:border-zinc-700">
-                      {t.subtopics.map((sub) => {
-                        const isSubActive = isOnThisPage && activeHash === sub.id;
-                        return (
-                          <li key={sub.id}>
-                            <Link
-                              href={`${href}#${sub.id}`}
-                              onClick={() => setOpen(false)}
-                              className={`block rounded-md px-2 py-1.5 text-sm transition-all duration-150 ${
-                                isSubActive
-                                  ? "bg-cyan-50 font-semibold text-cyan-700 dark:bg-cyan-900/40 dark:text-cyan-300"
-                                  : "text-zinc-500 hover:bg-zinc-200/70 hover:text-zinc-800 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-200"
-                              }`}
-                            >
-                              {sub.title}
-                            </Link>
-                          </li>
-                        );
-                      })}
-                    </ul>
-                  )}
-                </li>
-              );
-            });
+                    {/* Sub-topics */}
+                    {isExpanded && t.subtopics.length > 0 && (
+                      <ul className="ml-3 mt-0.5 space-y-0.5 border-l border-zinc-200 pl-3 dark:border-zinc-700">
+                        {t.subtopics.map((sub) => {
+                          const isSubActive = isOnThisPage && activeHash === sub.id;
+                          return (
+                            <li key={sub.id}>
+                              <Link
+                                href={`${href}#${sub.id}`}
+                                onClick={() => setOpen(false)}
+                                className={`block rounded-md px-2 py-1.5 text-xs transition-all duration-150 ${
+                                  isSubActive
+                                    ? "font-medium text-cyan-600 dark:text-cyan-400"
+                                    : "text-zinc-400 hover:bg-zinc-200/70 hover:text-zinc-700 dark:text-zinc-500 dark:hover:bg-zinc-800 dark:hover:text-zinc-300"
+                                }`}
+                              >
+                                {sub.title}
+                              </Link>
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    )}
+                  </li>
+                );
+              });
             })()}
           </ul>
         </nav>
