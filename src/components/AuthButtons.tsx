@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import { createPortal } from "react-dom";
 import Link from "next/link";
 import { useAuth } from "./AuthProvider";
 import Avatar from "./Avatar";
@@ -166,7 +167,7 @@ export default function AuthButtons() {
         <button onClick={() => { setShowModal("signup"); resetForm(); }} className="rounded-lg bg-cyan-700 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-cyan-800">Sign up</button>
       </div>
 
-      {showModal && (
+      {showModal && createPortal(
         <div className="fixed inset-0 z-50 overflow-y-auto bg-black/50 backdrop-blur-sm">
           <div className="flex min-h-full items-center justify-center p-4">
             <div className="w-full max-w-md rounded-2xl bg-white p-8 shadow-xl dark:bg-zinc-900">
@@ -270,7 +271,8 @@ export default function AuthButtons() {
               )}
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </>
   );
