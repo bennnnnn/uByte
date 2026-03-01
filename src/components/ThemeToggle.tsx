@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useAuth } from "@/components/AuthProvider";
+import { apiFetch } from "@/lib/api-client";
 
 function getStoredTheme(): "light" | "dark" {
   if (typeof window === "undefined") return "dark";
@@ -18,12 +20,11 @@ export function applyTheme(theme: "light" | "dark") {
 
 export default function ThemeToggle({ className }: { className?: string }) {
   const [theme, setTheme] = useState<"light" | "dark">("dark");
+  const { user } = useAuth();
 
   useEffect(() => {
     const t = getStoredTheme();
     setTheme(t);
-    // Re-apply the html class in case the inline script in layout.tsx didn't run
-    // (e.g., during development HMR or unusual render paths).
     document.documentElement.classList.remove("light", "dark");
     document.documentElement.classList.add(t);
   }, []);
@@ -32,6 +33,15 @@ export default function ThemeToggle({ className }: { className?: string }) {
     const next = theme === "dark" ? "light" : "dark";
     setTheme(next);
     applyTheme(next);
+
+    // Persist to DB for logged-in users
+    if (user) {
+      apiFetch("/api/profile", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ theme: next }),
+      }).catch(() => {});
+    }
   }
 
   return (
