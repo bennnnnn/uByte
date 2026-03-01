@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useMemo } from "react";
+import { useState, useRef, useMemo, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { highlightGo } from "@/lib/highlight-go";
 import { useAuth } from "./AuthProvider";
@@ -10,10 +10,34 @@ interface CodePlaygroundProps {
   title?: string;
 }
 
+// Stable short hash of initial code — used as storage key when no title is provided
+function codeHash(str: string): string {
+  let h = 0;
+  for (let i = 0; i < Math.min(str.length, 200); i++) {
+    h = (Math.imul(31, h) + str.charCodeAt(i)) | 0;
+  }
+  return Math.abs(h).toString(36);
+}
+
 export default function CodePlayground({ code: initialCode, title }: CodePlaygroundProps) {
   const pathname = usePathname();
   const { user } = useAuth();
-  const [code, setCode] = useState(initialCode);
+
+  const storageKey = `pg:${pathname}:${title ?? codeHash(initialCode)}`;
+
+  const [code, setCode] = useState<string>(() => {
+    if (typeof window === "undefined") return initialCode;
+    return localStorage.getItem(storageKey) ?? initialCode;
+  });
+
+  // Persist user edits; remove entry when code matches the original (reset)
+  useEffect(() => {
+    if (code === initialCode) {
+      localStorage.removeItem(storageKey);
+    } else {
+      localStorage.setItem(storageKey, code);
+    }
+  }, [code, storageKey, initialCode]);
   const [output, setOutput] = useState<string | null>(null);
   const [isRunning, setIsRunning] = useState(false);
   const [copied, setCopied] = useState(false);
