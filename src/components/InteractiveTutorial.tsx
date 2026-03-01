@@ -7,6 +7,7 @@ import confetti from "canvas-confetti";
 import type { TutorialStep } from "@/lib/tutorial-steps";
 import { highlightGo } from "@/lib/highlight-go";
 import { useAuth } from "@/components/AuthProvider";
+import { apiFetch } from "@/lib/api-client";
 import ThemeToggle from "@/components/ThemeToggle";
 import Avatar from "@/components/Avatar";
 import TutorialRating from "@/components/TutorialRating";
@@ -80,7 +81,7 @@ export default function InteractiveTutorial({
   const [status, setStatus] = useState<Status>("idle");
   const [showHint, setShowHint] = useState(false);
   const [completedSteps, setCompletedSteps] = useState<Set<number>>(new Set());
-  const [copied, setCopied] = useState(false);
+  const [bookmarked, setBookmarked] = useState(false);
   const [failCount, setFailCount] = useState(0);
   const [tutorialDone, setTutorialDone] = useState(false);
   const [countdown, setCountdown] = useState(3);
@@ -319,9 +320,16 @@ export default function InteractiveTutorial({
 
   function handleReset() { setCode(currentStep.starter); setOutput(null); setStatus("idle"); }
 
-  async function handleCopy() {
-    try { await navigator.clipboard.writeText(code); setCopied(true); setTimeout(() => setCopied(false), 2000); }
-    catch { /* ignore */ }
+  async function handleBookmark() {
+    if (!user) return;
+    try {
+      const res = await apiFetch("/api/bookmarks", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ tutorialSlug, snippet: code, note: currentStep.title }),
+      });
+      if (res.ok) { setBookmarked(true); setTimeout(() => setBookmarked(false), 2000); }
+    } catch { /* ignore */ }
   }
 
   if (!currentStep) {
@@ -664,12 +672,22 @@ export default function InteractiveTutorial({
             >
               Reset
             </button>
-            <button
-              onClick={handleCopy}
-              className="rounded-md border border-zinc-300 px-3 py-1.5 text-sm text-zinc-500 transition-colors hover:border-zinc-400 hover:text-zinc-800 dark:border-zinc-700 dark:text-zinc-400 dark:hover:border-zinc-600 dark:hover:text-zinc-200"
-            >
-              {copied ? "Copied!" : "Copy"}
-            </button>
+            {user && (
+              <button
+                onClick={handleBookmark}
+                title="Bookmark this code to your profile"
+                className={`flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-sm transition-colors ${
+                  bookmarked
+                    ? "border-indigo-400 text-indigo-600 dark:border-indigo-600 dark:text-indigo-400"
+                    : "border-zinc-300 text-zinc-500 hover:border-zinc-400 hover:text-zinc-800 dark:border-zinc-700 dark:text-zinc-400 dark:hover:border-zinc-600 dark:hover:text-zinc-200"
+                }`}
+              >
+                <svg className="h-3.5 w-3.5" fill={bookmarked ? "currentColor" : "none"} viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+                </svg>
+                {bookmarked ? "Saved!" : "Bookmark"}
+              </button>
+            )}
             <span className="ml-auto hidden text-xs text-zinc-400 dark:text-zinc-600 lg:block">
               Tab = indent · Ctrl+Enter = Run · Ctrl+Shift+Enter = Check
             </span>
