@@ -54,17 +54,23 @@ export default function AdminPage() {
     if (!user) { router.push("/"); return; }
 
     Promise.all([
-      fetch("/api/admin/users", { credentials: "same-origin" }).then((r) => {
+      fetch("/api/admin/users", { credentials: "same-origin" }).then(async (r) => {
         if (r.status === 403) { router.push("/"); return null; }
-        return r.json();
+        const data = await r.json();
+        if (!r.ok) throw new Error(data.error ?? `HTTP ${r.status}`);
+        return data;
       }),
-      fetch("/api/admin/users?view=analytics", { credentials: "same-origin" }).then((r) => r.json()),
+      fetch("/api/admin/users?view=analytics", { credentials: "same-origin" }).then(async (r) => {
+        const data = await r.json();
+        if (!r.ok) return { analytics: [] };
+        return data;
+      }),
     ])
       .then(([userData, analyticsData]) => {
         if (userData) setUsers(userData.users ?? []);
         setAnalytics(analyticsData.analytics ?? []);
       })
-      .catch((err) => setError(err.message))
+      .catch((err) => setError(String(err.message ?? err)))
       .finally(() => setFetching(false));
   }, [user, loading, router]);
 

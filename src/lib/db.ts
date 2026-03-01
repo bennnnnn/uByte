@@ -425,14 +425,18 @@ export async function getAdminUsers(): Promise<AdminUserRow[]> {
   const sql = getSql();
   const rows = await sql`
     SELECT
-      u.id, u.name, u.email, u.xp, u.streak_days, u.created_at, u.last_active_at, u.is_admin,
-      (u.locked_until IS NOT NULL AND u.locked_until > NOW()) AS banned,
+      u.id, u.name, u.email, u.xp, u.streak_days, u.created_at, u.last_active_at,
+      u.is_admin, u.locked_until,
       (SELECT COUNT(*)::int FROM progress WHERE user_id = u.id) AS completed_count,
       (SELECT COUNT(*)::int FROM bookmarks WHERE user_id = u.id) AS bookmark_count
     FROM users u
     ORDER BY u.created_at DESC
   `;
-  return rows.map((r) => ({ ...r, banned: r.banned === true || r.banned === 1 })) as AdminUserRow[];
+  const now = new Date();
+  return rows.map((r) => ({
+    ...r,
+    banned: !!r.locked_until && new Date(r.locked_until as string) > now,
+  })) as AdminUserRow[];
 }
 
 export async function adminDeleteUser(userId: number): Promise<void> {
