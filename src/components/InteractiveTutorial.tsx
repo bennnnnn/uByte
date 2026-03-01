@@ -241,6 +241,7 @@ export default function InteractiveTutorial({
       setOutput(null);
       setStatus("idle");
       setShowHint(false);
+      setShowInlineChat(false);
     }, 2000);
     return () => clearTimeout(id);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -308,6 +309,7 @@ export default function InteractiveTutorial({
     setFailCount(0);
     setErrorLines(new Set());
     setAiFeedback(null);
+    setShowInlineChat(false);
   }
 
   async function runCodeRequest(currentCode: string) {
@@ -853,7 +855,7 @@ export default function InteractiveTutorial({
                 {showInlineChat && (
                   <div className="border-t border-zinc-200/70 dark:border-zinc-700/40">
                     <TutorialChat
-                      tutorialSlug={tutorialSlug}
+                      chatSlug={`${tutorialSlug}-step-${stepIndex}`}
                       onClose={() => setShowInlineChat(false)}
                       stepContext={{
                         title: currentStep.title,

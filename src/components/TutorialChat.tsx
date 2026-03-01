@@ -13,7 +13,7 @@ interface StepContext {
 }
 
 interface Props {
-  tutorialSlug: string;
+  chatSlug: string;
   onClose: () => void;
   stepContext: StepContext;
   inline?: boolean;
@@ -68,7 +68,7 @@ function MessageBubble({ msg }: { msg: TutorialMessage }) {
   );
 }
 
-export default function TutorialChat({ tutorialSlug, onClose, stepContext, inline = false }: Props) {
+export default function TutorialChat({ chatSlug, onClose, stepContext, inline = false }: Props) {
   const { user } = useAuth();
   const [messages, setMessages] = useState<TutorialMessage[]>([]);
   const [input, setInput] = useState("");
@@ -79,11 +79,11 @@ export default function TutorialChat({ tutorialSlug, onClose, stepContext, inlin
 
   // Load messages on mount
   useEffect(() => {
-    fetch(`/api/chat?slug=${encodeURIComponent(tutorialSlug)}`)
+    fetch(`/api/chat?slug=${encodeURIComponent(chatSlug)}`)
       .then((r) => r.json())
       .then((data) => { setMessages(data.messages ?? []); setLoading(false); })
       .catch(() => setLoading(false));
-  }, [tutorialSlug]);
+  }, [chatSlug]);
 
   // Scroll to bottom on new messages
   useEffect(() => {
@@ -105,7 +105,7 @@ export default function TutorialChat({ tutorialSlug, onClose, stepContext, inlin
     const tempId = Date.now();
     const optimistic: TutorialMessage = {
       id: tempId,
-      tutorial_slug: tutorialSlug,
+      tutorial_slug: chatSlug,
       user_id: null,
       user_name: user.name,
       is_ai: false,
@@ -118,7 +118,7 @@ export default function TutorialChat({ tutorialSlug, onClose, stepContext, inlin
       const res = await apiFetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ slug: tutorialSlug, content: text, stepContext }),
+        body: JSON.stringify({ slug: chatSlug, content: text, stepContext }),
       });
       const data = await res.json();
       if (res.ok) {
