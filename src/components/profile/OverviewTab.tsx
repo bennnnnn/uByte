@@ -25,19 +25,24 @@ export default function OverviewTab({ stats, badges, achievements, userId }: Pro
         {stats.completed_count} of {stats.total_tutorials} tutorials completed
       </p>
 
-      {allDone && userId && (
+      {allDone && userId ? (
         <div className="mb-6 flex flex-wrap items-center gap-3">
           <Link
             href={`/certificate/${userId}`}
             className="inline-flex items-center gap-2 rounded-lg bg-indigo-700 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-800"
           >
-            View Certificate
+            🎓 View Certificate
           </Link>
           <ShareButton
             text={`I just completed all Go tutorials on uByte! Check out my certificate:`}
             url={typeof window !== "undefined" ? `${window.location.origin}/certificate/${userId}` : ""}
           />
         </div>
+      ) : (
+        <p className="mb-6 text-sm text-zinc-400 dark:text-zinc-500">
+          🎓 Complete all {stats.total_tutorials} tutorials to earn your{" "}
+          <span className="font-medium text-zinc-600 dark:text-zinc-300">certificate of completion</span>.
+        </p>
       )}
 
       <h2 className="mb-4 text-lg font-semibold text-zinc-900 dark:text-zinc-100">Recent Badges</h2>
