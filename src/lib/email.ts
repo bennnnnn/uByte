@@ -13,6 +13,32 @@ function getResend(): Resend | null {
   return new Resend(key);
 }
 
+export async function sendStreakReminderEmail(
+  to: string,
+  name: string,
+  streakDays: number
+): Promise<void> {
+  const resend = getResend();
+  if (!resend) return;
+
+  const siteUrl = BASE_URL;
+  await resend.emails.send({
+    from: FROM,
+    to,
+    subject: `🔥 Keep your ${streakDays}-day streak alive — uByte`,
+    html: `
+      <div style="font-family:sans-serif;max-width:480px;margin:auto">
+        <h2 style="color:#0891b2">Your streak is at risk!</h2>
+        <p>Hi ${name},</p>
+        <p>You have a <strong>${streakDays}-day</strong> streak on uByte — don't let it slip today!</p>
+        <a href="${siteUrl}" style="display:inline-block;margin:16px 0;padding:12px 24px;background:#0891b2;color:#fff;border-radius:8px;text-decoration:none;font-weight:600">Keep my streak 🔥</a>
+        <p style="color:#6b7280;font-size:13px">Complete any tutorial step to keep your streak going.</p>
+        <p style="color:#6b7280;font-size:12px">You're receiving this because you have an active streak on uByte. <a href="${siteUrl}/profile" style="color:#6b7280">Manage your preferences</a>.</p>
+      </div>
+    `,
+  });
+}
+
 export async function sendVerificationEmail(
   to: string,
   name: string,

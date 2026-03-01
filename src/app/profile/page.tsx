@@ -253,6 +253,7 @@ function ProfilePage() {
       {tab === "settings" && (
         <SettingsTab
           profile={profile}
+          plan={profile.plan}
           onSave={saveProfile}
           onChangePassword={changePassword}
           onDeleteAccount={deleteAccount}

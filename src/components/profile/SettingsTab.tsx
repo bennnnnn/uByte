@@ -8,6 +8,7 @@ import type { Profile } from "./types";
 
 interface Props {
   profile: Profile;
+  plan?: string;
   onSave: (data: { name: string; bio: string; avatar: string; theme: string }) => Promise<boolean>;
   onChangePassword: (currentPw: string, newPw: string) => Promise<string | null>;
   onDeleteAccount: () => Promise<void>;
@@ -28,7 +29,7 @@ function passwordStrength(pw: string): { label: string; color: string; width: st
   return { label: "Strong", color: "bg-green-500", width: "100%" };
 }
 
-export default function SettingsTab({ profile, onSave, onChangePassword, onDeleteAccount, onResetProgress, onLogoutAll }: Props) {
+export default function SettingsTab({ profile, plan = "free", onSave, onChangePassword, onDeleteAccount, onResetProgress, onLogoutAll }: Props) {
   const { toast } = useToast();
   const [editName, setEditName] = useState(profile.name);
   const [editBio, setEditBio] = useState(profile.bio);
@@ -265,6 +266,28 @@ export default function SettingsTab({ profile, onSave, onChangePassword, onDelet
           )}
         </section>
       )}
+
+      {/* Plan */}
+      <section>
+        <h3 className="mb-2 text-lg font-semibold text-zinc-900 dark:text-zinc-100">Plan</h3>
+        <div className="flex items-center gap-3">
+          <span className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-wider ${
+            plan === "pro"
+              ? "bg-cyan-100 text-cyan-700 dark:bg-cyan-900/40 dark:text-cyan-300"
+              : "bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400"
+          }`}>
+            {plan === "pro" ? "Pro" : "Free"}
+          </span>
+          {plan !== "pro" && (
+            <a
+              href="/pricing"
+              className="text-sm font-medium text-cyan-700 hover:underline dark:text-cyan-400"
+            >
+              Upgrade to Pro →
+            </a>
+          )}
+        </div>
+      </section>
 
       {/* Data export */}
       <section>

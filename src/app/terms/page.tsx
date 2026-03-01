@@ -49,7 +49,7 @@ export default function TermsPage() {
       </Section>
 
       <Section title="The Code Runner">
-        <p>Interactive code steps send your code to the official Go Playground (play.golang.org), operated by Google. Do not submit secret keys, passwords, or personal information in code you run. We are not responsible for how the Go Playground handles submitted code.</p>
+        <p>Interactive code steps send your code to the Piston API (emkc.org), an open-source code execution API. Do not submit secret keys, passwords, or personal information in code you run.</p>
         <p>Using the code runner to attempt denial-of-service attacks, cryptocurrency mining, or network intrusion is strictly prohibited and may result in immediate account termination and reporting to relevant authorities.</p>
       </Section>
 

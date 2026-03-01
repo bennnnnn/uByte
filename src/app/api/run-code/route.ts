@@ -21,18 +21,31 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const response = await fetch("https://go.dev/_/compile?backend=", {
+    const response = await fetch("https://emkc.org/api/v2/piston/execute", {
       method: "POST",
-      headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      body: new URLSearchParams({
-        version: "2",
-        body: code,
-        withVet: "true",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        language: "go",
+        version: "*",
+        files: [{ name: "main.go", content: code }],
       }),
     });
 
     const data = await response.json();
-    return NextResponse.json(data);
+
+    // Map Piston response to the shape CodePlayground.tsx expects
+    const compileErr: string = data.compile?.stderr ?? "";
+    const runErr: string = data.run?.stderr ?? "";
+    const stdout: string = data.run?.stdout ?? "";
+    const stderr = compileErr || runErr;
+
+    if (stderr) {
+      return NextResponse.json({ Errors: stderr });
+    }
+    if (stdout) {
+      return NextResponse.json({ Events: [{ Message: stdout }] });
+    }
+    return NextResponse.json({ Events: [] });
   } catch {
     return NextResponse.json(
       { Errors: "Failed to compile code. Please try again." },

@@ -604,6 +604,24 @@ export async function getPlaygroundSnippet(
   return row as PlaygroundSnippet | undefined;
 }
 
+export async function getUserByPaddleCustomerId(paddleCustomerId: string): Promise<User | undefined> {
+  const sql = getSql();
+  const [row] = await sql`SELECT * FROM users WHERE stripe_customer_id = ${paddleCustomerId}`;
+  return row as User | undefined;
+}
+
+export async function getUsersAtRiskOfLosingStreak(): Promise<Pick<User, "id" | "email" | "name" | "streak_days">[]> {
+  const sql = getSql();
+  const rows = await sql`
+    SELECT id, email, name, streak_days FROM users
+    WHERE streak_last_date = CURRENT_DATE - INTERVAL '1 day'
+      AND streak_days > 0
+      AND email IS NOT NULL
+      AND email_verified = 1
+  `;
+  return rows as Pick<User, "id" | "email" | "name" | "streak_days">[];
+}
+
 // ─── Rate Limiting ────────────────────────────────────
 
 export async function dbCheckRateLimit(

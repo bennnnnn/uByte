@@ -20,6 +20,7 @@ interface NavItem {
 
 export default function MobileNav({ tutorials }: { tutorials: NavItem[] }) {
   const [open, setOpen] = useState(false);
+  const [query, setQuery] = useState("");
   const { pathname, expanded, activeHash, toggleExpand } = useNavState(tutorials);
   const { progress } = useAuth();
 
@@ -59,12 +60,45 @@ export default function MobileNav({ tutorials }: { tutorials: NavItem[] }) {
             <span>⚡</span> Playground
           </Link>
 
+          {/* Search */}
+          <div className="relative mb-2">
+            <svg className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z" />
+            </svg>
+            <input
+              type="search"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Search lessons..."
+              className="w-full rounded-lg border border-zinc-200 bg-white py-2 pl-9 pr-8 text-sm text-zinc-700 placeholder-zinc-400 focus:border-cyan-500 focus:outline-none dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300 dark:placeholder-zinc-500"
+            />
+            {query && (
+              <button
+                onClick={() => setQuery("")}
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200"
+                aria-label="Clear search"
+              >
+                <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            )}
+          </div>
+
           <p className="mb-2 px-3 text-[10px] font-bold uppercase tracking-widest text-zinc-400 dark:text-zinc-500">
             Lessons
           </p>
 
           <ul className="space-y-0.5">
-            {tutorials.map((t, i) => {
+            {(() => {
+              const q = query.toLowerCase();
+              const filtered = tutorials
+                .map((t, i) => ({ t, i }))
+                .filter(({ t }) => t.title.toLowerCase().includes(q));
+              if (filtered.length === 0) {
+                return <li className="px-3 py-4 text-center text-xs text-zinc-400 dark:text-zinc-500">No lessons found</li>;
+              }
+              return filtered.map(({ t, i }) => {
               const href = `/golang/${t.slug}`;
               const isOnThisPage = pathname === href;
               const isExpanded = expanded === t.slug;
@@ -134,7 +168,8 @@ export default function MobileNav({ tutorials }: { tutorials: NavItem[] }) {
                   )}
                 </li>
               );
-            })}
+            });
+            })()}
           </ul>
         </nav>
       )}

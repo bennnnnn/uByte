@@ -62,7 +62,7 @@ export default function PrivacyPage() {
         <p><strong>Vercel Analytics</strong> — we use Vercel&apos;s built-in analytics for anonymous usage statistics (page views, country). No cookies are set by Vercel Analytics; data is aggregated and not linked to individuals.</p>
         <p><strong>Resend</strong> — transactional email (email verification, password reset). Resend receives your email address to deliver messages. See <a href="https://resend.com/privacy" target="_blank" rel="noopener noreferrer" className="text-cyan-600 hover:underline">Resend&apos;s Privacy Policy</a>.</p>
         <p><strong>Google OAuth</strong> — if you choose &ldquo;Continue with Google&rdquo;, Google handles authentication and shares your name and email with us. See <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer" className="text-cyan-600 hover:underline">Google&apos;s Privacy Policy</a>.</p>
-        <p><strong>Go Playground API</strong> — code you run in the interactive steps is sent to the official Go Playground (play.golang.org) for execution. Go Playground is operated by Google; do not submit sensitive information in code.</p>
+        <p><strong>Piston API</strong> — code you run in the interactive steps is sent to the Piston API (emkc.org), an open-source code execution API. Do not submit sensitive information in code you run.</p>
       </Section>
 
       <Section title="How We Use Your Data">
