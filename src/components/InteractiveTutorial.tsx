@@ -83,6 +83,7 @@ export default function InteractiveTutorial({
   const [showHint, setShowHint] = useState(false);
   const [completedSteps, setCompletedSteps] = useState<Set<number>>(new Set());
   const [bookmarked, setBookmarked] = useState(false);
+  const [aiFeedback, setAiFeedback] = useState<string | null>(null);
   const [failCount, setFailCount] = useState(0);
   const [tutorialDone, setTutorialDone] = useState(false);
   const [countdown, setCountdown] = useState(3);
@@ -300,12 +301,16 @@ export default function InteractiveTutorial({
   }
 
   async function handleCheck() {
-    setStatus("running"); setOutput(null);
+    setStatus("running"); setOutput(null); setAiFeedback(null);
     try {
       const { output: out, hasError } = await runCodeRequest(code);
       setOutputIsError(hasError);
       setOutput(out || (hasError ? "Compilation error" : "(no output)"));
-      if (hasError) { setStatus("failed"); return; }
+      if (hasError) {
+        setStatus("failed");
+        fetchAiFeedback(code, "", out, currentStep.expectedOutput, currentStep.title, currentStep.instruction);
+        return;
+      }
       if (checkOutput(out, currentStep.expectedOutput)) {
         setStatus("passed");
         setFailCount(0);
@@ -313,11 +318,30 @@ export default function InteractiveTutorial({
       } else {
         setStatus("failed");
         setFailCount((n) => n + 1);
+        fetchAiFeedback(code, "", out, currentStep.expectedOutput, currentStep.title, currentStep.instruction);
       }
     } catch {
       setOutput("Could not reach the Go compiler. Please try again.");
       setStatus("failed");
     }
+  }
+
+  function fetchAiFeedback(
+    userCode: string,
+    error: string,
+    output: string,
+    expectedOutput: string[],
+    stepTitle: string,
+    instruction: string
+  ) {
+    fetch("/api/code-feedback", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ code: userCode, error, output, expectedOutput, stepTitle, instruction }),
+    })
+      .then((r) => r.json())
+      .then((d) => { if (d.feedback) setAiFeedback(d.feedback); })
+      .catch(() => {});
   }
 
   function handleReset() { setCode(currentStep.starter); setOutput(null); setStatus("idle"); }
@@ -739,11 +763,8 @@ export default function InteractiveTutorial({
               </p>
             )}
             {status === "failed" && output !== null && (
-              <p className="mt-2 text-sm text-red-600 dark:text-red-400">
-                ✗ Not quite.{" "}
-                {currentStep.expectedOutput.length > 0
-                  ? `Expected output to include: ${currentStep.expectedOutput.slice(0, 4).map((s) => `"${s}"`).join(", ")}`
-                  : "Make sure your code produces some output."}
+              <p className="mt-2 text-sm text-amber-600 dark:text-amber-400">
+                {aiFeedback ?? "Analyzing your code…"}
               </p>
             )}
           </div>
