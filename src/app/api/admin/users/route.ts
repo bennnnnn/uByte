@@ -1,6 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
-import { getUserById, getAdminUsers, adminResetUserProgress } from "@/lib/db";
+import {
+  getUserById,
+  getAdminUsers,
+  adminResetUserProgress,
+  adminDeleteUser,
+  adminBanUser,
+  adminUnbanUser,
+  setAdminStatus,
+  getAdminTutorialAnalytics,
+} from "@/lib/db";
 import { verifyCsrf } from "@/lib/csrf";
 
 async function requireAdmin() {
@@ -11,10 +20,16 @@ async function requireAdmin() {
   return user;
 }
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
     const admin = await requireAdmin();
     if (!admin) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+
+    const { searchParams } = new URL(request.url);
+    if (searchParams.get("view") === "analytics") {
+      const analytics = await getAdminTutorialAnalytics();
+      return NextResponse.json({ analytics });
+    }
 
     const users = await getAdminUsers();
     return NextResponse.json({ users });
@@ -34,8 +49,33 @@ export async function POST(request: NextRequest) {
 
     const { action, userId } = await request.json() as { action: string; userId: number };
 
+    // Prevent acting on self for destructive actions
+    if (userId === admin.id && ["delete_user", "remove_admin"].includes(action)) {
+      return NextResponse.json({ error: "Cannot perform this action on yourself" }, { status: 400 });
+    }
+
     if (action === "reset_progress") {
       await adminResetUserProgress(userId);
+      return NextResponse.json({ ok: true });
+    }
+    if (action === "delete_user") {
+      await adminDeleteUser(userId);
+      return NextResponse.json({ ok: true });
+    }
+    if (action === "ban_user") {
+      await adminBanUser(userId);
+      return NextResponse.json({ ok: true });
+    }
+    if (action === "unban_user") {
+      await adminUnbanUser(userId);
+      return NextResponse.json({ ok: true });
+    }
+    if (action === "set_admin") {
+      await setAdminStatus(userId, true);
+      return NextResponse.json({ ok: true });
+    }
+    if (action === "remove_admin") {
+      await setAdminStatus(userId, false);
       return NextResponse.json({ ok: true });
     }
 

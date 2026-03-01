@@ -100,8 +100,16 @@ export interface AdminUserRow {
   created_at: string;
   last_active_at: string | null;
   is_admin: number;
+  banned: boolean;
   completed_count: number;
   bookmark_count: number;
+}
+
+export interface AdminTutorialRow {
+  slug: string;
+  completed_count: number;
+  thumbs_up: number;
+  thumbs_down: number;
 }
 
 // ─── Users ───────────────────────────────────────────
@@ -418,12 +426,44 @@ export async function getAdminUsers(): Promise<AdminUserRow[]> {
   const rows = await sql`
     SELECT
       u.id, u.name, u.email, u.xp, u.streak_days, u.created_at, u.last_active_at, u.is_admin,
+      (u.locked_until IS NOT NULL AND u.locked_until > NOW()) AS banned,
       (SELECT COUNT(*)::int FROM progress WHERE user_id = u.id) AS completed_count,
       (SELECT COUNT(*)::int FROM bookmarks WHERE user_id = u.id) AS bookmark_count
     FROM users u
     ORDER BY u.created_at DESC
   `;
-  return rows as AdminUserRow[];
+  return rows.map((r) => ({ ...r, banned: r.banned === true || r.banned === 1 })) as AdminUserRow[];
+}
+
+export async function adminDeleteUser(userId: number): Promise<void> {
+  const sql = getSql();
+  await sql`DELETE FROM users WHERE id = ${userId}`;
+}
+
+export async function adminBanUser(userId: number): Promise<void> {
+  const sql = getSql();
+  await sql`UPDATE users SET locked_until = '2099-12-31 23:59:59' WHERE id = ${userId}`;
+}
+
+export async function adminUnbanUser(userId: number): Promise<void> {
+  const sql = getSql();
+  await sql`UPDATE users SET locked_until = NULL, failed_login_attempts = 0 WHERE id = ${userId}`;
+}
+
+export async function getAdminTutorialAnalytics(): Promise<AdminTutorialRow[]> {
+  const sql = getSql();
+  const rows = await sql`
+    SELECT
+      p.tutorial_slug AS slug,
+      COUNT(p.user_id)::int AS completed_count,
+      COALESCE(SUM(CASE WHEN r.vote = 1 THEN 1 ELSE 0 END)::int, 0) AS thumbs_up,
+      COALESCE(SUM(CASE WHEN r.vote = -1 THEN 1 ELSE 0 END)::int, 0) AS thumbs_down
+    FROM progress p
+    LEFT JOIN ratings r ON r.tutorial_slug = p.tutorial_slug AND r.user_id = p.user_id
+    GROUP BY p.tutorial_slug
+    ORDER BY completed_count DESC
+  `;
+  return rows as AdminTutorialRow[];
 }
 
 export async function adminResetUserProgress(userId: number): Promise<void> {
