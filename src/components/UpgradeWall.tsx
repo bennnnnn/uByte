@@ -24,9 +24,9 @@ export default function UpgradeWall({ tutorialTitle }: { tutorialTitle: string }
               Best value
             </span>
             <p className="text-2xl font-bold text-zinc-900 dark:text-zinc-100">
-              $4.50<span className="text-sm font-normal text-zinc-400">/mo</span>
+              $49.99<span className="text-sm font-normal text-zinc-400">/yr</span>
             </p>
-            <p className="mt-0.5 text-xs font-medium text-indigo-600 dark:text-indigo-400">$54/year — 50% off</p>
+            <p className="mt-0.5 text-xs font-medium text-indigo-600 dark:text-indigo-400">$49.99/year — save $70</p>
             <p className="mt-2 text-xs text-zinc-500 dark:text-zinc-400">Billed annually</p>
           </div>
 
@@ -36,7 +36,7 @@ export default function UpgradeWall({ tutorialTitle }: { tutorialTitle: string }
               Monthly
             </span>
             <p className="text-2xl font-bold text-zinc-900 dark:text-zinc-100">
-              $9<span className="text-sm font-normal text-zinc-400">/mo</span>
+              $9.99<span className="text-sm font-normal text-zinc-400">/mo</span>
             </p>
             <p className="mt-0.5 text-xs text-zinc-400">Billed monthly</p>
             <p className="mt-2 text-xs text-zinc-500 dark:text-zinc-400">Cancel anytime</p>
@@ -47,7 +47,7 @@ export default function UpgradeWall({ tutorialTitle }: { tutorialTitle: string }
           href="/pricing"
           className="block w-full rounded-xl bg-indigo-700 py-3 text-center text-sm font-semibold text-white transition-colors hover:bg-indigo-800"
         >
-          See plans — from $4.50/mo
+          See plans — from $49.99/yr
         </Link>
 
         <Link

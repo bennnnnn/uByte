@@ -113,10 +113,10 @@ export default function PricingPage() {
           </span>
           <p className="mb-1 text-xs font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">Yearly</p>
           <div className="flex items-baseline gap-2">
-            <p className="text-4xl font-bold text-zinc-900 dark:text-zinc-100">$4.50<span className="text-lg font-normal text-zinc-400">/mo</span></p>
-            <span className="text-sm font-medium text-zinc-400 line-through">$9</span>
+            <p className="text-4xl font-bold text-zinc-900 dark:text-zinc-100">$49.99<span className="text-lg font-normal text-zinc-400">/yr</span></p>
+            <span className="text-sm font-medium text-zinc-400 line-through">$119.88</span>
           </div>
-          <p className="mt-1 mb-6 text-sm font-medium text-indigo-600 dark:text-indigo-400">$54 billed yearly — save $54</p>
+          <p className="mt-1 mb-6 text-sm font-medium text-indigo-600 dark:text-indigo-400">$49.99 billed yearly — save $70</p>
           <ul className="mb-8 flex-1 space-y-2.5 text-sm text-zinc-600 dark:text-zinc-400">
             {["All 20 tutorials", "AI code feedback", "Community chat", "Certificate of completion", "Best value"].map((f) => (
               <li key={f} className="flex items-center gap-2">
@@ -130,14 +130,14 @@ export default function PricingPage() {
           ) : isMonthly ? (
             <div className="rounded-xl border border-zinc-200 py-3 text-center text-sm text-zinc-400 dark:border-zinc-700">You&apos;re on Monthly</div>
           ) : (
-            <UpgradeButton priceId={YEARLY_PRICE_ID} label="Get Yearly — $4.50/mo" className="block rounded-xl bg-indigo-700 py-3 text-center text-sm font-semibold text-white transition-colors hover:bg-indigo-800" />
+            <UpgradeButton priceId={YEARLY_PRICE_ID} label="Get Yearly — $49.99/yr" className="block rounded-xl bg-indigo-700 py-3 text-center text-sm font-semibold text-white transition-colors hover:bg-indigo-800" />
           )}
         </div>
 
         {/* Monthly */}
         <div className="flex flex-col rounded-2xl border border-zinc-200 bg-white p-7 dark:border-zinc-800 dark:bg-zinc-900">
           <p className="mb-1 text-xs font-bold uppercase tracking-wider text-zinc-500">Monthly</p>
-          <p className="text-4xl font-bold text-zinc-900 dark:text-zinc-100">$9<span className="text-lg font-normal text-zinc-400">/mo</span></p>
+          <p className="text-4xl font-bold text-zinc-900 dark:text-zinc-100">$9.99<span className="text-lg font-normal text-zinc-400">/mo</span></p>
           <p className="mt-1 mb-6 text-sm text-zinc-400">Cancel anytime</p>
           <ul className="mb-8 flex-1 space-y-2.5 text-sm text-zinc-600 dark:text-zinc-400">
             {["All 20 tutorials", "AI code feedback", "Community chat", "Certificate of completion", "Flexible — no commitment"].map((f) => (
@@ -152,7 +152,7 @@ export default function PricingPage() {
           ) : isYearly ? (
             <div className="rounded-xl border border-zinc-200 py-3 text-center text-sm text-zinc-400 dark:border-zinc-700">You&apos;re on Yearly</div>
           ) : (
-            <UpgradeButton priceId={MONTHLY_PRICE_ID} label="Get Monthly — $9/mo" className="block rounded-xl border border-zinc-300 py-3 text-center text-sm font-semibold text-zinc-700 transition-colors hover:bg-zinc-50 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800" />
+            <UpgradeButton priceId={MONTHLY_PRICE_ID} label="Get Monthly — $9.99/mo" className="block rounded-xl border border-zinc-300 py-3 text-center text-sm font-semibold text-zinc-700 transition-colors hover:bg-zinc-50 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800" />
           )}
         </div>
 
