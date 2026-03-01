@@ -28,6 +28,14 @@ interface Props {
 
 type Status = "idle" | "running" | "passed" | "failed";
 
+function parseErrorLines(errorText: string): Set<number> {
+  const lines = new Set<number>();
+  const re = /\.go:(\d+):\d+:/g;
+  let m;
+  while ((m = re.exec(errorText)) !== null) lines.add(parseInt(m[1], 10));
+  return lines;
+}
+
 function checkOutput(output: string, expected: string[]): boolean {
   if (!output.trim()) return false;
   if (expected.length === 0) return true;
@@ -84,6 +92,8 @@ export default function InteractiveTutorial({
   const [completedSteps, setCompletedSteps] = useState<Set<number>>(new Set());
   const [bookmarked, setBookmarked] = useState(false);
   const [aiFeedback, setAiFeedback] = useState<string | null>(null);
+  const [errorLines, setErrorLines] = useState<Set<number>>(new Set());
+  const [formatting, setFormatting] = useState(false);
   const [failCount, setFailCount] = useState(0);
   const [tutorialDone, setTutorialDone] = useState(false);
   const [countdown, setCountdown] = useState(3);
@@ -104,6 +114,7 @@ export default function InteractiveTutorial({
   const dragState = useRef<{ type: "h" | "v"; startX: number; startY: number; startValue: number } | null>(null);
   const preRef = useRef<HTMLPreElement>(null);
   const lineNumRef = useRef<HTMLDivElement>(null);
+  const highlightRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const markedRef = useRef(false);
 
@@ -240,10 +251,34 @@ export default function InteractiveTutorial({
       if (lineNumRef.current) {
         lineNumRef.current.scrollTop = textareaRef.current.scrollTop;
       }
+      if (highlightRef.current) {
+        highlightRef.current.scrollTop = textareaRef.current.scrollTop;
+      }
+    }
+  }
+
+  async function handleFormat() {
+    setFormatting(true);
+    try {
+      const body = new URLSearchParams({ body: code, imports: "true" });
+      const res = await fetch("https://go.dev/_/fmt", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: body.toString(),
+      });
+      const data = await res.json();
+      if (data.Body && !data.Error) setCode(data.Body);
+    } catch { /* ignore */ } finally {
+      setFormatting(false);
     }
   }
 
   function handleKeyDown(e: React.KeyboardEvent<HTMLTextAreaElement>) {
+    if (e.key === "F" && e.shiftKey && e.altKey) {
+      e.preventDefault();
+      handleFormat();
+      return;
+    }
     if (e.key === "Tab") {
       e.preventDefault();
       const ta = textareaRef.current!;
@@ -271,6 +306,8 @@ export default function InteractiveTutorial({
     setStatus("idle");
     setShowHint(false);
     setFailCount(0);
+    setErrorLines(new Set());
+    setAiFeedback(null);
   }
 
   async function runCodeRequest(currentCode: string) {
@@ -287,11 +324,12 @@ export default function InteractiveTutorial({
   }
 
   async function handleRun() {
-    setStatus("running"); setOutput(null);
+    setStatus("running"); setOutput(null); setErrorLines(new Set()); setAiFeedback(null);
     try {
       const { output: out, hasError } = await runCodeRequest(code);
       setOutputIsError(hasError);
       setOutput(out || (hasError ? "Compilation error (see above)" : "(no output)"));
+      if (hasError) setErrorLines(parseErrorLines(out));
       setStatus("idle");
     } catch {
       setOutputIsError(true);
@@ -301,14 +339,27 @@ export default function InteractiveTutorial({
   }
 
   async function handleCheck() {
-    setStatus("running"); setOutput(null); setAiFeedback(null);
+    setStatus("running"); setOutput(null); setAiFeedback(null); setErrorLines(new Set());
+    // Silently auto-format before checking
+    try {
+      const body = new URLSearchParams({ body: code, imports: "true" });
+      const fmtRes = await fetch("https://go.dev/_/fmt", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: body.toString(),
+      });
+      const fmtData = await fmtRes.json();
+      if (fmtData.Body && !fmtData.Error) setCode(fmtData.Body);
+    } catch { /* ignore — format is best-effort */ }
+
     try {
       const { output: out, hasError } = await runCodeRequest(code);
       setOutputIsError(hasError);
       setOutput(out || (hasError ? "Compilation error" : "(no output)"));
       if (hasError) {
+        setErrorLines(parseErrorLines(out));
         setStatus("failed");
-        fetchAiFeedback(code, "", out, currentStep.expectedOutput, currentStep.title, currentStep.instruction);
+        fetchAiFeedback(code, out, "", currentStep.expectedOutput, currentStep.title, currentStep.instruction);
         return;
       }
       if (checkOutput(out, currentStep.expectedOutput)) {
@@ -344,7 +395,7 @@ export default function InteractiveTutorial({
       .catch(() => {});
   }
 
-  function handleReset() { setCode(currentStep.starter); setOutput(null); setStatus("idle"); }
+  function handleReset() { setCode(currentStep.starter); setOutput(null); setStatus("idle"); setErrorLines(new Set()); setAiFeedback(null); }
 
   async function handleBookmark() {
     if (!user) return;
@@ -648,11 +699,23 @@ export default function InteractiveTutorial({
               className="shrink-0 select-none overflow-hidden border-r border-zinc-800 bg-zinc-900 px-3 py-4 text-right text-zinc-600"
             >
               {code.split("\n").map((_, i) => (
-                <div key={i}>{i + 1}</div>
+                <div key={i} className={errorLines.has(i + 1) ? "text-red-400" : ""}>
+                  {errorLines.has(i + 1) ? "▶" : i + 1}
+                </div>
               ))}
             </div>
             {/* Editor */}
             <div className="relative flex-1 overflow-hidden">
+              {/* Error line highlight overlay — scrolls in sync with textarea */}
+              <div ref={highlightRef} aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
+                {[...errorLines].map((ln) => (
+                  <div
+                    key={ln}
+                    className="absolute left-0 right-0 bg-red-500/10"
+                    style={{ top: 16 + (ln - 1) * 24, height: 24 }}
+                  />
+                ))}
+              </div>
               <pre
                 ref={preRef}
                 aria-hidden
@@ -698,6 +761,14 @@ export default function InteractiveTutorial({
             >
               Reset
             </button>
+            <button
+              onClick={handleFormat}
+              disabled={formatting}
+              title="Format code (Shift+Alt+F)"
+              className="rounded-md border border-zinc-300 px-3 py-1.5 text-sm text-zinc-500 transition-colors hover:border-zinc-400 hover:text-zinc-800 disabled:opacity-40 dark:border-zinc-700 dark:text-zinc-400 dark:hover:border-zinc-600 dark:hover:text-zinc-200"
+            >
+              {formatting ? "Formatting…" : "Format"}
+            </button>
             {user && (
               <button
                 onClick={handleBookmark}
@@ -729,7 +800,7 @@ export default function InteractiveTutorial({
               Chat
             </button>
             <span className="ml-auto hidden text-xs text-zinc-400 dark:text-zinc-600 lg:block">
-              Tab = indent · Ctrl+Enter = Run · Ctrl+Shift+Enter = Check
+              Tab = indent · Ctrl+Enter = Run · Ctrl+Shift+Enter = Check · Shift+Alt+F = Format
             </span>
           </div>
 
