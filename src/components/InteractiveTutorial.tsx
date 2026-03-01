@@ -814,24 +814,44 @@ export default function InteractiveTutorial({
             suppressHydrationWarning
           >
             <p className="mb-2 text-xs font-semibold uppercase tracking-widest text-zinc-400 dark:text-zinc-500">
-              Output
+              {outputIsError
+                ? "Error"
+                : status === "failed" && output !== null
+                ? "Wrong output"
+                : status === "passed"
+                ? "Output — correct ✓"
+                : "Output"}
             </p>
             {output === null ? (
               <p className="text-xs text-zinc-400 dark:text-zinc-600">
                 Click Run to execute, or Check to validate.
               </p>
             ) : (
-              <pre className={`whitespace-pre-wrap ${outputIsError ? "text-red-600 dark:text-red-400" : "text-green-600 dark:text-green-400"}`}>{output}</pre>
+              <pre className={`whitespace-pre-wrap ${
+                outputIsError
+                  ? "text-red-600 dark:text-red-400"
+                  : status === "failed"
+                  ? "text-amber-600 dark:text-amber-400"
+                  : "text-green-600 dark:text-green-400"
+              }`}>{output}</pre>
             )}
             {status === "passed" && (
               <p className="mt-2 text-sm font-medium text-emerald-600 dark:text-emerald-400">
                 🎉 {stepIndex < steps.length - 1 ? "Great job! Moving to the next step…" : "Outstanding! Tutorial complete!"}
               </p>
             )}
-            {status === "failed" && output !== null && (
-              <p className="mt-2 text-sm text-amber-600 dark:text-amber-400">
-                {aiFeedback ?? "Analyzing your code…"}
+            {status === "failed" && output !== null && !outputIsError && currentStep.expectedOutput.length > 0 && (
+              <p className="mt-1 text-xs text-zinc-400 dark:text-zinc-500">
+                Expected: <span className="font-medium text-zinc-500 dark:text-zinc-400">{currentStep.expectedOutput.join(" · ")}</span>
               </p>
+            )}
+            {status === "failed" && output !== null && (
+              <div className="mt-3 flex items-start gap-2 rounded-lg border border-zinc-200/70 bg-white/70 px-3 py-2 font-sans backdrop-blur-sm dark:border-zinc-700/40 dark:bg-zinc-900/50">
+                <span className="mt-px shrink-0 text-[11px] text-indigo-400 dark:text-indigo-500">✦</span>
+                <p className={`text-xs leading-relaxed text-zinc-500 dark:text-zinc-400 ${!aiFeedback ? "animate-pulse" : ""}`}>
+                  {aiFeedback ?? "Analyzing your code…"}
+                </p>
+              </div>
             )}
           </div>
         </div>
@@ -943,7 +963,16 @@ export default function InteractiveTutorial({
           showChat ? "translate-x-0" : "translate-x-full"
         }`}
       >
-        <TutorialChat tutorialSlug={tutorialSlug} onClose={() => setShowChat(false)} />
+        <TutorialChat
+          tutorialSlug={tutorialSlug}
+          onClose={() => setShowChat(false)}
+          stepContext={{
+            title: currentStep.title,
+            instruction: currentStep.instruction,
+            expectedOutput: currentStep.expectedOutput,
+            currentCode: code,
+          }}
+        />
       </div>
 
       {/* ── Congratulations Modal ── */}

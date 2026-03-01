@@ -16,6 +16,8 @@ export async function POST(req: NextRequest) {
     ? `Expected output to contain: ${expectedOutput.slice(0, 3).join(", ")}`
     : "The program should produce some output.";
 
+  const isWrongOutput = !error;
+
   const prompt = `A student is learning Go. They're working on: "${stepTitle}"
 
 Task: ${String(instruction).slice(0, 300)}
@@ -28,7 +30,11 @@ ${String(code).slice(0, 1200)}
 
 ${context}
 
-Give ONE short sentence of feedback (max 20 words). Be warm and encouraging. Don't reveal the answer — nudge them in the right direction. No prefix like "Feedback:" just the sentence.`;
+${isWrongOutput
+  ? "Their code ran but produced the WRONG output — it does NOT match what's expected. Give ONE short sentence telling them specifically what's missing or wrong (max 20 words). Be direct but friendly. Don't say 'you're on the right track'. Don't reveal the full answer — just point at what needs to change."
+  : "Give ONE short sentence of feedback (max 20 words). Be warm and specific. Don't reveal the full answer — nudge them in the right direction."
+}
+No prefix like "Feedback:" — just the sentence.`;
 
   try {
     if (!process.env.ANTHROPIC_API_KEY) throw new Error("ANTHROPIC_API_KEY not set");

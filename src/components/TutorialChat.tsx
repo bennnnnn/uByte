@@ -5,9 +5,17 @@ import { useAuth } from "@/components/AuthProvider";
 import { apiFetch } from "@/lib/api-client";
 import type { TutorialMessage } from "@/lib/db";
 
+interface StepContext {
+  title: string;
+  instruction: string;
+  expectedOutput: string[];
+  currentCode: string;
+}
+
 interface Props {
   tutorialSlug: string;
   onClose: () => void;
+  stepContext: StepContext;
 }
 
 function MessageBubble({ msg }: { msg: TutorialMessage }) {
@@ -59,7 +67,7 @@ function MessageBubble({ msg }: { msg: TutorialMessage }) {
   );
 }
 
-export default function TutorialChat({ tutorialSlug, onClose }: Props) {
+export default function TutorialChat({ tutorialSlug, onClose, stepContext }: Props) {
   const { user } = useAuth();
   const [messages, setMessages] = useState<TutorialMessage[]>([]);
   const [input, setInput] = useState("");
@@ -109,7 +117,7 @@ export default function TutorialChat({ tutorialSlug, onClose }: Props) {
       const res = await apiFetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ slug: tutorialSlug, content: text }),
+        body: JSON.stringify({ slug: tutorialSlug, content: text, stepContext }),
       });
       const data = await res.json();
       if (res.ok) {
