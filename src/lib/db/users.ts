@@ -85,7 +85,13 @@ export async function addXp(userId: number, amount: number): Promise<void> {
 
 export async function updateStreak(
   userId: number
-): Promise<{ streak_days: number; longest_streak: number }> {
+): Promise<{ streak_days: number; longest_streak: number; freeze_used?: boolean }> {
+  const sql = getSql();
+  // Ensure streak_freezes column exists (idempotent migration)
+  try {
+    await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS streak_freezes INTEGER NOT NULL DEFAULT 1`;
+  } catch { /* ignore */ }
+
   const user = await getUserById(userId);
   if (!user) return { streak_days: 0, longest_streak: 0 };
 
@@ -94,25 +100,38 @@ export async function updateStreak(
 
   let streak = user.streak_days;
   let longest = user.longest_streak;
+  let freeze_used = false;
+  const freezes: number = (user as unknown as { streak_freezes?: number }).streak_freezes ?? 1;
 
   if (user.streak_last_date === today) {
     return { streak_days: streak, longest_streak: longest };
   } else if (user.streak_last_date === yesterday) {
     streak += 1;
   } else {
-    streak = 1;
+    // Missed a day — try freeze
+    if (freezes > 0) {
+      freeze_used = true;
+      await sql`UPDATE users SET streak_freezes = streak_freezes - 1 WHERE id = ${userId}`;
+      // keep streak, just update last date
+    } else {
+      streak = 1;
+    }
   }
 
   if (streak > longest) longest = streak;
 
-  const sql = getSql();
   await sql`
     UPDATE users
     SET streak_days = ${streak}, longest_streak = ${longest},
         streak_last_date = ${today}, last_active_at = NOW()::text
     WHERE id = ${userId}
   `;
-  return { streak_days: streak, longest_streak: longest };
+  return { streak_days: streak, longest_streak: longest, freeze_used };
+}
+
+export async function addStreakFreeze(userId: number): Promise<void> {
+  const sql = getSql();
+  await sql`UPDATE users SET streak_freezes = LEAST(streak_freezes + 1, 3) WHERE id = ${userId}`;
 }
 
 export async function incrementLoginFailure(
@@ -179,6 +198,29 @@ export async function getUserByPaddleCustomerId(paddleCustomerId: string): Promi
   const sql = getSql();
   const [row] = await sql`SELECT * FROM users WHERE stripe_customer_id = ${paddleCustomerId}`;
   return row as User | undefined;
+}
+
+export async function getPublicProfile(userId: number): Promise<{
+  id: number; name: string; avatar: string; bio: string;
+  xp: number; streak_days: number; longest_streak: number;
+  created_at: string; completed_count: number;
+} | null> {
+  const sql = getSql();
+  const [row] = await sql`
+    SELECT
+      u.id, u.name, u.avatar, u.bio, u.xp, u.streak_days, u.longest_streak, u.created_at,
+      COUNT(p.tutorial_slug)::int AS completed_count
+    FROM users u
+    LEFT JOIN progress p ON p.user_id = u.id
+    WHERE u.id = ${userId}
+    GROUP BY u.id
+  `;
+  if (!row) return null;
+  return row as {
+    id: number; name: string; avatar: string; bio: string;
+    xp: number; streak_days: number; longest_streak: number;
+    created_at: string; completed_count: number;
+  };
 }
 
 export async function getUsersAtRiskOfLosingStreak(): Promise<Pick<User, "id" | "email" | "name" | "streak_days">[]> {

@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useNavState } from "@/hooks/useNavState";
 import { useAuth } from "@/components/AuthProvider";
+import { tutorialUrl } from "@/lib/urls";
 import ThemeToggle from "@/components/ThemeToggle";
 import AuthButtons from "@/components/AuthButtons";
 
@@ -18,10 +19,10 @@ interface NavItem {
   subtopics: SubTopic[];
 }
 
-export default function MobileNav({ tutorials }: { tutorials: NavItem[] }) {
+export default function MobileNav({ lang, tutorials }: { lang: string; tutorials: NavItem[] }) {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
-  const { pathname, expanded, activeHash, toggleExpand } = useNavState(tutorials);
+  const { pathname, expanded, activeHash, toggleExpand } = useNavState(tutorials, lang);
   const { progress } = useAuth();
 
   return (
@@ -89,7 +90,7 @@ export default function MobileNav({ tutorials }: { tutorials: NavItem[] }) {
                 return <li className="px-3 py-4 text-center text-xs text-zinc-400 dark:text-zinc-500">No lessons found</li>;
               }
               return filtered.map((t) => {
-                const href = `/golang/${t.slug}`;
+                const href = tutorialUrl(lang, t.slug);
                 const isOnThisPage = pathname === href;
                 const isExpanded = expanded === t.slug;
                 const isCompleted = progress.includes(t.slug);

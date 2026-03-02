@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
+import { tutorialUrl } from "@/lib/urls";
 
 interface SubTopic {
   id: string;
@@ -14,7 +15,7 @@ interface NavItem {
   subtopics: SubTopic[];
 }
 
-export function useNavState(tutorials: NavItem[]) {
+export function useNavState(tutorials: NavItem[], lang: string = "go") {
   const pathname = usePathname();
   const [expanded, setExpanded] = useState<string | null>(null);
   const [prevPathname, setPrevPathname] = useState(pathname);
@@ -23,7 +24,7 @@ export function useNavState(tutorials: NavItem[]) {
   // Synchronously expand the active tutorial when pathname changes
   if (pathname !== prevPathname) {
     setPrevPathname(pathname);
-    const active = tutorials.find((t) => pathname === `/golang/${t.slug}`);
+    const active = tutorials.find((t) => pathname === tutorialUrl(lang, t.slug));
     if (active) setExpanded(active.slug);
   }
 
@@ -43,7 +44,7 @@ export function useNavState(tutorials: NavItem[]) {
 
   // Track which subtopic is in view via IntersectionObserver
   useEffect(() => {
-    const activeTutorial = tutorials.find((t) => pathname === `/golang/${t.slug}`);
+    const activeTutorial = tutorials.find((t) => pathname === tutorialUrl(lang, t.slug));
     if (!activeTutorial || activeTutorial.subtopics.length === 0) return;
 
     const ids = activeTutorial.subtopics.map((s) => s.id);
@@ -65,7 +66,7 @@ export function useNavState(tutorials: NavItem[]) {
     }
 
     return () => observer.disconnect();
-  }, [pathname, tutorials]);
+  }, [pathname, tutorials, lang]);
 
   const toggleExpand = (slug: string) => {
     setExpanded((prev) => (prev === slug ? null : slug));

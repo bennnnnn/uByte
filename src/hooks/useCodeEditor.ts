@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { highlightGo } from "@/lib/highlight-go";
+import { getHighlighter } from "@/lib/languages/registry";
+import type { SupportedLanguage } from "@/lib/languages/types";
 
 export function parseErrorLines(errorText: string): Set<number> {
   const lines = new Set<number>();
@@ -17,7 +18,7 @@ export interface CodeEditorState {
   errorLines: Set<number>;
   setErrorLines: (lines: Set<number>) => void;
   formatting: boolean;
-  highlightGo: typeof highlightGo;
+  highlightGo: (code: string) => string;
   preRef: React.RefObject<HTMLPreElement | null>;
   lineNumRef: React.RefObject<HTMLDivElement | null>;
   highlightRef: React.RefObject<HTMLDivElement | null>;
@@ -26,8 +27,12 @@ export interface CodeEditorState {
   syncScroll: () => void;
 }
 
-export function useCodeEditor(initialCode: string): CodeEditorState {
+export function useCodeEditor(
+  initialCode: string,
+  lang: SupportedLanguage = "go"
+): CodeEditorState {
   const [code, setCode] = useState(initialCode);
+  const highlightFn = getHighlighter(lang);
   const [errorLines, setErrorLines] = useState<Set<number>>(new Set());
   const [formatting, setFormatting] = useState(false);
 
@@ -73,7 +78,7 @@ export function useCodeEditor(initialCode: string): CodeEditorState {
     errorLines,
     setErrorLines,
     formatting,
-    highlightGo,
+    highlightGo: highlightFn,
     preRef,
     lineNumRef,
     highlightRef,

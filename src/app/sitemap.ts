@@ -1,13 +1,13 @@
 import type { MetadataRoute } from "next";
 import { getAllTutorials } from "@/lib/tutorials";
-
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://golang-tutorials.vercel.app";
+import { BASE_URL } from "@/lib/constants";
+import { tutorialUrl } from "@/lib/urls";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const tutorials = getAllTutorials();
+  const goTutorials = getAllTutorials("go");
 
-  const tutorialEntries = tutorials.map((tutorial) => ({
-    url: `${BASE_URL}/golang/${tutorial.slug}`,
+  const tutorialEntries = goTutorials.map((tutorial) => ({
+    url: `${BASE_URL}${tutorialUrl("go", tutorial.slug)}`,
     lastModified: new Date(),
     changeFrequency: "monthly" as const,
     priority: 0.8,

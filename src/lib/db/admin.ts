@@ -60,6 +60,56 @@ export async function setAdminStatus(userId: number, isAdmin: boolean): Promise<
   await sql`UPDATE users SET is_admin = ${isAdmin ? 1 : 0} WHERE id = ${userId}`;
 }
 
+// ─── Step Checks (pass/fail heatmap) ──────────────────
+
+let _stepChecksReady = false;
+async function ensureStepChecksTable(): Promise<void> {
+  if (_stepChecksReady) return;
+  const sql = getSql();
+  await sql`
+    CREATE TABLE IF NOT EXISTS step_checks (
+      id            SERIAL PRIMARY KEY,
+      tutorial_slug TEXT NOT NULL,
+      step_index    INTEGER NOT NULL,
+      passed        BOOLEAN NOT NULL,
+      created_at    TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    )
+  `;
+  await sql`CREATE INDEX IF NOT EXISTS idx_step_checks_slug ON step_checks(tutorial_slug)`;
+  _stepChecksReady = true;
+}
+
+export async function recordStepCheck(
+  tutorialSlug: string,
+  stepIndex: number,
+  passed: boolean
+): Promise<void> {
+  await ensureStepChecksTable();
+  const sql = getSql();
+  await sql`
+    INSERT INTO step_checks (tutorial_slug, step_index, passed)
+    VALUES (${tutorialSlug}, ${stepIndex}, ${passed})
+  `;
+}
+
+export async function getStepCheckStats(
+  tutorialSlug: string
+): Promise<{ step_index: number; pass_count: number; fail_count: number }[]> {
+  await ensureStepChecksTable();
+  const sql = getSql();
+  const rows = await sql`
+    SELECT
+      step_index,
+      COUNT(*) FILTER (WHERE passed = TRUE)::int  AS pass_count,
+      COUNT(*) FILTER (WHERE passed = FALSE)::int AS fail_count
+    FROM step_checks
+    WHERE tutorial_slug = ${tutorialSlug}
+    GROUP BY step_index
+    ORDER BY step_index
+  `;
+  return rows as { step_index: number; pass_count: number; fail_count: number }[];
+}
+
 // ─── Admin Audit Log ──────────────────────────────────
 
 let _auditLogReady = false;
@@ -77,6 +127,27 @@ async function ensureAuditLogTable(): Promise<void> {
   `;
   await sql`CREATE INDEX IF NOT EXISTS idx_audit_log_created ON admin_audit_log(created_at DESC)`;
   _auditLogReady = true;
+}
+
+export async function getAdminAuditLog(
+  limit = 100
+): Promise<{ id: number; action: string; admin_name: string | null; target_name: string | null; created_at: string }[]> {
+  await ensureAuditLogTable();
+  const sql = getSql();
+  const rows = await sql`
+    SELECT
+      a.id,
+      a.action,
+      a.created_at,
+      adm.name AS admin_name,
+      tgt.name AS target_name
+    FROM admin_audit_log a
+    LEFT JOIN users adm ON adm.id = a.admin_id
+    LEFT JOIN users tgt ON tgt.id = a.target_user_id
+    ORDER BY a.created_at DESC
+    LIMIT ${limit}
+  `;
+  return rows as { id: number; action: string; admin_name: string | null; target_name: string | null; created_at: string }[];
 }
 
 export async function logAdminAction(

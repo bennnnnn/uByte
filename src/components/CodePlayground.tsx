@@ -4,6 +4,7 @@ import { useState, useRef, useMemo, useEffect, useCallback } from "react";
 import { usePathname } from "next/navigation";
 import { highlightGo } from "@/lib/highlight-go";
 import { useAuth } from "./AuthProvider";
+import { apiFetch } from "@/lib/api-client";
 
 interface CodePlaygroundProps {
   code: string;
@@ -23,8 +24,8 @@ export default function CodePlayground({ code: initialCode, title }: CodePlaygro
   const pathname = usePathname();
   const { user } = useAuth();
 
-  // slug: "variables" from "/golang/variables"
-  const slug = pathname.replace(/^\/golang\//, "");
+  // slug: "variables" from "/go/variables" or "/golang/variables" (legacy redirect)
+  const slug = pathname.replace(/^\/(?:go|golang|python|cpp)\//, "");
   // Stable identifier for this editor on the page
   const editorKey = title ?? codeHash(initialCode);
   // localStorage key
@@ -66,7 +67,7 @@ export default function CodePlayground({ code: initialCode, title }: CodePlaygro
     if (!user || code === initialCode) return;
     if (apiTimer.current) clearTimeout(apiTimer.current);
     apiTimer.current = setTimeout(() => {
-      fetch("/api/code-drafts", {
+      apiFetch("/api/code-drafts", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ slug, key: editorKey, code }),
@@ -81,7 +82,7 @@ export default function CodePlayground({ code: initialCode, title }: CodePlaygro
     setCode(initialCode);
     localStorage.removeItem(storageKey);
     if (user) {
-      fetch("/api/code-drafts", {
+      apiFetch("/api/code-drafts", {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ slug, key: editorKey }),
@@ -157,8 +158,7 @@ export default function CodePlayground({ code: initialCode, title }: CodePlaygro
             <button
               onClick={async () => {
                 try {
-                  const slug = pathname.replace("/golang/", "");
-                  const res = await fetch("/api/bookmarks", {
+                  const res = await apiFetch("/api/bookmarks", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ tutorialSlug: slug, snippet: code, note: title || "" }),

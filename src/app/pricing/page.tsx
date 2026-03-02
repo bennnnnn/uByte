@@ -5,22 +5,6 @@ import Link from "next/link";
 import { useAuth } from "@/components/AuthProvider";
 import { hasPaidAccess } from "@/lib/plans";
 
-declare global {
-  interface Window {
-    Paddle?: {
-      Environment: { set: (env: "sandbox" | "production") => void };
-      Setup: (opts: { token: string; eventCallback?: (ev: unknown) => void }) => void;
-      Checkout: {
-        open: (opts: {
-          items: { priceId: string; quantity: number }[];
-          customData?: Record<string, string>;
-          customer?: { email?: string };
-        }) => void;
-      };
-    };
-  }
-}
-
 const CLIENT_TOKEN = process.env.NEXT_PUBLIC_PADDLE_CLIENT_TOKEN ?? "";
 const YEARLY_PRICE_ID = process.env.NEXT_PUBLIC_PADDLE_YEARLY_PRICE_ID ?? "";
 const MONTHLY_PRICE_ID = process.env.NEXT_PUBLIC_PADDLE_PRO_PRICE_ID ?? "";

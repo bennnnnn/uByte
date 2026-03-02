@@ -5,6 +5,7 @@ import { apiFetch } from "@/lib/api-client";
 import { useAuth } from "./AuthProvider";
 
 interface Props {
+  lang: string;
   tutorialSlug: string;
 }
 
@@ -14,7 +15,7 @@ interface RatingData {
   user_vote: number | null;
 }
 
-export default function TutorialRating({ tutorialSlug }: Props) {
+export default function TutorialRating({ lang, tutorialSlug }: Props) {
   const { user } = useAuth();
   const [rating, setRating] = useState<RatingData | null>(null);
   const [loading, setLoading] = useState(false);

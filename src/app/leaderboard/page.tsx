@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import Avatar from "@/components/Avatar";
 
 interface LeaderboardEntry {
@@ -83,7 +84,7 @@ export default function LeaderboardPage() {
                 <Avatar avatarKey={u.avatar || "gopher"} size="sm" />
 
                 <div className="flex-1 min-w-0">
-                  <p className="truncate font-medium text-zinc-900 dark:text-zinc-100">{u.name}</p>
+                  <Link href={`/u/${u.id}`} className="truncate font-medium text-zinc-900 hover:text-indigo-600 dark:text-zinc-100 dark:hover:text-indigo-400">{u.name}</Link>
                   <p className="text-xs text-zinc-400">
                     {u.completed_count} tutorial{u.completed_count !== 1 ? "s" : ""} · {u.streak_days}d streak
                   </p>

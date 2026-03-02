@@ -24,6 +24,7 @@ export const GET = withErrorHandling("GET /api/profile/stats", async () => {
       xp: user.xp,
       streak_days: user.streak_days,
       longest_streak: user.longest_streak,
+      streak_freezes: (user as unknown as { streak_freezes?: number }).streak_freezes ?? 1,
       completed_count: completedCount,
       total_tutorials: getAllTutorials().length,
       activity_count: activityCount,

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import ShareButton from "@/components/ShareButton";
 import type { Stats } from "./types";
+import { tutorialUrl } from "@/lib/urls";
 
 interface Props {
   stats: Stats;
@@ -113,7 +114,7 @@ export default function ProgressTab({ stats, userId }: Props) {
             {completedSlugs.map((slug) => (
               <li key={slug}>
                 <Link
-                  href={`/golang/${slug}`}
+                  href={tutorialUrl("go", slug)}
                   className="flex items-center gap-3 rounded-xl border border-zinc-200 bg-white px-4 py-3 text-sm transition-colors hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900 dark:hover:bg-zinc-800"
                 >
                   <svg className="h-4 w-4 shrink-0 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">

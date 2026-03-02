@@ -40,16 +40,28 @@ function formatCents(cents: number) {
   return `$${(cents / 100).toFixed(2)}`;
 }
 
-type Tab = "users" | "analytics" | "revenue";
+type Tab = "users" | "analytics" | "revenue" | "audit";
 
 export default function AdminPage() {
   const { user, loading } = useAuth();
   const router = useRouter();
 
+  interface AuditEntry {
+    id: number;
+    action: string;
+    admin_name: string | null;
+    target_name: string | null;
+    created_at: string;
+  }
+  interface StepStat { step_index: number; pass_count: number; fail_count: number; }
+
   const [tab, setTab] = useState<Tab>("users");
   const [users, setUsers] = useState<AdminUser[]>([]);
   const [analytics, setAnalytics] = useState<TutorialAnalytics[]>([]);
   const [revenue, setRevenue] = useState<AdminRevenueStats | null>(null);
+  const [auditLog, setAuditLog] = useState<AuditEntry[]>([]);
+  const [stepStats, setStepStats] = useState<StepStat[]>([]);
+  const [heatmapSlug, setHeatmapSlug] = useState("");
   const [fetching, setFetching] = useState(true);
   const [error, setError] = useState("");
   const [query, setQuery] = useState("");
@@ -75,11 +87,16 @@ export default function AdminPage() {
         if (!r.ok) return null;
         return r.json();
       }),
+      fetch("/api/admin/audit-log", { credentials: "same-origin" }).then(async (r) => {
+        if (!r.ok) return { log: [] };
+        return r.json();
+      }),
     ])
-      .then(([userData, analyticsData, revenueData]) => {
+      .then(([userData, analyticsData, revenueData, auditData]) => {
         if (userData) setUsers(userData.users ?? []);
         setAnalytics(analyticsData.analytics ?? []);
         if (revenueData) setRevenue(revenueData);
+        setAuditLog(auditData.log ?? []);
       })
       .catch((err) => setError(String(err.message ?? err)))
       .finally(() => setFetching(false));
@@ -181,7 +198,7 @@ export default function AdminPage() {
 
       {/* Tabs */}
       <div className="mb-6 flex gap-1 rounded-xl border border-zinc-200 bg-zinc-100 p-1 dark:border-zinc-800 dark:bg-zinc-900">
-        {(["users", "analytics", "revenue"] as Tab[]).map((t) => (
+        {(["users", "analytics", "revenue", "audit"] as Tab[]).map((t) => (
           <button
             key={t}
             onClick={() => setTab(t)}
@@ -191,7 +208,7 @@ export default function AdminPage() {
                 : "text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200"
             }`}
           >
-            {t === "users" ? "Users" : t === "analytics" ? "Tutorial Analytics" : "Revenue"}
+            {t === "users" ? "Users" : t === "analytics" ? "Tutorial Analytics" : t === "revenue" ? "Revenue" : "Audit Log"}
           </button>
         ))}
       </div>
@@ -309,6 +326,85 @@ export default function AdminPage() {
               })}
               {analytics.length === 0 && (
                 <tr><td colSpan={5} className="px-4 py-12 text-center text-zinc-400">No tutorial data yet.</td></tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      {/* Step difficulty heatmap — shown inside analytics tab */}
+      {tab === "analytics" && (
+        <div className="mt-8 rounded-xl border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-900">
+          <h3 className="mb-4 text-sm font-semibold text-zinc-700 dark:text-zinc-300">Step Difficulty Heatmap</h3>
+          <div className="mb-4 flex items-center gap-3">
+            <select
+              value={heatmapSlug}
+              onChange={async (e) => {
+                const slug = e.target.value;
+                setHeatmapSlug(slug);
+                if (!slug) { setStepStats([]); return; }
+                const r = await fetch(`/api/admin/users?view=step-stats&slug=${encodeURIComponent(slug)}`, { credentials: "same-origin" });
+                const d = await r.json();
+                setStepStats(d.stats ?? []);
+              }}
+              className="rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-1.5 text-sm text-zinc-700 focus:border-indigo-500 focus:outline-none dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300"
+            >
+              <option value="">Select a tutorial…</option>
+              {analytics.map((t) => (
+                <option key={t.slug} value={t.slug}>{slugToTitle(t.slug)}</option>
+              ))}
+            </select>
+          </div>
+          {stepStats.length > 0 ? (
+            <div className="space-y-2">
+              {stepStats.map((s) => {
+                const total = s.pass_count + s.fail_count;
+                const pct = total > 0 ? Math.round((s.pass_count / total) * 100) : 0;
+                return (
+                  <div key={s.step_index} className="flex items-center gap-3">
+                    <span className="w-16 shrink-0 text-xs text-zinc-500">Step {s.step_index + 1}</span>
+                    <div className="flex-1 overflow-hidden rounded-full bg-zinc-100 dark:bg-zinc-800">
+                      <div
+                        className={`h-4 rounded-full transition-all ${pct >= 70 ? "bg-emerald-500" : pct >= 40 ? "bg-amber-500" : "bg-red-500"}`}
+                        style={{ width: `${Math.max(pct, 2)}%` }}
+                      />
+                    </div>
+                    <span className="w-24 shrink-0 text-right text-xs text-zinc-400">
+                      {pct}% pass ({total})
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+          ) : (
+            <p className="text-sm text-zinc-400">{heatmapSlug ? "No data yet for this tutorial." : "Select a tutorial above."}</p>
+          )}
+        </div>
+      )}
+
+      {/* ── Audit Log tab ── */}
+      {tab === "audit" && (
+        <div className="overflow-hidden rounded-xl border border-zinc-200 dark:border-zinc-800">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-zinc-200 bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900">
+                <th className="px-4 py-3 text-left font-medium text-zinc-500 dark:text-zinc-400">Action</th>
+                <th className="px-4 py-3 text-left font-medium text-zinc-500 dark:text-zinc-400">Admin</th>
+                <th className="px-4 py-3 text-left font-medium text-zinc-500 dark:text-zinc-400">Target</th>
+                <th className="px-4 py-3 text-right font-medium text-zinc-500 dark:text-zinc-400">When</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800">
+              {auditLog.map((entry) => (
+                <tr key={entry.id} className="bg-white hover:bg-zinc-50 dark:bg-zinc-950 dark:hover:bg-zinc-900">
+                  <td className="px-4 py-3 font-mono text-xs text-zinc-700 dark:text-zinc-300">{entry.action}</td>
+                  <td className="px-4 py-3 text-zinc-600 dark:text-zinc-400">{entry.admin_name ?? "—"}</td>
+                  <td className="px-4 py-3 text-zinc-600 dark:text-zinc-400">{entry.target_name ?? "—"}</td>
+                  <td className="px-4 py-3 text-right text-zinc-400">{formatDate(entry.created_at)}</td>
+                </tr>
+              ))}
+              {auditLog.length === 0 && (
+                <tr><td colSpan={4} className="px-4 py-12 text-center text-zinc-400">No admin actions recorded yet.</td></tr>
               )}
             </tbody>
           </table>

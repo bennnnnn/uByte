@@ -16,8 +16,14 @@ import { usePanelResize } from "@/hooks/usePanelResize";
 import OutputPanel from "@/components/tutorial/OutputPanel";
 import InstructionsSidebar from "@/components/tutorial/InstructionsSidebar";
 import CourseOutlineDrawer from "@/components/tutorial/CourseOutlineDrawer";
+import ShortcutsModal from "@/components/tutorial/ShortcutsModal";
+import SnapshotDrawer from "@/components/tutorial/SnapshotDrawer";
+import ChallengeTimer from "@/components/tutorial/ChallengeTimer";
+import { useChallengeTimer } from "@/hooks/useChallengeTimer";
+import { tutorialUrl } from "@/lib/urls";
 
 interface Props {
+  lang: string;
   tutorialTitle: string;
   tutorialSlug: string;
   steps: TutorialStep[];
@@ -41,6 +47,7 @@ function GripDots({ vertical }: { vertical?: boolean }) {
 }
 
 export default function InteractiveTutorial({
+  lang,
   tutorialTitle,
   tutorialSlug,
   steps,
@@ -51,14 +58,23 @@ export default function InteractiveTutorial({
 }: Props) {
   const { user, profile, logout, loading } = useAuth();
 
-  const editor = useCodeEditor(steps[0]?.starter ?? "");
-  const stepProgress = useStepProgress(steps, tutorialSlug, next, editor.setCode);
+  const editor = useCodeEditor(steps[0]?.starter ?? "", lang as import("@/lib/languages/types").SupportedLanguage);
+  const stepProgress = useStepProgress(steps, lang, tutorialSlug, next, editor.setCode, user?.id);
   const { leftWidth, outputHeight, isDragging, startDragH, startDragV } = usePanelResize();
 
   const [bookmarked, setBookmarked] = useState(false);
   const [showNav, setShowNav] = useState(false);
   const [expandedSlug, setExpandedSlug] = useState(tutorialSlug);
   const [showUserMenu, setShowUserMenu] = useState(false);
+  const [showShortcuts, setShowShortcuts] = useState(false);
+  const [showSnapshots, setShowSnapshots] = useState(false);
+  const [challengeMode, setChallengeMode] = useState(false);
+  const [challengeResult, setChallengeResult] = useState<{ totalMs: number; personalBest: number | null } | null>(null);
+  const challengeTimer = useChallengeTimer();
+  const [fontSize, setFontSize] = useState<14 | 16 | 18>(() => {
+    try { const s = localStorage.getItem("ide-font-size"); if (s === "16") return 16; if (s === "18") return 18; } catch { /* ignore */ }
+    return 14;
+  });
   const [mobileTab, setMobileTab] = useState<"instructions" | "code">("instructions");
   const [isMobile, setIsMobile] = useState(false);
   const userMenuRef = useRef<HTMLDivElement>(null);
@@ -73,10 +89,26 @@ export default function InteractiveTutorial({
     return () => window.removeEventListener("resize", check);
   }, []);
 
-  // Switch to instructions tab after passing
+  // Auto-switch mobile tab on pass/fail
   useEffect(() => {
     if (stepProgress.status === "passed") setMobileTab("instructions");
-  }, [stepProgress.status]);
+    if (stepProgress.status === "failed" && isMobile) setMobileTab("code");
+  }, [stepProgress.status, isMobile]);
+
+  // Challenge mode: stop timer on tutorial completion
+  useEffect(() => {
+    if (!challengeMode || !stepProgress.tutorialDone) return;
+    const totalMs = challengeTimer.stop();
+    if (!user) return;
+    apiFetch("/api/challenge", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ slug: tutorialSlug, totalMs, stepsCount: steps.length }),
+    })
+      .then((r) => r.json())
+      .then((d) => setChallengeResult({ totalMs, personalBest: d.personalBest ?? totalMs }))
+      .catch(() => setChallengeResult({ totalMs, personalBest: null }));
+  }, [stepProgress.tutorialDone, challengeMode]);
 
   // Close user menu on outside click
   useEffect(() => {
@@ -99,6 +131,18 @@ export default function InteractiveTutorial({
       if (res.ok) { setBookmarked(true); setTimeout(() => setBookmarked(false), 2000); }
     } catch { /* ignore */ }
   }
+
+  // Global ? key → shortcuts modal (only when not typing in textarea)
+  useEffect(() => {
+    function handleGlobalKey(e: KeyboardEvent) {
+      if (e.key === "?" && document.activeElement?.tagName !== "TEXTAREA") {
+        e.preventDefault();
+        setShowShortcuts((v) => !v);
+      }
+    }
+    window.addEventListener("keydown", handleGlobalKey);
+    return () => window.removeEventListener("keydown", handleGlobalKey);
+  }, []);
 
   function handleKeyDown(e: React.KeyboardEvent<HTMLTextAreaElement>) {
     if (e.key === "Tab") {
@@ -149,6 +193,28 @@ export default function InteractiveTutorial({
         </div>
         <h1 className="max-w-[40%] truncate text-sm font-semibold text-zinc-800 dark:text-zinc-100">{tutorialTitle}</h1>
         <div className="flex items-center gap-3">
+          {user && (
+            <button
+              onClick={() => {
+                if (!challengeMode) {
+                  setChallengeMode(true);
+                  challengeTimer.reset();
+                  challengeTimer.start();
+                } else {
+                  setChallengeMode(false);
+                  challengeTimer.reset();
+                }
+              }}
+              title="Toggle challenge mode"
+              className={`hidden items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-medium transition-colors sm:flex ${
+                challengeMode
+                  ? "bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-400"
+                  : "text-zinc-500 hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-zinc-800"
+              }`}
+            >
+              ⏱ {challengeMode ? "Stop" : "Challenge"}
+            </button>
+          )}
           <ThemeToggle className="flex h-8 w-8 items-center justify-center rounded text-zinc-500 transition-colors hover:bg-zinc-200 hover:text-zinc-800 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-200" />
           <div className="relative" ref={userMenuRef}>
             <button onClick={() => setShowUserMenu((v) => !v)} title={user ? "Account" : "Log in"} className="flex items-center gap-1.5 rounded-full p-1 transition-colors hover:bg-zinc-200 dark:hover:bg-zinc-800">
@@ -196,12 +262,24 @@ export default function InteractiveTutorial({
       </header>
 
       {/* Mobile tab bar */}
-      <div className="flex shrink-0 border-b border-zinc-200 dark:border-zinc-800 md:hidden">
+      <div className="flex shrink-0 items-center border-b border-zinc-200 dark:border-zinc-800 md:hidden">
         {(["instructions", "code"] as const).map((tab) => (
-          <button key={tab} onClick={() => setMobileTab(tab)} className={`flex-1 py-2 text-sm font-medium capitalize transition-colors ${mobileTab === tab ? "border-b-2 border-indigo-500 text-indigo-600 dark:text-indigo-400" : "text-zinc-500 dark:text-zinc-400"}`}>
-            {tab === "instructions" ? "Instructions" : "Code Editor"}
+          <button key={tab} onClick={() => setMobileTab(tab)} className={`relative flex-1 py-2 text-sm font-medium capitalize transition-colors ${mobileTab === tab ? "border-b-2 border-indigo-500 text-indigo-600 dark:text-indigo-400" : "text-zinc-500 dark:text-zinc-400"}`}>
+            {tab === "instructions" ? "Instructions" : (
+              <>
+                Code Editor
+                {stepProgress.output && (stepProgress.outputIsError || stepProgress.status === "failed") && mobileTab !== "code" && (
+                  <span className="absolute right-6 top-2 h-2 w-2 rounded-full bg-red-500" />
+                )}
+              </>
+            )}
           </button>
         ))}
+        {/* Font size controls — mobile only */}
+        <div className="flex items-center gap-0.5 px-2">
+          <button onClick={() => { const s = fontSize === 18 ? 16 : 14; setFontSize(s); try { localStorage.setItem("ide-font-size", String(s)); } catch { /* ignore */ } }} className="rounded px-1.5 py-1 text-xs text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800">A⁻</button>
+          <button onClick={() => { const s = fontSize === 14 ? 16 : 18; setFontSize(s); try { localStorage.setItem("ide-font-size", String(s)); } catch { /* ignore */ } }} className="rounded px-1.5 py-1 text-xs text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800">A⁺</button>
+        </div>
       </div>
 
       {/* Main Split */}
@@ -209,6 +287,7 @@ export default function InteractiveTutorial({
         {/* Left panel */}
         <aside className={`flex shrink-0 flex-col overflow-hidden bg-zinc-50 dark:bg-zinc-900 ${mobileTab === "instructions" ? "flex" : "hidden"} md:flex`} style={isMobile ? undefined : { width: leftWidth }} suppressHydrationWarning>
           <InstructionsSidebar
+            lang={lang}
             step={currentStep}
             stepIndex={stepProgress.stepIndex}
             steps={steps}
@@ -231,7 +310,7 @@ export default function InteractiveTutorial({
         {/* Right panel */}
         <div className={`flex-col overflow-hidden ${mobileTab === "code" ? "flex" : "hidden"} md:flex flex-1`}>
           {/* Code editor */}
-          <div className="flex flex-1 overflow-hidden bg-zinc-950 font-mono text-sm leading-6">
+          <div className="flex flex-1 overflow-hidden bg-zinc-950 font-mono leading-6" style={{ fontSize: isMobile ? fontSize : undefined }}>
             <div ref={editor.lineNumRef} aria-hidden className="shrink-0 select-none overflow-hidden border-r border-zinc-800 bg-zinc-900 px-3 py-4 text-right text-zinc-600">
               {editor.code.split("\n").map((_, i) => (
                 <div key={i} className={editor.errorLines.has(i + 1) ? "text-red-400" : ""}>
@@ -267,6 +346,18 @@ export default function InteractiveTutorial({
                 {bookmarked ? "Saved!" : "Bookmark"}
               </button>
             )}
+            {user && (
+              <button onClick={() => setShowSnapshots(true)} title="Code history" className="flex items-center gap-1.5 rounded-md border border-zinc-300 px-3 py-1.5 text-sm text-zinc-500 transition-colors hover:border-zinc-400 hover:text-zinc-800 dark:border-zinc-700 dark:text-zinc-400 dark:hover:border-zinc-600 dark:hover:text-zinc-200">
+                🕐
+              </button>
+            )}
+            <button
+              onClick={() => setShowShortcuts(true)}
+              title="Keyboard shortcuts (?)"
+              className="ml-auto flex h-7 w-7 items-center justify-center rounded-md border border-zinc-300 text-xs font-bold text-zinc-400 transition-colors hover:border-zinc-400 hover:text-zinc-600 dark:border-zinc-700 dark:text-zinc-500 dark:hover:border-zinc-600 dark:hover:text-zinc-300"
+            >
+              ?
+            </button>
           </div>
 
           {/* Vertical resize handle */}
@@ -292,8 +383,33 @@ export default function InteractiveTutorial({
         </div>
       </div>
 
+      {challengeMode && <ChallengeTimer display={challengeTimer.display} />}
+
+      {/* Mobile persistent bottom action bar */}
+      <div className="fixed bottom-0 left-0 right-0 z-[54] flex items-center gap-2 border-t border-zinc-200 bg-zinc-50 px-4 py-2 md:hidden dark:border-zinc-800 dark:bg-zinc-900">
+        <button onClick={() => stepProgress.handleRun(editor.code, editor.setErrorLines)} disabled={stepProgress.status === "running"} className="flex flex-1 items-center justify-center gap-1 rounded-md bg-green-100 py-2 text-sm font-medium text-green-800 disabled:opacity-50 dark:bg-green-900/40 dark:text-green-300">
+          {stepProgress.status === "running" ? "…" : "▶ Run"}
+        </button>
+        <button onClick={() => stepProgress.handleCheck(editor.code, currentStep, editor.setCode, editor.setErrorLines)} disabled={stepProgress.status === "running"} className="flex flex-1 items-center justify-center gap-1 rounded-md bg-indigo-700 py-2 text-sm font-medium text-white disabled:opacity-50">
+          ✓ Check
+        </button>
+        <button onClick={() => stepProgress.handleReset(currentStep, editor.setCode, editor.setErrorLines)} className="flex flex-1 items-center justify-center rounded-md border border-zinc-300 py-2 text-sm text-zinc-500 dark:border-zinc-700 dark:text-zinc-400">
+          Reset
+        </button>
+      </div>
+      {showShortcuts && <ShortcutsModal onClose={() => setShowShortcuts(false)} />}
+      {showSnapshots && (
+        <SnapshotDrawer
+          slug={tutorialSlug}
+          stepIndex={stepProgress.stepIndex}
+          onRestore={(code) => editor.setCode(code)}
+          onClose={() => setShowSnapshots(false)}
+        />
+      )}
+
       {/* Course outline drawer */}
       <CourseOutlineDrawer
+        lang={lang}
         show={showNav}
         onClose={() => setShowNav(false)}
         allTutorials={allTutorials}
@@ -313,12 +429,23 @@ export default function InteractiveTutorial({
             <div className="mb-3 text-5xl">🎉</div>
             <h2 id="congrats-title" className="mb-2 text-2xl font-bold text-zinc-900 dark:text-zinc-100">Tutorial Complete!</h2>
             <p className="mb-2 text-zinc-500 dark:text-zinc-400">You finished <span className="font-medium text-zinc-800 dark:text-zinc-200">{tutorialTitle}</span>. Great work!</p>
+            {challengeResult && (
+              <div className="mb-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 dark:border-amber-800 dark:bg-amber-950/40">
+                <p className="text-sm font-semibold text-amber-700 dark:text-amber-400">🏁 Challenge Complete!</p>
+                <p className="text-xs text-amber-600 dark:text-amber-500">
+                  Time: <span className="font-mono font-bold">{challengeTimer.display}</span>
+                  {challengeResult.personalBest !== null && challengeResult.personalBest <= challengeResult.totalMs && (
+                    <span className="ml-2">🏆 New personal best!</span>
+                  )}
+                </p>
+              </div>
+            )}
             <p className="mb-6 text-xs text-zinc-400 dark:text-zinc-500">{next ? `Continuing to "${next.title}" in ${stepProgress.countdown}…` : `Returning home in ${stepProgress.countdown}…`}</p>
             <div className="flex flex-wrap justify-center gap-3">
               <button onClick={() => stepProgress.setTutorialDone(false)} className="rounded-lg border border-zinc-300 px-4 py-2 text-sm text-zinc-600 transition-colors hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800">Review steps</button>
-              <ShareButton text={`I just completed "${tutorialTitle}" on uByte! 🐹`} url={typeof window !== "undefined" ? `${window.location.origin}/golang/${tutorialSlug}` : ""} />
+              <ShareButton text={`I just completed "${tutorialTitle}" on uByte! 🐹`} url={typeof window !== "undefined" ? `${window.location.origin}${tutorialUrl(lang, tutorialSlug)}` : ""} />
               {next ? (
-                <Link href={`/golang/${next.slug}`} className="rounded-lg bg-indigo-700 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-indigo-800">Next: {next.title} →</Link>
+                <Link href={tutorialUrl(lang, next.slug)} className="rounded-lg bg-indigo-700 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-indigo-800">Next: {next.title} →</Link>
               ) : (
                 <Link href="/" className="rounded-lg bg-indigo-700 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-indigo-800">All Tutorials</Link>
               )}

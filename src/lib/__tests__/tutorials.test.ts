@@ -24,6 +24,8 @@ const makeMdx = (title: string, order: number, content = "") =>
 
 beforeEach(() => {
   vi.clearAllMocks();
+  // getAllTutorials/getTutorialBySlug check existsSync(contentDir) — must return true
+  mockExistsSync.mockReturnValue(true);
 });
 
 describe("getAllTutorials", () => {
@@ -33,7 +35,7 @@ describe("getAllTutorials", () => {
       .mockReturnValueOnce(makeMdx("Beta", 2))
       .mockReturnValueOnce(makeMdx("Alpha", 1));
 
-    const result = getAllTutorials();
+    const result = getAllTutorials("go");
     expect(result).toHaveLength(2);
     expect(result[0].slug).toBe("a");
     expect(result[0].title).toBe("Alpha");
@@ -46,7 +48,7 @@ describe("getAllTutorials", () => {
       makeMdx("Test", 1, "## Hello World\nsome text\n## `Code Example`\n")
     );
 
-    const result = getAllTutorials();
+    const result = getAllTutorials("go");
     expect(result[0].subtopics).toHaveLength(2);
     expect(result[0].subtopics[0]).toEqual({ id: "hello-world", title: "Hello World" });
     expect(result[0].subtopics[1]).toEqual({ id: "code-example", title: "Code Example" });
@@ -58,7 +60,7 @@ describe("getAllTutorials", () => {
       .mockReturnValueOnce(makeMdx("A", 1))
       .mockReturnValueOnce(makeMdx("B", 2));
 
-    const result = getAllTutorials();
+    const result = getAllTutorials("go");
     expect(result).toHaveLength(2);
   });
 });
@@ -68,7 +70,7 @@ describe("getTutorialBySlug", () => {
     mockExistsSync.mockReturnValue(true);
     mockReadFileSync.mockReturnValue(makeMdx("Found", 1, "## Section\nbody"));
 
-    const result = getTutorialBySlug("found");
+    const result = getTutorialBySlug("found", "go");
     expect(result).not.toBeNull();
     expect(result!.title).toBe("Found");
     expect(result!.content).toContain("## Section");
@@ -76,7 +78,7 @@ describe("getTutorialBySlug", () => {
 
   it("returns null when not found", () => {
     mockExistsSync.mockReturnValue(false);
-    const result = getTutorialBySlug("nonexistent");
+    const result = getTutorialBySlug("nonexistent", "go");
     expect(result).toBeNull();
   });
 });
@@ -91,19 +93,19 @@ describe("getAdjacentTutorials", () => {
   });
 
   it("returns prev and next for middle tutorial", () => {
-    const { prev, next } = getAdjacentTutorials("b");
+    const { prev, next } = getAdjacentTutorials("b", "go");
     expect(prev?.slug).toBe("a");
     expect(next?.slug).toBe("c");
   });
 
   it("returns null prev for first tutorial", () => {
-    const { prev, next } = getAdjacentTutorials("a");
+    const { prev, next } = getAdjacentTutorials("a", "go");
     expect(prev).toBeNull();
     expect(next?.slug).toBe("b");
   });
 
   it("returns null next for last tutorial", () => {
-    const { prev, next } = getAdjacentTutorials("c");
+    const { prev, next } = getAdjacentTutorials("c", "go");
     expect(prev?.slug).toBe("b");
     expect(next).toBeNull();
   });

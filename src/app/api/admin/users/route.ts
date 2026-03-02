@@ -8,6 +8,7 @@ import {
   setAdminStatus,
   getAdminTutorialAnalytics,
   logAdminAction,
+  getStepCheckStats,
 } from "@/lib/db";
 import { verifyCsrf } from "@/lib/csrf";
 import { withErrorHandling, requireAdmin } from "@/lib/api-utils";
@@ -20,6 +21,12 @@ export const GET = withErrorHandling("GET /api/admin/users", async (request: Nex
   if (searchParams.get("view") === "analytics") {
     const analytics = await getAdminTutorialAnalytics();
     return NextResponse.json({ analytics });
+  }
+  if (searchParams.get("view") === "step-stats") {
+    const slug = searchParams.get("slug") ?? "";
+    if (!slug) return NextResponse.json({ stats: [] });
+    const stats = await getStepCheckStats(slug);
+    return NextResponse.json({ stats });
   }
 
   const users = await getAdminUsers();

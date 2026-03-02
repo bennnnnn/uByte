@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import Link from "next/link";
 import { getAllTutorials } from "@/lib/tutorials";
+import { BASE_URL } from "@/lib/constants";
+import { tutorialUrl } from "@/lib/urls";
 import TutorialGrid from "@/components/TutorialGrid";
 import ContinueBanner from "@/components/ContinueBanner";
 import GoogleOAuthError from "@/components/GoogleOAuthError";
@@ -24,8 +26,6 @@ export const metadata: Metadata = {
   },
 };
 
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://golang-tutorials.vercel.app";
-
 const HOW_IT_WORKS = [
   { icon: "📖", label: "Read", desc: "Short, focused lessons" },
   { icon: "✏️", label: "Code", desc: "Edit real Go in the browser" },
@@ -34,7 +34,7 @@ const HOW_IT_WORKS = [
 ];
 
 export default function Home() {
-  const tutorials = getAllTutorials();
+  const tutorials = getAllTutorials("go");
   const tutorialList = tutorials.map(({ slug, title }) => ({ slug, title }));
 
   const jsonLd = {
@@ -48,7 +48,7 @@ export default function Home() {
     hasCourseInstance: tutorials.map((t) => ({
       "@type": "CourseInstance",
       name: t.title,
-      url: `${BASE_URL}/golang/${t.slug}`,
+      url: `${BASE_URL}${tutorialUrl("go", t.slug)}`,
     })),
   };
 
@@ -77,7 +77,7 @@ export default function Home() {
         {tutorials.length > 0 && (
           <div className="mt-7 flex flex-wrap gap-3">
             <Link
-              href={`/golang/${tutorials[0].slug}`}
+              href={tutorialUrl("go", tutorials[0].slug)}
               className="inline-flex items-center gap-2 rounded-xl bg-indigo-700 px-6 py-3 text-sm font-semibold text-white shadow-sm transition-all hover:bg-indigo-800 hover:shadow-md"
             >
               Start Learning →
@@ -101,13 +101,13 @@ export default function Home() {
       </div>
 
       {/* Continue banner */}
-      <ContinueBanner tutorials={tutorialList} />
+      <ContinueBanner lang="go" tutorials={tutorialList} />
 
       {/* Tutorial grid */}
       <h2 className="mb-5 text-xl font-semibold text-zinc-900 dark:text-zinc-100">
         All Tutorials
       </h2>
-      <TutorialGrid tutorials={tutorials} />
+      <TutorialGrid lang="go" tutorials={tutorials} />
     </div>
   );
 }

@@ -1,10 +1,21 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useNavState } from "@/hooks/useNavState";
 import { useAuth } from "@/components/AuthProvider";
 import { FREE_TUTORIAL_LIMIT, hasPaidAccess } from "@/lib/plans";
+import { tutorialUrl } from "@/lib/urls";
+
+interface SearchResult {
+  slug: string;
+  title: string;
+  matchType: "tutorial" | "step";
+  stepIndex?: number;
+  stepTitle?: string;
+  excerpt: string;
+}
 
 interface SubTopic {
   id: string;
@@ -18,11 +29,34 @@ interface SidebarItem {
   subtopics: SubTopic[];
 }
 
-export default function Sidebar({ tutorials }: { tutorials: SidebarItem[] }) {
-  const { pathname, expanded, activeHash, toggleExpand } = useNavState(tutorials);
+export default function Sidebar({ lang, tutorials }: { lang: string; tutorials: SidebarItem[] }) {
+  const { pathname, expanded, activeHash, toggleExpand } = useNavState(tutorials, lang);
   const { progress, profile } = useAuth();
   const userHasPaidAccess = hasPaidAccess(profile?.plan);
   const [query, setQuery] = useState("");
+  const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
+  const [showDropdown, setShowDropdown] = useState(false);
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const router = useRouter();
+
+  useEffect(() => {
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    if (query.trim().length < 2) {
+      setSearchResults([]);
+      setShowDropdown(false);
+      return;
+    }
+    debounceRef.current = setTimeout(() => {
+      fetch(`/api/search?q=${encodeURIComponent(query.trim())}`)
+        .then((r) => r.json())
+        .then((d) => {
+          setSearchResults(d.results ?? []);
+          setShowDropdown(true);
+        })
+        .catch(() => {});
+    }, 300);
+    return () => { if (debounceRef.current) clearTimeout(debounceRef.current); };
+  }, [query]);
 
   return (
     <aside className="hidden md:flex w-72 shrink-0 flex-col border-r border-zinc-100 bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-950">
@@ -44,12 +78,14 @@ export default function Sidebar({ tutorials }: { tutorials: SidebarItem[] }) {
             type="search"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
+            onBlur={() => setTimeout(() => setShowDropdown(false), 150)}
+            onFocus={() => searchResults.length > 0 && setShowDropdown(true)}
             placeholder="Search lessons..."
             className="w-full rounded-lg border border-zinc-200 bg-white py-2 pl-9 pr-8 text-sm text-zinc-700 placeholder-zinc-400 focus:border-indigo-500 focus:outline-none dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300 dark:placeholder-zinc-500"
           />
           {query && (
             <button
-              onClick={() => setQuery("")}
+              onClick={() => { setQuery(""); setShowDropdown(false); setSearchResults([]); }}
               className="absolute right-2.5 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200"
               aria-label="Clear search"
             >
@@ -57,6 +93,39 @@ export default function Sidebar({ tutorials }: { tutorials: SidebarItem[] }) {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
+          )}
+
+          {/* Search dropdown */}
+          {showDropdown && searchResults.length > 0 && (
+            <div className="absolute left-0 right-0 top-full z-50 mt-1 max-h-72 overflow-y-auto rounded-xl border border-zinc-200 bg-white shadow-lg dark:border-zinc-700 dark:bg-zinc-900">
+              {searchResults.map((r, i) => (
+                <button
+                  key={i}
+                  onMouseDown={() => {
+                    const href = r.matchType === "step" && r.stepIndex !== undefined
+                      ? tutorialUrl(lang, r.slug, r.stepIndex)
+                      : tutorialUrl(lang, r.slug);
+                    setShowDropdown(false);
+                    setQuery("");
+                    router.push(href);
+                  }}
+                  className="flex w-full flex-col gap-0.5 px-3 py-2.5 text-left transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-800"
+                >
+                  <div className="flex items-center gap-2">
+                    <span className={`shrink-0 rounded px-1.5 py-0.5 text-[10px] font-bold uppercase ${r.matchType === "tutorial" ? "bg-indigo-100 text-indigo-700 dark:bg-indigo-950 dark:text-indigo-400" : "bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400"}`}>
+                      {r.matchType === "tutorial" ? "Tutorial" : "Step"}
+                    </span>
+                    <span className="truncate text-sm font-medium text-zinc-800 dark:text-zinc-200">
+                      {r.stepTitle ?? r.title}
+                    </span>
+                  </div>
+                  {r.matchType === "step" && (
+                    <span className="pl-1 text-xs text-zinc-400">{r.title}</span>
+                  )}
+                  <p className="line-clamp-1 pl-1 text-xs text-zinc-400">{r.excerpt}</p>
+                </button>
+              ))}
+            </div>
           )}
         </div>
 
@@ -73,7 +142,7 @@ export default function Sidebar({ tutorials }: { tutorials: SidebarItem[] }) {
               return <li className="px-3 py-4 text-center text-xs text-zinc-400 dark:text-zinc-500">No lessons found</li>;
             }
             return filtered.map((tutorial) => {
-              const href = `/golang/${tutorial.slug}`;
+              const href = tutorialUrl(lang, tutorial.slug);
               const isOnThisPage = pathname === href;
               const isExpanded = expanded === tutorial.slug;
               const isCompleted = progress.includes(tutorial.slug);

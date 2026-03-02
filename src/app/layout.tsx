@@ -12,6 +12,7 @@ import CookieConsent from "@/components/CookieConsent";
 import EmailVerificationBanner from "@/components/EmailVerificationBanner";
 import { Analytics } from "@vercel/analytics/next";
 import { getAllTutorials } from "@/lib/tutorials";
+import { BASE_URL } from "@/lib/constants";
 import Link from "next/link";
 import Script from "next/script";
 
@@ -28,8 +29,6 @@ const geistMono = Geist_Mono({
   display: "swap",
   preload: true,
 });
-
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://golang-tutorials.vercel.app";
 
 export const metadata: Metadata = {
   metadataBase: new URL(BASE_URL),
@@ -83,7 +82,7 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const tutorials = getAllTutorials();
+  const tutorials = getAllTutorials("go");
 
   return (
     <html lang="en">
@@ -112,9 +111,9 @@ export default function RootLayout({
               </div>
             </header>
             <div className="flex flex-1 overflow-hidden">
-              <Sidebar tutorials={tutorials} />
+              <Sidebar lang="go" tutorials={tutorials} />
               <div className="flex flex-1 flex-col overflow-hidden">
-                <MobileNav tutorials={tutorials} />
+                <MobileNav lang="go" tutorials={tutorials} />
                 <EmailVerificationBanner />
                 <main id="main-content" className="flex-1 overflow-y-auto">
                   <ErrorBoundary>{children}</ErrorBoundary>

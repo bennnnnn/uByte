@@ -47,11 +47,8 @@ const nextConfig: NextConfig = {
   },
   async redirects() {
     return [
-      {
-        source: "/tutorials/:slug",
-        destination: "/golang/:slug",
-        permanent: true,
-      },
+      { source: "/tutorials/:slug", destination: "/go/:slug", permanent: true },
+      { source: "/golang/:path*", destination: "/go/:path*", permanent: true },
     ];
   },
   async headers() {

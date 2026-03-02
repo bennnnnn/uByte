@@ -1,6 +1,9 @@
 "use client";
 
+import { useState, useEffect, useRef } from "react";
 import TutorialRating from "@/components/TutorialRating";
+import { useAuth } from "@/components/AuthProvider";
+import { apiFetch } from "@/lib/api-client";
 import type { TutorialStep } from "@/lib/tutorial-steps";
 import type { Status } from "@/hooks/useStepProgress";
 
@@ -22,6 +25,7 @@ function InstructionText({ text }: { text: string }) {
 }
 
 interface Props {
+  lang: string;
   step: TutorialStep;
   stepIndex: number;
   steps: TutorialStep[];
@@ -36,6 +40,7 @@ interface Props {
 }
 
 export default function InstructionsSidebar({
+  lang,
   step,
   stepIndex,
   steps,
@@ -48,6 +53,32 @@ export default function InstructionsSidebar({
   onSkip,
   tutorialSlug,
 }: Props) {
+  const { user } = useAuth();
+  const [showNote, setShowNote] = useState(false);
+  const [note, setNote] = useState("");
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Load note when user/step changes
+  useEffect(() => {
+    if (!user) return;
+    fetch(`/api/notes?slug=${encodeURIComponent(tutorialSlug)}&stepIndex=${stepIndex}`, { credentials: "same-origin" })
+      .then((r) => r.json())
+      .then((d) => setNote(d.note ?? ""))
+      .catch(() => {});
+  }, [user, tutorialSlug, stepIndex]);
+
+  function handleNoteChange(val: string) {
+    setNote(val);
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(() => {
+      apiFetch("/api/notes", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ slug: tutorialSlug, stepIndex, note: val }),
+      }).catch(() => {});
+    }, 1000);
+  }
+
   return (
     <>
       <div className="flex-1 overflow-y-auto p-6">
@@ -80,6 +111,28 @@ export default function InstructionsSidebar({
           </div>
         )}
 
+        {user && (
+          <div className="mt-6">
+            <button
+              onClick={() => setShowNote((v) => !v)}
+              className="flex items-center gap-1.5 text-sm text-zinc-500 transition-colors hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200"
+            >
+              <span>{showNote ? "▾" : "▸"}</span>
+              📝 {showNote ? "Hide note" : "My note"}
+            </button>
+            {showNote && (
+              <textarea
+                value={note}
+                onChange={(e) => handleNoteChange(e.target.value)}
+                placeholder="Write a note for this step…"
+                maxLength={2000}
+                rows={4}
+                className="mt-2 w-full resize-none rounded-lg border border-zinc-200 bg-zinc-50 p-2.5 text-sm text-zinc-700 placeholder-zinc-400 focus:border-indigo-400 focus:outline-none dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300 dark:placeholder-zinc-500"
+              />
+            )}
+          </div>
+        )}
+
         {status === "passed" && (
           <div className="mt-6 rounded-lg border border-emerald-300 bg-emerald-50 p-4 dark:border-emerald-800 dark:bg-emerald-950/40">
             <p className="text-sm font-semibold text-emerald-700 dark:text-emerald-400">
@@ -94,7 +147,7 @@ export default function InstructionsSidebar({
         )}
 
         {completedSteps.size === steps.length && steps.length > 0 && (
-          <TutorialRating tutorialSlug={tutorialSlug} />
+          <TutorialRating lang={lang} tutorialSlug={tutorialSlug} />
         )}
 
         {status === "failed" && failCount >= 3 && (

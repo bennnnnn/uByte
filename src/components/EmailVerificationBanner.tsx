@@ -3,11 +3,25 @@
 import { useState } from "react";
 import { useAuth } from "./AuthProvider";
 
+const DISMISS_KEY = "banner-dismissed-verify";
+const DISMISS_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours
+
 export default function EmailVerificationBanner() {
   const { user, profile } = useAuth();
-  const [dismissed, setDismissed] = useState(false);
+  const [dismissed, setDismissed] = useState(() => {
+    try {
+      const ts = localStorage.getItem(DISMISS_KEY);
+      if (ts && Date.now() - parseInt(ts, 10) < DISMISS_TTL_MS) return true;
+    } catch { /* ignore */ }
+    return false;
+  });
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
+
+  function dismiss() {
+    setDismissed(true);
+    try { localStorage.setItem(DISMISS_KEY, String(Date.now())); } catch { /* ignore */ }
+  }
 
   // Only show for logged-in users whose email isn't verified
   if (!user || !profile || profile.emailVerified || dismissed) return null;
@@ -41,7 +55,7 @@ export default function EmailVerificationBanner() {
         )}
       </p>
       <button
-        onClick={() => setDismissed(true)}
+        onClick={dismiss}
         aria-label="Dismiss"
         className="shrink-0 rounded p-0.5 text-amber-500 hover:bg-amber-100 hover:text-amber-700 dark:hover:bg-amber-900/50 dark:hover:text-amber-300"
       >

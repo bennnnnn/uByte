@@ -3,8 +3,10 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useAuth } from "./AuthProvider";
+import { tutorialUrl } from "@/lib/urls";
 
 type Difficulty = "beginner" | "intermediate" | "advanced";
+type DifficultyFilter = "all" | Difficulty;
 
 const DIFFICULTY_STYLES: Record<Difficulty, string> = {
   beginner:     "bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-400",
@@ -20,18 +22,21 @@ interface Tutorial {
   estimatedMinutes: number;
 }
 
-export default function TutorialGrid({ tutorials }: { tutorials: Tutorial[] }) {
+export default function TutorialGrid({ lang, tutorials }: { lang: string; tutorials: Tutorial[] }) {
   const { user, progress } = useAuth();
   const completedCount = progress.length;
   const totalCount = tutorials.length;
   const [query, setQuery] = useState("");
+  const [diffFilter, setDiffFilter] = useState<DifficultyFilter>("all");
 
-  const filtered = query.trim()
-    ? tutorials.filter((t) => {
-        const q = query.toLowerCase();
-        return t.title.toLowerCase().includes(q) || t.description.toLowerCase().includes(q);
-      })
-    : tutorials;
+  const filtered = tutorials.filter((t) => {
+    if (diffFilter !== "all" && t.difficulty !== diffFilter) return false;
+    if (query.trim()) {
+      const q = query.toLowerCase();
+      return t.title.toLowerCase().includes(q) || t.description.toLowerCase().includes(q);
+    }
+    return true;
+  });
 
   return (
     <>
@@ -53,6 +58,23 @@ export default function TutorialGrid({ tutorials }: { tutorials: Tutorial[] }) {
           </div>
         </div>
       )}
+
+      {/* Difficulty filter */}
+      <div className="mb-4 flex gap-1.5 flex-wrap">
+        {(["all", "beginner", "intermediate", "advanced"] as DifficultyFilter[]).map((d) => (
+          <button
+            key={d}
+            onClick={() => setDiffFilter(d)}
+            className={`rounded-full px-3 py-1 text-xs font-medium capitalize transition-colors ${
+              diffFilter === d
+                ? "bg-indigo-600 text-white"
+                : "bg-zinc-100 text-zinc-600 hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-400 dark:hover:bg-zinc-700"
+            }`}
+          >
+            {d === "all" ? "All" : d}
+          </button>
+        ))}
+      </div>
 
       {/* Search */}
       <div className="mb-6 relative">
@@ -87,7 +109,7 @@ export default function TutorialGrid({ tutorials }: { tutorials: Tutorial[] }) {
             return (
               <Link
                 key={tutorial.slug}
-                href={`/golang/${tutorial.slug}`}
+                href={tutorialUrl(lang, tutorial.slug)}
                 className="group relative rounded-xl border border-zinc-200 p-5 transition-all hover:border-indigo-300 hover:shadow-md dark:border-zinc-800 dark:hover:border-indigo-800"
               >
                 <div className="mb-2 flex items-center gap-3">
@@ -117,6 +139,7 @@ export default function TutorialGrid({ tutorials }: { tutorials: Tutorial[] }) {
                   <span className={`rounded-full px-2.5 py-0.5 text-xs font-medium capitalize ${DIFFICULTY_STYLES[tutorial.difficulty]}`}>
                     {tutorial.difficulty}
                   </span>
+                  <span className="text-xs text-zinc-400 dark:text-zinc-500">⏱ {tutorial.estimatedMinutes} min</span>
                 </div>
               </Link>
             );

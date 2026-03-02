@@ -1,18 +1,33 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useAuth } from "@/components/AuthProvider";
+import { tutorialUrl } from "@/lib/urls";
 
 interface Tutorial {
   slug: string;
   title: string;
 }
 
-export default function ContinueBanner({ tutorials }: { tutorials: Tutorial[] }) {
+export default function ContinueBanner({ lang, tutorials }: { lang: string; tutorials: Tutorial[] }) {
   const { user, progress } = useAuth();
-  if (!user || progress.length === 0) return null;
+  const [lastStep, setLastStep] = useState<number | null>(null);
 
   const nextTutorial = tutorials.find((t) => !progress.includes(t.slug));
+
+  useEffect(() => {
+    if (!nextTutorial) return;
+    try {
+      const saved = localStorage.getItem(`last-step-${lang}-${nextTutorial.slug}`);
+      if (saved !== null) {
+        const n = parseInt(saved, 10);
+        if (!isNaN(n) && n > 0) setLastStep(n);
+      }
+    } catch { /* ignore */ }
+  }, [nextTutorial?.slug, lang]);
+
+  if (!user || progress.length === 0) return null;
   // All done
   if (!nextTutorial) {
     return (
@@ -49,7 +64,7 @@ export default function ContinueBanner({ tutorials }: { tutorials: Tutorial[] })
         </div>
       </div>
       <Link
-        href={`/golang/${nextTutorial.slug}`}
+        href={tutorialUrl(lang, nextTutorial.slug, lastStep ?? undefined)}
         className="rounded-lg bg-indigo-700 px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-indigo-800"
       >
         {nextTutorial.title} →

@@ -1,16 +1,17 @@
-# Go Tutorials
+# Go Tutorials (uByte)
 
-An interactive Go learning platform built with Next.js. Learn Go through 15 concise tutorials with a live code playground, progress tracking, XP system, and achievements.
+An interactive Go learning platform built with Next.js. Learn Go through concise tutorials with a live code playground, progress tracking, XP system, and achievements. **Multi-language ready** — structure supports adding Python, C++, and more.
 
 ## Features
 
-- 15 Go tutorials from beginner to advanced
-- Interactive code playground (runs real Go code)
+- 19+ Go tutorials from beginner to advanced
+- Interactive code playground (runs real Go code via go.dev)
 - Progress tracking with XP and streaks
 - Badges and achievements
-- Bookmarks
+- Bookmarks & code snapshots
 - Dark/light/system theme
 - Freemium signup wall (5 free page views)
+- **Modular architecture** for adding Python, C++ and other languages
 
 ## Tutorials
 
@@ -32,12 +33,12 @@ An interactive Go learning platform built with Next.js. Learn Go through 15 conc
 
 ## Tech Stack
 
-- **Framework**: Next.js 15 (App Router) + TypeScript
-- **Content**: MDX with gray-matter
-- **Database**: SQLite via better-sqlite3
-- **Auth**: JWT with HttpOnly cookies
-- **Styling**: Tailwind CSS
-- **Syntax highlighting**: Shiki (server) + custom Go highlighter (client)
+- **Framework**: Next.js 16 (App Router) + TypeScript
+- **Content**: MDX with gray-matter (`content/go/` per language)
+- **Database**: Neon PostgreSQL
+- **Auth**: JWT with HttpOnly cookies, Google OAuth, CSRF protection
+- **Styling**: Tailwind CSS 4
+- **Syntax highlighting**: Custom client-side Go highlighter
 
 ## Getting Started
 

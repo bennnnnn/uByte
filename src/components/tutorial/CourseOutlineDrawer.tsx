@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useAuth } from "@/components/AuthProvider";
+import { tutorialUrl } from "@/lib/urls";
 
 interface Tutorial {
   slug: string;
@@ -12,6 +13,7 @@ interface Tutorial {
 }
 
 interface Props {
+  lang: string;
   show: boolean;
   onClose: () => void;
   allTutorials: Tutorial[];
@@ -25,6 +27,7 @@ interface Props {
 }
 
 export default function CourseOutlineDrawer({
+  lang,
   show,
   onClose,
   allTutorials,
@@ -67,7 +70,7 @@ export default function CourseOutlineDrawer({
               return (
                 <li key={t.slug}>
                   <Link
-                    href={`/golang/${t.slug}`}
+                    href={tutorialUrl(lang, t.slug)}
                     onClick={() => {
                       if (subSteps.length > 0) onExpandSlug(isExpanded ? "" : t.slug);
                       else onClose();
@@ -115,7 +118,7 @@ export default function CourseOutlineDrawer({
                               </button>
                             ) : (
                               <Link
-                                href={`/golang/${t.slug}?step=${step.index}`}
+                                href={tutorialUrl(lang, t.slug, step.index)}
                                 onClick={onClose}
                                 className="block rounded-md px-2 py-1.5 text-xs text-zinc-400 transition-all duration-150 hover:bg-zinc-200/70 hover:text-zinc-700 dark:text-zinc-500 dark:hover:bg-zinc-800 dark:hover:text-zinc-300"
                               >

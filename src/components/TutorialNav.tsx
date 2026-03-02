@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useAuth } from "./AuthProvider";
+import { tutorialUrl } from "@/lib/urls";
 
 interface NavTutorial {
   slug: string;
@@ -9,10 +10,12 @@ interface NavTutorial {
 }
 
 export default function TutorialNav({
+  lang,
   slug,
   prev,
   next,
 }: {
+  lang: string;
   slug: string;
   prev: NavTutorial | null;
   next: NavTutorial | null;
@@ -29,7 +32,7 @@ export default function TutorialNav({
   return (
     <div className="mt-16 flex items-center justify-between border-t border-zinc-200 pt-8 dark:border-zinc-800">
       {prev ? (
-        <Link href={`/golang/${prev.slug}`} className="group flex flex-col">
+        <Link href={tutorialUrl(lang, prev.slug)} className="group flex flex-col">
           <span className="text-xs text-zinc-400 group-hover:text-zinc-600 dark:group-hover:text-zinc-300">
             &larr; Previous
           </span>
@@ -42,7 +45,7 @@ export default function TutorialNav({
       )}
       {next ? (
         <Link
-          href={`/golang/${next.slug}`}
+          href={tutorialUrl(lang, next.slug)}
           onClick={handleNext}
           className="group flex flex-col items-end"
         >

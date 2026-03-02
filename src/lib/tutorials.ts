@@ -1,8 +1,8 @@
 import fs from "fs";
 import path from "path";
 import matter from "gray-matter";
-
-const contentDir = path.join(process.cwd(), "content");
+import { getLanguageConfig } from "./languages/registry";
+import type { SupportedLanguage } from "./languages/types";
 
 export interface SubTopic {
   id: string;
@@ -43,7 +43,17 @@ function extractSubtopics(content: string): SubTopic[] {
   return subtopics;
 }
 
-export function getAllTutorials(): TutorialMeta[] {
+/** Get content directory for a language (resolves to absolute path) */
+function getContentDir(lang: SupportedLanguage): string {
+  const config = getLanguageConfig(lang);
+  if (!config) throw new Error(`Unknown language: ${lang}`);
+  return path.join(process.cwd(), config.contentDir);
+}
+
+export function getAllTutorials(lang: SupportedLanguage = "go"): TutorialMeta[] {
+  const contentDir = getContentDir(lang);
+  if (!fs.existsSync(contentDir)) return [];
+
   const files = fs.readdirSync(contentDir).filter((f) => f.endsWith(".mdx"));
 
   const tutorials = files.map((filename) => {
@@ -66,7 +76,11 @@ export function getAllTutorials(): TutorialMeta[] {
   return tutorials.sort((a, b) => a.order - b.order);
 }
 
-export function getTutorialBySlug(slug: string): Tutorial | null {
+export function getTutorialBySlug(
+  slug: string,
+  lang: SupportedLanguage = "go"
+): Tutorial | null {
+  const contentDir = getContentDir(lang);
   const filePath = path.join(contentDir, `${slug}.mdx`);
 
   if (!fs.existsSync(filePath)) return null;
@@ -86,8 +100,11 @@ export function getTutorialBySlug(slug: string): Tutorial | null {
   };
 }
 
-export function getAdjacentTutorials(currentSlug: string) {
-  const all = getAllTutorials();
+export function getAdjacentTutorials(
+  currentSlug: string,
+  lang: SupportedLanguage = "go"
+) {
+  const all = getAllTutorials(lang);
   const idx = all.findIndex((t) => t.slug === currentSlug);
 
   return {

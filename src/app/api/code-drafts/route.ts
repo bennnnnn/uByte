@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
 import { getCodeDraft, upsertCodeDraft, deleteCodeDraft } from "@/lib/db";
 import { withErrorHandling, requireAuth } from "@/lib/api-utils";
+import { verifyCsrf } from "@/lib/csrf";
 
 export const GET = withErrorHandling("GET /api/code-drafts", async (request: NextRequest) => {
   const user = await getCurrentUser();
@@ -17,6 +18,9 @@ export const GET = withErrorHandling("GET /api/code-drafts", async (request: Nex
 });
 
 export const PUT = withErrorHandling("PUT /api/code-drafts", async (request: NextRequest) => {
+  const csrfError = verifyCsrf(request);
+  if (csrfError) return NextResponse.json({ error: csrfError }, { status: 403 });
+
   const { user, response } = await requireAuth();
   if (!user) return response;
 
@@ -37,6 +41,9 @@ export const PUT = withErrorHandling("PUT /api/code-drafts", async (request: Nex
 });
 
 export const DELETE = withErrorHandling("DELETE /api/code-drafts", async (request: NextRequest) => {
+  const csrfError = verifyCsrf(request);
+  if (csrfError) return NextResponse.json({ error: csrfError }, { status: 403 });
+
   const { user, response } = await requireAuth();
   if (!user) return response;
 

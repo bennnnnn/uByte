@@ -6,6 +6,8 @@ import confetti from "canvas-confetti";
 import type { TutorialStep } from "@/lib/tutorial-steps";
 import { useAuth } from "@/components/AuthProvider";
 import { parseErrorLines } from "./useCodeEditor";
+import { apiFetch } from "@/lib/api-client";
+import { tutorialUrl } from "@/lib/urls";
 
 export type Status = "idle" | "running" | "passed" | "failed";
 
@@ -16,11 +18,14 @@ function checkOutput(output: string, expected: string[]): boolean {
   return expected.every((s) => lower.includes(s.toLowerCase()));
 }
 
-async function runCodeRequest(currentCode: string): Promise<{ output: string; hasError: boolean }> {
+async function runCodeRequest(
+  currentCode: string,
+  lang: string = "go"
+): Promise<{ output: string; hasError: boolean }> {
   const res = await fetch("/api/run-code", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ code: currentCode }),
+    body: JSON.stringify({ code: currentCode, language: lang }),
   });
   const data = await res.json();
   if (data.Errors) return { output: data.Errors as string, hasError: true };
@@ -53,9 +58,11 @@ export interface StepProgressState {
 
 export function useStepProgress(
   steps: TutorialStep[],
+  lang: string,
   tutorialSlug: string,
   next: { slug: string; title: string } | null,
-  setCode: (c: string) => void
+  setCode: (c: string) => void,
+  userId?: number
 ): StepProgressState {
   const { toggleProgress, progress } = useAuth();
   const router = useRouter();
@@ -87,6 +94,13 @@ export function useStepProgress(
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // ── Persist last-visited step for ContinueBanner deep-link ──
+  useEffect(() => {
+    try {
+      localStorage.setItem(`last-step-${lang}-${tutorialSlug}`, String(stepIndex));
+    } catch { /* ignore */ }
+  }, [stepIndex, lang, tutorialSlug]);
+
   // ── Tutorial completion ──
   useEffect(() => {
     if (completedSteps.size === steps.length && steps.length > 0 && !markedRef.current && !progress.includes(tutorialSlug)) {
@@ -107,8 +121,8 @@ export function useStepProgress(
 
   useEffect(() => {
     if (!tutorialDone || countdown > 0) return;
-    router.push(next ? `/golang/${next.slug}` : "/");
-  }, [countdown, tutorialDone, next, router]);
+    router.push(next ? tutorialUrl(lang, next.slug) : "/");
+  }, [countdown, tutorialDone, next, router, lang]);
 
   // ── Auto-advance to next step after passing ──
   useEffect(() => {
@@ -165,7 +179,7 @@ export function useStepProgress(
     setErrorLines(new Set());
     setAiFeedback(null);
     try {
-      const { output: out, hasError } = await runCodeRequest(code);
+      const { output: out, hasError } = await runCodeRequest(code, lang);
       setOutputIsError(hasError);
       setOutput(out || (hasError ? "Compilation error (see above)" : "(no output)"));
       if (hasError) setErrorLines(parseErrorLines(out));
@@ -188,6 +202,15 @@ export function useStepProgress(
     setAiFeedback(null);
     setErrorLines(new Set());
 
+    // Auto-snapshot before checking (fire-and-forget, only when logged in)
+    if (userId) {
+      apiFetch("/api/code-snapshots", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ slug: tutorialSlug, stepIndex, code }),
+      }).catch(() => {});
+    }
+
     // Silently auto-format before checking
     try {
       const body = new URLSearchParams({ body: code, imports: "true" });
@@ -201,23 +224,38 @@ export function useStepProgress(
     } catch { /* ignore */ }
 
     try {
-      const { output: out, hasError } = await runCodeRequest(code);
+      const { output: out, hasError } = await runCodeRequest(code, lang);
       setOutputIsError(hasError);
       setOutput(out || (hasError ? "Compilation error" : "(no output)"));
       if (hasError) {
         setErrorLines(parseErrorLines(out));
         setStatus("failed");
         fetchAiFeedback(code, out, "", stepIndex);
+        apiFetch("/api/step-check", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ lang, tutorialSlug, stepIndex, passed: false }),
+        }).catch(() => {});
         return;
       }
       if (checkOutput(out, step.expectedOutput)) {
         setStatus("passed");
         setFailCount(0);
         setCompletedSteps((prev) => new Set([...prev, stepIndex]));
+        apiFetch("/api/step-check", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ lang, tutorialSlug, stepIndex, passed: true }),
+        }).catch(() => {});
       } else {
         setStatus("failed");
         setFailCount((n) => n + 1);
         fetchAiFeedback(code, "", out, stepIndex);
+        apiFetch("/api/step-check", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ lang, tutorialSlug, stepIndex, passed: false }),
+        }).catch(() => {});
       }
     } catch {
       setOutput("Could not reach the Go compiler. Please try again.");

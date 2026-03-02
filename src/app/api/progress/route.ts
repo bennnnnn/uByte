@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
-import { getProgress, markComplete, markIncomplete, addXp, logActivity, updateStreak, getUserById } from "@/lib/db";
+import { getProgress, markComplete, markIncomplete, addXp, logActivity, updateStreak, getUserById, addStreakFreeze } from "@/lib/db";
 import { checkBadges, BADGE_MAP } from "@/lib/badges";
 import { verifyCsrf } from "@/lib/csrf";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
@@ -54,6 +54,11 @@ export const POST = withErrorHandling("POST /api/progress", async (request: Next
     for (const key of newBadges) {
       const badge = BADGE_MAP[key];
       if (badge) await addXp(user.userId, badge.xpReward);
+    }
+
+    // Award streak freeze every 7 days (capped at 3)
+    if (streak_days > 0 && streak_days % 7 === 0) {
+      await addStreakFreeze(user.userId);
     }
   } else {
     await markIncomplete(user.userId, slug);

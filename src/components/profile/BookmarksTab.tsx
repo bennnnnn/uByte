@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import type { Bookmark } from "./types";
+import { tutorialUrl } from "@/lib/urls";
 
 interface Props {
   bookmarks: Bookmark[];
@@ -47,7 +48,7 @@ export default function BookmarksTab({ bookmarks, hasMore, total, onDelete, onLo
             >
               <div className="mb-2 flex items-center justify-between">
                 <Link
-                  href={`/golang/${bm.tutorial_slug}`}
+                  href={tutorialUrl("go", bm.tutorial_slug)}
                   className="text-sm font-medium text-indigo-600 hover:text-indigo-700"
                 >
                   {bm.tutorial_slug}
