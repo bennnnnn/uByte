@@ -59,13 +59,19 @@ export default function MobileStandaloneHeader() {
           className="border-b border-zinc-100 bg-zinc-50 px-3 py-3 dark:border-zinc-800 dark:bg-zinc-950"
           aria-label="Main navigation"
         >
+          {/* Top links */}
           <div className="mb-3 flex flex-wrap items-center gap-2 border-b border-zinc-200 pb-3 dark:border-zinc-700">
+            <Link href="/leaderboard" className="rounded-lg px-3 py-2 text-sm font-medium text-zinc-700 hover:bg-zinc-200 dark:text-zinc-300 dark:hover:bg-zinc-800" onClick={() => setOpen(false)}>
+              Leaderboard
+            </Link>
             <Link href="/pricing" className="rounded-lg px-3 py-2 text-sm font-medium text-zinc-700 hover:bg-zinc-200 dark:text-zinc-300 dark:hover:bg-zinc-800" onClick={() => setOpen(false)}>
               Pricing
             </Link>
           </div>
+
+          {/* Tutorials */}
           <p className="mb-2 px-3 text-[10px] font-bold uppercase tracking-widest text-zinc-500 dark:text-zinc-400">
-            Languages
+            Tutorials
           </p>
           <ul className="space-y-0.5">
             {languageSlugs.map((slug) => {
@@ -78,22 +84,37 @@ export default function MobileStandaloneHeader() {
                     onClick={() => setOpen(false)}
                     className="block rounded-lg px-3 py-2 text-sm font-medium text-zinc-800 hover:bg-zinc-200 dark:text-zinc-200 dark:hover:bg-zinc-800"
                   >
-                    {config.name} tutorials
+                    {config.name}
                   </Link>
                 </li>
               );
             })}
           </ul>
+
+          {/* Practice */}
           <p className="mb-2 mt-4 px-3 text-[10px] font-bold uppercase tracking-widest text-zinc-500 dark:text-zinc-400">
             Practice
           </p>
-          <Link
-            href="/practice"
-            onClick={() => setOpen(false)}
-            className="block rounded-lg px-3 py-2 text-sm font-medium text-zinc-800 hover:bg-zinc-200 dark:text-zinc-200 dark:hover:bg-zinc-800"
-          >
-            Interview practice
+          <Link href="/practice" onClick={() => setOpen(false)} className="block rounded-lg px-3 py-2 text-sm font-medium text-zinc-800 hover:bg-zinc-200 dark:text-zinc-200 dark:hover:bg-zinc-800">
+            All problems
           </Link>
+          <ul className="mt-0.5 space-y-0.5">
+            {languageSlugs.map((slug) => {
+              const config = LANGUAGES[slug as keyof typeof LANGUAGES];
+              if (!config) return null;
+              return (
+                <li key={slug}>
+                  <Link
+                    href={`/practice/${slug}`}
+                    onClick={() => setOpen(false)}
+                    className="block rounded-lg px-3 py-2 text-sm font-medium text-zinc-800 hover:bg-zinc-200 dark:text-zinc-200 dark:hover:bg-zinc-800"
+                  >
+                    {config.name} practice
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
         </nav>
       )}
     </div>
