@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { randomUUID } from "crypto";
 import { getCurrentUser } from "@/lib/auth";
 import { recordPageView, getPageViewCount, clearPageViews } from "@/lib/db";
+import { withErrorHandling } from "@/lib/api-utils";
 
 const VISITOR_COOKIE = "visitor_id";
 const FREE_PAGE_LIMIT = 20;
@@ -11,7 +12,7 @@ function getVisitorId(request: NextRequest): string | null {
 }
 
 // GET — return current view count and whether the wall should show
-export async function GET(request: NextRequest) {
+export const GET = withErrorHandling("GET /api/views", async (request: NextRequest) => {
   try {
     const user = await getCurrentUser();
     if (user) {
@@ -32,10 +33,10 @@ export async function GET(request: NextRequest) {
     console.error("GET /api/views error:", err);
     return NextResponse.json({ viewCount: 0, limited: false });
   }
-}
+});
 
 // POST — record a page view, return updated count
-export async function POST(request: NextRequest) {
+export const POST = withErrorHandling("POST /api/views", async (request: NextRequest) => {
   try {
     const user = await getCurrentUser();
     if (user) {
@@ -80,4 +81,4 @@ export async function POST(request: NextRequest) {
     console.error("POST /api/views error:", err);
     return NextResponse.json({ viewCount: 0, limited: false });
   }
-}
+});

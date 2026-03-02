@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
+import { withErrorHandling } from "@/lib/api-utils";
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
 // POST /api/code-feedback
 // { code, output, error, expectedOutput, stepTitle, instruction }
-export async function POST(req: NextRequest) {
+export const POST = withErrorHandling("POST /api/code-feedback", async (req: NextRequest) => {
   const { code, output, error, expectedOutput, stepTitle, instruction } = await req.json();
 
   const context = error
@@ -48,4 +49,4 @@ No prefix like "Feedback:" — just the sentence.`;
   } catch {
     return NextResponse.json({ feedback: null });
   }
-}
+});

@@ -9,12 +9,13 @@ import {
 } from "@/lib/db";
 import { signToken, setAuthCookie } from "@/lib/auth";
 import { setCsrfCookie } from "@/lib/csrf";
+import { withErrorHandling } from "@/lib/api-utils";
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
 
-export async function GET(request: NextRequest) {
+export const GET = withErrorHandling("GET /api/auth/google/callback", async (request: NextRequest) => {
   const { searchParams } = new URL(request.url);
   const code = searchParams.get("code");
   const state = searchParams.get("state");
@@ -101,4 +102,4 @@ export async function GET(request: NextRequest) {
     console.error("Google OAuth callback error:", msg);
     return NextResponse.redirect(`${BASE_URL}/?error=oauth_failed&detail=${encodeURIComponent(msg)}`);
   }
-}
+});

@@ -1,10 +1,11 @@
 import { NextResponse } from "next/server";
 import { randomBytes } from "crypto";
+import { withErrorHandling } from "@/lib/api-utils";
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 
-export async function GET() {
+export const GET = withErrorHandling("GET /api/auth/google", async () => {
   if (!GOOGLE_CLIENT_ID) {
     return NextResponse.json({ error: "Google OAuth is not configured" }, { status: 503 });
   }
@@ -33,4 +34,4 @@ export async function GET() {
   });
 
   return res;
-}
+});

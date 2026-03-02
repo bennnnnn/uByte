@@ -1,9 +1,10 @@
 import { ImageResponse } from "next/og";
-import { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
+import { withErrorHandling } from "@/lib/api-utils";
 
 export const runtime = "edge";
 
-export async function GET(request: NextRequest) {
+export const GET = withErrorHandling("GET /api/pwa-icon", async (request: NextRequest) => {
   const raw = parseInt(request.nextUrl.searchParams.get("size") ?? "192");
   const size = [192, 512].includes(raw) ? raw : 192;
 
@@ -26,5 +27,5 @@ export async function GET(request: NextRequest) {
       },
     },
     { width: size, height: size }
-  );
-}
+  ) as unknown as NextResponse;
+});

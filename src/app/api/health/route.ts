@@ -1,9 +1,10 @@
 import { NextResponse } from "next/server";
 import { getUserById } from "@/lib/db";
+import { withErrorHandling } from "@/lib/api-utils";
 
 const startTime = Date.now();
 
-export async function GET() {
+export const GET = withErrorHandling("GET /api/health", async () => {
   let dbOk = false;
   try {
     // Lightweight check: look up a non-existent user (returns undefined — no throw = DB up)
@@ -22,4 +23,4 @@ export async function GET() {
     },
     { status: dbOk ? 200 : 503 }
   );
-}
+});

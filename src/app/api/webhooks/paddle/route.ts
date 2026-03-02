@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { updateUserPlan, getUserByPaddleCustomerId, getUserById, createNotification, recordSubscriptionEvent } from "@/lib/db";
+import { withErrorHandling } from "@/lib/api-utils";
 
 const WEBHOOK_SECRET = process.env.PADDLE_WEBHOOK_SECRET ?? "";
 
@@ -39,7 +40,7 @@ function planFromStatus(status: string): string {
   return ["active", "trialing"].includes(status) ? "pro" : "free";
 }
 
-export async function POST(request: NextRequest) {
+export const POST = withErrorHandling("POST /api/webhooks/paddle", async (request: NextRequest) => {
   if (!WEBHOOK_SECRET) {
     return NextResponse.json({ error: "Paddle not configured" }, { status: 503 });
   }
@@ -119,4 +120,4 @@ export async function POST(request: NextRequest) {
   }
 
   return NextResponse.json({ received: true });
-}
+});

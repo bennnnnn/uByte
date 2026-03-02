@@ -1,21 +1,19 @@
 import { NextRequest, NextResponse } from "next/server";
 import crypto from "crypto";
-import { getCurrentUser } from "@/lib/auth";
 import { getUserById, createEmailVerificationToken } from "@/lib/db";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 import { sendVerificationEmail } from "@/lib/email";
+import { withErrorHandling, requireAuth } from "@/lib/api-utils";
 
-export async function POST(request: NextRequest) {
+export const POST = withErrorHandling("POST /api/auth/resend-verification", async (request: NextRequest) => {
   const ip = getClientIp(request.headers);
   const { limited } = await checkRateLimit(`resend-verify:${ip}`, 3, 300_000); // 3 per 5 min
   if (limited) {
     return NextResponse.json({ error: "Too many requests" }, { status: 429 });
   }
 
-  const tokenPayload = await getCurrentUser();
-  if (!tokenPayload) {
-    return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
-  }
+  const { user: tokenPayload, response } = await requireAuth();
+  if (!tokenPayload) return response;
 
   const user = await getUserById(tokenPayload.userId);
   if (!user) {
@@ -34,4 +32,4 @@ export async function POST(request: NextRequest) {
   });
 
   return NextResponse.json({ message: "Verification email sent" });
-}
+});

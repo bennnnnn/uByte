@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
 import { getCodeDraft, upsertCodeDraft, deleteCodeDraft } from "@/lib/db";
+import { withErrorHandling, requireAuth } from "@/lib/api-utils";
 
-export async function GET(request: NextRequest) {
+export const GET = withErrorHandling("GET /api/code-drafts", async (request: NextRequest) => {
   const user = await getCurrentUser();
   if (!user) return NextResponse.json({ code: null });
 
@@ -13,11 +14,11 @@ export async function GET(request: NextRequest) {
 
   const code = await getCodeDraft(user.userId, slug, key);
   return NextResponse.json({ code });
-}
+});
 
-export async function PUT(request: NextRequest) {
-  const user = await getCurrentUser();
-  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+export const PUT = withErrorHandling("PUT /api/code-drafts", async (request: NextRequest) => {
+  const { user, response } = await requireAuth();
+  if (!user) return response;
 
   const body = await request.json();
   const slug: string = body.slug ?? "";
@@ -33,11 +34,11 @@ export async function PUT(request: NextRequest) {
 
   await upsertCodeDraft(user.userId, slug, key, code);
   return NextResponse.json({ ok: true });
-}
+});
 
-export async function DELETE(request: NextRequest) {
-  const user = await getCurrentUser();
-  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+export const DELETE = withErrorHandling("DELETE /api/code-drafts", async (request: NextRequest) => {
+  const { user, response } = await requireAuth();
+  if (!user) return response;
 
   const body = await request.json();
   const slug: string = body.slug ?? "";
@@ -49,4 +50,4 @@ export async function DELETE(request: NextRequest) {
 
   await deleteCodeDraft(user.userId, slug, key);
   return NextResponse.json({ ok: true });
-}
+});

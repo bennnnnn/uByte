@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getUsersAtRiskOfLosingStreak } from "@/lib/db";
 import { sendStreakReminderEmail } from "@/lib/email";
+import { withErrorHandling } from "@/lib/api-utils";
 
-export async function GET(request: NextRequest) {
+export const GET = withErrorHandling("GET /api/cron/streak-reminder", async (request: NextRequest) => {
   const cronSecret = process.env.CRON_SECRET;
   if (cronSecret) {
     const auth = request.headers.get("Authorization");
@@ -25,4 +26,4 @@ export async function GET(request: NextRequest) {
   }
 
   return NextResponse.json({ sent });
-}
+});

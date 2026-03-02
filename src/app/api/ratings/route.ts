@@ -3,8 +3,9 @@ import { getCurrentUser } from "@/lib/auth";
 import { rateTutorial, getTutorialRating } from "@/lib/db";
 import { verifyCsrf } from "@/lib/csrf";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
+import { withErrorHandling, requireAuth } from "@/lib/api-utils";
 
-export async function GET(request: NextRequest) {
+export const GET = withErrorHandling("GET /api/ratings", async (request: NextRequest) => {
   const slug = request.nextUrl.searchParams.get("slug");
   if (!slug) {
     return NextResponse.json({ error: "slug is required" }, { status: 400 });
@@ -13,14 +14,14 @@ export async function GET(request: NextRequest) {
   const user = await getCurrentUser();
   const rating = await getTutorialRating(slug, user?.userId);
   return NextResponse.json(rating);
-}
+});
 
-export async function POST(request: NextRequest) {
+export const POST = withErrorHandling("POST /api/ratings", async (request: NextRequest) => {
   const csrfError = await verifyCsrf(request);
   if (csrfError) return NextResponse.json({ error: "Invalid CSRF token" }, { status: 403 });
 
-  const user = await getCurrentUser();
-  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const { user, response } = await requireAuth();
+  if (!user) return response;
 
   const ip = getClientIp(request.headers);
   const { limited } = await checkRateLimit(`ratings:${ip}:${user.userId}`, 30, 60_000);
@@ -34,4 +35,4 @@ export async function POST(request: NextRequest) {
   await rateTutorial(user.userId, body.slug, body.value as 1 | -1);
   const rating = await getTutorialRating(body.slug, user.userId);
   return NextResponse.json(rating);
-}
+});

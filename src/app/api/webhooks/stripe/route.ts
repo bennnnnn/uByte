@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { updateUserPlan, getUserByStripeCustomerId } from "@/lib/db";
+import { withErrorHandling } from "@/lib/api-utils";
 
 // Stripe is an optional dependency — degrade gracefully when not configured.
 // We manually verify the webhook signature using the Web Crypto API so we
@@ -51,7 +52,7 @@ function planFromStatus(status: string): string {
   return ["active", "trialing"].includes(status) ? "pro" : "free";
 }
 
-export async function POST(request: NextRequest) {
+export const POST = withErrorHandling("POST /api/webhooks/stripe", async (request: NextRequest) => {
   if (!WEBHOOK_SECRET) {
     return NextResponse.json({ error: "Stripe not configured" }, { status: 503 });
   }
@@ -111,4 +112,4 @@ export async function POST(request: NextRequest) {
   }
 
   return NextResponse.json({ received: true });
-}
+});

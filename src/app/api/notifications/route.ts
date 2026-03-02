@@ -1,33 +1,23 @@
 import { NextResponse } from "next/server";
-import { getCurrentUser } from "@/lib/auth";
 import { getNotifications, getUnreadNotificationCount, markNotificationsRead } from "@/lib/db";
+import { withErrorHandling, requireAuth } from "@/lib/api-utils";
 
-export async function GET() {
-  try {
-    const tokenUser = await getCurrentUser();
-    if (!tokenUser) return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+export const GET = withErrorHandling("GET /api/notifications", async () => {
+  const { user: tokenUser, response } = await requireAuth();
+  if (!tokenUser) return response;
 
-    const [notifications, unreadCount] = await Promise.all([
-      getNotifications(tokenUser.userId),
-      getUnreadNotificationCount(tokenUser.userId),
-    ]);
+  const [notifications, unreadCount] = await Promise.all([
+    getNotifications(tokenUser.userId),
+    getUnreadNotificationCount(tokenUser.userId),
+  ]);
 
-    return NextResponse.json({ notifications, unreadCount });
-  } catch (err) {
-    console.error("GET /api/notifications error:", err);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
-  }
-}
+  return NextResponse.json({ notifications, unreadCount });
+});
 
-export async function PATCH() {
-  try {
-    const tokenUser = await getCurrentUser();
-    if (!tokenUser) return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+export const PATCH = withErrorHandling("PATCH /api/notifications", async () => {
+  const { user: tokenUser, response } = await requireAuth();
+  if (!tokenUser) return response;
 
-    await markNotificationsRead(tokenUser.userId);
-    return NextResponse.json({ ok: true });
-  } catch (err) {
-    console.error("PATCH /api/notifications error:", err);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
-  }
-}
+  await markNotificationsRead(tokenUser.userId);
+  return NextResponse.json({ ok: true });
+});

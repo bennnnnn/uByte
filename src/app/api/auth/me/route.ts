@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
+import { withErrorHandling } from "@/lib/api-utils";
 
-export async function GET() {
+export const GET = withErrorHandling("GET /api/auth/me", async () => {
   try {
     const user = await getCurrentUser();
     if (!user) {
@@ -12,4 +13,4 @@ export async function GET() {
     console.error("GET /api/auth/me error:", err);
     return NextResponse.json({ user: null });
   }
-}
+});

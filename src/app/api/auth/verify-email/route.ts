@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { verifyEmail } from "@/lib/db";
+import { withErrorHandling } from "@/lib/api-utils";
 
-export async function GET(request: NextRequest) {
+export const GET = withErrorHandling("GET /api/auth/verify-email", async (request: NextRequest) => {
   const token = request.nextUrl.searchParams.get("token");
   if (!token) {
     return NextResponse.json({ error: "Token is required" }, { status: 400 });
@@ -13,4 +14,4 @@ export async function GET(request: NextRequest) {
   }
 
   return NextResponse.json({ ok: true });
-}
+});
