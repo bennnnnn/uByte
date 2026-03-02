@@ -63,9 +63,6 @@ export default function MobileStandaloneHeader() {
             <Link href="/pricing" className="rounded-lg px-3 py-2 text-sm font-medium text-zinc-700 hover:bg-zinc-200 dark:text-zinc-300 dark:hover:bg-zinc-800" onClick={() => setOpen(false)}>
               Pricing
             </Link>
-            <Link href="/search" className="rounded-lg px-3 py-2 text-sm font-medium text-zinc-700 hover:bg-zinc-200 dark:text-zinc-300 dark:hover:bg-zinc-800" onClick={() => setOpen(false)}>
-              Search
-            </Link>
           </div>
           <p className="mb-2 px-3 text-[10px] font-bold uppercase tracking-widest text-zinc-500 dark:text-zinc-400">
             Languages
