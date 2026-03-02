@@ -133,7 +133,7 @@ export default function Sidebar({ lang, tutorials }: { lang: string; tutorials: 
             const filtered = tutorials
               .filter((tutorial) => tutorial.title.toLowerCase().includes(q));
             if (filtered.length === 0) {
-              return <li className="px-3 py-4 text-center text-sm text-zinc-400 dark:text-zinc-500">No lessons found</li>;
+              return <li className="px-3 py-4 text-center text-sm text-zinc-500 dark:text-zinc-400">No lessons found</li>;
             }
             return filtered.map((tutorial) => {
               const href = tutorialUrl(lang, tutorial.slug);
@@ -156,7 +156,7 @@ export default function Sidebar({ lang, tutorials }: { lang: string; tutorials: 
                         : "font-medium text-zinc-800 hover:bg-zinc-200/70 hover:text-zinc-900 dark:text-zinc-200 dark:hover:bg-zinc-800 dark:hover:text-white"
                     }`}
                   >
-                    <span className={`flex-1 leading-snug ${isLocked ? "text-zinc-400 dark:text-zinc-500" : ""}`}>{tutorial.title}</span>
+                    <span className={`flex-1 leading-snug ${isLocked ? "text-zinc-500 dark:text-zinc-400" : ""}`}>{tutorial.title}</span>
                     {isLocked ? (
                       <svg className="h-3.5 w-3.5 shrink-0 text-zinc-400 dark:text-zinc-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
@@ -169,7 +169,7 @@ export default function Sidebar({ lang, tutorials }: { lang: string; tutorials: 
                     {tutorial.subtopics.length > 0 && (
                       <svg
                         className={`h-3.5 w-3.5 shrink-0 transition-transform duration-200 ${isExpanded ? "rotate-90" : ""} ${
-                          isOnThisPage ? "text-indigo-500 dark:text-indigo-400" : "text-zinc-400 dark:text-zinc-500"
+                          isOnThisPage ? "text-indigo-500 dark:text-indigo-400" : "text-zinc-500 dark:text-zinc-400"
                         }`}
                         fill="none"
                         viewBox="0 0 24 24"
@@ -192,7 +192,7 @@ export default function Sidebar({ lang, tutorials }: { lang: string; tutorials: 
                               className={`block rounded-md px-2 py-1.5 text-base transition-all duration-150 ${
                                 isSubActive
                                   ? "font-medium text-indigo-600 dark:text-indigo-400"
-                                  : "text-zinc-400 hover:bg-zinc-200/70 hover:text-zinc-700 dark:text-zinc-500 dark:hover:bg-zinc-800 dark:hover:text-zinc-300"
+                                  : "text-zinc-500 hover:bg-zinc-200/70 hover:text-zinc-700 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-300"
                               }`}
                             >
                               {sub.title}

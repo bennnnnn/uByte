@@ -139,7 +139,7 @@ export default function TutorialGrid({ lang, tutorials }: { lang: string; tutori
                   <span className={`rounded-full px-2.5 py-0.5 text-xs font-medium capitalize ${DIFFICULTY_STYLES[tutorial.difficulty]}`}>
                     {tutorial.difficulty}
                   </span>
-                  <span className="text-xs text-zinc-400 dark:text-zinc-500">⏱ {tutorial.estimatedMinutes} min</span>
+                  <span className="text-xs text-zinc-500 dark:text-zinc-400">⏱ {tutorial.estimatedMinutes} min</span>
                 </div>
               </Link>
             );

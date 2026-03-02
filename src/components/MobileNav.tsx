@@ -78,7 +78,7 @@ export default function MobileNav({ lang, tutorials }: { lang: string; tutorials
             )}
           </div>
 
-          <p className="mb-2 px-3 text-[10px] font-bold uppercase tracking-widest text-zinc-400 dark:text-zinc-500">
+          <p className="mb-2 px-3 text-[10px] font-bold uppercase tracking-widest text-zinc-500 dark:text-zinc-400">
             Lessons
           </p>
 
@@ -87,7 +87,7 @@ export default function MobileNav({ lang, tutorials }: { lang: string; tutorials
               const q = query.toLowerCase();
               const filtered = tutorials.filter((t) => t.title.toLowerCase().includes(q));
               if (filtered.length === 0) {
-                return <li className="px-3 py-4 text-center text-xs text-zinc-400 dark:text-zinc-500">No lessons found</li>;
+                return <li className="px-3 py-4 text-center text-xs text-zinc-500 dark:text-zinc-400">No lessons found</li>;
               }
               return filtered.map((t) => {
                 const href = tutorialUrl(lang, t.slug);
@@ -118,7 +118,7 @@ export default function MobileNav({ lang, tutorials }: { lang: string; tutorials
                       {t.subtopics.length > 0 && (
                         <svg
                           className={`h-3.5 w-3.5 shrink-0 transition-transform duration-200 ${isExpanded ? "rotate-90" : ""} ${
-                            isOnThisPage ? "text-indigo-500 dark:text-indigo-400" : "text-zinc-400 dark:text-zinc-500"
+                            isOnThisPage ? "text-indigo-500 dark:text-indigo-400" : "text-zinc-500 dark:text-zinc-400"
                           }`}
                           fill="none"
                           viewBox="0 0 24 24"
