@@ -140,7 +140,7 @@ export default function Home() {
                     slug={slug}
                     name={config.name}
                     icon={LANGUAGE_ICONS[slug] ?? "🎯"}
-                    href="/practice"
+                    href={`/practice/${slug}`}
                   />
                 ))}
               </div>

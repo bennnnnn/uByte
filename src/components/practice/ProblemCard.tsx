@@ -9,12 +9,13 @@ const DIFFICULTY_STYLES: Record<Difficulty, string> = {
 
 export interface ProblemCardProps {
   problem: PracticeProblem;
+  lang?: string;
 }
 
-export default function ProblemCard({ problem }: ProblemCardProps) {
+export default function ProblemCard({ problem, lang = "go" }: ProblemCardProps) {
   return (
     <Link
-      href={`/practice/${problem.slug}`}
+      href={`/practice/${lang}/${problem.slug}`}
       className="group flex flex-col rounded-xl border border-zinc-200 bg-white p-5 text-left shadow-sm transition-all hover:border-indigo-300 hover:shadow-md dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-indigo-700"
     >
       <div className="mb-2 flex items-center gap-3">
