@@ -1,0 +1,109 @@
+---
+title: "Variables and Types in Rust"
+description: "Explore Rust's immutability, scalar types, String vs &str, shadowing, constants, and tuples."
+order: 2
+difficulty: "beginner"
+estimatedMinutes: 15
+---
+
+## Immutability by Default
+
+In Rust, variables are **immutable** unless you explicitly opt into mutability with `mut`:
+
+```rust
+let x = 5;       // immutable — cannot reassign
+let mut y = 10;  // mutable
+y = 20;
+println!("{} {}", x, y); // 5 20
+```
+
+This design prevents a whole class of bugs at compile time.
+
+---
+
+## Scalar Types
+
+| Category | Types | Example |
+|----------|-------|---------|
+| Integers | `i8`, `i16`, `i32`, `i64`, `u8`, `u32`… | `let n: i32 = 42;` |
+| Floats | `f32`, `f64` | `let pi: f64 = 3.14;` |
+| Boolean | `bool` | `let active = true;` |
+| Character | `char` | `let grade = 'A';` |
+
+```rust
+let score: i32 = 42;
+let pi: f64 = 3.14;
+let active: bool = true;
+println!("{} {} {}", score, pi, active);
+```
+
+---
+
+## String vs &str
+
+Rust has two main string types:
+
+| Type | Storage | Mutable | Use when |
+|------|---------|---------|----------|
+| `&str` | stack/static | No | String literals, borrowed data |
+| `String` | heap | Yes | Owned, growable strings |
+
+```rust
+let s1: &str = "hello";                // string slice
+let s2 = String::from("world");        // owned String
+let s3 = format!("{} {}", s1, s2);    // "hello world"
+println!("{}", s3);
+```
+
+---
+
+## Shadowing
+
+You can re-declare a variable with `let` — this *shadows* the previous binding. Unlike `mut`, shadowing can change the type:
+
+```rust
+let x = 5;
+let x = x * 2;   // shadows previous x
+let x = x + 3;   // shadows again
+println!("{}", x); // 13
+```
+
+---
+
+## Constants
+
+`const` values are always immutable, must have a type annotation, and are evaluated at compile time:
+
+```rust
+const MAX_SCORE: u32 = 100;
+let half = MAX_SCORE / 2;
+println!("{}", half); // 50
+```
+
+Constants use `UPPER_SNAKE_CASE` by convention.
+
+---
+
+## Tuples
+
+Tuples group a fixed number of values of potentially different types:
+
+```rust
+let tup: (i32, f64, &str) = (42, 3.14, "Rust");
+println!("{}", tup.0); // 42
+println!("{}", tup.1); // 3.14
+println!("{}", tup.2); // Rust
+```
+
+Destructure a tuple with `let`:
+
+```rust
+let (a, b, c) = tup;
+println!("{} {} {}", a, b, c);
+```
+
+---
+
+## What's Next?
+
+You understand Rust's type system fundamentals. Next: **output and formatting** — println!, print!, debug formatting, and padding.

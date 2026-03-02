@@ -4,6 +4,7 @@ import { pythonSteps } from "./python";
 import { cppSteps } from "./cpp";
 import { javascriptSteps } from "./javascript";
 import { javaSteps } from "./java";
+import { rustSteps } from "./rust";
 import type { SupportedLanguage } from "../languages/types";
 
 /** Steps per language. Add more languages here as they are translated. */
@@ -13,7 +14,7 @@ const stepsByLanguage: Record<SupportedLanguage, Record<string, TutorialStep[]>>
   cpp: cppSteps,
   javascript: javascriptSteps,
   java: javaSteps,
-  rust: {},
+  rust: rustSteps,
 };
 
 export function getSteps(

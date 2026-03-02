@@ -1,0 +1,82 @@
+---
+title: "Output and Formatting in Rust"
+description: "Master println!, print!, debug formatting, number precision, and padding in Rust."
+order: 3
+difficulty: "beginner"
+estimatedMinutes: 15
+---
+
+## Print Macros
+
+| Macro | Newline | Use case |
+|-------|---------|----------|
+| `println!(fmt, …)` | Yes | Most common — print + newline |
+| `print!(fmt, …)` | No | Print without newline |
+| `eprintln!(fmt, …)` | Yes | Print to stderr |
+| `format!(fmt, …)` | — | Build a `String` (no print) |
+
+---
+
+## Placeholders
+
+| Placeholder | Meaning |
+|-------------|---------|
+| `{}` | Default display |
+| `{:?}` | Debug output |
+| `{:#?}` | Pretty-print debug |
+| `{:.2}` | Float with 2 decimal places |
+| `{:>10}` | Right-align in 10 chars |
+| `{:<10}` | Left-align in 10 chars |
+| `{:^10}` | Center in 10 chars |
+| `{:0>5}` | Zero-pad to 5 chars |
+
+---
+
+## Named and Positional Arguments
+
+```rust
+let name = "Alice";
+let age = 30;
+println!("{name} is {age} years old"); // Rust 1.58+
+println!("{0} is {1} years old", name, age); // positional
+```
+
+---
+
+## Debug Formatting
+
+Any type that derives `Debug` can be printed with `{:?}`:
+
+```rust
+let point = (1, 2, 3);
+println!("{:?}", point);   // (1, 2, 3)
+println!("{:#?}", point);  // pretty-printed
+```
+
+---
+
+## Number Formatting
+
+```rust
+let result = 22.0_f64 / 7.0;
+println!("{:.2}", result);  // 3.14
+println!("{:.4}", result);  // 3.1429
+println!("{:08.2}", result); // 00003.14 (zero-padded width 8)
+```
+
+---
+
+## Padding and Alignment
+
+```rust
+println!("{:<10}", "left");   // "left      "
+println!("{:>10}", "right");  // "     right"
+println!("{:^10}", "center"); // "  center  "
+println!("{:-^10}", "hi");    // "----hi----"
+```
+
+---
+
+## What's Next?
+
+You can now format Rust output precisely. Next: **control flow** — if/else, match expressions, and pattern matching.
