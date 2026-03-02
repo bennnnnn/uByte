@@ -1,0 +1,30 @@
+---
+title: "Headers & Namespaces"
+description: "Header files, namespaces, and organizing C++ code."
+order: 14
+difficulty: "intermediate"
+estimatedMinutes: 12
+---
+
+## Header Files
+
+```cpp
+// math_utils.h
+#pragma once
+int add(int a, int b);
+
+// math_utils.cpp
+#include "math_utils.h"
+int add(int a, int b) { return a + b; }
+```
+
+## Namespaces
+
+```cpp
+namespace myapp {
+    void hello() { std::cout << "Hello from myapp!" << std::endl; }
+}
+myapp::hello();
+```
+
+More content coming soon. Try the interactive steps above!

@@ -1,0 +1,27 @@
+---
+title: "Maps & Unordered Maps"
+description: "std::map (sorted) and std::unordered_map (hash) in C++."
+order: 7
+difficulty: "intermediate"
+estimatedMinutes: 12
+---
+
+## std::map
+
+```cpp
+#include <map>
+std::map<std::string, int> ages;
+ages["Alice"] = 30;
+ages["Bob"] = 25;
+std::cout << ages["Alice"] << std::endl; // 30
+```
+
+## std::unordered_map (O(1) average lookup)
+
+```cpp
+#include <unordered_map>
+std::unordered_map<std::string, int> scores;
+scores["Alice"] = 95;
+```
+
+More content coming soon. Try the interactive steps above!

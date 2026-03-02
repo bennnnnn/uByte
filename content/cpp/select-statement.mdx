@@ -1,0 +1,27 @@
+---
+title: "Async I/O & Select"
+description: "select(), poll(), and async I/O in C++."
+order: 19
+difficulty: "advanced"
+estimatedMinutes: 20
+---
+
+## select() (POSIX)
+
+`select()` monitors multiple file descriptors for readability/writability:
+
+```cpp
+#include <sys/select.h>
+fd_set readfds;
+FD_ZERO(&readfds);
+FD_SET(STDIN_FILENO, &readfds);
+
+struct timeval tv = {5, 0}; // 5 second timeout
+int result = select(STDIN_FILENO + 1, &readfds, nullptr, nullptr, &tv);
+```
+
+## Asio (modern async I/O)
+
+Boost.Asio or standalone Asio provides async networking similar to Go channels.
+
+More content coming soon. Try the interactive steps above!

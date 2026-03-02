@@ -1,0 +1,26 @@
+---
+title: "Member Functions"
+description: "Instance methods, const methods, and operator overloading in C++."
+order: 11
+difficulty: "intermediate"
+estimatedMinutes: 12
+---
+
+## Member Functions
+
+```cpp
+class Rectangle {
+public:
+    int width, height;
+    Rectangle(int w, int h) : width(w), height(h) {}
+    int area() const { return width * height; }
+};
+Rectangle r(4, 5);
+std::cout << r.area() << std::endl; // 20
+```
+
+## const Methods
+
+A `const` method promises not to modify the object — good practice for getters.
+
+More content coming soon. Try the interactive steps above!

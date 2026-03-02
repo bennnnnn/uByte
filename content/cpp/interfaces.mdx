@@ -1,0 +1,28 @@
+---
+title: "Virtual Functions & Polymorphism"
+description: "Abstract classes, virtual functions, and runtime polymorphism in C++."
+order: 12
+difficulty: "intermediate"
+estimatedMinutes: 20
+---
+
+## Abstract Class (Interface)
+
+```cpp
+class Shape {
+public:
+    virtual double area() const = 0; // pure virtual
+    virtual ~Shape() {}
+};
+
+class Circle : public Shape {
+    double r;
+public:
+    Circle(double r) : r(r) {}
+    double area() const override { return 3.14159 * r * r; }
+};
+```
+
+Use `= 0` to make a function pure virtual (must be overridden). A class with any pure virtual is abstract.
+
+More content coming soon. Try the interactive steps above!

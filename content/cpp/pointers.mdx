@@ -1,0 +1,32 @@
+---
+title: "Pointers & References"
+description: "Raw pointers, references, and smart pointers in C++."
+order: 9
+difficulty: "intermediate"
+estimatedMinutes: 15
+---
+
+## Pointers
+
+```cpp
+int x = 42;
+int* p = &x;        // p holds the address of x
+std::cout << *p;    // dereference: prints 42
+```
+
+## References
+
+```cpp
+int& ref = x;       // ref is an alias for x
+ref = 100;          // modifies x
+```
+
+## Smart Pointers (C++11)
+
+```cpp
+#include <memory>
+auto ptr = std::make_unique<int>(42);
+std::cout << *ptr << std::endl;
+```
+
+More content coming soon. Try the interactive steps above!

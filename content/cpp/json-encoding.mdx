@@ -1,0 +1,23 @@
+---
+title: "JSON in C++"
+description: "Parsing and generating JSON with nlohmann/json."
+order: 18
+difficulty: "intermediate"
+estimatedMinutes: 15
+---
+
+## nlohmann/json (most popular header-only library)
+
+```cpp
+#include <nlohmann/json.hpp>
+using json = nlohmann::json;
+
+json j = {{"name", "Alice"}, {"age", 30}};
+std::cout << j.dump(2) << std::endl;
+
+// Parsing
+auto parsed = json::parse("{\"city\": \"Berlin\"}");
+std::string city = parsed["city"];
+```
+
+More content coming soon. Try the interactive steps above!

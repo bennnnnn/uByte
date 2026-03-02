@@ -1,0 +1,31 @@
+---
+title: "Threads & Concurrency"
+description: "std::thread, mutexes, and async in C++."
+order: 15
+difficulty: "advanced"
+estimatedMinutes: 25
+---
+
+## std::thread (C++11)
+
+```cpp
+#include <thread>
+#include <iostream>
+
+void worker(int id) {
+    std::cout << "Thread " << id << " running" << std::endl;
+}
+
+int main() {
+    std::thread t1(worker, 1);
+    std::thread t2(worker, 2);
+    t1.join();
+    t2.join();
+}
+```
+
+## std::mutex
+
+Use `std::mutex` + `std::lock_guard` to protect shared data from data races.
+
+More content coming soon. Try the interactive steps above!

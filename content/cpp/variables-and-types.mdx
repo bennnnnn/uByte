@@ -1,0 +1,82 @@
+---
+title: "Variables & Types"
+description: "Declare variables, use auto, understand C++'s type system, and work with strings, numbers, and constants."
+order: 2
+difficulty: "beginner"
+estimatedMinutes: 12
+---
+
+## What Are Variables?
+
+Variables name a location in memory where a value lives. C++ is **statically typed** — every variable has a fixed type decided at compile time.
+
+---
+
+## Declaring Variables
+
+```cpp
+int age = 30;
+double price = 9.99;
+std::string city = "Berlin";
+bool active = true;
+```
+
+C++ has no "zero value" guarantee for built-in types (unlike Go). Always initialize your variables.
+
+---
+
+## The `auto` Keyword (C++11)
+
+`auto` tells the compiler to deduce the type:
+
+```cpp
+auto x = 42;          // int
+auto pi = 3.14;       // double
+auto name = std::string("Ada");  // std::string
+```
+
+Use `auto` freely in modern C++ — it reduces verbosity without losing type safety.
+
+---
+
+## Basic Types
+
+| Type | Example | Notes |
+|------|---------|-------|
+| `int` | `42` | 32-bit integer |
+| `long long` | `1'000'000'000LL` | 64-bit integer |
+| `double` | `3.14` | 64-bit float |
+| `float` | `3.14f` | 32-bit float |
+| `bool` | `true` / `false` | boolean |
+| `char` | `'A'` | single character |
+| `std::string` | `"hello"` | heap-allocated string (needs `<string>`) |
+
+---
+
+## Constants
+
+`const` and `constexpr` both prevent modification. `constexpr` is evaluated at **compile time**:
+
+```cpp
+const double Pi = 3.14159;        // runtime constant
+constexpr int MaxSize = 1024;     // compile-time constant
+```
+
+---
+
+## Type Casting
+
+C++ casts require explicit syntax — no implicit narrowing conversions:
+
+```cpp
+int i = 42;
+double d = static_cast<double>(i);  // safe, explicit
+```
+
+Avoid C-style casts `(double)i` in modern C++; prefer `static_cast`.
+
+---
+
+## What's Next?
+
+Next: **I/O Formatting** — how to use `std::cout`, format numbers, and build strings with `std::ostringstream`.

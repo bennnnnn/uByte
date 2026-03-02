@@ -1,0 +1,31 @@
+---
+title: "Structs & Classes"
+description: "Structs, classes, constructors, and access modifiers in C++."
+order: 10
+difficulty: "intermediate"
+estimatedMinutes: 15
+---
+
+## struct
+
+```cpp
+struct Point {
+    double x;
+    double y;
+};
+Point p = {3.0, 4.0};
+std::cout << p.x << std::endl;
+```
+
+## class with Constructor
+
+```cpp
+class Circle {
+public:
+    double radius;
+    Circle(double r) : radius(r) {}
+    double area() { return 3.14159 * radius * radius; }
+};
+```
+
+More content coming soon. Try the interactive steps above!

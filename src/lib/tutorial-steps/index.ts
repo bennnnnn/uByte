@@ -1,13 +1,14 @@
 import type { TutorialStep } from "./types";
 import { goSteps } from "./go";
 import { pythonSteps } from "./python";
+import { cppSteps } from "./cpp";
 import type { SupportedLanguage } from "../languages/types";
 
-/** Steps per language. Add cppSteps etc. when adding languages. */
+/** Steps per language. Add more languages here as they are translated. */
 const stepsByLanguage: Record<SupportedLanguage, Record<string, TutorialStep[]>> = {
   go: goSteps,
   python: pythonSteps,
-  cpp: {},
+  cpp: cppSteps,
   javascript: {},
   java: {},
   rust: {},

@@ -1,0 +1,32 @@
+---
+title: "Testing in C++"
+description: "Unit testing with assertions and Catch2 in C++."
+order: 16
+difficulty: "intermediate"
+estimatedMinutes: 18
+---
+
+## Assertions
+
+```cpp
+#include <cassert>
+int add(int a, int b) { return a + b; }
+int main() {
+    assert(add(2, 3) == 5);
+    std::cout << "All tests passed!" << std::endl;
+}
+```
+
+## Catch2 (popular test framework)
+
+```cpp
+#define CATCH_CONFIG_MAIN
+#include <catch2/catch.hpp>
+
+TEST_CASE("add works correctly") {
+    REQUIRE(add(2, 3) == 5);
+    REQUIRE(add(-1, 1) == 0);
+}
+```
+
+More content coming soon. Try the interactive steps above!

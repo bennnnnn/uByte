@@ -1,0 +1,31 @@
+---
+title: "HTTP in C++"
+description: "Making HTTP requests with libcurl and cpp-httplib."
+order: 17
+difficulty: "intermediate"
+estimatedMinutes: 20
+---
+
+## libcurl (most common)
+
+```cpp
+#include <curl/curl.h>
+
+CURL* curl = curl_easy_init();
+if (curl) {
+    curl_easy_setopt(curl, CURLOPT_URL, "https://api.example.com/data");
+    curl_easy_perform(curl);
+    curl_easy_cleanup(curl);
+}
+```
+
+## cpp-httplib (header-only, simpler)
+
+```cpp
+#include "httplib.h"
+httplib::Client cli("httpbin.org");
+auto res = cli.Get("/get");
+if (res) std::cout << res->body << std::endl;
+```
+
+More content coming soon. Try the interactive steps above!

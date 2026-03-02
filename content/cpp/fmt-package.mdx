@@ -1,0 +1,65 @@
+---
+title: "I/O & Formatting"
+description: "Use std::cout, format floats with iomanip, and build strings with std::ostringstream."
+order: 3
+difficulty: "beginner"
+estimatedMinutes: 10
+---
+
+## Output with `std::cout`
+
+`std::cout` is the standard output stream. Use `<<` to insert values:
+
+```cpp
+#include <iostream>
+std::cout << "Hello, " << "World!" << std::endl;
+```
+
+---
+
+## Formatting Numbers
+
+Include `<iomanip>` for formatting manipulators:
+
+```cpp
+#include <iomanip>
+double pi = 3.14159;
+std::cout << std::fixed << std::setprecision(2) << pi << std::endl; // 3.14
+```
+
+**Common manipulators:**
+- `std::fixed` — decimal notation
+- `std::setprecision(n)` — n decimal places
+- `std::setw(n)` — field width
+- `std::left` / `std::right` — alignment
+
+---
+
+## Building Strings with `ostringstream`
+
+`std::ostringstream` (from `<sstream>`) works exactly like `cout` but writes to a string:
+
+```cpp
+#include <sstream>
+std::ostringstream oss;
+oss << "http://" << host << ":" << port << "/api";
+std::string url = oss.str();
+```
+
+---
+
+## C-style `printf`
+
+C++ also supports `printf` from `<cstdio>`:
+
+```cpp
+printf("Name: %s, Age: %d\n", name.c_str(), age);
+```
+
+Use `printf` when you need C-style format strings. `std::cout` is preferred in modern C++ for type safety.
+
+---
+
+## What's Next?
+
+Next: **Control Flow** — `if`, `else`, `switch`, and boolean logic in C++.

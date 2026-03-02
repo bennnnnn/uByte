@@ -1,0 +1,28 @@
+---
+title: "Exceptions"
+description: "try/catch, throwing exceptions, and std::exception in C++."
+order: 13
+difficulty: "intermediate"
+estimatedMinutes: 15
+---
+
+## try / catch / throw
+
+```cpp
+#include <stdexcept>
+
+void divide(int a, int b) {
+    if (b == 0) throw std::invalid_argument("division by zero");
+    std::cout << a / b << std::endl;
+}
+
+int main() {
+    try {
+        divide(10, 0);
+    } catch (const std::exception& e) {
+        std::cout << "Error: " << e.what() << std::endl;
+    }
+}
+```
+
+More content coming soon. Try the interactive steps above!
