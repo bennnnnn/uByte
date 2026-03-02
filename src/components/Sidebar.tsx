@@ -61,14 +61,6 @@ export default function Sidebar({ lang, tutorials }: { lang: string; tutorials: 
 
   return (
     <aside className="hidden md:flex w-72 shrink-0 flex-col border-r border-zinc-100 bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-950">
-      {/* Logo */}
-      <div className="flex items-center gap-2.5 px-5 py-5 border-b border-zinc-100 dark:border-zinc-800">
-        <Link href="/" className="flex items-center gap-2.5 text-xl font-bold text-zinc-900 dark:text-white">
-          <span className="text-2xl">🐹</span>
-          <span>uByte</span>
-        </Link>
-      </div>
-
       <nav className="flex-1 overflow-y-auto px-3 py-4">
         {/* Search */}
         <div className="relative mb-3">

@@ -8,22 +8,18 @@ interface Props {
   editName: string;
   editBio: string;
   editAvatar: string;
-  saving: boolean;
   onChangeName: (v: string) => void;
   onChangeBio: (v: string) => void;
   onChangeAvatar: (v: string) => void;
-  onSave: () => void;
 }
 
 export default function ProfileSection({
   editName,
   editBio,
   editAvatar,
-  saving,
   onChangeName,
   onChangeBio,
   onChangeAvatar,
-  onSave,
 }: Props) {
   return (
     <section>
@@ -48,9 +44,6 @@ export default function ProfileSection({
             ))}
           </div>
         </div>
-        <button onClick={onSave} disabled={saving} className="rounded-lg bg-indigo-700 px-6 py-2.5 text-sm font-medium text-white hover:bg-indigo-800 disabled:opacity-50">
-          {saving ? "Saving..." : "Save Changes"}
-        </button>
       </div>
     </section>
   );
