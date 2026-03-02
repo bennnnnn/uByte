@@ -19,10 +19,13 @@ export interface TokenPayload {
   tokenVersion: number;
 }
 
+/** Session duration: 1 year so users stay logged in on this device until they log out */
+const SESSION_DAYS = 365;
+
 export async function signToken(payload: TokenPayload): Promise<string> {
   return new SignJWT({ ...payload })
     .setProtectedHeader({ alg: "HS256" })
-    .setExpirationTime("7d")
+    .setExpirationTime(`${SESSION_DAYS}d`)
     .setIssuedAt()
     .sign(getSecret());
 }
@@ -42,7 +45,7 @@ export async function setAuthCookie(token: string): Promise<void> {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
-    maxAge: 60 * 60 * 24 * 7, // 7 days
+    maxAge: 60 * 60 * 24 * SESSION_DAYS, // 1 year — persistent until logout
     path: "/",
   });
 }

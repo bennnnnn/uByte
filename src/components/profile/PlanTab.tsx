@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import Link from "next/link";
+import { useAuth } from "@/components/AuthProvider";
 import { hasPaidAccess } from "@/lib/plans";
 import { apiFetch } from "@/lib/api-client";
 
@@ -26,6 +27,7 @@ interface Props {
 }
 
 export default function PlanTab({ plan }: Props) {
+  const { user } = useAuth();
   const isPaid = hasPaidAccess(plan);
   const isYearly = plan === "yearly";
   const isMonthly = plan === "pro";
@@ -57,53 +59,89 @@ export default function PlanTab({ plan }: Props) {
     if (!res.ok) return;
     const { priceId } = await res.json();
     if (!window.Paddle || !priceId) return;
-    window.Paddle.Checkout.open({ items: [{ priceId, quantity: 1 }] });
+    window.Paddle.Checkout.open({
+      items: [{ priceId, quantity: 1 }],
+      customData: user ? { userId: String(user.id) } : undefined,
+      customer: user ? { email: user.email } : undefined,
+    });
   }
 
   return (
-    <div className="space-y-5">
-
+    <div className="space-y-6">
       {/* Current plan */}
-      <div className={`rounded-2xl border-2 p-6 ${isPaid ? "border-indigo-500 bg-indigo-50 dark:bg-indigo-950/30" : "border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900"}`}>
-        <p className="mb-1 text-xs font-bold uppercase tracking-wider text-zinc-400">Current plan</p>
-        <div className="flex items-center justify-between">
-          <div>
-            <div className="flex items-center gap-3">
-              <h3 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100">{planLabel}</h3>
-              {isPaid && (
-                <span className="rounded-full bg-indigo-600 px-3 py-0.5 text-xs font-bold text-white">Active</span>
-              )}
+      <div
+        className={`overflow-hidden rounded-2xl border-2 ${
+          isPaid
+            ? "border-emerald-200 bg-emerald-50/50 dark:border-emerald-900/50 dark:bg-emerald-950/20"
+            : "border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900"
+        }`}
+      >
+        <div className="px-6 py-5">
+          <p className="mb-1 text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
+            Current plan
+          </p>
+          <div className="flex items-center justify-between gap-4">
+            <div>
+              <div className="flex items-center gap-2">
+                <h3 className="text-xl font-bold text-zinc-900 dark:text-zinc-100">
+                  {planLabel}
+                </h3>
+                {isPaid && (
+                  <span className="rounded-full bg-emerald-500 px-2.5 py-0.5 text-xs font-semibold text-white">
+                    Active
+                  </span>
+                )}
+              </div>
+              <p
+                className={`mt-0.5 text-sm ${
+                  isPaid ? "text-emerald-700 dark:text-emerald-400" : "text-zinc-500 dark:text-zinc-400"
+                }`}
+              >
+                {planPrice}
+              </p>
             </div>
-            <p className={`mt-1 text-sm ${isPaid ? "text-indigo-600 dark:text-indigo-400" : "text-zinc-500"}`}>
-              {planPrice}
-            </p>
+            <span className="text-3xl" aria-hidden>
+              {isPaid ? "✓" : "○"}
+            </span>
           </div>
-          <span className="text-4xl">{isPaid ? "⭐" : "🆓"}</span>
         </div>
       </div>
 
       {/* Features */}
-      <div className="rounded-2xl border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-900">
-        <h3 className="mb-4 font-semibold text-zinc-900 dark:text-zinc-100">
-          {isPaid ? "Your plan includes" : "Free plan includes"}
-        </h3>
-        <ul className="space-y-2.5">
+      <div className="overflow-hidden rounded-2xl border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900">
+        <div className="border-b border-zinc-100 px-6 py-4 dark:border-zinc-800">
+          <h3 className="font-semibold text-zinc-900 dark:text-zinc-100">
+            {isPaid ? "Your plan includes" : "Free plan includes"}
+          </h3>
+        </div>
+        <ul className="space-y-3 px-6 py-4">
           {(isPaid ? PRO_FEATURES : FREE_FEATURES).map((f) => (
-            <li key={f} className="flex items-center gap-2.5 text-sm text-zinc-600 dark:text-zinc-400">
-              <svg className={`h-4 w-4 shrink-0 ${isPaid ? "text-indigo-500" : "text-emerald-500"}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
-              </svg>
+            <li
+              key={f}
+              className="flex items-center gap-3 text-sm text-zinc-600 dark:text-zinc-400"
+            >
+              <span
+                className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full ${
+                  isPaid ? "bg-emerald-100 text-emerald-600 dark:bg-emerald-900/40 dark:text-emerald-400" : "bg-zinc-100 text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400"
+                }`}
+              >
+                <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                </svg>
+              </span>
               {f}
             </li>
           ))}
         </ul>
 
         {!isPaid && (
-          <div className="mt-4 rounded-xl bg-zinc-50 p-4 dark:bg-zinc-800">
-            <p className="mb-1 text-sm font-medium text-zinc-700 dark:text-zinc-300">Upgrade to unlock everything</p>
-            <ul className="space-y-1">
+          <div className="border-t border-zinc-100 bg-zinc-50/50 px-6 py-4 dark:border-zinc-800 dark:bg-zinc-800/30">
+            <p className="mb-2 text-sm font-medium text-zinc-700 dark:text-zinc-300">
+              Upgrade to unlock
+            </p>
+            <ul className="space-y-1 text-xs text-zinc-500 dark:text-zinc-400">
               {PRO_FEATURES.filter((f) => !FREE_FEATURES.includes(f)).map((f) => (
-                <li key={f} className="flex items-center gap-2 text-xs text-zinc-400">
+                <li key={f} className="flex items-center gap-2">
                   <span className="text-zinc-300 dark:text-zinc-600">—</span>
                   {f}
                 </li>
@@ -115,48 +153,74 @@ export default function PlanTab({ plan }: Props) {
 
       {/* CTA */}
       {!isPaid ? (
-        <div className="grid gap-3 sm:grid-cols-2">
-          {/* Monthly */}
+        <div className="grid gap-4 sm:grid-cols-2">
           <div className="rounded-2xl border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900">
-            <p className="mb-1 text-lg font-bold text-zinc-900 dark:text-zinc-100">$9.99<span className="text-sm font-normal text-zinc-400">/mo</span></p>
-            <p className="mb-4 text-xs text-zinc-500">Monthly Pro · cancel anytime</p>
+            <p className="text-lg font-bold text-zinc-900 dark:text-zinc-100">
+              $9.99
+              <span className="text-sm font-normal text-zinc-500">/mo</span>
+            </p>
+            <p className="mb-4 text-xs text-zinc-500 dark:text-zinc-400">
+              Monthly · cancel anytime
+            </p>
             <button
+              type="button"
               onClick={() => openCheckout("monthly")}
-              className="w-full rounded-xl bg-indigo-700 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-indigo-800"
+              className="w-full rounded-xl bg-zinc-900 py-3 text-sm font-semibold text-white transition-colors hover:bg-zinc-800 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-100"
             >
               Get Monthly
             </button>
           </div>
-          {/* Yearly */}
-          <div className="rounded-2xl border-2 border-indigo-500 bg-white p-5 dark:bg-zinc-900">
+          <div className="rounded-2xl border-2 border-emerald-200 bg-emerald-50/30 p-5 dark:border-emerald-900/50 dark:bg-emerald-950/20">
             <div className="mb-1 flex items-center gap-2">
-              <p className="text-lg font-bold text-zinc-900 dark:text-zinc-100">$49.99<span className="text-sm font-normal text-zinc-400">/yr</span></p>
-              <span className="rounded-full bg-emerald-500 px-2 py-0.5 text-[10px] font-bold text-white">Save 58%</span>
+              <p className="text-lg font-bold text-zinc-900 dark:text-zinc-100">
+                $49.99
+                <span className="text-sm font-normal text-zinc-500">/yr</span>
+              </p>
+              <span className="rounded-full bg-emerald-500 px-2 py-0.5 text-[10px] font-bold text-white">
+                Save 58%
+              </span>
             </div>
-            <p className="mb-4 text-xs text-zinc-500">Yearly Pro · best value</p>
+            <p className="mb-4 text-xs text-zinc-500 dark:text-zinc-400">
+              Yearly · best value
+            </p>
             <button
+              type="button"
               onClick={() => openCheckout("yearly")}
-              className="w-full rounded-xl bg-indigo-700 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-indigo-800"
+              className="w-full rounded-xl bg-zinc-900 py-3 text-sm font-semibold text-white transition-colors hover:bg-zinc-800 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-100"
             >
               Get Yearly
             </button>
           </div>
         </div>
       ) : (
-        <div className="rounded-2xl border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900">
-          <p className="text-sm font-medium text-zinc-700 dark:text-zinc-300">You&apos;re all set ✓</p>
-          <p className="mt-1 text-xs text-zinc-400">
-            To update billing or cancel, visit your{" "}
+        <div className="rounded-2xl border border-zinc-200 bg-zinc-50/50 px-6 py-5 dark:border-zinc-800 dark:bg-zinc-800/30">
+          <p className="font-medium text-zinc-700 dark:text-zinc-300">
+            You’re all set
+          </p>
+          <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
+            Manage billing or cancel in the{" "}
             <a
               href="https://paddle.com"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-indigo-600 hover:underline dark:text-indigo-400"
+              className="font-medium text-zinc-900 underline decoration-zinc-300 underline-offset-2 hover:decoration-zinc-500 dark:text-zinc-200 dark:decoration-zinc-600 dark:hover:decoration-zinc-400"
             >
               Paddle billing portal
-            </a>.
+            </a>
+            .
           </p>
         </div>
+      )}
+
+      {!isPaid && (
+        <p className="text-center">
+          <Link
+            href="/pricing"
+            className="text-sm font-medium text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-200"
+          >
+            View full pricing →
+          </Link>
+        </p>
       )}
     </div>
   );
