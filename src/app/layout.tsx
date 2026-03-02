@@ -1,16 +1,14 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import Sidebar from "@/components/Sidebar";
-import MobileNav from "@/components/MobileNav";
 import AuthButtons from "@/components/AuthButtons";
 import AuthProvider from "@/components/AuthProvider";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import { ToastProvider } from "@/components/Toast";
 import ThemeToggle from "@/components/ThemeToggle";
+import HeaderNavLinks from "@/components/layout/HeaderNavLinks";
+import MobileStandaloneHeader from "@/components/layout/MobileStandaloneHeader";
 import LazyCookieConsentAndAnalytics from "@/components/LazyCookieConsentAndAnalytics";
-import LazyEmailVerificationBanner from "@/components/LazyEmailVerificationBanner";
-import { getAllTutorials } from "@/lib/tutorials";
 import { BASE_URL } from "@/lib/constants";
 import Link from "next/link";
 import Script from "next/script";
@@ -81,8 +79,6 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const tutorials = getAllTutorials("go");
-
   return (
     <html lang="en">
       <body
@@ -101,36 +97,33 @@ export default function RootLayout({
         <AuthProvider>
           <ToastProvider>
           <div className="flex h-dvh flex-col overflow-hidden">
-            {/* Top header bar — desktop only (mobile uses MobileNav) */}
+            {/* Top header — Pricing, Search, Login/Sign up; same on all pages */}
             <header className="relative z-20 hidden md:flex items-center justify-between border-b border-zinc-100 bg-white/90 px-6 py-3 shadow-sm backdrop-blur-md dark:border-zinc-800 dark:bg-zinc-950/90">
               <Link href="/" className="flex items-center gap-2.5 text-zinc-900 dark:text-white">
                 <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-indigo-600 text-sm font-bold text-white">U</span>
                 <span className="text-lg font-bold">uByte</span>
               </Link>
               <div className="flex items-center gap-2">
+                <HeaderNavLinks />
                 <ThemeToggle className="flex h-8 w-8 items-center justify-center rounded-lg text-zinc-500 transition-colors hover:bg-zinc-100 hover:text-zinc-800 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-200" />
                 <AuthButtons />
               </div>
             </header>
-            <div className="flex flex-1 overflow-hidden">
-              <Sidebar lang="go" tutorials={tutorials} />
-              <div className="flex flex-1 flex-col overflow-hidden">
-                <MobileNav lang="go" tutorials={tutorials} />
-                <LazyEmailVerificationBanner />
-                <main id="main-content" className="flex-1 overflow-y-auto">
-                  <ErrorBoundary>{children}</ErrorBoundary>
-                </main>
-                <footer className="border-t border-zinc-100 bg-white px-6 py-3 dark:border-zinc-800 dark:bg-zinc-950">
-                  <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-xs text-zinc-500 dark:text-zinc-400">
-                    <span>© {new Date().getFullYear()} uByte</span>
-                    <Link href="/privacy" className="transition-colors hover:text-indigo-600">Privacy</Link>
-                    <Link href="/terms" className="transition-colors hover:text-indigo-600">Terms</Link>
-                    <Link href="/leaderboard" className="transition-colors hover:text-indigo-600">Leaderboard</Link>
-                    <a href="https://go.dev" target="_blank" rel="noopener noreferrer" className="transition-colors hover:text-indigo-600">go.dev</a>
-                  </div>
-                </footer>
-              </div>
+            <MobileStandaloneHeader />
+            {/* Home / practice: just scrollable content. /[lang]: sidebar + content from [lang] layout */}
+            <div className="flex flex-1 min-h-0 overflow-hidden">
+              <ErrorBoundary>{children}</ErrorBoundary>
             </div>
+            <footer className="border-t border-zinc-100 bg-white px-6 py-3 dark:border-zinc-800 dark:bg-zinc-950 shrink-0">
+              <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-xs text-zinc-500 dark:text-zinc-400">
+                <span>© {new Date().getFullYear()} uByte</span>
+                <Link href="/privacy" className="transition-colors hover:text-indigo-600">Privacy</Link>
+                <Link href="/terms" className="transition-colors hover:text-indigo-600">Terms</Link>
+                <Link href="/leaderboard" className="transition-colors hover:text-indigo-600">Leaderboard</Link>
+                <Link href="/pricing" className="transition-colors hover:text-indigo-600">Pricing</Link>
+                <a href="https://go.dev" target="_blank" rel="noopener noreferrer" className="transition-colors hover:text-indigo-600">go.dev</a>
+              </div>
+            </footer>
           </div>
           <LazyCookieConsentAndAnalytics />
           </ToastProvider>

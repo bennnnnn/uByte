@@ -7,6 +7,7 @@ import { useAuth } from "@/components/AuthProvider";
 import { tutorialUrl } from "@/lib/urls";
 import ThemeToggle from "@/components/ThemeToggle";
 import AuthButtons from "@/components/AuthButtons";
+import HeaderNavLinks from "@/components/layout/HeaderNavLinks";
 
 interface SubTopic {
   id: string;
@@ -53,6 +54,9 @@ export default function MobileNav({ lang, tutorials }: { lang: string; tutorials
 
       {open && (
         <nav className="border-b border-zinc-100 bg-zinc-50 px-3 py-3 dark:border-zinc-800 dark:bg-zinc-950">
+          <div className="mb-3 flex flex-wrap items-center gap-2 border-b border-zinc-200 pb-3 dark:border-zinc-700">
+            <HeaderNavLinks />
+          </div>
           {/* Search */}
           <div className="relative mb-2">
             <svg className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
