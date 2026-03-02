@@ -29,7 +29,7 @@ export default function UserMenuDropdown({ unreadCount }: Props) {
   if (!user) return null;
 
   return (
-    <div className="relative" ref={menuRef}>
+    <div className="relative z-10" ref={menuRef}>
       <button onClick={() => setMenuOpen(!menuOpen)} className="flex items-center gap-2 rounded-full p-1 transition-colors hover:bg-zinc-100 dark:hover:bg-zinc-800">
         <Avatar avatarKey={profile?.avatar ?? "gopher"} size="sm" />
         <svg className={`h-4 w-4 text-zinc-400 transition-transform ${menuOpen ? "rotate-180" : ""}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -38,7 +38,7 @@ export default function UserMenuDropdown({ unreadCount }: Props) {
       </button>
 
       {menuOpen && (
-        <div className="absolute right-0 top-full z-50 mt-2 w-64 overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-lg dark:border-zinc-800 dark:bg-zinc-900">
+        <div className="absolute right-0 top-full z-[100] mt-2 w-64 overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-lg dark:border-zinc-800 dark:bg-zinc-900">
           <div className="border-b border-zinc-100 px-4 py-3 dark:border-zinc-800">
             <div className="flex items-center justify-between">
               <div>
