@@ -33,10 +33,10 @@ export default function ProblemSidebar({ problems, activeSlug, lang }: Props) {
           Problems
         </Link>
         <Link
-          href="/"
+          href={`/practice`}
           className="text-xs text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300"
         >
-          ← Home
+          All languages
         </Link>
       </div>
 
