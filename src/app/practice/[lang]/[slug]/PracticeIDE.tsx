@@ -328,6 +328,7 @@ export function PracticeIDE({ problem, initialLang }: Props) {
               className="hidden select-none overflow-hidden border-r border-zinc-800 bg-zinc-950 px-3 pt-4 text-right text-xs leading-relaxed text-zinc-600 sm:block"
               style={{ minWidth: "3rem" }}
               aria-hidden
+              suppressHydrationWarning
             >
               {lineNumbers.map((n) => (
                 <div key={n} className="leading-[1.625rem]">
@@ -341,6 +342,7 @@ export function PracticeIDE({ problem, initialLang }: Props) {
               ref={editor.preRef}
               className="pointer-events-none absolute bottom-0 left-0 right-0 top-0 overflow-hidden p-4 sm:left-12"
               aria-hidden
+              suppressHydrationWarning
             >
               <div
                 ref={editor.highlightRef}
@@ -348,6 +350,7 @@ export function PracticeIDE({ problem, initialLang }: Props) {
                 dangerouslySetInnerHTML={{
                   __html: editor.highlightGo(editor.code),
                 }}
+                suppressHydrationWarning
               />
             </pre>
 
@@ -359,11 +362,10 @@ export function PracticeIDE({ problem, initialLang }: Props) {
               onScroll={editor.syncScroll}
               spellCheck={false}
               autoComplete="off"
-              autoCorrect="off"
-              autoCapitalize="off"
               className="absolute bottom-0 left-0 right-0 top-0 resize-none bg-transparent p-4 leading-[1.625rem] text-transparent caret-white focus:outline-none sm:left-12"
               style={{ caretColor: "white" }}
               aria-label="Code editor"
+              suppressHydrationWarning
             />
           </div>
 

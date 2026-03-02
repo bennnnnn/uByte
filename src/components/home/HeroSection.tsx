@@ -98,13 +98,13 @@ const SNIPPETS: Record<LangKey, CodeSnippet> = {
 
 const LANG_ORDER: LangKey[] = ["go", "python", "javascript", "java", "rust", "cpp"];
 
-const TAB_COLORS: Record<LangKey, string> = {
-  go:         "data-[active=true]:bg-cyan-500",
-  python:     "data-[active=true]:bg-blue-500",
-  javascript: "data-[active=true]:bg-yellow-400 data-[active=true]:text-zinc-900",
-  java:       "data-[active=true]:bg-orange-500",
-  rust:       "data-[active=true]:bg-red-500",
-  cpp:        "data-[active=true]:bg-violet-500",
+const ACTIVE_BG: Record<LangKey, string> = {
+  go:         "bg-cyan-500 text-white",
+  python:     "bg-blue-500 text-white",
+  javascript: "bg-yellow-400 text-zinc-900",
+  java:       "bg-orange-500 text-white",
+  rust:       "bg-red-500 text-white",
+  cpp:        "bg-violet-500 text-white",
 };
 
 export default function HeroSection() {
@@ -176,29 +176,38 @@ export default function HeroSection() {
 
             {/* Language tabs */}
             <div className="flex items-center gap-0.5 overflow-x-auto border-b border-white/10 bg-zinc-950/60 px-2 py-1.5 scrollbar-none">
-              {LANG_ORDER.map((lang) => (
-                <button
-                  key={lang}
-                  type="button"
-                  data-active={lang === activeLang}
-                  onClick={() => setActiveLang(lang)}
-                  className={`shrink-0 rounded-md px-2.5 py-1 text-xs font-medium transition-all ${TAB_COLORS[lang]} data-[active=false]:text-zinc-500 data-[active=false]:hover:text-zinc-300 data-[active=true]:text-white`}
-                >
-                  {SNIPPETS[lang].label}
-                </button>
-              ))}
+              {LANG_ORDER.map((lang) => {
+                const isActive = lang === activeLang;
+                return (
+                  <button
+                    key={lang}
+                    type="button"
+                    onClick={() => setActiveLang(lang)}
+                    className={`shrink-0 rounded-md px-2.5 py-1 text-xs font-medium transition-all ${
+                      isActive
+                        ? ACTIVE_BG[lang]
+                        : "text-zinc-500 hover:text-zinc-300"
+                    }`}
+                  >
+                    {SNIPPETS[lang].label}
+                  </button>
+                );
+              })}
             </div>
 
             {/* Code */}
-            <div className="min-h-[180px] p-4 font-mono text-xs leading-relaxed">
+            <div
+              className="min-h-[180px] p-4 font-mono text-xs leading-relaxed"
+              suppressHydrationWarning
+            >
               {snippet.lines.map((line, i) => (
-                <div key={`${activeLang}-${i}`}>
+                <div key={i} suppressHydrationWarning>
                   {line.text ? (
-                    <span style={{ color: line.color ?? "#e2e8f0" }}>
+                    <span style={{ color: line.color ?? "#e2e8f0" }} suppressHydrationWarning>
                       {line.text}
                     </span>
                   ) : (
-                    <span>&nbsp;</span>
+                    <span>{"\u00a0"}</span>
                   )}
                 </div>
               ))}
