@@ -81,19 +81,24 @@ function ProfilePage() {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [error, setError] = useState("");
+  const [activeTab, setActiveTab] = useState<Tab | null>(null);
 
   const paramTab = searchParams.get("tab") as Tab | null;
   const planSuccess = searchParams.get("plan") === "success";
-  const tab: Tab = planSuccess ? "plan" : (paramTab && VALID_TABS.includes(paramTab) ? paramTab : "overview");
+  const tabFromUrl: Tab | null = planSuccess ? "plan" : (paramTab && VALID_TABS.includes(paramTab) ? paramTab : null);
+  const tab: Tab = tabFromUrl ?? activeTab ?? "overview";
 
-  const setTab = (t: Tab) => router.push(`/profile?tab=${t}`, { scroll: false });
+  const setTab = (t: Tab) => {
+    setActiveTab(t);
+    router.push(`/profile?tab=${t}`, { scroll: false });
+  };
 
   const fetchProfile = useCallback(async () => {
     try {
       const [profRes, statsRes, bmRes, notifRes] = await Promise.all([
         fetch("/api/profile", { credentials: "same-origin" }),
         fetch("/api/profile/stats", { credentials: "same-origin" }),
-        fetch("/api/bookmarks", { credentials: "same-origin" }),
+        fetch("/api/bookmarks?lang=go", { credentials: "same-origin" }),
         fetch("/api/notifications", { credentials: "same-origin" }),
       ]);
 
@@ -107,19 +112,20 @@ function ProfilePage() {
       }
 
       const [profData, statsData, bmData, notifData] = await Promise.all([
-        profRes.json(),
-        statsRes.json(),
-        bmRes.ok ? bmRes.json() : { bookmarks: [] },
-        notifRes.ok ? notifRes.json() : { notifications: [], unreadCount: 0 },
+        profRes.json().catch(() => ({})),
+        statsRes.json().catch(() => ({})),
+        bmRes.ok ? bmRes.json().catch(() => ({ bookmarks: [], hasMore: false, total: 0 })) : { bookmarks: [], hasMore: false, total: 0 },
+        notifRes.ok ? notifRes.json().catch(() => ({ notifications: [], unreadCount: 0 })) : { notifications: [], unreadCount: 0 },
       ]);
 
+      setError("");
       if (profData.profile) setProfile(profData.profile);
       if (statsData.stats) {
         setStats(statsData.stats);
         setBadges(statsData.all_badges);
         setAchievements(statsData.achievements);
       }
-      if (bmData.bookmarks) {
+      if (bmData.bookmarks != null) {
         setBookmarks(bmData.bookmarks);
         setBmHasMore(bmData.hasMore ?? false);
         setBmTotal(bmData.total ?? 0);
@@ -138,6 +144,10 @@ function ProfilePage() {
     if (!loading && !user) { router.push("/"); return; }
     if (user) startTransition(() => { void fetchProfile(); });
   }, [user, loading, router, fetchProfile]);
+
+  useEffect(() => {
+    if (tabFromUrl) setActiveTab(tabFromUrl);
+  }, [tabFromUrl]);
 
   const saveProfile = async (data: { name: string; bio: string; avatar: string; theme: string }): Promise<boolean> => {
     const res = await fetch("/api/profile", {
@@ -193,7 +203,7 @@ function ProfilePage() {
   const loadMoreBookmarks = async () => {
     setBmLoading(true);
     try {
-      const res = await fetch(`/api/bookmarks?offset=${bookmarks.length}`, { credentials: "same-origin" });
+      const res = await fetch(`/api/bookmarks?offset=${bookmarks.length}&lang=go`, { credentials: "same-origin" });
       if (res.ok) {
         const data = await res.json();
         setBookmarks((prev) => [...prev, ...data.bookmarks]);
