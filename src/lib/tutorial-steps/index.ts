@@ -7,6 +7,9 @@ const stepsByLanguage: Record<SupportedLanguage, Record<string, TutorialStep[]>>
   go: goSteps,
   python: {},
   cpp: {},
+  javascript: {},
+  java: {},
+  rust: {},
 };
 
 export function getSteps(

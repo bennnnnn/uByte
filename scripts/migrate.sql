@@ -112,3 +112,13 @@ CREATE TABLE IF NOT EXISTS rate_limits (
   hit_at BIGINT NOT NULL
 );
 CREATE INDEX IF NOT EXISTS idx_rate_limits_key_hit ON rate_limits(key, hit_at);
+
+-- Popular content for home sidebar (practice problem views)
+CREATE TABLE IF NOT EXISTS practice_views (
+  id SERIAL PRIMARY KEY,
+  viewer_id TEXT NOT NULL,
+  problem_slug TEXT NOT NULL,
+  viewed_at TEXT DEFAULT (NOW()::text),
+  UNIQUE(viewer_id, problem_slug)
+);
+CREATE INDEX IF NOT EXISTS idx_practice_views_slug ON practice_views(problem_slug);

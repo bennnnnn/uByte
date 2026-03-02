@@ -8,7 +8,7 @@ import { tutorialUrl } from "@/lib/urls";
 import {
   LanguageCard,
   InterviewLanguageCard,
-  TutorialCard,
+  HomePopularSidebar,
 } from "@/components/home";
 import ContinueBanner from "@/components/ContinueBanner";
 import GoogleOAuthError from "@/components/GoogleOAuthError";
@@ -47,14 +47,14 @@ const LANGUAGE_ICONS: Record<string, string> = {
   go: "🐹",
   python: "🐍",
   cpp: "⚙️",
+  javascript: "🟨",
+  java: "☕",
+  rust: "🦀",
 };
-
-const FEATURED_TUTORIALS_COUNT = 8;
 
 export default function Home() {
   const goTutorials = getAllTutorials("go");
   const tutorialList = goTutorials.map(({ slug, title }) => ({ slug, title }));
-  const featuredTutorials = goTutorials.slice(0, FEATURED_TUTORIALS_COUNT);
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -92,8 +92,22 @@ export default function Home() {
                 Learn to code with uByte
               </h1>
               <p className="max-w-2xl text-base leading-relaxed text-zinc-600 dark:text-zinc-400">
-                Interactive lessons in Go, Python, and C++. Same concepts across languages — pick one and start. Prepare for interviews with practice problems.
+                Interactive lessons in Go, Python, C++, and more. Same concepts across languages — pick one and start. Prepare for interviews with practice problems.
               </p>
+            </div>
+
+            {/* How it works — moved to top before language cards */}
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+              {HOW_IT_WORKS.map(({ icon, label, desc }) => (
+                <div
+                  key={label}
+                  className="rounded-xl border border-zinc-100 bg-white p-4 text-center shadow-sm transition-shadow hover:shadow-md dark:border-zinc-800 dark:bg-zinc-900"
+                >
+                  <div className="mb-1.5 text-2xl">{icon}</div>
+                  <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">{label}</p>
+                  <p className="mt-0.5 text-xs text-zinc-500 dark:text-zinc-400">{desc}</p>
+                </div>
+              ))}
             </div>
 
             {/* Programming languages */}
@@ -132,20 +146,6 @@ export default function Home() {
               </div>
             </section>
 
-            {/* How it works */}
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-              {HOW_IT_WORKS.map(({ icon, label, desc }) => (
-                <div
-                  key={label}
-                  className="rounded-xl border border-zinc-100 bg-white p-4 text-center shadow-sm transition-shadow hover:shadow-md dark:border-zinc-800 dark:bg-zinc-900"
-                >
-                  <div className="mb-1.5 text-2xl">{icon}</div>
-                  <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">{label}</p>
-                  <p className="mt-0.5 text-xs text-zinc-500 dark:text-zinc-400">{desc}</p>
-                </div>
-              ))}
-            </div>
-
             <ContinueBanner lang="go" tutorials={tutorialList} />
 
             <nav className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-sm text-zinc-500 dark:text-zinc-400" aria-label="Quick links">
@@ -160,33 +160,8 @@ export default function Home() {
             </nav>
           </div>
 
-          {/* Right column: featured tutorials — fills the empty space */}
-          <aside className="lg:pt-0" aria-labelledby="featured-heading">
-            <h2 id="featured-heading" className="mb-4 text-lg font-semibold text-zinc-900 dark:text-zinc-100">
-              Featured tutorials
-            </h2>
-            <div className="space-y-3">
-              {featuredTutorials.map((t) => (
-                <TutorialCard
-                  key={t.slug}
-                  lang="go"
-                  slug={t.slug}
-                  title={t.title}
-                  description={t.description}
-                  difficulty={t.difficulty}
-                  estimatedMinutes={t.estimatedMinutes}
-                />
-              ))}
-            </div>
-            {goTutorials.length > FEATURED_TUTORIALS_COUNT && (
-              <Link
-                href="/go"
-                className="mt-4 inline-block text-sm font-medium text-indigo-600 hover:underline dark:text-indigo-400"
-              >
-                View all {goTutorials.length} tutorials →
-              </Link>
-            )}
-          </aside>
+          {/* Right column: dynamic popular languages, tutorials, interview questions */}
+          <HomePopularSidebar />
         </div>
       </div>
     </div>

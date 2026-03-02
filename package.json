@@ -14,7 +14,8 @@
     "build": "next build --webpack",
     "start": "next start",
     "lint": "eslint",
-    "test": "vitest run"
+    "test": "vitest run",
+    "migrate": "node scripts/run-migrate.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.78.0",

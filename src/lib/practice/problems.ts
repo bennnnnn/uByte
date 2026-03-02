@@ -25,6 +25,10 @@ int main() {
     return 0;
 }`;
 
+const DEFAULT_JAVASCRIPT = `// Your code here\nconsole.log("Hello, World!");`;
+const DEFAULT_JAVA = `public class Main {\n    public static void main(String[] args) {\n        // Your code here\n    }\n}`;
+const DEFAULT_RUST = `fn main() {\n    println!("Hello, World!");\n}`;
+
 export const PRACTICE_PROBLEMS: PracticeProblem[] = [
   {
     slug: "two-sum",
@@ -132,6 +136,12 @@ export function getStarterForLanguage(
       return DEFAULT_PYTHON;
     case "cpp":
       return DEFAULT_CPP;
+    case "javascript":
+      return DEFAULT_JAVASCRIPT;
+    case "java":
+      return DEFAULT_JAVA;
+    case "rust":
+      return DEFAULT_RUST;
     default:
       return DEFAULT_GO;
   }

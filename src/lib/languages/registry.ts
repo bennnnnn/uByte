@@ -70,6 +70,66 @@ export const LANGUAGES: Record<SupportedLanguage, LanguageConfig> = {
       ],
     },
   },
+  javascript: {
+    id: "javascript",
+    name: "JavaScript",
+    slug: "javascript",
+    contentDir: "content/javascript",
+    defaultStarter: '// Your code here\nconsole.log("Hello, World!");',
+    fileExtension: ".js",
+    seo: {
+      defaultTitle: "uByte — Learn JavaScript for Free",
+      defaultDescription: "Learn JavaScript programming for free with uByte. Interactive JS tutorials for beginners — write and run real code in your browser.",
+      keywords: [
+        "JavaScript",
+        "Learn JavaScript",
+        "JS tutorial",
+        "JavaScript for beginners",
+        "free JavaScript course",
+        "uByte",
+      ],
+    },
+  },
+  java: {
+    id: "java",
+    name: "Java",
+    slug: "java",
+    contentDir: "content/java",
+    defaultStarter: 'public class Main {\n    public static void main(String[] args) {\n        // Your code here\n    }\n}',
+    fileExtension: ".java",
+    seo: {
+      defaultTitle: "uByte — Learn Java for Free",
+      defaultDescription: "Learn Java programming for free with uByte. Interactive Java tutorials for beginners — write and run real code in your browser.",
+      keywords: [
+        "Java programming",
+        "Learn Java",
+        "Java tutorial",
+        "Java for beginners",
+        "free Java course",
+        "uByte",
+      ],
+    },
+  },
+  rust: {
+    id: "rust",
+    name: "Rust",
+    slug: "rust",
+    contentDir: "content/rust",
+    defaultStarter: 'fn main() {\n    // Your code here\n    println!("Hello, World!");\n}',
+    fileExtension: ".rs",
+    seo: {
+      defaultTitle: "uByte — Learn Rust for Free",
+      defaultDescription: "Learn Rust programming for free with uByte. Interactive Rust tutorials for beginners — write and run real code in your browser.",
+      keywords: [
+        "Rust programming",
+        "Learn Rust",
+        "Rust tutorial",
+        "Rust for beginners",
+        "free Rust course",
+        "uByte",
+      ],
+    },
+  },
 };
 
 /** Get highlighter function for a language (client-side syntax highlighting) */

@@ -1,16 +1,25 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import Link from "next/link";
 import type { PracticeProblem } from "@/lib/practice/types";
 import type { SupportedLanguage } from "@/lib/languages/types";
 import { getStarterForLanguage } from "@/lib/practice/problems";
 import { LANGUAGES } from "@/lib/languages/registry";
 
-const LANG_ORDER: SupportedLanguage[] = ["go", "python", "cpp"];
+const LANG_ORDER: SupportedLanguage[] = ["go", "python", "cpp", "javascript", "java", "rust"];
 
 export function PracticeProblemView({ problem }: { problem: PracticeProblem }) {
   const [lang, setLang] = useState<SupportedLanguage>("go");
+
+  useEffect(() => {
+    fetch("/api/practice-view", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ slug: problem.slug }),
+      credentials: "same-origin",
+    }).catch(() => {});
+  }, [problem.slug]);
   const [code, setCode] = useState(() => getStarterForLanguage(problem, "go"));
   const [output, setOutput] = useState<string>("");
   const [running, setRunning] = useState(false);

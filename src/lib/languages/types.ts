@@ -1,5 +1,5 @@
-/** Supported programming languages for tutorials */
-export type SupportedLanguage = "go" | "python" | "cpp";
+/** Supported programming languages for tutorials and practice */
+export type SupportedLanguage = "go" | "python" | "cpp" | "javascript" | "java" | "rust";
 
 /** Configuration for a language's tutorials and code execution */
 export interface LanguageConfig {
