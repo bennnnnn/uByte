@@ -2,14 +2,27 @@ import { getSql } from "./client";
 
 const DEFAULT_LANG = "go";
 
+/** PostgreSQL error code for undefined column (e.g. language not yet migrated) */
+const UNDEFINED_COLUMN = "42703";
+
 export async function getProgress(userId: number, language: string = DEFAULT_LANG): Promise<string[]> {
   const sql = getSql();
-  const rows = await sql`
-    SELECT tutorial_slug FROM progress
-    WHERE user_id = ${userId} AND (language = ${language} OR language IS NULL)
-    ORDER BY completed_at
-  `;
-  return rows.map((r) => r.tutorial_slug as string);
+  try {
+    const rows = await sql`
+      SELECT tutorial_slug FROM progress
+      WHERE user_id = ${userId} AND (language = ${language} OR language IS NULL)
+      ORDER BY completed_at
+    `;
+    return rows.map((r) => r.tutorial_slug as string);
+  } catch (err: unknown) {
+    if ((err as { code?: string })?.code === UNDEFINED_COLUMN) {
+      const rows = await sql`
+        SELECT tutorial_slug FROM progress WHERE user_id = ${userId} ORDER BY completed_at
+      `;
+      return rows.map((r) => r.tutorial_slug as string);
+    }
+    throw err;
+  }
 }
 
 /** If language is omitted, returns total count across all languages (for stats/leaderboard). */
@@ -24,11 +37,21 @@ export async function getProgressCount(
     `;
     return (row?.c as number) ?? 0;
   }
-  const [row] = await sql`
-    SELECT COUNT(*)::int AS c FROM progress
-    WHERE user_id = ${userId} AND (language = ${language} OR language IS NULL)
-  `;
-  return (row?.c as number) ?? 0;
+  try {
+    const [row] = await sql`
+      SELECT COUNT(*)::int AS c FROM progress
+      WHERE user_id = ${userId} AND (language = ${language} OR language IS NULL)
+    `;
+    return (row?.c as number) ?? 0;
+  } catch (err: unknown) {
+    if ((err as { code?: string })?.code === UNDEFINED_COLUMN) {
+      const [row] = await sql`
+        SELECT COUNT(*)::int AS c FROM progress WHERE user_id = ${userId}
+      `;
+      return (row?.c as number) ?? 0;
+    }
+    throw err;
+  }
 }
 
 export async function markComplete(
@@ -37,11 +60,23 @@ export async function markComplete(
   language: string = DEFAULT_LANG
 ): Promise<void> {
   const sql = getSql();
-  await sql`
-    INSERT INTO progress (user_id, tutorial_slug, language)
-    VALUES (${userId}, ${tutorialSlug}, ${language})
-    ON CONFLICT (user_id, language, tutorial_slug) DO NOTHING
-  `;
+  try {
+    await sql`
+      INSERT INTO progress (user_id, tutorial_slug, language)
+      VALUES (${userId}, ${tutorialSlug}, ${language})
+      ON CONFLICT (user_id, language, tutorial_slug) DO NOTHING
+    `;
+  } catch (err: unknown) {
+    if ((err as { code?: string })?.code === UNDEFINED_COLUMN) {
+      await sql`
+        INSERT INTO progress (user_id, tutorial_slug)
+        VALUES (${userId}, ${tutorialSlug})
+        ON CONFLICT (user_id, tutorial_slug) DO NOTHING
+      `;
+      return;
+    }
+    throw err;
+  }
 }
 
 export async function markIncomplete(
@@ -50,10 +85,20 @@ export async function markIncomplete(
   language: string = DEFAULT_LANG
 ): Promise<void> {
   const sql = getSql();
-  await sql`
-    DELETE FROM progress
-    WHERE user_id = ${userId} AND tutorial_slug = ${tutorialSlug} AND (language = ${language} OR language IS NULL)
-  `;
+  try {
+    await sql`
+      DELETE FROM progress
+      WHERE user_id = ${userId} AND tutorial_slug = ${tutorialSlug} AND (language = ${language} OR language IS NULL)
+    `;
+  } catch (err: unknown) {
+    if ((err as { code?: string })?.code === UNDEFINED_COLUMN) {
+      await sql`
+        DELETE FROM progress WHERE user_id = ${userId} AND tutorial_slug = ${tutorialSlug}
+      `;
+      return;
+    }
+    throw err;
+  }
 }
 
 export async function resetAllProgress(userId: number): Promise<void> {
