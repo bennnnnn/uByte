@@ -3,19 +3,14 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "@/components/AuthProvider";
 import { apiFetch } from "@/lib/api-client";
+import { applyTheme } from "@/lib/theme";
+export { applyTheme };
 
 function getStoredTheme(): "light" | "dark" {
   if (typeof window === "undefined") return "dark";
   const saved = localStorage.getItem("theme");
   if (saved === "light" || saved === "dark") return saved;
   return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
-}
-
-export function applyTheme(theme: "light" | "dark") {
-  localStorage.setItem("theme", theme);
-  const html = document.documentElement;
-  html.classList.remove("light", "dark");
-  html.classList.add(theme);
 }
 
 export default function ThemeToggle({ className }: { className?: string }) {

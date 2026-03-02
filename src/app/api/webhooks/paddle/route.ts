@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { updateUserPlan, getUserByPaddleCustomerId, getUserById, createNotification } from "@/lib/db";
+import { updateUserPlan, getUserByPaddleCustomerId, getUserById, createNotification, recordSubscriptionEvent } from "@/lib/db";
 
 const WEBHOOK_SECRET = process.env.PADDLE_WEBHOOK_SECRET ?? "";
 
@@ -78,6 +78,8 @@ export async function POST(request: NextRequest) {
         await updateUserPlan(uid, activatedPlan, paddleCustomerId);
         const planLabel = activatedPlan === "yearly" ? "Yearly Pro" : "Monthly Pro";
         await createNotification(uid, "plan", `You're now on ${planLabel}!`, "All tutorials and features are now unlocked. Enjoy!");
+        const amountCents = activatedPlan === "yearly" ? 4999 : 999;
+        await recordSubscriptionEvent(uid, activatedPlan, amountCents, "activated");
       }
       break;
     }
@@ -94,13 +96,19 @@ export async function POST(request: NextRequest) {
     case "subscription.canceled": {
       if (paddleCustomerId) {
         const user = await getUserByPaddleCustomerId(paddleCustomerId);
-        if (user) await updateUserPlan(user.id, "free");
+        if (user) {
+          await updateUserPlan(user.id, "free");
+          await recordSubscriptionEvent(user.id, user.plan, 0, "canceled");
+        }
       } else {
         // Fall back to userId in custom_data
         const userId = customData?.["userId"];
         if (userId) {
           const user = await getUserById(parseInt(userId, 10));
-          if (user) await updateUserPlan(user.id, "free");
+          if (user) {
+            await updateUserPlan(user.id, "free");
+            await recordSubscriptionEvent(user.id, user.plan, 0, "canceled");
+          }
         }
       }
       break;

@@ -82,12 +82,6 @@ export default function Home() {
             >
               Start Learning →
             </Link>
-            <Link
-              href="/playground"
-              className="inline-flex items-center gap-2 rounded-xl border border-zinc-200 bg-white px-6 py-3 text-sm font-semibold text-zinc-700 shadow-sm transition-all hover:border-zinc-300 hover:shadow-md dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200"
-            >
-              ⚡ Playground
-            </Link>
           </div>
         )}
       </div>

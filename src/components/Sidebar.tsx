@@ -60,19 +60,6 @@ export default function Sidebar({ tutorials }: { tutorials: SidebarItem[] }) {
           )}
         </div>
 
-        {/* Playground */}
-        <Link
-          href="/playground"
-          className={`mb-3 flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-150 ${
-            pathname === "/playground"
-              ? "bg-indigo-500 text-white shadow-sm"
-              : "text-zinc-700 hover:bg-zinc-200/70 hover:text-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800 dark:hover:text-white"
-          }`}
-        >
-          <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-white/30 text-sm dark:bg-white/10">⚡</span>
-          Playground
-        </Link>
-
         <p className="mb-2 px-3 text-[10px] font-bold uppercase tracking-widest text-zinc-500 dark:text-zinc-400">
           Lessons
         </p>

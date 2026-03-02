@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useState, useEffect, useCallback } from "react";
 import { apiFetch } from "@/lib/api-client";
+import { applyTheme } from "@/lib/theme";
 
 // ─── Types ───────────────────────────────────────────
 
@@ -84,15 +85,6 @@ export function useAppData() {
 }
 
 // ─── Helpers ─────────────────────────────────────────
-
-function applyTheme(theme: string) {
-  if (typeof window === "undefined") return;
-  localStorage.setItem("theme", theme);
-  const html = document.documentElement;
-  html.classList.remove("light", "dark");
-  if (theme === "dark") html.classList.add("dark");
-  else if (theme === "light") html.classList.add("light");
-}
 
 function extractProfile(data: { profile?: Record<string, unknown> }): ProfileData | null {
   if (!data.profile) return null;

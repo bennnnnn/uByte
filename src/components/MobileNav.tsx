@@ -52,14 +52,6 @@ export default function MobileNav({ tutorials }: { tutorials: NavItem[] }) {
 
       {open && (
         <nav className="border-b border-zinc-100 bg-zinc-50 px-3 py-3 dark:border-zinc-800 dark:bg-zinc-950">
-          <Link
-            href="/playground"
-            onClick={() => setOpen(false)}
-            className="mb-2 flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-200/70 dark:text-zinc-300 dark:hover:bg-zinc-800"
-          >
-            <span>⚡</span> Playground
-          </Link>
-
           {/* Search */}
           <div className="relative mb-2">
             <svg className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
