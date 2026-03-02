@@ -150,10 +150,9 @@ function ProfilePage() {
   }, [tabFromUrl]);
 
   const saveProfile = async (data: { name: string; bio: string; avatar: string; theme: string }): Promise<boolean> => {
-    const res = await fetch("/api/profile", {
+    const res = await apiFetch("/api/profile", {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
-      credentials: "same-origin",
       body: JSON.stringify(data),
     });
     if (res.ok) {
@@ -166,10 +165,9 @@ function ProfilePage() {
   };
 
   const changePassword = async (currentPw: string, newPw: string): Promise<string | null> => {
-    const res = await fetch("/api/profile", {
+    const res = await apiFetch("/api/profile", {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
-      credentials: "same-origin",
       body: JSON.stringify({ currentPassword: currentPw, newPassword: newPw }),
     });
     if (res.ok) return null;
