@@ -8,9 +8,8 @@ import AuthProvider from "@/components/AuthProvider";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import { ToastProvider } from "@/components/Toast";
 import ThemeToggle from "@/components/ThemeToggle";
-import CookieConsent from "@/components/CookieConsent";
-import EmailVerificationBanner from "@/components/EmailVerificationBanner";
-import { Analytics } from "@vercel/analytics/next";
+import LazyCookieConsentAndAnalytics from "@/components/LazyCookieConsentAndAnalytics";
+import LazyEmailVerificationBanner from "@/components/LazyEmailVerificationBanner";
 import { getAllTutorials } from "@/lib/tutorials";
 import { BASE_URL } from "@/lib/constants";
 import Link from "next/link";
@@ -117,7 +116,7 @@ export default function RootLayout({
               <Sidebar lang="go" tutorials={tutorials} />
               <div className="flex flex-1 flex-col overflow-hidden">
                 <MobileNav lang="go" tutorials={tutorials} />
-                <EmailVerificationBanner />
+                <LazyEmailVerificationBanner />
                 <main id="main-content" className="flex-1 overflow-y-auto">
                   <ErrorBoundary>{children}</ErrorBoundary>
                 </main>
@@ -133,10 +132,9 @@ export default function RootLayout({
               </div>
             </div>
           </div>
-          <CookieConsent />
+          <LazyCookieConsentAndAnalytics />
           </ToastProvider>
         </AuthProvider>
-        <Analytics />
         <Script
           id="sw-register"
           strategy="lazyOnload"
