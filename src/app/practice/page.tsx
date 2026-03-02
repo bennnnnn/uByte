@@ -35,32 +35,24 @@ export default function PracticePage() {
     <div className="min-h-full overflow-y-auto">
       <div className="mx-auto max-w-4xl px-6 py-14">
         {/* Header */}
-        <div className="mb-10 flex items-start justify-between gap-4">
-          <div>
-            <h1 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100">
-              Interview Practice
-            </h1>
-            <p className="mt-2 max-w-xl text-zinc-600 dark:text-zinc-400">
-              Sharpen your coding skills with classic interview problems. Pick your language, read the problem, and write real code in the browser — just like LeetCode.
-            </p>
-            <div className="mt-4 flex gap-3 text-sm">
-              <span className="rounded-full bg-emerald-100 px-3 py-1 font-medium text-emerald-700 dark:bg-emerald-950 dark:text-emerald-400">
-                {easy} Easy
-              </span>
-              <span className="rounded-full bg-amber-100 px-3 py-1 font-medium text-amber-700 dark:bg-amber-950 dark:text-amber-400">
-                {medium} Medium
-              </span>
-              <span className="rounded-full bg-red-100 px-3 py-1 font-medium text-red-700 dark:bg-red-950 dark:text-red-400">
-                {hard} Hard
-              </span>
-            </div>
+        <div className="mb-10">
+          <h1 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100">
+            Interview Practice
+          </h1>
+          <p className="mt-2 max-w-xl text-zinc-600 dark:text-zinc-400">
+            Sharpen your coding skills with classic interview problems. Pick your language, read the problem, and write real code in the browser — just like LeetCode.
+          </p>
+          <div className="mt-4 flex gap-3 text-sm">
+            <span className="rounded-full bg-emerald-100 px-3 py-1 font-medium text-emerald-700 dark:bg-emerald-950 dark:text-emerald-400">
+              {easy} Easy
+            </span>
+            <span className="rounded-full bg-amber-100 px-3 py-1 font-medium text-amber-700 dark:bg-amber-950 dark:text-amber-400">
+              {medium} Medium
+            </span>
+            <span className="rounded-full bg-red-100 px-3 py-1 font-medium text-red-700 dark:bg-red-950 dark:text-red-400">
+              {hard} Hard
+            </span>
           </div>
-          <Link
-            href="/"
-            className="shrink-0 rounded-lg px-4 py-2 text-sm font-medium text-zinc-600 transition-colors hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-200"
-          >
-            ← Home
-          </Link>
         </div>
 
         {/* Language cards */}
