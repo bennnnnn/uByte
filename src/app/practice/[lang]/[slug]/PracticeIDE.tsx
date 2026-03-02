@@ -54,6 +54,14 @@ export function PracticeIDE({ problem, initialLang }: Props) {
   const [showShortcuts, setShowShortcuts] = useState(false);
   const [statuses, setStatuses] = useState<Record<string, PracticeAttemptStatus>>({});
   const [xpToast, setXpToast] = useState<number | null>(null);
+  const [submitting, setSubmitting] = useState(false);
+  const [verdict, setVerdict] = useState<{
+    type: "accepted" | "wrong_answer" | "compile_error" | "runtime_error" | "tle" | "error";
+    message: string;
+    output?: string;
+    passedCases?: number;
+    totalCases?: number;
+  } | null>(null);
 
   const userMenuRef = useRef<HTMLDivElement>(null);
 
@@ -159,11 +167,64 @@ export function PracticeIDE({ problem, initialLang }: Props) {
     }
   }, [editor.code, lang, problem.slug]);
 
+  const handleSubmit = useCallback(async () => {
+    setSubmitting(true);
+    setVerdict(null);
+    try {
+      const res = await fetch("/api/judge-code", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "same-origin",
+        body: JSON.stringify({ slug: problem.slug, code: editor.code, language: lang }),
+      });
+      const data = await res.json();
+      const v = {
+        type:        data.verdict,
+        message:     data.message,
+        output:      data.output,
+        passedCases: data.passedCases,
+        totalCases:  data.totalCases,
+      };
+      setVerdict(v);
+
+      if (data.verdict === "accepted") {
+        setStatuses((prev) => ({ ...prev, [problem.slug]: "solved" }));
+        fetch("/api/practice-attempt", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "same-origin",
+          body: JSON.stringify({ slug: problem.slug, status: "solved" }),
+        })
+          .then((r) => r.json())
+          .then((d) => {
+            if (d?.xpAwarded > 0) {
+              setXpToast(d.xpAwarded);
+              setTimeout(() => setXpToast(null), 3500);
+            }
+          })
+          .catch(() => {});
+      } else if (["wrong_answer", "runtime_error", "compile_error"].includes(data.verdict)) {
+        setStatuses((prev) => ({ ...prev, [problem.slug]: "failed" }));
+        fetch("/api/practice-attempt", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "same-origin",
+          body: JSON.stringify({ slug: problem.slug, status: "failed" }),
+        }).catch(() => {});
+      }
+    } catch {
+      setVerdict({ type: "error", message: "Network error. Please try again." });
+    } finally {
+      setSubmitting(false);
+    }
+  }, [editor.code, lang, problem.slug]);
+
   function handleReset() {
     editor.setCode(getStarterForLanguage(problem, lang));
     editor.setErrorLines(new Set());
     setOutput(null);
     setOutputIsError(false);
+    setVerdict(null);
   }
 
   /** Tab → 4 spaces indent; Ctrl/Cmd+Enter → run */
@@ -477,12 +538,24 @@ export function PracticeIDE({ problem, initialLang }: Props) {
             <button
               type="button"
               onClick={handleRun}
-              disabled={running}
+              disabled={running || submitting}
               title="Run code (Ctrl+Enter)"
               className="flex items-center gap-1.5 rounded-md bg-green-100 px-3 py-1.5 text-sm font-medium text-green-800 transition-colors hover:bg-green-200 disabled:opacity-50 dark:bg-green-900/40 dark:text-green-300 dark:hover:bg-green-900/70"
             >
               {running ? "Running…" : "▶ Run"}
             </button>
+
+            {problem.testCases?.length && (lang === "go" || lang === "python" || lang === "javascript" || lang === "cpp" || lang === "java" || lang === "rust") && (
+              <button
+                type="button"
+                onClick={handleSubmit}
+                disabled={running || submitting}
+                title="Submit solution against test cases"
+                className="flex items-center gap-1.5 rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-medium text-white transition-colors hover:bg-indigo-500 disabled:opacity-50"
+              >
+                {submitting ? "Judging…" : "✓ Submit"}
+              </button>
+            )}
 
             <button
               type="button"
@@ -511,24 +584,70 @@ export function PracticeIDE({ problem, initialLang }: Props) {
             <GripDots />
           </div>
 
-          {/* Output panel — same styling as OutputPanel component */}
+          {/* Output / verdict panel */}
           <div
-            className="shrink-0 overflow-y-auto bg-zinc-50 p-4 font-mono text-sm dark:bg-zinc-950"
+            className="shrink-0 overflow-y-auto bg-zinc-50 dark:bg-zinc-950"
             style={{ height: outputHeight }}
             suppressHydrationWarning
           >
-            <p className="mb-2 text-xs font-semibold uppercase tracking-widest text-zinc-400 dark:text-zinc-500">
-              {outputIsError ? "Error" : "Output"}
-            </p>
-            {output === null ? (
-              <p className="text-xs text-zinc-400 dark:text-zinc-600">
-                Click Run to execute, or press Ctrl+Enter.
-              </p>
-            ) : (
-              <pre className={`whitespace-pre-wrap ${outputIsError ? "text-red-600 dark:text-red-400" : "text-green-600 dark:text-green-400"}`}>
-                {output}
-              </pre>
+            {verdict && (
+              <div className={`flex items-center gap-3 border-b px-4 py-3 ${
+                verdict.type === "accepted"
+                  ? "border-emerald-200 bg-emerald-50 dark:border-emerald-800 dark:bg-emerald-950/40"
+                  : verdict.type === "tle"
+                  ? "border-amber-200 bg-amber-50 dark:border-amber-800 dark:bg-amber-950/40"
+                  : "border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-950/40"
+              }`}>
+                <span className="text-xl">
+                  {verdict.type === "accepted" ? "✅" : verdict.type === "tle" ? "⏱" : "❌"}
+                </span>
+                <div className="min-w-0 flex-1">
+                  <p className={`text-sm font-bold ${
+                    verdict.type === "accepted"
+                      ? "text-emerald-700 dark:text-emerald-400"
+                      : verdict.type === "tle"
+                      ? "text-amber-700 dark:text-amber-400"
+                      : "text-red-700 dark:text-red-400"
+                  }`}>
+                    {verdict.message}
+                  </p>
+                  {verdict.totalCases != null && (
+                    <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                      {verdict.passedCases}/{verdict.totalCases} test cases passed
+                    </p>
+                  )}
+                </div>
+              </div>
             )}
+            <div className="p-4 font-mono text-sm">
+              {!verdict && output === null ? (
+                <p className="text-xs text-zinc-400 dark:text-zinc-600">
+                  Click <strong>Run</strong> to execute, or <strong>Submit</strong> to grade (all languages).
+                </p>
+              ) : verdict?.output != null ? (
+                <>
+                  <p className="mb-2 text-xs font-semibold uppercase tracking-widest text-zinc-400 dark:text-zinc-500">
+                    {verdict.type === "compile_error" ? "Compile Error" : verdict.type === "runtime_error" ? "Runtime Error" : "Output"}
+                  </p>
+                  <pre className={`whitespace-pre-wrap text-xs ${
+                    verdict.type === "accepted" ? "text-emerald-600 dark:text-emerald-400"
+                    : verdict.type === "wrong_answer" ? "text-zinc-600 dark:text-zinc-300"
+                    : "text-red-600 dark:text-red-400"
+                  }`}>
+                    {verdict.output}
+                  </pre>
+                </>
+              ) : output !== null ? (
+                <>
+                  <p className="mb-2 text-xs font-semibold uppercase tracking-widest text-zinc-400 dark:text-zinc-500">
+                    {outputIsError ? "Error" : "Output"}
+                  </p>
+                  <pre className={`whitespace-pre-wrap ${outputIsError ? "text-red-600 dark:text-red-400" : "text-green-600 dark:text-green-400"}`}>
+                    {output}
+                  </pre>
+                </>
+              ) : null}
+            </div>
           </div>
         </div>
       </div>
@@ -538,11 +657,21 @@ export function PracticeIDE({ problem, initialLang }: Props) {
         <button
           type="button"
           onClick={handleRun}
-          disabled={running}
+          disabled={running || submitting}
           className="flex flex-1 items-center justify-center gap-1 rounded-md bg-green-100 py-2 text-sm font-medium text-green-800 disabled:opacity-50 dark:bg-green-900/40 dark:text-green-300"
         >
           {running ? "…" : "▶ Run"}
         </button>
+        {problem.testCases?.length && (lang === "go" || lang === "python" || lang === "javascript" || lang === "cpp" || lang === "java" || lang === "rust") && (
+          <button
+            type="button"
+            onClick={handleSubmit}
+            disabled={running || submitting}
+            className="flex flex-1 items-center justify-center gap-1 rounded-md bg-indigo-600 py-2 text-sm font-medium text-white disabled:opacity-50"
+          >
+            {submitting ? "…" : "✓ Submit"}
+          </button>
+        )}
         <button
           type="button"
           onClick={handleReset}

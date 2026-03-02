@@ -29,6 +29,22 @@ function fromb64(s: string | null | undefined): string {
   return Buffer.from(s, "base64").toString("utf-8");
 }
 
+function maybeDecodeJudge0Message(message: string | null | undefined): string {
+  if (!message) return "";
+  const m = String(message).trim();
+  const looksB64 = /^[A-Za-z0-9+/=\r\n]+$/.test(m) && m.length >= 8;
+  if (!looksB64) return m;
+  try {
+    const decoded = Buffer.from(m.replace(/\s+/g, ""), "base64").toString("utf-8").trim();
+    if (!decoded) return m;
+    const printable = decoded.replace(/[^\x09\x0A\x0D\x20-\x7E]/g, "");
+    if (printable.length / decoded.length < 0.85) return m;
+    return decoded;
+  } catch {
+    return m;
+  }
+}
+
 /**
  * Normalise a Judge0 response into the shape the frontend expects:
  *   { CompileErrors?, Errors?, Events?: { Message, Kind }[] }
@@ -42,7 +58,7 @@ function normaliseJudge0(data: {
 }) {
   // Internal Judge0 error
   if (data.message) {
-    return { Errors: data.message };
+    return { Errors: maybeDecodeJudge0Message(data.message) };
   }
 
   const stdout     = fromb64(data.stdout).trimEnd();
