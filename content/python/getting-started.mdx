@@ -1,0 +1,90 @@
+---
+title: "Getting Started with Python"
+description: "Install Python, set up your editor, and write your first Hello World program."
+order: 1
+difficulty: "beginner"
+estimatedMinutes: 10
+---
+
+## What is Python?
+
+Python is a high-level, interpreted programming language created by Guido van Rossum and first released in 1991. It emphasizes readability and simplicity — perfect for beginners, scripting, data science, and web development.
+
+**Why learn Python?**
+- **Readable syntax** — clean and minimal, often called "executable pseudocode"
+- **Large standard library** — batteries included for file I/O, HTTP, JSON, and more
+- **Huge ecosystem** — PyPI has hundreds of thousands of packages
+- **Used everywhere** — Google, Netflix, Instagram, NASA, and most data/ML teams
+
+---
+
+## Installing Python
+
+Visit [python.org/downloads](https://www.python.org/downloads/) and download the latest Python 3 installer:
+
+- **macOS / Linux:** Often pre-installed; check with `python3 --version`. Or use the official installer or your package manager.
+- **Windows:** Download the installer and check "Add Python to PATH".
+
+After installation, open your terminal and verify:
+
+```bash
+python3 --version
+```
+
+You should see something like `Python 3.12.0`. Use `python3` (and `pip3`) on macOS/Linux if both Python 2 and 3 are installed.
+
+---
+
+## Your First Python Program: Hello World
+
+Create a file called `hello.py` and add:
+
+```python
+print("Hello, World!")
+```
+
+Click **Run** above to see the output. In Python there is no `main` function required — the script runs from top to bottom. The `print()` function sends text to the console.
+
+---
+
+## Printing and Formatting Output
+
+You can call `print()` many times; each call prints one line by default. Use f-strings to embed values:
+
+```python
+name = "Python"
+version = 3
+print(f"Learning {name} version {version}")
+```
+
+**Quick reference:**
+- `print("text")` — prints with a newline
+- `print(a, b)` — prints multiple values separated by spaces
+- `print(f"{x}")` — f-string formatting
+
+---
+
+## Comments
+
+Comments start with `#` and are ignored by Python:
+
+```python
+# This is a comment
+print("Comments are ignored")  # inline comment
+```
+
+---
+
+<ChallengeBlock
+  title="Hello, You!"
+  description="Modify the program below to print your name and the current year on separate lines."
+  hint="Use print() twice — once for your name and once for the year."
+  starter={`# TODO: print your name on one line
+# TODO: print the current year on the next line
+print("My name is ...")
+print("The year is ...")`}
+/>
+
+## What's Next?
+
+You've run your first Python program. Next, learn **variables and data types** — the building blocks for storing and working with data in Python.

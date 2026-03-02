@@ -16,10 +16,12 @@ import type { Metadata } from "next";
 
 export async function generateStaticParams() {
   const params: { lang: string; slug: string }[] = [];
-  if (isSupportedLanguage("go")) {
-    const tutorials = getAllTutorials("go");
+  const langs = ["go", "python"] as const;
+  for (const lang of langs) {
+    if (!isSupportedLanguage(lang)) continue;
+    const tutorials = getAllTutorials(lang);
     for (const t of tutorials) {
-      params.push({ lang: "go", slug: t.slug });
+      params.push({ lang, slug: t.slug });
     }
   }
   return params;

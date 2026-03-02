@@ -1,0 +1,70 @@
+---
+title: "Variables & Data Types"
+description: "Learn how to assign variables, understand Python's types, and work with strings, numbers, booleans, and constants."
+order: 2
+difficulty: "beginner"
+estimatedMinutes: 12
+---
+
+## What Are Variables?
+
+Variables are names that refer to values. In Python you assign with `=`. Types are inferred automatically — you don't declare them.
+
+```python
+name = "Alice"
+age = 30
+print(name)  # Alice
+print(age)   # 30
+```
+
+---
+
+## Assignment and Naming
+
+Use descriptive names. Python style is `snake_case` for variables:
+
+```python
+user_name = "Gopher"
+total_count = 42
+is_active = True
+```
+
+---
+
+## Basic Types
+
+- **str** — strings: `"hello"`, `'world'`
+- **int** — integers: `0`, `42`, `-7`
+- **float** — decimals: `3.14`, `0.0`
+- **bool** — booleans: `True`, `False`
+
+---
+
+## f-strings and Formatting
+
+Use f-strings to embed values in strings:
+
+```python
+name = "Alice"
+age = 30
+print(f"Name: {name}, Age: {age}")
+pi = 3.14159
+print(f"Pi to 2 decimals: {pi:.2f}")
+```
+
+---
+
+## Constants (by convention)
+
+Python has no real constants. Use UPPER_CASE by convention for values you don't intend to change:
+
+```python
+PI = 3.14159
+MAX_SIZE = 100
+```
+
+---
+
+## What's Next?
+
+Next we'll cover **print and formatting** in more detail — then control flow and loops.

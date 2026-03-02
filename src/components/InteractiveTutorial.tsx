@@ -21,6 +21,8 @@ import SnapshotDrawer from "@/components/tutorial/SnapshotDrawer";
 import { useChallengeTimer } from "@/hooks/useChallengeTimer";
 import { tutorialUrl } from "@/lib/urls";
 import { useToast } from "@/components/Toast";
+import { LANGUAGES } from "@/lib/languages/registry";
+import type { SupportedLanguage } from "@/lib/languages/types";
 
 interface Props {
   lang: string;
@@ -59,8 +61,13 @@ export default function InteractiveTutorial({
   const { user, profile, logout, loading } = useAuth();
   const { toast } = useToast();
 
-  const editor = useCodeEditor(steps[0]?.starter ?? "", lang as import("@/lib/languages/types").SupportedLanguage);
-  const stepProgress = useStepProgress(steps, lang, tutorialSlug, next, editor.setCode, user?.id);
+  const [ideLang, setIdeLang] = useState<SupportedLanguage>(lang as SupportedLanguage);
+  const [stepsForLang, setStepsForLang] = useState<TutorialStep[] | null>(null);
+  const [stepsLoading, setStepsLoading] = useState(false);
+  const currentSteps = ideLang === lang ? steps : (stepsForLang ?? steps);
+
+  const editor = useCodeEditor(currentSteps[0]?.starter ?? "", ideLang);
+  const stepProgress = useStepProgress(currentSteps, ideLang, tutorialSlug, next, editor.setCode, user?.id);
   const { leftWidth, outputHeight, isDragging, startDragH, startDragV } = usePanelResize();
 
   const [bookmarked, setBookmarked] = useState(false);
@@ -80,7 +87,29 @@ export default function InteractiveTutorial({
   const [isMobile, setIsMobile] = useState(false);
   const userMenuRef = useRef<HTMLDivElement>(null);
 
-  const currentStep = steps[stepProgress.stepIndex];
+  const currentStep = currentSteps[stepProgress.stepIndex];
+
+  // Fetch steps when user selects a different language in the IDE
+  useEffect(() => {
+    if (ideLang === lang) {
+      setStepsForLang(null);
+      return;
+    }
+    setStepsLoading(true);
+    fetch(`/api/tutorial-steps?lang=${encodeURIComponent(ideLang)}&slug=${encodeURIComponent(tutorialSlug)}`, { credentials: "same-origin" })
+      .then((r) => r.json())
+      .then((d) => setStepsForLang(Array.isArray(d?.steps) ? d.steps : []))
+      .catch(() => setStepsForLang([]))
+      .finally(() => setStepsLoading(false));
+  }, [ideLang, lang, tutorialSlug]);
+
+  // When IDE language or steps change, sync editor to current step and cap step index
+  useEffect(() => {
+    if (currentSteps.length === 0) return;
+    const safeIndex = Math.min(stepProgress.stepIndex, currentSteps.length - 1);
+    if (safeIndex !== stepProgress.stepIndex) stepProgress.goToStep(safeIndex);
+    else editor.setCode(currentSteps[safeIndex]?.starter ?? "");
+  }, [ideLang, stepsForLang]);
 
   // Detect mobile
   useEffect(() => {
@@ -311,7 +340,7 @@ export default function InteractiveTutorial({
             lang={lang}
             step={currentStep}
             stepIndex={stepProgress.stepIndex}
-            steps={steps}
+            steps={currentSteps}
             status={stepProgress.status}
             showHint={stepProgress.showHint}
             onToggleHint={() => stepProgress.setShowHint(!stepProgress.showHint)}
@@ -352,6 +381,17 @@ export default function InteractiveTutorial({
 
           {/* Toolbar */}
           <div className="flex shrink-0 items-center gap-2 border-t border-zinc-200 bg-zinc-50 px-4 py-2 dark:border-zinc-800 dark:bg-zinc-900">
+            <select
+              value={ideLang}
+              onChange={(e) => setIdeLang(e.target.value as SupportedLanguage)}
+              title="Code language in IDE"
+              className="rounded-md border border-zinc-300 bg-white px-2.5 py-1.5 text-sm text-zinc-700 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-200"
+            >
+              {(Object.keys(LANGUAGES) as SupportedLanguage[]).map((l) => (
+                <option key={l} value={l}>{LANGUAGES[l].name}</option>
+              ))}
+            </select>
+            {stepsLoading && <span className="text-xs text-zinc-500">Loading…</span>}
             <button onClick={() => stepProgress.handleRun(editor.code, editor.setErrorLines)} disabled={stepProgress.status === "running"} title="Run code (Ctrl+Enter)" className="flex items-center gap-1.5 rounded-md bg-green-100 px-3 py-1.5 text-sm font-medium text-green-800 transition-colors hover:bg-green-200 disabled:opacity-50 dark:bg-green-900/40 dark:text-green-300 dark:hover:bg-green-900/70">
               {stepProgress.status === "running" ? "Running…" : "▶ Run"}
             </button>
