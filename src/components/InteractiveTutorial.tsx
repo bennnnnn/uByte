@@ -286,7 +286,7 @@ export default function InteractiveTutorial({
             showInlineChat={stepProgress.showInlineChat}
             onToggleChat={() => stepProgress.setShowInlineChat(!stepProgress.showInlineChat)}
             chatSlug={`${tutorialSlug}-step-${stepProgress.stepIndex}`}
-            stepContext={{ title: currentStep.title, instruction: currentStep.instruction, expectedOutput: currentStep.expectedOutput, currentCode: editor.code }}
+            currentCode={editor.code}
             height={outputHeight}
           />
         </div>

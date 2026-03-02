@@ -11,9 +11,10 @@ export async function checkRateLimit(
 ): Promise<{ limited: boolean; retryAfter: number }> {
   try {
     return await dbCheckRateLimit(key, maxRequests, windowMs);
-  } catch {
-    // If DB is unavailable, fail open (don't block requests)
-    return { limited: false, retryAfter: 0 };
+  } catch (err) {
+    // If DB is unavailable, fail closed — deny the request rather than bypass rate limiting
+    console.error("[rate-limit] DB unavailable, failing closed:", err);
+    return { limited: true, retryAfter: 60 };
   }
 }
 

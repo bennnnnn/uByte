@@ -98,8 +98,7 @@ export const GET = withErrorHandling("GET /api/auth/google/callback", async (req
     setCsrfCookie(res);
     return res;
   } catch (err) {
-    const msg = err instanceof Error ? err.message : String(err);
-    console.error("Google OAuth callback error:", msg);
-    return NextResponse.redirect(`${BASE_URL}/?error=oauth_failed&detail=${encodeURIComponent(msg)}`);
+    console.error("Google OAuth callback error:", err);
+    return NextResponse.redirect(`${BASE_URL}/?error=oauth_failed`);
   }
 });

@@ -1,32 +1,42 @@
 import { NextRequest, NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
 import { withErrorHandling } from "@/lib/api-utils";
+import { allSteps } from "@/lib/tutorial-steps";
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
 // POST /api/code-feedback
-// { code, output, error, expectedOutput, stepTitle, instruction }
+// { code, output, error, tutorialSlug, stepIndex }
 export const POST = withErrorHandling("POST /api/code-feedback", async (req: NextRequest) => {
-  const { code, output, error, expectedOutput, stepTitle, instruction } = await req.json();
+  const { code, output, error, tutorialSlug, stepIndex } = await req.json();
+
+  // Look up step server-side — never trust client-supplied titles/instructions
+  const step = allSteps[String(tutorialSlug)]?.[parseInt(stepIndex, 10)];
+  if (!step) {
+    return NextResponse.json({ feedback: null });
+  }
 
   const context = error
     ? `Compiler error:\n${String(error).slice(0, 400)}`
     : `Their output: "${String(output).slice(0, 200)}"`;
 
-  const expected = Array.isArray(expectedOutput) && expectedOutput.length > 0
-    ? `Expected output to contain: ${expectedOutput.slice(0, 3).join(", ")}`
+  const expected = step.expectedOutput.length > 0
+    ? `Expected output to contain: ${step.expectedOutput.slice(0, 3).join(", ")}`
     : "The program should produce some output.";
 
   const isWrongOutput = !error;
 
-  const prompt = `A student is learning Go. They're working on: "${stepTitle}"
+  // Sanitize user code to prevent backtick injection
+  const safeCode = String(code).slice(0, 1200).replace(/`{3}/g, "` ` `");
 
-Task: ${String(instruction).slice(0, 300)}
+  const prompt = `A student is learning Go. They're working on: "${step.title}"
+
+Task: ${step.instruction.slice(0, 300)}
 ${expected}
 
 Their code:
 \`\`\`go
-${String(code).slice(0, 1200)}
+${safeCode}
 \`\`\`
 
 ${context}

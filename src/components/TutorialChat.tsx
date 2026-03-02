@@ -5,17 +5,10 @@ import { useAuth } from "@/components/AuthProvider";
 import { apiFetch } from "@/lib/api-client";
 import type { TutorialMessage } from "@/lib/db";
 
-interface StepContext {
-  title: string;
-  instruction: string;
-  expectedOutput: string[];
-  currentCode: string;
-}
-
 interface Props {
   chatSlug: string;
   onClose: () => void;
-  stepContext: StepContext;
+  currentCode?: string;
   inline?: boolean;
 }
 
@@ -68,7 +61,7 @@ function MessageBubble({ msg }: { msg: TutorialMessage }) {
   );
 }
 
-export default function TutorialChat({ chatSlug, onClose, stepContext, inline = false }: Props) {
+export default function TutorialChat({ chatSlug, onClose, currentCode, inline = false }: Props) {
   const { user } = useAuth();
   const [messages, setMessages] = useState<TutorialMessage[]>([]);
   const [input, setInput] = useState("");
@@ -118,7 +111,7 @@ export default function TutorialChat({ chatSlug, onClose, stepContext, inline = 
       const res = await apiFetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ slug: chatSlug, content: text, stepContext }),
+        body: JSON.stringify({ slug: chatSlug, content: text, currentCode }),
       });
       const data = await res.json();
       if (res.ok) {

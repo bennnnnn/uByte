@@ -147,14 +147,12 @@ export function useStepProgress(
     userCode: string,
     error: string,
     outputText: string,
-    expectedOutput: string[],
-    stepTitle: string,
-    instruction: string
+    currentStepIndex: number
   ) {
     fetch("/api/code-feedback", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ code: userCode, error, output: outputText, expectedOutput, stepTitle, instruction }),
+      body: JSON.stringify({ code: userCode, error, output: outputText, tutorialSlug, stepIndex: currentStepIndex }),
     })
       .then((r) => r.json())
       .then((d) => { if (d.feedback) setAiFeedback(d.feedback); })
@@ -209,7 +207,7 @@ export function useStepProgress(
       if (hasError) {
         setErrorLines(parseErrorLines(out));
         setStatus("failed");
-        fetchAiFeedback(code, out, "", step.expectedOutput, step.title, step.instruction);
+        fetchAiFeedback(code, out, "", stepIndex);
         return;
       }
       if (checkOutput(out, step.expectedOutput)) {
@@ -219,7 +217,7 @@ export function useStepProgress(
       } else {
         setStatus("failed");
         setFailCount((n) => n + 1);
-        fetchAiFeedback(code, "", out, step.expectedOutput, step.title, step.instruction);
+        fetchAiFeedback(code, "", out, stepIndex);
       }
     } catch {
       setOutput("Could not reach the Go compiler. Please try again.");

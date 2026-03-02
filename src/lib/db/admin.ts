@@ -60,6 +60,38 @@ export async function setAdminStatus(userId: number, isAdmin: boolean): Promise<
   await sql`UPDATE users SET is_admin = ${isAdmin ? 1 : 0} WHERE id = ${userId}`;
 }
 
+// ─── Admin Audit Log ──────────────────────────────────
+
+let _auditLogReady = false;
+async function ensureAuditLogTable(): Promise<void> {
+  if (_auditLogReady) return;
+  const sql = getSql();
+  await sql`
+    CREATE TABLE IF NOT EXISTS admin_audit_log (
+      id             SERIAL PRIMARY KEY,
+      admin_id       INTEGER REFERENCES users(id) ON DELETE SET NULL,
+      action         TEXT NOT NULL,
+      target_user_id INTEGER REFERENCES users(id) ON DELETE SET NULL,
+      created_at     TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    )
+  `;
+  await sql`CREATE INDEX IF NOT EXISTS idx_audit_log_created ON admin_audit_log(created_at DESC)`;
+  _auditLogReady = true;
+}
+
+export async function logAdminAction(
+  adminId: number,
+  action: string,
+  targetUserId: number | null
+): Promise<void> {
+  await ensureAuditLogTable();
+  const sql = getSql();
+  await sql`
+    INSERT INTO admin_audit_log (admin_id, action, target_user_id)
+    VALUES (${adminId}, ${action}, ${targetUserId})
+  `;
+}
+
 // ─── Subscription Events ──────────────────────────────
 
 let _subscriptionEventsReady = false;

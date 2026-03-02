@@ -3,13 +3,6 @@
 import TutorialChat from "@/components/TutorialChat";
 import type { Status } from "@/hooks/useStepProgress";
 
-interface StepContext {
-  title: string;
-  instruction: string;
-  expectedOutput: string[];
-  currentCode: string;
-}
-
 interface Props {
   output: string | null;
   outputIsError: boolean;
@@ -21,7 +14,7 @@ interface Props {
   showInlineChat: boolean;
   onToggleChat: () => void;
   chatSlug: string;
-  stepContext: StepContext;
+  currentCode: string;
   height: number;
 }
 
@@ -36,7 +29,7 @@ export default function OutputPanel({
   showInlineChat,
   onToggleChat,
   chatSlug,
-  stepContext,
+  currentCode,
   height,
 }: Props) {
   return (
@@ -105,7 +98,7 @@ export default function OutputPanel({
               <TutorialChat
                 chatSlug={chatSlug}
                 onClose={onToggleChat}
-                stepContext={stepContext}
+                currentCode={currentCode}
                 inline
               />
             </div>
