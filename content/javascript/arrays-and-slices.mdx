@@ -1,0 +1,27 @@
+---
+title: "Arrays"
+description: "Creating, slicing, mapping, and filtering arrays in JavaScript."
+order: 6
+difficulty: "intermediate"
+estimatedMinutes: 15
+---
+
+## Creating Arrays
+
+```javascript
+const nums = [1, 2, 3, 4, 5];
+console.log(nums.length); // 5
+console.log(nums[0]);     // 1
+```
+
+## Common Methods
+
+```javascript
+nums.push(6);              // add to end
+nums.slice(1, 3);          // [2, 3] — non-mutating
+nums.map(n => n * 2);      // [2, 4, 6, ...]
+nums.filter(n => n > 2);   // [3, 4, 5, ...]
+nums.reduce((a, b) => a + b, 0); // 15
+```
+
+More content coming soon. Try the interactive steps above!

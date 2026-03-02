@@ -1,0 +1,38 @@
+---
+title: "Interfaces & Protocols"
+description: "Duck typing, mixins, and TypeScript interfaces in JavaScript."
+order: 12
+difficulty: "intermediate"
+estimatedMinutes: 20
+---
+
+## Duck Typing
+
+JavaScript has no `interface` keyword — any object that has the right methods works:
+
+```javascript
+function makeSound(animal) {
+  animal.speak(); // works if animal has speak()
+}
+```
+
+## Symbols for Protocols
+
+```javascript
+const Serializable = Symbol("Serializable");
+class User {
+  [Serializable]() { return JSON.stringify(this); }
+}
+```
+
+## TypeScript Interfaces
+
+If using TypeScript, `interface` provides compile-time checking:
+
+```typescript
+interface Shape {
+  area(): number;
+}
+```
+
+More content coming soon. Try the interactive steps above!

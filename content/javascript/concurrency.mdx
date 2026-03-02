@@ -1,0 +1,34 @@
+---
+title: "Promises & Async/Await"
+description: "The event loop, Promises, async/await, and parallel execution in JavaScript."
+order: 15
+difficulty: "advanced"
+estimatedMinutes: 25
+---
+
+## Promises
+
+```javascript
+const p = new Promise((resolve, reject) => {
+  setTimeout(() => resolve("done"), 1000);
+});
+p.then(val => console.log(val)); // "done" after 1s
+```
+
+## async / await
+
+```javascript
+async function getData() {
+  const res = await fetch("https://api.example.com/data");
+  const data = await res.json();
+  return data;
+}
+```
+
+## Parallel Execution
+
+```javascript
+const [a, b] = await Promise.all([fetchA(), fetchB()]);
+```
+
+More content coming soon. Try the interactive steps above!

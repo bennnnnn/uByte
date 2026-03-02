@@ -1,0 +1,83 @@
+---
+title: "Getting Started with JavaScript"
+description: "Write your first JavaScript program, learn console.log, and understand how JS runs."
+order: 1
+difficulty: "beginner"
+estimatedMinutes: 10
+---
+
+## What is JavaScript?
+
+JavaScript (JS) is the language of the web. Originally created for browsers in 1995, it now runs everywhere thanks to **Node.js** — on servers, in CLIs, and in desktop apps.
+
+**Why learn JavaScript?**
+- **Ubiquitous** — every browser runs JavaScript natively
+- **Full-stack** — Node.js lets you build backends and CLIs
+- **Huge ecosystem** — npm has millions of packages
+- **Fast to start** — no compiler, no setup, just a browser or `node`
+
+---
+
+## Running JavaScript
+
+**In the browser:** Open DevTools (F12) → Console tab → type code and press Enter.
+
+**With Node.js:**
+```bash
+node --version     # check version
+node hello.js      # run a file
+```
+Install Node.js from [nodejs.org](https://nodejs.org).
+
+---
+
+## Hello, World!
+
+```javascript
+console.log("Hello, World!");
+```
+
+`console.log()` prints to the console. No `main()`, no imports needed — the file runs top-to-bottom.
+
+Click **Run** above to see the output.
+
+---
+
+## Variables
+
+```javascript
+const name = "JavaScript";   // immutable binding
+let version = 2024;          // mutable binding
+console.log(`Learning ${name} version ${version}`);
+```
+
+Use `const` by default; use `let` only when you need to reassign. Avoid `var` in modern JS.
+
+---
+
+## Template Literals
+
+Backtick strings allow embedded expressions:
+
+```javascript
+const user = "Alice";
+console.log(`Hello, ${user}!`);          // Hello, Alice!
+console.log(`2 + 2 = ${2 + 2}`);        // 2 + 2 = 4
+```
+
+---
+
+## Comments
+
+```javascript
+// Single-line comment
+/* Multi-line
+   comment */
+console.log("Comments are ignored"); // inline comment
+```
+
+---
+
+## What's Next?
+
+You've run your first JavaScript program. Next: **variables and types** — how JS handles numbers, strings, booleans, and dynamic typing.

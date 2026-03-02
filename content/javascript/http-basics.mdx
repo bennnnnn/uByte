@@ -1,0 +1,36 @@
+---
+title: "HTTP & fetch"
+description: "Making HTTP requests with the fetch API and handling responses in JavaScript."
+order: 17
+difficulty: "intermediate"
+estimatedMinutes: 20
+---
+
+## fetch API (browser & Node.js 18+)
+
+```javascript
+const res = await fetch("https://jsonplaceholder.typicode.com/posts/1");
+const data = await res.json();
+console.log(data.title);
+```
+
+## POST Request
+
+```javascript
+const res = await fetch("https://api.example.com/users", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ name: "Alice" }),
+});
+const user = await res.json();
+```
+
+## Error Handling
+
+```javascript
+if (!res.ok) {
+  throw new Error(`HTTP error: ${res.status}`);
+}
+```
+
+More content coming soon. Try the interactive steps above!

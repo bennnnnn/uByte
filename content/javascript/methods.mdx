@@ -1,0 +1,40 @@
+---
+title: "Methods"
+description: "Instance methods, static methods, getters, and setters in JavaScript."
+order: 11
+difficulty: "intermediate"
+estimatedMinutes: 12
+---
+
+## Instance Methods
+
+```javascript
+class Rectangle {
+  constructor(w, h) { this.w = w; this.h = h; }
+  area() { return this.w * this.h; }
+  perimeter() { return 2 * (this.w + this.h); }
+}
+const r = new Rectangle(4, 5);
+console.log(r.area()); // 20
+```
+
+## Static Methods
+
+```javascript
+class MathUtils {
+  static square(n) { return n * n; }
+}
+console.log(MathUtils.square(4)); // 16
+```
+
+## Getters & Setters
+
+```javascript
+class Circle {
+  constructor(r) { this._r = r; }
+  get diameter() { return this._r * 2; }
+  set radius(r) { this._r = r; }
+}
+```
+
+More content coming soon. Try the interactive steps above!

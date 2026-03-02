@@ -1,0 +1,34 @@
+---
+title: "References & Closures"
+description: "How JavaScript passes primitives by value and objects by reference."
+order: 9
+difficulty: "intermediate"
+estimatedMinutes: 15
+---
+
+## Primitives — Passed by Value
+
+```javascript
+let a = 10;
+let b = a;
+b = 20;
+console.log(a); // 10 — unchanged
+```
+
+## Objects — Passed by Reference
+
+```javascript
+const obj = { x: 1 };
+const ref = obj;
+ref.x = 99;
+console.log(obj.x); // 99 — same object!
+```
+
+## Cloning Objects
+
+```javascript
+const copy = { ...obj };        // shallow clone
+const deep = structuredClone(obj); // deep clone (modern)
+```
+
+More content coming soon. Try the interactive steps above!

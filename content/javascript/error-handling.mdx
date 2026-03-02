@@ -1,0 +1,46 @@
+---
+title: "Error Handling"
+description: "try/catch/finally, Error types, and async error handling in JavaScript."
+order: 13
+difficulty: "intermediate"
+estimatedMinutes: 15
+---
+
+## try / catch / finally
+
+```javascript
+try {
+  JSON.parse("invalid json");
+} catch (err) {
+  console.log("Error:", err.message);
+} finally {
+  console.log("Always runs");
+}
+```
+
+## Custom Errors
+
+```javascript
+class ValidationError extends Error {
+  constructor(msg) {
+    super(msg);
+    this.name = "ValidationError";
+  }
+}
+throw new ValidationError("Invalid input");
+```
+
+## Async Error Handling
+
+```javascript
+async function fetchData() {
+  try {
+    const res = await fetch("https://api.example.com");
+    return await res.json();
+  } catch (err) {
+    console.error("Fetch failed:", err.message);
+  }
+}
+```
+
+More content coming soon. Try the interactive steps above!

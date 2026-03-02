@@ -1,0 +1,45 @@
+---
+title: "Functions"
+description: "Function declarations, arrow functions, default params, and closures in JavaScript."
+order: 8
+difficulty: "intermediate"
+estimatedMinutes: 15
+---
+
+## Function Declaration
+
+```javascript
+function add(a, b) {
+  return a + b;
+}
+console.log(add(3, 4)); // 7
+```
+
+## Arrow Functions
+
+```javascript
+const multiply = (a, b) => a * b;
+const square = n => n * n;
+```
+
+## Default Parameters
+
+```javascript
+function greet(name = "World") {
+  console.log(`Hello, ${name}!`);
+}
+```
+
+## Closures
+
+```javascript
+function counter() {
+  let count = 0;
+  return () => ++count;
+}
+const inc = counter();
+console.log(inc()); // 1
+console.log(inc()); // 2
+```
+
+More content coming soon. Try the interactive steps above!

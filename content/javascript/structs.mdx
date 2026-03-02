@@ -1,0 +1,44 @@
+---
+title: "Classes & Objects"
+description: "ES6 classes, constructors, inheritance, and private fields in JavaScript."
+order: 10
+difficulty: "intermediate"
+estimatedMinutes: 15
+---
+
+## Class
+
+```javascript
+class Animal {
+  constructor(name) {
+    this.name = name;
+  }
+  speak() {
+    console.log(`${this.name} makes a sound.`);
+  }
+}
+const a = new Animal("Dog");
+a.speak(); // Dog makes a sound.
+```
+
+## Inheritance
+
+```javascript
+class Dog extends Animal {
+  speak() {
+    console.log(`${this.name} barks.`);
+  }
+}
+```
+
+## Private Fields (ES2022)
+
+```javascript
+class Counter {
+  #count = 0;
+  increment() { this.#count++; }
+  get() { return this.#count; }
+}
+```
+
+More content coming soon. Try the interactive steps above!

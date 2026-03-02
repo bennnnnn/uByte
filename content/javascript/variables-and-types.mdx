@@ -1,0 +1,89 @@
+---
+title: "Variables & Types"
+description: "let, const, dynamic typing, typeof, string methods, and type conversion in JavaScript."
+order: 2
+difficulty: "beginner"
+estimatedMinutes: 12
+---
+
+## let and const
+
+```javascript
+const name = "Alice";   // cannot be reassigned
+let age = 30;           // can be reassigned
+age = 31;               // OK
+// name = "Bob";        // TypeError!
+```
+
+Prefer `const` everywhere. Use `let` only when you need to reassign.
+
+---
+
+## Dynamic Typing
+
+JavaScript variables have **no fixed type** — the same variable can hold different types:
+
+```javascript
+let x = 42;
+x = "hello";    // perfectly valid
+x = true;       // still valid
+```
+
+This is very different from Go, Python, or C++.
+
+---
+
+## Primitive Types
+
+| Type | Example | typeof |
+|------|---------|--------|
+| Number | `42`, `3.14` | `"number"` |
+| String | `"hello"` | `"string"` |
+| Boolean | `true` / `false` | `"boolean"` |
+| null | `null` | `"object"` (quirk) |
+| undefined | `undefined` | `"undefined"` |
+| BigInt | `9007199254740993n` | `"bigint"` |
+| Symbol | `Symbol("id")` | `"symbol"` |
+
+---
+
+## String Methods
+
+```javascript
+"hello".toUpperCase()      // "HELLO"
+"JavaScript".slice(0, 4)   // "Java"
+"  hi  ".trim()            // "hi"
+"a,b,c".split(",")         // ["a","b","c"]
+```
+
+---
+
+## Type Conversion
+
+```javascript
+Number("42")      // 42
+String(100)       // "100"
+Boolean(0)        // false
+Boolean("hello")  // true
+parseInt("42px")  // 42
+```
+
+**Falsy values:** `0`, `""`, `null`, `undefined`, `NaN`, `false` — everything else is truthy.
+
+---
+
+## Constants
+
+`const` is the JavaScript equivalent of a constant — it prevents reassignment (but objects/arrays it points to can still be mutated):
+
+```javascript
+const PI = 3.14159;
+const area = PI * 5 * 5;
+console.log(area.toFixed(2)); // 78.54
+```
+
+---
+
+## What's Next?
+
+Next: **Console & Formatting** — how to format output, use template literals, and build strings.

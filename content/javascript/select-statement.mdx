@@ -1,0 +1,37 @@
+---
+title: "Event Loop & Async"
+description: "The JavaScript event loop, microtasks, and concurrent patterns."
+order: 19
+difficulty: "advanced"
+estimatedMinutes: 20
+---
+
+## The Event Loop
+
+JavaScript is single-threaded. Async work is queued as callbacks/microtasks:
+
+```javascript
+console.log("1 - sync");
+setTimeout(() => console.log("3 - macro task"), 0);
+Promise.resolve().then(() => console.log("2 - microtask"));
+// Output: 1, 2, 3
+```
+
+## Promise.race (first to resolve)
+
+```javascript
+const result = await Promise.race([
+  fetch("/api/fast"),
+  new Promise((_, reject) => setTimeout(() => reject("timeout"), 5000))
+]);
+```
+
+## AbortController (cancellation)
+
+```javascript
+const controller = new AbortController();
+fetch("/api/data", { signal: controller.signal });
+controller.abort(); // cancel the request
+```
+
+More content coming soon. Try the interactive steps above!
