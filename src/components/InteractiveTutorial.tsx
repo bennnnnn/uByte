@@ -103,12 +103,14 @@ export default function InteractiveTutorial({
       .finally(() => setStepsLoading(false));
   }, [ideLang, lang, tutorialSlug]);
 
-  // When IDE language or steps change, sync editor to current step and cap step index
+  // When IDE language or steps change, reset editor to the starter for the current step
+  const stepIndexRef = useRef(stepProgress.stepIndex);
+  stepIndexRef.current = stepProgress.stepIndex;
   useEffect(() => {
     if (currentSteps.length === 0) return;
-    const safeIndex = Math.min(stepProgress.stepIndex, currentSteps.length - 1);
-    if (safeIndex !== stepProgress.stepIndex) stepProgress.goToStep(safeIndex);
-    else editor.setCode(currentSteps[safeIndex]?.starter ?? "");
+    const safeIndex = Math.min(stepIndexRef.current, currentSteps.length - 1);
+    editor.setCode(currentSteps[safeIndex]?.starter ?? "");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ideLang, stepsForLang]);
 
   // Detect mobile
