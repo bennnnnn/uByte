@@ -59,11 +59,11 @@ export default function HomePopularSidebar() {
   const practice = data?.popularPracticeProblems ?? [];
 
   return (
-    <aside className="lg:pt-0 space-y-8" aria-label="Popular">
+    <aside className="space-y-8 lg:pt-0" aria-label="Popular">
       {/* Popular programming languages */}
       <section aria-labelledby="popular-languages-heading">
-        <h2 id="popular-languages-heading" className="mb-3 text-lg font-semibold text-zinc-900 dark:text-zinc-100">
-          Popular programming languages
+        <h2 id="popular-languages-heading" className="mb-3 text-sm font-semibold uppercase tracking-widest text-zinc-400 dark:text-zinc-500">
+          Popular languages
         </h2>
         <ul className="space-y-2">
           {languages.length === 0 ? (
@@ -91,7 +91,7 @@ export default function HomePopularSidebar() {
       {/* Popular tutorials */}
       {tutorials.length > 0 && (
         <section aria-labelledby="popular-tutorials-heading">
-          <h2 id="popular-tutorials-heading" className="mb-3 text-lg font-semibold text-zinc-900 dark:text-zinc-100">
+          <h2 id="popular-tutorials-heading" className="mb-3 text-sm font-semibold uppercase tracking-widest text-zinc-400 dark:text-zinc-500">
             Popular tutorials
           </h2>
           <ul className="space-y-2">
@@ -111,8 +111,8 @@ export default function HomePopularSidebar() {
 
       {/* Popular interview questions */}
       <section aria-labelledby="popular-practice-heading">
-        <h2 id="popular-practice-heading" className="mb-3 text-lg font-semibold text-zinc-900 dark:text-zinc-100">
-          Popular interview questions
+        <h2 id="popular-practice-heading" className="mb-3 text-sm font-semibold uppercase tracking-widest text-zinc-400 dark:text-zinc-500">
+          Trending problems
         </h2>
         <ul className="space-y-2">
           {practice.length === 0 ? (
@@ -121,7 +121,7 @@ export default function HomePopularSidebar() {
             practice.map(({ slug, title }) => (
               <li key={slug}>
                 <Link
-                  href={`/practice/${slug}`}
+                  href={`/practice/go/${slug}`}
                   className="flex items-center justify-between rounded-lg px-3 py-2 text-sm font-medium text-zinc-800 transition-colors hover:bg-zinc-100 hover:text-indigo-700 dark:text-zinc-200 dark:hover:bg-zinc-800 dark:hover:text-indigo-400"
                 >
                   <span className="line-clamp-1">{title}</span>

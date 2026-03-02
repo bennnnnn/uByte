@@ -3,3 +3,6 @@ export { default as InterviewCtaCard } from "./InterviewCtaCard";
 export { default as InterviewLanguageCard } from "./InterviewLanguageCard";
 export { default as TutorialCard } from "./TutorialCard";
 export { default as HomePopularSidebar } from "./HomePopularSidebar";
+export { default as HeroSection } from "./HeroSection";
+export { default as PracticeSection } from "./PracticeSection";
+export { default as StepsSection } from "./StepsSection";
