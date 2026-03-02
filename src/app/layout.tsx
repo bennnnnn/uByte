@@ -8,8 +8,10 @@ import AuthProvider from "@/components/AuthProvider";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import { ToastProvider } from "@/components/Toast";
 import ThemeToggle from "@/components/ThemeToggle";
+import DeferUntilIdle from "@/components/DeferUntilIdle";
 import LazyCookieConsentAndAnalytics from "@/components/LazyCookieConsentAndAnalytics";
 import LazyEmailVerificationBanner from "@/components/LazyEmailVerificationBanner";
+import LazyFooter from "@/components/LazyFooter";
 import { getAllTutorials } from "@/lib/tutorials";
 import { BASE_URL } from "@/lib/constants";
 import Link from "next/link";
@@ -116,23 +118,21 @@ export default function RootLayout({
               <Sidebar lang="go" tutorials={tutorials} />
               <div className="flex flex-1 flex-col overflow-hidden">
                 <MobileNav lang="go" tutorials={tutorials} />
-                <LazyEmailVerificationBanner />
+                <DeferUntilIdle>
+                  <LazyEmailVerificationBanner />
+                </DeferUntilIdle>
                 <main id="main-content" className="flex-1 overflow-y-auto">
                   <ErrorBoundary>{children}</ErrorBoundary>
                 </main>
-                <footer className="border-t border-zinc-100 bg-white px-6 py-3 dark:border-zinc-800 dark:bg-zinc-950">
-                  <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-xs text-zinc-500 dark:text-zinc-400">
-                    <span>© {new Date().getFullYear()} uByte</span>
-                    <Link href="/privacy" className="transition-colors hover:text-indigo-600">Privacy</Link>
-                    <Link href="/terms" className="transition-colors hover:text-indigo-600">Terms</Link>
-                    <Link href="/leaderboard" className="transition-colors hover:text-indigo-600">Leaderboard</Link>
-                    <a href="https://go.dev" target="_blank" rel="noopener noreferrer" className="transition-colors hover:text-indigo-600">go.dev</a>
-                  </div>
-                </footer>
+                <DeferUntilIdle>
+                  <LazyFooter />
+                </DeferUntilIdle>
               </div>
             </div>
           </div>
-          <LazyCookieConsentAndAnalytics />
+          <DeferUntilIdle>
+            <LazyCookieConsentAndAnalytics />
+          </DeferUntilIdle>
           </ToastProvider>
         </AuthProvider>
         <Script
