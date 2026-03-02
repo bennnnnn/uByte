@@ -3,6 +3,7 @@ import { goSteps } from "./go";
 import { pythonSteps } from "./python";
 import { cppSteps } from "./cpp";
 import { javascriptSteps } from "./javascript";
+import { javaSteps } from "./java";
 import type { SupportedLanguage } from "../languages/types";
 
 /** Steps per language. Add more languages here as they are translated. */
@@ -11,7 +12,7 @@ const stepsByLanguage: Record<SupportedLanguage, Record<string, TutorialStep[]>>
   python: pythonSteps,
   cpp: cppSteps,
   javascript: javascriptSteps,
-  java: {},
+  java: javaSteps,
   rust: {},
 };
 
