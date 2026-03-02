@@ -1,12 +1,15 @@
 import type { MetadataRoute } from "next";
 import { BASE_URL } from "@/lib/constants";
+import { getAllLanguageSlugs } from "@/lib/languages/registry";
 
 export default function robots(): MetadataRoute.Robots {
+  const languageSlugs = getAllLanguageSlugs();
+  const allowPaths = ["/", ...languageSlugs.map((slug) => `/${slug}/`)];
   return {
     rules: [
       {
         userAgent: "*",
-        allow: ["/", "/go/"],
+        allow: allowPaths,
         disallow: ["/profile", "/api/"],
       },
     ],

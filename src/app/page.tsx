@@ -108,6 +108,18 @@ export default function Home() {
         All Tutorials
       </h2>
       <TutorialGrid lang="go" tutorials={tutorials} />
+
+      {/* Coming soon: other languages */}
+      <p className="mt-10 text-center text-sm text-zinc-500 dark:text-zinc-400">
+        Also coming:{" "}
+        <Link href="/python" className="font-medium text-indigo-600 hover:underline dark:text-indigo-400">
+          Python
+        </Link>
+        {" · "}
+        <Link href="/cpp" className="font-medium text-indigo-600 hover:underline dark:text-indigo-400">
+          C++
+        </Link>
+      </p>
     </div>
   );
 }

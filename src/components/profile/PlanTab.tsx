@@ -59,10 +59,16 @@ export default function PlanTab({ plan }: Props) {
     if (!res.ok) return;
     const { priceId } = await res.json();
     if (!window.Paddle || !priceId) return;
+    const origin = typeof window !== "undefined" ? window.location.origin : "";
     window.Paddle.Checkout.open({
       items: [{ priceId, quantity: 1 }],
       customData: user ? { userId: String(user.id) } : undefined,
       customer: user ? { email: user.email } : undefined,
+      settings: {
+        successUrl: `${origin}/profile?tab=plan&plan=success`,
+        displayMode: "overlay",
+        variant: "one-page",
+      },
     });
   }
 
@@ -165,7 +171,7 @@ export default function PlanTab({ plan }: Props) {
             <button
               type="button"
               onClick={() => openCheckout("monthly")}
-              className="w-full rounded-xl bg-zinc-900 py-3 text-sm font-semibold text-white transition-colors hover:bg-zinc-800 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-100"
+              className="w-full rounded-xl bg-indigo-600 py-3 text-sm font-semibold text-white transition-colors hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600"
             >
               Get Monthly
             </button>
@@ -186,7 +192,7 @@ export default function PlanTab({ plan }: Props) {
             <button
               type="button"
               onClick={() => openCheckout("yearly")}
-              className="w-full rounded-xl bg-zinc-900 py-3 text-sm font-semibold text-white transition-colors hover:bg-zinc-800 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-100"
+              className="w-full rounded-xl bg-indigo-600 py-3 text-sm font-semibold text-white transition-colors hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600"
             >
               Get Yearly
             </button>

@@ -8,6 +8,12 @@ declare global {
           items: { priceId: string; quantity: number }[];
           customData?: Record<string, string>;
           customer?: { email?: string };
+          settings?: {
+            displayMode?: string;
+            theme?: string;
+            successUrl?: string;
+            variant?: string;
+          };
         }) => void;
       };
     };

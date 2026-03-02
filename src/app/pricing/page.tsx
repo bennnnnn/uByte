@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { useAuth } from "@/components/AuthProvider";
 import { hasPaidAccess } from "@/lib/plans";
 
@@ -18,10 +19,12 @@ const FEATURES = [
   "Progress tracking & leaderboard",
 ];
 
-export default function PricingPage() {
+function PricingContent() {
+  const searchParams = useSearchParams();
   const { user, profile } = useAuth();
   const paddleReady = useRef(false);
   const [billing, setBilling] = useState<"monthly" | "yearly">("yearly");
+  const showSuccess = searchParams.get("success") === "1";
 
   useEffect(() => {
     if (!CLIENT_TOKEN || paddleReady.current) return;
@@ -44,10 +47,16 @@ export default function PricingPage() {
 
   function openCheckout(priceId: string) {
     if (!window.Paddle || !priceId) return;
+    const origin = typeof window !== "undefined" ? window.location.origin : "";
     window.Paddle.Checkout.open({
       items: [{ priceId, quantity: 1 }],
       customData: user ? { userId: String(user.id) } : undefined,
       customer: user ? { email: user.email } : undefined,
+      settings: {
+        successUrl: `${origin}/pricing?success=1`,
+        displayMode: "overlay",
+        variant: "one-page",
+      },
     });
   }
 
@@ -62,6 +71,18 @@ export default function PricingPage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-zinc-50 to-white dark:from-zinc-950 dark:to-zinc-900">
       <div className="mx-auto max-w-2xl px-6 py-16 sm:py-24">
+        {/* Success message after redirect from Paddle */}
+        {showSuccess && (
+          <div className="mb-6 rounded-2xl border border-emerald-200 bg-emerald-50 px-6 py-4 text-center dark:border-emerald-900/50 dark:bg-emerald-950/30">
+            <p className="font-semibold text-emerald-800 dark:text-emerald-200">
+              Payment successful. Welcome to Pro!
+            </p>
+            <p className="mt-1 text-sm text-emerald-700 dark:text-emerald-300">
+              Your plan is active. Check your email for the receipt.
+            </p>
+          </div>
+        )}
+
         {/* Header */}
         <div className="text-center">
           <h1 className="text-3xl font-bold tracking-tight text-zinc-900 sm:text-4xl dark:text-zinc-100">
@@ -80,7 +101,7 @@ export default function PricingPage() {
               onClick={() => setBilling("monthly")}
               className={`rounded-xl px-6 py-2.5 text-sm font-semibold transition-all ${
                 billing === "monthly"
-                  ? "bg-zinc-900 text-white dark:bg-white dark:text-zinc-900"
+                  ? "bg-indigo-600 text-white dark:bg-indigo-500 dark:text-white"
                   : "text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-200"
               }`}
             >
@@ -91,7 +112,7 @@ export default function PricingPage() {
               onClick={() => setBilling("yearly")}
               className={`flex items-center gap-2 rounded-xl px-6 py-2.5 text-sm font-semibold transition-all ${
                 billing === "yearly"
-                  ? "bg-zinc-900 text-white dark:bg-white dark:text-zinc-900"
+                  ? "bg-indigo-600 text-white dark:bg-indigo-500 dark:text-white"
                   : "text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-200"
               }`}
             >
@@ -164,7 +185,7 @@ export default function PricingPage() {
               ) : !user ? (
                 <Link
                   href="/"
-                  className="block rounded-2xl bg-zinc-900 py-4 text-center text-sm font-semibold text-white transition-colors hover:bg-zinc-800 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-100"
+                  className="block rounded-2xl bg-indigo-600 py-4 text-center text-sm font-semibold text-white transition-colors hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600"
                 >
                   Sign up to get started
                 </Link>
@@ -176,7 +197,7 @@ export default function PricingPage() {
                 <button
                   type="button"
                   onClick={() => openCheckout(selectedPriceId)}
-                  className="w-full rounded-2xl bg-zinc-900 py-4 text-sm font-semibold text-white transition-colors hover:bg-zinc-800 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-100"
+                  className="w-full rounded-2xl bg-indigo-600 py-4 text-sm font-semibold text-white transition-colors hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600"
                 >
                   {billing === "yearly"
                     ? "Get Yearly — $49.99/yr"
@@ -210,5 +231,13 @@ export default function PricingPage() {
         </p>
       </div>
     </div>
+  );
+}
+
+export default function PricingPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-gradient-to-b from-zinc-50 to-white dark:from-zinc-950 dark:to-zinc-900" />}>
+      <PricingContent />
+    </Suspense>
   );
 }

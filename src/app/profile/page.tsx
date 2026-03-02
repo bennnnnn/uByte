@@ -83,7 +83,8 @@ function ProfilePage() {
   const [error, setError] = useState("");
 
   const paramTab = searchParams.get("tab") as Tab | null;
-  const tab: Tab = paramTab && VALID_TABS.includes(paramTab) ? paramTab : "overview";
+  const planSuccess = searchParams.get("plan") === "success";
+  const tab: Tab = planSuccess ? "plan" : (paramTab && VALID_TABS.includes(paramTab) ? paramTab : "overview");
 
   const setTab = (t: Tab) => router.push(`/profile?tab=${t}`, { scroll: false });
 
@@ -270,7 +271,15 @@ function ProfilePage() {
         <ProgressTab stats={stats} userId={profile.id} />
       )}
       {tab === "plan" && (
-        <PlanTab plan={profile.plan} />
+        <>
+          {planSuccess && (
+            <div className="mb-6 rounded-2xl border border-emerald-200 bg-emerald-50 px-6 py-4 dark:border-emerald-900/50 dark:bg-emerald-950/30">
+              <p className="font-semibold text-emerald-800 dark:text-emerald-200">Payment successful. Welcome to Pro!</p>
+              <p className="mt-1 text-sm text-emerald-700 dark:text-emerald-300">Your plan is active. Check your email for the receipt.</p>
+            </div>
+          )}
+          <PlanTab plan={profile.plan} />
+        </>
       )}
       {tab === "achievements" && (
         <AchievementsTab badges={badges} achievements={achievements} />

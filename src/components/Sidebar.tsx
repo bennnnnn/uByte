@@ -15,6 +15,7 @@ interface SearchResult {
   stepIndex?: number;
   stepTitle?: string;
   excerpt: string;
+  lang?: string;
 }
 
 interface SubTopic {
@@ -102,9 +103,10 @@ export default function Sidebar({ lang, tutorials }: { lang: string; tutorials: 
                 <button
                   key={i}
                   onMouseDown={() => {
+                    const resultLang = r.lang ?? lang;
                     const href = r.matchType === "step" && r.stepIndex !== undefined
-                      ? tutorialUrl(lang, r.slug, r.stepIndex)
-                      : tutorialUrl(lang, r.slug);
+                      ? tutorialUrl(resultLang, r.slug, r.stepIndex)
+                      : tutorialUrl(resultLang, r.slug);
                     setShowDropdown(false);
                     setQuery("");
                     router.push(href);

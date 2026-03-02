@@ -2,6 +2,7 @@ import { createHash } from "crypto";
 import { NextRequest, NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
 import { withErrorHandling } from "@/lib/api-utils";
+import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 import { getSteps } from "@/lib/tutorial-steps";
 import { getCachedFeedback, setCachedFeedback } from "@/lib/db/ai-feedback-cache";
 import { isSupportedLanguage } from "@/lib/languages/registry";
@@ -30,6 +31,15 @@ function feedbackCacheKey(
 // POST /api/code-feedback
 // { code, output, error, tutorialSlug, stepIndex, lang? }
 export const POST = withErrorHandling("POST /api/code-feedback", async (req: NextRequest) => {
+  const ip = getClientIp(req.headers);
+  const { limited, retryAfter } = await checkRateLimit(`code-feedback:${ip}`, 30, 60_000);
+  if (limited) {
+    return NextResponse.json(
+      { error: "Too many requests. Please wait before requesting more feedback." },
+      { status: 429, headers: { "Retry-After": String(retryAfter) } }
+    );
+  }
+
   const body = await req.json();
   const { code, output, error, tutorialSlug, stepIndex, lang = "go" } = body;
   const language = typeof lang === "string" && isSupportedLanguage(lang) ? lang : "go";
