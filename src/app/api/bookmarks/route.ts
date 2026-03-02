@@ -13,9 +13,10 @@ export const GET = withErrorHandling("GET /api/bookmarks", async (request: NextR
 
   const { searchParams } = new URL(request.url);
   const offset = Math.max(0, parseInt(searchParams.get("offset") || "0", 10) || 0);
+  const lang = searchParams.get("lang") ?? "go";
   const [bookmarks, total] = await Promise.all([
-    getBookmarks(tokenUser.userId, PAGE_SIZE, offset),
-    getBookmarkTotal(tokenUser.userId),
+    getBookmarks(tokenUser.userId, PAGE_SIZE, offset, lang),
+    getBookmarkTotal(tokenUser.userId, lang),
   ]);
   return NextResponse.json({ bookmarks, total, hasMore: offset + PAGE_SIZE < total });
 });
@@ -35,12 +36,12 @@ export const POST = withErrorHandling("POST /api/bookmarks", async (request: Nex
     return NextResponse.json({ error: "Too many requests" }, { status: 429 });
   }
 
-  const { tutorialSlug, snippet, note } = await request.json();
+  const body = await request.json();
+  const { tutorialSlug, snippet, note, lang = "go" } = body;
   if (!tutorialSlug || typeof tutorialSlug !== "string" || !snippet || typeof snippet !== "string") {
     return NextResponse.json({ error: "tutorialSlug and snippet are required" }, { status: 400 });
   }
-
-  const bookmark = await addBookmark(tokenUser.userId, tutorialSlug, snippet, note || "");
+  const bookmark = await addBookmark(tokenUser.userId, tutorialSlug, snippet, note || "", typeof lang === "string" ? lang : "go");
   await checkBadges(tokenUser.userId);
 
   return NextResponse.json({ bookmark });

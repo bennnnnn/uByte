@@ -6,12 +6,13 @@ import { verifyCsrf } from "@/lib/csrf";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 import { withErrorHandling, requireAuth } from "@/lib/api-utils";
 
-export const GET = withErrorHandling("GET /api/progress", async () => {
+export const GET = withErrorHandling("GET /api/progress", async (request: NextRequest) => {
   const user = await getCurrentUser();
   if (!user) {
     return NextResponse.json({ progress: [] });
   }
-  const progress = await getProgress(user.userId);
+  const lang = request.nextUrl.searchParams.get("lang") ?? "go";
+  const progress = await getProgress(user.userId, lang);
   return NextResponse.json({ progress });
 });
 
@@ -30,13 +31,15 @@ export const POST = withErrorHandling("POST /api/progress", async (request: Next
     return NextResponse.json({ error: "Too many requests" }, { status: 429 });
   }
 
-  const { slug, completed } = await request.json();
+  const body = await request.json();
+  const { slug, completed, lang = "go" } = body;
   if (!slug || typeof slug !== "string") {
     return NextResponse.json({ error: "Slug is required" }, { status: 400 });
   }
+  const language = typeof lang === "string" ? lang : "go";
 
   if (completed) {
-    await markComplete(user.userId, slug);
+    await markComplete(user.userId, slug, language);
     await addXp(user.userId, 10);
     await logActivity(user.userId, "complete", slug);
 
@@ -61,9 +64,9 @@ export const POST = withErrorHandling("POST /api/progress", async (request: Next
       await addStreakFreeze(user.userId);
     }
   } else {
-    await markIncomplete(user.userId, slug);
+    await markIncomplete(user.userId, slug, language);
   }
 
-  const progress = await getProgress(user.userId);
+  const progress = await getProgress(user.userId, language);
   return NextResponse.json({ progress });
 });

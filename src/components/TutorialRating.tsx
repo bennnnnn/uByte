@@ -21,10 +21,10 @@ export default function TutorialRating({ lang, tutorialSlug }: Props) {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    fetch(`/api/ratings?slug=${encodeURIComponent(tutorialSlug)}`, { credentials: "same-origin" })
+    fetch(`/api/ratings?slug=${encodeURIComponent(tutorialSlug)}&lang=${encodeURIComponent(lang)}`, { credentials: "same-origin" })
       .then((res) => res.ok ? res.json() : null)
       .then((data) => { if (data) setRating(data); });
-  }, [tutorialSlug]);
+  }, [tutorialSlug, lang]);
 
   const vote = async (value: 1 | -1) => {
     if (!user || loading) return;
@@ -33,7 +33,7 @@ export default function TutorialRating({ lang, tutorialSlug }: Props) {
       const res = await apiFetch("/api/ratings", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ slug: tutorialSlug, value }),
+        body: JSON.stringify({ slug: tutorialSlug, value, lang }),
       });
       if (res.ok) {
         const data = await res.json();

@@ -25,7 +25,7 @@ export default function TutorialNav({
 
   const handleNext = () => {
     if (user && !isCompleted) {
-      toggleProgress(slug);
+      toggleProgress(slug, lang);
     }
   };
 
@@ -60,7 +60,7 @@ export default function TutorialNav({
         // Last tutorial — show a "Finish" button that marks complete
         user && !isCompleted ? (
           <button
-            onClick={() => toggleProgress(slug)}
+            onClick={() => toggleProgress(slug, lang)}
             className="group flex flex-col items-end"
           >
             <span className="text-xs text-zinc-400 group-hover:text-zinc-600 dark:group-hover:text-zinc-300">

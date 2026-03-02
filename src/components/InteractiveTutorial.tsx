@@ -126,7 +126,7 @@ export default function InteractiveTutorial({
       const res = await apiFetch("/api/bookmarks", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ tutorialSlug, snippet: editor.code, note: currentStep.title }),
+        body: JSON.stringify({ tutorialSlug, snippet: editor.code, note: currentStep.title, lang }),
       });
       if (res.ok) { setBookmarked(true); setTimeout(() => setBookmarked(false), 2000); }
     } catch { /* ignore */ }
@@ -402,6 +402,7 @@ export default function InteractiveTutorial({
         <SnapshotDrawer
           slug={tutorialSlug}
           stepIndex={stepProgress.stepIndex}
+          lang={lang}
           onRestore={(code) => editor.setCode(code)}
           onClose={() => setShowSnapshots(false)}
         />

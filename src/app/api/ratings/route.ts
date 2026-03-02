@@ -10,9 +10,9 @@ export const GET = withErrorHandling("GET /api/ratings", async (request: NextReq
   if (!slug) {
     return NextResponse.json({ error: "slug is required" }, { status: 400 });
   }
-
+  const lang = request.nextUrl.searchParams.get("lang") ?? "go";
   const user = await getCurrentUser();
-  const rating = await getTutorialRating(slug, user?.userId);
+  const rating = await getTutorialRating(slug, user?.userId, lang);
   return NextResponse.json(rating);
 });
 
@@ -27,12 +27,12 @@ export const POST = withErrorHandling("POST /api/ratings", async (request: NextR
   const { limited } = await checkRateLimit(`ratings:${ip}:${user.userId}`, 30, 60_000);
   if (limited) return NextResponse.json({ error: "Too many requests" }, { status: 429 });
 
-  const body = await request.json() as { slug?: string; value?: number };
+  const body = (await request.json()) as { slug?: string; value?: number; lang?: string };
   if (!body.slug || (body.value !== 1 && body.value !== -1)) {
     return NextResponse.json({ error: "slug and value (1 or -1) are required" }, { status: 400 });
   }
-
-  await rateTutorial(user.userId, body.slug, body.value as 1 | -1);
-  const rating = await getTutorialRating(body.slug, user.userId);
+  const lang = body.lang ?? "go";
+  await rateTutorial(user.userId, body.slug, body.value as 1 | -1, lang);
+  const rating = await getTutorialRating(body.slug, user.userId, lang);
   return NextResponse.json(rating);
 });

@@ -8,9 +8,10 @@ export const GET = withErrorHandling("GET /api/profile/stats", async () => {
   const { user: tokenUser, response } = await requireAuth();
   if (!tokenUser) return response;
 
+  const lang = "go";
   const [user, completedCount, achievements, activityCount] = await Promise.all([
     getUserById(tokenUser.userId),
-    getProgressCount(tokenUser.userId),
+    getProgressCount(tokenUser.userId, lang),
     getAchievements(tokenUser.userId),
     getActivityCount(tokenUser.userId),
   ]);
@@ -26,7 +27,7 @@ export const GET = withErrorHandling("GET /api/profile/stats", async () => {
       longest_streak: user.longest_streak,
       streak_freezes: (user as unknown as { streak_freezes?: number }).streak_freezes ?? 1,
       completed_count: completedCount,
-      total_tutorials: getAllTutorials().length,
+      total_tutorials: getAllTutorials(lang).length,
       activity_count: activityCount,
       created_at: user.created_at,
       last_active_at: user.last_active_at,

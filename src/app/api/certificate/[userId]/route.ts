@@ -3,6 +3,8 @@ import { getUserById, getProgressCount } from "@/lib/db";
 import { getAllTutorials } from "@/lib/tutorials";
 import { withErrorHandling } from "@/lib/api-utils";
 
+const GO_LANG = "go";
+
 export const GET = withErrorHandling(
   "GET /api/certificate/[userId]",
   async (
@@ -19,14 +21,14 @@ export const GET = withErrorHandling(
 
     const [user, completedCount] = await Promise.all([
       getUserById(id),
-      getProgressCount(id),
+      getProgressCount(id, GO_LANG),
     ]);
 
     if (!user) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    const totalTutorials = getAllTutorials().length;
+    const totalTutorials = getAllTutorials(GO_LANG).length;
     const isComplete = completedCount >= totalTutorials;
 
     return NextResponse.json({

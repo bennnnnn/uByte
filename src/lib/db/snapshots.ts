@@ -1,5 +1,7 @@
 import { getSql } from "./client";
 
+const DEFAULT_LANG = "go";
+
 let _snapshotsReady = false;
 async function ensureSnapshotsTable(): Promise<void> {
   if (_snapshotsReady) return;
@@ -8,13 +10,14 @@ async function ensureSnapshotsTable(): Promise<void> {
     CREATE TABLE IF NOT EXISTS code_snapshots (
       id         SERIAL PRIMARY KEY,
       user_id    INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      language   TEXT NOT NULL DEFAULT 'go',
       slug       TEXT NOT NULL,
       step_index INTEGER NOT NULL,
       code       TEXT NOT NULL,
       saved_at   TIMESTAMPTZ NOT NULL DEFAULT NOW()
     )
   `;
-  await sql`CREATE INDEX IF NOT EXISTS idx_snapshots_user_slug ON code_snapshots(user_id, slug, step_index, saved_at DESC)`;
+  await sql`CREATE INDEX IF NOT EXISTS idx_snapshots_user_lang_slug ON code_snapshots(user_id, language, slug, step_index)`;
   _snapshotsReady = true;
 }
 
@@ -28,20 +31,21 @@ export async function saveSnapshot(
   userId: number,
   slug: string,
   stepIndex: number,
-  code: string
+  code: string,
+  language: string = DEFAULT_LANG
 ): Promise<void> {
   await ensureSnapshotsTable();
   const sql = getSql();
   await sql`
-    INSERT INTO code_snapshots (user_id, slug, step_index, code)
-    VALUES (${userId}, ${slug}, ${stepIndex}, ${code})
+    INSERT INTO code_snapshots (user_id, language, slug, step_index, code)
+    VALUES (${userId}, ${language}, ${slug}, ${stepIndex}, ${code})
   `;
-  // Keep only 5 most recent per (user, slug, stepIndex)
   await sql`
     DELETE FROM code_snapshots
     WHERE id IN (
       SELECT id FROM code_snapshots
       WHERE user_id = ${userId} AND slug = ${slug} AND step_index = ${stepIndex}
+        AND (language = ${language} OR language IS NULL)
       ORDER BY saved_at DESC
       OFFSET 5
     )
@@ -51,7 +55,8 @@ export async function saveSnapshot(
 export async function getSnapshots(
   userId: number,
   slug: string,
-  stepIndex: number
+  stepIndex: number,
+  language: string = DEFAULT_LANG
 ): Promise<CodeSnapshot[]> {
   await ensureSnapshotsTable();
   const sql = getSql();
@@ -59,6 +64,7 @@ export async function getSnapshots(
     SELECT id, code, saved_at
     FROM code_snapshots
     WHERE user_id = ${userId} AND slug = ${slug} AND step_index = ${stepIndex}
+      AND (language = ${language} OR language IS NULL)
     ORDER BY saved_at DESC
     LIMIT 5
   `;

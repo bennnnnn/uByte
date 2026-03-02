@@ -106,7 +106,7 @@ export function useStepProgress(
     if (completedSteps.size === steps.length && steps.length > 0 && !markedRef.current && !progress.includes(tutorialSlug)) {
       markedRef.current = true;
       setTutorialDone(true);
-      toggleProgress(tutorialSlug);
+      toggleProgress(tutorialSlug, lang);
     }
   }, [completedSteps, steps.length, tutorialSlug, toggleProgress, progress]);
 
@@ -166,7 +166,7 @@ export function useStepProgress(
     fetch("/api/code-feedback", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ code: userCode, error, output: outputText, tutorialSlug, stepIndex: currentStepIndex }),
+      body: JSON.stringify({ code: userCode, error, output: outputText, tutorialSlug, stepIndex: currentStepIndex, lang }),
     })
       .then((r) => r.json())
       .then((d) => { if (d.feedback) setAiFeedback(d.feedback); })
@@ -207,7 +207,7 @@ export function useStepProgress(
       apiFetch("/api/code-snapshots", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ slug: tutorialSlug, stepIndex, code }),
+        body: JSON.stringify({ slug: tutorialSlug, stepIndex, code, lang }),
       }).catch(() => {});
     }
 

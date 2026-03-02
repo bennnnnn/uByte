@@ -1,31 +1,59 @@
 import { getSql } from "./client";
 
-export async function getProgress(userId: number): Promise<string[]> {
+const DEFAULT_LANG = "go";
+
+export async function getProgress(userId: number, language: string = DEFAULT_LANG): Promise<string[]> {
   const sql = getSql();
   const rows = await sql`
-    SELECT tutorial_slug FROM progress WHERE user_id = ${userId} ORDER BY completed_at
+    SELECT tutorial_slug FROM progress
+    WHERE user_id = ${userId} AND (language = ${language} OR language IS NULL)
+    ORDER BY completed_at
   `;
   return rows.map((r) => r.tutorial_slug as string);
 }
 
-export async function getProgressCount(userId: number): Promise<number> {
+/** If language is omitted, returns total count across all languages (for stats/leaderboard). */
+export async function getProgressCount(
+  userId: number,
+  language?: string
+): Promise<number> {
   const sql = getSql();
-  const [row] = await sql`SELECT COUNT(*)::int AS c FROM progress WHERE user_id = ${userId}`;
+  if (language === undefined) {
+    const [row] = await sql`
+      SELECT COUNT(*)::int AS c FROM progress WHERE user_id = ${userId}
+    `;
+    return (row?.c as number) ?? 0;
+  }
+  const [row] = await sql`
+    SELECT COUNT(*)::int AS c FROM progress
+    WHERE user_id = ${userId} AND (language = ${language} OR language IS NULL)
+  `;
   return (row?.c as number) ?? 0;
 }
 
-export async function markComplete(userId: number, tutorialSlug: string): Promise<void> {
+export async function markComplete(
+  userId: number,
+  tutorialSlug: string,
+  language: string = DEFAULT_LANG
+): Promise<void> {
   const sql = getSql();
   await sql`
-    INSERT INTO progress (user_id, tutorial_slug)
-    VALUES (${userId}, ${tutorialSlug})
-    ON CONFLICT (user_id, tutorial_slug) DO NOTHING
+    INSERT INTO progress (user_id, tutorial_slug, language)
+    VALUES (${userId}, ${tutorialSlug}, ${language})
+    ON CONFLICT (user_id, language, tutorial_slug) DO NOTHING
   `;
 }
 
-export async function markIncomplete(userId: number, tutorialSlug: string): Promise<void> {
+export async function markIncomplete(
+  userId: number,
+  tutorialSlug: string,
+  language: string = DEFAULT_LANG
+): Promise<void> {
   const sql = getSql();
-  await sql`DELETE FROM progress WHERE user_id = ${userId} AND tutorial_slug = ${tutorialSlug}`;
+  await sql`
+    DELETE FROM progress
+    WHERE user_id = ${userId} AND tutorial_slug = ${tutorialSlug} AND (language = ${language} OR language IS NULL)
+  `;
 }
 
 export async function resetAllProgress(userId: number): Promise<void> {

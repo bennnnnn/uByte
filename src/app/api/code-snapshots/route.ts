@@ -11,10 +11,11 @@ export const GET = withErrorHandling("GET /api/code-snapshots", async (request: 
   const { searchParams } = new URL(request.url);
   const slug = searchParams.get("slug") ?? "";
   const stepIndex = parseInt(searchParams.get("stepIndex") ?? "0", 10);
+  const lang = searchParams.get("lang") ?? "go";
 
   if (!slug) return NextResponse.json({ error: "slug required" }, { status: 400 });
 
-  const snapshots = await getSnapshots(user.userId, slug, stepIndex);
+  const snapshots = await getSnapshots(user.userId, slug, stepIndex, lang);
   return NextResponse.json({ snapshots });
 });
 
@@ -29,11 +30,12 @@ export const POST = withErrorHandling("POST /api/code-snapshots", async (request
   const { limited } = await checkRateLimit(`snapshots:${ip}:${user.userId}`, 30, 60_000);
   if (limited) return NextResponse.json({ error: "Too many requests" }, { status: 429 });
 
-  const { slug, stepIndex, code } = await request.json();
+  const body = await request.json();
+  const { slug, stepIndex, code, lang = "go" } = body;
   if (!slug || typeof stepIndex !== "number" || !code) {
     return NextResponse.json({ error: "Invalid payload" }, { status: 400 });
   }
 
-  await saveSnapshot(user.userId, slug, stepIndex, code);
+  await saveSnapshot(user.userId, slug, stepIndex, code, typeof lang === "string" ? lang : "go");
   return NextResponse.json({ ok: true });
 });

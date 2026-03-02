@@ -26,6 +26,8 @@ export default function CodePlayground({ code: initialCode, title }: CodePlaygro
 
   // slug: "variables" from "/go/variables" or "/golang/variables" (legacy redirect)
   const slug = pathname.replace(/^\/(?:go|golang|python|cpp)\//, "");
+  const pathLang = pathname.split("/")[1];
+  const lang = pathLang === "golang" ? "go" : pathLang || "go";
   // Stable identifier for this editor on the page
   const editorKey = title ?? codeHash(initialCode);
   // localStorage key
@@ -39,7 +41,7 @@ export default function CodePlayground({ code: initialCode, title }: CodePlaygro
   // On mount: load from DB if user is logged in (DB is source of truth for cross-device)
   useEffect(() => {
     if (!user) return;
-    fetch(`/api/code-drafts?slug=${encodeURIComponent(slug)}&key=${encodeURIComponent(editorKey)}`)
+    fetch(`/api/code-drafts?slug=${encodeURIComponent(slug)}&key=${encodeURIComponent(editorKey)}&lang=${encodeURIComponent(lang)}`)
       .then((r) => (r.ok ? r.json() : null))
       .then((data) => {
         if (data?.code != null && data.code !== initialCode) {
@@ -70,7 +72,7 @@ export default function CodePlayground({ code: initialCode, title }: CodePlaygro
       apiFetch("/api/code-drafts", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ slug, key: editorKey, code }),
+        body: JSON.stringify({ slug, key: editorKey, code, lang }),
       }).catch(() => {});
     }, 1000);
     return () => { if (apiTimer.current) clearTimeout(apiTimer.current); };
@@ -85,7 +87,7 @@ export default function CodePlayground({ code: initialCode, title }: CodePlaygro
       apiFetch("/api/code-drafts", {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ slug, key: editorKey }),
+        body: JSON.stringify({ slug, key: editorKey, lang }),
       }).catch(() => {});
     }
   }, [user, slug, editorKey, storageKey, initialCode]);
@@ -161,7 +163,7 @@ export default function CodePlayground({ code: initialCode, title }: CodePlaygro
                   const res = await apiFetch("/api/bookmarks", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ tutorialSlug: slug, snippet: code, note: title || "" }),
+                    body: JSON.stringify({ tutorialSlug: slug, snippet: code, note: title || "", lang }),
                   });
                   if (res.ok) {
                     setBookmarked(true);

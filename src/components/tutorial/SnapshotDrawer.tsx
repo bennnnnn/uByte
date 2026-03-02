@@ -11,6 +11,7 @@ interface Snapshot {
 interface Props {
   slug: string;
   stepIndex: number;
+  lang?: string;
   onRestore: (code: string) => void;
   onClose: () => void;
 }
@@ -25,17 +26,17 @@ function timeAgo(iso: string): string {
   return new Date(iso).toLocaleDateString();
 }
 
-export default function SnapshotDrawer({ slug, stepIndex, onRestore, onClose }: Props) {
+export default function SnapshotDrawer({ slug, stepIndex, lang = "go", onRestore, onClose }: Props) {
   const [snapshots, setSnapshots] = useState<Snapshot[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch(`/api/code-snapshots?slug=${encodeURIComponent(slug)}&stepIndex=${stepIndex}`, { credentials: "same-origin" })
+    fetch(`/api/code-snapshots?slug=${encodeURIComponent(slug)}&stepIndex=${stepIndex}&lang=${encodeURIComponent(lang)}`, { credentials: "same-origin" })
       .then((r) => r.json())
       .then((d) => setSnapshots(d.snapshots ?? []))
       .catch(() => {})
       .finally(() => setLoading(false));
-  }, [slug, stepIndex]);
+  }, [slug, stepIndex, lang]);
 
   return (
     <>

@@ -51,7 +51,7 @@ interface AppDataContextType {
   viewCount: number;
   limited: boolean;
   recordView: (slug: string) => Promise<void>;
-  toggleProgress: (slug: string) => Promise<void>;
+  toggleProgress: (slug: string, lang?: string) => Promise<void>;
   refreshProfile: () => Promise<void>;
 }
 
@@ -61,7 +61,7 @@ const AppDataContext = createContext<AppDataContextType>({
   viewCount: 0,
   limited: false,
   recordView: async () => {},
-  toggleProgress: async () => {},
+  toggleProgress: async (_slug: string, _lang?: string) => {},
   refreshProfile: async () => {},
 });
 
@@ -119,7 +119,7 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
       setUser(data.user);
       if (data.user) {
         const [progRes, profRes] = await Promise.all([
-          fetch("/api/progress", { credentials: "same-origin" }),
+          fetch("/api/progress?lang=go", { credentials: "same-origin" }),
           fetch("/api/profile", { credentials: "same-origin" }),
         ]);
         const progData = progRes.ok ? await progRes.json() : { progress: [] };
@@ -183,7 +183,7 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
     setViewCount(0);
     try {
       const [progRes, profRes] = await Promise.all([
-        fetch("/api/progress", { credentials: "same-origin" }),
+        fetch("/api/progress?lang=go", { credentials: "same-origin" }),
         fetch("/api/profile", { credentials: "same-origin" }),
       ]);
       const progData = progRes.ok ? await progRes.json() : { progress: [] };
@@ -229,14 +229,14 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
     } catch { /* ignore */ }
   }, [user]);
 
-  const toggleProgress = async (slug: string) => {
+  const toggleProgress = async (slug: string, lang: string = "go") => {
     if (!user) return;
     const completed = !progress.includes(slug);
     try {
       const res = await apiFetch("/api/progress", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ slug, completed }),
+        body: JSON.stringify({ slug, completed, lang }),
       });
       if (res.ok) {
         const data = await res.json();
