@@ -171,20 +171,6 @@ export function PracticeIDE({ problem, initialLang }: Props) {
             <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-indigo-600 text-xs font-bold text-white">U</span>
             <span className="text-sm font-bold text-zinc-800 dark:text-zinc-100">uByte</span>
           </Link>
-          {/* Problem list sidebar toggle */}
-          <button
-            type="button"
-            onClick={() => setSidebarOpen((v) => !v)}
-            title="Toggle problem list"
-            aria-label="Toggle problem list"
-            className="flex h-8 w-8 items-center justify-center rounded text-zinc-500 transition-colors hover:bg-zinc-200 hover:text-zinc-800 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-200"
-          >
-            <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">
-              <line x1="2" y1="4.5" x2="16" y2="4.5" />
-              <line x1="2" y1="9"   x2="16" y2="9"   />
-              <line x1="2" y1="13.5" x2="16" y2="13.5" />
-            </svg>
-          </button>
         </div>
 
         {/* Breadcrumb */}
@@ -296,12 +282,30 @@ export function PracticeIDE({ problem, initialLang }: Props) {
       {/* ── Main split ───────────────────────────────────────────────── */}
       <div className="flex flex-1 overflow-hidden">
 
-        {/* Problem list sidebar (desktop) */}
-        {sidebarOpen && (
-          <aside className="hidden w-60 shrink-0 md:flex">
-            <ProblemSidebar problems={allProblems} activeSlug={problem.slug} lang={lang} />
-          </aside>
-        )}
+        {/* Problem list sidebar (desktop) — collapses to a thin expand strip */}
+        <aside className="hidden shrink-0 md:flex">
+          {sidebarOpen ? (
+            <div className="flex w-60">
+              <ProblemSidebar
+                problems={allProblems}
+                activeSlug={problem.slug}
+                lang={lang}
+                onCollapse={() => setSidebarOpen(false)}
+              />
+            </div>
+          ) : (
+            <button
+              type="button"
+              onClick={() => setSidebarOpen(true)}
+              title="Expand problem list"
+              className="flex w-8 flex-col items-center justify-center border-r border-zinc-200 bg-zinc-50 text-zinc-400 transition-colors hover:bg-zinc-100 hover:text-zinc-700 dark:border-zinc-800 dark:bg-zinc-900 dark:hover:bg-zinc-800 dark:hover:text-zinc-200"
+            >
+              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+          )}
+        </aside>
 
         {/* Description panel (left) — same bg as InstructionsSidebar */}
         <aside
@@ -311,20 +315,6 @@ export function PracticeIDE({ problem, initialLang }: Props) {
           style={{ width: leftWidth }}
           suppressHydrationWarning
         >
-          {/* Panel header */}
-          <div className="flex shrink-0 items-center justify-between border-b border-zinc-200 bg-zinc-50 px-4 py-2.5 dark:border-zinc-800 dark:bg-zinc-900">
-            <span className="text-xs font-semibold uppercase tracking-widest text-zinc-400 dark:text-zinc-500">
-              Description
-            </span>
-            <nav className="flex items-center gap-1 text-xs text-zinc-400" aria-label="breadcrumb">
-              <a href={`/practice/${lang}`} className="hover:text-zinc-600 dark:hover:text-zinc-300">
-                {LANGUAGES[lang]?.name ?? lang}
-              </a>
-              <span>/</span>
-              <span className="text-zinc-500 dark:text-zinc-400">{problem.title}</span>
-            </nav>
-          </div>
-
           {/* Problem body */}
           <div className="flex-1 overflow-y-auto p-5">
             <h1 className="mb-2 text-xl font-bold text-zinc-900 dark:text-zinc-100">

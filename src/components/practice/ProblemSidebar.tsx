@@ -19,25 +19,27 @@ interface Props {
   problems: PracticeProblem[];
   activeSlug: string;
   lang: string;
+  onCollapse: () => void;
 }
 
-export default function ProblemSidebar({ problems, activeSlug, lang }: Props) {
+export default function ProblemSidebar({ problems, activeSlug, lang, onCollapse }: Props) {
   return (
-    <nav className="flex h-full flex-col overflow-hidden border-r border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900">
-      {/* Header */}
-      <div className="flex shrink-0 items-center justify-between border-b border-zinc-200 px-4 py-3 dark:border-zinc-800">
-        <Link
-          href={`/practice/${lang}`}
-          className="text-sm font-semibold text-zinc-900 hover:text-indigo-600 dark:text-zinc-100 dark:hover:text-indigo-400"
-        >
+    <nav className="flex h-full flex-col overflow-hidden border-r border-zinc-200 bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900">
+      {/* Collapse button row */}
+      <div className="flex shrink-0 items-center justify-between border-b border-zinc-200 px-3 py-2 dark:border-zinc-800">
+        <span className="text-xs font-semibold uppercase tracking-widest text-zinc-400 dark:text-zinc-500">
           Problems
-        </Link>
-        <Link
-          href={`/practice`}
-          className="text-xs text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300"
+        </span>
+        <button
+          type="button"
+          onClick={onCollapse}
+          title="Collapse sidebar"
+          className="flex h-6 w-6 items-center justify-center rounded text-zinc-400 transition-colors hover:bg-zinc-200 hover:text-zinc-700 dark:hover:bg-zinc-700 dark:hover:text-zinc-200"
         >
-          All languages
-        </Link>
+          <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+          </svg>
+        </button>
       </div>
 
       {/* Problem list */}
