@@ -139,7 +139,7 @@ export default function RootLayout({
         <Analytics />
         <Script
           id="sw-register"
-          strategy="afterInteractive"
+          strategy="lazyOnload"
           dangerouslySetInnerHTML={{
             __html: `if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('/sw.js'))}`,
           }}
