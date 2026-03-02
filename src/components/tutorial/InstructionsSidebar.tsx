@@ -198,23 +198,33 @@ export default function InstructionsSidebar({
         )}
       </div>
 
-      {/* Step dots */}
+      {/* Step dots — green + checkmark = completed (saved per question) */}
       <div className="shrink-0 border-t border-zinc-200 p-4 dark:border-zinc-800">
-        <div className="flex flex-wrap gap-1.5" role="tablist" aria-label="Tutorial steps">
-          {steps.map((s, i) => (
-            <button
-              key={i}
-              role="tab"
-              aria-selected={i === stepIndex}
-              aria-label={`Step ${i + 1}: ${s.title}${completedSteps.has(i) ? " (completed)" : ""}`}
-              onClick={() => onGoToStep(i)}
-              className={`h-2.5 w-2.5 rounded-full transition-colors ${
-                i === stepIndex ? "bg-indigo-500"
-                : completedSteps.has(i) ? "bg-emerald-500"
-                : "bg-zinc-300 hover:bg-zinc-400 dark:bg-zinc-600 dark:hover:bg-zinc-400"
-              }`}
-            />
-          ))}
+        <div className="flex flex-wrap items-center gap-1.5" role="tablist" aria-label="Tutorial steps">
+          {steps.map((s, i) => {
+            const isCompleted = completedSteps.has(i);
+            return (
+              <button
+                key={i}
+                role="tab"
+                aria-selected={i === stepIndex}
+                aria-label={`Step ${i + 1}: ${s.title}${isCompleted ? " (done)" : ""}`}
+                title={isCompleted ? "Done" : undefined}
+                onClick={() => onGoToStep(i)}
+                className={`flex h-7 w-7 items-center justify-center rounded-full transition-colors ${
+                  i === stepIndex ? "bg-indigo-500 ring-2 ring-indigo-300 dark:ring-indigo-800"
+                  : isCompleted ? "bg-emerald-500 text-white"
+                  : "bg-zinc-300 hover:bg-zinc-400 dark:bg-zinc-600 dark:hover:bg-zinc-400"
+                }`}
+              >
+                {isCompleted ? (
+                  <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                  </svg>
+                ) : null}
+              </button>
+            );
+          })}
         </div>
       </div>
     </>

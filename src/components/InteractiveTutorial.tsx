@@ -18,9 +18,9 @@ import InstructionsSidebar from "@/components/tutorial/InstructionsSidebar";
 import CourseOutlineDrawer from "@/components/tutorial/CourseOutlineDrawer";
 import ShortcutsModal from "@/components/tutorial/ShortcutsModal";
 import SnapshotDrawer from "@/components/tutorial/SnapshotDrawer";
-import ChallengeTimer from "@/components/tutorial/ChallengeTimer";
 import { useChallengeTimer } from "@/hooks/useChallengeTimer";
 import { tutorialUrl } from "@/lib/urls";
+import { useToast } from "@/components/Toast";
 
 interface Props {
   lang: string;
@@ -57,6 +57,7 @@ export default function InteractiveTutorial({
   isFree,
 }: Props) {
   const { user, profile, logout, loading } = useAuth();
+  const { toast } = useToast();
 
   const editor = useCodeEditor(steps[0]?.starter ?? "", lang as import("@/lib/languages/types").SupportedLanguage);
   const stepProgress = useStepProgress(steps, lang, tutorialSlug, next, editor.setCode, user?.id);
@@ -121,15 +122,26 @@ export default function InteractiveTutorial({
   }, [showUserMenu]);
 
   async function handleBookmark() {
-    if (!user) return;
+    if (!user) {
+      toast("Sign in to save bookmarks", "error");
+      return;
+    }
     try {
       const res = await apiFetch("/api/bookmarks", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ tutorialSlug, snippet: editor.code, note: currentStep.title, lang }),
       });
-      if (res.ok) { setBookmarked(true); setTimeout(() => setBookmarked(false), 2000); }
-    } catch { /* ignore */ }
+      if (res.ok) {
+        setBookmarked(true);
+        setTimeout(() => setBookmarked(false), 2000);
+      } else {
+        const data = await res.json().catch(() => ({}));
+        toast(data?.error ?? "Failed to save bookmark", "error");
+      }
+    } catch {
+      toast("Failed to save bookmark", "error");
+    }
   }
 
   // Global ? key → shortcuts modal (only when not typing in textarea)
@@ -195,26 +207,34 @@ export default function InteractiveTutorial({
         <h1 className="max-w-[40%] truncate text-sm font-semibold text-zinc-800 dark:text-zinc-100">{tutorialTitle}</h1>
         <div className="flex items-center gap-3">
           {user && (
-            <button
-              onClick={() => {
-                if (!challengeMode) {
-                  setChallengeMode(true);
-                  challengeTimer.reset();
-                  challengeTimer.start();
-                } else {
-                  setChallengeMode(false);
-                  challengeTimer.reset();
-                }
-              }}
-              title="Toggle challenge mode"
-              className={`hidden items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-medium transition-colors sm:flex ${
-                challengeMode
-                  ? "bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-400"
-                  : "text-zinc-500 hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-zinc-800"
-              }`}
-            >
-              ⏱ {challengeMode ? "Stop" : "Challenge"}
-            </button>
+            <>
+              {challengeMode && (
+                <div className="hidden items-center gap-2 rounded-full border border-amber-300 bg-amber-50 px-3 py-1 shadow-sm dark:border-amber-700 dark:bg-amber-950/80 sm:flex">
+                  <span className="text-xs font-bold text-amber-700 dark:text-amber-400">Challenge</span>
+                  <span className="font-mono text-sm font-bold text-amber-800 dark:text-amber-300">{challengeTimer.display}</span>
+                </div>
+              )}
+              <button
+                onClick={() => {
+                  if (!challengeMode) {
+                    setChallengeMode(true);
+                    challengeTimer.reset();
+                    challengeTimer.start();
+                  } else {
+                    setChallengeMode(false);
+                    challengeTimer.reset();
+                  }
+                }}
+                title="Toggle challenge mode"
+                className={`hidden items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-medium transition-colors sm:flex ${
+                  challengeMode
+                    ? "bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-400"
+                    : "text-zinc-500 hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-zinc-800"
+                }`}
+              >
+                ⏱ {challengeMode ? "Stop" : "Challenge"}
+              </button>
+            </>
           )}
           <ThemeToggle className="flex h-8 w-8 items-center justify-center rounded text-zinc-500 transition-colors hover:bg-zinc-200 hover:text-zinc-800 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-200" />
           <div className="relative" ref={userMenuRef}>
@@ -348,8 +368,12 @@ export default function InteractiveTutorial({
               </button>
             )}
             {user && (
-              <button onClick={() => setShowSnapshots(true)} title="Code history" className="flex items-center gap-1.5 rounded-md border border-zinc-300 px-3 py-1.5 text-sm text-zinc-500 transition-colors hover:border-zinc-400 hover:text-zinc-800 dark:border-zinc-700 dark:text-zinc-400 dark:hover:border-zinc-600 dark:hover:text-zinc-200">
-                🕐
+              <button onClick={() => setShowSnapshots(true)} title="Code history" className="flex items-center gap-1.5 rounded-md border border-zinc-400 px-3 py-1.5 text-sm font-medium text-zinc-700 transition-colors hover:border-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 dark:border-zinc-600 dark:text-zinc-200 dark:hover:border-zinc-500 dark:hover:bg-zinc-800 dark:hover:text-zinc-100">
+                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="12" r="10" />
+                  <path d="M12 6v6l4 2" />
+                </svg>
+                History
               </button>
             )}
             <button
@@ -383,8 +407,6 @@ export default function InteractiveTutorial({
           />
         </div>
       </div>
-
-      {challengeMode && <ChallengeTimer display={challengeTimer.display} />}
 
       {/* Mobile persistent bottom action bar */}
       <div className="fixed bottom-0 left-0 right-0 z-[54] flex items-center gap-2 border-t border-zinc-200 bg-zinc-50 px-4 py-2 md:hidden dark:border-zinc-800 dark:bg-zinc-900">

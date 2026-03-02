@@ -1,6 +1,7 @@
 export * from "./types";
 export * from "./users";
 export * from "./progress";
+export * from "./step-progress";
 export * from "./achievements";
 export * from "./bookmarks";
 export * from "./activity";

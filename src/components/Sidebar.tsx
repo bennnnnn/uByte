@@ -123,7 +123,7 @@ export default function Sidebar({ lang, tutorials }: { lang: string; tutorials: 
           )}
         </div>
 
-        <p className="mb-2 px-3 text-xs font-bold uppercase tracking-widest text-zinc-500 dark:text-zinc-400">
+        <p className="mb-2 px-3 text-sm font-bold uppercase tracking-widest text-zinc-500 dark:text-zinc-400">
           Lessons
         </p>
 
@@ -133,7 +133,7 @@ export default function Sidebar({ lang, tutorials }: { lang: string; tutorials: 
             const filtered = tutorials
               .filter((tutorial) => tutorial.title.toLowerCase().includes(q));
             if (filtered.length === 0) {
-              return <li className="px-3 py-4 text-center text-xs text-zinc-400 dark:text-zinc-500">No lessons found</li>;
+              return <li className="px-3 py-4 text-center text-sm text-zinc-400 dark:text-zinc-500">No lessons found</li>;
             }
             return filtered.map((tutorial) => {
               const href = tutorialUrl(lang, tutorial.slug);
@@ -148,7 +148,7 @@ export default function Sidebar({ lang, tutorials }: { lang: string; tutorials: 
                   <Link
                     href={href}
                     onClick={() => tutorial.subtopics.length > 0 && toggleExpand(tutorial.slug)}
-                    className={`flex items-center justify-between rounded-lg px-3 py-2 text-base transition-all duration-150 ${
+                    className={`flex items-center justify-between rounded-lg px-3 py-2 text-lg transition-all duration-150 ${
                       isOnThisPage
                         ? "bg-white font-semibold text-indigo-700 shadow-sm dark:bg-zinc-800 dark:text-indigo-400"
                         : isCompleted
@@ -189,7 +189,7 @@ export default function Sidebar({ lang, tutorials }: { lang: string; tutorials: 
                           <li key={sub.id}>
                             <Link
                               href={`${href}#${sub.id}`}
-                              className={`block rounded-md px-2 py-1.5 text-sm transition-all duration-150 ${
+                              className={`block rounded-md px-2 py-1.5 text-base transition-all duration-150 ${
                                 isSubActive
                                   ? "font-medium text-indigo-600 dark:text-indigo-400"
                                   : "text-zinc-400 hover:bg-zinc-200/70 hover:text-zinc-700 dark:text-zinc-500 dark:hover:bg-zinc-800 dark:hover:text-zinc-300"

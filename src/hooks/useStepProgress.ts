@@ -101,6 +101,18 @@ export function useStepProgress(
     } catch { /* ignore */ }
   }, [stepIndex, lang, tutorialSlug]);
 
+  // ── Load completed steps from DB (per-question progress) ──
+  useEffect(() => {
+    if (userId == null || !tutorialSlug) return;
+    fetch(`/api/progress/steps?slug=${encodeURIComponent(tutorialSlug)}&lang=${encodeURIComponent(lang)}`, { credentials: "same-origin" })
+      .then((r) => r.json())
+      .then((d) => {
+        const steps = Array.isArray(d?.steps) ? d.steps : [];
+        setCompletedSteps((prev) => new Set([...prev, ...steps]));
+      })
+      .catch(() => {});
+  }, [userId, tutorialSlug, lang]);
+
   // ── Tutorial completion ──
   useEffect(() => {
     if (completedSteps.size === steps.length && steps.length > 0 && !markedRef.current && !progress.includes(tutorialSlug)) {
@@ -247,6 +259,13 @@ export function useStepProgress(
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ lang, tutorialSlug, stepIndex, passed: true }),
         }).catch(() => {});
+        if (userId != null) {
+          apiFetch("/api/progress/steps", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ slug: tutorialSlug, stepIndex, lang }),
+          }).catch(() => {});
+        }
       } else {
         setStatus("failed");
         setFailCount((n) => n + 1);

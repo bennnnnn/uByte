@@ -3,12 +3,23 @@ import type { Bookmark } from "./types";
 
 const DEFAULT_LANG = "go";
 
+let _languageColumnReady = false;
+async function ensureLanguageColumn(): Promise<void> {
+  if (_languageColumnReady) return;
+  const sql = getSql();
+  try {
+    await sql`ALTER TABLE bookmarks ADD COLUMN IF NOT EXISTS language TEXT DEFAULT 'go'`;
+  } catch { /* ignore if table missing or column exists */ }
+  _languageColumnReady = true;
+}
+
 export async function getBookmarks(
   userId: number,
   limit: number = 50,
   offset: number = 0,
   language: string = DEFAULT_LANG
 ): Promise<Bookmark[]> {
+  await ensureLanguageColumn();
   const sql = getSql();
   const rows = await sql`
     SELECT * FROM bookmarks
@@ -20,6 +31,7 @@ export async function getBookmarks(
 }
 
 export async function getBookmarkTotal(userId: number, language: string = DEFAULT_LANG): Promise<number> {
+  await ensureLanguageColumn();
   const sql = getSql();
   const [row] = await sql`
     SELECT COUNT(*)::int AS c FROM bookmarks
@@ -35,6 +47,7 @@ export async function addBookmark(
   note: string,
   language: string = DEFAULT_LANG
 ): Promise<Bookmark> {
+  await ensureLanguageColumn();
   const sql = getSql();
   const [row] = await sql`
     INSERT INTO bookmarks (user_id, tutorial_slug, snippet, note, language)

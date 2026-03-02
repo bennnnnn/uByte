@@ -1,4 +1,5 @@
 import { getSql } from "./client";
+import { clearStepProgress } from "./step-progress";
 
 const DEFAULT_LANG = "go";
 
@@ -104,6 +105,7 @@ export async function markIncomplete(
 export async function resetAllProgress(userId: number): Promise<void> {
   const sql = getSql();
   await sql`DELETE FROM progress WHERE user_id = ${userId}`;
+  await clearStepProgress(userId);
   await sql`DELETE FROM achievements WHERE user_id = ${userId}`;
   await sql`
     UPDATE users
