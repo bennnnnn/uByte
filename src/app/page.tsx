@@ -6,7 +6,6 @@ import { LANGUAGES, getAllLanguageSlugs } from "@/lib/languages/registry";
 import { BASE_URL } from "@/lib/constants";
 import {
   LanguageCard,
-  HomePopularSidebar,
   HeroSection,
   PracticeSection,
   StepsSection,
@@ -64,80 +63,78 @@ export default function Home() {
     .filter((e): e is { slug: string; config: (typeof LANGUAGES)["go"] } => !!e.config);
 
   return (
-    <div className="min-h-0 flex-1 overflow-y-auto">
-      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-        />
-        <Suspense>
-          <GoogleOAuthError />
-        </Suspense>
+    <div id="main-content" className="min-h-0 flex-1 overflow-y-auto">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <Suspense>
+        <GoogleOAuthError />
+      </Suspense>
 
-        <div className="grid gap-8 lg:grid-cols-[1fr_320px] xl:grid-cols-[1fr_360px]">
-          {/* ── Main column ─────────────────────────────────── */}
-          <div className="min-w-0 space-y-10">
+      {/* ── 1. Hero — full bleed, dark ───────────────────────────────── */}
+      <HeroSection />
 
-            {/* 1. Hero */}
-            <HeroSection />
+      {/* ── 2-N. Sections — constrained ─────────────────────────────── */}
+      <div className="mx-auto max-w-6xl space-y-16 px-4 py-16 sm:px-6 lg:px-8 lg:py-20">
 
-            {/* 2. Continue banner (logged-in users only) */}
-            <ContinueBanner lang="go" tutorials={tutorialList} />
+        {/* Continue banner (logged-in users only) */}
+        <ContinueBanner lang="go" tutorials={tutorialList} />
 
-            {/* 3. How it works */}
-            <StepsSection />
+        {/* How it works */}
+        <StepsSection />
 
-            {/* 4. Languages */}
-            <section aria-labelledby="languages-heading">
-              <h2
-                id="languages-heading"
-                className="mb-4 text-xl font-bold text-zinc-900 dark:text-zinc-100"
-              >
-                Programming languages
-              </h2>
-              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                {languageEntries.map(({ slug, config }) => (
-                  <LanguageCard
-                    key={slug}
-                    slug={slug}
-                    name={config.name}
-                    description={config.seo.defaultDescription}
-                    icon={LANGUAGE_ICONS[slug] ?? "📝"}
-                    tutorialCount={19}
-                  />
-                ))}
-              </div>
-            </section>
-
-            {/* 5. Interview practice */}
-            <PracticeSection />
-
-            {/* 6. Footer links */}
-            <nav
-              className="flex flex-wrap items-center justify-center gap-x-5 gap-y-1.5 border-t border-zinc-100 pt-6 text-sm dark:border-zinc-800"
-              aria-label="Quick links"
+        {/* Languages */}
+        <section aria-labelledby="languages-heading">
+          <div className="mb-8 text-center">
+            <h2
+              id="languages-heading"
+              className="text-2xl font-black text-zinc-900 dark:text-zinc-100 sm:text-3xl"
             >
-              {languageEntries.map(({ slug, config }) => (
-                <Link
-                  key={slug}
-                  href={`/${slug}`}
-                  className="font-medium text-zinc-500 transition-colors hover:text-indigo-600 dark:text-zinc-500 dark:hover:text-indigo-400"
-                >
-                  {config.name} tutorials
-                </Link>
-              ))}
-              <Link
-                href="/practice"
-                className="font-medium text-indigo-600 hover:underline dark:text-indigo-400"
-              >
-                Interview practice →
-              </Link>
-            </nav>
+              Pick your language
+            </h2>
+            <p className="mt-2 text-sm text-zinc-500 dark:text-zinc-400">
+              Same concepts, same structure — choose the language you want to master.
+            </p>
           </div>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {languageEntries.map(({ slug, config }) => (
+              <LanguageCard
+                key={slug}
+                slug={slug}
+                name={config.name}
+                description={config.seo.defaultDescription}
+                icon={LANGUAGE_ICONS[slug] ?? "📝"}
+                tutorialCount={19}
+              />
+            ))}
+          </div>
+        </section>
 
-          {/* ── Sidebar ─────────────────────────────────────── */}
-          <HomePopularSidebar />
-        </div>
+        {/* Interview practice */}
+        <PracticeSection />
+
+        {/* Quick-nav footer */}
+        <nav
+          className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 border-t border-zinc-100 pt-8 text-sm dark:border-zinc-800"
+          aria-label="Quick links"
+        >
+          {languageEntries.map(({ slug, config }) => (
+            <Link
+              key={slug}
+              href={`/${slug}`}
+              className="font-medium text-zinc-500 transition-colors hover:text-indigo-600 dark:text-zinc-500 dark:hover:text-indigo-400"
+            >
+              {config.name} tutorials
+            </Link>
+          ))}
+          <Link
+            href="/practice"
+            className="font-medium text-indigo-600 hover:underline dark:text-indigo-400"
+          >
+            Interview practice →
+          </Link>
+        </nav>
       </div>
     </div>
   );
