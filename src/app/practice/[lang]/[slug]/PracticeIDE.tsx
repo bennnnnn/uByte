@@ -47,7 +47,7 @@ export function PracticeIDE({ problem, initialLang }: Props) {
   const [running, setRunning]         = useState(false);
   const [outputIsError, setOutputIsError] = useState(false);
 
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [mobileTab, setMobileTab]     = useState<"desc" | "code">("desc");
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showShortcuts, setShowShortcuts] = useState(false);
