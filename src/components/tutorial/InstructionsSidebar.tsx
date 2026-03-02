@@ -56,7 +56,10 @@ export default function InstructionsSidebar({
   const { user } = useAuth();
   const [showNote, setShowNote] = useState(false);
   const [note, setNote] = useState("");
+  const [savingNote, setSavingNote] = useState(false);
+  const [noteSaved, setNoteSaved] = useState(false);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const savedTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Load note when user/step changes
   useEffect(() => {
@@ -67,16 +70,31 @@ export default function InstructionsSidebar({
       .catch(() => {});
   }, [user, tutorialSlug, stepIndex]);
 
+  useEffect(() => () => {
+    if (savedTimeoutRef.current) clearTimeout(savedTimeoutRef.current);
+  }, []);
+
+  async function saveNote(value: string) {
+    if (!user) return;
+    setSavingNote(true);
+    try {
+      await apiFetch("/api/notes", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ slug: tutorialSlug, stepIndex, note: value }),
+      });
+      setNoteSaved(true);
+      if (savedTimeoutRef.current) clearTimeout(savedTimeoutRef.current);
+      savedTimeoutRef.current = setTimeout(() => setNoteSaved(false), 2500);
+    } finally {
+      setSavingNote(false);
+    }
+  }
+
   function handleNoteChange(val: string) {
     setNote(val);
     if (debounceRef.current) clearTimeout(debounceRef.current);
-    debounceRef.current = setTimeout(() => {
-      apiFetch("/api/notes", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ slug: tutorialSlug, stepIndex, note: val }),
-      }).catch(() => {});
-    }, 1000);
+    debounceRef.current = setTimeout(() => saveNote(val), 800);
   }
 
   return (
@@ -118,17 +136,31 @@ export default function InstructionsSidebar({
               className="flex items-center gap-1.5 text-sm text-zinc-500 transition-colors hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200"
             >
               <span>{showNote ? "▾" : "▸"}</span>
-              📝 {showNote ? "Hide note" : "My note"}
+              📝 {showNote ? "Hide note" : "Note for this step"}
             </button>
             {showNote && (
-              <textarea
-                value={note}
-                onChange={(e) => handleNoteChange(e.target.value)}
-                placeholder="Write a note for this step…"
-                maxLength={2000}
-                rows={4}
-                className="mt-2 w-full resize-none rounded-lg border border-zinc-200 bg-zinc-50 p-2.5 text-sm text-zinc-700 placeholder-zinc-400 focus:border-indigo-400 focus:outline-none dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300 dark:placeholder-zinc-500"
-              />
+              <div className="mt-2 space-y-2">
+                <textarea
+                  value={note}
+                  onChange={(e) => handleNoteChange(e.target.value)}
+                  onBlur={() => note.trim() && saveNote(note)}
+                  placeholder="Write a note for this step (saved per question)…"
+                  maxLength={2000}
+                  rows={4}
+                  className="w-full resize-none rounded-lg border border-zinc-200 bg-zinc-50 p-2.5 text-sm text-zinc-700 placeholder-zinc-400 focus:border-indigo-400 focus:outline-none dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300 dark:placeholder-zinc-500"
+                />
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-zinc-400 dark:text-zinc-500">{note.length}/2000</span>
+                  <button
+                    type="button"
+                    onClick={() => saveNote(note)}
+                    disabled={savingNote}
+                    className="rounded-md bg-indigo-600 px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-indigo-700 disabled:opacity-50"
+                  >
+                    {savingNote ? "Saving…" : noteSaved ? "Saved ✓" : "Save note"}
+                  </button>
+                </div>
+              </div>
             )}
           </div>
         )}
