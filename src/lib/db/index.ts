@@ -17,3 +17,4 @@ export * from "./notes";
 export * from "./challenges";
 export * from "./snapshots";
 export * from "./ai-feedback-cache";
+export * from "./practice-attempts";

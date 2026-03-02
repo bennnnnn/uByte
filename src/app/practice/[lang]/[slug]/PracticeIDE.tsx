@@ -13,6 +13,7 @@ import ThemeToggle from "@/components/ThemeToggle";
 import Avatar from "@/components/Avatar";
 import ShortcutsModal from "@/components/tutorial/ShortcutsModal";
 import ProblemSidebar from "@/components/practice/ProblemSidebar";
+import type { PracticeAttemptStatus } from "@/lib/db/practice-attempts";
 
 const DIFFICULTY_STYLES: Record<Difficulty, string> = {
   easy:   "bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-400",
@@ -51,6 +52,7 @@ export function PracticeIDE({ problem, initialLang }: Props) {
   const [mobileTab, setMobileTab]     = useState<"desc" | "code">("desc");
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showShortcuts, setShowShortcuts] = useState(false);
+  const [statuses, setStatuses] = useState<Record<string, PracticeAttemptStatus>>({});
 
   const userMenuRef = useRef<HTMLDivElement>(null);
 
@@ -76,6 +78,14 @@ export function PracticeIDE({ problem, initialLang }: Props) {
       credentials: "same-origin",
     }).catch(() => {});
   }, [problem.slug]);
+
+  // Load attempt statuses for all problems (to show circles in sidebar)
+  useEffect(() => {
+    fetch("/api/practice-attempt", { credentials: "same-origin" })
+      .then((r) => r.json())
+      .then((d) => { if (d?.attempts) setStatuses(d.attempts); })
+      .catch(() => {});
+  }, []);
 
   // Close user menu on outside click
   useEffect(() => {
@@ -118,17 +128,28 @@ export function PracticeIDE({ problem, initialLang }: Props) {
       if (!res.ok)            { setOutput(data?.Errors ?? data?.error ?? "Run failed."); setOutputIsError(true); return; }
 
       const out: string[] = [];
-      if (data.CompileErrors) { out.push("Compile error:\n" + data.CompileErrors); setOutputIsError(true); }
-      if (data.Errors)        { out.push(data.Errors); setOutputIsError(true); }
+      let hasError = false;
+      if (data.CompileErrors) { out.push("Compile error:\n" + data.CompileErrors); setOutputIsError(true); hasError = true; }
+      if (data.Errors)        { out.push(data.Errors); setOutputIsError(true); hasError = true; }
       if (data.Events)        { for (const e of data.Events) { if (e.Message) out.push(e.Message); } }
       setOutput(out.length ? out.join("\n") : "(no output)");
+
+      // Save attempt status to DB and update local state
+      const attemptStatus: PracticeAttemptStatus = hasError ? "failed" : "solved";
+      setStatuses((prev) => ({ ...prev, [problem.slug]: attemptStatus }));
+      fetch("/api/practice-attempt", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "same-origin",
+        body: JSON.stringify({ slug: problem.slug, status: attemptStatus }),
+      }).catch(() => {});
     } catch {
       setOutput("Network error. Please try again.");
       setOutputIsError(true);
     } finally {
       setRunning(false);
     }
-  }, [editor.code, lang]);
+  }, [editor.code, lang, problem.slug]);
 
   function handleReset() {
     editor.setCode(getStarterForLanguage(problem, lang));
@@ -291,6 +312,7 @@ export function PracticeIDE({ problem, initialLang }: Props) {
                 activeSlug={problem.slug}
                 lang={lang}
                 onCollapse={() => setSidebarOpen(false)}
+                statuses={statuses}
               />
             </div>
           ) : (
