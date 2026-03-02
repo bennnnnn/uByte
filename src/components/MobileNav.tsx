@@ -5,7 +5,6 @@ import Link from "next/link";
 import { useNavState } from "@/hooks/useNavState";
 import { useAuth } from "@/components/AuthProvider";
 import { tutorialUrl } from "@/lib/urls";
-import ThemeToggle from "@/components/ThemeToggle";
 import AuthButtons from "@/components/AuthButtons";
 import HeaderNavLinks from "@/components/layout/HeaderNavLinks";
 
@@ -34,7 +33,6 @@ export default function MobileNav({ lang, tutorials }: { lang: string; tutorials
           <span className="text-lg font-bold">uByte</span>
         </Link>
         <div className="flex items-center gap-1">
-          <ThemeToggle className="flex h-8 w-8 items-center justify-center rounded-lg text-zinc-500 transition-colors hover:bg-zinc-100 hover:text-zinc-800 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-200" />
           <AuthButtons />
           <button
             onClick={() => setOpen(!open)}

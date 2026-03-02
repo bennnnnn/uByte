@@ -5,7 +5,6 @@ import AuthButtons from "@/components/AuthButtons";
 import AuthProvider from "@/components/AuthProvider";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import { ToastProvider } from "@/components/Toast";
-import ThemeToggle from "@/components/ThemeToggle";
 import HeaderNavLinks from "@/components/layout/HeaderNavLinks";
 import MobileStandaloneHeader from "@/components/layout/MobileStandaloneHeader";
 import LazyCookieConsentAndAnalytics from "@/components/LazyCookieConsentAndAnalytics";
@@ -99,13 +98,18 @@ export default function RootLayout({
           <div className="flex h-dvh flex-col overflow-hidden">
             {/* Top header — Pricing, Search, Login/Sign up; same on all pages */}
             <header className="relative z-20 hidden md:flex items-center justify-between border-b border-zinc-100 bg-white/90 px-6 py-3 shadow-sm backdrop-blur-md dark:border-zinc-800 dark:bg-zinc-950/90">
-              <Link href="/" className="flex items-center gap-2.5 text-zinc-900 dark:text-white">
-                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-indigo-600 text-sm font-bold text-white">U</span>
-                <span className="text-lg font-bold">uByte</span>
-              </Link>
+              {/* Left: logo + Tutorials + Practice */}
+              <div className="flex items-center gap-3">
+                <Link href="/" className="flex items-center gap-2.5 text-zinc-900 dark:text-white">
+                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-indigo-600 text-sm font-bold text-white">U</span>
+                  <span className="text-lg font-bold">uByte</span>
+                </Link>
+                <div className="mx-2 h-5 w-px bg-zinc-200 dark:bg-zinc-700" />
+                <HeaderNavLinks side="left" />
+              </div>
+              {/* Right: Leaderboard + Pricing + auth */}
               <div className="flex items-center gap-2">
                 <HeaderNavLinks />
-                <ThemeToggle className="flex h-8 w-8 items-center justify-center rounded-lg text-zinc-500 transition-colors hover:bg-zinc-100 hover:text-zinc-800 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-200" />
                 <AuthButtons />
               </div>
             </header>

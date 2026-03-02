@@ -11,6 +11,7 @@ interface LeaderboardEntry {
   xp: number;
   streak_days: number;
   completed_count: number;
+  problems_solved: number;
 }
 
 // Rank medal colours
@@ -62,7 +63,9 @@ export default function LeaderboardPage() {
     <div className="mx-auto max-w-3xl px-6 py-12">
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100">Leaderboard</h1>
-        <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">Top 20 learners by XP</p>
+        <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
+          Top 20 learners by XP · earn XP completing tutorials and solving practice problems
+        </p>
       </div>
 
       <div className="overflow-hidden rounded-xl border border-zinc-200 dark:border-zinc-800">
@@ -86,7 +89,9 @@ export default function LeaderboardPage() {
                 <div className="flex-1 min-w-0">
                   <Link href={`/u/${u.id}`} className="truncate font-medium text-zinc-900 hover:text-indigo-600 dark:text-zinc-100 dark:hover:text-indigo-400">{u.name}</Link>
                   <p className="text-xs text-zinc-400">
-                    {u.completed_count} tutorial{u.completed_count !== 1 ? "s" : ""} · {u.streak_days}d streak
+                    {u.completed_count} tutorial{u.completed_count !== 1 ? "s" : ""} ·{" "}
+                    {u.problems_solved ?? 0} problem{(u.problems_solved ?? 0) !== 1 ? "s" : ""} solved ·{" "}
+                    {u.streak_days}d streak
                   </p>
                 </div>
 

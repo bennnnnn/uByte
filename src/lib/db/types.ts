@@ -30,6 +30,7 @@ export interface LeaderboardEntry {
   xp: number;
   streak_days: number;
   completed_count: number;
+  problems_solved: number;
 }
 
 export interface Rating {

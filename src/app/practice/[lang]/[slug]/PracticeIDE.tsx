@@ -53,6 +53,7 @@ export function PracticeIDE({ problem, initialLang }: Props) {
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showShortcuts, setShowShortcuts] = useState(false);
   const [statuses, setStatuses] = useState<Record<string, PracticeAttemptStatus>>({});
+  const [xpToast, setXpToast] = useState<number | null>(null);
 
   const userMenuRef = useRef<HTMLDivElement>(null);
 
@@ -122,7 +123,6 @@ export function PracticeIDE({ problem, initialLang }: Props) {
       });
       const data = await res.json();
 
-      if (res.status === 501) { setOutput("This language is not yet supported for code execution."); setOutputIsError(true); return; }
       if (res.status === 429) { setOutput("Too many requests. Please wait a moment before running again."); setOutputIsError(true); return; }
       if (res.status === 504) { setOutput("Request timed out. Try simpler or faster code."); setOutputIsError(true); return; }
       if (!res.ok)            { setOutput(data?.Errors ?? data?.error ?? "Run failed."); setOutputIsError(true); return; }
@@ -142,7 +142,15 @@ export function PracticeIDE({ problem, initialLang }: Props) {
         headers: { "Content-Type": "application/json" },
         credentials: "same-origin",
         body: JSON.stringify({ slug: problem.slug, status: attemptStatus }),
-      }).catch(() => {});
+      })
+        .then((r) => r.json())
+        .then((d) => {
+          if (d?.xpAwarded > 0) {
+            setXpToast(d.xpAwarded);
+            setTimeout(() => setXpToast(null), 3000);
+          }
+        })
+        .catch(() => {});
     } catch {
       setOutput("Network error. Please try again.");
       setOutputIsError(true);
@@ -176,6 +184,16 @@ export function PracticeIDE({ problem, initialLang }: Props) {
 
   return (
     <div className="fixed inset-0 z-50 flex flex-col bg-white text-zinc-900 dark:bg-zinc-950 dark:text-zinc-100">
+      {/* XP awarded toast */}
+      {xpToast !== null && (
+        <div className="pointer-events-none fixed bottom-6 left-1/2 z-[100] -translate-x-1/2 animate-bounce">
+          <div className="flex items-center gap-2 rounded-full bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white shadow-lg">
+            <span>⚡</span>
+            <span>+{xpToast} XP — first solve!</span>
+          </div>
+        </div>
+      )}
+
       {/* Drag-cursor overlay */}
       {isDragging && (
         <div className="fixed inset-0 z-[52]" style={{ cursor: isDragging === "h" ? "col-resize" : "row-resize" }} />

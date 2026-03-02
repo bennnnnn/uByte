@@ -14,14 +14,14 @@ const LANG_META: Record<Lang, { label: string; ext: string }> = {
   cpp:        { label: "C++",    ext: "cpp"  },
 };
 
-// Token colors
-const K = "#c084fc"; // keyword
-const S = "#86efac"; // string
-const F = "#60a5fa"; // function
-const C = "#6b7280"; // comment
-const P = "#67e8f9"; // package / module
-const D = "#e2e8f0"; // default
-const N = "#fb923c"; // number
+// Token colors — light-theme palette
+const K = "#7c3aed"; // keyword   (violet-700)
+const S = "#059669"; // string    (emerald-600)
+const F = "#2563eb"; // function  (blue-600)
+const C = "#9ca3af"; // comment   (zinc-400)
+const P = "#0891b2"; // package   (cyan-600)
+const D = "#1e293b"; // default   (slate-800)
+const N = "#ea580c"; // number    (orange-600)
 
 type T = { t: string; c?: string };
 
@@ -104,46 +104,45 @@ export default function HeroSection() {
   const lines = CODE[lang];
 
   return (
-    <section className="relative overflow-hidden bg-[#060612]">
-      {/* ── Ambient glow orbs ─────────────────────────────────────────── */}
+    <section className="relative overflow-hidden bg-white">
+      {/* ── Soft glow orbs ────────────────────────────────────────────── */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        <div className="absolute -left-40 top-1/4 h-[700px] w-[700px] -translate-y-1/4 rounded-full bg-indigo-700/20 blur-[160px]" />
-        <div className="absolute -top-40 right-0 h-[600px] w-[600px] translate-x-1/3 rounded-full bg-violet-700/15 blur-[130px]" />
-        <div className="absolute bottom-0 left-1/2 h-[500px] w-[500px] -translate-x-1/2 translate-y-1/2 rounded-full bg-cyan-700/10 blur-[110px]" />
+        <div className="absolute -left-40 top-1/4 h-[700px] w-[700px] -translate-y-1/4 rounded-full bg-indigo-200/40 blur-[160px]" />
+        <div className="absolute -top-40 right-0 h-[600px] w-[600px] translate-x-1/3 rounded-full bg-violet-200/30 blur-[130px]" />
+        <div className="absolute bottom-0 left-1/2 h-[500px] w-[500px] -translate-x-1/2 translate-y-1/2 rounded-full bg-cyan-200/20 blur-[110px]" />
       </div>
 
-      {/* ── Grid overlay ──────────────────────────────────────────────── */}
+      {/* ── Subtle dot grid ───────────────────────────────────────────── */}
       <div
-        className="pointer-events-none absolute inset-0 opacity-[0.03]"
+        className="pointer-events-none absolute inset-0 opacity-[0.4]"
         style={{
-          backgroundImage:
-            "linear-gradient(#818cf8 1px, transparent 1px), linear-gradient(90deg, #818cf8 1px, transparent 1px)",
-          backgroundSize: "60px 60px",
+          backgroundImage: "radial-gradient(circle, #d1d5db 1px, transparent 1px)",
+          backgroundSize: "28px 28px",
         }}
       />
 
       {/* ── Content ───────────────────────────────────────────────────── */}
       <div className="relative mx-auto flex min-h-[calc(100dvh-3.5rem)] max-w-7xl flex-col px-6 lg:px-8">
-        <div className="grid flex-1 items-center gap-10 py-16 lg:grid-cols-[1fr_1.1fr] lg:gap-14 lg:py-0">
+        <div className="grid flex-1 items-center gap-10 py-16 lg:grid-cols-[1fr_1.1fr] lg:gap-14 lg:py-14">
 
           {/* ── LEFT: Copy ────────────────────────────────────────────── */}
           <div>
             {/* Badge */}
-            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-indigo-500/25 bg-indigo-500/10 px-4 py-1.5 text-[11px] font-bold uppercase tracking-[0.12em] text-indigo-300">
-              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-indigo-400" />
+            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-indigo-200 bg-indigo-50 px-4 py-1.5 text-[11px] font-bold uppercase tracking-[0.12em] text-indigo-600">
+              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-indigo-500" />
               Free · No signup · 6 Languages
             </div>
 
             {/* Headline */}
-            <h1 className="mb-5 text-[2.75rem] font-black leading-[1.04] tracking-tight text-white sm:text-5xl lg:text-[3.25rem] xl:text-[3.75rem]">
+            <h1 className="mb-5 text-[2.75rem] font-black leading-[1.04] tracking-tight text-zinc-900 sm:text-5xl lg:text-[3.25rem] xl:text-[3.75rem]">
               Learn to code.
-              <span className="mt-1 block bg-gradient-to-r from-indigo-400 via-violet-400 to-cyan-300 bg-clip-text text-transparent">
+              <span className="mt-1 block bg-gradient-to-r from-indigo-600 via-violet-600 to-cyan-500 bg-clip-text text-transparent">
                 In every language.
               </span>
             </h1>
 
             {/* Sub */}
-            <p className="mb-8 max-w-[480px] text-base leading-relaxed text-zinc-400 sm:text-lg">
+            <p className="mb-8 max-w-[480px] text-base leading-relaxed text-zinc-500 sm:text-lg">
               Interactive tutorials in Go, Python, JavaScript, Java, Rust, and C++.
               Write real code in your browser, get instant feedback, and ace technical interviews.
             </p>
@@ -151,8 +150,8 @@ export default function HeroSection() {
             {/* Feature list */}
             <ul className="mb-10 space-y-3">
               {FEATURES.map((f) => (
-                <li key={f} className="flex items-start gap-3 text-sm text-zinc-400">
-                  <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-indigo-500/20 text-[10px] font-bold text-indigo-400">
+                <li key={f} className="flex items-start gap-3 text-sm text-zinc-600">
+                  <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-indigo-100 text-[10px] font-bold text-indigo-600">
                     ✓
                   </span>
                   {f}
@@ -164,7 +163,7 @@ export default function HeroSection() {
             <div className="mb-10 flex flex-wrap gap-3">
               <Link
                 href="/go"
-                className="group inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-7 py-3 text-sm font-bold text-white shadow-lg shadow-indigo-600/30 transition-all hover:bg-indigo-500 hover:shadow-indigo-500/50"
+                className="group inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-7 py-3 text-sm font-bold text-white shadow-lg shadow-indigo-600/25 transition-all hover:bg-indigo-500 hover:shadow-indigo-500/40"
               >
                 Start for free
                 <svg className="h-4 w-4 transition-transform group-hover:translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
@@ -173,23 +172,23 @@ export default function HeroSection() {
               </Link>
               <Link
                 href="/practice"
-                className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-7 py-3 text-sm font-semibold text-zinc-300 backdrop-blur-sm transition-all hover:border-white/20 hover:bg-white/10"
+                className="inline-flex items-center gap-2 rounded-xl border border-zinc-200 bg-zinc-50 px-7 py-3 text-sm font-semibold text-zinc-700 transition-all hover:border-zinc-300 hover:bg-zinc-100"
               >
                 Interview practice
               </Link>
             </div>
 
             {/* Stats */}
-            <div className="flex flex-wrap gap-6 border-t border-white/[0.07] pt-8">
+            <div className="flex flex-wrap gap-6 border-t border-zinc-200 pt-8">
               {[
-                { n: "6",   label: "Languages"  },
-                { n: "19",  label: "Topics each" },
-                { n: "11+", label: "Problems"    },
-                { n: "100%",label: "Free"        },
+                { n: "6",    label: "Languages"  },
+                { n: "19",   label: "Topics each" },
+                { n: "11+",  label: "Problems"    },
+                { n: "100%", label: "Free"        },
               ].map(({ n, label }) => (
                 <div key={label}>
-                  <p className="text-2xl font-black text-white">{n}</p>
-                  <p className="text-xs text-zinc-500">{label}</p>
+                  <p className="text-2xl font-black text-zinc-900">{n}</p>
+                  <p className="text-xs text-zinc-400">{label}</p>
                 </div>
               ))}
             </div>
@@ -198,26 +197,26 @@ export default function HeroSection() {
           {/* ── RIGHT: IDE mockup ─────────────────────────────────────── */}
           <div className="relative">
             {/* Floating success badge */}
-            <div className="absolute -right-3 -top-5 z-10 flex items-center gap-2 rounded-xl border border-emerald-500/30 bg-[#060612]/90 px-3.5 py-2 text-xs font-semibold text-emerald-400 shadow-xl shadow-black/40 backdrop-blur-sm">
-              <span className="flex h-5 w-5 items-center justify-center rounded-full bg-emerald-500/20 text-[11px]">✓</span>
+            <div className="absolute -right-3 -top-5 z-10 flex items-center gap-2 rounded-xl border border-emerald-200 bg-white px-3.5 py-2 text-xs font-semibold text-emerald-600 shadow-lg shadow-zinc-200/60">
+              <span className="flex h-5 w-5 items-center justify-center rounded-full bg-emerald-100 text-[11px]">✓</span>
               Step passed! +10 XP
             </div>
 
             {/* Floating streak badge */}
-            <div className="absolute -bottom-4 -left-3 z-10 flex items-center gap-2 rounded-xl border border-amber-500/25 bg-[#060612]/90 px-3.5 py-2 text-xs font-semibold text-amber-400 shadow-xl shadow-black/40 backdrop-blur-sm">
+            <div className="absolute -bottom-4 -left-3 z-10 flex items-center gap-2 rounded-xl border border-amber-200 bg-white px-3.5 py-2 text-xs font-semibold text-amber-600 shadow-lg shadow-zinc-200/60">
               <span className="text-base">🔥</span>
               3-day streak
             </div>
 
             {/* IDE card */}
-            <div className="overflow-hidden rounded-2xl border border-white/[0.08] bg-[#0c0c18] shadow-[0_32px_80px_rgba(0,0,0,0.6)]">
+            <div className="overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-[0_20px_60px_rgba(0,0,0,0.10)]">
 
               {/* Window chrome + language tabs */}
-              <div className="flex items-center gap-3 border-b border-white/[0.06] bg-[#0a0a15] px-4 py-3">
+              <div className="flex items-center gap-3 border-b border-zinc-100 bg-zinc-50 px-4 py-3">
                 <div className="flex gap-1.5">
-                  <span className="h-3 w-3 rounded-full bg-red-500/70" />
-                  <span className="h-3 w-3 rounded-full bg-yellow-500/70" />
-                  <span className="h-3 w-3 rounded-full bg-emerald-500/70" />
+                  <span className="h-3 w-3 rounded-full bg-red-400/80" />
+                  <span className="h-3 w-3 rounded-full bg-yellow-400/80" />
+                  <span className="h-3 w-3 rounded-full bg-emerald-400/80" />
                 </div>
                 <div className="flex flex-1 gap-0.5 overflow-x-auto">
                   {LANG_ORDER.map((l) => (
@@ -228,36 +227,36 @@ export default function HeroSection() {
                       className={`shrink-0 rounded-md px-3 py-1 text-[11px] font-semibold transition-all ${
                         l === lang
                           ? "bg-indigo-600 text-white"
-                          : "text-zinc-500 hover:text-zinc-300"
+                          : "text-zinc-400 hover:text-zinc-700"
                       }`}
                     >
                       {LANG_META[l].label}
                     </button>
                   ))}
                 </div>
-                <span className="shrink-0 rounded bg-white/[0.05] px-2 py-0.5 font-mono text-[10px] text-zinc-600">
+                <span className="shrink-0 rounded bg-zinc-100 px-2 py-0.5 font-mono text-[10px] text-zinc-400">
                   hello.{meta.ext}
                 </span>
               </div>
 
               {/* Step instruction banner */}
-              <div className="border-b border-white/[0.06] bg-indigo-950/25 px-4 py-3">
+              <div className="border-b border-zinc-100 bg-indigo-50/60 px-4 py-3">
                 <div className="mb-1.5 flex items-center gap-2">
-                  <span className="rounded-full bg-indigo-500/20 px-2.5 py-0.5 text-[9px] font-bold uppercase tracking-widest text-indigo-400">
+                  <span className="rounded-full bg-indigo-100 px-2.5 py-0.5 text-[9px] font-bold uppercase tracking-widest text-indigo-600">
                     Step 1 / 5
                   </span>
-                  <span className="text-[10px] text-zinc-600">Getting Started</span>
+                  <span className="text-[10px] text-zinc-400">Getting Started</span>
                 </div>
-                <p className="text-[11px] leading-relaxed text-zinc-400" suppressHydrationWarning>
+                <p className="text-[11px] leading-relaxed text-zinc-500" suppressHydrationWarning>
                   {STEP_TEXT[lang]}
                 </p>
               </div>
 
               {/* Code block */}
-              <div className="p-4 font-mono text-[12.5px] leading-[1.7]" suppressHydrationWarning>
+              <div className="bg-zinc-50/80 p-4 font-mono text-[12.5px] leading-[1.7]" suppressHydrationWarning>
                 {lines.map((line, i) => (
                   <div key={i} className="flex">
-                    <span className="mr-4 w-4 shrink-0 select-none text-right text-[10px] leading-[1.7] text-zinc-700">
+                    <span className="mr-4 w-4 shrink-0 select-none text-right text-[10px] leading-[1.7] text-zinc-300">
                       {i + 1}
                     </span>
                     <span>
@@ -276,10 +275,10 @@ export default function HeroSection() {
               </div>
 
               {/* Action bar */}
-              <div className="flex items-center gap-2 border-t border-white/[0.06] bg-[#0a0a15] px-4 py-2.5">
+              <div className="flex items-center gap-2 border-t border-zinc-100 bg-zinc-50 px-4 py-2.5">
                 <button
                   type="button"
-                  className="flex items-center gap-1.5 rounded-lg bg-indigo-600 px-3.5 py-1.5 text-[11px] font-bold text-white shadow shadow-indigo-600/30 transition-colors hover:bg-indigo-500"
+                  className="flex items-center gap-1.5 rounded-lg bg-indigo-600 px-3.5 py-1.5 text-[11px] font-bold text-white shadow shadow-indigo-600/20 transition-colors hover:bg-indigo-500"
                 >
                   <svg className="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
                     <path d="M6.3 2.84A1.5 1.5 0 004 4.11v11.78a1.5 1.5 0 002.3 1.27l9.344-5.891a1.5 1.5 0 000-2.538L6.3 2.84z" />
@@ -288,22 +287,22 @@ export default function HeroSection() {
                 </button>
                 <button
                   type="button"
-                  className="flex items-center gap-1.5 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-3.5 py-1.5 text-[11px] font-bold text-emerald-400 transition-colors hover:bg-emerald-500/20"
+                  className="flex items-center gap-1.5 rounded-lg border border-emerald-200 bg-emerald-50 px-3.5 py-1.5 text-[11px] font-bold text-emerald-600 transition-colors hover:bg-emerald-100"
                 >
                   ✓ Check
                 </button>
-                <span className="ml-auto text-[10px] text-zinc-700">◉ Format</span>
+                <span className="ml-auto text-[10px] text-zinc-300">◉ Format</span>
               </div>
 
               {/* Output */}
-              <div className="border-t border-white/[0.06] bg-black/40 px-4 py-3">
-                <p className="mb-1.5 text-[9px] font-bold uppercase tracking-[0.15em] text-zinc-700">
+              <div className="border-t border-zinc-100 bg-zinc-50 px-4 py-3">
+                <p className="mb-1.5 text-[9px] font-bold uppercase tracking-[0.15em] text-zinc-300">
                   Output
                 </p>
                 <div className="flex items-center justify-between">
-                  <span className="font-mono text-xs text-emerald-400">Hello, World!</span>
-                  <span className="flex items-center gap-1.5 text-[11px] font-bold text-emerald-400">
-                    <span className="flex h-4 w-4 items-center justify-center rounded-full bg-emerald-500/20 text-[9px]">✓</span>
+                  <span className="font-mono text-xs text-emerald-600">Hello, World!</span>
+                  <span className="flex items-center gap-1.5 text-[11px] font-bold text-emerald-600">
+                    <span className="flex h-4 w-4 items-center justify-center rounded-full bg-emerald-100 text-[9px]">✓</span>
                     Correct!
                   </span>
                 </div>
@@ -313,7 +312,7 @@ export default function HeroSection() {
         </div>
 
         {/* Scroll hint */}
-        <div className="flex items-center justify-center gap-2 pb-6 text-zinc-700">
+        <div className="flex items-center justify-center gap-2 pb-6 text-zinc-300">
           <svg className="h-4 w-4 animate-bounce" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
           </svg>
