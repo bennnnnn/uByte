@@ -287,7 +287,7 @@ export function PracticeIDE({ problem, initialLang }: Props) {
 
         {/* Right: theme toggle + user menu */}
         <div className="flex flex-1 justify-end gap-3 md:flex-initial">
-          <ThemeToggle className="flex h-8 w-8 items-center justify-center rounded text-zinc-500 transition-colors hover:bg-zinc-200 hover:text-zinc-800 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-200" />
+          <ThemeToggle className="hidden h-8 w-8 items-center justify-center rounded text-zinc-500 transition-colors hover:bg-zinc-200 hover:text-zinc-800 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-200 md:flex" />
           <AuthButtons />
         </div>
       </header>

@@ -1,13 +1,18 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useAuth } from "./AuthProvider";
 import AuthModal from "./auth/AuthModal";
 import UserMenuDropdown from "./auth/UserMenuDropdown";
+import ThemeToggle from "./ThemeToggle";
+import { useIsMobile } from "@/hooks/useIsMobile";
 
 export default function AuthButtons() {
   const { user, loading } = useAuth();
+  const isMobile = useIsMobile();
   const [showModal, setShowModal] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
   const [unreadCount, setUnreadCount] = useState(0);
 
   useEffect(() => {
@@ -18,12 +23,56 @@ export default function AuthButtons() {
       .catch(() => {});
   }, [user]);
 
+  useEffect(() => {
+    if (!menuOpen) return;
+    const handleClick = (e: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) setMenuOpen(false);
+    };
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, [menuOpen]);
+
   if (loading) {
     return <div className="h-9 w-20 animate-pulse rounded-lg bg-zinc-200 dark:bg-zinc-800" />;
   }
 
   if (user) {
-    return <UserMenuDropdown unreadCount={unreadCount} />;
+    return <UserMenuDropdown unreadCount={unreadCount} isMobile={isMobile} />;
+  }
+
+  // Mobile: single "Account" dropdown with Theme + Log in + Sign up
+  if (isMobile) {
+    return (
+      <div className="relative" ref={menuRef}>
+        <button
+          type="button"
+          onClick={() => setMenuOpen(!menuOpen)}
+          className="flex h-9 w-9 items-center justify-center rounded-lg text-zinc-600 transition-colors hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-200"
+          aria-label="Account"
+        >
+          <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+          </svg>
+        </button>
+        {menuOpen && (
+          <div className="absolute right-0 top-full z-[100] mt-2 w-56 overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-lg dark:border-zinc-800 dark:bg-zinc-900">
+            <div className="flex items-center justify-between border-b border-zinc-100 px-4 py-3 dark:border-zinc-800">
+              <span className="text-sm text-zinc-600 dark:text-zinc-400">Appearance</span>
+              <ThemeToggle className="flex h-8 w-8 items-center justify-center rounded text-zinc-500 transition-colors hover:bg-zinc-100 hover:text-zinc-800 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-200" />
+            </div>
+            <div className="p-2">
+              <button onClick={() => { setMenuOpen(false); setShowModal(true); }} className="flex w-full items-center rounded-lg px-3 py-2.5 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50 dark:text-zinc-300 dark:hover:bg-zinc-800">
+                Log in
+              </button>
+              <button onClick={() => { setMenuOpen(false); setShowModal(true); }} className="flex w-full items-center rounded-lg bg-indigo-600 px-3 py-2.5 text-sm font-medium text-white transition-colors hover:bg-indigo-700">
+                Sign up
+              </button>
+            </div>
+          </div>
+        )}
+        {showModal && <AuthModal onClose={() => setShowModal(false)} />}
+      </div>
+    );
   }
 
   return (

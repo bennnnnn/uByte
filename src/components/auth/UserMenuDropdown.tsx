@@ -4,14 +4,16 @@ import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { useAuth } from "@/components/AuthProvider";
 import Avatar from "@/components/Avatar";
+import ThemeToggle from "@/components/ThemeToggle";
 
 const TOTAL_TUTORIALS = 20;
 
 interface Props {
   unreadCount: number;
+  isMobile?: boolean;
 }
 
-export default function UserMenuDropdown({ unreadCount }: Props) {
+export default function UserMenuDropdown({ unreadCount, isMobile }: Props) {
   const { user, profile, logout, progress } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -39,6 +41,12 @@ export default function UserMenuDropdown({ unreadCount }: Props) {
 
       {menuOpen && (
         <div className="absolute right-0 top-full z-[100] mt-2 w-64 overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-lg dark:border-zinc-800 dark:bg-zinc-900">
+          {isMobile && (
+            <div className="flex items-center justify-between border-b border-zinc-100 px-4 py-3 dark:border-zinc-800">
+              <span className="text-sm text-zinc-600 dark:text-zinc-400">Appearance</span>
+              <ThemeToggle className="flex h-8 w-8 items-center justify-center rounded text-zinc-500 transition-colors hover:bg-zinc-100 hover:text-zinc-800 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-200" />
+            </div>
+          )}
           <div className="border-b border-zinc-100 px-4 py-3 dark:border-zinc-800">
             <div className="flex items-center justify-between">
               <div>
