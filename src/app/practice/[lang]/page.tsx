@@ -5,8 +5,14 @@ import { getAllPracticeProblems } from "@/lib/practice/problems";
 import { isSupportedLanguage, LANGUAGES } from "@/lib/languages/registry";
 import type { SupportedLanguage } from "@/lib/languages/types";
 import type { Difficulty } from "@/lib/practice/types";
+import { getCurrentUser } from "@/lib/auth";
+import { getUserPlan } from "@/lib/db";
+import { hasPaidAccess } from "@/lib/plans";
+import UpgradeWall from "@/components/UpgradeWall";
 
 type Props = { params: Promise<{ lang: string }> };
+
+export const dynamic = "force-dynamic";
 
 const DIFFICULTY_STYLES: Record<Difficulty, string> = {
   easy:   "bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-400",
@@ -36,6 +42,19 @@ export async function generateStaticParams() {
 export default async function PracticeLangPage({ params }: Props) {
   const { lang } = await params;
   if (!isSupportedLanguage(lang)) notFound();
+
+  const user = await getCurrentUser();
+  const plan = user ? await getUserPlan(user.userId) : "free";
+  if (!hasPaidAccess(plan)) {
+    return (
+      <UpgradeWall
+        tutorialTitle="Interview Practice"
+        subtitle="Upgrade to unlock all practice problems, all tutorials, and AI feedback."
+        backHref="/"
+        backLabel="← Back to home"
+      />
+    );
+  }
 
   const l = lang as SupportedLanguage;
   const config = LANGUAGES[l];

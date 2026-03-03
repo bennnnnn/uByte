@@ -4,8 +4,14 @@ import { getPracticeProblemBySlug, getAllPracticeProblems } from "@/lib/practice
 import { isSupportedLanguage, LANGUAGES } from "@/lib/languages/registry";
 import type { SupportedLanguage } from "@/lib/languages/types";
 import { PracticeIDE } from "./PracticeIDE";
+import { getCurrentUser } from "@/lib/auth";
+import { getUserPlan } from "@/lib/db";
+import { hasPaidAccess } from "@/lib/plans";
+import UpgradeWall from "@/components/UpgradeWall";
 
 type Props = { params: Promise<{ lang: string; slug: string }> };
+
+export const dynamic = "force-dynamic";
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { lang, slug } = await params;
@@ -31,6 +37,19 @@ export default async function PracticeProblemPage({ params }: Props) {
   if (!isSupportedLanguage(lang)) notFound();
   const problem = getPracticeProblemBySlug(slug);
   if (!problem) notFound();
+
+  const user = await getCurrentUser();
+  const plan = user ? await getUserPlan(user.userId) : "free";
+  if (!hasPaidAccess(plan)) {
+    return (
+      <UpgradeWall
+        tutorialTitle="Interview Practice"
+        subtitle="Upgrade to unlock all practice problems, all tutorials, and AI feedback."
+        backHref="/"
+        backLabel="← Back to home"
+      />
+    );
+  }
 
   return (
     <PracticeIDE

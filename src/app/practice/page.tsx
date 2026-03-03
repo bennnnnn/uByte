@@ -3,6 +3,12 @@ import Link from "next/link";
 import { getAllPracticeProblems } from "@/lib/practice/problems";
 import { LANGUAGES, getAllLanguageSlugs } from "@/lib/languages/registry";
 import type { SupportedLanguage } from "@/lib/languages/types";
+import { getCurrentUser } from "@/lib/auth";
+import { getUserPlan } from "@/lib/db";
+import { hasPaidAccess } from "@/lib/plans";
+import UpgradeWall from "@/components/UpgradeWall";
+
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Interview Practice",
@@ -23,7 +29,20 @@ const LANG_DESC: Record<string, string> = {
   rust:       "Solve with Rust's safety and speed",
 };
 
-export default function PracticePage() {
+export default async function PracticePage() {
+  const user = await getCurrentUser();
+  const plan = user ? await getUserPlan(user.userId) : "free";
+  if (!hasPaidAccess(plan)) {
+    return (
+      <UpgradeWall
+        tutorialTitle="Interview Practice"
+        subtitle="Upgrade to unlock all practice problems, all tutorials, and AI feedback."
+        backHref="/"
+        backLabel="← Back to home"
+      />
+    );
+  }
+
   const problems = getAllPracticeProblems();
   const easy   = problems.filter((p) => p.difficulty === "easy").length;
   const medium = problems.filter((p) => p.difficulty === "medium").length;

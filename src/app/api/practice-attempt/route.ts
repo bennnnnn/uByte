@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
-import { savePracticeAttempt, getPracticeAttempts, addXp } from "@/lib/db";
+import { savePracticeAttempt, getPracticeAttempts, addXp, getUserById } from "@/lib/db";
+import { hasPaidAccess } from "@/lib/plans";
 import { withErrorHandling } from "@/lib/api-utils";
 import { PRACTICE_PROBLEMS } from "@/lib/practice/problems";
 
@@ -19,10 +20,15 @@ export const GET = withErrorHandling("GET /api/practice-attempt", async () => {
   return NextResponse.json({ attempts });
 });
 
-/** POST /api/practice-attempt — body: { slug, status: "solved"|"failed" } */
+/** POST /api/practice-attempt — body: { slug, status: "solved"|"failed" } — requires paid plan */
 export const POST = withErrorHandling("POST /api/practice-attempt", async (request: NextRequest) => {
   const user = await getCurrentUser();
   if (!user) return NextResponse.json({ error: "Unauthorised" }, { status: 401 });
+
+  const profile = await getUserById(user.userId);
+  if (!hasPaidAccess(profile?.plan)) {
+    return NextResponse.json({ error: "Upgrade to Pro to save practice progress" }, { status: 403 });
+  }
 
   const body = await request.json();
   const { slug, status } = body ?? {};
