@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getAdminRevenueStats, getAdminRecentSubscriptionEvents } from "@/lib/db";
+import { getAdminRevenueStats, getAdminRecentSubscriptionEvents, getAdminRevenueByPeriod } from "@/lib/db";
+import type { RevenuePeriod } from "@/lib/db";
 import { requireAdmin } from "@/lib/api-utils";
+
+const PERIODS: RevenuePeriod[] = ["day", "week", "month", "year"];
 
 export async function GET(request: NextRequest) {
   const { admin, response } = await requireAdmin();
@@ -13,5 +16,9 @@ export async function GET(request: NextRequest) {
   }
 
   const stats = await getAdminRevenueStats();
+  const period = searchParams.get("period") as RevenuePeriod | null;
+  if (period && PERIODS.includes(period)) {
+    stats.revenueByPeriod = await getAdminRevenueByPeriod(period);
+  }
   return NextResponse.json(stats);
 }

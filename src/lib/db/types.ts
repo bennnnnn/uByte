@@ -125,5 +125,7 @@ export interface AdminRevenueStats {
   revenueToday: number;
   revenueThisWeek: number;
   revenueThisMonth: number;
+  revenueThisYear?: number;
   revenueByDay: { date: string; revenue: number }[];
+  revenueByPeriod?: { date: string; revenue: number }[];
 }

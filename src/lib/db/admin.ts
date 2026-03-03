@@ -229,6 +229,12 @@ export async function getAdminRevenueStats(): Promise<AdminRevenueStats> {
     ORDER BY DATE_TRUNC('day', created_at)
   `;
 
+  const [revenueYear] = await sql`
+    SELECT COALESCE(SUM(amount_cents) FILTER (WHERE created_at >= DATE_TRUNC('year', CURRENT_DATE)), 0)::int AS this_year
+    FROM subscription_events
+    WHERE event_type = 'activated'
+  `;
+
   return {
     proSubscribers: (subscribers?.pro_subscribers as number) ?? 0,
     monthlySubscribers: (subscribers?.monthly_subscribers as number) ?? 0,
@@ -237,7 +243,68 @@ export async function getAdminRevenueStats(): Promise<AdminRevenueStats> {
     revenueThisWeek: (revenue?.this_week as number) ?? 0,
     revenueThisMonth: (revenue?.this_month as number) ?? 0,
     revenueByDay: byDay.map((r) => ({ date: r.date as string, revenue: r.revenue as number })),
+    revenueThisYear: (revenueYear?.this_year as number) ?? 0,
   };
+}
+
+export type RevenuePeriod = "day" | "week" | "month" | "year";
+
+export async function getAdminRevenueByPeriod(
+  period: RevenuePeriod
+): Promise<{ date: string; revenue: number; label?: string }[]> {
+  await ensureSubscriptionEventsTable();
+  const sql = getSql();
+  if (period === "day") {
+    const rows = await sql`
+      SELECT
+        TO_CHAR(DATE_TRUNC('day', created_at), 'YYYY-MM-DD') AS date,
+        COALESCE(SUM(amount_cents), 0)::int AS revenue
+      FROM subscription_events
+      WHERE event_type = 'activated'
+        AND created_at >= CURRENT_DATE - INTERVAL '31 days'
+      GROUP BY DATE_TRUNC('day', created_at)
+      ORDER BY DATE_TRUNC('day', created_at)
+    `;
+    return rows.map((r) => ({ date: r.date as string, revenue: r.revenue as number }));
+  }
+  if (period === "week") {
+    const rows = await sql`
+      SELECT
+        TO_CHAR(DATE_TRUNC('week', created_at), 'YYYY-MM-DD') AS date,
+        COALESCE(SUM(amount_cents), 0)::int AS revenue
+      FROM subscription_events
+      WHERE event_type = 'activated'
+        AND created_at >= CURRENT_DATE - INTERVAL '16 weeks'
+      GROUP BY DATE_TRUNC('week', created_at)
+      ORDER BY DATE_TRUNC('week', created_at)
+    `;
+    return rows.map((r) => ({ date: r.date as string, revenue: r.revenue as number }));
+  }
+  if (period === "month") {
+    const rows = await sql`
+      SELECT
+        TO_CHAR(DATE_TRUNC('month', created_at), 'YYYY-MM') AS date,
+        COALESCE(SUM(amount_cents), 0)::int AS revenue
+      FROM subscription_events
+      WHERE event_type = 'activated'
+        AND created_at >= CURRENT_DATE - INTERVAL '24 months'
+      GROUP BY DATE_TRUNC('month', created_at)
+      ORDER BY DATE_TRUNC('month', created_at)
+    `;
+    return rows.map((r) => ({ date: r.date as string, revenue: r.revenue as number }));
+  }
+  // year
+  const rows = await sql`
+    SELECT
+      TO_CHAR(DATE_TRUNC('year', created_at), 'YYYY') AS date,
+      COALESCE(SUM(amount_cents), 0)::int AS revenue
+    FROM subscription_events
+    WHERE event_type = 'activated'
+      AND created_at >= CURRENT_DATE - INTERVAL '6 years'
+    GROUP BY DATE_TRUNC('year', created_at)
+    ORDER BY DATE_TRUNC('year', created_at)
+  `;
+  return rows.map((r) => ({ date: r.date as string, revenue: r.revenue as number }));
 }
 
 export interface AdminSubscriptionEventRow {
