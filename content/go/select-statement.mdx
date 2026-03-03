@@ -6,6 +6,14 @@ difficulty: "advanced"
 estimatedMinutes: 20
 ---
 
+## Concepts in this chapter
+
+You will learn and practice: select (receive from ready channel); non-blocking select (default); timeout pattern (time.After).
+
+Each section below has a short explanation; then you'll code the same ideas in the exercises (one concept per exercise).
+
+---
+
 ## Selecting Between Channels
 
 The `select` statement is like a `switch` for channels. It blocks until one of its cases can proceed, then executes that case. If multiple are ready, it picks one at random.

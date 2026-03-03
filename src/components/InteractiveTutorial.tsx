@@ -392,6 +392,7 @@ export default function InteractiveTutorial({
             showInlineChat={stepProgress.showInlineChat}
             onToggleChat={() => stepProgress.setShowInlineChat(!stepProgress.showInlineChat)}
             chatSlug={`${tutorialSlug}-step-${stepProgress.stepIndex}`}
+            lang={lang}
             currentCode={editor.code}
             height={outputHeight}
           />

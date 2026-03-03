@@ -1,0 +1,50 @@
+[
+  {
+    "title": "Println Basics",
+    "instruction": "Print Hello on one line and World on the next using two Println calls.",
+    "hint": "Two fmt.Println calls",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\t// TODO: print Hello then World\n}",
+    "expectedOutput": [
+      "Hello",
+      "World"
+    ]
+  },
+  {
+    "title": "Printf with %s and %d",
+    "instruction": "Use Printf to print Name: Alice, Age: 30 using variables.",
+    "hint": "fmt.Printf(\"Name: %s, Age: %d\n\", name, age)",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tname := \"Alice\"\n\tage := 30\n\t// TODO: Printf Name and Age\n\t_ = name\n\t_ = age\n}",
+    "expectedOutput": [
+      "Alice",
+      "30"
+    ]
+  },
+  {
+    "title": "Float Formatting",
+    "instruction": "Print pi (3.14159) with exactly 2 decimal places (3.14).",
+    "hint": "fmt.Printf(\"%.2f\n\", pi)",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tpi := 3.14159\n\t// TODO: print pi with %.2f\n\t_ = pi\n}",
+    "expectedOutput": [
+      "3.14"
+    ]
+  },
+  {
+    "title": "Build a URL with Sprintf",
+    "instruction": "Use Sprintf to build http://localhost:8080/api from host and port, then print it.",
+    "hint": "url := fmt.Sprintf(\"http://%s:%d/api\", host, port)",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\thost := \"localhost\"\n\tport := 8080\n\turl := \"\"\n\t// TODO: Sprintf URL\n\t_ = host\n\t_ = port\n\tfmt.Println(url)\n}",
+    "expectedOutput": [
+      "localhost:8080"
+    ]
+  },
+  {
+    "title": "Any Type with %v and %T",
+    "instruction": "Print 42 and hello each with value and type (%v and %T).",
+    "hint": "fmt.Printf(\"%v is of type %T\n\", n, n)",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tn := 42\n\ts := \"hello\"\n\t// TODO: print value and type for each\n\t_ = n\n\t_ = s\n}",
+    "expectedOutput": [
+      "int",
+      "string"
+    ]
+  }
+]

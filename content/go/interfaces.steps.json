@@ -1,0 +1,49 @@
+[
+  {
+    "title": "Define an Interface",
+    "instruction": "Define a Speaker interface with Speak() string. Implement it on a Dog struct and print the result of calling Speak().",
+    "hint": "type Speaker interface { Speak() string }; type Dog struct{}; func (d Dog) Speak() string { return \"Woof\" }",
+    "starter": "package main\n\nimport \"fmt\"\n\n// TODO: define Speaker interface with Speak() string\n// TODO: define Dog struct and implement Speak() returning \"Woof\"\n\nfunc main() {\n\tvar s Speaker = Dog{}\n\tfmt.Println(s.Speak())\n}",
+    "expectedOutput": [
+      "Woof"
+    ]
+  },
+  {
+    "title": "Implicit Implementation",
+    "instruction": "Create a slice of Speakers containing a Dog and a Cat, loop over it, and print what each one says.",
+    "hint": "animals := []Speaker{Dog{}, Cat{}}; for _, a := range animals { fmt.Println(a.Speak()) }",
+    "starter": "package main\n\nimport \"fmt\"\n\ntype Speaker interface { Speak() string }\ntype Dog struct{}\ntype Cat struct{}\n\nfunc (d Dog) Speak() string { return \"Woof\" }\nfunc (c Cat) Speak() string { return \"Meow\" }\n\nfunc main() {\n\t// TODO: create []Speaker with Dog{} and Cat{}, range and print Speak()\n}",
+    "expectedOutput": [
+      "Woof",
+      "Meow"
+    ]
+  },
+  {
+    "title": "Interface as Parameter",
+    "instruction": "Define makeNoise(s Speaker) that calls fmt.Println(s.Speak()). Create a Lion with Speak() returning \"Roar\" and pass it to makeNoise.",
+    "hint": "func makeNoise(s Speaker) { fmt.Println(s.Speak()) }; type Lion struct{}; func (l Lion) Speak() string { return \"Roar\" }",
+    "starter": "package main\n\nimport \"fmt\"\n\ntype Speaker interface { Speak() string }\n\n// TODO: define makeNoise(s Speaker)\n// TODO: define Lion struct and Speak() returning \"Roar\"\n\nfunc main() {\n\tmakeNoise(Lion{})\n}",
+    "expectedOutput": [
+      "Roar"
+    ]
+  },
+  {
+    "title": "Type Assertion",
+    "instruction": "Given a Speaker holding a Dog with Breed field, assert it to Dog and print the Breed.",
+    "hint": "d, ok := s.(Dog); if ok { fmt.Println(d.Breed) }",
+    "starter": "package main\n\nimport \"fmt\"\n\ntype Speaker interface { Speak() string }\ntype Dog struct { Breed string }\n\nfunc (d Dog) Speak() string { return \"Woof\" }\n\nfunc main() {\n\tvar s Speaker = Dog{Breed: \"Labrador\"}\n\t// TODO: assert s to Dog and print Breed\n}",
+    "expectedOutput": [
+      "Labrador"
+    ]
+  },
+  {
+    "title": "Empty Interface (any)",
+    "instruction": "Define printAny(v any) that prints the value. Call it with 42 and \"hello\".",
+    "hint": "func printAny(v any) { fmt.Println(v) }",
+    "starter": "package main\n\nimport \"fmt\"\n\n// TODO: define printAny(v any)\n\nfunc main() {\n\tprintAny(42)\n\tprintAny(\"hello\")\n}",
+    "expectedOutput": [
+      "42",
+      "hello"
+    ]
+  }
+]

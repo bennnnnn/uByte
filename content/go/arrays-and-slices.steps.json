@@ -1,0 +1,37 @@
+[
+  {
+    "title": "Declare a Slice",
+    "instruction": "Declare a slice of strings containing go, python, and rust using a slice literal, then print the whole slice.",
+    "hint": "langs := []string{\"go\", \"python\", \"rust\"} then fmt.Println(langs)",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\t// TODO: declare a slice of strings with go, python, rust\n\t// TODO: print the slice\n}",
+    "expectedOutput": ["go", "python", "rust"]
+  },
+  {
+    "title": "Append to a Slice",
+    "instruction": "Start with a slice of 3 languages, append java using append, then print the new length with len().",
+    "hint": "langs = append(langs, \"java\") then fmt.Println(len(langs))",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tlangs := []string{\"go\", \"python\", \"rust\"}\n\t// TODO: append java to langs\n\t// TODO: print the length of the new slice\n}",
+    "expectedOutput": ["4"]
+  },
+  {
+    "title": "Slice a Slice",
+    "instruction": "From the slice [1, 2, 3, 4, 5], extract the middle three elements (2, 3, 4) using s[low:high] and print them.",
+    "hint": "fmt.Println(nums[1:4]) gives [2 3 4]",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tnums := []int{1, 2, 3, 4, 5}\n\t// TODO: slice nums to get [2, 3, 4] and print it\n\t_ = nums\n}",
+    "expectedOutput": ["2", "3", "4"]
+  },
+  {
+    "title": "Range to Sum a Slice",
+    "instruction": "Use for range to sum all values in [1, 2, 3, 4, 5] and print the result (15).",
+    "hint": "for _, v := range nums { sum += v }",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tnums := []int{1, 2, 3, 4, 5}\n\tsum := 0\n\t// TODO: range over nums and add each value to sum\n\tfmt.Println(sum)\n}",
+    "expectedOutput": ["15"]
+  },
+  {
+    "title": "2D Slice",
+    "instruction": "Create a 2x2 grid (slice of slices). Set the element at row 1, column 1 to 99, then print that element.",
+    "hint": "grid[1][1] = 99 then fmt.Println(grid[1][1])",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tgrid := [][]int{\n\t\t{1, 2},\n\t\t{3, 4},\n\t}\n\t// TODO: set grid[1][1] to 99 and print it\n\t_ = grid\n}",
+    "expectedOutput": ["99"]
+  }
+]

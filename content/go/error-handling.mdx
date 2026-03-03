@@ -6,6 +6,20 @@ difficulty: "intermediate"
 estimatedMinutes: 15
 ---
 
+## Concepts in this chapter
+
+You will learn and practice:
+
+- **Return an error** — `(result, error)`; use `fmt.Errorf` when failing
+- **Check an error** — `if err != nil { ... }`; handle or return
+- **Custom error type** — struct with `Error() string` method
+- **Wrap errors** — `fmt.Errorf("msg: %w", err)` for error chains
+- **errors.Is** — check if wrapped error matches a target
+
+Each section below has a short explanation; then you'll code the same ideas in the exercises (one concept per exercise).
+
+---
+
 ## Go's Error Philosophy
 
 Go treats errors as **normal values**, not exceptions. A function that can fail returns an `error` as its last return value. The caller checks it explicitly. No hidden exceptions, no surprise crashes.

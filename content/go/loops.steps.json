@@ -1,0 +1,37 @@
+[
+  {
+    "title": "Basic for Loop",
+    "instruction": "Go has one loop keyword: `for`. The classic form is `for init; condition; post { }`. Write a loop that prints the numbers 1 through 5, each on its own line.",
+    "hint": "for i := 1; i <= 5; i++ { fmt.Println(i) }",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\t// TODO: print numbers 1 to 5 using a for loop\n}",
+    "expectedOutput": ["1", "2", "3", "4", "5"]
+  },
+  {
+    "title": "While-Style Loop",
+    "instruction": "Omitting init and post makes `for` act like a while loop. Count down from 3 to 1, printing each number, then print \"Liftoff!\" after the loop.",
+    "hint": "for n > 0 { fmt.Println(n); n-- } then fmt.Println(\"Liftoff!\")",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tn := 3\n\t// TODO: loop while n > 0, print n, decrement n\n\t// TODO: after the loop, print \"Liftoff!\"\n\t_ = n\n}",
+    "expectedOutput": ["3", "2", "1", "Liftoff!"]
+  },
+  {
+    "title": "Range over Slice",
+    "instruction": "`for range` iterates over a slice (index and value). Loop over the fruits slice and print each fruit name on its own line.",
+    "hint": "for _, fruit := range fruits { fmt.Println(fruit) }",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tfruits := []string{\"apple\", \"banana\", \"cherry\"}\n\t// TODO: range over fruits and print each fruit\n\t_ = fruits\n}",
+    "expectedOutput": ["apple", "banana", "cherry"]
+  },
+  {
+    "title": "break and continue",
+    "instruction": "`break` exits the loop; `continue` skips to the next iteration. Loop from 1 to 6: skip evens with `continue`, stop if number exceeds 5 with `break`. Print only 1, 3, and 5.",
+    "hint": "if i%2 == 0 { continue }; if i > 5 { break }; fmt.Println(i)",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tfor i := 1; i <= 6; i++ {\n\t\t// TODO: if i even continue; if i > 5 break; else print i\n\t}\n}",
+    "expectedOutput": ["1", "3", "5"]
+  },
+  {
+    "title": "Sum with a Loop",
+    "instruction": "Accumulate a running total. Sum all integers from 1 to 10 and print the result (should be 55).",
+    "hint": "for i := 1; i <= 10; i++ { sum += i }",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tsum := 0\n\t// TODO: loop from 1 to 10 and add each to sum\n\tfmt.Println(sum)\n}",
+    "expectedOutput": ["55"]
+  }
+]

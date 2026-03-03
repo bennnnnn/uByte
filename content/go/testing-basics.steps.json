@@ -1,0 +1,53 @@
+[
+  {
+    "title": "Your First Test",
+    "instruction": "Implement add(a, b int) int to return a+b. Result 5 should print PASS.",
+    "hint": "return a + b",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc add(a, b int) int { return 0 }\n\nfunc main() {\n\tresult := add(2, 3)\n\tif result == 5 { fmt.Println(\"PASS: add(2, 3) = 5\") } else { fmt.Printf(\"FAIL: got %d\n\", result) }\n}",
+    "expectedOutput": [
+      "PASS"
+    ]
+  },
+  {
+    "title": "Table-Driven Tests",
+    "instruction": "Implement multiply(a, b int) int. All four cases should print PASS.",
+    "hint": "return a * b",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc multiply(a, b int) int { return 0 }\n\nfunc main() {\n\tcases := []struct{ a, b, want int }{{2,3,6},{0,5,0},{-1,4,-4},{7,7,49}}\n\tfor _, tc := range cases {\n\t\tgot := multiply(tc.a, tc.b)\n\t\tif got == tc.want { fmt.Printf(\"PASS: multiply(%d, %d) = %d\n\", tc.a, tc.b, got) } else { fmt.Printf(\"FAIL\n\") }\n\t}\n}",
+    "expectedOutput": [
+      "PASS: multiply(2, 3)",
+      "PASS: multiply(7, 7)"
+    ]
+  },
+  {
+    "title": "Test Helper Functions",
+    "instruction": "Implement subtract (a-b) and check(label, got, want) that prints PASS or FAIL.",
+    "hint": "subtract return a - b; check: if got==want print PASS [label] else FAIL",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc subtract(a, b int) int { return 0 }\nfunc check(label string, got, want int) {}\n\nfunc main() {\n\tcheck(\"10-3\", subtract(10, 3), 7)\n\tcheck(\"5-5\", subtract(5, 5), 0)\n\tcheck(\"1-9\", subtract(1, 9), -8)\n}",
+    "expectedOutput": [
+      "PASS [10-3]",
+      "PASS [5-5]",
+      "PASS [1-9]"
+    ]
+  },
+  {
+    "title": "Testing Edge Cases",
+    "instruction": "Implement clamp(val, min, max int): return min if val<min, max if val>max, else val. All 5 PASS.",
+    "hint": "if val < min return min; if val > max return max; return val",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc clamp(val, min, max int) int { return val }\n\nfunc main() {\n\tcases := []struct{ val, min, max, want int; label string }{\n\t\t{5,0,10,5,\"in range\"}, {-3,0,10,0,\"below min\"}, {15,0,10,10,\"above max\"}, {0,0,10,0,\"at min\"}, {10,0,10,10,\"at max\"}\n\t}\n\tpassed := 0\n\tfor _, tc := range cases {\n\t\tgot := clamp(tc.val, tc.min, tc.max)\n\t\tif got == tc.want { fmt.Printf(\"PASS [%s]\n\", tc.label); passed++ } else { fmt.Printf(\"FAIL\n\") }\n\t}\n\tfmt.Printf(\"%d/5 passed\n\", passed)\n}",
+    "expectedOutput": [
+      "PASS [in range]",
+      "PASS [below min]",
+      "5/5 passed"
+    ]
+  },
+  {
+    "title": "Benchmark: Measuring Performance",
+    "instruction": "Implement buildWithPlus (result += \"x\" in loop) and buildWithBuilder (sb.WriteByte(\"x\")). Print which is faster.",
+    "hint": "buildWithPlus: for i:=0;i<n;i++ { result += \"x\" }. buildWithBuilder: for i:=0;i<n;i++ { sb.WriteByte(120) }; return sb.String()",
+    "starter": "package main\n\nimport ( \"fmt\"; \"strings\"; \"time\" )\n\nfunc buildWithPlus(n int) string { return \"\" }\nfunc buildWithBuilder(n int) string { var sb strings.Builder; return sb.String() }\n\nfunc main() {\n\tstart := time.Now()\n\tfor i := 0; i < 1000; i++ { buildWithPlus(500) }\n\tt1 := time.Since(start)\n\tstart = time.Now()\n\tfor i := 0; i < 1000; i++ { buildWithBuilder(500) }\n\tt2 := time.Since(start)\n\tfmt.Printf(\"plus: %v builder: %v\n\", t1, t2)\n\tif t2 < t1 { fmt.Println(\"Winner: strings.Builder is faster!\") } else { fmt.Println(\"Winner: string + is faster!\") }\n}",
+    "expectedOutput": [
+      "strings.Builder",
+      "faster"
+    ]
+  }
+]

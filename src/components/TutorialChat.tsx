@@ -8,6 +8,7 @@ import type { TutorialMessage } from "@/lib/db";
 
 interface Props {
   chatSlug: string;
+  lang?: string;
   onClose: () => void;
   currentCode?: string;
   inline?: boolean;
@@ -62,7 +63,7 @@ function MessageBubble({ msg }: { msg: TutorialMessage }) {
   );
 }
 
-export default function TutorialChat({ chatSlug, onClose, currentCode, inline = false }: Props) {
+export default function TutorialChat({ chatSlug, lang, onClose, currentCode, inline = false }: Props) {
   const { user } = useAuth();
   const [messages, setMessages] = useState<TutorialMessage[]>([]);
   const [input, setInput] = useState("");
@@ -112,7 +113,7 @@ export default function TutorialChat({ chatSlug, onClose, currentCode, inline = 
       const res = await apiFetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ slug: chatSlug, content: text, currentCode }),
+        body: JSON.stringify({ slug: chatSlug, content: text, currentCode, lang: lang ?? "go" }),
       });
       const data = await res.json();
       if (res.ok) {

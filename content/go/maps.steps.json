@@ -1,0 +1,37 @@
+[
+  {
+    "title": "Create a Map",
+    "instruction": "Create a `map[string]int` with alice→30, bob→25, carol→35. Then print alice's age.",
+    "hint": "ages := map[string]int{\"alice\": 30, \"bob\": 25, \"carol\": 35} — fmt.Println(\"alice\", ages[\"alice\"])",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\t// TODO: create a map with alice=30, bob=25, carol=35\n\t// TODO: print alice's age\n}",
+    "expectedOutput": ["alice", "30"]
+  },
+  {
+    "title": "Check if a Key Exists",
+    "instruction": "Map lookups return (value, ok). Look up \"go\" in the langs map; if found print \"found\", otherwise \"not found\".",
+    "hint": "if _, ok := langs[\"go\"]; ok { fmt.Println(\"found\") } else { fmt.Println(\"not found\") }",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tlangs := map[string]int{\"go\": 2009, \"python\": 1991}\n\t// TODO: two-value form and print \"found\" or \"not found\"\n\t_ = langs\n}",
+    "expectedOutput": ["found"]
+  },
+  {
+    "title": "Delete a Key",
+    "instruction": "Use `delete(ages, \"bob\")` to remove \"bob\". Then check if \"bob\" exists and print \"not found\" if it's gone.",
+    "hint": "delete(ages, \"bob\") — then if _, ok := ages[\"bob\"]; !ok { fmt.Println(\"not found\") }",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tages := map[string]int{\"alice\": 30, \"bob\": 25}\n\t// TODO: delete \"bob\", then check and print \"not found\" if missing\n\t_ = ages\n}",
+    "expectedOutput": ["not found"]
+  },
+  {
+    "title": "Iterate over a Map",
+    "instruction": "Use `for range` on the scores map to print each player's name and score on one line (e.g. \"alice: 10\").",
+    "hint": "for name, score := range scores { fmt.Printf(\"%s: %d\\n\", name, score) }",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tscores := map[string]int{\"alice\": 10, \"bob\": 20, \"carol\": 30}\n\t// TODO: range over scores and print each \"name: score\"\n\t_ = scores\n}",
+    "expectedOutput": ["alice", "bob", "carol"]
+  },
+  {
+    "title": "Word Count",
+    "instruction": "Split \"the cat sat on the mat\" by spaces, count each word in a map, then print the count for \"the\" (should be 2).",
+    "hint": "for _, w := range strings.Split(sentence, \" \") { counts[w]++ } — fmt.Println(\"the\", counts[\"the\"])",
+    "starter": "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n)\n\nfunc main() {\n\tsentence := \"the cat sat on the mat\"\n\tcounts := map[string]int{}\n\t// TODO: split and count each word\n\t// TODO: print the count for \"the\"\n\t_ = sentence\n\t_ = counts\n}",
+    "expectedOutput": ["the", "2"]
+  }
+]

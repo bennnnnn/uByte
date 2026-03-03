@@ -6,6 +6,24 @@ difficulty: "beginner"
 estimatedMinutes: 12
 ---
 
+## Concepts in this chapter
+
+You will learn and practice:
+
+- **Variables** — named containers with a fixed type (`var`, short declaration `:=`)
+- **Zero values** — what uninitialized variables hold (0, `""`, `false`)
+- **Strings** — text, `len()`, concatenation, `strings` package
+- **Integers** — `int`, `int8`, `int16`, `int32`, `int64`, `uint8` (byte), arithmetic
+- **Floats** — `float32`, `float64`, `math` package
+- **Booleans** — `true`/`false`, comparisons, logical operators
+- **Type conversion** — explicit conversion (e.g. `float64(i)`), no implicit conversion
+- **Constants** — `const`, `iota` for enumerations
+- **Multiple declarations** — `x, y := 1, 2`, swap, `var` blocks
+
+Each section below has a short explanation; then you'll code the same ideas in the exercises (one concept per exercise) so you learn by doing.
+
+---
+
 ## What Are Variables?
 
 Variables are named containers that store data. In Go, every variable has a **type** that determines what kind of data it can hold. Unlike dynamically typed languages (Python, JavaScript), Go requires every variable to have a fixed type at compile time.
@@ -164,7 +182,7 @@ func main() {
 
 ### Integers
 
-Go has several integer types with different sizes:
+Go has several integer types with different sizes. In the exercises you'll use **int8**, **int16**, and **int** (and see type conversion):
 
 ```gorun
 // integers.go

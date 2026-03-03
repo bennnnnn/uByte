@@ -6,6 +6,19 @@ difficulty: "intermediate"
 estimatedMinutes: 12
 ---
 
+## Concepts in this chapter
+
+You will learn and practice:
+
+- **Value receiver** — method on struct; gets a copy (e.g. Area)
+- **Pointer receiver** — method that modifies the struct (e.g. Increment)
+- **Stringer** — `String() string` for custom fmt.Println output
+- **Method chaining** — return receiver for fluent API (e.g. Builder)
+
+Each section below has a short explanation; then you'll code the same ideas in the exercises (one concept per exercise).
+
+---
+
 ## What is a Method?
 
 A method is a function **attached to a type**. Instead of writing `area(rect)`, you write `rect.Area()`. Methods give your types behavior — they're how Go achieves object-oriented-like design.

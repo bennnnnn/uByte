@@ -1,0 +1,57 @@
+[
+  {
+    "title": "HTTP Handler Functions",
+    "instruction": "Complete helloHandler to write Hello, Go! to the response using fmt.Fprint.",
+    "hint": "fmt.Fprint(w, \"Hello, Go!\")",
+    "starter": "package main\n\nimport ( \"fmt\"; \"net/http\"; \"net/http/httptest\" )\n\nfunc helloHandler(w http.ResponseWriter, r *http.Request) {\n\t// TODO: write Hello, Go! to w\n}\n\nfunc main() {\n\treq, _ := http.NewRequest(\"GET\", \"/\", nil)\n\trec := httptest.NewRecorder()\n\thelloHandler(rec, req)\n\tfmt.Println(\"Status:\", rec.Code)\n\tfmt.Println(\"Body:\", rec.Body.String())\n}",
+    "expectedOutput": [
+      "Status: 200",
+      "Hello, Go!"
+    ]
+  },
+  {
+    "title": "Parsing URLs",
+    "instruction": "Parse the URL in raw using url.Parse. Print scheme, host, path, and q query param.",
+    "hint": "u, err := url.Parse(raw)",
+    "starter": "package main\n\nimport ( \"fmt\"; \"net/url\" )\n\nfunc main() {\n\traw := \"https://api.example.com/v1/search?q=golang&page=2\"\n\tu, err := url.Parse(\"\")\n\tif err != nil { fmt.Println(\"Error:\", err); return }\n\tfmt.Println(\"Scheme:\", u.Scheme)\n\tfmt.Println(\"Host:\", u.Host)\n\tfmt.Println(\"Path:\", u.Path)\n\tfmt.Println(\"q:\", u.Query().Get(\"q\"))\n}",
+    "expectedOutput": [
+      "Scheme: https",
+      "api.example.com",
+      "/v1/search",
+      "q: golang"
+    ]
+  },
+  {
+    "title": "Reading Query Parameters",
+    "instruction": "In greetHandler, if name is empty set to World. Write Hello, {name}! to w.",
+    "hint": "if name == \"\" { name = \"World\" }; fmt.Fprintf(w, \"Hello, %s!\", name)",
+    "starter": "package main\n\nimport ( \"fmt\"; \"net/http\"; \"net/http/httptest\" )\n\nfunc greetHandler(w http.ResponseWriter, r *http.Request) {\n\tname := r.URL.Query().Get(\"name\")\n\t// TODO: default name to World, write Hello name\n}\n\nfunc main() {\n\treq, _ := http.NewRequest(\"GET\", \"/greet?name=Gopher\", nil)\n\trec := httptest.NewRecorder()\n\tgreetHandler(rec, req)\n\tfmt.Println(rec.Body.String())\n\treq2, _ := http.NewRequest(\"GET\", \"/greet\", nil)\n\trec2 := httptest.NewRecorder()\n\tgreetHandler(rec2, req2)\n\tfmt.Println(rec2.Body.String())\n}",
+    "expectedOutput": [
+      "Hello, Gopher!",
+      "Hello, World!"
+    ]
+  },
+  {
+    "title": "HTTP Status Codes",
+    "instruction": "In resourceHandler, return 404 when id==missing else 200. Write not found or found: id.",
+    "hint": "if id == \"missing\" { w.WriteHeader(404); fmt.Fprint(w, \"not found\") } else { w.WriteHeader(200); fmt.Fprint(w, \"found: \"+id) }",
+    "starter": "package main\n\nimport ( \"fmt\"; \"net/http\"; \"net/http/httptest\" )\n\nfunc resourceHandler(w http.ResponseWriter, r *http.Request) {\n\tid := r.URL.Query().Get(\"id\")\n\t// TODO: 404 if id==missing, else 200 and found: id\n\t_ = id\n}\n\nfunc main() {\n\treq, _ := http.NewRequest(\"GET\", \"/?id=missing\", nil)\n\trec := httptest.NewRecorder()\n\tresourceHandler(rec, req)\n\tfmt.Println(rec.Code, rec.Body.String())\n\treq2, _ := http.NewRequest(\"GET\", \"/?id=42\", nil)\n\trec2 := httptest.NewRecorder()\n\tresourceHandler(rec2, req2)\n\tfmt.Println(rec2.Code, rec2.Body.String())\n}",
+    "expectedOutput": [
+      "status=404",
+      "status=200",
+      "not found",
+      "found: 42"
+    ]
+  },
+  {
+    "title": "Building Query Strings",
+    "instruction": "Use url.Values: set q=hello world, page=1, add tag=go and tag=web. Print Encode().",
+    "hint": "v.Set(\"q\", \"hello world\"); v.Set(\"page\", \"1\"); v.Add(\"tag\", \"go\"); v.Add(\"tag\", \"web\")",
+    "starter": "package main\n\nimport ( \"fmt\"; \"net/url\" )\n\nfunc main() {\n\tv := url.Values{}\n\t// TODO: set q, page, add tag twice\n\tfmt.Println(v.Encode())\n}",
+    "expectedOutput": [
+      "hello+world",
+      "page=1",
+      "tag=go"
+    ]
+  }
+]

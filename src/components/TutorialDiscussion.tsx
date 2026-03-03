@@ -9,7 +9,7 @@ interface Props {
   tutorialSlug: string;
 }
 
-export default function TutorialDiscussion({ tutorialSlug }: Props) {
+export default function TutorialDiscussion({ lang, tutorialSlug }: Props) {
   const { user } = useAuth();
   const chatSlug = `${tutorialSlug}-general`;
 
@@ -22,6 +22,7 @@ export default function TutorialDiscussion({ tutorialSlug }: Props) {
       {user ? (
         <TutorialChat
           chatSlug={chatSlug}
+          lang={lang}
           onClose={() => {}}
           inline
         />

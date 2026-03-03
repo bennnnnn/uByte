@@ -1,0 +1,50 @@
+[
+  {
+    "title": "Basic Select",
+    "instruction": "Send \"one\" to ch1. Use select to receive from ch1 or ch2 and print the result.",
+    "hint": "ch1 <- \"one\"; select already has cases",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tch1 := make(chan string, 1)\n\tch2 := make(chan string, 1)\n\tch1 <- \"one\"\n\tselect {\n\tcase msg := <-ch1:\n\t\tfmt.Println(\"received from ch1:\", msg)\n\tcase msg := <-ch2:\n\t\tfmt.Println(\"received from ch2:\", msg)\n\t}\n}",
+    "expectedOutput": [
+      "received from ch1: one"
+    ]
+  },
+  {
+    "title": "Non-Blocking with Default",
+    "instruction": "Use select with case <-ch and default that prints \"no data available\".",
+    "hint": "Add default: fmt.Println(\"no data available\")",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tch := make(chan int, 1)\n\tselect {\n\tcase v := <-ch:\n\t\tfmt.Println(\"got:\", v)\n\tdefault:\n\t\tfmt.Println(\"no data available\")\n\t}\n}",
+    "expectedOutput": [
+      "no data available"
+    ]
+  },
+  {
+    "title": "Timeout Pattern",
+    "instruction": "Use select to receive from result OR time.After(50ms). Slow sends after 200ms so timeout fires first; print \"timeout: operation took too long\".",
+    "hint": "case <-time.After(50 * time.Millisecond): fmt.Println(\"timeout: operation took too long\")",
+    "starter": "package main\n\nimport ( \"fmt\"; \"time\" )\n\nfunc slowOperation() <-chan string {\n\tch := make(chan string, 1)\n\tgo func() { time.Sleep(200 * time.Millisecond); ch <- \"slow result\" }()\n\treturn ch\n}\n\nfunc main() {\n\tresult := slowOperation()\n\tselect {\n\tcase v := <-result:\n\t\tfmt.Println(\"got:\", v)\n\tcase <-time.After(50 * time.Millisecond):\n\t\tfmt.Println(\"timeout: operation took too long\")\n\t}\n}",
+    "expectedOutput": [
+      "timeout"
+    ]
+  },
+  {
+    "title": "Done Channel Pattern",
+    "instruction": "Start counter(done) goroutine. After 100ms close(done) to stop it.",
+    "hint": "time.Sleep(100 * time.Millisecond); close(done)",
+    "starter": "package main\n\nimport ( \"fmt\"; \"time\" )\n\nfunc counter(done <-chan struct{}) {\n\tfor i := 1; ; i++ {\n\t\tselect {\n\t\tcase <-done:\n\t\t\tfmt.Println(\"counter stopped at\", i-1)\n\t\t\treturn\n\t\tdefault:\n\t\t\tfmt.Println(\"count:\", i)\n\t\t\ttime.Sleep(30 * time.Millisecond)\n\t\t}\n\t}\n}\n\nfunc main() {\n\tdone := make(chan struct{})\n\tgo counter(done)\n\ttime.Sleep(100 * time.Millisecond)\n\tclose(done)\n\ttime.Sleep(50 * time.Millisecond)\n\tfmt.Println(\"main done\")\n}",
+    "expectedOutput": [
+      "count:",
+      "counter stopped",
+      "main done"
+    ]
+  },
+  {
+    "title": "Fan-In: Merging Channels",
+    "instruction": "Complete merge: start two goroutines calling forward(ch1) and forward(ch2).",
+    "hint": "go forward(ch1); go forward(ch2)",
+    "starter": "package main\n\nimport ( \"fmt\"; \"sync\" )\n\nfunc merge(ch1, ch2 <-chan int) <-chan int {\n\tout := make(chan int)\n\tvar wg sync.WaitGroup\n\tforward := func(ch <-chan int) {\n\t\tdefer wg.Done()\n\t\tfor v := range ch { out <- v }\n\t}\n\twg.Add(2)\n\tgo forward(ch1)\n\tgo forward(ch2)\n\tgo func() { wg.Wait(); close(out) }()\n\treturn out\n}\n\nfunc source(vals ...int) <-chan int {\n\tch := make(chan int, len(vals))\n\tfor _, v := range vals { ch <- v }\n\tclose(ch)\n\treturn ch\n}\n\nfunc main() {\n\tch1 := source(1,2,3)\n\tch2 := source(4,5,6)\n\tmerged := merge(ch1, ch2)\n\ttotal := 0\n\tfor v := range merged { fmt.Println(\"received:\", v); total += v }\n\tfmt.Println(\"total:\", total)\n}",
+    "expectedOutput": [
+      "received:",
+      "total: 21"
+    ]
+  }
+]

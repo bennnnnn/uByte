@@ -1,0 +1,37 @@
+[
+  {
+    "title": "Define a Struct",
+    "instruction": "Define a `Person` struct with `Name string` and `Age int`. Create a Person with name \"Alice\" and age 30, then print both fields on separate lines.",
+    "hint": "type Person struct { Name string; Age int } — p := Person{Name: \"Alice\", Age: 30}",
+    "starter": "package main\n\nimport \"fmt\"\n\n// TODO: define Person struct with Name and Age\n\nfunc main() {\n\t// TODO: create Person{Name: \"Alice\", Age: 30} and print Name then Age\n}",
+    "expectedOutput": ["Alice", "30"]
+  },
+  {
+    "title": "Struct Method (Value Receiver)",
+    "instruction": "Define a `Greet()` method on `Person` that returns `\"Hi, \" + p.Name + \"!\"`. Create Alice and print the result of calling her `Greet()` method.",
+    "hint": "func (p Person) Greet() string { return \"Hi, \" + p.Name + \"!\" }",
+    "starter": "package main\n\nimport \"fmt\"\n\ntype Person struct {\n\tName string\n\tAge  int\n}\n\n// TODO: define Greet() method on Person that returns \"Hi, <Name>!\"\n\nfunc main() {\n\tp := Person{Name: \"Alice\", Age: 30}\n\tfmt.Println(p.Greet())\n}",
+    "expectedOutput": ["Hi, Alice!"]
+  },
+  {
+    "title": "Nested Structs",
+    "instruction": "Define an `Address` struct with `City string`. Add an `Address` field to `Person`. Create a Person in London and print the city.",
+    "hint": "type Address struct { City string }; type Person struct { Name string; Address Address }",
+    "starter": "package main\n\nimport \"fmt\"\n\n// TODO: define Address with City, Person with Name and Address\n\nfunc main() {\n\tp := Person{\n\t\tName:    \"Alice\",\n\t\tAddress: Address{City: \"London\"},\n\t}\n\tfmt.Println(p.Address.City)\n}",
+    "expectedOutput": ["London"]
+  },
+  {
+    "title": "Anonymous Struct",
+    "instruction": "Create an anonymous struct inline with `Name` and `Score` fields, set them to \"Bob\" and 95, and print both.",
+    "hint": "entry := struct{ Name string; Score int }{Name: \"Bob\", Score: 95}",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\t// TODO: anonymous struct with Name and Score, then print them\n}",
+    "expectedOutput": ["Bob", "95"]
+  },
+  {
+    "title": "Pointer to Struct",
+    "instruction": "Use `new(Person)` to allocate a Person, set the Name field to \"Charlie\", then print the name.",
+    "hint": "p := new(Person); p.Name = \"Charlie\"; fmt.Println(p.Name)",
+    "starter": "package main\n\nimport \"fmt\"\n\ntype Person struct {\n\tName string\n\tAge  int\n}\n\nfunc main() {\n\t// TODO: use new(Person), set Name to \"Charlie\", print Name\n}",
+    "expectedOutput": ["Charlie"]
+  }
+]

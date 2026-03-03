@@ -1,0 +1,37 @@
+[
+  {
+    "title": "Hello, World!",
+    "instruction": "Every Go program needs `package main` (executable) and `func main()` (entry point). Use `fmt.Println()` to print a line of text. Click Run to see your first Go program.",
+    "hint": "The program is already complete — just click Run.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tfmt.Println(\"Hello, World!\")\n}",
+    "expectedOutput": ["Hello, World!"]
+  },
+  {
+    "title": "Print Multiple Lines",
+    "instruction": "You can call `fmt.Println()` multiple times — each call prints one line. Update the program to print two lines: one containing \"Go\" and one containing \"Gopher\".",
+    "hint": "Add a second fmt.Println() below the first.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\t// TODO: print \"Go\" on first line, \"Gopher\" on second line\n}",
+    "expectedOutput": ["Go", "Gopher"]
+  },
+  {
+    "title": "Use Printf",
+    "instruction": "`fmt.Printf()` formats output using verbs: `%s` (string), `%d` (integer), `\\n` (newline). Use Printf to print \"Learning Go version 1\" where the language and version come from variables.",
+    "hint": "fmt.Printf(\"%s version %d\\n\", language, version)",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tlanguage := \"Go\"\n\tversion := 1\n\t// TODO: use fmt.Printf to print \"Learning Go version 1\"\n\t_ = language\n\t_ = version\n}",
+    "expectedOutput": ["Learning Go"]
+  },
+  {
+    "title": "Use Sprintf",
+    "instruction": "`fmt.Sprintf()` works like Printf but returns a formatted string instead of printing it. Build the greeting \"Hello, Gopher!\" using Sprintf with the variable `name`, then print it.",
+    "hint": "greeting := fmt.Sprintf(\"Hello, %s!\", name)",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tname := \"Gopher\"\n\t// TODO: use fmt.Sprintf to build \"Hello, Gopher!\" and store in greeting\n\tgreeting := \"\"\n\t_ = name\n\tfmt.Println(greeting)\n}",
+    "expectedOutput": ["Hello, Gopher!"]
+  },
+  {
+    "title": "Add Comments",
+    "instruction": "Comments start with `//` and are ignored by the compiler. Add a `//` comment above the Println describing what it does, then ensure the program prints \"Comments done!\".",
+    "hint": "A comment looks like: // This prints a confirmation message.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\t// TODO: add a comment here describing the next line\n\tfmt.Println(\"Comments done!\")\n}",
+    "expectedOutput": ["Comments done!"]
+  }
+]

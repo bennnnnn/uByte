@@ -1,0 +1,38 @@
+[
+  {
+    "title": "Value Receiver — Area",
+    "instruction": "Define Rectangle with Width and Height and an Area() int method. Create 5x10 and print area.",
+    "hint": "func (r Rectangle) Area() int { return r.Width * r.Height }",
+    "starter": "package main\n\nimport \"fmt\"\n\n// TODO: define Rectangle with Width, Height and Area() method\n\nfunc main() {\n\tr := Rectangle{Width: 5, Height: 10}\n\tfmt.Println(r.Area())\n}",
+    "expectedOutput": [
+      "50"
+    ]
+  },
+  {
+    "title": "Pointer Receiver — Increment",
+    "instruction": "Define Counter with Count int and Increment() with pointer receiver. Create counter, call Increment three times, print count.",
+    "hint": "func (c *Counter) Increment() { c.Count++ }",
+    "starter": "package main\n\nimport \"fmt\"\n\n// TODO: define Counter and Increment() with pointer receiver\n\nfunc main() {\n\tc := Counter{}\n\tc.Increment()\n\tc.Increment()\n\tc.Increment()\n\tfmt.Println(c.Count)\n}",
+    "expectedOutput": [
+      "3"
+    ]
+  },
+  {
+    "title": "Stringer Interface",
+    "instruction": "Define Person and String() method returning \"<Name> (<Age>)\". Print a Person.",
+    "hint": "func (p Person) String() string { return fmt.Sprintf(\"%s (%d)\", p.Name, p.Age) }",
+    "starter": "package main\n\nimport \"fmt\"\n\ntype Person struct { Name string; Age int }\n\n// TODO: define String() on Person\n\nfunc main() {\n\tp := Person{Name: \"Alice\", Age: 30}\n\tfmt.Println(p)\n}",
+    "expectedOutput": [
+      "Alice (30)"
+    ]
+  },
+  {
+    "title": "Method Chaining (Builder)",
+    "instruction": "Chain .Add(\"Hello\").Add(\"World\") on Builder and print Build() result.",
+    "hint": "b := &Builder{}; fmt.Println(b.Add(\"Hello\").Add(\"World\").Build())",
+    "starter": "package main\n\nimport \"fmt\"\n\ntype Builder struct { result string }\nfunc (b *Builder) Add(s string) *Builder { if b.result != \"\" { b.result += \" \" }; b.result += s; return b }\nfunc (b *Builder) Build() string { return b.result }\n\nfunc main() {\n\t// TODO: chain Add(\"Hello\").Add(\"World\") and print Build()\n}",
+    "expectedOutput": [
+      "Hello World"
+    ]
+  }
+]

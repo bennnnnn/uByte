@@ -1,0 +1,38 @@
+[
+  {
+    "title": "Import Standard Library Packages",
+    "instruction": "Import strings and fmt. Use strings.ToUpper(\"hello\") and print it, then print len(\"hello\").",
+    "hint": "fmt.Println(strings.ToUpper(\"hello\")); fmt.Println(len(\"hello\"))",
+    "starter": "package main\n\nimport ( \"fmt\"; \"strings\" )\n\nfunc main() {\n\t// TODO: print strings.ToUpper(\"hello\") and len(\"hello\")\n}",
+    "expectedOutput": [
+      "HELLO",
+      "5"
+    ]
+  },
+  {
+    "title": "Multiple Imports — fmt and math",
+    "instruction": "Use fmt and math. Print math.Pi to 2 decimal places and math.Sqrt(16).",
+    "hint": "fmt.Printf(\"%.2f\n\", math.Pi); fmt.Println(math.Sqrt(16))",
+    "starter": "package main\n\nimport ( \"fmt\"; \"math\" )\n\nfunc main() {\n\t// TODO: print math.Pi (2 decimals) and math.Sqrt(16)\n}",
+    "expectedOutput": [
+      "3.14",
+      "4"
+    ]
+  },
+  {
+    "title": "Package-Level Variables",
+    "instruction": "A package-level variable greeting is set to \"initialized\". Print it from main.",
+    "hint": "fmt.Println(greeting)",
+    "starter": "package main\n\nimport \"fmt\"\n\nvar greeting = \"initialized\"\n\nfunc main() {\n\t// TODO: print greeting\n}",
+    "expectedOutput": [
+      "initialized"
+    ]
+  },
+  {
+    "title": "math/rand — Random Numbers",
+    "instruction": "Use rand.Intn(100)+1 to get a number 1-100 and print it.",
+    "hint": "n := rand.Intn(100) + 1; fmt.Println(n)",
+    "starter": "package main\n\nimport ( \"fmt\"; \"math/rand\" )\n\nfunc main() {\n\t// TODO: random 1-100 and print\n}",
+    "expectedOutput": []
+  }
+]

@@ -1,0 +1,37 @@
+[
+  {
+    "title": "if Statement",
+    "instruction": "An `if` runs a block only when the condition is true. Check if `x` (set to 15) is greater than 10; if so, print \"greater than 10\".",
+    "hint": "if x > 10 { fmt.Println(\"greater than 10\") }",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tx := 15\n\t// TODO: if x > 10, print \"greater than 10\"\n\t_ = x\n}",
+    "expectedOutput": ["greater than 10"]
+  },
+  {
+    "title": "if-else",
+    "instruction": "Use `if-else` to run different code by condition. If score (72) is 60 or higher print \"Pass\", otherwise print \"Fail\".",
+    "hint": "if score >= 60 { fmt.Println(\"Pass\") } else { fmt.Println(\"Fail\") }",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tscore := 72\n\t// TODO: print \"Pass\" if score >= 60, else \"Fail\"\n\t_ = score\n}",
+    "expectedOutput": ["Pass"]
+  },
+  {
+    "title": "if with Init Statement",
+    "instruction": "Go lets you run a short statement before the condition in an `if`. Look up the key \"go\" in the map `langs`. If it exists print \"found\", else \"not found\".",
+    "hint": "if v, ok := langs[\"go\"]; ok { fmt.Println(\"found:\", v) } else { fmt.Println(\"not found\") }",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tlangs := map[string]int{\"go\": 2009, \"python\": 1991}\n\t// TODO: use if v, ok := langs[\"go\"]; ok { ... }\n\t_ = langs\n}",
+    "expectedOutput": ["found"]
+  },
+  {
+    "title": "switch Statement",
+    "instruction": "Use a `switch` on `day` (\"Monday\") to print \"Weekday\" for Monday–Friday and \"Weekend\" for Saturday–Sunday.",
+    "hint": "switch day { case \"Monday\", \"Tuesday\", ...: fmt.Println(\"Weekday\") case \"Saturday\", \"Sunday\": fmt.Println(\"Weekend\") }",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tday := \"Monday\"\n\t// TODO: switch on day, print \"Weekday\" or \"Weekend\"\n\t_ = day\n}",
+    "expectedOutput": ["Weekday"]
+  },
+  {
+    "title": "FizzBuzz",
+    "instruction": "Loop from 1 to 15. For multiples of 3 print \"Fizz\", of 5 print \"Buzz\", of both print \"FizzBuzz\", else print the number. Check FizzBuzz first.",
+    "hint": "Check i%15==0 first for FizzBuzz, then i%3==0 for Fizz, then i%5==0 for Buzz, else print i.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tfor i := 1; i <= 15; i++ {\n\t\t// TODO: FizzBuzz logic\n\t\tfmt.Println(i)\n\t}\n}",
+    "expectedOutput": ["Fizz", "Buzz", "FizzBuzz"]
+  }
+]

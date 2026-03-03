@@ -1,0 +1,51 @@
+[
+  {
+    "title": "Launch a Goroutine",
+    "instruction": "Start a goroutine that prints \"from goroutine\". Sleep 100ms in main so it runs.",
+    "hint": "go func() { fmt.Println(\"from goroutine\") }()",
+    "starter": "package main\n\nimport ( \"fmt\"; \"time\" )\n\nfunc main() {\n\t// TODO: go goroutine that prints \"from goroutine\"\n\ttime.Sleep(100 * time.Millisecond)\n}",
+    "expectedOutput": [
+      "from goroutine"
+    ]
+  },
+  {
+    "title": "WaitGroup",
+    "instruction": "Launch 3 goroutines (worker 1, 2, 3), use WaitGroup to wait for all.",
+    "hint": "wg.Add(1); go func(n int) { defer wg.Done(); fmt.Printf(\"worker %d\n\", n) }(i)",
+    "starter": "package main\n\nimport ( \"fmt\"; \"sync\" )\n\nfunc main() {\n\tvar wg sync.WaitGroup\n\tfor i := 1; i <= 3; i++ {\n\t\t// TODO: wg.Add(1), go worker that prints and wg.Done()\n\t}\n\twg.Wait()\n}",
+    "expectedOutput": [
+      "worker 1",
+      "worker 2",
+      "worker 3"
+    ]
+  },
+  {
+    "title": "Channel Send and Receive",
+    "instruction": "Create chan int, launch goroutine that sends 42, receive and print in main.",
+    "hint": "go func() { ch <- 42 }(); fmt.Println(<-ch)",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tch := make(chan int)\n\t// TODO: goroutine send 42, receive and print\n}",
+    "expectedOutput": [
+      "42"
+    ]
+  },
+  {
+    "title": "Buffered Channel",
+    "instruction": "Create buffered channel size 3, send a b c, receive and print all three.",
+    "hint": "ch <- \"a\"; ch <- \"b\"; ch <- \"c\"; then receive 3 times",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tch := make(chan string, 3)\n\t// TODO: send a b c, receive and print\n}",
+    "expectedOutput": [
+      "a",
+      "b",
+      "c"
+    ]
+  },
+  {
+    "title": "Select Statement",
+    "instruction": "Send on done from goroutine; use select to print \"done\" when it arrives.",
+    "hint": "select { case <-done: fmt.Println(\"done\") case <-other: ... }",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tdone := make(chan bool)\n\tother := make(chan bool)\n\tgo func() { done <- true }()\n\t// TODO: select on done or other, print \"done\" when done\n}",
+    "expectedOutput": [
+      "done"
+    ]
+  }
+]

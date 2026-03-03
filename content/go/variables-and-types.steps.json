@@ -1,0 +1,58 @@
+[
+  {
+    "title": "Declare with var",
+    "instruction": "The `var` keyword declares a variable with an explicit type. Declare a `string` variable named `name` with the value \"Alice\" and an `int` variable named `age` with the value 30. Print both on separate lines.",
+    "hint": "var name string = \"Alice\" — then fmt.Println(name) to print it.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\t// TODO: declare name (string) = \"Alice\"\n\t// TODO: declare age (int) = 30\n\t// TODO: print name, then print age\n}",
+    "expectedOutput": ["Alice", "30"]
+  },
+  {
+    "title": "Short Declaration",
+    "instruction": "Inside functions, `:=` is the most common way to declare variables. It infers the type automatically. Declare `city` as \"London\" and `population` as 9000000 using `:=`, then print both.",
+    "hint": "city := \"London\" and population := 9000000 — Go infers string and int automatically.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\t// TODO: declare city and population using :=\n\t// TODO: print both\n}",
+    "expectedOutput": ["London", "9000000"]
+  },
+  {
+    "title": "Zero Values",
+    "instruction": "In Go every variable is initialized to its zero value if no value is given. Declare an `int`, a `bool`, and a `string` without assigning values, then print each. You should see 0, false, and an empty string.",
+    "hint": "fmt.Println(n) prints 0, fmt.Println(b) prints false, fmt.Println(s) prints an empty line.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tvar n int\n\tvar b bool\n\tvar s string\n\t// TODO: print n, b, and s\n}",
+    "expectedOutput": ["0", "false"]
+  },
+  {
+    "title": "String Operations",
+    "instruction": "The `strings` package provides useful functions for working with strings. Import it and use `strings.ToUpper()` to convert \"hello\" to uppercase, then print the result.",
+    "hint": "upper := strings.ToUpper(word) — then fmt.Println(upper).",
+    "starter": "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n)\n\nfunc main() {\n\tword := \"hello\"\n\t// TODO: convert word to uppercase using strings.ToUpper\n\t// TODO: print the result\n\t_ = word\n}",
+    "expectedOutput": ["HELLO"]
+  },
+  {
+    "title": "Use int8",
+    "instruction": "`int8` is an 8-bit signed integer (-128 to 127). Declare a variable `tiny` of type `int8` with value 100, then print it.",
+    "hint": "var tiny int8 = 100 — then fmt.Println(tiny).",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\t// TODO: declare tiny as int8 with value 100\n\t// TODO: print tiny\n}",
+    "expectedOutput": ["100"]
+  },
+  {
+    "title": "Use int16",
+    "instruction": "`int16` is a 16-bit signed integer (-32768 to 32767). Declare `small` as `int16` with value 2000, then print it.",
+    "hint": "var small int16 = 2000 — then fmt.Println(small).",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\t// TODO: declare small as int16 with value 2000\n\t// TODO: print small\n}",
+    "expectedOutput": ["2000"]
+  },
+  {
+    "title": "Type Conversion",
+    "instruction": "Go never converts types implicitly — you must do it explicitly. Convert the `int` value 42 to `float64` and print it. Then print its type using `%T`.",
+    "hint": "f := float64(i) converts the int. Then fmt.Printf(\"value: %v, type: %T\\n\", f, f) prints both.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\ti := 42\n\t// TODO: convert i to float64 and store in f\n\t// TODO: print f and its type with fmt.Printf(\"value: %v, type: %T\\n\", f, f)\n\t_ = i\n}",
+    "expectedOutput": ["42", "float64"]
+  },
+  {
+    "title": "Constants",
+    "instruction": "Constants are values fixed at compile time, declared with `const`. Declare a constant `Pi` equal to 3.14159 and use it to calculate the area of a circle with radius 5 (area = Pi × r²). Print the result formatted to 2 decimal places.",
+    "hint": "area := Pi * radius * radius — then fmt.Printf(\"Area: %.2f\\n\", area).",
+    "starter": "package main\n\nimport \"fmt\"\n\nconst Pi = 3.14159\n\nfunc main() {\n\tradius := 5.0\n\t// TODO: calculate area = Pi * radius * radius\n\t// TODO: print area with fmt.Printf(\"Area: %.2f\\n\", area)\n\t_ = radius\n}",
+    "expectedOutput": ["78.54"]
+  }
+]

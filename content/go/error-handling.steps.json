@@ -1,0 +1,48 @@
+[
+  {
+    "title": "Return an Error",
+    "instruction": "Define divide(a, b float64) (float64, error). When b is zero return 0 and fmt.Errorf(\"cannot divide by zero\"). Otherwise return result and nil.",
+    "hint": "if b == 0 { return 0, fmt.Errorf(\"cannot divide by zero\") }; return a / b, nil",
+    "starter": "package main\n\nimport \"fmt\"\n\n// TODO: define divide(a, b float64) (float64, error)\n\nfunc main() {\n\t_, err := divide(10, 0)\n\tfmt.Println(err)\n}",
+    "expectedOutput": [
+      "cannot divide by zero"
+    ]
+  },
+  {
+    "title": "Check an Error",
+    "instruction": "Call divide(10, 0) and divide(10, 2). For zero case print the error; for success print \"success:\" and result.",
+    "hint": "if err != nil { fmt.Println(\"Error:\", err) }; fmt.Println(\"success:\", result)",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc divide(a, b float64) (float64, error) {\n\tif b == 0 { return 0, fmt.Errorf(\"cannot divide by zero\") }\n\treturn a / b, nil\n}\n\nfunc main() {\n\t// TODO: call divide(10, 0), check err, print error\n\t// TODO: call divide(10, 2), print \"success:\" and result\n}",
+    "expectedOutput": [
+      "Error:",
+      "success: 5"
+    ]
+  },
+  {
+    "title": "Custom Error Type",
+    "instruction": "Define ValidationError struct with Field string and Error() string returning \"ValidationError: \" + e.Field. Return one from validate(\"\") and print it.",
+    "hint": "func (e ValidationError) Error() string { return \"ValidationError: \" + e.Field }",
+    "starter": "package main\n\nimport \"fmt\"\n\n// TODO: define ValidationError with Field and Error() method\n\nfunc validate(name string) error {\n\tif name == \"\" { return ValidationError{Field: \"name\"} }\n\treturn nil\n}\n\nfunc main() {\n\terr := validate(\"\")\n\tfmt.Println(err)\n}",
+    "expectedOutput": [
+      "ValidationError"
+    ]
+  },
+  {
+    "title": "Wrap Errors with %w",
+    "instruction": "Create base error, wrap with fmt.Errorf(\"wrapped: %w\", base), then print the wrapped error.",
+    "hint": "wrapped := fmt.Errorf(\"wrapped: %w\", base); fmt.Println(wrapped)",
+    "starter": "package main\n\nimport ( \"errors\"; \"fmt\" )\n\nfunc main() {\n\tbase := errors.New(\"connection refused\")\n\t// TODO: wrap base with fmt.Errorf and print\n\t_ = base\n}",
+    "expectedOutput": [
+      "wrapped:"
+    ]
+  },
+  {
+    "title": "errors.Is",
+    "instruction": "Create ErrNotFound, wrap with fmt.Errorf, use errors.Is to check wrapped contains ErrNotFound and print true.",
+    "hint": "fmt.Println(errors.Is(wrapped, ErrNotFound))",
+    "starter": "package main\n\nimport ( \"errors\"; \"fmt\" )\n\nvar ErrNotFound = errors.New(\"not found\")\n\nfunc main() {\n\twrapped := fmt.Errorf(\"db: %w\", ErrNotFound)\n\t// TODO: use errors.Is and print true/false\n\t_ = wrapped\n}",
+    "expectedOutput": [
+      "true"
+    ]
+  }
+]
