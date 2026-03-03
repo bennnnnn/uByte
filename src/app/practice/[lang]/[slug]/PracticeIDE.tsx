@@ -48,6 +48,7 @@ export function PracticeIDE({ problem, initialLang }: Props) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [mobileTab, setMobileTab]     = useState<"desc" | "code">("desc");
+  const [isMobile, setIsMobile]       = useState(false);
   const [showShortcuts, setShowShortcuts] = useState(false);
   const [statuses, setStatuses] = useState<Record<string, PracticeAttemptStatus>>({});
   const [xpToast, setXpToast] = useState<number | null>(null);
@@ -89,6 +90,14 @@ export function PracticeIDE({ problem, initialLang }: Props) {
       .then((r) => r.json())
       .then((d) => { if (d?.attempts) setStatuses(d.attempts); })
       .catch(() => {});
+  }, []);
+
+  // Detect mobile for layout (description panel width)
+  useEffect(() => {
+    function check() { setIsMobile(window.innerWidth < 768); }
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
   }, []);
 
   // Global ? key → shortcuts modal
@@ -363,22 +372,22 @@ export function PracticeIDE({ problem, initialLang }: Props) {
 
         {/* Description panel (left) — same bg as InstructionsSidebar */}
         <aside
-          className={`flex shrink-0 flex-col overflow-hidden bg-zinc-50 dark:bg-zinc-900 ${
-            mobileTab === "desc" ? "flex" : "hidden"
-          } md:flex`}
-          style={{ width: leftWidth }}
+          className={`flex min-w-0 flex-col overflow-hidden bg-zinc-50 dark:bg-zinc-900 ${
+            mobileTab === "desc" ? "flex shrink" : "hidden"
+          } md:flex md:shrink-0`}
+          style={isMobile ? undefined : { width: leftWidth }}
           suppressHydrationWarning
         >
           {/* Problem body */}
-          <div className="flex-1 overflow-y-auto p-5">
-            <h1 className="mb-2 text-xl font-bold text-zinc-900 dark:text-zinc-100">
+          <div className="min-w-0 flex-1 overflow-x-hidden overflow-y-auto break-words p-4 md:p-5">
+            <h1 className="mb-2 break-words text-xl font-bold text-zinc-900 dark:text-zinc-100">
               {problem.title}
             </h1>
             <span className={`mb-4 inline-block rounded-full px-2.5 py-0.5 text-xs font-medium capitalize ${DIFFICULTY_STYLES[problem.difficulty]}`}>
               {problem.difficulty}
             </span>
 
-            <p className="mb-5 whitespace-pre-wrap text-sm leading-relaxed text-zinc-700 dark:text-zinc-300">
+            <p className="mb-5 min-w-0 break-words whitespace-pre-wrap text-sm leading-relaxed text-zinc-700 dark:text-zinc-300">
               {problem.description}
             </p>
 

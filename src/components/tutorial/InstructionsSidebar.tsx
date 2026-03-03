@@ -13,7 +13,7 @@ function InstructionText({ text }: { text: string }) {
     <>
       {parts.map((part, i) =>
         part.startsWith("`") && part.endsWith("`") ? (
-          <code key={i} className="rounded bg-zinc-200 px-1 py-0.5 text-xs font-mono text-indigo-700 dark:bg-zinc-800 dark:text-indigo-300">
+          <code key={i} className="break-all rounded bg-zinc-200 px-1 py-0.5 text-xs font-mono text-indigo-700 dark:bg-zinc-800 dark:text-indigo-300">
             {part.slice(1, -1)}
           </code>
         ) : (
@@ -99,16 +99,16 @@ export default function InstructionsSidebar({
 
   return (
     <>
-      <div className="flex-1 overflow-y-auto p-6">
+      <div className="min-w-0 flex-1 overflow-x-hidden overflow-y-auto p-4 break-words md:p-6">
         <p className="mb-1 text-xs font-semibold uppercase tracking-widest text-indigo-600 dark:text-indigo-500">
           Step {stepIndex + 1} of {steps.length}
         </p>
-        <h2 className="mb-4 text-lg font-bold text-zinc-900 dark:text-zinc-100">
+        <h2 className="mb-4 break-words text-lg font-bold text-zinc-900 dark:text-zinc-100">
           {step.title}
         </h2>
-        <div className="space-y-3 text-sm leading-relaxed text-zinc-700 dark:text-zinc-300">
+        <div className="min-w-0 space-y-3 break-words text-sm leading-relaxed text-zinc-700 dark:text-zinc-300">
           {step.instruction.split("\n").map((line, i) => (
-            <p key={i}><InstructionText text={line} /></p>
+            <p key={i} className="min-w-0 break-words"><InstructionText text={line} /></p>
           ))}
         </div>
 
