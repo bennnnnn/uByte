@@ -68,3 +68,25 @@ export async function getPracticeAttempts(
   }
   return map;
 }
+
+export interface PracticeProblemStat {
+  problem_slug: string;
+  solved_count: number;
+  attempt_count: number;
+}
+
+/** Admin: per-problem stats (how many users solved, how many attempted). */
+export async function getPracticeProblemStats(): Promise<PracticeProblemStat[]> {
+  await ensurePracticeAttemptsTable();
+  const sql = getSql();
+  const rows = await sql`
+    SELECT
+      problem_slug,
+      COUNT(*) FILTER (WHERE status = 'solved')::int AS solved_count,
+      COUNT(DISTINCT user_id)::int AS attempt_count
+    FROM practice_attempts
+    GROUP BY problem_slug
+    ORDER BY solved_count DESC
+  `;
+  return rows as PracticeProblemStat[];
+}

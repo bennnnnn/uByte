@@ -9,6 +9,8 @@ import {
   getAdminTutorialAnalytics,
   logAdminAction,
   getStepCheckStats,
+  updateUserPlan,
+  getPracticeProblemStats,
 } from "@/lib/db";
 import { verifyCsrf } from "@/lib/csrf";
 import { withErrorHandling, requireAdmin } from "@/lib/api-utils";
@@ -28,6 +30,28 @@ export const GET = withErrorHandling("GET /api/admin/users", async (request: Nex
     const stats = await getStepCheckStats(slug);
     return NextResponse.json({ stats });
   }
+  if (searchParams.get("view") === "practice-stats") {
+    const stats = await getPracticeProblemStats();
+    return NextResponse.json({ stats });
+  }
+  if (searchParams.get("export") === "csv") {
+    const users = await getAdminUsers();
+    const header = "id,name,email,xp,streak_days,created_at,last_active_at,is_admin,banned,completed_count,bookmark_count,plan";
+    const escape = (v: string | number | boolean | null | undefined) => {
+      const s = String(v ?? "");
+      return s.includes(",") || s.includes('"') || s.includes("\n") ? `"${s.replace(/"/g, '""')}"` : s;
+    };
+    const rows = users.map((u) =>
+      [u.id, u.name, u.email, u.xp, u.streak_days, u.created_at, u.last_active_at ?? "", u.is_admin, u.banned, u.completed_count, u.bookmark_count, u.plan ?? "free"].map(escape).join(",")
+    );
+    const csv = [header, ...rows].join("\n");
+    return new NextResponse(csv, {
+      headers: {
+        "Content-Type": "text/csv; charset=utf-8",
+        "Content-Disposition": 'attachment; filename="users.csv"',
+      },
+    });
+  }
 
   const users = await getAdminUsers();
   return NextResponse.json({ users });
@@ -40,7 +64,8 @@ export const POST = withErrorHandling("POST /api/admin/users", async (request: N
   const { admin, response } = await requireAdmin();
   if (!admin) return response;
 
-  const { action, userId } = await request.json() as { action: string; userId: number };
+  const body = (await request.json()) as { action: string; userId: number; plan?: string };
+  const { action, userId, plan } = body;
 
   // Prevent acting on self for destructive actions
   if (userId === admin.id && ["delete_user", "remove_admin"].includes(action)) {
@@ -75,6 +100,15 @@ export const POST = withErrorHandling("POST /api/admin/users", async (request: N
   if (action === "remove_admin") {
     await setAdminStatus(userId, false);
     await logAdminAction(admin.id, "remove_admin", userId);
+    return NextResponse.json({ ok: true });
+  }
+  if (action === "set_plan") {
+    const allowed = ["free", "pro", "yearly", "monthly"];
+    if (!plan || !allowed.includes(plan)) {
+      return NextResponse.json({ error: "Invalid plan. Use free, pro, yearly, or monthly." }, { status: 400 });
+    }
+    await updateUserPlan(userId, plan);
+    await logAdminAction(admin.id, `set_plan:${plan}`, userId);
     return NextResponse.json({ ok: true });
   }
 

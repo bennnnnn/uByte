@@ -98,6 +98,7 @@ export interface AdminUserRow {
   banned: boolean;
   completed_count: number;
   bookmark_count: number;
+  plan: string;
 }
 
 export interface AdminTutorialRow {

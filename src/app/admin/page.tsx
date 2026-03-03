@@ -18,6 +18,7 @@ interface AdminUser {
   banned: boolean;
   completed_count: number;
   bookmark_count: number;
+  plan: string;
 }
 
 interface TutorialAnalytics {
@@ -54,11 +55,24 @@ export default function AdminPage() {
     created_at: string;
   }
   interface StepStat { step_index: number; pass_count: number; fail_count: number; }
+  interface SubscriptionEventRow {
+    id: number;
+    user_id: number | null;
+    user_name: string | null;
+    user_email: string | null;
+    plan: string;
+    amount_cents: number;
+    event_type: string;
+    created_at: string;
+  }
+  interface PracticeStat { problem_slug: string; solved_count: number; attempt_count: number; }
 
   const [tab, setTab] = useState<Tab>("users");
   const [users, setUsers] = useState<AdminUser[]>([]);
   const [analytics, setAnalytics] = useState<TutorialAnalytics[]>([]);
+  const [practiceStats, setPracticeStats] = useState<PracticeStat[]>([]);
   const [revenue, setRevenue] = useState<AdminRevenueStats | null>(null);
+  const [subscriptionEvents, setSubscriptionEvents] = useState<SubscriptionEventRow[]>([]);
   const [auditLog, setAuditLog] = useState<AuditEntry[]>([]);
   const [stepStats, setStepStats] = useState<StepStat[]>([]);
   const [heatmapSlug, setHeatmapSlug] = useState("");
@@ -83,6 +97,11 @@ export default function AdminPage() {
         if (!r.ok) return { analytics: [] };
         return data;
       }),
+      fetch("/api/admin/users?view=practice-stats", { credentials: "same-origin" }).then(async (r) => {
+        const data = await r.json();
+        if (!r.ok) return { stats: [] };
+        return data;
+      }),
       fetch("/api/admin/stats", { credentials: "same-origin" }).then(async (r) => {
         if (!r.ok) return null;
         return r.json();
@@ -91,25 +110,31 @@ export default function AdminPage() {
         if (!r.ok) return { log: [] };
         return r.json();
       }),
+      fetch("/api/admin/stats?view=subscription-events", { credentials: "same-origin" }).then(async (r) => {
+        if (!r.ok) return { events: [] };
+        return r.json();
+      }),
     ])
-      .then(([userData, analyticsData, revenueData, auditData]) => {
+      .then(([userData, analyticsData, practiceData, revenueData, auditData, eventsData]) => {
         if (userData) setUsers(userData.users ?? []);
         setAnalytics(analyticsData.analytics ?? []);
+        setPracticeStats(practiceData?.stats ?? []);
         if (revenueData) setRevenue(revenueData);
         setAuditLog(auditData.log ?? []);
+        setSubscriptionEvents(eventsData?.events ?? []);
       })
       .catch((err) => setError(String(err.message ?? err)))
       .finally(() => setFetching(false));
   }, [user, loading, router]);
 
-  async function doAction(userId: number, action: string, confirmMsg?: string) {
+  async function doAction(userId: number, action: string, confirmMsg?: string, extra?: { plan?: string }) {
     if (confirmMsg && !confirm(confirmMsg)) return;
     setPending({ id: userId, action });
     try {
       const res = await apiFetch("/api/admin/users", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action, userId }),
+        body: JSON.stringify({ action, userId, ...extra }),
       });
       if (!res.ok) {
         const data = await res.json();
@@ -129,6 +154,8 @@ export default function AdminPage() {
         setUsers((prev) => prev.map((u) => u.id === userId ? { ...u, is_admin: 1 } : u));
       } else if (action === "remove_admin") {
         setUsers((prev) => prev.map((u) => u.id === userId ? { ...u, is_admin: 0 } : u));
+      } else if (action === "set_plan" && extra?.plan) {
+        setUsers((prev) => prev.map((u) => u.id === userId ? { ...u, plan: extra.plan! } : u));
       }
     } catch {
       alert("Action failed.");
@@ -216,11 +243,30 @@ export default function AdminPage() {
       {/* ── Users tab ── */}
       {tab === "users" && (
         <>
-          <div className="relative mb-4">
-            <svg className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-4.35-4.35M17 11A6 6 0 105 11a6 6 0 0012 0z" />
-            </svg>
-            <input type="search" value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search users by name or email…" className="w-full rounded-xl border border-zinc-200 bg-white py-2.5 pl-10 pr-4 text-sm text-zinc-900 placeholder-zinc-400 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:placeholder-zinc-500" />
+          <div className="mb-4 flex flex-wrap items-center gap-3">
+            <div className="relative flex-1 min-w-[200px]">
+              <svg className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-4.35-4.35M17 11A6 6 0 105 11a6 6 0 0012 0z" />
+              </svg>
+              <input type="search" value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search users by name or email…" className="w-full rounded-xl border border-zinc-200 bg-white py-2.5 pl-10 pr-4 text-sm text-zinc-900 placeholder-zinc-400 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:placeholder-zinc-500" />
+            </div>
+            <button
+              type="button"
+              onClick={async () => {
+                const r = await fetch("/api/admin/users?export=csv", { credentials: "same-origin" });
+                if (!r.ok) return;
+                const blob = await r.blob();
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement("a");
+                a.href = url;
+                a.download = "users.csv";
+                a.click();
+                URL.revokeObjectURL(url);
+              }}
+              className="rounded-xl border border-zinc-200 bg-white px-4 py-2.5 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800"
+            >
+              Export CSV
+            </button>
           </div>
 
           <div className="overflow-x-auto overflow-hidden rounded-xl border border-zinc-200 dark:border-zinc-800">
@@ -246,6 +292,7 @@ export default function AdminPage() {
                       <td className="px-4 py-3">
                         <div className="flex flex-wrap items-center gap-1.5 font-medium text-zinc-900 dark:text-zinc-100">
                           {u.name}
+                          <span className="rounded bg-zinc-100 px-1.5 py-0.5 text-[10px] font-medium text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400">{u.plan ?? "free"}</span>
                           {u.is_admin === 1 && <span className="rounded bg-indigo-100 px-1.5 py-0.5 text-[10px] font-semibold text-indigo-700 dark:bg-indigo-950 dark:text-indigo-400">admin</span>}
                           {u.banned && <span className="rounded bg-red-100 px-1.5 py-0.5 text-[10px] font-semibold text-red-700 dark:bg-red-950 dark:text-red-400">banned</span>}
                           {isMe && <span className="rounded bg-zinc-100 px-1.5 py-0.5 text-[10px] font-semibold text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400">you</span>}
@@ -269,6 +316,11 @@ export default function AdminPage() {
                           ) : (
                             <button onClick={() => doAction(u.id, "set_admin", `Make ${u.name} an admin?`)} disabled={anyBusy} className="rounded-md border border-indigo-300 px-2.5 py-1 text-xs font-medium text-indigo-600 transition-colors hover:bg-indigo-50 disabled:opacity-50 dark:border-indigo-800 dark:text-indigo-400 dark:hover:bg-indigo-950">{busy("set_admin") ? "…" : "Make Admin"}</button>
                           ))}
+                          <span className="inline-flex gap-0.5">
+                            {(["free", "pro", "yearly"] as const).map((p) => (
+                              <button key={p} onClick={() => doAction(u.id, "set_plan", `Set ${u.name} to ${p}?`, { plan: p })} disabled={anyBusy || (u.plan ?? "free") === p} className="rounded border border-zinc-300 px-1.5 py-0.5 text-[10px] font-medium text-zinc-600 transition-colors hover:bg-zinc-100 disabled:opacity-50 dark:border-zinc-600 dark:text-zinc-400 dark:hover:bg-zinc-800">{p}</button>
+                            ))}
+                          </span>
                           <button onClick={() => doAction(u.id, "reset_progress", `Reset all progress for ${u.name}? This cannot be undone.`)} disabled={anyBusy} className="rounded-md border border-amber-300 px-2.5 py-1 text-xs font-medium text-amber-600 transition-colors hover:bg-amber-50 disabled:opacity-50 dark:border-amber-800 dark:text-amber-400 dark:hover:bg-amber-950">{busy("reset_progress") ? "…" : "Reset"}</button>
                           {!isMe && <button onClick={() => doAction(u.id, "delete_user", `Permanently delete ${u.name}? All their data will be lost.`)} disabled={anyBusy} className="rounded-md border border-red-300 px-2.5 py-1 text-xs font-medium text-red-600 transition-colors hover:bg-red-50 disabled:opacity-50 dark:border-red-800 dark:text-red-400 dark:hover:bg-red-950">{busy("delete_user") ? "…" : "Delete"}</button>}
                         </div>
@@ -326,6 +378,42 @@ export default function AdminPage() {
               })}
               {analytics.length === 0 && (
                 <tr><td colSpan={5} className="px-4 py-12 text-center text-zinc-400">No tutorial data yet.</td></tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      {/* Practice problem stats — inside analytics tab */}
+      {tab === "analytics" && (
+        <div className="mt-8 overflow-hidden rounded-xl border border-zinc-200 dark:border-zinc-800">
+          <h3 className="border-b border-zinc-200 bg-zinc-50 px-4 py-3 text-sm font-semibold text-zinc-700 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-300">Practice problems</h3>
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-zinc-200 bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900">
+                <th className="px-4 py-3 text-left font-medium text-zinc-500 dark:text-zinc-400">Problem</th>
+                <th className="px-4 py-3 text-right font-medium text-zinc-500 dark:text-zinc-400">Solved</th>
+                <th className="px-4 py-3 text-right font-medium text-zinc-500 dark:text-zinc-400">Attempted</th>
+                <th className="px-4 py-3 text-right font-medium text-zinc-500 dark:text-zinc-400">Rate</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800">
+              {practiceStats.map((p) => (
+                <tr key={p.problem_slug} className="bg-white hover:bg-zinc-50 dark:bg-zinc-950 dark:hover:bg-zinc-900">
+                  <td className="px-4 py-3 font-medium text-zinc-900 dark:text-zinc-100">{slugToTitle(p.problem_slug)}</td>
+                  <td className="px-4 py-3 text-right font-mono text-zinc-700 dark:text-zinc-300">{p.solved_count}</td>
+                  <td className="px-4 py-3 text-right font-mono text-zinc-700 dark:text-zinc-300">{p.attempt_count}</td>
+                  <td className="px-4 py-3 text-right">
+                    {p.attempt_count > 0 ? (
+                      <span className={p.solved_count / p.attempt_count >= 0.5 ? "text-emerald-600 dark:text-emerald-400" : "text-amber-600 dark:text-amber-400"}>
+                        {Math.round((p.solved_count / p.attempt_count) * 100)}%
+                      </span>
+                    ) : "—"}
+                  </td>
+                </tr>
+              ))}
+              {practiceStats.length === 0 && (
+                <tr><td colSpan={4} className="px-4 py-8 text-center text-zinc-400">No practice data yet.</td></tr>
               )}
             </tbody>
           </table>
@@ -472,6 +560,39 @@ export default function AdminPage() {
               <p className="text-sm text-zinc-400">No revenue data yet.</p>
             )}
             <p className="mt-2 text-xs text-zinc-400">This week: {formatCents(revenue?.revenueThisWeek ?? 0)}</p>
+          </div>
+
+          {/* Recent subscription events */}
+          <div className="overflow-hidden rounded-xl border border-zinc-200 dark:border-zinc-800">
+            <h3 className="border-b border-zinc-200 bg-zinc-50 px-4 py-3 text-sm font-semibold text-zinc-700 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-300">Recent subscription events</h3>
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-zinc-200 bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900">
+                  <th className="px-4 py-2 text-left font-medium text-zinc-500 dark:text-zinc-400">When</th>
+                  <th className="px-4 py-2 text-left font-medium text-zinc-500 dark:text-zinc-400">User</th>
+                  <th className="px-4 py-2 text-left font-medium text-zinc-500 dark:text-zinc-400">Plan</th>
+                  <th className="px-4 py-2 text-right font-medium text-zinc-500 dark:text-zinc-400">Amount</th>
+                  <th className="px-4 py-2 text-left font-medium text-zinc-500 dark:text-zinc-400">Event</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800">
+                {subscriptionEvents.map((e) => (
+                  <tr key={e.id} className="bg-white hover:bg-zinc-50 dark:bg-zinc-950 dark:hover:bg-zinc-900">
+                    <td className="px-4 py-2 text-zinc-500">{formatDate(e.created_at)}</td>
+                    <td className="px-4 py-2">
+                      <span className="text-zinc-900 dark:text-zinc-100">{e.user_name ?? "—"}</span>
+                      {e.user_email && <span className="ml-1 text-xs text-zinc-400">{e.user_email}</span>}
+                    </td>
+                    <td className="px-4 py-2 font-medium text-zinc-700 dark:text-zinc-300">{e.plan}</td>
+                    <td className="px-4 py-2 text-right font-mono text-zinc-700 dark:text-zinc-300">{formatCents(e.amount_cents)}</td>
+                    <td className="px-4 py-2 font-mono text-xs text-zinc-500">{e.event_type}</td>
+                  </tr>
+                ))}
+                {subscriptionEvents.length === 0 && (
+                  <tr><td colSpan={5} className="px-4 py-8 text-center text-zinc-400">No subscription events yet.</td></tr>
+                )}
+              </tbody>
+            </table>
           </div>
         </div>
       )}

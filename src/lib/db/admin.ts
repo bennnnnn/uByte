@@ -7,7 +7,7 @@ export async function getAdminUsers(): Promise<AdminUserRow[]> {
   const rows = await sql`
     SELECT
       u.id, u.name, u.email, u.xp, u.streak_days, u.created_at, u.last_active_at,
-      u.is_admin, u.locked_until,
+      u.is_admin, u.locked_until, COALESCE(u.plan, 'free') AS plan,
       (SELECT COUNT(*)::int FROM progress WHERE user_id = u.id) AS completed_count,
       (SELECT COUNT(*)::int FROM bookmarks WHERE user_id = u.id) AS bookmark_count
     FROM users u
@@ -238,4 +238,38 @@ export async function getAdminRevenueStats(): Promise<AdminRevenueStats> {
     revenueThisMonth: (revenue?.this_month as number) ?? 0,
     revenueByDay: byDay.map((r) => ({ date: r.date as string, revenue: r.revenue as number })),
   };
+}
+
+export interface AdminSubscriptionEventRow {
+  id: number;
+  user_id: number | null;
+  user_name: string | null;
+  user_email: string | null;
+  plan: string;
+  amount_cents: number;
+  event_type: string;
+  created_at: string;
+}
+
+export async function getAdminRecentSubscriptionEvents(
+  limit = 50
+): Promise<AdminSubscriptionEventRow[]> {
+  await ensureSubscriptionEventsTable();
+  const sql = getSql();
+  const rows = await sql`
+    SELECT
+      e.id,
+      e.user_id,
+      u.name AS user_name,
+      u.email AS user_email,
+      e.plan,
+      e.amount_cents,
+      e.event_type,
+      e.created_at
+    FROM subscription_events e
+    LEFT JOIN users u ON u.id = e.user_id
+    ORDER BY e.created_at DESC
+    LIMIT ${limit}
+  `;
+  return rows as AdminSubscriptionEventRow[];
 }
