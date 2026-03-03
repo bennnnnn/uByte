@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
+import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/components/AuthProvider";
 import { apiFetch } from "@/lib/api-client";
@@ -42,7 +43,7 @@ function formatCents(cents: number) {
 }
 
 type Tab = "users" | "analytics" | "revenue" | "audit";
-type RevenuePeriod = "day" | "week" | "month" | "year";
+type RevenuePeriod = "7days" | "month" | "year";
 
 const TAB_LABELS: Record<Tab, string> = {
   users: "Users",
@@ -80,7 +81,7 @@ export default function AdminPage() {
   const [analytics, setAnalytics] = useState<TutorialAnalytics[]>([]);
   const [practiceStats, setPracticeStats] = useState<PracticeStat[]>([]);
   const [revenue, setRevenue] = useState<AdminRevenueStats | null>(null);
-  const [revenuePeriod, setRevenuePeriod] = useState<RevenuePeriod>("day");
+  const [revenuePeriod, setRevenuePeriod] = useState<RevenuePeriod>("7days");
   const [revenueSeries, setRevenueSeries] = useState<{ date: string; revenue: number }[]>([]);
   const [subscriptionEvents, setSubscriptionEvents] = useState<SubscriptionEventRow[]>([]);
   const [auditLog, setAuditLog] = useState<AuditEntry[]>([]);
@@ -91,6 +92,7 @@ export default function AdminPage() {
   const [query, setQuery] = useState("");
   const [pending, setPending] = useState<{ id: number; action: string } | null>(null);
   const [userActionsOpen, setUserActionsOpen] = useState<number | null>(null);
+  const [actionAnchorRect, setActionAnchorRect] = useState<DOMRect | null>(null);
   const printRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -114,7 +116,7 @@ export default function AdminPage() {
         if (!r.ok) return { stats: [] };
         return data;
       }),
-      fetch("/api/admin/stats?period=day", { credentials: "same-origin" }).then(async (r) => {
+      fetch("/api/admin/stats?period=7days", { credentials: "same-origin" }).then(async (r) => {
         if (!r.ok) return null;
         return r.json();
       }),
@@ -366,12 +368,34 @@ export default function AdminPage() {
                           <td className="px-4 py-3 text-right text-zinc-500 dark:text-zinc-400">{formatDate(u.created_at)}</td>
                           <td className="px-4 py-3 text-right text-zinc-500 dark:text-zinc-400">{formatDate(u.last_active_at)}</td>
                           <td className="relative px-4 py-3 text-right">
-                            <button type="button" onClick={() => setUserActionsOpen(open ? null : u.id)} disabled={anyBusy} className="rounded-lg border border-zinc-200 px-2.5 py-1.5 text-xs font-medium text-zinc-700 hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800">
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                if (open) {
+                                  setUserActionsOpen(null);
+                                  setActionAnchorRect(null);
+                                } else {
+                                  setActionAnchorRect((e.currentTarget as HTMLElement).getBoundingClientRect());
+                                  setUserActionsOpen(u.id);
+                                }
+                              }}
+                              disabled={anyBusy}
+                              className="rounded-lg border border-zinc-200 px-2.5 py-1.5 text-xs font-medium text-zinc-700 hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800"
+                            >
                               {anyBusy ? "…" : "Actions ▼"}
                             </button>
-                            {open && (
+                            {open && typeof document !== "undefined" && actionAnchorRect && createPortal(
                               <>
-                                <div className="absolute right-0 top-full z-20 mt-1 w-48 rounded-lg border border-zinc-200 bg-white py-1 shadow-lg dark:border-zinc-700 dark:bg-zinc-900" role="menu">
+                                <div
+                                  className="fixed z-50 w-48 rounded-lg border border-zinc-200 bg-white py-1 shadow-xl dark:border-zinc-700 dark:bg-zinc-900"
+                                  role="menu"
+                                  style={{
+                                    left: Math.max(8, Math.min(actionAnchorRect.right - 192, (typeof window !== "undefined" ? window.innerWidth : 800) - 200)),
+                                    top: actionAnchorRect.bottom + 4,
+                                    maxHeight: "16rem",
+                                    overflowY: "auto",
+                                  }}
+                                >
                                   {!isMe && (u.banned ? (
                                     <button type="button" onClick={() => doAction(u.id, "unban_user")} className="block w-full px-3 py-1.5 text-left text-xs text-green-700 hover:bg-zinc-100 dark:text-green-400 dark:hover:bg-zinc-800">Unban</button>
                                   ) : (
@@ -390,8 +414,9 @@ export default function AdminPage() {
                                   <button type="button" onClick={() => doAction(u.id, "reset_progress", "Reset all progress for " + u.name + "?")} className="block w-full px-3 py-1.5 text-left text-xs text-amber-600 hover:bg-zinc-100 dark:text-amber-400 dark:hover:bg-zinc-800">Reset progress</button>
                                   {!isMe && <button type="button" onClick={() => doAction(u.id, "delete_user", "Permanently delete " + u.name + "?")} className="block w-full px-3 py-1.5 text-left text-xs text-red-600 hover:bg-zinc-100 dark:text-red-400 dark:hover:bg-zinc-800">Delete user</button>}
                                 </div>
-                                <div className="fixed inset-0 z-10" aria-hidden onClick={() => setUserActionsOpen(null)} />
-                              </>
+                                <div className="fixed inset-0 z-40" aria-hidden onClick={() => { setUserActionsOpen(null); setActionAnchorRect(null); }} />
+                              </>,
+                              document.body
                             )}
                           </td>
                         </tr>
@@ -482,10 +507,9 @@ export default function AdminPage() {
                 <div className="flex flex-wrap items-center gap-3">
                   <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Income by</label>
                   <select value={revenuePeriod} onChange={(e) => setRevenuePeriod(e.target.value as RevenuePeriod)} className="rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-900 focus:border-zinc-400 focus:outline-none dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100">
-                    <option value="day">Day (last 31 days)</option>
-                    <option value="week">Week (last 16 weeks)</option>
-                    <option value="month">Month (last 24 months)</option>
-                    <option value="year">Year (last 6 years)</option>
+                    <option value="7days">1 week (7 days)</option>
+                    <option value="month">1 month</option>
+                    <option value="year">1 year</option>
                   </select>
                 </div>
                 <div className="flex items-center gap-2">

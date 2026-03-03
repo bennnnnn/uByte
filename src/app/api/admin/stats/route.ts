@@ -3,7 +3,7 @@ import { getAdminRevenueStats, getAdminRecentSubscriptionEvents, getAdminRevenue
 import type { RevenuePeriod } from "@/lib/db";
 import { requireAdmin } from "@/lib/api-utils";
 
-const PERIODS: RevenuePeriod[] = ["day", "week", "month", "year"];
+const PERIODS: RevenuePeriod[] = ["7days", "month", "year"];
 
 export async function GET(request: NextRequest) {
   const { admin, response } = await requireAdmin();
