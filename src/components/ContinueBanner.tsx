@@ -22,10 +22,13 @@ export default function ContinueBanner({ lang, tutorials }: { lang: string; tuto
       const saved = localStorage.getItem(`last-step-${lang}-${nextTutorial.slug}`);
       if (saved !== null) {
         const n = parseInt(saved, 10);
-        if (!isNaN(n) && n > 0) setLastStep(n);
+        if (!isNaN(n) && n > 0) {
+          // eslint-disable-next-line react-hooks/set-state-in-effect -- hydrate from localStorage
+          setLastStep(n);
+        }
       }
     } catch { /* ignore */ }
-  }, [nextTutorial?.slug, lang]);
+  }, [nextTutorial, nextTutorial?.slug, lang]);
 
   if (!user || progress.length === 0) return null;
   // All done

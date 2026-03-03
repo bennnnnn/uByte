@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import Link from "next/link";
 import { useAuth } from "@/components/AuthProvider";
 import { apiFetch } from "@/lib/api-client";
 import type { TutorialMessage } from "@/lib/db";
@@ -216,7 +217,7 @@ export default function TutorialChat({ chatSlug, onClose, currentCode, inline = 
           </div>
         ) : (
           <p className="text-center text-xs text-zinc-400 dark:text-zinc-500">
-            <a href="/" className="text-indigo-500 hover:underline">Sign in</a> to ask questions
+            <Link href="/" className="text-indigo-500 hover:underline">Sign in</Link> to ask questions
           </p>
         )}
         <p className="mt-1.5 text-center text-[10px] text-zinc-400 dark:text-zinc-600">

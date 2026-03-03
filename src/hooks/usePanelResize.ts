@@ -19,10 +19,12 @@ export function usePanelResize(): PanelResizeState {
 
   // Hydrate from localStorage after mount (avoids SSR mismatch)
   useEffect(() => {
+    /* eslint-disable react-hooks/set-state-in-effect -- intentional hydration */
     const w = Number(localStorage.getItem("it-leftWidth"));
     const h = Number(localStorage.getItem("it-outputHeight"));
     if (w) setLeftWidth(w);
     if (h) setOutputHeight(h);
+    /* eslint-enable react-hooks/set-state-in-effect */
   }, []);
 
   // Persist to localStorage

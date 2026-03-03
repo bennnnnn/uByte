@@ -90,7 +90,7 @@ export default function CodePlayground({ code: initialCode, title }: CodePlaygro
         body: JSON.stringify({ slug, key: editorKey, lang }),
       }).catch(() => {});
     }
-  }, [user, slug, editorKey, storageKey, initialCode]);
+  }, [user, slug, editorKey, storageKey, initialCode, lang]);
 
   const [output, setOutput] = useState<string | null>(null);
   const [isRunning, setIsRunning] = useState(false);

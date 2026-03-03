@@ -140,6 +140,7 @@ export default function InteractiveTutorial({
       .then((r) => r.json())
       .then((d) => setChallengeResult({ totalMs, personalBest: d.personalBest ?? totalMs }))
       .catch(() => setChallengeResult({ totalMs, personalBest: null }));
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- run only when tutorial completes in challenge mode
   }, [stepProgress.tutorialDone, challengeMode]);
 
   // Close user menu on outside click

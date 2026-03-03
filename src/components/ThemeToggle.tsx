@@ -14,15 +14,13 @@ function getStoredTheme(): "light" | "dark" {
 }
 
 export default function ThemeToggle({ className }: { className?: string }) {
-  const [theme, setTheme] = useState<"light" | "dark">("dark");
+  const [theme, setTheme] = useState<"light" | "dark">(getStoredTheme);
   const { user } = useAuth();
 
   useEffect(() => {
-    const t = getStoredTheme();
-    setTheme(t);
     document.documentElement.classList.remove("light", "dark");
-    document.documentElement.classList.add(t);
-  }, []);
+    document.documentElement.classList.add(theme);
+  }, [theme]);
 
   function toggle() {
     const next = theme === "dark" ? "light" : "dark";

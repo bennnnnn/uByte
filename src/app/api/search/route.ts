@@ -106,6 +106,11 @@ export const GET = withErrorHandling("GET /api/search", async (request: NextRequ
   }
 
   results.sort((a, b) => b.score - a.score);
-  const final = results.slice(0, 20).map(({ score: _s, ...r }) => r);
+  // Omit internal score from API response
+  const final = results.slice(0, 20).map((r) => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars -- omit score from response
+    const { score, ...rest } = r;
+    return rest;
+  });
   return NextResponse.json({ results: final });
 });

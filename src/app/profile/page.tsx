@@ -146,7 +146,10 @@ function ProfilePage() {
   }, [user, loading, router, fetchProfile]);
 
   useEffect(() => {
-    if (tabFromUrl) setActiveTab(tabFromUrl);
+    if (tabFromUrl) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- sync tab from URL
+      setActiveTab(tabFromUrl);
+    }
   }, [tabFromUrl]);
 
   const saveProfile = async (data: { name: string; bio: string; avatar: string; theme: string }): Promise<boolean> => {

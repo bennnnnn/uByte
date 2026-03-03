@@ -42,6 +42,7 @@ export function SearchPageClient() {
   );
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- sync query from URL
     setQuery(initialQ);
     runSearch(initialQ);
   }, [initialQ, runSearch]);

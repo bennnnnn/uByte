@@ -120,7 +120,7 @@ export function useStepProgress(
       setTutorialDone(true);
       toggleProgress(tutorialSlug, lang);
     }
-  }, [completedSteps, steps.length, tutorialSlug, toggleProgress, progress]);
+  }, [completedSteps, steps.length, tutorialSlug, toggleProgress, progress, lang]);
 
   // ── Auto-advance countdown + confetti ──
   useEffect(() => {

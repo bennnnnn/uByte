@@ -40,13 +40,13 @@ export default function Sidebar({ lang, tutorials }: { lang: string; tutorials: 
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const router = useRouter();
 
+  const queryLongEnough = query.trim().length >= 2;
+  const displayResults = queryLongEnough ? searchResults : [];
+  const displayShowDropdown = queryLongEnough && showDropdown;
+
   useEffect(() => {
     if (debounceRef.current) clearTimeout(debounceRef.current);
-    if (query.trim().length < 2) {
-      setSearchResults([]);
-      setShowDropdown(false);
-      return;
-    }
+    if (!queryLongEnough) return;
     debounceRef.current = setTimeout(() => {
       fetch(`/api/search?q=${encodeURIComponent(query.trim())}`)
         .then((r) => r.json())
@@ -57,7 +57,7 @@ export default function Sidebar({ lang, tutorials }: { lang: string; tutorials: 
         .catch(() => {});
     }, 300);
     return () => { if (debounceRef.current) clearTimeout(debounceRef.current); };
-  }, [query]);
+  }, [query, queryLongEnough]);
 
   return (
     <aside className="hidden md:flex w-72 shrink-0 flex-col border-r border-zinc-100 bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-950">
@@ -72,7 +72,7 @@ export default function Sidebar({ lang, tutorials }: { lang: string; tutorials: 
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             onBlur={() => setTimeout(() => setShowDropdown(false), 150)}
-            onFocus={() => searchResults.length > 0 && setShowDropdown(true)}
+            onFocus={() => displayResults.length > 0 && setShowDropdown(true)}
             placeholder="Search lessons..."
             className="w-full rounded-lg border border-zinc-200 bg-white py-2 pl-9 pr-8 text-sm text-zinc-700 placeholder-zinc-400 focus:border-indigo-500 focus:outline-none dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300 dark:placeholder-zinc-500"
           />
@@ -89,9 +89,9 @@ export default function Sidebar({ lang, tutorials }: { lang: string; tutorials: 
           )}
 
           {/* Search dropdown */}
-          {showDropdown && searchResults.length > 0 && (
+          {displayShowDropdown && displayResults.length > 0 && (
             <div className="absolute left-0 right-0 top-full z-50 mt-1 max-h-72 overflow-y-auto rounded-xl border border-zinc-200 bg-white shadow-lg dark:border-zinc-700 dark:bg-zinc-900">
-              {searchResults.map((r, i) => (
+              {displayResults.map((r, i) => (
                 <button
                   key={i}
                   onMouseDown={() => {

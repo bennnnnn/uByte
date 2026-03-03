@@ -61,7 +61,7 @@ const AppDataContext = createContext<AppDataContextType>({
   viewCount: 0,
   limited: false,
   recordView: async () => {},
-  toggleProgress: async (_slug: string, _lang?: string) => {},
+  toggleProgress: async (slug: string, lang?: string) => { void slug; void lang; },
   refreshProfile: async () => {},
 });
 

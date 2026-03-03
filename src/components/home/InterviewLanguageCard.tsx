@@ -15,7 +15,6 @@ export interface InterviewLanguageCardProps {
  * Card for "Ace your interview" section: one per language. Click opens the list of interview problems (/practice).
  */
 export default function InterviewLanguageCard({
-  slug,
   name,
   icon,
   href = "/practice",

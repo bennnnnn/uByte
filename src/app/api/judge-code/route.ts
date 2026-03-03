@@ -100,7 +100,7 @@ function extractCppSolution(code: string): string {
 }
 
 function extractJavaSolution(code: string): string {
-  let s = code.replace(/^\s*import\s+.*;\s*$/gm, "").trim();
+  const s = code.replace(/^\s*import\s+.*;\s*$/gm, "").trim();
   const classMatch = s.match(/class\s+Main\s*\{/);
   if (!classMatch || classMatch.index == null) return s;
   const classStart = classMatch.index + classMatch[0].length;
