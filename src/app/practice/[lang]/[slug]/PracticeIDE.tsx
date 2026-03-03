@@ -10,7 +10,7 @@ import { useCodeEditor } from "@/hooks/useCodeEditor";
 import { usePanelResize } from "@/hooks/usePanelResize";
 import { useAuth } from "@/components/AuthProvider";
 import ThemeToggle from "@/components/ThemeToggle";
-import Avatar from "@/components/Avatar";
+import AuthButtons from "@/components/AuthButtons";
 import ShortcutsModal from "@/components/tutorial/ShortcutsModal";
 import ProblemSidebar from "@/components/practice/ProblemSidebar";
 import type { PracticeAttemptStatus } from "@/lib/db/practice-attempts";
@@ -40,7 +40,7 @@ function GripDots({ vertical }: { vertical?: boolean }) {
 }
 
 export function PracticeIDE({ problem, initialLang }: Props) {
-  const { user, profile, logout } = useAuth();
+  const { user } = useAuth();
 
   const allProblems = getAllPracticeProblems();
   const [lang, setLang] = useState<SupportedLanguage>(initialLang);
@@ -50,7 +50,6 @@ export function PracticeIDE({ problem, initialLang }: Props) {
 
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [mobileTab, setMobileTab]     = useState<"desc" | "code">("desc");
-  const [showUserMenu, setShowUserMenu] = useState(false);
   const [showShortcuts, setShowShortcuts] = useState(false);
   const [statuses, setStatuses] = useState<Record<string, PracticeAttemptStatus>>({});
   const [xpToast, setXpToast] = useState<number | null>(null);
@@ -62,8 +61,6 @@ export function PracticeIDE({ problem, initialLang }: Props) {
     passedCases?: number;
     totalCases?: number;
   } | null>(null);
-
-  const userMenuRef = useRef<HTMLDivElement>(null);
 
   const editor = useCodeEditor(getStarterForLanguage(problem, initialLang), lang);
   const { leftWidth, outputHeight, isDragging, startDragH, startDragV } = usePanelResize();
@@ -95,17 +92,6 @@ export function PracticeIDE({ problem, initialLang }: Props) {
       .then((d) => { if (d?.attempts) setStatuses(d.attempts); })
       .catch(() => {});
   }, []);
-
-  // Close user menu on outside click
-  useEffect(() => {
-    if (!showUserMenu) return;
-    function handle(e: MouseEvent) {
-      if (userMenuRef.current && !userMenuRef.current.contains(e.target as Node))
-        setShowUserMenu(false);
-    }
-    document.addEventListener("mousedown", handle);
-    return () => document.removeEventListener("mousedown", handle);
-  }, [showUserMenu]);
 
   // Global ? key → shortcuts modal
   useEffect(() => {
@@ -284,80 +270,7 @@ export function PracticeIDE({ problem, initialLang }: Props) {
         {/* Right: theme toggle + user menu */}
         <div className="flex items-center gap-3">
           <ThemeToggle className="flex h-8 w-8 items-center justify-center rounded text-zinc-500 transition-colors hover:bg-zinc-200 hover:text-zinc-800 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-200" />
-
-          <div className="relative" ref={userMenuRef}>
-            <button
-              onClick={() => setShowUserMenu((v) => !v)}
-              title={user ? "Account" : "Log in"}
-              className="flex items-center gap-1.5 rounded-full p-1 transition-colors hover:bg-zinc-200 dark:hover:bg-zinc-800"
-            >
-              {user ? (
-                <>
-                  <Avatar avatarKey={profile?.avatar ?? "gopher"} size="sm" />
-                  <svg className={`h-3.5 w-3.5 text-zinc-400 transition-transform ${showUserMenu ? "rotate-180" : ""}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                  </svg>
-                </>
-              ) : (
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="text-zinc-500 dark:text-zinc-400">
-                  <circle cx="12" cy="8" r="4" />
-                  <path d="M4 20c0-4 3.582-7 8-7s8 3 8 7" />
-                </svg>
-              )}
-            </button>
-            {showUserMenu && (
-              <div className="absolute right-0 top-full z-[60] mt-2 w-64 overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-lg dark:border-zinc-800 dark:bg-zinc-900">
-                {user ? (
-                  <>
-                    <div className="border-b border-zinc-100 px-4 py-3 dark:border-zinc-800">
-                      <p className="text-sm font-medium text-zinc-900 dark:text-zinc-100">{user.name}</p>
-                      <p className="text-xs text-zinc-500 dark:text-zinc-400">{user.email}</p>
-                      {profile && (
-                        <div className="mt-2 flex items-center gap-3 text-xs text-zinc-400">
-                          <span>⭐ {profile.xp} XP</span>
-                          <span>🔥 {profile.streak_days}d streak</span>
-                        </div>
-                      )}
-                    </div>
-                    <div className="py-1">
-                      {profile?.isAdmin && (
-                        <Link href="/admin" onClick={() => setShowUserMenu(false)} className="flex items-center gap-3 px-4 py-2.5 text-sm text-indigo-700 transition-colors hover:bg-indigo-50 dark:text-indigo-400 dark:hover:bg-indigo-950/40">
-                          <svg className="h-4 w-4 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
-                          Admin
-                        </Link>
-                      )}
-                      <Link href="/profile" onClick={() => setShowUserMenu(false)} className="flex items-center gap-3 px-4 py-2.5 text-sm text-zinc-700 transition-colors hover:bg-zinc-50 dark:text-zinc-300 dark:hover:bg-zinc-800">
-                        <svg className="h-4 w-4 text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
-                        Profile
-                      </Link>
-                      <Link href="/profile?tab=bookmarks" onClick={() => setShowUserMenu(false)} className="flex items-center gap-3 px-4 py-2.5 text-sm text-zinc-700 transition-colors hover:bg-zinc-50 dark:text-zinc-300 dark:hover:bg-zinc-800">
-                        <svg className="h-4 w-4 text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" /></svg>
-                        Bookmarks
-                      </Link>
-                      <Link href="/profile?tab=settings" onClick={() => setShowUserMenu(false)} className="flex items-center gap-3 px-4 py-2.5 text-sm text-zinc-700 transition-colors hover:bg-zinc-50 dark:text-zinc-300 dark:hover:bg-zinc-800">
-                        <svg className="h-4 w-4 text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-                        Settings
-                      </Link>
-                    </div>
-                    <div className="border-t border-zinc-100 py-1 dark:border-zinc-800">
-                      <button onClick={() => { setShowUserMenu(false); logout(); }} className="flex w-full items-center gap-3 px-4 py-2.5 text-sm text-red-600 transition-colors hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-950/50">
-                        <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
-                        Log out
-                      </button>
-                    </div>
-                  </>
-                ) : (
-                  <>
-                    <p className="border-b border-zinc-100 px-4 py-2.5 text-xs text-zinc-400 dark:border-zinc-800 dark:text-zinc-500">Not signed in</p>
-                    <div className="py-1">
-                      <Link href="/" onClick={() => setShowUserMenu(false)} className="flex items-center gap-3 px-4 py-2.5 text-sm text-zinc-700 hover:bg-zinc-50 dark:text-zinc-300 dark:hover:bg-zinc-800">Log in</Link>
-                      <Link href="/" onClick={() => setShowUserMenu(false)} className="flex items-center gap-3 px-4 py-2.5 text-sm text-zinc-700 hover:bg-zinc-50 dark:text-zinc-300 dark:hover:bg-zinc-800">Sign up</Link>
-                    </div>
-                  </>
-                )}
-              </div>
-            )}
-          </div>
+          <AuthButtons />
         </div>
       </header>
 
