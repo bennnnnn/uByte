@@ -3,6 +3,13 @@ import { getCurrentUser, type TokenPayload } from "@/lib/auth";
 import { getUserById } from "@/lib/db";
 import type { User } from "@/lib/db";
 
+function getRequestId(): string {
+  if (typeof globalThis.crypto !== "undefined" && typeof globalThis.crypto.randomUUID === "function") {
+    return globalThis.crypto.randomUUID();
+  }
+  return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 11)}`;
+}
+
 type Handler = (request: NextRequest, context?: unknown) => Promise<NextResponse>;
 
 export function withErrorHandling(routeName: string, handler: Handler): Handler {
@@ -10,8 +17,12 @@ export function withErrorHandling(routeName: string, handler: Handler): Handler 
     try {
       return await handler(request, context);
     } catch (err) {
-      console.error(`${routeName} error:`, err);
-      return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+      const requestId = getRequestId();
+      console.error(`[${requestId}] ${routeName} error:`, err);
+      return NextResponse.json(
+        { error: "Internal server error", requestId },
+        { status: 500 }
+      );
     }
   };
 }

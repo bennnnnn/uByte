@@ -2,41 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { withErrorHandling } from "@/lib/api-utils";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 import { getPracticeProblemBySlug } from "@/lib/practice/problems";
-
-const JUDGE0_URL = process.env.JUDGE0_URL;
-const JUDGE0_LANG: Record<string, number> = {
-  go:     60, // Go 1.13.5
-  python: 71, // Python 3.8.1
-  javascript: 63, // Node.js 12.14.0
-  cpp: 54, // C++ GCC 9.2.0
-  java: 62, // Java OpenJDK 13.0.1
-  rust: 73, // Rust 1.40.0
-};
-
-function b64(s: string): string {
-  return Buffer.from(s).toString("base64");
-}
-function fromb64(s: string | null | undefined): string {
-  return s ? Buffer.from(s, "base64").toString("utf-8") : "";
-}
-
-function maybeDecodeJudge0Message(message: string | null | undefined): string {
-  if (!message) return "";
-  const m = String(message).trim();
-  // Judge0 sometimes base64-encodes `message` even when it is plain text.
-  const looksB64 = /^[A-Za-z0-9+/=\r\n]+$/.test(m) && m.length >= 8;
-  if (!looksB64) return m;
-  try {
-    const decoded = Buffer.from(m.replace(/\s+/g, ""), "base64").toString("utf-8").trim();
-    // Heuristic: decoded text should contain mostly printable chars.
-    if (!decoded) return m;
-    const printable = decoded.replace(/[^\x09\x0A\x0D\x20-\x7E]/g, "");
-    if (printable.length / decoded.length < 0.85) return m;
-    return decoded;
-  } catch {
-    return m;
-  }
-}
+import { JUDGE0_URL, JUDGE0_LANG_IDS, b64, fromb64, maybeDecodeJudge0Message } from "@/lib/judge0";
 
 /** Normalize a line for comparison (Python "[0, 1]" and Go "[0 1]" both match "[0 1]"; True/False -> true/false). */
 function normalizeLine(s: string): string {
@@ -223,7 +189,7 @@ export const POST = withErrorHandling("POST /api/judge-code", async (request: Ne
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         source_code:     b64(judgeCode),
-        language_id:     JUDGE0_LANG[lang],
+        language_id:     JUDGE0_LANG_IDS[lang],
         stdin:           b64(stdin),
         cpu_time_limit:  10,
         memory_limit:    131072,

@@ -11,7 +11,7 @@ import { signToken, setAuthCookie } from "@/lib/auth";
 import { setCsrfCookie } from "@/lib/csrf";
 import { withErrorHandling } from "@/lib/api-utils";
 
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
+import { BASE_URL } from "@/lib/constants";
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
 

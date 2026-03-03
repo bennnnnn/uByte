@@ -3,6 +3,7 @@
 import { Suspense, useState, useEffect, useCallback, startTransition } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/components/AuthProvider";
+import { trackConversion } from "@/lib/analytics";
 import { apiFetch } from "@/lib/api-client";
 import ProfileHeader from "@/components/profile/ProfileHeader";
 import StatsRow from "@/components/profile/StatsRow";
@@ -87,6 +88,10 @@ function ProfilePage() {
   const planSuccess = searchParams.get("plan") === "success";
   const tabFromUrl: Tab | null = planSuccess ? "plan" : (paramTab && VALID_TABS.includes(paramTab) ? paramTab : null);
   const tab: Tab = tabFromUrl ?? activeTab ?? "overview";
+
+  useEffect(() => {
+    if (planSuccess) trackConversion("checkout_completed");
+  }, [planSuccess]);
 
   const setTab = (t: Tab) => {
     setActiveTab(t);

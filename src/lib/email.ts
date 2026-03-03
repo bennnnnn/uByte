@@ -4,7 +4,7 @@
  */
 import { Resend } from "resend";
 
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL ?? "http://localhost:3000";
+import { BASE_URL } from "@/lib/constants";
 const FROM = process.env.RESEND_FROM_EMAIL ?? "noreply@resend.dev";
 
 function getResend(): Resend | null {

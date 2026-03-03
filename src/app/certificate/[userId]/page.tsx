@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { BASE_URL } from "@/lib/constants";
 
 interface CertData {
   userId: number;
@@ -12,8 +13,7 @@ interface CertData {
 
 async function getCertData(userId: string): Promise<CertData | null> {
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? "http://localhost:3000";
-    const res = await fetch(`${baseUrl}/api/certificate/${userId}`, { cache: "no-store" });
+    const res = await fetch(`${BASE_URL}/api/certificate/${userId}`, { cache: "no-store" });
     if (!res.ok) return null;
     return res.json();
   } catch {

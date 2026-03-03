@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import Link from "next/link";
 import { useAuth } from "@/components/AuthProvider";
 import { hasPaidAccess } from "@/lib/plans";
+import { trackConversion } from "@/lib/analytics";
 import { apiFetch } from "@/lib/api-client";
 
 const FREE_FEATURES = [
@@ -51,6 +52,7 @@ export default function PlanTab({ plan }: Props) {
   }, []);
 
   async function openCheckout(billingPlan: "monthly" | "yearly") {
+    trackConversion("clicked_upgrade", { plan: billingPlan });
     const res = await apiFetch("/api/billing/checkout", {
       method: "POST",
       headers: { "Content-Type": "application/json" },

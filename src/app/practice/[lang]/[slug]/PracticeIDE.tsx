@@ -8,7 +8,6 @@ import { getStarterForLanguage, getAllPracticeProblems } from "@/lib/practice/pr
 import { LANGUAGES } from "@/lib/languages/registry";
 import { useCodeEditor } from "@/hooks/useCodeEditor";
 import { usePanelResize } from "@/hooks/usePanelResize";
-import { useAuth } from "@/components/AuthProvider";
 import ThemeToggle from "@/components/ThemeToggle";
 import AuthButtons from "@/components/AuthButtons";
 import ShortcutsModal from "@/components/tutorial/ShortcutsModal";
@@ -40,8 +39,6 @@ function GripDots({ vertical }: { vertical?: boolean }) {
 }
 
 export function PracticeIDE({ problem, initialLang }: Props) {
-  const { user } = useAuth();
-
   const allProblems = getAllPracticeProblems();
   const [lang, setLang] = useState<SupportedLanguage>(initialLang);
   const [output, setOutput]           = useState<string | null>(null);

@@ -34,7 +34,8 @@
     "react": "19.2.3",
     "react-dom": "19.2.3",
     "resend": "^6.9.3",
-    "shiki": "^4.0.0"
+    "shiki": "^4.0.0",
+    "zod": "^4.3.6"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useAuth } from "@/components/AuthProvider";
 import { hasPaidAccess } from "@/lib/plans";
+import { trackConversion } from "@/lib/analytics";
 import AuthModal from "@/components/auth/AuthModal";
 
 const CLIENT_TOKEN     = process.env.NEXT_PUBLIC_PADDLE_CLIENT_TOKEN ?? "";
@@ -46,6 +47,10 @@ function PricingContent() {
   const [billing, setBilling]       = useState<"monthly" | "yearly">("yearly");
   const [showAuth, setShowAuth]     = useState(false);
   const showSuccess = searchParams.get("success") === "1";
+
+  useEffect(() => {
+    trackConversion("viewed_pricing");
+  }, []);
 
   useEffect(() => {
     if (!CLIENT_TOKEN || paddleReady.current) return;

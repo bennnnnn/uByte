@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
 import { getChatMessages, saveChatMessage, getChatParticipants, createNotification } from "@/lib/db";
 import { withErrorHandling, requireAuth } from "@/lib/api-utils";
+import { verifyCsrf } from "@/lib/csrf";
 import { allSteps } from "@/lib/tutorial-steps";
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
@@ -17,7 +18,7 @@ function parseStepSlug(slug: string): { tutorialSlug: string; stepIndex: number 
   return { tutorialSlug, stepIndex };
 }
 
-// GET /api/chat?slug=<chatSlug>
+// GET /api/chat?slug=<chatSlug> — intentionally public so anyone can read discussion for a step
 export const GET = withErrorHandling("GET /api/chat", async (req: NextRequest) => {
   const slug = req.nextUrl.searchParams.get("slug");
   if (!slug) return NextResponse.json({ error: "slug required" }, { status: 400 });
@@ -28,6 +29,9 @@ export const GET = withErrorHandling("GET /api/chat", async (req: NextRequest) =
 
 // POST /api/chat  { slug, content, currentCode? }
 export const POST = withErrorHandling("POST /api/chat", async (req: NextRequest) => {
+  const csrfError = verifyCsrf(req);
+  if (csrfError) return NextResponse.json({ error: csrfError }, { status: 403 });
+
   const { user, response } = await requireAuth();
   if (!user) return response;
 

@@ -5,7 +5,7 @@ import { getUserByEmail, createPasswordResetToken } from "@/lib/db";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 import { withErrorHandling } from "@/lib/api-utils";
 
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
+import { BASE_URL } from "@/lib/constants";
 
 export const POST = withErrorHandling("POST /api/auth/forgot-password", async (request: NextRequest) => {
   const ip = getClientIp(request.headers);

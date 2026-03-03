@@ -115,9 +115,9 @@ export default function RootLayout({
             </header>
             <MobileStandaloneHeader />
             {/* Home / practice: just scrollable content. /[lang]: sidebar + content from [lang] layout */}
-            <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
+            <main id="main-content" className="flex min-h-0 flex-1 flex-col overflow-hidden">
               <ErrorBoundary>{children}</ErrorBoundary>
-            </div>
+            </main>
             <footer className="border-t border-zinc-100 bg-white px-6 py-3 dark:border-zinc-800 dark:bg-zinc-950 shrink-0">
               <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-xs text-zinc-500 dark:text-zinc-400">
                 <span>© {new Date().getFullYear()} uByte</span>

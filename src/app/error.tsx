@@ -14,8 +14,14 @@ export default function Error({
   }, [error]);
 
   return (
-    <div className="flex h-full flex-col items-center justify-center gap-4 p-8">
-      <span className="text-5xl">😵</span>
+    <div
+      className="flex h-full flex-col items-center justify-center gap-4 p-8"
+      role="alert"
+      aria-live="assertive"
+    >
+      <span className="text-5xl" aria-hidden>
+        😵
+      </span>
       <h2 className="text-xl font-bold text-zinc-900 dark:text-zinc-100">
         Something went wrong
       </h2>
@@ -26,8 +32,10 @@ export default function Error({
         <p className="text-xs text-zinc-400">Error ID: {error.digest}</p>
       )}
       <button
+        type="button"
         onClick={reset}
         className="rounded-lg bg-indigo-700 px-6 py-2.5 text-sm font-medium text-white hover:bg-indigo-800"
+        aria-label="Try again to reload the page"
       >
         Try Again
       </button>

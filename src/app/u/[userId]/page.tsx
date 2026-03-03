@@ -4,7 +4,7 @@ import { getAllTutorials } from "@/lib/tutorials";
 import Avatar from "@/components/Avatar";
 import type { Metadata } from "next";
 
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://golang-tutorials.vercel.app";
+import { BASE_URL } from "@/lib/constants";
 
 export async function generateMetadata({ params }: { params: Promise<{ userId: string }> }): Promise<Metadata> {
   const { userId } = await params;

@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { randomBytes } from "crypto";
 import { withErrorHandling } from "@/lib/api-utils";
 
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
+import { BASE_URL } from "@/lib/constants";
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 
 export const GET = withErrorHandling("GET /api/auth/google", async () => {
