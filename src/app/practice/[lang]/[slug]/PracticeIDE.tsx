@@ -46,6 +46,7 @@ export function PracticeIDE({ problem, initialLang }: Props) {
   const [outputIsError, setOutputIsError] = useState(false);
 
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [mobileTab, setMobileTab]     = useState<"desc" | "code">("desc");
   const [showShortcuts, setShowShortcuts] = useState(false);
   const [statuses, setStatuses] = useState<Record<string, PracticeAttemptStatus>>({});
@@ -60,7 +61,7 @@ export function PracticeIDE({ problem, initialLang }: Props) {
   } | null>(null);
 
   const editor = useCodeEditor(getStarterForLanguage(problem, initialLang), lang);
-  const { leftWidth, outputHeight, isDragging, startDragH, startDragV } = usePanelResize();
+  const { leftWidth, outputHeight, isDragging, startDragH, startDragV, startDragHTouch, startDragVTouch } = usePanelResize();
 
   // When language changes, load the starter for the new language
   const prevLangRef = useRef(lang);
@@ -243,12 +244,23 @@ export function PracticeIDE({ problem, initialLang }: Props) {
         <div className="fixed inset-0 z-[52]" style={{ cursor: isDragging === "h" ? "col-resize" : "row-resize" }} />
       )}
 
-      {/* ── Top bar — identical to InteractiveTutorial ───────────────── */}
+      {/* ── Top bar ───────────────────────────────────────────────────── */}
       <header className="flex h-12 shrink-0 items-center justify-between border-b border-zinc-200 bg-zinc-50 px-4 dark:border-zinc-800 dark:bg-zinc-900">
-        <div className="flex items-center gap-2">
+        {/* Left: hamburger on mobile (problem list), logo on desktop */}
+        <div className="flex min-w-0 flex-1 items-center gap-2 md:flex-initial">
+          <button
+            type="button"
+            onClick={() => setMobileSidebarOpen(true)}
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md text-zinc-600 transition-colors hover:bg-zinc-200 hover:text-zinc-900 md:hidden dark:text-zinc-400 dark:hover:bg-zinc-700 dark:hover:text-zinc-100"
+            aria-label="Open problem list"
+          >
+            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          </button>
           <Link
             href="/"
-            className="flex items-center gap-2 rounded-md py-1 pr-2 transition-colors hover:bg-zinc-200 dark:hover:bg-zinc-800"
+            className="hidden items-center gap-2 rounded-md py-1 pr-2 transition-colors hover:bg-zinc-200 dark:hover:bg-zinc-800 md:flex"
             aria-label="Back to home"
           >
             <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-indigo-600 text-xs font-bold text-white">U</span>
@@ -257,7 +269,7 @@ export function PracticeIDE({ problem, initialLang }: Props) {
         </div>
 
         {/* Breadcrumb */}
-        <h1 className="max-w-[40%] truncate text-sm font-semibold text-zinc-800 dark:text-zinc-100">
+        <h1 className="min-w-0 max-w-[45%] flex-1 truncate text-center text-sm font-semibold text-zinc-800 dark:text-zinc-100 md:max-w-[40%] md:flex-initial">
           {problem.title}
           <span className={`ml-2 inline-block rounded-full px-2 py-0.5 text-xs font-medium capitalize align-middle ${DIFFICULTY_STYLES[problem.difficulty]}`}>
             {problem.difficulty}
@@ -265,11 +277,42 @@ export function PracticeIDE({ problem, initialLang }: Props) {
         </h1>
 
         {/* Right: theme toggle + user menu */}
-        <div className="flex items-center gap-3">
+        <div className="flex flex-1 justify-end gap-3 md:flex-initial">
           <ThemeToggle className="flex h-8 w-8 items-center justify-center rounded text-zinc-500 transition-colors hover:bg-zinc-200 hover:text-zinc-800 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-200" />
           <AuthButtons />
         </div>
       </header>
+
+      {/* Mobile problem list drawer */}
+      {mobileSidebarOpen && (
+        <div className="fixed inset-0 z-[53] md:hidden">
+          <div className="absolute inset-0 bg-black/50" aria-hidden onClick={() => setMobileSidebarOpen(false)} />
+          <div className="absolute left-0 top-0 bottom-0 w-[min(280px,85vw)] overflow-hidden bg-zinc-50 shadow-xl dark:bg-zinc-900">
+            <div className="flex h-12 items-center justify-between border-b border-zinc-200 px-3 dark:border-zinc-800">
+              <span className="text-sm font-semibold text-zinc-800 dark:text-zinc-100">Problems</span>
+              <button
+                type="button"
+                onClick={() => setMobileSidebarOpen(false)}
+                className="flex h-8 w-8 items-center justify-center rounded text-zinc-500 hover:bg-zinc-200 dark:hover:bg-zinc-700 dark:hover:text-zinc-300"
+                aria-label="Close"
+              >
+                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            <div className="h-[calc(100%-3rem)] overflow-y-auto">
+              <ProblemSidebar
+                problems={allProblems}
+                activeSlug={problem.slug}
+                lang={lang}
+                onCollapse={() => setMobileSidebarOpen(false)}
+                statuses={statuses}
+              />
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ── Mobile tab bar — identical style to InteractiveTutorial ─── */}
       <div className="flex shrink-0 items-center border-b border-zinc-200 dark:border-zinc-800 md:hidden">
@@ -432,8 +475,8 @@ export function PracticeIDE({ problem, initialLang }: Props) {
             </div>
           </div>
 
-          {/* Toolbar — identical style to InteractiveTutorial */}
-          <div className="flex shrink-0 items-center gap-2 border-t border-zinc-200 bg-zinc-50 px-4 py-2 dark:border-zinc-800 dark:bg-zinc-900">
+          {/* Toolbar — desktop only; mobile uses single bottom bar when on code tab */}
+          <div className="hidden shrink-0 items-center gap-2 border-t border-zinc-200 bg-zinc-50 px-4 py-2 dark:border-zinc-800 dark:bg-zinc-900 md:flex">
             <select
               value={lang}
               onChange={(e) => setLang(e.target.value as SupportedLanguage)}
@@ -486,10 +529,14 @@ export function PracticeIDE({ problem, initialLang }: Props) {
             </button>
           </div>
 
-          {/* Vertical resize handle — identical to InteractiveTutorial */}
+          {/* Vertical resize handle — touch-friendly on mobile */}
           <div
             onMouseDown={startDragV}
-            className="group relative h-1 shrink-0 cursor-row-resize bg-zinc-200 transition-colors hover:bg-indigo-400 dark:bg-zinc-800 dark:hover:bg-indigo-600"
+            onTouchStart={startDragVTouch}
+            className="group relative shrink-0 cursor-row-resize touch-none bg-zinc-200 transition-colors hover:bg-indigo-400 dark:bg-zinc-800 dark:hover:bg-indigo-600"
+            style={{ minHeight: 24 }}
+            role="separator"
+            aria-label="Resize output"
           >
             <GripDots />
           </div>
@@ -562,34 +609,46 @@ export function PracticeIDE({ problem, initialLang }: Props) {
         </div>
       </div>
 
-      {/* Mobile persistent bottom action bar — identical to InteractiveTutorial */}
-      <div className="fixed bottom-0 left-0 right-0 z-[54] flex items-center gap-2 border-t border-zinc-200 bg-zinc-50 px-4 py-2 md:hidden dark:border-zinc-800 dark:bg-zinc-900">
-        <button
-          type="button"
-          onClick={handleRun}
-          disabled={running || submitting}
-          className="flex flex-1 items-center justify-center gap-1 rounded-md bg-green-100 py-2 text-sm font-medium text-green-800 disabled:opacity-50 dark:bg-green-900/40 dark:text-green-300"
-        >
-          {running ? "…" : "▶ Run"}
-        </button>
-        {problem.testCases?.length && (lang === "go" || lang === "python" || lang === "javascript" || lang === "cpp" || lang === "java" || lang === "rust") && (
+      {/* Mobile bottom bar — only when on Code tab (not on Instructions) */}
+      {mobileTab === "code" && (
+        <div className="fixed bottom-0 left-0 right-0 z-[54] flex items-center gap-2 border-t border-zinc-200 bg-zinc-50 px-3 py-2 md:hidden dark:border-zinc-800 dark:bg-zinc-900">
+          <select
+            value={lang}
+            onChange={(e) => setLang(e.target.value as SupportedLanguage)}
+            title="Language"
+            className="w-24 shrink-0 rounded-md border border-zinc-300 bg-white px-2 py-2 text-sm text-zinc-700 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-200"
+          >
+            {LANG_ORDER.map((l) => (
+              <option key={l} value={l}>{LANGUAGES[l]?.name ?? l}</option>
+            ))}
+          </select>
           <button
             type="button"
-            onClick={handleSubmit}
+            onClick={handleRun}
             disabled={running || submitting}
-            className="flex flex-1 items-center justify-center gap-1 rounded-md bg-indigo-600 py-2 text-sm font-medium text-white disabled:opacity-50"
+            className="flex flex-1 items-center justify-center gap-1 rounded-md bg-green-100 py-2 text-sm font-medium text-green-800 disabled:opacity-50 dark:bg-green-900/40 dark:text-green-300"
           >
-            {submitting ? "…" : "✓ Submit"}
+            {running ? "…" : "▶ Run"}
           </button>
-        )}
-        <button
-          type="button"
-          onClick={handleReset}
-          className="flex flex-1 items-center justify-center rounded-md border border-zinc-300 py-2 text-sm text-zinc-500 dark:border-zinc-700 dark:text-zinc-400"
-        >
-          Reset
-        </button>
-      </div>
+          {problem.testCases?.length && (lang === "go" || lang === "python" || lang === "javascript" || lang === "cpp" || lang === "java" || lang === "rust") && (
+            <button
+              type="button"
+              onClick={handleSubmit}
+              disabled={running || submitting}
+              className="flex flex-1 items-center justify-center gap-1 rounded-md bg-indigo-600 py-2 text-sm font-medium text-white disabled:opacity-50"
+            >
+              {submitting ? "…" : "✓ Submit"}
+            </button>
+          )}
+          <button
+            type="button"
+            onClick={handleReset}
+            className="flex shrink-0 items-center justify-center rounded-md border border-zinc-300 px-3 py-2 text-sm text-zinc-500 dark:border-zinc-700 dark:text-zinc-400"
+          >
+            Reset
+          </button>
+        </div>
+      )}
 
       {showShortcuts && <ShortcutsModal onClose={() => setShowShortcuts(false)} />}
     </div>

@@ -8,6 +8,8 @@ export interface PanelResizeState {
   isDragging: false | "h" | "v";
   startDragH: (e: React.MouseEvent) => void;
   startDragV: (e: React.MouseEvent) => void;
+  startDragHTouch: (e: React.TouchEvent) => void;
+  startDragVTouch: (e: React.TouchEvent) => void;
 }
 
 export function usePanelResize(): PanelResizeState {
@@ -32,23 +34,39 @@ export function usePanelResize(): PanelResizeState {
   useEffect(() => { localStorage.setItem("it-outputHeight", String(outputHeight)); }, [outputHeight]);
 
   useEffect(() => {
-    function onMouseMove(e: MouseEvent) {
+    function applyMove(clientX: number, clientY: number) {
       const ds = dragState.current;
       if (!ds) return;
       if (ds.type === "h") {
-        setLeftWidth(Math.max(200, Math.min(620, ds.startValue + (e.clientX - ds.startX))));
+        setLeftWidth(Math.max(200, Math.min(620, ds.startValue + (clientX - ds.startX))));
       } else {
-        setOutputHeight(Math.max(60, Math.min(520, ds.startValue + (ds.startY - e.clientY))));
+        setOutputHeight(Math.max(60, Math.min(520, ds.startValue + (ds.startY - clientY))));
       }
+    }
+    function onMouseMove(e: MouseEvent) {
+      applyMove(e.clientX, e.clientY);
     }
     function onMouseUp() {
       if (dragState.current) { dragState.current = null; setIsDragging(false); }
     }
+    function onTouchMove(e: TouchEvent) {
+      if (dragState.current && e.cancelable) e.preventDefault();
+      if (e.touches.length) applyMove(e.touches[0].clientX, e.touches[0].clientY);
+    }
+    function onTouchEnd() {
+      if (dragState.current) { dragState.current = null; setIsDragging(false); }
+    }
     window.addEventListener("mousemove", onMouseMove);
     window.addEventListener("mouseup", onMouseUp);
+    window.addEventListener("touchmove", onTouchMove, { passive: false });
+    window.addEventListener("touchend", onTouchEnd);
+    window.addEventListener("touchcancel", onTouchEnd);
     return () => {
       window.removeEventListener("mousemove", onMouseMove);
       window.removeEventListener("mouseup", onMouseUp);
+      window.removeEventListener("touchmove", onTouchMove);
+      window.removeEventListener("touchend", onTouchEnd);
+      window.removeEventListener("touchcancel", onTouchEnd);
     };
   }, []);
 
@@ -64,5 +82,19 @@ export function usePanelResize(): PanelResizeState {
     setIsDragging("v");
   }
 
-  return { leftWidth, outputHeight, isDragging, startDragH, startDragV };
+  function startDragHTouch(e: React.TouchEvent) {
+    e.preventDefault();
+    const t = e.touches[0];
+    if (t) dragState.current = { type: "h", startX: t.clientX, startY: 0, startValue: leftWidth };
+    setIsDragging("h");
+  }
+
+  function startDragVTouch(e: React.TouchEvent) {
+    e.preventDefault();
+    const t = e.touches[0];
+    if (t) dragState.current = { type: "v", startX: 0, startY: t.clientY, startValue: outputHeight };
+    setIsDragging("v");
+  }
+
+  return { leftWidth, outputHeight, isDragging, startDragH, startDragV, startDragHTouch, startDragVTouch };
 }
