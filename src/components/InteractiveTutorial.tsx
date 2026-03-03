@@ -68,7 +68,7 @@ export default function InteractiveTutorial({
 
   const editor = useCodeEditor(currentSteps[0]?.starter ?? "", ideLang);
   const stepProgress = useStepProgress(currentSteps, ideLang, tutorialSlug, next, editor.setCode, user?.id);
-  const { leftWidth, outputHeight, isDragging, startDragH, startDragV } = usePanelResize();
+  const { leftWidth, outputHeight, isDragging, startDragH, startDragV, startDragVTouch } = usePanelResize();
 
   const [bookmarked, setBookmarked] = useState(false);
   const [showNav, setShowNav] = useState(false);
@@ -215,17 +215,17 @@ export default function InteractiveTutorial({
 
       {/* ── Top Bar ── */}
       <header className="flex h-12 shrink-0 items-center justify-between border-b border-zinc-200 bg-zinc-50 px-4 dark:border-zinc-800 dark:bg-zinc-900">
-        <div className="flex items-center gap-2">
-          <Link href="/" className="flex items-center gap-2 rounded-md py-1 pr-2 transition-colors hover:bg-zinc-200 dark:hover:bg-zinc-800" aria-label="Back to home">
+        <div className="flex min-w-0 flex-1 items-center gap-2 md:flex-initial">
+          <button onClick={() => { setShowNav(true); setExpandedSlug(tutorialSlug); }} aria-label="Open course outline" className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md text-zinc-600 transition-colors hover:bg-zinc-200 hover:text-zinc-900 md:h-8 md:w-8 dark:text-zinc-400 dark:hover:bg-zinc-700 dark:hover:text-zinc-100">
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><line x1="2" y1="4.5" x2="16" y2="4.5" /><line x1="2" y1="9" x2="16" y2="9" /><line x1="2" y1="13.5" x2="16" y2="13.5" /></svg>
+          </button>
+          <Link href="/" className="hidden items-center gap-2 rounded-md py-1 pr-2 transition-colors hover:bg-zinc-200 dark:hover:bg-zinc-800 md:flex" aria-label="Back to home">
             <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-indigo-600 text-xs font-bold text-white">U</span>
             <span className="text-sm font-bold text-zinc-800 dark:text-zinc-100">uByte</span>
           </Link>
-          <button onClick={() => { setShowNav(true); setExpandedSlug(tutorialSlug); }} aria-label="Open course outline" className="flex h-8 w-8 items-center justify-center rounded text-zinc-500 transition-colors hover:bg-zinc-200 hover:text-zinc-800 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-200">
-            <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><line x1="2" y1="4.5" x2="16" y2="4.5" /><line x1="2" y1="9" x2="16" y2="9" /><line x1="2" y1="13.5" x2="16" y2="13.5" /></svg>
-          </button>
         </div>
-        <h1 className="max-w-[40%] truncate text-sm font-semibold text-zinc-800 dark:text-zinc-100">{tutorialTitle}</h1>
-        <div className="flex items-center gap-3">
+        <h1 className="min-w-0 max-w-[45%] flex-1 truncate text-center text-sm font-semibold text-zinc-800 dark:text-zinc-100 md:max-w-[40%] md:flex-initial">{tutorialTitle}</h1>
+        <div className="flex flex-1 justify-end gap-3 md:flex-initial">
           {user && (
             <>
               {challengeMode && (
@@ -329,8 +329,8 @@ export default function InteractiveTutorial({
             </div>
           </div>
 
-          {/* Toolbar */}
-          <div className="flex shrink-0 items-center gap-2 border-t border-zinc-200 bg-zinc-50 px-4 py-2 dark:border-zinc-800 dark:bg-zinc-900">
+          {/* Toolbar — desktop only; mobile uses single bottom bar when on Code tab */}
+          <div className="hidden shrink-0 items-center gap-2 border-t border-zinc-200 bg-zinc-50 px-4 py-2 dark:border-zinc-800 dark:bg-zinc-900 md:flex">
             <select
               value={ideLang}
               onChange={(e) => setIdeLang(e.target.value as SupportedLanguage)}
@@ -375,8 +375,15 @@ export default function InteractiveTutorial({
             </button>
           </div>
 
-          {/* Vertical resize handle */}
-          <div onMouseDown={startDragV} className="group relative h-1 shrink-0 cursor-row-resize bg-zinc-200 transition-colors hover:bg-indigo-400 dark:bg-zinc-800 dark:hover:bg-indigo-600">
+          {/* Vertical resize handle — touch-friendly on mobile */}
+          <div
+            onMouseDown={startDragV}
+            onTouchStart={startDragVTouch}
+            className="group relative shrink-0 cursor-row-resize touch-none bg-zinc-200 transition-colors hover:bg-indigo-400 dark:bg-zinc-800 dark:hover:bg-indigo-600"
+            style={{ minHeight: 24 }}
+            role="separator"
+            aria-label="Resize output"
+          >
             <GripDots />
           </div>
 
@@ -399,18 +406,30 @@ export default function InteractiveTutorial({
         </div>
       </div>
 
-      {/* Mobile persistent bottom action bar */}
-      <div className="fixed bottom-0 left-0 right-0 z-[54] flex items-center gap-2 border-t border-zinc-200 bg-zinc-50 px-4 py-2 md:hidden dark:border-zinc-800 dark:bg-zinc-900">
-        <button onClick={() => stepProgress.handleRun(editor.code, editor.setErrorLines)} disabled={stepProgress.status === "running"} className="flex flex-1 items-center justify-center gap-1 rounded-md bg-green-100 py-2 text-sm font-medium text-green-800 disabled:opacity-50 dark:bg-green-900/40 dark:text-green-300">
-          {stepProgress.status === "running" ? "…" : "▶ Run"}
-        </button>
-        <button onClick={() => stepProgress.handleCheck(editor.code, currentStep, editor.setCode, editor.setErrorLines)} disabled={stepProgress.status === "running"} className="flex flex-1 items-center justify-center gap-1 rounded-md bg-indigo-700 py-2 text-sm font-medium text-white disabled:opacity-50">
-          ✓ Check
-        </button>
-        <button onClick={() => stepProgress.handleReset(currentStep, editor.setCode, editor.setErrorLines)} className="flex flex-1 items-center justify-center rounded-md border border-zinc-300 py-2 text-sm text-zinc-500 dark:border-zinc-700 dark:text-zinc-400">
-          Reset
-        </button>
-      </div>
+      {/* Mobile bottom bar — only when on Code tab (not on Instructions) */}
+      {mobileTab === "code" && (
+        <div className="fixed bottom-0 left-0 right-0 z-[54] flex items-center gap-2 border-t border-zinc-200 bg-zinc-50 px-3 py-2 md:hidden dark:border-zinc-800 dark:bg-zinc-900">
+          <select
+            value={ideLang}
+            onChange={(e) => setIdeLang(e.target.value as SupportedLanguage)}
+            title="Language"
+            className="w-24 shrink-0 rounded-md border border-zinc-300 bg-white px-2 py-2 text-sm text-zinc-700 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-200"
+          >
+            {(Object.keys(LANGUAGES) as SupportedLanguage[]).map((l) => (
+              <option key={l} value={l}>{LANGUAGES[l].name}</option>
+            ))}
+          </select>
+          <button onClick={() => stepProgress.handleRun(editor.code, editor.setErrorLines)} disabled={stepProgress.status === "running"} className="flex flex-1 items-center justify-center gap-1 rounded-md bg-green-100 py-2 text-sm font-medium text-green-800 disabled:opacity-50 dark:bg-green-900/40 dark:text-green-300">
+            {stepProgress.status === "running" ? "…" : "▶ Run"}
+          </button>
+          <button onClick={() => stepProgress.handleCheck(editor.code, currentStep, editor.setCode, editor.setErrorLines)} disabled={stepProgress.status === "running"} className="flex flex-1 items-center justify-center gap-1 rounded-md bg-indigo-700 py-2 text-sm font-medium text-white disabled:opacity-50">
+            ✓ Check
+          </button>
+          <button onClick={() => stepProgress.handleReset(currentStep, editor.setCode, editor.setErrorLines)} className="flex shrink-0 items-center justify-center rounded-md border border-zinc-300 px-3 py-2 text-sm text-zinc-500 dark:border-zinc-700 dark:text-zinc-400">
+            Reset
+          </button>
+        </div>
+      )}
       {showShortcuts && <ShortcutsModal onClose={() => setShowShortcuts(false)} />}
       {showSnapshots && (
         <SnapshotDrawer
