@@ -42,6 +42,10 @@ export function useCodeEditor(
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   async function handleFormat() {
+    if (lang !== "go") {
+      // Format is only supported for Go (go.dev/_/fmt); other languages use Judge0, no client formatter
+      return;
+    }
     setFormatting(true);
     try {
       const body = new URLSearchParams({ body: code, imports: "true" });

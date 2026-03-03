@@ -1,5 +1,10 @@
 import type { LanguageConfig, SupportedLanguage } from "./types";
 import { highlightGo } from "@/lib/highlight-go";
+import { highlightPython } from "@/lib/highlight-python";
+import { highlightJavaScript } from "@/lib/highlight-javascript";
+import { highlightCpp } from "@/lib/highlight-cpp";
+import { highlightJava } from "@/lib/highlight-java";
+import { highlightRust } from "@/lib/highlight-rust";
 
 export const LANGUAGES: Record<SupportedLanguage, LanguageConfig> = {
   go: {
@@ -138,15 +143,18 @@ export function getHighlighter(lang: SupportedLanguage): (code: string) => strin
     case "go":
       return highlightGo;
     case "python":
+      return highlightPython;
+    case "javascript":
+      return highlightJavaScript;
     case "cpp":
-      // Placeholder: return passthrough (no highlighting) until we add highlighters
-      return (code: string) =>
-        code
-          .replace(/&/g, "&amp;")
-          .replace(/</g, "&lt;")
-          .replace(/>/g, "&gt;");
+      return highlightCpp;
+    case "java":
+      return highlightJava;
+    case "rust":
+      return highlightRust;
     default:
-      return (code: string) => code.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+      return (code: string) =>
+        code.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
   }
 }
 
