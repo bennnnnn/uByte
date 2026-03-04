@@ -9,61 +9,18 @@ const PROBLEMS = [
   { label: "Climbing Stairs",    diff: "easy",   color: "text-emerald-600 dark:text-emerald-400" },
 ];
 
+const CARD_STYLE =
+  "border-indigo-200 bg-gradient-to-br from-white to-indigo-50/60 hover:border-indigo-400 hover:shadow-indigo-100 dark:border-indigo-900/40 dark:from-zinc-900 dark:to-indigo-950/20 dark:hover:border-indigo-700";
+const BADGE_STYLE = "bg-indigo-100 text-indigo-700 dark:bg-indigo-950 dark:text-indigo-400";
+const ARROW_STYLE = "text-indigo-600 dark:text-indigo-400";
+
 const LANGS = [
-  {
-    slug: "go",
-    icon: "🐹",
-    label: "Go",
-    desc: "Arrays, hashmaps & goroutines",
-    card: "border-cyan-200 bg-gradient-to-br from-white to-cyan-50/60 hover:border-cyan-400 hover:shadow-cyan-100 dark:border-cyan-900/40 dark:from-zinc-900 dark:to-cyan-950/20 dark:hover:border-cyan-700",
-    badge: "bg-cyan-100 text-cyan-700 dark:bg-cyan-950 dark:text-cyan-400",
-    arrow: "text-cyan-600 dark:text-cyan-400",
-  },
-  {
-    slug: "python",
-    icon: "🐍",
-    label: "Python",
-    desc: "Clean syntax, fast prototyping",
-    card: "border-blue-200 bg-gradient-to-br from-white to-blue-50/60 hover:border-blue-400 hover:shadow-blue-100 dark:border-blue-900/40 dark:from-zinc-900 dark:to-blue-950/20 dark:hover:border-blue-700",
-    badge: "bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-400",
-    arrow: "text-blue-600 dark:text-blue-400",
-  },
-  {
-    slug: "javascript",
-    icon: "🟨",
-    label: "JavaScript",
-    desc: "Closures, callbacks & async",
-    card: "border-yellow-200 bg-gradient-to-br from-white to-yellow-50/60 hover:border-yellow-400 hover:shadow-yellow-100 dark:border-yellow-900/40 dark:from-zinc-900 dark:to-yellow-950/20 dark:hover:border-yellow-700",
-    badge: "bg-yellow-100 text-yellow-700 dark:bg-yellow-950 dark:text-yellow-400",
-    arrow: "text-yellow-600 dark:text-yellow-500",
-  },
-  {
-    slug: "java",
-    icon: "☕",
-    label: "Java",
-    desc: "OOP, generics & collections",
-    card: "border-orange-200 bg-gradient-to-br from-white to-orange-50/60 hover:border-orange-400 hover:shadow-orange-100 dark:border-orange-900/40 dark:from-zinc-900 dark:to-orange-950/20 dark:hover:border-orange-700",
-    badge: "bg-orange-100 text-orange-700 dark:bg-orange-950 dark:text-orange-400",
-    arrow: "text-orange-600 dark:text-orange-400",
-  },
-  {
-    slug: "rust",
-    icon: "🦀",
-    label: "Rust",
-    desc: "Ownership, lifetimes & safety",
-    card: "border-red-200 bg-gradient-to-br from-white to-red-50/60 hover:border-red-400 hover:shadow-red-100 dark:border-red-900/40 dark:from-zinc-900 dark:to-red-950/20 dark:hover:border-red-700",
-    badge: "bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-400",
-    arrow: "text-red-600 dark:text-red-400",
-  },
-  {
-    slug: "cpp",
-    icon: "⚙️",
-    label: "C++",
-    desc: "Pointers, STL & performance",
-    card: "border-violet-200 bg-gradient-to-br from-white to-violet-50/60 hover:border-violet-400 hover:shadow-violet-100 dark:border-violet-900/40 dark:from-zinc-900 dark:to-violet-950/20 dark:hover:border-violet-700",
-    badge: "bg-violet-100 text-violet-700 dark:bg-violet-950 dark:text-violet-400",
-    arrow: "text-violet-600 dark:text-violet-400",
-  },
+  { slug: "go",         icon: "🐹", label: "Go",         desc: "Arrays, hashmaps & goroutines", card: CARD_STYLE, badge: BADGE_STYLE, arrow: ARROW_STYLE },
+  { slug: "python",     icon: "🐍", label: "Python",     desc: "Clean syntax, fast prototyping", card: CARD_STYLE, badge: BADGE_STYLE, arrow: ARROW_STYLE },
+  { slug: "javascript", icon: "🟨", label: "JavaScript", desc: "Closures, callbacks & async",   card: CARD_STYLE, badge: BADGE_STYLE, arrow: ARROW_STYLE },
+  { slug: "java",       icon: "☕", label: "Java",       desc: "OOP, generics & collections",   card: CARD_STYLE, badge: BADGE_STYLE, arrow: ARROW_STYLE },
+  { slug: "rust",       icon: "🦀", label: "Rust",       desc: "Ownership, lifetimes & safety", card: CARD_STYLE, badge: BADGE_STYLE, arrow: ARROW_STYLE },
+  { slug: "cpp",        icon: "⚙️", label: "C++",        desc: "Pointers, STL & performance",   card: CARD_STYLE, badge: BADGE_STYLE, arrow: ARROW_STYLE },
 ];
 
 export default function PracticeSection() {

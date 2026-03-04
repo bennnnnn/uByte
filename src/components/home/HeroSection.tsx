@@ -137,7 +137,7 @@ export default function HeroSection() {
             {/* Badge */}
             <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-indigo-200 bg-indigo-50 px-4 py-1.5 text-[11px] font-bold uppercase tracking-[0.12em] text-indigo-600 dark:border-indigo-800 dark:bg-indigo-950/50 dark:text-indigo-400">
               <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-indigo-500" />
-              Free · No signup · 6 Languages
+              Free to start · No signup · 6 Languages
             </div>
 
             {/* Headline */}
@@ -172,7 +172,7 @@ export default function HeroSection() {
                 href="/go"
                 className="group inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-7 py-3 text-sm font-bold text-white shadow-lg shadow-indigo-600/25 transition-all hover:bg-indigo-500 hover:shadow-indigo-500/40"
               >
-                Start for free
+                Start free
                 <svg className="h-4 w-4 transition-transform group-hover:translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
                 </svg>
@@ -188,10 +188,10 @@ export default function HeroSection() {
             {/* Stats */}
             <div className="flex flex-wrap gap-6 border-t border-zinc-200 pt-8 dark:border-zinc-800">
               {[
-                { n: "6",    label: "Languages"  },
+                { n: "6",    label: "Languages"   },
                 { n: "19",   label: "Topics each" },
                 { n: "11+",  label: "Problems"    },
-                { n: "100%", label: "Free"        },
+                { n: "Free", label: "to start"    },
               ].map(({ n, label }) => (
                 <div key={label}>
                   <p className="text-2xl font-black text-zinc-900 dark:text-zinc-100">{n}</p>
