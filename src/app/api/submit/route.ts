@@ -3,7 +3,7 @@ import { createHash } from "crypto";
 import { getCurrentUser } from "@/lib/auth";
 import { insertSubmission, getConsecutiveFailures } from "@/lib/db/submissions";
 import { savePracticeAttempt, getPracticeAttempts, addXp, getUserById } from "@/lib/db";
-import { hasPaidAccess } from "@/lib/plans";
+import { hasPaidAccess, isPracticeProblemFree } from "@/lib/plans";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 import { withErrorHandling } from "@/lib/api-utils";
 import { runJudge } from "@/lib/practice/judge-runner";
@@ -80,7 +80,8 @@ export const POST = withErrorHandling("POST /api/submit", async (request: NextRe
     (response as Record<string, number>).consecutive_failures = consecutiveFailures;
 
     const profile = await getUserById(user.userId);
-    if (hasPaidAccess(profile?.plan)) {
+    const canSaveProgress = hasPaidAccess(profile?.plan) || isPracticeProblemFree(String(problemId));
+    if (canSaveProgress) {
       if (result.verdict === "accepted") {
         const { wasFirstSolve } = await savePracticeAttempt(user.userId, String(problemId), "solved");
         if (wasFirstSolve) {

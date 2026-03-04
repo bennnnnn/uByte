@@ -3,10 +3,7 @@ import Link from "next/link";
 import { getAllPracticeProblems } from "@/lib/practice/problems";
 import { LANGUAGES, getAllLanguageSlugs } from "@/lib/languages/registry";
 import type { SupportedLanguage } from "@/lib/languages/types";
-import { getCurrentUser } from "@/lib/auth";
-import { getUserPlan } from "@/lib/db";
-import { hasPaidAccess } from "@/lib/plans";
-import UpgradeWall from "@/components/UpgradeWall";
+import { FREE_PRACTICE_LIMIT } from "@/lib/plans";
 
 export const dynamic = "force-dynamic";
 
@@ -30,19 +27,6 @@ const LANG_DESC: Record<string, string> = {
 };
 
 export default async function PracticePage() {
-  const user = await getCurrentUser();
-  const plan = user ? await getUserPlan(user.userId) : "free";
-  if (!hasPaidAccess(plan)) {
-    return (
-      <UpgradeWall
-        tutorialTitle="Interview Practice"
-        subtitle="Upgrade to unlock all practice problems, all tutorials, and AI feedback."
-        backHref="/"
-        backLabel="← Back to home"
-      />
-    );
-  }
-
   const problems = getAllPracticeProblems();
   const easy   = problems.filter((p) => p.difficulty === "easy").length;
   const medium = problems.filter((p) => p.difficulty === "medium").length;
@@ -59,7 +43,7 @@ export default async function PracticePage() {
             Interview Practice
           </h1>
           <p className="mt-2 max-w-xl text-zinc-600 dark:text-zinc-400">
-            Sharpen your coding skills with classic interview problems. Pick your language, read the problem, and write real code in the browser — just like LeetCode.
+            Sharpen your coding skills with classic interview problems. Pick your language, read the problem, and write real code in the browser — just like LeetCode. First {FREE_PRACTICE_LIMIT} problems free per language; upgrade for full access.
           </p>
           <div className="mt-4 flex gap-3 text-sm">
             <span className="rounded-full bg-emerald-100 px-3 py-1 font-medium text-emerald-700 dark:bg-emerald-950 dark:text-emerald-400">

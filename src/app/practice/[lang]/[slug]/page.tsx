@@ -6,7 +6,7 @@ import type { SupportedLanguage } from "@/lib/languages/types";
 import { PracticeIDE } from "./PracticeIDE";
 import { getCurrentUser } from "@/lib/auth";
 import { getUserPlan } from "@/lib/db";
-import { hasPaidAccess } from "@/lib/plans";
+import { hasPaidAccess, isPracticeProblemFree } from "@/lib/plans";
 import UpgradeWall from "@/components/UpgradeWall";
 
 type Props = { params: Promise<{ lang: string; slug: string }> };
@@ -40,13 +40,14 @@ export default async function PracticeProblemPage({ params }: Props) {
 
   const user = await getCurrentUser();
   const plan = user ? await getUserPlan(user.userId) : "free";
-  if (!hasPaidAccess(plan)) {
+  const canAccess = hasPaidAccess(plan) || isPracticeProblemFree(slug);
+  if (!canAccess) {
     return (
       <UpgradeWall
         tutorialTitle="Interview Practice"
-        subtitle="Upgrade to unlock all practice problems, all tutorials, and AI feedback."
-        backHref="/"
-        backLabel="← Back to home"
+        subtitle="You've used your free problems for this language. Upgrade to unlock all problems and save progress."
+        backHref={`/practice/${lang}`}
+        backLabel={`← Back to ${LANGUAGES[lang as SupportedLanguage]?.name ?? lang} practice`}
       />
     );
   }

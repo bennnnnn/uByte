@@ -5,10 +5,7 @@ import { getAllPracticeProblems } from "@/lib/practice/problems";
 import { isSupportedLanguage, LANGUAGES } from "@/lib/languages/registry";
 import type { SupportedLanguage } from "@/lib/languages/types";
 import type { Difficulty } from "@/lib/practice/types";
-import { getCurrentUser } from "@/lib/auth";
-import { getUserPlan } from "@/lib/db";
-import { hasPaidAccess } from "@/lib/plans";
-import UpgradeWall from "@/components/UpgradeWall";
+import { isPracticeProblemFree } from "@/lib/plans";
 
 type Props = { params: Promise<{ lang: string }> };
 
@@ -42,19 +39,6 @@ export async function generateStaticParams() {
 export default async function PracticeLangPage({ params }: Props) {
   const { lang } = await params;
   if (!isSupportedLanguage(lang)) notFound();
-
-  const user = await getCurrentUser();
-  const plan = user ? await getUserPlan(user.userId) : "free";
-  if (!hasPaidAccess(plan)) {
-    return (
-      <UpgradeWall
-        tutorialTitle="Interview Practice"
-        subtitle="Upgrade to unlock all practice problems, all tutorials, and AI feedback."
-        backHref="/"
-        backLabel="← Back to home"
-      />
-    );
-  }
 
   const l = lang as SupportedLanguage;
   const config = LANGUAGES[l];
@@ -112,7 +96,9 @@ export default async function PracticeLangPage({ params }: Props) {
               </div>
 
               <ul className="space-y-2">
-                {items.map((p, idx) => (
+                {items.map((p, idx) => {
+                  const free = isPracticeProblemFree(p.slug);
+                  return (
                   <li key={p.slug}>
                     <Link
                       href={`/practice/${lang}/${p.slug}`}
@@ -124,6 +110,11 @@ export default async function PracticeLangPage({ params }: Props) {
                       <span className="flex-1 font-medium text-zinc-900 group-hover:text-indigo-700 dark:text-zinc-100 dark:group-hover:text-indigo-400">
                         {p.title}
                       </span>
+                      {!free && (
+                        <span className="shrink-0 rounded-full border border-amber-300 bg-amber-50 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-amber-700 dark:border-amber-700 dark:bg-amber-950/50 dark:text-amber-400">
+                          Pro
+                        </span>
+                      )}
                       <span className={`shrink-0 rounded-full px-2.5 py-0.5 text-xs font-medium capitalize ${DIFFICULTY_STYLES[p.difficulty]}`}>
                         {p.difficulty}
                       </span>
@@ -138,7 +129,8 @@ export default async function PracticeLangPage({ params }: Props) {
                       </svg>
                     </Link>
                   </li>
-                ))}
+                  );
+                })}
               </ul>
             </section>
           ) : null
