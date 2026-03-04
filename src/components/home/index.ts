@@ -5,4 +5,5 @@ export { default as TutorialCard } from "./TutorialCard";
 export { default as HomePopularSidebar } from "./HomePopularSidebar";
 export { default as HeroSection } from "./HeroSection";
 export { default as PracticeSection } from "./PracticeSection";
+export { default as PracticeExamsSection } from "./PracticeExamsSection";
 export { default as StepsSection } from "./StepsSection";

@@ -8,6 +8,7 @@ import {
   LanguageCard,
   HeroSection,
   PracticeSection,
+  PracticeExamsSection,
   StepsSection,
 } from "@/components/home";
 import ContinueBanner from "@/components/ContinueBanner";
@@ -114,6 +115,9 @@ export default function Home() {
         {/* Interview practice */}
         <PracticeSection />
 
+        {/* Practice exams */}
+        <PracticeExamsSection />
+
         {/* Quick-nav footer */}
         <nav
           className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 border-t border-zinc-100 pt-8 text-sm dark:border-zinc-800"
@@ -133,6 +137,12 @@ export default function Home() {
             className="font-medium text-indigo-600 hover:underline dark:text-indigo-400"
           >
             Interview practice →
+          </Link>
+          <Link
+            href="/practice-exams"
+            className="font-medium text-indigo-600 hover:underline dark:text-indigo-400"
+          >
+            Practice exams →
           </Link>
         </nav>
       </div>
