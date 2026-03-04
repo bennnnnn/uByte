@@ -100,6 +100,15 @@ export default async function PracticeLangPage({ params, searchParams }: Props) 
     return `/practice/${lang}${q ? `?${q}` : ""}`;
   };
 
+  /** Link to a problem from the list; preserves current category & page so the problem page sidebar shows the same filter. */
+  const buildProblemHref = (slug: string) => {
+    const q = new URLSearchParams();
+    if (categoryFilter) q.set("category", categoryFilter);
+    if (currentPage > 1) q.set("page", String(currentPage));
+    const query = q.toString();
+    return `/practice/${lang}/${slug}${query ? `?${query}` : ""}`;
+  };
+
   return (
     <div className="min-h-full overflow-y-auto">
       {/* Hero header */}
@@ -186,7 +195,7 @@ export default async function PracticeLangPage({ params, searchParams }: Props) 
               return (
                 <li key={p.slug}>
                   <Link
-                    href={`/practice/${lang}/${p.slug}`}
+                    href={buildProblemHref(p.slug)}
                     className="group flex flex-wrap items-center gap-3 px-5 py-4 transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-800/50 sm:flex-nowrap"
                   >
                     <span className="w-8 shrink-0 text-center text-sm font-bold tabular-nums text-zinc-400 group-hover:text-indigo-500 dark:text-zinc-500 dark:group-hover:text-indigo-400">

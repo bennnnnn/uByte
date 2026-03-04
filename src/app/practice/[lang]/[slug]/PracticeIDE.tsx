@@ -4,7 +4,8 @@ import { useState, useCallback, useEffect, useRef } from "react";
 import Link from "next/link";
 import type { PracticeProblem, Difficulty } from "@/lib/practice/types";
 import type { SupportedLanguage } from "@/lib/languages/types";
-import { getStarterForLanguage, getAllPracticeProblems } from "@/lib/practice/problems";
+import { getStarterForLanguage, getAllPracticeProblems, getCategoryForSlug, getPracticeCategories } from "@/lib/practice/problems";
+import type { ProblemCategory } from "@/lib/practice/types";
 import { LANGUAGES } from "@/lib/languages/registry";
 import { useCodeEditor } from "@/hooks/useCodeEditor";
 import { usePanelResize } from "@/hooks/usePanelResize";
@@ -25,6 +26,10 @@ const LANG_ORDER: SupportedLanguage[] = ["go", "python", "cpp", "javascript", "j
 interface Props {
   problem: PracticeProblem;
   initialLang: SupportedLanguage;
+  /** When set, sidebar shows only problems in this category (matches list filter). */
+  categoryFilter?: ProblemCategory | null;
+  /** Page number on the list; used for "back to list" link. */
+  listPage?: number;
 }
 
 /** Three grip dots — identical to InteractiveTutorial */
@@ -38,8 +43,31 @@ function GripDots({ vertical }: { vertical?: boolean }) {
   );
 }
 
-export function PracticeIDE({ problem, initialLang }: Props) {
+function sortProblemsByCategoryAndDifficulty(
+  problems: PracticeProblem[],
+  categoryOrder: ProblemCategory[]
+): PracticeProblem[] {
+  return [...problems].sort((a, b) => {
+    const ca = getCategoryForSlug(a.slug) ?? ("array" as ProblemCategory);
+    const cb = getCategoryForSlug(b.slug) ?? ("array" as ProblemCategory);
+    const ia = categoryOrder.indexOf(ca);
+    const ib = categoryOrder.indexOf(cb);
+    if (ia !== ib) return ia - ib;
+    const diffOrder: Record<string, number> = { easy: 0, medium: 1, hard: 2 };
+    return (diffOrder[a.difficulty] ?? 0) - (diffOrder[b.difficulty] ?? 0);
+  });
+}
+
+export function PracticeIDE({ problem, initialLang, categoryFilter = null, listPage = 1 }: Props) {
   const allProblems = getAllPracticeProblems();
+  const categories = getPracticeCategories();
+  const sidebarProblems =
+    categoryFilter === null || categoryFilter === undefined
+      ? allProblems
+      : sortProblemsByCategoryAndDifficulty(
+          allProblems.filter((p) => getCategoryForSlug(p.slug) === categoryFilter),
+          categories
+        );
   const [lang, setLang] = useState<SupportedLanguage>(initialLang);
   const [output, setOutput]           = useState<string | null>(null);
   const [running, setRunning]         = useState(false);
@@ -373,11 +401,12 @@ export function PracticeIDE({ problem, initialLang }: Props) {
             </div>
             <div className="h-[calc(100%-3rem)] overflow-y-auto">
               <ProblemSidebar
-                problems={allProblems}
+                problems={sidebarProblems}
                 activeSlug={problem.slug}
                 lang={lang}
                 onCollapse={() => setMobileSidebarOpen(false)}
                 statuses={statuses}
+                listQuery={{ category: categoryFilter ?? undefined, page: listPage > 1 ? listPage : undefined }}
               />
             </div>
           </div>
@@ -410,11 +439,12 @@ export function PracticeIDE({ problem, initialLang }: Props) {
           {sidebarOpen ? (
             <div className="flex w-60">
               <ProblemSidebar
-                problems={allProblems}
+                problems={sidebarProblems}
                 activeSlug={problem.slug}
                 lang={lang}
                 onCollapse={() => setSidebarOpen(false)}
                 statuses={statuses}
+                listQuery={{ category: categoryFilter ?? undefined, page: listPage > 1 ? listPage : undefined }}
               />
             </div>
           ) : (

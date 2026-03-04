@@ -10,6 +10,11 @@ const DIFF_BADGE: Record<Difficulty, string> = {
   hard:   "bg-red-100     text-red-700     dark:bg-red-950/60     dark:text-red-400",
 };
 
+interface ListQuery {
+  category?: string;
+  page?: number;
+}
+
 interface Props {
   problems: PracticeProblem[];
   activeSlug: string;
@@ -17,6 +22,17 @@ interface Props {
   onCollapse: () => void;
   /** slug → attempt status; undefined means not yet attempted */
   statuses: Record<string, PracticeAttemptStatus>;
+  /** When set, problem links and "back to list" preserve this filter (e.g. from list page). */
+  listQuery?: ListQuery;
+}
+
+function buildListQueryString(q: ListQuery | undefined): string {
+  if (!q || (!q.category && !q.page)) return "";
+  const params = new URLSearchParams();
+  if (q.category) params.set("category", q.category);
+  if (q.page != null && q.page > 1) params.set("page", String(q.page));
+  const s = params.toString();
+  return s ? `?${s}` : "";
 }
 
 export default function ProblemSidebar({
@@ -25,7 +41,9 @@ export default function ProblemSidebar({
   lang,
   onCollapse,
   statuses,
+  listQuery,
 }: Props) {
+  const queryString = buildListQueryString(listQuery);
   const easy   = problems.filter((p) => p.difficulty === "easy").length;
   const medium = problems.filter((p) => p.difficulty === "medium").length;
   const hard   = problems.filter((p) => p.difficulty === "hard").length;
@@ -73,7 +91,7 @@ export default function ProblemSidebar({
           return (
             <li key={p.slug}>
               <Link
-                href={`/practice/${lang}/${p.slug}`}
+                href={`/practice/${lang}/${p.slug}${queryString}`}
                 className={`group flex items-center gap-3 px-3 py-2.5 text-sm transition-colors ${
                   isActive
                     ? "bg-indigo-50 text-indigo-700 dark:bg-indigo-950/40 dark:text-indigo-300"
@@ -104,14 +122,23 @@ export default function ProblemSidebar({
 
       {/* ── Footer ──────────────────────────────────────── */}
       <div className="shrink-0 border-t border-zinc-200 px-3 py-2.5 dark:border-zinc-800">
-        <div className="flex items-center justify-between text-xs text-zinc-400 dark:text-zinc-500">
-          <span>{problems.length} problems</span>
-          <Link
-            href="/practice"
-            className="hover:text-indigo-600 dark:hover:text-indigo-400"
-          >
-            All languages →
-          </Link>
+        <div className="flex flex-col gap-1.5 text-xs text-zinc-400 dark:text-zinc-500">
+          <span>{problems.length} problems{queryString ? " in this category" : ""}</span>
+          <div className="flex items-center gap-2">
+            <Link
+              href={`/practice/${lang}${queryString}`}
+              className="hover:text-indigo-600 dark:hover:text-indigo-400"
+            >
+              ← Back to list
+            </Link>
+            <span className="text-zinc-300 dark:text-zinc-600">·</span>
+            <Link
+              href="/practice"
+              className="hover:text-indigo-600 dark:hover:text-indigo-400"
+            >
+              All languages →
+            </Link>
+          </div>
         </div>
       </div>
     </nav>
