@@ -51,7 +51,7 @@ export default function StartExamButton({ lang, langName }: Props) {
         type="button"
         onClick={handleStart}
         disabled={loading}
-        className="inline-flex items-center justify-center rounded-xl bg-amber-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-amber-700 disabled:cursor-not-allowed disabled:opacity-60"
+        className="inline-flex items-center justify-center rounded-xl bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-indigo-500 disabled:cursor-not-allowed disabled:opacity-60"
       >
         {loading ? "Starting exam..." : `Start ${langName} exam`}
       </button>
