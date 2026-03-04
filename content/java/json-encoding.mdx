@@ -1,11 +1,47 @@
 ---
-title: "Coming Soon"
-description: "This Java tutorial is coming soon."
-order: 0
-difficulty: "beginner"
-estimatedMinutes: 15
+title: "JSON in Java"
+description: "Parse and generate JSON using simple string handling or libraries like Gson."
+order: 18
+difficulty: "intermediate"
+estimatedMinutes: 12
 ---
 
-## Coming Soon
+## Concepts in this chapter
 
-This tutorial is being translated to Java. Check back soon, or try the **Go version** for now.
+You will learn and practice:
+
+- **JSON format** — objects {}, arrays [], strings, numbers
+- **Manual parsing** — for simple cases; use libraries in production
+- **Gson / Jackson** — fromJson, toJson; ObjectMapper
+- **POJOs** — plain Java objects with getters/setters for mapping
+- **JSON in HTTP** — send and receive JSON in request/response body
+
+---
+
+## Simple JSON String
+
+```java
+// Without a library, build JSON manually for simple cases:
+String name = "Alice";
+int age = 30;
+String json = "{\"name\":\"" + name + "\",\"age\":" + age + "}";
+System.out.println(json);
+```
+
+---
+
+## With Gson (if available)
+
+```java
+// Gson gson = new Gson();
+// String json = gson.toJson(person);
+// Person p = gson.fromJson(json, Person.class);
+```
+
+In the exercise we use simple string building so it runs without external deps.
+
+---
+
+## What's Next?
+
+Next: **Streams and Lambdas** — functional-style operations on collections.

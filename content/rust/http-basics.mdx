@@ -1,11 +1,34 @@
 ---
-title: "Coming Soon"
-description: "This Rust tutorial is coming soon."
-order: 0
-difficulty: "beginner"
-estimatedMinutes: 15
+title: "HTTP in Rust"
+description: "Make HTTP requests using reqwest or std library basics."
+order: 17
+difficulty: "intermediate"
+estimatedMinutes: 12
 ---
 
-## Coming Soon
+## Concepts in this chapter
 
-This tutorial is being translated to Rust. Check back soon, or try the **Go version** for now.
+You will learn and practice:
+
+- **reqwest** — popular HTTP client crate (add to Cargo.toml in real projects)
+- **Blocking get** — reqwest::blocking::get(url)
+- **Status and body** — response.status(), response.text()
+- **In exercises** — we use simple output so the runner can verify without network
+
+---
+
+## With reqwest (typical)
+
+```rust
+// In a real project: reqwest = "0.11" in Cargo.toml
+// let res = reqwest::blocking::get("https://example.com")?;
+// println!("{}", res.status());
+```
+
+For the in-browser runner we simulate or print a fixed status so the step passes without external deps.
+
+---
+
+## What's Next?
+
+Next: **JSON with serde** — parse and serialize JSON.

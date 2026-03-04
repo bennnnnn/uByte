@@ -1,11 +1,56 @@
 ---
-title: "Coming Soon"
-description: "This Java tutorial is coming soon."
-order: 0
+title: "Instance Methods and Overloading in Java"
+description: "Add behavior to classes with instance methods and overload methods by signature."
+order: 11
 difficulty: "beginner"
-estimatedMinutes: 15
+estimatedMinutes: 12
 ---
 
-## Coming Soon
+## Concepts in this chapter
 
-This tutorial is being translated to Java. Check back soon, or try the **Go version** for now.
+You will learn and practice:
+
+- **Instance methods** — non-static; called on an object; can use this
+- **Static methods** — belong to the class; no this
+- **Overloading** — same method name, different parameter list
+- **Method calls** — object.method() and Class.staticMethod()
+
+---
+
+## Instance vs Static
+
+```java
+public class Counter {
+    private int count = 0;
+
+    public void increment() {
+        count++;
+    }
+    public int getCount() {
+        return count;
+    }
+}
+
+Counter c = new Counter();
+c.increment();
+c.increment();
+System.out.println(c.getCount());  // 2
+```
+
+---
+
+## Overloading
+
+Same name, different parameters (count or types):
+
+```java
+public void print(int x) { System.out.println(x); }
+public void print(String s) { System.out.println(s); }
+public void print(int a, int b) { System.out.println(a + ", " + b); }
+```
+
+---
+
+## What's Next?
+
+Next: **Interfaces and Abstract Classes** — contracts and polymorphism.

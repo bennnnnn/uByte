@@ -1,11 +1,51 @@
 ---
-title: "Coming Soon"
-description: "This Java tutorial is coming soon."
-order: 0
+title: "Exceptions and Error Handling in Java"
+description: "Handle errors with try-catch, throw exceptions, and use finally."
+order: 13
 difficulty: "beginner"
-estimatedMinutes: 15
+estimatedMinutes: 12
 ---
 
-## Coming Soon
+## Concepts in this chapter
 
-This tutorial is being translated to Java. Check back soon, or try the **Go version** for now.
+You will learn and practice:
+
+- **try-catch** — catch exceptions; prevent program crash
+- **throw** — throw checked or unchecked exceptions
+- **finally** — run cleanup code whether or not an exception occurred
+- **Checked vs unchecked** — IOException is checked; RuntimeException is not
+- **Exception hierarchy** — Exception, RuntimeException, Error
+
+---
+
+## try and catch
+
+```java
+try {
+    int n = Integer.parseInt("abc");  // throws NumberFormatException
+} catch (NumberFormatException e) {
+    System.out.println("Invalid number: " + e.getMessage());
+}
+```
+
+---
+
+## throw and finally
+
+```java
+if (age < 0) {
+    throw new IllegalArgumentException("Age cannot be negative");
+}
+
+try {
+    // ...
+} finally {
+    System.out.println("Cleanup");
+}
+```
+
+---
+
+## What's Next?
+
+Next: **Packages and Imports** — organize code into packages.

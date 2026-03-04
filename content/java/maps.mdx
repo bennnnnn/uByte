@@ -1,11 +1,59 @@
 ---
-title: "Coming Soon"
-description: "This Java tutorial is coming soon."
-order: 0
+title: "HashMap and Maps in Java"
+description: "Store and look up key-value pairs with HashMap and the Map interface."
+order: 7
 difficulty: "beginner"
-estimatedMinutes: 15
+estimatedMinutes: 12
 ---
 
-## Coming Soon
+## Concepts in this chapter
 
-This tutorial is being translated to Java. Check back soon, or try the **Go version** for now.
+You will learn and practice:
+
+- **HashMap** — create, put, get, containsKey
+- **Map interface** — Map&lt;K, V&gt; and implementations
+- **Iteration** — keySet, values, entrySet
+- **getOrDefault** — safe lookup with default value
+
+---
+
+## HashMap Basics
+
+```java
+import java.util.HashMap;
+import java.util.Map;
+
+Map<String, Integer> ages = new HashMap<>();
+ages.put("Alice", 30);
+ages.put("Bob", 25);
+System.out.println(ages.get("Alice"));   // 30
+System.out.println(ages.containsKey("Bob"));  // true
+```
+
+---
+
+## getOrDefault and putIfAbsent
+
+```java
+int age = ages.getOrDefault("Charlie", 0);  // 0 if missing
+ages.putIfAbsent("Diana", 28);  // put only if key absent
+```
+
+---
+
+## Iterating
+
+```java
+for (String name : ages.keySet()) {
+    System.out.println(name + ": " + ages.get(name));
+}
+for (Map.Entry<String, Integer> e : ages.entrySet()) {
+    System.out.println(e.getKey() + " -> " + e.getValue());
+}
+```
+
+---
+
+## What's Next?
+
+Next: **Methods and Functions** — defining and calling methods.

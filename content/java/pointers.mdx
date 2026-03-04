@@ -1,11 +1,66 @@
 ---
-title: "Coming Soon"
-description: "This Java tutorial is coming soon."
-order: 0
-difficulty: "beginner"
-estimatedMinutes: 15
+title: "References and Memory in Java"
+description: "Understand references, object identity, and how Java passes objects by reference value."
+order: 9
+difficulty: "intermediate"
+estimatedMinutes: 10
 ---
 
-## Coming Soon
+## Concepts in this chapter
 
-This tutorial is being translated to Java. Check back soon, or try the **Go version** for now.
+You will learn and practice:
+
+- **References vs primitives** — objects are referenced; primitives are copied
+- **Pass by value** — reference value is copied, so the same object is shared
+- **null** — no object; check before use to avoid NullPointerException
+- **Equality** — == for reference equality, equals() for value equality
+
+---
+
+## Primitives vs Objects
+
+- **Primitives** (int, double, boolean, etc.) are stored by value. Assigning copies the value.
+- **Objects** (String, arrays, any class instance) are stored by **reference**. Assigning copies the reference, not the object.
+
+```java
+int a = 10;
+int b = a;   // b is a copy
+b = 20;      // a is still 10
+
+String s1 = "hello";
+String s2 = s1;  // s2 refers to the same String
+```
+
+---
+
+## null and Null Checks
+
+A reference can be `null` (no object). Calling a method on null throws NullPointerException:
+
+```java
+String name = null;
+if (name != null) {
+    System.out.println(name.length());
+}
+// or: Objects.requireNonNull(name);
+```
+
+---
+
+## == vs equals()
+
+- **==** for references compares whether they point to the same object.
+- **equals()** compares content (overridden by String, Integer, etc.).
+
+```java
+String a = "hi";
+String b = new String("hi");
+System.out.println(a == b);        // false (different objects)
+System.out.println(a.equals(b));  // true (same content)
+```
+
+---
+
+## What's Next?
+
+Next: **Classes and Objects** — define your own types.

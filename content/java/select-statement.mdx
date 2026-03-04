@@ -1,11 +1,50 @@
 ---
-title: "Coming Soon"
-description: "This Java tutorial is coming soon."
-order: 0
-difficulty: "beginner"
+title: "Streams and Lambdas in Java"
+description: "Use the Stream API and lambda expressions for functional-style operations on collections."
+order: 19
+difficulty: "intermediate"
 estimatedMinutes: 15
 ---
 
-## Coming Soon
+## Concepts in this chapter
 
-This tutorial is being translated to Java. Check back soon, or try the **Go version** for now.
+You will learn and practice:
+
+- **Lambda** — (x) -> x * 2, (a, b) -> a + b
+- **Stream** — list.stream(), filter, map, collect
+- **filter** — keep elements matching a predicate
+- **map** — transform each element
+- **collect** — toList(), joining(), toMap()
+- **Method references** — String::valueOf, Integer::parseInt
+
+---
+
+## Lambda and Stream
+
+```java
+import java.util.List;
+import java.util.stream.Collectors;
+
+List<Integer> nums = List.of(1, 2, 3, 4, 5);
+List<Integer> doubled = nums.stream()
+    .map(n -> n * 2)
+    .collect(Collectors.toList());
+
+List<Integer> evens = nums.stream()
+    .filter(n -> n % 2 == 0)
+    .collect(Collectors.toList());
+```
+
+---
+
+## Method Reference
+
+```java
+list.stream().map(String::toUpperCase).collect(Collectors.toList());
+```
+
+---
+
+## What's Next?
+
+You've completed the Java tutorial track. Try practice problems or another language!

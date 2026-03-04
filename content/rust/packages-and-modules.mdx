@@ -1,11 +1,52 @@
 ---
-title: "Coming Soon"
-description: "This Rust tutorial is coming soon."
-order: 0
+title: "Crates and Modules in Rust"
+description: "Organize code into modules and use the standard library."
+order: 14
 difficulty: "beginner"
-estimatedMinutes: 15
+estimatedMinutes: 10
 ---
 
-## Coming Soon
+## Concepts in this chapter
 
-This tutorial is being translated to Rust. Check back soon, or try the **Go version** for now.
+You will learn and practice:
+
+- **mod** — declare a module; code in same file or mod.rs / file.rs
+- **use** — bring items into scope: use std::collections::HashMap;
+- **pub** — make items public for other modules
+- **std** — standard library; Vec, HashMap, Option, Result, etc.
+- **Cargo** — crate = package; dependencies in Cargo.toml
+
+---
+
+## use and std
+
+```rust
+use std::collections::HashMap;
+
+fn main() {
+    let mut map = HashMap::new();
+    map.insert("a", 1);
+}
+```
+
+---
+
+## Nested modules
+
+```rust
+mod math {
+    pub fn add(a: i32, b: i32) -> i32 {
+        a + b
+    }
+}
+
+fn main() {
+    println!("{}", math::add(2, 3));
+}
+```
+
+---
+
+## What's Next?
+
+Next: **Threads and Channels** — concurrency in Rust.

@@ -1,11 +1,39 @@
 ---
-title: "Coming Soon"
-description: "This Rust tutorial is coming soon."
-order: 0
+title: "Structs in Rust"
+description: "Define structs, create instances, and use field access."
+order: 10
 difficulty: "beginner"
-estimatedMinutes: 15
+estimatedMinutes: 12
 ---
 
-## Coming Soon
+## Concepts in this chapter
 
-This tutorial is being translated to Rust. Check back soon, or try the **Go version** for now.
+You will learn and practice:
+
+- **struct** — define with named fields
+- **Instantiation** — Point { x: 3, y: 4 }
+- **Field access** — p.x, p.y
+- **Update syntax** — Point { x: 1, ..other } to copy rest from other
+- **Tuple structs** — struct Color(i32, i32, i32);
+
+---
+
+## Defining a Struct
+
+```rust
+struct Point {
+    x: i32,
+    y: i32,
+}
+
+fn main() {
+    let p = Point { x: 3, y: 4 };
+    println!("{} {}", p.x, p.y);
+}
+```
+
+---
+
+## What's Next?
+
+Next: **Methods and impl** — add methods to structs.

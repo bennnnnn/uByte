@@ -1,11 +1,52 @@
 ---
-title: "Coming Soon"
-description: "This Rust tutorial is coming soon."
-order: 0
+title: "Methods and impl in Rust"
+description: "Add methods to structs with impl blocks."
+order: 11
 difficulty: "beginner"
-estimatedMinutes: 15
+estimatedMinutes: 12
 ---
 
-## Coming Soon
+## Concepts in this chapter
 
-This tutorial is being translated to Rust. Check back soon, or try the **Go version** for now.
+You will learn and practice:
+
+- **impl** — impl Struct { fn method(&self) -> T }
+- **&self** — immutable reference to the struct
+- **&mut self** — mutable reference
+- **Associated functions** — fn new() -> Self (no self); called with Struct::new()
+- **Multiple impl** — you can have several impl blocks for the same type
+
+---
+
+## Methods
+
+```rust
+struct Counter {
+    count: u32,
+}
+
+impl Counter {
+    fn new() -> Self {
+        Counter { count: 0 }
+    }
+    fn increment(&mut self) {
+        self.count += 1;
+    }
+    fn get(&self) -> u32 {
+        self.count
+    }
+}
+
+fn main() {
+    let mut c = Counter::new();
+    c.increment();
+    c.increment();
+    println!("{}", c.get());
+}
+```
+
+---
+
+## What's Next?
+
+Next: **Traits** — shared behavior and polymorphism.

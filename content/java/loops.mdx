@@ -1,11 +1,83 @@
 ---
-title: "Coming Soon"
-description: "This Java tutorial is coming soon."
-order: 0
+title: "Loops in Java"
+description: "Master for, while, and for-each loops to repeat code and iterate over collections."
+order: 5
 difficulty: "beginner"
-estimatedMinutes: 15
+estimatedMinutes: 12
 ---
 
-## Coming Soon
+## Concepts in this chapter
 
-This tutorial is being translated to Java. Check back soon, or try the **Go version** for now.
+You will learn and practice:
+
+- **for** — classic init; condition; update (count 1 to 5)
+- **while** — repeat while a condition is true
+- **for-each** — iterate over arrays and collections
+- **break and continue** — exit loop or skip to next iteration
+- **Accumulation** — sum or collect values in a loop
+
+---
+
+## For Loop
+
+The classic three-part for loop: init; condition; update:
+
+```java
+for (int i = 1; i <= 5; i++) {
+    System.out.println(i);
+}
+```
+
+- **Init** runs once before the loop.
+- **Condition** is checked before each iteration.
+- **Update** runs after each iteration.
+
+---
+
+## While Loop
+
+Use `while` when you don't know how many iterations you need:
+
+```java
+int n = 3;
+while (n > 0) {
+    System.out.println(n);
+    n--;
+}
+System.out.println("Liftoff!");
+```
+
+---
+
+## For-Each Loop
+
+Iterate over an array or any `Iterable` without an index:
+
+```java
+String[] fruits = {"apple", "banana", "cherry"};
+for (String fruit : fruits) {
+    System.out.println(fruit);
+}
+```
+
+---
+
+## Break and Continue
+
+- **break** — exit the loop immediately.
+- **continue** — skip the rest of the current iteration and go to the next.
+
+```java
+for (int i = 1; i <= 6; i++) {
+    if (i % 2 == 0) continue;  // skip evens
+    if (i > 5) break;
+    System.out.println(i);
+}
+// prints 1, 3, 5
+```
+
+---
+
+## What's Next?
+
+Next: **Arrays and ArrayList** — fixed-size arrays and dynamic lists.

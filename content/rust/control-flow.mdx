@@ -1,11 +1,54 @@
 ---
-title: "Coming Soon"
-description: "This Rust tutorial is coming soon."
-order: 0
+title: "Control Flow in Rust"
+description: "Master if/else expressions and match for decisions in Rust."
+order: 4
 difficulty: "beginner"
 estimatedMinutes: 15
 ---
 
-## Coming Soon
+## Concepts in this chapter
 
-This tutorial is being translated to Rust. Check back soon, or try the **Go version** for now.
+You will learn and practice:
+
+- **if / else** — conditions are expressions; no parentheses required
+- **if-else chain** — `else if` for multiple branches
+- **match** — exhaustive pattern matching (like switch, but stronger)
+- **No C-style for** — use `loop`, `while`, or `for` over iterators
+- **FizzBuzz** — combine conditions in a loop
+
+---
+
+## if and else
+
+In Rust, `if` is an expression — it produces a value. No parentheses around the condition:
+
+```rust
+let x = 10;
+if x > 5 {
+    println!("big");
+}
+
+let score = 72;
+let result = if score >= 60 { "Pass" } else { "Fail" };
+println!("{}", result);
+```
+
+---
+
+## match
+
+`match` is exhaustive: every possible value must be handled. Use `_` for a catch-all:
+
+```rust
+let day = "Monday";
+let kind = match day {
+    "Saturday" | "Sunday" => "Weekend",
+    _ => "Weekday",
+};
+```
+
+---
+
+## What's Next?
+
+Next: **Loops** — loop, while, and for.

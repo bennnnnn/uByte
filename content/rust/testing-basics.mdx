@@ -1,11 +1,39 @@
 ---
-title: "Coming Soon"
-description: "This Rust tutorial is coming soon."
-order: 0
-difficulty: "beginner"
-estimatedMinutes: 15
+title: "Testing in Rust"
+description: "Write and run unit tests with #[test] and cargo test."
+order: 16
+difficulty: "intermediate"
+estimatedMinutes: 12
 ---
 
-## Coming Soon
+## Concepts in this chapter
 
-This tutorial is being translated to Rust. Check back soon, or try the **Go version** for now.
+You will learn and practice:
+
+- **#[test]** — mark a function as a test
+- **assert!** — assert!(condition)
+- **assert_eq!** — assert_eq!(expected, actual)
+- **#[cfg(test)]** — compile tests only when testing
+- **cargo test** — run all tests
+
+---
+
+## Simple Test
+
+```rust
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn it_works() {
+        assert_eq!(2 + 2, 4);
+    }
+}
+```
+
+In the exercise we simulate the test by calling the function and printing pass/fail so the runner can check output.
+
+---
+
+## What's Next?
+
+Next: **HTTP with reqwest** — make HTTP requests (or use std for basics).

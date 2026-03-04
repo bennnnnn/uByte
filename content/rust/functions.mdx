@@ -1,11 +1,42 @@
 ---
-title: "Coming Soon"
-description: "This Rust tutorial is coming soon."
-order: 0
+title: "Functions in Rust"
+description: "Define and call functions; pass arguments and return values."
+order: 8
 difficulty: "beginner"
-estimatedMinutes: 15
+estimatedMinutes: 12
 ---
 
-## Coming Soon
+## Concepts in this chapter
 
-This tutorial is being translated to Rust. Check back soon, or try the **Go version** for now.
+You will learn and practice:
+
+- **Function syntax** — `fn name(x: i32) -> i32 { }`
+- **Return** — last expression without semicolon, or `return` keyword
+- **Parameters** — pass by value (ownership moves for non-Copy types)
+- **Multiple return** — use a tuple `(i32, bool)`
+- **Unit type** — `()` for functions that don't return a value
+
+---
+
+## Defining Functions
+
+```rust
+fn add(a: i32, b: i32) -> i32 {
+    a + b   // no semicolon = return value
+}
+
+fn greet(name: &str) {
+    println!("Hello, {}!", name);
+}
+
+fn main() {
+    println!("{}", add(3, 5));
+    greet("Rust");
+}
+```
+
+---
+
+## What's Next?
+
+Next: **Ownership and References** — how Rust manages memory.

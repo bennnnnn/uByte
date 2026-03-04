@@ -1,11 +1,44 @@
 ---
-title: "Coming Soon"
-description: "This Rust tutorial is coming soon."
-order: 0
-difficulty: "beginner"
+title: "Iterators and Closures in Rust"
+description: "Use iterators, closures, and iterator adapters (map, filter, collect)."
+order: 19
+difficulty: "intermediate"
 estimatedMinutes: 15
 ---
 
-## Coming Soon
+## Concepts in this chapter
 
-This tutorial is being translated to Rust. Check back soon, or try the **Go version** for now.
+You will learn and practice:
+
+- **Closures** — |x| x * 2, |a, b| a + b
+- **Iterator** — .iter(), .into_iter(); .next()
+- **map** — transform each element
+- **filter** — keep elements matching a predicate
+- **collect** — build a Vec or other collection from an iterator
+- **Method chains** — iter().map(...).filter(...).collect()
+
+---
+
+## Iterator and map
+
+```rust
+let nums = vec![1, 2, 3, 4, 5];
+let doubled: Vec<i32> = nums.iter().map(|n| n * 2).collect();
+for d in &doubled {
+    println!("{}", d);
+}
+```
+
+---
+
+## filter
+
+```rust
+let evens: Vec<_> = nums.iter().filter(|n| *n % 2 == 0).copied().collect();
+```
+
+---
+
+## What's Next?
+
+You've completed the Rust tutorial track. Try practice problems or another language!

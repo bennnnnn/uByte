@@ -1,11 +1,45 @@
 ---
-title: "Coming Soon"
-description: "This Rust tutorial is coming soon."
-order: 0
+title: "HashMap in Rust"
+description: "Store and look up key-value pairs with std::collections::HashMap."
+order: 7
 difficulty: "beginner"
-estimatedMinutes: 15
+estimatedMinutes: 12
 ---
 
-## Coming Soon
+## Concepts in this chapter
 
-This tutorial is being translated to Rust. Check back soon, or try the **Go version** for now.
+You will learn and practice:
+
+- **HashMap** — insert, get, get with default (entry, or_insert)
+- **Iteration** — for (k, v) in &map
+- **entry API** — map.entry(key).or_insert(value)
+- **use std::collections::HashMap**
+
+---
+
+## Basics
+
+```rust
+use std::collections::HashMap;
+
+let mut ages = HashMap::new();
+ages.insert("Alice", 30);
+ages.insert("Bob", 25);
+println!("{}", ages.get("Alice").unwrap());
+```
+
+---
+
+## entry and or_insert
+
+```rust
+ages.entry("Charlie").or_insert(0);
+let count = ages.entry("Diana").or_insert(0);
+*count += 1;
+```
+
+---
+
+## What's Next?
+
+Next: **Functions** — defining and calling functions.

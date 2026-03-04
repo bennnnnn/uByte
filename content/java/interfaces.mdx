@@ -1,11 +1,55 @@
 ---
-title: "Coming Soon"
-description: "This Java tutorial is coming soon."
-order: 0
-difficulty: "beginner"
+title: "Interfaces and Abstract Classes in Java"
+description: "Define contracts with interfaces and share code with abstract classes."
+order: 12
+difficulty: "intermediate"
 estimatedMinutes: 15
 ---
 
-## Coming Soon
+## Concepts in this chapter
 
-This tutorial is being translated to Java. Check back soon, or try the **Go version** for now.
+You will learn and practice:
+
+- **Interface** — contract of methods; class implements interface
+- **Abstract class** — can have abstract methods and concrete methods
+- **Polymorphism** — reference type is interface; runtime type is implementation
+- **@Override** — override interface or parent methods
+
+---
+
+## Interface
+
+```java
+public interface Drawable {
+    void draw();
+}
+
+public class Circle implements Drawable {
+    @Override
+    public void draw() {
+        System.out.println("Drawing a circle");
+    }
+}
+
+Drawable d = new Circle();
+d.draw();
+```
+
+---
+
+## Abstract Class
+
+```java
+public abstract class Shape {
+    public abstract double area();
+    public void describe() {
+        System.out.println("Area: " + area());
+    }
+}
+```
+
+---
+
+## What's Next?
+
+Next: **Exceptions and Error Handling** — try, catch, throw.

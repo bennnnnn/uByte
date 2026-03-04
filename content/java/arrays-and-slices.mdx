@@ -1,11 +1,70 @@
 ---
-title: "Coming Soon"
-description: "This Java tutorial is coming soon."
-order: 0
+title: "Arrays and ArrayList in Java"
+description: "Work with fixed-size arrays and dynamic ArrayList collections in Java."
+order: 6
 difficulty: "beginner"
 estimatedMinutes: 15
 ---
 
-## Coming Soon
+## Concepts in this chapter
 
-This tutorial is being translated to Java. Check back soon, or try the **Go version** for now.
+You will learn and practice:
+
+- **Arrays** — fixed-size, same-type elements; `int[]`, `String[]`
+- **ArrayList** — dynamic size; add, get, size
+- **Access by index** — zero-based; length vs size
+- **Iteration** — for loop with index and for-each
+- **Copying and sorting** — Arrays.copyOf, Collections.sort
+
+---
+
+## Arrays
+
+Arrays have a fixed length set at creation:
+
+```java
+int[] numbers = {10, 20, 30};
+String[] names = new String[3];
+names[0] = "Alice";
+names[1] = "Bob";
+
+System.out.println(numbers.length);  // 3
+System.out.println(numbers[1]);      // 20
+```
+
+---
+
+## ArrayList
+
+`ArrayList` grows as you add elements. Import `java.util.ArrayList`:
+
+```java
+import java.util.ArrayList;
+
+ArrayList<String> list = new ArrayList<>();
+list.add("apple");
+list.add("banana");
+list.add("cherry");
+System.out.println(list.size());   // 3
+System.out.println(list.get(1));   // banana
+```
+
+---
+
+## For-Each and Index Loop
+
+```java
+for (int n : numbers) {
+    System.out.println(n);
+}
+
+for (int i = 0; i < list.size(); i++) {
+    System.out.println(i + ": " + list.get(i));
+}
+```
+
+---
+
+## What's Next?
+
+Next: **HashMap and Maps** — key-value storage.

@@ -1,11 +1,45 @@
 ---
-title: "Coming Soon"
-description: "This Rust tutorial is coming soon."
-order: 0
-difficulty: "beginner"
+title: "Traits in Rust"
+description: "Define shared behavior with traits and implement them for types."
+order: 12
+difficulty: "intermediate"
 estimatedMinutes: 15
 ---
 
-## Coming Soon
+## Concepts in this chapter
 
-This tutorial is being translated to Rust. Check back soon, or try the **Go version** for now.
+You will learn and practice:
+
+- **trait** — define a set of methods; like an interface
+- **impl Trait for Type** — implement the trait for your struct
+- **Default implementations** — methods in the trait with a body
+- **Trait bounds** — generic functions that require T: Trait
+- **derive** — #[derive(Debug, Clone)] for common traits
+
+---
+
+## Defining and Implementing a Trait
+
+```rust
+trait Greet {
+    fn greet(&self) -> String;
+}
+
+struct Person;
+impl Greet for Person {
+    fn greet(&self) -> String {
+        "Hello!".to_string()
+    }
+}
+
+fn main() {
+    let p = Person;
+    println!("{}", p.greet());
+}
+```
+
+---
+
+## What's Next?
+
+Next: **Error Handling with Result** — Result and ? operator.

@@ -1,11 +1,61 @@
 ---
-title: "Coming Soon"
-description: "This Rust tutorial is coming soon."
-order: 0
+title: "Loops in Rust"
+description: "Use loop, while, and for to repeat code and iterate in Rust."
+order: 5
 difficulty: "beginner"
-estimatedMinutes: 15
+estimatedMinutes: 12
 ---
 
-## Coming Soon
+## Concepts in this chapter
 
-This tutorial is being translated to Rust. Check back soon, or try the **Go version** for now.
+You will learn and practice:
+
+- **loop** — infinite loop; break to exit
+- **while** — condition before each iteration
+- **for** — iterate over a range or iterator (e.g. 1..=5, collection.iter())
+- **break and continue** — exit loop or skip to next iteration
+- **Range** — 1..5 (exclusive end), 1..=5 (inclusive)
+
+---
+
+## loop and break
+
+```rust
+let mut n = 3;
+loop {
+    println!("{}", n);
+    n -= 1;
+    if n == 0 {
+        break;
+    }
+}
+println!("Liftoff!");
+```
+
+---
+
+## while
+
+```rust
+let mut n = 3;
+while n > 0 {
+    println!("{}", n);
+    n -= 1;
+}
+```
+
+---
+
+## for over a range
+
+```rust
+for i in 1..=5 {
+    println!("{}", i);
+}
+```
+
+---
+
+## What's Next?
+
+Next: **Arrays and Slices** — fixed-size arrays and dynamic slices.

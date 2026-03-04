@@ -1,11 +1,49 @@
 ---
-title: "Coming Soon"
-description: "This Rust tutorial is coming soon."
-order: 0
+title: "Error Handling with Result in Rust"
+description: "Use Result and Option for fallible operations; the ? operator."
+order: 13
 difficulty: "beginner"
-estimatedMinutes: 15
+estimatedMinutes: 12
 ---
 
-## Coming Soon
+## Concepts in this chapter
 
-This tutorial is being translated to Rust. Check back soon, or try the **Go version** for now.
+You will learn and practice:
+
+- **Result&lt;T, E&gt;** — Ok(value) or Err(error)
+- **Option&lt;T&gt;** — Some(value) or None
+- **unwrap** — panic on Err/None (use for quick tests)
+- **? operator** — propagate errors to caller (in functions returning Result)
+- **match** — handle Ok/Err or Some/None explicitly
+
+---
+
+## Result
+
+```rust
+fn parse(s: &str) -> Result<i32, std::num::ParseIntError> {
+    s.parse()
+}
+
+fn main() {
+    match parse("42") {
+        Ok(n) => println!("{}", n),
+        Err(e) => println!("Invalid: {}", e),
+    }
+}
+```
+
+---
+
+## unwrap and expect
+
+```rust
+let n: i32 = "42".parse().unwrap();
+let n = "x".parse().expect("not a number");  // panic with message
+```
+
+---
+
+## What's Next?
+
+Next: **Crates and Modules** — organize code.

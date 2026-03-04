@@ -1,11 +1,53 @@
 ---
-title: "Coming Soon"
-description: "This Java tutorial is coming soon."
-order: 0
+title: "Classes and Objects in Java"
+description: "Define classes, create objects, and use constructors and fields."
+order: 10
 difficulty: "beginner"
 estimatedMinutes: 15
 ---
 
-## Coming Soon
+## Concepts in this chapter
 
-This tutorial is being translated to Java. Check back soon, or try the **Go version** for now.
+You will learn and practice:
+
+- **Class definition** — fields and methods
+- **Constructors** — same name as class; no return type
+- **new** — create an object; reference type
+- **Encapsulation** — private fields, public getters/setters
+- **this** — refer to the current object
+
+---
+
+## Simple Class
+
+```java
+public class Person {
+    private String name;
+    private int age;
+
+    public Person(String name, int age) {
+        this.name = name;
+        this.age = age;
+    }
+
+    public String getName() { return name; }
+    public int getAge() { return age; }
+}
+
+// usage:
+Person p = new Person("Alice", 30);
+System.out.println(p.getName());
+```
+
+---
+
+## Constructor and Fields
+
+- The constructor runs when you call `new Person(...)`.
+- `this.name` refers to the instance field (not the parameter).
+
+---
+
+## What's Next?
+
+Next: **Methods and Overloading** — instance methods and method overloading.

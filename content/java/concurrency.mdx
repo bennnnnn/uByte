@@ -1,11 +1,44 @@
 ---
-title: "Coming Soon"
-description: "This Java tutorial is coming soon."
-order: 0
-difficulty: "beginner"
+title: "Threads and Concurrency in Java"
+description: "Run code in parallel with Thread and Runnable; basics of synchronization."
+order: 15
+difficulty: "intermediate"
 estimatedMinutes: 15
 ---
 
-## Coming Soon
+## Concepts in this chapter
 
-This tutorial is being translated to Java. Check back soon, or try the **Go version** for now.
+You will learn and practice:
+
+- **Thread** — create a thread with Runnable or extending Thread
+- **start()** — begin execution; run() is called by the JVM
+- **join()** — wait for a thread to finish
+- **Runnable** — functional interface; can use lambda
+- **Concurrency** — multiple threads; shared state needs care
+
+---
+
+## Creating a Thread
+
+```java
+Thread t = new Thread(() -> {
+    System.out.println("Hello from thread");
+});
+t.start();
+t.join();  // wait for thread to finish
+```
+
+---
+
+## Runnable Lambda
+
+```java
+Runnable task = () -> System.out.println("Running");
+new Thread(task).start();
+```
+
+---
+
+## What's Next?
+
+Next: **Testing with JUnit** — write and run unit tests.

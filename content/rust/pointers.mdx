@@ -1,11 +1,55 @@
 ---
-title: "Coming Soon"
-description: "This Rust tutorial is coming soon."
-order: 0
-difficulty: "beginner"
+title: "Ownership and References in Rust"
+description: "Understand ownership, borrowing, and references in Rust."
+order: 9
+difficulty: "intermediate"
 estimatedMinutes: 15
 ---
 
-## Coming Soon
+## Concepts in this chapter
 
-This tutorial is being translated to Rust. Check back soon, or try the **Go version** for now.
+You will learn and practice:
+
+- **Ownership** — each value has one owner; assignment moves ownership
+- **Borrowing** — `&T` immutable reference, `&mut T` mutable reference
+- **References** — don't take ownership; can have many `&` or one `&mut`
+- **Dereference** — use `*ref` to get the value (or use . methods that do it)
+- **No null** — use Option&lt;T&gt; for optional values
+
+---
+
+## References
+
+```rust
+let s = String::from("hello");
+let r = &s;   // borrow; s still owns
+println!("{}", r);
+```
+
+---
+
+## Mutable Reference
+
+```rust
+let mut x = 10;
+let r = &mut x;
+*r += 1;
+println!("{}", x);  // 11
+```
+
+---
+
+## Option
+
+```rust
+let maybe: Option<i32> = Some(42);
+if let Some(n) = maybe {
+    println!("{}", n);
+}
+```
+
+---
+
+## What's Next?
+
+Next: **Structs** — define your own types.

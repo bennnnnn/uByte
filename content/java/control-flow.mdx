@@ -1,11 +1,105 @@
 ---
-title: "Coming Soon"
-description: "This Java tutorial is coming soon."
-order: 0
+title: "Control Flow in Java"
+description: "Master if/else, switch, and ternary operators to make decisions in your Java code."
+order: 4
 difficulty: "beginner"
 estimatedMinutes: 15
 ---
 
-## Coming Soon
+## Concepts in this chapter
 
-This tutorial is being translated to Java. Check back soon, or try the **Go version** for now.
+You will learn and practice:
+
+- **if** — run a block when a condition is true
+- **if / else if / else** — chain conditions; first match runs
+- **switch** — multi-way branching (traditional and switch expressions)
+- **Ternary operator** — `condition ? a : b` for simple choices
+- **FizzBuzz** — combine conditions in a loop
+
+---
+
+## If Statements
+
+The `if` statement runs a block only when the condition is `true`. Parentheses around the condition are required; curly braces are required when the body has more than one statement:
+
+```java
+int temperature = 35;
+if (temperature > 30) {
+    System.out.println("It's hot outside!");
+}
+
+int age = 20;
+if (age >= 18) {
+    System.out.println("You are an adult");
+}
+```
+
+---
+
+## If-Else and Else-If
+
+Use `else` for the "otherwise" case and `else if` to chain multiple conditions:
+
+```java
+int score = 72;
+if (score >= 60) {
+    System.out.println("Pass");
+} else {
+    System.out.println("Fail");
+}
+
+String day = "Monday";
+if (day.equals("Saturday") || day.equals("Sunday")) {
+    System.out.println("Weekend");
+} else if (day.equals("Friday")) {
+    System.out.println("Almost weekend");
+} else {
+    System.out.println("Weekday");
+}
+```
+
+---
+
+## Switch Statement
+
+`switch` is cleaner than long if-else chains. Use `break` to avoid fall-through (or use `switch` expressions in Java 14+):
+
+```java
+String day = "Monday";
+switch (day) {
+    case "Saturday":
+    case "Sunday":
+        System.out.println("Weekend");
+        break;
+    default:
+        System.out.println("Weekday");
+        break;
+}
+```
+
+Java 14+ switch expression (no break needed):
+
+```java
+String result = switch (day) {
+    case "Saturday", "Sunday" -> "Weekend";
+    default -> "Weekday";
+};
+```
+
+---
+
+## Ternary Operator
+
+For simple choices: `condition ? valueIfTrue : valueIfFalse`:
+
+```java
+int a = 10, b = 20;
+int max = (a > b) ? a : b;
+String label = (score >= 60) ? "Pass" : "Fail";
+```
+
+---
+
+## What's Next?
+
+Next: **Loops** — for, while, and for-each to repeat code.

@@ -1,11 +1,33 @@
 ---
-title: "Coming Soon"
-description: "This Rust tutorial is coming soon."
-order: 0
-difficulty: "beginner"
-estimatedMinutes: 15
+title: "JSON in Rust"
+description: "Parse and serialize JSON with serde_json or manual string building."
+order: 18
+difficulty: "intermediate"
+estimatedMinutes: 12
 ---
 
-## Coming Soon
+## Concepts in this chapter
 
-This tutorial is being translated to Rust. Check back soon, or try the **Go version** for now.
+You will learn and practice:
+
+- **serde_json** — serde_json::to_string, serde_json::from_str (with serde crate)
+- **Manual** — build JSON string for simple cases without dependencies
+- **Value** — serde_json::Value for untyped JSON
+- **Struct** — #[derive(Serialize, Deserialize)] for typed (de)serialization
+
+---
+
+## Manual JSON String
+
+```rust
+let name = "Alice";
+let age = 30;
+let json = format!(r#"{{"name":"{}","age":{}}}"#, name, age);
+println!("{}", json);
+```
+
+---
+
+## What's Next?
+
+Next: **Iterators and Closures** — functional style in Rust.

@@ -1,11 +1,56 @@
 ---
-title: "Coming Soon"
-description: "This Rust tutorial is coming soon."
-order: 0
+title: "Arrays and Slices in Rust"
+description: "Work with fixed-size arrays and slices in Rust."
+order: 6
 difficulty: "beginner"
 estimatedMinutes: 15
 ---
 
-## Coming Soon
+## Concepts in this chapter
 
-This tutorial is being translated to Rust. Check back soon, or try the **Go version** for now.
+You will learn and practice:
+
+- **Arrays** — fixed size, same type; `[T; N]` e.g. `[i32; 5]`
+- **Slices** — `&[T]` view into a contiguous sequence; length not known at compile time
+- **Vec** — heap-allocated, growable vector; use for dynamic collections
+- **Indexing** — arr[i]; panics on out of bounds
+- **Iteration** — for x in arr.iter() or for x in &v
+
+---
+
+## Arrays
+
+```rust
+let arr: [i32; 3] = [10, 20, 30];
+println!("{}", arr[1]);   // 20
+println!("{}", arr.len());
+```
+
+---
+
+## Vec
+
+```rust
+let mut v: Vec<i32> = Vec::new();
+v.push(1);
+v.push(2);
+v.push(3);
+println!("{}", v.len());
+```
+
+---
+
+## Slices
+
+A slice `&[T]` is a reference to a contiguous region. Arrays and Vecs coerce to slices:
+
+```rust
+let arr = [1, 2, 3];
+let slice: &[i32] = &arr[1..];  // [2, 3]
+```
+
+---
+
+## What's Next?
+
+Next: **HashMap** — key-value storage.
