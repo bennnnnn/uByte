@@ -93,8 +93,8 @@ export default function Home() {
             >
               Pick your language
             </h2>
-            <p className="mt-2 text-sm text-zinc-500 dark:text-zinc-400">
-              Same concepts, same structure — choose the language you want to master.
+            <p className="mt-2 text-sm font-medium text-zinc-600 dark:text-zinc-400 sm:text-base">
+              Same concepts, same structure — start in seconds with no setup.
             </p>
           </div>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">

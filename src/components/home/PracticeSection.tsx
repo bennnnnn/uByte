@@ -72,14 +72,17 @@ export default function PracticeSection() {
       {/* ── Main practice CTA card ───────────────────────────────────── */}
       <div className="overflow-hidden rounded-2xl border border-indigo-200/70 bg-gradient-to-br from-indigo-50 to-violet-50/40 dark:border-indigo-900/50 dark:from-indigo-950/30 dark:to-violet-950/20">
         <div className="p-6 sm:p-8">
-          <div className="mb-1 flex items-center gap-2">
+          <div className="mb-1 flex flex-wrap items-center gap-2">
             <span className="text-2xl">🎯</span>
             <h2 id="practice-heading" className="text-xl font-bold text-zinc-900 dark:text-zinc-100">
               Ace your interview
             </h2>
+            <span className="rounded-full border border-indigo-300 bg-white/80 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-indigo-600 dark:border-indigo-700 dark:bg-zinc-900/80 dark:text-indigo-400">
+              LeetCode-style
+            </span>
           </div>
           <p className="mb-5 text-sm text-zinc-600 dark:text-zinc-400">
-            Solve classic problems — Two Sum, LRU Cache, Merge Intervals and more — in any language. Same LeetCode-style IDE, built right in.
+            Solve classic problems — Two Sum, LRU Cache, Merge Intervals and more — in any language. Same IDE, built right in.
           </p>
 
           {/* Problem list preview */}
@@ -98,9 +101,12 @@ export default function PracticeSection() {
 
           <Link
             href="/practice"
-            className="inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white shadow-md shadow-indigo-500/20 transition-all hover:bg-indigo-500 hover:shadow-indigo-500/30"
+            className="inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-5 py-3 text-sm font-bold text-white shadow-md shadow-indigo-500/25 transition-all hover:bg-indigo-500 hover:shadow-indigo-500/35 hover:-translate-y-0.5"
           >
-            Browse all problems →
+            <span>Browse all problems</span>
+            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+            </svg>
           </Link>
         </div>
       </div>

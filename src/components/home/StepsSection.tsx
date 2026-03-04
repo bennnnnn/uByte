@@ -40,23 +40,29 @@ const STEPS = [
 export default function StepsSection() {
   return (
     <section aria-labelledby="how-heading">
-      <div className="mb-8 text-center">
+      <div className="mb-10 text-center">
         <h2
           id="how-heading"
           className="text-2xl font-black text-zinc-900 dark:text-zinc-100 sm:text-3xl"
         >
           How it works
         </h2>
-        <p className="mt-2 text-sm text-zinc-500 dark:text-zinc-400">
-          Four steps between you and fluency in a new language.
+        <p className="mt-2 text-sm font-medium text-zinc-600 dark:text-zinc-400 sm:text-base">
+          Four steps. Zero setup. Real code.
         </p>
       </div>
 
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+      <div className="relative grid grid-cols-2 gap-4 sm:grid-cols-4">
+        {/* Flow connector line (visible on larger screens) */}
+        <div
+          aria-hidden
+          className="absolute left-0 right-0 top-12 hidden border-t-2 border-dashed border-zinc-200 dark:border-zinc-700 sm:block"
+        />
+
         {STEPS.map((step) => (
           <div
             key={step.label}
-            className={`relative overflow-hidden rounded-2xl border p-5 transition-shadow hover:shadow-md ${step.card}`}
+            className={`relative z-10 overflow-hidden rounded-2xl border p-5 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg ${step.card}`}
           >
             {/* Large background number */}
             <span
