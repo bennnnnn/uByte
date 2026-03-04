@@ -9,8 +9,16 @@ import { hasPaidAccess } from "@/lib/plans";
 import { getExamDetailContent } from "@/lib/exams/content";
 import StartExamButton from "./StartExamButton";
 import ExamDetailTabs from "./ExamDetailTabs";
-import ExamCardsSection from "./ExamCardsSection";
 import OtherExamsGrid from "./OtherExamsGrid";
+
+const LANG_ICONS: Record<string, string> = {
+  go: "🐹",
+  python: "🐍",
+  cpp: "⚙️",
+  javascript: "🟨",
+  java: "☕",
+  rust: "🦀",
+};
 
 export const dynamic = "force-dynamic";
 
@@ -45,28 +53,40 @@ export default async function PracticeExamLangPage({ params }: Props) {
   const content = getExamDetailContent(lang, examConfig);
   const langSlugs = getAllLanguageSlugs();
 
+  const tagline = content?.tagline ?? `Timed multiple-choice exam to validate your ${name} knowledge.`;
+
   return (
     <div className="min-h-full overflow-y-auto bg-zinc-50 dark:bg-zinc-950">
       <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-10 lg:py-12">
-        {/* Breadcrumb */}
-        <Link
-          href="/practice-exams"
-          className="inline-flex items-center gap-1 text-sm font-medium text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-300"
-        >
-          <span aria-hidden>←</span>
-          Practice exams
-        </Link>
-
-        {/* Exam cards — all languages with details from config */}
-        <h1 className="sr-only">
-          {name} Practice Exam — {examConfig.examSize} questions, {examConfig.examDurationMinutes} minutes
-        </h1>
-        <ExamCardsSection
-          currentLang={lang}
-          langSlugs={langSlugs}
-          examSize={examConfig.examSize}
-          examDurationMinutes={examConfig.examDurationMinutes}
-        />
+        {/* Exam hero card — current exam details only */}
+        <section aria-labelledby="exam-hero-heading" className="rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-700 dark:bg-zinc-900 sm:p-8">
+          <div className="flex flex-wrap items-start justify-between gap-4">
+            <div className="flex items-start gap-4">
+              <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-amber-50 text-2xl dark:bg-amber-950/50">
+                {LANG_ICONS[lang] ?? "📋"}
+              </span>
+              <div>
+                <div className="mb-1 flex flex-wrap items-center gap-2">
+                  <h1 id="exam-hero-heading" className="text-xl font-bold text-zinc-900 dark:text-zinc-100 sm:text-2xl">
+                    {name} Practice Exam
+                  </h1>
+                  <span className="rounded-full border border-amber-300 bg-amber-50 px-2.5 py-0.5 text-xs font-semibold uppercase tracking-wider text-amber-700 dark:border-amber-700 dark:bg-amber-950/50 dark:text-amber-400">
+                    Pro
+                  </span>
+                </div>
+                <p className="text-sm text-zinc-600 dark:text-zinc-400 sm:text-base">
+                  {tagline}
+                </p>
+                <ul className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-sm text-zinc-500 dark:text-zinc-400">
+                  <li>{examConfig.examSize} questions</li>
+                  <li>{examConfig.examDurationMinutes} minutes</li>
+                  <li>70% to pass</li>
+                  <li>Certificate on pass</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </section>
 
         {/* Main + Sidebar layout */}
         <div className="mt-10 grid gap-8 lg:grid-cols-[1fr_320px] lg:items-start">

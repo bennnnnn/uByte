@@ -5,23 +5,30 @@ import type { ExamDetailContent } from "@/lib/exams/content";
 
 function FaqAccordion({ items }: { items: { question: string; answer: string }[] }) {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
+  const [hoverIndex, setHoverIndex] = useState<number | null>(null);
+
   return (
     <div className="divide-y divide-zinc-100 dark:divide-zinc-800">
       {items.map((item, i) => {
-        const isOpen = openIndex === i;
+        const isOpen = openIndex === i || hoverIndex === i;
         return (
-          <div key={i}>
+          <div
+            key={i}
+            className="group"
+            onMouseEnter={() => setHoverIndex(i)}
+            onMouseLeave={() => setHoverIndex(null)}
+          >
             <button
               type="button"
               onClick={() => setOpenIndex(isOpen ? null : i)}
-              className="flex w-full items-center justify-between gap-3 py-4 text-left font-semibold text-zinc-900 dark:text-zinc-100"
+              className="flex w-full cursor-pointer items-center justify-between gap-3 py-4 text-left font-semibold text-zinc-900 transition-colors hover:bg-zinc-50 hover:text-indigo-600 dark:text-zinc-100 dark:hover:bg-zinc-800/50 dark:hover:text-indigo-400"
               aria-expanded={isOpen}
               aria-controls={`faq-answer-${i}`}
               id={`faq-question-${i}`}
             >
               <span>{item.question}</span>
               <span
-                className={`shrink-0 text-zinc-400 transition-transform ${isOpen ? "rotate-180" : ""}`}
+                className={`shrink-0 text-zinc-400 transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`}
                 aria-hidden
               >
                 <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -33,11 +40,15 @@ function FaqAccordion({ items }: { items: { question: string; answer: string }[]
               id={`faq-answer-${i}`}
               role="region"
               aria-labelledby={`faq-question-${i}`}
-              className={`overflow-hidden transition-all duration-200 ${isOpen ? "max-h-[50rem] opacity-100" : "max-h-0 opacity-0"}`}
+              className={`grid transition-[grid-template-rows] duration-200 ease-out ${
+                isOpen ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
+              }`}
             >
-              <p className="pb-4 text-sm text-zinc-600 dark:text-zinc-400">
-                {item.answer}
-              </p>
+              <div className="overflow-hidden">
+                <p className="pb-4 text-sm text-zinc-600 dark:text-zinc-400">
+                  {item.answer}
+                </p>
+              </div>
             </div>
           </div>
         );
