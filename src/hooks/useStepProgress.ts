@@ -41,9 +41,11 @@ export interface StepProgressState {
   output: string | null;
   outputIsError: boolean;
   aiFeedback: string | null;
+  aiFeedbackLoading: boolean;
   failCount: number;
   showInlineChat: boolean;
   setShowInlineChat: (v: boolean) => void;
+  requestHint: (code: string) => void;
   tutorialDone: boolean;
   setTutorialDone: (v: boolean) => void;
   countdown: number;
@@ -73,6 +75,7 @@ export function useStepProgress(
   const [output, setOutput] = useState<string | null>(null);
   const [outputIsError, setOutputIsError] = useState(false);
   const [aiFeedback, setAiFeedback] = useState<string | null>(null);
+  const [aiFeedbackLoading, setAiFeedbackLoading] = useState(false);
   const [failCount, setFailCount] = useState(0);
   const [showInlineChat, setShowInlineChat] = useState(false);
   const [tutorialDone, setTutorialDone] = useState(false);
@@ -175,6 +178,7 @@ export function useStepProgress(
     outputText: string,
     currentStepIndex: number
   ) {
+    setAiFeedbackLoading(true);
     fetch("/api/code-feedback", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -182,7 +186,14 @@ export function useStepProgress(
     })
       .then((r) => r.json())
       .then((d) => { if (d.feedback) setAiFeedback(d.feedback); })
-      .catch(() => {});
+      .catch(() => {})
+      .finally(() => setAiFeedbackLoading(false));
+  }
+
+  /** Call when user clicks "Get hint" — requests AI feedback for current step failure. Pass current editor code. */
+  function requestHint(code: string) {
+    if (status !== "failed") return;
+    fetchAiFeedback(code, outputIsError ? output ?? "" : "", outputIsError ? "" : output ?? "", stepIndex);
   }
 
   async function handleRun(code: string, setErrorLines: (l: Set<number>) => void) {
@@ -242,7 +253,11 @@ export function useStepProgress(
       if (hasError) {
         setErrorLines(parseErrorLines(out));
         setStatus("failed");
-        fetchAiFeedback(code, out, "", stepIndex);
+        setFailCount((n) => {
+          const next = n + 1;
+          if (next >= 2) fetchAiFeedback(code, out, "", stepIndex);
+          return next;
+        });
         apiFetch("/api/step-check", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -268,8 +283,11 @@ export function useStepProgress(
         }
       } else {
         setStatus("failed");
-        setFailCount((n) => n + 1);
-        fetchAiFeedback(code, "", out, stepIndex);
+        setFailCount((n) => {
+          const next = n + 1;
+          if (next >= 2) fetchAiFeedback(code, "", out, stepIndex);
+          return next;
+        });
         apiFetch("/api/step-check", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -297,9 +315,11 @@ export function useStepProgress(
     output,
     outputIsError,
     aiFeedback,
+    aiFeedbackLoading,
     failCount,
     showInlineChat,
     setShowInlineChat,
+    requestHint,
     tutorialDone,
     setTutorialDone,
     countdown,

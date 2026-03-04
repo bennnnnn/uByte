@@ -387,20 +387,17 @@ export default function InteractiveTutorial({
             <GripDots />
           </div>
 
-          {/* Output panel */}
+          {/* Output panel — single scroll, inline AI only */}
           <OutputPanel
             output={stepProgress.output}
             outputIsError={stepProgress.outputIsError}
             status={stepProgress.status}
             aiFeedback={stepProgress.aiFeedback}
+            aiFeedbackLoading={stepProgress.aiFeedbackLoading}
             expectedOutput={currentStep.expectedOutput}
             stepIndex={stepProgress.stepIndex}
             stepsLength={steps.length}
-            showInlineChat={stepProgress.showInlineChat}
-            onToggleChat={() => stepProgress.setShowInlineChat(!stepProgress.showInlineChat)}
-            chatSlug={`${tutorialSlug}-step-${stepProgress.stepIndex}`}
-            lang={lang}
-            currentCode={editor.code}
+            onRequestHint={() => stepProgress.requestHint(editor.code)}
             height={outputHeight}
           />
         </div>

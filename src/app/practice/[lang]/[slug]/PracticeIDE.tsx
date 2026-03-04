@@ -209,6 +209,8 @@ export function PracticeIDE({ problem, initialLang }: Props) {
       } else if (["wrong_answer", "runtime_error", "compile_error", "tle"].includes(data.verdict)) {
         setStatuses((prev) => ({ ...prev, [problem.slug]: "failed" }));
         if (data.consecutive_failures >= 2 && data.submission_id) {
+          setAiLoading(true);
+          setAiError(null);
           fetch("/api/ai-feedback", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -224,9 +226,12 @@ export function PracticeIDE({ problem, initialLang }: Props) {
                   next_step: d.next_step ?? "",
                   minimal_patch: d.minimal_patch,
                 });
+              } else {
+                setAiError(d?.message ?? d?.error ?? "Request failed");
               }
             })
-            .catch(() => {});
+            .catch(() => setAiError("Network error"))
+            .finally(() => setAiLoading(false));
         }
       }
     } catch {
@@ -606,12 +611,13 @@ export function PracticeIDE({ problem, initialLang }: Props) {
             <GripDots />
           </div>
 
-          {/* Output / verdict panel */}
+          {/* Output / verdict panel — single scroll container */}
           <div
-            className="shrink-0 overflow-y-auto bg-zinc-50 dark:bg-zinc-950"
+            className="shrink-0 overflow-y-auto overflow-x-hidden bg-zinc-50 dark:bg-zinc-950"
             style={{ height: outputHeight }}
             suppressHydrationWarning
           >
+            {/* 1) Verdict banner */}
             {verdict && (
               <div className={`flex items-center gap-3 border-b px-4 py-3 ${
                 verdict.type === "accepted"
@@ -641,6 +647,7 @@ export function PracticeIDE({ problem, initialLang }: Props) {
                 </div>
               </div>
             )}
+            {/* 2) Judge0 factual block: failing test (WA) + output/error */}
             {verdict && verdict.type === "wrong_answer" && (verdict.failedInput != null || verdict.failedExpected != null || verdict.failedActual != null) && (
               <div className="border-b border-zinc-200 bg-zinc-100/50 px-4 py-3 dark:border-zinc-800 dark:bg-zinc-800/50">
                 <p className="mb-1.5 text-xs font-semibold uppercase tracking-widest text-zinc-500 dark:text-zinc-400">Failing test</p>
@@ -649,27 +656,7 @@ export function PracticeIDE({ problem, initialLang }: Props) {
                 {verdict.failedActual != null && <p className="text-xs text-amber-700 dark:text-amber-400"><span className="text-zinc-500 dark:text-zinc-500">Got:</span> {verdict.failedActual}</p>}
               </div>
             )}
-            {verdict && verdict.type !== "accepted" && verdict.submissionId != null && (
-              <div className="flex flex-wrap items-center gap-2 border-b border-zinc-200 px-4 py-2 dark:border-zinc-800">
-                {verdict.consecutiveFailures != null && verdict.consecutiveFailures >= 2 && (
-                  <span className="text-xs text-zinc-500 dark:text-zinc-400">Want a hint?</span>
-                )}
-                <button type="button" onClick={() => requestAiFeedback(1)} disabled={aiLoading} className="rounded-md bg-zinc-200 px-2.5 py-1.5 text-xs font-medium text-zinc-800 hover:bg-zinc-300 disabled:opacity-50 dark:bg-zinc-700 dark:text-zinc-200 dark:hover:bg-zinc-600">Hint</button>
-                <button type="button" onClick={() => requestAiFeedback(2)} disabled={aiLoading} className="rounded-md bg-zinc-200 px-2.5 py-1.5 text-xs font-medium text-zinc-800 hover:bg-zinc-300 disabled:opacity-50 dark:bg-zinc-700 dark:text-zinc-200 dark:hover:bg-zinc-600">Explain</button>
-                <button type="button" onClick={() => requestAiFeedback(3)} disabled={aiLoading} className="rounded-md bg-zinc-200 px-2.5 py-1.5 text-xs font-medium text-zinc-800 hover:bg-zinc-300 disabled:opacity-50 dark:bg-zinc-700 dark:text-zinc-200 dark:hover:bg-zinc-600">Suggest fix</button>
-                <button type="button" onClick={() => requestAiFeedback(4)} disabled={aiLoading} className="rounded-md bg-zinc-200 px-2.5 py-1.5 text-xs font-medium text-zinc-800 hover:bg-zinc-300 disabled:opacity-50 dark:bg-zinc-700 dark:text-zinc-200 dark:hover:bg-zinc-600">Teach</button>
-              </div>
-            )}
-            {aiError && <p className="border-b border-red-200 bg-red-50 px-4 py-2 text-xs text-red-700 dark:border-red-800 dark:bg-red-950/50 dark:text-red-400">{aiError}</p>}
-            {aiFeedback && (
-              <div className="border-b border-indigo-200 bg-indigo-50/50 px-4 py-3 dark:border-indigo-800 dark:bg-indigo-950/30">
-                <p className="text-sm font-medium text-indigo-800 dark:text-indigo-300">{aiFeedback.friendly_one_liner}</p>
-                <p className="mt-1.5 text-xs text-zinc-700 dark:text-zinc-300">{aiFeedback.hint}</p>
-                <p className="mt-1 text-xs text-zinc-600 dark:text-zinc-400">Next: {aiFeedback.next_step}</p>
-                {aiFeedback.minimal_patch && <pre className="mt-2 overflow-x-auto rounded bg-zinc-800 p-2 text-xs text-zinc-100">{aiFeedback.minimal_patch}</pre>}
-              </div>
-            )}
-            <div className="p-4 font-mono text-sm">
+            <div className="border-b border-zinc-200 px-4 py-3 font-mono text-sm dark:border-zinc-800">
               {!verdict && output === null ? (
                 <p className="text-xs text-zinc-400 dark:text-zinc-600">
                   Click <strong>Run</strong> to execute, or <strong>Submit</strong> to grade (all languages).
@@ -692,12 +679,46 @@ export function PracticeIDE({ problem, initialLang }: Props) {
                   <p className="mb-2 text-xs font-semibold uppercase tracking-widest text-zinc-400 dark:text-zinc-500">
                     {outputIsError ? "Error" : "Output"}
                   </p>
-                  <pre className={`whitespace-pre-wrap break-words ${outputIsError ? "text-red-600 dark:text-red-400" : "text-green-600 dark:text-green-400"}`}>
+                  <pre className={`whitespace-pre-wrap break-words text-xs ${outputIsError ? "text-red-600 dark:text-red-400" : "text-green-600 dark:text-green-400"}`}>
                     {output}
                   </pre>
                 </>
               ) : null}
             </div>
+            {/* 3) AI action buttons — only when verdict != AC and submission_id exists */}
+            {verdict && verdict.type !== "accepted" && verdict.submissionId != null && (
+              <div className="flex flex-wrap items-center gap-2 border-b border-zinc-200 px-4 py-2 dark:border-zinc-800">
+                {verdict.consecutiveFailures != null && verdict.consecutiveFailures >= 2 && (
+                  <span className="text-xs text-zinc-500 dark:text-zinc-400">Want a hint?</span>
+                )}
+                <button type="button" onClick={() => requestAiFeedback(1)} disabled={aiLoading} className="rounded-md bg-zinc-200 px-2.5 py-1.5 text-xs font-medium text-zinc-800 hover:bg-zinc-300 disabled:opacity-50 dark:bg-zinc-700 dark:text-zinc-200 dark:hover:bg-zinc-600">Hint</button>
+                <button type="button" onClick={() => requestAiFeedback(2)} disabled={aiLoading} className="rounded-md bg-zinc-200 px-2.5 py-1.5 text-xs font-medium text-zinc-800 hover:bg-zinc-300 disabled:opacity-50 dark:bg-zinc-700 dark:text-zinc-200 dark:hover:bg-zinc-600">Explain</button>
+                <button type="button" onClick={() => requestAiFeedback(3)} disabled={aiLoading} className="rounded-md bg-zinc-200 px-2.5 py-1.5 text-xs font-medium text-zinc-800 hover:bg-zinc-300 disabled:opacity-50 dark:bg-zinc-700 dark:text-zinc-200 dark:hover:bg-zinc-600">Suggest fix</button>
+                <button type="button" onClick={() => requestAiFeedback(4)} disabled={aiLoading} className="rounded-md bg-zinc-200 px-2.5 py-1.5 text-xs font-medium text-zinc-800 hover:bg-zinc-300 disabled:opacity-50 dark:bg-zinc-700 dark:text-zinc-200 dark:hover:bg-zinc-600">Teach</button>
+              </div>
+            )}
+            {/* 4) Inline AI — "Analyzing…" only when /api/ai-feedback is in flight */}
+            {aiLoading && (
+              <div className="border-b border-zinc-200 px-4 py-2 dark:border-zinc-800">
+                <p className="text-xs text-zinc-500 dark:text-zinc-400 animate-pulse">Analyzing your code…</p>
+              </div>
+            )}
+            {aiError && (
+              <p className="border-b border-red-200 bg-red-50 px-4 py-2 text-xs text-red-700 dark:border-red-800 dark:bg-red-950/50 dark:text-red-400">{aiError}</p>
+            )}
+            {aiFeedback && (
+              <div className="border-b border-indigo-200 bg-indigo-50/50 px-4 py-3 dark:border-indigo-800 dark:bg-indigo-950/30">
+                <div className="flex items-start justify-between gap-2">
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-medium text-indigo-800 dark:text-indigo-300">{aiFeedback.friendly_one_liner}</p>
+                    <p className="mt-1.5 text-xs text-zinc-700 dark:text-zinc-300">{aiFeedback.hint}</p>
+                    <p className="mt-1 text-xs text-zinc-600 dark:text-zinc-400">Next: {aiFeedback.next_step}</p>
+                    {aiFeedback.minimal_patch && <pre className="mt-2 overflow-x-auto rounded bg-zinc-800 p-2 text-xs text-zinc-100">{aiFeedback.minimal_patch}</pre>}
+                  </div>
+                  <button type="button" onClick={() => { setAiFeedback(null); setAiError(null); }} title="Clear AI feedback" className="shrink-0 rounded p-1 text-zinc-400 hover:bg-zinc-200 hover:text-zinc-600 dark:hover:bg-zinc-700 dark:hover:text-zinc-300" aria-label="Clear AI">✕</button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
