@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { EXAM_SIZE, EXAM_DURATION_MINUTES } from "@/lib/exams/config";
 import { LANGUAGES, getAllLanguageSlugs } from "@/lib/languages/registry";
 
 /* Amber accent so Practice exams are visually distinct from Interview practice (indigo). */
@@ -17,7 +16,12 @@ const LANG_ICONS: Record<string, string> = {
   rust: "🦀",
 };
 
-export default function PracticeExamsSection() {
+interface Props {
+  examSize: number;
+  examDurationMinutes: number;
+}
+
+export default function PracticeExamsSection({ examSize, examDurationMinutes }: Props) {
   const langSlugs = getAllLanguageSlugs();
 
   return (
@@ -35,7 +39,7 @@ export default function PracticeExamsSection() {
             </span>
           </div>
           <p className="mb-5 text-sm text-zinc-600 dark:text-zinc-400">
-            Timed multiple-choice exams by language. {EXAM_SIZE} questions, {EXAM_DURATION_MINUTES} minutes. Score at least 70% to pass and earn a certificate.
+            Timed multiple-choice exams by language. {examSize} questions, {examDurationMinutes} minutes. Score at least 70% to pass and earn a certificate.
           </p>
 
           <Link
@@ -71,12 +75,12 @@ export default function PracticeExamsSection() {
                   </h3>
                 </div>
                 <span className={`shrink-0 rounded-full px-2 py-0.5 text-xs font-semibold ${BADGE_STYLE}`}>
-                  {EXAM_SIZE} questions
+                  {examSize} questions
                 </span>
               </div>
 
               <p className="flex-1 text-sm leading-relaxed text-zinc-500 dark:text-zinc-400">
-                {EXAM_DURATION_MINUTES} min · 70% to pass · Certificate
+                {examDurationMinutes} min · 70% to pass · Certificate
               </p>
 
               <div className={`mt-4 flex items-center gap-1 text-sm font-semibold transition-[gap] group-hover:gap-2 ${ARROW_STYLE}`}>

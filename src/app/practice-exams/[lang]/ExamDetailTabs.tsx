@@ -2,7 +2,49 @@
 
 import { useState } from "react";
 import type { ExamDetailContent } from "@/lib/exams/content";
-import { EXAM_SIZE, EXAM_DURATION_MINUTES } from "@/lib/exams/content";
+
+function FaqAccordion({ items }: { items: { question: string; answer: string }[] }) {
+  const [openIndex, setOpenIndex] = useState<number | null>(null);
+  return (
+    <div className="divide-y divide-zinc-100 dark:divide-zinc-800">
+      {items.map((item, i) => {
+        const isOpen = openIndex === i;
+        return (
+          <div key={i}>
+            <button
+              type="button"
+              onClick={() => setOpenIndex(isOpen ? null : i)}
+              className="flex w-full items-center justify-between gap-3 py-4 text-left font-semibold text-zinc-900 dark:text-zinc-100"
+              aria-expanded={isOpen}
+              aria-controls={`faq-answer-${i}`}
+              id={`faq-question-${i}`}
+            >
+              <span>{item.question}</span>
+              <span
+                className={`shrink-0 text-zinc-400 transition-transform ${isOpen ? "rotate-180" : ""}`}
+                aria-hidden
+              >
+                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                </svg>
+              </span>
+            </button>
+            <div
+              id={`faq-answer-${i}`}
+              role="region"
+              aria-labelledby={`faq-question-${i}`}
+              className={`overflow-hidden transition-all duration-200 ${isOpen ? "max-h-[50rem] opacity-100" : "max-h-0 opacity-0"}`}
+            >
+              <p className="pb-4 text-sm text-zinc-600 dark:text-zinc-400">
+                {item.answer}
+              </p>
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
 
 type TabId = "overview" | "learn" | "faq";
 
@@ -15,9 +57,11 @@ const TAB_LABELS: { id: TabId; label: string }[] = [
 interface Props {
   langName: string;
   content: ExamDetailContent | null;
+  examSize: number;
+  examDurationMinutes: number;
 }
 
-export default function ExamDetailTabs({ langName, content }: Props) {
+export default function ExamDetailTabs({ langName, content, examSize, examDurationMinutes }: Props) {
   const [activeTab, setActiveTab] = useState<TabId>("overview");
 
   const tagline =
@@ -37,11 +81,11 @@ export default function ExamDetailTabs({ langName, content }: Props) {
     content?.faq ?? [
       {
         question: "How long is the exam?",
-        answer: `${EXAM_DURATION_MINUTES} minutes. The timer starts when you begin and cannot be paused.`,
+        answer: `${examDurationMinutes} minutes. The timer starts when you begin and cannot be paused.`,
       },
       {
         question: "How many questions?",
-        answer: `${EXAM_SIZE} multiple-choice questions. You need 70% or higher to pass.`,
+        answer: `${examSize} multiple-choice questions. You need 70% or higher to pass.`,
       },
       {
         question: "Do I get a certificate?",
@@ -140,21 +184,9 @@ export default function ExamDetailTabs({ langName, content }: Props) {
             id="tabpanel-faq"
             role="tabpanel"
             aria-labelledby="tab-faq"
-            className="space-y-1"
+            className="space-y-0"
           >
-            {faq.map((item, i) => (
-              <div
-                key={i}
-                className="border-b border-zinc-100 py-4 last:border-0 dark:border-zinc-800"
-              >
-                <h3 className="font-semibold text-zinc-900 dark:text-zinc-100">
-                  {item.question}
-                </h3>
-                <p className="mt-1.5 text-sm text-zinc-600 dark:text-zinc-400">
-                  {item.answer}
-                </p>
-              </div>
-            ))}
+            <FaqAccordion items={faq} />
           </div>
         )}
       </div>

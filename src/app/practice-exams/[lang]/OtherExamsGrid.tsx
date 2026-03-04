@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { LANGUAGES } from "@/lib/languages/registry";
 import type { SupportedLanguage } from "@/lib/languages/types";
-import { EXAM_SIZE, EXAM_DURATION_MINUTES } from "@/lib/exams/content";
 
 const LANG_ICONS: Record<string, string> = {
   go: "🐹",
@@ -15,9 +14,11 @@ const LANG_ICONS: Record<string, string> = {
 interface Props {
   currentLang: string;
   langSlugs: string[];
+  examSize: number;
+  examDurationMinutes: number;
 }
 
-export default function OtherExamsGrid({ currentLang, langSlugs }: Props) {
+export default function OtherExamsGrid({ currentLang, langSlugs, examSize, examDurationMinutes }: Props) {
   const others = langSlugs.filter((slug) => slug !== currentLang);
 
   if (others.length === 0) return null;
@@ -31,7 +32,7 @@ export default function OtherExamsGrid({ currentLang, langSlugs }: Props) {
         Other practice exams
       </h2>
       <p className="mb-6 text-sm text-zinc-600 dark:text-zinc-400">
-        Explore exams in other languages. Same format — 40 questions, 45 minutes, 70% to pass.
+        Explore exams in other languages. Same format — {examSize} questions, {examDurationMinutes} minutes, 70% to pass.
       </p>
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {others.map((slug) => {
@@ -51,7 +52,7 @@ export default function OtherExamsGrid({ currentLang, langSlugs }: Props) {
                   {config.name} Practice Exam
                 </h3>
                 <p className="text-xs text-zinc-500 dark:text-zinc-400">
-                  {EXAM_SIZE} questions · {EXAM_DURATION_MINUTES} min
+                  {examSize} questions · {examDurationMinutes} min
                 </p>
               </div>
               <span className="shrink-0 text-zinc-400 transition-transform group-hover:translate-x-0.5">

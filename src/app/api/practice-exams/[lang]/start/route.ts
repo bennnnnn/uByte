@@ -4,8 +4,9 @@ import { getUserById } from "@/lib/db";
 import { hasPaidAccess } from "@/lib/plans";
 import { getQuestionIdsByLang, getQuestionsByIds } from "@/lib/db/exam-questions";
 import { createAttempt } from "@/lib/db/exam-attempts";
+import { getExamConfig } from "@/lib/db/exam-settings";
 import { withErrorHandling } from "@/lib/api-utils";
-import { EXAM_SIZE, isExamLang } from "@/lib/exams/config";
+import { isExamLang } from "@/lib/exams/config";
 
 function shuffle<T>(arr: T[]): T[] {
   const out = [...arr];
@@ -38,8 +39,9 @@ export const POST = withErrorHandling(
       return NextResponse.json({ error: "Invalid language" }, { status: 400 });
     }
 
+    const { examSize } = await getExamConfig();
     const ids = await getQuestionIdsByLang(lang);
-    if (ids.length < EXAM_SIZE) {
+    if (ids.length < examSize) {
       return NextResponse.json(
         { error: "Not enough questions in the bank yet. Try another language." },
         { status: 503 }
@@ -47,7 +49,7 @@ export const POST = withErrorHandling(
     }
 
     const shuffled = shuffle(ids);
-    const selected = shuffled.slice(0, EXAM_SIZE);
+    const selected = shuffled.slice(0, examSize);
     const choicesOrder = selected.map(() => shuffle([0, 1, 2, 3])); // assume 4 choices; adjust if needed
     const attemptId = crypto.randomUUID();
 

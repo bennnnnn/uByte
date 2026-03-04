@@ -5,6 +5,7 @@ import { getAllTutorials } from "@/lib/tutorials";
 import { getAllPracticeProblems } from "@/lib/practice/problems";
 import { LANGUAGES, getAllLanguageSlugs } from "@/lib/languages/registry";
 import { BASE_URL } from "@/lib/constants";
+import { getExamConfig } from "@/lib/db";
 import {
   LanguageCard,
   HeroSection,
@@ -47,11 +48,12 @@ const LANGUAGE_ICONS: Record<string, string> = {
   rust: "🦀",
 };
 
-export default function Home() {
+export default async function Home() {
   const goTutorials = getAllTutorials("go");
   const tutorialList = goTutorials.map(({ slug, title }) => ({ slug, title }));
   const topicCount = goTutorials.length;
   const problemCount = getAllPracticeProblems().length;
+  const examConfig = await getExamConfig();
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -119,7 +121,7 @@ export default function Home() {
         <PracticeSection problemCount={problemCount} />
 
         {/* Practice exams */}
-        <PracticeExamsSection />
+        <PracticeExamsSection examSize={examConfig.examSize} examDurationMinutes={examConfig.examDurationMinutes} />
 
         {/* Quick-nav footer */}
         <nav

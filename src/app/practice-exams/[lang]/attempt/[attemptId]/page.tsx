@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { LANGUAGES } from "@/lib/languages/registry";
 import type { SupportedLanguage } from "@/lib/languages/types";
-import { EXAM_DURATION_MINUTES } from "@/lib/exams/config";
+import { EXAM_DURATION_MINUTES } from "@/lib/exams/config"; // fallback when API omits durationMinutes
 import type { AttemptPayload, SubmitExamResponse } from "@/lib/exams/api-types";
 import { parseJson, getApiErrorMessage } from "@/lib/fetch-utils";
 
@@ -133,10 +133,12 @@ export default function PracticeExamAttemptPage() {
     return () => window.removeEventListener("beforeunload", onBeforeUnload);
   }, [attempt, autoSubmitted]);
 
-  // Timer — count down from EXAM_DURATION_MINUTES based on attempt.startedAt
+  const durationMinutes = attempt?.durationMinutes ?? EXAM_DURATION_MINUTES;
+
+  // Timer — count down from durationMinutes based on attempt.startedAt
   useEffect(() => {
     if (!attempt) return;
-    const durationSec = EXAM_DURATION_MINUTES * 60;
+    const durationSec = durationMinutes * 60;
     const startedMs = new Date(attempt.startedAt).getTime();
     if (Number.isNaN(startedMs)) return;
     const computeRemaining = () =>
@@ -158,7 +160,7 @@ export default function PracticeExamAttemptPage() {
     }, 1000);
 
     return () => window.clearInterval(id);
-  }, [attempt]);
+  }, [attempt, durationMinutes]);
 
   const minutes = remainingSeconds != null ? Math.floor(remainingSeconds / 60) : null;
   const seconds = remainingSeconds != null ? remainingSeconds % 60 : null;
@@ -168,10 +170,7 @@ export default function PracticeExamAttemptPage() {
       : "—";
   const timeFraction =
     remainingSeconds != null && attempt
-      ? Math.max(
-          0,
-          Math.min(1, remainingSeconds / (EXAM_DURATION_MINUTES * 60)),
-        )
+      ? Math.max(0, Math.min(1, remainingSeconds / (durationMinutes * 60)))
       : 1;
 
   if (loading) {
@@ -215,7 +214,7 @@ export default function PracticeExamAttemptPage() {
             </h1>
             <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
               {totalQuestions} multiple-choice questions · 70% to pass ·{" "}
-              {EXAM_DURATION_MINUTES} minute time limit
+              {durationMinutes} minute time limit
             </p>
           </div>
 

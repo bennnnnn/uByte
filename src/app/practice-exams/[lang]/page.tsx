@@ -4,11 +4,12 @@ import { notFound } from "next/navigation";
 import { LANGUAGES, getAllLanguageSlugs } from "@/lib/languages/registry";
 import type { SupportedLanguage } from "@/lib/languages/types";
 import { getCurrentUser } from "@/lib/auth";
-import { getUserPlan } from "@/lib/db";
+import { getUserPlan, getExamConfig } from "@/lib/db";
 import { hasPaidAccess } from "@/lib/plans";
-import { getExamDetailContent, EXAM_SIZE, EXAM_DURATION_MINUTES } from "@/lib/exams/content";
+import { getExamDetailContent } from "@/lib/exams/content";
 import StartExamButton from "./StartExamButton";
 import ExamDetailTabs from "./ExamDetailTabs";
+import ExamCardsSection from "./ExamCardsSection";
 import OtherExamsGrid from "./OtherExamsGrid";
 
 export const dynamic = "force-dynamic";
@@ -21,9 +22,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { lang } = await params;
   const config = LANGUAGES[lang as SupportedLanguage];
   const name = config?.name ?? lang;
+  const examConfig = await getExamConfig();
   return {
     title: `${name} Practice Exam`,
-    description: `Prepare for the ${name} practice exam. ${EXAM_SIZE} questions, ${EXAM_DURATION_MINUTES} minutes, 70% to pass and earn a certificate.`,
+    description: `Prepare for the ${name} practice exam. ${examConfig.examSize} questions, ${examConfig.examDurationMinutes} minutes, 70% to pass and earn a certificate.`,
   };
 }
 
@@ -31,21 +33,17 @@ export default async function PracticeExamLangPage({ params }: Props) {
   const { lang } = await params;
   if (!VALID_LANGS.has(lang)) notFound();
 
-  const user = await getCurrentUser();
+  const [user, examConfig] = await Promise.all([
+    getCurrentUser().then((u) => u),
+    getExamConfig(),
+  ]);
   const plan = user ? await getUserPlan(user.userId) : "free";
   const canTakeExam = hasPaidAccess(plan);
 
   const config = LANGUAGES[lang as SupportedLanguage];
   const name = config?.name ?? lang;
-  const content = getExamDetailContent(lang);
+  const content = getExamDetailContent(lang, examConfig);
   const langSlugs = getAllLanguageSlugs();
-
-  const statPills = [
-    { label: `${EXAM_SIZE} questions`, value: EXAM_SIZE },
-    { label: `${EXAM_DURATION_MINUTES} min`, value: EXAM_DURATION_MINUTES },
-    { label: "70% to pass", value: "70%" },
-    { label: "Certificate", value: "cert" },
-  ];
 
   return (
     <div className="min-h-full overflow-y-auto bg-zinc-50 dark:bg-zinc-950">
@@ -59,54 +57,22 @@ export default async function PracticeExamLangPage({ params }: Props) {
           Practice exams
         </Link>
 
-        {/* Hero */}
-        <header className="mt-4">
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="rounded-lg bg-indigo-100 px-2 py-1 text-xs font-bold uppercase tracking-wider text-indigo-700 dark:bg-indigo-900/60 dark:text-indigo-300">
-              Pro
-            </span>
-            <span className="text-sm text-zinc-500 dark:text-zinc-400">
-              Practice exam
-            </span>
-          </div>
-          <h1 className="mt-2 text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100 sm:text-4xl">
-            {name} Practice Exam
-          </h1>
-          <p className="mt-2 max-w-2xl text-zinc-600 dark:text-zinc-400">
-            {content?.tagline ??
-              `Timed multiple-choice exam to validate your ${name} knowledge.`}
-          </p>
-          {/* Stat pills */}
-          <ul className="mt-5 flex flex-wrap gap-3" aria-label="Exam format">
-            {statPills.map((p) => (
-              <li
-                key={p.label}
-                className="inline-flex items-center gap-2 rounded-full border border-zinc-200 bg-white px-4 py-2 text-sm font-medium text-zinc-700 shadow-sm dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300"
-              >
-                {typeof p.value === "number" ? (
-                  <span className="font-bold text-indigo-600 dark:text-indigo-400">
-                    {p.value}
-                  </span>
-                ) : p.value === "cert" ? (
-                  <span className="text-base" aria-hidden>
-                    🏆
-                  </span>
-                ) : (
-                  <span className="font-bold text-indigo-600 dark:text-indigo-400">
-                    {p.value}
-                  </span>
-                )}
-                <span>{p.label}</span>
-              </li>
-            ))}
-          </ul>
-        </header>
+        {/* Exam cards — all languages with details from config */}
+        <h1 className="sr-only">
+          {name} Practice Exam — {examConfig.examSize} questions, {examConfig.examDurationMinutes} minutes
+        </h1>
+        <ExamCardsSection
+          currentLang={lang}
+          langSlugs={langSlugs}
+          examSize={examConfig.examSize}
+          examDurationMinutes={examConfig.examDurationMinutes}
+        />
 
         {/* Main + Sidebar layout */}
         <div className="mt-10 grid gap-8 lg:grid-cols-[1fr_320px] lg:items-start">
           {/* Tabs (main) */}
           <div className="min-w-0">
-            <ExamDetailTabs langName={name} content={content} />
+            <ExamDetailTabs langName={name} content={content} examSize={examConfig.examSize} examDurationMinutes={examConfig.examDurationMinutes} />
           </div>
 
           {/* Sticky CTA card */}
@@ -116,7 +82,7 @@ export default async function PracticeExamLangPage({ params }: Props) {
                 <>
                   <p className="text-sm text-zinc-600 dark:text-zinc-400">
                     You have access. The timer starts when you begin — you&apos;ll
-                    have {EXAM_DURATION_MINUTES} minutes.
+                    have {examConfig.examDurationMinutes} minutes.
                   </p>
                   <div className="mt-4">
                     <StartExamButton lang={lang} langName={name} fullWidth />
@@ -154,7 +120,7 @@ export default async function PracticeExamLangPage({ params }: Props) {
         </div>
 
         {/* Other exams */}
-        <OtherExamsGrid currentLang={lang} langSlugs={langSlugs} />
+        <OtherExamsGrid currentLang={lang} langSlugs={langSlugs} examSize={examConfig.examSize} examDurationMinutes={examConfig.examDurationMinutes} />
       </div>
     </div>
   );

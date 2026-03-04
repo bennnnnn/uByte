@@ -19,6 +19,8 @@ export interface AttemptPayload {
   attemptId: string;
   lang: string;
   startedAt: string;
+  /** Admin-configured duration (minutes). Omitted in older responses; client may fallback to config default. */
+  durationMinutes?: number;
   questions: AttemptQuestion[];
 }
 

@@ -122,3 +122,15 @@ CREATE TABLE IF NOT EXISTS practice_views (
   UNIQUE(viewer_id, problem_slug)
 );
 CREATE INDEX IF NOT EXISTS idx_practice_views_slug ON practice_views(problem_slug);
+
+-- Exam settings (admin-editable). Fallback to code defaults if not set.
+CREATE TABLE IF NOT EXISTS site_settings (
+  key TEXT PRIMARY KEY,
+  value TEXT NOT NULL,
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+INSERT INTO site_settings (key, value)
+VALUES
+  ('exam_size', '40'),
+  ('exam_duration_minutes', '45')
+ON CONFLICT (key) DO NOTHING;

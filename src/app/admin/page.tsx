@@ -102,6 +102,9 @@ export default function AdminPage() {
   const [examUploadFile, setExamUploadFile] = useState<File | null>(null);
   const [examUploading, setExamUploading] = useState(false);
   const [examUploadResult, setExamUploadResult] = useState<{ inserted: number; errors: string[] } | null>(null);
+  const [examSettings, setExamSettings] = useState<{ examSize: number; examDurationMinutes: number } | null>(null);
+  const [examSettingsSaving, setExamSettingsSaving] = useState(false);
+  const [examSettingsMessage, setExamSettingsMessage] = useState<string | null>(null);
 
   useEffect(() => {
     if (loading) return;
@@ -166,6 +169,7 @@ export default function AdminPage() {
   useEffect(() => {
     if (tab !== "exams") return;
     setExamStatsLoading(true);
+    setExamSettings(null);
     let cancelled = false;
     fetch("/api/admin/exam-stats", { credentials: "same-origin" })
       .then((r) => r.ok ? r.json() : null)
@@ -173,6 +177,11 @@ export default function AdminPage() {
         if (!cancelled && data) setExamStats(data);
       })
       .finally(() => { if (!cancelled) setExamStatsLoading(false); });
+    fetch("/api/admin/exam-settings", { credentials: "same-origin" })
+      .then((r) => r.ok ? r.json() : null)
+      .then((data) => {
+        if (!cancelled && data) setExamSettings({ examSize: data.examSize, examDurationMinutes: data.examDurationMinutes });
+      });
     return () => { cancelled = true; };
   }, [tab]);
 
@@ -601,6 +610,77 @@ export default function AdminPage() {
           {/* ── Practice exams tab ── */}
           {tab === "exams" && (
             <div className="space-y-6">
+              {/* Exam settings (admin-editable) */}
+              <div className="rounded-xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+                <h2 className="mb-3 text-sm font-semibold text-zinc-700 dark:text-zinc-300">Exam settings</h2>
+                <p className="mb-4 text-xs text-zinc-500 dark:text-zinc-400">Configure questions per exam and duration. These apply to all practice exams.</p>
+                {examSettings === null ? (
+                  <p className="text-sm text-zinc-500">Loading…</p>
+                ) : (
+                  <div className="flex flex-wrap items-end gap-4">
+                    <label className="flex flex-col gap-1">
+                      <span className="text-xs font-medium text-zinc-600 dark:text-zinc-400">Questions per exam</span>
+                      <input
+                        type="number"
+                        min={1}
+                        max={200}
+                        value={examSettings.examSize}
+                        onChange={(e) => setExamSettings((s) => s ? { ...s, examSize: Math.max(1, Math.min(200, parseInt(e.target.value, 10) || 1)) } : s)}
+                        className="w-24 rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-200"
+                      />
+                    </label>
+                    <label className="flex flex-col gap-1">
+                      <span className="text-xs font-medium text-zinc-600 dark:text-zinc-400">Duration (minutes)</span>
+                      <input
+                        type="number"
+                        min={5}
+                        max={180}
+                        value={examSettings.examDurationMinutes}
+                        onChange={(e) => setExamSettings((s) => s ? { ...s, examDurationMinutes: Math.max(5, Math.min(180, parseInt(e.target.value, 10) || 5)) } : s)}
+                        className="w-24 rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-200"
+                      />
+                    </label>
+                    <button
+                      type="button"
+                      disabled={examSettingsSaving}
+                      onClick={async () => {
+                        if (!examSettings) return;
+                        setExamSettingsSaving(true);
+                        setExamSettingsMessage(null);
+                        try {
+                          const res = await fetch("/api/admin/exam-settings", {
+                            method: "PUT",
+                            credentials: "same-origin",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({ examSize: examSettings.examSize, examDurationMinutes: examSettings.examDurationMinutes }),
+                          });
+                          const data = await res.json();
+                          if (res.ok) {
+                            setExamSettings({ examSize: data.examSize, examDurationMinutes: data.examDurationMinutes });
+                            setExamSettingsMessage("Saved.");
+                            setTimeout(() => setExamSettingsMessage(null), 3000);
+                          } else {
+                            setExamSettingsMessage(data.error ?? "Save failed");
+                          }
+                        } catch (e) {
+                          setExamSettingsMessage(String(e));
+                        } finally {
+                          setExamSettingsSaving(false);
+                        }
+                      }}
+                      className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700 disabled:opacity-50"
+                    >
+                      {examSettingsSaving ? "Saving…" : "Save"}
+                    </button>
+                    {examSettingsMessage && (
+                      <span className={`text-sm ${examSettingsMessage === "Saved." ? "text-emerald-600 dark:text-emerald-400" : "text-amber-600 dark:text-amber-400"}`}>
+                        {examSettingsMessage}
+                      </span>
+                    )}
+                  </div>
+                )}
+              </div>
+
               {examStatsLoading ? (
                 <p className="text-sm text-zinc-500">Loading exam stats…</p>
               ) : examStats ? (

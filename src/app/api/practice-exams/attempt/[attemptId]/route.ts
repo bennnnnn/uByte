@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
 import { getAttempt } from "@/lib/db/exam-attempts";
 import { getQuestionsByIds } from "@/lib/db/exam-questions";
+import { getExamConfig } from "@/lib/db/exam-settings";
 import { withErrorHandling } from "@/lib/api-utils";
 
 /** GET /api/practice-exams/attempt/[attemptId] — return attempt metadata + questions (no correct answers). */
@@ -20,11 +21,13 @@ export const GET = withErrorHandling(
     if (attempt.submitted_at) return NextResponse.json({ error: "Attempt already submitted" }, { status: 400 });
 
     const questions = await getQuestionsByIds(attempt.question_ids_json, attempt.choices_order_json);
+    const { examDurationMinutes } = await getExamConfig();
 
     return NextResponse.json({
       attemptId: attempt.id,
       lang: attempt.lang,
       startedAt: attempt.started_at,
+      durationMinutes: examDurationMinutes,
       questions: questions.map((q) => ({ id: q.id, prompt: q.prompt, choices: q.choices })),
     });
   }
