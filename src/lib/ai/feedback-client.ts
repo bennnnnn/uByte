@@ -1,0 +1,164 @@
+/**
+ * AI feedback client: Gemini or Grok. Returns strict JSON shape.
+ * Set env GEMINI_API_KEY or GROK_API_KEY (Gemini preferred if both set).
+ */
+
+export interface AiFeedbackSchema {
+  friendly_one_liner: string;
+  root_cause: string;
+  evidence: string[];
+  hint: string;
+  next_step: string;
+  minimal_patch?: string;
+  confidence: number;
+}
+
+const SCHEMA_DESC = `Respond with ONLY a single JSON object (no markdown, no explanation) with these exact keys:
+- friendly_one_liner: string, max 160 chars, one sentence for the user
+- root_cause: string, brief technical cause
+- evidence: array of strings (1-3 items from the submission)
+- hint: string, helpful hint for the current hint level
+- next_step: string, what to try next
+- minimal_patch: string (optional), only a small code snippet if needed, never full solution
+- confidence: number between 0 and 1
+
+Do NOT output full working solution. Do NOT reveal hidden tests. Prefer hints and minimal patch.`;
+
+export async function callAiFeedback(
+  evidenceBundle: string,
+  hintLevel: number,
+  verdict: string
+): Promise<AiFeedbackSchema> {
+  const apiKey = process.env.GEMINI_API_KEY ?? process.env.GROK_API_KEY;
+  if (!apiKey) {
+    return {
+      friendly_one_liner: "AI feedback is not configured. Check your setup.",
+      root_cause: "no_ai_config",
+      evidence: [],
+      hint: "Review the compiler or runtime output above and try a small fix.",
+      next_step: "Fix the reported issue and resubmit.",
+      confidence: 0,
+    };
+  }
+
+  if (process.env.GEMINI_API_KEY) {
+    return callGemini(apiKey, evidenceBundle, hintLevel, verdict);
+  }
+  return callGrok(apiKey, evidenceBundle, hintLevel, verdict);
+}
+
+async function callGemini(
+  apiKey: string,
+  evidenceBundle: string,
+  hintLevel: number,
+  verdict: string
+): Promise<AiFeedbackSchema> {
+  const url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" + encodeURIComponent(apiKey);
+
+  const levelPrompt =
+    hintLevel === 1 ? "Give a short, gentle hint (1-2 sentences). Do not give code yet." :
+    hintLevel === 2 ? "Explain the root cause and suggest a direction. You may give a minimal code snippet if it helps." :
+    hintLevel === 3 ? "Suggest a concrete fix (minimal_patch) if applicable. Still no full solution." :
+    "Teach the concept briefly; keep hint and next_step actionable. No full solution.";
+
+  const system = `You are a friendly coding tutor. ${SCHEMA_DESC} ${levelPrompt}`;
+  const user = `Verdict: ${verdict}\n\n${evidenceBundle}\n\nReturn ONLY valid JSON.`;
+
+  const body = {
+    contents: [{ role: "user", parts: [{ text: system + "\n\n" + user }] }],
+    generationConfig: {
+      responseMimeType: "application/json",
+      temperature: 0.3,
+      maxOutputTokens: 1024,
+    },
+  };
+
+  const res = await fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+
+  if (!res.ok) {
+    const errText = await res.text();
+    throw new Error("Gemini API error: " + res.status + " " + errText.slice(0, 200));
+  }
+
+  const data = await res.json();
+  const text = data.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
+  return await parseAiResponse(text, () => callGemini(apiKey, evidenceBundle + "\n\nImportant: return ONLY valid JSON, no markdown.", hintLevel, verdict));
+}
+
+async function callGrok(
+  apiKey: string,
+  evidenceBundle: string,
+  hintLevel: number,
+  verdict: string
+): Promise<AiFeedbackSchema> {
+  const url = "https://api.x.ai/v1/chat/completions";
+  const levelPrompt =
+    hintLevel === 1 ? "Give a short, gentle hint (1-2 sentences). Do not give code yet." :
+    hintLevel === 2 ? "Explain the root cause and suggest a direction. You may give a minimal code snippet." :
+    hintLevel === 3 ? "Suggest a concrete fix (minimal_patch) if applicable. No full solution." :
+    "Teach the concept briefly; keep hint and next_step actionable. No full solution.";
+
+  const system = `You are a friendly coding tutor. ${SCHEMA_DESC} ${levelPrompt} Respond with ONLY a single JSON object.`;
+  const user = `Verdict: ${verdict}\n\n${evidenceBundle}\n\nReturn ONLY valid JSON.`;
+
+  const res = await fetch(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: "Bearer " + apiKey,
+    },
+    body: JSON.stringify({
+      model: "grok-2-latest",
+      messages: [
+        { role: "system", content: system },
+        { role: "user", content: user },
+      ],
+      temperature: 0.3,
+      max_tokens: 1024,
+    }),
+  });
+
+  if (!res.ok) {
+    const errText = await res.text();
+    throw new Error("Grok API error: " + res.status + " " + errText.slice(0, 200));
+  }
+
+  const data = await res.json();
+  const text = data.choices?.[0]?.message?.content ?? "";
+  return await parseAiResponse(text, () => callGrok(apiKey, evidenceBundle + "\n\nReturn ONLY valid JSON.", hintLevel, verdict));
+}
+
+async function parseAiResponse(
+  text: string,
+  retry: () => Promise<AiFeedbackSchema>
+): Promise<AiFeedbackSchema> {
+  const trimmed = text.trim().replace(/^```json?\s*/i, "").replace(/\s*```\s*$/, "");
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(trimmed);
+  } catch {
+    return retry().catch((): AiFeedbackSchema => ({
+      friendly_one_liner: "Could not parse AI response. Try again or use the judge output above.",
+      root_cause: "parse_error",
+      evidence: [],
+      hint: "Review the compiler or runtime output.",
+      next_step: "Fix and resubmit.",
+      confidence: 0,
+    }));
+  }
+
+  const o = parsed as Record<string, unknown>;
+  return {
+    friendly_one_liner: typeof o.friendly_one_liner === "string" ? o.friendly_one_liner.slice(0, 160) : "Something went wrong.",
+    root_cause: typeof o.root_cause === "string" ? o.root_cause : "",
+    evidence: Array.isArray(o.evidence) ? o.evidence.filter((x): x is string => typeof x === "string") : [],
+    hint: typeof o.hint === "string" ? o.hint : "",
+    next_step: typeof o.next_step === "string" ? o.next_step : "",
+    minimal_patch: typeof o.minimal_patch === "string" ? o.minimal_patch : undefined,
+    confidence: typeof o.confidence === "number" && o.confidence >= 0 && o.confidence <= 1 ? o.confidence : 0.5,
+  };
+}

@@ -17,4 +17,7 @@ export * from "./notes";
 export * from "./challenges";
 export * from "./snapshots";
 export * from "./ai-feedback-cache";
+export * from "./ai-feedback-responses";
+export * from "./ai-usage";
 export * from "./practice-attempts";
+export * from "./submissions";

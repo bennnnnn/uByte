@@ -59,7 +59,20 @@ export function PracticeIDE({ problem, initialLang }: Props) {
     output?: string;
     passedCases?: number;
     totalCases?: number;
+    submissionId?: number;
+    failedInput?: string;
+    failedExpected?: string;
+    failedActual?: string;
+    consecutiveFailures?: number;
   } | null>(null);
+  const [aiFeedback, setAiFeedback] = useState<{
+    friendly_one_liner: string;
+    hint: string;
+    next_step: string;
+    minimal_patch?: string;
+  } | null>(null);
+  const [aiLoading, setAiLoading] = useState(false);
+  const [aiError, setAiError] = useState<string | null>(null);
 
   const editor = useCodeEditor(getStarterForLanguage(problem, initialLang), lang);
   const { leftWidth, outputHeight, isDragging, startDragH, startDragV, startDragHTouch, startDragVTouch } = usePanelResize();
@@ -163,47 +176,58 @@ export function PracticeIDE({ problem, initialLang }: Props) {
   const handleSubmit = useCallback(async () => {
     setSubmitting(true);
     setVerdict(null);
+    setAiFeedback(null);
+    setAiError(null);
     try {
-      const res = await fetch("/api/judge-code", {
+      const res = await fetch("/api/submit", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "same-origin",
-        body: JSON.stringify({ slug: problem.slug, code: editor.code, language: lang }),
+        body: JSON.stringify({ problem_id: problem.slug, code: editor.code, language: lang }),
       });
       const data = await res.json();
       const v = {
-        type:        data.verdict,
-        message:     data.message,
-        output:      data.output,
-        passedCases: data.passedCases,
-        totalCases:  data.totalCases,
+        type:                data.verdict,
+        message:            data.message,
+        output:              data.output,
+        passedCases:        data.passedCases,
+        totalCases:         data.totalCases,
+        submissionId:       data.submission_id,
+        failedInput:        data.failedInput,
+        failedExpected:     data.failedExpected,
+        failedActual:       data.failedActual,
+        consecutiveFailures: data.consecutive_failures,
       };
       setVerdict(v);
 
       if (data.verdict === "accepted") {
         setStatuses((prev) => ({ ...prev, [problem.slug]: "solved" }));
-        fetch("/api/practice-attempt", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          credentials: "same-origin",
-          body: JSON.stringify({ slug: problem.slug, status: "solved" }),
-        })
-          .then((r) => r.json())
-          .then((d) => {
-            if (d?.xpAwarded > 0) {
-              setXpToast(d.xpAwarded);
-              setTimeout(() => setXpToast(null), 3500);
-            }
-          })
-          .catch(() => {});
-      } else if (["wrong_answer", "runtime_error", "compile_error"].includes(data.verdict)) {
+        if (data.xpAwarded > 0) {
+          setXpToast(data.xpAwarded);
+          setTimeout(() => setXpToast(null), 3500);
+        }
+      } else if (["wrong_answer", "runtime_error", "compile_error", "tle"].includes(data.verdict)) {
         setStatuses((prev) => ({ ...prev, [problem.slug]: "failed" }));
-        fetch("/api/practice-attempt", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          credentials: "same-origin",
-          body: JSON.stringify({ slug: problem.slug, status: "failed" }),
-        }).catch(() => {});
+        if (data.consecutive_failures >= 2 && data.submission_id) {
+          fetch("/api/ai-feedback", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            credentials: "same-origin",
+            body: JSON.stringify({ submission_id: data.submission_id, hint_level: 1 }),
+          })
+            .then(async (res) => {
+              const d = await res.json();
+              if (res.ok && d?.friendly_one_liner != null) {
+                setAiFeedback({
+                  friendly_one_liner: d.friendly_one_liner ?? "",
+                  hint: d.hint ?? "",
+                  next_step: d.next_step ?? "",
+                  minimal_patch: d.minimal_patch,
+                });
+              }
+            })
+            .catch(() => {});
+        }
       }
     } catch {
       setVerdict({ type: "error", message: "Network error. Please try again." });
@@ -212,12 +236,44 @@ export function PracticeIDE({ problem, initialLang }: Props) {
     }
   }, [editor.code, lang, problem.slug]);
 
+  const requestAiFeedback = useCallback(async (hintLevel: number) => {
+    const sid = verdict?.submissionId;
+    if (!sid) return;
+    setAiLoading(true);
+    setAiError(null);
+    try {
+      const res = await fetch("/api/ai-feedback", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "same-origin",
+        body: JSON.stringify({ submission_id: sid, hint_level: hintLevel }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setAiError(data?.message ?? data?.error ?? "Request failed");
+        return;
+      }
+      setAiFeedback({
+        friendly_one_liner: data.friendly_one_liner ?? "",
+        hint: data.hint ?? "",
+        next_step: data.next_step ?? "",
+        minimal_patch: data.minimal_patch,
+      });
+    } catch {
+      setAiError("Network error");
+    } finally {
+      setAiLoading(false);
+    }
+  }, [verdict?.submissionId]);
+
   function handleReset() {
     editor.setCode(getStarterForLanguage(problem, lang));
     editor.setErrorLines(new Set());
     setOutput(null);
     setOutputIsError(false);
     setVerdict(null);
+    setAiFeedback(null);
+    setAiError(null);
   }
 
   /** Tab → 4 spaces indent; Ctrl/Cmd+Enter → run */
@@ -585,6 +641,34 @@ export function PracticeIDE({ problem, initialLang }: Props) {
                 </div>
               </div>
             )}
+            {verdict && verdict.type === "wrong_answer" && (verdict.failedInput != null || verdict.failedExpected != null || verdict.failedActual != null) && (
+              <div className="border-b border-zinc-200 bg-zinc-100/50 px-4 py-3 dark:border-zinc-800 dark:bg-zinc-800/50">
+                <p className="mb-1.5 text-xs font-semibold uppercase tracking-widest text-zinc-500 dark:text-zinc-400">Failing test</p>
+                {verdict.failedInput != null && <p className="text-xs text-zinc-700 dark:text-zinc-300"><span className="text-zinc-500 dark:text-zinc-500">Input:</span> {verdict.failedInput}</p>}
+                {verdict.failedExpected != null && <p className="text-xs text-zinc-700 dark:text-zinc-300"><span className="text-zinc-500 dark:text-zinc-500">Expected:</span> {verdict.failedExpected}</p>}
+                {verdict.failedActual != null && <p className="text-xs text-amber-700 dark:text-amber-400"><span className="text-zinc-500 dark:text-zinc-500">Got:</span> {verdict.failedActual}</p>}
+              </div>
+            )}
+            {verdict && verdict.type !== "accepted" && verdict.submissionId != null && (
+              <div className="flex flex-wrap items-center gap-2 border-b border-zinc-200 px-4 py-2 dark:border-zinc-800">
+                {verdict.consecutiveFailures != null && verdict.consecutiveFailures >= 2 && (
+                  <span className="text-xs text-zinc-500 dark:text-zinc-400">Want a hint?</span>
+                )}
+                <button type="button" onClick={() => requestAiFeedback(1)} disabled={aiLoading} className="rounded-md bg-zinc-200 px-2.5 py-1.5 text-xs font-medium text-zinc-800 hover:bg-zinc-300 disabled:opacity-50 dark:bg-zinc-700 dark:text-zinc-200 dark:hover:bg-zinc-600">Hint</button>
+                <button type="button" onClick={() => requestAiFeedback(2)} disabled={aiLoading} className="rounded-md bg-zinc-200 px-2.5 py-1.5 text-xs font-medium text-zinc-800 hover:bg-zinc-300 disabled:opacity-50 dark:bg-zinc-700 dark:text-zinc-200 dark:hover:bg-zinc-600">Explain</button>
+                <button type="button" onClick={() => requestAiFeedback(3)} disabled={aiLoading} className="rounded-md bg-zinc-200 px-2.5 py-1.5 text-xs font-medium text-zinc-800 hover:bg-zinc-300 disabled:opacity-50 dark:bg-zinc-700 dark:text-zinc-200 dark:hover:bg-zinc-600">Suggest fix</button>
+                <button type="button" onClick={() => requestAiFeedback(4)} disabled={aiLoading} className="rounded-md bg-zinc-200 px-2.5 py-1.5 text-xs font-medium text-zinc-800 hover:bg-zinc-300 disabled:opacity-50 dark:bg-zinc-700 dark:text-zinc-200 dark:hover:bg-zinc-600">Teach</button>
+              </div>
+            )}
+            {aiError && <p className="border-b border-red-200 bg-red-50 px-4 py-2 text-xs text-red-700 dark:border-red-800 dark:bg-red-950/50 dark:text-red-400">{aiError}</p>}
+            {aiFeedback && (
+              <div className="border-b border-indigo-200 bg-indigo-50/50 px-4 py-3 dark:border-indigo-800 dark:bg-indigo-950/30">
+                <p className="text-sm font-medium text-indigo-800 dark:text-indigo-300">{aiFeedback.friendly_one_liner}</p>
+                <p className="mt-1.5 text-xs text-zinc-700 dark:text-zinc-300">{aiFeedback.hint}</p>
+                <p className="mt-1 text-xs text-zinc-600 dark:text-zinc-400">Next: {aiFeedback.next_step}</p>
+                {aiFeedback.minimal_patch && <pre className="mt-2 overflow-x-auto rounded bg-zinc-800 p-2 text-xs text-zinc-100">{aiFeedback.minimal_patch}</pre>}
+              </div>
+            )}
             <div className="p-4 font-mono text-sm">
               {!verdict && output === null ? (
                 <p className="text-xs text-zinc-400 dark:text-zinc-600">
@@ -595,7 +679,7 @@ export function PracticeIDE({ problem, initialLang }: Props) {
                   <p className="mb-2 text-xs font-semibold uppercase tracking-widest text-zinc-400 dark:text-zinc-500">
                     {verdict.type === "compile_error" ? "Compile Error" : verdict.type === "runtime_error" ? "Runtime Error" : "Output"}
                   </p>
-                  <pre className={`whitespace-pre-wrap text-xs ${
+                  <pre className={`whitespace-pre-wrap break-words text-xs ${
                     verdict.type === "accepted" ? "text-emerald-600 dark:text-emerald-400"
                     : verdict.type === "wrong_answer" ? "text-zinc-600 dark:text-zinc-300"
                     : "text-red-600 dark:text-red-400"
@@ -608,7 +692,7 @@ export function PracticeIDE({ problem, initialLang }: Props) {
                   <p className="mb-2 text-xs font-semibold uppercase tracking-widest text-zinc-400 dark:text-zinc-500">
                     {outputIsError ? "Error" : "Output"}
                   </p>
-                  <pre className={`whitespace-pre-wrap ${outputIsError ? "text-red-600 dark:text-red-400" : "text-green-600 dark:text-green-400"}`}>
+                  <pre className={`whitespace-pre-wrap break-words ${outputIsError ? "text-red-600 dark:text-red-400" : "text-green-600 dark:text-green-400"}`}>
                     {output}
                   </pre>
                 </>
