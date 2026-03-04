@@ -42,7 +42,7 @@ function formatCents(cents: number) {
   return "$" + (cents / 100).toFixed(2);
 }
 
-type Tab = "users" | "analytics" | "revenue" | "audit";
+type Tab = "users" | "analytics" | "revenue" | "audit" | "exams";
 type RevenuePeriod = "7days" | "month" | "year";
 
 const TAB_LABELS: Record<Tab, string> = {
@@ -50,6 +50,7 @@ const TAB_LABELS: Record<Tab, string> = {
   analytics: "Analytics",
   revenue: "Revenue",
   audit: "Audit log",
+  exams: "Practice exams",
 };
 
 export default function AdminPage() {
@@ -75,6 +76,8 @@ export default function AdminPage() {
     created_at: string;
   }
   interface PracticeStat { problem_slug: string; solved_count: number; attempt_count: number; }
+  interface ExamStatRow { lang: string; question_count: number; attempt_count: number; passed_count: number; certificates_count: number; }
+  interface ExamStats { questionsByLang: ExamStatRow[]; totalQuestions: number; totalAttempts: number; passedAttempts: number; certificatesIssued: number; passRatePercent: number; }
 
   const [tab, setTab] = useState<Tab>("users");
   const [users, setUsers] = useState<AdminUser[]>([]);
@@ -94,6 +97,11 @@ export default function AdminPage() {
   const [userActionsOpen, setUserActionsOpen] = useState<number | null>(null);
   const [actionAnchorRect, setActionAnchorRect] = useState<DOMRect | null>(null);
   const printRef = useRef<HTMLDivElement>(null);
+  const [examStats, setExamStats] = useState<ExamStats | null>(null);
+  const [examStatsLoading, setExamStatsLoading] = useState(false);
+  const [examUploadFile, setExamUploadFile] = useState<File | null>(null);
+  const [examUploading, setExamUploading] = useState(false);
+  const [examUploadResult, setExamUploadResult] = useState<{ inserted: number; errors: string[] } | null>(null);
 
   useEffect(() => {
     if (loading) return;
@@ -154,6 +162,19 @@ export default function AdminPage() {
       });
     return () => { cancelled = true; };
   }, [tab, revenuePeriod, revenue]);
+
+  useEffect(() => {
+    if (tab !== "exams") return;
+    setExamStatsLoading(true);
+    let cancelled = false;
+    fetch("/api/admin/exam-stats", { credentials: "same-origin" })
+      .then((r) => r.ok ? r.json() : null)
+      .then((data) => {
+        if (!cancelled && data) setExamStats(data);
+      })
+      .finally(() => { if (!cancelled) setExamStatsLoading(false); });
+    return () => { cancelled = true; };
+  }, [tab]);
 
   async function doAction(userId: number, action: string, confirmMsg?: string, extra?: { plan?: string }) {
     if (confirmMsg && !confirm(confirmMsg)) return;
@@ -271,7 +292,7 @@ export default function AdminPage() {
           <span className="font-semibold text-zinc-900 dark:text-zinc-100">Admin</span>
         </div>
         <nav className="flex-1 space-y-0.5 p-3">
-          {(["users", "analytics", "revenue", "audit"] as Tab[]).map((t) => (
+          {(["users", "analytics", "revenue", "audit", "exams"] as Tab[]).map((t) => (
             <button
               key={t}
               type="button"
@@ -299,6 +320,7 @@ export default function AdminPage() {
               {tab === "analytics" && "Tutorials & practice"}
               {tab === "revenue" && "Income & subscribers"}
               {tab === "audit" && "Admin actions"}
+              {tab === "exams" && "Questions, attempts & upload"}
             </p>
           </div>
           {tab === "users" && (
@@ -572,6 +594,126 @@ export default function AdminPage() {
                     </tbody>
                   </table>
                 </div>
+              </div>
+            </div>
+          )}
+
+          {/* ── Practice exams tab ── */}
+          {tab === "exams" && (
+            <div className="space-y-6">
+              {examStatsLoading ? (
+                <p className="text-sm text-zinc-500">Loading exam stats…</p>
+              ) : examStats ? (
+                <>
+                  <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+                    {[
+                      { label: "Total questions", value: examStats.totalQuestions },
+                      { label: "Exam attempts", value: examStats.totalAttempts },
+                      { label: "Pass rate", value: examStats.totalAttempts > 0 ? examStats.passRatePercent + "%" : "—" },
+                      { label: "Certificates", value: examStats.certificatesIssued },
+                    ].map((s) => (
+                      <div key={s.label} className="rounded-xl border border-zinc-200 bg-white p-4 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+                        <p className="text-xl font-bold text-zinc-900 dark:text-zinc-100">{s.value}</p>
+                        <p className="text-xs text-zinc-500 dark:text-zinc-400">{s.label}</p>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="rounded-xl border border-zinc-200 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+                    <h2 className="border-b border-zinc-200 px-4 py-3 text-sm font-semibold text-zinc-700 dark:border-zinc-800 dark:text-zinc-300">By language</h2>
+                    <div className="overflow-auto">
+                      <table className="w-full text-sm">
+                        <thead className="bg-zinc-50 dark:bg-zinc-900">
+                          <tr>
+                            <th className="px-4 py-2 text-left font-medium text-zinc-500">Lang</th>
+                            <th className="px-4 py-2 text-right font-medium text-zinc-500">Questions</th>
+                            <th className="px-4 py-2 text-right font-medium text-zinc-500">Attempts</th>
+                            <th className="px-4 py-2 text-right font-medium text-zinc-500">Passed</th>
+                            <th className="px-4 py-2 text-right font-medium text-zinc-500">Certificates</th>
+                            <th className="px-4 py-2 text-right font-medium text-zinc-500">Pass %</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800">
+                          {examStats.questionsByLang.length === 0 ? (
+                            <tr><td colSpan={6} className="px-4 py-8 text-center text-zinc-400">No questions yet. Upload a CSV or JSON file below.</td></tr>
+                          ) : (
+                            examStats.questionsByLang.map((r) => (
+                              <tr key={r.lang} className="hover:bg-zinc-50/80 dark:hover:bg-zinc-800/50">
+                                <td className="px-4 py-2 font-medium text-zinc-900 dark:text-zinc-100">{r.lang}</td>
+                                <td className="px-4 py-2 text-right font-mono">{r.question_count}</td>
+                                <td className="px-4 py-2 text-right font-mono">{r.attempt_count}</td>
+                                <td className="px-4 py-2 text-right font-mono">{r.passed_count}</td>
+                                <td className="px-4 py-2 text-right font-mono">{r.certificates_count}</td>
+                                <td className="px-4 py-2 text-right">{r.attempt_count > 0 ? Math.round((r.passed_count / r.attempt_count) * 100) + "%" : "—"}</td>
+                              </tr>
+                            ))
+                          )}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </>
+              ) : null}
+
+              <div className="rounded-xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+                <h2 className="mb-3 text-sm font-semibold text-zinc-700 dark:text-zinc-300">Bulk upload questions</h2>
+                <p className="mb-3 text-xs text-zinc-500 dark:text-zinc-400">
+                  Upload a <strong>CSV</strong> or <strong>JSON</strong> file. CSV: header optional; columns: <code className="rounded bg-zinc-100 px-1 dark:bg-zinc-800">lang,prompt,choice1,choice2,choice3,choice4,correct_index,explanation</code>. correct_index is 0–3. JSON: <code className="rounded bg-zinc-100 px-1 dark:bg-zinc-800">{"{ \"questions\": [ { \"lang\", \"prompt\", \"choices\": [4 strings], \"correct_index\", \"explanation\"? } ] }"}</code>
+                </p>
+                <div className="flex flex-wrap items-center gap-3">
+                  <input
+                    type="file"
+                    accept=".csv,.json,text/csv,application/json"
+                    onChange={(e) => { setExamUploadFile(e.target.files?.[0] ?? null); setExamUploadResult(null); }}
+                    className="rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-200"
+                  />
+                  <button
+                    type="button"
+                    disabled={!examUploadFile || examUploading}
+                    onClick={async () => {
+                      if (!examUploadFile) return;
+                      setExamUploading(true);
+                      setExamUploadResult(null);
+                      try {
+                        const isJson = examUploadFile.name.toLowerCase().endsWith(".json");
+                        const body = await examUploadFile.text();
+                        const res = await apiFetch("/api/admin/exam-questions/upload", {
+                          method: "POST",
+                          headers: isJson ? { "Content-Type": "application/json" } : { "Content-Type": "text/csv" },
+                          body: isJson ? JSON.stringify({ questions: (() => { try { const j = JSON.parse(body); return Array.isArray(j.questions) ? j.questions : Array.isArray(j) ? j : []; } catch { return []; } })() }) : body,
+                        });
+                        const data = await res.json();
+                        if (res.ok) {
+                          setExamUploadResult({ inserted: data.inserted ?? 0, errors: data.errors ?? [] });
+                          setExamUploadFile(null);
+                          if (tab === "exams" && (data.inserted ?? 0) > 0) {
+                            const st = await fetch("/api/admin/exam-stats", { credentials: "same-origin" });
+                            if (st.ok) setExamStats(await st.json());
+                          }
+                        } else {
+                          setExamUploadResult({ inserted: 0, errors: [data.error ?? "Upload failed"] });
+                        }
+                      } catch (err) {
+                        setExamUploadResult({ inserted: 0, errors: [String(err)] });
+                      } finally {
+                        setExamUploading(false);
+                      }
+                    }}
+                    className="rounded-lg bg-amber-600 px-4 py-2 text-sm font-medium text-white hover:bg-amber-700 disabled:opacity-50"
+                  >
+                    {examUploading ? "Uploading…" : "Upload"}
+                  </button>
+                </div>
+                {examUploadResult && (
+                  <div className="mt-3 rounded-lg border border-zinc-200 bg-zinc-50 p-3 text-sm dark:border-zinc-700 dark:bg-zinc-800">
+                    <p className="font-medium text-zinc-900 dark:text-zinc-100">Inserted: {examUploadResult.inserted}</p>
+                    {examUploadResult.errors.length > 0 && (
+                      <ul className="mt-1 list-inside list-disc text-amber-700 dark:text-amber-400">
+                        {examUploadResult.errors.slice(0, 10).map((e, i) => <li key={i}>{e}</li>)}
+                        {examUploadResult.errors.length > 10 && <li>… and {examUploadResult.errors.length - 10} more</li>}
+                      </ul>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
           )}

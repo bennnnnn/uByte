@@ -15,7 +15,8 @@
     "start": "next start",
     "lint": "eslint",
     "test": "vitest run",
-    "migrate": "node scripts/run-migrate.mjs"
+    "migrate": "node scripts/run-migrate.mjs",
+    "seed:exams": "node scripts/seeds/run-exam-seed.mjs"
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.0.2",

@@ -41,6 +41,9 @@ interface Props {
 export default function OverviewTab({ stats, badges, achievements, userId }: Props) {
   const [activity, setActivity] = useState<ActivityItem[]>([]);
   const [activityLoading, setActivityLoading] = useState(true);
+  const [examCerts, setExamCerts] = useState<
+    { id: string; lang: string; passed_at: string }[]
+  >([]);
 
   const pct = stats.total_tutorials > 0
     ? Math.round((stats.completed_count / stats.total_tutorials) * 100)
@@ -54,6 +57,18 @@ export default function OverviewTab({ stats, badges, achievements, userId }: Pro
       .catch(() => {})
       .finally(() => setActivityLoading(false));
   }, []);
+
+  useEffect(() => {
+    if (!userId) return;
+    fetch("/api/profile/exam-certificates", { credentials: "same-origin" })
+      .then((r) => r.json())
+      .then((d) => {
+        if (Array.isArray(d.certificates)) {
+          setExamCerts(d.certificates);
+        }
+      })
+      .catch(() => {});
+  }, [userId]);
 
   return (
     <div className="space-y-8">
@@ -84,6 +99,37 @@ export default function OverviewTab({ stats, badges, achievements, userId }: Pro
           </Link>
         </div>
       </div>
+
+      {/* Exam certificates */}
+      {examCerts.length > 0 && (
+        <div className="rounded-2xl border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900">
+          <div className="mb-3 flex items-center justify-between">
+            <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+              Exam certificates
+            </h2>
+          </div>
+          <ul className="space-y-2">
+            {examCerts.slice(0, 3).map((c) => (
+              <li key={c.id} className="flex items-center justify-between text-sm">
+                <span className="text-zinc-700 dark:text-zinc-200">
+                  {c.lang.toUpperCase()} exam
+                </span>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-zinc-400">
+                    {new Date(c.passed_at).toLocaleDateString()}
+                  </span>
+                  <Link
+                    href={`/practice-exams/certificate/${c.id}`}
+                    className="text-xs font-medium text-indigo-600 hover:underline dark:text-indigo-400"
+                  >
+                    Download
+                  </Link>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
 
       {/* Recent achievements */}
       <div>

@@ -21,3 +21,6 @@ export * from "./ai-feedback-responses";
 export * from "./ai-usage";
 export * from "./practice-attempts";
 export * from "./submissions";
+export * from "./exam-questions";
+export * from "./exam-attempts";
+export * from "./exam-certificates";

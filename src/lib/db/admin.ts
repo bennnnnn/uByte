@@ -327,3 +327,64 @@ export async function getAdminRecentSubscriptionEvents(
   `;
   return rows as AdminSubscriptionEventRow[];
 }
+
+// ─── Practice exam stats (admin) ──────────────────────
+
+export interface ExamStatsByLang {
+  lang: string;
+  question_count: number;
+  attempt_count: number;
+  passed_count: number;
+  certificates_count: number;
+}
+
+export interface AdminExamStats {
+  questionsByLang: ExamStatsByLang[];
+  totalQuestions: number;
+  totalAttempts: number;
+  passedAttempts: number;
+  certificatesIssued: number;
+  passRatePercent: number;
+}
+
+export async function getAdminExamStats(): Promise<AdminExamStats> {
+  const sql = getSql();
+  const [qRows, aRows, pRows, cRows] = await Promise.all([
+    sql`SELECT lang, COUNT(*)::int AS cnt FROM exam_questions GROUP BY lang ORDER BY lang`,
+    sql`SELECT lang, COUNT(*)::int AS cnt FROM exam_attempts WHERE submitted_at IS NOT NULL GROUP BY lang`,
+    sql`SELECT lang, COUNT(*)::int AS cnt FROM exam_attempts WHERE submitted_at IS NOT NULL AND passed = true GROUP BY lang`,
+    sql`SELECT lang, COUNT(*)::int AS cnt FROM exam_certificates GROUP BY lang`,
+  ]);
+  const langSet = new Set<string>();
+  (qRows as { lang: string }[]).forEach((r) => langSet.add(r.lang));
+  (aRows as { lang: string }[]).forEach((r) => langSet.add(r.lang));
+  (pRows as { lang: string }[]).forEach((r) => langSet.add(r.lang));
+  (cRows as { lang: string }[]).forEach((r) => langSet.add(r.lang));
+  const qMap = new Map<string, number>();
+  const aMap = new Map<string, number>();
+  const pMap = new Map<string, number>();
+  const cMap = new Map<string, number>();
+  (qRows as { lang: string; cnt: number }[]).forEach((r) => qMap.set(r.lang, r.cnt));
+  (aRows as { lang: string; cnt: number }[]).forEach((r) => aMap.set(r.lang, r.cnt));
+  (pRows as { lang: string; cnt: number }[]).forEach((r) => pMap.set(r.lang, r.cnt));
+  (cRows as { lang: string; cnt: number }[]).forEach((r) => cMap.set(r.lang, r.cnt));
+  const questionsByLang: ExamStatsByLang[] = [...langSet].sort().map((lang) => ({
+    lang,
+    question_count: qMap.get(lang) ?? 0,
+    attempt_count: aMap.get(lang) ?? 0,
+    passed_count: pMap.get(lang) ?? 0,
+    certificates_count: cMap.get(lang) ?? 0,
+  }));
+  const totalQuestions = [...qMap.values()].reduce((s, n) => s + n, 0);
+  const totalAttempts = [...aMap.values()].reduce((s, n) => s + n, 0);
+  const passedAttempts = [...pMap.values()].reduce((s, n) => s + n, 0);
+  const certificatesIssued = [...cMap.values()].reduce((s, n) => s + n, 0);
+  return {
+    questionsByLang,
+    totalQuestions,
+    totalAttempts,
+    passedAttempts,
+    certificatesIssued,
+    passRatePercent: totalAttempts > 0 ? Math.round((passedAttempts / totalAttempts) * 100) : 0,
+  };
+}
