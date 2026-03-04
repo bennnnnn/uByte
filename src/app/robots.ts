@@ -4,7 +4,7 @@ import { getAllLanguageSlugs } from "@/lib/languages/registry";
 
 export default function robots(): MetadataRoute.Robots {
   const languageSlugs = getAllLanguageSlugs();
-  const allowPaths = ["/", ...languageSlugs.map((slug) => `/${slug}/`)];
+  const allowPaths = ["/", ...languageSlugs.map((slug) => `/tutorial/${slug}/`)];
   return {
     rules: [
       {

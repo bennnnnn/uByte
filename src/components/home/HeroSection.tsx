@@ -177,7 +177,7 @@ export default function HeroSection({ topicCount = 19, problemCount = 11 }: Hero
             {/* CTAs */}
             <div className="mb-10 flex flex-wrap gap-3">
               <Link
-                href="/go"
+                href="/tutorial/go"
                 className="group inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-7 py-3 text-sm font-bold text-white shadow-lg shadow-indigo-600/25 transition-all hover:bg-indigo-500 hover:shadow-indigo-500/40"
               >
                 Start free

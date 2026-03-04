@@ -197,7 +197,7 @@ function PricingContent() {
               </div>
             ) : (
               <Link
-                href="/go"
+                href="/tutorial/go"
                 className="block rounded-xl border border-zinc-300 py-3 text-center text-sm font-semibold text-zinc-700 transition-colors hover:border-indigo-400 hover:bg-indigo-50 hover:text-indigo-700 dark:border-zinc-600 dark:text-zinc-300 dark:hover:border-indigo-600 dark:hover:text-indigo-400"
               >
                 Continue learning →
@@ -326,7 +326,7 @@ function PricingContent() {
               className="text-zinc-600 underline underline-offset-2 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-200"
             >
               {user ? (
-                <Link href="/go">Start with 5 free tutorials</Link>
+                <Link href="/tutorial/go">Start with 5 free tutorials</Link>
               ) : (
                 "Start with 5 free tutorials"
               )}

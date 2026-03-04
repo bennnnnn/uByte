@@ -24,10 +24,12 @@ export default function CodePlayground({ code: initialCode, title }: CodePlaygro
   const pathname = usePathname();
   const { user } = useAuth();
 
-  // slug: "variables" from "/go/variables" or "/golang/variables" (legacy redirect)
-  const slug = pathname.replace(/^\/(?:go|golang|python|cpp)\//, "");
-  const pathLang = pathname.split("/")[1];
+  // slug: "variables" from "/tutorial/go/variables" or legacy "/go/variables"
+  const pathParts = pathname.split("/").filter(Boolean);
+  const isTutorialPath = pathParts[0] === "tutorial" && pathParts.length >= 3;
+  const pathLang = isTutorialPath ? pathParts[1] : pathParts[0];
   const lang = pathLang === "golang" ? "go" : pathLang || "go";
+  const slug = isTutorialPath ? pathParts[2] ?? "" : pathname.replace(/^\/(?:go|golang|python|cpp|javascript|java|rust)\//, "");
   // Stable identifier for this editor on the page
   const editorKey = title ?? codeHash(initialCode);
   // localStorage key

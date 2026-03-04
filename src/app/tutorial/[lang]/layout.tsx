@@ -7,7 +7,7 @@ import { getAllTutorials } from "@/lib/tutorials";
 import { isSupportedLanguage } from "@/lib/languages/registry";
 import type { SupportedLanguage } from "@/lib/languages/types";
 
-export default async function LangLayout({
+export default async function TutorialLangLayout({
   children,
   params,
 }: Readonly<{

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { LANGUAGE_DISPLAY_LIST } from "@/lib/languages/display-list";
+import { tutorialUrl, tutorialLangUrl } from "@/lib/urls";
 
 /**
  * Set to true when multiple languages have content and you want to show the switcher.
@@ -19,12 +20,14 @@ export default function LanguageSwitcher({ currentLang }: LanguageSwitcherProps)
   const pathname = usePathname();
   if (!SHOW_LANGUAGE_SWITCHER) return null;
 
-  const basePath = pathname?.replace(/^\/(go|python|cpp)(\/|$)/, "") ?? "";
+  // Strip /tutorial/:lang or /tutorial/:lang/ to get slug (e.g. "getting-started") or ""
+  const slugMatch = pathname?.match(/^\/tutorial\/(?:go|python|cpp|javascript|java|rust)\/?([^/]*)/);
+  const slug = slugMatch?.[1] ?? "";
 
   return (
     <div className="flex items-center gap-1 rounded-lg border border-zinc-200 bg-white p-1 dark:border-zinc-700 dark:bg-zinc-800">
       {LANGUAGE_DISPLAY_LIST.map((lang) => {
-        const href = basePath ? `/${lang.slug}/${basePath}` : `/${lang.slug}`;
+        const href = slug ? tutorialUrl(lang.slug, slug) : tutorialLangUrl(lang.slug);
         const isActive = currentLang === lang.slug;
         return (
           <Link

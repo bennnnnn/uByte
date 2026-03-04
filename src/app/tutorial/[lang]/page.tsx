@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 import { getAllTutorials } from "@/lib/tutorials";
 import { getLanguageConfig, isSupportedLanguage, getAllLanguageSlugs } from "@/lib/languages/registry";
 import { BASE_URL, APP_NAME } from "@/lib/constants";
-import { tutorialUrl } from "@/lib/urls";
+import { tutorialUrl, tutorialLangUrl } from "@/lib/urls";
 import TutorialGrid from "@/components/TutorialGrid";
 import type { SupportedLanguage } from "@/lib/languages/types";
 
@@ -20,7 +20,7 @@ export async function generateMetadata({
   const { lang } = await params;
   if (!isSupportedLanguage(lang)) return { title: "Not Found" };
   const config = getLanguageConfig(lang)!;
-  const canonical = `${BASE_URL.replace(/\/$/, "")}/${lang}`;
+  const canonical = `${BASE_URL.replace(/\/$/, "")}${tutorialLangUrl(lang)}`;
   return {
     title: config.seo.defaultTitle,
     description: config.seo.defaultDescription,
@@ -42,7 +42,7 @@ export async function generateMetadata({
   };
 }
 
-export default async function LanguageLandingPage({
+export default async function TutorialLangLandingPage({
   params,
 }: {
   params: Promise<{ lang: string }>;
@@ -65,7 +65,7 @@ export default async function LanguageLandingPage({
           <div className="mt-7 flex flex-wrap gap-3">
             <Link
               href={tutorialUrl(lang, tutorials[0].slug)}
-              className="inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-6 py-3 text-sm font-semibold text-white shadow-sm transition-all hover:bg-indigo-700"
+              className="inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-6 py-3 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-indigo-700"
             >
               Start Learning →
             </Link>
@@ -87,7 +87,7 @@ export default async function LanguageLandingPage({
           </p>
           <p className="mt-2 text-sm text-zinc-500 dark:text-zinc-400">
             We&apos;re building interactive {config.name} lessons. In the meantime, try our{" "}
-            <Link href="/go" className="font-medium text-indigo-600 hover:underline dark:text-indigo-400">
+            <Link href={tutorialLangUrl("go")} className="font-medium text-indigo-600 hover:underline dark:text-indigo-400">
               Go tutorials
             </Link>
             .

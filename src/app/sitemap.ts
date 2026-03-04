@@ -2,7 +2,7 @@ import type { MetadataRoute } from "next";
 import { getAllTutorials } from "@/lib/tutorials";
 import { getAllLanguageSlugs } from "@/lib/languages/registry";
 import { BASE_URL } from "@/lib/constants";
-import { tutorialUrl } from "@/lib/urls";
+import { tutorialUrl, tutorialLangUrl } from "@/lib/urls";
 import type { SupportedLanguage } from "@/lib/languages/types";
 
 export default function sitemap(): MetadataRoute.Sitemap {
@@ -18,9 +18,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   for (const lang of languageSlugs) {
     const tutorials = getAllTutorials(lang as SupportedLanguage);
-    // Language landing page (e.g. /go, /python, /cpp)
+    // Language landing page (e.g. /tutorial/go, /tutorial/cpp)
     entries.push({
-      url: `${BASE_URL}/${lang}`,
+      url: `${BASE_URL.replace(/\/$/, "")}${tutorialLangUrl(lang)}`,
       lastModified: new Date(),
       changeFrequency: "weekly",
       priority: 0.9,

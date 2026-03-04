@@ -114,7 +114,7 @@ export default function RootLayout({
               </div>
             </header>
             <MobileStandaloneHeader />
-            {/* Home / practice: just scrollable content. /[lang]: sidebar + content from [lang] layout */}
+            {/* Home / practice: just scrollable content. /tutorial/[lang]: sidebar + content from tutorial layout */}
             <main id="main-content" className="flex min-h-0 flex-1 flex-col overflow-hidden">
               <ErrorBoundary>{children}</ErrorBoundary>
             </main>

@@ -48,9 +48,15 @@ const nextConfig: NextConfig = {
     removeConsole: process.env.NODE_ENV === "production",
   },
   async redirects() {
+    const tutorialLangs = ["go", "python", "cpp", "javascript", "java", "rust"];
+    const langRedirects = tutorialLangs.flatMap((lang) => [
+      { source: `/${lang}`, destination: `/tutorial/${lang}`, permanent: true },
+      { source: `/${lang}/:path*`, destination: `/tutorial/${lang}/:path*`, permanent: true },
+    ]);
     return [
-      { source: "/tutorials/:slug", destination: "/go/:slug", permanent: true },
-      { source: "/golang/:path*", destination: "/go/:path*", permanent: true },
+      { source: "/tutorials/:slug", destination: "/tutorial/go/:slug", permanent: true },
+      { source: "/golang/:path*", destination: "/tutorial/go/:path*", permanent: true },
+      ...langRedirects,
     ];
   },
   async headers() {

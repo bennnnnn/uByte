@@ -6,6 +6,7 @@ import { getAllPracticeProblems } from "@/lib/practice/problems";
 import { LANGUAGES, getAllLanguageSlugs } from "@/lib/languages/registry";
 import { BASE_URL } from "@/lib/constants";
 import { getExamConfig } from "@/lib/db";
+import { tutorialLangUrl } from "@/lib/urls";
 import {
   LanguageCard,
   HeroSection,
@@ -112,6 +113,7 @@ export default async function Home() {
                 description={config.seo.defaultDescription}
                 icon={LANGUAGE_ICONS[slug] ?? "📝"}
                 tutorialCount={topicCount}
+                href={tutorialLangUrl(slug)}
               />
             ))}
           </div>
@@ -131,7 +133,7 @@ export default async function Home() {
           {languageEntries.map(({ slug, config }) => (
             <Link
               key={slug}
-              href={`/${slug}`}
+              href={tutorialLangUrl(slug)}
               className="font-medium text-zinc-500 transition-colors hover:text-indigo-600 dark:text-zinc-500 dark:hover:text-indigo-400"
             >
               {config.name} tutorials
