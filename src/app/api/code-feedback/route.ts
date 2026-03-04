@@ -1,13 +1,13 @@
 import { createHash } from "crypto";
 import { NextRequest, NextResponse } from "next/server";
-import Anthropic from "@anthropic-ai/sdk";
 import { withErrorHandling } from "@/lib/api-utils";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 import { getSteps } from "@/lib/tutorial-steps";
 import { getCachedFeedback, setCachedFeedback } from "@/lib/db/ai-feedback-cache";
 import { isSupportedLanguage } from "@/lib/languages/registry";
 
-const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+const GROK_URL = "https://api.x.ai/v1/chat/completions";
+const GROK_MODEL = "grok-4";
 
 function normalizeCodeForCache(code: string): string {
   return String(code)
@@ -89,15 +89,27 @@ ${isWrongOutput
 No prefix like "Feedback:" — just the sentence.`;
 
   try {
-    if (!process.env.ANTHROPIC_API_KEY) throw new Error("ANTHROPIC_API_KEY not set");
-    const response = await anthropic.messages.create({
-      model: "claude-haiku-4-5-20251001",
-      max_tokens: 80,
-      messages: [{ role: "user", content: prompt }],
+    const apiKey = process.env.XAI_API_KEY;
+    if (!apiKey) throw new Error("XAI_API_KEY not set");
+    const res = await fetch(GROK_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify({
+        model: GROK_MODEL,
+        messages: [{ role: "user", content: prompt }],
+        max_tokens: 80,
+        stream: false,
+        temperature: 0.3,
+      }),
     });
-    const feedback = (response.content[0] as Anthropic.TextBlock).text.trim();
-    await setCachedFeedback(cacheKey, feedback);
-    return NextResponse.json({ feedback });
+    if (!res.ok) throw new Error(await res.text());
+    const data = await res.json();
+    const feedback = (data.choices?.[0]?.message?.content ?? "").trim();
+    if (feedback) await setCachedFeedback(cacheKey, feedback);
+    return NextResponse.json({ feedback: feedback || null });
   } catch {
     return NextResponse.json({ feedback: null });
   }

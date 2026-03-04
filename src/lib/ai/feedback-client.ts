@@ -1,6 +1,6 @@
 /**
- * AI feedback client: Gemini or Grok. Returns strict JSON shape.
- * Set env GEMINI_API_KEY or GROK_API_KEY (Gemini preferred if both set).
+ * AI feedback client: Grok (X.AI). Returns strict JSON shape.
+ * Set env XAI_API_KEY.
  */
 
 export interface AiFeedbackSchema {
@@ -24,15 +24,18 @@ const SCHEMA_DESC = `Respond with ONLY a single JSON object (no markdown, no exp
 
 Do NOT output full working solution. Do NOT reveal hidden tests. Prefer hints and minimal patch.`;
 
+const GROK_URL = "https://api.x.ai/v1/chat/completions";
+const GROK_MODEL = "grok-4";
+
 export async function callAiFeedback(
   evidenceBundle: string,
   hintLevel: number,
   verdict: string
 ): Promise<AiFeedbackSchema> {
-  const apiKey = process.env.GEMINI_API_KEY ?? process.env.GROK_API_KEY;
+  const apiKey = process.env.XAI_API_KEY;
   if (!apiKey) {
     return {
-      friendly_one_liner: "AI feedback is not configured. Check your setup.",
+      friendly_one_liner: "AI feedback is not configured. Set XAI_API_KEY.",
       root_cause: "no_ai_config",
       evidence: [],
       hint: "Review the compiler or runtime output above and try a small fix.",
@@ -40,53 +43,7 @@ export async function callAiFeedback(
       confidence: 0,
     };
   }
-
-  if (process.env.GEMINI_API_KEY) {
-    return callGemini(apiKey, evidenceBundle, hintLevel, verdict);
-  }
   return callGrok(apiKey, evidenceBundle, hintLevel, verdict);
-}
-
-async function callGemini(
-  apiKey: string,
-  evidenceBundle: string,
-  hintLevel: number,
-  verdict: string
-): Promise<AiFeedbackSchema> {
-  const url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=" + encodeURIComponent(apiKey);
-
-  const levelPrompt =
-    hintLevel === 1 ? "Give a short, gentle hint (1-2 sentences). Do not give code yet." :
-    hintLevel === 2 ? "Explain the root cause and suggest a direction. You may give a minimal code snippet if it helps." :
-    hintLevel === 3 ? "Suggest a concrete fix (minimal_patch) if applicable. Still no full solution." :
-    "Teach the concept briefly; keep hint and next_step actionable. No full solution.";
-
-  const system = `You are a friendly coding tutor. ${SCHEMA_DESC} ${levelPrompt}`;
-  const user = `Verdict: ${verdict}\n\n${evidenceBundle}\n\nReturn ONLY valid JSON.`;
-
-  const body = {
-    contents: [{ role: "user", parts: [{ text: system + "\n\n" + user }] }],
-    generationConfig: {
-      responseMimeType: "application/json",
-      temperature: 0.3,
-      maxOutputTokens: 1024,
-    },
-  };
-
-  const res = await fetch(url, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body),
-  });
-
-  if (!res.ok) {
-    const errText = await res.text();
-    throw new Error("Gemini API error: " + res.status + " " + errText.slice(0, 200));
-  }
-
-  const data = await res.json();
-  const text = data.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
-  return await parseAiResponse(text, () => callGemini(apiKey, evidenceBundle + "\n\nImportant: return ONLY valid JSON, no markdown.", hintLevel, verdict));
 }
 
 async function callGrok(
@@ -95,7 +52,6 @@ async function callGrok(
   hintLevel: number,
   verdict: string
 ): Promise<AiFeedbackSchema> {
-  const url = "https://api.x.ai/v1/chat/completions";
   const levelPrompt =
     hintLevel === 1 ? "Give a short, gentle hint (1-2 sentences). Do not give code yet." :
     hintLevel === 2 ? "Explain the root cause and suggest a direction. You may give a minimal code snippet." :
@@ -105,20 +61,21 @@ async function callGrok(
   const system = `You are a friendly coding tutor. ${SCHEMA_DESC} ${levelPrompt} Respond with ONLY a single JSON object.`;
   const user = `Verdict: ${verdict}\n\n${evidenceBundle}\n\nReturn ONLY valid JSON.`;
 
-  const res = await fetch(url, {
+  const res = await fetch(GROK_URL, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
       Authorization: "Bearer " + apiKey,
     },
     body: JSON.stringify({
-      model: "grok-2-latest",
+      model: GROK_MODEL,
       messages: [
         { role: "system", content: system },
         { role: "user", content: user },
       ],
       temperature: 0.3,
       max_tokens: 1024,
+      stream: false,
     }),
   });
 

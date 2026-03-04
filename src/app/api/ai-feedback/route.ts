@@ -9,7 +9,7 @@ import { runHeuristics } from "@/lib/ai/heuristics";
 import { callAiFeedback } from "@/lib/ai/feedback-client";
 import { withErrorHandling } from "@/lib/api-utils";
 
-const MODEL_NAME = "gemini-1.5-flash";
+const MODEL_NAME = "grok-4";
 
 /** POST /api/ai-feedback — submission_id, hint_level (1-4). Returns cached or heuristic or AI JSON. */
 export const POST = withErrorHandling("POST /api/ai-feedback", async (request: NextRequest) => {
