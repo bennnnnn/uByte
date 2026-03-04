@@ -53,8 +53,34 @@ export default function LeaderboardPage() {
 
   if (error) {
     return (
-      <div className="flex h-full items-center justify-center">
+      <div className="flex min-h-[50vh] flex-col items-center justify-center gap-4 px-4">
         <p className="text-sm text-red-500">{error}</p>
+        <div className="flex flex-wrap justify-center gap-3">
+          <button
+            type="button"
+            onClick={() => {
+              setError("");
+              setLoading(true);
+              fetch("/api/leaderboard", { credentials: "same-origin" })
+                .then(async (res) => {
+                  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                  const data = await res.json();
+                  setUsers(data.users ?? []);
+                })
+                .catch((err) => setError(err.message))
+                .finally(() => setLoading(false));
+            }}
+            className="rounded-xl bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-500"
+          >
+            Retry
+          </button>
+          <Link
+            href="/"
+            className="rounded-xl border border-zinc-300 bg-white px-4 py-2 text-sm font-semibold text-zinc-700 hover:bg-zinc-50 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-200 dark:hover:bg-zinc-700"
+          >
+            Back to home
+          </Link>
+        </div>
       </div>
     );
   }

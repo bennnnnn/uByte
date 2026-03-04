@@ -5,15 +5,8 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { LANGUAGES } from "@/lib/languages/registry";
 import type { SupportedLanguage } from "@/lib/languages/types";
-
-interface CertPayload {
-  id: string;
-  userId: number;
-  name: string;
-  lang: string;
-  attemptId: string;
-  passedAt: string;
-}
+import type { CertificatePayload } from "@/lib/exams/api-types";
+import { parseJson, getApiErrorMessage } from "@/lib/fetch-utils";
 
 function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString("en-US", {
@@ -25,7 +18,7 @@ function formatDate(iso: string) {
 
 export default function ExamCertificatePage() {
   const { certificateId } = useParams<{ certificateId: string }>();
-  const [data, setData] = useState<CertPayload | null>(null);
+  const [data, setData] = useState<CertificatePayload | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -35,13 +28,13 @@ export default function ExamCertificatePage() {
         const res = await fetch(`/api/practice-exams/certificate/${certificateId}`, {
           credentials: "same-origin",
         });
-        const json = await res.json().catch(() => ({}));
+        const json = await parseJson<CertificatePayload & { error?: string }>(res);
         if (cancelled) return;
         if (!res.ok) {
-          setError((json as any).error || "Unable to load certificate.");
+          setError(getApiErrorMessage(res, json, "Unable to load certificate."));
           return;
         }
-        setData(json as CertPayload);
+        setData(json as CertificatePayload);
       } catch {
         if (!cancelled) setError("Network error. Please try again.");
       }
@@ -62,12 +55,20 @@ export default function ExamCertificatePage() {
       <div className="flex min-h-[80vh] items-center justify-center px-4">
         <div className="w-full max-w-md text-center">
           <p className="mb-3 text-sm text-red-500">{error}</p>
-          <Link
-            href="/profile?tab=overview"
-            className="text-sm font-medium text-indigo-600 hover:text-indigo-700 dark:text-indigo-400"
-          >
-            ← Back to profile
-          </Link>
+          <div className="flex flex-col gap-2 sm:flex-row sm:justify-center">
+            <Link
+              href="/profile?tab=overview"
+              className="text-sm font-medium text-indigo-600 hover:text-indigo-700 dark:text-indigo-400"
+            >
+              ← Back to profile
+            </Link>
+            <Link
+              href="/practice-exams"
+              className="text-sm font-medium text-indigo-600 hover:text-indigo-700 dark:text-indigo-400"
+            >
+              ← Back to practice exams
+            </Link>
+          </div>
         </div>
       </div>
     );
@@ -75,7 +76,7 @@ export default function ExamCertificatePage() {
 
   if (!data) {
     return (
-      <div className="flex min-h-[80vh] items-center justify-center">
+      <div className="flex min-h-[80vh] items-center justify-center" aria-live="polite" aria-busy="true">
         <p className="text-sm text-zinc-500">Loading certificate…</p>
       </div>
     );

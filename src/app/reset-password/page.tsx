@@ -2,6 +2,7 @@
 
 import { useState, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
+import Input from "@/components/ui/Input";
 
 function ResetPasswordForm() {
   const searchParams = useSearchParams();
@@ -88,26 +89,24 @@ function ResetPasswordForm() {
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <label className="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300">New password</label>
-          <input
+          <Input
             type="password"
             required
             minLength={6}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             placeholder="••••••••"
-            className="w-full rounded-lg border border-zinc-300 bg-white px-4 py-2.5 text-sm text-zinc-900 placeholder-zinc-400 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"
           />
         </div>
         <div>
           <label className="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300">Confirm password</label>
-          <input
+          <Input
             type="password"
             required
             minLength={6}
             value={confirm}
             onChange={(e) => setConfirm(e.target.value)}
             placeholder="••••••••"
-            className="w-full rounded-lg border border-zinc-300 bg-white px-4 py-2.5 text-sm text-zinc-900 placeholder-zinc-400 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"
           />
         </div>
         <button

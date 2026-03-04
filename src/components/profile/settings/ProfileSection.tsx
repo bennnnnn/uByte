@@ -1,6 +1,8 @@
 "use client";
 
 import Avatar, { AVATAR_KEYS } from "@/components/Avatar";
+import Input from "@/components/ui/Input";
+import Textarea from "@/components/ui/Textarea";
 import type { Profile } from "../types";
 
 interface Props {
@@ -27,11 +29,11 @@ export default function ProfileSection({
       <div className="space-y-4">
         <div>
           <label className="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300">Name</label>
-          <input value={editName} onChange={(e) => onChangeName(e.target.value)} className="w-full rounded-lg border border-zinc-300 bg-white px-4 py-2.5 text-sm text-zinc-900 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100" />
+          <Input value={editName} onChange={(e) => onChangeName(e.target.value)} />
         </div>
         <div>
           <label className="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300">Bio</label>
-          <textarea value={editBio} onChange={(e) => onChangeBio(e.target.value)} maxLength={200} rows={2} className="w-full rounded-lg border border-zinc-300 bg-white px-4 py-2.5 text-sm text-zinc-900 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100" placeholder="Tell us about yourself..." />
+          <Textarea value={editBio} onChange={(e) => onChangeBio(e.target.value)} maxLength={200} rows={2} placeholder="Tell us about yourself..." />
           <p className="mt-1 text-xs text-zinc-400">{editBio.length}/200</p>
         </div>
         <div>

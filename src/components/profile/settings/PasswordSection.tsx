@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Input from "@/components/ui/Input";
 import type { Profile } from "../types";
 
 function passwordStrength(pw: string): { label: string; color: string; width: string } {
@@ -76,9 +77,9 @@ export default function PasswordSection({ profile, onChangePassword, onToast }: 
       </div>
       {showForm && (
         <div className="mt-4 space-y-3">
-          <input type="password" value={currentPw} onChange={(e) => setCurrentPw(e.target.value)} placeholder="Current password" className="w-full rounded-lg border border-zinc-300 bg-white px-4 py-2.5 text-sm text-zinc-900 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100" />
+          <Input type="password" value={currentPw} onChange={(e) => setCurrentPw(e.target.value)} placeholder="Current password" />
           <div>
-            <input type="password" value={newPw} onChange={(e) => setNewPw(e.target.value)} placeholder="New password" className="w-full rounded-lg border border-zinc-300 bg-white px-4 py-2.5 text-sm text-zinc-900 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100" />
+            <Input type="password" value={newPw} onChange={(e) => setNewPw(e.target.value)} placeholder="New password" />
             {newPw.length > 0 && (
               <div className="mt-1.5">
                 <div className="h-1.5 w-full overflow-hidden rounded-full bg-zinc-200 dark:bg-zinc-700">

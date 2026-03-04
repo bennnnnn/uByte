@@ -1,24 +1,13 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useCallback } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { LANGUAGES } from "@/lib/languages/registry";
 import type { SupportedLanguage } from "@/lib/languages/types";
 import { EXAM_DURATION_MINUTES } from "@/lib/exams/config";
-
-interface Question {
-  id: number;
-  prompt: string;
-  choices: string[];
-}
-
-interface AttemptPayload {
-  attemptId: string;
-  lang: string;
-  startedAt: string;
-  questions: Question[];
-}
+import type { AttemptPayload, SubmitExamResponse } from "@/lib/exams/api-types";
+import { parseJson, getApiErrorMessage } from "@/lib/fetch-utils";
 
 export default function PracticeExamAttemptPage() {
   const { lang, attemptId } = useParams<{ lang: string; attemptId: string }>();
@@ -30,6 +19,9 @@ export default function PracticeExamAttemptPage() {
   const [error, setError] = useState<string | null>(null);
   const [remainingSeconds, setRemainingSeconds] = useState<number | null>(null);
   const [autoSubmitted, setAutoSubmitted] = useState(false);
+  const [showSubmitConfirm, setShowSubmitConfirm] = useState(false);
+  const [showLeaveConfirm, setShowLeaveConfirm] = useState(false);
+  const [pendingLeaveUrl, setPendingLeaveUrl] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -38,7 +30,7 @@ export default function PracticeExamAttemptPage() {
         const res = await fetch(`/api/practice-exams/attempt/${attemptId}`, {
           credentials: "same-origin",
         });
-        const data = await res.json().catch(() => ({}));
+        const data = await parseJson<AttemptPayload & { error?: string }>(res);
         if (cancelled) return;
 
         if (res.status === 401) {
@@ -50,7 +42,7 @@ export default function PracticeExamAttemptPage() {
           return;
         }
         if (!res.ok) {
-          setError((data as any).error || "Unable to load exam.");
+          setError(getApiErrorMessage(res, data, "Unable to load exam."));
           return;
         }
 
@@ -93,18 +85,14 @@ export default function PracticeExamAttemptPage() {
         credentials: "same-origin",
         body: JSON.stringify({ answers }),
       });
-      const data = await res.json().catch(() => ({}));
+      const data = await parseJson<SubmitExamResponse & { error?: string }>(res);
       if (!res.ok) {
-        setError((data as any).error || "Submission failed. Please try again.");
+        setError(getApiErrorMessage(res, data, "Submission failed. Please try again."));
         setSubmitting(false);
         return;
       }
 
-      const { score, passed, certificateId } = data as {
-        score: number;
-        passed: boolean;
-        certificateId: string | null;
-      };
+      const { score, passed, certificateId } = data;
 
       const params = new URLSearchParams();
       params.set("score", String(score));
@@ -120,12 +108,30 @@ export default function PracticeExamAttemptPage() {
 
   const handleSwitchLanguage = (nextLang: string) => {
     if (nextLang === lang) return;
-    const confirmed = window.confirm(
-      "Switching languages will end this attempt and return you to the language landing page. Continue?"
-    );
-    if (!confirmed) return;
-    router.push(`/practice-exams/${nextLang}`);
+    setPendingLeaveUrl(`/practice-exams/${nextLang}`);
+    setShowLeaveConfirm(true);
   };
+
+  const confirmLeave = useCallback(() => {
+    if (pendingLeaveUrl) router.push(pendingLeaveUrl);
+    setShowLeaveConfirm(false);
+    setPendingLeaveUrl(null);
+  }, [pendingLeaveUrl, router]);
+
+  const cancelLeave = useCallback(() => {
+    setShowLeaveConfirm(false);
+    setPendingLeaveUrl(null);
+  }, []);
+
+  // Prevent accidental tab close/refresh during attempt
+  useEffect(() => {
+    if (!attempt || autoSubmitted) return;
+    const onBeforeUnload = (e: BeforeUnloadEvent) => {
+      e.preventDefault();
+    };
+    window.addEventListener("beforeunload", onBeforeUnload);
+    return () => window.removeEventListener("beforeunload", onBeforeUnload);
+  }, [attempt, autoSubmitted]);
 
   // Timer — count down from EXAM_DURATION_MINUTES based on attempt.startedAt
   useEffect(() => {
@@ -308,12 +314,18 @@ export default function PracticeExamAttemptPage() {
               key={q.id}
               id={`q-${q.id}`}
               className="rounded-xl border border-zinc-200 bg-white p-4 shadow-sm transition-shadow hover:shadow-md dark:border-zinc-800 dark:bg-zinc-900"
+              role="group"
+              aria-labelledby={`q-${q.id}-label`}
             >
-              <p className="mb-3 text-sm font-medium text-zinc-900 dark:text-zinc-100">
+              <p id={`q-${q.id}-label`} className="mb-3 text-sm font-medium text-zinc-900 dark:text-zinc-100">
                 <span className="mr-1.5 text-xs text-zinc-400">Q{idx + 1}.</span>
                 {q.prompt}
               </p>
-              <div className="space-y-2">
+              <div
+                className="space-y-2"
+                role="radiogroup"
+                aria-labelledby={`q-${q.id}-label`}
+              >
                 {q.choices.map((choice, cIdx) => (
                   <label
                     key={cIdx}
@@ -326,6 +338,7 @@ export default function PracticeExamAttemptPage() {
                       value={cIdx}
                       checked={answers[q.id] === cIdx}
                       onChange={() => handleChange(q.id, cIdx)}
+                      aria-describedby={`q-${q.id}-label`}
                     />
                     <span className="text-zinc-800 dark:text-zinc-200">
                       {choice}
@@ -340,7 +353,7 @@ export default function PracticeExamAttemptPage() {
         <div className="mt-8 flex flex-col items-end gap-2">
           <button
             type="button"
-            onClick={() => void handleSubmit()}
+            onClick={() => (allAnswered ? setShowSubmitConfirm(true) : void handleSubmit())}
             disabled={submitting || !allAnswered || autoSubmitted}
             className="inline-flex items-center justify-center rounded-xl bg-amber-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-amber-700 disabled:cursor-not-allowed disabled:opacity-60"
           >
@@ -364,6 +377,66 @@ export default function PracticeExamAttemptPage() {
           </p>
         )}
       </div>
+
+      {/* Submit confirmation modal */}
+      {showSubmitConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" role="dialog" aria-modal="true" aria-labelledby="submit-confirm-title">
+          <div className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-xl dark:bg-zinc-900">
+            <h2 id="submit-confirm-title" className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">
+              Submit exam?
+            </h2>
+            <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
+              You can&apos;t change your answers after submitting. Your score will be calculated and you&apos;ll see the result.
+            </p>
+            <div className="mt-6 flex gap-3">
+              <button
+                type="button"
+                onClick={() => setShowSubmitConfirm(false)}
+                className="flex-1 rounded-xl border border-zinc-300 py-2.5 text-sm font-semibold text-zinc-700 hover:bg-zinc-50 dark:border-zinc-600 dark:text-zinc-200 dark:hover:bg-zinc-800"
+              >
+                Keep editing
+              </button>
+              <button
+                type="button"
+                onClick={() => { setShowSubmitConfirm(false); void handleSubmit(); }}
+                className="flex-1 rounded-xl bg-amber-600 py-2.5 text-sm font-semibold text-white hover:bg-amber-700"
+              >
+                Submit
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Leave attempt confirmation modal */}
+      {showLeaveConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" role="dialog" aria-modal="true" aria-labelledby="leave-confirm-title">
+          <div className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-xl dark:bg-zinc-900">
+            <h2 id="leave-confirm-title" className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">
+              Leave this attempt?
+            </h2>
+            <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
+              Your progress will be lost. You can start a new attempt from the exam page.
+            </p>
+            <div className="mt-6 flex gap-3">
+              <button
+                type="button"
+                onClick={cancelLeave}
+                className="flex-1 rounded-xl border border-zinc-300 py-2.5 text-sm font-semibold text-zinc-700 hover:bg-zinc-50 dark:border-zinc-600 dark:text-zinc-200 dark:hover:bg-zinc-800"
+              >
+                Stay
+              </button>
+              <button
+                type="button"
+                onClick={confirmLeave}
+                className="flex-1 rounded-xl bg-amber-600 py-2.5 text-sm font-semibold text-white hover:bg-amber-700"
+              >
+                Leave
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

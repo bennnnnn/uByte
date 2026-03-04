@@ -23,7 +23,12 @@ const LANGS = [
   { slug: "cpp",        icon: "⚙️", label: "C++",        desc: "Pointers, STL & performance",   card: CARD_STYLE, badge: BADGE_STYLE, arrow: ARROW_STYLE },
 ];
 
-export default function PracticeSection() {
+interface PracticeSectionProps {
+  problemCount?: number;
+}
+
+export default function PracticeSection({ problemCount = 11 }: PracticeSectionProps) {
+  const moreCount = Math.max(0, problemCount - PROBLEMS.length);
   return (
     <section aria-labelledby="practice-heading" className="space-y-5">
       {/* ── Main practice CTA card ───────────────────────────────────── */}
@@ -53,7 +58,9 @@ export default function PracticeSection() {
                 </span>
               </li>
             ))}
-            <li className="pl-4 text-xs text-zinc-400">+ 5 more problems</li>
+            {moreCount > 0 && (
+              <li className="pl-4 text-xs text-zinc-400">+ {moreCount} more problem{moreCount !== 1 ? "s" : ""}</li>
+            )}
           </ul>
 
           <Link
@@ -86,7 +93,7 @@ export default function PracticeSection() {
                 </h3>
               </div>
               <span className={`shrink-0 rounded-full px-2 py-0.5 text-xs font-semibold ${l.badge}`}>
-                11 problems
+                {problemCount} problems
               </span>
             </div>
 

@@ -98,10 +98,18 @@ const FEATURES = [
   "Built-in LeetCode-style interview practice",
 ];
 
-export default function HeroSection() {
+interface HeroSectionProps {
+  /** Number of topics per language (e.g. from getAllTutorials("go").length) */
+  topicCount?: number;
+  /** Number of practice problems (e.g. from getAllPracticeProblems().length) */
+  problemCount?: number;
+}
+
+export default function HeroSection({ topicCount = 19, problemCount = 11 }: HeroSectionProps) {
   const [lang, setLang] = useState<Lang>("go");
   const meta = LANG_META[lang];
   const lines = CODE[lang];
+  const problemsLabel = problemCount >= 10 ? `${problemCount}+` : String(problemCount);
 
   return (
     <section className="relative overflow-hidden bg-white dark:bg-zinc-950">
@@ -183,15 +191,26 @@ export default function HeroSection() {
               >
                 Interview practice
               </Link>
+              <Link
+                href="/practice-exams"
+                className="inline-flex items-center gap-2 rounded-xl border border-zinc-200 bg-zinc-50 px-7 py-3 text-sm font-semibold text-zinc-700 transition-all hover:border-zinc-300 hover:bg-zinc-100 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:border-zinc-600 dark:hover:bg-zinc-700"
+              >
+                Practice exams
+              </Link>
             </div>
+
+            {/* Trust line */}
+            <p className="mb-6 text-xs font-medium text-zinc-500 dark:text-zinc-400">
+              Join learners building real skills — no credit card required.
+            </p>
 
             {/* Stats */}
             <div className="flex flex-wrap gap-6 border-t border-zinc-200 pt-8 dark:border-zinc-800">
               {[
-                { n: "6",    label: "Languages"   },
-                { n: "19",   label: "Topics each" },
-                { n: "11+",  label: "Problems"    },
-                { n: "Free", label: "to start"    },
+                { n: "6",           label: "Languages"   },
+                { n: String(topicCount), label: "Topics each" },
+                { n: problemsLabel, label: "Problems"    },
+                { n: "Free",        label: "to start"    },
               ].map(({ n, label }) => (
                 <div key={label}>
                   <p className="text-2xl font-black text-zinc-900 dark:text-zinc-100">{n}</p>

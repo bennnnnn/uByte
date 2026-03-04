@@ -9,18 +9,26 @@ export interface InterviewCtaCardProps {
   href?: string;
   /** Optional icon/emoji */
   icon?: string;
+  /** CTA label; defaults to "Practice problems →" or "Practice exams →" based on href */
+  ctaLabel?: string;
 }
 
 /**
  * Reusable CTA card for the interview practice section on the homepage.
  * Click navigates to the practice problem list (e.g. /practice).
  */
+function defaultCtaLabel(href: string): string {
+  return href.includes("practice-exams") ? "Practice exams →" : "Practice problems →";
+}
+
 export default function InterviewCtaCard({
   title,
   description,
   href = "/practice",
   icon = "🎯",
+  ctaLabel,
 }: InterviewCtaCardProps) {
+  const label = ctaLabel ?? defaultCtaLabel(href);
   return (
     <Link
       href={href}
@@ -38,7 +46,7 @@ export default function InterviewCtaCard({
         {description}
       </p>
       <span className="mt-4 inline-flex items-center text-sm font-medium text-indigo-700 dark:text-indigo-300">
-        Practice problems →
+        {label}
       </span>
     </Link>
   );

@@ -38,3 +38,11 @@ export async function getCertificateById(certificateId: string): Promise<ExamCer
   `;
   return (row as ExamCertificateRow | undefined) ?? null;
 }
+
+export async function getCertificateByAttemptId(attemptId: string): Promise<ExamCertificateRow | null> {
+  const sql = getSql();
+  const [row] = await sql`
+    SELECT id, user_id, lang, attempt_id, passed_at FROM exam_certificates WHERE attempt_id = ${attemptId}
+  `;
+  return (row as ExamCertificateRow | undefined) ?? null;
+}

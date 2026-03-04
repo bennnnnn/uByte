@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import Link from "next/link";
 import { getAllTutorials } from "@/lib/tutorials";
+import { getAllPracticeProblems } from "@/lib/practice/problems";
 import { LANGUAGES, getAllLanguageSlugs } from "@/lib/languages/registry";
 import { BASE_URL } from "@/lib/constants";
 import {
@@ -49,6 +50,8 @@ const LANGUAGE_ICONS: Record<string, string> = {
 export default function Home() {
   const goTutorials = getAllTutorials("go");
   const tutorialList = goTutorials.map(({ slug, title }) => ({ slug, title }));
+  const topicCount = goTutorials.length;
+  const problemCount = getAllPracticeProblems().length;
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -74,7 +77,7 @@ export default function Home() {
       </Suspense>
 
       {/* ── 1. Hero — full bleed, dark ───────────────────────────────── */}
-      <HeroSection />
+      <HeroSection topicCount={topicCount} problemCount={problemCount} />
 
       {/* ── 2-N. Sections — constrained ─────────────────────────────── */}
       <div className="mx-auto max-w-6xl space-y-16 px-4 py-16 sm:px-6 lg:px-8 lg:py-20">
@@ -106,14 +109,14 @@ export default function Home() {
                 name={config.name}
                 description={config.seo.defaultDescription}
                 icon={LANGUAGE_ICONS[slug] ?? "📝"}
-                tutorialCount={19}
+                tutorialCount={topicCount}
               />
             ))}
           </div>
         </section>
 
         {/* Interview practice */}
-        <PracticeSection />
+        <PracticeSection problemCount={problemCount} />
 
         {/* Practice exams */}
         <PracticeExamsSection />

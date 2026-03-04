@@ -4,15 +4,13 @@ import { useState } from "react";
 import { createPortal } from "react-dom";
 import Link from "next/link";
 import { useAuth } from "@/components/AuthProvider";
+import Input from "@/components/ui/Input";
 
 type ModalMode = "login" | "signup" | "forgot";
 
 interface Props {
   onClose: () => void;
 }
-
-const inputClass =
-  "w-full rounded-xl border border-zinc-200 bg-zinc-50/80 px-4 py-3 text-sm text-zinc-900 placeholder-zinc-400 transition-colors focus:border-indigo-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500/20 dark:border-zinc-700 dark:bg-zinc-800/80 dark:text-zinc-100 dark:placeholder-zinc-500 dark:focus:border-indigo-400 dark:focus:bg-zinc-800 dark:focus:ring-indigo-400/20";
 
 export default function AuthModal({ onClose }: Props) {
   const { login, signup } = useAuth();
@@ -153,14 +151,14 @@ export default function AuthModal({ onClose }: Props) {
                     <label htmlFor="forgot-email" className="mb-1.5 block text-sm font-medium text-zinc-700 dark:text-zinc-300">
                       Email
                     </label>
-                    <input
+                    <Input
                       id="forgot-email"
                       type="email"
                       required
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       placeholder="you@example.com"
-                      className={inputClass}
+                      className="rounded-xl bg-zinc-50/80 dark:bg-zinc-800/80"
                     />
                   </div>
                   <button
@@ -213,14 +211,14 @@ export default function AuthModal({ onClose }: Props) {
                     <label htmlFor="auth-name" className="mb-1.5 block text-sm font-medium text-zinc-700 dark:text-zinc-300">
                       Name
                     </label>
-                    <input
+                    <Input
                       id="auth-name"
                       type="text"
                       required
                       value={name}
                       onChange={(e) => setName(e.target.value)}
                       placeholder="Your name"
-                      className={inputClass}
+                      className="rounded-xl bg-zinc-50/80 dark:bg-zinc-800/80"
                     />
                   </div>
                 )}
@@ -228,14 +226,14 @@ export default function AuthModal({ onClose }: Props) {
                   <label htmlFor="auth-email" className="mb-1.5 block text-sm font-medium text-zinc-700 dark:text-zinc-300">
                     Email
                   </label>
-                  <input
+                  <Input
                     id="auth-email"
                     type="email"
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="you@example.com"
-                    className={inputClass}
+                    className="rounded-xl bg-zinc-50/80 dark:bg-zinc-800/80"
                   />
                 </div>
                 <div>
@@ -253,7 +251,7 @@ export default function AuthModal({ onClose }: Props) {
                       </button>
                     )}
                   </div>
-                  <input
+                  <Input
                     id="auth-password"
                     type="password"
                     required
@@ -261,7 +259,7 @@ export default function AuthModal({ onClose }: Props) {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="••••••••"
-                    className={inputClass}
+                    className="rounded-xl bg-zinc-50/80 dark:bg-zinc-800/80"
                   />
                 </div>
                 <button
