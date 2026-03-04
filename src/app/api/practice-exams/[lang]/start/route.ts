@@ -1,14 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
-import { randomUUID } from "crypto";
 import { getCurrentUser } from "@/lib/auth";
 import { getUserById } from "@/lib/db";
 import { hasPaidAccess } from "@/lib/plans";
 import { getQuestionIdsByLang, getQuestionsByIds } from "@/lib/db/exam-questions";
 import { createAttempt } from "@/lib/db/exam-attempts";
 import { withErrorHandling } from "@/lib/api-utils";
-
-const EXAM_SIZE = 40;
-const VALID_LANGS = ["go", "python", "javascript", "java", "rust", "cpp"];
+import { EXAM_SIZE, isExamLang } from "@/lib/exams/config";
 
 function shuffle<T>(arr: T[]): T[] {
   const out = [...arr];
@@ -37,7 +34,7 @@ export const POST = withErrorHandling(
     const { lang } = (context as { params?: Promise<{ lang: string }> }).params
       ? await (context as { params: Promise<{ lang: string }> }).params
       : { lang: "" };
-    if (!VALID_LANGS.includes(lang)) {
+    if (!isExamLang(lang)) {
       return NextResponse.json({ error: "Invalid language" }, { status: 400 });
     }
 
@@ -52,7 +49,7 @@ export const POST = withErrorHandling(
     const shuffled = shuffle(ids);
     const selected = shuffled.slice(0, EXAM_SIZE);
     const choicesOrder = selected.map(() => shuffle([0, 1, 2, 3])); // assume 4 choices; adjust if needed
-    const attemptId = randomUUID();
+    const attemptId = crypto.randomUUID();
 
     await createAttempt(attemptId, user.userId, lang, selected, choicesOrder);
 

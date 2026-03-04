@@ -1,4 +1,5 @@
 import { getSql } from "./client";
+import { isExamLang } from "@/lib/exams/config";
 
 export interface ExamQuestionRow {
   id: number;
@@ -71,10 +72,9 @@ export async function insertExamQuestions(
   const sql = getSql();
   const errors: string[] = [];
   let inserted = 0;
-  const VALID_LANGS = ["go", "python", "javascript", "java", "rust", "cpp"];
   for (let i = 0; i < rows.length; i++) {
     const r = rows[i];
-    if (!VALID_LANGS.includes(r.lang)) {
+    if (!isExamLang(r.lang)) {
       errors.push(`Row ${i + 1}: invalid lang "${r.lang}"`);
       continue;
     }

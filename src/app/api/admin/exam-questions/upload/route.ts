@@ -3,8 +3,7 @@ import { withErrorHandling, requireAdmin } from "@/lib/api-utils";
 import { insertExamQuestions } from "@/lib/db/exam-questions";
 import type { ExamQuestionInsertRow } from "@/lib/db/exam-questions";
 import { verifyCsrf } from "@/lib/csrf";
-
-const VALID_LANGS = ["go", "python", "javascript", "java", "rust", "cpp"];
+import { isExamLang } from "@/lib/exams/config";
 
 function parseCSV(text: string): ExamQuestionInsertRow[] {
   const rows: ExamQuestionInsertRow[] = [];
@@ -40,7 +39,7 @@ function parseCSV(text: string): ExamQuestionInsertRow[] {
     );
     const correct_index = parseInt(parts[6], 10);
     const explanation = parts[7]?.replace(/^"|"$/g, "").trim() || null;
-    if (!VALID_LANGS.includes(lang) || !prompt || choices.some((c) => !c)) continue;
+    if (!isExamLang(lang) || !prompt || choices.some((c) => !c)) continue;
     if (!Number.isInteger(correct_index) || correct_index < 0 || correct_index > 3) continue;
     rows.push({ lang, prompt, choices, correct_index, explanation });
   }
