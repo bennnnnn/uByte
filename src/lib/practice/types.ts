@@ -2,6 +2,17 @@ import type { SupportedLanguage } from "@/lib/languages/types";
 
 export type Difficulty = "easy" | "medium" | "hard";
 
+/** Topic/category for grouping (e.g. Array, String, Dynamic Programming). */
+export type ProblemCategory =
+  | "array"
+  | "string"
+  | "dynamic-programming"
+  | "stack"
+  | "two-pointers"
+  | "sliding-window"
+  | "sorting"
+  | "hash-map";
+
 export interface ProblemExample {
   input: string;
   output: string;
@@ -29,6 +40,8 @@ export interface PracticeProblem {
   title: string;
   description: string;
   difficulty: Difficulty;
+  /** Optional category for grouping on practice list (e.g. array, string). */
+  category?: ProblemCategory;
   examples: ProblemExample[];
   /** Starter code per language; used for editor initial value */
   starter: Partial<Record<SupportedLanguage, string>>;

@@ -1,20 +1,30 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import Link from "next/link";
-import { getAllPracticeProblems } from "@/lib/practice/problems";
+import {
+  getAllPracticeProblems,
+  getCategoryForSlug,
+  getCategoryLabel,
+  getPracticeCategories,
+} from "@/lib/practice/problems";
 import { isSupportedLanguage, LANGUAGES } from "@/lib/languages/registry";
 import type { SupportedLanguage } from "@/lib/languages/types";
-import type { Difficulty } from "@/lib/practice/types";
+import type { Difficulty, ProblemCategory } from "@/lib/practice/types";
 import { isPracticeProblemFree } from "@/lib/plans";
 
-type Props = { params: Promise<{ lang: string }> };
+const PROBLEMS_PER_PAGE = 6;
+
+type Props = {
+  params: Promise<{ lang: string }>;
+  searchParams: Promise<{ page?: string; category?: string }>;
+};
 
 export const dynamic = "force-dynamic";
 
 const DIFFICULTY_STYLES: Record<Difficulty, string> = {
-  easy:   "bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-400",
-  medium: "bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-400",
-  hard:   "bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-400",
+  easy: "bg-emerald-100 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-400",
+  medium: "bg-amber-100 text-amber-700 dark:bg-amber-950/60 dark:text-amber-400",
+  hard: "bg-red-100 text-red-700 dark:bg-red-950/60 dark:text-red-400",
 };
 
 const LANG_ICONS: Record<string, string> = {
@@ -36,112 +46,243 @@ export async function generateStaticParams() {
   return langs.map((lang) => ({ lang }));
 }
 
-export default async function PracticeLangPage({ params }: Props) {
+function getEffectiveCategory(slug: string): ProblemCategory | null {
+  return getCategoryForSlug(slug);
+}
+
+function sortProblemsByCategoryAndDifficulty<T extends { slug: string; difficulty: Difficulty }>(
+  problems: T[],
+  categoryOrder: ProblemCategory[]
+): T[] {
+  return [...problems].sort((a, b) => {
+    const ca = getEffectiveCategory(a.slug) ?? ("array" as ProblemCategory);
+    const cb = getEffectiveCategory(b.slug) ?? ("array" as ProblemCategory);
+    const ia = categoryOrder.indexOf(ca);
+    const ib = categoryOrder.indexOf(cb);
+    if (ia !== ib) return ia - ib;
+    const diffOrder: Record<Difficulty, number> = { easy: 0, medium: 1, hard: 2 };
+    return diffOrder[a.difficulty] - diffOrder[b.difficulty];
+  });
+}
+
+export default async function PracticeLangPage({ params, searchParams }: Props) {
   const { lang } = await params;
+  const sp = await searchParams;
   if (!isSupportedLanguage(lang)) notFound();
 
   const l = lang as SupportedLanguage;
   const config = LANGUAGES[l];
-  const problems = getAllPracticeProblems();
-  const easy   = problems.filter((p) => p.difficulty === "easy");
-  const medium = problems.filter((p) => p.difficulty === "medium");
-  const hard   = problems.filter((p) => p.difficulty === "hard");
+  const allProblems = getAllPracticeProblems();
+  const categories = getPracticeCategories();
+
+  const categoryFilter = sp.category && categories.includes(sp.category as ProblemCategory)
+    ? (sp.category as ProblemCategory)
+    : null;
+  const filtered =
+    categoryFilter === null
+      ? allProblems
+      : allProblems.filter((p) => getEffectiveCategory(p.slug) === categoryFilter);
+
+  const categoryOrder = categories;
+  const sorted = sortProblemsByCategoryAndDifficulty(filtered, categoryOrder);
+
+  const page = Math.max(1, parseInt(sp.page ?? "1", 10) || 1);
+  const totalPages = Math.max(1, Math.ceil(sorted.length / PROBLEMS_PER_PAGE));
+  const currentPage = Math.min(page, totalPages);
+  const start = (currentPage - 1) * PROBLEMS_PER_PAGE;
+  const pageProblems = sorted.slice(start, start + PROBLEMS_PER_PAGE);
+
+  const buildUrl = (opts: { page?: number; category?: string }) => {
+    const u = new URLSearchParams();
+    if (opts.page != null && opts.page !== 1) u.set("page", String(opts.page));
+    if (opts.category != null && opts.category !== "") u.set("category", opts.category);
+    const q = u.toString();
+    return `/practice/${lang}${q ? `?${q}` : ""}`;
+  };
 
   return (
     <div className="min-h-full overflow-y-auto">
-      <div className="mx-auto max-w-3xl px-6 py-14">
-        {/* Header */}
-        <div className="mb-2 flex items-center gap-3">
-          <span className="text-3xl">{LANG_ICONS[lang] ?? "🎯"}</span>
-          <div>
-            <h1 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100">
-              {config.name} Interview Practice
-            </h1>
-            <p className="mt-1 text-zinc-500 dark:text-zinc-400">
-              {problems.length} problems · sorted by difficulty
-            </p>
+      {/* Hero header */}
+      <section className="relative overflow-hidden border-b border-zinc-100 bg-white dark:border-zinc-800 dark:bg-zinc-950">
+        <div className="pointer-events-none absolute inset-0 overflow-hidden">
+          <div className="absolute -left-32 top-0 h-[400px] w-[400px] -translate-y-1/4 rounded-full bg-indigo-200/40 blur-[120px] dark:bg-indigo-500/10" />
+          <div className="absolute -top-20 right-0 h-[320px] w-[320px] translate-x-1/4 rounded-full bg-violet-200/30 blur-[100px] dark:bg-violet-500/10" />
+        </div>
+        <div className="relative mx-auto max-w-4xl px-6 py-10 sm:py-12">
+          <div className="mb-6 flex items-center gap-4">
+            <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-zinc-100 text-3xl dark:bg-zinc-800">
+              {LANG_ICONS[lang] ?? "🎯"}
+            </span>
+            <div>
+              <h1 className="text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100 sm:text-3xl">
+                {config.name} Interview Practice
+              </h1>
+              <p className="mt-0.5 text-sm text-zinc-500 dark:text-zinc-400">
+                {allProblems.length} problems · by category & difficulty
+              </p>
+            </div>
+          </div>
+
+          {/* Language tabs */}
+          <div className="flex flex-wrap gap-2">
+            {(["go", "python", "cpp", "javascript", "java", "rust"] as SupportedLanguage[]).map((l2) => (
+              <Link
+                key={l2}
+                href={`/practice/${l2}${sp.category ? `?category=${sp.category}` : ""}`}
+                className={`rounded-full px-4 py-2 text-sm font-medium transition-all ${
+                  l2 === l
+                    ? "bg-indigo-600 text-white shadow-md shadow-indigo-500/25"
+                    : "border border-zinc-200 bg-white text-zinc-600 hover:border-indigo-300 hover:bg-indigo-50 hover:text-indigo-700 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-400 dark:hover:border-indigo-700 dark:hover:bg-indigo-950/50 dark:hover:text-indigo-400"
+                }`}
+              >
+                {LANG_ICONS[l2]} {LANGUAGES[l2]?.name}
+              </Link>
+            ))}
           </div>
         </div>
+      </section>
 
-        {/* Language switcher */}
-        <div className="mb-10 flex flex-wrap gap-2">
-          {(["go","python","cpp","javascript","java","rust"] as SupportedLanguage[]).map((l2) => (
+      {/* Category filter + content */}
+      <section className="border-b border-zinc-100 bg-zinc-50/50 dark:border-zinc-800 dark:bg-zinc-900/30">
+        <div className="mx-auto max-w-4xl px-6 py-6">
+          <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">
+            Category
+          </p>
+          <div className="flex flex-wrap gap-2">
             <Link
-              key={l2}
-              href={`/practice/${l2}`}
-              className={`rounded-full px-3.5 py-1.5 text-sm font-medium transition-colors ${
-                l2 === l
+              href={buildUrl({ category: "", page: 1 })}
+              className={`rounded-full px-4 py-2 text-sm font-medium transition-colors ${
+                categoryFilter === null
                   ? "bg-indigo-600 text-white"
-                  : "border border-zinc-200 bg-white text-zinc-600 hover:border-indigo-300 hover:bg-indigo-50 hover:text-indigo-700 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-400 dark:hover:border-indigo-700 dark:hover:text-indigo-400"
-              }`}
+                  : "bg-white text-zinc-600 hover:bg-zinc-100 dark:bg-zinc-800 dark:text-zinc-400 dark:hover:bg-zinc-700"
+              } dark:border dark:border-zinc-700`}
             >
-              {LANG_ICONS[l2]} {LANGUAGES[l2]?.name}
+              All
             </Link>
-          ))}
+            {categories.map((cat) => (
+              <Link
+                key={cat}
+                href={buildUrl({ category: cat, page: 1 })}
+                className={`rounded-full px-4 py-2 text-sm font-medium transition-colors ${
+                  categoryFilter === cat
+                    ? "bg-indigo-600 text-white"
+                    : "bg-white text-zinc-600 hover:bg-zinc-100 dark:bg-zinc-800 dark:text-zinc-400 dark:hover:bg-zinc-700"
+                } dark:border dark:border-zinc-700`}
+              >
+                {getCategoryLabel(cat)}
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Problem list */}
+      <section className="mx-auto max-w-4xl px-6 py-8">
+        <div className="overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-sm dark:border-zinc-700 dark:bg-zinc-900">
+          <ul className="divide-y divide-zinc-100 dark:divide-zinc-700">
+            {pageProblems.map((p, idx) => {
+              const free = isPracticeProblemFree(p.slug);
+              const cat = getEffectiveCategory(p.slug);
+              return (
+                <li key={p.slug}>
+                  <Link
+                    href={`/practice/${lang}/${p.slug}`}
+                    className="group flex flex-wrap items-center gap-3 px-5 py-4 transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-800/50 sm:flex-nowrap"
+                  >
+                    <span className="w-8 shrink-0 text-center text-sm font-bold tabular-nums text-zinc-400 group-hover:text-indigo-500 dark:text-zinc-500 dark:group-hover:text-indigo-400">
+                      {start + idx + 1}
+                    </span>
+                    <span className="min-w-0 flex-1 font-semibold text-zinc-900 group-hover:text-indigo-700 dark:text-zinc-100 dark:group-hover:text-indigo-400">
+                      {p.title}
+                    </span>
+                    {cat && (
+                      <span className="shrink-0 rounded-full border border-zinc-200 bg-zinc-50 px-2.5 py-0.5 text-xs font-medium text-zinc-600 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-400">
+                        {getCategoryLabel(cat)}
+                      </span>
+                    )}
+                    {!free && (
+                      <span className="shrink-0 rounded-full border border-amber-300 bg-amber-50 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-amber-700 dark:border-amber-700 dark:bg-amber-950/50 dark:text-amber-400">
+                        Pro
+                      </span>
+                    )}
+                    <span className={`shrink-0 rounded-full px-2.5 py-0.5 text-xs font-semibold capitalize ${DIFFICULTY_STYLES[p.difficulty]}`}>
+                      {p.difficulty}
+                    </span>
+                    <svg className="h-4 w-4 shrink-0 text-zinc-300 group-hover:text-indigo-500 dark:text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                    </svg>
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
+
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div className="flex flex-wrap items-center justify-between gap-4 border-t border-zinc-100 bg-zinc-50/80 px-4 py-4 dark:border-zinc-700 dark:bg-zinc-800/50 sm:px-6">
+              <p className="text-sm text-zinc-500 dark:text-zinc-400">
+                Showing {start + 1}–{Math.min(start + PROBLEMS_PER_PAGE, sorted.length)} of {sorted.length}
+              </p>
+              <nav className="flex items-center gap-1" aria-label="Pagination">
+                {currentPage > 1 ? (
+                  <Link
+                    href={buildUrl({ page: currentPage - 1, category: categoryFilter ?? undefined })}
+                    className="inline-flex items-center gap-1 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm font-medium text-zinc-700 hover:bg-zinc-50 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700"
+                  >
+                    ← Previous
+                  </Link>
+                ) : (
+                  <span className="inline-flex cursor-not-allowed items-center gap-1 rounded-lg border border-zinc-100 bg-zinc-50 px-3 py-2 text-sm font-medium text-zinc-400 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-500">
+                    ← Previous
+                  </span>
+                )}
+                <div className="flex items-center gap-1 px-2">
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) =>
+                    p === currentPage ? (
+                      <span
+                        key={p}
+                        className="flex h-9 w-9 items-center justify-center rounded-lg bg-indigo-600 text-sm font-bold text-white"
+                        aria-current="page"
+                      >
+                        {p}
+                      </span>
+                    ) : (
+                      <Link
+                        key={p}
+                        href={buildUrl({ page: p, category: categoryFilter ?? undefined })}
+                        className="flex h-9 w-9 items-center justify-center rounded-lg border border-zinc-200 bg-white text-sm font-medium text-zinc-700 hover:bg-zinc-50 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700"
+                      >
+                        {p}
+                      </Link>
+                    )
+                  )}
+                </div>
+                {currentPage < totalPages ? (
+                  <Link
+                    href={buildUrl({ page: currentPage + 1, category: categoryFilter ?? undefined })}
+                    className="inline-flex items-center gap-1 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm font-medium text-zinc-700 hover:bg-zinc-50 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700"
+                  >
+                    Next →
+                  </Link>
+                ) : (
+                  <span className="inline-flex cursor-not-allowed items-center gap-1 rounded-lg border border-zinc-100 bg-zinc-50 px-3 py-2 text-sm font-medium text-zinc-400 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-500">
+                    Next →
+                  </span>
+                )}
+              </nav>
+            </div>
+          )}
         </div>
 
-        {/* Problem sections */}
-        {[
-          { label: "Easy", items: easy,   badge: "bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-400" },
-          { label: "Medium", items: medium, badge: "bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-400" },
-          { label: "Hard", items: hard,   badge: "bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-400" },
-        ].map(({ label, items, badge }) =>
-          items.length > 0 ? (
-            <section key={label} className="mb-10">
-              <div className="mb-4 flex items-center gap-2">
-                <span className={`rounded-full px-3 py-0.5 text-xs font-semibold ${badge}`}>
-                  {label}
-                </span>
-                <span className="text-sm text-zinc-400">{items.length} problem{items.length !== 1 ? "s" : ""}</span>
-              </div>
-
-              <ul className="space-y-2">
-                {items.map((p, idx) => {
-                  const free = isPracticeProblemFree(p.slug);
-                  return (
-                  <li key={p.slug}>
-                    <Link
-                      href={`/practice/${lang}/${p.slug}`}
-                      className="group flex items-center gap-4 rounded-xl border border-zinc-200 bg-white px-5 py-3.5 transition-all hover:border-indigo-300 hover:shadow-sm dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-indigo-700"
-                    >
-                      <span className="w-6 shrink-0 text-right text-sm tabular-nums text-zinc-400">
-                        {idx + 1}.
-                      </span>
-                      <span className="flex-1 font-medium text-zinc-900 group-hover:text-indigo-700 dark:text-zinc-100 dark:group-hover:text-indigo-400">
-                        {p.title}
-                      </span>
-                      {!free && (
-                        <span className="shrink-0 rounded-full border border-amber-300 bg-amber-50 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-amber-700 dark:border-amber-700 dark:bg-amber-950/50 dark:text-amber-400">
-                          Pro
-                        </span>
-                      )}
-                      <span className={`shrink-0 rounded-full px-2.5 py-0.5 text-xs font-medium capitalize ${DIFFICULTY_STYLES[p.difficulty]}`}>
-                        {p.difficulty}
-                      </span>
-                      <svg
-                        className="h-4 w-4 shrink-0 text-zinc-300 transition-colors group-hover:text-indigo-400"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                        strokeWidth={2}
-                      >
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-                      </svg>
-                    </Link>
-                  </li>
-                  );
-                })}
-              </ul>
-            </section>
-          ) : null
-        )}
-
-        <div className="mt-6 border-t border-zinc-200 pt-6 dark:border-zinc-800">
-          <Link href="/practice" className="text-sm text-zinc-500 hover:text-indigo-600 dark:hover:text-indigo-400">
+        <div className="mt-6">
+          <Link
+            href="/practice"
+            className="text-sm font-medium text-zinc-500 hover:text-indigo-600 dark:text-zinc-400 dark:hover:text-indigo-400"
+          >
             ← All languages
           </Link>
         </div>
-      </div>
+      </section>
     </div>
   );
 }

@@ -1,4 +1,4 @@
-import type { PracticeProblem } from "./types";
+import type { PracticeProblem, ProblemCategory } from "./types";
 import type { SupportedLanguage } from "@/lib/languages/types";
 
 // ─── Default starters ───────────────────────────────────────────────────────
@@ -2192,6 +2192,50 @@ fn main() {
     },
   },
 ];
+
+// ─── Category mapping (slug → category for grouping/filtering) ───────────────
+
+const SLUG_CATEGORY: Record<string, ProblemCategory> = {
+  "two-sum": "array",
+  "valid-parentheses": "stack",
+  "contains-duplicate": "array",
+  "best-time-to-buy-sell-stock": "array",
+  "reverse-string": "string",
+  "climbing-stairs": "dynamic-programming",
+  "three-sum": "array",
+  "maximum-subarray": "array",
+  "longest-substring-without-repeating": "string",
+  "merge-intervals": "sorting",
+  "trapping-rain-water": "array",
+};
+
+const CATEGORY_LABELS: Record<ProblemCategory, string> = {
+  array: "Array",
+  string: "String",
+  "dynamic-programming": "Dynamic Programming",
+  stack: "Stack",
+  "two-pointers": "Two Pointers",
+  "sliding-window": "Sliding Window",
+  sorting: "Sorting",
+  "hash-map": "Hash Map",
+};
+
+export function getCategoryForSlug(slug: string): ProblemCategory | null {
+  return SLUG_CATEGORY[slug] ?? null;
+}
+
+export function getCategoryLabel(cat: ProblemCategory): string {
+  return CATEGORY_LABELS[cat];
+}
+
+export function getPracticeCategories(): ProblemCategory[] {
+  const set = new Set<ProblemCategory>();
+  for (const slug of Object.keys(SLUG_CATEGORY)) {
+    const c = SLUG_CATEGORY[slug];
+    if (c) set.add(c);
+  }
+  return Array.from(set).sort((a, b) => CATEGORY_LABELS[a].localeCompare(CATEGORY_LABELS[b]));
+}
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
