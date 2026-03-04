@@ -6,20 +6,29 @@ export interface ExamConfig {
   examDurationMinutes: number;
 }
 
-/** Get exam config from DB; fallback to code defaults. */
+const DEFAULT_CONFIG: ExamConfig = {
+  examSize: DEFAULT_EXAM_SIZE,
+  examDurationMinutes: DEFAULT_EXAM_DURATION_MINUTES,
+};
+
+/** Get exam config from DB; fallback to code defaults if table missing or query fails (e.g. during build). */
 export async function getExamConfig(): Promise<ExamConfig> {
-  const sql = getSql();
-  const rows = await sql`
-    SELECT key, value FROM site_settings
-    WHERE key IN ('exam_size', 'exam_duration_minutes')
-  `;
-  const map = new Map((rows as { key: string; value: string }[]).map((r) => [r.key, r.value]));
-  const examSize = parseInt(map.get("exam_size") ?? "", 10);
-  const examDurationMinutes = parseInt(map.get("exam_duration_minutes") ?? "", 10);
-  return {
-    examSize: Number.isInteger(examSize) && examSize > 0 ? examSize : DEFAULT_EXAM_SIZE,
-    examDurationMinutes: Number.isInteger(examDurationMinutes) && examDurationMinutes > 0 ? examDurationMinutes : DEFAULT_EXAM_DURATION_MINUTES,
-  };
+  try {
+    const sql = getSql();
+    const rows = await sql`
+      SELECT key, value FROM site_settings
+      WHERE key IN ('exam_size', 'exam_duration_minutes')
+    `;
+    const map = new Map((rows as { key: string; value: string }[]).map((r) => [r.key, r.value]));
+    const examSize = parseInt(map.get("exam_size") ?? "", 10);
+    const examDurationMinutes = parseInt(map.get("exam_duration_minutes") ?? "", 10);
+    return {
+      examSize: Number.isInteger(examSize) && examSize > 0 ? examSize : DEFAULT_EXAM_SIZE,
+      examDurationMinutes: Number.isInteger(examDurationMinutes) && examDurationMinutes > 0 ? examDurationMinutes : DEFAULT_EXAM_DURATION_MINUTES,
+    };
+  } catch {
+    return DEFAULT_CONFIG;
+  }
 }
 
 /** Update exam settings (admin only). */

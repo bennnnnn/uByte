@@ -44,9 +44,9 @@ const cleaned = fullSql
   .filter((line) => !line.trim().startsWith("--"))
   .join("\n");
 
-// Split into statements: split at ";\n" followed by "CREATE" (each statement ends with ";")
+// Split into statements: split at ";\n" followed by "CREATE" or "INSERT" (each statement ends with ";")
 const statements = cleaned
-  .split(/;\s*\n\s*(?=CREATE\s)/)
+  .split(/;\s*\n\s*(?=(?:CREATE|INSERT)\s)/i)
   .map((s) => s.trim())
   .filter(Boolean)
   .map((s) => (s.endsWith(";") ? s : s + ";"));
