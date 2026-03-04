@@ -15,6 +15,8 @@ export interface ExamDetailContent {
   rules: string[];
   /** Optional: who it's for */
   audience?: string;
+  /** Q&A for the FAQ tab */
+  faq?: { question: string; answer: string }[];
 }
 
 const GO_CONTENT: ExamDetailContent = {
@@ -43,6 +45,32 @@ const GO_CONTENT: ExamDetailContent = {
     "Passing earns a shareable certificate.",
   ],
   audience: "Developers who have completed the Go tutorials or have equivalent experience.",
+  faq: [
+    {
+      question: "How long is the exam?",
+      answer: "You have 45 minutes from the moment you start. The timer cannot be paused. Use your time wisely and try to answer every question.",
+    },
+    {
+      question: "How many questions are there?",
+      answer: "Each attempt has 40 multiple-choice questions. They are drawn at random from a larger pool, so each attempt can feel different.",
+    },
+    {
+      question: "What score do I need to pass?",
+      answer: "You need 70% or higher (at least 28 correct answers out of 40) to pass and earn your certificate.",
+    },
+    {
+      question: "Can I retake the exam?",
+      answer: "Yes. After you complete an attempt (submit or run out of time), you can start a new attempt. Questions and answer order are randomized each time.",
+    },
+    {
+      question: "Do I get a certificate?",
+      answer: "Yes. When you pass with 70% or higher, you receive a shareable certificate that you can link to from your profile or resume.",
+    },
+    {
+      question: "What if I run out of time?",
+      answer: "Your answers are automatically submitted when the timer ends. You'll see your score and whether you passed. You can start a new attempt anytime.",
+    },
+  ],
 };
 
 const EXAM_CONTENT: Partial<Record<ExamLang, ExamDetailContent>> = {

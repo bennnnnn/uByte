@@ -6,9 +6,10 @@ import { useRouter } from "next/navigation";
 interface Props {
   lang: string;
   langName: string;
+  fullWidth?: boolean;
 }
 
-export default function StartExamButton({ lang, langName }: Props) {
+export default function StartExamButton({ lang, langName, fullWidth }: Props) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -51,7 +52,7 @@ export default function StartExamButton({ lang, langName }: Props) {
         type="button"
         onClick={handleStart}
         disabled={loading}
-        className="inline-flex items-center justify-center rounded-xl bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-indigo-500 disabled:cursor-not-allowed disabled:opacity-60"
+        className={`inline-flex items-center justify-center rounded-xl bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-indigo-500 disabled:cursor-not-allowed disabled:opacity-60 ${fullWidth ? "w-full" : ""}`}
       >
         {loading ? "Starting exam..." : `Start ${langName} exam`}
       </button>
