@@ -22,7 +22,7 @@ function shuffle<T>(arr: T[]): T[] {
 /** POST /api/practice-exams/[lang]/start — create attempt, return attemptId + questions (no correct answers). Paid only. */
 export const POST = withErrorHandling(
   "POST /api/practice-exams/[lang]/start",
-  async (request: NextRequest, context: { params: Promise<{ lang: string }> }) => {
+  async (request: NextRequest, context?: unknown) => {
     const user = await getCurrentUser();
     if (!user) return NextResponse.json({ error: "Sign in to start an exam" }, { status: 401 });
 
@@ -34,7 +34,9 @@ export const POST = withErrorHandling(
       );
     }
 
-    const { lang } = await context.params;
+    const { lang } = (context as { params?: Promise<{ lang: string }> }).params
+      ? await (context as { params: Promise<{ lang: string }> }).params
+      : { lang: "" };
     if (!VALID_LANGS.includes(lang)) {
       return NextResponse.json({ error: "Invalid language" }, { status: 400 });
     }

@@ -5,11 +5,13 @@ import { getCertificateById, getUserById } from "@/lib/db";
 /** GET /api/practice-exams/certificate/[certificateId] — details for a single exam certificate (owned by current user). */
 export const GET = withErrorHandling(
   "GET /api/practice-exams/certificate/[certificateId]",
-  async (_req: Request, context: { params: Promise<{ certificateId: string }> }) => {
+  async (_req: Request, context?: unknown) => {
     const { user, response } = await requireAuth();
     if (!user) return response;
 
-    const { certificateId } = await context.params;
+    const { certificateId } = (context as { params?: Promise<{ certificateId: string }> }).params
+      ? await (context as { params: Promise<{ certificateId: string }> }).params
+      : { certificateId: "" };
     const cert = await getCertificateById(certificateId);
     if (!cert) {
       return NextResponse.json({ error: "Certificate not found" }, { status: 404 });

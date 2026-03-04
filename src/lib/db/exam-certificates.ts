@@ -1,5 +1,4 @@
 import { getSql } from "./client";
-import { randomUUID } from "crypto";
 
 export interface ExamCertificateRow {
   id: string;
@@ -14,13 +13,13 @@ export async function createCertificate(
   lang: string,
   attemptId: string
 ): Promise<string> {
-  const id = randomUUID();
   const sql = getSql();
-  await sql`
-    INSERT INTO exam_certificates (id, user_id, lang, attempt_id)
-    VALUES (${id}, ${userId}, ${lang}, ${attemptId})
+  const [row] = await sql`
+    INSERT INTO exam_certificates (user_id, lang, attempt_id)
+    VALUES (${userId}, ${lang}, ${attemptId})
+    RETURNING id
   `;
-  return id;
+  return (row as { id: string }).id;
 }
 
 export async function getCertificatesByUser(userId: number): Promise<ExamCertificateRow[]> {

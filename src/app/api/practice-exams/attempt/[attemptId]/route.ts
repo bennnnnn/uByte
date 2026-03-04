@@ -4,16 +4,16 @@ import { getAttempt } from "@/lib/db/exam-attempts";
 import { getQuestionsByIds } from "@/lib/db/exam-questions";
 import { withErrorHandling } from "@/lib/api-utils";
 
-type Context = { params: Promise<{ attemptId: string }> };
-
 /** GET /api/practice-exams/attempt/[attemptId] — return attempt metadata + questions (no correct answers). */
 export const GET = withErrorHandling(
   "GET /api/practice-exams/attempt/[attemptId]",
-  async (_req: Request, context: Context) => {
+  async (_req: Request, context?: unknown) => {
     const user = await getCurrentUser();
     if (!user) return NextResponse.json({ error: "Unauthorised" }, { status: 401 });
 
-    const { attemptId } = await context.params;
+    const { attemptId } = (context as { params?: Promise<{ attemptId: string }> }).params
+      ? await (context as { params: Promise<{ attemptId: string }> }).params
+      : { attemptId: "" };
     const attempt = await getAttempt(attemptId);
     if (!attempt) return NextResponse.json({ error: "Attempt not found" }, { status: 404 });
     if (attempt.user_id !== user.userId) return NextResponse.json({ error: "Forbidden" }, { status: 403 });

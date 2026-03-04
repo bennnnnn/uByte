@@ -8,11 +8,13 @@ import { withErrorHandling } from "@/lib/api-utils";
 /** POST /api/practice-exams/attempt/[attemptId]/submit — body: { answers: { questionId: chosenIndex }[] }. Validate, score, pass/fail, create certificate if pass. */
 export const POST = withErrorHandling(
   "POST /api/practice-exams/attempt/[attemptId]/submit",
-  async (request: NextRequest, context: { params: Promise<{ attemptId: string }> }) => {
+  async (request: NextRequest, context?: unknown) => {
     const user = await getCurrentUser();
     if (!user) return NextResponse.json({ error: "Unauthorised" }, { status: 401 });
 
-    const { attemptId } = await context.params;
+    const { attemptId } = (context as { params?: Promise<{ attemptId: string }> }).params
+      ? await (context as { params: Promise<{ attemptId: string }> }).params
+      : { attemptId: "" };
     const attempt = await getAttempt(attemptId);
     if (!attempt) return NextResponse.json({ error: "Attempt not found" }, { status: 404 });
     if (attempt.user_id !== user.userId) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
