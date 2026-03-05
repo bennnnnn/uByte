@@ -7,6 +7,7 @@ import { javaSteps } from "./java";
 import { rustSteps } from "./rust";
 import type { SupportedLanguage } from "../languages/types";
 import { loadStepsFromContent } from "./load-from-content";
+import { getAllTutorials } from "../tutorials";
 
 /** Steps per language. Fallback when content/<lang>/<slug>.steps.json is not present. */
 const stepsByLanguage: Record<SupportedLanguage, Record<string, TutorialStep[]>> = {
@@ -35,6 +36,20 @@ export function getAllStepsForLanguage(
   lang: SupportedLanguage
 ): Record<string, TutorialStep[]> {
   return stepsByLanguage[lang] ?? {};
+}
+
+/**
+ * Total number of lessons (steps) for a language across all tutorials.
+ * Used for home page cards so the count reflects actual content (MDX + .steps.json or TS steps).
+ */
+export function getTotalLessonCount(lang: SupportedLanguage): number {
+  const tutorials = getAllTutorials(lang);
+  let total = 0;
+  for (const t of tutorials) {
+    const steps = getSteps(lang, t.slug);
+    total += steps.length;
+  }
+  return total;
 }
 
 /** @deprecated Use getSteps(lang, slug) or getAllStepsForLanguage(lang). Kept for gradual migration. */

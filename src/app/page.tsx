@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import Link from "next/link";
 import { getAllTutorials } from "@/lib/tutorials";
+import { getTotalLessonCount } from "@/lib/tutorial-steps";
 import { getAllPracticeProblems, getPracticeProblemBySlug } from "@/lib/practice/problems";
 import { LANGUAGES, getAllLanguageSlugs } from "@/lib/languages/registry";
 import { getLangIcon } from "@/lib/languages/icons";
@@ -47,7 +48,7 @@ export const metadata: Metadata = {
 export default async function Home() {
   const goTutorials = getAllTutorials("go");
   const tutorialList = goTutorials.map(({ slug, title }) => ({ slug, title }));
-  const topicCount = goTutorials.length;
+  const topicCount = goTutorials.length; // used for Hero "Topics each" (Go topic count)
   const problemCount = getAllPracticeProblems().length;
   const examConfig = await getExamConfig();
 
@@ -139,7 +140,7 @@ export default async function Home() {
                 name={config.name}
                 description={config.seo.defaultDescription}
                 icon={getLangIcon(slug)}
-                tutorialCount={topicCount}
+                lessonCount={getTotalLessonCount(slug as SupportedLanguage)}
                 href={tutorialLangUrl(slug)}
               />
             ))}

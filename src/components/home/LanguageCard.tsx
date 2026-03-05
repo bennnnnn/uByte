@@ -6,7 +6,8 @@ export interface LanguageCardProps {
   description: string;
   icon?: string;
   href?: string;
-  tutorialCount?: number;
+  /** Total number of lessons (steps) for this language, from tutorial data. */
+  lessonCount?: number;
 }
 
 /** Single purple identity theme for all language cards */
@@ -23,7 +24,7 @@ export default function LanguageCard({
   description,
   icon,
   href = `/${slug}`,
-  tutorialCount = 19,
+  lessonCount = 0,
 }: LanguageCardProps) {
   const theme = PURPLE_THEME;
 
@@ -44,7 +45,7 @@ export default function LanguageCard({
           </h3>
         </div>
         <span className={`shrink-0 rounded-full px-2 py-0.5 text-xs font-semibold ${theme.badge}`}>
-          {tutorialCount} lessons
+          {lessonCount} lessons
         </span>
       </div>
 
