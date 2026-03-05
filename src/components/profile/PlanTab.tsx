@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useAuth } from "@/components/AuthProvider";
 import { hasPaidAccess } from "@/lib/plans";
@@ -25,6 +25,53 @@ const PRO_FEATURES = [
 
 interface Props {
   plan: string;
+}
+
+function ManageOrCancelButtons() {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function openPortal(action: "manage" | "cancel") {
+    setError(null);
+    setLoading(true);
+    try {
+      const res = await fetch("/api/billing/portal", { credentials: "same-origin" });
+      const data = (await res.json()) as { portalUrl?: string | null; cancelUrl?: string | null; error?: string };
+      if (!res.ok || data.error) {
+        setError(data.error ?? "Could not open billing portal.");
+        return;
+      }
+      const url = action === "cancel" && data.cancelUrl ? data.cancelUrl : data.portalUrl;
+      if (url) window.open(url, "_blank", "noopener,noreferrer");
+      else setError("Billing portal is not available. Please try again later.");
+    } catch {
+      setError("Something went wrong.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <div className="mt-4 flex flex-wrap gap-3">
+      <button
+        type="button"
+        onClick={() => openPortal("manage")}
+        disabled={loading}
+        className="rounded-xl border border-zinc-300 bg-white px-4 py-2.5 text-sm font-semibold text-zinc-700 transition-colors hover:border-zinc-400 hover:bg-zinc-50 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-200 dark:hover:border-zinc-500 dark:hover:bg-zinc-700 disabled:opacity-50"
+      >
+        {loading ? "Opening…" : "Manage billing"}
+      </button>
+      <button
+        type="button"
+        onClick={() => openPortal("cancel")}
+        disabled={loading}
+        className="rounded-xl border border-red-200 bg-white px-4 py-2.5 text-sm font-semibold text-red-600 transition-colors hover:border-red-300 hover:bg-red-50 dark:border-red-900/50 dark:bg-red-950/30 dark:text-red-400 dark:hover:bg-red-950/50 disabled:opacity-50"
+      >
+        Cancel subscription
+      </button>
+      {error && <p className="w-full text-sm text-red-600 dark:text-red-400">{error}</p>}
+    </div>
+  );
 }
 
 export default function PlanTab({ plan }: Props) {
@@ -201,22 +248,16 @@ export default function PlanTab({ plan }: Props) {
           </div>
         </div>
       ) : (
-        <div className="rounded-2xl border border-zinc-200 bg-zinc-50/50 px-6 py-5 dark:border-zinc-800 dark:bg-zinc-800/30">
-          <p className="font-medium text-zinc-700 dark:text-zinc-300">
-            You’re all set
-          </p>
-          <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
-            Manage billing or cancel in the{" "}
-            <a
-              href="https://paddle.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="font-medium text-zinc-900 underline decoration-zinc-300 underline-offset-2 hover:decoration-zinc-500 dark:text-zinc-200 dark:decoration-zinc-600 dark:hover:decoration-zinc-400"
-            >
-              Paddle billing portal
-            </a>
-            .
-          </p>
+        <div className="space-y-4">
+          <div className="rounded-2xl border border-zinc-200 bg-zinc-50/50 px-6 py-5 dark:border-zinc-800 dark:bg-zinc-800/30">
+            <p className="font-medium text-zinc-700 dark:text-zinc-300">
+              You’re all set
+            </p>
+            <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
+              Manage billing, update payment method, or cancel your subscription below. If you cancel, you keep Pro until the end of your current billing period—then access reverts to free.
+            </p>
+            <ManageOrCancelButtons />
+          </div>
         </div>
       )}
 

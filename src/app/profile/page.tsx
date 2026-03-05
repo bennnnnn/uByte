@@ -243,7 +243,8 @@ function ProfilePage() {
   if (!profile || !stats) return <ProfileSkeleton />;
 
   return (
-    <div className="mx-auto max-w-4xl px-6 py-12">
+    <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
+      <div className="mx-auto w-full max-w-4xl flex-1 px-6 py-12">
       <ProfileHeader
         name={profile.name}
         email={profile.email}
@@ -255,8 +256,8 @@ function ProfilePage() {
       />
       <StatsRow stats={stats} />
 
-      {/* Tabs */}
-      <div className="mb-6 overflow-x-auto">
+      {/* Tabs — horizontal scroll so all tabs visible on small screens */}
+      <div className="-mx-1 mb-6 overflow-x-auto overflow-y-hidden">
         <div className="flex min-w-max gap-1 rounded-xl bg-zinc-100 p-1 dark:bg-zinc-900">
           {VALID_TABS.map((t) => (
             <button
@@ -324,6 +325,7 @@ function ProfilePage() {
           onLogoutAll={async () => { await logoutAll(); router.push("/"); }}
         />
       )}
+      </div>
     </div>
   );
 }
