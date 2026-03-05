@@ -183,6 +183,7 @@ export default async function PracticeLangPage({ params, searchParams }: Props) 
               <Link
                 key={l2}
                 href={`/practice/${l2}${tabQueryStr ? `?${tabQueryStr}` : ""}`}
+                scroll={false}
                 className={`rounded-full px-4 py-2 text-sm font-medium transition-all ${
                   l2 === l
                     ? "bg-indigo-600 text-white shadow-md shadow-indigo-500/25"
@@ -208,6 +209,7 @@ export default async function PracticeLangPage({ params, searchParams }: Props) 
               <div className="flex flex-wrap gap-2">
                 <Link
                   href={buildUrl({ category: "", status: statusFilter ?? undefined, page: 1 })}
+                  scroll={false}
                   className={`rounded-full px-4 py-2 text-sm font-medium transition-colors ${
                     categoryFilter === null
                       ? "bg-indigo-600 text-white"
@@ -220,6 +222,7 @@ export default async function PracticeLangPage({ params, searchParams }: Props) 
                   <Link
                     key={cat}
                     href={buildUrl({ category: cat, status: statusFilter ?? undefined, page: 1 })}
+                    scroll={false}
                     className={`rounded-full px-4 py-2 text-sm font-medium transition-colors ${
                       categoryFilter === cat
                         ? "bg-indigo-600 text-white"
@@ -239,6 +242,7 @@ export default async function PracticeLangPage({ params, searchParams }: Props) 
                 <div className="flex flex-wrap gap-2">
                   <Link
                     href={buildUrl({ status: "", category: categoryFilter ?? undefined, page: 1 })}
+                    scroll={false}
                     className={`rounded-full px-4 py-2 text-sm font-medium transition-colors ${
                       statusFilter === null
                         ? "bg-indigo-600 text-white"
@@ -249,6 +253,7 @@ export default async function PracticeLangPage({ params, searchParams }: Props) 
                   </Link>
                   <Link
                     href={buildUrl({ status: "solved", category: categoryFilter ?? undefined, page: 1 })}
+                    scroll={false}
                     className={`rounded-full px-4 py-2 text-sm font-medium transition-colors ${
                       statusFilter === "solved"
                         ? "bg-indigo-600 text-white"
@@ -259,6 +264,7 @@ export default async function PracticeLangPage({ params, searchParams }: Props) 
                   </Link>
                   <Link
                     href={buildUrl({ status: "unsolved", category: categoryFilter ?? undefined, page: 1 })}
+                    scroll={false}
                     className={`rounded-full px-4 py-2 text-sm font-medium transition-colors ${
                       statusFilter === "unsolved"
                         ? "bg-indigo-600 text-white"
@@ -338,7 +344,8 @@ export default async function PracticeLangPage({ params, searchParams }: Props) 
               <nav className="flex items-center gap-1" aria-label="Pagination">
                 {currentPage > 1 ? (
                   <Link
-                    href={buildUrl({ page: currentPage - 1, category: categoryFilter ?? undefined })}
+                    href={buildUrl({ page: currentPage - 1, category: categoryFilter ?? undefined, status: statusFilter ?? undefined })}
+                    scroll={false}
                     className="inline-flex items-center gap-1 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm font-medium text-zinc-700 hover:bg-zinc-50 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700"
                   >
                     ← Previous
@@ -361,7 +368,8 @@ export default async function PracticeLangPage({ params, searchParams }: Props) 
                     ) : (
                       <Link
                         key={p}
-                        href={buildUrl({ page: p, category: categoryFilter ?? undefined })}
+                        href={buildUrl({ page: p, category: categoryFilter ?? undefined, status: statusFilter ?? undefined })}
+                        scroll={false}
                         className="flex h-9 w-9 items-center justify-center rounded-lg border border-zinc-200 bg-white text-sm font-medium text-zinc-700 hover:bg-zinc-50 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700"
                       >
                         {p}
@@ -371,7 +379,8 @@ export default async function PracticeLangPage({ params, searchParams }: Props) 
                 </div>
                 {currentPage < totalPages ? (
                   <Link
-                    href={buildUrl({ page: currentPage + 1, category: categoryFilter ?? undefined })}
+                    href={buildUrl({ page: currentPage + 1, category: categoryFilter ?? undefined, status: statusFilter ?? undefined })}
+                    scroll={false}
                     className="inline-flex items-center gap-1 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm font-medium text-zinc-700 hover:bg-zinc-50 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700"
                   >
                     Next →
