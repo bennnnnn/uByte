@@ -12,7 +12,7 @@ export const GET = withErrorHandling("GET /api/billing/portal", async () => {
   const { user, response } = await requireAuth();
   if (!user) return response;
 
-  const dbUser = await getUserById(user.id);
+  const dbUser = await getUserById(user.userId);
   const customerId = dbUser?.stripe_customer_id ?? null;
   if (!customerId || !PADDLE_API_KEY) {
     return NextResponse.json(
