@@ -11,26 +11,26 @@ import { signToken, setAuthCookie } from "@/lib/auth";
 import { setCsrfCookie } from "@/lib/csrf";
 import { withErrorHandling } from "@/lib/api-utils";
 
-import { BASE_URL } from "@/lib/constants";
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
 
 export const GET = withErrorHandling("GET /api/auth/google/callback", async (request: NextRequest) => {
+  const origin = request.nextUrl.origin;
   const { searchParams } = new URL(request.url);
   const code = searchParams.get("code");
   const state = searchParams.get("state");
   const storedState = request.cookies.get("oauth_state")?.value;
 
   if (!state || !storedState || state !== storedState) {
-    return NextResponse.redirect(`${BASE_URL}/?error=oauth_invalid_state`);
+    return NextResponse.redirect(`${origin}/?error=oauth_invalid_state`);
   }
 
   if (!code) {
-    return NextResponse.redirect(`${BASE_URL}/?error=oauth_no_code`);
+    return NextResponse.redirect(`${origin}/?error=oauth_no_code`);
   }
 
   if (!GOOGLE_CLIENT_ID || !GOOGLE_CLIENT_SECRET) {
-    return NextResponse.redirect(`${BASE_URL}/?error=oauth_not_configured`);
+    return NextResponse.redirect(`${origin}/?error=oauth_not_configured`);
   }
 
   try {
@@ -41,13 +41,13 @@ export const GET = withErrorHandling("GET /api/auth/google/callback", async (req
         code,
         client_id: GOOGLE_CLIENT_ID,
         client_secret: GOOGLE_CLIENT_SECRET,
-        redirect_uri: `${BASE_URL}/api/auth/google/callback`,
+        redirect_uri: `${origin}/api/auth/google/callback`,
         grant_type: "authorization_code",
       }),
     });
 
     if (!tokenRes.ok) {
-      return NextResponse.redirect(`${BASE_URL}/?error=oauth_token_failed`);
+      return NextResponse.redirect(`${origin}/?error=oauth_token_failed`);
     }
 
     const tokenData = await tokenRes.json();
@@ -58,14 +58,14 @@ export const GET = withErrorHandling("GET /api/auth/google/callback", async (req
     });
 
     if (!userInfoRes.ok) {
-      return NextResponse.redirect(`${BASE_URL}/?error=oauth_userinfo_failed`);
+      return NextResponse.redirect(`${origin}/?error=oauth_userinfo_failed`);
     }
 
     const googleUser = await userInfoRes.json();
     const { sub: googleId, email, name } = googleUser;
 
     if (!googleId || !email) {
-      return NextResponse.redirect(`${BASE_URL}/?error=oauth_missing_fields`);
+      return NextResponse.redirect(`${origin}/?error=oauth_missing_fields`);
     }
 
     let user = await getUserByGoogleId(googleId);
@@ -93,12 +93,12 @@ export const GET = withErrorHandling("GET /api/auth/google/callback", async (req
     await logActivity(user.id, "login_google");
     await updateStreak(user.id);
 
-    const res = NextResponse.redirect(`${BASE_URL}/`);
+    const res = NextResponse.redirect(`${origin}/`);
     res.cookies.delete("oauth_state");
     setCsrfCookie(res);
     return res;
   } catch (err) {
     console.error("Google OAuth callback error:", err);
-    return NextResponse.redirect(`${BASE_URL}/?error=oauth_failed`);
+    return NextResponse.redirect(`${origin}/?error=oauth_failed`);
   }
 });

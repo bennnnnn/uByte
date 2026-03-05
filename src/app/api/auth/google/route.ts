@@ -1,20 +1,20 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { randomBytes } from "crypto";
 import { withErrorHandling } from "@/lib/api-utils";
 
-import { BASE_URL } from "@/lib/constants";
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 
-export const GET = withErrorHandling("GET /api/auth/google", async () => {
+export const GET = withErrorHandling("GET /api/auth/google", async (request: NextRequest) => {
   if (!GOOGLE_CLIENT_ID) {
     return NextResponse.json({ error: "Google OAuth is not configured" }, { status: 503 });
   }
 
+  const origin = request.nextUrl.origin;
   const state = randomBytes(16).toString("hex");
 
   const params = new URLSearchParams({
     client_id: GOOGLE_CLIENT_ID,
-    redirect_uri: `${BASE_URL}/api/auth/google/callback`,
+    redirect_uri: `${origin}/api/auth/google/callback`,
     response_type: "code",
     scope: "openid email profile",
     state,

@@ -48,10 +48,23 @@ function PricingContent() {
   const [showAuth, setShowAuth]     = useState(false);
   const [faqOpen, setFaqOpen]       = useState<number | null>(null);
   const showSuccess = searchParams.get("success") === "1";
+  const planParam = searchParams.get("plan");
+  const signupParam = searchParams.get("signup") === "1";
 
   useEffect(() => {
     trackConversion("viewed_pricing");
   }, []);
+
+  // Preselect plan when coming from an upgrade wall (e.g. /pricing?plan=monthly|yearly).
+  useEffect(() => {
+    if (planParam === "monthly") setBilling("monthly");
+    else if (planParam === "yearly") setBilling("yearly");
+  }, [planParam]);
+
+  // If user is logged out and we were sent here to sign up, open auth modal automatically.
+  useEffect(() => {
+    if (!user && signupParam) setShowAuth(true);
+  }, [user, signupParam]);
 
   useEffect(() => {
     if (!CLIENT_TOKEN || paddleReady.current) return;

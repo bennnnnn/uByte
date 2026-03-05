@@ -53,6 +53,13 @@ const nextConfig: NextConfig = {
       { source: `/${lang}/:path*`, destination: `/tutorial/${lang}/:path*`, permanent: true },
     ]);
     return [
+      // Canonicalize domain (avoid www vs non-www auth/cookie mismatches)
+      {
+        source: "/:path*",
+        has: [{ type: "host", value: "ubyte.dev" }],
+        destination: "https://www.ubyte.dev/:path*",
+        permanent: true,
+      },
       { source: "/tutorials/:slug", destination: "/tutorial/go/:slug", permanent: true },
       { source: "/golang/:path*", destination: "/tutorial/go/:path*", permanent: true },
       ...langRedirects,
