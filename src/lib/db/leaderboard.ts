@@ -16,7 +16,8 @@ export async function getLeaderboard(limit = 20, period: LeaderboardPeriod = "al
             (SELECT COUNT(*)::int FROM progress WHERE user_id = u.id) AS completed_count,
             (SELECT COUNT(*)::int FROM practice_attempts WHERE user_id = u.id AND status = 'solved') AS problems_solved
           FROM users u
-          WHERE u.last_active_at >= NOW() - INTERVAL '7 days'
+          WHERE u.last_active_at IS NOT NULL
+            AND u.last_active_at >= (NOW() - INTERVAL '7 days')::text
           ORDER BY u.xp DESC
           LIMIT ${limit}
         `

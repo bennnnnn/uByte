@@ -46,6 +46,7 @@ function PricingContent() {
   const paddleReady = useRef(false);
   const [billing, setBilling]       = useState<"monthly" | "yearly">("yearly");
   const [showAuth, setShowAuth]     = useState(false);
+  const [faqOpen, setFaqOpen]       = useState<number | null>(null);
   const showSuccess = searchParams.get("success") === "1";
 
   useEffect(() => {
@@ -207,12 +208,14 @@ function PricingContent() {
 
           {/* ── Pro card ──────────────────────────────────── */}
           <div className="relative flex flex-col rounded-2xl border border-indigo-300 bg-gradient-to-b from-indigo-50 to-white p-8 shadow-lg shadow-indigo-100 dark:border-indigo-500/50 dark:from-indigo-950/50 dark:to-zinc-900 dark:shadow-indigo-900/20">
-            {/* Popular badge */}
-            <div className="absolute -top-3.5 left-1/2 -translate-x-1/2">
-              <span className="rounded-full bg-indigo-600 px-4 py-1 text-xs font-bold text-white shadow shadow-indigo-600/30">
-                Most popular
-              </span>
-            </div>
+            {/* Popular badge — only for yearly (the recommended option) */}
+            {billing === "yearly" && (
+              <div className="absolute -top-3.5 left-1/2 -translate-x-1/2">
+                <span className="rounded-full bg-indigo-600 px-4 py-1 text-xs font-bold text-white shadow shadow-indigo-600/30">
+                  Most popular
+                </span>
+              </div>
+            )}
 
             <div className="mb-6">
               <p className="mb-1 text-xs font-bold uppercase tracking-widest text-indigo-600 dark:text-indigo-400">
@@ -296,12 +299,12 @@ function PricingContent() {
           </div>
         </div>
 
-        {/* ── FAQ ────────────────────────────────────────── */}
+        {/* ── FAQ (accordion) ─────────────────────────────── */}
         <div className="mx-auto mt-14 max-w-2xl">
           <h2 className="mb-6 text-center text-lg font-bold text-zinc-900 dark:text-zinc-100">
             Frequently asked questions
           </h2>
-          <dl className="space-y-4">
+          <dl className="space-y-2">
             {[
               {
                 q: "What's included in Pro?",
@@ -319,12 +322,46 @@ function PricingContent() {
                 q: "Who processes payments?",
                 a: "Payments are processed securely by Paddle. Tax may be added based on your location.",
               },
-            ].map((faq) => (
-              <div key={faq.q} className="rounded-xl border border-zinc-200 bg-white p-4 dark:border-zinc-700 dark:bg-zinc-900/50">
-                <dt className="font-semibold text-zinc-900 dark:text-zinc-100">{faq.q}</dt>
-                <dd className="mt-1.5 text-sm text-zinc-600 dark:text-zinc-400">{faq.a}</dd>
-              </div>
-            ))}
+            ].map((faq, i) => {
+              const isOpen = faqOpen === i;
+              return (
+                <div
+                  key={faq.q}
+                  className="rounded-xl border border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-900/50"
+                >
+                  <dt>
+                    <button
+                      type="button"
+                      onClick={() => setFaqOpen(isOpen ? null : i)}
+                      className="flex w-full items-center justify-between gap-3 px-4 py-3.5 text-left font-semibold text-zinc-900 transition-colors hover:bg-zinc-50 dark:text-zinc-100 dark:hover:bg-zinc-800/50"
+                      aria-expanded={isOpen}
+                      aria-controls={`faq-answer-${i}`}
+                      id={`faq-question-${i}`}
+                    >
+                      {faq.q}
+                      <span
+                        className={`shrink-0 text-zinc-400 transition-transform dark:text-zinc-500 ${isOpen ? "rotate-180" : ""}`}
+                        aria-hidden
+                      >
+                        <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                        </svg>
+                      </span>
+                    </button>
+                  </dt>
+                  <dd
+                    id={`faq-answer-${i}`}
+                    role="region"
+                    aria-labelledby={`faq-question-${i}`}
+                    className={`overflow-hidden text-sm text-zinc-600 transition-[height] dark:text-zinc-400 ${
+                      isOpen ? "visible" : "hidden"
+                    }`}
+                  >
+                    <p className="border-t border-zinc-100 px-4 pb-3.5 pt-1.5 dark:border-zinc-700">{faq.a}</p>
+                  </dd>
+                </div>
+              );
+            })}
           </dl>
         </div>
 
