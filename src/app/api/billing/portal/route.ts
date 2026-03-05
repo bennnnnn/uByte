@@ -14,9 +14,16 @@ export const GET = withErrorHandling("GET /api/billing/portal", async () => {
 
   const dbUser = await getUserById(user.userId);
   const customerId = dbUser?.stripe_customer_id ?? null;
-  if (!customerId || !PADDLE_API_KEY) {
+
+  if (!PADDLE_API_KEY) {
     return NextResponse.json(
-      { error: "No billing account or portal not configured", portalUrl: null, cancelUrl: null },
+      { error: "Billing portal is not configured. Please contact support.", portalUrl: null, cancelUrl: null },
+      { status: 200 }
+    );
+  }
+  if (!customerId) {
+    return NextResponse.json(
+      { error: "No billing account linked to this profile. If you subscribed recently, try again in a few minutes or contact support.", portalUrl: null, cancelUrl: null },
       { status: 200 }
     );
   }
