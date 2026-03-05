@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useEffect, useRef } from "react";
+import { useState, useCallback, useEffect, useRef, Suspense } from "react";
 import Link from "next/link";
 import type { PracticeProblem, Difficulty } from "@/lib/practice/types";
 import type { SupportedLanguage } from "@/lib/languages/types";
@@ -391,7 +391,9 @@ export function PracticeIDE({ problem, initialLang, categoryFilter = null, listP
         {/* Right: theme toggle + user menu */}
         <div className="flex flex-1 justify-end gap-3 md:flex-initial">
           <ThemeToggle className="hidden h-8 w-8 items-center justify-center rounded text-zinc-500 transition-colors hover:bg-zinc-200 hover:text-zinc-800 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-200 md:flex" />
-          <AuthButtons />
+          <Suspense fallback={<div className="h-9 w-20 rounded-lg bg-zinc-200 dark:bg-zinc-800 animate-pulse" />}>
+            <AuthButtons />
+          </Suspense>
         </div>
       </header>
 

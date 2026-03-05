@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import Link from "next/link";
 import { useNavState } from "@/hooks/useNavState";
 import { useAuth } from "@/components/AuthProvider";
@@ -33,7 +33,9 @@ export default function MobileNav({ lang, tutorials }: { lang: string; tutorials
           <span className="text-lg font-bold">uByte</span>
         </Link>
         <div className="flex items-center gap-1">
-          <AuthButtons />
+          <Suspense fallback={<div className="h-9 w-9 rounded-lg bg-zinc-200 dark:bg-zinc-800 animate-pulse" />}>
+            <AuthButtons />
+          </Suspense>
           <button
             onClick={() => setOpen(!open)}
             className="rounded-lg p-2 text-zinc-600 transition-colors hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-800"
