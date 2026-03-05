@@ -225,48 +225,46 @@ export function PracticeListClient({
                 ))}
               </div>
             </div>
-            {hasUser && (
-              <div>
-                <p className="mb-1.5 text-xs font-semibold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">
-                  Status
-                </p>
-                <div className="flex flex-wrap gap-2">
-                  <Link
-                    href={buildUrl(selectedLang, { status: "", category: categoryFilter ?? undefined, difficulty: difficultyFilter ?? undefined, page: 1 })}
-                    scroll={false}
-                    className={`rounded-full px-4 py-2 text-sm font-medium transition-colors ${
-                      statusFilter === null
-                        ? "bg-indigo-600 text-white"
-                        : "bg-white text-zinc-600 hover:bg-zinc-100 dark:bg-zinc-800 dark:text-zinc-400 dark:hover:bg-zinc-700"
-                    } dark:border dark:border-zinc-700`}
-                  >
-                    All
-                  </Link>
-                  <Link
-                    href={buildUrl(selectedLang, { status: "solved", category: categoryFilter ?? undefined, difficulty: difficultyFilter ?? undefined, page: 1 })}
-                    scroll={false}
-                    className={`rounded-full px-4 py-2 text-sm font-medium transition-colors ${
-                      statusFilter === "solved"
-                        ? "bg-indigo-600 text-white"
-                        : "bg-white text-zinc-600 hover:bg-zinc-100 dark:bg-zinc-800 dark:text-zinc-400 dark:hover:bg-zinc-700"
-                    } dark:border dark:border-zinc-700`}
-                  >
-                    ✓ Solved
-                  </Link>
-                  <Link
-                    href={buildUrl(selectedLang, { status: "unsolved", category: categoryFilter ?? undefined, difficulty: difficultyFilter ?? undefined, page: 1 })}
-                    scroll={false}
-                    className={`rounded-full px-4 py-2 text-sm font-medium transition-colors ${
-                      statusFilter === "unsolved"
-                        ? "bg-indigo-600 text-white"
-                        : "bg-white text-zinc-600 hover:bg-zinc-100 dark:bg-zinc-800 dark:text-zinc-400 dark:hover:bg-zinc-700"
-                    } dark:border dark:border-zinc-700`}
-                  >
-                    Not solved
-                  </Link>
-                </div>
+            <div>
+              <p className="mb-1.5 text-xs font-semibold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">
+                Status
+              </p>
+              <div className="flex flex-wrap gap-2">
+                <Link
+                  href={buildUrl(selectedLang, { status: "", category: categoryFilter ?? undefined, difficulty: difficultyFilter ?? undefined, page: 1 })}
+                  scroll={false}
+                  className={`rounded-full px-4 py-2 text-sm font-medium transition-colors ${
+                    statusFilter === null
+                      ? "bg-indigo-600 text-white"
+                      : "bg-white text-zinc-600 hover:bg-zinc-100 dark:bg-zinc-800 dark:text-zinc-400 dark:hover:bg-zinc-700"
+                  } dark:border dark:border-zinc-700`}
+                >
+                  All
+                </Link>
+                <Link
+                  href={buildUrl(selectedLang, { status: "solved", category: categoryFilter ?? undefined, difficulty: difficultyFilter ?? undefined, page: 1 })}
+                  scroll={false}
+                  className={`rounded-full px-4 py-2 text-sm font-medium transition-colors ${
+                    statusFilter === "solved"
+                      ? "bg-indigo-600 text-white"
+                      : "bg-white text-zinc-600 hover:bg-zinc-100 dark:bg-zinc-800 dark:text-zinc-400 dark:hover:bg-zinc-700"
+                  } dark:border dark:border-zinc-700`}
+                >
+                  ✓ Solved
+                </Link>
+                <Link
+                  href={buildUrl(selectedLang, { status: "unsolved", category: categoryFilter ?? undefined, difficulty: difficultyFilter ?? undefined, page: 1 })}
+                  scroll={false}
+                  className={`rounded-full px-4 py-2 text-sm font-medium transition-colors ${
+                    statusFilter === "unsolved"
+                      ? "bg-indigo-600 text-white"
+                      : "bg-white text-zinc-600 hover:bg-zinc-100 dark:bg-zinc-800 dark:text-zinc-400 dark:hover:bg-zinc-700"
+                  } dark:border dark:border-zinc-700`}
+                >
+                  Not solved
+                </Link>
               </div>
-            )}
+            </div>
             <div>
               <p className="mb-1.5 text-xs font-semibold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">
                 Difficulty

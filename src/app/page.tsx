@@ -2,11 +2,13 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import Link from "next/link";
 import { getAllTutorials } from "@/lib/tutorials";
-import { getAllPracticeProblems } from "@/lib/practice/problems";
+import { getAllPracticeProblems, getPracticeProblemBySlug } from "@/lib/practice/problems";
 import { LANGUAGES, getAllLanguageSlugs } from "@/lib/languages/registry";
 import { BASE_URL } from "@/lib/constants";
-import { getExamConfig } from "@/lib/db";
-import { tutorialLangUrl } from "@/lib/urls";
+import { getExamConfig, getLastActivity } from "@/lib/db";
+import { tutorialLangUrl, tutorialUrl } from "@/lib/urls";
+import { getCurrentUser } from "@/lib/auth";
+import type { SupportedLanguage } from "@/lib/languages/types";
 import {
   LanguageCard,
   HeroSection,
@@ -15,6 +17,7 @@ import {
   StepsSection,
 } from "@/components/home";
 import ContinueBanner from "@/components/ContinueBanner";
+import LeftOffBanner from "@/components/LeftOffBanner";
 import GoogleOAuthError from "@/components/GoogleOAuthError";
 
 export const metadata: Metadata = {
@@ -69,6 +72,35 @@ export default async function Home() {
     .map((slug) => ({ slug, config: LANGUAGES[slug as keyof typeof LANGUAGES] }))
     .filter((e): e is { slug: string; config: (typeof LANGUAGES)["go"] } => !!e.config);
 
+  // Resolve "You left off at..." from last activity (logged-in only, from DB)
+  let leftOff: { href: string; label: string } | null = null;
+  const user = await getCurrentUser();
+  if (user) {
+    const last = await getLastActivity(user.userId);
+    if (last) {
+      if (last.activity_type === "tutorial" && last.slug) {
+        const tutorials = getAllTutorials(last.lang as SupportedLanguage);
+        const meta = tutorials.find((t) => t.slug === last.slug);
+        if (meta) {
+          const step = last.step != null ? last.step : undefined;
+          leftOff = {
+            href: tutorialUrl(last.lang, last.slug, step),
+            label: step != null ? `${meta.title} · Step ${step + 1}` : meta.title,
+          };
+        }
+      } else if (last.activity_type === "practice" && last.slug) {
+        const problem = getPracticeProblemBySlug(last.slug);
+        if (problem) {
+          const langName = LANGUAGES[last.lang as SupportedLanguage]?.name ?? last.lang;
+          leftOff = {
+            href: `/practice/${last.lang}/${last.slug}`,
+            label: `${problem.title} (${langName})`,
+          };
+        }
+      }
+    }
+  }
+
   return (
     <div id="main-content" className="min-h-0 flex-1 overflow-y-auto">
       <script
@@ -84,6 +116,9 @@ export default async function Home() {
 
       {/* ── 2-N. Sections — constrained ─────────────────────────────── */}
       <div className="mx-auto max-w-6xl space-y-16 px-4 py-16 sm:px-6 lg:px-8 lg:py-20">
+
+        {/* You left off at... (from DB, logged-in only) */}
+        {leftOff && <LeftOffBanner href={leftOff.href} label={leftOff.label} />}
 
         {/* Continue banner (logged-in users only) */}
         <ContinueBanner lang="go" tutorials={tutorialList} />

@@ -104,6 +104,17 @@ export function useStepProgress(
     } catch { /* ignore */ }
   }, [stepIndex, lang, tutorialSlug]);
 
+  // ── Save last activity for "You left off at..." (logged-in only) ──
+  useEffect(() => {
+    if (userId == null) return;
+    fetch("/api/last-activity", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "same-origin",
+      body: JSON.stringify({ type: "tutorial", lang, slug: tutorialSlug, step: stepIndex }),
+    }).catch(() => {});
+  }, [userId, lang, tutorialSlug, stepIndex]);
+
   // ── Load completed steps from DB (per-question progress) ──
   useEffect(() => {
     if (userId == null || !tutorialSlug) return;

@@ -129,6 +129,16 @@ export function PracticeIDE({ problem, initialLang, categoryFilter = null, listP
     }).catch(() => {});
   }, [problem.slug]);
 
+  // Save last activity for "You left off at..." (logged-in only)
+  useEffect(() => {
+    fetch("/api/last-activity", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "same-origin",
+      body: JSON.stringify({ type: "practice", lang, slug: problem.slug }),
+    }).catch(() => {});
+  }, [lang, problem.slug]);
+
   // Load attempt statuses for all problems (to show circles in sidebar)
   useEffect(() => {
     fetch("/api/practice-attempt", { credentials: "same-origin" })
