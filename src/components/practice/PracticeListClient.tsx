@@ -115,7 +115,8 @@ export function PracticeListClient({
   const handleDifficultyChange = useCallback(
     (e: React.ChangeEvent<HTMLSelectElement>) => {
       const value = e.target.value;
-      const difficulty = value === "" ? undefined : value;
+      // Pass "" when "All" is selected so buildUrl omits the difficulty param (undefined would keep current filter)
+      const difficulty = value === "" ? "" : value;
       router.push(buildUrl(selectedLang, { difficulty, page: 1 }), { scroll: false });
     },
     [router, selectedLang, buildUrl]
