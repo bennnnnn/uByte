@@ -13,6 +13,7 @@ const DIFF_BADGE: Record<Difficulty, string> = {
 interface ListQuery {
   category?: string;
   page?: number;
+  status?: string;
 }
 
 interface Props {
@@ -27,10 +28,11 @@ interface Props {
 }
 
 function buildListQueryString(q: ListQuery | undefined): string {
-  if (!q || (!q.category && !q.page)) return "";
+  if (!q || (!q.category && !q.page && !q.status)) return "";
   const params = new URLSearchParams();
   if (q.category) params.set("category", q.category);
   if (q.page != null && q.page > 1) params.set("page", String(q.page));
+  if (q.status) params.set("status", q.status);
   const s = params.toString();
   return s ? `?${s}` : "";
 }

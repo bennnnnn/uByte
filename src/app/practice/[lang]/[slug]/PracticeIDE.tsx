@@ -30,6 +30,8 @@ interface Props {
   categoryFilter?: ProblemCategory | null;
   /** Page number on the list; used for "back to list" link. */
   listPage?: number;
+  /** Status filter on the list (solved / unsolved); preserved in sidebar links. */
+  listStatus?: "solved" | "unsolved";
 }
 
 /** Three grip dots — identical to InteractiveTutorial */
@@ -58,7 +60,7 @@ function sortProblemsByCategoryAndDifficulty(
   });
 }
 
-export function PracticeIDE({ problem, initialLang, categoryFilter = null, listPage = 1 }: Props) {
+export function PracticeIDE({ problem, initialLang, categoryFilter = null, listPage = 1, listStatus }: Props) {
   const allProblems = getAllPracticeProblems();
   const categories = getPracticeCategories();
   const sidebarProblems =
@@ -406,7 +408,7 @@ export function PracticeIDE({ problem, initialLang, categoryFilter = null, listP
                 lang={lang}
                 onCollapse={() => setMobileSidebarOpen(false)}
                 statuses={statuses}
-                listQuery={{ category: categoryFilter ?? undefined, page: listPage > 1 ? listPage : undefined }}
+                listQuery={{ category: categoryFilter ?? undefined, page: listPage > 1 ? listPage : undefined, status: listStatus }}
               />
             </div>
           </div>
@@ -444,7 +446,7 @@ export function PracticeIDE({ problem, initialLang, categoryFilter = null, listP
                 lang={lang}
                 onCollapse={() => setSidebarOpen(false)}
                 statuses={statuses}
-                listQuery={{ category: categoryFilter ?? undefined, page: listPage > 1 ? listPage : undefined }}
+                listQuery={{ category: categoryFilter ?? undefined, page: listPage > 1 ? listPage : undefined, status: listStatus }}
               />
             </div>
           ) : (

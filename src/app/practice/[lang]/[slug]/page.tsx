@@ -12,7 +12,7 @@ import UpgradeWall from "@/components/UpgradeWall";
 
 type Props = {
   params: Promise<{ lang: string; slug: string }>;
-  searchParams: Promise<{ category?: string; page?: string }>;
+  searchParams: Promise<{ category?: string; page?: string; status?: string }>;
 };
 
 export const dynamic = "force-dynamic";
@@ -47,12 +47,16 @@ export default async function PracticeProblemPage({ params, searchParams }: Prop
   const plan = user ? await getUserPlan(user.userId) : "free";
   const canAccess = hasPaidAccess(plan) || isPracticeProblemFree(slug);
   if (!canAccess) {
-    const backQuery = [sp.category && `category=${sp.category}`, sp.page && sp.page !== "1" && `page=${sp.page}`].filter(Boolean).join("&");
+    const backQuery = new URLSearchParams();
+    if (sp.category) backQuery.set("category", sp.category);
+    if (sp.page && sp.page !== "1") backQuery.set("page", sp.page);
+    if (sp.status) backQuery.set("status", sp.status);
+    const backQueryStr = backQuery.toString();
     return (
       <UpgradeWall
         tutorialTitle="Interview Practice"
         subtitle="You've used your free problems for this language. Upgrade to unlock all problems and save progress."
-        backHref={`/practice/${lang}${backQuery ? `?${backQuery}` : ""}`}
+        backHref={`/practice/${lang}${backQueryStr ? `?${backQueryStr}` : ""}`}
         backLabel={`← Back to ${LANGUAGES[lang as SupportedLanguage]?.name ?? lang} practice`}
       />
     );
@@ -64,6 +68,7 @@ export default async function PracticeProblemPage({ params, searchParams }: Prop
       ? (sp.category as ProblemCategory)
       : null;
   const listPage = Math.max(1, parseInt(sp.page ?? "1", 10) || 1);
+  const listStatus = sp.status === "solved" || sp.status === "unsolved" ? sp.status : undefined;
 
   return (
     <PracticeIDE
@@ -71,6 +76,7 @@ export default async function PracticeProblemPage({ params, searchParams }: Prop
       initialLang={lang as SupportedLanguage}
       categoryFilter={categoryFilter}
       listPage={listPage}
+      listStatus={listStatus}
     />
   );
 }
