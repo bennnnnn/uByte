@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useAuth } from "@/components/AuthProvider";
-import { hasPaidAccess } from "@/lib/plans";
+import { BILLING_CONFIG, hasPaidAccess } from "@/lib/plans";
 import { trackConversion } from "@/lib/analytics";
 import { apiFetch } from "@/lib/api-client";
 
@@ -81,8 +81,12 @@ export default function PlanTab({ plan }: Props) {
   const isMonthly = plan === "pro";
   const paddleReady = useRef(false);
 
-  const planLabel = isYearly ? "Yearly Pro" : isMonthly ? "Monthly Pro" : "Free";
-  const planPrice = isYearly ? "$49.99/year" : isMonthly ? "$9.99/month" : "Free forever";
+  const planLabel = isYearly ? BILLING_CONFIG.yearly.label : isMonthly ? BILLING_CONFIG.monthly.label : "Free";
+  const planPrice = isYearly
+    ? BILLING_CONFIG.yearly.priceText
+    : isMonthly
+      ? BILLING_CONFIG.monthly.priceText
+      : "Free forever";
 
   useEffect(() => {
     if (paddleReady.current) return;
@@ -211,11 +215,10 @@ export default function PlanTab({ plan }: Props) {
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="rounded-2xl border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900">
             <p className="text-lg font-bold text-zinc-900 dark:text-zinc-100">
-              $9.99
-              <span className="text-sm font-normal text-zinc-500">/mo</span>
+              {BILLING_CONFIG.monthly.priceText.replace("/month", "")}
             </p>
             <p className="mb-4 text-xs text-zinc-500 dark:text-zinc-400">
-              Monthly · cancel anytime
+              {BILLING_CONFIG.monthly.subLabel}
             </p>
             <button
               type="button"
@@ -228,11 +231,10 @@ export default function PlanTab({ plan }: Props) {
           <div className="rounded-2xl border-2 border-emerald-200 bg-emerald-50/30 p-5 dark:border-emerald-900/50 dark:bg-emerald-950/20">
             <div className="mb-1 flex items-center gap-2">
               <p className="text-lg font-bold text-zinc-900 dark:text-zinc-100">
-                $49.99
-                <span className="text-sm font-normal text-zinc-500">/yr</span>
+                {BILLING_CONFIG.yearly.priceText.replace("/year", "")}
               </p>
               <span className="rounded-full bg-emerald-500 px-2 py-0.5 text-[10px] font-bold text-white">
-                Save 58%
+                {BILLING_CONFIG.yearly.subLabel}
               </span>
             </div>
             <p className="mb-4 text-xs text-zinc-500 dark:text-zinc-400">

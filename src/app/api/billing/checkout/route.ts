@@ -2,12 +2,11 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { withErrorHandling, requireAuth } from "@/lib/api-utils";
 import { verifyCsrf } from "@/lib/csrf";
+import { MONTHLY_PRICE_ID, YEARLY_PRICE_ID } from "@/lib/plans";
 
 const CheckoutBody = z.object({ plan: z.enum(["monthly", "yearly"]) });
 
 const CLIENT_TOKEN = process.env.NEXT_PUBLIC_PADDLE_CLIENT_TOKEN ?? "";
-const MONTHLY_PRICE_ID = process.env.NEXT_PUBLIC_PADDLE_PRO_PRICE_ID ?? "";
-const YEARLY_PRICE_ID = process.env.NEXT_PUBLIC_PADDLE_YEARLY_PRICE_ID ?? "";
 
 export const POST = withErrorHandling("POST /api/billing/checkout", async (request: NextRequest) => {
   const csrfError = verifyCsrf(request);

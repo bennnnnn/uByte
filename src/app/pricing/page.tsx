@@ -4,13 +4,11 @@ import { Suspense, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useAuth } from "@/components/AuthProvider";
-import { hasPaidAccess } from "@/lib/plans";
+import { BILLING_CONFIG, MONTHLY_PRICE_ID, YEARLY_PRICE_ID, hasPaidAccess } from "@/lib/plans";
 import { trackConversion } from "@/lib/analytics";
 import AuthModal from "@/components/auth/AuthModal";
 
 const CLIENT_TOKEN     = process.env.NEXT_PUBLIC_PADDLE_CLIENT_TOKEN ?? "";
-const YEARLY_PRICE_ID  = process.env.NEXT_PUBLIC_PADDLE_YEARLY_PRICE_ID ?? "";
-const MONTHLY_PRICE_ID = process.env.NEXT_PUBLIC_PADDLE_PRO_PRICE_ID ?? "";
 
 const FREE_FEATURES = [
   "5 free tutorials per language",
@@ -237,10 +235,14 @@ function PricingContent() {
               {billing === "monthly" ? (
                 <div>
                   <div className="flex items-baseline gap-2">
-                    <span className="text-4xl font-black text-zinc-900 dark:text-white">$9.99</span>
+                    <span className="text-4xl font-black text-zinc-900 dark:text-white">
+                      {BILLING_CONFIG.monthly.priceText.replace("/month", "")}
+                    </span>
                     <span className="text-zinc-500 dark:text-zinc-400">/month</span>
                   </div>
-                  <p className="mt-1.5 text-sm text-zinc-500 dark:text-zinc-400">Cancel anytime.</p>
+                  <p className="mt-1.5 text-sm text-zinc-500 dark:text-zinc-400">
+                    {BILLING_CONFIG.monthly.subLabel}
+                  </p>
                 </div>
               ) : (
                 <div>
@@ -250,10 +252,10 @@ function PricingContent() {
                   </div>
                   <p className="mt-1.5 text-sm">
                     <span className="font-semibold text-emerald-600 dark:text-emerald-400">
-                      $49.99 billed yearly
+                      {BILLING_CONFIG.yearly.priceText.replace("/year", " billed yearly")}
                     </span>
                     <span className="mx-1.5 text-zinc-400 line-through dark:text-zinc-600">$119.88</span>
-                    <span className="text-zinc-500 dark:text-zinc-400">— save $70</span>
+                    <span className="text-zinc-500 dark:text-zinc-400">— {BILLING_CONFIG.yearly.subLabel}</span>
                   </p>
                 </div>
               )}
@@ -300,7 +302,9 @@ function PricingContent() {
                 onClick={() => openCheckout(selectedPriceId)}
                 className="w-full rounded-xl bg-indigo-600 py-3.5 text-sm font-bold text-white shadow shadow-indigo-600/20 transition-colors hover:bg-indigo-700"
               >
-                {billing === "yearly" ? "Get Pro — $49.99/yr" : "Get Pro — $9.99/mo"}
+                {billing === "yearly"
+                  ? `Get Pro — ${BILLING_CONFIG.yearly.priceText.replace("/year", "/yr")}`
+                  : `Get Pro — ${BILLING_CONFIG.monthly.priceText.replace("/month", "/mo")}`}
               </button>
             )}
 

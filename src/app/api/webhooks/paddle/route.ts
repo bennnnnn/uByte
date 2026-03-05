@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { updateUserPlan, getUserByPaddleCustomerId, getUserById, createNotification, recordSubscriptionEvent } from "@/lib/db";
 import { withErrorHandling } from "@/lib/api-utils";
+import { BILLING_CONFIG } from "@/lib/plans";
 
 const WEBHOOK_SECRET = process.env.PADDLE_WEBHOOK_SECRET ?? "";
 
@@ -81,8 +82,13 @@ export const POST = withErrorHandling("POST /api/webhooks/paddle", async (reques
       if (userId && paddleCustomerId) {
         const uid = parseInt(userId, 10);
         await updateUserPlan(uid, activatedPlan, paddleCustomerId);
-        const planLabel = activatedPlan === "yearly" ? "Yearly Pro" : "Monthly Pro";
-        await createNotification(uid, "plan", `You're now on ${planLabel}!`, "All tutorials and features are now unlocked. Enjoy!");
+        const planLabel = activatedPlan === "yearly" ? BILLING_CONFIG.yearly.label : BILLING_CONFIG.monthly.label;
+        await createNotification(
+          uid,
+          "plan",
+          `You're now on ${planLabel}!`,
+          "All tutorials and features are now unlocked. Enjoy!"
+        );
         const amountCents = activatedPlan === "yearly" ? 4999 : 999;
         await recordSubscriptionEvent(uid, activatedPlan, amountCents, "activated");
       }
