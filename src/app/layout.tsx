@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import AuthButtons from "@/components/AuthButtons";
@@ -111,7 +112,9 @@ export default function RootLayout({
               {/* Right: Leaderboard + Pricing + auth */}
               <div className="flex items-center gap-2">
                 <HeaderNavLinks />
-                <AuthButtons />
+                <Suspense fallback={<div className="h-9 w-20 rounded-lg bg-zinc-200 dark:bg-zinc-800 animate-pulse" />}>
+                  <AuthButtons />
+                </Suspense>
               </div>
             </header>
             <MobileStandaloneHeader />
