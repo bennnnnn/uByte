@@ -14,9 +14,9 @@ const MONTHLY_PRICE_ID = process.env.NEXT_PUBLIC_PADDLE_PRO_PRICE_ID ?? "";
 
 const FREE_FEATURES = [
   "5 free tutorials per language",
+  "15 free practice problems per language",
   "Interactive code editor",
   "6 programming languages",
-  "Interview practice problems",
   "Progress tracking",
 ];
 
@@ -294,6 +294,38 @@ function PricingContent() {
               </p>
             )}
           </div>
+        </div>
+
+        {/* ── FAQ ────────────────────────────────────────── */}
+        <div className="mx-auto mt-14 max-w-2xl">
+          <h2 className="mb-6 text-center text-lg font-bold text-zinc-900 dark:text-zinc-100">
+            Frequently asked questions
+          </h2>
+          <dl className="space-y-4">
+            {[
+              {
+                q: "What's included in Pro?",
+                a: "Unlimited tutorials in all 6 languages, AI code feedback on every step, practice exams with certificates, community chat, and priority support.",
+              },
+              {
+                q: "Can I cancel anytime?",
+                a: "Yes. Cancel from your account settings and you'll keep Pro until the end of your billing period.",
+              },
+              {
+                q: "How does the free trial work?",
+                a: "Start with 5 free tutorials per language and 15 practice problems per language. No card required. Upgrade when you want full access.",
+              },
+              {
+                q: "Who processes payments?",
+                a: "Payments are processed securely by Paddle. Tax may be added based on your location.",
+              },
+            ].map((faq) => (
+              <div key={faq.q} className="rounded-xl border border-zinc-200 bg-white p-4 dark:border-zinc-700 dark:bg-zinc-900/50">
+                <dt className="font-semibold text-zinc-900 dark:text-zinc-100">{faq.q}</dt>
+                <dd className="mt-1.5 text-sm text-zinc-600 dark:text-zinc-400">{faq.a}</dd>
+              </div>
+            ))}
+          </dl>
         </div>
 
         {/* ── Trust strip ────────────────────────────────── */}

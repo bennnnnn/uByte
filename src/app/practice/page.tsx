@@ -4,6 +4,7 @@ import { getAllPracticeProblems } from "@/lib/practice/problems";
 import { LANGUAGES, getAllLanguageSlugs } from "@/lib/languages/registry";
 import type { SupportedLanguage } from "@/lib/languages/types";
 import { FREE_PRACTICE_LIMIT } from "@/lib/plans";
+import { getLangIcon, PRACTICE_TAGLINES } from "@/lib/languages/icons";
 
 export const dynamic = "force-dynamic";
 
@@ -11,19 +12,6 @@ export const metadata: Metadata = {
   title: "Interview Practice",
   description:
     "Solve classic coding interview problems in Go, Python, C++, JavaScript, Java, and Rust. Run your code in the browser.",
-};
-
-const LANG_ICONS: Record<string, string> = {
-  go: "🐹", python: "🐍", cpp: "⚙️", javascript: "🟨", java: "☕", rust: "🦀",
-};
-
-const LANG_DESC: Record<string, string> = {
-  go:         "Solve with Go's simplicity and performance",
-  python:     "Solve with Python's clean, readable syntax",
-  cpp:        "Solve with C++ for low-level control",
-  javascript: "Solve with JavaScript in the browser",
-  java:       "Solve with Java's robust type system",
-  rust:       "Solve with Rust's safety and speed",
 };
 
 const DIFF_STYLES = {
@@ -120,7 +108,7 @@ export default async function PracticePage() {
                   <div className="absolute right-0 top-0 h-24 w-24 translate-x-4 -translate-y-4 rounded-full bg-indigo-100/80 opacity-0 transition-opacity group-hover:opacity-100 dark:bg-indigo-500/10" />
                   <div className="relative mb-4 flex items-center gap-4">
                     <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-zinc-100 text-2xl shadow-inner dark:bg-zinc-800">
-                      {LANG_ICONS[slug] ?? "🎯"}
+                      {getLangIcon(slug)}
                     </span>
                     <div>
                       <h3 className="text-lg font-bold text-zinc-900 dark:text-zinc-100">
@@ -132,7 +120,7 @@ export default async function PracticePage() {
                     </div>
                   </div>
                   <p className="relative mb-5 flex-1 text-sm leading-relaxed text-zinc-500 dark:text-zinc-400">
-                    {LANG_DESC[slug] ?? `Solve problems in ${config.name}`}
+                    {PRACTICE_TAGLINES[slug as SupportedLanguage] ?? `Solve problems in ${config.name}`}
                   </p>
                   <span className="relative inline-flex items-center gap-2 text-sm font-semibold text-indigo-600 transition-[gap] group-hover:gap-3 dark:text-indigo-400">
                     View problems
@@ -153,8 +141,19 @@ export default async function PracticePage() {
           <h2 id="preview-heading" className="mb-2 text-xs font-bold uppercase tracking-[0.2em] text-zinc-400 dark:text-zinc-500">
             Try these first
           </h2>
-          <p className="mb-8 text-2xl font-bold text-zinc-900 dark:text-zinc-100 sm:text-3xl">
+          <p className="mb-2 text-2xl font-bold text-zinc-900 dark:text-zinc-100 sm:text-3xl">
             Featured problems
+          </p>
+          <p className="mb-6 text-sm text-zinc-500 dark:text-zinc-400">
+            View in:{" "}
+            {langSlugs.map((slug, i) => (
+              <span key={slug}>
+                {i > 0 && " · "}
+                <Link href={`/practice/${slug}`} className="font-medium text-indigo-600 hover:underline dark:text-indigo-400">
+                  {LANGUAGES[slug]?.name ?? slug}
+                </Link>
+              </span>
+            ))}
           </p>
 
           <div className="overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-sm dark:border-zinc-700 dark:bg-zinc-900">

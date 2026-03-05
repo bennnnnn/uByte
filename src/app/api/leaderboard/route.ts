@@ -9,7 +9,7 @@ export const GET = withErrorHandling("GET /api/leaderboard", async (request: Nex
   if (limited) {
     return NextResponse.json({ error: "Too many requests" }, { status: 429 });
   }
-
-  const users = await getLeaderboard(20);
+  const period = (request.nextUrl.searchParams.get("period") === "week" ? "week" : "all") as "all" | "week";
+  const users = await getLeaderboard(20, period);
   return NextResponse.json({ users });
 });

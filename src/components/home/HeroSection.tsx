@@ -101,15 +101,18 @@ const FEATURES = [
 interface HeroSectionProps {
   /** Number of topics per language (e.g. from getAllTutorials("go").length) */
   topicCount?: number;
+  /** Total lesson (step) count for Go — from getTotalLessonCount("go") */
+  lessonCountGo?: number;
   /** Number of practice problems (e.g. from getAllPracticeProblems().length) */
   problemCount?: number;
 }
 
-export default function HeroSection({ topicCount = 19, problemCount = 11 }: HeroSectionProps) {
+export default function HeroSection({ topicCount = 19, lessonCountGo = 0, problemCount = 11 }: HeroSectionProps) {
   const [lang, setLang] = useState<Lang>("go");
   const meta = LANG_META[lang];
   const lines = CODE[lang];
   const problemsLabel = problemCount >= 10 ? `${problemCount}+` : String(problemCount);
+  const lessonsLabel = lessonCountGo > 0 ? String(lessonCountGo) : String(topicCount);
 
   return (
     <section className="relative overflow-hidden bg-white dark:bg-zinc-950">
@@ -207,10 +210,10 @@ export default function HeroSection({ topicCount = 19, problemCount = 11 }: Hero
             {/* Stats */}
             <div className="flex flex-wrap gap-6 border-t border-zinc-200 pt-8 dark:border-zinc-800">
               {[
-                { n: "6",           label: "Languages"   },
-                { n: String(topicCount), label: "Topics each" },
+                { n: "6",            label: "Languages"   },
+                { n: lessonsLabel,   label: "Lessons (Go)" },
                 { n: problemsLabel, label: "Problems"    },
-                { n: "Free",        label: "to start"    },
+                { n: "Free",         label: "to start"    },
               ].map(({ n, label }) => (
                 <div key={label}>
                   <p className="text-2xl font-black text-zinc-900 dark:text-zinc-100">{n}</p>

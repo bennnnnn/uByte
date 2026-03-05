@@ -58,6 +58,9 @@ export function SearchPageClient() {
 
   return (
     <>
+      <p className="mb-4 text-sm text-zinc-500 dark:text-zinc-400">
+        Search tutorial titles and lesson steps across all languages.
+      </p>
       <form onSubmit={handleSubmit} className="mb-8">
         <div className="relative">
           <svg
@@ -86,8 +89,13 @@ export function SearchPageClient() {
       {!loading && query.trim().length >= 2 && (
         <ul className="space-y-2">
           {results.length === 0 ? (
-            <li className="rounded-xl border border-zinc-200 bg-zinc-50 px-4 py-8 text-center text-sm text-zinc-500 dark:border-zinc-800 dark:bg-zinc-900/50 dark:text-zinc-400">
-              No results for &ldquo;{query.trim()}&rdquo;
+            <li className="rounded-xl border border-zinc-200 bg-zinc-50 px-4 py-10 text-center dark:border-zinc-800 dark:bg-zinc-900/50">
+              <p className="font-medium text-zinc-700 dark:text-zinc-300">
+                No results for &ldquo;{query.trim()}&rdquo;
+              </p>
+              <p className="mt-2 text-sm text-zinc-500 dark:text-zinc-400">
+                Try different keywords or browse <a href="/tutorial/go" className="font-medium text-indigo-600 hover:underline dark:text-indigo-400">tutorials</a> and <a href="/practice" className="font-medium text-indigo-600 hover:underline dark:text-indigo-400">practice problems</a>.
+              </p>
             </li>
           ) : (
             results.map((r, i) => {

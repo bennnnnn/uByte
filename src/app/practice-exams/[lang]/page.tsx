@@ -6,19 +6,11 @@ import type { SupportedLanguage } from "@/lib/languages/types";
 import { getCurrentUser } from "@/lib/auth";
 import { getUserPlan, getExamConfig } from "@/lib/db";
 import { hasPaidAccess } from "@/lib/plans";
+import { getLangIcon } from "@/lib/languages/icons";
 import { getExamDetailContent } from "@/lib/exams/content";
 import StartExamButton from "./StartExamButton";
 import ExamDetailTabs from "./ExamDetailTabs";
 import OtherExamsGrid from "./OtherExamsGrid";
-
-const LANG_ICONS: Record<string, string> = {
-  go: "🐹",
-  python: "🐍",
-  cpp: "⚙️",
-  javascript: "🟨",
-  java: "☕",
-  rust: "🦀",
-};
 
 export const dynamic = "force-dynamic";
 
@@ -63,7 +55,7 @@ export default async function PracticeExamLangPage({ params }: Props) {
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div className="flex items-start gap-4">
               <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-amber-50 text-2xl dark:bg-amber-950/50">
-                {LANG_ICONS[lang] ?? "📋"}
+                {getLangIcon(lang)}
               </span>
               <div>
                 <div className="mb-1 flex flex-wrap items-center gap-2">

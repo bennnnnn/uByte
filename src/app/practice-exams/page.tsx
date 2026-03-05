@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { LANGUAGES, getAllLanguageSlugs } from "@/lib/languages/registry";
+import { getLangIcon } from "@/lib/languages/icons";
 import type { SupportedLanguage } from "@/lib/languages/types";
 import { getCurrentUser } from "@/lib/auth";
-import { getUserPlan } from "@/lib/db";
+import { getUserPlan, getExamConfig } from "@/lib/db";
 import { hasPaidAccess } from "@/lib/plans";
 import UpgradeWall from "@/components/UpgradeWall";
 
@@ -15,31 +16,53 @@ export const metadata: Metadata = {
     "Timed multiple-choice practice exams by language. Pass to earn a certificate. Available for Pro members.",
 };
 
-const LANG_ICONS: Record<string, string> = {
-  go: "🐹",
-  python: "🐍",
-  cpp: "⚙️",
-  javascript: "🟨",
-  java: "☕",
-  rust: "🦀",
-};
-
 export default async function PracticeExamsPage() {
-  const user = await getCurrentUser();
+  const [user, examConfig] = await Promise.all([
+    getCurrentUser(),
+    getExamConfig(),
+  ]);
   const plan = user ? await getUserPlan(user.userId) : "free";
+  const isPro = hasPaidAccess(plan);
+  const langSlugs = getAllLanguageSlugs() as SupportedLanguage[];
+  const { examSize, examDurationMinutes } = examConfig;
 
-  if (!hasPaidAccess(plan)) {
+  if (!isPro) {
     return (
-      <UpgradeWall
-        tutorialTitle="Practice Exams"
-        subtitle="Practice exams and certificates are available on Pro. Upgrade to take timed MCQ exams and earn certificates."
-        backHref="/"
-        backLabel="← Back to home"
-      />
+      <div className="min-h-full overflow-y-auto bg-zinc-50 dark:bg-zinc-950">
+        <div className="mx-auto max-w-4xl px-6 py-14">
+          <div className="mb-10">
+            <span className="inline-flex items-center gap-2 rounded-full border border-amber-300 bg-amber-50 px-3 py-1 text-xs font-bold uppercase tracking-wider text-amber-700 dark:border-amber-700 dark:bg-amber-950/50 dark:text-amber-400">
+              Pro
+            </span>
+            <h1 className="mt-4 text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100">
+              Practice Exams
+            </h1>
+            <p className="mt-2 max-w-xl text-zinc-600 dark:text-zinc-400">
+              Timed multiple-choice exams by language. Each attempt selects {examSize} questions at random. {examDurationMinutes} minutes. Score at least 70% to pass and earn a certificate.
+            </p>
+          </div>
+
+          <div className="mb-10 rounded-2xl border border-amber-200 bg-amber-50/60 p-6 dark:border-amber-800 dark:bg-amber-950/30">
+            <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">
+              What to expect
+            </h2>
+            <ul className="mt-3 space-y-2 text-sm text-zinc-600 dark:text-zinc-400">
+              <li>· {examSize} questions per attempt, {examDurationMinutes} minutes</li>
+              <li>· 70% correct to pass and earn a shareable certificate</li>
+              <li>· Available in Go, Python, C++, JavaScript, Java, and Rust</li>
+            </ul>
+          </div>
+
+          <UpgradeWall
+            tutorialTitle="Practice Exams"
+            subtitle="Upgrade to Pro to take timed exams and earn certificates."
+            backHref="/"
+            backLabel="← Back to home"
+          />
+        </div>
+      </div>
     );
   }
-
-  const langSlugs = getAllLanguageSlugs() as SupportedLanguage[];
 
   return (
     <div className="min-h-full overflow-y-auto">
@@ -49,8 +72,7 @@ export default async function PracticeExamsPage() {
             Practice Exams
           </h1>
           <p className="mt-2 max-w-xl text-zinc-600 dark:text-zinc-400">
-            Timed multiple-choice exams by language. Each attempt selects 40 questions at random. Score
-            at least 70% to pass and earn a certificate.
+            Timed multiple-choice exams by language. Each attempt selects {examSize} questions at random. {examDurationMinutes} minutes. Score at least 70% to pass and earn a certificate.
           </p>
         </div>
 
@@ -72,14 +94,14 @@ export default async function PracticeExamsPage() {
                   className="group flex items-center gap-4 rounded-xl border-2 border-amber-100 bg-amber-50/40 p-5 transition-all hover:border-amber-400 hover:bg-amber-50 hover:shadow-md dark:border-amber-900/40 dark:bg-amber-950/20 dark:hover:border-amber-600 dark:hover:bg-amber-950/40"
                 >
                   <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white text-xl shadow-sm dark:bg-zinc-900">
-                    {LANG_ICONS[slug] ?? "📝"}
+                    {getLangIcon(slug)}
                   </span>
                   <div className="min-w-0 flex-1">
                     <h3 className="text-base font-semibold text-zinc-900 dark:text-zinc-100">
                       {config.name}
                     </h3>
                     <p className="text-sm text-zinc-500 dark:text-zinc-400">
-                      40 questions · 70% to pass
+                      {examSize} questions · {examDurationMinutes} min · 70% to pass
                     </p>
                   </div>
                   <span className="text-sm font-medium text-amber-700 dark:text-amber-400">

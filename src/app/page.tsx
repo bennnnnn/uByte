@@ -47,8 +47,7 @@ export const metadata: Metadata = {
 
 export default async function Home() {
   const goTutorials = getAllTutorials("go");
-  const tutorialList = goTutorials.map(({ slug, title }) => ({ slug, title }));
-  const topicCount = goTutorials.length; // used for Hero "Topics each" (Go topic count)
+  const topicCount = goTutorials.length;
   const problemCount = getAllPracticeProblems().length;
   const examConfig = await getExamConfig();
 
@@ -65,14 +64,16 @@ export default async function Home() {
     .map((slug) => ({ slug, config: LANGUAGES[slug as keyof typeof LANGUAGES] }))
     .filter((e): e is { slug: string; config: (typeof LANGUAGES)["go"] } => !!e.config);
 
-  // Resolve "You left off at..." from last activity (logged-in only, from DB)
+  // Resolve "You left off at..." and "Continue" language from last activity (logged-in only)
   let leftOff: { href: string; label: string } | null = null;
+  let continueLang: SupportedLanguage = "go";
   const user = await getCurrentUser();
   if (user) {
     const last = await getLastActivity(user.userId);
     if (last) {
       if (last.activity_type === "tutorial" && last.slug) {
-        const tutorials = getAllTutorials(last.lang as SupportedLanguage);
+        continueLang = last.lang as SupportedLanguage;
+        const tutorials = getAllTutorials(continueLang);
         const meta = tutorials.find((t) => t.slug === last.slug);
         if (meta) {
           const step = last.step != null ? last.step : undefined;
@@ -93,6 +94,8 @@ export default async function Home() {
       }
     }
   }
+  const continueTutorialList = getAllTutorials(continueLang).map(({ slug, title }) => ({ slug, title }));
+  const lessonCountGo = getTotalLessonCount("go");
 
   return (
     <div className="min-h-0 flex-1 overflow-y-auto">
@@ -105,7 +108,7 @@ export default async function Home() {
       </Suspense>
 
       {/* ── 1. Hero — full bleed, dark ───────────────────────────────── */}
-      <HeroSection topicCount={topicCount} problemCount={problemCount} />
+      <HeroSection topicCount={topicCount} lessonCountGo={lessonCountGo} problemCount={problemCount} />
 
       {/* ── 2-N. Sections — constrained ─────────────────────────────── */}
       <div className="mx-auto max-w-6xl space-y-16 px-4 py-16 sm:px-6 lg:px-8 lg:py-20">
@@ -114,7 +117,7 @@ export default async function Home() {
         {leftOff && <LeftOffBanner href={leftOff.href} label={leftOff.label} />}
 
         {/* Continue banner (logged-in users only) */}
-        <ContinueBanner lang="go" tutorials={tutorialList} />
+        <ContinueBanner lang={continueLang} tutorials={continueTutorialList} />
 
         {/* How it works */}
         <StepsSection />
