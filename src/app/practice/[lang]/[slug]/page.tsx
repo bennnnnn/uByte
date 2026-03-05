@@ -12,7 +12,7 @@ import UpgradeWall from "@/components/UpgradeWall";
 
 type Props = {
   params: Promise<{ lang: string; slug: string }>;
-  searchParams: Promise<{ category?: string; page?: string; status?: string }>;
+  searchParams: Promise<{ category?: string; page?: string; status?: string; difficulty?: string }>;
 };
 
 export const dynamic = "force-dynamic";
@@ -51,6 +51,7 @@ export default async function PracticeProblemPage({ params, searchParams }: Prop
     if (sp.category) backQuery.set("category", sp.category);
     if (sp.page && sp.page !== "1") backQuery.set("page", sp.page);
     if (sp.status) backQuery.set("status", sp.status);
+    if (sp.difficulty) backQuery.set("difficulty", sp.difficulty);
     const backQueryStr = backQuery.toString();
     return (
       <UpgradeWall
@@ -69,6 +70,7 @@ export default async function PracticeProblemPage({ params, searchParams }: Prop
       : null;
   const listPage = Math.max(1, parseInt(sp.page ?? "1", 10) || 1);
   const listStatus = sp.status === "solved" || sp.status === "unsolved" ? sp.status : undefined;
+  const listDifficulty = ["easy", "medium", "hard"].includes(sp.difficulty ?? "") ? sp.difficulty : undefined;
 
   return (
     <PracticeIDE
@@ -77,6 +79,7 @@ export default async function PracticeProblemPage({ params, searchParams }: Prop
       categoryFilter={categoryFilter}
       listPage={listPage}
       listStatus={listStatus}
+      listDifficulty={listDifficulty}
     />
   );
 }

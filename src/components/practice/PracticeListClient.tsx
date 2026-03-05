@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { LANGUAGES } from "@/lib/languages/registry";
 import type { SupportedLanguage } from "@/lib/languages/types";
 import type { Difficulty, ProblemCategory } from "@/lib/practice/types";
@@ -30,6 +31,7 @@ interface Props {
   categories: ProblemCategory[];
   categoryFilter: ProblemCategory | null;
   statusFilter: "solved" | "unsolved" | null;
+  difficultyFilter: Difficulty | null;
   currentPage: number;
   totalPages: number;
   start: number;
@@ -41,10 +43,11 @@ interface Props {
   allProblemsLength: number;
 }
 
-function buildQueryString(opts: { category?: string; status?: string; page?: number }): string {
+function buildQueryString(opts: { category?: string; status?: string; difficulty?: string; page?: number }): string {
   const u = new URLSearchParams();
   if (opts.category != null && opts.category !== "") u.set("category", opts.category);
   if (opts.status != null && opts.status !== "") u.set("status", opts.status);
+  if (opts.difficulty != null && opts.difficulty !== "") u.set("difficulty", opts.difficulty);
   if (opts.page != null && opts.page !== 1) u.set("page", String(opts.page));
   return u.toString();
 }
@@ -54,6 +57,7 @@ export function PracticeListClient({
   categories,
   categoryFilter,
   statusFilter,
+  difficultyFilter,
   currentPage,
   totalPages,
   start,
@@ -64,18 +68,20 @@ export function PracticeListClient({
   solvedCount,
   allProblemsLength,
 }: Props) {
+  const router = useRouter();
   const [selectedLang, setSelectedLang] = useState<SupportedLanguage>(initialLang);
 
   const buildUrl = useCallback(
-    (lang: SupportedLanguage, opts: { page?: number; category?: string; status?: string }) => {
+    (lang: SupportedLanguage, opts: { page?: number; category?: string; status?: string; difficulty?: string }) => {
       const q = buildQueryString({
         category: opts.category ?? categoryFilter ?? undefined,
         status: opts.status ?? statusFilter ?? undefined,
+        difficulty: opts.difficulty ?? difficultyFilter ?? undefined,
         page: opts.page ?? currentPage,
       });
       return `/practice/${lang}${q ? `?${q}` : ""}`;
     },
-    [categoryFilter, statusFilter, currentPage]
+    [categoryFilter, statusFilter, difficultyFilter, currentPage]
   );
 
   const buildProblemHref = useCallback(
@@ -83,11 +89,12 @@ export function PracticeListClient({
       const q = buildQueryString({
         category: categoryFilter ?? undefined,
         status: statusFilter ?? undefined,
+        difficulty: difficultyFilter ?? undefined,
         page: currentPage > 1 ? currentPage : undefined,
       });
       return `/practice/${selectedLang}/${slug}${q ? `?${q}` : ""}`;
     },
-    [selectedLang, categoryFilter, statusFilter, currentPage]
+    [selectedLang, categoryFilter, statusFilter, difficultyFilter, currentPage]
   );
 
   const handleLanguageClick = useCallback(
@@ -96,12 +103,22 @@ export function PracticeListClient({
       const q = buildQueryString({
         category: categoryFilter ?? undefined,
         status: statusFilter ?? undefined,
+        difficulty: difficultyFilter ?? undefined,
         page: currentPage > 1 ? currentPage : undefined,
       });
       const url = `/practice/${l2}${q ? `?${q}` : ""}`;
       window.history.replaceState(null, "", url);
     },
-    [categoryFilter, statusFilter, currentPage]
+    [categoryFilter, statusFilter, difficultyFilter, currentPage]
+  );
+
+  const handleDifficultyChange = useCallback(
+    (e: React.ChangeEvent<HTMLSelectElement>) => {
+      const value = e.target.value;
+      const difficulty = value === "" ? undefined : value;
+      router.push(buildUrl(selectedLang, { difficulty, page: 1 }), { scroll: false });
+    },
+    [router, selectedLang, buildUrl]
   );
 
   const config = LANGUAGES[selectedLang];
@@ -182,7 +199,7 @@ export function PracticeListClient({
               </p>
               <div className="flex flex-wrap gap-2">
                 <Link
-                  href={buildUrl(selectedLang, { category: "", status: statusFilter ?? undefined, page: 1 })}
+                  href={buildUrl(selectedLang, { category: "", status: statusFilter ?? undefined, difficulty: difficultyFilter ?? undefined, page: 1 })}
                   scroll={false}
                   className={`rounded-full px-4 py-2 text-sm font-medium transition-colors ${
                     categoryFilter === null
@@ -195,7 +212,7 @@ export function PracticeListClient({
                 {categories.map((cat) => (
                   <Link
                     key={cat}
-                    href={buildUrl(selectedLang, { category: cat, status: statusFilter ?? undefined, page: 1 })}
+                    href={buildUrl(selectedLang, { category: cat, status: statusFilter ?? undefined, difficulty: difficultyFilter ?? undefined, page: 1 })}
                     scroll={false}
                     className={`rounded-full px-4 py-2 text-sm font-medium transition-colors ${
                       categoryFilter === cat
@@ -215,7 +232,7 @@ export function PracticeListClient({
                 </p>
                 <div className="flex flex-wrap gap-2">
                   <Link
-                    href={buildUrl(selectedLang, { status: "", category: categoryFilter ?? undefined, page: 1 })}
+                    href={buildUrl(selectedLang, { status: "", category: categoryFilter ?? undefined, difficulty: difficultyFilter ?? undefined, page: 1 })}
                     scroll={false}
                     className={`rounded-full px-4 py-2 text-sm font-medium transition-colors ${
                       statusFilter === null
@@ -226,7 +243,7 @@ export function PracticeListClient({
                     All
                   </Link>
                   <Link
-                    href={buildUrl(selectedLang, { status: "solved", category: categoryFilter ?? undefined, page: 1 })}
+                    href={buildUrl(selectedLang, { status: "solved", category: categoryFilter ?? undefined, difficulty: difficultyFilter ?? undefined, page: 1 })}
                     scroll={false}
                     className={`rounded-full px-4 py-2 text-sm font-medium transition-colors ${
                       statusFilter === "solved"
@@ -237,7 +254,7 @@ export function PracticeListClient({
                     ✓ Solved
                   </Link>
                   <Link
-                    href={buildUrl(selectedLang, { status: "unsolved", category: categoryFilter ?? undefined, page: 1 })}
+                    href={buildUrl(selectedLang, { status: "unsolved", category: categoryFilter ?? undefined, difficulty: difficultyFilter ?? undefined, page: 1 })}
                     scroll={false}
                     className={`rounded-full px-4 py-2 text-sm font-medium transition-colors ${
                       statusFilter === "unsolved"
@@ -250,6 +267,21 @@ export function PracticeListClient({
                 </div>
               </div>
             )}
+            <div>
+              <p className="mb-1.5 text-xs font-semibold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">
+                Difficulty
+              </p>
+              <select
+                value={difficultyFilter ?? ""}
+                onChange={handleDifficultyChange}
+                className="rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm font-medium text-zinc-700 shadow-sm transition-colors hover:bg-zinc-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700"
+              >
+                <option value="">All</option>
+                <option value="easy">Easy</option>
+                <option value="medium">Medium</option>
+                <option value="hard">Hard</option>
+              </select>
+            </div>
           </div>
         </div>
       </section>
@@ -366,12 +398,6 @@ export function PracticeListClient({
               </nav>
             </div>
           )}
-        </div>
-
-        <div className="mt-6">
-          <Link href="/practice" className="text-sm font-medium text-zinc-500 hover:text-indigo-600 dark:text-zinc-400 dark:hover:text-indigo-400">
-            ← All languages
-          </Link>
         </div>
       </section>
     </div>

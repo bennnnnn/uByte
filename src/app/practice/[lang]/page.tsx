@@ -18,7 +18,7 @@ const PROBLEMS_PER_PAGE = 35;
 
 type Props = {
   params: Promise<{ lang: string }>;
-  searchParams: Promise<{ page?: string; category?: string; status?: string }>;
+  searchParams: Promise<{ page?: string; category?: string; status?: string; difficulty?: string }>;
 };
 
 export const dynamic = "force-dynamic";
@@ -87,6 +87,13 @@ export default async function PracticeLangPage({ params, searchParams }: Props) 
     filtered = filtered.filter((p) => attempts[p.slug] !== "solved");
   }
 
+  const difficultyFilter = ["easy", "medium", "hard"].includes(sp.difficulty ?? "")
+    ? (sp.difficulty as Difficulty)
+    : null;
+  if (difficultyFilter) {
+    filtered = filtered.filter((p) => p.difficulty === difficultyFilter);
+  }
+
   const categoryOrder = categories;
   const sorted = sortProblemsByCategoryAndDifficulty(filtered, categoryOrder);
 
@@ -106,6 +113,7 @@ export default async function PracticeLangPage({ params, searchParams }: Props) 
       categories={categories}
       categoryFilter={categoryFilter}
       statusFilter={statusFilter}
+      difficultyFilter={difficultyFilter}
       currentPage={currentPage}
       totalPages={totalPages}
       start={start}

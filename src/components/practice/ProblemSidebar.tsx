@@ -14,6 +14,7 @@ interface ListQuery {
   category?: string;
   page?: number;
   status?: string;
+  difficulty?: string;
 }
 
 interface Props {
@@ -28,11 +29,12 @@ interface Props {
 }
 
 function buildListQueryString(q: ListQuery | undefined): string {
-  if (!q || (!q.category && !q.page && !q.status)) return "";
+  if (!q || (!q.category && !q.page && !q.status && !q.difficulty)) return "";
   const params = new URLSearchParams();
   if (q.category) params.set("category", q.category);
   if (q.page != null && q.page > 1) params.set("page", String(q.page));
   if (q.status) params.set("status", q.status);
+  if (q.difficulty) params.set("difficulty", q.difficulty);
   const s = params.toString();
   return s ? `?${s}` : "";
 }

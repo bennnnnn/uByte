@@ -32,6 +32,8 @@ interface Props {
   listPage?: number;
   /** Status filter on the list (solved / unsolved); preserved in sidebar links. */
   listStatus?: "solved" | "unsolved";
+  /** Difficulty filter on the list; preserved in sidebar links. */
+  listDifficulty?: string;
 }
 
 /** Three grip dots — identical to InteractiveTutorial */
@@ -60,7 +62,7 @@ function sortProblemsByCategoryAndDifficulty(
   });
 }
 
-export function PracticeIDE({ problem, initialLang, categoryFilter = null, listPage = 1, listStatus }: Props) {
+export function PracticeIDE({ problem, initialLang, categoryFilter = null, listPage = 1, listStatus, listDifficulty }: Props) {
   const allProblems = getAllPracticeProblems();
   const categories = getPracticeCategories();
   const sidebarProblems =
@@ -408,7 +410,7 @@ export function PracticeIDE({ problem, initialLang, categoryFilter = null, listP
                 lang={lang}
                 onCollapse={() => setMobileSidebarOpen(false)}
                 statuses={statuses}
-                listQuery={{ category: categoryFilter ?? undefined, page: listPage > 1 ? listPage : undefined, status: listStatus }}
+                listQuery={{ category: categoryFilter ?? undefined, page: listPage > 1 ? listPage : undefined, status: listStatus, difficulty: listDifficulty }}
               />
             </div>
           </div>
@@ -446,7 +448,7 @@ export function PracticeIDE({ problem, initialLang, categoryFilter = null, listP
                 lang={lang}
                 onCollapse={() => setSidebarOpen(false)}
                 statuses={statuses}
-                listQuery={{ category: categoryFilter ?? undefined, page: listPage > 1 ? listPage : undefined, status: listStatus }}
+                listQuery={{ category: categoryFilter ?? undefined, page: listPage > 1 ? listPage : undefined, status: listStatus, difficulty: listDifficulty }}
               />
             </div>
           ) : (
