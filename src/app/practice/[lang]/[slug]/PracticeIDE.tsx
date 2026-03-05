@@ -523,14 +523,22 @@ export function PracticeIDE({ problem, initialLang, categoryFilter = null, listP
                 return (
                   <>
                     {prev && (
-                      <a href={`/practice/${lang}/${prev.slug}`} className="flex-1 rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2 text-center text-xs font-medium text-zinc-600 transition-colors hover:border-indigo-300 hover:bg-indigo-50 hover:text-indigo-700 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-400 dark:hover:border-indigo-700 dark:hover:text-indigo-400">
+                      <Link
+                        href={`/practice/${lang}/${prev.slug}`}
+                        scroll={false}
+                        className="flex-1 rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2 text-center text-xs font-medium text-zinc-600 transition-colors hover:border-indigo-300 hover:bg-indigo-50 hover:text-indigo-700 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-400 dark:hover:border-indigo-700 dark:hover:text-indigo-400"
+                      >
                         ← Prev
-                      </a>
+                      </Link>
                     )}
                     {next && (
-                      <a href={`/practice/${lang}/${next.slug}`} className="flex-1 rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2 text-center text-xs font-medium text-zinc-600 transition-colors hover:border-indigo-300 hover:bg-indigo-50 hover:text-indigo-700 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-400 dark:hover:border-indigo-700 dark:hover:text-indigo-400">
+                      <Link
+                        href={`/practice/${lang}/${next.slug}`}
+                        scroll={false}
+                        className="flex-1 rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2 text-center text-xs font-medium text-zinc-600 transition-colors hover:border-indigo-300 hover:bg-indigo-50 hover:text-indigo-700 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-400 dark:hover:border-indigo-700 dark:hover:text-indigo-400"
+                      >
                         Next →
-                      </a>
+                      </Link>
                     )}
                   </>
                 );
