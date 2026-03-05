@@ -29,6 +29,7 @@ interface UserContextType {
   user: User | null;
   loading: boolean;
   login: (email: string, password: string) => Promise<string | null>;
+  loginWithGoogle: (credential: string) => Promise<string | null>;
   signup: (name: string, email: string, password: string) => Promise<string | null>;
   logout: () => Promise<void>;
   logoutAll: () => Promise<void>;
@@ -38,6 +39,7 @@ const UserContext = createContext<UserContextType>({
   user: null,
   loading: true,
   login: async () => null,
+  loginWithGoogle: async () => null,
   signup: async () => null,
   logout: async () => {},
   logoutAll: async () => {},
@@ -200,6 +202,39 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
     return null;
   };
 
+  const loginWithGoogle = async (credential: string): Promise<string | null> => {
+    const res = await apiFetch("/api/auth/google-id-token", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ credential }),
+    });
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      return data.error || "Google sign-in failed";
+    }
+    const data = await res.json().catch(() => ({}));
+    if (data.user) setUser(data.user);
+    setLimited(false);
+    setViewCount(0);
+    try {
+      const [progRes, profRes] = await Promise.all([
+        fetch("/api/progress?lang=go", { credentials: "same-origin" }),
+        fetch("/api/profile", { credentials: "same-origin" }),
+      ]);
+      const progData = progRes.ok ? await progRes.json() : { progress: [] };
+      setProgress(progData.progress || []);
+      if (profRes.ok) {
+        const profData = await profRes.json();
+        const prof = extractProfile(profData);
+        if (prof) {
+          setProfile(prof);
+          applyTheme(prof.theme);
+        }
+      }
+    } catch { /* ignore */ }
+    return null;
+  };
+
   const logout = async () => {
     await apiFetch("/api/auth/logout", { method: "POST" });
     setUser(null);
@@ -256,7 +291,7 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
   }, []);
 
   return (
-    <UserContext.Provider value={{ user, loading, login, signup, logout, logoutAll }}>
+    <UserContext.Provider value={{ user, loading, login, loginWithGoogle, signup, logout, logoutAll }}>
       <AppDataContext.Provider value={{ progress, profile, viewCount, limited, recordView, toggleProgress, refreshProfile }}>
         {children}
       </AppDataContext.Provider>

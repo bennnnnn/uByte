@@ -11,16 +11,15 @@ const securityHeaders = [
     value: [
       "default-src 'self'",
       // Next.js requires 'unsafe-inline' for its runtime styles; Sentry needs blob:
-      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://cdn.paddle.com https://sandbox-cdn.paddle.com",
+      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://cdn.paddle.com https://sandbox-cdn.paddle.com https://accounts.google.com",
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.paddle.com https://sandbox-cdn.paddle.com",
       "font-src 'self' https://fonts.gstatic.com",
-      // Go Playground (code execution) + Vercel Analytics
-      "connect-src 'self' https://go.dev https://*.sentry.io https://va.vercel-scripts.com vitals.vercel-insights.com https://paddle.com https://*.paddle.com",
-      // Google OAuth redirect
+      // Go Playground, Vercel Analytics, Google token verification
+      "connect-src 'self' https://go.dev https://*.sentry.io https://va.vercel-scripts.com vitals.vercel-insights.com https://paddle.com https://*.paddle.com https://oauth2.googleapis.com https://www.googleapis.com https://accounts.google.com",
+      // Google OAuth redirect + One Tap
       "form-action 'self' https://accounts.google.com",
       "img-src 'self' data: https:",
-      // Paddle checkout uses iframes
-      "frame-src https://paddle.com https://*.paddle.com",
+      "frame-src https://paddle.com https://*.paddle.com https://accounts.google.com",
     ].join("; "),
   },
 ];
