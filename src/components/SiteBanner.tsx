@@ -36,28 +36,30 @@ export default function SiteBanner() {
     <div
       role="region"
       aria-label="Site announcement"
-      className="relative z-30 shrink-0 overflow-hidden border-b border-amber-200/70 dark:border-amber-800/50"
+      className="relative z-30 shrink-0 border-b border-zinc-200/80 bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900/80"
     >
-      {/* Fluid gradient — soft diagonal flow, works in light and dark */}
-      <div className="absolute inset-0 bg-gradient-to-br from-amber-100 via-amber-50 to-orange-100 dark:from-amber-950 dark:via-amber-900/95 dark:to-orange-950/90" />
-      <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(254,243,199,0.6)_0%,transparent_40%,rgba(255,237,213,0.5)_100%)] dark:bg-[linear-gradient(135deg,rgba(69,26,3,0.4)_0%,transparent_50%,rgba(120,53,15,0.3)_100%)]" />
-      {/* Subtle bottom edge for depth */}
-      <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-b from-amber-300/40 to-transparent dark:from-amber-600/30" />
+      <div className="mx-auto flex max-w-7xl items-center justify-center gap-2 px-4 py-2.5 sm:px-6">
+        {/* Accent bar — modern left stripe */}
+        <span className="absolute left-0 top-0 bottom-0 w-1 bg-indigo-500 dark:bg-indigo-500" aria-hidden />
 
-      <div className="relative flex items-center justify-center gap-3 px-4 py-3 text-center">
-        <p className="text-sm font-medium text-amber-900 drop-shadow-sm dark:text-amber-100">
+        <p className="text-center text-[13px] font-medium text-zinc-700 dark:text-zinc-300">
           {banner.message}
+          {" · "}
+          <Link
+            href={banner.linkUrl}
+            className="inline-flex items-center gap-0.5 font-semibold text-indigo-600 underline decoration-indigo-600/40 underline-offset-2 transition-colors hover:text-indigo-700 hover:decoration-indigo-600 dark:text-indigo-400 dark:decoration-indigo-400/50 dark:hover:text-indigo-300 dark:hover:decoration-indigo-400"
+          >
+            {banner.linkText}
+            <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+            </svg>
+          </Link>
         </p>
-        <Link
-          href={banner.linkUrl}
-          className="shrink-0 rounded-full bg-gradient-to-r from-amber-500 to-amber-600 px-4 py-2 text-xs font-bold text-white shadow-md shadow-amber-500/30 transition-all duration-200 hover:from-amber-600 hover:to-amber-700 hover:shadow-lg hover:shadow-amber-500/40 hover:-translate-y-0.5 dark:from-amber-600 dark:to-amber-700 dark:shadow-amber-600/30 dark:hover:from-amber-500 dark:hover:to-amber-600"
-        >
-          {banner.linkText}
-        </Link>
+
         <button
           type="button"
           onClick={() => setDismissed(true)}
-          className="shrink-0 rounded-full p-1.5 text-amber-700/90 transition-all hover:bg-amber-200/60 hover:text-amber-800 dark:text-amber-300 dark:hover:bg-amber-700/40 dark:hover:text-amber-200"
+          className="absolute right-2 top-1/2 -translate-y-1/2 rounded p-1.5 text-zinc-400 transition-colors hover:bg-zinc-200 hover:text-zinc-600 dark:hover:bg-zinc-700 dark:hover:text-zinc-300 sm:right-4"
           aria-label="Dismiss banner"
         >
           <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
