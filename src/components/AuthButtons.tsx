@@ -11,7 +11,6 @@ import { useIsMobile } from "@/hooks/useIsMobile";
 export default function AuthButtons() {
   const { user, loading } = useAuth();
   const isMobile = useIsMobile();
-  const pathname = usePathname();
   const searchParams = useSearchParams();
   const [showModal, setShowModal] = useState(false);
   const [signupMode, setSignupMode] = useState(false);
