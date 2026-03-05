@@ -8,6 +8,7 @@ import { ToastProvider } from "@/components/Toast";
 import HeaderNavLinks from "@/components/layout/HeaderNavLinks";
 import MobileStandaloneHeader from "@/components/layout/MobileStandaloneHeader";
 import LazyCookieConsentAndAnalytics from "@/components/LazyCookieConsentAndAnalytics";
+import SiteBanner from "@/components/SiteBanner";
 import { BASE_URL } from "@/lib/constants";
 import Link from "next/link";
 import Script from "next/script";
@@ -114,6 +115,7 @@ export default function RootLayout({
               </div>
             </header>
             <MobileStandaloneHeader />
+            <SiteBanner />
             {/* Home / practice: just scrollable content. /tutorial/[lang]: sidebar + content from tutorial layout */}
             <main id="main-content" className="flex min-h-0 flex-1 flex-col overflow-hidden">
               <ErrorBoundary>{children}</ErrorBoundary>

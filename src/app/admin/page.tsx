@@ -42,7 +42,7 @@ function formatCents(cents: number) {
   return "$" + (cents / 100).toFixed(2);
 }
 
-type Tab = "users" | "analytics" | "revenue" | "audit" | "exams";
+type Tab = "users" | "analytics" | "revenue" | "audit" | "exams" | "banner";
 type RevenuePeriod = "7days" | "month" | "year";
 
 const TAB_LABELS: Record<Tab, string> = {
@@ -51,6 +51,7 @@ const TAB_LABELS: Record<Tab, string> = {
   revenue: "Revenue",
   audit: "Audit log",
   exams: "Practice exams",
+  banner: "Site banner",
 };
 
 export default function AdminPage() {
@@ -105,6 +106,9 @@ export default function AdminPage() {
   const [examSettings, setExamSettings] = useState<{ examSize: number; examDurationMinutes: number } | null>(null);
   const [examSettingsSaving, setExamSettingsSaving] = useState(false);
   const [examSettingsMessage, setExamSettingsMessage] = useState<string | null>(null);
+  const [bannerData, setBannerData] = useState<{ enabled: boolean; message: string; linkUrl: string; linkText: string } | null>(null);
+  const [bannerSaving, setBannerSaving] = useState(false);
+  const [bannerMessage, setBannerMessage] = useState<string | null>(null);
 
   useEffect(() => {
     if (loading) return;
@@ -181,6 +185,18 @@ export default function AdminPage() {
       .then((r) => r.ok ? r.json() : null)
       .then((data) => {
         if (!cancelled && data) setExamSettings({ examSize: data.examSize, examDurationMinutes: data.examDurationMinutes });
+      });
+    return () => { cancelled = true; };
+  }, [tab]);
+
+  useEffect(() => {
+    if (tab !== "banner") return;
+    setBannerData(null);
+    let cancelled = false;
+    fetch("/api/admin/banner", { credentials: "same-origin" })
+      .then((r) => r.ok ? r.json() : null)
+      .then((data) => {
+        if (!cancelled && data) setBannerData({ enabled: !!data.enabled, message: data.message ?? "", linkUrl: data.linkUrl ?? "/", linkText: data.linkText ?? "Sign up" });
       });
     return () => { cancelled = true; };
   }, [tab]);
@@ -301,7 +317,7 @@ export default function AdminPage() {
           <span className="font-semibold text-zinc-900 dark:text-zinc-100">Admin</span>
         </div>
         <nav className="flex-1 space-y-0.5 p-3">
-          {(["users", "analytics", "revenue", "audit", "exams"] as Tab[]).map((t) => (
+          {(["users", "analytics", "revenue", "audit", "exams", "banner"] as Tab[]).map((t) => (
             <button
               key={t}
               type="button"
@@ -330,6 +346,7 @@ export default function AdminPage() {
               {tab === "revenue" && "Income & subscribers"}
               {tab === "audit" && "Admin actions"}
               {tab === "exams" && "Questions, attempts & upload"}
+              {tab === "banner" && "Announcements, discounts, outages"}
             </p>
           </div>
           {tab === "users" && (
@@ -792,6 +809,107 @@ export default function AdminPage() {
                         {examUploadResult.errors.length > 10 && <li>… and {examUploadResult.errors.length - 10} more</li>}
                       </ul>
                     )}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* ── Site banner tab ── */}
+          {tab === "banner" && (
+            <div className="max-w-2xl space-y-4">
+              <div className="rounded-xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+                <h2 className="mb-3 text-sm font-semibold text-zinc-700 dark:text-zinc-300">Announcement banner</h2>
+                <p className="mb-4 text-xs text-zinc-500 dark:text-zinc-400">
+                  Show a message to all users (e.g. discount, outage). The banner appears below the header. Users can dismiss it for the session.
+                </p>
+                {bannerData === null ? (
+                  <p className="text-sm text-zinc-500">Loading…</p>
+                ) : (
+                  <div className="space-y-4">
+                    <label className="flex items-center gap-2">
+                      <input
+                        type="checkbox"
+                        checked={bannerData.enabled}
+                        onChange={(e) => setBannerData((b) => b ? { ...b, enabled: e.target.checked } : b)}
+                        className="h-4 w-4 rounded border-zinc-300 text-indigo-600 focus:ring-indigo-500"
+                      />
+                      <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Banner enabled</span>
+                    </label>
+                    <label className="flex flex-col gap-1">
+                      <span className="text-xs font-medium text-zinc-600 dark:text-zinc-400">Message</span>
+                      <textarea
+                        value={bannerData.message}
+                        onChange={(e) => setBannerData((b) => b ? { ...b, message: e.target.value } : b)}
+                        placeholder="e.g. We're giving 80% off! Sign up now."
+                        rows={2}
+                        className="rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-200"
+                      />
+                    </label>
+                    <label className="flex flex-col gap-1">
+                      <span className="text-xs font-medium text-zinc-600 dark:text-zinc-400">Link URL</span>
+                      <input
+                        type="text"
+                        value={bannerData.linkUrl}
+                        onChange={(e) => setBannerData((b) => b ? { ...b, linkUrl: e.target.value } : b)}
+                        placeholder="/ or /pricing or /?signup=1"
+                        className="rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-200"
+                      />
+                    </label>
+                    <label className="flex flex-col gap-1">
+                      <span className="text-xs font-medium text-zinc-600 dark:text-zinc-400">Link text</span>
+                      <input
+                        type="text"
+                        value={bannerData.linkText}
+                        onChange={(e) => setBannerData((b) => b ? { ...b, linkText: e.target.value } : b)}
+                        placeholder="Sign up"
+                        className="rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-200"
+                      />
+                    </label>
+                    <div className="flex items-center gap-3">
+                      <button
+                        type="button"
+                        disabled={bannerSaving}
+                        onClick={async () => {
+                          if (!bannerData) return;
+                          setBannerSaving(true);
+                          setBannerMessage(null);
+                          try {
+                            const res = await fetch("/api/admin/banner", {
+                              method: "PATCH",
+                              credentials: "same-origin",
+                              headers: { "Content-Type": "application/json" },
+                              body: JSON.stringify({
+                                enabled: bannerData.enabled,
+                                message: bannerData.message,
+                                linkUrl: bannerData.linkUrl || "/",
+                                linkText: bannerData.linkText || "Sign up",
+                              }),
+                            });
+                            const data = await res.json();
+                            if (res.ok) {
+                              setBannerData({ enabled: !!data.enabled, message: data.message ?? "", linkUrl: data.linkUrl ?? "/", linkText: data.linkText ?? "Sign up" });
+                              setBannerMessage("Saved.");
+                              setTimeout(() => setBannerMessage(null), 3000);
+                            } else {
+                              setBannerMessage(data.error ?? "Save failed");
+                            }
+                          } catch (e) {
+                            setBannerMessage(String(e));
+                          } finally {
+                            setBannerSaving(false);
+                          }
+                        }}
+                        className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700 disabled:opacity-50"
+                      >
+                        {bannerSaving ? "Saving…" : "Save banner"}
+                      </button>
+                      {bannerMessage && (
+                        <span className={`text-sm ${bannerMessage === "Saved." ? "text-emerald-600 dark:text-emerald-400" : "text-amber-600 dark:text-amber-400"}`}>
+                          {bannerMessage}
+                        </span>
+                      )}
+                    </div>
                   </div>
                 )}
               </div>

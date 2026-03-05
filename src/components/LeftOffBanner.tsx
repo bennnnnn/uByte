@@ -17,7 +17,7 @@ export default function LeftOffBanner({ href, label }: Props) {
               You left off at
             </p>
             <p className="text-xs text-violet-600 dark:text-violet-400">
-              Pick up where you left off
+              {label}
             </p>
           </div>
         </div>

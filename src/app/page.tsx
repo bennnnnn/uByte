@@ -4,6 +4,7 @@ import Link from "next/link";
 import { getAllTutorials } from "@/lib/tutorials";
 import { getAllPracticeProblems, getPracticeProblemBySlug } from "@/lib/practice/problems";
 import { LANGUAGES, getAllLanguageSlugs } from "@/lib/languages/registry";
+import { getLangIcon } from "@/lib/languages/icons";
 import { BASE_URL } from "@/lib/constants";
 import { getExamConfig, getLastActivity } from "@/lib/db";
 import { tutorialLangUrl, tutorialUrl } from "@/lib/urls";
@@ -41,15 +42,6 @@ export const metadata: Metadata = {
       "Interactive lessons in Go, Python, C++, JavaScript, Java, and Rust. Prepare for interviews. Write and run real code in your browser.",
     type: "website",
   },
-};
-
-const LANGUAGE_ICONS: Record<string, string> = {
-  go: "🐹",
-  python: "🐍",
-  cpp: "⚙️",
-  javascript: "🟨",
-  java: "☕",
-  rust: "🦀",
 };
 
 export default async function Home() {
@@ -102,7 +94,7 @@ export default async function Home() {
   }
 
   return (
-    <div id="main-content" className="min-h-0 flex-1 overflow-y-auto">
+    <div className="min-h-0 flex-1 overflow-y-auto">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
@@ -146,7 +138,7 @@ export default async function Home() {
                 slug={slug}
                 name={config.name}
                 description={config.seo.defaultDescription}
-                icon={LANGUAGE_ICONS[slug] ?? "📝"}
+                icon={getLangIcon(slug)}
                 tutorialCount={topicCount}
                 href={tutorialLangUrl(slug)}
               />
@@ -169,7 +161,7 @@ export default async function Home() {
             <Link
               key={slug}
               href={tutorialLangUrl(slug)}
-              className="font-medium text-zinc-500 transition-colors hover:text-indigo-600 dark:text-zinc-500 dark:hover:text-indigo-400"
+              className="font-medium text-zinc-500 transition-colors hover:text-indigo-600 hover:underline dark:text-zinc-500 dark:hover:text-indigo-400"
             >
               {config.name} tutorials
             </Link>

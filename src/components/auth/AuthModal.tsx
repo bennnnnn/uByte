@@ -10,11 +10,13 @@ type ModalMode = "login" | "signup" | "forgot";
 
 interface Props {
   onClose: () => void;
+  /** When true, open in signup mode (e.g. from banner link /?signup=1). */
+  initialMode?: "login" | "signup";
 }
 
-export default function AuthModal({ onClose }: Props) {
+export default function AuthModal({ onClose, initialMode }: Props) {
   const { login, signup } = useAuth();
-  const [mode, setMode] = useState<ModalMode>("login");
+  const [mode, setMode] = useState<ModalMode>(initialMode ?? "login");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");

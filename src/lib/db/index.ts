@@ -26,3 +26,4 @@ export * from "./exam-questions";
 export * from "./exam-attempts";
 export * from "./exam-certificates";
 export * from "./exam-settings";
+export * from "./site-banner";

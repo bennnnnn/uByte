@@ -250,6 +250,7 @@ export default function HeroSection({ topicCount = 19, problemCount = 11 }: Hero
                       key={l}
                       type="button"
                       onClick={() => setLang(l)}
+                      aria-current={l === lang ? "true" : undefined}
                       className={`shrink-0 rounded-md px-3 py-1 text-[11px] font-semibold transition-all ${
                         l === lang
                           ? "bg-indigo-600 text-white"
@@ -300,23 +301,17 @@ export default function HeroSection({ topicCount = 19, problemCount = 11 }: Hero
                 ))}
               </div>
 
-              {/* Action bar */}
-              <div className="flex items-center gap-2 border-t border-zinc-100 bg-zinc-50 px-4 py-2.5 dark:border-zinc-700 dark:bg-zinc-800/80">
-                <button
-                  type="button"
-                  className="flex items-center gap-1.5 rounded-lg bg-indigo-600 px-3.5 py-1.5 text-[11px] font-bold text-white shadow shadow-indigo-600/20 transition-colors hover:bg-indigo-500"
-                >
+              {/* Action bar (decorative demo only) */}
+              <div aria-hidden className="flex items-center gap-2 border-t border-zinc-100 bg-zinc-50 px-4 py-2.5 dark:border-zinc-700 dark:bg-zinc-800/80">
+                <span className="flex items-center gap-1.5 rounded-lg bg-indigo-600 px-3.5 py-1.5 text-[11px] font-bold text-white shadow shadow-indigo-600/20">
                   <svg className="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
                     <path d="M6.3 2.84A1.5 1.5 0 004 4.11v11.78a1.5 1.5 0 002.3 1.27l9.344-5.891a1.5 1.5 0 000-2.538L6.3 2.84z" />
                   </svg>
                   Run
-                </button>
-                <button
-                  type="button"
-                  className="flex items-center gap-1.5 rounded-lg border border-emerald-200 bg-emerald-50 px-3.5 py-1.5 text-[11px] font-bold text-emerald-600 transition-colors hover:bg-emerald-100"
-                >
+                </span>
+                <span className="flex items-center gap-1.5 rounded-lg border border-emerald-200 bg-emerald-50 px-3.5 py-1.5 text-[11px] font-bold text-emerald-600">
                   ✓ Check
-                </button>
+                </span>
                 <span className="ml-auto text-[10px] text-zinc-300 dark:text-zinc-500">◉ Format</span>
               </div>
 

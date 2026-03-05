@@ -1,20 +1,12 @@
 import Link from "next/link";
 import { LANGUAGES, getAllLanguageSlugs } from "@/lib/languages/registry";
+import { getLangIcon } from "@/lib/languages/icons";
 
 /* Amber accent so Practice exams are visually distinct from Interview practice (indigo). */
 const CARD_STYLE =
   "border-amber-200 bg-gradient-to-br from-white to-amber-50/60 hover:border-amber-400 hover:shadow-amber-100 dark:border-amber-900/40 dark:from-zinc-900 dark:to-amber-950/20 dark:hover:border-amber-700";
 const BADGE_STYLE = "bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-400";
 const ARROW_STYLE = "text-amber-600 dark:text-amber-400";
-
-const LANG_ICONS: Record<string, string> = {
-  go: "🐹",
-  python: "🐍",
-  cpp: "⚙️",
-  javascript: "🟨",
-  java: "☕",
-  rust: "🦀",
-};
 
 interface Props {
   examSize: number;
@@ -68,7 +60,7 @@ export default function PracticeExamsSection({ examSize, examDurationMinutes }: 
               <div className="mb-3 flex items-center justify-between gap-2">
                 <div className="flex items-center gap-3">
                   <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber-50 text-xl shadow-sm dark:bg-amber-950/50">
-                    {LANG_ICONS[slug] ?? "📝"}
+                    {getLangIcon(slug)}
                   </span>
                   <h3 className="text-base font-bold text-zinc-900 dark:text-zinc-100">
                     {config.name}

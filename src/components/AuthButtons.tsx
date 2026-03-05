@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { useSearchParams } from "next/navigation";
 import { useAuth } from "./AuthProvider";
 import AuthModal from "./auth/AuthModal";
 import UserMenuDropdown from "./auth/UserMenuDropdown";
@@ -10,10 +11,21 @@ import { useIsMobile } from "@/hooks/useIsMobile";
 export default function AuthButtons() {
   const { user, loading } = useAuth();
   const isMobile = useIsMobile();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
   const [showModal, setShowModal] = useState(false);
+  const [signupMode, setSignupMode] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const [unreadCount, setUnreadCount] = useState(0);
+
+  // Open signup modal when URL has ?signup=1 (e.g. from banner "Sign up" link)
+  useEffect(() => {
+    if (searchParams.get("signup") === "1") {
+      setSignupMode(true);
+      setShowModal(true);
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     if (!user) return;
@@ -61,16 +73,24 @@ export default function AuthButtons() {
               <ThemeToggle className="flex h-8 w-8 items-center justify-center rounded text-zinc-500 transition-colors hover:bg-zinc-100 hover:text-zinc-800 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-200" />
             </div>
             <div className="p-2">
-              <button onClick={() => { setMenuOpen(false); setShowModal(true); }} className="flex w-full items-center rounded-lg px-3 py-2.5 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50 dark:text-zinc-300 dark:hover:bg-zinc-800">
+              <button onClick={() => { setMenuOpen(false); setSignupMode(false); setShowModal(true); }} className="flex w-full items-center rounded-lg px-3 py-2.5 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50 dark:text-zinc-300 dark:hover:bg-zinc-800">
                 Log in
               </button>
-              <button onClick={() => { setMenuOpen(false); setShowModal(true); }} className="flex w-full items-center rounded-lg bg-indigo-600 px-3 py-2.5 text-sm font-medium text-white transition-colors hover:bg-indigo-700">
+              <button onClick={() => { setMenuOpen(false); setSignupMode(true); setShowModal(true); }} className="flex w-full items-center rounded-lg bg-indigo-600 px-3 py-2.5 text-sm font-medium text-white transition-colors hover:bg-indigo-700">
                 Sign up
               </button>
             </div>
           </div>
         )}
-        {showModal && <AuthModal onClose={() => setShowModal(false)} />}
+        {showModal && (
+          <AuthModal
+            initialMode={signupMode ? "signup" : undefined}
+            onClose={() => {
+              setShowModal(false);
+              setSignupMode(false);
+            }}
+          />
+        )}
       </div>
     );
   }
@@ -78,10 +98,18 @@ export default function AuthButtons() {
   return (
     <>
       <div className="flex items-center gap-2">
-        <button onClick={() => setShowModal(true)} className="rounded-lg px-4 py-2 text-sm font-medium text-zinc-600 transition-colors hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-200">Log in</button>
-        <button onClick={() => setShowModal(true)} className="rounded-lg bg-indigo-700 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-indigo-800">Sign up</button>
+        <button onClick={() => { setSignupMode(false); setShowModal(true); }} className="rounded-lg px-4 py-2 text-sm font-medium text-zinc-600 transition-colors hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-200">Log in</button>
+        <button onClick={() => { setSignupMode(true); setShowModal(true); }} className="rounded-lg bg-indigo-700 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-indigo-800">Sign up</button>
       </div>
-      {showModal && <AuthModal onClose={() => setShowModal(false)} />}
+      {showModal && (
+        <AuthModal
+          initialMode={signupMode ? "signup" : undefined}
+          onClose={() => {
+            setShowModal(false);
+            setSignupMode(false);
+          }}
+        />
+      )}
     </>
   );
 }
