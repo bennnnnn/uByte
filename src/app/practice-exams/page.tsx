@@ -22,92 +22,106 @@ function ExamCard({
   examConfig,
   stats,
   publicStats,
+  isLoggedIn = false,
   variant = "default",
 }: {
   slug: string;
   examConfig: { examSize: number; examDurationMinutes: number };
   stats?: { attemptCount: number; lastPassed: boolean | null; hasCertificate: boolean };
   publicStats?: { usersTaken: number; attemptsSubmitted: number; passRatePercent: number };
+  isLoggedIn?: boolean;
   variant?: "default" | "try-again" | "passed";
 }) {
   const config = LANGUAGES[slug as keyof typeof LANGUAGES];
   if (!config) return null;
+
   const isPassed = stats?.hasCertificate ?? false;
   const tryAgain = stats && stats.attemptCount > 0 && !stats.lastPassed && !stats.hasCertificate;
-  const statUsersTaken = publicStats?.usersTaken ?? 0;
-  const statAttempts = publicStats?.attemptsSubmitted ?? 0;
-  const statPassRate = publicStats?.passRatePercent ?? 0;
-  const hasPublicStats = statUsersTaken > 0 || statAttempts > 0;
   const userAttempts = stats?.attemptCount ?? 0;
-  const ctaLabel = tryAgain && variant === "try-again" ? "Try again" : isPassed && variant === "passed" ? "View" : "Start";
+  const totalAttempts = publicStats?.attemptsSubmitted ?? 0;
+  const passRate = publicStats?.passRatePercent ?? 0;
+  const hasPublicStats = totalAttempts > 0;
+
+  const borderColor =
+    variant === "try-again"
+      ? "border-amber-200 dark:border-amber-800/60"
+      : variant === "passed"
+      ? "border-emerald-200 dark:border-emerald-900/50"
+      : "border-zinc-200 dark:border-zinc-800";
+
+  const accentColor =
+    variant === "try-again"
+      ? "from-amber-400 to-amber-200"
+      : variant === "passed"
+      ? "from-emerald-400 to-emerald-200"
+      : "from-indigo-500 to-indigo-300";
 
   return (
     <Link
       href={`/practice-exams/${slug}`}
-      className={`group relative overflow-hidden rounded-2xl border p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md
-        ${variant === "try-again" ? "border-amber-200 bg-white dark:border-amber-800/60 dark:bg-zinc-900" : ""}
-        ${variant === "passed" ? "border-emerald-200 bg-white dark:border-emerald-900/50 dark:bg-zinc-900" : ""}
-        ${variant === "default" ? "border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900" : ""}
-        hover:border-zinc-300 dark:hover:border-zinc-700 focus:outline-none focus:ring-2 focus:ring-indigo-500/40`}
+      className={`group relative flex flex-col overflow-hidden rounded-2xl border bg-white shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md dark:bg-zinc-900 ${borderColor} hover:border-zinc-300 dark:hover:border-zinc-700 focus:outline-none focus:ring-2 focus:ring-indigo-500/40`}
     >
-      {/* Accent */}
-      <div
-        className={`pointer-events-none absolute inset-x-0 top-0 h-1
-          ${variant === "try-again" ? "bg-gradient-to-r from-amber-400/70 via-amber-300/40 to-transparent" : ""}
-          ${variant === "passed" ? "bg-gradient-to-r from-emerald-400/70 via-emerald-300/40 to-transparent" : ""}
-          ${variant === "default" ? "bg-gradient-to-r from-indigo-400/60 via-indigo-300/20 to-transparent" : ""}`}
-      />
+      {/* Top accent bar */}
+      <div className={`h-1 w-full bg-gradient-to-r ${accentColor}`} />
 
-      <div className="flex items-start gap-4">
-        <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-zinc-200 bg-zinc-50 text-2xl dark:border-zinc-700 dark:bg-zinc-800/60">
-          {getLangIcon(slug)}
-        </span>
-
-        <div className="min-w-0 flex-1">
-          <div className="flex flex-wrap items-start justify-between gap-3">
-            <div className="min-w-0">
-              <h3 className="truncate text-base font-semibold text-zinc-900 dark:text-zinc-100">
-                {config.name} Practice Exam
-              </h3>
-              <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
-                {examConfig.examSize} questions · {examConfig.examDurationMinutes} min · 70% to pass
-              </p>
-            </div>
-
-            <div className="flex shrink-0 items-center gap-2">
-              {isPassed && (
-                <span className="inline-flex items-center rounded-full bg-emerald-100 px-2.5 py-1 text-xs font-semibold text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300">
-                  Passed
-                </span>
-              )}
-              {tryAgain && !isPassed && userAttempts > 0 && (
-                <span className="inline-flex items-center rounded-full bg-amber-100 px-2.5 py-1 text-xs font-semibold text-amber-800 dark:bg-amber-900/50 dark:text-amber-200">
-                  {userAttempts} attempt{userAttempts !== 1 ? "s" : ""}
-                </span>
-              )}
-              <span className="inline-flex items-center justify-center rounded-xl bg-indigo-600 px-3 py-2 text-xs font-semibold text-white shadow-sm transition-colors group-hover:bg-indigo-500 dark:shadow-none">
-                {ctaLabel} →
-              </span>
-            </div>
+      <div className="flex flex-col gap-4 p-5">
+        {/* Header: icon + title + CTA */}
+        <div className="flex items-center gap-3">
+          <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-zinc-200 bg-zinc-50 text-2xl dark:border-zinc-700 dark:bg-zinc-800">
+            {getLangIcon(slug)}
+          </span>
+          <div className="min-w-0 flex-1">
+            <h3 className="truncate font-semibold text-zinc-900 dark:text-zinc-100">
+              {config.name}
+            </h3>
+            <p className="text-xs text-zinc-500 dark:text-zinc-400">Practice Exam</p>
           </div>
+          <div className="flex shrink-0 items-center gap-1.5">
+            {isPassed && (
+              <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-semibold text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300">
+                Passed ✓
+              </span>
+            )}
+            {tryAgain && !isPassed && (
+              <span className="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-semibold text-amber-800 dark:bg-amber-900/50 dark:text-amber-200">
+                {userAttempts} attempt{userAttempts !== 1 ? "s" : ""}
+              </span>
+            )}
+            <span className="rounded-xl bg-indigo-600 px-3 py-1.5 text-xs font-semibold text-white transition-colors group-hover:bg-indigo-500">
+              {tryAgain ? "Try again →" : isPassed ? "View →" : "Start →"}
+            </span>
+          </div>
+        </div>
 
-          <div className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-2">
-            <div className="flex items-center justify-between rounded-xl border border-indigo-200 bg-indigo-50/70 px-3 py-2 dark:border-indigo-900/60 dark:bg-indigo-950/20">
-              <span className="text-xs font-medium text-indigo-700 dark:text-indigo-300">Your attempts</span>
-              <span className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">{userAttempts}</span>
-            </div>
-            <div className="flex items-center justify-between rounded-xl border border-zinc-200 bg-zinc-50 px-3 py-2 dark:border-zinc-700 dark:bg-zinc-800/40">
-              <span className="text-xs font-medium text-zinc-600 dark:text-zinc-300">Total attempts</span>
-              <span className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">{hasPublicStats ? statAttempts.toLocaleString() : "0"}</span>
-            </div>
-            <div className="flex items-center justify-between rounded-xl border border-zinc-200 bg-zinc-50 px-3 py-2 dark:border-zinc-700 dark:bg-zinc-800/40">
-              <span className="text-xs font-medium text-zinc-600 dark:text-zinc-300">Users</span>
-              <span className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">{hasPublicStats ? statUsersTaken.toLocaleString() : "0"}</span>
-            </div>
-            <div className="flex items-center justify-between rounded-xl border border-zinc-200 bg-zinc-50 px-3 py-2 dark:border-zinc-700 dark:bg-zinc-800/40">
-              <span className="text-xs font-medium text-zinc-600 dark:text-zinc-300">Pass rate</span>
-              <span className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">{hasPublicStats ? `${statPassRate}%` : "New"}</span>
-            </div>
+        {/* Divider */}
+        <div className="h-px bg-zinc-100 dark:bg-zinc-800" />
+
+        {/* Stats grid: always 4 cells */}
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+          <div>
+            <p className="text-[11px] font-medium uppercase tracking-wide text-zinc-400 dark:text-zinc-500">Questions</p>
+            <p className="mt-0.5 text-base font-bold text-zinc-900 dark:text-zinc-100">{examConfig.examSize}</p>
+          </div>
+          <div>
+            <p className="text-[11px] font-medium uppercase tracking-wide text-zinc-400 dark:text-zinc-500">Time</p>
+            <p className="mt-0.5 text-base font-bold text-zinc-900 dark:text-zinc-100">{examConfig.examDurationMinutes} min</p>
+          </div>
+          <div>
+            <p className="text-[11px] font-medium uppercase tracking-wide text-zinc-400 dark:text-zinc-500">Attempts</p>
+            <p className="mt-0.5 text-base font-bold text-zinc-900 dark:text-zinc-100">
+              {isLoggedIn
+                ? `${userAttempts} / ${hasPublicStats ? totalAttempts.toLocaleString() : "0"}`
+                : hasPublicStats ? totalAttempts.toLocaleString() : "—"}
+            </p>
+            {isLoggedIn && (
+              <p className="text-[10px] text-zinc-400 dark:text-zinc-500">yours / total</p>
+            )}
+          </div>
+          <div>
+            <p className="text-[11px] font-medium uppercase tracking-wide text-zinc-400 dark:text-zinc-500">Pass rate</p>
+            <p className={`mt-0.5 text-base font-bold ${hasPublicStats ? (passRate >= 50 ? "text-emerald-600 dark:text-emerald-400" : "text-amber-600 dark:text-amber-400") : "text-zinc-900 dark:text-zinc-100"}`}>
+              {hasPublicStats ? `${passRate}%` : "New"}
+            </p>
           </div>
         </div>
       </div>
@@ -240,6 +254,7 @@ export default async function PracticeExamsPage() {
                     examConfig={examConfig}
                     stats={statsByLang[lang]}
                     publicStats={publicStatsByLang[lang]}
+                    isLoggedIn={!!user}
                     variant="default"
                   />
                 );
@@ -281,6 +296,7 @@ export default async function PracticeExamsPage() {
                     examConfig={examConfig}
                     stats={statsByLang[lang]}
                     publicStats={publicStatsByLang[lang]}
+                    isLoggedIn={!!user}
                     variant="try-again"
                   />
                 );
@@ -310,6 +326,7 @@ export default async function PracticeExamsPage() {
                     examConfig={examConfig}
                     stats={statsByLang[lang]}
                     publicStats={publicStatsByLang[lang]}
+                    isLoggedIn={!!user}
                     variant="passed"
                   />
                 );
@@ -338,6 +355,7 @@ export default async function PracticeExamsPage() {
                   examConfig={examConfig}
                   stats={statsByLang[slug]}
                   publicStats={publicStatsByLang[slug]}
+                  isLoggedIn={!!user}
                   variant="default"
                 />
               );
