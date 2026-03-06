@@ -4,7 +4,7 @@ import { useState, useCallback, useEffect, useRef, Suspense } from "react";
 import Link from "next/link";
 import { DIFFICULTY_BADGE, type PracticeProblem, type ProblemCategory } from "@/lib/practice/types";
 import type { SupportedLanguage } from "@/lib/languages/types";
-import { getStarterForLanguage, getAllPracticeProblems, getCategoryForSlug, getPracticeCategories } from "@/lib/practice/problems";
+import { getStarterForLanguage, getAllPracticeProblems, getCategoryForSlug, getPracticeCategories, sortProblemsByCategoryAndDifficulty } from "@/lib/practice/problems";
 import { LANGUAGES } from "@/lib/languages/registry";
 import { useCodeEditor } from "@/hooks/useCodeEditor";
 import { usePanelResize } from "@/hooks/usePanelResize";
@@ -12,6 +12,7 @@ import ThemeToggle from "@/components/ThemeToggle";
 import AuthButtons from "@/components/AuthButtons";
 import ShortcutsModal from "@/components/tutorial/ShortcutsModal";
 import ProblemSidebar from "@/components/practice/ProblemSidebar";
+import GripDots from "@/components/GripDots";
 import type { PracticeAttemptStatus } from "@/lib/db/practice-attempts";
 
 const LANG_ORDER: SupportedLanguage[] = ["go", "python", "cpp", "javascript", "java", "rust"];
@@ -27,32 +28,6 @@ interface Props {
   listStatus?: "solved" | "unsolved";
   /** Difficulty filter on the list; preserved in sidebar links. */
   listDifficulty?: string;
-}
-
-/** Three grip dots — identical to InteractiveTutorial */
-function GripDots({ vertical }: { vertical?: boolean }) {
-  return (
-    <div className={`absolute inset-0 flex items-center justify-center opacity-0 transition-opacity group-hover:opacity-100 ${vertical ? "flex-col gap-0.5" : "gap-0.5"}`}>
-      {[0, 1, 2].map((i) => (
-        <div key={i} className="h-1 w-1 rounded-full bg-zinc-400 dark:bg-zinc-500" />
-      ))}
-    </div>
-  );
-}
-
-function sortProblemsByCategoryAndDifficulty(
-  problems: PracticeProblem[],
-  categoryOrder: ProblemCategory[]
-): PracticeProblem[] {
-  return [...problems].sort((a, b) => {
-    const ca = getCategoryForSlug(a.slug) ?? ("array" as ProblemCategory);
-    const cb = getCategoryForSlug(b.slug) ?? ("array" as ProblemCategory);
-    const ia = categoryOrder.indexOf(ca);
-    const ib = categoryOrder.indexOf(cb);
-    if (ia !== ib) return ia - ib;
-    const diffOrder: Record<string, number> = { easy: 0, medium: 1, hard: 2 };
-    return (diffOrder[a.difficulty] ?? 0) - (diffOrder[b.difficulty] ?? 0);
-  });
 }
 
 export function PracticeIDE({ problem, initialLang, categoryFilter = null, listPage = 1, listStatus, listDifficulty }: Props) {
@@ -306,6 +281,15 @@ export function PracticeIDE({ problem, initialLang, categoryFilter = null, listP
     }
   }, [verdict?.submissionId]);
 
+  const canSubmit = !!problem.testCases?.length;
+  const sidebarProps = {
+    problems: sidebarProblems,
+    activeSlug: problem.slug,
+    lang,
+    statuses,
+    listQuery: { category: categoryFilter ?? undefined, page: listPage > 1 ? listPage : undefined, status: listStatus, difficulty: listDifficulty },
+  } as const;
+
   function handleReset() {
     editor.setCode(getStarterForLanguage(problem, lang));
     editor.setErrorLines(new Set());
@@ -409,14 +393,7 @@ export function PracticeIDE({ problem, initialLang, categoryFilter = null, listP
               </button>
             </div>
             <div className="h-[calc(100%-3rem)] overflow-y-auto">
-              <ProblemSidebar
-                problems={sidebarProblems}
-                activeSlug={problem.slug}
-                lang={lang}
-                onCollapse={() => setMobileSidebarOpen(false)}
-                statuses={statuses}
-                listQuery={{ category: categoryFilter ?? undefined, page: listPage > 1 ? listPage : undefined, status: listStatus, difficulty: listDifficulty }}
-              />
+              <ProblemSidebar {...sidebarProps} onCollapse={() => setMobileSidebarOpen(false)} />
             </div>
           </div>
         </div>
@@ -447,14 +424,7 @@ export function PracticeIDE({ problem, initialLang, categoryFilter = null, listP
         <aside className="hidden shrink-0 md:flex">
           {sidebarOpen ? (
             <div className="flex w-60">
-              <ProblemSidebar
-                problems={sidebarProblems}
-                activeSlug={problem.slug}
-                lang={lang}
-                onCollapse={() => setSidebarOpen(false)}
-                statuses={statuses}
-                listQuery={{ category: categoryFilter ?? undefined, page: listPage > 1 ? listPage : undefined, status: listStatus, difficulty: listDifficulty }}
-              />
+              <ProblemSidebar {...sidebarProps} onCollapse={() => setSidebarOpen(false)} />
             </div>
           ) : (
             <button
@@ -615,7 +585,7 @@ export function PracticeIDE({ problem, initialLang, categoryFilter = null, listP
               {running ? "Running…" : "▶ Run"}
             </button>
 
-            {problem.testCases?.length && (lang === "go" || lang === "python" || lang === "javascript" || lang === "cpp" || lang === "java" || lang === "rust") && (
+            {canSubmit && (
               <button
                 type="button"
                 onClick={handleSubmit}
@@ -738,10 +708,11 @@ export function PracticeIDE({ problem, initialLang, categoryFilter = null, listP
                 {verdict.consecutiveFailures != null && verdict.consecutiveFailures >= 2 && (
                   <span className="text-xs text-zinc-500 dark:text-zinc-400">Want a hint?</span>
                 )}
-                <button type="button" onClick={() => requestAiFeedback(1)} disabled={aiLoading} className="rounded-md bg-zinc-200 px-2.5 py-1.5 text-xs font-medium text-zinc-800 hover:bg-zinc-300 disabled:opacity-50 dark:bg-zinc-700 dark:text-zinc-200 dark:hover:bg-zinc-600">Hint</button>
-                <button type="button" onClick={() => requestAiFeedback(2)} disabled={aiLoading} className="rounded-md bg-zinc-200 px-2.5 py-1.5 text-xs font-medium text-zinc-800 hover:bg-zinc-300 disabled:opacity-50 dark:bg-zinc-700 dark:text-zinc-200 dark:hover:bg-zinc-600">Explain</button>
-                <button type="button" onClick={() => requestAiFeedback(3)} disabled={aiLoading} className="rounded-md bg-zinc-200 px-2.5 py-1.5 text-xs font-medium text-zinc-800 hover:bg-zinc-300 disabled:opacity-50 dark:bg-zinc-700 dark:text-zinc-200 dark:hover:bg-zinc-600">Suggest fix</button>
-                <button type="button" onClick={() => requestAiFeedback(4)} disabled={aiLoading} className="rounded-md bg-zinc-200 px-2.5 py-1.5 text-xs font-medium text-zinc-800 hover:bg-zinc-300 disabled:opacity-50 dark:bg-zinc-700 dark:text-zinc-200 dark:hover:bg-zinc-600">Teach</button>
+                {([[1, "Hint"], [2, "Explain"], [3, "Suggest fix"], [4, "Teach"]] as const).map(([level, label]) => (
+                  <button key={level} type="button" onClick={() => requestAiFeedback(level)} disabled={aiLoading} className="rounded-md bg-zinc-200 px-2.5 py-1.5 text-xs font-medium text-zinc-800 hover:bg-zinc-300 disabled:opacity-50 dark:bg-zinc-700 dark:text-zinc-200 dark:hover:bg-zinc-600">
+                    {label}
+                  </button>
+                ))}
               </div>
             )}
             {/* 4) Inline AI — "Analyzing…" only when /api/ai-feedback is in flight */}
@@ -791,7 +762,7 @@ export function PracticeIDE({ problem, initialLang, categoryFilter = null, listP
           >
             {running ? "…" : "▶ Run"}
           </button>
-          {problem.testCases?.length && (lang === "go" || lang === "python" || lang === "javascript" || lang === "cpp" || lang === "java" || lang === "rust") && (
+          {canSubmit && (
             <button
               type="button"
               onClick={handleSubmit}

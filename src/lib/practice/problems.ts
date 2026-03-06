@@ -1,4 +1,4 @@
-import type { PracticeProblem, ProblemCategory } from "./types";
+import type { PracticeProblem, ProblemCategory, Difficulty } from "./types";
 import type { SupportedLanguage } from "@/lib/languages/types";
 import { EASY_PROBLEMS } from "./problems-easy";
 import { MEDIUM_PROBLEMS } from "./problems-medium";
@@ -84,6 +84,23 @@ export function getPracticeCategories(): ProblemCategory[] {
     if (c) set.add(c);
   }
   return Array.from(set).sort((a, b) => CATEGORY_LABELS[a].localeCompare(CATEGORY_LABELS[b]));
+}
+
+// ─── Sorting ─────────────────────────────────────────────────────────────────
+
+export function sortProblemsByCategoryAndDifficulty<T extends { slug: string; difficulty: Difficulty }>(
+  problems: T[],
+  categoryOrder: ProblemCategory[]
+): T[] {
+  const diffOrder: Record<string, number> = { easy: 0, medium: 1, hard: 2 };
+  return [...problems].sort((a, b) => {
+    const ca = getCategoryForSlug(a.slug) ?? ("array" as ProblemCategory);
+    const cb = getCategoryForSlug(b.slug) ?? ("array" as ProblemCategory);
+    const ia = categoryOrder.indexOf(ca);
+    const ib = categoryOrder.indexOf(cb);
+    if (ia !== ib) return ia - ib;
+    return (diffOrder[a.difficulty] ?? 0) - (diffOrder[b.difficulty] ?? 0);
+  });
 }
 
 // ─── Helpers ────────────────────────────────────────────────────────────────

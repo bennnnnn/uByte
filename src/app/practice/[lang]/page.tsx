@@ -4,6 +4,7 @@ import {
   getAllPracticeProblems,
   getCategoryForSlug,
   getPracticeCategories,
+  sortProblemsByCategoryAndDifficulty,
 } from "@/lib/practice/problems";
 import { isSupportedLanguage, LANGUAGES } from "@/lib/languages/registry";
 import type { SupportedLanguage } from "@/lib/languages/types";
@@ -38,25 +39,6 @@ export async function generateStaticParams() {
   return langs.map((lang) => ({ lang }));
 }
 
-function getEffectiveCategory(slug: string): ProblemCategory | null {
-  return getCategoryForSlug(slug);
-}
-
-function sortProblemsByCategoryAndDifficulty<T extends { slug: string; difficulty: Difficulty }>(
-  problems: T[],
-  categoryOrder: ProblemCategory[]
-): T[] {
-  return [...problems].sort((a, b) => {
-    const ca = getEffectiveCategory(a.slug) ?? ("array" as ProblemCategory);
-    const cb = getEffectiveCategory(b.slug) ?? ("array" as ProblemCategory);
-    const ia = categoryOrder.indexOf(ca);
-    const ib = categoryOrder.indexOf(cb);
-    if (ia !== ib) return ia - ib;
-    const diffOrder: Record<Difficulty, number> = { easy: 0, medium: 1, hard: 2 };
-    return diffOrder[a.difficulty] - diffOrder[b.difficulty];
-  });
-}
-
 export default async function PracticeLangPage({ params, searchParams }: Props) {
   const { lang } = await params;
   const sp = await searchParams;
@@ -78,7 +60,7 @@ export default async function PracticeLangPage({ params, searchParams }: Props) 
   let filtered =
     categoryFilter === null
       ? allProblems
-      : allProblems.filter((p) => getEffectiveCategory(p.slug) === categoryFilter);
+      : allProblems.filter((p) => getCategoryForSlug(p.slug) === categoryFilter);
 
   const statusFilter = sp.status === "solved" || sp.status === "unsolved" ? sp.status : null;
   if (statusFilter === "solved") {
