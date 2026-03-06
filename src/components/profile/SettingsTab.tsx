@@ -51,7 +51,7 @@ export default function SettingsTab({ profile, onSave, onChangePassword, onDelet
       <PasswordSection profile={profile} onChangePassword={onChangePassword} onToast={toast} />
       <AppearanceSection editTheme={editTheme} onChangeTheme={setEditTheme} />
       <div>
-        <button onClick={handleSave} disabled={saving} className="rounded-lg bg-indigo-700 px-6 py-2.5 text-sm font-medium text-white hover:bg-indigo-800 disabled:opacity-50">
+        <button onClick={handleSave} disabled={saving} className="rounded-lg bg-indigo-700 px-6 py-2.5 text-sm font-medium text-white hover:bg-indigo-800 dark:bg-indigo-600 dark:hover:bg-indigo-700 disabled:opacity-50">
           {saving ? "Saving..." : "Save Changes"}
         </button>
       </div>

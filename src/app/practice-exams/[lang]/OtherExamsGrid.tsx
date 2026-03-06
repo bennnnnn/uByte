@@ -7,9 +7,10 @@ interface Props {
   currentLang: string;
   langSlugs: string[];
   examConfigByLang: Record<string, { examSize: number; examDurationMinutes: number }>;
+  passPercent: number;
 }
 
-export default function OtherExamsGrid({ currentLang, langSlugs, examConfigByLang }: Props) {
+export default function OtherExamsGrid({ currentLang, langSlugs, examConfigByLang, passPercent }: Props) {
   const others = langSlugs.filter((slug) => slug !== currentLang);
   if (others.length === 0) return null;
 
@@ -24,7 +25,7 @@ export default function OtherExamsGrid({ currentLang, langSlugs, examConfigByLan
             Other exams
           </h2>
           <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
-            Each exam is independently timed and scored. 70% to pass.
+            Each exam is independently timed and scored. {passPercent}% to pass.
           </p>
         </div>
         <Link

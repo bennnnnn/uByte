@@ -41,7 +41,14 @@ export default function SnapshotDrawer({ slug, stepIndex, lang = "go", onRestore
   return (
     <>
       {/* Backdrop */}
-      <div className="fixed inset-0 z-[55] bg-black/40" onClick={onClose} />
+      <div
+        className="fixed inset-0 z-[55] bg-black/40"
+        role="button"
+        aria-label="Close drawer"
+        tabIndex={0}
+        onClick={onClose}
+        onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onClose(); } }}
+      />
 
       {/* Drawer */}
       <div className="fixed inset-y-0 right-0 z-[56] flex w-80 flex-col border-l border-zinc-200 bg-white shadow-xl dark:border-zinc-800 dark:bg-zinc-900">

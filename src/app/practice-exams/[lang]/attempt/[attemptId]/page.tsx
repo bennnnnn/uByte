@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { LANGUAGES } from "@/lib/languages/registry";
 import type { SupportedLanguage } from "@/lib/languages/types";
-import { EXAM_DURATION_MINUTES } from "@/lib/exams/config"; // fallback when API omits durationMinutes
+import { EXAM_DURATION_MINUTES } from "@/lib/exams/config";
 import type { AttemptPayload, SubmitExamResponse } from "@/lib/exams/api-types";
 import { parseJson, getApiErrorMessage } from "@/lib/fetch-utils";
 
@@ -22,6 +22,13 @@ export default function PracticeExamAttemptPage() {
   const [showSubmitConfirm, setShowSubmitConfirm] = useState(false);
   const [showLeaveConfirm, setShowLeaveConfirm] = useState(false);
   const [pendingLeaveUrl, setPendingLeaveUrl] = useState<string | null>(null);
+  const [passPercent, setPassPercent] = useState(70);
+
+  useEffect(() => {
+    fetch("/api/site-settings").then((r) => r.ok ? r.json() : null).then((d) => {
+      if (d?.examPassPercent) setPassPercent(d.examPassPercent);
+    }).catch(() => {});
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -176,7 +183,10 @@ export default function PracticeExamAttemptPage() {
   if (loading) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
-        <p className="text-sm text-zinc-500">Loading exam…</p>
+        <div className="flex items-center justify-center gap-3 py-12">
+          <div className="h-5 w-5 animate-spin rounded-full border-2 border-zinc-300 border-t-zinc-600 dark:border-zinc-600 dark:border-t-zinc-400" />
+          <span className="text-sm text-zinc-500 dark:text-zinc-400">Loading exam…</span>
+        </div>
       </div>
     );
   }
@@ -185,7 +195,7 @@ export default function PracticeExamAttemptPage() {
     return (
       <div className="flex min-h-[60vh] items-center justify-center px-4">
         <div className="max-w-md text-center">
-          <p className="mb-3 text-sm text-red-500">
+          <p className="mb-3 text-sm text-red-500 dark:text-red-400">
             {error || "Exam not found."}
           </p>
           <Link
@@ -213,7 +223,7 @@ export default function PracticeExamAttemptPage() {
               {langConfig?.name ?? attempt.lang} Exam
             </h1>
             <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
-              {totalQuestions} multiple-choice questions · 70% to pass ·{" "}
+              {totalQuestions} multiple-choice questions · {passPercent}% to pass ·{" "}
               {durationMinutes} minute time limit
             </p>
           </div>
@@ -364,14 +374,14 @@ export default function PracticeExamAttemptPage() {
             </p>
           )}
           {autoSubmitted && (
-            <p className="text-xs text-red-500">
+            <p className="text-xs text-red-500 dark:text-red-400">
               Time is up. Your exam is being submitted with the answers you provided.
             </p>
           )}
         </div>
 
         {error && (
-          <p className="mt-3 text-sm text-red-500">
+          <p className="mt-3 text-sm text-red-500 dark:text-red-400">
             {error}
           </p>
         )}

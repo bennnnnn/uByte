@@ -49,7 +49,8 @@ export function useCodeEditor(
     setFormatting(true);
     try {
       const body = new URLSearchParams({ body: code, imports: "true" });
-      const res = await fetch("https://go.dev/_/fmt", {
+      const goFmtUrl = process.env.NEXT_PUBLIC_GO_FMT_URL || "https://go.dev/_/fmt";
+      const res = await fetch(goFmtUrl, {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body: body.toString(),

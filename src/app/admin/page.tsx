@@ -54,6 +54,9 @@ export default function AdminPage() {
   const [bannerData, setBannerData] = useState<{ enabled: boolean; message: string; linkUrl: string; linkText: string } | null>(null);
   const [bannerSaving, setBannerSaving] = useState(false);
   const [bannerMessage, setBannerMessage] = useState<string | null>(null);
+  const [siteSettings, setSiteSettings] = useState<{ exam_pass_percent: string; monthly_price_cents: string; yearly_price_cents: string } | null>(null);
+  const [siteSettingsSaving, setSiteSettingsSaving] = useState(false);
+  const [siteSettingsMessage, setSiteSettingsMessage] = useState<string | null>(null);
 
   useEffect(() => {
     if (loading) return;
@@ -142,6 +145,22 @@ export default function AdminPage() {
       .then((r) => r.ok ? r.json() : null)
       .then((data) => {
         if (!cancelled && data) setBannerData({ enabled: !!data.enabled, message: data.message ?? "", linkUrl: data.linkUrl ?? "/", linkText: data.linkText ?? "Sign up" });
+      });
+    return () => { cancelled = true; };
+  }, [tab]);
+
+  useEffect(() => {
+    if (tab !== "settings") return;
+    setSiteSettings(null);
+    let cancelled = false;
+    fetch("/api/admin/site-settings", { credentials: "same-origin" })
+      .then((r) => r.ok ? r.json() : null)
+      .then((data) => {
+        if (!cancelled && data) setSiteSettings({
+          exam_pass_percent: data.exam_pass_percent ?? "70",
+          monthly_price_cents: data.monthly_price_cents ?? "999",
+          yearly_price_cents: data.yearly_price_cents ?? "4999",
+        });
       });
     return () => { cancelled = true; };
   }, [tab]);
@@ -262,7 +281,7 @@ export default function AdminPage() {
           <span className="font-semibold text-zinc-900 dark:text-zinc-100">Admin</span>
         </div>
         <nav className="flex-1 space-y-0.5 p-3">
-          {(["users", "analytics", "revenue", "audit", "exams", "banner"] as Tab[]).map((t) => (
+          {(["users", "analytics", "revenue", "audit", "exams", "banner", "settings"] as Tab[]).map((t) => (
             <button
               key={t}
               type="button"
@@ -275,7 +294,7 @@ export default function AdminPage() {
           ))}
         </nav>
         <div className="border-t border-zinc-200 p-3 dark:border-zinc-800">
-          <p className="truncate text-xs text-zinc-400 dark:text-zinc-500">{user?.email}</p>
+          <p className="truncate text-xs text-zinc-400 dark:text-zinc-500" title={user?.email ?? ""}>{user?.email}</p>
           <Link href="/" className="mt-1 block text-xs text-zinc-500 underline hover:text-zinc-700 dark:hover:text-zinc-400">Exit admin</Link>
         </div>
       </aside>
@@ -292,13 +311,14 @@ export default function AdminPage() {
               {tab === "audit" && "Admin actions"}
               {tab === "exams" && "Questions, attempts & upload"}
               {tab === "banner" && "Announcements, discounts, outages"}
+              {tab === "settings" && "Pricing, exam pass threshold, global config"}
             </p>
           </div>
           {tab === "users" && (
             <div className="flex items-center gap-3">
               <div className="relative">
                 <svg className="absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
-                <input type="search" value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search users…" className="w-56 rounded-lg border border-zinc-200 bg-zinc-50 py-2 pl-8 pr-3 text-sm text-zinc-900 placeholder-zinc-400 focus:border-zinc-400 focus:outline-none dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100" />
+                <input type="search" value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search users…" aria-label="Search users" className="w-56 rounded-lg border border-zinc-200 bg-zinc-50 py-2 pl-8 pr-3 text-sm text-zinc-900 placeholder-zinc-400 focus:border-zinc-400 focus:outline-none dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100" />
               </div>
               <button type="button" onClick={async () => { const r = await fetch("/api/admin/users?export=csv", { credentials: "same-origin" }); if (!r.ok) return; const blob = await r.blob(); const url = URL.createObjectURL(blob); const a = document.createElement("a"); a.href = url; a.download = "users.csv"; a.click(); URL.revokeObjectURL(url); }} className="rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm font-medium text-zinc-700 hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700">Export CSV</button>
             </div>
@@ -873,6 +893,128 @@ export default function AdminPage() {
                       {bannerMessage && (
                         <span className={`text-sm ${bannerMessage === "Saved." ? "text-emerald-600 dark:text-emerald-400" : "text-amber-600 dark:text-amber-400"}`}>
                           {bannerMessage}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* ── Site settings tab ── */}
+          {tab === "settings" && (
+            <div className="max-w-2xl space-y-6">
+              <div className="rounded-xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+                <h2 className="mb-1 text-sm font-semibold text-zinc-700 dark:text-zinc-300">Site settings</h2>
+                <p className="mb-5 text-xs text-zinc-500 dark:text-zinc-400">
+                  These values are used across the site. Pricing changes are display-only — update Paddle separately.
+                </p>
+                {siteSettings === null ? (
+                  <div className="flex items-center gap-3 py-6">
+                    <div className="h-5 w-5 animate-spin rounded-full border-2 border-zinc-300 border-t-zinc-600 dark:border-zinc-600 dark:border-t-zinc-400" />
+                    <span className="text-sm text-zinc-500 dark:text-zinc-400">Loading settings…</span>
+                  </div>
+                ) : (
+                  <div className="space-y-5">
+                    <div>
+                      <label className="mb-1.5 block text-xs font-medium text-zinc-600 dark:text-zinc-400">Exam pass threshold (%)</label>
+                      <div className="flex items-center gap-3">
+                        <input
+                          type="number"
+                          min={1}
+                          max={100}
+                          value={siteSettings.exam_pass_percent}
+                          onChange={(e) => setSiteSettings((s) => s ? { ...s, exam_pass_percent: e.target.value } : s)}
+                          className="w-24 rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm text-right dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-200"
+                        />
+                        <span className="text-xs text-zinc-400 dark:text-zinc-500">Minimum score to pass an exam and earn a certificate</span>
+                      </div>
+                    </div>
+                    <div className="h-px bg-zinc-100 dark:bg-zinc-800" />
+                    <div>
+                      <label className="mb-1.5 block text-xs font-medium text-zinc-600 dark:text-zinc-400">Monthly Pro price (cents)</label>
+                      <div className="flex items-center gap-3">
+                        <input
+                          type="number"
+                          min={0}
+                          value={siteSettings.monthly_price_cents}
+                          onChange={(e) => setSiteSettings((s) => s ? { ...s, monthly_price_cents: e.target.value } : s)}
+                          className="w-28 rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm text-right dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-200"
+                        />
+                        <span className="text-xs text-zinc-400 dark:text-zinc-500">
+                          = ${(parseInt(siteSettings.monthly_price_cents, 10) / 100).toFixed(2)}/month
+                        </span>
+                      </div>
+                    </div>
+                    <div>
+                      <label className="mb-1.5 block text-xs font-medium text-zinc-600 dark:text-zinc-400">Yearly Pro price (cents)</label>
+                      <div className="flex items-center gap-3">
+                        <input
+                          type="number"
+                          min={0}
+                          value={siteSettings.yearly_price_cents}
+                          onChange={(e) => setSiteSettings((s) => s ? { ...s, yearly_price_cents: e.target.value } : s)}
+                          className="w-28 rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm text-right dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-200"
+                        />
+                        <span className="text-xs text-zinc-400 dark:text-zinc-500">
+                          = ${(parseInt(siteSettings.yearly_price_cents, 10) / 100).toFixed(2)}/year
+                          {" "}(${(parseInt(siteSettings.yearly_price_cents, 10) / 1200).toFixed(2)}/mo)
+                        </span>
+                      </div>
+                    </div>
+                    {(() => {
+                      const m = parseInt(siteSettings.monthly_price_cents, 10) || 0;
+                      const y = parseInt(siteSettings.yearly_price_cents, 10) || 0;
+                      const ifMonthly = m * 12;
+                      const savings = ifMonthly - y;
+                      const discountPct = ifMonthly > 0 ? Math.round((savings / ifMonthly) * 100) : 0;
+                      return (
+                        <div className="rounded-lg bg-zinc-50 p-3 text-xs text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400">
+                          Yearly savings: ${(savings / 100).toFixed(2)} · Discount: {discountPct}% · Monthly equivalent: ${(y / 1200).toFixed(2)}/mo
+                        </div>
+                      );
+                    })()}
+                    <div className="flex items-center gap-3 pt-1">
+                      <button
+                        type="button"
+                        disabled={siteSettingsSaving}
+                        onClick={async () => {
+                          if (!siteSettings) return;
+                          setSiteSettingsSaving(true);
+                          setSiteSettingsMessage(null);
+                          try {
+                            const res = await fetch("/api/admin/site-settings", {
+                              method: "PUT",
+                              credentials: "same-origin",
+                              headers: { "Content-Type": "application/json" },
+                              body: JSON.stringify(siteSettings),
+                            });
+                            const data = await res.json();
+                            if (res.ok) {
+                              setSiteSettings({
+                                exam_pass_percent: data.exam_pass_percent ?? siteSettings.exam_pass_percent,
+                                monthly_price_cents: data.monthly_price_cents ?? siteSettings.monthly_price_cents,
+                                yearly_price_cents: data.yearly_price_cents ?? siteSettings.yearly_price_cents,
+                              });
+                              setSiteSettingsMessage("Saved.");
+                              setTimeout(() => setSiteSettingsMessage(null), 3000);
+                            } else {
+                              setSiteSettingsMessage(data.error ?? "Save failed");
+                            }
+                          } catch (e) {
+                            setSiteSettingsMessage(String(e));
+                          } finally {
+                            setSiteSettingsSaving(false);
+                          }
+                        }}
+                        className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700 disabled:opacity-50"
+                      >
+                        {siteSettingsSaving ? "Saving…" : "Save settings"}
+                      </button>
+                      {siteSettingsMessage && (
+                        <span className={`text-sm ${siteSettingsMessage === "Saved." ? "text-emerald-600 dark:text-emerald-400" : "text-amber-600 dark:text-amber-400"}`}>
+                          {siteSettingsMessage}
                         </span>
                       )}
                     </div>

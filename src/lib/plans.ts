@@ -18,6 +18,19 @@ export function hasPaidAccess(plan?: string | null): boolean {
 
 // ─── Pricing + Paddle config (shared between client and server) ──────────────
 
+export const MONTHLY_PRICE_CENTS = 999;
+export const YEARLY_PRICE_CENTS = 4999;
+export const MONTHLY_EQUIVALENT_CENTS = Math.round(YEARLY_PRICE_CENTS / 12);
+export const YEARLY_IF_MONTHLY_CENTS = MONTHLY_PRICE_CENTS * 12;
+export const YEARLY_SAVINGS_CENTS = YEARLY_IF_MONTHLY_CENTS - YEARLY_PRICE_CENTS;
+export const YEARLY_DISCOUNT_PERCENT = Math.round(
+  ((YEARLY_IF_MONTHLY_CENTS - YEARLY_PRICE_CENTS) / YEARLY_IF_MONTHLY_CENTS) * 100
+);
+
+function formatUsd(cents: number): string {
+  return "$" + (cents / 100).toFixed(2);
+}
+
 /** Display + Paddle configuration for each billing option. */
 export const BILLING_CONFIG: Record<
   BillingPlan,
@@ -30,13 +43,13 @@ export const BILLING_CONFIG: Record<
 > = {
   yearly: {
     label: "Yearly Pro",
-    priceText: "$49.99/year",
-    subLabel: "Save $70 vs monthly",
+    priceText: `${formatUsd(YEARLY_PRICE_CENTS)}/year`,
+    subLabel: `Save ${formatUsd(YEARLY_SAVINGS_CENTS)} vs monthly`,
     badge: "Best value",
   },
   monthly: {
     label: "Monthly Pro",
-    priceText: "$9.99/month",
+    priceText: `${formatUsd(MONTHLY_PRICE_CENTS)}/month`,
     subLabel: "Cancel anytime",
   },
 };

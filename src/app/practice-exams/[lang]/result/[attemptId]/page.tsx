@@ -14,6 +14,13 @@ export default function PracticeExamResultPage() {
   const [result, setResult] = useState<ExamResultResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [passPercent, setPassPercent] = useState(70);
+
+  useEffect(() => {
+    fetch("/api/site-settings").then((r) => r.ok ? r.json() : null).then((d) => {
+      if (d?.examPassPercent) setPassPercent(d.examPassPercent);
+    }).catch(() => {});
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -54,7 +61,10 @@ export default function PracticeExamResultPage() {
   if (loading) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center" aria-live="polite">
-        <p className="text-sm text-zinc-500">Loading result…</p>
+        <div className="flex items-center justify-center gap-3 py-12">
+          <div className="h-5 w-5 animate-spin rounded-full border-2 border-zinc-300 border-t-zinc-600 dark:border-zinc-600 dark:border-t-zinc-400" />
+          <span className="text-sm text-zinc-500 dark:text-zinc-400">Loading result…</span>
+        </div>
       </div>
     );
   }
@@ -102,11 +112,11 @@ export default function PracticeExamResultPage() {
           <p className="mt-3 text-sm font-medium">
             {passed ? (
               <span className="text-emerald-600 dark:text-emerald-400">
-                ✅ You passed! A score of 70% or higher is required to earn a certificate.
+                ✅ You passed! A score of {passPercent}% or higher is required to earn a certificate.
               </span>
             ) : (
               <span className="text-red-600 dark:text-red-400">
-                ❌ You didn&apos;t reach 70%. Review the material and try again.
+                ❌ You didn&apos;t reach {passPercent}%. Review the material and try again.
               </span>
             )}
           </p>

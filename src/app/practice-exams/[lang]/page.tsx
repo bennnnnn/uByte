@@ -8,6 +8,7 @@ import { getUserPlan, getExamConfigForLang, getExamConfigForAllLangs } from "@/l
 import { hasPaidAccess } from "@/lib/plans";
 import { getLangIcon } from "@/lib/languages/icons";
 import { getExamDetailContent } from "@/lib/exams/content";
+import { getExamPassPercent } from "@/lib/db/site-settings";
 import StartExamButton from "./StartExamButton";
 import ExamDetailTabs from "./ExamDetailTabs";
 import OtherExamsGrid from "./OtherExamsGrid";
@@ -22,10 +23,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { lang } = await params;
   const config = LANGUAGES[lang as SupportedLanguage];
   const name = config?.name ?? lang;
-  const examConfig = await getExamConfigForLang(lang);
+  const [examConfig, passPercent] = await Promise.all([getExamConfigForLang(lang), getExamPassPercent()]);
   return {
     title: `${name} Practice Exam`,
-    description: `Take the ${name} practice exam. ${examConfig.examSize} questions, ${examConfig.examDurationMinutes} minutes. Score 70%+ to earn a certificate.`,
+    description: `Take the ${name} practice exam. ${examConfig.examSize} questions, ${examConfig.examDurationMinutes} minutes. Score ${passPercent}%+ to earn a certificate.`,
   };
 }
 
@@ -33,19 +34,20 @@ export default async function PracticeExamLangPage({ params }: Props) {
   const { lang } = await params;
   if (!VALID_LANGS.has(lang)) notFound();
 
-  const [user, examConfig, examConfigByLang] = await Promise.all([
+  const [user, examConfig, examConfigByLang, EXAM_PASS_PERCENT] = await Promise.all([
     getCurrentUser(),
     getExamConfigForLang(lang),
     getExamConfigForAllLangs(),
+    getExamPassPercent(),
   ]);
   const plan = user ? await getUserPlan(user.userId) : "free";
   const canTakeExam = hasPaidAccess(plan);
 
   const config = LANGUAGES[lang as SupportedLanguage];
   const name = config?.name ?? lang;
-  const content = getExamDetailContent(lang, examConfig);
+  const content = getExamDetailContent(lang, examConfig, EXAM_PASS_PERCENT);
   const langSlugs = getAllLanguageSlugs();
-  const passMin = Math.ceil((examConfig.examSize * 70) / 100);
+  const passMin = Math.ceil((examConfig.examSize * EXAM_PASS_PERCENT) / 100);
 
   return (
     <div className="min-h-full overflow-y-auto bg-zinc-50 dark:bg-zinc-950">
@@ -77,7 +79,7 @@ export default async function PracticeExamLangPage({ params }: Props) {
                   {[
                     { label: `${examConfig.examSize} questions` },
                     { label: `${examConfig.examDurationMinutes} min` },
-                    { label: `${passMin} correct to pass (70%)` },
+                    { label: `${passMin} correct to pass (${EXAM_PASS_PERCENT}%)` },
                     { label: "Certificate on pass" },
                   ].map(({ label }) => (
                     <span
@@ -105,6 +107,7 @@ export default async function PracticeExamLangPage({ params }: Props) {
               content={content}
               examSize={examConfig.examSize}
               examDurationMinutes={examConfig.examDurationMinutes}
+              passPercent={EXAM_PASS_PERCENT}
             />
           </div>
 
@@ -127,7 +130,7 @@ export default async function PracticeExamLangPage({ params }: Props) {
                       {[
                         `${examConfig.examSize} randomised questions`,
                         `${examConfig.examDurationMinutes} min — can't be paused`,
-                        `${passMin} correct (70%) to pass`,
+                        `${passMin} correct (${EXAM_PASS_PERCENT}%) to pass`,
                         "Certificate sent on pass",
                         "Retake anytime",
                       ].map((item) => (
@@ -193,6 +196,7 @@ export default async function PracticeExamLangPage({ params }: Props) {
           currentLang={lang}
           langSlugs={langSlugs}
           examConfigByLang={examConfigByLang}
+          passPercent={EXAM_PASS_PERCENT}
         />
       </div>
     </div>

@@ -224,7 +224,7 @@ export default function InteractiveTutorial({
             <span className="text-sm font-bold text-zinc-800 dark:text-zinc-100">uByte</span>
           </Link>
         </div>
-        <h1 className="min-w-0 max-w-[45%] flex-1 truncate text-center text-sm font-semibold text-zinc-800 dark:text-zinc-100 md:max-w-[40%] md:flex-initial">{tutorialTitle}</h1>
+        <h1 className="min-w-0 max-w-[45%] flex-1 truncate text-center text-sm font-semibold text-zinc-800 dark:text-zinc-100 md:max-w-[40%] md:flex-initial" title={tutorialTitle}>{tutorialTitle}</h1>
         <div className="flex flex-1 justify-end gap-3 md:flex-initial">
           {user && (
             <>
@@ -279,8 +279,8 @@ export default function InteractiveTutorial({
         ))}
         {/* Font size controls — mobile only */}
         <div className="flex items-center gap-0.5 px-2">
-          <button onClick={() => { const s = fontSize === 18 ? 16 : 14; setFontSize(s); try { localStorage.setItem("ide-font-size", String(s)); } catch { /* ignore */ } }} className="rounded px-1.5 py-1 text-xs text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800">A⁻</button>
-          <button onClick={() => { const s = fontSize === 14 ? 16 : 18; setFontSize(s); try { localStorage.setItem("ide-font-size", String(s)); } catch { /* ignore */ } }} className="rounded px-1.5 py-1 text-xs text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800">A⁺</button>
+          <button onClick={() => { const s = fontSize === 18 ? 16 : 14; setFontSize(s); try { localStorage.setItem("ide-font-size", String(s)); } catch { /* ignore */ } }} aria-label="Decrease font size" className="rounded px-1.5 py-1 text-xs text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800">A⁻</button>
+          <button onClick={() => { const s = fontSize === 14 ? 16 : 18; setFontSize(s); try { localStorage.setItem("ide-font-size", String(s)); } catch { /* ignore */ } }} aria-label="Increase font size" className="rounded px-1.5 py-1 text-xs text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800">A⁺</button>
         </div>
       </div>
 
@@ -421,13 +421,13 @@ export default function InteractiveTutorial({
               <option key={l} value={l}>{LANGUAGES[l].name}</option>
             ))}
           </select>
-          <button onClick={() => stepProgress.handleRun(editor.code, editor.setErrorLines)} disabled={stepProgress.status === "running"} className="flex flex-1 items-center justify-center gap-1 rounded-md bg-green-100 py-2 text-sm font-medium text-green-800 disabled:opacity-50 dark:bg-green-900/40 dark:text-green-300">
+          <button onClick={() => stepProgress.handleRun(editor.code, editor.setErrorLines)} disabled={stepProgress.status === "running"} aria-label={stepProgress.status === "running" ? "Running" : "Run code"} className="flex flex-1 items-center justify-center gap-1 rounded-md bg-green-100 py-2 text-sm font-medium text-green-800 disabled:opacity-50 dark:bg-green-900/40 dark:text-green-300">
             {stepProgress.status === "running" ? "…" : "▶ Run"}
           </button>
-          <button onClick={() => stepProgress.handleCheck(editor.code, currentStep, editor.setCode, editor.setErrorLines)} disabled={stepProgress.status === "running"} className="flex flex-1 items-center justify-center gap-1 rounded-md bg-indigo-700 py-2 text-sm font-medium text-white disabled:opacity-50">
+          <button onClick={() => stepProgress.handleCheck(editor.code, currentStep, editor.setCode, editor.setErrorLines)} disabled={stepProgress.status === "running"} aria-label="Check answer" className="flex flex-1 items-center justify-center gap-1 rounded-md bg-indigo-700 py-2 text-sm font-medium text-white disabled:opacity-50">
             ✓ Check
           </button>
-          <button onClick={() => stepProgress.handleReset(currentStep, editor.setCode, editor.setErrorLines)} className="flex shrink-0 items-center justify-center rounded-md border border-zinc-300 px-3 py-2 text-sm text-zinc-500 dark:border-zinc-700 dark:text-zinc-400">
+          <button onClick={() => stepProgress.handleReset(currentStep, editor.setCode, editor.setErrorLines)} aria-label="Reset" className="flex shrink-0 items-center justify-center rounded-md border border-zinc-300 px-3 py-2 text-sm text-zinc-500 dark:border-zinc-700 dark:text-zinc-400">
             Reset
           </button>
         </div>

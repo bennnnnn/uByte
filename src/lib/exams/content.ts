@@ -24,9 +24,9 @@ export interface ExamDetailContent {
   faq?: { question: string; answer: string }[];
 }
 
-function buildGoContent(cfg: ExamConfigNumbers): ExamDetailContent {
+function buildGoContent(cfg: ExamConfigNumbers, passPercent: number): ExamDetailContent {
   const { examSize, examDurationMinutes } = cfg;
-  const passMin = Math.ceil((examSize * 70) / 100);
+  const passMin = Math.ceil((examSize * passPercent) / 100);
   return {
     tagline: "Validate your Go fundamentals with a timed, multiple-choice assessment.",
     objective:
@@ -44,15 +44,15 @@ function buildGoContent(cfg: ExamConfigNumbers): ExamDetailContent {
       "Context and net/http basics",
       "Testing (go test) and tooling (gofmt, go mod)",
     ],
-    rules: buildRules(examSize, examDurationMinutes, passMin),
+    rules: buildRules(examSize, examDurationMinutes, passMin, passPercent),
     audience: "Developers who have completed the Go tutorials or have equivalent experience.",
-    faq: buildFaq(examSize, examDurationMinutes, passMin),
+    faq: buildFaq(examSize, examDurationMinutes, passMin, passPercent),
   };
 }
 
-function buildPythonContent(cfg: ExamConfigNumbers): ExamDetailContent {
+function buildPythonContent(cfg: ExamConfigNumbers, passPercent: number): ExamDetailContent {
   const { examSize, examDurationMinutes } = cfg;
-  const passMin = Math.ceil((examSize * 70) / 100);
+  const passMin = Math.ceil((examSize * passPercent) / 100);
   return {
     tagline: "Prove your Python fundamentals with a timed, multiple-choice assessment.",
     objective:
@@ -70,15 +70,15 @@ function buildPythonContent(cfg: ExamConfigNumbers): ExamDetailContent {
       "Decorators and generators",
       "Common standard library modules (os, json, re, collections)",
     ],
-    rules: buildRules(examSize, examDurationMinutes, passMin),
+    rules: buildRules(examSize, examDurationMinutes, passMin, passPercent),
     audience: "Developers who have completed the Python tutorials or have equivalent scripting experience.",
-    faq: buildFaq(examSize, examDurationMinutes, passMin),
+    faq: buildFaq(examSize, examDurationMinutes, passMin, passPercent),
   };
 }
 
-function buildJavaScriptContent(cfg: ExamConfigNumbers): ExamDetailContent {
+function buildJavaScriptContent(cfg: ExamConfigNumbers, passPercent: number): ExamDetailContent {
   const { examSize, examDurationMinutes } = cfg;
-  const passMin = Math.ceil((examSize * 70) / 100);
+  const passMin = Math.ceil((examSize * passPercent) / 100);
   return {
     tagline: "Test your JavaScript knowledge with a timed, multiple-choice assessment.",
     objective:
@@ -96,15 +96,15 @@ function buildJavaScriptContent(cfg: ExamConfigNumbers): ExamDetailContent {
       "DOM basics and event handling",
       "JSON, fetch, and working with APIs",
     ],
-    rules: buildRules(examSize, examDurationMinutes, passMin),
+    rules: buildRules(examSize, examDurationMinutes, passMin, passPercent),
     audience: "Developers who have completed the JavaScript tutorials or have equivalent web development experience.",
-    faq: buildFaq(examSize, examDurationMinutes, passMin),
+    faq: buildFaq(examSize, examDurationMinutes, passMin, passPercent),
   };
 }
 
-function buildJavaContent(cfg: ExamConfigNumbers): ExamDetailContent {
+function buildJavaContent(cfg: ExamConfigNumbers, passPercent: number): ExamDetailContent {
   const { examSize, examDurationMinutes } = cfg;
-  const passMin = Math.ceil((examSize * 70) / 100);
+  const passMin = Math.ceil((examSize * passPercent) / 100);
   return {
     tagline: "Validate your Java fundamentals with a timed, multiple-choice assessment.",
     objective:
@@ -122,15 +122,15 @@ function buildJavaContent(cfg: ExamConfigNumbers): ExamDetailContent {
       "Concurrency basics: threads, Runnable, synchronized",
       "Packages, access modifiers, and the module system",
     ],
-    rules: buildRules(examSize, examDurationMinutes, passMin),
+    rules: buildRules(examSize, examDurationMinutes, passMin, passPercent),
     audience: "Developers who have completed the Java tutorials or have equivalent OOP experience.",
-    faq: buildFaq(examSize, examDurationMinutes, passMin),
+    faq: buildFaq(examSize, examDurationMinutes, passMin, passPercent),
   };
 }
 
-function buildRustContent(cfg: ExamConfigNumbers): ExamDetailContent {
+function buildRustContent(cfg: ExamConfigNumbers, passPercent: number): ExamDetailContent {
   const { examSize, examDurationMinutes } = cfg;
-  const passMin = Math.ceil((examSize * 70) / 100);
+  const passMin = Math.ceil((examSize * passPercent) / 100);
   return {
     tagline: "Prove your Rust knowledge with a timed, multiple-choice assessment.",
     objective:
@@ -148,15 +148,15 @@ function buildRustContent(cfg: ExamConfigNumbers): ExamDetailContent {
       "Modules, crates, and the use keyword",
       "String types: String vs &str",
     ],
-    rules: buildRules(examSize, examDurationMinutes, passMin),
+    rules: buildRules(examSize, examDurationMinutes, passMin, passPercent),
     audience: "Developers who have completed the Rust tutorials or have equivalent systems programming experience.",
-    faq: buildFaq(examSize, examDurationMinutes, passMin),
+    faq: buildFaq(examSize, examDurationMinutes, passMin, passPercent),
   };
 }
 
-function buildCppContent(cfg: ExamConfigNumbers): ExamDetailContent {
+function buildCppContent(cfg: ExamConfigNumbers, passPercent: number): ExamDetailContent {
   const { examSize, examDurationMinutes } = cfg;
-  const passMin = Math.ceil((examSize * 70) / 100);
+  const passMin = Math.ceil((examSize * passPercent) / 100);
   return {
     tagline: "Test your C++ fundamentals with a timed, multiple-choice assessment.",
     objective:
@@ -174,24 +174,24 @@ function buildCppContent(cfg: ExamConfigNumbers): ExamDetailContent {
       "Lambda expressions and std::function",
       "Exception handling and error management",
     ],
-    rules: buildRules(examSize, examDurationMinutes, passMin),
+    rules: buildRules(examSize, examDurationMinutes, passMin, passPercent),
     audience: "Developers who have completed the C++ tutorials or have equivalent systems programming experience.",
-    faq: buildFaq(examSize, examDurationMinutes, passMin),
+    faq: buildFaq(examSize, examDurationMinutes, passMin, passPercent),
   };
 }
 
-function buildRules(examSize: number, examDurationMinutes: number, passMin: number): string[] {
+function buildRules(examSize: number, examDurationMinutes: number, passMin: number, passPercent: number): string[] {
   return [
     `${examSize} multiple-choice questions.`,
     `${examDurationMinutes} minutes. The timer starts when you begin and cannot be paused.`,
-    `You need 70% or higher (${passMin} correct answers) to pass.`,
+    `You need ${passPercent}% or higher (${passMin} correct answers) to pass.`,
     "Questions and answer order are randomized each attempt.",
     "One attempt per exam session. You can retake the exam in a new session after completion.",
     "Passing earns a shareable certificate.",
   ];
 }
 
-function buildFaq(examSize: number, examDurationMinutes: number, passMin: number): { question: string; answer: string }[] {
+function buildFaq(examSize: number, examDurationMinutes: number, passMin: number, passPercent: number): { question: string; answer: string }[] {
   return [
     {
       question: "How long is the exam?",
@@ -203,7 +203,7 @@ function buildFaq(examSize: number, examDurationMinutes: number, passMin: number
     },
     {
       question: "What score do I need to pass?",
-      answer: `You need 70% or higher (at least ${passMin} correct answers out of ${examSize}) to pass and earn your certificate.`,
+      answer: `You need ${passPercent}% or higher (at least ${passMin} correct answers out of ${examSize}) to pass and earn your certificate.`,
     },
     {
       question: "Can I retake the exam?",
@@ -211,7 +211,7 @@ function buildFaq(examSize: number, examDurationMinutes: number, passMin: number
     },
     {
       question: "Do I get a certificate?",
-      answer: "Yes. When you pass with 70% or higher, you receive a shareable certificate that you can link to from your profile or resume.",
+      answer: `Yes. When you pass with ${passPercent}% or higher, you receive a shareable certificate that you can link to from your profile or resume.`,
     },
     {
       question: "What if I run out of time?",
@@ -222,16 +222,17 @@ function buildFaq(examSize: number, examDurationMinutes: number, passMin: number
 
 export function getExamDetailContent(
   lang: string,
-  config?: ExamConfigNumbers
+  config?: ExamConfigNumbers,
+  passPercent = 70,
 ): ExamDetailContent | null {
   const cfg = config ?? { examSize: EXAM_SIZE, examDurationMinutes: EXAM_DURATION_MINUTES };
   switch (lang) {
-    case "go": return buildGoContent(cfg);
-    case "python": return buildPythonContent(cfg);
-    case "javascript": return buildJavaScriptContent(cfg);
-    case "java": return buildJavaContent(cfg);
-    case "rust": return buildRustContent(cfg);
-    case "cpp": return buildCppContent(cfg);
+    case "go": return buildGoContent(cfg, passPercent);
+    case "python": return buildPythonContent(cfg, passPercent);
+    case "javascript": return buildJavaScriptContent(cfg, passPercent);
+    case "java": return buildJavaContent(cfg, passPercent);
+    case "rust": return buildRustContent(cfg, passPercent);
+    case "cpp": return buildCppContent(cfg, passPercent);
     default: return null;
   }
 }

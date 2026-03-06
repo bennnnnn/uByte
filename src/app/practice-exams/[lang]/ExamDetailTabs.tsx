@@ -70,9 +70,10 @@ interface Props {
   content: ExamDetailContent | null;
   examSize: number;
   examDurationMinutes: number;
+  passPercent: number;
 }
 
-export default function ExamDetailTabs({ langName, content, examSize, examDurationMinutes }: Props) {
+export default function ExamDetailTabs({ langName, content, examSize, examDurationMinutes, passPercent }: Props) {
   const [activeTab, setActiveTab] = useState<TabId>("overview");
 
   const tagline =
@@ -80,7 +81,7 @@ export default function ExamDetailTabs({ langName, content, examSize, examDurati
     `Timed multiple-choice exam to validate your ${langName} knowledge.`;
   const objective =
     content?.objective ??
-    `This exam tests core ${langName} concepts. Score 70% or higher to pass and earn a certificate.`;
+    `This exam tests core ${langName} concepts. Score ${passPercent}% or higher to pass and earn a certificate.`;
   const topics =
     content?.topics ?? [
       "Language syntax and types",
@@ -96,11 +97,11 @@ export default function ExamDetailTabs({ langName, content, examSize, examDurati
       },
       {
         question: "How many questions?",
-        answer: `${examSize} multiple-choice questions. You need 70% or higher to pass.`,
+        answer: `${examSize} multiple-choice questions. You need ${passPercent}% or higher to pass.`,
       },
       {
         question: "Do I get a certificate?",
-        answer: "Yes. Passing with 70% or higher earns you a shareable certificate.",
+        answer: `Yes. Passing with ${passPercent}% or higher earns you a shareable certificate.`,
       },
     ];
 

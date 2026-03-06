@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { LANGUAGES, getAllLanguageSlugs } from "@/lib/languages/registry";
 import { getLangIcon } from "@/lib/languages/icons";
+import { getExamPassPercent } from "@/lib/db/site-settings";
 
 /* Amber accent so Practice exams are visually distinct from Interview practice (indigo). */
 const CARD_STYLE =
@@ -13,8 +14,9 @@ interface Props {
   examConfigByLang: Record<string, { examSize: number; examDurationMinutes: number }>;
 }
 
-export default function PracticeExamsSection({ examConfigByLang }: Props) {
+export default async function PracticeExamsSection({ examConfigByLang }: Props) {
   const langSlugs = getAllLanguageSlugs();
+  const EXAM_PASS_PERCENT = await getExamPassPercent();
 
   return (
     <section aria-labelledby="practice-exams-heading" className="space-y-5">
@@ -31,7 +33,7 @@ export default function PracticeExamsSection({ examConfigByLang }: Props) {
             </span>
           </div>
           <p className="mb-5 text-sm text-zinc-600 dark:text-zinc-400">
-            Timed multiple-choice exams by language. Questions and duration set per language. Score at least 70% to pass and earn a certificate.
+            Timed multiple-choice exams by language. Questions and duration set per language. Score at least {EXAM_PASS_PERCENT}% to pass and earn a certificate.
           </p>
 
           <Link
@@ -73,7 +75,7 @@ export default function PracticeExamsSection({ examConfigByLang }: Props) {
               </div>
 
               <p className="flex-1 text-sm leading-relaxed text-zinc-500 dark:text-zinc-400">
-                {examConfig.examDurationMinutes} min · 70% to pass · Certificate
+                {examConfig.examDurationMinutes} min · {EXAM_PASS_PERCENT}% to pass · Certificate
               </p>
 
               <div className={`mt-4 flex items-center gap-1 text-sm font-semibold transition-[gap] group-hover:gap-2 ${ARROW_STYLE}`}>

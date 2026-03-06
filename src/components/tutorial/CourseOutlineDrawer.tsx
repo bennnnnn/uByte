@@ -46,7 +46,14 @@ export default function CourseOutlineDrawer({
   return (
     <>
       {show && (
-        <div className="fixed inset-0 z-[54] bg-black/50" onClick={onClose} />
+        <div
+          className="fixed inset-0 z-[54] bg-black/50"
+          role="button"
+          aria-label="Close drawer"
+          tabIndex={0}
+          onClick={onClose}
+          onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onClose(); } }}
+        />
       )}
       <div
         className={`fixed left-0 top-12 bottom-0 z-[55] flex w-72 flex-col border-r border-zinc-200 bg-zinc-50 transition-transform duration-200 dark:border-zinc-800 dark:bg-zinc-900 ${
@@ -59,6 +66,7 @@ export default function CourseOutlineDrawer({
           </span>
           <button
             onClick={onClose}
+            aria-label="Close"
             className="flex h-7 w-7 items-center justify-center rounded text-zinc-400 transition-colors hover:bg-zinc-200 hover:text-zinc-700 dark:text-zinc-500 dark:hover:bg-zinc-800 dark:hover:text-zinc-200"
           >✕</button>
         </div>

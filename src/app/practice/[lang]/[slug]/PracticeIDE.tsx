@@ -381,7 +381,7 @@ export function PracticeIDE({ problem, initialLang, categoryFilter = null, listP
         </div>
 
         {/* Breadcrumb */}
-        <h1 className="min-w-0 max-w-[45%] flex-1 truncate text-center text-sm font-semibold text-zinc-800 dark:text-zinc-100 md:max-w-[40%] md:flex-initial">
+        <h1 className="min-w-0 max-w-[45%] flex-1 truncate text-center text-sm font-semibold text-zinc-800 dark:text-zinc-100 md:max-w-[40%] md:flex-initial" title={problem.title}>
           {problem.title}
           <span className={`ml-2 inline-block rounded-full px-2 py-0.5 text-xs font-medium capitalize align-middle ${DIFFICULTY_STYLES[problem.difficulty]}`}>
             {problem.difficulty}

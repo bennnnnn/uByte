@@ -3,7 +3,7 @@ import { forwardRef } from "react";
 const VARIANTS = {
   primary:   "bg-indigo-700 text-white hover:bg-indigo-800 dark:bg-indigo-600 dark:hover:bg-indigo-700",
   secondary: "border border-zinc-300 text-zinc-700 hover:bg-zinc-50 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800",
-  danger:    "bg-red-600 text-white hover:bg-red-700",
+  danger:    "bg-red-600 text-white hover:bg-red-700 dark:bg-red-900 dark:text-red-200 dark:hover:bg-red-800",
   ghost:     "text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-200",
 } as const;
 

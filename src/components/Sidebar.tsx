@@ -109,7 +109,7 @@ export default function Sidebar({ lang, tutorials }: { lang: string; tutorials: 
                     <span className={`shrink-0 rounded px-1.5 py-0.5 text-[10px] font-bold uppercase ${r.matchType === "tutorial" ? "bg-indigo-100 text-indigo-700 dark:bg-indigo-950 dark:text-indigo-400" : "bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400"}`}>
                       {r.matchType === "tutorial" ? "Tutorial" : "Step"}
                     </span>
-                    <span className="truncate text-sm font-medium text-zinc-800 dark:text-zinc-200">
+                    <span className="truncate text-sm font-medium text-zinc-800 dark:text-zinc-200" title={r.stepTitle ?? r.title}>
                       {r.stepTitle ?? r.title}
                     </span>
                   </div>

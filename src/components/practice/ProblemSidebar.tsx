@@ -112,7 +112,7 @@ export default function ProblemSidebar({
                 </span>
 
                 {/* Title */}
-                <span className="flex-1 truncate font-medium leading-snug">
+                <span className="flex-1 truncate font-medium leading-snug" title={p.title}>
                   {p.title}
                 </span>
 

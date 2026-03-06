@@ -4,6 +4,7 @@ import { getAttempt, lockAttemptForSubmit, saveAnswersBatch, submitAttempt } fro
 import { getCorrectAndExplanationBatch } from "@/lib/db/exam-questions";
 import { createCertificate } from "@/lib/db/exam-certificates";
 import { withErrorHandling } from "@/lib/api-utils";
+import { getExamPassPercent } from "@/lib/db/site-settings";
 
 export const POST = withErrorHandling(
   "POST /api/practice-exams/attempt/[attemptId]/submit",
@@ -65,7 +66,8 @@ export const POST = withErrorHandling(
 
     const total = attempt.question_ids_json.length;
     const score = Math.round((correct / total) * 100);
-    const passed = score >= 70;
+    const passPercent = await getExamPassPercent();
+    const passed = score >= passPercent;
 
     // Update with final score (submitted_at was already set by lockAttemptForSubmit)
     await submitAttempt(attemptId, score, passed);

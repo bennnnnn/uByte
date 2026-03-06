@@ -6,7 +6,7 @@ import { getSteps } from "@/lib/tutorial-steps";
 import { getTutorialBySlug } from "@/lib/tutorials";
 import type { SupportedLanguage } from "@/lib/languages/types";
 
-const GROK_URL = "https://api.x.ai/v1/chat/completions";
+const GROK_URL = process.env.XAI_API_URL || "https://api.x.ai/v1/chat/completions";
 const GROK_MODEL = "grok-4";
 
 const DEFAULT_LANG: SupportedLanguage = "go";

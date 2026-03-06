@@ -62,7 +62,7 @@ export default function LeaderboardPage() {
   if (error) {
     return (
       <div className="flex min-h-[50vh] flex-col items-center justify-center gap-4 px-4">
-        <p className="text-sm text-red-500">{error}</p>
+        <p className="text-sm text-red-500 dark:text-red-400">{error}</p>
         <div className="flex flex-wrap justify-center gap-3">
           <button
             type="button"
@@ -163,7 +163,7 @@ export default function LeaderboardPage() {
 
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2">
-                      <Link href={`/u/${u.id}`} className="truncate font-medium text-zinc-900 hover:text-indigo-600 dark:text-zinc-100 dark:hover:text-indigo-400">{u.name}</Link>
+                      <Link href={`/u/${u.id}`} className="truncate font-medium text-zinc-900 hover:text-indigo-600 dark:text-zinc-100 dark:hover:text-indigo-400" title={u.name}>{u.name}</Link>
                       {isYou && (
                         <span className="shrink-0 rounded bg-indigo-100 px-1.5 py-0.5 text-[10px] font-semibold text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-300">
                           You

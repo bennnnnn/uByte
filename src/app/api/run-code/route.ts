@@ -35,7 +35,8 @@ export const POST = withErrorHandling("POST /api/run-code", async (request: Next
     // ── Go: go.dev playground (best error messages + vet) ────────────────────
     if (lang === "go") {
       const urlParams = new URLSearchParams({ version: "2", body: code, withVet: "true" });
-      const res = await fetch("https://go.dev/_/compile", {
+      const goCompileUrl = process.env.GO_COMPILE_URL || "https://go.dev/_/compile";
+      const res = await fetch(goCompileUrl, {
         method:  "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body:    urlParams.toString(),
