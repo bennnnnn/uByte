@@ -21,39 +21,81 @@ const MAX_EXAM_SIZE = 200;
 
 /**
  * Keys in site_settings for fallback when exam_lang_settings table is missing.
- * We use exam_questions_per_attempt (not exam_size) so the "questions per exam" value
- * is never confused with the total question bank count (e.g. 160). Total questions
- * come from COUNT(exam_questions), not from site_settings.
+ * Per-language keys so updating one exam doesn't change others: exam_questions_per_attempt_go, exam_duration_minutes_go, etc.
  */
-const SITE_KEY_QUESTIONS_PER_EXAM = "exam_questions_per_attempt";
-const SITE_KEY_DURATION_MINUTES = "exam_duration_minutes";
-/** Legacy key; if present and <= 100 we use it, else ignore (may have been set to bank count by mistake). */
+function siteKeyQuestionsPerExam(lang: string): string {
+  return `exam_questions_per_attempt_${lang}`;
+}
+function siteKeyDurationMinutes(lang: string): string {
+  return `exam_duration_minutes_${lang}`;
+}
+/** Legacy global keys (single value for all langs); used only when per-lang keys are missing. */
+const SITE_KEY_LEGACY_QUESTIONS = "exam_questions_per_attempt";
+const SITE_KEY_LEGACY_DURATION = "exam_duration_minutes";
 const SITE_KEY_LEGACY_EXAM_SIZE = "exam_size";
 
-/** Read "questions per exam" and duration from site_settings. Prefers exam_questions_per_attempt; ignores legacy exam_size if it looks like bank count (>100). */
-async function getExamConfigFromSiteSettings(): Promise<ExamConfig> {
+/** Read one lang from site_settings. Tries per-lang keys first, then legacy global keys. */
+async function getExamConfigFromSiteSettings(lang: string): Promise<ExamConfig> {
   try {
     const sql = getSql();
     const rows = await sql`
       SELECT key, value FROM site_settings
-      WHERE key IN (${SITE_KEY_QUESTIONS_PER_EXAM}, ${SITE_KEY_DURATION_MINUTES}, ${SITE_KEY_LEGACY_EXAM_SIZE})
+      WHERE key = ${siteKeyQuestionsPerExam(lang)} OR key = ${siteKeyDurationMinutes(lang)}
+         OR key IN (${SITE_KEY_LEGACY_QUESTIONS}, ${SITE_KEY_LEGACY_DURATION}, ${SITE_KEY_LEGACY_EXAM_SIZE})
     `;
     const map = new Map((rows as { key: string; value: string }[]).map((r) => [r.key, r.value]));
     let examSize: number;
-    const perAttempt = parseInt(map.get(SITE_KEY_QUESTIONS_PER_EXAM) ?? "", 10);
+    const perAttempt = parseInt(map.get(siteKeyQuestionsPerExam(lang)) ?? map.get(SITE_KEY_LEGACY_QUESTIONS) ?? "", 10);
     if (Number.isInteger(perAttempt) && perAttempt >= 1 && perAttempt <= MAX_EXAM_SIZE) {
       examSize = perAttempt;
     } else {
       const legacy = parseInt(map.get(SITE_KEY_LEGACY_EXAM_SIZE) ?? "", 10);
       examSize = Number.isInteger(legacy) && legacy >= 1 && legacy <= 100 ? legacy : DEFAULT_EXAM_SIZE;
     }
-    const examDurationMinutes = Math.max(5, Math.min(180, parseInt(map.get(SITE_KEY_DURATION_MINUTES) ?? "", 10) || DEFAULT_EXAM_DURATION_MINUTES));
+    const examDurationMinutes = Math.max(
+      5,
+      Math.min(180, parseInt(map.get(siteKeyDurationMinutes(lang)) ?? map.get(SITE_KEY_LEGACY_DURATION) ?? "", 10) || DEFAULT_EXAM_DURATION_MINUTES)
+    );
     return {
       examSize: Math.max(1, Math.min(MAX_EXAM_SIZE, examSize)),
       examDurationMinutes,
     };
   } catch {
     return DEFAULT_CONFIG;
+  }
+}
+
+/** Read all langs from site_settings (per-lang keys, then legacy global for missing). */
+async function getExamConfigFromSiteSettingsForAllLangs(): Promise<Record<string, ExamConfig>> {
+  try {
+    const sql = getSql();
+    const rows = await sql`
+      SELECT key, value FROM site_settings
+      WHERE key LIKE 'exam_questions_per_attempt_%' OR key LIKE 'exam_duration_minutes_%'
+         OR key IN (${SITE_KEY_LEGACY_QUESTIONS}, ${SITE_KEY_LEGACY_DURATION}, ${SITE_KEY_LEGACY_EXAM_SIZE})
+    `;
+    const map = new Map((rows as { key: string; value: string }[]).map((r) => [r.key, r.value]));
+    const result: Record<string, ExamConfig> = {};
+    const legacyQ = parseInt(map.get(SITE_KEY_LEGACY_QUESTIONS) ?? map.get(SITE_KEY_LEGACY_EXAM_SIZE) ?? "", 10);
+    const globalSize = Number.isInteger(legacyQ) && legacyQ >= 1 && legacyQ <= MAX_EXAM_SIZE
+      ? legacyQ
+      : Number.isInteger(legacyQ) && legacyQ >= 1 && legacyQ <= 100
+        ? legacyQ
+        : DEFAULT_EXAM_SIZE;
+    const globalDuration = Math.max(5, Math.min(180, parseInt(map.get(SITE_KEY_LEGACY_DURATION) ?? "", 10) || DEFAULT_EXAM_DURATION_MINUTES));
+    for (const lang of EXAM_LANGS) {
+      const q = parseInt(map.get(siteKeyQuestionsPerExam(lang)) ?? "", 10);
+      const d = parseInt(map.get(siteKeyDurationMinutes(lang)) ?? "", 10);
+      result[lang] = {
+        examSize: Number.isInteger(q) && q >= 1 && q <= MAX_EXAM_SIZE ? q : globalSize,
+        examDurationMinutes: Number.isInteger(d) && d >= 5 && d <= 180 ? d : globalDuration,
+      };
+    }
+    return result;
+  } catch {
+    const result: Record<string, ExamConfig> = {};
+    for (const lang of EXAM_LANGS) result[lang] = DEFAULT_CONFIG;
+    return result;
   }
 }
 
@@ -64,7 +106,7 @@ export async function getExamConfigForLang(lang: string): Promise<ExamConfig> {
     const [row] = await sql`
       SELECT exam_size, exam_duration_minutes FROM exam_lang_settings WHERE lang = ${lang}
     `;
-    if (!row) return getExamConfigFromSiteSettings();
+    if (!row) return getExamConfigFromSiteSettings(lang);
     const r = row as { exam_size: number; exam_duration_minutes: number };
     const examSize = Math.max(1, Math.min(MAX_EXAM_SIZE, Number(r.exam_size) || DEFAULT_EXAM_SIZE));
     const examDurationMinutes = Math.max(
@@ -73,7 +115,7 @@ export async function getExamConfigForLang(lang: string): Promise<ExamConfig> {
     );
     return { examSize, examDurationMinutes };
   } catch {
-    return getExamConfigFromSiteSettings();
+    return getExamConfigFromSiteSettings(lang);
   }
 }
 
@@ -100,28 +142,27 @@ export async function getExamConfigForAllLangs(): Promise<Record<string, ExamCon
     }
     return result;
   } catch {
-    const fallback = await getExamConfigFromSiteSettings();
-    const result: Record<string, ExamConfig> = {};
-    for (const lang of EXAM_LANGS) {
-      result[lang] = fallback;
-    }
-    return result;
+    return getExamConfigFromSiteSettingsForAllLangs();
   }
 }
 
-/** Write "questions per exam" and duration to site_settings. Uses exam_questions_per_attempt so we never overwrite with question bank total. */
-async function setExamConfigInSiteSettings(config: ExamConfig): Promise<void> {
+/** Write per-lang "questions per exam" and duration to site_settings so each exam keeps its own value. */
+async function setExamConfigInSiteSettingsBulk(settings: Record<string, ExamConfig>): Promise<void> {
   const sql = getSql();
-  const examSize = Math.max(1, Math.min(MAX_EXAM_SIZE, Math.floor(Number(config.examSize))));
-  const examDurationMinutes = Math.max(5, Math.min(180, Math.floor(Number(config.examDurationMinutes))));
-  await sql`
-    INSERT INTO site_settings (key, value, updated_at) VALUES (${SITE_KEY_QUESTIONS_PER_EXAM}, ${String(examSize)}, NOW())
-    ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value, updated_at = NOW()
-  `;
-  await sql`
-    INSERT INTO site_settings (key, value, updated_at) VALUES (${SITE_KEY_DURATION_MINUTES}, ${String(examDurationMinutes)}, NOW())
-    ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value, updated_at = NOW()
-  `;
+  for (const lang of EXAM_LANGS) {
+    const config = settings[lang];
+    if (!config) continue;
+    const examSize = Math.max(1, Math.min(MAX_EXAM_SIZE, Math.floor(Number(config.examSize))));
+    const examDurationMinutes = Math.max(5, Math.min(180, Math.floor(Number(config.examDurationMinutes))));
+    await sql`
+      INSERT INTO site_settings (key, value, updated_at) VALUES (${siteKeyQuestionsPerExam(lang)}, ${String(examSize)}, NOW())
+      ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value, updated_at = NOW()
+    `;
+    await sql`
+      INSERT INTO site_settings (key, value, updated_at) VALUES (${siteKeyDurationMinutes(lang)}, ${String(examDurationMinutes)}, NOW())
+      ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value, updated_at = NOW()
+    `;
+  }
 }
 
 /** Update exam settings for one language (admin only). Uses exam_lang_settings; throws if table missing. */
@@ -148,7 +189,7 @@ export async function setExamSettingsForLang(
   `;
 }
 
-/** Update exam settings for multiple languages (admin bulk save). Falls back to site_settings when exam_lang_settings table missing. */
+/** Update exam settings for multiple languages (admin bulk save). Falls back to per-lang site_settings keys when exam_lang_settings table missing. */
 export async function setExamSettingsBulk(
   settings: Record<string, Partial<ExamConfig>>
 ): Promise<void> {
@@ -159,15 +200,16 @@ export async function setExamSettingsBulk(
       }
     }
   } catch {
-    const firstLang = EXAM_LANGS[0];
-    const cfg = settings[firstLang];
-    if (cfg && (cfg.examSize != null || cfg.examDurationMinutes != null)) {
-      const fallback = await getExamConfigFromSiteSettings();
-      await setExamConfigInSiteSettings({
-        examSize: cfg.examSize ?? fallback.examSize,
-        examDurationMinutes: cfg.examDurationMinutes ?? fallback.examDurationMinutes,
-      });
+    const current = await getExamConfigFromSiteSettingsForAllLangs();
+    const merged: Record<string, ExamConfig> = {};
+    for (const lang of EXAM_LANGS) {
+      const incoming = settings[lang];
+      merged[lang] = {
+        examSize: incoming?.examSize != null ? Math.max(1, Math.min(MAX_EXAM_SIZE, Math.floor(Number(incoming.examSize)))) : current[lang].examSize,
+        examDurationMinutes: incoming?.examDurationMinutes != null ? Math.max(5, Math.min(180, Math.floor(Number(incoming.examDurationMinutes)))) : current[lang].examDurationMinutes,
+      };
     }
+    await setExamConfigInSiteSettingsBulk(merged);
   }
 }
 
