@@ -1,6 +1,7 @@
 import { createHash } from "crypto";
 import { NextRequest, NextResponse } from "next/server";
 import { withErrorHandling } from "@/lib/api-utils";
+import { getCurrentUser } from "@/lib/auth";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 import { getSteps } from "@/lib/tutorial-steps";
 import { getCachedFeedback, setCachedFeedback } from "@/lib/db/ai-feedback-cache";
@@ -31,6 +32,9 @@ function feedbackCacheKey(
 // POST /api/code-feedback
 // { code, output, error, tutorialSlug, stepIndex, lang? }
 export const POST = withErrorHandling("POST /api/code-feedback", async (req: NextRequest) => {
+  const user = await getCurrentUser();
+  if (!user) return NextResponse.json({ error: "Sign in to get code feedback" }, { status: 401 });
+
   const ip = getClientIp(req.headers);
   const { limited, retryAfter } = await checkRateLimit(`code-feedback:${ip}`, 30, 60_000);
   if (limited) {

@@ -60,11 +60,43 @@ export async function submitAttempt(
   `;
 }
 
+/**
+ * Atomically lock an attempt for submission. Returns true if the lock was acquired
+ * (submitted_at was NULL and is now set to a placeholder). Returns false if already submitted.
+ */
+export async function lockAttemptForSubmit(attemptId: string): Promise<boolean> {
+  const sql = getSql();
+  const rows = await sql`
+    UPDATE exam_attempts
+    SET submitted_at = NOW()
+    WHERE id = ${attemptId} AND submitted_at IS NULL
+    RETURNING id
+  `;
+  return rows.length > 0;
+}
+
 export async function saveAnswer(attemptId: string, questionId: number, chosenIndex: number): Promise<void> {
   const sql = getSql();
   await sql`
     INSERT INTO exam_answers (attempt_id, question_id, chosen_index)
     VALUES (${attemptId}, ${questionId}, ${chosenIndex})
+    ON CONFLICT (attempt_id, question_id) DO UPDATE SET chosen_index = EXCLUDED.chosen_index
+  `;
+}
+
+/** Batch insert/upsert answers for an attempt in one query. */
+export async function saveAnswersBatch(
+  attemptId: string,
+  answers: { questionId: number; chosenIndex: number }[]
+): Promise<void> {
+  if (answers.length === 0) return;
+  const sql = getSql();
+  const attemptIds = answers.map(() => attemptId);
+  const questionIds = answers.map((a) => a.questionId);
+  const chosenIndexes = answers.map((a) => a.chosenIndex);
+  await sql`
+    INSERT INTO exam_answers (attempt_id, question_id, chosen_index)
+    SELECT * FROM UNNEST(${attemptIds}::uuid[], ${questionIds}::bigint[], ${chosenIndexes}::int[])
     ON CONFLICT (attempt_id, question_id) DO UPDATE SET chosen_index = EXCLUDED.chosen_index
   `;
 }

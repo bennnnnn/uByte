@@ -6,80 +6,24 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/components/AuthProvider";
 import { apiFetch } from "@/lib/api-client";
-import type { AdminRevenueStats } from "@/lib/db";
-
-interface AdminUser {
-  id: number;
-  name: string;
-  email: string;
-  xp: number;
-  streak_days: number;
-  created_at: string;
-  last_active_at: string | null;
-  is_admin: number;
-  banned: boolean;
-  completed_count: number;
-  bookmark_count: number;
-  plan: string;
-}
-
-interface TutorialAnalytics {
-  slug: string;
-  completed_count: number;
-  thumbs_up: number;
-  thumbs_down: number;
-}
-
-function formatDate(iso: string | null) {
-  if (!iso) return "—";
-  return new Date(iso).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
-}
-
-function slugToTitle(slug: string) {
-  return slug.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
-}
-
-function formatCents(cents: number) {
-  return "$" + (cents / 100).toFixed(2);
-}
-
-type Tab = "users" | "analytics" | "revenue" | "audit" | "exams" | "banner";
-type RevenuePeriod = "7days" | "month" | "year";
-
-const TAB_LABELS: Record<Tab, string> = {
-  users: "Users",
-  analytics: "Analytics",
-  revenue: "Revenue",
-  audit: "Audit log",
-  exams: "Practice exams",
-  banner: "Site banner",
-};
+import { formatDate, slugToTitle, formatCents } from "./utils";
+import type {
+  AdminUser,
+  TutorialAnalytics,
+  AuditEntry,
+  StepStat,
+  SubscriptionEventRow,
+  PracticeStat,
+  ExamStats,
+  Tab,
+  RevenuePeriod,
+  AdminRevenueStats,
+} from "./types";
+import { TAB_LABELS } from "./types";
 
 export default function AdminPage() {
   const { user, loading } = useAuth();
   const router = useRouter();
-
-  interface AuditEntry {
-    id: number;
-    action: string;
-    admin_name: string | null;
-    target_name: string | null;
-    created_at: string;
-  }
-  interface StepStat { step_index: number; pass_count: number; fail_count: number; }
-  interface SubscriptionEventRow {
-    id: number;
-    user_id: number | null;
-    user_name: string | null;
-    user_email: string | null;
-    plan: string;
-    amount_cents: number;
-    event_type: string;
-    created_at: string;
-  }
-  interface PracticeStat { problem_slug: string; solved_count: number; attempt_count: number; }
-  interface ExamStatRow { lang: string; question_count: number; attempt_count: number; passed_count: number; certificates_count: number; }
-  interface ExamStats { questionsByLang: ExamStatRow[]; totalQuestions: number; totalAttempts: number; passedAttempts: number; certificatesIssued: number; passRatePercent: number; }
 
   const [tab, setTab] = useState<Tab>("users");
   const [users, setUsers] = useState<AdminUser[]>([]);

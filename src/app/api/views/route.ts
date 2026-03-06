@@ -3,6 +3,7 @@ import { randomUUID } from "crypto";
 import { getCurrentUser } from "@/lib/auth";
 import { recordPageView, getPageViewCount, clearPageViews } from "@/lib/db";
 import { withErrorHandling } from "@/lib/api-utils";
+import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 
 const VISITOR_COOKIE = "visitor_id";
 const FREE_PAGE_LIMIT = 20;
@@ -37,6 +38,12 @@ export const GET = withErrorHandling("GET /api/views", async (request: NextReque
 
 // POST — record a page view, return updated count
 export const POST = withErrorHandling("POST /api/views", async (request: NextRequest) => {
+  const ip = getClientIp(request.headers);
+  const { limited: rateLimited } = await checkRateLimit(`views:${ip}`, 60, 60_000);
+  if (rateLimited) {
+    return NextResponse.json({ viewCount: 0, limited: false });
+  }
+
   try {
     const user = await getCurrentUser();
     if (user) {

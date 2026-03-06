@@ -57,6 +57,22 @@ export async function getCorrectAndExplanation(
   return (row as { correct_index: number; explanation: string | null } | undefined) ?? null;
 }
 
+/** Batch version: get correct_index and explanation for multiple questions at once. */
+export async function getCorrectAndExplanationBatch(
+  questionIds: number[]
+): Promise<Map<number, { correct_index: number; explanation: string | null }>> {
+  if (questionIds.length === 0) return new Map();
+  const sql = getSql();
+  const rows = await sql`
+    SELECT id, correct_index, explanation FROM exam_questions WHERE id = ANY(${questionIds})
+  `;
+  const map = new Map<number, { correct_index: number; explanation: string | null }>();
+  for (const r of rows as { id: number; correct_index: number; explanation: string | null }[]) {
+    map.set(r.id, { correct_index: r.correct_index, explanation: r.explanation });
+  }
+  return map;
+}
+
 export interface ExamQuestionInsertRow {
   lang: string;
   prompt: string;

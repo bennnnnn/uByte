@@ -11,11 +11,21 @@ import { signToken, setAuthCookie } from "@/lib/auth";
 import { setCsrfCookie } from "@/lib/csrf";
 import { withErrorHandling } from "@/lib/api-utils";
 import { sendGoogleLinkedEmail } from "@/lib/email";
+import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 
 /** POST: sign in or sign up with a Google ID token (from One Tap or Sign in with Google button). */
 export const POST = withErrorHandling("POST /api/auth/google-id-token", async (request: NextRequest) => {
+  const ip = getClientIp(request.headers);
+  const { limited, retryAfter } = await checkRateLimit(`google-auth:${ip}`, 10, 60_000);
+  if (limited) {
+    return NextResponse.json(
+      { error: "Too many attempts. Please try again later." },
+      { status: 429, headers: { "Retry-After": String(retryAfter) } }
+    );
+  }
+
   if (!GOOGLE_CLIENT_ID) {
     return NextResponse.json({ error: "Google sign-in is not configured" }, { status: 503 });
   }
