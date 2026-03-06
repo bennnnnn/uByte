@@ -2,11 +2,7 @@ import { NextResponse } from "next/server";
 import { withErrorHandling, requireAdmin } from "@/lib/api-utils";
 import { getAllSiteSettings, setSiteSettings } from "@/lib/db/site-settings";
 
-const ALLOWED_KEYS = new Set([
-  "exam_pass_percent",
-  "monthly_price_cents",
-  "yearly_price_cents",
-]);
+const ALLOWED_KEYS = new Set(["exam_pass_percent"]);
 
 export const GET = withErrorHandling("GET /api/admin/site-settings", async () => {
   const { admin, response } = await requireAdmin();
@@ -38,9 +34,6 @@ export const PUT = withErrorHandling("PUT /api/admin/site-settings", async (req:
 
     if (key === "exam_pass_percent" && (num < 1 || num > 100)) {
       return NextResponse.json({ error: "Pass percent must be 1–100" }, { status: 400 });
-    }
-    if ((key === "monthly_price_cents" || key === "yearly_price_cents") && num < 0) {
-      return NextResponse.json({ error: "Price cannot be negative" }, { status: 400 });
     }
 
     updates[key] = String(num);

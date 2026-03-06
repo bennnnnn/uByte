@@ -54,7 +54,7 @@ export default function AdminPage() {
   const [bannerData, setBannerData] = useState<{ enabled: boolean; message: string; linkUrl: string; linkText: string } | null>(null);
   const [bannerSaving, setBannerSaving] = useState(false);
   const [bannerMessage, setBannerMessage] = useState<string | null>(null);
-  const [siteSettings, setSiteSettings] = useState<{ exam_pass_percent: string; monthly_price_cents: string; yearly_price_cents: string } | null>(null);
+  const [siteSettings, setSiteSettings] = useState<{ exam_pass_percent: string } | null>(null);
   const [siteSettingsSaving, setSiteSettingsSaving] = useState(false);
   const [siteSettingsMessage, setSiteSettingsMessage] = useState<string | null>(null);
 
@@ -158,8 +158,6 @@ export default function AdminPage() {
       .then((data) => {
         if (!cancelled && data) setSiteSettings({
           exam_pass_percent: data.exam_pass_percent ?? "70",
-          monthly_price_cents: data.monthly_price_cents ?? "999",
-          yearly_price_cents: data.yearly_price_cents ?? "4999",
         });
       });
     return () => { cancelled = true; };
@@ -311,7 +309,7 @@ export default function AdminPage() {
               {tab === "audit" && "Admin actions"}
               {tab === "exams" && "Questions, attempts & upload"}
               {tab === "banner" && "Announcements, discounts, outages"}
-              {tab === "settings" && "Pricing, exam pass threshold, global config"}
+              {tab === "settings" && "Exam pass threshold, global config"}
             </p>
           </div>
           {tab === "users" && (
@@ -908,7 +906,7 @@ export default function AdminPage() {
               <div className="rounded-xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
                 <h2 className="mb-1 text-sm font-semibold text-zinc-700 dark:text-zinc-300">Site settings</h2>
                 <p className="mb-5 text-xs text-zinc-500 dark:text-zinc-400">
-                  These values are used across the site. Pricing changes are display-only — update Paddle separately.
+                  Global configuration that applies across the site.
                 </p>
                 {siteSettings === null ? (
                   <div className="flex items-center gap-3 py-6">
@@ -931,50 +929,6 @@ export default function AdminPage() {
                         <span className="text-xs text-zinc-400 dark:text-zinc-500">Minimum score to pass an exam and earn a certificate</span>
                       </div>
                     </div>
-                    <div className="h-px bg-zinc-100 dark:bg-zinc-800" />
-                    <div>
-                      <label className="mb-1.5 block text-xs font-medium text-zinc-600 dark:text-zinc-400">Monthly Pro price (cents)</label>
-                      <div className="flex items-center gap-3">
-                        <input
-                          type="number"
-                          min={0}
-                          value={siteSettings.monthly_price_cents}
-                          onChange={(e) => setSiteSettings((s) => s ? { ...s, monthly_price_cents: e.target.value } : s)}
-                          className="w-28 rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm text-right dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-200"
-                        />
-                        <span className="text-xs text-zinc-400 dark:text-zinc-500">
-                          = ${(parseInt(siteSettings.monthly_price_cents, 10) / 100).toFixed(2)}/month
-                        </span>
-                      </div>
-                    </div>
-                    <div>
-                      <label className="mb-1.5 block text-xs font-medium text-zinc-600 dark:text-zinc-400">Yearly Pro price (cents)</label>
-                      <div className="flex items-center gap-3">
-                        <input
-                          type="number"
-                          min={0}
-                          value={siteSettings.yearly_price_cents}
-                          onChange={(e) => setSiteSettings((s) => s ? { ...s, yearly_price_cents: e.target.value } : s)}
-                          className="w-28 rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm text-right dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-200"
-                        />
-                        <span className="text-xs text-zinc-400 dark:text-zinc-500">
-                          = ${(parseInt(siteSettings.yearly_price_cents, 10) / 100).toFixed(2)}/year
-                          {" "}(${(parseInt(siteSettings.yearly_price_cents, 10) / 1200).toFixed(2)}/mo)
-                        </span>
-                      </div>
-                    </div>
-                    {(() => {
-                      const m = parseInt(siteSettings.monthly_price_cents, 10) || 0;
-                      const y = parseInt(siteSettings.yearly_price_cents, 10) || 0;
-                      const ifMonthly = m * 12;
-                      const savings = ifMonthly - y;
-                      const discountPct = ifMonthly > 0 ? Math.round((savings / ifMonthly) * 100) : 0;
-                      return (
-                        <div className="rounded-lg bg-zinc-50 p-3 text-xs text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400">
-                          Yearly savings: ${(savings / 100).toFixed(2)} · Discount: {discountPct}% · Monthly equivalent: ${(y / 1200).toFixed(2)}/mo
-                        </div>
-                      );
-                    })()}
                     <div className="flex items-center gap-3 pt-1">
                       <button
                         type="button"
@@ -994,8 +948,6 @@ export default function AdminPage() {
                             if (res.ok) {
                               setSiteSettings({
                                 exam_pass_percent: data.exam_pass_percent ?? siteSettings.exam_pass_percent,
-                                monthly_price_cents: data.monthly_price_cents ?? siteSettings.monthly_price_cents,
-                                yearly_price_cents: data.yearly_price_cents ?? siteSettings.yearly_price_cents,
                               });
                               setSiteSettingsMessage("Saved.");
                               setTimeout(() => setSiteSettingsMessage(null), 3000);

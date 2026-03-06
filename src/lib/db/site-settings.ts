@@ -1,14 +1,11 @@
 import { getSql } from "./client";
 
-// In-memory cache with TTL to avoid hitting DB on every page load.
 const CACHE_TTL_MS = 60_000;
 let _cache: Record<string, string> | null = null;
 let _cacheAt = 0;
 
 const DEFAULTS: Record<string, string> = {
   exam_pass_percent: "70",
-  monthly_price_cents: "999",
-  yearly_price_cents: "4999",
 };
 
 async function loadAll(): Promise<Record<string, string>> {
@@ -58,49 +55,10 @@ export async function setSiteSettings(
   invalidateSiteSettingsCache();
 }
 
-// ─── Typed helpers for common settings ──────────────────────────────────────
+// ─── Typed helpers ──────────────────────────────────────────────────────────
 
 export async function getExamPassPercent(): Promise<number> {
   const v = await getSiteSetting("exam_pass_percent");
   const n = parseInt(v, 10);
   return isNaN(n) || n < 1 || n > 100 ? 70 : n;
-}
-
-export async function getMonthlyPriceCents(): Promise<number> {
-  const v = await getSiteSetting("monthly_price_cents");
-  const n = parseInt(v, 10);
-  return isNaN(n) || n < 0 ? 999 : n;
-}
-
-export async function getYearlyPriceCents(): Promise<number> {
-  const v = await getSiteSetting("yearly_price_cents");
-  const n = parseInt(v, 10);
-  return isNaN(n) || n < 0 ? 4999 : n;
-}
-
-export interface SitePricing {
-  monthlyPriceCents: number;
-  yearlyPriceCents: number;
-  monthlyEquivalentCents: number;
-  yearlyIfMonthlyCents: number;
-  yearlySavingsCents: number;
-  yearlyDiscountPercent: number;
-}
-
-export async function getSitePricing(): Promise<SitePricing> {
-  const monthly = await getMonthlyPriceCents();
-  const yearly = await getYearlyPriceCents();
-  const yearlyIfMonthly = monthly * 12;
-  const savings = yearlyIfMonthly - yearly;
-  const discount = yearlyIfMonthly > 0
-    ? Math.round((savings / yearlyIfMonthly) * 100)
-    : 0;
-  return {
-    monthlyPriceCents: monthly,
-    yearlyPriceCents: yearly,
-    monthlyEquivalentCents: Math.round(yearly / 12),
-    yearlyIfMonthlyCents: yearlyIfMonthly,
-    yearlySavingsCents: savings,
-    yearlyDiscountPercent: discount,
-  };
 }

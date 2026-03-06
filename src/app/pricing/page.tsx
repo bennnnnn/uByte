@@ -7,7 +7,6 @@ import { useAuth } from "@/components/AuthProvider";
 import {
   BILLING_CONFIG, MONTHLY_PRICE_ID, YEARLY_PRICE_ID, hasPaidAccess,
   FREE_TUTORIAL_LIMIT, FREE_PRACTICE_LIMIT,
-  MONTHLY_PRICE_CENTS, YEARLY_PRICE_CENTS,
   MONTHLY_EQUIVALENT_CENTS, YEARLY_IF_MONTHLY_CENTS, YEARLY_DISCOUNT_PERCENT,
 } from "@/lib/plans";
 import { trackConversion } from "@/lib/analytics";
@@ -50,30 +49,9 @@ function PricingContent() {
   const [billing, setBilling]       = useState<"monthly" | "yearly">("yearly");
   const [showAuth, setShowAuth]     = useState(false);
   const [faqOpen, setFaqOpen]       = useState<number | null>(null);
-  const [dynPricing, setDynPricing] = useState<{
-    monthlyPriceCents: number;
-    yearlyPriceCents: number;
-    monthlyEquivalentCents: number;
-    yearlyIfMonthlyCents: number;
-    yearlySavingsCents: number;
-    yearlyDiscountPercent: number;
-  } | null>(null);
   const showSuccess = searchParams.get("success") === "1";
   const planParam = searchParams.get("plan");
   const signupParam = searchParams.get("signup") === "1";
-
-  useEffect(() => {
-    fetch("/api/site-settings")
-      .then((r) => r.ok ? r.json() : null)
-      .then((data) => { if (data) setDynPricing(data); })
-      .catch(() => {});
-  }, []);
-
-  const monthlyPriceCents = dynPricing?.monthlyPriceCents ?? MONTHLY_PRICE_CENTS;
-  const yearlyPriceCents = dynPricing?.yearlyPriceCents ?? YEARLY_PRICE_CENTS;
-  const monthlyEq = dynPricing?.monthlyEquivalentCents ?? MONTHLY_EQUIVALENT_CENTS;
-  const yearlyIfMonthly = dynPricing?.yearlyIfMonthlyCents ?? YEARLY_IF_MONTHLY_CENTS;
-  const discountPct = dynPricing?.yearlyDiscountPercent ?? YEARLY_DISCOUNT_PERCENT;
 
   useEffect(() => {
     trackConversion("viewed_pricing");
@@ -189,7 +167,7 @@ function PricingContent() {
             >
               Yearly
               <span className="rounded-full bg-emerald-500 px-1.5 py-0.5 text-[9px] font-bold text-white">
-                −{discountPct}%
+                −{YEARLY_DISCOUNT_PERCENT}%
               </span>
             </button>
           </div>
@@ -266,7 +244,7 @@ function PricingContent() {
                 <div>
                   <div className="flex items-baseline gap-2">
                     <span className="text-4xl font-black text-zinc-900 dark:text-white">
-                      ${(monthlyPriceCents / 100).toFixed(2)}
+                      {BILLING_CONFIG.monthly.priceText.replace("/month", "")}
                     </span>
                     <span className="text-zinc-500 dark:text-zinc-400">/month</span>
                   </div>
@@ -277,14 +255,14 @@ function PricingContent() {
               ) : (
                 <div>
                   <div className="flex items-baseline gap-2">
-                    <span className="text-4xl font-black text-zinc-900 dark:text-white">${(monthlyEq / 100).toFixed(2)}</span>
+                    <span className="text-4xl font-black text-zinc-900 dark:text-white">${(MONTHLY_EQUIVALENT_CENTS / 100).toFixed(2)}</span>
                     <span className="text-zinc-500 dark:text-zinc-400">/month</span>
                   </div>
                   <p className="mt-1.5 text-sm">
                     <span className="font-semibold text-emerald-600 dark:text-emerald-400">
-                      ${(yearlyPriceCents / 100).toFixed(2)} billed yearly
+                      {BILLING_CONFIG.yearly.priceText.replace("/year", " billed yearly")}
                     </span>
-                    <span className="mx-1.5 text-zinc-400 line-through dark:text-zinc-600">${(yearlyIfMonthly / 100).toFixed(2)}</span>
+                    <span className="mx-1.5 text-zinc-400 line-through dark:text-zinc-600">${(YEARLY_IF_MONTHLY_CENTS / 100).toFixed(2)}</span>
                     <span className="text-zinc-500 dark:text-zinc-400">— {BILLING_CONFIG.yearly.subLabel}</span>
                   </p>
                 </div>
@@ -333,8 +311,8 @@ function PricingContent() {
                 className="w-full rounded-xl bg-indigo-600 py-3.5 text-sm font-bold text-white shadow shadow-indigo-600/20 transition-colors hover:bg-indigo-700"
               >
                 {billing === "yearly"
-                  ? `Get Pro — $${(yearlyPriceCents / 100).toFixed(2)}/yr`
-                  : `Get Pro — $${(monthlyPriceCents / 100).toFixed(2)}/mo`}
+                  ? `Get Pro — ${BILLING_CONFIG.yearly.priceText.replace("/year", "/yr")}`
+                  : `Get Pro — ${BILLING_CONFIG.monthly.priceText.replace("/month", "/mo")}`}
               </button>
             )}
 
