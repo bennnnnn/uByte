@@ -40,14 +40,18 @@ export function getAllStepsForLanguage(
 
 /**
  * Total number of lessons (steps) for a language across all tutorials.
- * Used for home page cards so the count reflects actual content (MDX + .steps.json or TS steps).
+ * Uses content-driven tutorial list when available (MDX); falls back to TS step keys
+ * so the count is never 0 when we have step data (e.g. if content dir is missing at build time).
  */
 export function getTotalLessonCount(lang: SupportedLanguage): number {
-  const tutorials = getAllTutorials(lang);
+  let slugs: string[] = getAllTutorials(lang).map((t) => t.slug);
+  if (slugs.length === 0) {
+    const stepMap = stepsByLanguage[lang];
+    if (stepMap) slugs = Object.keys(stepMap);
+  }
   let total = 0;
-  for (const t of tutorials) {
-    const steps = getSteps(lang, t.slug);
-    total += steps.length;
+  for (const slug of slugs) {
+    total += getSteps(lang, slug).length;
   }
   return total;
 }

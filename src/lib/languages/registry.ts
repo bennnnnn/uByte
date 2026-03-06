@@ -15,8 +15,8 @@ export const LANGUAGES: Record<SupportedLanguage, LanguageConfig> = {
     defaultStarter: 'package main\n\nimport "fmt"\n\nfunc main() {\n\t// TODO\n}',
     fileExtension: ".go",
     seo: {
-      defaultTitle: "uByte — Learn Go Programming for Free",
-      defaultDescription: "Learn Go programming for free with uByte. Interactive Golang tutorials for beginners — write and run real Go code in your browser. Start today.",
+      defaultTitle: "uByte — Learn Go Programming",
+      defaultDescription: "Master Go from the ground up: variables, concurrency, and APIs. Interactive lessons with runnable code and instant feedback. Start with free intro tutorials, unlock the full track with Pro.",
       keywords: [
         "Go programming language",
         "Golang tutorial",
@@ -41,8 +41,8 @@ export const LANGUAGES: Record<SupportedLanguage, LanguageConfig> = {
     defaultStarter: '# TODO: Write your Python code here\nprint("Hello, World!")',
     fileExtension: ".py",
     seo: {
-      defaultTitle: "uByte — Learn Python Programming for Free",
-      defaultDescription: "Learn Python programming for free with uByte. Interactive Python tutorials for beginners — write and run real Python code in your browser.",
+      defaultTitle: "uByte — Learn Python Programming",
+      defaultDescription: "From basics to modules and async. Hands-on Python lessons with a built-in editor and instant runs. Free intro lessons; Pro unlocks the full curriculum.",
       keywords: [
         "Python programming",
         "Learn Python",
@@ -62,8 +62,8 @@ export const LANGUAGES: Record<SupportedLanguage, LanguageConfig> = {
     defaultStarter: '#include <iostream>\n\nint main() {\n    // TODO\n    return 0;\n}',
     fileExtension: ".cpp",
     seo: {
-      defaultTitle: "uByte — Learn C++ Programming for Free",
-      defaultDescription: "Learn C++ programming for free with uByte. Interactive C++ tutorials for beginners — write and run real C++ code in your browser.",
+      defaultTitle: "uByte — Learn C++ Programming",
+      defaultDescription: "C++ fundamentals, I/O, and modern patterns. Learn by doing with in-browser coding and feedback. Free starter tutorials; go further with Pro.",
       keywords: [
         "C++ programming",
         "Learn C++",
@@ -83,8 +83,8 @@ export const LANGUAGES: Record<SupportedLanguage, LanguageConfig> = {
     defaultStarter: '// Your code here\nconsole.log("Hello, World!");',
     fileExtension: ".js",
     seo: {
-      defaultTitle: "uByte — Learn JavaScript for Free",
-      defaultDescription: "Learn JavaScript programming for free with uByte. Interactive JS tutorials for beginners — write and run real code in your browser.",
+      defaultTitle: "uByte — Learn JavaScript",
+      defaultDescription: "Core JS, the DOM, and Node-style modules. Bite-sized lessons with runnable examples. Try free lessons first; Pro opens the full path.",
       keywords: [
         "JavaScript",
         "Learn JavaScript",
@@ -103,8 +103,8 @@ export const LANGUAGES: Record<SupportedLanguage, LanguageConfig> = {
     defaultStarter: 'public class Main {\n    public static void main(String[] args) {\n        // Your code here\n    }\n}',
     fileExtension: ".java",
     seo: {
-      defaultTitle: "uByte — Learn Java for Free",
-      defaultDescription: "Learn Java programming for free with uByte. Interactive Java tutorials for beginners — write and run real code in your browser.",
+      defaultTitle: "uByte — Learn Java",
+      defaultDescription: "Java from syntax to interfaces and concurrency. Step-by-step tutorials with runnable code. Free intro; Pro for the complete track.",
       keywords: [
         "Java programming",
         "Learn Java",
@@ -123,8 +123,8 @@ export const LANGUAGES: Record<SupportedLanguage, LanguageConfig> = {
     defaultStarter: 'fn main() {\n    // Your code here\n    println!("Hello, World!");\n}',
     fileExtension: ".rs",
     seo: {
-      defaultTitle: "uByte — Learn Rust for Free",
-      defaultDescription: "Learn Rust programming for free with uByte. Interactive Rust tutorials for beginners — write and run real code in your browser.",
+      defaultTitle: "uByte — Learn Rust",
+      defaultDescription: "Ownership, borrowing, and fearless concurrency. Structured Rust lessons with in-browser coding. Free start; Pro for the full journey.",
       keywords: [
         "Rust programming",
         "Learn Rust",
