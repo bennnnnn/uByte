@@ -6,8 +6,8 @@ import type { SupportedLanguage } from "@/lib/languages/types";
 import { getCurrentUser } from "@/lib/auth";
 import { getUserPlan, getExamConfigForAllLangs, getUserExamStats } from "@/lib/db";
 import { hasPaidAccess } from "@/lib/plans";
-import UpgradeWall from "@/components/UpgradeWall";
 import { EXAM_LANGS } from "@/lib/exams/config";
+import { tutorialLangUrl } from "@/lib/urls";
 
 export const dynamic = "force-dynamic";
 
@@ -87,44 +87,6 @@ export default async function PracticeExamsPage() {
     (lang) => statsByLang[lang] && statsByLang[lang].attemptCount > 0 && !statsByLang[lang].lastPassed && !statsByLang[lang].hasCertificate
   );
   const passedLangs = EXAM_LANGS.filter((lang) => statsByLang[lang]?.hasCertificate);
-
-  if (!isPro) {
-    return (
-      <div className="min-h-full overflow-y-auto bg-zinc-50 dark:bg-zinc-950">
-        <div className="mx-auto max-w-3xl px-6 py-14">
-          <div className="mb-10">
-            <span className="inline-flex items-center gap-2 rounded-full border border-amber-200 bg-amber-50/80 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-amber-800 dark:border-amber-800 dark:bg-amber-950/50 dark:text-amber-200">
-              Pro
-            </span>
-            <h1 className="mt-4 text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100">
-              Practice Exams
-            </h1>
-            <p className="mt-2 text-zinc-600 dark:text-zinc-400">
-              Timed multiple-choice exams by language. Questions and duration vary per exam. Score 70% or higher to pass and earn a shareable certificate.
-            </p>
-          </div>
-
-          <div className="mb-10 rounded-2xl border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-900">
-            <h2 className="text-sm font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
-              What to expect
-            </h2>
-            <ul className="mt-3 space-y-2 text-sm text-zinc-700 dark:text-zinc-300">
-              <li>· Questions and duration set per language</li>
-              <li>· 70% correct to pass and earn a certificate</li>
-              <li>· Go, Python, C++, JavaScript, Java, Rust</li>
-            </ul>
-          </div>
-
-          <UpgradeWall
-            tutorialTitle="Practice Exams"
-            subtitle="Upgrade to Pro to take timed exams and earn certificates."
-            backHref="/"
-            backLabel="← Back to home"
-          />
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-full overflow-y-auto bg-zinc-50 dark:bg-zinc-950">
@@ -220,6 +182,28 @@ export default async function PracticeExamsPage() {
             })}
           </div>
         </section>
+
+        {/* Quick-nav footer */}
+        <nav
+          className="mt-14 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 border-t border-zinc-200 pt-8 text-sm dark:border-zinc-800"
+          aria-label="Quick links"
+        >
+          <Link href="/" className="font-medium text-zinc-500 transition-colors hover:text-indigo-600 dark:text-zinc-400 dark:hover:text-indigo-400">
+            Home
+          </Link>
+          {langSlugs.map((slug) => {
+            const config = LANGUAGES[slug];
+            if (!config) return null;
+            return (
+              <Link key={slug} href={tutorialLangUrl(slug)} className="font-medium text-zinc-500 transition-colors hover:text-indigo-600 dark:text-zinc-400 dark:hover:text-indigo-400">
+                {config.name} tutorials
+              </Link>
+            );
+          })}
+          <Link href="/practice" className="font-medium text-indigo-600 hover:underline dark:text-indigo-400">
+            Interview practice →
+          </Link>
+        </nav>
       </div>
     </div>
   );
