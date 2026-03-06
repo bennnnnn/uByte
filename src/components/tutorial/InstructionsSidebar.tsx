@@ -1,9 +1,11 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import Link from "next/link";
 import TutorialRating from "@/components/TutorialRating";
 import { useAuth } from "@/components/AuthProvider";
 import { apiFetch } from "@/lib/api-client";
+import { tutorialUrl } from "@/lib/urls";
 import type { TutorialStep } from "@/lib/tutorial-steps";
 import type { Status } from "@/hooks/useStepProgress";
 
@@ -38,6 +40,7 @@ interface Props {
   onGoToStep: (idx: number) => void;
   onSkip: () => void;
   tutorialSlug: string;
+  allTutorials: { slug: string; title: string }[];
 }
 
 export default function InstructionsSidebar({
@@ -54,8 +57,9 @@ export default function InstructionsSidebar({
   onGoToStep,
   onSkip,
   tutorialSlug,
+  allTutorials,
 }: Props) {
-  const { user } = useAuth();
+  const { user, progress } = useAuth();
   const [showNote, setShowNote] = useState(false);
   const [note, setNote] = useState("");
   const [savingNote, setSavingNote] = useState(false);
@@ -200,39 +204,34 @@ export default function InstructionsSidebar({
         )}
       </div>
 
-      {/* Step dots — green = completed, gray/dash = skipped, indigo = current */}
+      {/* Tutorial dots — one per tutorial in sequence; green = done, indigo = current, gray = pending */}
       <div className="shrink-0 border-t border-zinc-200 p-4 dark:border-zinc-800">
-        <div className="flex flex-wrap items-center gap-1.5" role="tablist" aria-label="Tutorial steps">
-          {steps.map((s, i) => {
-            const isCompleted = completedSteps.has(i) && !skippedSteps.has(i);
-            const isSkipped = skippedSteps.has(i);
-            const isCurrent = i === stepIndex;
+        <div className="flex flex-wrap items-center gap-1.5" role="tablist" aria-label="Course tutorials">
+          {allTutorials.map((t) => {
+            const isCurrent = t.slug === tutorialSlug;
+            const isDone = progress.includes(t.slug) && !isCurrent;
             return (
-              <button
-                key={i}
+              <Link
+                key={t.slug}
+                href={tutorialUrl(lang, t.slug)}
                 role="tab"
                 aria-selected={isCurrent}
-                aria-label={`Step ${i + 1}: ${s.title}${isCompleted ? " (done)" : isSkipped ? " (skipped)" : ""}`}
-                title={isCompleted ? "Done" : isSkipped ? "Skipped" : undefined}
-                onClick={() => onGoToStep(i)}
+                aria-label={`${t.title}${isDone ? " (done)" : isCurrent ? " (current)" : ""}`}
+                title={t.title}
                 className={`flex h-7 w-7 items-center justify-center rounded-full transition-colors ${
-                  isCurrent   ? "bg-indigo-500 ring-2 ring-indigo-300 dark:ring-indigo-800"
-                  : isCompleted ? "bg-emerald-500 text-white"
-                  : isSkipped   ? "bg-zinc-400 text-white dark:bg-zinc-500"
-                  : "bg-zinc-300 hover:bg-zinc-400 dark:bg-zinc-600 dark:hover:bg-zinc-400"
+                  isCurrent
+                    ? "bg-indigo-500 ring-2 ring-indigo-300 dark:ring-indigo-800"
+                    : isDone
+                    ? "bg-emerald-500 text-white"
+                    : "bg-zinc-300 hover:bg-zinc-400 dark:bg-zinc-600 dark:hover:bg-zinc-400"
                 }`}
               >
-                {isCompleted && (
+                {isDone && (
                   <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                   </svg>
                 )}
-                {isSkipped && (
-                  <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M13 5l7 7-7 7M5 12h15" />
-                  </svg>
-                )}
-              </button>
+              </Link>
             );
           })}
         </div>
