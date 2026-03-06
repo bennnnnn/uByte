@@ -60,6 +60,7 @@ export default function InstructionsSidebar({
   allTutorials,
 }: Props) {
   const { user, progress } = useAuth();
+  const dotsRef = useRef<HTMLDivElement>(null);
   const [showNote, setShowNote] = useState(false);
   const [note, setNote] = useState("");
   const [savingNote, setSavingNote] = useState(false);
@@ -75,6 +76,12 @@ export default function InstructionsSidebar({
       .then((d) => setNote(d.note ?? ""))
       .catch(() => {});
   }, [user, tutorialSlug, stepIndex]);
+
+  // Scroll active tutorial dot into view whenever the tutorial changes
+  useEffect(() => {
+    const el = dotsRef.current?.querySelector('[aria-selected="true"]');
+    el?.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+  }, [tutorialSlug]);
 
   useEffect(() => () => {
     if (savedTimeoutRef.current) clearTimeout(savedTimeoutRef.current);
@@ -206,7 +213,13 @@ export default function InstructionsSidebar({
 
       {/* Tutorial dots — one per tutorial in sequence; green = done, indigo = current, gray = pending */}
       <div className="shrink-0 border-t border-zinc-200 p-4 dark:border-zinc-800">
-        <div className="flex flex-wrap items-center gap-1.5" role="tablist" aria-label="Course tutorials">
+        <div
+          ref={dotsRef}
+          className="flex items-center gap-1.5 overflow-x-auto [&::-webkit-scrollbar]:hidden"
+          style={{ scrollbarWidth: "none" }}
+          role="tablist"
+          aria-label="Course tutorials"
+        >
           {allTutorials.map((t) => {
             const isCurrent = t.slug === tutorialSlug;
             const isDone = progress.includes(t.slug) && !isCurrent;
