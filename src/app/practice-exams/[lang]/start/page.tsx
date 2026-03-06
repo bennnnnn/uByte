@@ -54,7 +54,7 @@ export default function PracticeExamStartPage() {
           Preparing your exam…
         </p>
         <p className="text-sm text-zinc-500 dark:text-zinc-400">
-          We&apos;re selecting 40 questions at random. This may take a few seconds.
+          We&apos;re selecting your questions at random. This may take a few seconds.
         </p>
         {error && (
           <p className="mt-4 text-sm text-red-500">

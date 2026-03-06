@@ -101,7 +101,7 @@ export default async function PracticeExamsPage() {
                       {config.name}
                     </h3>
                     <p className="text-sm text-zinc-500 dark:text-zinc-400">
-                      {examSize} questions · {examDurationMinutes} min · 70% to pass
+                      {examSize} questions per exam · {examDurationMinutes} min · 70% to pass
                     </p>
                   </div>
                   <span className="text-sm font-medium text-amber-700 dark:text-amber-400">

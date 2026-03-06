@@ -52,7 +52,7 @@ export default function OtherExamsGrid({ currentLang, langSlugs, examSize, examD
                   {config.name} Practice Exam
                 </h3>
                 <p className="text-xs text-zinc-500 dark:text-zinc-400">
-                  {examSize} questions · {examDurationMinutes} min
+                  {examSize} per exam · {examDurationMinutes} min
                 </p>
               </div>
               <span className="shrink-0 text-zinc-400 transition-transform group-hover:translate-x-0.5">

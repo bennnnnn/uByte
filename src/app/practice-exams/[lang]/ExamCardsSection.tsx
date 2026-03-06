@@ -67,8 +67,9 @@ export default function ExamCardsSection({
                       ? "bg-indigo-200 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200"
                       : "bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400"
                   }`}
+                  title="Questions per exam (admin-configured)"
                 >
-                  {examSize} questions
+                  {examSize} per exam
                 </span>
               </div>
               <ul className="mt-2 space-y-1 text-sm text-zinc-600 dark:text-zinc-400">

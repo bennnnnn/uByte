@@ -8,6 +8,7 @@ const CARD_STYLE =
 const BADGE_STYLE = "bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-400";
 const ARROW_STYLE = "text-amber-600 dark:text-amber-400";
 
+/** Questions per exam and duration come from admin settings (site_settings), not from the question bank size. */
 interface Props {
   examSize: number;
   examDurationMinutes: number;
@@ -31,7 +32,7 @@ export default function PracticeExamsSection({ examSize, examDurationMinutes }: 
             </span>
           </div>
           <p className="mb-5 text-sm text-zinc-600 dark:text-zinc-400">
-            Timed multiple-choice exams by language. {examSize} questions, {examDurationMinutes} minutes. Score at least 70% to pass and earn a certificate.
+            Timed multiple-choice exams by language. {examSize} questions per exam, {examDurationMinutes} minutes. Score at least 70% to pass and earn a certificate.
           </p>
 
           <Link
@@ -66,8 +67,8 @@ export default function PracticeExamsSection({ examSize, examDurationMinutes }: 
                     {config.name}
                   </h3>
                 </div>
-                <span className={`shrink-0 rounded-full px-2 py-0.5 text-xs font-semibold ${BADGE_STYLE}`}>
-                  {examSize} questions
+                <span className={`shrink-0 rounded-full px-2 py-0.5 text-xs font-semibold ${BADGE_STYLE}`} title="Questions per exam (set in Admin → Exams)">
+                  {examSize} per exam
                 </span>
               </div>
 
