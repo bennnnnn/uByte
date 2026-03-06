@@ -25,7 +25,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const examConfig = await getExamConfigForLang(lang);
   return {
     title: `${name} Practice Exam`,
-    description: `Prepare for the ${name} practice exam. ${examConfig.examSize} questions, ${examConfig.examDurationMinutes} minutes, 70% to pass and earn a certificate.`,
+    description: `Take the ${name} practice exam. ${examConfig.examSize} questions, ${examConfig.examDurationMinutes} minutes. Score 70%+ to earn a certificate.`,
   };
 }
 
@@ -34,7 +34,7 @@ export default async function PracticeExamLangPage({ params }: Props) {
   if (!VALID_LANGS.has(lang)) notFound();
 
   const [user, examConfig, examConfigByLang] = await Promise.all([
-    getCurrentUser().then((u) => u),
+    getCurrentUser(),
     getExamConfigForLang(lang),
     getExamConfigForAllLangs(),
   ]);
@@ -45,95 +45,169 @@ export default async function PracticeExamLangPage({ params }: Props) {
   const name = config?.name ?? lang;
   const content = getExamDetailContent(lang, examConfig);
   const langSlugs = getAllLanguageSlugs();
-
-  const tagline = content?.tagline ?? `Timed multiple-choice exam to validate your ${name} knowledge.`;
+  const passMin = Math.ceil((examConfig.examSize * 70) / 100);
 
   return (
     <div className="min-h-full overflow-y-auto bg-zinc-50 dark:bg-zinc-950">
-      <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-10 lg:py-12">
-        {/* Exam hero card — current exam details only */}
-        <section aria-labelledby="exam-hero-heading" className="rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-700 dark:bg-zinc-900 sm:p-8">
-          <div className="flex flex-wrap items-start justify-between gap-4">
-            <div className="flex items-start gap-4">
-              <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-amber-50 text-2xl dark:bg-amber-950/50">
+
+      {/* ── Hero ──────────────────────────────────────────────────────────── */}
+      <div className="border-b border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900">
+        <div className="mx-auto max-w-5xl px-6 py-10 sm:py-14">
+          {/* Breadcrumb */}
+          <Link
+            href="/practice-exams"
+            className="mb-6 inline-flex items-center gap-1.5 text-sm font-medium text-zinc-500 transition-colors hover:text-indigo-600 dark:text-zinc-400 dark:hover:text-indigo-400"
+          >
+            ← Practice Exams
+          </Link>
+
+          <div className="flex flex-col gap-8 sm:flex-row sm:items-start sm:justify-between">
+            {/* Left: identity + tagline + stat chips */}
+            <div className="flex items-start gap-5">
+              <span className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl border border-zinc-100 bg-zinc-50 text-3xl dark:border-zinc-700/60 dark:bg-zinc-800">
                 {getLangIcon(lang)}
               </span>
               <div>
-                <div className="mb-1 flex flex-wrap items-center gap-2">
-                  <h1 id="exam-hero-heading" className="text-xl font-bold text-zinc-900 dark:text-zinc-100 sm:text-2xl">
+                <div className="flex flex-wrap items-center gap-2">
+                  <h1 className="text-3xl font-extrabold tracking-tight text-zinc-900 dark:text-zinc-100 sm:text-4xl">
                     {name} Practice Exam
                   </h1>
-                  <span className="rounded-full border border-amber-300 bg-amber-50 px-2.5 py-0.5 text-xs font-semibold uppercase tracking-wider text-amber-700 dark:border-amber-700 dark:bg-amber-950/50 dark:text-amber-400">
+                  <span className="rounded-full border border-amber-200 bg-amber-50 px-2.5 py-0.5 text-xs font-semibold text-amber-700 dark:border-amber-700/50 dark:bg-amber-950/30 dark:text-amber-400">
                     Pro
                   </span>
                 </div>
-                <p className="text-sm text-zinc-600 dark:text-zinc-400 sm:text-base">
-                  {tagline}
+                <p className="mt-2 max-w-xl text-base text-zinc-500 dark:text-zinc-400">
+                  {content?.tagline ?? `Timed multiple-choice exam to validate your ${name} knowledge.`}
                 </p>
-                <ul className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-sm text-zinc-500 dark:text-zinc-400">
-                  <li>{examConfig.examSize} questions</li>
-                  <li>{examConfig.examDurationMinutes} minutes</li>
-                  <li>70% to pass</li>
-                  <li>Certificate on pass</li>
-                </ul>
+
+                {/* Quick stats chips */}
+                <div className="mt-5 flex flex-wrap gap-2">
+                  {[
+                    { label: `${examConfig.examSize} questions` },
+                    { label: `${examConfig.examDurationMinutes} min` },
+                    { label: `${passMin} correct to pass (70%)` },
+                    { label: "Certificate on pass" },
+                  ].map(({ label }) => (
+                    <span
+                      key={label}
+                      className="inline-flex items-center rounded-full border border-zinc-200 bg-zinc-50 px-3 py-1 text-sm font-medium text-zinc-700 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300"
+                    >
+                      {label}
+                    </span>
+                  ))}
+                </div>
               </div>
             </div>
           </div>
-        </section>
+        </div>
+      </div>
 
-        {/* Main + Sidebar layout */}
-        <div className="mt-10 grid gap-8 lg:grid-cols-[1fr_320px] lg:items-start">
-          {/* Tabs (main) */}
+      {/* ── Body: main content + sticky sidebar ─────────────────────────── */}
+      <div className="mx-auto max-w-5xl px-6 py-10 sm:py-14">
+        <div className="grid gap-8 lg:grid-cols-[1fr_300px] lg:items-start">
+
+          {/* ── Left: tabs (overview, topics, FAQ) ──────────────────────── */}
           <div className="min-w-0">
-            <ExamDetailTabs langName={name} content={content} examSize={examConfig.examSize} examDurationMinutes={examConfig.examDurationMinutes} />
+            <ExamDetailTabs
+              langName={name}
+              content={content}
+              examSize={examConfig.examSize}
+              examDurationMinutes={examConfig.examDurationMinutes}
+            />
           </div>
 
-          {/* Sticky CTA card */}
+          {/* ── Right: sticky CTA card ───────────────────────────────────── */}
           <aside className="lg:sticky lg:top-6">
-            <div className="rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-700 dark:bg-zinc-900">
-              {canTakeExam ? (
-                <>
-                  <p className="text-sm text-zinc-600 dark:text-zinc-400">
-                    You have access. The timer starts when you begin — you&apos;ll
-                    have {examConfig.examDurationMinutes} minutes.
-                  </p>
-                  <div className="mt-4">
-                    <StartExamButton lang={lang} langName={name} fullWidth />
-                  </div>
-                </>
-              ) : (
-                <>
-                  <p className="font-semibold text-zinc-900 dark:text-zinc-100">
-                    Take this exam
-                  </p>
-                  <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
-                    Practice exams are included in Pro. Upgrade to take this exam
-                    and earn a certificate.
-                  </p>
-                  <div className="mt-5 flex flex-col gap-3">
-                    <Link
-                      href="/pricing"
-                      className="inline-flex items-center justify-center rounded-xl bg-indigo-600 px-5 py-3 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-indigo-500"
-                    >
-                      Upgrade to Pro
-                    </Link>
-                    {!user && (
+            <div className="overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-sm dark:border-zinc-700 dark:bg-zinc-900">
+              {/* Card top accent */}
+              <div className="h-1 w-full bg-gradient-to-r from-indigo-500 to-violet-400" />
+
+              <div className="p-6">
+                {canTakeExam ? (
+                  <>
+                    <p className="text-lg font-bold text-zinc-900 dark:text-zinc-100">Ready to start?</p>
+                    <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
+                      The timer starts the moment you begin. You&apos;ll have {examConfig.examDurationMinutes} minutes.
+                    </p>
+
+                    {/* Checklist */}
+                    <ul className="mt-5 space-y-2.5">
+                      {[
+                        `${examConfig.examSize} randomised questions`,
+                        `${examConfig.examDurationMinutes} min — can't be paused`,
+                        `${passMin} correct (70%) to pass`,
+                        "Certificate sent on pass",
+                        "Retake anytime",
+                      ].map((item) => (
+                        <li key={item} className="flex items-center gap-2.5 text-sm text-zinc-700 dark:text-zinc-300">
+                          <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-indigo-100 text-xs font-bold text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-300">
+                            ✓
+                          </span>
+                          {item}
+                        </li>
+                      ))}
+                    </ul>
+
+                    <div className="mt-6">
+                      <StartExamButton lang={lang} langName={name} fullWidth />
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <p className="text-lg font-bold text-zinc-900 dark:text-zinc-100">Take this exam</p>
+                    <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
+                      Practice exams are a Pro feature. Upgrade to start this exam and earn your certificate.
+                    </p>
+
+                    <ul className="mt-5 space-y-2.5">
+                      {[
+                        "Timed exams with real scoring",
+                        "Shareable certificate on pass",
+                        "All 6 language exams",
+                        "Retake anytime",
+                      ].map((item) => (
+                        <li key={item} className="flex items-center gap-2.5 text-sm text-zinc-700 dark:text-zinc-300">
+                          <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-indigo-100 text-xs font-bold text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-300">
+                            ✓
+                          </span>
+                          {item}
+                        </li>
+                      ))}
+                    </ul>
+
+                    <div className="mt-6 flex flex-col gap-3">
                       <Link
-                        href="/login"
-                        className="inline-flex items-center justify-center rounded-xl border border-zinc-300 bg-white py-3 text-sm font-semibold text-zinc-700 transition-colors hover:bg-zinc-50 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-200 dark:hover:bg-zinc-700"
+                        href="/pricing"
+                        className="inline-flex items-center justify-center rounded-xl bg-indigo-600 px-5 py-3 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-indigo-500"
                       >
-                        Sign in
+                        Upgrade to Pro
                       </Link>
-                    )}
-                  </div>
-                </>
-              )}
+                      {!user && (
+                        <Link
+                          href="/login"
+                          className="inline-flex items-center justify-center rounded-xl border border-zinc-200 bg-zinc-50 px-5 py-3 text-sm font-semibold text-zinc-700 transition-colors hover:bg-zinc-100 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-200 dark:hover:bg-zinc-700"
+                        >
+                          Sign in
+                        </Link>
+                      )}
+                    </div>
+
+                    <p className="mt-4 text-center text-xs text-zinc-400 dark:text-zinc-500">
+                      Free users can browse all exam details.
+                    </p>
+                  </>
+                )}
+              </div>
             </div>
           </aside>
         </div>
 
-        {/* Other exams */}
-        <OtherExamsGrid currentLang={lang} langSlugs={langSlugs} examConfigByLang={examConfigByLang} />
+        {/* ── Other exams ─────────────────────────────────────────────────── */}
+        <OtherExamsGrid
+          currentLang={lang}
+          langSlugs={langSlugs}
+          examConfigByLang={examConfigByLang}
+        />
       </div>
     </div>
   );
