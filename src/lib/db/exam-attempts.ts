@@ -79,3 +79,47 @@ export async function getAnswers(attemptId: string): Promise<{ question_id: numb
     chosen_index: r.chosen_index,
   }));
 }
+
+/** Per-language stats for a user: attempt count, last attempt result, and whether they have a certificate. */
+export interface UserExamLangStats {
+  lang: string;
+  attemptCount: number;
+  lastPassed: boolean | null;
+  lastScore: number | null;
+  hasCertificate: boolean;
+}
+
+/** Get exam attempt and certificate stats per language for the practice-exams page (e.g. "Try again", "Passed"). */
+export async function getUserExamStats(userId: number): Promise<UserExamLangStats[]> {
+  const sql = getSql();
+  const [attemptRows, certRows] = await Promise.all([
+    sql`
+      SELECT lang, COUNT(*)::int AS attempt_count,
+             (array_agg(score ORDER BY submitted_at DESC NULLS LAST))[1] AS last_score,
+             (array_agg(passed ORDER BY submitted_at DESC NULLS LAST))[1] AS last_passed
+      FROM exam_attempts
+      WHERE user_id = ${userId} AND submitted_at IS NOT NULL
+      GROUP BY lang
+    `,
+    sql`SELECT lang FROM exam_certificates WHERE user_id = ${userId}`,
+  ]);
+  const certLangs = new Set((certRows as { lang: string }[]).map((r) => r.lang));
+  const byLang = new Map<string, UserExamLangStats>();
+  for (const r of attemptRows as { lang: string; attempt_count: number; last_score: number | null; last_passed: boolean | null }[]) {
+    byLang.set(r.lang, {
+      lang: r.lang,
+      attemptCount: r.attempt_count,
+      lastPassed: r.last_passed,
+      lastScore: r.last_score,
+      hasCertificate: certLangs.has(r.lang),
+    });
+  }
+  for (const c of certRows as { lang: string }[]) {
+    if (!byLang.has(c.lang)) {
+      byLang.set(c.lang, { lang: c.lang, attemptCount: 0, lastPassed: null, lastScore: null, hasCertificate: true });
+    } else {
+      (byLang.get(c.lang)!).hasCertificate = true;
+    }
+  }
+  return Array.from(byLang.values());
+}
