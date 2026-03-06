@@ -35,12 +35,8 @@ export interface BannerData {
   linkText: string;
 }
 
-export interface SiteSettingsData {
-  exam_pass_percent: string;
-}
-
 export interface ExamSettingsMap {
-  [lang: string]: { examSize: number; examDurationMinutes: number };
+  [lang: string]: { examSize: number; examDurationMinutes: number; passPercent: number };
 }
 
 export interface ExamUploadResult {
@@ -96,11 +92,6 @@ export function useAdminData() {
   const [bannerSaving, setBannerSaving] = useState(false);
   const [bannerMessage, setBannerMessage] = useState<string | null>(null);
 
-  /* ── State: site settings tab ────────────────────────────────────────── */
-  const [siteSettings, setSiteSettings] = useState<SiteSettingsData | null>(null);
-  const [siteSettingsSaving, setSiteSettingsSaving] = useState(false);
-  const [siteSettingsMessage, setSiteSettingsMessage] = useState<string | null>(null);
-
   /* ── Ref for revenue print ───────────────────────────────────────────── */
   const printRef = useRef<HTMLDivElement>(null);
 
@@ -144,18 +135,14 @@ export function useAdminData() {
     return () => { cancelled = true; };
   }, [tab, revenuePeriod, revenue]);
 
-  /* ── Exam stats, settings & pass threshold (loaded when exams tab activates) */
+  /* ── Exam stats & settings (loaded when exams tab activates) ─────────── */
   useEffect(() => {
     if (tab !== "exams") return;
     setExamStatsLoading(true);
     setExamSettings(null);
-    setSiteSettings(null);
     let cancelled = false;
     fetch("/api/admin/exam-stats", { credentials: "same-origin" }).then((r) => r.ok ? r.json() : null).then((data) => { if (!cancelled && data) setExamStats(data); }).finally(() => { if (!cancelled) setExamStatsLoading(false); });
     fetch("/api/admin/exam-settings", { credentials: "same-origin" }).then((r) => r.ok ? r.json() : null).then((data) => { if (!cancelled && data && typeof data === "object") setExamSettings(data); });
-    fetch("/api/admin/site-settings", { credentials: "same-origin" }).then((r) => r.ok ? r.json() : null).then((data) => {
-      if (!cancelled && data) setSiteSettings({ exam_pass_percent: data.exam_pass_percent ?? "70" });
-    });
     return () => { cancelled = true; };
   }, [tab]);
 
@@ -249,19 +236,6 @@ export function useAdminData() {
     } catch (e) { setBannerMessage(String(e)); } finally { setBannerSaving(false); }
   }, [bannerData]);
 
-  /* ── Site settings save ──────────────────────────────────────────────── */
-  const saveSiteSettings = useCallback(async () => {
-    if (!siteSettings) return;
-    setSiteSettingsSaving(true);
-    setSiteSettingsMessage(null);
-    try {
-      const res = await fetch("/api/admin/site-settings", { method: "PUT", credentials: "same-origin", headers: { "Content-Type": "application/json" }, body: JSON.stringify(siteSettings) });
-      const data = await res.json();
-      if (res.ok) { setSiteSettings({ exam_pass_percent: data.exam_pass_percent ?? siteSettings.exam_pass_percent }); setSiteSettingsMessage("Saved."); setTimeout(() => setSiteSettingsMessage(null), 3000); }
-      else setSiteSettingsMessage(data.error ?? "Save failed");
-    } catch (e) { setSiteSettingsMessage(String(e)); } finally { setSiteSettingsSaving(false); }
-  }, [siteSettings]);
-
   /* ── Revenue CSV export ──────────────────────────────────────────────── */
   const exportRevenueCSV = useCallback(() => {
     const header = "Period,Revenue (USD)";
@@ -338,8 +312,6 @@ export function useAdminData() {
     examSettings, setExamSettings, examSettingsSaving, examSettingsMessage, saveExamSettings, uploadExamQuestions,
     /* banner */
     bannerData, setBannerData, bannerSaving, bannerMessage, saveBanner,
-    /* site settings */
-    siteSettings, setSiteSettings, siteSettingsSaving, siteSettingsMessage, saveSiteSettings,
     /* revenue helpers */
     exportRevenueCSV, printRevenuePDF, exportUsersCSV,
     /* computed */

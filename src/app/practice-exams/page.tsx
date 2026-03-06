@@ -7,7 +7,6 @@ import { getCurrentUser } from "@/lib/auth";
 import { getUserPlan, getExamConfigForAllLangs, getUserExamStats, getExamPublicStatsByLang } from "@/lib/db";
 import { hasPaidAccess } from "@/lib/plans";
 import { EXAM_LANGS } from "@/lib/exams/config";
-import { getExamPassPercent } from "@/lib/db/site-settings";
 import { tutorialLangUrl } from "@/lib/urls";
 
 export const dynamic = "force-dynamic";
@@ -148,11 +147,10 @@ function ExamCard({
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default async function PracticeExamsPage() {
-  const [user, examConfigByLang, publicStats, EXAM_PASS_PERCENT] = await Promise.all([
+  const [user, examConfigByLang, publicStats] = await Promise.all([
     getCurrentUser(),
     getExamConfigForAllLangs(),
     getExamPublicStatsByLang(),
-    getExamPassPercent(),
   ]);
 
   const plan = user ? await getUserPlan(user.userId) : "free";
@@ -194,7 +192,7 @@ export default async function PracticeExamsPage() {
                 Practice Exams
               </h1>
               <p className="mt-3 text-lg text-zinc-500 dark:text-zinc-400">
-                Timed multiple-choice exams by language. Score {EXAM_PASS_PERCENT}%+ to earn a shareable certificate.
+                Timed multiple-choice exams by language. Pass to earn a shareable certificate.
               </p>
             </div>
 
@@ -240,8 +238,8 @@ export default async function PracticeExamsPage() {
               <p className="mt-0.5 text-sm text-zinc-500 dark:text-zinc-400">Certificates issued</p>
             </div>
             <div>
-              <p className="text-2xl font-bold text-zinc-900 dark:text-zinc-100">{EXAM_PASS_PERCENT}%</p>
-              <p className="mt-0.5 text-sm text-zinc-500 dark:text-zinc-400">Score to pass</p>
+              <p className="text-2xl font-bold text-zinc-900 dark:text-zinc-100">Per exam</p>
+              <p className="mt-0.5 text-sm text-zinc-500 dark:text-zinc-400">Pass threshold</p>
             </div>
           </div>
         </div>
@@ -258,7 +256,7 @@ export default async function PracticeExamsPage() {
             {[
               { step: "1", title: "Pick a language", body: "Choose from Go, Python, JavaScript, Java, Rust, or C++. Each exam is independently timed and scored." },
               { step: "2", title: "Take the timed exam", body: "Answer multiple-choice questions within the time limit. The clock starts the moment you begin." },
-              { step: "3", title: "Pass and earn your cert", body: `Score ${EXAM_PASS_PERCENT}% or higher to pass. Download and share your certificate — it's yours forever.` },
+              { step: "3", title: "Pass and earn your cert", body: "Meet the pass threshold for that language. Download and share your certificate — it's yours forever." },
             ].map(({ step, title, body }) => (
               <div key={step} className="rounded-2xl border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-900">
                 <div className="mb-4 flex h-9 w-9 items-center justify-center rounded-xl bg-indigo-600 text-sm font-bold text-white">

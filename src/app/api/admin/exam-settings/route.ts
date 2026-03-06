@@ -12,7 +12,7 @@ export const GET = withErrorHandling("GET /api/admin/exam-settings", async () =>
 export const PUT = withErrorHandling("PUT /api/admin/exam-settings", async (req: Request) => {
   const { admin, response } = await requireAdmin();
   if (!admin) return response;
-  let body: { settings?: Record<string, { examSize?: number; examDurationMinutes?: number }> } = {};
+  let body: { settings?: Record<string, { examSize?: number; examDurationMinutes?: number; passPercent?: number }> } = {};
   try {
     body = await req.json();
   } catch {

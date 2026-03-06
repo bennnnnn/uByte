@@ -6,11 +6,10 @@ import type { SupportedLanguage } from "@/lib/languages/types";
 interface Props {
   currentLang: string;
   langSlugs: string[];
-  examConfigByLang: Record<string, { examSize: number; examDurationMinutes: number }>;
-  passPercent: number;
+  examConfigByLang: Record<string, { examSize: number; examDurationMinutes: number; passPercent: number }>;
 }
 
-export default function OtherExamsGrid({ currentLang, langSlugs, examConfigByLang, passPercent }: Props) {
+export default function OtherExamsGrid({ currentLang, langSlugs, examConfigByLang }: Props) {
   const others = langSlugs.filter((slug) => slug !== currentLang);
   if (others.length === 0) return null;
 
@@ -25,7 +24,7 @@ export default function OtherExamsGrid({ currentLang, langSlugs, examConfigByLan
             Other exams
           </h2>
           <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
-            Each exam is independently timed and scored. {passPercent}% to pass.
+            Each exam is independently timed and scored.
           </p>
         </div>
         <Link
@@ -40,7 +39,7 @@ export default function OtherExamsGrid({ currentLang, langSlugs, examConfigByLan
         {others.map((slug) => {
           const config = LANGUAGES[slug as SupportedLanguage];
           if (!config) return null;
-          const examConfig = examConfigByLang[slug] ?? { examSize: 40, examDurationMinutes: 45 };
+          const examConfig = examConfigByLang[slug] ?? { examSize: 40, examDurationMinutes: 45, passPercent: 70 };
           return (
             <Link
               key={slug}
@@ -55,7 +54,7 @@ export default function OtherExamsGrid({ currentLang, langSlugs, examConfigByLan
                   {config.name}
                 </p>
                 <p className="text-xs text-zinc-400 dark:text-zinc-500">
-                  {examConfig.examSize} questions · {examConfig.examDurationMinutes} min
+                  {examConfig.examSize} questions · {examConfig.examDurationMinutes} min · {examConfig.passPercent}% to pass
                 </p>
               </div>
               <span className="shrink-0 text-zinc-300 transition-all group-hover:translate-x-0.5 group-hover:text-indigo-500 dark:text-zinc-600 dark:group-hover:text-indigo-400">

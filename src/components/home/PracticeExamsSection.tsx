@@ -1,9 +1,7 @@
 import Link from "next/link";
 import { LANGUAGES, getAllLanguageSlugs } from "@/lib/languages/registry";
 import { getLangIcon } from "@/lib/languages/icons";
-import { getExamPassPercent } from "@/lib/db/site-settings";
 
-/* Amber accent so Practice exams are visually distinct from Interview practice (indigo). */
 const CARD_STYLE =
   "border-amber-200 bg-gradient-to-br from-white to-amber-50/60 hover:border-amber-400 hover:shadow-amber-100 dark:border-amber-900/40 dark:from-zinc-900 dark:to-amber-950/20 dark:hover:border-amber-700";
 const BADGE_STYLE = "bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-400";
@@ -11,12 +9,11 @@ const ARROW_STYLE = "text-amber-600 dark:text-amber-400";
 
 /** Per-language exam config from admin (exam_lang_settings). Cards show what the user will take for that language. */
 interface Props {
-  examConfigByLang: Record<string, { examSize: number; examDurationMinutes: number }>;
+  examConfigByLang: Record<string, { examSize: number; examDurationMinutes: number; passPercent: number }>;
 }
 
-export default async function PracticeExamsSection({ examConfigByLang }: Props) {
+export default function PracticeExamsSection({ examConfigByLang }: Props) {
   const langSlugs = getAllLanguageSlugs();
-  const EXAM_PASS_PERCENT = await getExamPassPercent();
 
   return (
     <section aria-labelledby="practice-exams-heading" className="space-y-5">
@@ -33,7 +30,7 @@ export default async function PracticeExamsSection({ examConfigByLang }: Props) 
             </span>
           </div>
           <p className="mb-5 text-sm text-zinc-600 dark:text-zinc-400">
-            Timed multiple-choice exams by language. Questions and duration set per language. Score at least {EXAM_PASS_PERCENT}% to pass and earn a certificate.
+            Timed multiple-choice exams by language. Questions, duration, and pass threshold set per language. Pass to earn a certificate.
           </p>
 
           <Link
@@ -53,7 +50,7 @@ export default async function PracticeExamsSection({ examConfigByLang }: Props) 
         {langSlugs.map((slug) => {
           const config = LANGUAGES[slug as keyof typeof LANGUAGES];
           if (!config) return null;
-          const examConfig = examConfigByLang[slug] ?? { examSize: 40, examDurationMinutes: 45 };
+          const examConfig = examConfigByLang[slug] ?? { examSize: 40, examDurationMinutes: 45, passPercent: 70 };
           return (
             <Link
               key={slug}
@@ -75,7 +72,7 @@ export default async function PracticeExamsSection({ examConfigByLang }: Props) 
               </div>
 
               <p className="flex-1 text-sm leading-relaxed text-zinc-500 dark:text-zinc-400">
-                {examConfig.examDurationMinutes} min · {EXAM_PASS_PERCENT}% to pass · Certificate
+                {examConfig.examDurationMinutes} min · {examConfig.passPercent}% to pass · Certificate
               </p>
 
               <div className={`mt-4 flex items-center gap-1 text-sm font-semibold transition-[gap] group-hover:gap-2 ${ARROW_STYLE}`}>

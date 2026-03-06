@@ -27,35 +27,13 @@ export default function ExamsTab({ data }: Props) {
     examStats, examStatsLoading,
     examSettings, setExamSettings, examSettingsSaving, examSettingsMessage, saveExamSettings,
     examUploadFile, setExamUploadFile, examUploading, examUploadResult, setExamUploadResult, uploadExamQuestions,
-    siteSettings, setSiteSettings, siteSettingsSaving, siteSettingsMessage, saveSiteSettings,
   } = data;
 
   return (
     <div className="space-y-5">
 
-      {/* ── Global pass threshold ──────────────────────────────────────── */}
-      <SectionCard title="Pass threshold" description="Minimum score (%) to pass any exam and earn a certificate. Changes take effect immediately.">
-        {siteSettings === null ? <LoadingBlock /> : (
-          <div className="flex flex-wrap items-center gap-4">
-            <div className="flex items-center gap-3">
-              <input
-                type="number"
-                min={1}
-                max={100}
-                value={siteSettings.exam_pass_percent}
-                onChange={(e) => setSiteSettings((s) => s ? { ...s, exam_pass_percent: e.target.value } : s)}
-                className="w-20 rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2 text-right font-mono text-sm dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-200"
-              />
-              <span className="text-sm text-zinc-500 dark:text-zinc-400">%</span>
-            </div>
-            <SaveButton saving={siteSettingsSaving} label="Save threshold" onClick={saveSiteSettings} />
-            <SaveFeedback message={siteSettingsMessage} />
-          </div>
-        )}
-      </SectionCard>
-
-      {/* ── Per-language settings ──────────────────────────────────────── */}
-      <SectionCard title="Exam settings" description="Questions and duration per language. Changes apply to new attempts.">
+      {/* ── Per-language settings (questions, duration, pass %) ─────────── */}
+      <SectionCard title="Exam settings" description="Questions, duration, and pass threshold per language. Each exam can have its own settings. Changes apply to new attempts.">
         {examSettings === null ? <LoadingBlock /> : (
           <>
             <div className="overflow-x-auto">
@@ -64,20 +42,24 @@ export default function ExamsTab({ data }: Props) {
                   <tr className="border-b border-zinc-200 dark:border-zinc-700">
                     <th className="pb-2 pr-4 text-left text-xs font-semibold uppercase tracking-wide text-zinc-400">Language</th>
                     <th className="pb-2 pr-4 text-right text-xs font-semibold uppercase tracking-wide text-zinc-400">Questions</th>
-                    <th className="pb-2 text-right text-xs font-semibold uppercase tracking-wide text-zinc-400">Duration (min)</th>
+                    <th className="pb-2 pr-4 text-right text-xs font-semibold uppercase tracking-wide text-zinc-400">Duration (min)</th>
+                    <th className="pb-2 text-right text-xs font-semibold uppercase tracking-wide text-zinc-400">Pass %</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800">
                   {LANG_KEYS.map((lang) => {
-                    const cfg = examSettings[lang] ?? { examSize: 40, examDurationMinutes: 45 };
+                    const cfg = examSettings[lang] ?? { examSize: 40, examDurationMinutes: 45, passPercent: 70 };
                     return (
                       <tr key={lang}>
                         <td className="py-2.5 pr-4 font-medium text-zinc-900 dark:text-zinc-100">{LANG_NAMES[lang]}</td>
                         <td className="py-2.5 pr-4 text-right">
                           <NumberInput value={cfg.examSize} min={1} max={200} onChange={(v) => setExamSettings((s) => s ? { ...s, [lang]: { ...cfg, examSize: v } } : s)} />
                         </td>
-                        <td className="py-2.5 text-right">
+                        <td className="py-2.5 pr-4 text-right">
                           <NumberInput value={cfg.examDurationMinutes} min={5} max={180} onChange={(v) => setExamSettings((s) => s ? { ...s, [lang]: { ...cfg, examDurationMinutes: v } } : s)} />
+                        </td>
+                        <td className="py-2.5 text-right">
+                          <NumberInput value={cfg.passPercent} min={1} max={100} onChange={(v) => setExamSettings((s) => s ? { ...s, [lang]: { ...cfg, passPercent: v } } : s)} />
                         </td>
                       </tr>
                     );

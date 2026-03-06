@@ -18,7 +18,7 @@ export default function PracticeExamResultPage() {
 
   useEffect(() => {
     fetch("/api/site-settings").then((r) => r.ok ? r.json() : null).then((d) => {
-      if (d?.examPassPercent) setPassPercent(d.examPassPercent);
+      if (d?.passPercentByLang?.[lang]) setPassPercent(d.passPercentByLang[lang]);
     }).catch(() => {});
   }, []);
 
