@@ -7,6 +7,7 @@ import { useAuth } from "@/components/AuthProvider";
 import {
   BILLING_CONFIG, MONTHLY_PRICE_ID, YEARLY_PRICE_ID, hasPaidAccess,
   FREE_TUTORIAL_LIMIT, FREE_PRACTICE_LIMIT,
+  MONTHLY_PRICE_CENTS, YEARLY_PRICE_CENTS,
   MONTHLY_EQUIVALENT_CENTS, YEARLY_IF_MONTHLY_CENTS, YEARLY_DISCOUNT_PERCENT,
 } from "@/lib/plans";
 import { trackConversion } from "@/lib/analytics";
@@ -68,8 +69,8 @@ function PricingContent() {
       .catch(() => {});
   }, []);
 
-  const monthlyPriceCents = dynPricing?.monthlyPriceCents ?? (BILLING_CONFIG.monthly as { priceCents: number }).priceCents ?? 999;
-  const yearlyPriceCents = dynPricing?.yearlyPriceCents ?? (BILLING_CONFIG.yearly as { priceCents: number }).priceCents ?? 4999;
+  const monthlyPriceCents = dynPricing?.monthlyPriceCents ?? MONTHLY_PRICE_CENTS;
+  const yearlyPriceCents = dynPricing?.yearlyPriceCents ?? YEARLY_PRICE_CENTS;
   const monthlyEq = dynPricing?.monthlyEquivalentCents ?? MONTHLY_EQUIVALENT_CENTS;
   const yearlyIfMonthly = dynPricing?.yearlyIfMonthlyCents ?? YEARLY_IF_MONTHLY_CENTS;
   const discountPct = dynPricing?.yearlyDiscountPercent ?? YEARLY_DISCOUNT_PERCENT;
