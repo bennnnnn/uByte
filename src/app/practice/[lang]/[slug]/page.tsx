@@ -24,9 +24,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const langName = isSupportedLanguage(lang) ? LANGUAGES[lang as SupportedLanguage]?.name : lang;
   if (!problem) return { title: "Not found" };
   const canonical = absoluteUrl(`/practice/${lang}/${slug}`);
+  const title = `${problem.title} (${langName}) | Interview Practice`;
+  const description = problem.description.slice(0, 160);
   return {
-    title: `${problem.title} (${langName}) | Interview Practice`,
-    description: problem.description.slice(0, 160),
+    title,
+    description,
     keywords: [
       ...SITE_KEYWORDS,
       problem.title,
@@ -37,10 +39,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     alternates: { canonical },
     openGraph: {
       type: "article",
-      title: `${problem.title} (${langName}) | Interview Practice`,
-      description: problem.description.slice(0, 160),
+      title: `${title} | uByte`,
+      description,
       url: canonical,
     },
+    twitter: { card: "summary_large_image" as const, title: `${title} | uByte`, description },
   };
 }
 

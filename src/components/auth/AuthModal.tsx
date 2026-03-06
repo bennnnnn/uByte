@@ -6,7 +6,8 @@ import Link from "next/link";
 import { useAuth } from "@/components/AuthProvider";
 import Input from "@/components/ui/Input";
 import GoogleIcon from "@/components/auth/GoogleIcon";
-import { requestPasswordReset, submitEmailAuth } from "@/lib/auth-client";
+import { apiFetch } from "@/lib/api-client";
+import { submitEmailAuth } from "@/lib/auth-client";
 import { MIN_PASSWORD_LENGTH, PASSWORD_POLICY_MESSAGE, isValidPassword } from "@/lib/password-policy";
 
 const GSI_CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ?? "";
@@ -116,9 +117,21 @@ export default function AuthModal({ onClose, initialMode }: Props) {
     setSubmitting(true);
 
     if (mode === "forgot") {
-      const result = await requestPasswordReset(email);
-      if (!result.ok) setError(result.error);
-      else setForgotDone(true);
+      try {
+        const res = await apiFetch("/api/auth/forgot-password", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email }),
+        });
+        if (!res.ok) {
+          const data = await res.json();
+          setError(data.error || "Something went wrong.");
+        } else {
+          setForgotDone(true);
+        }
+      } catch {
+        setError("Network error. Please try again.");
+      }
       setSubmitting(false);
       return;
     }
@@ -221,7 +234,7 @@ export default function AuthModal({ onClose, initialMode }: Props) {
                       type="email"
                       required
                       value={email}
-                      onChange={(e) => setEmail(e.target.value)}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
                       placeholder="you@example.com"
                       className="rounded-xl bg-zinc-50/80 dark:bg-zinc-800/80"
                     />
@@ -280,7 +293,7 @@ export default function AuthModal({ onClose, initialMode }: Props) {
                       type="text"
                       required
                       value={name}
-                      onChange={(e) => setName(e.target.value)}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => setName(e.target.value)}
                       placeholder="Your name"
                       className="rounded-xl bg-zinc-50/80 dark:bg-zinc-800/80"
                     />
@@ -296,7 +309,7 @@ export default function AuthModal({ onClose, initialMode }: Props) {
                     type="email"
                     required
                     value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
                     placeholder="you@example.com"
                     className="rounded-xl bg-zinc-50/80 dark:bg-zinc-800/80"
                   />
@@ -322,8 +335,8 @@ export default function AuthModal({ onClose, initialMode }: Props) {
                     required
                     minLength={MIN_PASSWORD_LENGTH}
                     value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="At least 6 chars, Aa1"
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
+                    placeholder="Min. 8 characters (Aa1)"
                     className="rounded-xl bg-zinc-50/80 dark:bg-zinc-800/80"
                   />
                 </div>

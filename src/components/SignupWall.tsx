@@ -123,10 +123,10 @@ export default function SignupWall({ slug }: { slug: string }) {
               id="wall-password"
               type="password"
               required
-              minLength={MIN_PASSWORD_LENGTH}
+              minLength={8}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="Password (e.g. Abc123)"
+              placeholder="Password (min. 8 characters)"
             />
           </div>
           <button

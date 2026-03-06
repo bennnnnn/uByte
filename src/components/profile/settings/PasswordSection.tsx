@@ -7,7 +7,7 @@ import { MIN_PASSWORD_LENGTH, PASSWORD_POLICY_MESSAGE, isValidPassword } from "@
 
 function passwordStrength(pw: string): { label: string; color: string; width: string } {
   if (pw.length === 0) return { label: "", color: "", width: "0%" };
-  if (pw.length < MIN_PASSWORD_LENGTH) return { label: "Too short", color: "bg-red-500", width: "20%" };
+  if (pw.length < 8) return { label: "Too short", color: "bg-red-500", width: "20%" };
   const hasLower = /[a-z]/.test(pw);
   const hasUpper = /[A-Z]/.test(pw);
   const hasNum = /[0-9]/.test(pw);
@@ -107,7 +107,7 @@ export default function PasswordSection({ profile, onChangePassword, onToast }: 
               </div>
             )}
           </div>
-          <button onClick={handleChange} disabled={!currentPw || !isValidPassword(newPw) || changing} className="rounded-lg bg-zinc-800 px-6 py-2.5 text-sm font-medium text-white hover:bg-zinc-700 disabled:opacity-50 dark:bg-zinc-200 dark:text-zinc-900 dark:hover:bg-zinc-300">
+          <button onClick={handleChange} disabled={!currentPw || newPw.length < 8 || !isValidPassword(newPw) || changing} className="rounded-lg bg-zinc-800 px-6 py-2.5 text-sm font-medium text-white hover:bg-zinc-700 disabled:opacity-50 dark:bg-zinc-200 dark:text-zinc-900 dark:hover:bg-zinc-300">
             {changing ? "Updating..." : "Update Password"}
           </button>
         </div>

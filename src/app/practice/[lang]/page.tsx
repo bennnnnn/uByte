@@ -29,9 +29,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!isSupportedLanguage(lang)) return { title: "Not found" };
   const name = LANGUAGES[lang as SupportedLanguage]?.name ?? lang;
   const canonical = absoluteUrl(`/practice/${lang}`);
+  const title = `${name} Interview Practice`;
+  const description = `Solve classic interview coding problems in ${name}. Two Sum, Three Sum, sliding window, dynamic programming and more.`;
   return {
-    title: `${name} Interview Practice`,
-    description: `Solve classic interview coding problems in ${name}. Two Sum, Three Sum, sliding window, dynamic programming and more.`,
+    title,
+    description,
     keywords: [
       ...SITE_KEYWORDS,
       `${name} interview questions`,
@@ -41,10 +43,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     alternates: { canonical },
     openGraph: {
       type: "website",
-      title: `${name} Interview Practice | uByte`,
+      title: `${title} | uByte`,
       description: `Practice ${name} interview questions with runnable coding challenges.`,
       url: canonical,
     },
+    twitter: { card: "summary_large_image" as const, title: `${title} | uByte`, description },
   };
 }
 

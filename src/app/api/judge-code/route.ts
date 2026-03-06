@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { withErrorHandling } from "@/lib/api-utils";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
+import { verifyCsrf } from "@/lib/csrf";
 import { getPracticeProblemBySlug } from "@/lib/practice/problems";
 import { JUDGE0_URL, JUDGE0_LANG_IDS, b64, fromb64, maybeDecodeJudge0Message } from "@/lib/judge0";
 
@@ -101,6 +102,9 @@ export interface JudgeResult {
 }
 
 export const POST = withErrorHandling("POST /api/judge-code", async (request: NextRequest) => {
+  const csrfError = verifyCsrf(request);
+  if (csrfError) return NextResponse.json({ verdict: "error" as const, message: csrfError }, { status: 403 });
+
   const ip = getClientIp(request.headers);
   const { limited, retryAfter } = await checkRateLimit(`judge:${ip}`, 10, 60_000);
   if (limited) {

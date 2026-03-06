@@ -30,7 +30,7 @@ export const POST = withErrorHandling("POST /api/auth/signup", async (request: N
 
   const existing = await getUserByEmail(email);
   if (existing) {
-    return NextResponse.json({ error: "Email already registered" }, { status: 409 });
+    return NextResponse.json({ error: "Unable to create account. Please try a different email or sign in." }, { status: 409 });
   }
 
   const passwordHash = await bcrypt.hash(password, 10);

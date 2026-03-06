@@ -14,16 +14,19 @@ export const metadata: Metadata = {
   alternates: { canonical: absoluteUrl("/leaderboard") },
   openGraph: {
     type: "website",
-    title: "uByte Leaderboard",
-    description: "Top learners by XP, tutorials completed, and interview practice progress.",
+    title: "Leaderboard | uByte",
+    description:
+      "See the top learners on uByte. Compete by earning XP through tutorials and practice.",
     url: absoluteUrl("/leaderboard"),
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Leaderboard | uByte",
+    description:
+      "See the top learners on uByte. Compete by earning XP through tutorials and practice.",
   },
 };
 
-export default function LeaderboardLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function LeaderboardLayout({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }

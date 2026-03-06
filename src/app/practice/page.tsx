@@ -29,6 +29,12 @@ export const metadata: Metadata = {
     type: "website",
     url: absoluteUrl("/practice"),
   },
+  twitter: {
+    card: "summary_large_image",
+    title: "Interview Practice | uByte",
+    description:
+      "Solve classic coding interview problems in Go, Python, C++, JavaScript, Java, and Rust.",
+  },
 };
 
 export default async function PracticePage() {

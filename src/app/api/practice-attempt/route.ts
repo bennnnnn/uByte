@@ -3,6 +3,7 @@ import { getCurrentUser } from "@/lib/auth";
 import { savePracticeAttempt, getPracticeAttempts, addXp, getUserById } from "@/lib/db";
 import { hasPaidAccess, isPracticeProblemFree } from "@/lib/plans";
 import { withErrorHandling } from "@/lib/api-utils";
+import { verifyCsrf } from "@/lib/csrf";
 import { PRACTICE_PROBLEMS } from "@/lib/practice/problems";
 
 /** XP awarded per difficulty on first solve. */
@@ -24,6 +25,9 @@ export const GET = withErrorHandling("GET /api/practice-attempt", async () => {
 export const POST = withErrorHandling("POST /api/practice-attempt", async (request: NextRequest) => {
   const user = await getCurrentUser();
   if (!user) return NextResponse.json({ error: "Unauthorised" }, { status: 401 });
+
+  const csrfError = verifyCsrf(request);
+  if (csrfError) return NextResponse.json({ error: csrfError }, { status: 403 });
 
   const body = await request.json();
   const { slug, status } = body ?? {};

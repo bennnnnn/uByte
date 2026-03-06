@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getChatMessages, saveChatMessage, getChatParticipants, createNotification } from "@/lib/db";
 import { withErrorHandling, requireAuth } from "@/lib/api-utils";
 import { verifyCsrf } from "@/lib/csrf";
+import { checkRateLimit } from "@/lib/rate-limit";
 import { getSteps } from "@/lib/tutorial-steps";
 import { getTutorialBySlug } from "@/lib/tutorials";
 import type { SupportedLanguage } from "@/lib/languages/types";
@@ -41,6 +42,11 @@ export const POST = withErrorHandling("POST /api/chat", async (req: NextRequest)
 
   const { user, response } = await requireAuth();
   if (!user) return response;
+
+  const { limited } = await checkRateLimit(`chat:${user.userId}`, 20, 60_000);
+  if (limited) {
+    return NextResponse.json({ error: "Too many messages. Please wait a moment." }, { status: 429 });
+  }
 
   const { slug, content, currentCode, lang: bodyLang } = await req.json();
   if (!slug || !content?.trim()) {

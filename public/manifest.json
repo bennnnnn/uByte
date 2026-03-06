@@ -1,11 +1,11 @@
 {
   "name": "uByte — Programming Tutorials, Interview Prep, and Certifications",
   "short_name": "uByte",
-  "description": "Interactive tutorials for Go, Python, C++, JavaScript, Java, and Rust, plus coding interview practice and certification-style exams.",
+  "description": "Interactive coding tutorials in Go, Python, C++, JavaScript, Java, and Rust. Practice for interviews. Write and run real code in your browser.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#09090b",
-  "theme_color": "#0891b2",
+  "theme_color": "#4f46e5",
   "orientation": "portrait-primary",
   "icons": [
     {
@@ -26,7 +26,7 @@
     {
       "name": "Practice",
       "url": "/practice",
-      "description": "Solve interview-style coding problems"
+      "description": "Solve coding interview problems"
     },
     {
       "name": "Practice Exams",

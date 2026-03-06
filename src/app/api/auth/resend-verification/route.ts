@@ -4,6 +4,7 @@ import { getUserById, createEmailVerificationToken } from "@/lib/db";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 import { sendVerificationEmail } from "@/lib/email";
 import { withErrorHandling, requireAuth } from "@/lib/api-utils";
+import { verifyCsrf } from "@/lib/csrf";
 
 export const POST = withErrorHandling("POST /api/auth/resend-verification", async (request: NextRequest) => {
   const ip = getClientIp(request.headers);
@@ -14,6 +15,9 @@ export const POST = withErrorHandling("POST /api/auth/resend-verification", asyn
 
   const { user: tokenPayload, response } = await requireAuth();
   if (!tokenPayload) return response;
+
+  const csrfError = verifyCsrf(request);
+  if (csrfError) return NextResponse.json({ error: csrfError }, { status: 403 });
 
   const user = await getUserById(tokenPayload.userId);
   if (!user) {

@@ -49,6 +49,10 @@ function ResetPasswordForm() {
       setError("Passwords don't match.");
       return;
     }
+    if (password.length < 8) {
+      setError("Password must be at least 8 characters.");
+      return;
+    }
     if (!isValidPassword(password)) {
       setError(PASSWORD_POLICY_MESSAGE);
       return;
@@ -89,22 +93,24 @@ function ResetPasswordForm() {
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label className="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300">New password</label>
+          <label htmlFor="reset-new-password" className="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300">New password</label>
           <Input
+            id="reset-new-password"
             type="password"
             required
-            minLength={MIN_PASSWORD_LENGTH}
+            minLength={8}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             placeholder="••••••••"
           />
         </div>
         <div>
-          <label className="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300">Confirm password</label>
+          <label htmlFor="reset-confirm-password" className="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300">Confirm password</label>
           <Input
+            id="reset-confirm-password"
             type="password"
             required
-            minLength={MIN_PASSWORD_LENGTH}
+            minLength={8}
             value={confirm}
             onChange={(e) => setConfirm(e.target.value)}
             placeholder="••••••••"

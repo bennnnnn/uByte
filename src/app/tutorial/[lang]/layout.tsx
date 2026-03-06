@@ -25,9 +25,9 @@ export default async function TutorialLangLayout({
       <div className="flex flex-1 flex-col min-h-0 overflow-hidden">
         <MobileNav lang={lang} tutorials={tutorials} />
         <LazyEmailVerificationBanner />
-        <main id="main-content" className="flex-1 overflow-y-auto">
+        <div className="flex-1 overflow-y-auto">
           <ErrorBoundary>{children}</ErrorBoundary>
-        </main>
+        </div>
       </div>
     </div>
   );

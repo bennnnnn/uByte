@@ -8,6 +8,7 @@ import { buildEvidenceBundle, buildFailureSignature } from "@/lib/ai/evidence-bu
 import { runHeuristics } from "@/lib/ai/heuristics";
 import { callAiFeedback } from "@/lib/ai/feedback-client";
 import { withErrorHandling } from "@/lib/api-utils";
+import { verifyCsrf } from "@/lib/csrf";
 
 const MODEL_NAME = "grok-4";
 
@@ -17,6 +18,9 @@ export const POST = withErrorHandling("POST /api/ai-feedback", async (request: N
   if (!user) {
     return NextResponse.json({ error: "Sign in to use AI feedback" }, { status: 401 });
   }
+
+  const csrfError = verifyCsrf(request);
+  if (csrfError) return NextResponse.json({ error: csrfError }, { status: 403 });
 
   const body = await request.json();
   const submissionId = body?.submission_id != null ? Number(body.submission_id) : NaN;

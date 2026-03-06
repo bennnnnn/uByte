@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { withErrorHandling } from "@/lib/api-utils";
 import { getCurrentUser } from "@/lib/auth";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
+import { verifyCsrf } from "@/lib/csrf";
 import { getSteps } from "@/lib/tutorial-steps";
 import { getCachedFeedback, setCachedFeedback } from "@/lib/db/ai-feedback-cache";
 import { isSupportedLanguage } from "@/lib/languages/registry";
@@ -32,6 +33,9 @@ function feedbackCacheKey(
 // POST /api/code-feedback
 // { code, output, error, tutorialSlug, stepIndex, lang? }
 export const POST = withErrorHandling("POST /api/code-feedback", async (req: NextRequest) => {
+  const csrfError = verifyCsrf(req);
+  if (csrfError) return NextResponse.json({ error: csrfError }, { status: 403 });
+
   const user = await getCurrentUser();
   if (!user) return NextResponse.json({ error: "Sign in to get code feedback" }, { status: 401 });
 

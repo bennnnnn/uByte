@@ -6,6 +6,7 @@ import { savePracticeAttempt, addXp, getUserById } from "@/lib/db";
 import { hasPaidAccess, isPracticeProblemFree } from "@/lib/plans";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 import { withErrorHandling } from "@/lib/api-utils";
+import { verifyCsrf } from "@/lib/csrf";
 import { runJudge } from "@/lib/practice/judge-runner";
 import type { SubmissionVerdict } from "@/lib/db/submissions";
 import { PRACTICE_PROBLEMS } from "@/lib/practice/problems";
@@ -22,6 +23,9 @@ function codeHash(code: string): string {
 
 /** POST /api/submit — submit code, run Judge0, store submission, return verdict + one failing test. */
 export const POST = withErrorHandling("POST /api/submit", async (request: NextRequest) => {
+  const csrfError = verifyCsrf(request);
+  if (csrfError) return NextResponse.json({ error: csrfError }, { status: 403 });
+
   const ip = getClientIp(request.headers);
   const { limited, retryAfter } = await checkRateLimit(`judge:${ip}`, 10, 60_000);
   if (limited) {

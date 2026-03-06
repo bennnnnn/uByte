@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { logActivity, updateStreak, getRecentActivity } from "@/lib/db";
 import { checkBadges } from "@/lib/badges";
 import { withErrorHandling, requireAuth } from "@/lib/api-utils";
+import { verifyCsrf } from "@/lib/csrf";
+import { checkRateLimit } from "@/lib/rate-limit";
 
 export const GET = withErrorHandling("GET /api/profile/activity", async () => {
   const { user: tokenUser, response } = await requireAuth();
@@ -14,6 +16,12 @@ export const GET = withErrorHandling("GET /api/profile/activity", async () => {
 export const POST = withErrorHandling("POST /api/profile/activity", async (request: NextRequest) => {
   const { user: tokenUser, response } = await requireAuth();
   if (!tokenUser) return response;
+
+  const csrfError = verifyCsrf(request);
+  if (csrfError) return NextResponse.json({ error: csrfError }, { status: 403 });
+
+  const { limited } = await checkRateLimit(`activity:${tokenUser.userId}`, 30, 60_000);
+  if (limited) return NextResponse.json({ error: "Too many requests" }, { status: 429 });
 
   const { action, detail } = await request.json();
   if (!action) {

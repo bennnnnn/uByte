@@ -75,7 +75,10 @@ export const PUT = withErrorHandling("PUT /api/profile", async (request: NextReq
     const valid = await bcrypt.compare(body.currentPassword, user.password_hash);
     if (!valid) return NextResponse.json({ error: "Current password is incorrect" }, { status: 400 });
 
-    if (typeof body.newPassword !== "string" || !isValidPassword(body.newPassword)) {
+    if (typeof body.newPassword !== "string" || body.newPassword.length < 8) {
+      return NextResponse.json({ error: "New password must be at least 8 characters" }, { status: 400 });
+    }
+    if (!isValidPassword(body.newPassword)) {
       return NextResponse.json({ error: PASSWORD_POLICY_MESSAGE }, { status: 400 });
     }
 

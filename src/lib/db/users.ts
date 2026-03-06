@@ -190,20 +190,14 @@ export async function getUserPlan(userId: number): Promise<string> {
   return (row?.plan as string) ?? "free";
 }
 
-export async function getUserByStripeCustomerId(customerId: string): Promise<User | undefined> {
-  const sql = getSql();
-  const [row] = await sql`SELECT * FROM users WHERE stripe_customer_id = ${customerId}`;
-  return row as User | undefined;
-}
-
 export async function updateUserPlan(
   userId: number,
   plan: string,
-  stripeCustomerId?: string
+  paddleCustomerId?: string
 ): Promise<void> {
   const sql = getSql();
-  if (stripeCustomerId) {
-    await sql`UPDATE users SET plan = ${plan}, stripe_customer_id = ${stripeCustomerId} WHERE id = ${userId}`;
+  if (paddleCustomerId) {
+    await sql`UPDATE users SET plan = ${plan}, stripe_customer_id = ${paddleCustomerId} WHERE id = ${userId}`;
   } else {
     await sql`UPDATE users SET plan = ${plan} WHERE id = ${userId}`;
   }

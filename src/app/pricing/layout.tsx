@@ -4,7 +4,7 @@ import { absoluteUrl, SITE_KEYWORDS } from "@/lib/seo";
 export const metadata: Metadata = {
   title: "uByte Pricing - Coding Tutorials and Interview Prep Plans",
   description:
-    "Compare Free and Pro plans for interactive coding tutorials, interview prep practice, and certification-style exams.",
+    "Upgrade to uByte Pro for unlimited tutorials, interview practice, AI hints, and more. Free and Pro plans available.",
   keywords: [
     ...SITE_KEYWORDS,
     "coding course pricing",
@@ -14,17 +14,19 @@ export const metadata: Metadata = {
   alternates: { canonical: absoluteUrl("/pricing") },
   openGraph: {
     type: "website",
-    title: "uByte Pricing",
+    title: "Pricing | uByte",
     description:
-      "Compare Free vs Pro for tutorials, interview practice, and certification-style exams.",
+      "Upgrade to uByte Pro for unlimited tutorials, interview practice, AI hints, and more.",
     url: absoluteUrl("/pricing"),
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Pricing | uByte",
+    description:
+      "Upgrade to uByte Pro for unlimited tutorials, interview practice, AI hints, and more.",
   },
 };
 
-export default function PricingLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function PricingLayout({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
