@@ -144,14 +144,18 @@ export function useAdminData() {
     return () => { cancelled = true; };
   }, [tab, revenuePeriod, revenue]);
 
-  /* ── Exam stats + settings (loaded when exams tab activates) ─────────── */
+  /* ── Exam stats, settings & pass threshold (loaded when exams tab activates) */
   useEffect(() => {
     if (tab !== "exams") return;
     setExamStatsLoading(true);
     setExamSettings(null);
+    setSiteSettings(null);
     let cancelled = false;
     fetch("/api/admin/exam-stats", { credentials: "same-origin" }).then((r) => r.ok ? r.json() : null).then((data) => { if (!cancelled && data) setExamStats(data); }).finally(() => { if (!cancelled) setExamStatsLoading(false); });
     fetch("/api/admin/exam-settings", { credentials: "same-origin" }).then((r) => r.ok ? r.json() : null).then((data) => { if (!cancelled && data && typeof data === "object") setExamSettings(data); });
+    fetch("/api/admin/site-settings", { credentials: "same-origin" }).then((r) => r.ok ? r.json() : null).then((data) => {
+      if (!cancelled && data) setSiteSettings({ exam_pass_percent: data.exam_pass_percent ?? "70" });
+    });
     return () => { cancelled = true; };
   }, [tab]);
 
@@ -162,17 +166,6 @@ export function useAdminData() {
     let cancelled = false;
     fetch("/api/admin/banner", { credentials: "same-origin" }).then((r) => r.ok ? r.json() : null).then((data) => {
       if (!cancelled && data) setBannerData({ enabled: !!data.enabled, message: data.message ?? "", linkUrl: data.linkUrl ?? "/", linkText: data.linkText ?? "Sign up" });
-    });
-    return () => { cancelled = true; };
-  }, [tab]);
-
-  /* ── Site settings (loaded when settings tab activates) ──────────────── */
-  useEffect(() => {
-    if (tab !== "settings") return;
-    setSiteSettings(null);
-    let cancelled = false;
-    fetch("/api/admin/site-settings", { credentials: "same-origin" }).then((r) => r.ok ? r.json() : null).then((data) => {
-      if (!cancelled && data) setSiteSettings({ exam_pass_percent: data.exam_pass_percent ?? "70" });
     });
     return () => { cancelled = true; };
   }, [tab]);

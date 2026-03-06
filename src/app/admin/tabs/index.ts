@@ -8,5 +8,4 @@ export { default as AnalyticsTab } from "./AnalyticsTab";
 export { default as RevenueTab }   from "./RevenueTab";
 export { default as ExamsTab }     from "./ExamsTab";
 export { default as BannerTab }    from "./BannerTab";
-export { default as SettingsTab }  from "./SettingsTab";
 export { default as AuditTab }     from "./AuditTab";

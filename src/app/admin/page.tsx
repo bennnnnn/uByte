@@ -13,7 +13,7 @@ import { useAdminData } from "./hooks";
 import { Spinner, TabIcon } from "./components";
 import { TAB_LABELS } from "./types";
 import type { Tab } from "./types";
-import { UsersTab, AnalyticsTab, RevenueTab, ExamsTab, BannerTab, SettingsTab, AuditTab } from "./tabs";
+import { UsersTab, AnalyticsTab, RevenueTab, ExamsTab, BannerTab, AuditTab } from "./tabs";
 
 /* ── Tab header subtitles (concise one-liners per tab) ───────────────────── */
 const TAB_SUBTITLES: Record<Tab, string> = {
@@ -21,15 +21,14 @@ const TAB_SUBTITLES: Record<Tab, string> = {
   analytics: "Tutorial completions & practice stats",
   revenue:   "Income, subscribers & billing events",
   audit:     "Admin action history",
-  exams:     "Questions, attempts, settings & upload",
+  exams:     "Questions, attempts, pass threshold, settings & upload",
   banner:    "Site-wide announcement banner",
-  settings:  "Global site configuration",
 };
 
 /* ── Sidebar section definitions ─────────────────────────────────────────── */
 const SIDEBAR_SECTIONS: { label: string; tabs: Tab[] }[] = [
   { label: "Overview", tabs: ["users", "analytics", "revenue"] },
-  { label: "Manage",   tabs: ["exams", "banner", "settings"] },
+  { label: "Manage",   tabs: ["exams", "banner"] },
   { label: "History",  tabs: ["audit"] },
 ];
 
@@ -70,7 +69,7 @@ export default function AdminPage() {
 
   /* ── Dashboard layout: sidebar + main ─────────────────────────────────── */
   return (
-    <div className="flex min-h-screen bg-zinc-50 dark:bg-zinc-950">
+    <div className="flex h-screen bg-zinc-50 dark:bg-zinc-950">
 
       {/* ── Sidebar ────────────────────────────────────────────────────── */}
       <aside className="flex w-60 shrink-0 flex-col border-r border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900">
@@ -159,7 +158,6 @@ export default function AdminPage() {
           {tab === "revenue"   && <RevenueTab   data={data} />}
           {tab === "exams"     && <ExamsTab     data={data} />}
           {tab === "banner"    && <BannerTab    data={data} />}
-          {tab === "settings"  && <SettingsTab  data={data} />}
           {tab === "audit"     && <AuditTab     data={data} />}
         </div>
       </main>

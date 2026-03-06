@@ -1,11 +1,12 @@
 /**
- * ExamsTab — exam settings, stats-by-language, and bulk question upload.
+ * ExamsTab — pass threshold, per-language settings, stats, and bulk upload.
  *
  * Sections:
- *   1. Per-language settings (question count, duration). Editable inline.
- *   2. Aggregate stat cards (total questions, attempts, pass rate, certs).
- *   3. Stats-by-language table.
- *   4. CSV / JSON bulk upload form.
+ *   1. Pass threshold (global % to pass any exam — saved via site settings).
+ *   2. Per-language settings (question count, duration). Editable inline.
+ *   3. Aggregate stat cards (total questions, attempts, pass rate, certs).
+ *   4. Stats-by-language table.
+ *   5. CSV / JSON bulk upload form.
  */
 
 import { Spinner, StatCard, SectionCard, EmptyRow, SaveButton, SaveFeedback, LoadingBlock } from "../components";
@@ -26,10 +27,32 @@ export default function ExamsTab({ data }: Props) {
     examStats, examStatsLoading,
     examSettings, setExamSettings, examSettingsSaving, examSettingsMessage, saveExamSettings,
     examUploadFile, setExamUploadFile, examUploading, examUploadResult, setExamUploadResult, uploadExamQuestions,
+    siteSettings, setSiteSettings, siteSettingsSaving, siteSettingsMessage, saveSiteSettings,
   } = data;
 
   return (
     <div className="space-y-5">
+
+      {/* ── Global pass threshold ──────────────────────────────────────── */}
+      <SectionCard title="Pass threshold" description="Minimum score (%) to pass any exam and earn a certificate. Changes take effect immediately.">
+        {siteSettings === null ? <LoadingBlock /> : (
+          <div className="flex flex-wrap items-center gap-4">
+            <div className="flex items-center gap-3">
+              <input
+                type="number"
+                min={1}
+                max={100}
+                value={siteSettings.exam_pass_percent}
+                onChange={(e) => setSiteSettings((s) => s ? { ...s, exam_pass_percent: e.target.value } : s)}
+                className="w-20 rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2 text-right font-mono text-sm dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-200"
+              />
+              <span className="text-sm text-zinc-500 dark:text-zinc-400">%</span>
+            </div>
+            <SaveButton saving={siteSettingsSaving} label="Save threshold" onClick={saveSiteSettings} />
+            <SaveFeedback message={siteSettingsMessage} />
+          </div>
+        )}
+      </SectionCard>
 
       {/* ── Per-language settings ──────────────────────────────────────── */}
       <SectionCard title="Exam settings" description="Questions and duration per language. Changes apply to new attempts.">
