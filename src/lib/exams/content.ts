@@ -1,7 +1,6 @@
 // Exam detail content for the public exam landing pages.
 // Used so users can read full info before upgrading to take the exam.
 
-import type { ExamLang } from "./config";
 import { EXAM_DURATION_MINUTES, EXAM_SIZE } from "./config";
 
 export interface ExamConfigNumbers {

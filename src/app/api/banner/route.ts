@@ -6,7 +6,7 @@ export async function GET() {
   try {
     const banner = await getSiteBanner();
     return NextResponse.json(banner);
-  } catch (e) {
+  } catch {
     return NextResponse.json(
       { enabled: false, message: "", linkUrl: "/", linkText: "Sign up" },
       { status: 200 }

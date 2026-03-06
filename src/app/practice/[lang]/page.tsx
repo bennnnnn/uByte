@@ -9,7 +9,6 @@ import {
 import { isSupportedLanguage, LANGUAGES } from "@/lib/languages/registry";
 import type { SupportedLanguage } from "@/lib/languages/types";
 import type { Difficulty, ProblemCategory } from "@/lib/practice/types";
-import { isPracticeProblemFree } from "@/lib/plans";
 import { getCurrentUser } from "@/lib/auth";
 import { getPracticeAttempts } from "@/lib/db";
 import type { PracticeAttemptStatus } from "@/lib/db/practice-attempts";

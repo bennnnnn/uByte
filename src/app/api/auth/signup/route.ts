@@ -7,6 +7,7 @@ import { setCsrfCookie } from "@/lib/csrf";
 import { sendVerificationEmail } from "@/lib/email";
 import crypto from "crypto";
 import { withErrorHandling } from "@/lib/api-utils";
+import { MIN_PASSWORD_LENGTH, PASSWORD_MIN_ERROR } from "@/lib/password-policy";
 
 export const POST = withErrorHandling("POST /api/auth/signup", async (request: NextRequest) => {
   const ip = getClientIp(request.headers);
@@ -23,8 +24,8 @@ export const POST = withErrorHandling("POST /api/auth/signup", async (request: N
     return NextResponse.json({ error: "All fields are required" }, { status: 400 });
   }
 
-  if (password.length < 8) {
-    return NextResponse.json({ error: "Password must be at least 8 characters" }, { status: 400 });
+  if (password.length < MIN_PASSWORD_LENGTH) {
+    return NextResponse.json({ error: PASSWORD_MIN_ERROR }, { status: 400 });
   }
 
   const existing = await getUserByEmail(email);

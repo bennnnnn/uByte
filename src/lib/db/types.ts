@@ -16,6 +16,7 @@ export interface User {
   is_admin: number;
   email_verified: number;
   email_verification_token: string | null;
+  email_verification_expires_at?: string | null;
   failed_login_attempts: number;
   locked_until: string | null;
   token_version: number;

@@ -1,6 +1,7 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { withErrorHandling, requireAdmin } from "@/lib/api-utils";
 import { getExamConfigForAllLangs, setExamSettingsBulk } from "@/lib/db";
+import { verifyCsrf } from "@/lib/csrf";
 
 export const GET = withErrorHandling("GET /api/admin/exam-settings", async () => {
   const { admin, response } = await requireAdmin();
@@ -9,7 +10,10 @@ export const GET = withErrorHandling("GET /api/admin/exam-settings", async () =>
   return NextResponse.json(settings);
 });
 
-export const PUT = withErrorHandling("PUT /api/admin/exam-settings", async (req: Request) => {
+export const PUT = withErrorHandling("PUT /api/admin/exam-settings", async (req: NextRequest) => {
+  const csrfError = verifyCsrf(req);
+  if (csrfError) return NextResponse.json({ error: "Invalid CSRF token" }, { status: 403 });
+
   const { admin, response } = await requireAdmin();
   if (!admin) return response;
   let body: { settings?: Record<string, { examSize?: number; examDurationMinutes?: number; passPercent?: number }> } = {};

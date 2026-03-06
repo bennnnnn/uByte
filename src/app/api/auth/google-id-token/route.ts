@@ -84,6 +84,13 @@ export const POST = withErrorHandling("POST /api/auth/google-id-token", async (r
     }
   }
 
+  if (user.locked_until && new Date(user.locked_until) > new Date()) {
+    return NextResponse.json(
+      { error: "Account temporarily locked. Please contact support if this is unexpected." },
+      { status: 423 }
+    );
+  }
+
   const token = await signToken({
     userId: user.id,
     email: user.email,

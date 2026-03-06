@@ -65,6 +65,7 @@ export async function getCurrentUser(): Promise<TokenPayload | null> {
   const user = await getUserById(payload.userId);
   if (!user) return null;
   if ((user.token_version ?? 0) !== (payload.tokenVersion ?? 0)) return null;
+  if (user.locked_until && new Date(user.locked_until) > new Date()) return null;
 
   return payload;
 }

@@ -19,6 +19,7 @@ CREATE TABLE IF NOT EXISTS users (
   is_admin INTEGER DEFAULT 0,
   email_verified INTEGER DEFAULT 0,
   email_verification_token TEXT,
+  email_verification_expires_at TEXT,
   failed_login_attempts INTEGER DEFAULT 0,
   locked_until TEXT,
   token_version INTEGER DEFAULT 0,

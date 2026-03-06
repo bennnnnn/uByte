@@ -7,6 +7,7 @@ import { useAuth } from "@/components/AuthProvider";
 import Input from "@/components/ui/Input";
 import GoogleIcon from "@/components/auth/GoogleIcon";
 import GoogleOAuthError from "@/components/GoogleOAuthError";
+import { requestPasswordReset, submitEmailAuth } from "@/lib/auth-client";
 
 type Mode = "login" | "signup" | "forgot";
 
@@ -52,29 +53,14 @@ function LoginPageInner() {
     setSubmitting(true);
 
     if (mode === "forgot") {
-      try {
-        const res = await fetch("/api/auth/forgot-password", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email }),
-        });
-        if (!res.ok) {
-          const data = await res.json();
-          setError(data.error || "Something went wrong.");
-        } else {
-          setForgotDone(true);
-        }
-      } catch {
-        setError("Network error. Please try again.");
-      }
+      const result = await requestPasswordReset(email);
+      if (!result.ok) setError(result.error);
+      else setForgotDone(true);
       setSubmitting(false);
       return;
     }
 
-    const err =
-      mode === "signup"
-        ? await signup(name, email, password)
-        : await login(email, password);
+    const err = await submitEmailAuth(mode, { name, email, password }, { login, signup });
 
     setSubmitting(false);
     if (err) {
@@ -94,9 +80,7 @@ function LoginPageInner() {
         </Link>
 
         {/* Card */}
-        <div className="overflow-hidden rounded-2xl border border-zinc-200/80 bg-white shadow-xl shadow-zinc-900/5 dark:border-zinc-800 dark:bg-zinc-900 dark:shadow-none">
-          <div className="h-1 bg-gradient-to-r from-indigo-500 to-violet-500" />
-
+        <div className="rounded-2xl border border-zinc-200/80 bg-white shadow-xl shadow-zinc-900/5 dark:border-zinc-800 dark:bg-zinc-900 dark:shadow-none">
           <div className="p-8">
             {mode === "forgot" ? (
               forgotDone ? (
@@ -266,7 +250,14 @@ function LoginPageInner() {
                   </button>
                 </form>
 
-                <p className="mt-5 text-center text-sm text-zinc-500 dark:text-zinc-400">
+                <p className="mt-4 text-center text-xs text-zinc-400 dark:text-zinc-500">
+                  By continuing, you agree to our{" "}
+                  <Link href="/terms" className="underline hover:text-zinc-600 dark:hover:text-zinc-300">Terms</Link>
+                  {" "}and{" "}
+                  <Link href="/privacy" className="underline hover:text-zinc-600 dark:hover:text-zinc-300">Privacy Policy</Link>.
+                </p>
+
+                <p className="mt-4 text-center text-sm text-zinc-500 dark:text-zinc-400">
                   {mode === "login" ? (
                     <>
                       Don&apos;t have an account?{" "}
@@ -288,12 +279,6 @@ function LoginPageInner() {
           </div>
         </div>
 
-        <p className="mt-4 text-center text-xs text-zinc-400 dark:text-zinc-500">
-          By continuing, you agree to our{" "}
-          <Link href="/terms" className="underline hover:text-zinc-600 dark:hover:text-zinc-300">Terms</Link>
-          {" "}and{" "}
-          <Link href="/privacy" className="underline hover:text-zinc-600 dark:hover:text-zinc-300">Privacy Policy</Link>.
-        </p>
       </div>
     </div>
   );

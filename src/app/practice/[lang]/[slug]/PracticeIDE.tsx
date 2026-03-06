@@ -75,7 +75,7 @@ export function PracticeIDE({ problem, initialLang, categoryFilter = null, listP
   const [aiError, setAiError] = useState<string | null>(null);
 
   const editor = useCodeEditor(getStarterForLanguage(problem, initialLang), lang);
-  const { leftWidth, outputHeight, isDragging, startDragH, startDragV, startDragHTouch, startDragVTouch } = usePanelResize();
+  const { leftWidth, outputHeight, isDragging, startDragH, startDragV, startDragVTouch } = usePanelResize();
 
   // When language changes, load the starter for the new language
   const prevLangRef = useRef(lang);

@@ -27,7 +27,11 @@ export async function adminDeleteUser(userId: number): Promise<void> {
 
 export async function adminBanUser(userId: number): Promise<void> {
   const sql = getSql();
-  await sql`UPDATE users SET locked_until = '2099-12-31 23:59:59' WHERE id = ${userId}`;
+  await sql`
+    UPDATE users
+    SET locked_until = '2099-12-31 23:59:59', token_version = token_version + 1
+    WHERE id = ${userId}
+  `;
 }
 
 export async function adminUnbanUser(userId: number): Promise<void> {

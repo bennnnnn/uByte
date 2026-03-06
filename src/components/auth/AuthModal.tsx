@@ -2,9 +2,11 @@
 
 import { useState, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
+import Link from "next/link";
 import { useAuth } from "@/components/AuthProvider";
 import Input from "@/components/ui/Input";
 import GoogleIcon from "@/components/auth/GoogleIcon";
+import { requestPasswordReset, submitEmailAuth } from "@/lib/auth-client";
 
 const GSI_CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ?? "";
 const GSI_SCRIPT = "https://accounts.google.com/gsi/client";
@@ -113,29 +115,14 @@ export default function AuthModal({ onClose, initialMode }: Props) {
     setSubmitting(true);
 
     if (mode === "forgot") {
-      try {
-        const res = await fetch("/api/auth/forgot-password", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email }),
-        });
-        if (!res.ok) {
-          const data = await res.json();
-          setError(data.error || "Something went wrong.");
-        } else {
-          setForgotDone(true);
-        }
-      } catch {
-        setError("Network error. Please try again.");
-      }
+      const result = await requestPasswordReset(email);
+      if (!result.ok) setError(result.error);
+      else setForgotDone(true);
       setSubmitting(false);
       return;
     }
 
-    const err =
-      mode === "signup"
-        ? await signup(name, email, password)
-        : await login(email, password);
+    const err = await submitEmailAuth(mode, { name, email, password }, { login, signup });
 
     setSubmitting(false);
     if (err) {
@@ -161,9 +148,6 @@ export default function AuthModal({ onClose, initialMode }: Props) {
 
       {/* Card */}
       <div className="relative w-full max-w-[400px] rounded-2xl border border-zinc-200/80 bg-white shadow-2xl shadow-zinc-900/10 dark:border-zinc-800 dark:bg-zinc-900 dark:shadow-none">
-        {/* Accent bar */}
-        <div className="h-1 rounded-t-2xl bg-gradient-to-r from-indigo-500 to-violet-500" />
-
         <div className="p-8">
           <div className="mb-6 flex items-start justify-between gap-4">
             <div>
@@ -345,8 +329,11 @@ export default function AuthModal({ onClose, initialMode }: Props) {
                 </button>
               </form>
 
-              <p className="mt-4 text-center text-xs text-zinc-500 dark:text-zinc-400">
-                You’ll stay signed in for 30 days.
+              <p className="mt-4 text-center text-xs text-zinc-400 dark:text-zinc-500">
+                By continuing, you agree to our{" "}
+                <Link href="/terms" className="underline hover:text-zinc-600 dark:hover:text-zinc-300">Terms</Link>
+                {" "}and{" "}
+                <Link href="/privacy" className="underline hover:text-zinc-600 dark:hover:text-zinc-300">Privacy Policy</Link>.
               </p>
 
               <p className="mt-3 text-center text-sm text-zinc-500 dark:text-zinc-400">

@@ -1,6 +1,7 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { withErrorHandling, requireAdmin } from "@/lib/api-utils";
 import { getAllSiteSettings, setSiteSettings } from "@/lib/db/site-settings";
+import { verifyCsrf } from "@/lib/csrf";
 
 const ALLOWED_KEYS = new Set(["exam_pass_percent"]);
 
@@ -11,7 +12,10 @@ export const GET = withErrorHandling("GET /api/admin/site-settings", async () =>
   return NextResponse.json(settings);
 });
 
-export const PUT = withErrorHandling("PUT /api/admin/site-settings", async (req: Request) => {
+export const PUT = withErrorHandling("PUT /api/admin/site-settings", async (req: NextRequest) => {
+  const csrfError = verifyCsrf(req);
+  if (csrfError) return NextResponse.json({ error: "Invalid CSRF token" }, { status: 403 });
+
   const { admin, response } = await requireAdmin();
   if (!admin) return response;
 

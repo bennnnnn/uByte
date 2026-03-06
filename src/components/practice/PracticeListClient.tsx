@@ -114,7 +114,6 @@ export function PracticeListClient({
   );
 
   const config = LANGUAGES[selectedLang];
-  const PROBLEMS_PER_PAGE = 35;
 
   const statusIcon = (slug: string) => {
     const s = attempts[slug];

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
 import { getSubmissionById } from "@/lib/db/submissions";
 import { getCachedAiResponse, setCachedAiResponse } from "@/lib/db/ai-feedback-responses";
-import { canMakeAiCall, incrementTodayAiUsage, isInCooldown, setLastAiCallAt, AI_QUOTA_DAILY, AI_COOLDOWN_SECONDS } from "@/lib/db/ai-usage";
+import { canMakeAiCall, incrementTodayAiUsage, isInCooldown, setLastAiCallAt, AI_COOLDOWN_SECONDS } from "@/lib/db/ai-usage";
 import { getPracticeProblemBySlug } from "@/lib/practice/problems";
 import { buildEvidenceBundle, buildFailureSignature } from "@/lib/ai/evidence-bundle";
 import { runHeuristics } from "@/lib/ai/heuristics";

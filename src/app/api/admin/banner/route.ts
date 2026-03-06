@@ -1,6 +1,7 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { withErrorHandling, requireAdmin } from "@/lib/api-utils";
 import { getSiteBanner, setSiteBanner } from "@/lib/db/site-banner";
+import { verifyCsrf } from "@/lib/csrf";
 
 export const GET = withErrorHandling("GET /api/admin/banner", async () => {
   const { admin, response } = await requireAdmin();
@@ -9,7 +10,10 @@ export const GET = withErrorHandling("GET /api/admin/banner", async () => {
   return NextResponse.json(banner);
 });
 
-export const PATCH = withErrorHandling("PATCH /api/admin/banner", async (req: Request) => {
+export const PATCH = withErrorHandling("PATCH /api/admin/banner", async (req: NextRequest) => {
+  const csrfError = verifyCsrf(req);
+  if (csrfError) return NextResponse.json({ error: "Invalid CSRF token" }, { status: 403 });
+
   const { admin, response } = await requireAdmin();
   if (!admin) return response;
   let body: { enabled?: boolean; message?: string; linkUrl?: string; linkText?: string } = {};

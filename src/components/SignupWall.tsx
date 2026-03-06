@@ -1,11 +1,11 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useAuth } from "./AuthProvider";
 import Input from "./ui/Input";
 import GoogleIcon from "./auth/GoogleIcon";
+import { submitEmailAuth } from "@/lib/auth-client";
 
 export default function SignupWall({ slug }: { slug: string }) {
   const pathname = usePathname();
@@ -36,10 +36,7 @@ export default function SignupWall({ slug }: { slug: string }) {
     setError("");
     setSubmitting(true);
 
-    const err =
-      mode === "signup"
-        ? await signup(name, email, password)
-        : await login(email, password);
+    const err = await submitEmailAuth(mode, { name, email, password }, { login, signup });
 
     setSubmitting(false);
     if (err) {

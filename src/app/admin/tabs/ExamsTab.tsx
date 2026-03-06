@@ -26,7 +26,7 @@ export default function ExamsTab({ data }: Props) {
   const {
     examStats, examStatsLoading,
     examSettings, setExamSettings, examSettingsSaving, examSettingsMessage, saveExamSettings,
-    examUploadFile, setExamUploadFile, examUploading, examUploadResult, setExamUploadResult, uploadExamQuestions,
+    setExamUploadFile, examUploading, examUploadResult, setExamUploadResult, uploadExamQuestions,
   } = data;
 
   return (

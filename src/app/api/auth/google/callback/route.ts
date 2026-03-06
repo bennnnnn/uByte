@@ -89,6 +89,10 @@ export const GET = withErrorHandling("GET /api/auth/google/callback", async (req
       }
     }
 
+    if (user.locked_until && new Date(user.locked_until) > new Date()) {
+      return NextResponse.redirect(`${origin}/?error=account_locked`);
+    }
+
     const token = await signToken({
       userId: user.id,
       email: user.email,

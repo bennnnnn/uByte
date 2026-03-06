@@ -111,7 +111,7 @@ export default function PracticeExamAttemptPage() {
   );
   const allAnswered = !!attempt && answeredCount === totalQuestions;
 
-  const handleSubmit = async (opts?: { force?: boolean }) => {
+  const handleSubmit = useCallback(async (opts?: { force?: boolean }) => {
     if (!attempt) return;
     if (!opts?.force && !allAnswered) {
       setError("Please answer all questions before submitting.");
@@ -145,7 +145,7 @@ export default function PracticeExamAttemptPage() {
       setError("Network error. Please try again.");
       setSubmitting(false);
     }
-  };
+  }, [allAnswered, answers, attempt, lang, router]);
 
   const handleSwitchLanguage = (nextLang: string) => {
     if (nextLang === lang) return;
@@ -201,7 +201,7 @@ export default function PracticeExamAttemptPage() {
     }, 1000);
 
     return () => window.clearInterval(id);
-  }, [attempt, durationMinutes]);
+  }, [attempt, durationMinutes, handleSubmit]);
 
   const minutes = remainingSeconds != null ? Math.floor(remainingSeconds / 60) : null;
   const seconds = remainingSeconds != null ? remainingSeconds % 60 : null;
@@ -442,4 +442,3 @@ export default function PracticeExamAttemptPage() {
     </div>
   );
 }
-

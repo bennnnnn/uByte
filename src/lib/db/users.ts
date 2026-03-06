@@ -1,5 +1,20 @@
 import { getSql } from "./client";
 import type { User } from "./types";
+import { hashToken } from "@/lib/token-security";
+
+const EMAIL_VERIFY_TOKEN_TTL_MS = 24 * 60 * 60 * 1000;
+
+let _emailVerifyExpiryReady = false;
+async function ensureEmailVerificationExpiryColumn(): Promise<void> {
+  if (_emailVerifyExpiryReady) return;
+  const sql = getSql();
+  try {
+    await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS email_verification_expires_at TEXT`;
+  } catch {
+    // Ignore migration races and continue.
+  }
+  _emailVerifyExpiryReady = true;
+}
 
 export async function createUser(name: string, email: string, passwordHash: string): Promise<User> {
   const sql = getSql();
@@ -239,18 +254,35 @@ export async function createEmailVerificationToken(
   userId: number,
   token: string
 ): Promise<void> {
+  await ensureEmailVerificationExpiryColumn();
   const sql = getSql();
-  await sql`UPDATE users SET email_verification_token = ${token} WHERE id = ${userId}`;
+  const tokenHash = await hashToken(token);
+  const expiresAt = new Date(Date.now() + EMAIL_VERIFY_TOKEN_TTL_MS).toISOString();
+  await sql`
+    UPDATE users
+    SET email_verification_token = ${tokenHash}, email_verification_expires_at = ${expiresAt}
+    WHERE id = ${userId}
+  `;
 }
 
 export async function verifyEmail(token: string): Promise<User | undefined> {
+  await ensureEmailVerificationExpiryColumn();
   const sql = getSql();
+  const tokenHash = await hashToken(token);
   const [user] = await sql`
-    SELECT * FROM users WHERE email_verification_token = ${token} AND email_verified = 0
+    SELECT * FROM users
+    WHERE (email_verification_token = ${tokenHash} OR email_verification_token = ${token})
+      AND email_verified = 0
+      AND (
+        email_verification_expires_at IS NULL
+        OR email_verification_expires_at::timestamptz > NOW()
+      )
   `;
   if (!user) return undefined;
   await sql`
-    UPDATE users SET email_verified = 1, email_verification_token = NULL WHERE id = ${(user as User).id}
+    UPDATE users
+    SET email_verified = 1, email_verification_token = NULL, email_verification_expires_at = NULL
+    WHERE id = ${(user as User).id}
   `;
   return user as User;
 }

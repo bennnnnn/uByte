@@ -13,7 +13,7 @@ export type BillingPlan = "monthly" | "yearly";
 
 /** Simple check for any paid access (used across UI and API routes). */
 export function hasPaidAccess(plan?: string | null): boolean {
-  return plan === "yearly" || plan === "pro";
+  return plan === "yearly" || plan === "pro" || plan === "monthly";
 }
 
 // ─── Pricing + Paddle config (shared between client and server) ──────────────

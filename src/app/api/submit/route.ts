@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createHash } from "crypto";
 import { getCurrentUser } from "@/lib/auth";
 import { insertSubmission, getConsecutiveFailures } from "@/lib/db/submissions";
-import { savePracticeAttempt, getPracticeAttempts, addXp, getUserById } from "@/lib/db";
+import { savePracticeAttempt, addXp, getUserById } from "@/lib/db";
 import { hasPaidAccess, isPracticeProblemFree } from "@/lib/plans";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 import { withErrorHandling } from "@/lib/api-utils";
