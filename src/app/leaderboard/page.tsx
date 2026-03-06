@@ -32,16 +32,18 @@ export default function LeaderboardPage() {
   const [period, setPeriod] = useState<Period>("all");
 
   useEffect(() => {
-    setLoading(true);
+    let cancelled = false;
+    queueMicrotask(() => { if (!cancelled) setLoading(true); });
     const url = period === "week" ? "/api/leaderboard?period=week" : "/api/leaderboard";
     fetch(url, { credentials: "same-origin" })
       .then(async (res) => {
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data = await res.json();
-        setUsers(data.users ?? []);
+        if (!cancelled) setUsers(data.users ?? []);
       })
-      .catch((err) => setError(err.message))
-      .finally(() => setLoading(false));
+      .catch((err) => { if (!cancelled) setError(err.message); })
+      .finally(() => { if (!cancelled) setLoading(false); });
+    return () => { cancelled = true; };
   }, [period]);
 
   if (loading) {

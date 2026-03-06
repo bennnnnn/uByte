@@ -302,7 +302,8 @@ export default function InteractiveTutorial({
             onGoToStep={stepProgress.goToStep}
             onSkip={stepProgress.skipStep}
             tutorialSlug={tutorialSlug}
-            allTutorials={allTutorials}
+            tutorialDone={stepProgress.tutorialDone}
+            nextTutorial={next ? { slug: next.slug, steps: allTutorialSteps[next.slug] ?? [] } : null}
           />
         </aside>
 

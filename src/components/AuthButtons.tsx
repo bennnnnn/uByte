@@ -20,10 +20,12 @@ export default function AuthButtons() {
 
   // Open signup modal when URL has ?signup=1 (e.g. from banner "Sign up" link)
   useEffect(() => {
-    if (searchParams.get("signup") === "1") {
-      setSignupMode(true);
-      setShowModal(true);
-    }
+    queueMicrotask(() => {
+      if (searchParams.get("signup") === "1") {
+        setSignupMode(true);
+        setShowModal(true);
+      }
+    });
   }, [searchParams]);
 
   useEffect(() => {

@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { tutorialUrl } from "@/lib/urls";
 
@@ -94,7 +95,7 @@ export function SearchPageClient() {
                 No results for &ldquo;{query.trim()}&rdquo;
               </p>
               <p className="mt-2 text-sm text-zinc-500 dark:text-zinc-400">
-                Try different keywords or browse <a href="/tutorial/go" className="font-medium text-indigo-600 hover:underline dark:text-indigo-400">tutorials</a> and <a href="/practice" className="font-medium text-indigo-600 hover:underline dark:text-indigo-400">practice problems</a>.
+                Try different keywords or browse <Link href="/tutorial/go" className="font-medium text-indigo-600 hover:underline dark:text-indigo-400">tutorials</Link> and <Link href="/practice" className="font-medium text-indigo-600 hover:underline dark:text-indigo-400">practice problems</Link>.
               </p>
             </li>
           ) : (

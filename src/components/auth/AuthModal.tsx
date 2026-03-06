@@ -42,17 +42,19 @@ export default function AuthModal({ onClose, initialMode }: Props) {
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [forgotDone, setForgotDone] = useState(false);
-  const [gsiReady, setGsiReady] = useState(false);
   const gsiInitialized = useRef(false);
   const credentialHandlerRef = useRef<(credential: string) => Promise<void>>(async () => {});
-  credentialHandlerRef.current = async (credential: string) => {
-    setError("");
-    setSubmitting(true);
-    const err = await loginWithGoogle(credential);
-    setSubmitting(false);
-    if (err) setError(err);
-    else onClose();
-  };
+
+  useEffect(() => {
+    credentialHandlerRef.current = async (credential: string) => {
+      setError("");
+      setSubmitting(true);
+      const err = await loginWithGoogle(credential);
+      setSubmitting(false);
+      if (err) setError(err);
+      else onClose();
+    };
+  }, [loginWithGoogle, onClose]);
 
   function reset() {
     setName("");
@@ -80,7 +82,6 @@ export default function AuthModal({ onClose, initialMode }: Props) {
         },
         cancel_on_tap_outside: false,
       });
-      setGsiReady(true);
       window.google.accounts.id.prompt();
     }
 

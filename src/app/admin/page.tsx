@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useRef } from "react";
 import { createPortal } from "react-dom";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/components/AuthProvider";
 import { apiFetch } from "@/lib/api-client";
@@ -331,7 +332,7 @@ export default function AdminPage() {
         </nav>
         <div className="border-t border-zinc-200 p-3 dark:border-zinc-800">
           <p className="truncate text-xs text-zinc-400 dark:text-zinc-500">{user?.email}</p>
-          <a href="/" className="mt-1 block text-xs text-zinc-500 underline hover:text-zinc-700 dark:hover:text-zinc-400">Exit admin</a>
+          <Link href="/" className="mt-1 block text-xs text-zinc-500 underline hover:text-zinc-700 dark:hover:text-zinc-400">Exit admin</Link>
         </div>
       </aside>
 
@@ -395,7 +396,6 @@ export default function AdminPage() {
                   <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800">
                     {filtered.map((u) => {
                       const isMe = u.id === user?.id;
-                      const busy = (action: string) => pending?.id === u.id && pending.action === action;
                       const anyBusy = pending?.id === u.id;
                       const open = userActionsOpen === u.id;
                       return (

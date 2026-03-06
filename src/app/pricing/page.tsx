@@ -55,13 +55,17 @@ function PricingContent() {
 
   // Preselect plan when coming from an upgrade wall (e.g. /pricing?plan=monthly|yearly).
   useEffect(() => {
-    if (planParam === "monthly") setBilling("monthly");
-    else if (planParam === "yearly") setBilling("yearly");
+    queueMicrotask(() => {
+      if (planParam === "monthly") setBilling("monthly");
+      else if (planParam === "yearly") setBilling("yearly");
+    });
   }, [planParam]);
 
   // If user is logged out and we were sent here to sign up, open auth modal automatically.
   useEffect(() => {
-    if (!user && signupParam) setShowAuth(true);
+    queueMicrotask(() => {
+      if (!user && signupParam) setShowAuth(true);
+    });
   }, [user, signupParam]);
 
   useEffect(() => {
