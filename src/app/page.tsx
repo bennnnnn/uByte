@@ -7,7 +7,7 @@ import { getAllPracticeProblems, getPracticeProblemBySlug } from "@/lib/practice
 import { LANGUAGES, getAllLanguageSlugs } from "@/lib/languages/registry";
 import { getLangIcon } from "@/lib/languages/icons";
 import { BASE_URL } from "@/lib/constants";
-import { getExamConfig, getLastActivity } from "@/lib/db";
+import { getExamConfigForAllLangs, getLastActivity } from "@/lib/db";
 import { tutorialLangUrl, tutorialUrl } from "@/lib/urls";
 import { getCurrentUser } from "@/lib/auth";
 import type { SupportedLanguage } from "@/lib/languages/types";
@@ -49,7 +49,7 @@ export default async function Home() {
   const goTutorials = getAllTutorials("go");
   const topicCount = goTutorials.length;
   const problemCount = getAllPracticeProblems().length;
-  const examConfig = await getExamConfig();
+  const examConfigByLang = await getExamConfigForAllLangs();
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -154,7 +154,7 @@ export default async function Home() {
         <PracticeSection problemCount={problemCount} />
 
         {/* Practice exams */}
-        <PracticeExamsSection examSize={examConfig.examSize} examDurationMinutes={examConfig.examDurationMinutes} />
+        <PracticeExamsSection examConfigByLang={examConfigByLang} />
 
         {/* Quick-nav footer */}
         <nav

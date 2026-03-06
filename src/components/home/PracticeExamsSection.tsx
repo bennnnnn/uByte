@@ -8,13 +8,12 @@ const CARD_STYLE =
 const BADGE_STYLE = "bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-400";
 const ARROW_STYLE = "text-amber-600 dark:text-amber-400";
 
-/** Questions per exam and duration come from admin settings (site_settings), not from the question bank size. */
+/** Per-language exam config from admin (exam_lang_settings). Cards show what the user will take for that language. */
 interface Props {
-  examSize: number;
-  examDurationMinutes: number;
+  examConfigByLang: Record<string, { examSize: number; examDurationMinutes: number }>;
 }
 
-export default function PracticeExamsSection({ examSize, examDurationMinutes }: Props) {
+export default function PracticeExamsSection({ examConfigByLang }: Props) {
   const langSlugs = getAllLanguageSlugs();
 
   return (
@@ -32,7 +31,7 @@ export default function PracticeExamsSection({ examSize, examDurationMinutes }: 
             </span>
           </div>
           <p className="mb-5 text-sm text-zinc-600 dark:text-zinc-400">
-            Timed multiple-choice exams by language. {examSize} questions per exam, {examDurationMinutes} minutes. Score at least 70% to pass and earn a certificate.
+            Timed multiple-choice exams by language. Questions and duration set per language. Score at least 70% to pass and earn a certificate.
           </p>
 
           <Link
@@ -52,6 +51,7 @@ export default function PracticeExamsSection({ examSize, examDurationMinutes }: 
         {langSlugs.map((slug) => {
           const config = LANGUAGES[slug as keyof typeof LANGUAGES];
           if (!config) return null;
+          const examConfig = examConfigByLang[slug] ?? { examSize: 40, examDurationMinutes: 45 };
           return (
             <Link
               key={slug}
@@ -67,13 +67,13 @@ export default function PracticeExamsSection({ examSize, examDurationMinutes }: 
                     {config.name}
                   </h3>
                 </div>
-                <span className={`shrink-0 rounded-full px-2 py-0.5 text-xs font-semibold ${BADGE_STYLE}`} title="Questions per exam (set in Admin → Exams)">
-                  {examSize} per exam
+                <span className={`shrink-0 rounded-full px-2 py-0.5 text-xs font-semibold ${BADGE_STYLE}`} title="Questions per exam (Admin → Exams)">
+                  {examConfig.examSize} per exam
                 </span>
               </div>
 
               <p className="flex-1 text-sm leading-relaxed text-zinc-500 dark:text-zinc-400">
-                {examDurationMinutes} min · 70% to pass · Certificate
+                {examConfig.examDurationMinutes} min · 70% to pass · Certificate
               </p>
 
               <div className={`mt-4 flex items-center gap-1 text-sm font-semibold transition-[gap] group-hover:gap-2 ${ARROW_STYLE}`}>

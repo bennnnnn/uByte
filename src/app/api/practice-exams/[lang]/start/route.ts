@@ -4,7 +4,7 @@ import { getUserById } from "@/lib/db";
 import { hasPaidAccess } from "@/lib/plans";
 import { getQuestionIdsByLang, getQuestionsByIds } from "@/lib/db/exam-questions";
 import { createAttempt } from "@/lib/db/exam-attempts";
-import { getExamConfig } from "@/lib/db/exam-settings";
+import { getExamConfigForLang } from "@/lib/db/exam-settings";
 import { withErrorHandling } from "@/lib/api-utils";
 import { isExamLang } from "@/lib/exams/config";
 
@@ -39,7 +39,7 @@ export const POST = withErrorHandling(
       return NextResponse.json({ error: "Invalid language" }, { status: 400 });
     }
 
-    const { examSize } = await getExamConfig();
+    const { examSize } = await getExamConfigForLang(lang);
     const ids = await getQuestionIdsByLang(lang);
     if (ids.length < examSize) {
       return NextResponse.json(
