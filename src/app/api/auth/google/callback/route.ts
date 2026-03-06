@@ -10,6 +10,7 @@ import {
 import { signToken, setAuthCookie } from "@/lib/auth";
 import { setCsrfCookie } from "@/lib/csrf";
 import { withErrorHandling } from "@/lib/api-utils";
+import { sendGoogleLinkedEmail } from "@/lib/email";
 
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
@@ -62,10 +63,14 @@ export const GET = withErrorHandling("GET /api/auth/google/callback", async (req
     }
 
     const googleUser = await userInfoRes.json();
-    const { sub: googleId, email, name } = googleUser;
+    const { sub: googleId, email, name, email_verified } = googleUser;
 
     if (!googleId || !email) {
       return NextResponse.redirect(`${origin}/?error=oauth_missing_fields`);
+    }
+
+    if (!email_verified) {
+      return NextResponse.redirect(`${origin}/?error=oauth_email_not_verified`);
     }
 
     let user = await getUserByGoogleId(googleId);
@@ -74,6 +79,7 @@ export const GET = withErrorHandling("GET /api/auth/google/callback", async (req
       if (existing) {
         await linkGoogleId(existing.id, googleId);
         user = existing;
+        sendGoogleLinkedEmail(user.email, user.name).catch(() => {});
       } else {
         user = await createUserWithGoogle(
           name ?? email.split("@")[0],

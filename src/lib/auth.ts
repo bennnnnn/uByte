@@ -19,8 +19,8 @@ export interface TokenPayload {
   tokenVersion: number;
 }
 
-/** Session duration: 1 year so users stay logged in on this device until they log out */
-const SESSION_DAYS = 365;
+/** Session duration: 30 days. Reasonable for a learning platform without requiring frequent re-login. */
+const SESSION_DAYS = 30;
 
 export async function signToken(payload: TokenPayload): Promise<string> {
   return new SignJWT({ ...payload })
@@ -45,7 +45,7 @@ export async function setAuthCookie(token: string): Promise<void> {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
-    maxAge: 60 * 60 * 24 * SESSION_DAYS, // 1 year — persistent until logout
+    maxAge: 60 * 60 * 24 * SESSION_DAYS,
     path: "/",
   });
 }

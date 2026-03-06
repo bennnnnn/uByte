@@ -255,6 +255,7 @@ export default function CodePlayground({ code: initialCode, title }: CodePlaygro
         {/* Editable textarea (on top, transparent text) */}
         <textarea
           ref={textareaRef}
+          aria-label="Code editor"
           value={code}
           onChange={(e) => setCode(e.target.value)}
           onKeyDown={(e) => {

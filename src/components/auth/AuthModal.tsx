@@ -208,7 +208,7 @@ export default function AuthModal({ onClose, initialMode }: Props) {
             ) : (
               <>
                 {error && (
-                  <div className="mb-4 rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700 dark:bg-red-950/50 dark:text-red-300">
+                  <div role="alert" className="mb-4 rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700 dark:bg-red-950/50 dark:text-red-300">
                     {error}
                   </div>
                 )}
@@ -269,7 +269,7 @@ export default function AuthModal({ onClose, initialMode }: Props) {
               </div>
 
               {error && (
-                <div className="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700 dark:bg-red-950/50 dark:text-red-300">
+                <div role="alert" className="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700 dark:bg-red-950/50 dark:text-red-300">
                   {error}
                 </div>
               )}
@@ -341,7 +341,7 @@ export default function AuthModal({ onClose, initialMode }: Props) {
               </form>
 
               <p className="mt-4 text-center text-xs text-zinc-500 dark:text-zinc-400">
-                You’ll stay signed in on this device until you log out.
+                You’ll stay signed in for 30 days.
               </p>
 
               <p className="mt-3 text-center text-sm text-zinc-500 dark:text-zinc-400">

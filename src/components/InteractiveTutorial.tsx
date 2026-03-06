@@ -336,7 +336,7 @@ export default function InteractiveTutorial({
             <select
               value={ideLang}
               onChange={(e) => setIdeLang(e.target.value as SupportedLanguage)}
-              title="Code language in IDE"
+              aria-label="Code language"
               className="rounded-md border border-zinc-300 bg-white px-2.5 py-1.5 text-sm text-zinc-700 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-200"
             >
               {(Object.keys(LANGUAGES) as SupportedLanguage[]).map((l) => (
@@ -411,7 +411,7 @@ export default function InteractiveTutorial({
           <select
             value={ideLang}
             onChange={(e) => setIdeLang(e.target.value as SupportedLanguage)}
-            title="Language"
+            aria-label="Code language"
             className="w-24 shrink-0 rounded-md border border-zinc-300 bg-white px-2 py-2 text-sm text-zinc-700 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-200"
           >
             {(Object.keys(LANGUAGES) as SupportedLanguage[]).map((l) => (

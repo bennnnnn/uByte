@@ -10,6 +10,7 @@ import {
 import { signToken, setAuthCookie } from "@/lib/auth";
 import { setCsrfCookie } from "@/lib/csrf";
 import { withErrorHandling } from "@/lib/api-utils";
+import { sendGoogleLinkedEmail } from "@/lib/email";
 
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 
@@ -38,15 +39,19 @@ export const POST = withErrorHandling("POST /api/auth/google-id-token", async (r
     return NextResponse.json({ error: "Invalid or expired Google sign-in. Try again." }, { status: 401 });
   }
 
-  let payload: { aud?: string; sub?: string; email?: string; name?: string };
+  let payload: { aud?: string; sub?: string; email?: string; name?: string; email_verified?: string };
   try {
-    payload = (await tokenRes.json()) as { aud?: string; sub?: string; email?: string; name?: string };
+    payload = (await tokenRes.json()) as { aud?: string; sub?: string; email?: string; name?: string; email_verified?: string };
   } catch {
     return NextResponse.json({ error: "Invalid Google response" }, { status: 401 });
   }
 
   if (payload.aud !== GOOGLE_CLIENT_ID) {
     return NextResponse.json({ error: "Invalid client" }, { status: 401 });
+  }
+
+  if (payload.email_verified !== "true") {
+    return NextResponse.json({ error: "Google email is not verified. Please verify your Google account email first." }, { status: 400 });
   }
 
   const googleId = payload.sub;
@@ -63,6 +68,7 @@ export const POST = withErrorHandling("POST /api/auth/google-id-token", async (r
     if (existing) {
       await linkGoogleId(existing.id, googleId);
       user = existing;
+      sendGoogleLinkedEmail(user.email, user.name).catch(() => {});
     } else {
       user = await createUserWithGoogle(name, email, googleId);
     }

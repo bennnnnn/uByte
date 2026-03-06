@@ -36,7 +36,12 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
   return (
     <ToastContext.Provider value={{ toast }}>
       {children}
-      <div className="fixed bottom-6 right-6 z-50 flex flex-col gap-2">
+      <div
+        role="status"
+        aria-live="polite"
+        aria-atomic="false"
+        className="fixed bottom-6 right-6 z-50 flex flex-col gap-2"
+      >
         {toasts.map((t) => (
           <div
             key={t.id}
@@ -48,15 +53,16 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
                 : "bg-zinc-800 text-white dark:bg-zinc-100 dark:text-zinc-900"
             }`}
           >
-            {t.type === "success" && <span>✓</span>}
-            {t.type === "error" && <span>✕</span>}
-            {t.type === "info" && <span>ℹ</span>}
+            {t.type === "success" && <span aria-hidden>✓</span>}
+            {t.type === "error" && <span aria-hidden>✕</span>}
+            {t.type === "info" && <span aria-hidden>ℹ</span>}
             {t.message}
             <button
               onClick={() => setToasts((prev) => prev.filter((x) => x.id !== t.id))}
+              aria-label="Dismiss"
               className="ml-2 opacity-70 hover:opacity-100"
             >
-              ×
+              <span aria-hidden>×</span>
             </button>
           </div>
         ))}

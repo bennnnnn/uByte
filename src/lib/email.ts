@@ -39,6 +39,31 @@ export async function sendStreakReminderEmail(
   });
 }
 
+export async function sendGoogleLinkedEmail(
+  to: string,
+  name: string
+): Promise<void> {
+  const resend = getResend();
+  if (!resend) return;
+
+  const siteUrl = BASE_URL;
+  await resend.emails.send({
+    from: FROM,
+    to,
+    subject: "Google sign-in linked to your uByte account",
+    html: `
+      <div style="font-family:sans-serif;max-width:480px;margin:auto">
+        <h2 style="color:#0891b2">Google sign-in linked</h2>
+        <p>Hi ${name},</p>
+        <p>Google sign-in has been linked to your uByte account. You can now sign in with either your password or Google.</p>
+        <p style="color:#dc2626;font-weight:600">If you didn't do this, your account may be compromised. Change your password immediately.</p>
+        <a href="${siteUrl}/profile" style="display:inline-block;margin:16px 0;padding:12px 24px;background:#dc2626;color:#fff;border-radius:8px;text-decoration:none;font-weight:600">Secure my account</a>
+        <p style="color:#6b7280;font-size:12px">You're receiving this because a Google account was linked to your uByte account.</p>
+      </div>
+    `,
+  });
+}
+
 export async function sendVerificationEmail(
   to: string,
   name: string,

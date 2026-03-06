@@ -77,15 +77,31 @@ export default function PasswordSection({ profile, onChangePassword, onToast }: 
       </div>
       {showForm && (
         <div className="mt-4 space-y-3">
-          <Input type="password" value={currentPw} onChange={(e) => setCurrentPw(e.target.value)} placeholder="Current password" />
           <div>
-            <Input type="password" value={newPw} onChange={(e) => setNewPw(e.target.value)} placeholder="New password" />
+            <label htmlFor="current-password" className="mb-1.5 block text-sm font-medium text-zinc-700 dark:text-zinc-300">
+              Current password
+            </label>
+            <Input id="current-password" type="password" value={currentPw} onChange={(e) => setCurrentPw(e.target.value)} placeholder="••••••••" />
+          </div>
+          <div>
+            <label htmlFor="new-password" className="mb-1.5 block text-sm font-medium text-zinc-700 dark:text-zinc-300">
+              New password
+            </label>
+            <Input id="new-password" type="password" value={newPw} onChange={(e) => setNewPw(e.target.value)} placeholder="••••••••" aria-describedby={newPw.length > 0 ? "pw-strength" : undefined} />
             {newPw.length > 0 && (
-              <div className="mt-1.5">
-                <div className="h-1.5 w-full overflow-hidden rounded-full bg-zinc-200 dark:bg-zinc-700">
+              <div className="mt-1.5" id="pw-strength">
+                <div
+                  role="meter"
+                  aria-label="Password strength"
+                  aria-valuemin={0}
+                  aria-valuemax={100}
+                  aria-valuenow={parseInt(strength.width)}
+                  aria-valuetext={strength.label}
+                  className="h-1.5 w-full overflow-hidden rounded-full bg-zinc-200 dark:bg-zinc-700"
+                >
                   <div className={`h-full rounded-full transition-all ${strength.color}`} style={{ width: strength.width }} />
                 </div>
-                <p className="mt-1 text-xs text-zinc-500">{strength.label}</p>
+                <p className="mt-1 text-xs text-zinc-500" aria-hidden>{strength.label}</p>
               </div>
             )}
           </div>

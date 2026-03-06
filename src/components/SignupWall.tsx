@@ -87,36 +87,48 @@ export default function SignupWall({ slug }: { slug: string }) {
         </div>
 
         {error && (
-          <div className="mb-4 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-600 dark:bg-red-950 dark:text-red-400">
+          <div role="alert" className="mb-4 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-600 dark:bg-red-950 dark:text-red-400">
             {error}
           </div>
         )}
 
         <form onSubmit={handleSubmit} className="space-y-3">
           {mode === "signup" && (
-            <Input
-              type="text"
-              required
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Your name"
-            />
+            <div>
+              <label htmlFor="wall-name" className="sr-only">Your name</label>
+              <Input
+                id="wall-name"
+                type="text"
+                required
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Your name"
+              />
+            </div>
           )}
-          <Input
-            type="email"
-            required
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="Email address"
-          />
-          <Input
-            type="password"
-            required
-            minLength={6}
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="Password (min. 6 characters)"
-          />
+          <div>
+            <label htmlFor="wall-email" className="sr-only">Email address</label>
+            <Input
+              id="wall-email"
+              type="email"
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Email address"
+            />
+          </div>
+          <div>
+            <label htmlFor="wall-password" className="sr-only">Password</label>
+            <Input
+              id="wall-password"
+              type="password"
+              required
+              minLength={6}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Password (min. 6 characters)"
+            />
+          </div>
           <button
             type="submit"
             disabled={submitting}
