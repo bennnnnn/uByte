@@ -103,7 +103,12 @@ export default async function PracticeExamsPage() {
   );
   const passedLangs = EXAM_LANGS.filter((lang) => statsByLang[lang]?.hasCertificate);
 
-  const popularLangs = [...EXAM_LANGS]
+  const popularCandidates = EXAM_LANGS.filter((lang) => {
+    const s = publicStatsByLang[lang];
+    return (s?.usersTaken ?? 0) > 0 || (s?.attemptsSubmitted ?? 0) > 0;
+  });
+
+  const popularLangs = [...popularCandidates]
     .sort((a, b) => {
       const au = publicStatsByLang[a]?.usersTaken ?? 0;
       const bu = publicStatsByLang[b]?.usersTaken ?? 0;
@@ -175,41 +180,55 @@ export default async function PracticeExamsPage() {
         </header>
 
         {/* Popular exams */}
-        <section className="mb-12" aria-labelledby="popular-exams-heading">
-          <div className="mb-4 flex flex-wrap items-end justify-between gap-2">
-            <div>
-              <h2
-                id="popular-exams-heading"
-                className="text-sm font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400"
-              >
-                Popular exams
-              </h2>
-              <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
-                Based on completed attempts across all users.
-              </p>
+        {popularLangs.length > 0 ? (
+          <section className="mb-12" aria-labelledby="popular-exams-heading">
+            <div className="mb-4 flex flex-wrap items-end justify-between gap-2">
+              <div>
+                <h2
+                  id="popular-exams-heading"
+                  className="text-sm font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400"
+                >
+                  Popular exams
+                </h2>
+                <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
+                  Based on completed attempts across all users.
+                </p>
+              </div>
+              <Link href="#all-exams-heading" className="text-sm font-semibold text-indigo-600 hover:underline dark:text-indigo-400">
+                View all →
+              </Link>
             </div>
-            <Link href="#all-exams-heading" className="text-sm font-semibold text-indigo-600 hover:underline dark:text-indigo-400">
-              View all →
-            </Link>
-          </div>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {popularLangs.map((lang) => {
-              const config = LANGUAGES[lang as keyof typeof LANGUAGES];
-              if (!config) return null;
-              const examConfig = examConfigByLang[lang] ?? { examSize: 40, examDurationMinutes: 45 };
-              return (
-                <ExamCard
-                  key={lang}
-                  slug={lang}
-                  examConfig={examConfig}
-                  stats={statsByLang[lang]}
-                  publicStats={publicStatsByLang[lang]}
-                  variant="default"
-                />
-              );
-            })}
-          </div>
-        </section>
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {popularLangs.map((lang) => {
+                const config = LANGUAGES[lang as keyof typeof LANGUAGES];
+                if (!config) return null;
+                const examConfig = examConfigByLang[lang] ?? { examSize: 40, examDurationMinutes: 45 };
+                return (
+                  <ExamCard
+                    key={lang}
+                    slug={lang}
+                    examConfig={examConfig}
+                    stats={statsByLang[lang]}
+                    publicStats={publicStatsByLang[lang]}
+                    variant="default"
+                  />
+                );
+              })}
+            </div>
+          </section>
+        ) : (
+          <section className="mb-12" aria-labelledby="popular-exams-heading">
+            <h2
+              id="popular-exams-heading"
+              className="text-sm font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400"
+            >
+              Popular exams
+            </h2>
+            <div className="mt-3 rounded-2xl border border-zinc-200 bg-white p-5 text-sm text-zinc-700 shadow-sm dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-200">
+              No completed exam attempts yet — take the first one and this section will start ranking what’s actually popular.
+            </div>
+          </section>
+        )}
 
         {/* Try again — failed last attempt */}
         {tryAgainLangs.length > 0 && (
