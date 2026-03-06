@@ -53,14 +53,6 @@ export default async function PracticeExamLangPage({ params }: Props) {
       {/* ── Hero ──────────────────────────────────────────────────────────── */}
       <div className="border-b border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900">
         <div className="mx-auto max-w-5xl px-6 py-10 sm:py-14">
-          {/* Breadcrumb */}
-          <Link
-            href="/practice-exams"
-            className="mb-6 inline-flex items-center gap-1.5 text-sm font-medium text-zinc-500 transition-colors hover:text-indigo-600 dark:text-zinc-400 dark:hover:text-indigo-400"
-          >
-            ← Practice Exams
-          </Link>
-
           <div className="flex flex-col gap-8 sm:flex-row sm:items-start sm:justify-between">
             {/* Left: identity + tagline + stat chips */}
             <div className="flex items-start gap-5">
@@ -155,9 +147,6 @@ export default async function PracticeExamLangPage({ params }: Props) {
                 ) : (
                   <>
                     <p className="text-lg font-bold text-zinc-900 dark:text-zinc-100">Take this exam</p>
-                    <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
-                      Practice exams are a Pro feature. Upgrade to start this exam and earn your certificate.
-                    </p>
 
                     <ul className="mt-5 space-y-2.5">
                       {[
@@ -180,7 +169,7 @@ export default async function PracticeExamLangPage({ params }: Props) {
                         href="/pricing"
                         className="inline-flex items-center justify-center rounded-xl bg-indigo-600 px-5 py-3 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-indigo-500"
                       >
-                        Upgrade to Pro
+                        Get certified
                       </Link>
                       {!user && (
                         <Link
@@ -192,9 +181,6 @@ export default async function PracticeExamLangPage({ params }: Props) {
                       )}
                     </div>
 
-                    <p className="mt-4 text-center text-xs text-zinc-400 dark:text-zinc-500">
-                      Free users can browse all exam details.
-                    </p>
                   </>
                 )}
               </div>
