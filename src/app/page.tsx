@@ -12,7 +12,8 @@ import { tutorialLangUrl, tutorialUrl } from "@/lib/urls";
 import { getCurrentUser } from "@/lib/auth";
 import type { SupportedLanguage } from "@/lib/languages/types";
 import {
-  LanguageCard,
+  LangCard,
+  SectionHeading,
   HeroSection,
   PracticeSection,
   PracticeExamsSection,
@@ -124,27 +125,17 @@ export default async function Home() {
 
         {/* Languages */}
         <section aria-labelledby="languages-heading">
-          <div className="mb-8 text-center">
-            <h2
-              id="languages-heading"
-              className="text-2xl font-black text-zinc-900 dark:text-zinc-100 sm:text-3xl"
-            >
-              Pick your language
-            </h2>
-            <p className="mt-2 text-sm font-medium text-zinc-600 dark:text-zinc-400 sm:text-base">
-              Same concepts, same structure — start in seconds with no setup.
-            </p>
-          </div>
+          <SectionHeading id="languages-heading" title="Pick your language" subtitle="Same concepts, same structure — start in seconds with no setup." />
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {languageEntries.map(({ slug, config }) => (
-              <LanguageCard
+              <LangCard
                 key={slug}
-                slug={slug}
-                name={config.name}
-                description={config.seo.defaultDescription}
-                icon={getLangIcon(slug)}
-                lessonCount={getTotalLessonCount(slug as SupportedLanguage)}
                 href={tutorialLangUrl(slug)}
+                icon={getLangIcon(slug)}
+                name={config.name}
+                badge={`${getTotalLessonCount(slug as SupportedLanguage)} lessons`}
+                description={config.seo.defaultDescription}
+                cta="Start learning"
               />
             ))}
           </div>
