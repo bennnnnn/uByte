@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import { LANGUAGES, getAllLanguageSlugs } from "@/lib/languages/registry";
 import type { SupportedLanguage } from "@/lib/languages/types";
 import { getCurrentUser } from "@/lib/auth";
-import { getUserPlan, getExamConfig } from "@/lib/db";
+import { getUserPlan, getExamConfigForLang, getExamConfigForAllLangs } from "@/lib/db";
 import { hasPaidAccess } from "@/lib/plans";
 import { getLangIcon } from "@/lib/languages/icons";
 import { getExamDetailContent } from "@/lib/exams/content";
@@ -22,7 +22,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { lang } = await params;
   const config = LANGUAGES[lang as SupportedLanguage];
   const name = config?.name ?? lang;
-  const examConfig = await getExamConfig();
+  const examConfig = await getExamConfigForLang(lang);
   return {
     title: `${name} Practice Exam`,
     description: `Prepare for the ${name} practice exam. ${examConfig.examSize} questions, ${examConfig.examDurationMinutes} minutes, 70% to pass and earn a certificate.`,
@@ -33,9 +33,10 @@ export default async function PracticeExamLangPage({ params }: Props) {
   const { lang } = await params;
   if (!VALID_LANGS.has(lang)) notFound();
 
-  const [user, examConfig] = await Promise.all([
+  const [user, examConfig, examConfigByLang] = await Promise.all([
     getCurrentUser().then((u) => u),
-    getExamConfig(),
+    getExamConfigForLang(lang),
+    getExamConfigForAllLangs(),
   ]);
   const plan = user ? await getUserPlan(user.userId) : "free";
   const canTakeExam = hasPaidAccess(plan);
@@ -132,7 +133,7 @@ export default async function PracticeExamLangPage({ params }: Props) {
         </div>
 
         {/* Other exams */}
-        <OtherExamsGrid currentLang={lang} langSlugs={langSlugs} examSize={examConfig.examSize} examDurationMinutes={examConfig.examDurationMinutes} />
+        <OtherExamsGrid currentLang={lang} langSlugs={langSlugs} examConfigByLang={examConfigByLang} />
       </div>
     </div>
   );

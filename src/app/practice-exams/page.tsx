@@ -4,7 +4,7 @@ import { LANGUAGES, getAllLanguageSlugs } from "@/lib/languages/registry";
 import { getLangIcon } from "@/lib/languages/icons";
 import type { SupportedLanguage } from "@/lib/languages/types";
 import { getCurrentUser } from "@/lib/auth";
-import { getUserPlan, getExamConfig } from "@/lib/db";
+import { getUserPlan, getExamConfigForAllLangs } from "@/lib/db";
 import { hasPaidAccess } from "@/lib/plans";
 import UpgradeWall from "@/components/UpgradeWall";
 
@@ -17,14 +17,13 @@ export const metadata: Metadata = {
 };
 
 export default async function PracticeExamsPage() {
-  const [user, examConfig] = await Promise.all([
+  const [user, examConfigByLang] = await Promise.all([
     getCurrentUser(),
-    getExamConfig(),
+    getExamConfigForAllLangs(),
   ]);
   const plan = user ? await getUserPlan(user.userId) : "free";
   const isPro = hasPaidAccess(plan);
   const langSlugs = getAllLanguageSlugs() as SupportedLanguage[];
-  const { examSize, examDurationMinutes } = examConfig;
 
   if (!isPro) {
     return (
@@ -38,7 +37,7 @@ export default async function PracticeExamsPage() {
               Practice Exams
             </h1>
             <p className="mt-2 max-w-xl text-zinc-600 dark:text-zinc-400">
-              Timed multiple-choice exams by language. Each attempt selects {examSize} questions at random. {examDurationMinutes} minutes. Score at least 70% to pass and earn a certificate.
+              Timed multiple-choice exams by language. Questions and duration vary by language. Score at least 70% to pass and earn a certificate.
             </p>
           </div>
 
@@ -47,7 +46,7 @@ export default async function PracticeExamsPage() {
               What to expect
             </h2>
             <ul className="mt-3 space-y-2 text-sm text-zinc-600 dark:text-zinc-400">
-              <li>· {examSize} questions per attempt, {examDurationMinutes} minutes</li>
+              <li>· Questions and duration set per language (Admin → Exams)</li>
               <li>· 70% correct to pass and earn a shareable certificate</li>
               <li>· Available in Go, Python, C++, JavaScript, Java, and Rust</li>
             </ul>
@@ -72,7 +71,7 @@ export default async function PracticeExamsPage() {
             Practice Exams
           </h1>
           <p className="mt-2 max-w-xl text-zinc-600 dark:text-zinc-400">
-            Timed multiple-choice exams by language. Each attempt selects {examSize} questions at random. {examDurationMinutes} minutes. Score at least 70% to pass and earn a certificate.
+            Timed multiple-choice exams by language. Questions and duration set per language. Score at least 70% to pass and earn a certificate.
           </p>
         </div>
 
@@ -87,6 +86,7 @@ export default async function PracticeExamsPage() {
             {langSlugs.map((slug) => {
               const config = LANGUAGES[slug];
               if (!config) return null;
+              const examConfig = examConfigByLang[slug] ?? { examSize: 40, examDurationMinutes: 45 };
               return (
                 <Link
                   key={slug}
@@ -101,7 +101,7 @@ export default async function PracticeExamsPage() {
                       {config.name}
                     </h3>
                     <p className="text-sm text-zinc-500 dark:text-zinc-400">
-                      {examSize} questions per exam · {examDurationMinutes} min · 70% to pass
+                      {examConfig.examSize} questions per exam · {examConfig.examDurationMinutes} min · 70% to pass
                     </p>
                   </div>
                   <span className="text-sm font-medium text-amber-700 dark:text-amber-400">
