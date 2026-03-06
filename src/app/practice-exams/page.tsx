@@ -91,38 +91,22 @@ function ExamCard({
             </div>
           </div>
 
-          <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
-            <div className="rounded-xl border border-indigo-200 bg-indigo-50/70 px-3 py-2 dark:border-indigo-900/60 dark:bg-indigo-950/20">
-              <div className="text-[11px] font-medium uppercase tracking-wider text-indigo-700 dark:text-indigo-300">
-                Your attempts
-              </div>
-              <div className="mt-0.5 text-sm font-semibold text-zinc-900 dark:text-zinc-100">
-                {userAttempts}
-              </div>
+          <div className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-2">
+            <div className="flex items-center justify-between rounded-xl border border-indigo-200 bg-indigo-50/70 px-3 py-2 dark:border-indigo-900/60 dark:bg-indigo-950/20">
+              <span className="text-xs font-medium text-indigo-700 dark:text-indigo-300">Your attempts</span>
+              <span className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">{userAttempts}</span>
             </div>
-            <div className="rounded-xl border border-zinc-200 bg-zinc-50 px-3 py-2 dark:border-zinc-700 dark:bg-zinc-800/40">
-              <div className="text-[11px] font-medium uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
-                Total attempts
-              </div>
-              <div className="mt-0.5 text-sm font-semibold text-zinc-900 dark:text-zinc-100">
-                {hasPublicStats ? statAttempts.toLocaleString() : "0"}
-              </div>
+            <div className="flex items-center justify-between rounded-xl border border-zinc-200 bg-zinc-50 px-3 py-2 dark:border-zinc-700 dark:bg-zinc-800/40">
+              <span className="text-xs font-medium text-zinc-600 dark:text-zinc-300">Total attempts</span>
+              <span className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">{hasPublicStats ? statAttempts.toLocaleString() : "0"}</span>
             </div>
-            <div className="rounded-xl border border-zinc-200 bg-zinc-50 px-3 py-2 dark:border-zinc-700 dark:bg-zinc-800/40">
-              <div className="text-[11px] font-medium uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
-                Users
-              </div>
-              <div className="mt-0.5 text-sm font-semibold text-zinc-900 dark:text-zinc-100">
-                {hasPublicStats ? statUsersTaken.toLocaleString() : "0"}
-              </div>
+            <div className="flex items-center justify-between rounded-xl border border-zinc-200 bg-zinc-50 px-3 py-2 dark:border-zinc-700 dark:bg-zinc-800/40">
+              <span className="text-xs font-medium text-zinc-600 dark:text-zinc-300">Users</span>
+              <span className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">{hasPublicStats ? statUsersTaken.toLocaleString() : "0"}</span>
             </div>
-            <div className="rounded-xl border border-zinc-200 bg-zinc-50 px-3 py-2 dark:border-zinc-700 dark:bg-zinc-800/40">
-              <div className="text-[11px] font-medium uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
-                Pass rate
-              </div>
-              <div className="mt-0.5 text-sm font-semibold text-zinc-900 dark:text-zinc-100">
-                {hasPublicStats ? `${statPassRate}%` : "New"}
-              </div>
+            <div className="flex items-center justify-between rounded-xl border border-zinc-200 bg-zinc-50 px-3 py-2 dark:border-zinc-700 dark:bg-zinc-800/40">
+              <span className="text-xs font-medium text-zinc-600 dark:text-zinc-300">Pass rate</span>
+              <span className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">{hasPublicStats ? `${statPassRate}%` : "New"}</span>
             </div>
           </div>
         </div>
