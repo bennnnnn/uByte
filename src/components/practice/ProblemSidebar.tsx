@@ -1,14 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import type { PracticeProblem, Difficulty } from "@/lib/practice/types";
+import { DIFFICULTY_BADGE, type PracticeProblem } from "@/lib/practice/types";
 import type { PracticeAttemptStatus } from "@/lib/db/practice-attempts";
-
-const DIFF_BADGE: Record<Difficulty, string> = {
-  easy:   "bg-emerald-100 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-400",
-  medium: "bg-amber-100   text-amber-700   dark:bg-amber-950/60   dark:text-amber-400",
-  hard:   "bg-red-100     text-red-700     dark:bg-red-950/60     dark:text-red-400",
-};
 
 interface ListQuery {
   category?: string;
@@ -58,13 +52,13 @@ export default function ProblemSidebar({
       <div className="shrink-0 border-b border-zinc-200 px-3 py-2.5 dark:border-zinc-800">
         {/* Difficulty badges row */}
         <div className="mb-2 flex items-center gap-1.5 flex-wrap">
-          <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${DIFF_BADGE.easy}`}>
+          <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${DIFFICULTY_BADGE.easy}`}>
             {easy} Easy
           </span>
-          <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${DIFF_BADGE.medium}`}>
+          <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${DIFFICULTY_BADGE.medium}`}>
             {medium} Medium
           </span>
-          <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${DIFF_BADGE.hard}`}>
+          <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${DIFFICULTY_BADGE.hard}`}>
             {hard} Hard
           </span>
         </div>

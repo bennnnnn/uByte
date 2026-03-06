@@ -3,8 +3,10 @@ import Link from "next/link";
 import { getAllPracticeProblems } from "@/lib/practice/problems";
 import { LANGUAGES, getAllLanguageSlugs } from "@/lib/languages/registry";
 import type { SupportedLanguage } from "@/lib/languages/types";
+import { DIFFICULTY_BADGE } from "@/lib/practice/types";
 import { FREE_PRACTICE_LIMIT } from "@/lib/plans";
 import { getLangIcon, PRACTICE_TAGLINES } from "@/lib/languages/icons";
+import { LangCard } from "@/components/home";
 
 export const dynamic = "force-dynamic";
 
@@ -13,12 +15,6 @@ export const metadata: Metadata = {
   description:
     "Solve classic coding interview problems in Go, Python, C++, JavaScript, Java, and Rust. Run your code in the browser.",
 };
-
-const DIFF_STYLES = {
-  easy:   "bg-emerald-100 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-400",
-  medium: "bg-amber-100 text-amber-700 dark:bg-amber-950/60 dark:text-amber-400",
-  hard:   "bg-red-100 text-red-700 dark:bg-red-950/60 dark:text-red-400",
-} as const;
 
 export default async function PracticePage() {
   const problems = getAllPracticeProblems();
@@ -31,7 +27,7 @@ export default async function PracticePage() {
 
   return (
     <div className="min-h-full overflow-y-auto">
-      {/* ── Hero section with background ───────────────────────────────── */}
+      {/* ── Hero section ────────────────────────────────────────────────── */}
       <section className="relative overflow-hidden bg-white dark:bg-zinc-950">
         <div className="pointer-events-none absolute inset-0 overflow-hidden">
           <div className="absolute -left-40 top-0 h-[600px] w-[600px] -translate-y-1/3 rounded-full bg-indigo-200/50 blur-[140px] dark:bg-indigo-500/15" />
@@ -47,13 +43,11 @@ export default async function PracticePage() {
         />
 
         <div className="relative mx-auto max-w-5xl px-6 pt-14 pb-16 sm:pt-20 sm:pb-24">
-          {/* Badge */}
           <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-indigo-200 bg-indigo-50 px-4 py-1.5 text-[11px] font-bold uppercase tracking-[0.12em] text-indigo-600 dark:border-indigo-800 dark:bg-indigo-950/50 dark:text-indigo-400">
             <span className="text-base">🎯</span>
             LeetCode-style · Run in browser
           </div>
 
-          {/* Headline */}
           <h1 className="mb-4 text-4xl font-black tracking-tight text-zinc-900 dark:text-zinc-50 sm:text-5xl">
             Interview{" "}
             <span className="bg-gradient-to-r from-indigo-600 via-violet-600 to-cyan-500 bg-clip-text text-transparent">
@@ -67,22 +61,11 @@ export default async function PracticePage() {
             per language; upgrade for full access.
           </p>
 
-          {/* Difficulty stats */}
-          <div className="flex flex-wrap gap-3">
-            <span className={`rounded-full px-4 py-2 text-sm font-semibold ${DIFF_STYLES.easy}`}>
-              {easy} Easy
-            </span>
-            <span className={`rounded-full px-4 py-2 text-sm font-semibold ${DIFF_STYLES.medium}`}>
-              {medium} Medium
-            </span>
-            <span className={`rounded-full px-4 py-2 text-sm font-semibold ${DIFF_STYLES.hard}`}>
-              {hard} Hard
-            </span>
-          </div>
+          <DifficultyPills easy={easy} medium={medium} hard={hard} />
         </div>
       </section>
 
-      {/* ── Choose language ─────────────────────────────────────────────── */}
+      {/* ── Choose language ───────────────────────────────────────────── */}
       <section
         aria-labelledby="lang-heading"
         className="border-t border-zinc-100 bg-zinc-50/50 dark:border-zinc-800 dark:bg-zinc-900/30"
@@ -100,42 +83,22 @@ export default async function PracticePage() {
               const config = LANGUAGES[slug];
               if (!config) return null;
               return (
-                <Link
+                <LangCard
                   key={slug}
                   href={`/practice/${slug}`}
-                  className="group relative flex flex-col overflow-hidden rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm transition-all duration-200 hover:-translate-y-1 hover:border-indigo-300 hover:shadow-xl hover:shadow-indigo-500/10 dark:border-zinc-700 dark:bg-zinc-900 dark:hover:border-indigo-600 dark:hover:shadow-indigo-500/5"
-                >
-                  <div className="absolute right-0 top-0 h-24 w-24 translate-x-4 -translate-y-4 rounded-full bg-indigo-100/80 opacity-0 transition-opacity group-hover:opacity-100 dark:bg-indigo-500/10" />
-                  <div className="relative mb-4 flex items-center gap-4">
-                    <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-zinc-100 text-2xl shadow-inner dark:bg-zinc-800">
-                      {getLangIcon(slug)}
-                    </span>
-                    <div>
-                      <h3 className="text-lg font-bold text-zinc-900 dark:text-zinc-100">
-                        {config.name}
-                      </h3>
-                      <p className="text-sm font-medium text-indigo-600 dark:text-indigo-400">
-                        {problems.length} problems
-                      </p>
-                    </div>
-                  </div>
-                  <p className="relative mb-5 flex-1 text-sm leading-relaxed text-zinc-500 dark:text-zinc-400">
-                    {PRACTICE_TAGLINES[slug as SupportedLanguage] ?? `Solve problems in ${config.name}`}
-                  </p>
-                  <span className="relative inline-flex items-center gap-2 text-sm font-semibold text-indigo-600 transition-[gap] group-hover:gap-3 dark:text-indigo-400">
-                    View problems
-                    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                    </svg>
-                  </span>
-                </Link>
+                  icon={getLangIcon(slug)}
+                  name={config.name}
+                  badge={`${problems.length} problems`}
+                  description={PRACTICE_TAGLINES[slug] ?? `Solve problems in ${config.name}`}
+                  cta="View problems"
+                />
               );
             })}
           </div>
         </div>
       </section>
 
-      {/* ── Featured problems ───────────────────────────────────────────── */}
+      {/* ── Featured problems ─────────────────────────────────────────── */}
       <section className="border-t border-zinc-100 dark:border-zinc-800" aria-labelledby="preview-heading">
         <div className="mx-auto max-w-5xl px-6 py-12 sm:py-16">
           <h2 id="preview-heading" className="mb-2 text-xs font-bold uppercase tracking-[0.2em] text-zinc-400 dark:text-zinc-500">
@@ -170,7 +133,7 @@ export default async function PracticePage() {
                     <span className="flex-1 font-semibold text-zinc-900 group-hover:text-indigo-700 dark:text-zinc-100 dark:group-hover:text-indigo-400">
                       {p.title}
                     </span>
-                    <span className={`shrink-0 rounded-full px-3 py-1 text-xs font-semibold capitalize ${DIFF_STYLES[p.difficulty]}`}>
+                    <span className={`shrink-0 rounded-full px-3 py-1 text-xs font-semibold capitalize ${DIFFICULTY_BADGE[p.difficulty]}`}>
                       {p.difficulty}
                     </span>
                     <svg className="h-5 w-5 shrink-0 text-zinc-300 transition-colors group-hover:text-indigo-500 dark:text-zinc-500 dark:group-hover:text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -194,6 +157,23 @@ export default async function PracticePage() {
           </div>
         </div>
       </section>
+    </div>
+  );
+}
+
+function DifficultyPills({ easy, medium, hard }: { easy: number; medium: number; hard: number }) {
+  const pills = [
+    { count: easy, label: "Easy", cls: DIFFICULTY_BADGE.easy },
+    { count: medium, label: "Medium", cls: DIFFICULTY_BADGE.medium },
+    { count: hard, label: "Hard", cls: DIFFICULTY_BADGE.hard },
+  ];
+  return (
+    <div className="flex flex-wrap gap-3">
+      {pills.map((p) => (
+        <span key={p.label} className={`rounded-full px-4 py-2 text-sm font-semibold ${p.cls}`}>
+          {p.count} {p.label}
+        </span>
+      ))}
     </div>
   );
 }

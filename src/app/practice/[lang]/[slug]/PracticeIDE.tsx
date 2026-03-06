@@ -2,10 +2,9 @@
 
 import { useState, useCallback, useEffect, useRef, Suspense } from "react";
 import Link from "next/link";
-import type { PracticeProblem, Difficulty } from "@/lib/practice/types";
+import { DIFFICULTY_BADGE, type PracticeProblem, type ProblemCategory } from "@/lib/practice/types";
 import type { SupportedLanguage } from "@/lib/languages/types";
 import { getStarterForLanguage, getAllPracticeProblems, getCategoryForSlug, getPracticeCategories } from "@/lib/practice/problems";
-import type { ProblemCategory } from "@/lib/practice/types";
 import { LANGUAGES } from "@/lib/languages/registry";
 import { useCodeEditor } from "@/hooks/useCodeEditor";
 import { usePanelResize } from "@/hooks/usePanelResize";
@@ -14,12 +13,6 @@ import AuthButtons from "@/components/AuthButtons";
 import ShortcutsModal from "@/components/tutorial/ShortcutsModal";
 import ProblemSidebar from "@/components/practice/ProblemSidebar";
 import type { PracticeAttemptStatus } from "@/lib/db/practice-attempts";
-
-const DIFFICULTY_STYLES: Record<Difficulty, string> = {
-  easy:   "bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-400",
-  medium: "bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-400",
-  hard:   "bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-400",
-};
 
 const LANG_ORDER: SupportedLanguage[] = ["go", "python", "cpp", "javascript", "java", "rust"];
 
@@ -383,7 +376,7 @@ export function PracticeIDE({ problem, initialLang, categoryFilter = null, listP
         {/* Breadcrumb */}
         <h1 className="min-w-0 max-w-[45%] flex-1 truncate text-center text-sm font-semibold text-zinc-800 dark:text-zinc-100 md:max-w-[40%] md:flex-initial" title={problem.title}>
           {problem.title}
-          <span className={`ml-2 inline-block rounded-full px-2 py-0.5 text-xs font-medium capitalize align-middle ${DIFFICULTY_STYLES[problem.difficulty]}`}>
+          <span className={`ml-2 inline-block rounded-full px-2 py-0.5 text-xs font-medium capitalize align-middle ${DIFFICULTY_BADGE[problem.difficulty]}`}>
             {problem.difficulty}
           </span>
         </h1>
@@ -490,7 +483,7 @@ export function PracticeIDE({ problem, initialLang, categoryFilter = null, listP
             <h1 className="mb-2 break-words text-xl font-bold text-zinc-900 dark:text-zinc-100">
               {problem.title}
             </h1>
-            <span className={`mb-4 inline-block rounded-full px-2.5 py-0.5 text-xs font-medium capitalize ${DIFFICULTY_STYLES[problem.difficulty]}`}>
+            <span className={`mb-4 inline-block rounded-full px-2.5 py-0.5 text-xs font-medium capitalize ${DIFFICULTY_BADGE[problem.difficulty]}`}>
               {problem.difficulty}
             </span>
 

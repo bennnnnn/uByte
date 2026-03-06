@@ -4,21 +4,12 @@ import { useState, useCallback } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { LANGUAGES } from "@/lib/languages/registry";
+import { getLangIcon } from "@/lib/languages/icons";
 import type { SupportedLanguage } from "@/lib/languages/types";
-import type { Difficulty, ProblemCategory } from "@/lib/practice/types";
+import { DIFFICULTY_BADGE, type Difficulty, type ProblemCategory } from "@/lib/practice/types";
 import { getCategoryForSlug, getCategoryLabel } from "@/lib/practice/problems";
 import { isPracticeProblemFree } from "@/lib/plans";
 import type { PracticeAttemptStatus } from "@/lib/db/practice-attempts";
-
-const LANG_ICONS: Record<string, string> = {
-  go: "🐹", python: "🐍", cpp: "⚙️", javascript: "🟨", java: "☕", rust: "🦀",
-};
-
-const DIFFICULTY_STYLES: Record<Difficulty, string> = {
-  easy: "bg-emerald-100 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-400",
-  medium: "bg-amber-100 text-amber-700 dark:bg-amber-950/60 dark:text-amber-400",
-  hard: "bg-red-100 text-red-700 dark:bg-red-950/60 dark:text-red-400",
-};
 
 export interface PracticeListProblem {
   slug: string;
@@ -140,7 +131,7 @@ export function PracticeListClient({
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div className="flex items-center gap-3">
               <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-zinc-100 text-2xl dark:bg-zinc-800">
-                {LANG_ICONS[selectedLang] ?? "🎯"}
+                {getLangIcon(selectedLang)}
               </span>
               <div>
                 <h1 className="text-xl font-bold text-zinc-900 dark:text-zinc-100 sm:text-2xl">
@@ -168,7 +159,7 @@ export function PracticeListClient({
                       : "border border-zinc-200 bg-white text-zinc-600 hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800"
                   }`}
                 >
-                  {LANG_ICONS[l2]} {LANGUAGES[l2]?.name}
+                  {getLangIcon(l2)} {LANGUAGES[l2]?.name}
                 </button>
               ))}
             </div>
@@ -318,7 +309,7 @@ export function PracticeListClient({
                           Pro
                         </span>
                       )}
-                      <span className={`shrink-0 rounded-md px-2 py-0.5 text-xs font-semibold capitalize ${DIFFICULTY_STYLES[p.difficulty]}`}>
+                      <span className={`shrink-0 rounded-md px-2 py-0.5 text-xs font-semibold capitalize ${DIFFICULTY_BADGE[p.difficulty]}`}>
                         {p.difficulty}
                       </span>
                       <svg className="h-4 w-4 shrink-0 text-zinc-300 group-hover:text-indigo-500 dark:text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>

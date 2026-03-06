@@ -2,6 +2,12 @@ import type { SupportedLanguage } from "@/lib/languages/types";
 
 export type Difficulty = "easy" | "medium" | "hard";
 
+export const DIFFICULTY_BADGE: Record<Difficulty, string> = {
+  easy:   "bg-emerald-100 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-400",
+  medium: "bg-amber-100 text-amber-700 dark:bg-amber-950/60 dark:text-amber-400",
+  hard:   "bg-red-100 text-red-700 dark:bg-red-950/60 dark:text-red-400",
+};
+
 /** Topic/category for grouping (e.g. Array, String, Dynamic Programming). */
 export type ProblemCategory =
   | "array"
