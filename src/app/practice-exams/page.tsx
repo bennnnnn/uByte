@@ -96,30 +96,29 @@ function ExamCard({
         {/* Divider */}
         <div className="h-px bg-zinc-100 dark:bg-zinc-800" />
 
-        {/* Stats grid: always 4 cells */}
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-          <div>
-            <p className="text-[11px] font-medium uppercase tracking-wide text-zinc-400 dark:text-zinc-500">Questions</p>
-            <p className="mt-0.5 text-base font-bold text-zinc-900 dark:text-zinc-100">{examConfig.examSize}</p>
+        {/* Stats grid: 2×2 */}
+        <div className="grid grid-cols-2 gap-x-6 gap-y-4">
+          <div className="flex flex-col gap-0.5">
+            <p className="text-xs font-medium text-zinc-400 dark:text-zinc-500">Questions</p>
+            <p className="text-xl font-bold text-zinc-900 dark:text-zinc-100">{examConfig.examSize}</p>
           </div>
-          <div>
-            <p className="text-[11px] font-medium uppercase tracking-wide text-zinc-400 dark:text-zinc-500">Time</p>
-            <p className="mt-0.5 text-base font-bold text-zinc-900 dark:text-zinc-100">{examConfig.examDurationMinutes} min</p>
+          <div className="flex flex-col gap-0.5">
+            <p className="text-xs font-medium text-zinc-400 dark:text-zinc-500">Time limit</p>
+            <p className="text-xl font-bold text-zinc-900 dark:text-zinc-100">{examConfig.examDurationMinutes} <span className="text-sm font-medium text-zinc-500">min</span></p>
           </div>
-          <div>
-            <p className="text-[11px] font-medium uppercase tracking-wide text-zinc-400 dark:text-zinc-500">Attempts</p>
-            <p className="mt-0.5 text-base font-bold text-zinc-900 dark:text-zinc-100">
-              {isLoggedIn
-                ? `${userAttempts} / ${hasPublicStats ? totalAttempts.toLocaleString() : "0"}`
-                : hasPublicStats ? totalAttempts.toLocaleString() : "—"}
+          <div className="flex flex-col gap-0.5">
+            <p className="text-xs font-medium text-zinc-400 dark:text-zinc-500">
+              {isLoggedIn ? "Attempts (you / all)" : "Total attempts"}
             </p>
-            {isLoggedIn && (
-              <p className="text-[10px] text-zinc-400 dark:text-zinc-500">yours / total</p>
-            )}
+            <p className="text-xl font-bold text-zinc-900 dark:text-zinc-100">
+              {isLoggedIn
+                ? <>{userAttempts} <span className="text-sm font-medium text-zinc-400">/ {hasPublicStats ? totalAttempts.toLocaleString() : "0"}</span></>
+                : hasPublicStats ? totalAttempts.toLocaleString() : <span className="text-zinc-400">—</span>}
+            </p>
           </div>
-          <div>
-            <p className="text-[11px] font-medium uppercase tracking-wide text-zinc-400 dark:text-zinc-500">Pass rate</p>
-            <p className={`mt-0.5 text-base font-bold ${hasPublicStats ? (passRate >= 50 ? "text-emerald-600 dark:text-emerald-400" : "text-amber-600 dark:text-amber-400") : "text-zinc-900 dark:text-zinc-100"}`}>
+          <div className="flex flex-col gap-0.5">
+            <p className="text-xs font-medium text-zinc-400 dark:text-zinc-500">Pass rate</p>
+            <p className={`text-xl font-bold ${hasPublicStats ? (passRate >= 50 ? "text-emerald-600 dark:text-emerald-400" : "text-amber-600 dark:text-amber-400") : "text-zinc-400 dark:text-zinc-500"}`}>
               {hasPublicStats ? `${passRate}%` : "New"}
             </p>
           </div>
