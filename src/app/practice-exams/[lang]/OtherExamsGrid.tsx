@@ -2,6 +2,7 @@ import Link from "next/link";
 import { LANGUAGES } from "@/lib/languages/registry";
 import { getLangIcon } from "@/lib/languages/icons";
 import type { SupportedLanguage } from "@/lib/languages/types";
+import { DEFAULT_EXAM_CONFIG } from "@/lib/db";
 
 interface Props {
   currentLang: string;
@@ -39,7 +40,7 @@ export default function OtherExamsGrid({ currentLang, langSlugs, examConfigByLan
         {others.map((slug) => {
           const config = LANGUAGES[slug as SupportedLanguage];
           if (!config) return null;
-          const examConfig = examConfigByLang[slug] ?? { examSize: 40, examDurationMinutes: 45, passPercent: 70 };
+          const examConfig = examConfigByLang[slug] ?? DEFAULT_EXAM_CONFIG;
           return (
             <Link
               key={slug}

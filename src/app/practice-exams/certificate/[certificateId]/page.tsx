@@ -7,6 +7,7 @@ import { LANGUAGES } from "@/lib/languages/registry";
 import type { SupportedLanguage } from "@/lib/languages/types";
 import type { CertificatePayload } from "@/lib/exams/api-types";
 import { parseJson, getApiErrorMessage } from "@/lib/fetch-utils";
+import Spinner from "@/components/Spinner";
 
 function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString("en-US", {
@@ -77,10 +78,7 @@ export default function ExamCertificatePage() {
   if (!data) {
     return (
       <div className="flex min-h-[80vh] items-center justify-center" aria-live="polite" aria-busy="true">
-        <div className="flex items-center justify-center gap-3 py-12">
-          <div className="h-5 w-5 animate-spin rounded-full border-2 border-zinc-300 border-t-zinc-600 dark:border-zinc-600 dark:border-t-zinc-400" />
-          <span className="text-sm text-zinc-500 dark:text-zinc-400">Loading certificate…</span>
-        </div>
+        <Spinner label="Loading certificate…" />
       </div>
     );
   }

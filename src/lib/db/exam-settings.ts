@@ -13,7 +13,7 @@ export interface ExamConfig {
   passPercent: number;
 }
 
-const DEFAULT_CONFIG: ExamConfig = {
+export const DEFAULT_EXAM_CONFIG: ExamConfig = {
   examSize: DEFAULT_EXAM_SIZE,
   examDurationMinutes: DEFAULT_EXAM_DURATION_MINUTES,
   passPercent: DEFAULT_EXAM_PASS_PERCENT,
@@ -71,7 +71,7 @@ async function getExamConfigFromSiteSettings(lang: string): Promise<ExamConfig> 
       passPercent,
     };
   } catch {
-    return DEFAULT_CONFIG;
+    return DEFAULT_EXAM_CONFIG;
   }
 }
 
@@ -108,7 +108,7 @@ async function getExamConfigFromSiteSettingsForAllLangs(): Promise<Record<string
     return result;
   } catch {
     const result: Record<string, ExamConfig> = {};
-    for (const lang of EXAM_LANGS) result[lang] = DEFAULT_CONFIG;
+    for (const lang of EXAM_LANGS) result[lang] = DEFAULT_EXAM_CONFIG;
     return result;
   }
 }
@@ -150,7 +150,7 @@ export async function getExamConfigForAllLangs(): Promise<Record<string, ExamCon
     }
     const result: Record<string, ExamConfig> = {};
     for (const lang of EXAM_LANGS) {
-      result[lang] = byLang.get(lang) ?? DEFAULT_CONFIG;
+      result[lang] = byLang.get(lang) ?? DEFAULT_EXAM_CONFIG;
     }
     return result;
   } catch {

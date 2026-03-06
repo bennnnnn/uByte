@@ -5,9 +5,49 @@ import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { LANGUAGES } from "@/lib/languages/registry";
 import type { SupportedLanguage } from "@/lib/languages/types";
-import { EXAM_DURATION_MINUTES } from "@/lib/exams/config";
+import { EXAM_DURATION_MINUTES, EXAM_LANGS } from "@/lib/exams/config";
 import type { AttemptPayload, SubmitExamResponse } from "@/lib/exams/api-types";
 import { parseJson, getApiErrorMessage } from "@/lib/fetch-utils";
+import { usePassPercent } from "@/hooks/usePassPercent";
+import Spinner from "@/components/Spinner";
+
+function ConfirmModal({
+  open,
+  id,
+  title,
+  body,
+  cancelLabel,
+  confirmLabel,
+  onCancel,
+  onConfirm,
+}: {
+  open: boolean;
+  id: string;
+  title: string;
+  body: string;
+  cancelLabel: string;
+  confirmLabel: string;
+  onCancel: () => void;
+  onConfirm: () => void;
+}) {
+  if (!open) return null;
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" role="dialog" aria-modal="true" aria-labelledby={id}>
+      <div className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-xl dark:bg-zinc-900">
+        <h2 id={id} className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">{title}</h2>
+        <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">{body}</p>
+        <div className="mt-6 flex gap-3">
+          <button type="button" onClick={onCancel} className="flex-1 rounded-xl border border-zinc-300 py-2.5 text-sm font-semibold text-zinc-700 hover:bg-zinc-50 dark:border-zinc-600 dark:text-zinc-200 dark:hover:bg-zinc-800">
+            {cancelLabel}
+          </button>
+          <button type="button" onClick={onConfirm} className="flex-1 rounded-xl bg-amber-600 py-2.5 text-sm font-semibold text-white hover:bg-amber-700">
+            {confirmLabel}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default function PracticeExamAttemptPage() {
   const { lang, attemptId } = useParams<{ lang: string; attemptId: string }>();
@@ -22,13 +62,7 @@ export default function PracticeExamAttemptPage() {
   const [showSubmitConfirm, setShowSubmitConfirm] = useState(false);
   const [showLeaveConfirm, setShowLeaveConfirm] = useState(false);
   const [pendingLeaveUrl, setPendingLeaveUrl] = useState<string | null>(null);
-  const [passPercent, setPassPercent] = useState(70);
-
-  useEffect(() => {
-    fetch("/api/site-settings").then((r) => r.ok ? r.json() : null).then((d) => {
-      if (d?.passPercentByLang?.[lang]) setPassPercent(d.passPercentByLang[lang]);
-    }).catch(() => {});
-  }, []);
+  const passPercent = usePassPercent(lang);
 
   useEffect(() => {
     let cancelled = false;
@@ -183,10 +217,7 @@ export default function PracticeExamAttemptPage() {
   if (loading) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
-        <div className="flex items-center justify-center gap-3 py-12">
-          <div className="h-5 w-5 animate-spin rounded-full border-2 border-zinc-300 border-t-zinc-600 dark:border-zinc-600 dark:border-t-zinc-400" />
-          <span className="text-sm text-zinc-500 dark:text-zinc-400">Loading exam…</span>
-        </div>
+        <Spinner label="Loading exam…" />
       </div>
     );
   }
@@ -239,7 +270,7 @@ export default function PracticeExamAttemptPage() {
               value={attempt.lang}
               onChange={(e) => handleSwitchLanguage(e.target.value)}
             >
-              {(["go", "python", "cpp", "javascript", "java", "rust"] as SupportedLanguage[]).map(
+              {EXAM_LANGS.map(
                 (l) => (
                   <option key={l} value={l}>
                     {LANGUAGES[l]?.name}
@@ -387,65 +418,27 @@ export default function PracticeExamAttemptPage() {
         )}
       </div>
 
-      {/* Submit confirmation modal */}
-      {showSubmitConfirm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" role="dialog" aria-modal="true" aria-labelledby="submit-confirm-title">
-          <div className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-xl dark:bg-zinc-900">
-            <h2 id="submit-confirm-title" className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">
-              Submit exam?
-            </h2>
-            <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
-              You can&apos;t change your answers after submitting. Your score will be calculated and you&apos;ll see the result.
-            </p>
-            <div className="mt-6 flex gap-3">
-              <button
-                type="button"
-                onClick={() => setShowSubmitConfirm(false)}
-                className="flex-1 rounded-xl border border-zinc-300 py-2.5 text-sm font-semibold text-zinc-700 hover:bg-zinc-50 dark:border-zinc-600 dark:text-zinc-200 dark:hover:bg-zinc-800"
-              >
-                Keep editing
-              </button>
-              <button
-                type="button"
-                onClick={() => { setShowSubmitConfirm(false); void handleSubmit(); }}
-                className="flex-1 rounded-xl bg-amber-600 py-2.5 text-sm font-semibold text-white hover:bg-amber-700"
-              >
-                Submit
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <ConfirmModal
+        open={showSubmitConfirm}
+        id="submit-confirm-title"
+        title="Submit exam?"
+        body="You can't change your answers after submitting. Your score will be calculated and you'll see the result."
+        cancelLabel="Keep editing"
+        confirmLabel="Submit"
+        onCancel={() => setShowSubmitConfirm(false)}
+        onConfirm={() => { setShowSubmitConfirm(false); void handleSubmit(); }}
+      />
 
-      {/* Leave attempt confirmation modal */}
-      {showLeaveConfirm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" role="dialog" aria-modal="true" aria-labelledby="leave-confirm-title">
-          <div className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-xl dark:bg-zinc-900">
-            <h2 id="leave-confirm-title" className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">
-              Leave this attempt?
-            </h2>
-            <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
-              Your progress will be lost. You can start a new attempt from the exam page.
-            </p>
-            <div className="mt-6 flex gap-3">
-              <button
-                type="button"
-                onClick={cancelLeave}
-                className="flex-1 rounded-xl border border-zinc-300 py-2.5 text-sm font-semibold text-zinc-700 hover:bg-zinc-50 dark:border-zinc-600 dark:text-zinc-200 dark:hover:bg-zinc-800"
-              >
-                Stay
-              </button>
-              <button
-                type="button"
-                onClick={confirmLeave}
-                className="flex-1 rounded-xl bg-amber-600 py-2.5 text-sm font-semibold text-white hover:bg-amber-700"
-              >
-                Leave
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <ConfirmModal
+        open={showLeaveConfirm}
+        id="leave-confirm-title"
+        title="Leave this attempt?"
+        body="Your progress will be lost. You can start a new attempt from the exam page."
+        cancelLabel="Stay"
+        confirmLabel="Leave"
+        onCancel={cancelLeave}
+        onConfirm={confirmLeave}
+      />
     </div>
   );
 }

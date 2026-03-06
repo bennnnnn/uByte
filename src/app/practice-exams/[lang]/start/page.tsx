@@ -2,8 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import type { StartExamResponse, StartExamError } from "@/lib/exams/api-types";
-import { parseJson, getApiErrorMessage } from "@/lib/fetch-utils";
+import { callStartExamApi } from "@/lib/exams/start-exam";
 
 export default function PracticeExamStartPage() {
   const { lang } = useParams<{ lang: string }>();
@@ -14,29 +13,16 @@ export default function PracticeExamStartPage() {
     let cancelled = false;
     async function startExam() {
       try {
-        const res = await fetch(`/api/practice-exams/${lang}/start`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          credentials: "same-origin",
-        });
-        const data = await parseJson<StartExamResponse & StartExamError>(res);
-
+        const result = await callStartExamApi(lang);
         if (cancelled) return;
 
-        if (res.status === 401) {
-          router.replace("/login");
-          return;
+        if (result.kind === "redirect") {
+          router.replace(result.url);
+        } else if (result.kind === "error") {
+          setError(result.message);
+        } else {
+          router.replace(`/practice-exams/${lang}/attempt/${result.attemptId}`);
         }
-        if (res.status === 403 && data?.code === "upgrade_required") {
-          router.replace("/pricing");
-          return;
-        }
-        if (!res.ok || !data?.attemptId) {
-          setError(getApiErrorMessage(res, data, "Unable to start exam. Please try again."));
-          return;
-        }
-
-        router.replace(`/practice-exams/${lang}/attempt/${data.attemptId}`);
       } catch {
         if (!cancelled) setError("Network error. Please try again.");
       }
@@ -65,4 +51,3 @@ export default function PracticeExamStartPage() {
     </div>
   );
 }
-

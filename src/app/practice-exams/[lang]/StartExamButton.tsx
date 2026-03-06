@@ -2,8 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import type { StartExamResponse, StartExamError } from "@/lib/exams/api-types";
-import { parseJson, getApiErrorMessage } from "@/lib/fetch-utils";
+import { callStartExamApi } from "@/lib/exams/start-exam";
 
 interface Props {
   lang: string;
@@ -20,27 +19,14 @@ export default function StartExamButton({ lang, langName, fullWidth }: Props) {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch(`/api/practice-exams/${lang}/start`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "same-origin",
-      });
-      const data = await parseJson<StartExamResponse & StartExamError>(res);
-
-      if (res.status === 401) {
-        router.push("/login");
-        return;
+      const result = await callStartExamApi(lang);
+      if (result.kind === "redirect") {
+        router.push(result.url);
+      } else if (result.kind === "error") {
+        setError(result.message);
+      } else {
+        router.push(`/practice-exams/${lang}/attempt/${result.attemptId}`);
       }
-      if (res.status === 403 && data?.code === "upgrade_required") {
-        router.push("/pricing");
-        return;
-      }
-      if (!res.ok || !data?.attemptId) {
-        setError(getApiErrorMessage(res, data, "Unable to start exam. Please try again."));
-        return;
-      }
-
-      router.push(`/practice-exams/${lang}/attempt/${data.attemptId}`);
     } catch {
       setError("Network error. Please try again.");
     } finally {
@@ -66,4 +52,3 @@ export default function StartExamButton({ lang, langName, fullWidth }: Props) {
     </div>
   );
 }
-

@@ -12,6 +12,21 @@ import StartExamButton from "./StartExamButton";
 import ExamDetailTabs from "./ExamDetailTabs";
 import OtherExamsGrid from "./OtherExamsGrid";
 
+function CheckList({ items }: { items: string[] }) {
+  return (
+    <ul className="mt-5 space-y-2.5">
+      {items.map((item) => (
+        <li key={item} className="flex items-center gap-2.5 text-sm text-zinc-700 dark:text-zinc-300">
+          <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-indigo-100 text-xs font-bold text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-300">
+            ✓
+          </span>
+          {item}
+        </li>
+      ))}
+    </ul>
+  );
+}
+
 export const dynamic = "force-dynamic";
 
 const VALID_LANGS = new Set(getAllLanguageSlugs());
@@ -76,11 +91,11 @@ export default async function PracticeExamLangPage({ params }: Props) {
                 {/* Quick stats chips */}
                 <div className="mt-5 flex flex-wrap gap-2">
                   {[
-                    { label: `${examConfig.examSize} questions` },
-                    { label: `${examConfig.examDurationMinutes} min` },
-                    { label: `${passMin} correct to pass (${EXAM_PASS_PERCENT}%)` },
-                    { label: "Certificate on pass" },
-                  ].map(({ label }) => (
+                    `${examConfig.examSize} questions`,
+                    `${examConfig.examDurationMinutes} min`,
+                    `${passMin} correct to pass (${EXAM_PASS_PERCENT}%)`,
+                    "Certificate on pass",
+                  ].map((label) => (
                     <span
                       key={label}
                       className="inline-flex items-center rounded-full border border-zinc-200 bg-zinc-50 px-3 py-1 text-sm font-medium text-zinc-700 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300"
@@ -124,23 +139,13 @@ export default async function PracticeExamLangPage({ params }: Props) {
                       The timer starts the moment you begin. You&apos;ll have {examConfig.examDurationMinutes} minutes.
                     </p>
 
-                    {/* Checklist */}
-                    <ul className="mt-5 space-y-2.5">
-                      {[
-                        `${examConfig.examSize} randomised questions`,
-                        `${examConfig.examDurationMinutes} min — can't be paused`,
-                        `${passMin} correct (${EXAM_PASS_PERCENT}%) to pass`,
-                        "Certificate sent on pass",
-                        "Retake anytime",
-                      ].map((item) => (
-                        <li key={item} className="flex items-center gap-2.5 text-sm text-zinc-700 dark:text-zinc-300">
-                          <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-indigo-100 text-xs font-bold text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-300">
-                            ✓
-                          </span>
-                          {item}
-                        </li>
-                      ))}
-                    </ul>
+                    <CheckList items={[
+                      `${examConfig.examSize} randomised questions`,
+                      `${examConfig.examDurationMinutes} min — can't be paused`,
+                      `${passMin} correct (${EXAM_PASS_PERCENT}%) to pass`,
+                      "Certificate sent on pass",
+                      "Retake anytime",
+                    ]} />
 
                     <div className="mt-6">
                       <StartExamButton lang={lang} langName={name} fullWidth />
@@ -150,21 +155,12 @@ export default async function PracticeExamLangPage({ params }: Props) {
                   <>
                     <p className="text-lg font-bold text-zinc-900 dark:text-zinc-100">Take this exam</p>
 
-                    <ul className="mt-5 space-y-2.5">
-                      {[
-                        "Timed exams with real scoring",
-                        "Shareable certificate on pass",
-                        "All 6 language exams",
-                        "Retake anytime",
-                      ].map((item) => (
-                        <li key={item} className="flex items-center gap-2.5 text-sm text-zinc-700 dark:text-zinc-300">
-                          <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-indigo-100 text-xs font-bold text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-300">
-                            ✓
-                          </span>
-                          {item}
-                        </li>
-                      ))}
-                    </ul>
+                    <CheckList items={[
+                      "Timed exams with real scoring",
+                      "Shareable certificate on pass",
+                      "All 6 language exams",
+                      "Retake anytime",
+                    ]} />
 
                     <div className="mt-6 flex flex-col gap-3">
                       <Link

@@ -7,6 +7,8 @@ import { LANGUAGES } from "@/lib/languages/registry";
 import type { SupportedLanguage } from "@/lib/languages/types";
 import type { ExamResultResponse } from "@/lib/exams/api-types";
 import { parseJson, getApiErrorMessage } from "@/lib/fetch-utils";
+import { usePassPercent } from "@/hooks/usePassPercent";
+import Spinner from "@/components/Spinner";
 
 export default function PracticeExamResultPage() {
   const { lang, attemptId } = useParams<{ lang: string; attemptId: string }>();
@@ -14,13 +16,7 @@ export default function PracticeExamResultPage() {
   const [result, setResult] = useState<ExamResultResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [passPercent, setPassPercent] = useState(70);
-
-  useEffect(() => {
-    fetch("/api/site-settings").then((r) => r.ok ? r.json() : null).then((d) => {
-      if (d?.passPercentByLang?.[lang]) setPassPercent(d.passPercentByLang[lang]);
-    }).catch(() => {});
-  }, []);
+  const passPercent = usePassPercent(lang);
 
   useEffect(() => {
     let cancelled = false;
@@ -61,10 +57,7 @@ export default function PracticeExamResultPage() {
   if (loading) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center" aria-live="polite">
-        <div className="flex items-center justify-center gap-3 py-12">
-          <div className="h-5 w-5 animate-spin rounded-full border-2 border-zinc-300 border-t-zinc-600 dark:border-zinc-600 dark:border-t-zinc-400" />
-          <span className="text-sm text-zinc-500 dark:text-zinc-400">Loading result…</span>
-        </div>
+        <Spinner label="Loading result…" />
       </div>
     );
   }

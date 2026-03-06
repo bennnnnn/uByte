@@ -4,7 +4,7 @@ import { LANGUAGES, getAllLanguageSlugs } from "@/lib/languages/registry";
 import { getLangIcon } from "@/lib/languages/icons";
 import type { SupportedLanguage } from "@/lib/languages/types";
 import { getCurrentUser } from "@/lib/auth";
-import { getUserPlan, getExamConfigForAllLangs, getUserExamStats, getExamPublicStatsByLang } from "@/lib/db";
+import { getUserPlan, getExamConfigForAllLangs, getUserExamStats, getExamPublicStatsByLang, DEFAULT_EXAM_CONFIG } from "@/lib/db";
 import { hasPaidAccess } from "@/lib/plans";
 import { EXAM_LANGS } from "@/lib/exams/config";
 import { tutorialLangUrl } from "@/lib/urls";
@@ -141,6 +141,41 @@ function ExamCard({
         </div>
       </div>
     </Link>
+  );
+}
+
+/** Renders a grid of ExamCards for a list of language slugs. */
+function ExamCardGrid({
+  langs,
+  examConfigByLang,
+  statsByLang,
+  publicStatsByLang,
+  isLoggedIn,
+  variant,
+  cols = 3,
+}: {
+  langs: string[];
+  examConfigByLang: Record<string, { examSize: number; examDurationMinutes: number }>;
+  statsByLang: Record<string, { attemptCount: number; lastPassed: boolean | null; hasCertificate: boolean }>;
+  publicStatsByLang: Record<string, { usersTaken: number; attemptsSubmitted: number; passRatePercent: number }>;
+  isLoggedIn: boolean;
+  variant?: "default" | "try-again" | "passed";
+  cols?: 2 | 3;
+}) {
+  return (
+    <div className={`grid gap-5 sm:grid-cols-2 ${cols === 3 ? "lg:grid-cols-3" : ""}`}>
+      {langs.map((lang) => (
+        <ExamCard
+          key={lang}
+          slug={lang}
+          examConfig={examConfigByLang[lang] ?? DEFAULT_EXAM_CONFIG}
+          stats={statsByLang[lang]}
+          publicStats={publicStatsByLang[lang]}
+          isLoggedIn={isLoggedIn}
+          variant={variant}
+        />
+      ))}
+    </div>
   );
 }
 
@@ -283,21 +318,7 @@ export default async function PracticeExamsPage() {
                 View all →
               </a>
             </div>
-            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-              {popularLangs.map((lang) => {
-                const examConfig = examConfigByLang[lang] ?? { examSize: 40, examDurationMinutes: 45 };
-                return (
-                  <ExamCard
-                    key={lang}
-                    slug={lang}
-                    examConfig={examConfig}
-                    stats={statsByLang[lang]}
-                    publicStats={publicStatsByLang[lang]}
-                    isLoggedIn={!!user}
-                  />
-                );
-              })}
-            </div>
+            <ExamCardGrid langs={popularLangs} examConfigByLang={examConfigByLang} statsByLang={statsByLang} publicStatsByLang={publicStatsByLang} isLoggedIn={!!user} />
           </section>
         )}
 
@@ -307,22 +328,7 @@ export default async function PracticeExamsPage() {
             <h2 id="try-again-heading" className="mb-5 text-xs font-semibold uppercase tracking-widest text-zinc-400 dark:text-zinc-500">
               Give it another shot
             </h2>
-            <div className="grid gap-5 sm:grid-cols-2">
-              {tryAgainLangs.map((lang) => {
-                const examConfig = examConfigByLang[lang] ?? { examSize: 40, examDurationMinutes: 45 };
-                return (
-                  <ExamCard
-                    key={lang}
-                    slug={lang}
-                    examConfig={examConfig}
-                    stats={statsByLang[lang]}
-                    publicStats={publicStatsByLang[lang]}
-                    isLoggedIn={!!user}
-                    variant="try-again"
-                  />
-                );
-              })}
-            </div>
+            <ExamCardGrid langs={tryAgainLangs} examConfigByLang={examConfigByLang} statsByLang={statsByLang} publicStatsByLang={publicStatsByLang} isLoggedIn={!!user} variant="try-again" cols={2} />
           </section>
         )}
 
@@ -332,22 +338,7 @@ export default async function PracticeExamsPage() {
             <h2 id="passed-heading" className="mb-5 text-xs font-semibold uppercase tracking-widest text-zinc-400 dark:text-zinc-500">
               You passed
             </h2>
-            <div className="grid gap-5 sm:grid-cols-2">
-              {passedLangs.map((lang) => {
-                const examConfig = examConfigByLang[lang] ?? { examSize: 40, examDurationMinutes: 45 };
-                return (
-                  <ExamCard
-                    key={lang}
-                    slug={lang}
-                    examConfig={examConfig}
-                    stats={statsByLang[lang]}
-                    publicStats={publicStatsByLang[lang]}
-                    isLoggedIn={!!user}
-                    variant="passed"
-                  />
-                );
-              })}
-            </div>
+            <ExamCardGrid langs={passedLangs} examConfigByLang={examConfigByLang} statsByLang={statsByLang} publicStatsByLang={publicStatsByLang} isLoggedIn={!!user} variant="passed" cols={2} />
           </section>
         )}
 
@@ -356,23 +347,7 @@ export default async function PracticeExamsPage() {
           <h2 id="all-heading" className="mb-5 text-xs font-semibold uppercase tracking-widest text-zinc-400 dark:text-zinc-500">
             All exams
           </h2>
-          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {langSlugs.map((slug) => {
-              const config = LANGUAGES[slug];
-              if (!config) return null;
-              const examConfig = examConfigByLang[slug] ?? { examSize: 40, examDurationMinutes: 45 };
-              return (
-                <ExamCard
-                  key={slug}
-                  slug={slug}
-                  examConfig={examConfig}
-                  stats={statsByLang[slug]}
-                  publicStats={publicStatsByLang[slug]}
-                  isLoggedIn={!!user}
-                />
-              );
-            })}
-          </div>
+          <ExamCardGrid langs={langSlugs} examConfigByLang={examConfigByLang} statsByLang={statsByLang} publicStatsByLang={publicStatsByLang} isLoggedIn={!!user} />
         </section>
 
         {/* ── Bottom CTA (free / logged-out users only) ─────────────────────── */}
