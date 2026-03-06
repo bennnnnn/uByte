@@ -19,7 +19,7 @@ export default function AuditTab({ data }: Props) {
 
   return (
     <SectionCard title="Admin action log">
-      <div className="max-h-[calc(100vh-20rem)] overflow-auto -mx-5 -mb-5">
+      <div className="overflow-auto -mx-5 -mb-5">
         <table className="w-full text-sm">
           <thead className="sticky top-0 bg-zinc-50 dark:bg-zinc-900">
             <tr>

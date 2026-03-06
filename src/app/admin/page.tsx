@@ -69,7 +69,7 @@ export default function AdminPage() {
 
   /* ── Dashboard layout: sidebar + main ─────────────────────────────────── */
   return (
-    <div className="flex h-screen bg-zinc-50 dark:bg-zinc-950">
+    <div className="flex h-full bg-zinc-50 dark:bg-zinc-950">
 
       {/* ── Sidebar ────────────────────────────────────────────────────── */}
       <aside className="flex w-60 shrink-0 flex-col border-r border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900">

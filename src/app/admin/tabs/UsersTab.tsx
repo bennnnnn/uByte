@@ -35,7 +35,7 @@ export default function UsersTab({ data }: Props) {
 
       {/* ── User table ─────────────────────────────────────────────────── */}
       <div className="rounded-xl border border-zinc-200 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
-        <div className="max-h-[calc(100vh-20rem)] overflow-auto">
+        <div className="overflow-auto">
           <table className="w-full min-w-[800px] text-sm">
             <thead className="sticky top-0 z-10 border-b border-zinc-200 bg-zinc-50/90 backdrop-blur-sm dark:border-zinc-800 dark:bg-zinc-900/90">
               <tr>

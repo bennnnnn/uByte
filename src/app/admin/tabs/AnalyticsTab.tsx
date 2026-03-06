@@ -23,7 +23,7 @@ export default function AnalyticsTab({ data }: Props) {
 
       {/* ── Tutorial completions & ratings ─────────────────────────────── */}
       <SectionCard title="Tutorial completions & ratings">
-        <div className="max-h-80 overflow-auto -mx-5 -mb-5">
+        <div className="overflow-auto -mx-5 -mb-5">
           <table className="w-full text-sm">
             <thead className="sticky top-0 bg-zinc-50 dark:bg-zinc-900">
               <tr>
@@ -63,7 +63,7 @@ export default function AnalyticsTab({ data }: Props) {
 
       {/* ── Practice problems ──────────────────────────────────────────── */}
       <SectionCard title="Practice problems">
-        <div className="max-h-64 overflow-auto -mx-5 -mb-5">
+        <div className="overflow-auto -mx-5 -mb-5">
           <table className="w-full text-sm">
             <thead className="sticky top-0 bg-zinc-50 dark:bg-zinc-900">
               <tr>
