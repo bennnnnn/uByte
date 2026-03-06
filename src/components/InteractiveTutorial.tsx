@@ -298,6 +298,7 @@ export default function InteractiveTutorial({
             onToggleHint={() => stepProgress.setShowHint(!stepProgress.showHint)}
             failCount={stepProgress.failCount}
             completedSteps={stepProgress.completedSteps}
+            skippedSteps={stepProgress.skippedSteps}
             onGoToStep={stepProgress.goToStep}
             onSkip={stepProgress.skipStep}
             tutorialSlug={tutorialSlug}
@@ -450,6 +451,7 @@ export default function InteractiveTutorial({
         tutorialSlug={tutorialSlug}
         stepIndex={stepProgress.stepIndex}
         completedSteps={stepProgress.completedSteps}
+        skippedSteps={stepProgress.skippedSteps}
         expandedSlug={expandedSlug}
         onExpandSlug={setExpandedSlug}
         onGoToStep={stepProgress.goToStep}

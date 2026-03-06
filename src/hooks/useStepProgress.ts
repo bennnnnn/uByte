@@ -37,6 +37,7 @@ async function runCodeRequest(
 export interface StepProgressState {
   stepIndex: number;
   completedSteps: Set<number>;
+  skippedSteps: Set<number>;
   status: Status;
   output: string | null;
   outputIsError: boolean;
@@ -71,6 +72,7 @@ export function useStepProgress(
 
   const [stepIndex, setStepIndex] = useState(0);
   const [completedSteps, setCompletedSteps] = useState<Set<number>>(new Set());
+  const [skippedSteps, setSkippedSteps] = useState<Set<number>>(new Set());
   const [status, setStatus] = useState<Status>("idle");
   const [output, setOutput] = useState<string | null>(null);
   const [outputIsError, setOutputIsError] = useState(false);
@@ -121,8 +123,10 @@ export function useStepProgress(
     fetch(`/api/progress/steps?slug=${encodeURIComponent(tutorialSlug)}&lang=${encodeURIComponent(lang)}`, { credentials: "same-origin" })
       .then((r) => r.json())
       .then((d) => {
-        const steps = Array.isArray(d?.steps) ? d.steps : [];
-        setCompletedSteps((prev) => new Set([...prev, ...steps]));
+        const completed: number[] = Array.isArray(d?.steps) ? d.steps : [];
+        const skipped: number[] = Array.isArray(d?.skippedSteps) ? d.skippedSteps : [];
+        setCompletedSteps((prev) => new Set([...prev, ...completed, ...skipped]));
+        setSkippedSteps((prev) => new Set([...prev, ...skipped]));
       })
       .catch(() => {});
   }, [userId, tutorialSlug, lang]);
@@ -167,9 +171,18 @@ export function useStepProgress(
   }, [status, stepIndex]);
 
   function skipStep() {
+    setSkippedSteps((prev) => new Set([...prev, stepIndex]));
     setCompletedSteps((prev) => new Set([...prev, stepIndex]));
     setStatus("passed");
     setFailCount(0);
+    // Persist to DB as skipped so it's distinguished from genuinely completed steps on refresh
+    if (userId != null) {
+      apiFetch("/api/progress/steps", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ slug: tutorialSlug, stepIndex, lang, skipped: true }),
+      }).catch(() => {});
+    }
   }
 
   function goToStep(idx: number) {
@@ -322,6 +335,7 @@ export function useStepProgress(
   return {
     stepIndex,
     completedSteps,
+    skippedSteps,
     status,
     output,
     outputIsError,

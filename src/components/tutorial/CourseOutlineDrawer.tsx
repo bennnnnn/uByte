@@ -21,6 +21,7 @@ interface Props {
   tutorialSlug: string;
   stepIndex: number;
   completedSteps: Set<number>;
+  skippedSteps: Set<number>;
   expandedSlug: string;
   onExpandSlug: (slug: string) => void;
   onGoToStep: (idx: number) => void;
@@ -35,6 +36,7 @@ export default function CourseOutlineDrawer({
   tutorialSlug,
   stepIndex,
   completedSteps,
+  skippedSteps,
   expandedSlug,
   onExpandSlug,
   onGoToStep,
@@ -101,7 +103,8 @@ export default function CourseOutlineDrawer({
                     <ul className="ml-3 mt-0.5 space-y-0.5 border-l border-zinc-200 pl-3 dark:border-zinc-700">
                       {subSteps.map((step) => {
                         const isActiveStep = isCurrent && step.index === stepIndex;
-                        const isStepDone = isCurrent && completedSteps.has(step.index);
+                        const isStepSkipped = isCurrent && skippedSteps.has(step.index);
+                        const isStepDone = isCurrent && completedSteps.has(step.index) && !isStepSkipped;
                         return (
                           <li key={step.index}>
                             {isCurrent ? (
@@ -114,7 +117,8 @@ export default function CourseOutlineDrawer({
                                 }`}
                               >
                                 <span>{step.title}</span>
-                                {isStepDone && <span className="shrink-0 text-emerald-500 dark:text-emerald-400">✓</span>}
+                                {isStepDone    && <span className="shrink-0 text-emerald-500 dark:text-emerald-400">✓</span>}
+                                {isStepSkipped && <span className="shrink-0 text-zinc-400 dark:text-zinc-500" title="Skipped">›</span>}
                               </button>
                             ) : (
                               <Link

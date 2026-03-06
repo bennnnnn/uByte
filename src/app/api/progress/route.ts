@@ -39,29 +39,37 @@ export const POST = withErrorHandling("POST /api/progress", async (request: Next
   const language = typeof lang === "string" ? lang : "go";
 
   if (completed) {
+    // Check before marking — markComplete uses ON CONFLICT DO NOTHING, so XP/badges
+    // must be guarded separately to prevent re-awarding on duplicate requests.
+    const existing = await getProgress(user.userId, language);
+    const isFirstCompletion = !existing.includes(slug);
+
     await markComplete(user.userId, slug, language);
-    await addXp(user.userId, 10);
-    await logActivity(user.userId, "complete", slug);
 
-    const today = new Date().toISOString().slice(0, 10);
-    const dbUserBefore = await getUserById(user.userId);
-    const isSpeedster = dbUserBefore?.created_at?.startsWith(today) ?? false;
+    if (isFirstCompletion) {
+      await addXp(user.userId, 10);
+      await logActivity(user.userId, "complete", slug);
 
-    const { streak_days } = await updateStreak(user.userId);
+      const today = new Date().toISOString().slice(0, 10);
+      const dbUserBefore = await getUserById(user.userId);
+      const isSpeedster = dbUserBefore?.created_at?.startsWith(today) ?? false;
 
-    const newBadges = await checkBadges(user.userId, {
-      streakDays: streak_days,
-      justCompletedSlug: slug,
-      speedster: isSpeedster,
-    });
-    for (const key of newBadges) {
-      const badge = BADGE_MAP[key];
-      if (badge) await addXp(user.userId, badge.xpReward);
-    }
+      const { streak_days } = await updateStreak(user.userId);
 
-    // Award streak freeze every 7 days (capped at 3)
-    if (streak_days > 0 && streak_days % 7 === 0) {
-      await addStreakFreeze(user.userId);
+      const newBadges = await checkBadges(user.userId, {
+        streakDays: streak_days,
+        justCompletedSlug: slug,
+        speedster: isSpeedster,
+      });
+      for (const key of newBadges) {
+        const badge = BADGE_MAP[key];
+        if (badge) await addXp(user.userId, badge.xpReward);
+      }
+
+      // Award streak freeze every 7 days (capped at 3 by DB)
+      if (streak_days > 0 && streak_days % 7 === 0) {
+        await addStreakFreeze(user.userId);
+      }
     }
   } else {
     await markIncomplete(user.userId, slug, language);
