@@ -80,6 +80,53 @@ export async function getAnswers(attemptId: string): Promise<{ question_id: numb
   }));
 }
 
+/** Aggregate per-language public stats: usage + success rate. */
+export interface ExamLangPublicStats {
+  lang: string;
+  usersTaken: number;
+  attemptsSubmitted: number;
+  passedAttempts: number;
+  passRatePercent: number;
+  usersPassed: number;
+}
+
+/**
+ * Aggregate exam popularity/success by language.
+ * Counts are based on submitted attempts (completed exams) only.
+ */
+export async function getExamPublicStatsByLang(): Promise<ExamLangPublicStats[]> {
+  const sql = getSql();
+  const rows = await sql`
+    SELECT
+      lang,
+      COUNT(*)::int AS attempts_submitted,
+      COUNT(DISTINCT user_id)::int AS users_taken,
+      COUNT(*) FILTER (WHERE passed = true)::int AS passed_attempts,
+      COUNT(DISTINCT user_id) FILTER (WHERE passed = true)::int AS users_passed
+    FROM exam_attempts
+    WHERE submitted_at IS NOT NULL
+    GROUP BY lang
+  `;
+
+  return (rows as {
+    lang: string;
+    attempts_submitted: number;
+    users_taken: number;
+    passed_attempts: number;
+    users_passed: number;
+  }[]).map((r) => ({
+    lang: r.lang,
+    usersTaken: r.users_taken ?? 0,
+    attemptsSubmitted: r.attempts_submitted ?? 0,
+    passedAttempts: r.passed_attempts ?? 0,
+    passRatePercent:
+      (r.attempts_submitted ?? 0) > 0
+        ? Math.round(((r.passed_attempts ?? 0) / (r.attempts_submitted ?? 1)) * 100)
+        : 0,
+    usersPassed: r.users_passed ?? 0,
+  }));
+}
+
 /** Per-language stats for a user: attempt count, last attempt result, and whether they have a certificate. */
 export interface UserExamLangStats {
   lang: string;
