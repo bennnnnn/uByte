@@ -19,18 +19,39 @@ const DEFAULT_CONFIG: ExamConfig = {
 /** Max sensible "questions per exam" per language. */
 const MAX_EXAM_SIZE = 200;
 
-/** Read exam_size and exam_duration_minutes from site_settings (fallback when exam_lang_settings table missing). */
+/**
+ * Keys in site_settings for fallback when exam_lang_settings table is missing.
+ * We use exam_questions_per_attempt (not exam_size) so the "questions per exam" value
+ * is never confused with the total question bank count (e.g. 160). Total questions
+ * come from COUNT(exam_questions), not from site_settings.
+ */
+const SITE_KEY_QUESTIONS_PER_EXAM = "exam_questions_per_attempt";
+const SITE_KEY_DURATION_MINUTES = "exam_duration_minutes";
+/** Legacy key; if present and <= 100 we use it, else ignore (may have been set to bank count by mistake). */
+const SITE_KEY_LEGACY_EXAM_SIZE = "exam_size";
+
+/** Read "questions per exam" and duration from site_settings. Prefers exam_questions_per_attempt; ignores legacy exam_size if it looks like bank count (>100). */
 async function getExamConfigFromSiteSettings(): Promise<ExamConfig> {
   try {
     const sql = getSql();
     const rows = await sql`
       SELECT key, value FROM site_settings
-      WHERE key IN ('exam_size', 'exam_duration_minutes')
+      WHERE key IN (${SITE_KEY_QUESTIONS_PER_EXAM}, ${SITE_KEY_DURATION_MINUTES}, ${SITE_KEY_LEGACY_EXAM_SIZE})
     `;
     const map = new Map((rows as { key: string; value: string }[]).map((r) => [r.key, r.value]));
-    const examSize = Math.max(1, Math.min(MAX_EXAM_SIZE, parseInt(map.get("exam_size") ?? "", 10) || DEFAULT_EXAM_SIZE));
-    const examDurationMinutes = Math.max(5, Math.min(180, parseInt(map.get("exam_duration_minutes") ?? "", 10) || DEFAULT_EXAM_DURATION_MINUTES));
-    return { examSize, examDurationMinutes };
+    let examSize: number;
+    const perAttempt = parseInt(map.get(SITE_KEY_QUESTIONS_PER_EXAM) ?? "", 10);
+    if (Number.isInteger(perAttempt) && perAttempt >= 1 && perAttempt <= MAX_EXAM_SIZE) {
+      examSize = perAttempt;
+    } else {
+      const legacy = parseInt(map.get(SITE_KEY_LEGACY_EXAM_SIZE) ?? "", 10);
+      examSize = Number.isInteger(legacy) && legacy >= 1 && legacy <= 100 ? legacy : DEFAULT_EXAM_SIZE;
+    }
+    const examDurationMinutes = Math.max(5, Math.min(180, parseInt(map.get(SITE_KEY_DURATION_MINUTES) ?? "", 10) || DEFAULT_EXAM_DURATION_MINUTES));
+    return {
+      examSize: Math.max(1, Math.min(MAX_EXAM_SIZE, examSize)),
+      examDurationMinutes,
+    };
   } catch {
     return DEFAULT_CONFIG;
   }
@@ -88,17 +109,17 @@ export async function getExamConfigForAllLangs(): Promise<Record<string, ExamCon
   }
 }
 
-/** Write exam_size and exam_duration_minutes to site_settings (fallback when exam_lang_settings table missing). */
+/** Write "questions per exam" and duration to site_settings. Uses exam_questions_per_attempt so we never overwrite with question bank total. */
 async function setExamConfigInSiteSettings(config: ExamConfig): Promise<void> {
   const sql = getSql();
   const examSize = Math.max(1, Math.min(MAX_EXAM_SIZE, Math.floor(Number(config.examSize))));
   const examDurationMinutes = Math.max(5, Math.min(180, Math.floor(Number(config.examDurationMinutes))));
   await sql`
-    INSERT INTO site_settings (key, value, updated_at) VALUES ('exam_size', ${String(examSize)}, NOW())
+    INSERT INTO site_settings (key, value, updated_at) VALUES (${SITE_KEY_QUESTIONS_PER_EXAM}, ${String(examSize)}, NOW())
     ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value, updated_at = NOW()
   `;
   await sql`
-    INSERT INTO site_settings (key, value, updated_at) VALUES ('exam_duration_minutes', ${String(examDurationMinutes)}, NOW())
+    INSERT INTO site_settings (key, value, updated_at) VALUES (${SITE_KEY_DURATION_MINUTES}, ${String(examDurationMinutes)}, NOW())
     ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value, updated_at = NOW()
   `;
 }
