@@ -64,7 +64,7 @@ function ExamCard({
       {/* Top accent bar */}
       <div className={`h-1 w-full bg-gradient-to-r ${accentColor}`} />
 
-      <div className="flex flex-col gap-4 p-5">
+        <div className="flex flex-col gap-4 px-6 py-5">
         {/* Header: icon + title + CTA */}
         <div className="flex items-center gap-3">
           <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-zinc-200 bg-zinc-50 text-2xl dark:border-zinc-700 dark:bg-zinc-800">
