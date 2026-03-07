@@ -3,8 +3,9 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { getAllTutorials } from "@/lib/tutorials";
 import { getLanguageConfig, isSupportedLanguage, getAllLanguageSlugs } from "@/lib/languages/registry";
-import { BASE_URL, APP_NAME } from "@/lib/constants";
+import { APP_NAME } from "@/lib/constants";
 import { tutorialUrl, tutorialLangUrl } from "@/lib/urls";
+import { absoluteUrl, buildBreadcrumbJsonLd } from "@/lib/seo";
 import TutorialGrid from "@/components/TutorialGrid";
 import type { SupportedLanguage } from "@/lib/languages/types";
 
@@ -20,11 +21,17 @@ export async function generateMetadata({
   const { lang } = await params;
   if (!isSupportedLanguage(lang)) return { title: "Not Found" };
   const config = getLanguageConfig(lang)!;
-  const canonical = `${BASE_URL.replace(/\/$/, "")}${tutorialLangUrl(lang)}`;
+  const canonical = absoluteUrl(tutorialLangUrl(lang));
   return {
     title: config.seo.defaultTitle,
     description: config.seo.defaultDescription,
-    keywords: config.seo.keywords,
+    keywords: [
+      ...config.seo.keywords,
+      `${config.name} course`,
+      `${config.name} certification prep`,
+      `${config.name} interview prep`,
+      `${config.name} coding tutorial`,
+    ],
     alternates: { canonical },
     openGraph: {
       type: "website",
@@ -51,9 +58,43 @@ export default async function TutorialLangLandingPage({
   if (!isSupportedLanguage(lang)) notFound();
   const config = getLanguageConfig(lang)!;
   const tutorials = getAllTutorials(lang as SupportedLanguage);
+  const canonical = absoluteUrl(tutorialLangUrl(lang));
+  const courseJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Course",
+    name: `${config.name} Programming Course`,
+    description: config.seo.defaultDescription,
+    provider: {
+      "@type": "Organization",
+      name: APP_NAME,
+      url: absoluteUrl("/"),
+    },
+    url: canonical,
+  };
+  const breadcrumbJsonLd = buildBreadcrumbJsonLd([
+    { name: "Home", path: "/" },
+    { name: `${config.name} Tutorials`, path: tutorialLangUrl(lang) },
+  ]);
+  const listJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    name: `${config.name} tutorial lessons`,
+    itemListElement: tutorials.map((tutorial, index) => ({
+      "@type": "ListItem",
+      position: index + 1,
+      name: tutorial.title,
+      url: absoluteUrl(tutorialUrl(lang, tutorial.slug)),
+    })),
+  };
 
   return (
     <div className="mx-auto max-w-4xl px-6 py-14">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify([courseJsonLd, breadcrumbJsonLd, listJsonLd]),
+        }}
+      />
       <div className="mb-14">
         <h1 className="mb-4 text-4xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100 sm:text-5xl">
           Learn {config.name} with uByte

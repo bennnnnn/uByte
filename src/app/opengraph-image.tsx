@@ -31,7 +31,7 @@ export default function OgImage() {
           lineHeight: 1.4,
         }}
       >
-        Free Golang tutorials with interactive code examples
+        Interactive coding tutorials, interview prep, and certifications
       </div>
     </div>,
     size

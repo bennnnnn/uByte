@@ -5,15 +5,23 @@ import Avatar from "@/components/Avatar";
 import type { Metadata } from "next";
 
 import { BASE_URL } from "@/lib/constants";
+import { absoluteUrl, buildBreadcrumbJsonLd } from "@/lib/seo";
 
 export async function generateMetadata({ params }: { params: Promise<{ userId: string }> }): Promise<Metadata> {
   const { userId } = await params;
   const profile = await getPublicProfile(parseInt(userId, 10));
   if (!profile) return { title: "User not found" };
+  const canonical = absoluteUrl(`/u/${userId}`);
   return {
     title: `${profile.name}'s Profile`,
     description: `${profile.name} has ${profile.xp} XP and completed ${profile.completed_count} Go tutorials on uByte.`,
-    openGraph: { title: `${profile.name} on uByte`, url: `${BASE_URL}/u/${userId}` },
+    alternates: { canonical },
+    openGraph: {
+      title: `${profile.name} on uByte`,
+      description: `${profile.name}'s public learning profile on uByte.`,
+      url: canonical,
+      type: "profile",
+    },
   };
 }
 
@@ -28,9 +36,31 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
   const totalTutorials = getAllTutorials().length;
   const pct = totalTutorials > 0 ? Math.round((profile.completed_count / totalTutorials) * 100) : 0;
   const joinDate = new Date(profile.created_at).toLocaleDateString("en-US", { month: "long", year: "numeric" });
+  const personJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    name: profile.name,
+    description: profile.bio || `${profile.name}'s uByte coding profile`,
+    url: absoluteUrl(`/u/${userId}`),
+    memberOf: {
+      "@type": "Organization",
+      name: "uByte",
+      url: BASE_URL,
+    },
+  };
+  const breadcrumbJsonLd = buildBreadcrumbJsonLd([
+    { name: "Home", path: "/" },
+    { name: profile.name, path: `/u/${userId}` },
+  ]);
 
   return (
     <div className="mx-auto max-w-2xl px-6 py-12">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify([personJsonLd, breadcrumbJsonLd]),
+        }}
+      />
       {/* Header */}
       <div className="mb-8 flex items-start gap-5">
         <Avatar avatarKey={profile.avatar || "gopher"} size="lg" />

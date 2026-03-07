@@ -12,6 +12,7 @@ import { FREE_TUTORIAL_LIMIT } from "@/lib/plans";
 import { getLanguageConfig, isSupportedLanguage } from "@/lib/languages/registry";
 import { BASE_URL, APP_NAME } from "@/lib/constants";
 import { tutorialCanonicalUrl } from "@/lib/urls";
+import { buildBreadcrumbJsonLd } from "@/lib/seo";
 import type { Metadata } from "next";
 
 export async function generateStaticParams() {
@@ -47,9 +48,12 @@ export async function generateMetadata({
     tutorial.title,
     `${tutorial.title} ${config.name}`,
     `${config.name} tutorial`,
+    `${config.name} course`,
     `learn ${config.name}`,
     `${config.name} programming`,
     `${config.name} for beginners`,
+    `${config.name} interview prep`,
+    `${config.name} certification prep`,
     `interactive ${config.name}`,
     APP_NAME,
     tutorial.difficulty,
@@ -125,12 +129,19 @@ export default async function TutorialPage({
       url: BASE_URL,
     },
   };
+  const breadcrumbJsonLd = buildBreadcrumbJsonLd([
+    { name: "Home", path: "/" },
+    { name: `${config.name} Tutorials`, path: `/tutorial/${lang}` },
+    { name: tutorial.title, path: `/tutorial/${lang}/${slug}` },
+  ]);
 
   return (
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify([jsonLd, breadcrumbJsonLd]),
+        }}
       />
       <InteractiveTutorial
         lang={lang}

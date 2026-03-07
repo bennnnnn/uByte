@@ -8,13 +8,28 @@ import { getUserPlan, getExamConfigForAllLangs, getUserExamStats, getExamPublicS
 import { hasPaidAccess } from "@/lib/plans";
 import { EXAM_LANGS } from "@/lib/exams/config";
 import { tutorialLangUrl } from "@/lib/urls";
+import { absoluteUrl, SITE_KEYWORDS } from "@/lib/seo";
 
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Practice Exams",
+  title: "Programming Certification Practice Exams",
   description:
-    "Timed multiple-choice practice exams by language. Pass to earn a certificate. Pro members only.",
+    "Timed certification-style programming exams by language. Practice real assessment formats and earn shareable certificates when you pass.",
+  keywords: [
+    ...SITE_KEYWORDS,
+    "programming certification exams",
+    "coding certification practice",
+    "technical assessment practice",
+  ],
+  alternates: { canonical: absoluteUrl("/practice-exams") },
+  openGraph: {
+    title: "Programming Certification Practice Exams | uByte",
+    description:
+      "Take timed programming practice exams and earn shareable certificates.",
+    type: "website",
+    url: absoluteUrl("/practice-exams"),
+  },
 };
 
 // ─── Exam Card ────────────────────────────────────────────────────────────────
@@ -211,9 +226,57 @@ export default async function PracticeExamsPage() {
     .filter((lang) => (publicStatsByLang[lang]?.attemptsSubmitted ?? 0) > 0)
     .sort((a, b) => (publicStatsByLang[b]?.attemptsSubmitted ?? 0) - (publicStatsByLang[a]?.attemptsSubmitted ?? 0))
     .slice(0, 3);
+  const collectionJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    name: "Programming certification practice exams",
+    url: absoluteUrl("/practice-exams"),
+    hasPart: EXAM_LANGS.map((lang, index) => ({
+      "@type": "ListItem",
+      position: index + 1,
+      name: `${LANGUAGES[lang]?.name ?? lang} practice exam`,
+      url: absoluteUrl(`/practice-exams/${lang}`),
+    })),
+  };
+  const faqJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: [
+      {
+        "@type": "Question",
+        name: "How do practice exams work?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "Each exam is timed, language-specific, and scored automatically. You can retake exams after each attempt.",
+        },
+      },
+      {
+        "@type": "Question",
+        name: "Do I get a certificate?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "Yes. Passing an exam unlocks a shareable certificate for that language.",
+        },
+      },
+    ],
+  };
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: absoluteUrl("/") },
+      { "@type": "ListItem", position: 2, name: "Practice Exams", item: absoluteUrl("/practice-exams") },
+    ],
+  };
 
   return (
     <div className="min-h-full overflow-y-auto bg-zinc-50 dark:bg-zinc-950">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify([collectionJsonLd, faqJsonLd, breadcrumbJsonLd]),
+        }}
+      />
 
       {/* ── Hero ─────────────────────────────────────────────────────────── */}
       <div className="border-b border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900">

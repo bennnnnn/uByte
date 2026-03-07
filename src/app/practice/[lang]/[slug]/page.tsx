@@ -9,6 +9,7 @@ import { getCurrentUser } from "@/lib/auth";
 import { getUserPlan } from "@/lib/db";
 import { hasPaidAccess, isPracticeProblemFree } from "@/lib/plans";
 import UpgradeWall from "@/components/UpgradeWall";
+import { absoluteUrl, SITE_KEYWORDS } from "@/lib/seo";
 
 type Props = {
   params: Promise<{ lang: string; slug: string }>;
@@ -22,9 +23,24 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const problem = getPracticeProblemBySlug(slug);
   const langName = isSupportedLanguage(lang) ? LANGUAGES[lang as SupportedLanguage]?.name : lang;
   if (!problem) return { title: "Not found" };
+  const canonical = absoluteUrl(`/practice/${lang}/${slug}`);
   return {
     title: `${problem.title} (${langName}) | Interview Practice`,
     description: problem.description.slice(0, 160),
+    keywords: [
+      ...SITE_KEYWORDS,
+      problem.title,
+      `${problem.title} ${langName}`,
+      `${langName} coding problem`,
+      `${langName} interview prep`,
+    ],
+    alternates: { canonical },
+    openGraph: {
+      type: "article",
+      title: `${problem.title} (${langName}) | Interview Practice`,
+      description: problem.description.slice(0, 160),
+      url: canonical,
+    },
   };
 }
 

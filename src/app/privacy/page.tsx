@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
+import { absoluteUrl } from "@/lib/seo";
 
 export const metadata: Metadata = {
   title: "Privacy Policy",
   description: "How uByte collects, uses, and protects your data.",
+  alternates: { canonical: absoluteUrl("/privacy") },
 };
 
 const UPDATED = "28 February 2026";

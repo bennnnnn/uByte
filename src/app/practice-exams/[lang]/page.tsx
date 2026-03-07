@@ -8,6 +8,7 @@ import { getUserPlan, getExamConfigForLang, getExamConfigForAllLangs } from "@/l
 import { hasPaidAccess } from "@/lib/plans";
 import { getLangIcon } from "@/lib/languages/icons";
 import { getExamDetailContent } from "@/lib/exams/content";
+import { absoluteUrl, buildBreadcrumbJsonLd, buildFaqJsonLd, SITE_KEYWORDS } from "@/lib/seo";
 import StartExamButton from "./StartExamButton";
 import ExamDetailTabs from "./ExamDetailTabs";
 import OtherExamsGrid from "./OtherExamsGrid";
@@ -35,12 +36,28 @@ type Props = { params: Promise<{ lang: string }> };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { lang } = await params;
+  if (!VALID_LANGS.has(lang)) return { title: "Not found" };
   const config = LANGUAGES[lang as SupportedLanguage];
   const name = config?.name ?? lang;
   const examConfig = await getExamConfigForLang(lang);
+  const canonical = absoluteUrl(`/practice-exams/${lang}`);
   return {
     title: `${name} Practice Exam`,
     description: `Take the ${name} practice exam. ${examConfig.examSize} questions, ${examConfig.examDurationMinutes} minutes. Score ${examConfig.passPercent}%+ to earn a certificate.`,
+    keywords: [
+      ...SITE_KEYWORDS,
+      `${name} certification`,
+      `${name} practice exam`,
+      `${name} interview prep`,
+      `${name} assessment`,
+    ],
+    alternates: { canonical },
+    openGraph: {
+      type: "website",
+      title: `${name} Practice Exam | uByte`,
+      description: `Timed ${name} exam with certificate on pass.`,
+      url: canonical,
+    },
   };
 }
 
@@ -62,9 +79,42 @@ export default async function PracticeExamLangPage({ params }: Props) {
   const content = getExamDetailContent(lang, examConfig, EXAM_PASS_PERCENT);
   const langSlugs = getAllLanguageSlugs();
   const passMin = Math.ceil((examConfig.examSize * EXAM_PASS_PERCENT) / 100);
+  const faqItems =
+    content?.faq ?? [
+      {
+        question: "How long is the exam?",
+        answer: `${examConfig.examDurationMinutes} minutes. The timer starts when you begin and cannot be paused.`,
+      },
+      {
+        question: "How many questions are there?",
+        answer: `${examConfig.examSize} multiple-choice questions. You need ${EXAM_PASS_PERCENT}% or higher to pass.`,
+      },
+    ];
+  const examJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "EducationalOccupationalCredential",
+    name: `${name} Practice Exam Certificate`,
+    description:
+      content?.objective ??
+      `Timed ${name} multiple-choice exam with a certificate awarded on passing score.`,
+    url: absoluteUrl(`/practice-exams/${lang}`),
+    credentialCategory: "certificate",
+  };
+  const faqJsonLd = buildFaqJsonLd(faqItems);
+  const breadcrumbJsonLd = buildBreadcrumbJsonLd([
+    { name: "Home", path: "/" },
+    { name: "Practice Exams", path: "/practice-exams" },
+    { name: `${name} Practice Exam`, path: `/practice-exams/${lang}` },
+  ]);
 
   return (
     <div className="min-h-full overflow-y-auto bg-zinc-50 dark:bg-zinc-950">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify([examJsonLd, faqJsonLd, breadcrumbJsonLd]),
+        }}
+      />
 
       {/* ── Hero ──────────────────────────────────────────────────────────── */}
       <div className="border-b border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900">

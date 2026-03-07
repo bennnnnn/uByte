@@ -7,13 +7,28 @@ import { DIFFICULTY_BADGE } from "@/lib/practice/types";
 import { FREE_PRACTICE_LIMIT } from "@/lib/plans";
 import { getLangIcon, PRACTICE_TAGLINES } from "@/lib/languages/icons";
 import { LangCard } from "@/components/home";
+import { absoluteUrl, SITE_KEYWORDS } from "@/lib/seo";
 
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Interview Practice",
+  title: "Coding Interview Practice Problems",
   description:
-    "Solve classic coding interview problems in Go, Python, C++, JavaScript, Java, and Rust. Run your code in the browser.",
+    "Solve coding interview problems in Go, Python, C++, JavaScript, Java, and Rust. Practice LeetCode-style challenges with an in-browser code runner and instant feedback.",
+  keywords: [
+    ...SITE_KEYWORDS,
+    "coding interview questions",
+    "leetcode practice",
+    "data structures and algorithms practice",
+  ],
+  alternates: { canonical: absoluteUrl("/practice") },
+  openGraph: {
+    title: "Coding Interview Practice Problems | uByte",
+    description:
+      "Practice interview-ready coding problems across 6 languages with instant feedback.",
+    type: "website",
+    url: absoluteUrl("/practice"),
+  },
 };
 
 export default async function PracticePage() {
@@ -24,9 +39,35 @@ export default async function PracticePage() {
 
   const langSlugs = getAllLanguageSlugs() as SupportedLanguage[];
   const featured = problems.slice(0, 5);
+  const listJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    name: "Coding interview practice problems",
+    url: absoluteUrl("/practice"),
+    about: "Coding interview preparation and algorithm practice",
+    hasPart: featured.map((problem) => ({
+      "@type": "CreativeWork",
+      name: problem.title,
+      url: absoluteUrl(`/practice/go/${problem.slug}`),
+    })),
+  };
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: absoluteUrl("/") },
+      { "@type": "ListItem", position: 2, name: "Interview Practice", item: absoluteUrl("/practice") },
+    ],
+  };
 
   return (
     <div className="min-h-full overflow-y-auto">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify([listJsonLd, breadcrumbJsonLd]),
+        }}
+      />
       {/* ── Hero section ────────────────────────────────────────────────── */}
       <section className="relative overflow-hidden bg-white dark:bg-zinc-950">
         <div className="pointer-events-none absolute inset-0 overflow-hidden">

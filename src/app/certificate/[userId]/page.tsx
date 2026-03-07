@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { BASE_URL } from "@/lib/constants";
+import { absoluteUrl, buildBreadcrumbJsonLd } from "@/lib/seo";
 
 interface CertData {
   userId: number;
@@ -24,10 +25,23 @@ async function getCertData(userId: string): Promise<CertData | null> {
 export async function generateMetadata({ params }: { params: Promise<{ userId: string }> }): Promise<Metadata> {
   const { userId } = await params;
   const data = await getCertData(userId);
-  if (!data?.isComplete) return { title: "Certificate" };
+  if (!data?.isComplete) {
+    return {
+      title: "Certificate",
+      robots: { index: false, follow: false },
+    };
+  }
+  const canonical = absoluteUrl(`/certificate/${userId}`);
   return {
     title: `${data.name} — Go Tutorials Certificate`,
     description: `${data.name} has completed all ${data.totalTutorials} Go Tutorials.`,
+    alternates: { canonical },
+    openGraph: {
+      type: "profile",
+      title: `${data.name} — Go Tutorials Certificate`,
+      description: `${data.name} has completed all ${data.totalTutorials} Go Tutorials.`,
+      url: canonical,
+    },
   };
 }
 
@@ -76,8 +90,33 @@ export default async function CertificatePage({ params }: { params: Promise<{ us
     );
   }
 
+  const credentialJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "EducationalOccupationalCredential",
+    credentialCategory: "certificate",
+    name: `${data.name} - Go Tutorials Certificate`,
+    description: `${data.name} completed ${data.totalTutorials} Go tutorials on uByte.`,
+    url: absoluteUrl(`/certificate/${userId}`),
+    recognizedBy: {
+      "@type": "Organization",
+      name: "uByte",
+      url: BASE_URL,
+    },
+    validFrom: data.issuedAt ?? undefined,
+  };
+  const breadcrumbJsonLd = buildBreadcrumbJsonLd([
+    { name: "Home", path: "/" },
+    { name: "Certificate", path: `/certificate/${userId}` },
+  ]);
+
   return (
     <div className="flex min-h-[80vh] items-center justify-center px-4 py-12">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify([credentialJsonLd, breadcrumbJsonLd]),
+        }}
+      />
       <div className="w-full max-w-2xl">
         {/* Certificate card */}
         <div className="rounded-2xl border-4 border-indigo-500 bg-white p-10 text-center shadow-2xl dark:border-indigo-600 dark:bg-zinc-900">

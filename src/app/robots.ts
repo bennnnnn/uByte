@@ -1,18 +1,27 @@
 import type { MetadataRoute } from "next";
 import { BASE_URL } from "@/lib/constants";
-import { getAllLanguageSlugs } from "@/lib/languages/registry";
 
 export default function robots(): MetadataRoute.Robots {
-  const languageSlugs = getAllLanguageSlugs();
-  const allowPaths = ["/", ...languageSlugs.map((slug) => `/tutorial/${slug}/`)];
   return {
     rules: [
       {
         userAgent: "*",
-        allow: allowPaths,
-        disallow: ["/profile", "/reset-password", "/verify-email", "/api/"],
+        allow: "/",
+        disallow: [
+          "/api/",
+          "/admin",
+          "/profile",
+          "/login",
+          "/reset-password",
+          "/verify-email",
+          "/search",
+          "/practice-exams/*/start",
+          "/practice-exams/*/attempt",
+          "/practice-exams/*/result",
+        ],
       },
     ],
     sitemap: `${BASE_URL}/sitemap.xml`,
+    host: BASE_URL,
   };
 }

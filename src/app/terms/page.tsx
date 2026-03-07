@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
+import { absoluteUrl } from "@/lib/seo";
 
 export const metadata: Metadata = {
   title: "Terms of Service",
   description: "Terms and conditions for using uByte.",
+  alternates: { canonical: absoluteUrl("/terms") },
 };
 
 const UPDATED = "28 February 2026";

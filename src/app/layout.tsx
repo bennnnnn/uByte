@@ -10,7 +10,8 @@ import HeaderNavLinks from "@/components/layout/HeaderNavLinks";
 import MobileStandaloneHeader from "@/components/layout/MobileStandaloneHeader";
 import LazyCookieConsentAndAnalytics from "@/components/LazyCookieConsentAndAnalytics";
 import SiteBanner from "@/components/SiteBanner";
-import { BASE_URL } from "@/lib/constants";
+import { APP_NAME, BASE_URL } from "@/lib/constants";
+import { SITE_KEYWORDS } from "@/lib/seo";
 import Link from "next/link";
 import Script from "next/script";
 
@@ -31,19 +32,24 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL(BASE_URL),
   title: {
-    default: "uByte — Learn Go for Free",
+    default: "uByte — Interactive Coding Tutorials, Interview Prep, and Certifications",
     template: "%s | uByte",
   },
   description:
-    "Learn Go programming for free with uByte — interactive Golang tutorials with real code examples, instant feedback, and exercises. From variables to goroutines.",
+    "Learn Go, Python, C++, JavaScript, Java, and Rust with interactive coding tutorials. Practice interview problems, take certification-style exams, and build real skills in your browser.",
   keywords: [
-    "Go programming language", "Golang tutorial", "learn Go online", "Go for beginners",
-    "free Go course", "interactive Go tutorial", "Go programming course", "Golang for beginners",
-    "Go variables", "Go functions", "Go goroutines", "Go channels", "Go syntax",
-    "learn Golang free", "Go coding examples", "uByte", "Go web development",
+    ...SITE_KEYWORDS,
+    "learn Go",
+    "learn Python",
+    "learn C++",
+    "learn JavaScript",
+    "learn Java",
+    "learn Rust",
+    "coding certification exams",
+    "leetcode style practice",
   ],
-  authors: [{ name: "uByte" }],
-  creator: "uByte",
+  authors: [{ name: APP_NAME }],
+  creator: APP_NAME,
   robots: {
     index: true,
     follow: true,
@@ -51,18 +57,18 @@ export const metadata: Metadata = {
   },
   openGraph: {
     type: "website",
-    siteName: "uByte",
+    siteName: APP_NAME,
     locale: "en_US",
-    title: "uByte — Learn Go for Free",
+    title: "uByte — Interactive Coding Tutorials, Interview Prep, and Certifications",
     description:
-      "Learn Go programming for free with interactive tutorials, real code examples, and instant feedback. Master Golang from scratch.",
+      "Learn Go, Python, C++, JavaScript, Java, and Rust with interactive tutorials, interview prep, and certification-style exams.",
     url: BASE_URL,
   },
   twitter: {
     card: "summary_large_image",
-    title: "uByte — Learn Go for Free",
+    title: "uByte — Interactive Coding Tutorials, Interview Prep, and Certifications",
     description:
-      "Learn Go programming for free with interactive tutorials, real code examples, and instant feedback. Master Golang from scratch.",
+      "Interactive programming tutorials, interview practice, and certification-style exams across 6 languages.",
   },
   alternates: {
     canonical: BASE_URL,

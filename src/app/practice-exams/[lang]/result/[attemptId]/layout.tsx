@@ -4,6 +4,7 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title: "Exam result – uByte",
     description: "View your practice exam result and certificate.",
+    robots: { index: false, follow: false },
   };
 }
 

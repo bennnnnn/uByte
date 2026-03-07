@@ -1,7 +1,7 @@
 {
-  "name": "Go Tutorials — Learn Go Programming",
-  "short_name": "Go Tutorials",
-  "description": "Free, interactive Go programming tutorials with a built-in code editor.",
+  "name": "uByte — Programming Tutorials, Interview Prep, and Certifications",
+  "short_name": "uByte",
+  "description": "Interactive tutorials for Go, Python, C++, JavaScript, Java, and Rust, plus coding interview practice and certification-style exams.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#09090b",
@@ -24,9 +24,14 @@
   "categories": ["education", "developer tools"],
   "shortcuts": [
     {
-      "name": "Playground",
-      "url": "/playground",
-      "description": "Open the interactive Go playground"
+      "name": "Practice",
+      "url": "/practice",
+      "description": "Solve interview-style coding problems"
+    },
+    {
+      "name": "Practice Exams",
+      "url": "/practice-exams",
+      "description": "Take timed certification-style exams"
     },
     {
       "name": "Leaderboard",

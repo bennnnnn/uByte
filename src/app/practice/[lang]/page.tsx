@@ -13,6 +13,7 @@ import { getCurrentUser } from "@/lib/auth";
 import { getPracticeAttempts } from "@/lib/db";
 import type { PracticeAttemptStatus } from "@/lib/db/practice-attempts";
 import { PracticeListClient } from "@/components/practice/PracticeListClient";
+import { absoluteUrl, SITE_KEYWORDS } from "@/lib/seo";
 
 const PROBLEMS_PER_PAGE = 35;
 
@@ -27,9 +28,23 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { lang } = await params;
   if (!isSupportedLanguage(lang)) return { title: "Not found" };
   const name = LANGUAGES[lang as SupportedLanguage]?.name ?? lang;
+  const canonical = absoluteUrl(`/practice/${lang}`);
   return {
     title: `${name} Interview Practice`,
     description: `Solve classic interview coding problems in ${name}. Two Sum, Three Sum, sliding window, dynamic programming and more.`,
+    keywords: [
+      ...SITE_KEYWORDS,
+      `${name} interview questions`,
+      `${name} coding interview practice`,
+      `${name} algorithm problems`,
+    ],
+    alternates: { canonical },
+    openGraph: {
+      type: "website",
+      title: `${name} Interview Practice | uByte`,
+      description: `Practice ${name} interview questions with runnable coding challenges.`,
+      url: canonical,
+    },
   };
 }
 

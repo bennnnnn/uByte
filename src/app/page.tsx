@@ -6,9 +6,10 @@ import { getTotalLessonCount } from "@/lib/tutorial-steps";
 import { getAllPracticeProblems, getPracticeProblemBySlug } from "@/lib/practice/problems";
 import { LANGUAGES, getAllLanguageSlugs } from "@/lib/languages/registry";
 import { getLangIcon } from "@/lib/languages/icons";
-import { BASE_URL } from "@/lib/constants";
+import { APP_NAME, BASE_URL } from "@/lib/constants";
 import { getExamConfigForAllLangs, getLastActivity } from "@/lib/db";
 import { tutorialLangUrl, tutorialUrl } from "@/lib/urls";
+import { absoluteUrl, SITE_KEYWORDS, buildSiteSearchJsonLd } from "@/lib/seo";
 import { getCurrentUser } from "@/lib/auth";
 import type { SupportedLanguage } from "@/lib/languages/types";
 import {
@@ -26,23 +27,20 @@ import GoogleOAuthError from "@/components/GoogleOAuthError";
 export const metadata: Metadata = {
   title: "uByte — Learn to Code with Interactive Tutorials",
   description:
-    "Learn to code with uByte. Interactive lessons in Go, Python, C++, JavaScript, Java, and Rust. Prepare for interviews with practice problems. Write and run real code in your browser.",
+    "Learn to code with interactive tutorials in Go, Python, C++, JavaScript, Java, and Rust. Practice coding interview questions and prepare for certifications with timed exams.",
   keywords: [
-    "learn programming",
-    "interactive coding tutorials",
-    "Learn Go",
-    "Learn Python",
-    "Learn C++",
-    "interview practice",
-    "coding practice",
-    "uByte",
+    ...SITE_KEYWORDS,
+    "coding bootcamp alternative",
+    "software engineer interview prep",
+    "programming lessons online",
   ],
-  alternates: { canonical: "/" },
+  alternates: { canonical: absoluteUrl("/") },
   openGraph: {
     title: "uByte — Learn to Code with Interactive Tutorials",
     description:
-      "Interactive lessons in Go, Python, C++, JavaScript, Java, and Rust. Prepare for interviews. Write and run real code in your browser.",
+      "Interactive lessons in 6 programming languages, interview practice problems, and certification-style exams.",
     type: "website",
+    url: absoluteUrl("/"),
   },
 };
 
@@ -52,13 +50,24 @@ export default async function Home() {
   const problemCount = getAllPracticeProblems().length;
   const examConfigByLang = await getExamConfigForAllLangs();
 
-  const jsonLd = {
+  const websiteJsonLd = buildSiteSearchJsonLd();
+  const orgJsonLd = {
     "@context": "https://schema.org",
-    "@type": "WebSite",
-    name: "uByte",
-    description: "Learn to code with interactive tutorials and interview practice.",
+    "@type": "Organization",
+    name: APP_NAME,
     url: BASE_URL,
-    publisher: { "@type": "Organization", name: "uByte", url: BASE_URL },
+    sameAs: [BASE_URL],
+  };
+  const itemListJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    name: "Programming language tutorial tracks on uByte",
+    itemListElement: getAllLanguageSlugs().map((slug, index) => ({
+      "@type": "ListItem",
+      position: index + 1,
+      name: LANGUAGES[slug as SupportedLanguage]?.name ?? slug,
+      url: absoluteUrl(tutorialLangUrl(slug)),
+    })),
   };
 
   const languageEntries = getAllLanguageSlugs()
@@ -102,7 +111,9 @@ export default async function Home() {
     <div className="min-h-0 flex-1 overflow-y-auto">
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify([websiteJsonLd, orgJsonLd, itemListJsonLd]),
+        }}
       />
       <Suspense>
         <GoogleOAuthError />

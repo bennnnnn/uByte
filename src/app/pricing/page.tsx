@@ -8,9 +8,11 @@ import {
   BILLING_CONFIG, MONTHLY_PRICE_ID, YEARLY_PRICE_ID, hasPaidAccess,
   FREE_TUTORIAL_LIMIT, FREE_PRACTICE_LIMIT,
   MONTHLY_EQUIVALENT_CENTS, YEARLY_IF_MONTHLY_CENTS, YEARLY_DISCOUNT_PERCENT,
+  MONTHLY_PRICE_CENTS, YEARLY_PRICE_CENTS,
 } from "@/lib/plans";
 import { trackConversion } from "@/lib/analytics";
 import AuthModal from "@/components/auth/AuthModal";
+import { absoluteUrl } from "@/lib/seo";
 
 const CLIENT_TOKEN     = process.env.NEXT_PUBLIC_PADDLE_CLIENT_TOKEN ?? "";
 
@@ -29,6 +31,25 @@ const PRO_FEATURES = [
   "Certificate of completion",
   "Priority support",
   "New content as it ships",
+];
+
+const FAQ_ITEMS = [
+  {
+    q: "What's included in Pro?",
+    a: "Unlimited tutorials in all 6 languages, AI code feedback on every step, practice exams with certificates, community chat, and priority support.",
+  },
+  {
+    q: "Can I cancel anytime?",
+    a: "Yes. Cancel from your account settings and you'll keep Pro until the end of your billing period.",
+  },
+  {
+    q: "How does the free trial work?",
+    a: "Start with 5 free tutorials per language and 15 practice problems per language. No card required. Upgrade when you want full access.",
+  },
+  {
+    q: "Who processes payments?",
+    a: "Payments are processed securely by Paddle. Tax may be added based on your location.",
+  },
 ];
 
 function Check({ dim = false }) {
@@ -108,9 +129,61 @@ function PricingContent() {
   const selectedPriceId   = billing === "yearly" ? YEARLY_PRICE_ID : MONTHLY_PRICE_ID;
   const alreadyOnSelected = billing === "yearly" ? isYearly : isMonthly;
   const onOtherPlan       = billing === "yearly" ? isMonthly : isYearly;
+  const pricingJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: "uByte Pro",
+    description:
+      "Full access to coding tutorials, interview practice, and certification-style exams.",
+    brand: { "@type": "Brand", name: "uByte" },
+    offers: [
+      {
+        "@type": "Offer",
+        url: absoluteUrl("/pricing"),
+        priceCurrency: "USD",
+        price: (MONTHLY_PRICE_CENTS / 100).toFixed(2),
+        priceSpecification: {
+          "@type": "UnitPriceSpecification",
+          priceCurrency: "USD",
+          price: (MONTHLY_PRICE_CENTS / 100).toFixed(2),
+          billingDuration: "P1M",
+        },
+      },
+      {
+        "@type": "Offer",
+        url: absoluteUrl("/pricing"),
+        priceCurrency: "USD",
+        price: (YEARLY_PRICE_CENTS / 100).toFixed(2),
+        priceSpecification: {
+          "@type": "UnitPriceSpecification",
+          priceCurrency: "USD",
+          price: (YEARLY_PRICE_CENTS / 100).toFixed(2),
+          billingDuration: "P1Y",
+        },
+      },
+    ],
+  };
+  const faqJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: FAQ_ITEMS.map((faq) => ({
+      "@type": "Question",
+      name: faq.q,
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: faq.a,
+      },
+    })),
+  };
 
   return (
     <div className="min-h-0 flex-1 overflow-y-auto bg-zinc-50 dark:bg-zinc-950">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify([pricingJsonLd, faqJsonLd]),
+        }}
+      />
       <div className="px-6 pb-20 pt-16 sm:px-8">
 
         {/* ── Success banner ─────────────────────────────── */}
@@ -330,24 +403,7 @@ function PricingContent() {
             Frequently asked questions
           </h2>
           <dl className="space-y-2">
-            {[
-              {
-                q: "What's included in Pro?",
-                a: "Unlimited tutorials in all 6 languages, AI code feedback on every step, practice exams with certificates, community chat, and priority support.",
-              },
-              {
-                q: "Can I cancel anytime?",
-                a: "Yes. Cancel from your account settings and you'll keep Pro until the end of your billing period.",
-              },
-              {
-                q: "How does the free trial work?",
-                a: "Start with 5 free tutorials per language and 15 practice problems per language. No card required. Upgrade when you want full access.",
-              },
-              {
-                q: "Who processes payments?",
-                a: "Payments are processed securely by Paddle. Tax may be added based on your location.",
-              },
-            ].map((faq, i) => {
+            {FAQ_ITEMS.map((faq, i) => {
               const isOpen = faqOpen === i;
               return (
                 <div
