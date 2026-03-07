@@ -18,6 +18,11 @@ function checkOutput(output: string, expected: string[]): boolean {
   return expected.every((s) => lower.includes(s.toLowerCase()));
 }
 
+/** Returns true if the code still has unfinished TODO comment lines. */
+function hasTodoLines(code: string): boolean {
+  return code.split("\n").some((line) => /^\s*(\/\/|#)\s*TODO\b/.test(line));
+}
+
 async function runCodeRequest(
   currentCode: string,
   lang: string = "go"
@@ -282,6 +287,22 @@ export function useStepProgress(
         setFailCount((n) => {
           const next = n + 1;
           if (next >= 2) fetchAiFeedback(code, out, "", stepIndex);
+          return next;
+        });
+        apiFetch("/api/step-check", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ lang, tutorialSlug, stepIndex, passed: false }),
+        }).catch(() => {});
+        return;
+      }
+      if (checkOutput(out, step.expectedOutput) && hasTodoLines(code)) {
+        setOutputIsError(false);
+        setOutput("Output looks right, but you still have unfinished TODO comments.\nComplete the task described in the instructions, then check again.");
+        setStatus("failed");
+        setFailCount((n) => {
+          const next = n + 1;
+          if (next >= 2) fetchAiFeedback(code, "", out, stepIndex);
           return next;
         });
         apiFetch("/api/step-check", {
