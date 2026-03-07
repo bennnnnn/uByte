@@ -69,7 +69,7 @@ function ExamCard({
     variant === "passed"    ? "border-emerald-200 dark:border-emerald-900/40" :
                               "border-zinc-200 dark:border-zinc-800";
 
-  const ctaLabel = tryAgain ? "Try again →" : isPassed ? "View cert →" : "Start exam →";
+  const ctaLabel = tryAgain ? "Try again →" : isPassed ? "View cert →" : "Take exam →";
 
   return (
     <Link
@@ -287,7 +287,7 @@ export default async function PracticeExamsPage() {
                 Pro feature
               </p>
               <h1 className="text-4xl font-extrabold tracking-tight text-zinc-900 dark:text-zinc-100 sm:text-5xl">
-                Practice Exams
+                Programming Certification Practice Exams
               </h1>
               <p className="mt-3 text-lg text-zinc-500 dark:text-zinc-400">
                 Timed multiple-choice exams by language. Pass to earn a shareable certificate.

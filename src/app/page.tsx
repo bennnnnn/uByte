@@ -136,7 +136,11 @@ export default async function Home() {
 
         {/* Languages */}
         <section aria-labelledby="languages-heading">
-          <SectionHeading id="languages-heading" title="Pick your language" subtitle="Same concepts, same structure — start in seconds with no setup." />
+          <SectionHeading
+            id="languages-heading"
+            title="Programming Language Tutorials"
+            subtitle="Learn Go, Python, C++, JavaScript, Java, and Rust with the same step-by-step tutorial structure."
+          />
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {languageEntries.map(({ slug, config }) => (
               <LangCard
@@ -146,7 +150,7 @@ export default async function Home() {
                 name={config.name}
                 badge={`${getTotalLessonCount(slug as SupportedLanguage)} lessons`}
                 description={config.seo.defaultDescription}
-                cta="Start learning"
+                cta="View tutorials"
               />
             ))}
           </div>

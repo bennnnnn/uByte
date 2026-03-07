@@ -27,7 +27,7 @@ export default function PracticeSection({ problemCount = 11 }: PracticeSectionPr
         <div className="p-6 sm:p-8">
           <div className="mb-1 flex flex-wrap items-center gap-2">
             <span className="text-2xl">🎯</span>
-            <h2 id="practice-heading" className="text-xl font-bold text-zinc-900 dark:text-zinc-100">Ace your interview</h2>
+            <h2 id="practice-heading" className="text-xl font-bold text-zinc-900 dark:text-zinc-100">Coding Interview Prep</h2>
             <span className="rounded-full border border-indigo-300 bg-white/80 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-indigo-600 dark:border-indigo-700 dark:bg-zinc-900/80 dark:text-indigo-400">
               LeetCode-style
             </span>
@@ -50,7 +50,7 @@ export default function PracticeSection({ problemCount = 11 }: PracticeSectionPr
           </ul>
 
           <Link href="/practice" className="inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-5 py-3 text-sm font-bold text-white shadow-md shadow-indigo-500/25 transition-all hover:bg-indigo-500 hover:shadow-indigo-500/35 hover:-translate-y-0.5">
-            Browse all problems
+            Explore interview problems
           </Link>
         </div>
       </div>
@@ -68,7 +68,7 @@ export default function PracticeSection({ problemCount = 11 }: PracticeSectionPr
               name={config.name}
               badge={`${problemCount} problems`}
               description={PRACTICE_TAGLINES[slug as SupportedLanguage] ?? config.seo.defaultDescription}
-              cta="Start practicing"
+              cta="Solve problems"
             />
           );
         })}
