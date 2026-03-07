@@ -18,15 +18,15 @@ import {
 type Mode = "login" | "signup" | "forgot";
 
 const VALUE_POINTS = [
-  "Track progress across tutorials and practice",
-  "Unlock full interview prep and mock exams",
-  "Save bookmarks, snapshots, and certificates",
+  "Interactive tutorials across Go, Python, JavaScript, Java, Rust, and C++",
+  "Interview-style practice problems with real coding workflows",
+  "Timed practice exams with pass thresholds and shareable certificates",
 ];
 
 const QUICK_STATS = [
   { value: "6", label: "languages" },
   { value: "19+", label: "guided topics" },
-  { value: "Real", label: "practice flow" },
+  { value: "Timed", label: "practice exams" },
 ];
 
 function AccentGrid() {
@@ -121,24 +121,14 @@ export default function AuthPage({ variant }: { variant: AuthPageMode }) {
           <AccentGrid />
           <div className="absolute inset-y-0 right-0 w-1/2 bg-[radial-gradient(circle_at_top_right,rgba(249,115,22,0.32),transparent_42%),radial-gradient(circle_at_bottom_right,rgba(14,165,233,0.22),transparent_36%)]" />
           <div className="relative flex h-full flex-col">
-            <Link href="/" className="inline-flex items-center gap-3 self-start rounded-full border border-white/15 bg-white/10 px-4 py-2 text-sm font-medium text-white/90 backdrop-blur">
-              <span className="flex h-9 w-9 items-center justify-center rounded-2xl bg-[#f59e0b] font-black text-[#10233d]">
-                U
-              </span>
-              <span>uByte</span>
-            </Link>
-
-            <div className="mt-12 max-w-xl">
-              <p className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/8 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.24em] text-amber-200/90">
-                Dedicated auth pages
-              </p>
+            <div className="max-w-xl">
               <h1 className="mt-5 text-4xl font-black tracking-tight sm:text-5xl">
-                {isSignupPage ? "Create your account without leaving the page flow." : "Sign in on a real page, not a popup."}
+                {isSignupPage
+                  ? "Build skill with guided tutorials, interview prep, and real practice exams."
+                  : "Pick up your tutorials, interview prep, and practice exams where you left off."}
               </h1>
               <p className="mt-5 max-w-lg text-base leading-7 text-white/72 sm:text-lg">
-                {isSignupPage
-                  ? "Start with a focused signup flow, then continue straight back to the lesson, pricing page, or exam you came from."
-                  : "A full-page auth flow makes the state clearer, works better on mobile, and preserves the path you were on before sign-in."}
+                uByte is built for focused programming practice: short lessons, hands-on coding, interview-style problem solving, and timed exams that measure real progress.
               </p>
             </div>
 
@@ -162,6 +152,17 @@ export default function AuthPage({ variant }: { variant: AuthPageMode }) {
                   <p className="text-sm leading-6 text-white/78">{point}</p>
                 </div>
               ))}
+            </div>
+
+            <div className="mt-10 rounded-2xl border border-white/10 bg-black/10 px-5 py-5">
+              <p className="text-xs font-bold uppercase tracking-[0.22em] text-amber-200/90">
+                What you get
+              </p>
+              <ul className="mt-4 space-y-3 text-sm leading-6 text-white/78">
+                <li>Structured paths from fundamentals to advanced topics.</li>
+                <li>Interview prep that feels like actual coding practice, not flash cards.</li>
+                <li>Exam-style runs that track score, pass rate, and certificate history.</li>
+              </ul>
             </div>
           </div>
         </section>
@@ -370,17 +371,19 @@ export default function AuthPage({ variant }: { variant: AuthPageMode }) {
             )}
 
             <div className="mt-6 rounded-[24px] border border-zinc-200 bg-[#faf6ef] px-4 py-4 text-sm text-zinc-600 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-400">
-              <div className="flex flex-wrap items-center gap-2">
-                <span className="rounded-full bg-white px-2.5 py-1 text-[11px] font-bold uppercase tracking-[0.18em] text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400">
-                  No popup
-                </span>
-                <span className="rounded-full bg-white px-2.5 py-1 text-[11px] font-bold uppercase tracking-[0.18em] text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400">
-                  Mobile friendly
-                </span>
-                <span className="rounded-full bg-white px-2.5 py-1 text-[11px] font-bold uppercase tracking-[0.18em] text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400">
-                  Redirect aware
-                </span>
-              </div>
+              {!isSignupPage && (
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="rounded-full bg-white px-2.5 py-1 text-[11px] font-bold uppercase tracking-[0.18em] text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400">
+                    No popup
+                  </span>
+                  <span className="rounded-full bg-white px-2.5 py-1 text-[11px] font-bold uppercase tracking-[0.18em] text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400">
+                    Mobile friendly
+                  </span>
+                  <span className="rounded-full bg-white px-2.5 py-1 text-[11px] font-bold uppercase tracking-[0.18em] text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400">
+                    Redirect aware
+                  </span>
+                </div>
+              )}
               <p className="mt-3 leading-6">
                 By continuing, you agree to our{" "}
                 <Link href="/terms" className="font-semibold text-zinc-800 underline underline-offset-2 dark:text-zinc-200">
