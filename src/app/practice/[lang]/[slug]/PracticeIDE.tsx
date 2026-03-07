@@ -14,6 +14,8 @@ import ShortcutsModal from "@/components/tutorial/ShortcutsModal";
 import ProblemSidebar from "@/components/practice/ProblemSidebar";
 import GripDots from "@/components/GripDots";
 import type { PracticeAttemptStatus } from "@/lib/db/practice-attempts";
+import { useAuth } from "@/components/AuthProvider";
+import { apiFetch } from "@/lib/api-client";
 
 const LANG_ORDER: SupportedLanguage[] = ["go", "python", "cpp", "javascript", "java", "rust"];
 
@@ -40,6 +42,7 @@ export function PracticeIDE({ problem, initialLang, categoryFilter = null, listP
           allProblems.filter((p) => getCategoryForSlug(p.slug) === categoryFilter),
           categories
         );
+  const { user } = useAuth();
   const [lang, setLang] = useState<SupportedLanguage>(initialLang);
   const [output, setOutput]           = useState<string | null>(null);
   const [running, setRunning]         = useState(false);
@@ -50,6 +53,18 @@ export function PracticeIDE({ problem, initialLang, categoryFilter = null, listP
   const [mobileTab, setMobileTab]     = useState<"desc" | "code">("desc");
   const [isMobile, setIsMobile]       = useState(false);
   const [showShortcuts, setShowShortcuts] = useState(false);
+
+  // Bookmark
+  const [bookmarked, setBookmarked] = useState(false);
+
+  // Notes (per-problem, persisted in localStorage)
+  const [descTab, setDescTab] = useState<"desc" | "notes">("desc");
+  const [notes, setNotes] = useState<string>("");
+  const notesKey = `practice-notes-${problem.slug}`;
+
+  // Elapsed timer
+  const [elapsed, setElapsed] = useState(0);
+  const elapsedRef = useRef(0);
   const [statuses, setStatuses] = useState<Record<string, PracticeAttemptStatus>>({});
   const [xpToast, setXpToast] = useState<number | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -122,6 +137,51 @@ export function PracticeIDE({ problem, initialLang, categoryFilter = null, listP
     window.addEventListener("resize", check);
     return () => window.removeEventListener("resize", check);
   }, []);
+
+  // Load notes: DB for logged-in users, localStorage for guests
+  useEffect(() => {
+    if (user) {
+      fetch(`/api/practice-notes?slug=${encodeURIComponent(problem.slug)}`, { credentials: "same-origin" })
+        .then((r) => r.json())
+        .then((d) => { if (typeof d?.note === "string") setNotes(d.note); })
+        .catch(() => {
+          try { setNotes(localStorage.getItem(notesKey) ?? ""); } catch { /* ignore */ }
+        });
+    } else {
+      try { setNotes(localStorage.getItem(notesKey) ?? ""); } catch { /* ignore */ }
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [problem.slug, user?.id]);
+
+  // Save notes: debounced — DB for logged-in users, localStorage for guests
+  const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => {
+    if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
+    saveTimerRef.current = setTimeout(() => {
+      if (user) {
+        apiFetch("/api/practice-notes", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ slug: problem.slug, note: notes }),
+        }).catch(() => {});
+      } else {
+        try { localStorage.setItem(notesKey, notes); } catch { /* ignore */ }
+      }
+    }, 800);
+    return () => { if (saveTimerRef.current) clearTimeout(saveTimerRef.current); };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [notes]);
+
+  // Elapsed timer — reset when problem changes
+  useEffect(() => {
+    elapsedRef.current = 0;
+    setElapsed(0);
+    const id = setInterval(() => {
+      elapsedRef.current += 1;
+      setElapsed(elapsedRef.current);
+    }, 1000);
+    return () => clearInterval(id);
+  }, [problem.slug]);
 
   // Global ? key → shortcuts modal
   useEffect(() => {
@@ -290,6 +350,21 @@ export function PracticeIDE({ problem, initialLang, categoryFilter = null, listP
     listQuery: { category: categoryFilter ?? undefined, page: listPage > 1 ? listPage : undefined, status: listStatus, difficulty: listDifficulty },
   } as const;
 
+  async function handleBookmark() {
+    if (!user) return;
+    try {
+      const res = await apiFetch("/api/bookmarks", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ tutorialSlug: `practice:${problem.slug}`, snippet: editor.code, note: problem.title, lang }),
+      });
+      if (res.ok) {
+        setBookmarked(true);
+        setTimeout(() => setBookmarked(false), 2000);
+      }
+    } catch { /* ignore */ }
+  }
+
   function handleReset() {
     editor.setCode(getStarterForLanguage(problem, lang));
     editor.setErrorLines(new Set());
@@ -365,8 +440,28 @@ export function PracticeIDE({ problem, initialLang, categoryFilter = null, listP
           </span>
         </h1>
 
-        {/* Right: theme toggle + user menu */}
-        <div className="flex flex-1 justify-end gap-3 md:flex-initial">
+        {/* Right: timer + bookmark + theme + user menu */}
+        <div className="flex flex-1 justify-end gap-2 md:flex-initial md:gap-3">
+          {/* Elapsed timer */}
+          <div className="hidden items-center gap-1 rounded-md border border-zinc-200 px-2.5 py-1 text-xs font-mono text-zinc-500 dark:border-zinc-700 dark:text-zinc-400 sm:flex" title="Time spent on this problem">
+            ⏱ {String(Math.floor(elapsed / 60)).padStart(2, "0")}:{String(elapsed % 60).padStart(2, "0")}
+          </div>
+          {/* Bookmark */}
+          {user && (
+            <button
+              type="button"
+              onClick={handleBookmark}
+              title="Bookmark this problem"
+              className={`hidden items-center gap-1.5 rounded-md border px-2.5 py-1 text-sm transition-colors sm:flex ${
+                bookmarked
+                  ? "border-indigo-400 text-indigo-600 dark:border-indigo-600 dark:text-indigo-400"
+                  : "border-zinc-300 text-zinc-500 hover:border-zinc-400 hover:text-zinc-800 dark:border-zinc-700 dark:text-zinc-400 dark:hover:border-zinc-600 dark:hover:text-zinc-200"
+              }`}
+            >
+              <svg className="h-3.5 w-3.5" fill={bookmarked ? "currentColor" : "none"} viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" /></svg>
+              {bookmarked ? "Saved!" : "Save"}
+            </button>
+          )}
           <ThemeToggle className="hidden h-8 w-8 items-center justify-center rounded text-zinc-500 transition-colors hover:bg-zinc-200 hover:text-zinc-800 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-200 md:flex" />
           <Suspense fallback={<div className="h-9 w-20 rounded-lg bg-zinc-200 dark:bg-zinc-800 animate-pulse" />}>
             <AuthButtons />
@@ -448,66 +543,101 @@ export function PracticeIDE({ problem, initialLang, categoryFilter = null, listP
           style={isMobile ? undefined : { width: leftWidth }}
           suppressHydrationWarning
         >
-          {/* Problem body */}
-          <div className="min-w-0 flex-1 overflow-x-hidden overflow-y-auto break-words p-4 md:p-5">
-            <h1 className="mb-2 break-words text-xl font-bold text-zinc-900 dark:text-zinc-100">
-              {problem.title}
-            </h1>
-            <span className={`mb-4 inline-block rounded-full px-2.5 py-0.5 text-xs font-medium capitalize ${DIFFICULTY_BADGE[problem.difficulty]}`}>
-              {problem.difficulty}
-            </span>
-
-            <p className="mb-5 min-w-0 break-words whitespace-pre-wrap text-sm leading-relaxed text-zinc-700 dark:text-zinc-300">
-              {problem.description}
-            </p>
-
-            {problem.examples.length > 0 && (
-              <div className="space-y-3">
-                <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">Examples</h3>
-                {problem.examples.map((ex, i) => (
-                  <div key={i} className="rounded-lg border border-zinc-200 bg-white p-3 dark:border-zinc-800 dark:bg-zinc-950">
-                    <p className="mb-1 text-xs font-semibold text-zinc-500 dark:text-zinc-400">Example {i + 1}</p>
-                    <div className="space-y-1 font-mono text-xs">
-                      <div><span className="text-zinc-400">Input:  </span><span className="text-zinc-800 dark:text-zinc-200">{ex.input}</span></div>
-                      <div><span className="text-zinc-400">Output: </span><span className="text-zinc-800 dark:text-zinc-200">{ex.output}</span></div>
-                      {ex.explanation && <div className="mt-1.5 text-zinc-500 dark:text-zinc-400">{ex.explanation}</div>}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {/* Prev / Next problem */}
-            <div className="mt-6 flex gap-2">
-              {(() => {
-                const idx  = allProblems.findIndex((p) => p.slug === problem.slug);
-                const prev = allProblems[idx - 1];
-                const next = allProblems[idx + 1];
-                return (
-                  <>
-                    {prev && (
-                      <Link
-                        href={`/practice/${lang}/${prev.slug}`}
-                        scroll={false}
-                        className="flex-1 rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2 text-center text-xs font-medium text-zinc-600 transition-colors hover:border-indigo-300 hover:bg-indigo-50 hover:text-indigo-700 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-400 dark:hover:border-indigo-700 dark:hover:text-indigo-400"
-                      >
-                        ← Prev
-                      </Link>
-                    )}
-                    {next && (
-                      <Link
-                        href={`/practice/${lang}/${next.slug}`}
-                        scroll={false}
-                        className="flex-1 rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2 text-center text-xs font-medium text-zinc-600 transition-colors hover:border-indigo-300 hover:bg-indigo-50 hover:text-indigo-700 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-400 dark:hover:border-indigo-700 dark:hover:text-indigo-400"
-                      >
-                        Next →
-                      </Link>
-                    )}
-                  </>
-                );
-              })()}
-            </div>
+          {/* Tab strip: Description | Notes */}
+          <div className="flex shrink-0 border-b border-zinc-200 dark:border-zinc-800">
+            {(["desc", "notes"] as const).map((tab) => (
+              <button
+                key={tab}
+                type="button"
+                onClick={() => setDescTab(tab)}
+                className={`flex-1 py-2 text-xs font-semibold uppercase tracking-wider transition-colors ${
+                  descTab === tab
+                    ? "border-b-2 border-indigo-500 text-indigo-600 dark:text-indigo-400"
+                    : "text-zinc-400 hover:text-zinc-700 dark:text-zinc-500 dark:hover:text-zinc-300"
+                }`}
+              >
+                {tab === "desc" ? "Description" : "Notes"}
+              </button>
+            ))}
           </div>
+
+          {/* Description tab */}
+          {descTab === "desc" && (
+            <div className="min-w-0 flex-1 overflow-x-hidden overflow-y-auto break-words p-4 md:p-5">
+              <h1 className="mb-2 break-words text-xl font-bold text-zinc-900 dark:text-zinc-100">
+                {problem.title}
+              </h1>
+              <span className={`mb-4 inline-block rounded-full px-2.5 py-0.5 text-xs font-medium capitalize ${DIFFICULTY_BADGE[problem.difficulty]}`}>
+                {problem.difficulty}
+              </span>
+
+              <p className="mb-5 min-w-0 break-words whitespace-pre-wrap text-sm leading-relaxed text-zinc-700 dark:text-zinc-300">
+                {problem.description}
+              </p>
+
+              {problem.examples.length > 0 && (
+                <div className="space-y-3">
+                  <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">Examples</h3>
+                  {problem.examples.map((ex, i) => (
+                    <div key={i} className="rounded-lg border border-zinc-200 bg-white p-3 dark:border-zinc-800 dark:bg-zinc-950">
+                      <p className="mb-1 text-xs font-semibold text-zinc-500 dark:text-zinc-400">Example {i + 1}</p>
+                      <div className="space-y-1 font-mono text-xs">
+                        <div><span className="text-zinc-400">Input:  </span><span className="text-zinc-800 dark:text-zinc-200">{ex.input}</span></div>
+                        <div><span className="text-zinc-400">Output: </span><span className="text-zinc-800 dark:text-zinc-200">{ex.output}</span></div>
+                        {ex.explanation && <div className="mt-1.5 text-zinc-500 dark:text-zinc-400">{ex.explanation}</div>}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Prev / Next problem */}
+              <div className="mt-6 flex gap-2">
+                {(() => {
+                  const idx  = allProblems.findIndex((p) => p.slug === problem.slug);
+                  const prev = allProblems[idx - 1];
+                  const next = allProblems[idx + 1];
+                  return (
+                    <>
+                      {prev && (
+                        <Link
+                          href={`/practice/${lang}/${prev.slug}`}
+                          scroll={false}
+                          className="flex-1 rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2 text-center text-xs font-medium text-zinc-600 transition-colors hover:border-indigo-300 hover:bg-indigo-50 hover:text-indigo-700 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-400 dark:hover:border-indigo-700 dark:hover:text-indigo-400"
+                        >
+                          ← Prev
+                        </Link>
+                      )}
+                      {next && (
+                        <Link
+                          href={`/practice/${lang}/${next.slug}`}
+                          scroll={false}
+                          className="flex-1 rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2 text-center text-xs font-medium text-zinc-600 transition-colors hover:border-indigo-300 hover:bg-indigo-50 hover:text-indigo-700 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-400 dark:hover:border-indigo-700 dark:hover:text-indigo-400"
+                        >
+                          Next →
+                        </Link>
+                      )}
+                    </>
+                  );
+                })()}
+              </div>
+            </div>
+          )}
+
+          {/* Notes tab */}
+          {descTab === "notes" && (
+            <div className="flex min-w-0 flex-1 flex-col p-4 md:p-5">
+              <p className="mb-2 text-xs text-zinc-400 dark:text-zinc-500">
+                Notes are saved locally in your browser.
+              </p>
+              <textarea
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
+                placeholder="Write your approach, observations, or ideas here…"
+                className="flex-1 resize-none rounded-lg border border-zinc-200 bg-white p-3 text-sm text-zinc-800 placeholder-zinc-400 focus:border-indigo-400 focus:outline-none focus:ring-1 focus:ring-indigo-400 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-200 dark:placeholder-zinc-500 dark:focus:border-indigo-600"
+              />
+            </div>
+          )}
         </aside>
 
         {/* Horizontal resize handle — identical to InteractiveTutorial */}

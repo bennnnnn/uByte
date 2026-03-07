@@ -20,7 +20,6 @@ import ShortcutsModal from "@/components/tutorial/ShortcutsModal";
 import SnapshotDrawer from "@/components/tutorial/SnapshotDrawer";
 import { useChallengeTimer } from "@/hooks/useChallengeTimer";
 import { tutorialUrl } from "@/lib/urls";
-import { useToast } from "@/components/Toast";
 import { LANGUAGES } from "@/lib/languages/registry";
 import type { SupportedLanguage } from "@/lib/languages/types";
 import GripDots from "@/components/GripDots";
@@ -50,7 +49,6 @@ export default function InteractiveTutorial({
   isFree,
 }: Props) {
   const { user, profile, loading } = useAuth();
-  const { toast } = useToast();
 
   const [ideLang, setIdeLang] = useState<SupportedLanguage>(lang as SupportedLanguage);
   const [stepsForLang, setStepsForLang] = useState<TutorialStep[] | null>(null);
@@ -61,7 +59,6 @@ export default function InteractiveTutorial({
   const stepProgress = useStepProgress(currentSteps, ideLang, tutorialSlug, next, editor.setCode, user?.id);
   const { leftWidth, outputHeight, isDragging, startDragH, startDragV, startDragVTouch } = usePanelResize();
 
-  const [bookmarked, setBookmarked] = useState(false);
   const [showNav, setShowNav] = useState(false);
   const [expandedSlug, setExpandedSlug] = useState(tutorialSlug);
   const [showShortcuts, setShowShortcuts] = useState(false);
@@ -131,29 +128,6 @@ export default function InteractiveTutorial({
       .catch(() => setChallengeResult({ totalMs, personalBest: null }));
     // eslint-disable-next-line react-hooks/exhaustive-deps -- run only when tutorial completes in challenge mode
   }, [stepProgress.tutorialDone, challengeMode]);
-
-  async function handleBookmark() {
-    if (!user) {
-      toast("Sign in to save bookmarks", "error");
-      return;
-    }
-    try {
-      const res = await apiFetch("/api/bookmarks", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ tutorialSlug, snippet: editor.code, note: currentStep.title, lang }),
-      });
-      if (res.ok) {
-        setBookmarked(true);
-        setTimeout(() => setBookmarked(false), 2000);
-      } else {
-        const data = await res.json().catch(() => ({}));
-        toast(data?.error ?? "Failed to save bookmark", "error");
-      }
-    } catch {
-      toast("Failed to save bookmark", "error");
-    }
-  }
 
   // Global ? key → shortcuts modal (only when not typing in textarea)
   useEffect(() => {
@@ -347,12 +321,6 @@ export default function InteractiveTutorial({
             <button onClick={() => stepProgress.handleReset(currentStep, editor.setCode, editor.setErrorLines)} className="rounded-md border border-zinc-300 px-3 py-1.5 text-sm text-zinc-500 transition-colors hover:border-zinc-400 hover:text-zinc-800 dark:border-zinc-700 dark:text-zinc-400 dark:hover:border-zinc-600 dark:hover:text-zinc-200">
               Reset
             </button>
-            {user && (
-              <button onClick={handleBookmark} title="Bookmark this code" className={`flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-sm transition-colors ${bookmarked ? "border-indigo-400 text-indigo-600 dark:border-indigo-600 dark:text-indigo-400" : "border-zinc-300 text-zinc-500 hover:border-zinc-400 hover:text-zinc-800 dark:border-zinc-700 dark:text-zinc-400 dark:hover:border-zinc-600 dark:hover:text-zinc-200"}`}>
-                <svg className="h-3.5 w-3.5" fill={bookmarked ? "currentColor" : "none"} viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" /></svg>
-                {bookmarked ? "Saved!" : "Bookmark"}
-              </button>
-            )}
             {user && (
               <button onClick={() => setShowSnapshots(true)} title="Code history" className="flex items-center gap-1.5 rounded-md border border-zinc-400 px-3 py-1.5 text-sm font-medium text-zinc-700 transition-colors hover:border-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 dark:border-zinc-600 dark:text-zinc-200 dark:hover:border-zinc-500 dark:hover:bg-zinc-800 dark:hover:text-zinc-100">
                 <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
