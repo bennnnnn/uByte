@@ -2,7 +2,7 @@
 
 import { Suspense, useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/components/AuthProvider";
 import {
   BILLING_CONFIG, MONTHLY_PRICE_ID, YEARLY_PRICE_ID, hasPaidAccess,
@@ -11,8 +11,8 @@ import {
   MONTHLY_PRICE_CENTS, YEARLY_PRICE_CENTS,
 } from "@/lib/plans";
 import { trackConversion } from "@/lib/analytics";
-import AuthModal from "@/components/auth/AuthModal";
 import { absoluteUrl } from "@/lib/seo";
+import { buildAuthPageHref } from "@/lib/auth-redirect";
 
 const CLIENT_TOKEN     = process.env.NEXT_PUBLIC_PADDLE_CLIENT_TOKEN ?? "";
 
@@ -64,11 +64,11 @@ function Check({ dim = false }) {
 }
 
 function PricingContent() {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const { user, profile } = useAuth();
   const paddleReady = useRef(false);
   const [billing, setBilling]       = useState<"monthly" | "yearly">("yearly");
-  const [showAuth, setShowAuth]     = useState(false);
   const [faqOpen, setFaqOpen]       = useState<number | null>(null);
   const showSuccess = searchParams.get("success") === "1";
   const planParam = searchParams.get("plan");
@@ -86,12 +86,12 @@ function PricingContent() {
     });
   }, [planParam]);
 
-  // If user is logged out and we were sent here to sign up, open auth modal automatically.
+  // Preserve old pricing links that still use ?signup=1 by forwarding to the page-based signup flow.
   useEffect(() => {
-    queueMicrotask(() => {
-      if (!user && signupParam) setShowAuth(true);
-    });
-  }, [user, signupParam]);
+    if (user || !signupParam) return;
+    const nextPath = `/pricing${planParam ? `?plan=${planParam}` : ""}`;
+    router.replace(buildAuthPageHref("signup", nextPath));
+  }, [planParam, router, signupParam, user]);
 
   useEffect(() => {
     if (!CLIENT_TOKEN || paddleReady.current) return;
@@ -129,6 +129,8 @@ function PricingContent() {
   const selectedPriceId   = billing === "yearly" ? YEARLY_PRICE_ID : MONTHLY_PRICE_ID;
   const alreadyOnSelected = billing === "yearly" ? isYearly : isMonthly;
   const onOtherPlan       = billing === "yearly" ? isMonthly : isYearly;
+  const authNextPath = `/pricing?plan=${billing}`;
+  const signupHref = buildAuthPageHref("signup", authNextPath);
   const pricingJsonLd = {
     "@context": "https://schema.org",
     "@type": "Product",
@@ -277,13 +279,12 @@ function PricingContent() {
 
             {/* Free CTA — context-aware */}
             {!user ? (
-              <button
-                type="button"
-                onClick={() => setShowAuth(true)}
+              <Link
+                href={signupHref}
                 className="block w-full rounded-xl border border-zinc-300 py-3 text-center text-sm font-semibold text-zinc-700 transition-colors hover:border-zinc-400 hover:bg-zinc-50 hover:text-zinc-900 dark:border-zinc-600 dark:text-zinc-300 dark:hover:border-zinc-400 dark:hover:text-white"
               >
                 Create free account
-              </button>
+              </Link>
             ) : isPaid ? (
               <div className="rounded-xl border border-zinc-200 py-3 text-center text-sm text-zinc-400 dark:border-zinc-700 dark:text-zinc-500">
                 You&rsquo;re on a Pro plan
@@ -366,13 +367,12 @@ function PricingContent() {
                 You&rsquo;re on {billing === "yearly" ? "Monthly" : "Yearly"}
               </div>
             ) : !user ? (
-              <button
-                type="button"
-                onClick={() => setShowAuth(true)}
+              <Link
+                href={signupHref}
                 className="w-full rounded-xl bg-indigo-600 py-3.5 text-sm font-bold text-white shadow shadow-indigo-600/20 transition-colors hover:bg-indigo-700"
               >
                 Sign up &amp; upgrade
-              </button>
+              </Link>
             ) : !selectedPriceId ? (
               <div className="rounded-xl bg-zinc-100 py-3.5 text-center text-sm text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400">
                 Coming soon
@@ -470,23 +470,16 @@ function PricingContent() {
           </div>
           <p className="mt-6 text-center text-xs text-zinc-400 dark:text-zinc-500">
             Not ready?{" "}
-            <button
-              type="button"
-              onClick={() => !user && setShowAuth(true)}
+            <Link
+              href={user ? "/tutorial/go" : buildAuthPageHref("signup", "/tutorial/go")}
               className="text-zinc-600 underline underline-offset-2 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-200"
             >
-              {user ? (
-                <Link href="/tutorial/go">Start with 5 free tutorials</Link>
-              ) : (
-                "Start with 5 free tutorials"
-              )}
-            </button>
+              Start with 5 free tutorials
+            </Link>
             {" "}— no card required.
           </p>
         </div>
       </div>
-
-      {showAuth && <AuthModal onClose={() => setShowAuth(false)} />}
     </div>
   );
 }

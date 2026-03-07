@@ -11,6 +11,7 @@ import { signToken, setAuthCookie } from "@/lib/auth";
 import { setCsrfCookie } from "@/lib/csrf";
 import { withErrorHandling } from "@/lib/api-utils";
 import { sendGoogleLinkedEmail } from "@/lib/email";
+import { buildAuthPageHref, getSafeNextPath, type AuthPageMode } from "@/lib/auth-redirect";
 
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
@@ -21,17 +22,19 @@ export const GET = withErrorHandling("GET /api/auth/google/callback", async (req
   const code = searchParams.get("code");
   const state = searchParams.get("state");
   const storedState = request.cookies.get("oauth_state")?.value;
+  const authMode = getOauthMode(request.cookies.get("oauth_mode")?.value);
+  const nextPath = getSafeNextPath(request.cookies.get("oauth_next")?.value);
 
   if (!state || !storedState || state !== storedState) {
-    return NextResponse.redirect(`${origin}/?error=oauth_invalid_state`);
+    return createAuthRedirect(origin, authMode, nextPath, "oauth_invalid_state");
   }
 
   if (!code) {
-    return NextResponse.redirect(`${origin}/?error=oauth_no_code`);
+    return createAuthRedirect(origin, authMode, nextPath, "oauth_no_code");
   }
 
   if (!GOOGLE_CLIENT_ID || !GOOGLE_CLIENT_SECRET) {
-    return NextResponse.redirect(`${origin}/?error=oauth_not_configured`);
+    return createAuthRedirect(origin, authMode, nextPath, "oauth_not_configured");
   }
 
   try {
@@ -48,7 +51,7 @@ export const GET = withErrorHandling("GET /api/auth/google/callback", async (req
     });
 
     if (!tokenRes.ok) {
-      return NextResponse.redirect(`${origin}/?error=oauth_token_failed`);
+      return createAuthRedirect(origin, authMode, nextPath, "oauth_token_failed");
     }
 
     const tokenData = await tokenRes.json();
@@ -59,18 +62,18 @@ export const GET = withErrorHandling("GET /api/auth/google/callback", async (req
     });
 
     if (!userInfoRes.ok) {
-      return NextResponse.redirect(`${origin}/?error=oauth_userinfo_failed`);
+      return createAuthRedirect(origin, authMode, nextPath, "oauth_userinfo_failed");
     }
 
     const googleUser = await userInfoRes.json();
     const { sub: googleId, email, name, email_verified } = googleUser;
 
     if (!googleId || !email) {
-      return NextResponse.redirect(`${origin}/?error=oauth_missing_fields`);
+      return createAuthRedirect(origin, authMode, nextPath, "oauth_missing_fields");
     }
 
     if (!email_verified) {
-      return NextResponse.redirect(`${origin}/?error=oauth_email_not_verified`);
+      return createAuthRedirect(origin, authMode, nextPath, "oauth_email_not_verified");
     }
 
     let user = await getUserByGoogleId(googleId);
@@ -90,7 +93,7 @@ export const GET = withErrorHandling("GET /api/auth/google/callback", async (req
     }
 
     if (user.locked_until && new Date(user.locked_until) > new Date()) {
-      return NextResponse.redirect(`${origin}/?error=account_locked`);
+      return createAuthRedirect(origin, authMode, nextPath, "account_locked");
     }
 
     const token = await signToken({
@@ -103,12 +106,35 @@ export const GET = withErrorHandling("GET /api/auth/google/callback", async (req
     await logActivity(user.id, "login_google");
     await updateStreak(user.id);
 
-    const res = NextResponse.redirect(`${origin}/`);
-    res.cookies.delete("oauth_state");
-    setCsrfCookie(res);
-    return res;
+    const response = NextResponse.redirect(`${origin}${nextPath}`);
+    clearOauthFlowCookies(response);
+    setCsrfCookie(response);
+    return response;
   } catch (err) {
     console.error("Google OAuth callback error:", err);
-    return NextResponse.redirect(`${origin}/?error=oauth_failed`);
+    return createAuthRedirect(origin, authMode, nextPath, "oauth_failed");
   }
 });
+
+function getOauthMode(value: string | undefined): AuthPageMode {
+  return value === "signup" ? "signup" : "login";
+}
+
+function clearOauthFlowCookies(response: NextResponse) {
+  response.cookies.delete("oauth_state");
+  response.cookies.delete("oauth_mode");
+  response.cookies.delete("oauth_next");
+}
+
+function createAuthRedirect(
+  origin: string,
+  mode: AuthPageMode,
+  nextPath: string,
+  error: string
+) {
+  const redirectUrl = new URL(`${origin}${buildAuthPageHref(mode, nextPath)}`);
+  redirectUrl.searchParams.set("error", error);
+  const response = NextResponse.redirect(redirectUrl);
+  clearOauthFlowCookies(response);
+  return response;
+}

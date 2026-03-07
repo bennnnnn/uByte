@@ -9,6 +9,8 @@ const MESSAGES: Record<string, string> = {
   oauth_token_failed: "Could not connect to Google. Please try again.",
   oauth_userinfo_failed: "Could not retrieve your Google profile. Please try again.",
   oauth_missing_fields: "Google did not provide your email. Please try again.",
+  oauth_email_not_verified: "Your Google account email must be verified before you can sign in.",
+  account_locked: "This account is temporarily locked. Please try again later.",
   oauth_failed: "Google sign-in failed. Please try again.",
 };
 

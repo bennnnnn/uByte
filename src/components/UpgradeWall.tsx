@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { buildAuthPageHref } from "@/lib/auth-redirect";
 
 interface UpgradeWallProps {
   tutorialTitle: string;
@@ -93,7 +94,7 @@ export default function UpgradeWall({ tutorialTitle, subtitle, backHref = "/", b
         </div>
 
         <Link
-          href={`/pricing?plan=${selected}&signup=1`}
+          href={buildAuthPageHref("signup", `/pricing?plan=${selected}`)}
           className="block w-full rounded-xl bg-indigo-700 py-3 text-center text-sm font-semibold text-white transition-colors hover:bg-indigo-800"
         >
           {selected === "yearly" ? "Get Yearly — $49.99/yr" : "Get Monthly — $9.99/mo"}

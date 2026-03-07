@@ -1,45 +1,50 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
-import { useSearchParams } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
+import Link from "next/link";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "./AuthProvider";
-import AuthModal from "./auth/AuthModal";
 import UserMenuDropdown from "./auth/UserMenuDropdown";
 import ThemeToggle from "./ThemeToggle";
 import { useIsMobile } from "@/hooks/useIsMobile";
+import { buildAuthPageHref } from "@/lib/auth-redirect";
 
 export default function AuthButtons() {
   const { user, loading } = useAuth();
   const isMobile = useIsMobile();
+  const pathname = usePathname();
+  const router = useRouter();
   const searchParams = useSearchParams();
-  const [showModal, setShowModal] = useState(false);
-  const [signupMode, setSignupMode] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const [unreadCount, setUnreadCount] = useState(0);
+  const currentParams = new URLSearchParams(searchParams.toString());
+  currentParams.delete("signup");
+  const currentPath = `${pathname}${currentParams.toString() ? `?${currentParams.toString()}` : ""}`;
+  const loginHref = buildAuthPageHref("login", currentPath);
+  const signupHref = buildAuthPageHref("signup", currentPath);
 
-  // Open signup modal when URL has ?signup=1 (e.g. from banner "Sign up" link)
   useEffect(() => {
-    queueMicrotask(() => {
-      if (searchParams.get("signup") === "1") {
-        setSignupMode(true);
-        setShowModal(true);
-      }
-    });
-  }, [searchParams]);
+    if (loading || user) return;
+    if (searchParams.get("signup") !== "1") return;
+
+    router.replace(signupHref);
+  }, [loading, router, searchParams, signupHref, user]);
 
   useEffect(() => {
     if (!user) return;
     fetch("/api/notifications", { credentials: "same-origin" })
-      .then((r) => r.json())
-      .then((d) => { if (typeof d.unreadCount === "number") setUnreadCount(d.unreadCount); })
+      .then((response) => response.json())
+      .then((data) => {
+        if (typeof data.unreadCount === "number") setUnreadCount(data.unreadCount);
+      })
       .catch(() => {});
   }, [user]);
 
   useEffect(() => {
     if (!menuOpen) return;
-    const handleClick = (e: MouseEvent) => {
-      if (menuRef.current && !menuRef.current.contains(e.target as Node)) setMenuOpen(false);
+    const handleClick = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) setMenuOpen(false);
     };
     document.addEventListener("mousedown", handleClick);
     return () => document.removeEventListener("mousedown", handleClick);
@@ -53,13 +58,12 @@ export default function AuthButtons() {
     return <UserMenuDropdown unreadCount={unreadCount} isMobile={isMobile} />;
   }
 
-  // Mobile: single "Account" dropdown with Theme + Log in + Sign up
   if (isMobile) {
     return (
       <div className="relative" ref={menuRef}>
         <button
           type="button"
-          onClick={() => setMenuOpen(!menuOpen)}
+          onClick={() => setMenuOpen((open) => !open)}
           className="flex h-9 w-9 items-center justify-center rounded-lg text-zinc-600 transition-colors hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-200"
           aria-label="Account"
         >
@@ -74,43 +78,41 @@ export default function AuthButtons() {
               <ThemeToggle className="flex h-8 w-8 items-center justify-center rounded text-zinc-500 transition-colors hover:bg-zinc-100 hover:text-zinc-800 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-200" />
             </div>
             <div className="p-2">
-              <button onClick={() => { setMenuOpen(false); setSignupMode(false); setShowModal(true); }} className="flex w-full items-center rounded-lg px-3 py-2.5 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50 dark:text-zinc-300 dark:hover:bg-zinc-800">
+              <Link
+                href={loginHref}
+                onClick={() => setMenuOpen(false)}
+                className="flex w-full items-center rounded-lg px-3 py-2.5 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50 dark:text-zinc-300 dark:hover:bg-zinc-800"
+              >
                 Log in
-              </button>
-              <button onClick={() => { setMenuOpen(false); setSignupMode(true); setShowModal(true); }} className="flex w-full items-center rounded-lg bg-indigo-600 px-3 py-2.5 text-sm font-medium text-white transition-colors hover:bg-indigo-700">
+              </Link>
+              <Link
+                href={signupHref}
+                onClick={() => setMenuOpen(false)}
+                className="flex w-full items-center rounded-lg bg-indigo-600 px-3 py-2.5 text-sm font-medium text-white transition-colors hover:bg-indigo-700"
+              >
                 Sign up
-              </button>
+              </Link>
             </div>
           </div>
-        )}
-        {showModal && (
-          <AuthModal
-            initialMode={signupMode ? "signup" : undefined}
-            onClose={() => {
-              setShowModal(false);
-              setSignupMode(false);
-            }}
-          />
         )}
       </div>
     );
   }
 
   return (
-    <>
-      <div className="flex items-center gap-2">
-        <button onClick={() => { setSignupMode(false); setShowModal(true); }} className="rounded-lg px-4 py-2 text-sm font-medium text-zinc-600 transition-colors hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-200">Log in</button>
-        <button onClick={() => { setSignupMode(true); setShowModal(true); }} className="rounded-lg bg-indigo-700 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-indigo-800">Sign up</button>
-      </div>
-      {showModal && (
-        <AuthModal
-          initialMode={signupMode ? "signup" : undefined}
-          onClose={() => {
-            setShowModal(false);
-            setSignupMode(false);
-          }}
-        />
-      )}
-    </>
+    <div className="flex items-center gap-2">
+      <Link
+        href={loginHref}
+        className="rounded-lg px-4 py-2 text-sm font-medium text-zinc-600 transition-colors hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-200"
+      >
+        Log in
+      </Link>
+      <Link
+        href={signupHref}
+        className="rounded-lg bg-indigo-700 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-indigo-800"
+      >
+        Sign up
+      </Link>
+    </div>
   );
 }
