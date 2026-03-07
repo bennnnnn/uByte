@@ -25,9 +25,9 @@ import LeftOffBanner from "@/components/LeftOffBanner";
 import GoogleOAuthError from "@/components/GoogleOAuthError";
 
 export const metadata: Metadata = {
-  title: "uByte — Learn to Code with Interactive Tutorials",
+  title: "uByte - Programming Tutorials, Interview Prep, and Certifications",
   description:
-    "Learn to code with interactive tutorials in Go, Python, C++, JavaScript, Java, and Rust. Practice coding interview questions and prepare for certifications with timed exams.",
+    "Learn programming with interactive tutorials in Go, Python, C++, JavaScript, Java, and Rust. Practice interview questions and certification-style exams.",
   keywords: [
     ...SITE_KEYWORDS,
     "coding bootcamp alternative",
@@ -36,9 +36,9 @@ export const metadata: Metadata = {
   ],
   alternates: { canonical: absoluteUrl("/") },
   openGraph: {
-    title: "uByte — Learn to Code with Interactive Tutorials",
+    title: "uByte - Programming Tutorials, Interview Prep, and Certifications",
     description:
-      "Interactive lessons in 6 programming languages, interview practice problems, and certification-style exams.",
+      "Interactive programming tutorials, interview practice problems, and certification-style exams.",
     type: "website",
     url: absoluteUrl("/"),
   },

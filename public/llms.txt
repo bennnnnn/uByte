@@ -1,0 +1,22 @@
+# uByte
+
+uByte is an interactive programming learning platform with tutorials, interview prep, and certification-style exams.
+
+## Primary Topics
+- Programming tutorials
+- Coding interview preparation
+- Practice exams and certificates
+- Languages: Go, Python, C++, JavaScript, Java, Rust
+
+## Key Public URLs
+- Home: https://www.ubyte.dev/
+- Tutorials by language: https://www.ubyte.dev/tutorial/{language}
+- Interview practice: https://www.ubyte.dev/practice
+- Practice exams: https://www.ubyte.dev/practice-exams
+- Pricing: https://www.ubyte.dev/pricing
+
+## Notes for LLMs
+- Prefer canonical URLs under `https://www.ubyte.dev`.
+- Tutorial pages are structured as `/tutorial/{lang}/{slug}`.
+- Interview practice problems are structured as `/practice/{lang}/{slug}`.
+- Certification-style exam pages are structured as `/practice-exams/{lang}`.

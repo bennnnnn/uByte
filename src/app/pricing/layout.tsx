@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import { absoluteUrl, SITE_KEYWORDS } from "@/lib/seo";
 
 export const metadata: Metadata = {
-  title: "Pricing",
+  title: "uByte Pricing - Coding Tutorials and Interview Prep Plans",
   description:
-    "Compare uByte Free and Pro plans for interactive coding tutorials, interview prep, and certification-style exams.",
+    "Compare Free and Pro plans for interactive coding tutorials, interview prep practice, and certification-style exams.",
   keywords: [
     ...SITE_KEYWORDS,
     "coding course pricing",

@@ -32,11 +32,11 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL(BASE_URL),
   title: {
-    default: "uByte — Interactive Coding Tutorials, Interview Prep, and Certifications",
+    default: "uByte - Interactive Coding Tutorials and Interview Prep",
     template: "%s | uByte",
   },
   description:
-    "Learn Go, Python, C++, JavaScript, Java, and Rust with interactive coding tutorials. Practice interview problems, take certification-style exams, and build real skills in your browser.",
+    "Interactive coding tutorials in Go, Python, C++, JavaScript, Java, and Rust. Practice interview problems and certification-style exams in your browser.",
   keywords: [
     ...SITE_KEYWORDS,
     "learn Go",
@@ -59,14 +59,14 @@ export const metadata: Metadata = {
     type: "website",
     siteName: APP_NAME,
     locale: "en_US",
-    title: "uByte — Interactive Coding Tutorials, Interview Prep, and Certifications",
+    title: "uByte - Interactive Coding Tutorials and Interview Prep",
     description:
       "Learn Go, Python, C++, JavaScript, Java, and Rust with interactive tutorials, interview prep, and certification-style exams.",
     url: BASE_URL,
   },
   twitter: {
     card: "summary_large_image",
-    title: "uByte — Interactive Coding Tutorials, Interview Prep, and Certifications",
+    title: "uByte - Interactive Coding Tutorials and Interview Prep",
     description:
       "Interactive programming tutorials, interview practice, and certification-style exams across 6 languages.",
   },

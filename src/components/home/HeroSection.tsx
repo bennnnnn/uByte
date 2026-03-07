@@ -153,9 +153,9 @@ export default function HeroSection({ topicCount = 19, lessonCountGo = 0, proble
 
             {/* Headline */}
             <h1 className="mb-5 text-[2.75rem] font-black leading-[1.04] tracking-tight text-zinc-900 dark:text-zinc-50 sm:text-5xl lg:text-[3.25rem] xl:text-[3.75rem]">
-              Learn to code.
+              Learn programming.
               <span className="mt-1 block bg-gradient-to-r from-indigo-600 via-violet-600 to-cyan-500 bg-clip-text text-transparent">
-                In every language.
+                Interactive tutorials for every language.
               </span>
             </h1>
 
