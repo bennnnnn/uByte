@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
-import { getPasswordResetToken, markResetTokenUsed, updateUserPassword } from "@/lib/db";
+import { getPasswordResetToken, incrementTokenVersion, markResetTokenUsed, updateUserPassword } from "@/lib/db";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 import { withErrorHandling } from "@/lib/api-utils";
 import { MIN_PASSWORD_LENGTH, PASSWORD_MIN_ERROR } from "@/lib/password-policy";
@@ -33,6 +33,7 @@ export const POST = withErrorHandling("POST /api/auth/reset-password", async (re
 
   const passwordHash = await bcrypt.hash(newPassword, 10);
   await updateUserPassword(resetToken.user_id, passwordHash);
+  await incrementTokenVersion(resetToken.user_id);
   await markResetTokenUsed(resetToken.id);
 
   return NextResponse.json({ ok: true });

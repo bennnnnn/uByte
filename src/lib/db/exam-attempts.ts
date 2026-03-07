@@ -75,6 +75,19 @@ export async function lockAttemptForSubmit(attemptId: string): Promise<boolean> 
   return rows.length > 0;
 }
 
+/**
+ * Clears the optimistic submit lock if grading failed before a final score was written.
+ * Once score/passed are populated, the attempt is considered finalized and the lock stays in place.
+ */
+export async function releaseAttemptSubmitLock(attemptId: string): Promise<void> {
+  const sql = getSql();
+  await sql`
+    UPDATE exam_attempts
+    SET submitted_at = NULL
+    WHERE id = ${attemptId} AND score IS NULL AND passed IS NULL
+  `;
+}
+
 export async function saveAnswer(attemptId: string, questionId: number, chosenIndex: number): Promise<void> {
   const sql = getSql();
   await sql`

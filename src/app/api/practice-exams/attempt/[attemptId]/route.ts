@@ -3,6 +3,7 @@ import { getCurrentUser } from "@/lib/auth";
 import { getAttempt } from "@/lib/db/exam-attempts";
 import { getQuestionsByIds } from "@/lib/db/exam-questions";
 import { getExamConfigForLang } from "@/lib/db/exam-settings";
+import { hasAttemptExpired } from "@/lib/exams/attempt-utils";
 import { withErrorHandling } from "@/lib/api-utils";
 
 /** GET /api/practice-exams/attempt/[attemptId] — return attempt metadata + questions (no correct answers). */
@@ -20,8 +21,12 @@ export const GET = withErrorHandling(
     if (attempt.user_id !== user.userId) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     if (attempt.submitted_at) return NextResponse.json({ error: "Attempt already submitted" }, { status: 400 });
 
-    const questions = await getQuestionsByIds(attempt.question_ids_json, attempt.choices_order_json);
     const { examDurationMinutes } = await getExamConfigForLang(attempt.lang);
+    if (hasAttemptExpired(attempt.started_at, examDurationMinutes)) {
+      return NextResponse.json({ error: "Exam time limit exceeded" }, { status: 410 });
+    }
+
+    const questions = await getQuestionsByIds(attempt.question_ids_json, attempt.choices_order_json);
 
     return NextResponse.json({
       attemptId: attempt.id,
