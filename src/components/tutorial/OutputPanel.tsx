@@ -34,7 +34,13 @@ export default function OutputPanel({
       style={{ height }}
       suppressHydrationWarning
     >
-      <p className="mb-2 text-xs font-semibold uppercase tracking-widest text-zinc-400 dark:text-zinc-500">
+      <p className={`mb-2 text-xs font-semibold uppercase tracking-widest ${
+        outputIsError || status === "failed"
+          ? "text-red-500 dark:text-red-400"
+          : status === "passed"
+          ? "text-emerald-500 dark:text-emerald-400"
+          : "text-zinc-400 dark:text-zinc-500"
+      }`}>
         {outputIsError
           ? "Error"
           : status === "failed" && output !== null
@@ -50,10 +56,8 @@ export default function OutputPanel({
         </p>
       ) : (
         <pre className={`whitespace-pre-wrap break-words text-xs ${
-          outputIsError
+          outputIsError || status === "failed"
             ? "text-red-600 dark:text-red-400"
-            : status === "failed"
-            ? "text-amber-600 dark:text-amber-400"
             : "text-green-600 dark:text-green-400"
         }`}>{output}</pre>
       )}
@@ -71,24 +75,24 @@ export default function OutputPanel({
       )}
 
       {status === "failed" && output !== null && (
-        <div className="mt-3 rounded-lg border border-zinc-200/70 bg-white/70 font-sans backdrop-blur-sm dark:border-zinc-700/40 dark:bg-zinc-900/50">
+        <div className="mt-3 rounded-lg border border-violet-200 bg-violet-50 font-sans dark:border-violet-800/50 dark:bg-violet-950/20">
           {aiFeedbackLoading && (
-            <p className="px-3 py-2 text-xs text-zinc-500 dark:text-zinc-400 animate-pulse">Analyzing your code…</p>
+            <p className="px-3 py-2 text-xs text-violet-500 dark:text-violet-400 animate-pulse">Analyzing your code…</p>
           )}
           {!aiFeedbackLoading && !aiFeedback && (
             <div className="flex items-center gap-2 px-3 py-2">
-              <span className="shrink-0 text-[11px] text-indigo-400 dark:text-indigo-500">✦</span>
+              <span className="shrink-0 text-[11px] text-violet-400 dark:text-violet-500">✦</span>
               <button
                 type="button"
                 onClick={onRequestHint}
-                className="text-left text-xs font-medium text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300"
+                className="text-left text-xs font-medium text-violet-600 hover:text-violet-700 dark:text-violet-400 dark:hover:text-violet-300"
               >
                 Get hint
               </button>
             </div>
           )}
           {!aiFeedbackLoading && aiFeedback && (
-            <p className="px-3 py-2 text-xs leading-relaxed text-zinc-600 dark:text-zinc-300">{aiFeedback}</p>
+            <p className="px-3 py-2 text-xs leading-relaxed text-violet-800 dark:text-violet-200">{aiFeedback}</p>
           )}
         </div>
       )}

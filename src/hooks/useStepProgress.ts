@@ -143,7 +143,7 @@ export function useStepProgress(
   // ── Auto-advance countdown + confetti ──
   useEffect(() => {
     if (!tutorialDone) return;
-    setCountdown(3);
+    setCountdown(2);
     confetti({ particleCount: 120, spread: 80, origin: { y: 0.6 } });
     const id = setInterval(() => setCountdown((c) => c - 1), 1000);
     return () => clearInterval(id);
@@ -152,7 +152,8 @@ export function useStepProgress(
   useEffect(() => {
     if (!tutorialDone || countdown > 0) return;
     router.push(next ? tutorialUrl(lang, next.slug) : "/");
-  }, [countdown, tutorialDone, next, router, lang]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [countdown, tutorialDone]);
 
   // ── Auto-advance to next step after passing ──
   useEffect(() => {
