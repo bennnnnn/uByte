@@ -54,9 +54,10 @@ export function PracticeIDE({ problem, initialLang, categoryFilter = null, listP
   const [isMobile, setIsMobile]       = useState(false);
   const [showShortcuts, setShowShortcuts] = useState(false);
 
-  // Bookmark
-  const [bookmarked, setBookmarked] = useState(false);
+  // Bookmark — persistent toggle (load from DB on mount)
+  const [bookmarkId, setBookmarkId] = useState<number | null>(null);
   const [bookmarkLoading, setBookmarkLoading] = useState(false);
+  const bookmarked = bookmarkId !== null;
 
   // Notes (per-problem, persisted in localStorage)
   const [descTab, setDescTab] = useState<"desc" | "notes">("desc");
@@ -130,6 +131,21 @@ export function PracticeIDE({ problem, initialLang, categoryFilter = null, listP
       .then((d) => { if (d?.attempts) setStatuses(d.attempts); })
       .catch(() => {});
   }, []);
+
+  // Load bookmark state for this problem on mount
+  useEffect(() => {
+    if (!user) return;
+    fetch(`/api/bookmarks?lang=${encodeURIComponent(lang)}`, { credentials: "same-origin" })
+      .then((r) => r.json())
+      .then((d) => {
+        const match = (d?.bookmarks ?? []).find(
+          (b: { id: number; tutorial_slug: string }) => b.tutorial_slug === `practice:${problem.slug}`
+        );
+        setBookmarkId(match?.id ?? null);
+      })
+      .catch(() => {});
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id, problem.slug]);
 
   // Detect mobile for layout (description panel width)
   useEffect(() => {
@@ -356,17 +372,28 @@ export function PracticeIDE({ problem, initialLang, categoryFilter = null, listP
   } as const;
 
   async function handleBookmark() {
-    if (!user || bookmarkLoading || bookmarked) return;
+    if (!user || bookmarkLoading) return;
     setBookmarkLoading(true);
     try {
-      const res = await apiFetch("/api/bookmarks", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ tutorialSlug: `practice:${problem.slug}`, snippet: editor.code, note: problem.title, lang }),
-      });
-      if (res.ok) {
-        setBookmarked(true);
-        setTimeout(() => setBookmarked(false), 2500);
+      if (bookmarkId !== null) {
+        // Unsave
+        const res = await apiFetch("/api/bookmarks", {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id: bookmarkId }),
+        });
+        if (res.ok) setBookmarkId(null);
+      } else {
+        // Save
+        const res = await apiFetch("/api/bookmarks", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ tutorialSlug: `practice:${problem.slug}`, snippet: editor.code, note: problem.title, lang }),
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setBookmarkId(data?.bookmark?.id ?? -1);
+        }
       }
     } catch { /* ignore */ }
     finally { setBookmarkLoading(false); }
@@ -458,18 +485,16 @@ export function PracticeIDE({ problem, initialLang, categoryFilter = null, listP
             <button
               type="button"
               onClick={handleBookmark}
-              disabled={bookmarkLoading || bookmarked}
-              title="Bookmark this problem"
+              disabled={bookmarkLoading}
+              title={bookmarked ? "Remove bookmark" : "Bookmark this problem"}
               className={`hidden items-center gap-1.5 rounded-md border px-2.5 py-1 text-sm transition-colors sm:flex disabled:cursor-not-allowed disabled:opacity-60 ${
                 bookmarked
-                  ? "border-indigo-400 text-indigo-600 dark:border-indigo-600 dark:text-indigo-400"
-                  : bookmarkLoading
-                  ? "border-zinc-300 text-zinc-400 dark:border-zinc-700 dark:text-zinc-500"
+                  ? "border-indigo-400 bg-indigo-50 text-indigo-600 hover:border-red-400 hover:bg-red-50 hover:text-red-600 dark:border-indigo-600 dark:bg-indigo-950/30 dark:text-indigo-400 dark:hover:border-red-600 dark:hover:text-red-400"
                   : "border-zinc-300 text-zinc-500 hover:border-zinc-400 hover:text-zinc-800 dark:border-zinc-700 dark:text-zinc-400 dark:hover:border-zinc-600 dark:hover:text-zinc-200"
               }`}
             >
               <svg className="h-3.5 w-3.5" fill={bookmarked ? "currentColor" : "none"} viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" /></svg>
-              {bookmarked ? "Saved!" : bookmarkLoading ? "Saving…" : "Save"}
+              {bookmarkLoading ? "…" : bookmarked ? "Saved ✓" : "Save"}
             </button>
           )}
           <ThemeToggle className="hidden h-8 w-8 items-center justify-center rounded text-zinc-500 transition-colors hover:bg-zinc-200 hover:text-zinc-800 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-200 md:flex" />
