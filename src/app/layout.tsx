@@ -104,7 +104,7 @@ export default function RootLayout({
         </a>
         <AuthProvider>
           <ToastProvider>
-          <div className="flex h-dvh flex-col overflow-hidden">
+          <div className="flex min-h-dvh flex-col overflow-x-hidden">
             <SiteBanner />
             {/* Top header — Pricing, Search, Login/Sign up; same on all pages */}
             <header className="relative z-20 hidden md:flex items-center justify-between border-b border-zinc-100 bg-white/90 px-6 py-3 shadow-sm backdrop-blur-md dark:border-zinc-800 dark:bg-zinc-950/90">
@@ -127,7 +127,7 @@ export default function RootLayout({
             </header>
             <MobileStandaloneHeader />
             {/* Home / practice: just scrollable content. /tutorial/[lang]: sidebar + content from tutorial layout */}
-            <main id="main-content" className="flex min-h-0 flex-1 flex-col overflow-hidden">
+            <main id="main-content" className="flex min-h-0 flex-1 flex-col overflow-x-hidden">
               <ErrorBoundary>{children}</ErrorBoundary>
             </main>
             <SiteFooter />
