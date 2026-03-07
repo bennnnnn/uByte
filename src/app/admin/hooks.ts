@@ -194,7 +194,11 @@ export function useAdminData() {
     setExamSettingsSaving(true);
     setExamSettingsMessage(null);
     try {
-      const res = await fetch("/api/admin/exam-settings", { method: "PUT", credentials: "same-origin", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ settings: examSettings }) });
+      const res = await apiFetch("/api/admin/exam-settings", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ settings: examSettings }),
+      });
       const data = await res.json();
       if (res.ok) { setExamSettings(data); setExamSettingsMessage("Saved."); setTimeout(() => setExamSettingsMessage(null), 3000); }
       else setExamSettingsMessage(data.error ?? "Save failed");
@@ -229,7 +233,16 @@ export function useAdminData() {
     setBannerSaving(true);
     setBannerMessage(null);
     try {
-      const res = await fetch("/api/admin/banner", { method: "PATCH", credentials: "same-origin", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ enabled: bannerData.enabled, message: bannerData.message, linkUrl: bannerData.linkUrl || "/", linkText: bannerData.linkText || "Sign up" }) });
+      const res = await apiFetch("/api/admin/banner", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          enabled: bannerData.enabled,
+          message: bannerData.message,
+          linkUrl: bannerData.linkUrl || "/",
+          linkText: bannerData.linkText || "Sign up",
+        }),
+      });
       const data = await res.json();
       if (res.ok) { setBannerData({ enabled: !!data.enabled, message: data.message ?? "", linkUrl: data.linkUrl ?? "/", linkText: data.linkText ?? "Sign up" }); setBannerMessage("Saved."); setTimeout(() => setBannerMessage(null), 3000); }
       else setBannerMessage(data.error ?? "Save failed");
