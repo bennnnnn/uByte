@@ -94,14 +94,11 @@ export default function AuthPage({ variant }: { variant: AuthPageMode }) {
   if (user) return null;
 
   return (
-    <div className="min-h-[100svh] bg-zinc-50 text-zinc-950 dark:bg-zinc-950 dark:text-zinc-50">
+    <div className="min-h-[100svh] bg-white text-zinc-950 dark:bg-zinc-950 dark:text-zinc-50">
       <div className="mx-auto grid min-h-[100svh] max-w-5xl gap-10 px-5 py-10 lg:grid-cols-[0.9fr_1.1fr] lg:px-8 lg:py-14">
         <section className="px-1 py-3 sm:px-2">
           <div className="flex h-full flex-col">
             <div className="max-w-xl">
-              <p className="text-xs font-bold uppercase tracking-[0.22em] text-indigo-600 dark:text-indigo-400">
-                uByte
-              </p>
               <h1 className="mt-4 text-3xl font-black tracking-tight text-zinc-950 sm:text-4xl dark:text-white">
                 {isSignupPage
                   ? "Build skill with guided tutorials, interview prep, and real practice exams."
@@ -114,7 +111,7 @@ export default function AuthPage({ variant }: { variant: AuthPageMode }) {
 
             <div className="mt-8 space-y-3">
               {VALUE_POINTS.map((point) => (
-                <div key={point} className="flex items-start gap-3 rounded-2xl bg-white px-4 py-4 dark:bg-zinc-900">
+                <div key={point} className="flex items-start gap-3 px-1 py-2">
                   <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-indigo-600 text-[11px] font-black text-white">
                     +
                   </span>
@@ -136,13 +133,11 @@ export default function AuthPage({ variant }: { variant: AuthPageMode }) {
               </h2>
             </div>
 
-            <p className="text-sm leading-6 text-zinc-600 dark:text-zinc-400">
-              {mode === "forgot"
-                ? "Enter the email on your account and we’ll send a reset link."
-                : isSignupPage
-                  ? "Start free and save your learning progress."
-                  : "Use email or Google to sign in."}
-            </p>
+            {mode === "forgot" && (
+              <p className="text-sm leading-6 text-zinc-600 dark:text-zinc-400">
+                Enter the email on your account and we’ll send a reset link.
+              </p>
+            )}
 
             <div className="mt-6">
               <Suspense>
@@ -275,7 +270,7 @@ export default function AuthPage({ variant }: { variant: AuthPageMode }) {
                         <button
                           type="button"
                           onClick={() => switchMode("forgot")}
-                          className="text-xs font-semibold uppercase tracking-[0.14em] text-amber-600 transition-colors hover:text-amber-700 dark:text-amber-400 dark:hover:text-amber-300"
+                          className="text-xs font-semibold uppercase tracking-[0.14em] text-indigo-600 transition-colors hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300"
                         >
                           Forgot?
                         </button>
@@ -314,7 +309,7 @@ export default function AuthPage({ variant }: { variant: AuthPageMode }) {
               </>
             )}
 
-            <div className="mt-6 rounded-[24px] bg-zinc-50 px-4 py-4 text-sm text-zinc-600 dark:bg-zinc-950 dark:text-zinc-400">
+            <div className="mt-6 px-1 text-sm text-zinc-600 dark:text-zinc-400">
               <p className="leading-6">
                 By continuing, you agree to our{" "}
                 <Link href="/terms" className="font-semibold text-zinc-800 underline underline-offset-2 dark:text-zinc-200">
