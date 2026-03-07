@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
-import Link from "next/link";
 import { getAllTutorials } from "@/lib/tutorials";
 import { getTotalLessonCount } from "@/lib/tutorial-steps";
 import { getAllPracticeProblems, getPracticeProblemBySlug } from "@/lib/practice/problems";
@@ -161,34 +160,6 @@ export default async function Home() {
 
         {/* Practice exams */}
         <PracticeExamsSection examConfigByLang={examConfigByLang} />
-
-        {/* Quick-nav footer */}
-        <nav
-          className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 border-t border-zinc-100 pt-8 text-sm dark:border-zinc-800"
-          aria-label="Quick links"
-        >
-          {languageEntries.map(({ slug, config }) => (
-            <Link
-              key={slug}
-              href={tutorialLangUrl(slug)}
-              className="font-medium text-zinc-500 transition-colors hover:text-indigo-600 hover:underline dark:text-zinc-500 dark:hover:text-indigo-400"
-            >
-              {config.name} tutorials
-            </Link>
-          ))}
-          <Link
-            href="/practice"
-            className="font-medium text-indigo-600 hover:underline dark:text-indigo-400"
-          >
-            Interview practice →
-          </Link>
-          <Link
-            href="/practice-exams"
-            className="font-medium text-indigo-600 hover:underline dark:text-indigo-400"
-          >
-            Practice exams →
-          </Link>
-        </nav>
       </div>
     </div>
   );
