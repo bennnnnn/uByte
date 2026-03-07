@@ -75,13 +75,7 @@ export default async function PracticePage() {
           <div className="absolute -top-20 right-0 h-[500px] w-[500px] translate-x-1/4 rounded-full bg-violet-200/40 blur-[120px] dark:bg-violet-500/10" />
           <div className="absolute bottom-0 left-1/2 h-[400px] w-[400px] -translate-x-1/2 translate-y-1/2 rounded-full bg-cyan-200/25 blur-[100px] dark:bg-cyan-500/10" />
         </div>
-        <div
-          className="pointer-events-none absolute inset-0 opacity-[0.35] dark:opacity-[0.2]"
-          style={{
-            backgroundImage: "radial-gradient(circle, #d1d5db 1px, transparent 1px)",
-            backgroundSize: "24px 24px",
-          }}
-        />
+        <div className="pointer-events-none absolute inset-0 bg-dot-grid-24 opacity-[0.35] dark:opacity-[0.2]" />
 
         <div className="relative mx-auto max-w-5xl px-6 pt-14 pb-16 sm:pt-20 sm:pb-24">
           <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-indigo-200 bg-indigo-50 px-4 py-1.5 text-[11px] font-bold uppercase tracking-[0.12em] text-indigo-600 dark:border-indigo-800 dark:bg-indigo-950/50 dark:text-indigo-400">
@@ -90,7 +84,7 @@ export default async function PracticePage() {
           </div>
 
           <h1 className="mb-4 text-4xl font-black tracking-tight text-zinc-900 dark:text-zinc-50 sm:text-5xl">
-            Interview{" "}
+            Coding Interview{" "}
             <span className="bg-gradient-to-r from-indigo-600 via-violet-600 to-cyan-500 bg-clip-text text-transparent">
               Practice
             </span>

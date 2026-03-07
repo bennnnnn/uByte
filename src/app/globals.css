@@ -56,3 +56,19 @@ pre.shiki {
 pre.shiki code {
   font-family: var(--font-mono), ui-monospace, monospace;
 }
+
+/* Reusable dot-grid backgrounds to avoid inline style attributes */
+.bg-dot-grid-24 {
+  background-image: radial-gradient(circle, #d1d5db 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+.bg-dot-grid-28-light {
+  background-image: radial-gradient(circle, #d1d5db 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+
+.bg-dot-grid-28-dark {
+  background-image: radial-gradient(circle, #71717a 1px, transparent 1px);
+  background-size: 28px 28px;
+}

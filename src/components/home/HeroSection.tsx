@@ -14,14 +14,14 @@ const LANG_META: Record<Lang, { label: string; ext: string }> = {
   cpp:        { label: "C++",    ext: "cpp"  },
 };
 
-// Token colors — light-theme palette
-const K = "#7c3aed"; // keyword   (violet-700)
-const S = "#059669"; // string    (emerald-600)
-const F = "#2563eb"; // function  (blue-600)
-const C = "#9ca3af"; // comment   (zinc-400)
-const P = "#0891b2"; // package   (cyan-600)
-const D = "#1e293b"; // default   (slate-800)
-const N = "#ea580c"; // number    (orange-600)
+// Token color classes (avoids inline style attributes)
+const K = "text-violet-700 dark:text-violet-400"; // keyword
+const S = "text-emerald-600 dark:text-emerald-400"; // string
+const F = "text-blue-600 dark:text-blue-400"; // function
+const C = "text-zinc-400 dark:text-zinc-500"; // comment
+const P = "text-cyan-600 dark:text-cyan-400"; // package
+const D = "text-slate-800 dark:text-zinc-200"; // default
+const N = "text-orange-600 dark:text-orange-400"; // number
 
 type T = { t: string; c?: string };
 
@@ -124,20 +124,8 @@ export default function HeroSection({ topicCount = 19, lessonCountGo = 0, proble
       </div>
 
       {/* ── Subtle dot grid ───────────────────────────────────────────── */}
-      <div
-        className="pointer-events-none absolute inset-0 opacity-[0.4] dark:opacity-[0.25]"
-        style={{
-          backgroundImage: "radial-gradient(circle, #d1d5db 1px, transparent 1px)",
-          backgroundSize: "28px 28px",
-        }}
-      />
-      <div
-        className="pointer-events-none absolute inset-0 hidden opacity-[0.2] dark:block"
-        style={{
-          backgroundImage: "radial-gradient(circle, #71717a 1px, transparent 1px)",
-          backgroundSize: "28px 28px",
-        }}
-      />
+      <div className="pointer-events-none absolute inset-0 bg-dot-grid-28-light opacity-[0.4] dark:opacity-[0.25]" />
+      <div className="pointer-events-none absolute inset-0 hidden bg-dot-grid-28-dark opacity-[0.2] dark:block" />
 
       {/* ── Content ───────────────────────────────────────────────────── */}
       <div className="relative mx-auto flex min-h-[calc(100dvh-3.5rem)] max-w-7xl flex-col px-6 lg:px-8">
@@ -294,7 +282,7 @@ export default function HeroSection({ topicCount = 19, lessonCountGo = 0, proble
                         <span className="opacity-0">.</span>
                       ) : (
                         line.map((tok, j) => (
-                          <span key={j} style={{ color: tok.c ?? D }} suppressHydrationWarning>
+                          <span key={j} className={tok.c ?? D} suppressHydrationWarning>
                             {tok.t}
                           </span>
                         ))

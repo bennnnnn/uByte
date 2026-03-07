@@ -6,8 +6,8 @@ export default function PracticeLoading() {
         <div className="h-9 w-32 animate-pulse rounded-lg bg-zinc-200 dark:bg-zinc-800" />
       </div>
       <div className="grid flex-1 gap-4 p-4 md:grid-cols-3">
-        <div className="animate-pulse rounded-xl bg-zinc-100 dark:bg-zinc-900 md:col-span-1" style={{ minHeight: 200 }} />
-        <div className="animate-pulse rounded-xl bg-zinc-100 dark:bg-zinc-900 md:col-span-2" style={{ minHeight: 400 }} />
+        <div className="min-h-[200px] animate-pulse rounded-xl bg-zinc-100 dark:bg-zinc-900 md:col-span-1" />
+        <div className="min-h-[400px] animate-pulse rounded-xl bg-zinc-100 dark:bg-zinc-900 md:col-span-2" />
       </div>
     </div>
   );
