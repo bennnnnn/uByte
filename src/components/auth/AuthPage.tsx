@@ -29,20 +29,6 @@ const QUICK_STATS = [
   { value: "Timed", label: "practice exams" },
 ];
 
-function AccentGrid() {
-  return (
-    <div
-      className="absolute inset-0 opacity-70"
-      aria-hidden
-      style={{
-        backgroundImage:
-          "linear-gradient(to right, rgba(255,255,255,0.08) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,255,255,0.08) 1px, transparent 1px)",
-        backgroundSize: "36px 36px",
-      }}
-    />
-  );
-}
-
 export default function AuthPage({ variant }: { variant: AuthPageMode }) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -114,29 +100,29 @@ export default function AuthPage({ variant }: { variant: AuthPageMode }) {
   if (user) return null;
 
   return (
-    <div className="relative min-h-[100svh] overflow-hidden bg-[linear-gradient(180deg,#f4efe4_0%,#efe7da_45%,#f8f5ef_100%)] text-zinc-950 dark:bg-[linear-gradient(180deg,#18181b_0%,#101827_50%,#0b1120_100%)] dark:text-zinc-50">
-      <div className="absolute inset-x-0 top-0 h-72 bg-[radial-gradient(circle_at_top_left,rgba(213,147,52,0.25),transparent_40%),radial-gradient(circle_at_top_right,rgba(59,130,246,0.22),transparent_36%)] dark:bg-[radial-gradient(circle_at_top_left,rgba(245,158,11,0.14),transparent_38%),radial-gradient(circle_at_top_right,rgba(59,130,246,0.16),transparent_34%)]" />
-      <div className="relative mx-auto grid min-h-[100svh] max-w-7xl gap-10 px-5 py-8 lg:grid-cols-[1.15fr_0.85fr] lg:px-8 lg:py-10">
-        <section className="relative overflow-hidden rounded-[32px] border border-white/60 bg-[#10233d] px-6 py-7 text-white shadow-[0_30px_80px_rgba(16,35,61,0.24)] sm:px-8 sm:py-9 dark:border-white/10 dark:bg-[#0f172a] dark:shadow-[0_30px_80px_rgba(2,6,23,0.55)]">
-          <AccentGrid />
-          <div className="absolute inset-y-0 right-0 w-1/2 bg-[radial-gradient(circle_at_top_right,rgba(249,115,22,0.32),transparent_42%),radial-gradient(circle_at_bottom_right,rgba(14,165,233,0.22),transparent_36%)]" />
-          <div className="relative flex h-full flex-col">
+    <div className="min-h-[100svh] bg-zinc-50 text-zinc-950 dark:bg-zinc-950 dark:text-zinc-50">
+      <div className="mx-auto grid min-h-[100svh] max-w-7xl gap-6 px-5 py-8 lg:grid-cols-[1fr_0.92fr] lg:px-8 lg:py-10">
+        <section className="rounded-[32px] border border-indigo-100 bg-white px-6 py-7 shadow-[0_20px_60px_rgba(79,70,229,0.08)] sm:px-8 sm:py-9 dark:border-zinc-800 dark:bg-zinc-900 dark:shadow-none">
+          <div className="flex h-full flex-col">
             <div className="max-w-xl">
-              <h1 className="mt-5 text-4xl font-black tracking-tight sm:text-5xl">
+              <p className="text-xs font-bold uppercase tracking-[0.22em] text-indigo-600 dark:text-indigo-400">
+                uByte
+              </p>
+              <h1 className="mt-4 text-4xl font-black tracking-tight text-zinc-950 sm:text-5xl dark:text-white">
                 {isSignupPage
                   ? "Build skill with guided tutorials, interview prep, and real practice exams."
                   : "Pick up your tutorials, interview prep, and practice exams where you left off."}
               </h1>
-              <p className="mt-5 max-w-lg text-base leading-7 text-white/72 sm:text-lg">
-                uByte is built for focused programming practice: short lessons, hands-on coding, interview-style problem solving, and timed exams that measure real progress.
+              <p className="mt-4 max-w-lg text-base leading-7 text-zinc-600 sm:text-lg dark:text-zinc-400">
+                Learn by doing with short lessons, real coding practice, and exam-style runs that show measurable progress.
               </p>
             </div>
 
             <div className="mt-10 grid gap-3 sm:grid-cols-3">
               {QUICK_STATS.map((stat) => (
-                <div key={stat.label} className="rounded-2xl border border-white/12 bg-white/8 px-4 py-4 backdrop-blur-sm">
-                  <div className="text-2xl font-black">{stat.value}</div>
-                  <div className="mt-1 text-xs uppercase tracking-[0.16em] text-white/55">
+                <div key={stat.label} className="rounded-2xl border border-zinc-200 bg-zinc-50 px-4 py-4 dark:border-zinc-800 dark:bg-zinc-950">
+                  <div className="text-2xl font-black text-zinc-950 dark:text-white">{stat.value}</div>
+                  <div className="mt-1 text-xs uppercase tracking-[0.16em] text-zinc-500 dark:text-zinc-400">
                     {stat.label}
                   </div>
                 </div>
@@ -145,69 +131,43 @@ export default function AuthPage({ variant }: { variant: AuthPageMode }) {
 
             <div className="mt-10 space-y-3">
               {VALUE_POINTS.map((point) => (
-                <div key={point} className="flex items-start gap-3 rounded-2xl border border-white/10 bg-black/10 px-4 py-4">
-                  <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-amber-400/90 text-[11px] font-black text-[#10233d]">
-                    OK
+                <div key={point} className="flex items-start gap-3 rounded-2xl border border-zinc-200 bg-zinc-50 px-4 py-4 dark:border-zinc-800 dark:bg-zinc-950">
+                  <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-indigo-600 text-[11px] font-black text-white">
+                    +
                   </span>
-                  <p className="text-sm leading-6 text-white/78">{point}</p>
+                  <p className="text-sm leading-6 text-zinc-700 dark:text-zinc-300">{point}</p>
                 </div>
               ))}
             </div>
 
-            <div className="mt-10 rounded-2xl border border-white/10 bg-black/10 px-5 py-5">
-              <p className="text-xs font-bold uppercase tracking-[0.22em] text-amber-200/90">
-                What you get
+            <div className="mt-10 rounded-2xl border border-indigo-100 bg-indigo-50 px-5 py-5 dark:border-indigo-900/40 dark:bg-indigo-950/20">
+              <p className="text-sm font-semibold text-zinc-950 dark:text-white">
+                Account features
               </p>
-              <ul className="mt-4 space-y-3 text-sm leading-6 text-white/78">
-                <li>Structured paths from fundamentals to advanced topics.</li>
-                <li>Interview prep that feels like actual coding practice, not flash cards.</li>
-                <li>Exam-style runs that track score, pass rate, and certificate history.</li>
-              </ul>
+              <p className="mt-2 text-sm leading-6 text-zinc-600 dark:text-zinc-400">
+                Save progress, keep bookmarks and snapshots, track exam results, and continue across devices.
+              </p>
             </div>
           </div>
         </section>
 
         <section className="flex items-center justify-center">
-          <div className="w-full max-w-xl rounded-[30px] border border-zinc-200/70 bg-white/92 p-6 shadow-[0_24px_70px_rgba(15,23,42,0.12)] backdrop-blur xl:p-8 dark:border-white/10 dark:bg-zinc-950/82 dark:shadow-[0_24px_70px_rgba(2,6,23,0.5)]">
-            <div className="mb-8 flex items-center justify-between gap-3">
-              <div>
-                <p className="text-xs font-bold uppercase tracking-[0.22em] text-amber-600 dark:text-amber-400">
-                  {mode === "forgot" ? "Password reset" : isSignupPage ? "Create account" : "Welcome back"}
-                </p>
-                <h2 className="mt-2 text-3xl font-black tracking-tight text-zinc-950 dark:text-white">
-                  {mode === "forgot" ? "Get back into your account" : isSignupPage ? "Start free, upgrade when ready" : "Continue where you left off"}
-                </h2>
-              </div>
-              <div className="rounded-2xl border border-zinc-200 bg-zinc-50 p-1 dark:border-zinc-800 dark:bg-zinc-900">
-                <Link
-                  href={loginHref}
-                  className={`inline-flex rounded-xl px-3 py-2 text-sm font-semibold transition-colors ${
-                    !isSignupPage && mode !== "forgot"
-                      ? "bg-[#10233d] text-white dark:bg-zinc-100 dark:text-zinc-950"
-                      : "text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
-                  }`}
-                >
-                  Log in
-                </Link>
-                <Link
-                  href={signupHref}
-                  className={`inline-flex rounded-xl px-3 py-2 text-sm font-semibold transition-colors ${
-                    isSignupPage
-                      ? "bg-[#10233d] text-white dark:bg-zinc-100 dark:text-zinc-950"
-                      : "text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
-                  }`}
-                >
-                  Sign up
-                </Link>
-              </div>
+          <div className="w-full max-w-xl rounded-[30px] border-2 border-indigo-200 bg-white p-7 shadow-[0_30px_90px_rgba(79,70,229,0.14)] xl:p-9 dark:border-indigo-900/40 dark:bg-zinc-900 dark:shadow-[0_24px_70px_rgba(2,6,23,0.45)]">
+            <div className="mb-8">
+              <p className="text-xs font-bold uppercase tracking-[0.22em] text-indigo-600 dark:text-indigo-400">
+                {mode === "forgot" ? "Password reset" : isSignupPage ? "Create account" : "Welcome back"}
+              </p>
+              <h2 className="mt-2 text-3xl font-black tracking-tight text-zinc-950 dark:text-white">
+                {mode === "forgot" ? "Reset your password" : isSignupPage ? "Create your uByte account" : "Sign in to uByte"}
+              </h2>
             </div>
 
             <p className="text-sm leading-6 text-zinc-600 dark:text-zinc-400">
               {mode === "forgot"
                 ? "Enter the email on your account and we’ll send a reset link."
                 : isSignupPage
-                  ? "You’ll get the full account flow in-page, then go right back to what you were doing."
-                  : "Use email or Google sign-in. We’ll return you to the page you came from."}
+                  ? "Start free and save your learning progress."
+                  : "Use email or Google to continue."}
             </p>
 
             <div className="mt-6">
@@ -259,7 +219,7 @@ export default function AuthPage({ variant }: { variant: AuthPageMode }) {
                   <button
                     type="submit"
                     disabled={submitting}
-                    className="w-full rounded-2xl bg-[#10233d] py-3 text-sm font-semibold text-white transition-colors hover:bg-[#183458] disabled:opacity-50 dark:bg-white dark:text-zinc-950 dark:hover:bg-zinc-200"
+                    className="w-full rounded-2xl bg-indigo-600 py-3 text-sm font-semibold text-white transition-colors hover:bg-indigo-700 disabled:opacity-50"
                   >
                     {submitting ? "Sending…" : "Send reset link"}
                   </button>
@@ -362,7 +322,7 @@ export default function AuthPage({ variant }: { variant: AuthPageMode }) {
                   <button
                     type="submit"
                     disabled={submitting}
-                    className="w-full rounded-2xl bg-[#10233d] py-3 text-sm font-semibold text-white transition-colors hover:bg-[#183458] disabled:opacity-50 dark:bg-white dark:text-zinc-950 dark:hover:bg-zinc-200"
+                    className="w-full rounded-2xl bg-indigo-600 py-3 text-sm font-semibold text-white transition-colors hover:bg-indigo-700 disabled:opacity-50"
                   >
                     {submitting ? "Please wait…" : isSignupPage ? "Create account" : "Sign in"}
                   </button>
@@ -370,21 +330,8 @@ export default function AuthPage({ variant }: { variant: AuthPageMode }) {
               </>
             )}
 
-            <div className="mt-6 rounded-[24px] border border-zinc-200 bg-[#faf6ef] px-4 py-4 text-sm text-zinc-600 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-400">
-              {!isSignupPage && (
-                <div className="flex flex-wrap items-center gap-2">
-                  <span className="rounded-full bg-white px-2.5 py-1 text-[11px] font-bold uppercase tracking-[0.18em] text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400">
-                    No popup
-                  </span>
-                  <span className="rounded-full bg-white px-2.5 py-1 text-[11px] font-bold uppercase tracking-[0.18em] text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400">
-                    Mobile friendly
-                  </span>
-                  <span className="rounded-full bg-white px-2.5 py-1 text-[11px] font-bold uppercase tracking-[0.18em] text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400">
-                    Redirect aware
-                  </span>
-                </div>
-              )}
-              <p className="mt-3 leading-6">
+            <div className="mt-6 rounded-[24px] border border-zinc-200 bg-zinc-50 px-4 py-4 text-sm text-zinc-600 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-400">
+              <p className="leading-6">
                 By continuing, you agree to our{" "}
                 <Link href="/terms" className="font-semibold text-zinc-800 underline underline-offset-2 dark:text-zinc-200">
                   Terms
@@ -395,6 +342,17 @@ export default function AuthPage({ variant }: { variant: AuthPageMode }) {
                 </Link>
                 .
               </p>
+              {mode !== "forgot" && (
+                <p className="mt-4 text-sm">
+                  {isSignupPage ? "Already have an account? " : "Need an account? "}
+                  <Link
+                    href={isSignupPage ? loginHref : signupHref}
+                    className="font-semibold text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300"
+                  >
+                    {isSignupPage ? "Sign in" : "Create one"}
+                  </Link>
+                </p>
+              )}
             </div>
           </div>
         </section>
