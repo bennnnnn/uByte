@@ -80,5 +80,13 @@ func main() {
 }`,
     expectedOutput: ["Comments done!"],
     hint: "A comment looks like: // This prints a confirmation message. The comment doesn't affect what's printed.",
+    codeChecks: [
+      {
+        pattern: "^\\s*//(?!\\s*TODO)",
+        flags: "m",
+        required: true,
+        message: "Add a // comment on its own line above the fmt.Println call.",
+      },
+    ],
   },
 ];

@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import confetti from "canvas-confetti";
 import type { TutorialStep } from "@/lib/tutorial-steps";
+import type { CodeCheck } from "@/lib/tutorial-steps/types";
 import { useAuth } from "@/components/AuthProvider";
 import { parseErrorLines } from "./useCodeEditor";
 import { apiFetch } from "@/lib/api-client";
@@ -18,9 +19,35 @@ function checkOutput(output: string, expected: string[]): boolean {
   return expected.every((s) => lower.includes(s.toLowerCase()));
 }
 
-/** Returns true if the code still has unfinished TODO comment lines. */
-function hasTodoLines(code: string): boolean {
-  return code.split("\n").some((line) => /^\s*(\/\/|#)\s*TODO\b/.test(line));
+/** Strip TODO comment lines and collapse whitespace — used for meaningful-change detection. */
+function normCode(code: string): string {
+  return code
+    .split("\n")
+    .filter((line) => !/^\s*(\/\/|#)\s*TODO\b/.test(line))
+    .join("\n")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+/**
+ * Returns true when the starter had TODO comments and the user's code
+ * is functionally identical to the starter after stripping those lines.
+ * Catches both "left the TODO in" and "just deleted the TODO line" cases.
+ */
+function todoNotCompleted(code: string, starter: string): boolean {
+  if (!/^\s*(\/\/|#)\s*TODO\b/m.test(starter)) return false; // starter had no TODOs
+  return normCode(code) === normCode(starter);
+}
+
+/** Validate per-step code rules. Returns the first failing message, or null. */
+function runCodeChecks(code: string, checks: CodeCheck[] | undefined): string | null {
+  if (!checks?.length) return null;
+  for (const { pattern, flags = "im", required = true, message } of checks) {
+    const matches = new RegExp(pattern, flags).test(code);
+    if (required && !matches) return message;
+    if (!required && matches) return message;
+  }
+  return null;
 }
 
 async function runCodeRequest(
@@ -296,23 +323,30 @@ export function useStepProgress(
         }).catch(() => {});
         return;
       }
-      if (checkOutput(out, step.expectedOutput) && hasTodoLines(code)) {
-        setOutputIsError(false);
-        setOutput("Output looks right, but you still have unfinished TODO comments.\nComplete the task described in the instructions, then check again.");
-        setStatus("failed");
-        setFailCount((n) => {
-          const next = n + 1;
-          if (next >= 2) fetchAiFeedback(code, "", out, stepIndex);
-          return next;
-        });
-        apiFetch("/api/step-check", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ lang, tutorialSlug, stepIndex, passed: false }),
-        }).catch(() => {});
-        return;
-      }
       if (checkOutput(out, step.expectedOutput)) {
+        // Layer 1: per-step code pattern checks (e.g. must contain a comment, must use a loop)
+        const codeCheckMsg = runCodeChecks(code, step.codeChecks);
+        // Layer 2: universal starter-diff check (catches "just deleted the TODO" attempts)
+        const notDoneMsg = !codeCheckMsg && todoNotCompleted(code, step.starter)
+          ? "Output is correct, but you haven't completed the task yet.\nReplace the TODO comment with your actual solution."
+          : null;
+        const failMsg = codeCheckMsg ?? notDoneMsg;
+        if (failMsg) {
+          setOutputIsError(false);
+          setOutput(failMsg);
+          setStatus("failed");
+          setFailCount((n) => {
+            const next = n + 1;
+            if (next >= 2) fetchAiFeedback(code, "", out, stepIndex);
+            return next;
+          });
+          apiFetch("/api/step-check", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ lang, tutorialSlug, stepIndex, passed: false }),
+          }).catch(() => {});
+          return;
+        }
         setStatus("passed");
         setFailCount(0);
         setCompletedSteps((prev) => new Set([...prev, stepIndex]));
