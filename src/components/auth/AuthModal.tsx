@@ -7,6 +7,7 @@ import { useAuth } from "@/components/AuthProvider";
 import Input from "@/components/ui/Input";
 import GoogleIcon from "@/components/auth/GoogleIcon";
 import { requestPasswordReset, submitEmailAuth } from "@/lib/auth-client";
+import { MIN_PASSWORD_LENGTH, PASSWORD_POLICY_MESSAGE, isValidPassword } from "@/lib/password-policy";
 
 const GSI_CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ?? "";
 const GSI_SCRIPT = "https://accounts.google.com/gsi/client";
@@ -118,6 +119,12 @@ export default function AuthModal({ onClose, initialMode }: Props) {
       const result = await requestPasswordReset(email);
       if (!result.ok) setError(result.error);
       else setForgotDone(true);
+      setSubmitting(false);
+      return;
+    }
+
+    if (mode === "signup" && !isValidPassword(password)) {
+      setError(PASSWORD_POLICY_MESSAGE);
       setSubmitting(false);
       return;
     }
@@ -313,10 +320,10 @@ export default function AuthModal({ onClose, initialMode }: Props) {
                     id="auth-password"
                     type="password"
                     required
-                    minLength={8}
+                    minLength={MIN_PASSWORD_LENGTH}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    placeholder="••••••••"
+                    placeholder="At least 6 chars, Aa1"
                     className="rounded-xl bg-zinc-50/80 dark:bg-zinc-800/80"
                   />
                 </div>

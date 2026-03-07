@@ -3,6 +3,7 @@
 import { useState, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Input from "@/components/ui/Input";
+import { MIN_PASSWORD_LENGTH, PASSWORD_POLICY_MESSAGE, isValidPassword } from "@/lib/password-policy";
 
 function ResetPasswordForm() {
   const searchParams = useSearchParams();
@@ -48,8 +49,8 @@ function ResetPasswordForm() {
       setError("Passwords don't match.");
       return;
     }
-    if (password.length < 8) {
-      setError("Password must be at least 8 characters.");
+    if (!isValidPassword(password)) {
+      setError(PASSWORD_POLICY_MESSAGE);
       return;
     }
     setSubmitting(true);
@@ -77,7 +78,7 @@ function ResetPasswordForm() {
       <div className="mb-6 text-center">
         <div className="mb-3 text-5xl">🔐</div>
         <h1 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100">Set a new password</h1>
-        <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">Must be at least 8 characters.</p>
+        <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">{PASSWORD_POLICY_MESSAGE}</p>
       </div>
 
       {error && (
@@ -92,7 +93,7 @@ function ResetPasswordForm() {
           <Input
             type="password"
             required
-            minLength={8}
+            minLength={MIN_PASSWORD_LENGTH}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             placeholder="••••••••"
@@ -103,7 +104,7 @@ function ResetPasswordForm() {
           <Input
             type="password"
             required
-            minLength={8}
+            minLength={MIN_PASSWORD_LENGTH}
             value={confirm}
             onChange={(e) => setConfirm(e.target.value)}
             placeholder="••••••••"

@@ -5,7 +5,7 @@ import { User, getUserById, updateUserProfile, updateUserPassword, deleteUser } 
 import { verifyCsrf } from "@/lib/csrf";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 import { withErrorHandling, requireAuth } from "@/lib/api-utils";
-import { MIN_PASSWORD_LENGTH, PASSWORD_MIN_ERROR } from "@/lib/password-policy";
+import { isValidPassword, PASSWORD_POLICY_MESSAGE } from "@/lib/password-policy";
 
 const VALID_AVATARS = ["gopher", "cool", "ninja", "party", "robot", "wizard", "astro", "pirate"];
 const VALID_THEMES = ["light", "dark", "system"];
@@ -75,8 +75,8 @@ export const PUT = withErrorHandling("PUT /api/profile", async (request: NextReq
     const valid = await bcrypt.compare(body.currentPassword, user.password_hash);
     if (!valid) return NextResponse.json({ error: "Current password is incorrect" }, { status: 400 });
 
-    if (typeof body.newPassword !== "string" || body.newPassword.length < MIN_PASSWORD_LENGTH) {
-      return NextResponse.json({ error: PASSWORD_MIN_ERROR }, { status: 400 });
+    if (typeof body.newPassword !== "string" || !isValidPassword(body.newPassword)) {
+      return NextResponse.json({ error: PASSWORD_POLICY_MESSAGE }, { status: 400 });
     }
 
     const hash = await bcrypt.hash(body.newPassword, 10);

@@ -6,6 +6,7 @@ import { useAuth } from "./AuthProvider";
 import Input from "./ui/Input";
 import GoogleIcon from "./auth/GoogleIcon";
 import { submitEmailAuth } from "@/lib/auth-client";
+import { MIN_PASSWORD_LENGTH, PASSWORD_POLICY_MESSAGE, isValidPassword } from "@/lib/password-policy";
 
 export default function SignupWall({ slug }: { slug: string }) {
   const pathname = usePathname();
@@ -35,6 +36,12 @@ export default function SignupWall({ slug }: { slug: string }) {
     e.preventDefault();
     setError("");
     setSubmitting(true);
+
+    if (mode === "signup" && !isValidPassword(password)) {
+      setError(PASSWORD_POLICY_MESSAGE);
+      setSubmitting(false);
+      return;
+    }
 
     const err = await submitEmailAuth(mode, { name, email, password }, { login, signup });
 
@@ -116,10 +123,10 @@ export default function SignupWall({ slug }: { slug: string }) {
               id="wall-password"
               type="password"
               required
-              minLength={8}
+              minLength={MIN_PASSWORD_LENGTH}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="Password (min. 8 characters)"
+              placeholder="Password (e.g. Abc123)"
             />
           </div>
           <button

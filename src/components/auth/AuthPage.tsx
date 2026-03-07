@@ -8,6 +8,7 @@ import Input from "@/components/ui/Input";
 import GoogleIcon from "@/components/auth/GoogleIcon";
 import GoogleOAuthError from "@/components/GoogleOAuthError";
 import { requestPasswordReset, submitEmailAuth } from "@/lib/auth-client";
+import { MIN_PASSWORD_LENGTH, PASSWORD_POLICY_MESSAGE, isValidPassword } from "@/lib/password-policy";
 import {
   buildAuthPageHref,
   buildGoogleAuthHref,
@@ -77,6 +78,12 @@ export default function AuthPage({ variant }: { variant: AuthPageMode }) {
         return;
       }
       setForgotDone(true);
+      return;
+    }
+
+    if (mode === "signup" && !isValidPassword(password)) {
+      setSubmitting(false);
+      setError(PASSWORD_POLICY_MESSAGE);
       return;
     }
 
@@ -280,10 +287,10 @@ export default function AuthPage({ variant }: { variant: AuthPageMode }) {
                       id="auth-password"
                       type="password"
                       required
-                      minLength={8}
+                      minLength={MIN_PASSWORD_LENGTH}
                       value={password}
                       onChange={(event) => setPassword(event.target.value)}
-                      placeholder="Minimum 8 characters"
+                      placeholder="6+ chars, Aa1"
                       className="rounded-2xl border-zinc-200 bg-zinc-50/80 px-4 py-3 dark:border-zinc-800 dark:bg-zinc-900"
                     />
                   </div>

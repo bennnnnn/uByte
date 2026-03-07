@@ -3,15 +3,16 @@
 import { useState } from "react";
 import Input from "@/components/ui/Input";
 import type { Profile } from "../types";
+import { MIN_PASSWORD_LENGTH, PASSWORD_POLICY_MESSAGE, isValidPassword } from "@/lib/password-policy";
 
 function passwordStrength(pw: string): { label: string; color: string; width: string } {
   if (pw.length === 0) return { label: "", color: "", width: "0%" };
-  if (pw.length < 6) return { label: "Too short", color: "bg-red-500", width: "20%" };
+  if (pw.length < MIN_PASSWORD_LENGTH) return { label: "Too short", color: "bg-red-500", width: "20%" };
+  const hasLower = /[a-z]/.test(pw);
   const hasUpper = /[A-Z]/.test(pw);
   const hasNum = /[0-9]/.test(pw);
-  const hasSpecial = /[^A-Za-z0-9]/.test(pw);
-  const score = [pw.length >= 8, hasUpper, hasNum, hasSpecial].filter(Boolean).length;
-  if (score <= 1) return { label: "Weak", color: "bg-orange-500", width: "33%" };
+  const score = [hasLower, hasUpper, hasNum, pw.length >= 10].filter(Boolean).length;
+  if (!isValidPassword(pw)) return { label: "Weak", color: "bg-orange-500", width: "33%" };
   if (score <= 2) return { label: "Fair", color: "bg-yellow-500", width: "60%" };
   if (score === 3) return { label: "Good", color: "bg-blue-500", width: "80%" };
   return { label: "Strong", color: "bg-green-500", width: "100%" };
@@ -88,6 +89,7 @@ export default function PasswordSection({ profile, onChangePassword, onToast }: 
               New password
             </label>
             <Input id="new-password" type="password" value={newPw} onChange={(e) => setNewPw(e.target.value)} placeholder="••••••••" aria-describedby={newPw.length > 0 ? "pw-strength" : undefined} />
+            <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">{PASSWORD_POLICY_MESSAGE}</p>
             {newPw.length > 0 && (
               <div className="mt-1.5" id="pw-strength">
                 <div
@@ -105,7 +107,7 @@ export default function PasswordSection({ profile, onChangePassword, onToast }: 
               </div>
             )}
           </div>
-          <button onClick={handleChange} disabled={!currentPw || newPw.length < 6 || changing} className="rounded-lg bg-zinc-800 px-6 py-2.5 text-sm font-medium text-white hover:bg-zinc-700 disabled:opacity-50 dark:bg-zinc-200 dark:text-zinc-900 dark:hover:bg-zinc-300">
+          <button onClick={handleChange} disabled={!currentPw || !isValidPassword(newPw) || changing} className="rounded-lg bg-zinc-800 px-6 py-2.5 text-sm font-medium text-white hover:bg-zinc-700 disabled:opacity-50 dark:bg-zinc-200 dark:text-zinc-900 dark:hover:bg-zinc-300">
             {changing ? "Updating..." : "Update Password"}
           </button>
         </div>
