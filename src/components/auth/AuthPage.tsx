@@ -23,12 +23,6 @@ const VALUE_POINTS = [
   "Timed practice exams with pass thresholds and shareable certificates",
 ];
 
-const QUICK_STATS = [
-  { value: "6", label: "languages" },
-  { value: "19+", label: "guided topics" },
-  { value: "Timed", label: "practice exams" },
-];
-
 export default function AuthPage({ variant }: { variant: AuthPageMode }) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -101,37 +95,26 @@ export default function AuthPage({ variant }: { variant: AuthPageMode }) {
 
   return (
     <div className="min-h-[100svh] bg-zinc-50 text-zinc-950 dark:bg-zinc-950 dark:text-zinc-50">
-      <div className="mx-auto grid min-h-[100svh] max-w-7xl gap-6 px-5 py-8 lg:grid-cols-[1fr_0.92fr] lg:px-8 lg:py-10">
-        <section className="rounded-[32px] border border-indigo-100 bg-white px-6 py-7 shadow-[0_20px_60px_rgba(79,70,229,0.08)] sm:px-8 sm:py-9 dark:border-zinc-800 dark:bg-zinc-900 dark:shadow-none">
+      <div className="mx-auto grid min-h-[100svh] max-w-5xl gap-10 px-5 py-10 lg:grid-cols-[0.9fr_1.1fr] lg:px-8 lg:py-14">
+        <section className="px-1 py-3 sm:px-2">
           <div className="flex h-full flex-col">
             <div className="max-w-xl">
               <p className="text-xs font-bold uppercase tracking-[0.22em] text-indigo-600 dark:text-indigo-400">
                 uByte
               </p>
-              <h1 className="mt-4 text-4xl font-black tracking-tight text-zinc-950 sm:text-5xl dark:text-white">
+              <h1 className="mt-4 text-3xl font-black tracking-tight text-zinc-950 sm:text-4xl dark:text-white">
                 {isSignupPage
                   ? "Build skill with guided tutorials, interview prep, and real practice exams."
                   : "Pick up your tutorials, interview prep, and practice exams where you left off."}
               </h1>
-              <p className="mt-4 max-w-lg text-base leading-7 text-zinc-600 sm:text-lg dark:text-zinc-400">
+              <p className="mt-4 max-w-lg text-base leading-7 text-zinc-600 dark:text-zinc-400">
                 Learn by doing with short lessons, real coding practice, and exam-style runs that show measurable progress.
               </p>
             </div>
 
-            <div className="mt-10 grid gap-3 sm:grid-cols-3">
-              {QUICK_STATS.map((stat) => (
-                <div key={stat.label} className="rounded-2xl border border-zinc-200 bg-zinc-50 px-4 py-4 dark:border-zinc-800 dark:bg-zinc-950">
-                  <div className="text-2xl font-black text-zinc-950 dark:text-white">{stat.value}</div>
-                  <div className="mt-1 text-xs uppercase tracking-[0.16em] text-zinc-500 dark:text-zinc-400">
-                    {stat.label}
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            <div className="mt-10 space-y-3">
+            <div className="mt-8 space-y-3">
               {VALUE_POINTS.map((point) => (
-                <div key={point} className="flex items-start gap-3 rounded-2xl border border-zinc-200 bg-zinc-50 px-4 py-4 dark:border-zinc-800 dark:bg-zinc-950">
+                <div key={point} className="flex items-start gap-3 rounded-2xl bg-white px-4 py-4 dark:bg-zinc-900">
                   <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-indigo-600 text-[11px] font-black text-white">
                     +
                   </span>
@@ -139,26 +122,17 @@ export default function AuthPage({ variant }: { variant: AuthPageMode }) {
                 </div>
               ))}
             </div>
-
-            <div className="mt-10 rounded-2xl border border-indigo-100 bg-indigo-50 px-5 py-5 dark:border-indigo-900/40 dark:bg-indigo-950/20">
-              <p className="text-sm font-semibold text-zinc-950 dark:text-white">
-                Account features
-              </p>
-              <p className="mt-2 text-sm leading-6 text-zinc-600 dark:text-zinc-400">
-                Save progress, keep bookmarks and snapshots, track exam results, and continue across devices.
-              </p>
-            </div>
           </div>
         </section>
 
         <section className="flex items-center justify-center">
-          <div className="w-full max-w-xl rounded-[30px] border-2 border-indigo-200 bg-white p-7 shadow-[0_30px_90px_rgba(79,70,229,0.14)] xl:p-9 dark:border-indigo-900/40 dark:bg-zinc-900 dark:shadow-[0_24px_70px_rgba(2,6,23,0.45)]">
+          <div className="w-full max-w-xl rounded-[30px] bg-white p-7 shadow-[0_24px_70px_rgba(15,23,42,0.10)] xl:p-9 dark:bg-zinc-900 dark:shadow-[0_24px_70px_rgba(2,6,23,0.45)]">
             <div className="mb-8">
               <p className="text-xs font-bold uppercase tracking-[0.22em] text-indigo-600 dark:text-indigo-400">
                 {mode === "forgot" ? "Password reset" : isSignupPage ? "Create account" : "Welcome back"}
               </p>
               <h2 className="mt-2 text-3xl font-black tracking-tight text-zinc-950 dark:text-white">
-                {mode === "forgot" ? "Reset your password" : isSignupPage ? "Create your uByte account" : "Sign in to uByte"}
+                {mode === "forgot" ? "Reset your password" : isSignupPage ? "Sign up" : "Sign in"}
               </h2>
             </div>
 
@@ -167,7 +141,7 @@ export default function AuthPage({ variant }: { variant: AuthPageMode }) {
                 ? "Enter the email on your account and we’ll send a reset link."
                 : isSignupPage
                   ? "Start free and save your learning progress."
-                  : "Use email or Google to continue."}
+                  : "Use email or Google to sign in."}
             </p>
 
             <div className="mt-6">
@@ -246,7 +220,7 @@ export default function AuthPage({ variant }: { variant: AuthPageMode }) {
                 <div className="my-5 flex items-center gap-3">
                   <div className="h-px flex-1 bg-zinc-200 dark:bg-zinc-800" />
                   <span className="text-xs font-bold uppercase tracking-[0.18em] text-zinc-400">
-                    or use email
+                    OR
                   </span>
                   <div className="h-px flex-1 bg-zinc-200 dark:bg-zinc-800" />
                 </div>
@@ -326,11 +300,21 @@ export default function AuthPage({ variant }: { variant: AuthPageMode }) {
                   >
                     {submitting ? "Please wait…" : isSignupPage ? "Create account" : "Sign in"}
                   </button>
+
+                  <p className="text-sm text-zinc-600 dark:text-zinc-400">
+                    {isSignupPage ? "Already have an account? " : "Need an account? "}
+                    <Link
+                      href={isSignupPage ? loginHref : signupHref}
+                      className="font-semibold text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300"
+                    >
+                      {isSignupPage ? "Sign in" : "Create one"}
+                    </Link>
+                  </p>
                 </form>
               </>
             )}
 
-            <div className="mt-6 rounded-[24px] border border-zinc-200 bg-zinc-50 px-4 py-4 text-sm text-zinc-600 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-400">
+            <div className="mt-6 rounded-[24px] bg-zinc-50 px-4 py-4 text-sm text-zinc-600 dark:bg-zinc-950 dark:text-zinc-400">
               <p className="leading-6">
                 By continuing, you agree to our{" "}
                 <Link href="/terms" className="font-semibold text-zinc-800 underline underline-offset-2 dark:text-zinc-200">
@@ -342,17 +326,6 @@ export default function AuthPage({ variant }: { variant: AuthPageMode }) {
                 </Link>
                 .
               </p>
-              {mode !== "forgot" && (
-                <p className="mt-4 text-sm">
-                  {isSignupPage ? "Already have an account? " : "Need an account? "}
-                  <Link
-                    href={isSignupPage ? loginHref : signupHref}
-                    className="font-semibold text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300"
-                  >
-                    {isSignupPage ? "Sign in" : "Create one"}
-                  </Link>
-                </p>
-              )}
             </div>
           </div>
         </section>
