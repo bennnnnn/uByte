@@ -14,16 +14,19 @@ export const GET = withErrorHandling("GET /api/pwa-icon", async (request: NextRe
       key: null,
       props: {
         style: {
-          background: "linear-gradient(135deg, #0891b2, #164e63)",
+          background: "linear-gradient(135deg, #4338ca, #1d4ed8)",
           width: "100%",
           height: "100%",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
           borderRadius: Math.round(size * 0.18),
-          fontSize: Math.round(size * 0.52),
+          color: "#ffffff",
+          fontSize: Math.round(size * 0.44),
+          fontWeight: 800,
+          letterSpacing: "-0.08em",
         },
-        children: "🐹",
+        children: "U",
       },
     },
     { width: size, height: size }
