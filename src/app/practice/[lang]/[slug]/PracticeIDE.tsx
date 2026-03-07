@@ -56,6 +56,7 @@ export function PracticeIDE({ problem, initialLang, categoryFilter = null, listP
 
   // Bookmark
   const [bookmarked, setBookmarked] = useState(false);
+  const [bookmarkLoading, setBookmarkLoading] = useState(false);
 
   // Notes (per-problem, persisted in localStorage)
   const [descTab, setDescTab] = useState<"desc" | "notes">("desc");
@@ -153,12 +154,16 @@ export function PracticeIDE({ problem, initialLang, categoryFilter = null, listP
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [problem.slug, user?.id]);
 
+  // Keep a ref to user so the debounced save always sees the latest auth state
+  const userRef = useRef(user);
+  userRef.current = user;
+
   // Save notes: debounced — DB for logged-in users, localStorage for guests
   const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   useEffect(() => {
     if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
     saveTimerRef.current = setTimeout(() => {
-      if (user) {
+      if (userRef.current) {
         apiFetch("/api/practice-notes", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -170,7 +175,7 @@ export function PracticeIDE({ problem, initialLang, categoryFilter = null, listP
     }, 800);
     return () => { if (saveTimerRef.current) clearTimeout(saveTimerRef.current); };
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [notes]);
+  }, [notes, problem.slug]);
 
   // Elapsed timer — reset when problem changes
   useEffect(() => {
@@ -351,7 +356,8 @@ export function PracticeIDE({ problem, initialLang, categoryFilter = null, listP
   } as const;
 
   async function handleBookmark() {
-    if (!user) return;
+    if (!user || bookmarkLoading || bookmarked) return;
+    setBookmarkLoading(true);
     try {
       const res = await apiFetch("/api/bookmarks", {
         method: "POST",
@@ -360,9 +366,10 @@ export function PracticeIDE({ problem, initialLang, categoryFilter = null, listP
       });
       if (res.ok) {
         setBookmarked(true);
-        setTimeout(() => setBookmarked(false), 2000);
+        setTimeout(() => setBookmarked(false), 2500);
       }
     } catch { /* ignore */ }
+    finally { setBookmarkLoading(false); }
   }
 
   function handleReset() {
@@ -451,15 +458,18 @@ export function PracticeIDE({ problem, initialLang, categoryFilter = null, listP
             <button
               type="button"
               onClick={handleBookmark}
+              disabled={bookmarkLoading || bookmarked}
               title="Bookmark this problem"
-              className={`hidden items-center gap-1.5 rounded-md border px-2.5 py-1 text-sm transition-colors sm:flex ${
+              className={`hidden items-center gap-1.5 rounded-md border px-2.5 py-1 text-sm transition-colors sm:flex disabled:cursor-not-allowed disabled:opacity-60 ${
                 bookmarked
                   ? "border-indigo-400 text-indigo-600 dark:border-indigo-600 dark:text-indigo-400"
+                  : bookmarkLoading
+                  ? "border-zinc-300 text-zinc-400 dark:border-zinc-700 dark:text-zinc-500"
                   : "border-zinc-300 text-zinc-500 hover:border-zinc-400 hover:text-zinc-800 dark:border-zinc-700 dark:text-zinc-400 dark:hover:border-zinc-600 dark:hover:text-zinc-200"
               }`}
             >
               <svg className="h-3.5 w-3.5" fill={bookmarked ? "currentColor" : "none"} viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" /></svg>
-              {bookmarked ? "Saved!" : "Save"}
+              {bookmarked ? "Saved!" : bookmarkLoading ? "Saving…" : "Save"}
             </button>
           )}
           <ThemeToggle className="hidden h-8 w-8 items-center justify-center rounded text-zinc-500 transition-colors hover:bg-zinc-200 hover:text-zinc-800 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-200 md:flex" />
@@ -628,7 +638,7 @@ export function PracticeIDE({ problem, initialLang, categoryFilter = null, listP
           {descTab === "notes" && (
             <div className="flex min-w-0 flex-1 flex-col p-4 md:p-5">
               <p className="mb-2 text-xs text-zinc-400 dark:text-zinc-500">
-                Notes are saved locally in your browser.
+                {user ? "Notes are saved to your account for this problem." : "Sign in to save notes to your account."}
               </p>
               <textarea
                 value={notes}
