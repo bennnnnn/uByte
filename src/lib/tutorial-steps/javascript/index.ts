@@ -2,36 +2,41 @@ import type { TutorialStep } from "../types";
 import { steps as gettingStarted } from "./getting-started";
 import { steps as variablesAndTypes } from "./variables-and-types";
 import { steps as consoleFormatting } from "./console-formatting";
-
-function placeholderSteps(title: string): TutorialStep[] {
-  return [
-    {
-      title,
-      instruction: "This tutorial is being translated to JavaScript. Try the Go version for now, or check back soon.",
-      starter: `// JavaScript version coming soon\nconsole.log("Hello from JavaScript");`,
-      expectedOutput: ["Hello from JavaScript"],
-    },
-  ];
-}
+import { steps as controlFlow } from "./control-flow";
+import { steps as loops } from "./loops";
+import { steps as arraysAndSlices } from "./arrays-and-slices";
+import { steps as maps } from "./maps";
+import { steps as functions } from "./functions";
+import { steps as pointers } from "./pointers";
+import { steps as structs } from "./structs";
+import { steps as methods } from "./methods";
+import { steps as interfaces } from "./interfaces";
+import { steps as errorHandling } from "./error-handling";
+import { steps as packagesAndModules } from "./packages-and-modules";
+import { steps as concurrency } from "./concurrency";
+import { steps as testingBasics } from "./testing-basics";
+import { steps as httpBasics } from "./http-basics";
+import { steps as jsonEncoding } from "./json-encoding";
+import { steps as selectStatement } from "./select-statement";
 
 export const javascriptSteps: Record<string, TutorialStep[]> = {
   "getting-started": gettingStarted,
   "variables-and-types": variablesAndTypes,
   "fmt-package": consoleFormatting,
-  "control-flow": placeholderSteps("Control Flow"),
-  "loops": placeholderSteps("Loops"),
-  "arrays-and-slices": placeholderSteps("Arrays"),
-  "maps": placeholderSteps("Objects & Maps"),
-  "functions": placeholderSteps("Functions"),
-  "pointers": placeholderSteps("References & Closures"),
-  "structs": placeholderSteps("Classes & Objects"),
-  "methods": placeholderSteps("Methods"),
-  "interfaces": placeholderSteps("Interfaces & Protocols"),
-  "error-handling": placeholderSteps("Error Handling"),
-  "packages-and-modules": placeholderSteps("Modules & Imports"),
-  "concurrency": placeholderSteps("Promises & Async/Await"),
-  "testing-basics": placeholderSteps("Testing with Jest"),
-  "http-basics": placeholderSteps("HTTP & fetch"),
-  "json-encoding": placeholderSteps("JSON"),
-  "select-statement": placeholderSteps("Event Loop & Async"),
+  "control-flow": controlFlow,
+  "loops": loops,
+  "arrays-and-slices": arraysAndSlices,
+  "maps": maps,
+  "functions": functions,
+  "pointers": pointers,
+  "structs": structs,
+  "methods": methods,
+  "interfaces": interfaces,
+  "error-handling": errorHandling,
+  "packages-and-modules": packagesAndModules,
+  "concurrency": concurrency,
+  "testing-basics": testingBasics,
+  "http-basics": httpBasics,
+  "json-encoding": jsonEncoding,
+  "select-statement": selectStatement,
 };

@@ -7,6 +7,7 @@ import { APP_NAME } from "@/lib/constants";
 import { tutorialUrl, tutorialLangUrl } from "@/lib/urls";
 import { absoluteUrl, buildBreadcrumbJsonLd } from "@/lib/seo";
 import TutorialGrid from "@/components/TutorialGrid";
+import TutorialLangHero from "@/components/tutorial/TutorialLangHero";
 import type { SupportedLanguage } from "@/lib/languages/types";
 
 export async function generateStaticParams() {
@@ -95,24 +96,7 @@ export default async function TutorialLangLandingPage({
           __html: JSON.stringify([courseJsonLd, breadcrumbJsonLd, listJsonLd]),
         }}
       />
-      <div className="mb-14">
-        <h1 className="mb-4 text-4xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100 sm:text-5xl">
-          Learn {config.name} with uByte
-        </h1>
-        <p className="max-w-2xl text-lg leading-relaxed text-zinc-600 dark:text-zinc-400">
-          {config.seo.defaultDescription}
-        </p>
-        {tutorials.length > 0 && (
-          <div className="mt-7 flex flex-wrap gap-3">
-            <Link
-              href={tutorialUrl(lang, tutorials[0].slug)}
-              className="inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-6 py-3 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-indigo-700"
-            >
-              Start Learning →
-            </Link>
-          </div>
-        )}
-      </div>
+      <TutorialLangHero config={config} firstSlug={tutorials[0]?.slug ?? null} />
 
       {tutorials.length > 0 ? (
         <>

@@ -1,19 +1,16 @@
 import type { Metadata } from "next";
-import { Suspense } from "react";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import AuthButtons from "@/components/AuthButtons";
 import AuthProvider from "@/components/AuthProvider";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import { ToastProvider } from "@/components/Toast";
-import HeaderNavLinks from "@/components/layout/HeaderNavLinks";
+import SiteHeader from "@/components/layout/SiteHeader";
 import MobileStandaloneHeader from "@/components/layout/MobileStandaloneHeader";
 import SiteFooter from "@/components/layout/SiteFooter";
 import LazyCookieConsentAndAnalytics from "@/components/LazyCookieConsentAndAnalytics";
 import SiteBanner from "@/components/SiteBanner";
 import { APP_NAME, BASE_URL } from "@/lib/constants";
 import { SITE_KEYWORDS } from "@/lib/seo";
-import Link from "next/link";
 import Script from "next/script";
 
 const geistSans = Geist({
@@ -106,25 +103,7 @@ export default function RootLayout({
           <ToastProvider>
           <div className="flex min-h-dvh flex-col overflow-x-hidden">
             <SiteBanner />
-            {/* Top header — Pricing, Search, Login/Sign up; same on all pages */}
-            <header className="sticky top-0 z-30 hidden shrink-0 items-center justify-between border-b border-zinc-100 bg-white/90 px-6 py-3 shadow-sm backdrop-blur-md md:flex dark:border-zinc-800 dark:bg-zinc-950/90">
-              {/* Left: logo + Tutorials + Practice */}
-              <div className="flex items-center gap-3">
-                <Link href="/" className="flex items-center gap-2.5 text-zinc-900 dark:text-white">
-                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-indigo-600 text-sm font-bold text-white">U</span>
-                  <span className="text-lg font-bold">uByte</span>
-                </Link>
-                <div className="mx-2 h-5 w-px bg-zinc-200 dark:bg-zinc-700" />
-                <HeaderNavLinks side="left" />
-              </div>
-              {/* Right: Leaderboard + Pricing + auth */}
-              <div className="flex items-center gap-2">
-                <HeaderNavLinks />
-                <Suspense fallback={<div className="h-9 w-20 rounded-lg bg-zinc-200 dark:bg-zinc-800 animate-pulse" />}>
-                  <AuthButtons />
-                </Suspense>
-              </div>
-            </header>
+            <SiteHeader />
             <MobileStandaloneHeader />
             {/* Home / practice: just scrollable content. /tutorial/[lang]: sidebar + content from tutorial layout */}
             <main id="main-content" className="flex min-h-0 flex-1 flex-col overflow-x-hidden">

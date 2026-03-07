@@ -13,6 +13,7 @@ import {
 import { trackConversion } from "@/lib/analytics";
 import { absoluteUrl } from "@/lib/seo";
 import { buildAuthPageHref } from "@/lib/auth-redirect";
+import CheckIcon from "@/components/ui/CheckIcon";
 
 const CLIENT_TOKEN     = process.env.NEXT_PUBLIC_PADDLE_CLIENT_TOKEN ?? "";
 
@@ -51,17 +52,6 @@ const FAQ_ITEMS = [
     a: "Payments are processed securely by Paddle. Tax may be added based on your location.",
   },
 ];
-
-function Check({ dim = false }) {
-  return (
-    <svg
-      className={`h-3 w-3 ${dim ? "text-zinc-400 dark:text-zinc-500" : "text-indigo-600 dark:text-indigo-400"}`}
-      fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}
-    >
-      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-    </svg>
-  );
-}
 
 function PricingContent() {
   const router = useRouter();
@@ -270,7 +260,7 @@ function PricingContent() {
               {FREE_FEATURES.map((f) => (
                 <li key={f} className="flex items-center gap-3 text-sm text-zinc-600 dark:text-zinc-300">
                   <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-zinc-100 dark:bg-zinc-800">
-                    <Check dim />
+                    <CheckIcon dim />
                   </span>
                   {f}
                 </li>
@@ -347,7 +337,7 @@ function PricingContent() {
               {PRO_FEATURES.map((f) => (
                 <li key={f} className="flex items-center gap-3 text-sm text-zinc-700 dark:text-zinc-200">
                   <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-indigo-100 dark:bg-indigo-600/30">
-                    <Check />
+                    <CheckIcon />
                   </span>
                   {f}
                 </li>

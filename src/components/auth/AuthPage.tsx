@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/components/AuthProvider";
 import Input from "@/components/ui/Input";
+import FormError from "@/components/ui/FormError";
 import GoogleIcon from "@/components/auth/GoogleIcon";
 import GoogleOAuthError from "@/components/GoogleOAuthError";
 import { requestPasswordReset, submitEmailAuth } from "@/lib/auth-client";
@@ -170,11 +171,7 @@ export default function AuthPage({ variant }: { variant: AuthPageMode }) {
                 </div>
               ) : (
                 <form onSubmit={handleSubmit} className="mt-6 space-y-4">
-                  {error && (
-                    <div role="alert" className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-900/50 dark:bg-red-950/40 dark:text-red-300">
-                      {error}
-                    </div>
-                  )}
+                  {error && <FormError>{error}</FormError>}
 
                   <div>
                     <label htmlFor="forgot-email" className="mb-1.5 block text-sm font-semibold text-zinc-700 dark:text-zinc-300">
@@ -228,11 +225,7 @@ export default function AuthPage({ variant }: { variant: AuthPageMode }) {
                 </div>
 
                 <form onSubmit={handleSubmit} className="space-y-4">
-                  {error && (
-                    <div role="alert" className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-900/50 dark:bg-red-950/40 dark:text-red-300">
-                      {error}
-                    </div>
-                  )}
+                  {error && <FormError>{error}</FormError>}
 
                   {mode === "signup" && (
                     <div>

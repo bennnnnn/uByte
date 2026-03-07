@@ -245,7 +245,7 @@ export default function CodePlayground({ code: initialCode, title }: CodePlaygro
       </div>
 
       {/* Editable Code with Syntax Highlighting */}
-      <div className="relative" style={{ minHeight: "120px" }}>
+      <div className="relative min-h-[120px]">
         {/* Highlighted layer (behind) */}
         <pre
           className="absolute inset-0 overflow-auto bg-zinc-900 p-4 font-mono text-sm leading-relaxed text-zinc-100 pointer-events-none"
@@ -274,8 +274,8 @@ export default function CodePlayground({ code: initialCode, title }: CodePlaygro
             }
           }}
           spellCheck={false}
-          className="relative block w-full resize-none overflow-auto bg-transparent p-4 font-mono text-sm leading-relaxed text-transparent caret-white outline-none"
-          style={{ minHeight: "120px", height: `${Math.max(120, (code.split("\n").length + 1) * 22)}px` }}
+          className="relative block w-full resize-none overflow-auto bg-transparent p-4 font-mono text-sm leading-relaxed text-transparent caret-white outline-none min-h-[120px]"
+          style={{ height: `${Math.max(120, (code.split("\n").length + 1) * 22)}px` }}
         />
       </div>
 
