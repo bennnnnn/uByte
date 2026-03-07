@@ -107,7 +107,7 @@ export default function RootLayout({
           <div className="flex min-h-dvh flex-col overflow-x-hidden">
             <SiteBanner />
             {/* Top header — Pricing, Search, Login/Sign up; same on all pages */}
-            <header className="relative z-20 hidden md:flex items-center justify-between border-b border-zinc-100 bg-white/90 px-6 py-3 shadow-sm backdrop-blur-md dark:border-zinc-800 dark:bg-zinc-950/90">
+            <header className="sticky top-0 z-30 hidden shrink-0 items-center justify-between border-b border-zinc-100 bg-white/90 px-6 py-3 shadow-sm backdrop-blur-md md:flex dark:border-zinc-800 dark:bg-zinc-950/90">
               {/* Left: logo + Tutorials + Practice */}
               <div className="flex items-center gap-3">
                 <Link href="/" className="flex items-center gap-2.5 text-zinc-900 dark:text-white">

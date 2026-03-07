@@ -28,18 +28,18 @@
     "expectedOutput": ["HELLO"]
   },
   {
-    "title": "Use int8",
-    "instruction": "`int8` is an 8-bit signed integer (-128 to 127). Declare a variable `tiny` of type `int8` with value 100, then print it.",
-    "hint": "var tiny int8 = 100 — then fmt.Println(tiny).",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\t// TODO: declare tiny as int8 with value 100\n\t// TODO: print tiny\n}",
-    "expectedOutput": ["100"]
+    "title": "Booleans and Comparison",
+    "instruction": "Create two integers, `a := 7` and `b := 10`. Compare them with `<` and store the result in a boolean named `isSmaller`. Print `isSmaller`.",
+    "hint": "Use `isSmaller := a < b` and then print it.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\ta := 7\n\tb := 10\n\t// TODO: create isSmaller from the comparison a < b\n\t// TODO: print isSmaller\n\t_ = a\n\t_ = b\n}",
+    "expectedOutput": ["true"]
   },
   {
-    "title": "Use int16",
-    "instruction": "`int16` is a 16-bit signed integer (-32768 to 32767). Declare `small` as `int16` with value 2000, then print it.",
-    "hint": "var small int16 = 2000 — then fmt.Println(small).",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\t// TODO: declare small as int16 with value 2000\n\t// TODO: print small\n}",
-    "expectedOutput": ["2000"]
+    "title": "Work with Float Values",
+    "instruction": "Store `price := 19.99` and `tax := 0.50`, then print their sum.",
+    "hint": "Add the two numbers and print the result. Go will use `float64` here.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tprice := 19.99\n\ttax := 0.50\n\t// TODO: print price + tax\n\t_ = price\n\t_ = tax\n}",
+    "expectedOutput": ["20.49"]
   },
   {
     "title": "Type Conversion",

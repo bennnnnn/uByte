@@ -1,0 +1,37 @@
+[
+  {
+    "title": "Declare an Array",
+    "instruction": "Declare an array of 3 integers named `nums`, then print the whole array. It should print the zero values.",
+    "hint": "Use `var nums [3]int` and then `fmt.Println(nums)`.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\t// TODO: declare nums as an array of 3 ints\n\t// TODO: print nums\n}",
+    "expectedOutput": ["[0 0 0]"]
+  },
+  {
+    "title": "Assign by Index",
+    "instruction": "Create an array of 3 strings named `colors`. Set index 0 to `\"red\"`, index 1 to `\"green\"`, and index 2 to `\"blue\"`. Print the whole array.",
+    "hint": "Declare `var colors [3]string`, then assign `colors[0]`, `colors[1]`, and `colors[2]`.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tvar colors [3]string\n\t// TODO: assign red, green, blue by index\n\tfmt.Println(colors)\n}",
+    "expectedOutput": ["[red green blue]"]
+  },
+  {
+    "title": "First and Last Value",
+    "instruction": "Create `scores := [4]int{10, 20, 30, 40}`. Print the first value, then print the last value.",
+    "hint": "The first value is `scores[0]`. The last value is `scores[len(scores)-1]`.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tscores := [4]int{10, 20, 30, 40}\n\t// TODO: print the first value\n\t// TODO: print the last value\n}",
+    "expectedOutput": ["10", "40"]
+  },
+  {
+    "title": "Loop Through an Array",
+    "instruction": "Loop through `[3]int{2, 4, 6}` and print each number on its own line.",
+    "hint": "Use `for i := 0; i < len(nums); i++ { fmt.Println(nums[i]) }`.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tnums := [3]int{2, 4, 6}\n\t// TODO: loop through nums and print each value\n}",
+    "expectedOutput": ["2", "4", "6"]
+  },
+  {
+    "title": "Sum an Array",
+    "instruction": "Sum the values in `[5]int{1, 2, 3, 4, 5}` and print the total.",
+    "hint": "Start with `sum := 0`, then add each element inside a loop.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tnums := [5]int{1, 2, 3, 4, 5}\n\tsum := 0\n\t// TODO: add each array element to sum\n\tfmt.Println(sum)\n}",
+    "expectedOutput": ["15"]
+  }
+]

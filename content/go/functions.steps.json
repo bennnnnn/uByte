@@ -7,38 +7,31 @@
     "expectedOutput": ["Hello, Alice!"]
   },
   {
-    "title": "Multiple Return Values",
-    "instruction": "Define `divide(a, b float64) (float64, error)` that returns an error if b is zero, otherwise returns a/b. Call with 10 and 2, then print the result.",
-    "hint": "if b == 0 { return 0, errors.New(\"division by zero\") }; return a / b, nil",
-    "starter": "package main\n\nimport (\n\t\"errors\"\n\t\"fmt\"\n)\n\n// TODO: define divide(a, b float64) (float64, error)\n\nfunc main() {\n\tresult, err := divide(10, 2)\n\tif err != nil {\n\t\tfmt.Println(\"Error:\", err)\n\t\treturn\n\t}\n\tfmt.Println(result)\n}",
-    "expectedOutput": ["5"]
+    "title": "Parameters and Return Values",
+    "instruction": "Define `add(a int, b int) int` that returns the sum of the two numbers. Call it with 4 and 6, then print the result.",
+    "hint": "Write `func add(a int, b int) int { return a + b }`.",
+    "starter": "package main\n\nimport \"fmt\"\n\n// TODO: define add(a int, b int) int\n\nfunc main() {\n\tfmt.Println(add(4, 6))\n}",
+    "expectedOutput": ["10"]
   },
   {
-    "title": "Variadic Functions",
-    "instruction": "Define `sum(nums ...int) int` that returns the total of all arguments. Call it with 1, 2, 3, 4, 5 and print the result.",
-    "hint": "func sum(nums ...int) int { total := 0; for _, n := range nums { total += n }; return total }",
+    "title": "Multiple Return Values",
+    "instruction": "Define `minMax(nums []int) (int, int)` that returns the smallest and largest number in the slice. Call it with `[]int{3, 1, 4, 1, 5}` and print both results.",
+    "hint": "Start `min` and `max` with `nums[0]`, then compare the rest inside a loop.",
+    "starter": "package main\n\nimport \"fmt\"\n\n// TODO: define minMax(nums []int) (int, int)\n\nfunc main() {\n\tmin, max := minMax([]int{3, 1, 4, 1, 5})\n\tfmt.Println(min)\n\tfmt.Println(max)\n}",
+    "expectedOutput": ["1", "5"]
+  },
+  {
+    "title": "Variadic Function",
+    "instruction": "Define `sum(nums ...int) int` that returns the total of all arguments. Call it with 1, 2, 3, 4, and 5 and print the result.",
+    "hint": "Loop over `nums` and keep a running total.",
     "starter": "package main\n\nimport \"fmt\"\n\n// TODO: define sum(nums ...int) int\n\nfunc main() {\n\tfmt.Println(sum(1, 2, 3, 4, 5))\n}",
     "expectedOutput": ["15"]
   },
   {
-    "title": "Named Return Values",
-    "instruction": "Define `minMax(nums []int) (min, max int)` that returns the smallest and largest value. Call with [3, 1, 4, 1, 5] and print both.",
-    "hint": "func minMax(nums []int) (min, max int) { min, max = nums[0], nums[0]; for _, n := range nums { if n < min { min = n }; if n > max { max = n } }; return }",
-    "starter": "package main\n\nimport \"fmt\"\n\n// TODO: define minMax(nums []int) (min, max int)\n\nfunc main() {\n\tmin, max := minMax([]int{3, 1, 4, 1, 5})\n\tfmt.Println(min, max)\n}",
-    "expectedOutput": ["1", "5"]
-  },
-  {
-    "title": "Functions as Values",
-    "instruction": "Define `apply(f func(int) int, x int) int` that returns `f(x)`. Call it with a doubling function and 2, then print the result.",
-    "hint": "func apply(f func(int) int, x int) int { return f(x) }",
-    "starter": "package main\n\nimport \"fmt\"\n\n// TODO: define apply(f func(int) int, x int) int\n\nfunc main() {\n\tdouble := func(n int) int { return n * 2 }\n\tfmt.Println(apply(double, 2))\n}",
-    "expectedOutput": ["4"]
-  },
-  {
-    "title": "Closures",
-    "instruction": "Define `counter()` that returns a function which increments and returns an internal count each time it's called. Call the returned function three times and print each result (1, 2, 3).",
-    "hint": "func counter() func() int { count := 0; return func() int { count++; return count } }",
-    "starter": "package main\n\nimport \"fmt\"\n\n// TODO: define counter() func() int\n\nfunc main() {\n\tnext := counter()\n\tfmt.Println(next())\n\tfmt.Println(next())\n\tfmt.Println(next())\n}",
-    "expectedOutput": ["1", "2", "3"]
+    "title": "Use a Helper Function",
+    "instruction": "Define a helper function `isEven(n int) bool` that returns true when a number is even. Call it with 8 and print the result.",
+    "hint": "An even number has remainder 0 when divided by 2.",
+    "starter": "package main\n\nimport \"fmt\"\n\n// TODO: define isEven(n int) bool\n\nfunc main() {\n\tfmt.Println(isEven(8))\n}",
+    "expectedOutput": ["true"]
   }
 ]

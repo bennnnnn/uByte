@@ -14,18 +14,18 @@
     "expectedOutput": ["3", "2", "1", "Liftoff!"]
   },
   {
-    "title": "Range over Slice",
-    "instruction": "`for range` iterates over a slice (index and value). Loop over the fruits slice and print each fruit name on its own line.",
-    "hint": "for _, fruit := range fruits { fmt.Println(fruit) }",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tfruits := []string{\"apple\", \"banana\", \"cherry\"}\n\t// TODO: range over fruits and print each fruit\n\t_ = fruits\n}",
-    "expectedOutput": ["apple", "banana", "cherry"]
+    "title": "Break and Continue",
+    "instruction": "`continue` skips the current loop turn and `break` stops the loop completely. Loop from 1 to 6. Skip even numbers, stop when the number is greater than 5, and print only the values that remain.",
+    "hint": "Inside the loop: if `i%2 == 0`, continue. If `i > 5`, break. Otherwise print `i`.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tfor i := 1; i <= 6; i++ {\n\t\t// TODO: skip even numbers\n\t\t// TODO: stop the loop if i is greater than 5\n\t\t// TODO: print the remaining values\n\t}\n}",
+    "expectedOutput": ["1", "3", "5"]
   },
   {
-    "title": "break and continue",
-    "instruction": "`break` exits the loop; `continue` skips to the next iteration. Loop from 1 to 6: skip evens with `continue`, stop if number exceeds 5 with `break`. Print only 1, 3, and 5.",
-    "hint": "if i%2 == 0 { continue }; if i > 5 { break }; fmt.Println(i)",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tfor i := 1; i <= 6; i++ {\n\t\t// TODO: if i even continue; if i > 5 break; else print i\n\t}\n}",
-    "expectedOutput": ["1", "3", "5"]
+    "title": "Nested Loops",
+    "instruction": "Use a nested loop to print a 2 by 3 grid of stars. Print `***` on the first line and `***` on the second line.",
+    "hint": "Use one loop for rows and one loop for columns. Build each row as a string, then print it.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\t// TODO: use nested loops to print two lines of ***\n}",
+    "expectedOutput": ["***", "***"]
   },
   {
     "title": "Sum with a Loop",

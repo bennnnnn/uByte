@@ -35,7 +35,15 @@ export function getSteps(
 export function getAllStepsForLanguage(
   lang: SupportedLanguage
 ): Record<string, TutorialStep[]> {
-  return stepsByLanguage[lang] ?? {};
+  const merged: Record<string, TutorialStep[]> = {
+    ...(stepsByLanguage[lang] ?? {}),
+  };
+
+  for (const tutorial of getAllTutorials(lang)) {
+    merged[tutorial.slug] = getSteps(lang, tutorial.slug);
+  }
+
+  return merged;
 }
 
 /**

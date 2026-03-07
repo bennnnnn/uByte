@@ -1,0 +1,44 @@
+[
+  {
+    "title": "Declare a Slice",
+    "instruction": "Declare a slice of strings named `langs` containing `\"go\"`, `\"python\"`, and `\"rust\"`. Print the whole slice.",
+    "hint": "Use `langs := []string{\"go\", \"python\", \"rust\"}`.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\t// TODO: declare langs as a slice of strings\n\t// TODO: print langs\n}",
+    "expectedOutput": ["[go python rust]"]
+  },
+  {
+    "title": "Update a Slice Value",
+    "instruction": "Start with `scores := []int{80, 85, 90}`. Change the second value to `95`, then print the whole slice.",
+    "hint": "The second value is at index 1, so use `scores[1] = 95`.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tscores := []int{80, 85, 90}\n\t// TODO: change the second value to 95\n\tfmt.Println(scores)\n}",
+    "expectedOutput": ["[80 95 90]"]
+  },
+  {
+    "title": "First and Last Slice Value",
+    "instruction": "From `nums := []int{10, 20, 30, 40, 50}`, print the first value and then the last value.",
+    "hint": "Use `nums[0]` for the first value and `nums[len(nums)-1]` for the last value.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tnums := []int{10, 20, 30, 40, 50}\n\t// TODO: print the first value\n\t// TODO: print the last value\n}",
+    "expectedOutput": ["10", "50"]
+  },
+  {
+    "title": "Print Every Value",
+    "instruction": "Loop through `[]int{3, 6, 9}` and print each value on its own line.",
+    "hint": "Use a `for` loop with `i < len(nums)` and print `nums[i]`.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tnums := []int{3, 6, 9}\n\t// TODO: loop through nums and print each value\n}",
+    "expectedOutput": ["3", "6", "9"]
+  },
+  {
+    "title": "Find Min and Max",
+    "instruction": "For `nums := []int{8, 3, 15, 2, 10}`, find the minimum and maximum values and print them on separate lines.",
+    "hint": "Start with `min := nums[0]` and `max := nums[0]`, then compare the rest in a loop.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tnums := []int{8, 3, 15, 2, 10}\n\tmin := nums[0]\n\tmax := nums[0]\n\t// TODO: update min and max while looping through nums\n\tfmt.Println(min)\n\tfmt.Println(max)\n}",
+    "expectedOutput": ["2", "15"]
+  },
+  {
+    "title": "Sum Slice Elements",
+    "instruction": "Sum the values in `[]int{1, 2, 3, 4, 5}` and print the total.",
+    "hint": "Use `sum := 0` and add each value inside a loop.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tnums := []int{1, 2, 3, 4, 5}\n\tsum := 0\n\t// TODO: add every value in nums to sum\n\tfmt.Println(sum)\n}",
+    "expectedOutput": ["15"]
+  }
+]

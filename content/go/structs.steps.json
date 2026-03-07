@@ -7,11 +7,11 @@
     "expectedOutput": ["Alice", "30"]
   },
   {
-    "title": "Struct Method (Value Receiver)",
-    "instruction": "Define a `Greet()` method on `Person` that returns `\"Hi, \" + p.Name + \"!\"`. Create Alice and print the result of calling her `Greet()` method.",
-    "hint": "func (p Person) Greet() string { return \"Hi, \" + p.Name + \"!\" }",
-    "starter": "package main\n\nimport \"fmt\"\n\ntype Person struct {\n\tName string\n\tAge  int\n}\n\n// TODO: define Greet() method on Person that returns \"Hi, <Name>!\"\n\nfunc main() {\n\tp := Person{Name: \"Alice\", Age: 30}\n\tfmt.Println(p.Greet())\n}",
-    "expectedOutput": ["Hi, Alice!"]
+    "title": "Read and Update Fields",
+    "instruction": "Create a `Person` struct value for Alice with age 30. Increase the age to 31, then print the name and the updated age on separate lines.",
+    "hint": "After creating the struct, update it with `p.Age = 31`.",
+    "starter": "package main\n\nimport \"fmt\"\n\ntype Person struct {\n\tName string\n\tAge  int\n}\n\nfunc main() {\n\t// TODO: create Alice with age 30\n\t// TODO: change age to 31\n\t// TODO: print name and age\n}",
+    "expectedOutput": ["Alice", "31"]
   },
   {
     "title": "Nested Structs",
@@ -28,10 +28,10 @@
     "expectedOutput": ["Bob", "95"]
   },
   {
-    "title": "Pointer to Struct",
-    "instruction": "Use `new(Person)` to allocate a Person, set the Name field to \"Charlie\", then print the name.",
-    "hint": "p := new(Person); p.Name = \"Charlie\"; fmt.Println(p.Name)",
-    "starter": "package main\n\nimport \"fmt\"\n\ntype Person struct {\n\tName string\n\tAge  int\n}\n\nfunc main() {\n\t// TODO: use new(Person), set Name to \"Charlie\", print Name\n}",
-    "expectedOutput": ["Charlie"]
+    "title": "Struct List with Slices",
+    "instruction": "Create a slice of two `Person` values: Alice age 30 and Bob age 28. Print the name of the second person.",
+    "hint": "Use `people := []Person{{Name: \"Alice\", Age: 30}, {Name: \"Bob\", Age: 28}}`.",
+    "starter": "package main\n\nimport \"fmt\"\n\ntype Person struct {\n\tName string\n\tAge  int\n}\n\nfunc main() {\n\t// TODO: create a slice with Alice and Bob\n\t// TODO: print the second person's name\n}",
+    "expectedOutput": ["Bob"]
   }
 ]
