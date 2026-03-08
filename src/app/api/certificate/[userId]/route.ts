@@ -2,15 +2,25 @@ import { NextRequest, NextResponse } from "next/server";
 import { getUserById, getProgressCount } from "@/lib/db";
 import { getAllTutorials } from "@/lib/tutorials";
 import { withErrorHandling } from "@/lib/api-utils";
+import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 
 const GO_LANG = "go";
 
 export const GET = withErrorHandling(
   "GET /api/certificate/[userId]",
   async (
-    _request: NextRequest,
+    request: NextRequest,
     context?: unknown
   ) => {
+    const ip = getClientIp(request.headers);
+    const { limited, retryAfter } = await checkRateLimit(`cert-public:${ip}`, 30, 60_000);
+    if (limited) {
+      return NextResponse.json(
+        { error: "Too many requests." },
+        { status: 429, headers: { "Retry-After": String(retryAfter) } }
+      );
+    }
+
     const { userId } = (context as { params: Promise<{ userId: string }> }).params
       ? await (context as { params: Promise<{ userId: string }> }).params
       : { userId: "" };
@@ -32,7 +42,6 @@ export const GET = withErrorHandling(
     const isComplete = completedCount >= totalTutorials;
 
     return NextResponse.json({
-      userId: id,
       name: user.name,
       completedCount,
       totalTutorials,

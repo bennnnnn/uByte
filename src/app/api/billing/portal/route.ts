@@ -13,6 +13,7 @@ export const GET = withErrorHandling("GET /api/billing/portal", async () => {
   if (!user) return response;
 
   const dbUser = await getUserById(user.userId);
+  // Legacy column name — actually stores the Paddle customer ID
   const customerId = dbUser?.stripe_customer_id ?? null;
 
   if (!PADDLE_API_KEY) {

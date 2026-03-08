@@ -1,10 +1,19 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { getUserById, getProgress, getAchievements, getBookmarks, getRecentActivity } from "@/lib/db";
 import { withErrorHandling, requireAuth } from "@/lib/api-utils";
+import { checkRateLimit } from "@/lib/rate-limit";
 
-export const GET = withErrorHandling("GET /api/profile/export", async () => {
+export const GET = withErrorHandling("GET /api/profile/export", async (_req: NextRequest) => {
   const { user, response } = await requireAuth();
   if (!user) return response;
+
+  const { limited, retryAfter } = await checkRateLimit(`export:${user.userId}`, 5, 3_600_000);
+  if (limited) {
+    return NextResponse.json(
+      { error: "Export limit reached. Try again later." },
+      { status: 429, headers: { "Retry-After": String(retryAfter) } }
+    );
+  }
 
   const [dbUser, progress, achievements, bookmarks, activity] = await Promise.all([
     getUserById(user.userId),

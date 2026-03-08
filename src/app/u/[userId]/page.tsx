@@ -95,7 +95,7 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-          __html: JSON.stringify([personJsonLd, breadcrumbJsonLd]),
+          __html: JSON.stringify([personJsonLd, breadcrumbJsonLd]).replace(/</g, "\\u003c"),
         }}
       />
 

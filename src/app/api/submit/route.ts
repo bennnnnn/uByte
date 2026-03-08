@@ -12,6 +12,7 @@ import { runJudge } from "@/lib/practice/judge-runner";
 import type { SubmissionVerdict } from "@/lib/db/submissions";
 import { PRACTICE_PROBLEMS } from "@/lib/practice/problems";
 
+const MAX_CODE_LENGTH = 64 * 1024; // 64 KB
 const XP_BY_DIFFICULTY: Record<string, number> = { easy: 10, medium: 20, hard: 40 };
 
 function normalizeCodeForHash(code: string): string {
@@ -42,6 +43,13 @@ export const POST = withErrorHandling("POST /api/submit", async (request: NextRe
   if (!problemId || !code || !language) {
     return NextResponse.json(
       { verdict: "error" as const, message: "problem_id, code, and language required" },
+      { status: 400 }
+    );
+  }
+
+  if (typeof code !== "string" || code.length > MAX_CODE_LENGTH) {
+    return NextResponse.json(
+      { verdict: "error" as const, message: "Code exceeds maximum allowed length." },
       { status: 400 }
     );
   }

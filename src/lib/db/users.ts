@@ -188,6 +188,11 @@ export async function getUserPlan(userId: number): Promise<string> {
   return (row?.plan as string) ?? "free";
 }
 
+/**
+ * Update user plan. The DB column `stripe_customer_id` is a legacy name —
+ * it actually stores the Paddle customer ID. A future migration will rename
+ * the column to `paddle_customer_id`.
+ */
 export async function updateUserPlan(
   userId: number,
   plan: string,
@@ -195,12 +200,14 @@ export async function updateUserPlan(
 ): Promise<void> {
   const sql = getSql();
   if (paddleCustomerId) {
+    // Column will be renamed to paddle_customer_id in a future migration
     await sql`UPDATE users SET plan = ${plan}, stripe_customer_id = ${paddleCustomerId} WHERE id = ${userId}`;
   } else {
     await sql`UPDATE users SET plan = ${plan} WHERE id = ${userId}`;
   }
 }
 
+/** Look up user by Paddle customer ID (stored in legacy `stripe_customer_id` column). */
 export async function getUserByPaddleCustomerId(paddleCustomerId: string): Promise<User | undefined> {
   const sql = getSql();
   const [row] = await sql`SELECT * FROM users WHERE stripe_customer_id = ${paddleCustomerId}`;

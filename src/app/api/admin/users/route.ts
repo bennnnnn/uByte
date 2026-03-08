@@ -67,7 +67,13 @@ export const POST = withErrorHandling("POST /api/admin/users", async (request: N
   const body = (await request.json()) as { action: string; userId: number; plan?: string };
   const { action, userId, plan } = body;
 
-  // Prevent acting on self for destructive actions
+  if (!action || typeof action !== "string") {
+    return NextResponse.json({ error: "Action is required" }, { status: 400 });
+  }
+  if (!Number.isInteger(userId) || userId <= 0) {
+    return NextResponse.json({ error: "Invalid user ID" }, { status: 400 });
+  }
+
   if (userId === admin.id && ["delete_user", "remove_admin"].includes(action)) {
     return NextResponse.json({ error: "Cannot perform this action on yourself" }, { status: 400 });
   }

@@ -44,7 +44,7 @@ const nextConfig: NextConfig = {
     return config;
   },
   compiler: {
-    removeConsole: process.env.NODE_ENV === "production",
+    removeConsole: process.env.NODE_ENV === "production" ? { exclude: ["error", "warn"] } : false,
   },
   async redirects() {
     const tutorialLangs = ["go", "python", "cpp", "javascript", "java", "rust"];

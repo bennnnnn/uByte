@@ -23,6 +23,9 @@ export const POST = withErrorHandling("POST /api/auth/signup", async (request: N
   if (!name || !email || !password) {
     return NextResponse.json({ error: "All fields are required" }, { status: 400 });
   }
+  if (typeof name !== "string" || name.length > 100 || typeof email !== "string" || email.length > 254 || typeof password !== "string" || password.length > 256) {
+    return NextResponse.json({ error: "Invalid input" }, { status: 400 });
+  }
 
   if (!isValidPassword(password)) {
     return NextResponse.json({ error: PASSWORD_POLICY_MESSAGE }, { status: 400 });

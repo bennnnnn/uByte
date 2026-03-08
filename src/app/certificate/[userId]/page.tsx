@@ -114,7 +114,7 @@ export default async function CertificatePage({ params }: { params: Promise<{ us
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-          __html: JSON.stringify([credentialJsonLd, breadcrumbJsonLd]),
+          __html: JSON.stringify([credentialJsonLd, breadcrumbJsonLd]).replace(/</g, "\\u003c"),
         }}
       />
       <div className="w-full max-w-2xl">

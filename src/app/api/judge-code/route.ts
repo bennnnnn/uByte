@@ -5,6 +5,8 @@ import { verifyCsrf } from "@/lib/csrf";
 import { getPracticeProblemBySlug } from "@/lib/practice/problems";
 import { JUDGE0_URL, JUDGE0_LANG_IDS, b64, fromb64, maybeDecodeJudge0Message } from "@/lib/judge0";
 
+const MAX_CODE_LENGTH = 64 * 1024; // 64 KB
+
 /** Normalize a line for comparison (Python "[0, 1]" and Go "[0 1]" both match "[0 1]"; True/False -> true/false). */
 function normalizeLine(s: string): string {
   return s
@@ -120,6 +122,13 @@ export const POST = withErrorHandling("POST /api/judge-code", async (request: Ne
   if (!slug || !code || !language) {
     return NextResponse.json(
       { verdict: "error" as const, message: "slug, code, and language required" },
+      { status: 400 }
+    );
+  }
+
+  if (typeof code !== "string" || code.length > MAX_CODE_LENGTH) {
+    return NextResponse.json(
+      { verdict: "error" as const, message: "Code exceeds maximum allowed length." },
       { status: 400 }
     );
   }

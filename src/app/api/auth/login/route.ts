@@ -27,6 +27,9 @@ export const POST = withErrorHandling("POST /api/auth/login", async (request: Ne
   if (!email || !password) {
     return NextResponse.json({ error: "Email and password are required" }, { status: 400 });
   }
+  if (typeof email !== "string" || email.length > 254 || typeof password !== "string" || password.length > 256) {
+    return NextResponse.json({ error: "Invalid input" }, { status: 400 });
+  }
 
   const user = await getUserByEmail(email);
   if (!user) {

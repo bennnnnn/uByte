@@ -8,21 +8,28 @@ function getSecret(): Uint8Array {
 }
 
 /**
- * Edge middleware — fast-fails unauthenticated requests before they hit any route handler.
- * Full is_admin DB check still happens inside each /api/admin route handler.
+ * Edge middleware — fast-fails unauthenticated requests to admin routes.
+ * Covers both API endpoints (/api/admin/*) and the admin page (/admin).
+ * Full is_admin DB check still happens inside each handler / page hook.
  */
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  if (pathname.startsWith("/api/admin")) {
+  if (pathname.startsWith("/api/admin") || pathname === "/admin") {
     const token = request.cookies.get("auth_token")?.value;
     if (!token) {
-      return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+      if (pathname.startsWith("/api/")) {
+        return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+      }
+      return NextResponse.redirect(new URL("/", request.url));
     }
     try {
       await jwtVerify(token, getSecret());
     } catch {
-      return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+      if (pathname.startsWith("/api/")) {
+        return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+      }
+      return NextResponse.redirect(new URL("/", request.url));
     }
   }
 
@@ -30,5 +37,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/api/admin/:path*"],
+  matcher: ["/api/admin/:path*", "/admin"],
 };
