@@ -183,13 +183,13 @@ export default function HeroSection({ topicCount = 19, lessonCountGo = 0, proble
               </Link>
               <Link
                 href="/practice"
-                className="inline-flex items-center gap-2 rounded-xl border border-zinc-200 bg-zinc-50 px-7 py-3 text-sm font-semibold text-zinc-700 transition-all hover:border-zinc-300 hover:bg-zinc-100 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:border-zinc-600 dark:hover:bg-zinc-700"
+                className="inline-flex items-center gap-2 rounded-xl border border-zinc-200 bg-surface-card px-7 py-3 text-sm font-semibold text-zinc-700 transition-all hover:border-zinc-300 hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-300 dark:hover:border-zinc-600 dark:hover:bg-zinc-700"
               >
                 Interview practice
               </Link>
               <Link
                 href="/certifications"
-                className="inline-flex items-center gap-2 rounded-xl border border-zinc-200 bg-zinc-50 px-7 py-3 text-sm font-semibold text-zinc-700 transition-all hover:border-zinc-300 hover:bg-zinc-100 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:border-zinc-600 dark:hover:bg-zinc-700"
+                className="inline-flex items-center gap-2 rounded-xl border border-zinc-200 bg-surface-card px-7 py-3 text-sm font-semibold text-zinc-700 transition-all hover:border-zinc-300 hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-300 dark:hover:border-zinc-600 dark:hover:bg-zinc-700"
               >
                 Certifications
               </Link>
@@ -219,13 +219,13 @@ export default function HeroSection({ topicCount = 19, lessonCountGo = 0, proble
           {/* ── RIGHT: IDE mockup ─────────────────────────────────────── */}
           <div className="relative">
             {/* Floating success badge */}
-            <div className="absolute -right-3 -top-5 z-10 flex items-center gap-2 rounded-xl border border-emerald-200 bg-white px-3.5 py-2 text-xs font-semibold text-emerald-600 shadow-lg shadow-zinc-200/60 dark:border-emerald-800 dark:bg-zinc-900 dark:text-emerald-400 dark:shadow-zinc-900/80">
+            <div className="absolute -right-3 -top-5 z-10 flex items-center gap-2 rounded-xl border border-emerald-200 bg-surface-card px-3.5 py-2 text-xs font-semibold text-emerald-600 shadow-lg shadow-zinc-200/60 dark:border-emerald-800 dark:text-emerald-400 dark:shadow-zinc-900/80">
               <span className="flex h-5 w-5 items-center justify-center rounded-full bg-emerald-100 text-[11px] dark:bg-emerald-900/50">✓</span>
               Step passed! +10 XP
             </div>
 
             {/* Floating streak badge */}
-            <div className="absolute -bottom-4 -left-3 z-10 flex items-center gap-2 rounded-xl border border-amber-200 bg-white px-3.5 py-2 text-xs font-semibold text-amber-600 shadow-lg shadow-zinc-200/60 dark:border-amber-800 dark:bg-zinc-900 dark:text-amber-400 dark:shadow-zinc-900/80">
+            <div className="absolute -bottom-4 -left-3 z-10 flex items-center gap-2 rounded-xl border border-amber-200 bg-surface-card px-3.5 py-2 text-xs font-semibold text-amber-600 shadow-lg shadow-zinc-200/60 dark:border-amber-800 dark:text-amber-400 dark:shadow-zinc-900/80">
               <span className="text-base">🔥</span>
               3-day streak
             </div>
