@@ -174,14 +174,17 @@ export const POST = withErrorHandling("POST /api/webhooks/paddle", async (reques
     // transaction.completed fires on every successful payment and reliably
     // includes custom_data from the checkout widget — the most robust hook.
     case "transaction.completed": {
-      const txStatus = data["status"] as string | undefined;
-      if (txStatus !== "completed") break;
+      console.log("[paddle-webhook] transaction.completed data:", JSON.stringify({ 
+        status, paddleCustomerId, customData, purchasedPriceId 
+      }));
       const uid = await resolveUserId(paddleCustomerId, customData);
-      if (uid && purchasedPriceId) {
+      if (uid) {
         await updateUserPlan(uid, activatedPlan, paddleCustomerId);
         console.log("[paddle-webhook] transaction.completed — updated user", uid, "to plan:", activatedPlan);
         const amountCents = activatedPlan === "yearly" ? YEARLY_PRICE_CENTS : MONTHLY_PRICE_CENTS;
         await recordSubscriptionEvent(uid, activatedPlan, amountCents, "activated");
+      } else {
+        console.error("[paddle-webhook] transaction.completed — could not resolve user");
       }
       break;
     }
