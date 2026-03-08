@@ -266,7 +266,7 @@ export default async function PracticeExamsPage() {
                 Programming Certifications
               </h1>
               <p className="mt-3 text-lg text-zinc-500 dark:text-zinc-400">
-                Timed multiple-choice exams by language. Pass to earn a shareable certificate.
+                Timed exams by language. Pass to earn a verifiable certificate you can add to your LinkedIn, portfolio, or resume.
               </p>
             </div>
 
@@ -353,25 +353,26 @@ export default async function PracticeExamsPage() {
             )}
           </div>
 
-          {/* Trust bar */}
-          <div className="mt-10 grid grid-cols-3 gap-4 border-t border-zinc-100 pt-8 dark:border-zinc-800">
-            <div>
-              <p className="text-2xl font-bold text-zinc-900 dark:text-zinc-100">{EXAM_LANGS.length}</p>
-              <p className="mt-0.5 text-sm text-zinc-500 dark:text-zinc-400">Languages</p>
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-zinc-900 dark:text-zinc-100">
-                {totalAttempts > 0 ? totalAttempts.toLocaleString() : "—"}
-              </p>
-              <p className="mt-0.5 text-sm text-zinc-500 dark:text-zinc-400">Exams taken</p>
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-zinc-900 dark:text-zinc-100">
-                {totalCertificates > 0 ? totalCertificates.toLocaleString() : "—"}
-              </p>
-              <p className="mt-0.5 text-sm text-zinc-500 dark:text-zinc-400">Certificates issued</p>
-            </div>
-          </div>
+          {/* Trust bar — only show stats with real data */}
+          {(() => {
+            const trustItems: { value: string; label: string }[] = [
+              { value: String(EXAM_LANGS.length), label: "Languages" },
+            ];
+            if (totalAttempts > 0) trustItems.push({ value: totalAttempts.toLocaleString(), label: "Exams taken" });
+            if (totalCertificates > 0) trustItems.push({ value: totalCertificates.toLocaleString(), label: "Certificates issued" });
+            return (
+              <div className={`mt-10 grid gap-4 border-t border-zinc-100 pt-8 dark:border-zinc-800 ${
+                trustItems.length === 3 ? "grid-cols-3" : trustItems.length === 2 ? "grid-cols-2" : "grid-cols-1"
+              }`}>
+                {trustItems.map((item) => (
+                  <div key={item.label}>
+                    <p className="text-2xl font-bold text-zinc-900 dark:text-zinc-100">{item.value}</p>
+                    <p className="mt-0.5 text-sm text-zinc-500 dark:text-zinc-400">{item.label}</p>
+                  </div>
+                ))}
+              </div>
+            );
+          })()}
         </div>
       </div>
 
@@ -461,8 +462,8 @@ export default async function PracticeExamsPage() {
                 {
                   step: "2",
                   icon: "🏆",
-                  title: "Prove yourself",
-                  body: "Take a timed certification exam. Pass the threshold and earn a shareable digital certificate — proof of your expertise.",
+                  title: "Earn your certificate",
+                  body: "Take a timed exam and pass. You'll get a verifiable digital certificate with a unique ID — share it anywhere.",
                   link: "#all-certifications",
                   linkLabel: "View certifications",
                 },
@@ -473,6 +474,15 @@ export default async function PracticeExamsPage() {
                   </div>
                   <h3 className="font-semibold text-zinc-900 dark:text-zinc-100">{title}</h3>
                   <p className="mt-1.5 text-sm text-zinc-500 dark:text-zinc-400">{body}</p>
+                  {step === "2" && (
+                    <div className="mt-4 rounded-xl border-2 border-indigo-200 bg-white px-4 py-3 text-center dark:border-indigo-800/50 dark:bg-zinc-800">
+                      <p className="text-[10px] font-semibold uppercase tracking-widest text-indigo-500 dark:text-indigo-400">Certificate</p>
+                      <p className="mt-1 text-sm font-bold text-zinc-800 dark:text-zinc-200">Your Name</p>
+                      <p className="text-[10px] text-zinc-400">Python Certification Exam</p>
+                      <div className="mx-auto mt-1.5 h-px w-12 bg-indigo-200 dark:bg-indigo-700" />
+                      <p className="mt-1 text-[9px] text-zinc-400">ID: abc-1234 · Verified</p>
+                    </div>
+                  )}
                   <Link
                     href={link}
                     className="mt-4 inline-flex text-sm font-medium text-indigo-600 transition-colors hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300"
@@ -526,6 +536,38 @@ export default async function PracticeExamsPage() {
             All certifications
           </h2>
           <ExamCardGrid langs={langSlugs} examConfigByLang={examConfigByLang} statsByLang={statsByLang} publicStatsByLang={publicStatsByLang} isLoggedIn={!!user} />
+        </section>
+
+        {/* ── Why get certified? ───────────────────────────────────── */}
+        <section className="mt-14 mb-0">
+          <h2 className="mb-6 text-xs font-semibold uppercase tracking-widest text-zinc-400 dark:text-zinc-500">
+            Why get certified?
+          </h2>
+          <div className="grid gap-4 sm:grid-cols-3">
+            {[
+              {
+                icon: "📄",
+                title: "Strengthen your resume",
+                body: "Add a verifiable credential to your resume or LinkedIn profile. Each certificate has a unique ID that employers can check.",
+              },
+              {
+                icon: "🎯",
+                title: "Validate your knowledge",
+                body: "Timed exams test real understanding, not just memorization. Passing proves you can apply concepts under pressure.",
+              },
+              {
+                icon: "🔗",
+                title: "Share with anyone",
+                body: "Every certificate has a public verification page. Share the link with recruiters, teammates, or on social media.",
+              },
+            ].map(({ icon, title, body }) => (
+              <div key={title} className="rounded-2xl border border-zinc-200 bg-zinc-50 p-5 dark:border-zinc-800 dark:bg-zinc-900">
+                <span className="text-2xl">{icon}</span>
+                <h3 className="mt-3 font-semibold text-zinc-900 dark:text-zinc-100">{title}</h3>
+                <p className="mt-1.5 text-sm text-zinc-500 dark:text-zinc-400">{body}</p>
+              </div>
+            ))}
+          </div>
         </section>
 
         {/* ── Bottom CTA ─────────────────────────────────────────────── */}
