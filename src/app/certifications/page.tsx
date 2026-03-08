@@ -116,6 +116,14 @@ function ExamCard({
                 : hasData ? totalAttempts.toLocaleString() : "—"}
             </p>
           </div>
+          <div className="flex-1">
+            <p className="text-xs text-zinc-400 dark:text-zinc-500">Pass rate</p>
+            <p className={`mt-0.5 text-lg font-bold tabular-nums ${
+              !hasData ? "text-zinc-400" : passRate >= 60 ? "text-emerald-600 dark:text-emerald-400" : "text-amber-600 dark:text-amber-400"
+            }`}>
+              {hasData ? `${passRate}%` : "—"}
+            </p>
+          </div>
         </div>
 
         {/* CTA button */}
