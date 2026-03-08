@@ -101,12 +101,12 @@ export default function RootLayout({
         </a>
         <AuthProvider>
           <ToastProvider>
-          <div className="flex min-h-dvh flex-col overflow-x-hidden">
+          <div className="flex min-h-dvh flex-col overflow-x-clip">
             <SiteBanner />
             <SiteHeader />
             <MobileStandaloneHeader />
             {/* Home / practice: just scrollable content. /tutorial/[lang]: sidebar + content from tutorial layout */}
-            <main id="main-content" className="flex min-h-0 flex-1 flex-col overflow-x-hidden bg-surface-page">
+            <main id="main-content" className="flex min-h-0 flex-1 flex-col overflow-x-clip bg-surface-page">
               <ErrorBoundary>{children}</ErrorBoundary>
             </main>
             <SiteFooter />
