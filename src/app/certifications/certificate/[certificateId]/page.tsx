@@ -87,7 +87,7 @@ export default function ExamCertificatePage() {
   const langConfig = LANGUAGES[data.lang as SupportedLanguage];
 
   return (
-    <div className="flex min-h-[100vh] flex-col items-center justify-center bg-zinc-100 px-4 py-10 dark:bg-zinc-950 print:bg-white">
+    <div className="flex min-h-[100vh] flex-col items-center justify-center px-4 py-10 print:bg-white">
       {/* Action bar */}
       <div className="mb-4 flex w-full max-w-3xl items-center justify-between print:hidden">
         <Link
@@ -115,7 +115,7 @@ export default function ExamCertificatePage() {
       </div>
 
       {/* Certificate card */}
-      <div className="w-full max-w-3xl rounded-2xl border-4 border-indigo-500 bg-white p-10 text-center shadow-2xl dark:border-indigo-600 dark:bg-zinc-900 print:shadow-none">
+      <div className="w-full max-w-3xl rounded-2xl border-4 border-indigo-500 bg-surface-card p-10 text-center shadow-2xl dark:border-indigo-600 print:shadow-none">
         <div className="mb-6 flex items-center justify-center gap-3">
           <div className="h-px flex-1 bg-indigo-200 dark:bg-indigo-800" />
           <span className="text-3xl">🎓</span>

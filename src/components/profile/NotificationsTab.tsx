@@ -53,7 +53,7 @@ export default function NotificationsTab({ notifications, onMarkRead }: Props) {
       </div>
 
       {notifications.length === 0 ? (
-        <div className="rounded-2xl border border-zinc-200 bg-white py-16 text-center dark:border-zinc-800 dark:bg-zinc-900">
+        <div className="rounded-2xl border border-zinc-200 bg-surface-card py-16 text-center dark:border-zinc-800">
           <p className="text-3xl">🔔</p>
           <p className="mt-3 text-sm font-medium text-zinc-500">No notifications yet</p>
           <p className="mt-1 text-xs text-zinc-400">We&apos;ll let you know when something happens.</p>
@@ -66,7 +66,7 @@ export default function NotificationsTab({ notifications, onMarkRead }: Props) {
               className={`flex gap-3 rounded-xl border px-4 py-3.5 ${
                 !n.read
                   ? "border-indigo-200 bg-indigo-50 dark:border-indigo-900 dark:bg-indigo-950/30"
-                  : "border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900"
+                  : "border-zinc-200 bg-surface-card dark:border-zinc-800"
               }`}
             >
               <span className="mt-0.5 shrink-0 text-xl">{TYPE_ICONS[n.type] ?? "🔔"}</span>

@@ -43,7 +43,7 @@ export default function AdminPage() {
   /* ── Full-page loading state ──────────────────────────────────────────── */
   if (loading || fetching) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-zinc-50 dark:bg-zinc-950">
+      <div className="flex min-h-screen items-center justify-center bg-surface-card">
         <div className="flex flex-col items-center gap-3">
           <Spinner className="h-8 w-8" />
           <p className="text-sm text-zinc-400">Loading admin…</p>
@@ -55,7 +55,7 @@ export default function AdminPage() {
   /* ── Full-page error state ────────────────────────────────────────────── */
   if (error) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-zinc-50 dark:bg-zinc-950">
+      <div className="flex min-h-screen items-center justify-center bg-surface-card">
         <div className="max-w-sm rounded-2xl border border-red-200 bg-white p-8 text-center shadow-sm dark:border-red-900/60 dark:bg-zinc-900">
           <div className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-red-100 dark:bg-red-900/40">
             <svg className="h-5 w-5 text-red-600 dark:text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" /></svg>
@@ -69,7 +69,7 @@ export default function AdminPage() {
 
   /* ── Dashboard layout: sidebar + main ─────────────────────────────────── */
   return (
-    <div className="flex h-full bg-zinc-50 dark:bg-zinc-950">
+    <div className="flex h-full bg-surface-card">
 
       {/* ── Sidebar ────────────────────────────────────────────────────── */}
       <aside className="flex w-60 shrink-0 flex-col border-r border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900">

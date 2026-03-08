@@ -130,7 +130,7 @@ export default function PlanTab({ plan }: Props) {
         className={`overflow-hidden rounded-2xl border-2 ${
           isPaid
             ? "border-emerald-200 bg-emerald-50/50 dark:border-emerald-900/50 dark:bg-emerald-950/20"
-            : "border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900"
+            : "border-zinc-200 bg-surface-card dark:border-zinc-800"
         }`}
       >
         <div className="px-6 py-5">
@@ -165,7 +165,7 @@ export default function PlanTab({ plan }: Props) {
       </div>
 
       {/* Features */}
-      <div className="overflow-hidden rounded-2xl border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900">
+      <div className="overflow-hidden rounded-2xl border border-zinc-200 bg-surface-card dark:border-zinc-800">
         <div className="border-b border-zinc-100 px-6 py-4 dark:border-zinc-800">
           <h3 className="font-semibold text-zinc-900 dark:text-zinc-100">
             {isPaid ? "Your plan includes" : "Free plan includes"}
@@ -192,7 +192,7 @@ export default function PlanTab({ plan }: Props) {
         </ul>
 
         {!isPaid && (
-          <div className="border-t border-zinc-100 bg-zinc-50/50 px-6 py-4 dark:border-zinc-800 dark:bg-zinc-800/30">
+          <div className="border-t border-zinc-100 bg-surface-card px-6 py-4 dark:border-zinc-800">
             <p className="mb-2 text-sm font-medium text-zinc-700 dark:text-zinc-300">
               Upgrade to unlock
             </p>
@@ -211,7 +211,7 @@ export default function PlanTab({ plan }: Props) {
       {/* CTA */}
       {!isPaid ? (
         <div className="grid gap-4 sm:grid-cols-2">
-          <div className="rounded-2xl border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900">
+          <div className="rounded-2xl border border-zinc-200 bg-surface-card p-5 dark:border-zinc-800">
             <p className="text-lg font-bold text-zinc-900 dark:text-zinc-100">
               {BILLING_CONFIG.monthly.priceText.replace("/month", "")}
             </p>
@@ -249,7 +249,7 @@ export default function PlanTab({ plan }: Props) {
         </div>
       ) : (
         <div className="space-y-4">
-          <div className="rounded-2xl border border-zinc-200 bg-zinc-50/50 px-6 py-5 dark:border-zinc-800 dark:bg-zinc-800/30">
+          <div className="rounded-2xl border border-zinc-200 bg-surface-card px-6 py-5 dark:border-zinc-800">
             <p className="font-medium text-zinc-700 dark:text-zinc-300">
               You’re all set
             </p>

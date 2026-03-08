@@ -118,7 +118,7 @@ export default function HeroSection({ topicCount = 19, lessonCountGo = 0, proble
   const lessonsLabel = lessonCountGo > 0 ? String(lessonCountGo) : String(topicCount);
 
   return (
-    <section className="relative overflow-hidden bg-white dark:bg-zinc-950">
+    <section className="relative overflow-hidden">
       {/* ── Soft glow orbs ────────────────────────────────────────────── */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
         <div className="absolute -left-40 top-1/4 h-[700px] w-[700px] -translate-y-1/4 rounded-full bg-indigo-200/40 blur-[160px] dark:bg-indigo-500/15" />
@@ -229,10 +229,10 @@ export default function HeroSection({ topicCount = 19, lessonCountGo = 0, proble
             </div>
 
             {/* IDE card */}
-            <div className="overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-[0_20px_60px_rgba(0,0,0,0.10)] dark:border-zinc-700 dark:bg-zinc-900 dark:shadow-[0_20px_60px_rgba(0,0,0,0.4)]">
+            <div className="overflow-hidden rounded-2xl border border-zinc-200 bg-surface-card shadow-[0_20px_60px_rgba(0,0,0,0.10)] dark:border-zinc-700 dark:shadow-[0_20px_60px_rgba(0,0,0,0.4)]">
 
               {/* Window chrome + language tabs */}
-              <div className="flex items-center gap-3 border-b border-zinc-100 bg-zinc-50 px-4 py-3 dark:border-zinc-700 dark:bg-zinc-800/80">
+              <div className="flex items-center gap-3 border-b border-zinc-100 bg-surface-card px-4 py-3 dark:border-zinc-700">
                 <div className="flex gap-1.5">
                   <span className="h-3 w-3 rounded-full bg-red-400/80" />
                   <span className="h-3 w-3 rounded-full bg-yellow-400/80" />
@@ -274,7 +274,7 @@ export default function HeroSection({ topicCount = 19, lessonCountGo = 0, proble
               </div>
 
               {/* Code block */}
-              <div className="bg-zinc-50/80 p-4 font-mono text-[12.5px] leading-[1.7] dark:bg-zinc-900/80" suppressHydrationWarning>
+              <div className="bg-surface-card p-4 font-mono text-[12.5px] leading-[1.7]" suppressHydrationWarning>
                 {lines.map((line, i) => (
                   <div key={i} className="flex">
                     <span className="mr-4 w-4 shrink-0 select-none text-right text-[10px] leading-[1.7] text-zinc-300 dark:text-zinc-600">
@@ -296,7 +296,7 @@ export default function HeroSection({ topicCount = 19, lessonCountGo = 0, proble
               </div>
 
               {/* Action bar (decorative demo only) */}
-              <div aria-hidden className="flex items-center gap-2 border-t border-zinc-100 bg-zinc-50 px-4 py-2.5 dark:border-zinc-700 dark:bg-zinc-800/80">
+              <div aria-hidden className="flex items-center gap-2 border-t border-zinc-100 bg-surface-card px-4 py-2.5 dark:border-zinc-700">
                 <span className="flex items-center gap-1.5 rounded-lg bg-indigo-600 px-3.5 py-1.5 text-[11px] font-bold text-white shadow shadow-indigo-600/20">
                   <svg className="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
                     <path d="M6.3 2.84A1.5 1.5 0 004 4.11v11.78a1.5 1.5 0 002.3 1.27l9.344-5.891a1.5 1.5 0 000-2.538L6.3 2.84z" />
@@ -310,7 +310,7 @@ export default function HeroSection({ topicCount = 19, lessonCountGo = 0, proble
               </div>
 
               {/* Output */}
-              <div className="border-t border-zinc-100 bg-zinc-50 px-4 py-3 dark:border-zinc-700 dark:bg-zinc-800/80">
+              <div className="border-t border-zinc-100 bg-surface-card px-4 py-3 dark:border-zinc-700">
                 <p className="mb-1.5 text-[9px] font-bold uppercase tracking-[0.15em] text-zinc-300 dark:text-zinc-500">
                   Output
                 </p>

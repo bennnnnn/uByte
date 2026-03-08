@@ -44,13 +44,13 @@ export default function HelpPage() {
   const faqJsonLd = buildFaqJsonLd(FAQ_ITEMS);
 
   return (
-    <div className="min-h-full overflow-y-auto bg-zinc-50 dark:bg-zinc-950">
+    <div className="min-h-full overflow-y-auto">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
       />
       <div className="mx-auto max-w-4xl px-6 py-14">
-        <section className="mb-10 rounded-3xl border border-zinc-200 bg-white p-8 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+        <section className="mb-10 rounded-3xl border border-zinc-200 bg-surface-card p-8 shadow-sm dark:border-zinc-800">
           <p className="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-indigo-600 dark:text-indigo-400">
             Help Center
           </p>
@@ -71,7 +71,7 @@ export default function HelpPage() {
             <Link
               key={item.href}
               href={item.href}
-              className="rounded-2xl border border-zinc-200 bg-white p-5 transition-colors hover:border-indigo-300 dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-indigo-700"
+              className="rounded-2xl border border-zinc-200 bg-surface-card p-5 transition-colors hover:border-indigo-300 dark:border-zinc-800 dark:hover:border-indigo-700"
             >
               <h2 className="text-base font-bold text-zinc-900 dark:text-zinc-100">{item.label}</h2>
               <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">{item.hint}</p>
@@ -79,7 +79,7 @@ export default function HelpPage() {
           ))}
         </section>
 
-        <section className="rounded-3xl border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-900">
+        <section className="rounded-3xl border border-zinc-200 bg-surface-card p-6 dark:border-zinc-800">
           <h2 className="mb-4 text-xl font-bold text-zinc-900 dark:text-zinc-100">Frequently asked questions</h2>
           <div className="space-y-3">
             {FAQ_ITEMS.map((faq) => (

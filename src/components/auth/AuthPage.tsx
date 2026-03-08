@@ -102,7 +102,7 @@ export default function AuthPage({ variant }: { variant: AuthPageMode }) {
   if (user) return null;
 
   return (
-    <div className="min-h-[100svh] bg-white text-zinc-950 dark:bg-zinc-950 dark:text-zinc-50">
+    <div className="min-h-[100svh] text-zinc-950 dark:text-zinc-50">
       <div className="mx-auto grid min-h-[100svh] max-w-5xl gap-10 px-5 py-10 lg:grid-cols-[0.9fr_1.1fr] lg:px-8 lg:py-14">
         <section className="px-1 py-3 sm:px-2">
           <div className="flex h-full flex-col">
@@ -131,7 +131,7 @@ export default function AuthPage({ variant }: { variant: AuthPageMode }) {
         </section>
 
         <section className="flex items-center justify-center">
-          <div className="w-full max-w-xl rounded-[30px] bg-white p-7 shadow-[0_24px_70px_rgba(15,23,42,0.10)] xl:p-9 dark:bg-zinc-900 dark:shadow-[0_24px_70px_rgba(2,6,23,0.45)]">
+          <div className="w-full max-w-xl rounded-[30px] bg-surface-card p-7 shadow-[0_24px_70px_rgba(15,23,42,0.10)] xl:p-9 dark:shadow-[0_24px_70px_rgba(2,6,23,0.45)]">
             <div className="mb-8">
               <p className="text-xs font-bold uppercase tracking-[0.22em] text-indigo-600 dark:text-indigo-400">
                 {mode === "forgot" ? "Password reset" : isSignupPage ? "Create account" : "Welcome back"}
@@ -185,7 +185,7 @@ export default function AuthPage({ variant }: { variant: AuthPageMode }) {
                       value={email}
                       onChange={(event) => setEmail(event.target.value)}
                       placeholder="you@example.com"
-                      className="rounded-2xl border-zinc-200 bg-zinc-50/80 px-4 py-3 dark:border-zinc-800 dark:bg-zinc-900"
+                      className="rounded-2xl border-zinc-200 bg-surface-card px-4 py-3 dark:border-zinc-800"
                     />
                   </div>
 
@@ -210,7 +210,7 @@ export default function AuthPage({ variant }: { variant: AuthPageMode }) {
               <>
                 <a
                   href={googleHref}
-                  className="mt-6 flex w-full items-center justify-center gap-3 rounded-2xl border border-zinc-200 bg-zinc-50 px-4 py-3 text-sm font-semibold text-zinc-800 transition-colors hover:border-zinc-300 hover:bg-white dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:border-zinc-700"
+                  className="mt-6 flex w-full items-center justify-center gap-3 rounded-2xl border border-zinc-200 bg-surface-card px-4 py-3 text-sm font-semibold text-zinc-800 transition-colors hover:border-zinc-300 hover:bg-white dark:border-zinc-800 dark:text-zinc-100 dark:hover:border-zinc-700"
                 >
                   <GoogleIcon className="h-5 w-5 shrink-0" />
                   Continue with Google
@@ -240,7 +240,7 @@ export default function AuthPage({ variant }: { variant: AuthPageMode }) {
                         value={name}
                         onChange={(event) => setName(event.target.value)}
                         placeholder="Your name"
-                        className="rounded-2xl border-zinc-200 bg-zinc-50/80 px-4 py-3 dark:border-zinc-800 dark:bg-zinc-900"
+                        className="rounded-2xl border-zinc-200 bg-surface-card px-4 py-3 dark:border-zinc-800"
                       />
                     </div>
                   )}
@@ -257,7 +257,7 @@ export default function AuthPage({ variant }: { variant: AuthPageMode }) {
                       value={email}
                       onChange={(event) => setEmail(event.target.value)}
                       placeholder="you@example.com"
-                      className="rounded-2xl border-zinc-200 bg-zinc-50/80 px-4 py-3 dark:border-zinc-800 dark:bg-zinc-900"
+                      className="rounded-2xl border-zinc-200 bg-surface-card px-4 py-3 dark:border-zinc-800"
                     />
                   </div>
 
@@ -284,7 +284,7 @@ export default function AuthPage({ variant }: { variant: AuthPageMode }) {
                       value={password}
                       onChange={(event) => setPassword(event.target.value)}
                       placeholder="6+ chars, Aa1"
-                      className="rounded-2xl border-zinc-200 bg-zinc-50/80 px-4 py-3 dark:border-zinc-800 dark:bg-zinc-900"
+                      className="rounded-2xl border-zinc-200 bg-surface-card px-4 py-3 dark:border-zinc-800"
                     />
                   </div>
 

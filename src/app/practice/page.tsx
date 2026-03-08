@@ -70,7 +70,7 @@ export default async function PracticePage() {
   };
 
   return (
-    <div className="min-h-full overflow-y-auto bg-white dark:bg-zinc-950">
+    <div className="min-h-full overflow-y-auto">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -117,7 +117,7 @@ export default async function PracticePage() {
       </section>
 
       {/* ── Choose language ───────────────────────────────────────────── */}
-      <section aria-labelledby="lang-heading" className="border-t border-zinc-100 bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900/40">
+      <section aria-labelledby="lang-heading" className="border-t border-zinc-100 bg-surface-card dark:border-zinc-800">
         <div className="mx-auto max-w-5xl px-6 py-12 sm:py-14">
           <h2 id="lang-heading" className="mb-1 text-xs font-bold uppercase tracking-[0.2em] text-zinc-400 dark:text-zinc-500">
             Pick your language
@@ -167,7 +167,7 @@ export default async function PracticePage() {
             ))}
           </p>
 
-          <div className="overflow-hidden rounded-2xl border border-zinc-200 bg-zinc-50 shadow-sm dark:border-zinc-700 dark:bg-zinc-900">
+          <div className="overflow-hidden rounded-2xl border border-zinc-200 bg-surface-card shadow-sm dark:border-zinc-700">
             <ul className="divide-y divide-zinc-100 dark:divide-zinc-700">
               {featured.map((p, i) => (
                 <li key={p.slug}>
@@ -207,7 +207,7 @@ export default async function PracticePage() {
       </section>
 
       {/* ── Why uByte ─────────────────────────────────────────────────── */}
-      <section className="border-t border-zinc-100 bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900/40">
+      <section className="border-t border-zinc-100 bg-surface-card dark:border-zinc-800">
         <div className="mx-auto max-w-5xl px-6 py-12 sm:py-14">
           <h2 className="mb-8 text-center text-2xl font-bold text-zinc-900 dark:text-zinc-100 sm:text-3xl">
             Why developers choose uByte
@@ -218,7 +218,7 @@ export default async function PracticePage() {
               { icon: "🌐", title: "6 languages", desc: "Solve every problem in Go, Python, JavaScript, Java, Rust, or C++. Switch anytime." },
               { icon: "📈", title: "Track progress", desc: "See which problems you've solved, filter by difficulty, and pick up where you left off." },
             ].map((item) => (
-              <div key={item.title} className="rounded-2xl border border-zinc-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-900">
+              <div key={item.title} className="rounded-2xl border border-zinc-200 bg-surface-card p-6 dark:border-zinc-700">
                 <span className="mb-3 block text-2xl">{item.icon}</span>
                 <h3 className="mb-1 text-base font-bold text-zinc-900 dark:text-zinc-100">{item.title}</h3>
                 <p className="text-sm leading-relaxed text-zinc-500 dark:text-zinc-400">{item.desc}</p>

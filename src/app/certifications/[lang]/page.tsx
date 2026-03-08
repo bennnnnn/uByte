@@ -119,7 +119,7 @@ export default async function PracticeExamLangPage({ params }: Props) {
   ]);
 
   return (
-    <div className="min-h-full overflow-y-auto bg-white dark:bg-zinc-950">
+    <div className="min-h-full overflow-y-auto">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -128,7 +128,7 @@ export default async function PracticeExamLangPage({ params }: Props) {
       />
 
       {/* ── Hero ──────────────────────────────────────────────────────────── */}
-      <div className="border-b border-zinc-200 bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900">
+      <div className="border-b border-zinc-200 bg-surface-card dark:border-zinc-800">
         <div className="mx-auto max-w-5xl px-6 py-10 sm:py-14">
           <div className="flex flex-col gap-8 sm:flex-row sm:items-start sm:justify-between">
             {/* Left: identity + tagline + stat chips */}
@@ -219,7 +219,7 @@ export default async function PracticeExamLangPage({ params }: Props) {
       {/* ── Tutorial progress (partially completed) ────────────────────── */}
       {user && hasStartedTutorials && completedTutorials < totalTutorials && (
         <div className="mx-auto max-w-5xl px-6 pt-6">
-          <div className="flex items-center gap-3 rounded-xl border border-zinc-200 bg-zinc-50 px-5 py-4 dark:border-zinc-700 dark:bg-zinc-900">
+          <div className="flex items-center gap-3 rounded-xl border border-zinc-200 bg-surface-card px-5 py-4 dark:border-zinc-700">
             <span className="text-lg">📚</span>
             <div className="flex-1">
               <p className="text-sm font-medium text-zinc-800 dark:text-zinc-200">
@@ -259,7 +259,7 @@ export default async function PracticeExamLangPage({ params }: Props) {
 
           {/* ── Right: sticky CTA card ───────────────────────────────────── */}
           <aside className="lg:sticky lg:top-6">
-            <div className="overflow-hidden rounded-2xl border border-zinc-200 bg-zinc-50 shadow-sm dark:border-zinc-700 dark:bg-zinc-900">
+            <div className="overflow-hidden rounded-2xl border border-zinc-200 bg-surface-card shadow-sm dark:border-zinc-700">
               {/* Card top accent */}
               <div className="h-1 w-full bg-gradient-to-r from-indigo-500 to-violet-400" />
 

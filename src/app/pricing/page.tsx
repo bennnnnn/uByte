@@ -189,7 +189,7 @@ function PricingContent() {
   };
 
   return (
-    <div className="min-h-0 flex-1 overflow-y-auto bg-white dark:bg-zinc-950">
+    <div className="min-h-0 flex-1 overflow-y-auto">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -258,7 +258,7 @@ function PricingContent() {
         <div className="mx-auto mt-6 grid max-w-4xl gap-6 sm:grid-cols-2">
 
           {/* ── Free card ─────────────────────────────────── */}
-          <div className="flex flex-col rounded-2xl border border-zinc-200 bg-zinc-50 p-8 shadow-sm dark:border-zinc-700/60 dark:bg-zinc-900">
+          <div className="flex flex-col rounded-2xl border border-zinc-200 bg-surface-card p-8 shadow-sm dark:border-zinc-700/60">
             <div>
               <p className="mb-1 text-xs font-bold uppercase tracking-widest text-zinc-400 dark:text-zinc-500">
                 Free
@@ -418,7 +418,7 @@ function PricingContent() {
               { icon: "💪", title: "Interview Prep", body: "Hundreds of coding challenges across all languages. AI feedback helps you understand mistakes and improve." },
               { icon: "🏆", title: "Get certified", body: "Timed exams with real scoring. Pass and earn a verifiable digital certificate for your LinkedIn and resume." },
             ].map(({ icon, title, body }) => (
-              <div key={title} className="rounded-2xl border border-zinc-200 bg-zinc-50 p-5 dark:border-zinc-800 dark:bg-zinc-900">
+              <div key={title} className="rounded-2xl border border-zinc-200 bg-surface-card p-5 dark:border-zinc-800">
                 <span className="text-2xl">{icon}</span>
                 <h3 className="mt-3 font-semibold text-zinc-900 dark:text-zinc-100">{title}</h3>
                 <p className="mt-1.5 text-sm text-zinc-500 dark:text-zinc-400">{body}</p>
@@ -465,7 +465,7 @@ function PricingContent() {
               return (
                 <div
                   key={faq.q}
-                  className="rounded-xl border border-zinc-200 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900/50"
+                  className="rounded-xl border border-zinc-200 bg-surface-card dark:border-zinc-700"
                 >
                   <dt>
                     <button
@@ -537,7 +537,7 @@ function PricingContent() {
 
 export default function PricingPage() {
   return (
-    <Suspense fallback={<div className="min-h-0 flex-1 bg-white dark:bg-zinc-950" />}>
+    <Suspense fallback={<div className="min-h-0 flex-1" />}>
       <PricingContent />
     </Suspense>
   );

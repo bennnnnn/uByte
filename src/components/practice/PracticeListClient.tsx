@@ -168,7 +168,7 @@ export function PracticeListClient({
 
       <div className="mx-auto flex max-w-6xl flex-col lg:flex-row">
         {/* Left: Category sidebar */}
-        <aside className="shrink-0 border-b border-zinc-100 bg-zinc-50/80 dark:border-zinc-800 dark:bg-zinc-900/30 lg:w-56 lg:border-b-0 lg:border-r lg:py-6">
+        <aside className="shrink-0 border-b border-zinc-100 bg-surface-card dark:border-zinc-800 lg:w-56 lg:border-b-0 lg:border-r lg:py-6">
           <div className="px-4 py-4 lg:px-4">
             <h2 className="mb-3 text-sm font-semibold text-zinc-700 dark:text-zinc-300">
               Category
@@ -206,7 +206,7 @@ export function PracticeListClient({
         {/* Right: Status + Difficulty above list, then problems */}
         <main className="min-w-0 flex-1 px-4 py-6 sm:px-6 lg:py-8">
           {/* Status & Difficulty bar — above the list, easy to see */}
-          <div className="mb-4 flex flex-wrap items-center gap-4 rounded-xl border border-zinc-200 bg-white p-4 dark:border-zinc-700 dark:bg-zinc-900">
+          <div className="mb-4 flex flex-wrap items-center gap-4 rounded-xl border border-zinc-200 bg-surface-card p-4 dark:border-zinc-700">
             <div className="flex flex-wrap items-center gap-3">
               <span className="text-sm font-medium text-zinc-500 dark:text-zinc-400">Status:</span>
               <div className="flex gap-2">
@@ -267,7 +267,7 @@ export function PracticeListClient({
           </div>
 
           {/* Problem list */}
-          <div className="overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-sm dark:border-zinc-700 dark:bg-zinc-900">
+          <div className="overflow-hidden rounded-xl border border-zinc-200 bg-surface-card shadow-sm dark:border-zinc-700">
             <ul className="divide-y divide-zinc-100 dark:divide-zinc-700">
               {pageProblems.map((p, idx) => {
                 const free = isPracticeProblemFree(p.slug);
@@ -321,7 +321,7 @@ export function PracticeListClient({
             </ul>
 
             {totalPages > 1 && (
-              <div className="flex flex-wrap items-center justify-between gap-4 border-t border-zinc-100 bg-zinc-50/80 px-4 py-4 dark:border-zinc-700 dark:bg-zinc-800/50 sm:px-6">
+              <div className="flex flex-wrap items-center justify-between gap-4 border-t border-zinc-100 bg-surface-card px-4 py-4 dark:border-zinc-700 sm:px-6">
                 <p className="text-sm text-zinc-500 dark:text-zinc-400">
                   Page {currentPage} of {totalPages}
                 </p>

@@ -106,7 +106,7 @@ export default function ExamDetailTabs({ langName, content, examSize, examDurati
     ];
 
   return (
-    <div className="rounded-2xl border border-zinc-200 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900">
+    <div className="rounded-2xl border border-zinc-200 bg-surface-card dark:border-zinc-700">
       {/* Tab bar */}
       <div
         className="flex border-b border-zinc-200 dark:border-zinc-700"

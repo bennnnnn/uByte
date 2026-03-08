@@ -574,7 +574,7 @@ export function PracticeIDE({ problem, initialLang, categoryFilter = null, listP
 
         {/* Description panel (left) — same bg as InstructionsSidebar */}
         <aside
-          className={`flex min-w-0 flex-col overflow-hidden bg-zinc-50 dark:bg-zinc-900 ${
+          className={`flex min-w-0 flex-col overflow-hidden bg-surface-card ${
             mobileTab === "desc" ? "flex shrink" : "hidden"
           } md:flex md:shrink-0`}
           style={isMobile ? undefined : { width: leftWidth }}
@@ -797,7 +797,7 @@ export function PracticeIDE({ problem, initialLang, categoryFilter = null, listP
 
           {/* Output / verdict panel — single scroll container */}
           <div
-            className="shrink-0 overflow-y-auto overflow-x-hidden bg-zinc-50 dark:bg-zinc-950"
+            className="shrink-0 overflow-y-auto overflow-x-hidden bg-surface-card"
             style={{ height: outputHeight }}
             suppressHydrationWarning
           >

@@ -36,7 +36,7 @@ export default function ProgressTab({ stats, userId }: Props) {
     <div className="space-y-6">
 
       {/* Progress summary card */}
-      <div className="rounded-2xl border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-900">
+      <div className="rounded-2xl border border-zinc-200 bg-surface-card p-6 dark:border-zinc-800">
         <div className="mb-4 flex items-end justify-between">
           <div>
             <p className="text-4xl font-bold text-zinc-900 dark:text-zinc-100">
@@ -75,7 +75,7 @@ export default function ProgressTab({ stats, userId }: Props) {
           </div>
         </div>
       ) : (
-        <div className="flex items-center gap-4 rounded-2xl border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900">
+        <div className="flex items-center gap-4 rounded-2xl border border-zinc-200 bg-surface-card p-5 dark:border-zinc-800">
           <span className="text-3xl">🎓</span>
           <div>
             <p className="font-semibold text-zinc-900 dark:text-zinc-100">Certificate of Completion</p>
@@ -102,7 +102,7 @@ export default function ProgressTab({ stats, userId }: Props) {
             ))}
           </div>
         ) : completedSlugs.length === 0 ? (
-          <div className="rounded-2xl border border-zinc-200 bg-white py-10 text-center dark:border-zinc-800 dark:bg-zinc-900">
+          <div className="rounded-2xl border border-zinc-200 bg-surface-card py-10 text-center dark:border-zinc-800">
             <p className="text-2xl">📚</p>
             <p className="mt-2 text-sm text-zinc-500">No tutorials completed yet.</p>
             <Link href="/" className="mt-3 inline-block text-sm font-medium text-indigo-600 hover:underline dark:text-indigo-400">
@@ -115,7 +115,7 @@ export default function ProgressTab({ stats, userId }: Props) {
               <li key={slug}>
                 <Link
                   href={tutorialUrl("go", slug)}
-                  className="flex items-center gap-3 rounded-xl border border-zinc-200 bg-white px-4 py-3 text-sm transition-colors hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900 dark:hover:bg-zinc-800"
+                  className="flex items-center gap-3 rounded-xl border border-zinc-200 bg-surface-card px-4 py-3 text-sm transition-colors hover:bg-zinc-50 dark:border-zinc-800 dark:hover:bg-zinc-800"
                 >
                   <svg className="h-4 w-4 shrink-0 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />

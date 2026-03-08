@@ -70,7 +70,7 @@ function ExamCard({
   return (
     <Link
       href={`/certifications/${slug}`}
-      className="group relative flex flex-col overflow-hidden rounded-2xl border border-zinc-200 bg-zinc-50 shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-lg dark:border-zinc-800 dark:bg-zinc-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/40"
+      className="group relative flex flex-col overflow-hidden rounded-2xl border border-zinc-200 bg-surface-card shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-lg dark:border-zinc-800 focus:outline-none focus:ring-2 focus:ring-indigo-500/40"
     >
       <div className="flex flex-1 flex-col gap-5 p-6">
         {/* Top row: icon + name + difficulty + status */}
@@ -249,7 +249,7 @@ export default async function PracticeExamsPage() {
   };
 
   return (
-    <div className="min-h-full overflow-y-auto bg-white dark:bg-zinc-950">
+    <div className="min-h-full overflow-y-auto">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -258,7 +258,7 @@ export default async function PracticeExamsPage() {
       />
 
       {/* ── Hero ─────────────────────────────────────────────────────────── */}
-      <div className="border-b border-zinc-200 bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900">
+      <div className="border-b border-zinc-200 bg-surface-card dark:border-zinc-800">
         <div className="mx-auto max-w-5xl px-6 py-12 sm:py-16">
           <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
             <div className="max-w-xl">
@@ -385,7 +385,7 @@ export default async function PracticeExamsPage() {
             <h2 className="mb-6 text-xs font-semibold uppercase tracking-widest text-zinc-400 dark:text-zinc-500">
               Your progress
             </h2>
-            <div className="rounded-2xl border border-zinc-200 bg-zinc-50 p-6 dark:border-zinc-800 dark:bg-zinc-900">
+            <div className="rounded-2xl border border-zinc-200 bg-surface-card p-6 dark:border-zinc-800">
               <div className="mb-5 flex items-center justify-between">
                 <div>
                   <p className="text-2xl font-bold text-zinc-900 dark:text-zinc-100">
@@ -468,7 +468,7 @@ export default async function PracticeExamsPage() {
                   linkLabel: "View certifications",
                 },
               ].map(({ step, icon, title, body, link, linkLabel }) => (
-                <div key={step} className="relative rounded-2xl border border-zinc-200 bg-zinc-50 p-6 dark:border-zinc-800 dark:bg-zinc-900">
+                <div key={step} className="relative rounded-2xl border border-zinc-200 bg-surface-card p-6 dark:border-zinc-800">
                   <div className="relative z-10 mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-indigo-50 text-2xl dark:bg-indigo-950/40">
                     {icon}
                   </div>
@@ -561,7 +561,7 @@ export default async function PracticeExamsPage() {
                 body: "Every certificate has a public verification page. Share the link with recruiters, teammates, or on social media.",
               },
             ].map(({ icon, title, body }) => (
-              <div key={title} className="rounded-2xl border border-zinc-200 bg-zinc-50 p-5 dark:border-zinc-800 dark:bg-zinc-900">
+              <div key={title} className="rounded-2xl border border-zinc-200 bg-surface-card p-5 dark:border-zinc-800">
                 <span className="text-2xl">{icon}</span>
                 <h3 className="mt-3 font-semibold text-zinc-900 dark:text-zinc-100">{title}</h3>
                 <p className="mt-1.5 text-sm text-zinc-500 dark:text-zinc-400">{body}</p>
@@ -608,7 +608,7 @@ export default async function PracticeExamsPage() {
             </div>
           </div>
         ) : passedLangs.length < EXAM_LANGS.length ? (
-          <div className="mt-16 rounded-2xl border border-zinc-200 bg-zinc-50 p-8 text-center dark:border-zinc-800 dark:bg-zinc-900">
+          <div className="mt-16 rounded-2xl border border-zinc-200 bg-surface-card p-8 text-center dark:border-zinc-800">
             <h2 className="text-xl font-bold text-zinc-900 dark:text-zinc-100">
               {passedLangs.length === 0 ? "Take your first certification" : `${EXAM_LANGS.length - passedLangs.length} certifications remaining`}
             </h2>

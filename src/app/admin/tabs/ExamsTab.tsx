@@ -92,7 +92,7 @@ export default function ExamsTab({ data }: Props) {
           <SectionCard title="Stats by language">
             <div className="overflow-auto -mx-5 -mb-5">
               <table className="w-full text-sm">
-                <thead className="bg-zinc-50 dark:bg-zinc-900">
+                <thead className="bg-surface-card">
                   <tr>
                     {["Lang", "Questions", "Attempts", "Passed", "Certs", "Pass %"].map((h, i) => (
                       <th key={h} className={`${i === 0 ? "px-5 text-left" : i === 5 ? "px-5 text-right" : "px-4 text-right"} py-2.5 text-xs font-semibold uppercase tracking-wide text-zinc-400`}>{h}</th>

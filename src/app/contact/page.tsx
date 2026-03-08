@@ -22,9 +22,9 @@ export const metadata: Metadata = {
 
 export default function ContactPage() {
   return (
-    <div className="min-h-full overflow-y-auto bg-zinc-50 dark:bg-zinc-950">
+    <div className="min-h-full overflow-y-auto">
       <div className="mx-auto max-w-4xl px-6 py-14">
-        <section className="mb-10 rounded-3xl border border-zinc-200 bg-white p-8 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+        <section className="mb-10 rounded-3xl border border-zinc-200 bg-surface-card p-8 shadow-sm dark:border-zinc-800">
           <p className="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-indigo-600 dark:text-indigo-400">
             Contact
           </p>
@@ -39,7 +39,7 @@ export default function ContactPage() {
         <section className="grid gap-4 sm:grid-cols-2">
           <a
             href="mailto:support@ubyte.dev"
-            className="rounded-2xl border border-zinc-200 bg-white p-6 transition-colors hover:border-indigo-300 dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-indigo-700"
+            className="rounded-2xl border border-zinc-200 bg-surface-card p-6 transition-colors hover:border-indigo-300 dark:border-zinc-800 dark:hover:border-indigo-700"
           >
             <h2 className="text-lg font-bold text-zinc-900 dark:text-zinc-100">General Support</h2>
             <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
@@ -50,7 +50,7 @@ export default function ContactPage() {
 
           <a
             href="mailto:privacy@ubyte.dev"
-            className="rounded-2xl border border-zinc-200 bg-white p-6 transition-colors hover:border-indigo-300 dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-indigo-700"
+            className="rounded-2xl border border-zinc-200 bg-surface-card p-6 transition-colors hover:border-indigo-300 dark:border-zinc-800 dark:hover:border-indigo-700"
           >
             <h2 className="text-lg font-bold text-zinc-900 dark:text-zinc-100">Privacy & Data</h2>
             <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">

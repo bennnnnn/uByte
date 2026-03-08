@@ -21,7 +21,7 @@ export default function AuditTab({ data }: Props) {
     <SectionCard title="Admin action log">
       <div className="overflow-auto -mx-5 -mb-5">
         <table className="w-full text-sm">
-          <thead className="sticky top-0 bg-zinc-50 dark:bg-zinc-900">
+          <thead className="sticky top-0 bg-surface-card">
             <tr>
               <th className="px-5 py-2.5 text-left text-xs font-semibold uppercase tracking-wide text-zinc-400">Action</th>
               <th className="px-4 py-2.5 text-left text-xs font-semibold uppercase tracking-wide text-zinc-400">Admin</th>

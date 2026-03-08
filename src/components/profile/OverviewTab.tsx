@@ -74,7 +74,7 @@ export default function OverviewTab({ stats, badges, achievements, userId }: Pro
     <div className="space-y-8">
 
       {/* Quick progress summary */}
-      <div className="rounded-2xl border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900">
+      <div className="rounded-2xl border border-zinc-200 bg-surface-card p-5 dark:border-zinc-800">
         <div className="mb-3 flex items-center justify-between text-sm">
           <span className="font-medium text-zinc-700 dark:text-zinc-300">
             {stats.completed_count} / {stats.total_tutorials} tutorials
@@ -102,7 +102,7 @@ export default function OverviewTab({ stats, badges, achievements, userId }: Pro
 
       {/* Exam certificates */}
       {examCerts.length > 0 && (
-        <div className="rounded-2xl border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900">
+        <div className="rounded-2xl border border-zinc-200 bg-surface-card p-5 dark:border-zinc-800">
           <div className="mb-3 flex items-center justify-between">
             <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
               Exam certificates
@@ -150,7 +150,7 @@ export default function OverviewTab({ stats, badges, achievements, userId }: Pro
               return badge ? (
                 <div
                   key={a.badge_key}
-                  className="flex items-center gap-2 rounded-xl border border-zinc-200 bg-white px-3 py-2 dark:border-zinc-800 dark:bg-zinc-900"
+                  className="flex items-center gap-2 rounded-xl border border-zinc-200 bg-surface-card px-3 py-2 dark:border-zinc-800"
                 >
                   <span className="text-lg">{badge.icon}</span>
                   <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300">{badge.name}</span>
@@ -182,7 +182,7 @@ export default function OverviewTab({ stats, badges, achievements, userId }: Pro
             {activity.slice(0, 8).map((item) => (
               <li
                 key={item.id}
-                className="flex items-center gap-3 rounded-xl border border-zinc-200 bg-white px-4 py-3 dark:border-zinc-800 dark:bg-zinc-900"
+                className="flex items-center gap-3 rounded-xl border border-zinc-200 bg-surface-card px-4 py-3 dark:border-zinc-800"
               >
                 <span className="text-lg">{ACTION_ICONS[item.action] ?? "📌"}</span>
                 <div className="min-w-0 flex-1">

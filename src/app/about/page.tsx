@@ -24,9 +24,9 @@ export const metadata: Metadata = {
 
 export default function AboutPage() {
   return (
-    <div className="min-h-full overflow-y-auto bg-zinc-50 dark:bg-zinc-950">
+    <div className="min-h-full overflow-y-auto">
       <div className="mx-auto max-w-5xl px-6 py-14">
-        <section className="mb-12 rounded-3xl border border-zinc-200 bg-white p-8 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+        <section className="mb-12 rounded-3xl border border-zinc-200 bg-surface-card p-8 shadow-sm dark:border-zinc-800">
           <p className="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-indigo-600 dark:text-indigo-400">
             About
           </p>
@@ -60,7 +60,7 @@ export default function AboutPage() {
             { title: "Interview prep", body: "Coding challenges modeled after real technical interview patterns." },
             { title: "Certifications", body: "Timed certification exams with per-language scoring and shareable certificates." },
           ].map((card) => (
-            <article key={card.title} className="rounded-2xl border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900">
+            <article key={card.title} className="rounded-2xl border border-zinc-200 bg-surface-card p-5 dark:border-zinc-800">
               <h2 className="text-base font-bold text-zinc-900 dark:text-zinc-100">{card.title}</h2>
               <p className="mt-2 text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">{card.body}</p>
             </article>

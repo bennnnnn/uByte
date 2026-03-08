@@ -81,7 +81,7 @@ export default function PracticeExamResultPage() {
   const langName = LANGUAGES[lang as SupportedLanguage]?.name ?? lang;
 
   return (
-    <div className="min-h-full overflow-y-auto bg-zinc-50 dark:bg-zinc-950">
+    <div className="min-h-full overflow-y-auto">
       <div className="mx-auto max-w-2xl px-6 py-14">
         <Link
           href={`/certifications/${lang}`}

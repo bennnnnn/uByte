@@ -167,7 +167,7 @@ export default function AuthModal({ onClose, initialMode }: Props) {
       />
 
       {/* Card */}
-      <div className="relative w-full max-w-[400px] rounded-2xl border border-zinc-200/80 bg-white shadow-2xl shadow-zinc-900/10 dark:border-zinc-800 dark:bg-zinc-900 dark:shadow-none">
+      <div className="relative w-full max-w-[400px] rounded-2xl border border-zinc-200/80 bg-surface-card shadow-2xl shadow-zinc-900/10 dark:border-zinc-800 dark:shadow-none">
         <div className="p-8">
           <div className="mb-6 flex items-start justify-between gap-4">
             <div>

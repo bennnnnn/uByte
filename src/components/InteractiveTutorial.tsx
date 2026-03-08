@@ -252,7 +252,7 @@ export default function InteractiveTutorial({
       {/* Main Split */}
       <div className="flex flex-1 overflow-hidden">
         {/* Left panel */}
-        <aside className={`flex min-w-0 flex-col overflow-hidden bg-zinc-50 dark:bg-zinc-900 ${mobileTab === "instructions" ? "flex shrink" : "hidden"} md:flex md:shrink-0`} style={isMobile ? undefined : { width: leftWidth }} suppressHydrationWarning>
+        <aside className={`flex min-w-0 flex-col overflow-hidden bg-surface-card ${mobileTab === "instructions" ? "flex shrink" : "hidden"} md:flex md:shrink-0`} style={isMobile ? undefined : { width: leftWidth }} suppressHydrationWarning>
           <InstructionsSidebar
             lang={lang}
             step={currentStep}

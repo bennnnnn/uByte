@@ -55,7 +55,7 @@ export default function OtherExamsGrid({ currentLang, langSlugs, examConfigByLan
             <Link
               key={slug}
               href={`/certifications/${slug}`}
-              className="group flex items-center gap-4 rounded-2xl border border-zinc-200 bg-zinc-50 p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:border-indigo-300 hover:shadow-md dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-indigo-700"
+              className="group flex items-center gap-4 rounded-2xl border border-zinc-200 bg-surface-card p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:border-indigo-300 hover:shadow-md dark:border-zinc-800 dark:hover:border-indigo-700"
             >
               <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-zinc-100 bg-white text-2xl dark:border-zinc-700/60 dark:bg-zinc-800">
                 {getLangIcon(slug)}
