@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 import { withErrorHandling } from "@/lib/api-utils";
-import { verifyCsrf } from "@/lib/csrf";
 import { isSupportedLanguage } from "@/lib/languages/registry";
 import { JUDGE0_URL, JUDGE0_LANG_IDS, b64, normaliseJudge0RunOutput } from "@/lib/judge0";
 
@@ -9,9 +8,6 @@ const MAX_CODE_LENGTH = 64 * 1024; // 64 KB
 const TIMEOUT_MS = 20_000;
 
 export const POST = withErrorHandling("POST /api/run-code", async (request: NextRequest) => {
-  const csrfError = verifyCsrf(request);
-  if (csrfError) return NextResponse.json({ Errors: csrfError }, { status: 403 });
-
   const ip = getClientIp(request.headers);
   const { limited, retryAfter } = await checkRateLimit(`run:${ip}`, 15, 60_000);
   if (limited) {
