@@ -18,7 +18,13 @@ const PILLARS = [
   },
 ];
 
-export default function ValuePropBanner() {
+interface ValuePropBannerProps {
+  isPro?: boolean;
+}
+
+export default function ValuePropBanner({ isPro = false }: ValuePropBannerProps) {
+  if (isPro) return null;
+
   return (
     <section
       aria-labelledby="value-prop-heading"

@@ -6,7 +6,7 @@ import { getAllPracticeProblems, getPracticeProblemBySlug } from "@/lib/practice
 import { LANGUAGES, getAllLanguageSlugs } from "@/lib/languages/registry";
 import { getLangIcon } from "@/lib/languages/icons";
 import { APP_NAME, BASE_URL } from "@/lib/constants";
-import { getExamConfigForAllLangs, getLastActivity } from "@/lib/db";
+import { getExamConfigForAllLangs, getLastActivity, getUserPlan } from "@/lib/db";
 import { tutorialLangUrl, tutorialUrl } from "@/lib/urls";
 import { absoluteUrl, SITE_KEYWORDS, buildSiteSearchJsonLd } from "@/lib/seo";
 import { getCurrentUser } from "@/lib/auth";
@@ -108,6 +108,9 @@ export default async function Home() {
   const continueTutorialList = getAllTutorials(continueLang).map(({ slug, title }) => ({ slug, title }));
   const lessonCountGo = getTotalLessonCount("go");
 
+  const userPlan = user ? await getUserPlan(user.userId) : "free";
+  const isPro = userPlan === "pro" || userPlan === "yearly";
+
   return (
     <div className="min-h-0 flex-1 overflow-y-auto">
       <script
@@ -135,8 +138,8 @@ export default async function Home() {
         {/* How it works */}
         <StepsSection />
 
-        {/* Why upgrade — value proposition banner */}
-        <ValuePropBanner />
+        {/* Why upgrade — value proposition banner (hidden for Pro users) */}
+        <ValuePropBanner isPro={isPro} />
 
         {/* Languages */}
         <section aria-labelledby="languages-heading">
