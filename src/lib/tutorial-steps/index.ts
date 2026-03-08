@@ -48,8 +48,21 @@ export function getAllStepsForLanguage(
 
 /**
  * Total number of lessons (steps) for a language across all tutorials.
- * Uses content-driven tutorial list when available (MDX); falls back to TS step keys
- * so the count is never 0 when we have step data (e.g. if content dir is missing at build time).
+ *
+ * Used by: profile stats, homepage hero, tutorial cards, public profile.
+ *
+ * HOW TO ADD A NEW TUTORIAL:
+ *   1. Create the MDX file:  content/<lang>/<slug>.mdx
+ *   2. Create the steps via EITHER:
+ *      a. content/<lang>/<slug>.steps.json  (preferred — content-driven, translatable)
+ *      b. src/lib/tutorial-steps/<lang>/<slug>.ts  (TS fallback — export from lang index)
+ *   3. That's it — lesson count updates automatically (60s cache on MDX scan).
+ *
+ * Resolution order:
+ *   - First tries getAllTutorials(lang) which scans content/<lang>/*.mdx via fs.readdirSync
+ *   - If that returns empty (e.g. serverless env without content/ bundled),
+ *     falls back to TS step definitions in stepsByLanguage[lang]
+ *   - For each tutorial slug, getSteps() prefers .steps.json, then TS definitions
  */
 export function getTotalLessonCount(lang: SupportedLanguage): number {
   let slugs: string[] = getAllTutorials(lang).map((t) => t.slug);

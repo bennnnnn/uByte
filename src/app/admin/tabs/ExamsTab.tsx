@@ -37,7 +37,7 @@ export default function ExamsTab({ data }: Props) {
         {examSettings === null ? <LoadingBlock /> : (
           <>
             <div className="overflow-x-auto">
-              <table className="w-full text-sm">
+              <table className="w-full min-w-[500px] text-sm">
                 <thead>
                   <tr className="border-b border-zinc-200 dark:border-zinc-700">
                     <th className="pb-2 pr-4 text-left text-xs font-semibold uppercase tracking-wide text-zinc-400">Language</th>
@@ -91,7 +91,7 @@ export default function ExamsTab({ data }: Props) {
           {/* ── Per-language stats table ───────────────────────────────── */}
           <SectionCard title="Stats by language">
             <div className="overflow-auto -mx-5 -mb-5">
-              <table className="w-full text-sm">
+              <table className="w-full min-w-[560px] text-sm">
                 <thead className="bg-surface-card">
                   <tr>
                     {["Lang", "Questions", "Attempts", "Passed", "Certs", "Pass %"].map((h, i) => (

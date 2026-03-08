@@ -1,3 +1,16 @@
+/**
+ * Profile stats API.
+ *
+ * Progress is measured in LESSONS (steps within tutorials), not tutorials (MDX files).
+ * This matches the homepage display ("X lessons" on tutorial cards).
+ *
+ * - total_tutorials  = sum of getTotalLessonCount(lang) across all languages
+ * - completed_count  = for each completed tutorial, sum its step count
+ * - byLanguage[]     = per-language breakdown with the same lesson-based counts
+ *
+ * Lesson counts are dynamic — adding new tutorials/steps updates automatically.
+ * See src/lib/tutorial-steps/index.ts for the resolution order and how to add tutorials.
+ */
 import { NextResponse } from "next/server";
 import { getUserById, getProgress, getAchievements, getActivityCount } from "@/lib/db";
 import { BADGES } from "@/lib/badges";

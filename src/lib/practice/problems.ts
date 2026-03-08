@@ -1,3 +1,16 @@
+/**
+ * Interview prep problem registry.
+ *
+ * HOW TO ADD A NEW PROBLEM:
+ *   1. Add it to problems-easy.ts, problems-medium.ts, or problems-hard.ts
+ *   2. Include `category` on the definition (e.g. category: "array")
+ *      — categories, counts, and filters all derive from the problems automatically
+ *   3. Add starter code per language in the `starter` field
+ *   4. Optionally add testCases and judgeHarness for auto-grading
+ *
+ * All counts (total, per-category, per-difficulty) are dynamic.
+ * The free drip system (src/lib/db/practice-unlocks.ts) gates access for free users.
+ */
 import type { PracticeProblem, ProblemCategory, Difficulty } from "./types";
 import type { SupportedLanguage } from "@/lib/languages/types";
 import { EASY_PROBLEMS } from "./problems-easy";

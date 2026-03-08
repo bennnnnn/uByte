@@ -61,7 +61,7 @@ export default function RevenueTab({ data }: Props) {
       {/* ── Subscription events ────────────────────────────────────────── */}
       <SectionCard title="Recent subscription events">
         <div className="overflow-auto -mx-5 -mb-5">
-          <table className="w-full text-sm">
+          <table className="w-full min-w-[540px] text-sm">
             <thead className="sticky top-0 bg-surface-card">
               <tr>
                 <th className="px-5 py-2.5 text-left text-xs font-semibold uppercase tracking-wide text-zinc-400">When</th>
