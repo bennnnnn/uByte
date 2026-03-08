@@ -18,26 +18,28 @@ import {
   PracticeSection,
   PracticeExamsSection,
   StepsSection,
+  ValuePropBanner,
 } from "@/components/home";
 import ContinueBanner from "@/components/ContinueBanner";
 import LeftOffBanner from "@/components/LeftOffBanner";
 import GoogleOAuthError from "@/components/GoogleOAuthError";
 
 export const metadata: Metadata = {
-  title: "uByte - Programming Tutorials, Interview Prep, and Certifications",
+  title: "uByte — Learn, Practice, and Get Certified in 6 Languages",
   description:
-    "Learn programming with interactive tutorials in Go, Python, C++, JavaScript, Java, and Rust. Practice interview questions and certification-style exams.",
+    "The complete path from beginner to job-ready. Interactive tutorials, LeetCode-style interview prep, and verifiable certificates — all in Go, Python, JavaScript, Java, Rust, and C++.",
   keywords: [
     ...SITE_KEYWORDS,
     "coding bootcamp alternative",
     "software engineer interview prep",
-    "programming lessons online",
+    "programming certification online",
+    "learn to code and get certified",
   ],
   alternates: { canonical: absoluteUrl("/") },
   openGraph: {
-    title: "uByte - Programming Tutorials, Interview Prep, and Certifications",
+    title: "uByte — Learn, Practice, and Get Certified in 6 Languages",
     description:
-      "Interactive programming tutorials, interview prep, and certification-style exams.",
+      "Interactive tutorials, LeetCode-style interview prep, and verifiable certificates for Go, Python, JavaScript, Java, Rust, and C++.",
     type: "website",
     url: absoluteUrl("/"),
   },
@@ -133,12 +135,15 @@ export default async function Home() {
         {/* How it works */}
         <StepsSection />
 
+        {/* Why upgrade — value proposition banner */}
+        <ValuePropBanner />
+
         {/* Languages */}
         <section aria-labelledby="languages-heading">
           <SectionHeading
             id="languages-heading"
-            title="Programming Language Tutorials"
-            subtitle="Learn Go, Python, C++, JavaScript, Java, and Rust with the same step-by-step tutorial structure."
+            title="Six languages. One subscription."
+            subtitle="Go, Python, JavaScript, Java, Rust, and C++ — all with the same interactive step-by-step structure. Start one, continue all."
           />
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {languageEntries.map(({ slug, config }) => (

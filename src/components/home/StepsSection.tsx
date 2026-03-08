@@ -1,10 +1,10 @@
 import SectionHeading from "./SectionHeading";
 
 const STEPS = [
-  { number: "01", icon: "📖", label: "Read",     desc: "Short, focused lessons with clear explanations and real examples." },
-  { number: "02", icon: "✏️", label: "Code",     desc: "Edit real code directly in your browser — no installs, no setup." },
-  { number: "03", icon: "✓",  label: "Check",    desc: "Instant feedback tells you if your output matches the expected result." },
-  { number: "04", icon: "🏆", label: "Level up", desc: "Earn XP, maintain streaks, and track your progress across all languages." },
+  { number: "01", icon: "📖", label: "Learn",     desc: "Short, focused tutorials with real code examples. Zero setup — write and run code right in your browser." },
+  { number: "02", icon: "🎯", label: "Practice",  desc: "Solve LeetCode-style problems to sharpen the skills interviewers actually test. Same IDE, all 6 languages." },
+  { number: "03", icon: "📋", label: "Certify",   desc: "Take a timed exam and earn a verifiable certificate you can share on LinkedIn or your résumé." },
+  { number: "04", icon: "🚀", label: "Get hired", desc: "Walk into any technical interview job-ready — with proof of your skills to back it up." },
 ];
 
 const CARD_CLS = "border-indigo-200 bg-gradient-to-br from-white to-indigo-50/60 dark:border-indigo-900/40 dark:from-zinc-900 dark:to-indigo-950/20";
@@ -12,7 +12,7 @@ const CARD_CLS = "border-indigo-200 bg-gradient-to-br from-white to-indigo-50/60
 export default function StepsSection() {
   return (
     <section aria-labelledby="how-heading">
-      <SectionHeading id="how-heading" title="How it works" subtitle="Four steps. Zero setup. Real code." className="mb-10" />
+      <SectionHeading id="how-heading" title="One subscription. The complete path." subtitle="From your first line of code to a verifiable certificate — no other platform needed." className="mb-10" />
 
       <div className="relative grid grid-cols-2 gap-4 sm:grid-cols-4">
         <div aria-hidden className="absolute left-0 right-0 top-12 hidden border-t-2 border-dashed border-zinc-200 dark:border-zinc-700 sm:block" />

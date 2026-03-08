@@ -97,10 +97,10 @@ const STEP_TEXT: Record<Lang, string> = {
 const LANG_ORDER = ALL_LANGUAGE_KEYS;
 
 const FEATURES = [
-  "Write real code in your browser — zero setup",
-  "Instant pass/fail feedback on every step",
-  "Same concepts taught across all 6 languages",
-  "Built-in LeetCode-style interview prep",
+  "Write real code in your browser — zero setup, zero installs",
+  "Tutorials → Interview prep → Verifiable certification, all in one",
+  "Instant feedback on every step — know if you're right immediately",
+  "One subscription unlocks all 6 languages, all features",
 ];
 
 interface HeroSectionProps {
@@ -141,21 +141,21 @@ export default function HeroSection({ topicCount = 19, lessonCountGo = 0, proble
             {/* Badge */}
             <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-indigo-200 bg-indigo-50 px-4 py-1.5 text-[11px] font-bold uppercase tracking-[0.12em] text-indigo-600 dark:border-indigo-800 dark:bg-indigo-950/50 dark:text-indigo-400">
               <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-indigo-500" />
-              Free to start · No signup · 6 Languages
+              Free to start · No credit card · 6 Languages
             </div>
 
             {/* Headline */}
             <h1 className="mb-5 text-[2.75rem] font-black leading-[1.04] tracking-tight text-zinc-900 dark:text-zinc-50 sm:text-5xl lg:text-[3.25rem] xl:text-[3.75rem]">
-              Learn programming.
+              Learn. Practice.
               <GradientText className="mt-1 block">
-                Interactive tutorials for every language.
+                Get certified.
               </GradientText>
             </h1>
 
             {/* Sub */}
             <p className="mb-8 max-w-[480px] text-base leading-relaxed text-zinc-500 dark:text-zinc-400 sm:text-lg">
-              Interactive tutorials in Go, Python, JavaScript, Java, Rust, and C++.
-              Write real code in your browser, get instant feedback, and ace technical interviews.
+              The complete path from beginner to job-ready — interactive tutorials,
+              LeetCode-style interview prep, and verifiable certificates. All in one place, for all 6 languages.
             </p>
 
             {/* Feature list */}
@@ -176,37 +176,31 @@ export default function HeroSection({ topicCount = 19, lessonCountGo = 0, proble
                 href="/tutorial/go"
                 className="group inline-flex items-center justify-center gap-2 rounded-xl bg-indigo-600 px-5 py-3 text-sm font-bold text-white shadow-md shadow-indigo-500/20 transition-all hover:-translate-y-0.5 hover:bg-indigo-500"
               >
-                Start free
+                Start for free
                 <svg className="h-4 w-4 transition-transform group-hover:translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
                 </svg>
               </Link>
               <Link
-                href="/practice"
+                href="/pricing"
                 className="inline-flex items-center gap-2 rounded-xl border border-zinc-200 bg-surface-card px-7 py-3 text-sm font-semibold text-zinc-700 transition-all hover:border-zinc-300 hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-300 dark:hover:border-zinc-600 dark:hover:bg-zinc-700"
               >
-                Interview prep
-              </Link>
-              <Link
-                href="/certifications"
-                className="inline-flex items-center gap-2 rounded-xl border border-zinc-200 bg-surface-card px-7 py-3 text-sm font-semibold text-zinc-700 transition-all hover:border-zinc-300 hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-300 dark:hover:border-zinc-600 dark:hover:bg-zinc-700"
-              >
-                Certifications
+                See pricing
               </Link>
             </div>
 
             {/* Trust line */}
             <p className="mb-6 text-xs font-medium text-zinc-500 dark:text-zinc-400">
-              Join learners building real skills — no credit card required.
+              Free forever for the basics. Upgrade to unlock everything.
             </p>
 
             {/* Stats */}
             <div className="flex flex-wrap gap-6 border-t border-zinc-200 pt-8 dark:border-zinc-800">
               {[
-                { n: "6",            label: "Languages"   },
-                { n: lessonsLabel,   label: "Lessons (Go)" },
-                { n: problemsLabel, label: "Problems"    },
-                { n: "Free",         label: "to start"    },
+                { n: "6",            label: "Languages"       },
+                { n: lessonsLabel,   label: "Lessons in Go"   },
+                { n: problemsLabel,  label: "Interview Qs"    },
+                { n: "6",            label: "Certifications"  },
               ].map(({ n, label }) => (
                 <div key={label}>
                   <p className="text-2xl font-black text-zinc-900 dark:text-zinc-100">{n}</p>

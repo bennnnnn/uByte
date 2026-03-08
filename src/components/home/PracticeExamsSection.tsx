@@ -14,17 +14,17 @@ export default function PracticeExamsSection({ examConfigByLang }: Props) {
       <div className="overflow-hidden rounded-2xl border border-amber-200/70 bg-gradient-to-br from-amber-50 to-amber-50/40 dark:border-amber-900/50 dark:from-amber-950/30 dark:to-amber-950/20">
         <div className="p-6 sm:p-8">
           <div className="mb-1 flex flex-wrap items-center gap-2">
-            <span className="text-2xl">📋</span>
-            <h2 id="certifications-heading" className="text-xl font-bold text-zinc-900 dark:text-zinc-100">Certifications</h2>
+            <span className="text-2xl">🏅</span>
+            <h2 id="certifications-heading" className="text-xl font-bold text-zinc-900 dark:text-zinc-100">Verifiable Certifications</h2>
             <span className="rounded-full border border-amber-300 bg-white/80 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-amber-700 dark:border-amber-700 dark:bg-zinc-900/80 dark:text-amber-400">
               Pro
             </span>
           </div>
           <p className="mb-5 text-sm text-zinc-600 dark:text-zinc-400">
-            Timed multiple-choice exams by language. Questions, duration, and pass threshold set per language. Pass to earn a certificate.
+            Prove what you know. Pass a timed exam and download a certificate you can share directly on LinkedIn, attach to a job application, or link from your portfolio.
           </p>
           <Link href="/certifications" className="inline-flex items-center gap-2 rounded-xl bg-amber-600 px-5 py-3 text-sm font-bold text-white shadow-md shadow-amber-500/25 transition-all hover:bg-amber-500 hover:shadow-amber-500/35 hover:-translate-y-0.5">
-            Explore certifications
+            View certifications
           </Link>
         </div>
       </div>

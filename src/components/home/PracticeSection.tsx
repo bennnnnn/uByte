@@ -27,13 +27,13 @@ export default function PracticeSection({ problemCount = 11 }: PracticeSectionPr
         <div className="p-6 sm:p-8">
           <div className="mb-1 flex flex-wrap items-center gap-2">
             <span className="text-2xl">🎯</span>
-            <h2 id="practice-heading" className="text-xl font-bold text-zinc-900 dark:text-zinc-100">Coding Interview Prep</h2>
+            <h2 id="practice-heading" className="text-xl font-bold text-zinc-900 dark:text-zinc-100">Interview Prep</h2>
             <span className="rounded-full border border-indigo-300 bg-white/80 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-indigo-600 dark:border-indigo-700 dark:bg-zinc-900/80 dark:text-indigo-400">
               LeetCode-style
             </span>
           </div>
           <p className="mb-5 text-sm text-zinc-600 dark:text-zinc-400">
-            Solve classic problems — Two Sum, Merge Intervals, Trapping Rain Water and more — in any language. Same IDE, built right in.
+            The problems interviewers actually ask. Solve Two Sum, Merge Intervals, Trapping Rain Water, and more — in any of the 6 languages, without leaving uByte.
           </p>
 
           <ul className="mb-5 space-y-1.5">
