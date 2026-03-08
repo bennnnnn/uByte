@@ -168,6 +168,30 @@ export default function ExamCertificatePage() {
       <p className="mt-3 text-center text-xs text-zinc-400 print:hidden">
         This certificate is publicly verifiable. Anyone with this link can confirm its authenticity.
       </p>
+
+      {/* ── Conversion CTA for viewers ─────────────────────────────────── */}
+      <div className="mt-10 w-full max-w-3xl rounded-2xl border border-indigo-100 bg-indigo-50 p-6 text-center dark:border-indigo-900/40 dark:bg-indigo-950/20 print:hidden">
+        <p className="text-lg font-bold text-zinc-900 dark:text-zinc-100">
+          Want your own {langConfig?.name ?? data.lang} certificate?
+        </p>
+        <p className="mx-auto mt-1.5 max-w-md text-sm text-zinc-500 dark:text-zinc-400">
+          Take the timed {langConfig?.name ?? data.lang} certification exam. Pass and earn a verifiable certificate you can share anywhere.
+        </p>
+        <div className="mt-5 flex flex-wrap items-center justify-center gap-3">
+          <Link
+            href={`/certifications/${data.lang}`}
+            className="inline-flex items-center justify-center rounded-xl bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-indigo-500"
+          >
+            Get certified in {langConfig?.name ?? data.lang}
+          </Link>
+          <Link
+            href="/certifications"
+            className="inline-flex items-center justify-center rounded-xl border border-zinc-300 bg-white px-5 py-2.5 text-sm font-semibold text-zinc-700 transition-colors hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200"
+          >
+            Browse all certifications
+          </Link>
+        </div>
+      </div>
     </div>
   );
 }

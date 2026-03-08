@@ -341,18 +341,27 @@ export default async function PracticeExamLangPage({ params }: Props) {
                     ]} />
 
                     <div className="mt-6 flex flex-col gap-3">
-                      <Link
-                        href="/pricing"
-                        className="inline-flex items-center justify-center rounded-xl bg-indigo-600 px-5 py-3 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-indigo-500"
-                      >
-                        Get certified
-                      </Link>
-                      {!user && (
+                      {!user ? (
+                        <>
+                          <Link
+                            href={`/login?redirect=/certifications/${lang}`}
+                            className="inline-flex items-center justify-center rounded-xl bg-indigo-600 px-5 py-3 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-indigo-500"
+                          >
+                            Sign up free
+                          </Link>
+                          <Link
+                            href="/pricing"
+                            className="inline-flex items-center justify-center rounded-xl border border-zinc-200 bg-white px-5 py-3 text-sm font-semibold text-zinc-700 transition-colors hover:bg-zinc-100 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-200 dark:hover:bg-zinc-700"
+                          >
+                            See pricing
+                          </Link>
+                        </>
+                      ) : (
                         <Link
-                          href="/login"
-                          className="inline-flex items-center justify-center rounded-xl border border-zinc-200 bg-white px-5 py-3 text-sm font-semibold text-zinc-700 transition-colors hover:bg-zinc-100 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-200 dark:hover:bg-zinc-700"
+                          href="/pricing"
+                          className="inline-flex items-center justify-center rounded-xl bg-indigo-600 px-5 py-3 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-indigo-500"
                         >
-                          Sign in
+                          Upgrade to Pro
                         </Link>
                       )}
                     </div>
