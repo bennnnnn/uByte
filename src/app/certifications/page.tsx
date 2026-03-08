@@ -108,27 +108,14 @@ function ExamCard({
               {examConfig.examDurationMinutes}<span className="ml-0.5 text-sm font-normal text-zinc-400">min</span>
             </p>
           </div>
-          {isLoggedIn && userAttempts > 0 ? (
-            <>
-              {stats?.bestScore != null && (
-                <div className="flex-1">
-                  <p className="text-xs text-zinc-400 dark:text-zinc-500">Best</p>
-                  <p className={`mt-0.5 text-lg font-bold tabular-nums ${isPassed ? "text-emerald-600 dark:text-emerald-400" : "text-zinc-900 dark:text-zinc-100"}`}>
-                    {stats.bestScore}%
-                  </p>
-                </div>
-              )}
-            </>
-          ) : (
-            <div className="flex-1">
-              <p className="text-xs text-zinc-400 dark:text-zinc-500">Pass rate</p>
-              <p className={`mt-0.5 text-lg font-bold tabular-nums ${
-                !hasData ? "text-zinc-400" : passRate >= 60 ? "text-emerald-600 dark:text-emerald-400" : "text-amber-600 dark:text-amber-400"
-              }`}>
-                {hasData ? `${passRate}%` : "—"}
-              </p>
-            </div>
-          )}
+          <div className="flex-1">
+            <p className="text-xs text-zinc-400 dark:text-zinc-500">Attempts</p>
+            <p className="mt-0.5 text-lg font-bold tabular-nums text-zinc-900 dark:text-zinc-100">
+              {isLoggedIn && userAttempts > 0
+                ? <>{userAttempts}<span className="ml-1 text-sm font-normal text-zinc-400">/ {hasData ? totalAttempts.toLocaleString() : "0"}</span></>
+                : hasData ? totalAttempts.toLocaleString() : "—"}
+            </p>
+          </div>
         </div>
 
         {/* CTA button */}
