@@ -90,65 +90,46 @@ function ExamCard({
                 </span>
               )}
             </div>
-            <p className="mt-0.5 text-xs text-zinc-400 dark:text-zinc-500">
-              {examConfig.examSize} questions · {examConfig.examDurationMinutes} min
-            </p>
           </div>
         </div>
 
-        {/* Personal score (logged-in users with attempts) */}
-        {isLoggedIn && userAttempts > 0 && (
-          <>
-            <div className="h-px bg-zinc-100 dark:bg-zinc-800" />
-            <div className="flex items-center gap-4">
+        {/* Divider */}
+        <div className="h-px bg-zinc-100 dark:bg-zinc-800" />
+
+        {/* Exam info + stats */}
+        <div className="flex items-center gap-4">
+          <div className="flex-1">
+            <p className="text-xs text-zinc-400 dark:text-zinc-500">Questions</p>
+            <p className="mt-0.5 text-lg font-bold tabular-nums text-zinc-900 dark:text-zinc-100">{examConfig.examSize}</p>
+          </div>
+          <div className="flex-1">
+            <p className="text-xs text-zinc-400 dark:text-zinc-500">Time limit</p>
+            <p className="mt-0.5 text-lg font-bold tabular-nums text-zinc-900 dark:text-zinc-100">
+              {examConfig.examDurationMinutes}<span className="ml-0.5 text-sm font-normal text-zinc-400">min</span>
+            </p>
+          </div>
+          {isLoggedIn && userAttempts > 0 ? (
+            <>
               {stats?.bestScore != null && (
                 <div className="flex-1">
-                  <p className="text-xs text-zinc-400 dark:text-zinc-500">Best score</p>
+                  <p className="text-xs text-zinc-400 dark:text-zinc-500">Best</p>
                   <p className={`mt-0.5 text-lg font-bold tabular-nums ${isPassed ? "text-emerald-600 dark:text-emerald-400" : "text-zinc-900 dark:text-zinc-100"}`}>
                     {stats.bestScore}%
                   </p>
                 </div>
               )}
-              {tryAgain && stats?.lastScore != null && (
-                <div className="flex-1">
-                  <p className="text-xs text-zinc-400 dark:text-zinc-500">Last attempt</p>
-                  <p className="mt-0.5 text-lg font-bold tabular-nums text-amber-600 dark:text-amber-400">
-                    {stats.lastScore}%
-                  </p>
-                </div>
-              )}
-              <div className="flex-1">
-                <p className="text-xs text-zinc-400 dark:text-zinc-500">Attempts</p>
-                <p className="mt-0.5 text-lg font-bold tabular-nums text-zinc-900 dark:text-zinc-100">
-                  {userAttempts}
-                </p>
-              </div>
+            </>
+          ) : (
+            <div className="flex-1">
+              <p className="text-xs text-zinc-400 dark:text-zinc-500">Pass rate</p>
+              <p className={`mt-0.5 text-lg font-bold tabular-nums ${
+                !hasData ? "text-zinc-400" : passRate >= 60 ? "text-emerald-600 dark:text-emerald-400" : "text-amber-600 dark:text-amber-400"
+              }`}>
+                {hasData ? `${passRate}%` : "—"}
+              </p>
             </div>
-          </>
-        )}
-
-        {/* Public stats (logged-out or no attempts) */}
-        {(!isLoggedIn || userAttempts === 0) && (
-          <>
-            <div className="h-px bg-zinc-100 dark:bg-zinc-800" />
-            <div className="flex items-center gap-4">
-              <div className="flex-1">
-                <p className="text-xs text-zinc-400 dark:text-zinc-500">Pass rate</p>
-                <p className={`mt-0.5 text-lg font-bold tabular-nums ${
-                  !hasData ? "text-zinc-400" : passRate >= 60 ? "text-emerald-600 dark:text-emerald-400" : "text-amber-600 dark:text-amber-400"
-                }`}>
-                  {hasData ? `${passRate}%` : "—"}
-                </p>
-              </div>
-              <div className="flex-1">
-                <p className="text-xs text-zinc-400 dark:text-zinc-500">Taken by</p>
-                <p className="mt-0.5 text-lg font-bold tabular-nums text-zinc-900 dark:text-zinc-100">
-                  {hasData ? `${totalAttempts.toLocaleString()} users` : "Be first"}
-                </p>
-              </div>
-            </div>
-          </>
-        )}
+          )}
+        </div>
 
         {/* CTA button */}
         <span className="mt-auto w-full rounded-xl bg-indigo-600 px-4 py-2.5 text-center text-sm font-semibold text-white shadow-sm transition-colors group-hover:bg-indigo-500">
