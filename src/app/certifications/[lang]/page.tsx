@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import { LANGUAGES, getAllLanguageSlugs } from "@/lib/languages/registry";
 import type { SupportedLanguage } from "@/lib/languages/types";
 import { getCurrentUser } from "@/lib/auth";
-import { getUserPlan, getExamConfigForLang, getExamConfigForAllLangs, getProgressCount } from "@/lib/db";
+import { getUserPlan, getExamConfigForLang, getExamConfigForAllLangs, getProgressCount, getUserExamStats, getExamPublicStatsByLang } from "@/lib/db";
 import { hasPaidAccess } from "@/lib/plans";
 import { getAllTutorials } from "@/lib/tutorials";
 import { getLangIcon } from "@/lib/languages/icons";
@@ -66,10 +66,11 @@ export default async function PracticeExamLangPage({ params }: Props) {
   const { lang } = await params;
   if (!VALID_LANGS.has(lang)) notFound();
 
-  const [user, examConfig, examConfigByLang] = await Promise.all([
+  const [user, examConfig, examConfigByLang, publicStats] = await Promise.all([
     getCurrentUser(),
     getExamConfigForLang(lang),
     getExamConfigForAllLangs(),
+    getExamPublicStatsByLang(),
   ]);
   const plan = user ? await getUserPlan(user.userId) : "free";
   const canTakeExam = hasPaidAccess(plan);
@@ -77,6 +78,11 @@ export default async function PracticeExamLangPage({ params }: Props) {
   const totalTutorials = getAllTutorials(lang as SupportedLanguage).length;
   const completedTutorials = user ? await getProgressCount(user.userId, lang) : 0;
   const hasStartedTutorials = completedTutorials > 0;
+
+  const examStats = user && canTakeExam ? await getUserExamStats(user.userId) : [];
+  const userLangStats = examStats.find((s) => s.lang === lang);
+  const publicStatsByLang = Object.fromEntries(publicStats.map((s) => [s.lang, s]));
+  const langPublicStats = publicStatsByLang[lang];
 
   const config = LANGUAGES[lang as SupportedLanguage];
   const name = config?.name ?? lang;
@@ -113,7 +119,7 @@ export default async function PracticeExamLangPage({ params }: Props) {
   ]);
 
   return (
-    <div className="min-h-full overflow-y-auto bg-zinc-50 dark:bg-zinc-950">
+    <div className="min-h-full overflow-y-auto bg-white dark:bg-zinc-950">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -122,25 +128,20 @@ export default async function PracticeExamLangPage({ params }: Props) {
       />
 
       {/* ── Hero ──────────────────────────────────────────────────────────── */}
-      <div className="border-b border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900">
+      <div className="border-b border-zinc-200 bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900">
         <div className="mx-auto max-w-5xl px-6 py-10 sm:py-14">
           <div className="flex flex-col gap-8 sm:flex-row sm:items-start sm:justify-between">
             {/* Left: identity + tagline + stat chips */}
             <div className="flex items-start gap-5">
-              <span className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl border border-zinc-100 bg-zinc-50 text-3xl dark:border-zinc-700/60 dark:bg-zinc-800">
+              <span className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl border border-zinc-100 bg-white text-3xl dark:border-zinc-700/60 dark:bg-zinc-800">
                 {getLangIcon(lang)}
               </span>
               <div>
-                <div className="flex flex-wrap items-center gap-2">
-                  <h1 className="text-3xl font-extrabold tracking-tight text-zinc-900 dark:text-zinc-100 sm:text-4xl">
-                    {name} Certification Exam
-                  </h1>
-                  <span className="rounded-full border border-amber-200 bg-amber-50 px-2.5 py-0.5 text-xs font-semibold text-amber-700 dark:border-amber-700/50 dark:bg-amber-950/30 dark:text-amber-400">
-                    Pro
-                  </span>
-                </div>
+                <h1 className="text-3xl font-extrabold tracking-tight text-zinc-900 dark:text-zinc-100 sm:text-4xl">
+                  {name} Certification Exam
+                </h1>
                 <p className="mt-2 max-w-xl text-base text-zinc-500 dark:text-zinc-400">
-                  {content?.tagline ?? `Timed multiple-choice exam to validate your ${name} knowledge.`}
+                  {content?.tagline ?? `Prove your ${name} knowledge. Pass to earn a verifiable certificate for your resume and LinkedIn.`}
                 </p>
 
                 {/* Quick stats chips */}
@@ -149,11 +150,11 @@ export default async function PracticeExamLangPage({ params }: Props) {
                     `${examConfig.examSize} questions`,
                     `${examConfig.examDurationMinutes} min`,
                     `${passMin} correct to pass (${EXAM_PASS_PERCENT}%)`,
-                    "Certificate on pass",
+                    "Verifiable certificate",
                   ].map((label) => (
                     <span
                       key={label}
-                      className="inline-flex items-center rounded-full border border-zinc-200 bg-zinc-50 px-3 py-1 text-sm font-medium text-zinc-700 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300"
+                      className="inline-flex items-center rounded-full border border-zinc-200 bg-white px-3 py-1 text-sm font-medium text-zinc-700 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300"
                     >
                       {label}
                     </span>
@@ -162,6 +163,33 @@ export default async function PracticeExamLangPage({ params }: Props) {
               </div>
             </div>
           </div>
+
+          {/* ── Stats bar ────────────────────────────────────────────────── */}
+          {(() => {
+            const stats: { value: string; label: string }[] = [];
+            if (langPublicStats && langPublicStats.attemptsSubmitted > 0) {
+              stats.push({ value: langPublicStats.attemptsSubmitted.toLocaleString(), label: "Attempts" });
+              stats.push({ value: `${langPublicStats.passRatePercent}%`, label: "Pass rate" });
+              stats.push({ value: langPublicStats.usersPassed.toLocaleString(), label: "Certified" });
+            }
+            if (userLangStats && userLangStats.attemptCount > 0) {
+              stats.push({ value: String(userLangStats.attemptCount), label: "Your attempts" });
+              if (userLangStats.bestScore != null) stats.push({ value: `${userLangStats.bestScore}%`, label: "Your best" });
+            }
+            if (stats.length === 0) return null;
+            return (
+              <div className={`mt-8 grid gap-4 border-t border-zinc-200 pt-6 dark:border-zinc-800 ${
+                stats.length >= 5 ? "grid-cols-5" : stats.length >= 4 ? "grid-cols-4" : stats.length === 3 ? "grid-cols-3" : stats.length === 2 ? "grid-cols-2" : "grid-cols-1"
+              }`}>
+                {stats.map((s) => (
+                  <div key={s.label}>
+                    <p className="text-xl font-bold text-zinc-900 dark:text-zinc-100">{s.value}</p>
+                    <p className="mt-0.5 text-xs text-zinc-500 dark:text-zinc-400">{s.label}</p>
+                  </div>
+                ))}
+              </div>
+            );
+          })()}
         </div>
       </div>
 
@@ -191,7 +219,7 @@ export default async function PracticeExamLangPage({ params }: Props) {
       {/* ── Tutorial progress (partially completed) ────────────────────── */}
       {user && hasStartedTutorials && completedTutorials < totalTutorials && (
         <div className="mx-auto max-w-5xl px-6 pt-6">
-          <div className="flex items-center gap-3 rounded-xl border border-zinc-200 bg-white px-5 py-4 dark:border-zinc-700 dark:bg-zinc-900">
+          <div className="flex items-center gap-3 rounded-xl border border-zinc-200 bg-zinc-50 px-5 py-4 dark:border-zinc-700 dark:bg-zinc-900">
             <span className="text-lg">📚</span>
             <div className="flex-1">
               <p className="text-sm font-medium text-zinc-800 dark:text-zinc-200">
@@ -231,12 +259,53 @@ export default async function PracticeExamLangPage({ params }: Props) {
 
           {/* ── Right: sticky CTA card ───────────────────────────────────── */}
           <aside className="lg:sticky lg:top-6">
-            <div className="overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-sm dark:border-zinc-700 dark:bg-zinc-900">
+            <div className="overflow-hidden rounded-2xl border border-zinc-200 bg-zinc-50 shadow-sm dark:border-zinc-700 dark:bg-zinc-900">
               {/* Card top accent */}
               <div className="h-1 w-full bg-gradient-to-r from-indigo-500 to-violet-400" />
 
               <div className="p-6">
-                {canTakeExam ? (
+                {canTakeExam && userLangStats?.hasCertificate ? (
+                  /* Already certified */
+                  <>
+                    <div className="mb-4 flex items-center gap-2">
+                      <span className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-100 text-sm dark:bg-emerald-900/40">✓</span>
+                      <p className="text-lg font-bold text-emerald-700 dark:text-emerald-400">Certified</p>
+                    </div>
+                    <p className="text-sm text-zinc-500 dark:text-zinc-400">
+                      You passed this exam. Your certificate is publicly verifiable and can be shared anytime.
+                    </p>
+                    <div className="mt-5 flex flex-col gap-3">
+                      <Link
+                        href="/profile?tab=overview"
+                        className="inline-flex items-center justify-center rounded-xl bg-indigo-600 px-5 py-3 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-indigo-500"
+                      >
+                        View certificate
+                      </Link>
+                      <StartExamButton lang={lang} langName={name} fullWidth />
+                    </div>
+                  </>
+                ) : canTakeExam && userLangStats && userLangStats.attemptCount > 0 ? (
+                  /* Has attempted but not passed */
+                  <>
+                    <p className="text-lg font-bold text-zinc-900 dark:text-zinc-100">Try again</p>
+                    <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
+                      Your best score was <span className="font-semibold text-amber-600 dark:text-amber-400">{userLangStats.bestScore ?? 0}%</span>. You need {EXAM_PASS_PERCENT}% to pass.
+                    </p>
+
+                    <CheckList items={[
+                      `${examConfig.examSize} randomised questions`,
+                      `${examConfig.examDurationMinutes} min time limit`,
+                      `${passMin} correct (${EXAM_PASS_PERCENT}%) to pass`,
+                      "Verifiable certificate on pass",
+                      "Unlimited retakes",
+                    ]} />
+
+                    <div className="mt-6">
+                      <StartExamButton lang={lang} langName={name} fullWidth />
+                    </div>
+                  </>
+                ) : canTakeExam ? (
+                  /* Pro, no attempts yet */
                   <>
                     <p className="text-lg font-bold text-zinc-900 dark:text-zinc-100">Ready to start?</p>
                     <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
@@ -247,7 +316,7 @@ export default async function PracticeExamLangPage({ params }: Props) {
                       `${examConfig.examSize} randomised questions`,
                       `${examConfig.examDurationMinutes} min — can't be paused`,
                       `${passMin} correct (${EXAM_PASS_PERCENT}%) to pass`,
-                      "Certificate sent on pass",
+                      "Verifiable certificate on pass",
                       "Retake anytime",
                     ]} />
 
@@ -256,14 +325,19 @@ export default async function PracticeExamLangPage({ params }: Props) {
                     </div>
                   </>
                 ) : (
+                  /* Free / not logged in */
                   <>
-                    <p className="text-lg font-bold text-zinc-900 dark:text-zinc-100">Take this exam</p>
+                    <p className="text-lg font-bold text-zinc-900 dark:text-zinc-100">Earn your {name} certificate</p>
+                    <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
+                      Pass the exam and get a verifiable digital certificate with a unique ID.
+                    </p>
 
                     <CheckList items={[
-                      "Timed exams with real scoring",
-                      "Shareable certificate on pass",
-                      "All 6 language exams",
-                      "Retake anytime",
+                      "Timed exam with real scoring",
+                      "Verifiable certificate on pass",
+                      "Add to LinkedIn and resume",
+                      "All 6 language exams included",
+                      "Unlimited retakes",
                     ]} />
 
                     <div className="mt-6 flex flex-col gap-3">
@@ -276,13 +350,12 @@ export default async function PracticeExamLangPage({ params }: Props) {
                       {!user && (
                         <Link
                           href="/login"
-                          className="inline-flex items-center justify-center rounded-xl border border-zinc-200 bg-zinc-50 px-5 py-3 text-sm font-semibold text-zinc-700 transition-colors hover:bg-zinc-100 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-200 dark:hover:bg-zinc-700"
+                          className="inline-flex items-center justify-center rounded-xl border border-zinc-200 bg-white px-5 py-3 text-sm font-semibold text-zinc-700 transition-colors hover:bg-zinc-100 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-200 dark:hover:bg-zinc-700"
                         >
                           Sign in
                         </Link>
                       )}
                     </div>
-
                   </>
                 )}
               </div>
@@ -295,6 +368,7 @@ export default async function PracticeExamLangPage({ params }: Props) {
           currentLang={lang}
           langSlugs={langSlugs}
           examConfigByLang={examConfigByLang}
+          publicStatsByLang={publicStatsByLang}
         />
       </div>
     </div>
