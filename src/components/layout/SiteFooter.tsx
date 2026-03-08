@@ -16,7 +16,6 @@ const LEARN_LINKS = [
 const PRACTICE_LINKS = [
   { href: "/practice", label: "Interview Prep" },
   { href: "/certifications", label: "Certifications" },
-  { href: "/leaderboard", label: "Leaderboard" },
   { href: "/pricing", label: "Pricing" },
 ];
 

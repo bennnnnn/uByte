@@ -148,12 +148,6 @@ export default function HeaderNavLinks({ side = "right" }: { side?: "left" | "ri
 
   return (
     <nav className="flex items-center gap-1" aria-label="Secondary navigation">
-      {/* ── Leaderboard ─────────────────────────────────────────── */}
-      <Link href="/leaderboard" className={linkBase}>
-        Leaderboard
-      </Link>
-
-      {/* ── Pricing ─────────────────────────────────────────────── */}
       <Link href="/pricing" className={linkBase}>
         Pricing
       </Link>
