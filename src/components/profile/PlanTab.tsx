@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { useAuth } from "@/components/AuthProvider";
 import { Button, Card } from "@/components/ui";
 import { BILLING_CONFIG, hasPaidAccess } from "@/lib/plans";
@@ -74,11 +75,26 @@ function ManageOrCancelButtons() {
 }
 
 export default function PlanTab({ plan }: Props) {
-  const { user } = useAuth();
+  const { user, refreshProfile } = useAuth();
+  const searchParams = useSearchParams();
   const isPaid = hasPaidAccess(plan);
   const isYearly = plan === "yearly";
   const isMonthly = plan === "pro";
   const paddleReady = useRef(false);
+
+  // When redirected back from Paddle checkout with ?plan=success,
+  // poll the profile until the plan upgrades (webhook may take a few seconds).
+  useEffect(() => {
+    if (searchParams.get("plan") !== "success") return;
+    let attempts = 0;
+    const maxAttempts = 10;
+    const interval = setInterval(async () => {
+      attempts++;
+      await refreshProfile();
+      if (attempts >= maxAttempts) clearInterval(interval);
+    }, 2000);
+    return () => clearInterval(interval);
+  }, [searchParams, refreshProfile]);
 
   const planLabel = isYearly ? BILLING_CONFIG.yearly.label : isMonthly ? BILLING_CONFIG.monthly.label : "Free";
   const planPrice = isYearly
