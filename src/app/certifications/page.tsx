@@ -506,6 +506,7 @@ export default async function PracticeExamsPage() {
               <TextLink href="#all-certifications" className="text-sm">
                 View all →
               </TextLink>
+            </div>
             <ExamCardGrid langs={popularLangs} examConfigByLang={examConfigByLang} statsByLang={statsByLang} publicStatsByLang={publicStatsByLang} isLoggedIn={!!user} />
           </section>
         )}
