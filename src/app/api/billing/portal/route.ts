@@ -1,9 +1,26 @@
+/**
+ * Billing Portal — /api/billing/portal
+ *
+ * Returns a Paddle-hosted customer portal URL for the current user.
+ * The portal lets users: view invoices, update payment method, cancel subscription.
+ *
+ * Returns two URLs:
+ *   portalUrl  — general portal overview (invoices, payment method)
+ *   cancelUrl  — deep link directly to the cancel subscription page
+ *
+ * Requires: PADDLE_API_KEY (sandbox or live, matching the client token environment)
+ *
+ * GOING LIVE: no code change needed — just swap env vars to live values.
+ * The isSandbox flag switches the API base URL automatically.
+ */
 import { NextResponse } from "next/server";
 import { withErrorHandling, requireAuth } from "@/lib/api-utils";
 import { getUserById } from "@/lib/db";
 
 const PADDLE_API_KEY = process.env.PADDLE_API_KEY ?? "";
 const PADDLE_CLIENT_TOKEN = process.env.NEXT_PUBLIC_PADDLE_CLIENT_TOKEN ?? "";
+
+// Automatically targets sandbox or live Paddle API based on client token prefix
 const isSandbox = PADDLE_CLIENT_TOKEN.startsWith("test_");
 const PADDLE_BASE = isSandbox ? "https://sandbox-api.paddle.com" : "https://api.paddle.com";
 

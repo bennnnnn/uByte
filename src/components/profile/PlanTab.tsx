@@ -130,9 +130,14 @@ export default function PlanTab({ plan }: Props) {
     const origin = typeof window !== "undefined" ? window.location.origin : "";
     window.Paddle.Checkout.open({
       items: [{ priceId, quantity: 1 }],
+      // customData.userId is passed to the transaction and read by the webhook
+      // to link the Paddle customer to the uByte user account.
+      // Keep this in sync with resolveUserId() in /api/webhooks/paddle/route.ts
       customData: user ? { userId: String(user.id) } : undefined,
       customer: user ? { email: user.email } : undefined,
       settings: {
+        // After payment, the plan tab polls refreshProfile() every 2s for up to 20s
+        // so the UI updates as soon as the webhook processes the plan upgrade.
         successUrl: `${origin}/profile?tab=plan&plan=success`,
         displayMode: "overlay",
         variant: "one-page",

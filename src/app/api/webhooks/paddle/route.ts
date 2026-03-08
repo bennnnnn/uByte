@@ -1,3 +1,64 @@
+/**
+ * Paddle Webhook Handler — /api/webhooks/paddle
+ *
+ * ─── ENVIRONMENT VARIABLES REQUIRED ────────────────────────────────────────
+ *
+ * PADDLE_WEBHOOK_SECRET
+ *   The secret key for this notification destination.
+ *   Paddle dashboard → Developer Tools → Notifications → your destination → Secret key
+ *   Sandbox secret starts with: pdl_ntfset_...
+ *
+ * PADDLE_API_KEY
+ *   Used as a fallback to look up the customer's email when custom_data is missing.
+ *   Paddle dashboard → Developer Tools → Authentication → API key
+ *   Sandbox key starts with:  pdl_sdbx_apikey_...
+ *   Live key starts with:     pdl_live_apikey_...
+ *
+ * NEXT_PUBLIC_PADDLE_CLIENT_TOKEN
+ *   Determines sandbox vs live mode automatically:
+ *   - Starts with "test_" → uses sandbox-api.paddle.com
+ *   - Starts with "live_" → uses api.paddle.com
+ *
+ * ─── GOING LIVE CHECKLIST ───────────────────────────────────────────────────
+ *
+ * 1. In Vercel env vars, replace all sandbox values with live values:
+ *    - NEXT_PUBLIC_PADDLE_CLIENT_TOKEN  →  live_...
+ *    - NEXT_PUBLIC_PADDLE_YEARLY_PRICE_ID  →  live price ID from Paddle catalog
+ *    - NEXT_PUBLIC_PADDLE_PRO_PRICE_ID     →  live price ID from Paddle catalog
+ *    - PADDLE_API_KEY                   →  pdl_live_apikey_...
+ *    - PADDLE_WEBHOOK_SECRET            →  live notification secret
+ *
+ * 2. In Paddle live dashboard, create a notification destination pointing to:
+ *    https://www.ubyte.dev/api/webhooks/paddle
+ *    with these events enabled:
+ *    - transaction.updated    ← primary plan activation trigger
+ *    - transaction.completed  ← backup trigger
+ *    - subscription.activated ← backup trigger
+ *    - subscription.created   ← backup trigger
+ *    - subscription.updated   ← handles plan changes (upgrade/downgrade)
+ *    - subscription.canceled  ← downgrades user to free on cancellation
+ *
+ * 3. Redeploy on Vercel after updating env vars.
+ *
+ * ─── DATABASE NOTE ──────────────────────────────────────────────────────────
+ *
+ * The users table has a column named `stripe_customer_id` — this is a legacy
+ * name from an earlier Stripe integration that was never used. It now stores
+ * the Paddle customer ID (ctm_...). A future DB migration should rename it to
+ * `paddle_customer_id`. The code handles this correctly despite the name.
+ *
+ * ─── HOW USER LOOKUP WORKS ──────────────────────────────────────────────────
+ *
+ * When a webhook arrives, we resolve the uByte user via 3 fallbacks in order:
+ * 1. Paddle customer ID (ctm_...) already saved in users.stripe_customer_id
+ * 2. custom_data.userId passed from the checkout widget at purchase time
+ * 3. Fetch the customer's email from Paddle API, look up by email in DB
+ *
+ * Step 1 works for returning subscribers.
+ * Step 2 works for first-time subscribers if Paddle passes custom_data.
+ * Step 3 is the reliable fallback for new subscribers (requires PADDLE_API_KEY).
+ */
+
 import { NextRequest, NextResponse } from "next/server";
 import { timingSafeEqual } from "crypto";
 import {
@@ -14,9 +75,17 @@ import { BILLING_CONFIG, YEARLY_PRICE_CENTS, MONTHLY_PRICE_CENTS } from "@/lib/p
 const WEBHOOK_SECRET = process.env.PADDLE_WEBHOOK_SECRET ?? "";
 const PADDLE_API_KEY = process.env.PADDLE_API_KEY ?? "";
 const CLIENT_TOKEN = process.env.NEXT_PUBLIC_PADDLE_CLIENT_TOKEN ?? "";
+
+// Automatically switches between sandbox and live Paddle API based on client token prefix.
+// No code change needed when going live — just update NEXT_PUBLIC_PADDLE_CLIENT_TOKEN.
 const isSandbox = CLIENT_TOKEN.startsWith("test_");
 const PADDLE_BASE = isSandbox ? "https://sandbox-api.paddle.com" : "https://api.paddle.com";
 
+/**
+ * Verifies the Paddle-Signature header using HMAC-SHA256.
+ * Paddle signs webhooks as: HMAC_SHA256(secret, "ts:rawBody")
+ * Rejects events older than 5 minutes to prevent replay attacks.
+ */
 async function verifyPaddleSignature(
   payload: string,
   sigHeader: string,
@@ -40,6 +109,7 @@ async function verifyPaddleSignature(
     return false;
   }
 
+  // Reject webhooks older than 5 minutes (replay attack prevention)
   const TOLERANCE_SECONDS = 300;
   if (Math.abs(Date.now() / 1000 - parseInt(ts, 10)) > TOLERANCE_SECONDS) {
     console.error("[paddle-webhook] Timestamp outside tolerance window");
@@ -62,8 +132,9 @@ async function verifyPaddleSignature(
 }
 
 /**
- * Fetch the customer's email from the Paddle API.
- * Used as a fallback when custom_data.userId is missing from the webhook.
+ * Fallback: fetch the customer's email from the Paddle API.
+ * Used when custom_data.userId is missing from the webhook payload.
+ * Requires PADDLE_API_KEY to be set.
  */
 async function getPaddleCustomerEmail(customerId: string): Promise<string | null> {
   if (!PADDLE_API_KEY) return null;
@@ -81,16 +152,14 @@ async function getPaddleCustomerEmail(customerId: string): Promise<string | null
 }
 
 /**
- * Resolve the uByte user ID from a Paddle webhook event using a 3-step fallback:
- * 1. Paddle customer ID already linked in DB
- * 2. custom_data.userId passed from the checkout
- * 3. Fetch the customer's email from Paddle API and look up by email
+ * Resolve the uByte user ID from a Paddle webhook event.
+ * Three-step fallback — see file header comment for details.
  */
 async function resolveUserId(
   paddleCustomerId: string | undefined,
   customData: Record<string, string> | null
 ): Promise<number | null> {
-  // 1. Already linked by Paddle customer ID
+  // Step 1: Paddle customer ID already linked in users.stripe_customer_id
   if (paddleCustomerId) {
     const existing = await getUserByPaddleCustomerId(paddleCustomerId);
     if (existing) {
@@ -99,7 +168,7 @@ async function resolveUserId(
     }
   }
 
-  // 2. Custom data userId passed from checkout widget
+  // Step 2: custom_data.userId passed from Paddle.Checkout.open({ customData })
   const clientUserId = customData?.["userId"];
   if (clientUserId) {
     const u = await getUserById(parseInt(clientUserId, 10));
@@ -110,7 +179,7 @@ async function resolveUserId(
     console.error("[paddle-webhook] custom_data.userId not found in DB:", clientUserId);
   }
 
-  // 3. Fetch customer email from Paddle API and look up by email
+  // Step 3: Fetch email from Paddle API and match to uByte account by email
   if (paddleCustomerId) {
     const email = await getPaddleCustomerEmail(paddleCustomerId);
     if (email) {
@@ -127,6 +196,10 @@ async function resolveUserId(
   return null;
 }
 
+/**
+ * Map a subscription status + price ID to a uByte plan string.
+ * Used by subscription.updated to handle upgrades, downgrades, and pauses.
+ */
 function planFromSubscription(status: string, priceId?: string): string {
   if (!["active", "trialing"].includes(status)) return "free";
   const yearlyPriceId = process.env.NEXT_PUBLIC_PADDLE_YEARLY_PRICE_ID;
@@ -139,6 +212,7 @@ export const POST = withErrorHandling("POST /api/webhooks/paddle", async (reques
     return NextResponse.json({ error: "Paddle not configured" }, { status: 503 });
   }
 
+  // IMPORTANT: read raw body before any parsing — signature is computed over the raw bytes
   const sig = request.headers.get("Paddle-Signature") ?? "";
   const body = await request.text();
 
@@ -164,23 +238,31 @@ export const POST = withErrorHandling("POST /api/webhooks/paddle", async (reques
 
   console.log("[paddle-webhook] customer_id:", paddleCustomerId, "custom_data:", JSON.stringify(customData));
 
+  // Determine which plan to activate based on the price ID in the transaction/subscription
   const yearlyPriceId = process.env.NEXT_PUBLIC_PADDLE_YEARLY_PRICE_ID;
   const items = data["items"] as { price?: { id?: string } }[] | undefined;
   const purchasedPriceId = items?.[0]?.price?.id;
-  const activatedPlan =
-    yearlyPriceId && purchasedPriceId === yearlyPriceId ? "yearly" : "pro";
+  const activatedPlan = yearlyPriceId && purchasedPriceId === yearlyPriceId ? "yearly" : "pro";
 
   switch (event.event_type) {
-    // Handle both transaction.completed and transaction.updated (when status=completed).
-    // Paddle sends transaction.updated when a transaction transitions to completed status.
+    /**
+     * PRIMARY ACTIVATION TRIGGER
+     * transaction.updated fires when a transaction transitions to "completed".
+     * This is the event Paddle actually sends in practice — more reliable than
+     * transaction.completed for triggering plan activation.
+     * transaction.completed is also handled as a backup.
+     *
+     * NOTE: This event fires for ALL transaction updates (pending, billed, etc.)
+     * so we check status === "completed" before activating.
+     */
     case "transaction.completed":
     case "transaction.updated": {
       if (status !== "completed") {
         console.log("[paddle-webhook] Skipping transaction event with status:", status);
         break;
       }
-      console.log("[paddle-webhook] transaction completed data:", JSON.stringify({ 
-        status, paddleCustomerId, customData, purchasedPriceId 
+      console.log("[paddle-webhook] transaction completed data:", JSON.stringify({
+        status, paddleCustomerId, customData, purchasedPriceId
       }));
       const uid = await resolveUserId(paddleCustomerId, customData);
       if (uid) {
@@ -194,12 +276,19 @@ export const POST = withErrorHandling("POST /api/webhooks/paddle", async (reques
       break;
     }
 
+    /**
+     * BACKUP ACTIVATION TRIGGER
+     * subscription.activated / subscription.created fire after the subscription
+     * is set up. custom_data may be absent here (it's attached to the transaction),
+     * but resolveUserId will fall back to the Paddle API email lookup.
+     * Also sends the user an in-app notification.
+     */
     case "subscription.activated":
     case "subscription.created": {
       const uid = await resolveUserId(paddleCustomerId, customData);
       if (uid) {
         await updateUserPlan(uid, activatedPlan, paddleCustomerId);
-        console.log("[paddle-webhook] Updated user", uid, "to plan:", activatedPlan);
+        console.log("[paddle-webhook] subscription — updated user", uid, "to plan:", activatedPlan);
         const planLabel = activatedPlan === "yearly" ? BILLING_CONFIG.yearly.label : BILLING_CONFIG.monthly.label;
         await createNotification(
           uid,
@@ -213,25 +302,42 @@ export const POST = withErrorHandling("POST /api/webhooks/paddle", async (reques
       break;
     }
 
+    /**
+     * PLAN CHANGES
+     * Fires when a subscription is upgraded, downgraded, paused, or resumed.
+     * planFromSubscription() maps status + priceId → "yearly" | "pro" | "free"
+     *
+     * FUTURE: if you add more plans (e.g. team, enterprise), update
+     * planFromSubscription() and BILLING_CONFIG in src/lib/plans.ts.
+     */
     case "subscription.updated": {
       if (paddleCustomerId && status) {
         const plan = planFromSubscription(status, purchasedPriceId);
         const uid = await resolveUserId(paddleCustomerId, customData);
         if (uid) {
           await updateUserPlan(uid, plan);
-          console.log("[paddle-webhook] Updated user", uid, "plan to:", plan);
+          console.log("[paddle-webhook] subscription updated — user", uid, "plan:", plan);
         }
       }
       break;
     }
 
+    /**
+     * CANCELLATION
+     * Fires when a user cancels. Downgrades to free immediately.
+     *
+     * NOTE: Paddle cancels at end of billing period by default.
+     * If you want to keep Pro access until period end, you would need to
+     * store the cancellation date and run a cron job to downgrade at expiry.
+     * For now we downgrade immediately on cancellation event.
+     */
     case "subscription.canceled": {
       const uid = await resolveUserId(paddleCustomerId, customData);
       if (uid) {
         const user = await getUserById(uid);
         await updateUserPlan(uid, "free");
         if (user) await recordSubscriptionEvent(uid, user.plan, 0, "canceled");
-        console.log("[paddle-webhook] Canceled subscription for user:", uid);
+        console.log("[paddle-webhook] subscription canceled — user", uid, "downgraded to free");
       }
       break;
     }
@@ -241,5 +347,6 @@ export const POST = withErrorHandling("POST /api/webhooks/paddle", async (reques
       break;
   }
 
+  // Always return 200 so Paddle doesn't keep retrying
   return NextResponse.json({ received: true });
 });

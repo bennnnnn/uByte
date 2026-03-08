@@ -1,3 +1,34 @@
+/**
+ * Plans, pricing, and Paddle configuration
+ *
+ * ─── GOING LIVE CHECKLIST ───────────────────────────────────────────────────
+ *
+ * 1. Update MONTHLY_PRICE_CENTS and YEARLY_PRICE_CENTS if your live prices differ.
+ *
+ * 2. In Vercel, set these to your LIVE Paddle values:
+ *    - NEXT_PUBLIC_PADDLE_CLIENT_TOKEN     →  live_...
+ *    - NEXT_PUBLIC_PADDLE_PRO_PRICE_ID     →  pri_... (live monthly price)
+ *    - NEXT_PUBLIC_PADDLE_YEARLY_PRICE_ID  →  pri_... (live yearly price)
+ *    - PADDLE_API_KEY                      →  pdl_live_apikey_...
+ *    - PADDLE_WEBHOOK_SECRET               →  live notification secret
+ *
+ * 3. Create matching products/prices in your Paddle live dashboard.
+ *
+ * ─── ADDING NEW PLANS ───────────────────────────────────────────────────────
+ *
+ * To add a new plan (e.g. "team"):
+ * 1. Add it to hasPaidAccess() below
+ * 2. Add a new entry to BILLING_CONFIG
+ * 3. Add the price ID env var
+ * 4. Update planFromSubscription() in the webhook handler
+ * 5. Update the pricing page (src/app/pricing/page.tsx)
+ *
+ * ─── DATABASE NOTE ──────────────────────────────────────────────────────────
+ *
+ * The plan is stored in users.plan as a string: "free" | "pro" | "yearly" | "monthly"
+ * The Paddle customer ID is stored in users.stripe_customer_id (legacy column name).
+ * A future DB migration should rename it to users.paddle_customer_id.
+ */
 import { DAILY_DRIP, MAX_FREE_PROBLEMS } from "@/lib/db/practice-unlocks";
 
 // ─── Free tier limits ─────────────────────────────────────────────────────────
