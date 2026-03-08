@@ -33,9 +33,6 @@ export default function OtherExamsGrid({ currentLang, langSlugs, examConfigByLan
           >
             Other certifications
           </h2>
-          <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
-            Each exam is independently timed and scored.
-          </p>
         </div>
         <Link
           href="/certifications"
