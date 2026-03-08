@@ -605,8 +605,8 @@ export default async function PracticeExamsPage() {
               </Link>
             );
           })}
-          <Link href="/practice" className="font-medium text-indigo-600 hover:underline dark:text-indigo-400">
-            Interview practice →
+          <Link href="/certifications" className="font-medium text-indigo-600 hover:underline dark:text-indigo-400">
+            Certifications →
           </Link>
         </nav>
       </div>
