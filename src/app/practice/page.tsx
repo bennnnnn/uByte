@@ -12,20 +12,23 @@ import { absoluteUrl, SITE_KEYWORDS } from "@/lib/seo";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Interview Prep — Coding Problems",
+  title: "Interview Prep — Ace Your Coding Interview",
   description:
-    "Solve coding interview problems in Go, Python, C++, JavaScript, Java, and Rust. LeetCode-style challenges with an in-browser code runner and instant feedback.",
+    "Practice coding interview problems in Go, Python, C++, JavaScript, Java, and Rust. LeetCode-style challenges with an in-browser editor and instant test feedback.",
   keywords: [
     ...SITE_KEYWORDS,
     "coding interview questions",
-    "leetcode practice",
-    "data structures and algorithms practice",
+    "leetcode alternative",
+    "hackerrank alternative",
+    "data structures and algorithms",
+    "interview prep",
+    "coding challenges",
   ],
   alternates: { canonical: absoluteUrl("/practice") },
   openGraph: {
-    title: "Interview Prep — Coding Problems | uByte",
+    title: "Interview Prep — Ace Your Coding Interview | uByte",
     description:
-      "Interview-ready coding problems across 6 languages with instant feedback.",
+      "LeetCode-style coding problems across 6 languages. Write real code in the browser and get instant feedback.",
     type: "website",
     url: absoluteUrl("/practice"),
   },
@@ -33,7 +36,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Interview Prep | uByte",
     description:
-      "Solve classic coding interview problems in Go, Python, C++, JavaScript, Java, and Rust.",
+      "Ace your coding interview. Practice classic problems in Go, Python, C++, JavaScript, Java, and Rust.",
   },
 };
 
@@ -67,56 +70,60 @@ export default async function PracticePage() {
   };
 
   return (
-    <div className="min-h-full overflow-y-auto">
+    <div className="min-h-full overflow-y-auto bg-white dark:bg-zinc-950">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
           __html: JSON.stringify([listJsonLd, breadcrumbJsonLd]),
         }}
       />
-      {/* ── Hero section ────────────────────────────────────────────────── */}
-      <section className="relative overflow-hidden bg-white dark:bg-zinc-950">
+
+      {/* ── Hero ──────────────────────────────────────────────────────── */}
+      <section className="relative overflow-hidden">
         <div className="pointer-events-none absolute inset-0 overflow-hidden">
-          <div className="absolute -left-40 top-0 h-[600px] w-[600px] -translate-y-1/3 rounded-full bg-indigo-200/50 blur-[140px] dark:bg-indigo-500/15" />
-          <div className="absolute -top-20 right-0 h-[500px] w-[500px] translate-x-1/4 rounded-full bg-violet-200/40 blur-[120px] dark:bg-violet-500/10" />
-          <div className="absolute bottom-0 left-1/2 h-[400px] w-[400px] -translate-x-1/2 translate-y-1/2 rounded-full bg-cyan-200/25 blur-[100px] dark:bg-cyan-500/10" />
+          <div className="absolute -left-40 top-0 h-[500px] w-[500px] -translate-y-1/3 rounded-full bg-indigo-200/40 blur-[120px] dark:bg-indigo-500/10" />
+          <div className="absolute -top-20 right-0 h-[400px] w-[400px] translate-x-1/4 rounded-full bg-violet-200/30 blur-[100px] dark:bg-violet-500/8" />
         </div>
-        <div className="pointer-events-none absolute inset-0 bg-dot-grid-24 opacity-[0.35] dark:opacity-[0.2]" />
 
-        <div className="relative mx-auto max-w-5xl px-6 pt-14 pb-16 sm:pt-20 sm:pb-24">
-          <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-indigo-200 bg-indigo-50 px-4 py-1.5 text-[11px] font-bold uppercase tracking-[0.12em] text-indigo-600 dark:border-indigo-800 dark:bg-indigo-950/50 dark:text-indigo-400">
-            <span className="text-base">🎯</span>
-            LeetCode-style · Run in browser
-          </div>
-
-          <h1 className="mb-4 text-4xl font-black tracking-tight text-zinc-900 dark:text-zinc-50 sm:text-5xl">
-            Interview{" "}
+        <div className="relative mx-auto max-w-5xl px-6 pb-12 pt-10 sm:pb-16 sm:pt-16">
+          <h1 className="mb-3 text-3xl font-black tracking-tight text-zinc-900 dark:text-zinc-50 sm:text-5xl">
+            Ace your coding{" "}
             <span className="bg-gradient-to-r from-indigo-600 via-violet-600 to-cyan-500 bg-clip-text text-transparent">
-              Prep
+              interview
             </span>
           </h1>
-          <p className="mb-8 max-w-2xl text-base leading-relaxed text-zinc-600 dark:text-zinc-400 sm:text-lg">
-            Sharpen your skills with classic problems — Two Sum, LRU Cache, Merge Intervals and more.
-            Pick a language, write real code in the browser, get instant feedback. First{" "}
-            <span className="font-semibold text-indigo-600 dark:text-indigo-400">{FREE_PRACTICE_LIMIT} problems free</span>{" "}
-            per language; upgrade for full access.
+          <p className="mb-6 max-w-2xl text-base leading-relaxed text-zinc-600 dark:text-zinc-400 sm:text-lg">
+            Classic problems you&apos;ll see at top tech companies — Two Sum, LRU Cache, Merge Intervals and more.
+            Write real code, run tests instantly, and track your progress across 6 languages.
           </p>
 
-          <DifficultyPills easy={easy} medium={medium} hard={hard} />
+          <div className="mb-6 flex flex-wrap items-center gap-4">
+            <DifficultyPills easy={easy} medium={medium} hard={hard} />
+            <span className="text-sm text-zinc-500 dark:text-zinc-400">
+              {problems.length} problems · {FREE_PRACTICE_LIMIT} free per language
+            </span>
+          </div>
+
+          <Link
+            href="/practice/go"
+            className="inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-6 py-3 text-sm font-bold text-white shadow-md shadow-indigo-500/25 transition-all hover:-translate-y-0.5 hover:bg-indigo-500 hover:shadow-indigo-500/35"
+          >
+            Start solving
+            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+            </svg>
+          </Link>
         </div>
       </section>
 
       {/* ── Choose language ───────────────────────────────────────────── */}
-      <section
-        aria-labelledby="lang-heading"
-        className="border-t border-zinc-100 bg-zinc-50/50 dark:border-zinc-800 dark:bg-zinc-900/30"
-      >
-        <div className="mx-auto max-w-5xl px-6 py-12 sm:py-16">
-          <h2 id="lang-heading" className="mb-2 text-xs font-bold uppercase tracking-[0.2em] text-zinc-400 dark:text-zinc-500">
+      <section aria-labelledby="lang-heading" className="border-t border-zinc-100 bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900/40">
+        <div className="mx-auto max-w-5xl px-6 py-12 sm:py-14">
+          <h2 id="lang-heading" className="mb-1 text-xs font-bold uppercase tracking-[0.2em] text-zinc-400 dark:text-zinc-500">
             Pick your language
           </h2>
-          <p className="mb-10 text-2xl font-bold text-zinc-900 dark:text-zinc-100 sm:text-3xl">
-            Choose your language
+          <p className="mb-8 text-2xl font-bold text-zinc-900 dark:text-zinc-100 sm:text-3xl">
+            Same problems, your favorite language
           </p>
 
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
@@ -131,7 +138,7 @@ export default async function PracticePage() {
                   name={config.name}
                   badge={`${problems.length} problems`}
                   description={PRACTICE_TAGLINES[slug] ?? `Solve problems in ${config.name}`}
-                  cta="View problems"
+                  cta="Start practicing"
                 />
               );
             })}
@@ -141,15 +148,15 @@ export default async function PracticePage() {
 
       {/* ── Featured problems ─────────────────────────────────────────── */}
       <section className="border-t border-zinc-100 dark:border-zinc-800" aria-labelledby="preview-heading">
-        <div className="mx-auto max-w-5xl px-6 py-12 sm:py-16">
-          <h2 id="preview-heading" className="mb-2 text-xs font-bold uppercase tracking-[0.2em] text-zinc-400 dark:text-zinc-500">
-            Try these first
+        <div className="mx-auto max-w-5xl px-6 py-12 sm:py-14">
+          <h2 id="preview-heading" className="mb-1 text-xs font-bold uppercase tracking-[0.2em] text-zinc-400 dark:text-zinc-500">
+            Start here
           </h2>
           <p className="mb-2 text-2xl font-bold text-zinc-900 dark:text-zinc-100 sm:text-3xl">
-            Featured problems
+            Popular interview questions
           </p>
           <p className="mb-6 text-sm text-zinc-500 dark:text-zinc-400">
-            View in:{" "}
+            Available in:{" "}
             {langSlugs.map((slug, i) => (
               <span key={slug}>
                 {i > 0 && " · "}
@@ -160,13 +167,13 @@ export default async function PracticePage() {
             ))}
           </p>
 
-          <div className="overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-sm dark:border-zinc-700 dark:bg-zinc-900">
+          <div className="overflow-hidden rounded-2xl border border-zinc-200 bg-zinc-50 shadow-sm dark:border-zinc-700 dark:bg-zinc-900">
             <ul className="divide-y divide-zinc-100 dark:divide-zinc-700">
               {featured.map((p, i) => (
                 <li key={p.slug}>
                   <Link
                     href={`/practice/go/${p.slug}`}
-                    className="group flex items-center gap-4 px-6 py-4 transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-800/50"
+                    className="group flex items-center gap-4 px-6 py-4 transition-colors hover:bg-white dark:hover:bg-zinc-800/50"
                   >
                     <span className="w-8 shrink-0 text-center text-sm font-bold tabular-nums text-zinc-300 group-hover:text-indigo-500 dark:text-zinc-500 dark:group-hover:text-indigo-400">
                       {i + 1}
@@ -184,17 +191,39 @@ export default async function PracticePage() {
                 </li>
               ))}
             </ul>
-            <div className="border-t border-zinc-100 bg-zinc-50/80 px-6 py-4 dark:border-zinc-700 dark:bg-zinc-800/50">
+            <div className="border-t border-zinc-100 bg-white/80 px-6 py-4 dark:border-zinc-700 dark:bg-zinc-800/50">
               <Link
                 href="/practice/go"
                 className="inline-flex items-center gap-2 text-sm font-semibold text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300"
               >
-                View all {problems.length} problems in Go
+                View all {problems.length} problems
                 <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
                 </svg>
               </Link>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── Why uByte ─────────────────────────────────────────────────── */}
+      <section className="border-t border-zinc-100 bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900/40">
+        <div className="mx-auto max-w-5xl px-6 py-12 sm:py-14">
+          <h2 className="mb-8 text-center text-2xl font-bold text-zinc-900 dark:text-zinc-100 sm:text-3xl">
+            Why developers choose uByte
+          </h2>
+          <div className="grid gap-6 sm:grid-cols-3">
+            {[
+              { icon: "⚡", title: "Instant feedback", desc: "Run your code against real test cases right in the browser. No setup needed." },
+              { icon: "🌐", title: "6 languages", desc: "Solve every problem in Go, Python, JavaScript, Java, Rust, or C++. Switch anytime." },
+              { icon: "📈", title: "Track progress", desc: "See which problems you've solved, filter by difficulty, and pick up where you left off." },
+            ].map((item) => (
+              <div key={item.title} className="rounded-2xl border border-zinc-200 bg-white p-6 dark:border-zinc-700 dark:bg-zinc-900">
+                <span className="mb-3 block text-2xl">{item.icon}</span>
+                <h3 className="mb-1 text-base font-bold text-zinc-900 dark:text-zinc-100">{item.title}</h3>
+                <p className="text-sm leading-relaxed text-zinc-500 dark:text-zinc-400">{item.desc}</p>
+              </div>
+            ))}
           </div>
         </div>
       </section>

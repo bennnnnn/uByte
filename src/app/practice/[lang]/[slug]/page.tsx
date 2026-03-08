@@ -24,7 +24,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const langName = isSupportedLanguage(lang) ? LANGUAGES[lang as SupportedLanguage]?.name : lang;
   if (!problem) return { title: "Not found" };
   const canonical = absoluteUrl(`/practice/${lang}/${slug}`);
-  const title = `${problem.title} (${langName}) | Interview Practice`;
+  const title = `${problem.title} (${langName}) | Interview Prep`;
   const description = problem.description.slice(0, 160);
   return {
     title,
@@ -73,10 +73,10 @@ export default async function PracticeProblemPage({ params, searchParams }: Prop
     const backQueryStr = backQuery.toString();
     return (
       <UpgradeWall
-        tutorialTitle="Interview Practice"
+        tutorialTitle="Interview Prep"
         subtitle="You've used your free problems for this language. Upgrade to unlock all problems and save progress."
         backHref={`/practice/${lang}${backQueryStr ? `?${backQueryStr}` : ""}`}
-        backLabel={`← Back to ${LANGUAGES[lang as SupportedLanguage]?.name ?? lang} practice`}
+        backLabel={`← Back to ${LANGUAGES[lang as SupportedLanguage]?.name ?? lang} problems`}
       />
     );
   }

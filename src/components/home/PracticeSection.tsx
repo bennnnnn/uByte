@@ -50,7 +50,7 @@ export default function PracticeSection({ problemCount = 11 }: PracticeSectionPr
           </ul>
 
           <Link href="/practice" className="inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-5 py-3 text-sm font-bold text-white shadow-md shadow-indigo-500/25 transition-all hover:bg-indigo-500 hover:shadow-indigo-500/35 hover:-translate-y-0.5">
-            Explore interview problems
+            Start interview prep
           </Link>
         </div>
       </div>

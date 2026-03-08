@@ -134,7 +134,7 @@ export function PracticeListClient({
               </span>
               <div>
                 <h1 className="text-xl font-bold text-zinc-900 dark:text-zinc-100 sm:text-2xl">
-                  {config?.name ?? selectedLang} Practice
+                  {config?.name ?? selectedLang} Interview Prep
                 </h1>
                 <p className="text-sm text-zinc-500 dark:text-zinc-400">
                   {allProblemsLength} problems
