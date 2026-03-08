@@ -7,6 +7,7 @@ import { DIFFICULTY_BADGE } from "@/lib/practice/types";
 import { FREE_PRACTICE_LIMIT } from "@/lib/plans";
 import { getLangIcon, PRACTICE_TAGLINES } from "@/lib/languages/icons";
 import { LangCard } from "@/components/home";
+import { Card, Eyebrow, GradientText, TextLink } from "@/components/ui";
 import { absoluteUrl, SITE_KEYWORDS } from "@/lib/seo";
 
 export const dynamic = "force-dynamic";
@@ -88,9 +89,9 @@ export default async function PracticePage() {
         <div className="relative mx-auto max-w-5xl px-6 pb-12 pt-10 sm:pb-16 sm:pt-16">
           <h1 className="mb-3 text-3xl font-black tracking-tight text-zinc-900 dark:text-zinc-50 sm:text-5xl">
             Ace your coding{" "}
-            <span className="bg-gradient-to-r from-indigo-600 via-violet-600 to-cyan-500 bg-clip-text text-transparent">
+            <GradientText>
               interview
-            </span>
+            </GradientText>
           </h1>
           <p className="mb-6 max-w-2xl text-base leading-relaxed text-zinc-600 dark:text-zinc-400 sm:text-lg">
             Classic problems you&apos;ll see at top tech companies — Two Sum, LRU Cache, Merge Intervals and more.
@@ -106,7 +107,7 @@ export default async function PracticePage() {
 
           <Link
             href="/practice/go"
-            className="inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-6 py-3 text-sm font-bold text-white shadow-md shadow-indigo-500/25 transition-all hover:-translate-y-0.5 hover:bg-indigo-500 hover:shadow-indigo-500/35"
+            className="inline-flex items-center justify-center gap-2 rounded-xl bg-indigo-600 px-5 py-3 text-sm font-bold text-white shadow-md shadow-indigo-500/20 transition-all hover:-translate-y-0.5 hover:bg-indigo-500"
           >
             Start solving
             <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -119,9 +120,9 @@ export default async function PracticePage() {
       {/* ── Choose language ───────────────────────────────────────────── */}
       <section aria-labelledby="lang-heading" className="border-t border-zinc-100 bg-surface-card dark:border-zinc-800">
         <div className="mx-auto max-w-5xl px-6 py-12 sm:py-14">
-          <h2 id="lang-heading" className="mb-1 text-xs font-bold uppercase tracking-[0.2em] text-zinc-400 dark:text-zinc-500">
+          <Eyebrow id="lang-heading" className="mb-1">
             Pick your language
-          </h2>
+          </Eyebrow>
           <p className="mb-8 text-2xl font-bold text-zinc-900 dark:text-zinc-100 sm:text-3xl">
             Same problems, your favorite language
           </p>
@@ -149,9 +150,9 @@ export default async function PracticePage() {
       {/* ── Featured problems ─────────────────────────────────────────── */}
       <section className="border-t border-zinc-100 dark:border-zinc-800" aria-labelledby="preview-heading">
         <div className="mx-auto max-w-5xl px-6 py-12 sm:py-14">
-          <h2 id="preview-heading" className="mb-1 text-xs font-bold uppercase tracking-[0.2em] text-zinc-400 dark:text-zinc-500">
+          <Eyebrow id="preview-heading" className="mb-1">
             Start here
-          </h2>
+          </Eyebrow>
           <p className="mb-2 text-2xl font-bold text-zinc-900 dark:text-zinc-100 sm:text-3xl">
             Popular interview questions
           </p>
@@ -160,14 +161,14 @@ export default async function PracticePage() {
             {langSlugs.map((slug, i) => (
               <span key={slug}>
                 {i > 0 && " · "}
-                <Link href={`/practice/${slug}`} className="font-medium text-indigo-600 hover:underline dark:text-indigo-400">
+                <TextLink href={`/practice/${slug}`}>
                   {LANGUAGES[slug]?.name ?? slug}
-                </Link>
+                </TextLink>
               </span>
             ))}
           </p>
 
-          <div className="overflow-hidden rounded-2xl border border-zinc-200 bg-surface-card shadow-sm dark:border-zinc-700">
+          <Card className="overflow-hidden">
             <ul className="divide-y divide-zinc-100 dark:divide-zinc-700">
               {featured.map((p, i) => (
                 <li key={p.slug}>
@@ -192,17 +193,17 @@ export default async function PracticePage() {
               ))}
             </ul>
             <div className="border-t border-zinc-100 bg-white/80 px-6 py-4 dark:border-zinc-700 dark:bg-zinc-800/50">
-              <Link
+              <TextLink
                 href="/practice/go"
-                className="inline-flex items-center gap-2 text-sm font-semibold text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300"
+                className="inline-flex items-center gap-2 text-sm"
               >
                 View all {problems.length} problems
                 <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
                 </svg>
-              </Link>
+              </TextLink>
             </div>
-          </div>
+          </Card>
         </div>
       </section>
 
@@ -218,11 +219,11 @@ export default async function PracticePage() {
               { icon: "🌐", title: "6 languages", desc: "Solve every problem in Go, Python, JavaScript, Java, Rust, or C++. Switch anytime." },
               { icon: "📈", title: "Track progress", desc: "See which problems you've solved, filter by difficulty, and pick up where you left off." },
             ].map((item) => (
-              <div key={item.title} className="rounded-2xl border border-zinc-200 bg-surface-card p-6 dark:border-zinc-700">
+              <Card key={item.title} className="p-6">
                 <span className="mb-3 block text-2xl">{item.icon}</span>
                 <h3 className="mb-1 text-base font-bold text-zinc-900 dark:text-zinc-100">{item.title}</h3>
                 <p className="text-sm leading-relaxed text-zinc-500 dark:text-zinc-400">{item.desc}</p>
-              </div>
+              </Card>
             ))}
           </div>
         </div>

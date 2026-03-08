@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { Card, Eyebrow, TextLink } from "@/components/ui";
 import { LANGUAGES, getAllLanguageSlugs } from "@/lib/languages/registry";
 import { getLangIcon } from "@/lib/languages/icons";
 import type { SupportedLanguage } from "@/lib/languages/types";
@@ -70,7 +71,7 @@ function ExamCard({
   return (
     <Link
       href={`/certifications/${slug}`}
-      className="group relative flex flex-col overflow-hidden rounded-2xl border border-zinc-200 bg-surface-card shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-lg dark:border-zinc-800 focus:outline-none focus:ring-2 focus:ring-indigo-500/40"
+      className="group relative flex flex-col overflow-hidden rounded-2xl border border-zinc-200 bg-surface-card shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/40 dark:border-zinc-700"
     >
       <div className="flex flex-1 flex-col gap-5 p-6">
         {/* Top row: icon + name + difficulty + status */}
@@ -127,7 +128,7 @@ function ExamCard({
         </div>
 
         {/* CTA button */}
-        <span className="mt-auto w-full rounded-xl bg-indigo-600 px-4 py-2.5 text-center text-sm font-semibold text-white shadow-sm transition-colors group-hover:bg-indigo-500">
+        <span className="mt-auto flex w-full items-center justify-center rounded-xl bg-indigo-600 px-5 py-3 text-center text-sm font-bold text-white shadow-md shadow-indigo-500/20 transition-all group-hover:-translate-y-0.5 group-hover:bg-indigo-500">
           {ctaLabel}
         </span>
       </div>
@@ -275,13 +276,13 @@ export default async function PracticeExamsPage() {
               <div className="flex flex-wrap gap-3">
                 <Link
                   href="/login?redirect=/certifications"
-                  className="inline-flex items-center justify-center rounded-xl bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-indigo-500"
+                  className="inline-flex items-center justify-center gap-2 rounded-xl bg-indigo-600 px-5 py-3 text-sm font-bold text-white shadow-md shadow-indigo-500/20 transition-all hover:-translate-y-0.5 hover:bg-indigo-500"
                 >
                   Get started free
                 </Link>
                 <Link
                   href="/pricing"
-                  className="inline-flex items-center justify-center rounded-xl border border-zinc-300 bg-white px-5 py-2.5 text-sm font-semibold text-zinc-700 transition-colors hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-200 dark:hover:bg-zinc-700"
+                  className="inline-flex items-center justify-center gap-2 rounded-xl border border-zinc-300 bg-white px-5 py-2.5 text-sm font-semibold text-zinc-700 transition-all hover:border-zinc-400 hover:bg-zinc-50 dark:border-zinc-600 dark:bg-surface-card dark:text-zinc-200 dark:hover:border-zinc-500"
                 >
                   See pricing
                 </Link>
@@ -291,13 +292,13 @@ export default async function PracticeExamsPage() {
               <div className="flex flex-wrap gap-3">
                 <Link
                   href="/pricing"
-                  className="inline-flex items-center justify-center rounded-xl bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-indigo-500"
+                  className="inline-flex items-center justify-center gap-2 rounded-xl bg-indigo-600 px-5 py-3 text-sm font-bold text-white shadow-md shadow-indigo-500/20 transition-all hover:-translate-y-0.5 hover:bg-indigo-500"
                 >
                   Upgrade to Pro
                 </Link>
                 <a
                   href="#all-certifications"
-                  className="inline-flex items-center justify-center rounded-xl border border-zinc-300 bg-white px-5 py-2.5 text-sm font-semibold text-zinc-700 transition-colors hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-200 dark:hover:bg-zinc-700"
+                  className="inline-flex items-center justify-center gap-2 rounded-xl border border-zinc-300 bg-white px-5 py-2.5 text-sm font-semibold text-zinc-700 transition-all hover:border-zinc-400 hover:bg-zinc-50 dark:border-zinc-600 dark:bg-surface-card dark:text-zinc-200 dark:hover:border-zinc-500"
                 >
                   Browse certifications
                 </a>
@@ -311,7 +312,7 @@ export default async function PracticeExamsPage() {
                 </span>
                 <Link
                   href="/profile?tab=overview"
-                  className="inline-flex items-center justify-center rounded-xl border border-zinc-300 bg-white px-5 py-2.5 text-sm font-semibold text-zinc-700 transition-colors hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-200 dark:hover:bg-zinc-700"
+                  className="inline-flex items-center justify-center gap-2 rounded-xl border border-zinc-300 bg-white px-5 py-2.5 text-sm font-semibold text-zinc-700 transition-all hover:border-zinc-400 hover:bg-zinc-50 dark:border-zinc-600 dark:bg-surface-card dark:text-zinc-200 dark:hover:border-zinc-500"
                 >
                   View certificates
                 </Link>
@@ -321,13 +322,13 @@ export default async function PracticeExamsPage() {
               <div className="flex flex-wrap gap-3">
                 <Link
                   href={`/certifications/${tryAgainLangs[0]}`}
-                  className="inline-flex items-center justify-center rounded-xl bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-indigo-500"
+                  className="inline-flex items-center justify-center gap-2 rounded-xl bg-indigo-600 px-5 py-3 text-sm font-bold text-white shadow-md shadow-indigo-500/20 transition-all hover:-translate-y-0.5 hover:bg-indigo-500"
                 >
                   Retake {LANGUAGES[tryAgainLangs[0]]?.name} exam
                 </Link>
                 <a
                   href="#all-certifications"
-                  className="inline-flex items-center justify-center rounded-xl border border-zinc-300 bg-white px-5 py-2.5 text-sm font-semibold text-zinc-700 transition-colors hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-200 dark:hover:bg-zinc-700"
+                  className="inline-flex items-center justify-center gap-2 rounded-xl border border-zinc-300 bg-white px-5 py-2.5 text-sm font-semibold text-zinc-700 transition-all hover:border-zinc-400 hover:bg-zinc-50 dark:border-zinc-600 dark:bg-surface-card dark:text-zinc-200 dark:hover:border-zinc-500"
                 >
                   All certifications
                 </a>
@@ -337,7 +338,7 @@ export default async function PracticeExamsPage() {
               <div className="flex flex-wrap gap-3">
                 <Link
                   href={`/certifications/${suggestedLang}`}
-                  className="inline-flex items-center justify-center rounded-xl bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-indigo-500"
+                  className="inline-flex items-center justify-center gap-2 rounded-xl bg-indigo-600 px-5 py-3 text-sm font-bold text-white shadow-md shadow-indigo-500/20 transition-all hover:-translate-y-0.5 hover:bg-indigo-500"
                 >
                   {passedLangs.length > 0
                     ? `Next: ${LANGUAGES[suggestedLang]?.name} exam`
@@ -345,7 +346,7 @@ export default async function PracticeExamsPage() {
                 </Link>
                 <a
                   href="#all-certifications"
-                  className="inline-flex items-center justify-center rounded-xl border border-zinc-300 bg-white px-5 py-2.5 text-sm font-semibold text-zinc-700 transition-colors hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-200 dark:hover:bg-zinc-700"
+                  className="inline-flex items-center justify-center gap-2 rounded-xl border border-zinc-300 bg-white px-5 py-2.5 text-sm font-semibold text-zinc-700 transition-all hover:border-zinc-400 hover:bg-zinc-50 dark:border-zinc-600 dark:bg-surface-card dark:text-zinc-200 dark:hover:border-zinc-500"
                 >
                   Browse all
                 </a>
@@ -382,10 +383,10 @@ export default async function PracticeExamsPage() {
         {isPro && examStats.length > 0 ? (
           /* Progress dashboard for Pro users with exam history */
           <section className="mb-14">
-            <h2 className="mb-6 text-xs font-semibold uppercase tracking-widest text-zinc-400 dark:text-zinc-500">
+            <Eyebrow className="mb-6">
               Your progress
-            </h2>
-            <div className="rounded-2xl border border-zinc-200 bg-surface-card p-6 dark:border-zinc-800">
+            </Eyebrow>
+            <Card className="p-6">
               <div className="mb-5 flex items-center justify-between">
                 <div>
                   <p className="text-2xl font-bold text-zinc-900 dark:text-zinc-100">
@@ -438,14 +439,14 @@ export default async function PracticeExamsPage() {
                   );
                 })}
               </div>
-            </div>
+            </Card>
           </section>
         ) : (
           /* Learning journey for visitors / free users / Pro with no attempts */
           <section className="mb-14">
-            <h2 className="mb-6 text-xs font-semibold uppercase tracking-widest text-zinc-400 dark:text-zinc-500">
+            <Eyebrow className="mb-6">
               Your path to certification
-            </h2>
+            </Eyebrow>
             <div className="relative grid gap-4 sm:grid-cols-2">
               {/* Connector line (desktop only) */}
               <div className="pointer-events-none absolute left-0 right-0 top-[3.25rem] hidden h-px bg-gradient-to-r from-indigo-200 to-emerald-300 dark:from-indigo-800 dark:to-emerald-700 sm:block" />
@@ -468,7 +469,7 @@ export default async function PracticeExamsPage() {
                   linkLabel: "View certifications",
                 },
               ].map(({ step, icon, title, body, link, linkLabel }) => (
-                <div key={step} className="relative rounded-2xl border border-zinc-200 bg-surface-card p-6 dark:border-zinc-800">
+                <Card key={step} className="relative p-6">
                   <div className="relative z-10 mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-indigo-50 text-2xl dark:bg-indigo-950/40">
                     {icon}
                   </div>
@@ -483,13 +484,13 @@ export default async function PracticeExamsPage() {
                       <p className="mt-1 text-[9px] text-zinc-400">ID: abc-1234 · Verified</p>
                     </div>
                   )}
-                  <Link
+                  <TextLink
                     href={link}
-                    className="mt-4 inline-flex text-sm font-medium text-indigo-600 transition-colors hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300"
+                    className="mt-4 inline-flex text-sm"
                   >
                     {linkLabel} →
-                  </Link>
-                </div>
+                  </TextLink>
+                </Card>
               ))}
             </div>
           </section>
@@ -499,13 +500,12 @@ export default async function PracticeExamsPage() {
         {popularLangs.length > 0 && (
           <section className="mb-14" aria-labelledby="popular-heading">
             <div className="mb-5 flex items-end justify-between">
-              <h2 id="popular-heading" className="text-xs font-semibold uppercase tracking-widest text-zinc-400 dark:text-zinc-500">
+              <Eyebrow id="popular-heading">
                 Popular certifications
-              </h2>
-              <a href="#all-certifications" className="text-sm font-medium text-indigo-600 hover:underline dark:text-indigo-400">
+              </Eyebrow>
+              <TextLink href="#all-certifications" className="text-sm">
                 View all →
-              </a>
-            </div>
+              </TextLink>
             <ExamCardGrid langs={popularLangs} examConfigByLang={examConfigByLang} statsByLang={statsByLang} publicStatsByLang={publicStatsByLang} isLoggedIn={!!user} />
           </section>
         )}
@@ -513,9 +513,9 @@ export default async function PracticeExamsPage() {
         {/* ── Try again (Pro user with failed attempts) ─────────────────────── */}
         {tryAgainLangs.length > 0 && (
           <section className="mb-14" aria-labelledby="try-again-heading">
-            <h2 id="try-again-heading" className="mb-5 text-xs font-semibold uppercase tracking-widest text-zinc-400 dark:text-zinc-500">
+            <Eyebrow id="try-again-heading" className="mb-5">
               Give it another shot
-            </h2>
+            </Eyebrow>
             <ExamCardGrid langs={tryAgainLangs} examConfigByLang={examConfigByLang} statsByLang={statsByLang} publicStatsByLang={publicStatsByLang} isLoggedIn={!!user} cols={2} />
           </section>
         )}
@@ -523,26 +523,26 @@ export default async function PracticeExamsPage() {
         {/* ── Passed langs ─────────────────────────────────────────────────── */}
         {passedLangs.length > 0 && (
           <section className="mb-14" aria-labelledby="passed-heading">
-            <h2 id="passed-heading" className="mb-5 text-xs font-semibold uppercase tracking-widest text-zinc-400 dark:text-zinc-500">
+            <Eyebrow id="passed-heading" className="mb-5">
               You passed
-            </h2>
+            </Eyebrow>
             <ExamCardGrid langs={passedLangs} examConfigByLang={examConfigByLang} statsByLang={statsByLang} publicStatsByLang={publicStatsByLang} isLoggedIn={!!user} cols={2} />
           </section>
         )}
 
         {/* ── All certifications ─────────────────────────────────────────────────────── */}
         <section id="all-certifications" aria-labelledby="all-heading">
-          <h2 id="all-heading" className="mb-5 text-xs font-semibold uppercase tracking-widest text-zinc-400 dark:text-zinc-500">
+          <Eyebrow id="all-heading" className="mb-5">
             All certifications
-          </h2>
+          </Eyebrow>
           <ExamCardGrid langs={langSlugs} examConfigByLang={examConfigByLang} statsByLang={statsByLang} publicStatsByLang={publicStatsByLang} isLoggedIn={!!user} />
         </section>
 
         {/* ── Why get certified? ───────────────────────────────────── */}
         <section className="mt-14 mb-0">
-          <h2 className="mb-6 text-xs font-semibold uppercase tracking-widest text-zinc-400 dark:text-zinc-500">
-            Why get certified?
-          </h2>
+            <Eyebrow className="mb-6">
+              Why get certified?
+          </Eyebrow>
           <div className="grid gap-4 sm:grid-cols-3">
             {[
               {
@@ -561,11 +561,11 @@ export default async function PracticeExamsPage() {
                 body: "Every certificate has a public verification page. Share the link with recruiters, teammates, or on social media.",
               },
             ].map(({ icon, title, body }) => (
-              <div key={title} className="rounded-2xl border border-zinc-200 bg-surface-card p-5 dark:border-zinc-800">
+              <Card key={title} className="p-5">
                 <span className="text-2xl">{icon}</span>
                 <h3 className="mt-3 font-semibold text-zinc-900 dark:text-zinc-100">{title}</h3>
                 <p className="mt-1.5 text-sm text-zinc-500 dark:text-zinc-400">{body}</p>
-              </div>
+              </Card>
             ))}
           </div>
         </section>
@@ -580,13 +580,13 @@ export default async function PracticeExamsPage() {
             <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
               <Link
                 href="/login?redirect=/certifications"
-                className="inline-flex items-center justify-center rounded-xl bg-indigo-600 px-6 py-3 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-indigo-500"
+                className="inline-flex items-center justify-center gap-2 rounded-xl bg-indigo-600 px-5 py-3 text-sm font-bold text-white shadow-md shadow-indigo-500/20 transition-all hover:-translate-y-0.5 hover:bg-indigo-500"
               >
                 Sign up free
               </Link>
               <Link
                 href="/pricing"
-                className="inline-flex items-center justify-center rounded-xl border border-zinc-300 bg-white px-6 py-3 text-sm font-semibold text-zinc-700 transition-colors hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200"
+                className="inline-flex items-center justify-center gap-2 rounded-xl border border-zinc-300 bg-white px-5 py-2.5 text-sm font-semibold text-zinc-700 transition-all hover:border-zinc-400 hover:bg-zinc-50 dark:border-zinc-600 dark:bg-surface-card dark:text-zinc-200 dark:hover:border-zinc-500"
               >
                 See pricing
               </Link>
@@ -601,14 +601,14 @@ export default async function PracticeExamsPage() {
             <div className="mt-6">
               <Link
                 href="/pricing"
-                className="inline-flex items-center justify-center rounded-xl bg-indigo-600 px-6 py-3 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-indigo-500"
+                className="inline-flex items-center justify-center gap-2 rounded-xl bg-indigo-600 px-5 py-3 text-sm font-bold text-white shadow-md shadow-indigo-500/20 transition-all hover:-translate-y-0.5 hover:bg-indigo-500"
               >
                 Upgrade to Pro
               </Link>
             </div>
           </div>
         ) : passedLangs.length < EXAM_LANGS.length ? (
-          <div className="mt-16 rounded-2xl border border-zinc-200 bg-surface-card p-8 text-center dark:border-zinc-800">
+          <Card className="mt-16 p-8 text-center">
             <h2 className="text-xl font-bold text-zinc-900 dark:text-zinc-100">
               {passedLangs.length === 0 ? "Take your first certification" : `${EXAM_LANGS.length - passedLangs.length} certifications remaining`}
             </h2>
@@ -620,14 +620,14 @@ export default async function PracticeExamsPage() {
             <div className="mt-6">
               <Link
                 href={`/certifications/${suggestedLang}`}
-                className="inline-flex items-center justify-center rounded-xl bg-indigo-600 px-6 py-3 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-indigo-500"
+                className="inline-flex items-center justify-center gap-2 rounded-xl bg-indigo-600 px-5 py-3 text-sm font-bold text-white shadow-md shadow-indigo-500/20 transition-all hover:-translate-y-0.5 hover:bg-indigo-500"
               >
                 {tryAgainLangs.length > 0
                   ? `Retake ${LANGUAGES[tryAgainLangs[0]]?.name} exam`
                   : `Start ${LANGUAGES[suggestedLang]?.name} exam`}
               </Link>
             </div>
-          </div>
+            </Card>
         ) : null}
 
         {/* ── Footer nav ────────────────────────────────────────────────────── */}
@@ -647,9 +647,9 @@ export default async function PracticeExamsPage() {
               </Link>
             );
           })}
-          <Link href="/certifications" className="font-medium text-indigo-600 hover:underline dark:text-indigo-400">
+          <TextLink href="/certifications">
             Certifications →
-          </Link>
+          </TextLink>
         </nav>
       </div>
     </div>

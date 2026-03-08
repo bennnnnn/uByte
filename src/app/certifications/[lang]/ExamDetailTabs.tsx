@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Card } from "@/components/ui";
 import type { ExamDetailContent } from "@/lib/exams/content";
 
 function FaqAccordion({ items }: { items: { question: string; answer: string }[] }) {
@@ -106,7 +107,7 @@ export default function ExamDetailTabs({ langName, content, examSize, examDurati
     ];
 
   return (
-    <div className="rounded-2xl border border-zinc-200 bg-surface-card dark:border-zinc-700">
+    <Card>
       {/* Tab bar */}
       <div
         className="flex border-b border-zinc-200 dark:border-zinc-700"
@@ -202,6 +203,6 @@ export default function ExamDetailTabs({ langName, content, examSize, examDurati
           </div>
         )}
       </div>
-    </div>
+    </Card>
   );
 }

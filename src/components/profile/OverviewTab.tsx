@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { Card, TextLink } from "@/components/ui";
 import type { Badge, Achievement, Stats, ActivityItem } from "./types";
 
 const ACTION_ICONS: Record<string, string> = {
@@ -74,7 +75,7 @@ export default function OverviewTab({ stats, badges, achievements, userId }: Pro
     <div className="space-y-8">
 
       {/* Quick progress summary */}
-      <div className="rounded-2xl border border-zinc-200 bg-surface-card p-5 dark:border-zinc-800">
+      <Card className="p-5">
         <div className="mb-3 flex items-center justify-between text-sm">
           <span className="font-medium text-zinc-700 dark:text-zinc-300">
             {stats.completed_count} / {stats.total_tutorials} tutorials
@@ -86,9 +87,9 @@ export default function OverviewTab({ stats, badges, achievements, userId }: Pro
         </div>
         <div className="mt-3 flex items-center justify-between">
           {allDone && userId ? (
-            <Link href={`/certificate/${userId}`} className="text-xs font-medium text-indigo-600 hover:underline dark:text-indigo-400">
+            <TextLink href={`/certificate/${userId}`} className="text-xs">
               🎓 View your certificate →
-            </Link>
+            </TextLink>
           ) : (
             <span className="text-xs text-zinc-400">
               {stats.total_tutorials - stats.completed_count} tutorials to go
@@ -98,11 +99,11 @@ export default function OverviewTab({ stats, badges, achievements, userId }: Pro
             View details →
           </Link>
         </div>
-      </div>
+      </Card>
 
       {/* Exam certificates */}
       {examCerts.length > 0 && (
-        <div className="rounded-2xl border border-zinc-200 bg-surface-card p-5 dark:border-zinc-800">
+        <Card className="p-5">
           <div className="mb-3 flex items-center justify-between">
             <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
               Exam certificates
@@ -118,17 +119,17 @@ export default function OverviewTab({ stats, badges, achievements, userId }: Pro
                   <span className="text-xs text-zinc-400">
                     {new Date(c.passed_at).toLocaleDateString()}
                   </span>
-                  <Link
+                  <TextLink
                     href={`/certifications/certificate/${c.id}`}
-                    className="text-xs font-medium text-indigo-600 hover:underline dark:text-indigo-400"
+                    className="text-xs"
                   >
                     Download
-                  </Link>
+                  </TextLink>
                 </div>
               </li>
             ))}
           </ul>
-        </div>
+        </Card>
       )}
 
       {/* Recent achievements */}
@@ -173,9 +174,9 @@ export default function OverviewTab({ stats, badges, achievements, userId }: Pro
         ) : activity.length === 0 ? (
           <p className="text-sm text-zinc-400">
             No activity yet.{" "}
-            <Link href="/" className="font-medium text-indigo-600 hover:underline dark:text-indigo-400">
+            <TextLink href="/">
               Start a tutorial →
-            </Link>
+            </TextLink>
           </p>
         ) : (
           <ul className="space-y-2">

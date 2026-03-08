@@ -1,6 +1,7 @@
 "use client";
 
 import { forwardRef } from "react";
+import { Button } from "@/components/ui";
 import Input from "@/components/ui/Input";
 import GoogleIcon from "@/components/auth/GoogleIcon";
 import { MIN_PASSWORD_LENGTH } from "@/lib/password-policy";
@@ -47,7 +48,7 @@ const AuthFormFields = forwardRef<HTMLFormElement, AuthFormFieldsProps>(function
     onSwitchMode,
     onForgot,
     inputClassName = "",
-    buttonClassName = "w-full rounded-xl bg-indigo-600 py-3 text-sm font-semibold text-white transition-colors hover:bg-indigo-700 disabled:opacity-50 dark:bg-indigo-500 dark:hover:bg-indigo-600",
+    buttonClassName,
     submitLabel,
     firstInputRef,
     visibleLabels = true,
@@ -138,9 +139,9 @@ const AuthFormFields = forwardRef<HTMLFormElement, AuthFormFieldsProps>(function
             className={inputClassName}
           />
         </div>
-        <button type="submit" disabled={submitting} className={buttonClassName}>
+        <Button type="submit" disabled={submitting} size="lg" className={buttonClassName || "w-full"}>
           {submitLabel ?? (submitting ? "Please wait…" : mode === "login" ? "Sign in" : "Create account")}
-        </button>
+        </Button>
       </form>
 
       <p className="mt-3 text-center text-sm text-zinc-500 dark:text-zinc-400">

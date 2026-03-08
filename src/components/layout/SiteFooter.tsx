@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { Eyebrow } from "@/components/ui";
 
 const LEARN_LINKS = [
   { href: "/tutorial/go", label: "Go Tutorials" },
@@ -91,9 +92,9 @@ export default function SiteFooter() {
           </div>
 
           <div>
-            <h3 className="mb-3 text-xs font-bold uppercase tracking-[0.18em] text-zinc-400 dark:text-zinc-500">
+            <Eyebrow as="h3" className="mb-3">
               Learn
-            </h3>
+            </Eyebrow>
             <div className="space-y-2">
               {LEARN_LINKS.map((item) => (
                 <FooterLink key={item.href} href={item.href} label={item.label} />
@@ -102,9 +103,9 @@ export default function SiteFooter() {
           </div>
 
           <div>
-            <h3 className="mb-3 text-xs font-bold uppercase tracking-[0.18em] text-zinc-400 dark:text-zinc-500">
+            <Eyebrow as="h3" className="mb-3">
               Interview Prep
-            </h3>
+            </Eyebrow>
             <div className="space-y-2">
               {PRACTICE_LINKS.map((item) => (
                 <FooterLink key={item.href} href={item.href} label={item.label} />
@@ -113,9 +114,9 @@ export default function SiteFooter() {
           </div>
 
           <div>
-            <h3 className="mb-3 text-xs font-bold uppercase tracking-[0.18em] text-zinc-400 dark:text-zinc-500">
+            <Eyebrow as="h3" className="mb-3">
               Company
-            </h3>
+            </Eyebrow>
             <div className="space-y-2">
               {COMPANY_LINKS.map((item) => (
                 <FooterLink key={item.href} href={item.href} label={item.label} />
@@ -124,9 +125,9 @@ export default function SiteFooter() {
           </div>
 
           <div>
-            <h3 className="mb-3 text-xs font-bold uppercase tracking-[0.18em] text-zinc-400 dark:text-zinc-500">
+            <Eyebrow as="h3" className="mb-3">
               Trust
-            </h3>
+            </Eyebrow>
             <div className="space-y-2">
               {LEGAL_LINKS.map((item) => (
                 <FooterLink key={item.href} href={item.href} label={item.label} />

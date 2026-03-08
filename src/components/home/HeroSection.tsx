@@ -2,9 +2,11 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { Card } from "@/components/ui";
 
 import type { SupportedLanguage } from "@/lib/languages/types";
 import { ALL_LANGUAGE_KEYS } from "@/lib/languages/registry";
+import { GradientText } from "@/components/ui";
 
 type Lang = SupportedLanguage;
 
@@ -145,9 +147,9 @@ export default function HeroSection({ topicCount = 19, lessonCountGo = 0, proble
             {/* Headline */}
             <h1 className="mb-5 text-[2.75rem] font-black leading-[1.04] tracking-tight text-zinc-900 dark:text-zinc-50 sm:text-5xl lg:text-[3.25rem] xl:text-[3.75rem]">
               Learn programming.
-              <span className="mt-1 block bg-gradient-to-r from-indigo-600 via-violet-600 to-cyan-500 bg-clip-text text-transparent">
+              <GradientText className="mt-1 block">
                 Interactive tutorials for every language.
-              </span>
+              </GradientText>
             </h1>
 
             {/* Sub */}
@@ -172,7 +174,7 @@ export default function HeroSection({ topicCount = 19, lessonCountGo = 0, proble
             <div className="mb-10 flex flex-wrap gap-3">
               <Link
                 href="/tutorial/go"
-                className="group inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-7 py-3 text-sm font-bold text-white shadow-lg shadow-indigo-600/25 transition-all hover:bg-indigo-500 hover:shadow-indigo-500/40"
+                className="group inline-flex items-center justify-center gap-2 rounded-xl bg-indigo-600 px-5 py-3 text-sm font-bold text-white shadow-md shadow-indigo-500/20 transition-all hover:-translate-y-0.5 hover:bg-indigo-500"
               >
                 Start free
                 <svg className="h-4 w-4 transition-transform group-hover:translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
@@ -229,7 +231,7 @@ export default function HeroSection({ topicCount = 19, lessonCountGo = 0, proble
             </div>
 
             {/* IDE card */}
-            <div className="overflow-hidden rounded-2xl border border-zinc-200 bg-surface-card shadow-[0_20px_60px_rgba(0,0,0,0.10)] dark:border-zinc-700 dark:shadow-[0_20px_60px_rgba(0,0,0,0.4)]">
+            <Card className="overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.10)] dark:shadow-[0_20px_60px_rgba(0,0,0,0.4)]">
 
               {/* Window chrome + language tabs */}
               <div className="flex items-center gap-3 border-b border-zinc-100 bg-surface-card px-4 py-3 dark:border-zinc-700">
@@ -322,7 +324,7 @@ export default function HeroSection({ topicCount = 19, lessonCountGo = 0, proble
                   </span>
                 </div>
               </div>
-            </div>
+            </Card>
           </div>
         </div>
 

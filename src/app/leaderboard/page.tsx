@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import Avatar from "@/components/Avatar";
+import { Button } from "@/components/ui";
 import { useAuth } from "@/components/AuthProvider";
 
 interface LeaderboardEntry {
@@ -64,8 +65,9 @@ export default function LeaderboardPage() {
       <div className="flex min-h-[50vh] flex-col items-center justify-center gap-4 px-4">
         <p className="text-sm text-red-500 dark:text-red-400">{error}</p>
         <div className="flex flex-wrap justify-center gap-3">
-          <button
+          <Button
             type="button"
+            size="lg"
             onClick={() => {
               setError("");
               setLoading(true);
@@ -79,13 +81,12 @@ export default function LeaderboardPage() {
                 .catch((err) => setError(err.message))
                 .finally(() => setLoading(false));
             }}
-            className="rounded-xl bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-500"
           >
             Retry
-          </button>
+          </Button>
           <Link
             href="/"
-            className="rounded-xl border border-zinc-300 bg-white px-4 py-2 text-sm font-semibold text-zinc-700 hover:bg-zinc-50 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-200 dark:hover:bg-zinc-700"
+            className="inline-flex items-center justify-center gap-2 rounded-xl border border-zinc-300 bg-white px-5 py-2.5 text-sm font-semibold text-zinc-700 transition-all hover:border-zinc-400 hover:bg-zinc-50 dark:border-zinc-600 dark:bg-surface-card dark:text-zinc-200 dark:hover:border-zinc-500"
           >
             Back to home
           </Link>

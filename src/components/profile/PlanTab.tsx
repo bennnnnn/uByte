@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useAuth } from "@/components/AuthProvider";
+import { Button, Card } from "@/components/ui";
 import { BILLING_CONFIG, hasPaidAccess } from "@/lib/plans";
 import { trackConversion } from "@/lib/analytics";
 import { apiFetch } from "@/lib/api-client";
@@ -51,14 +52,15 @@ function ManageOrCancelButtons() {
 
   return (
     <div className="mt-4 flex flex-wrap gap-3">
-      <button
+      <Button
         type="button"
+        variant="secondary"
+        size="lg"
         onClick={() => openPortal("manage")}
         disabled={loading}
-        className="rounded-xl border border-zinc-300 bg-white px-4 py-2.5 text-sm font-semibold text-zinc-700 transition-colors hover:border-zinc-400 hover:bg-zinc-50 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-200 dark:hover:border-zinc-500 dark:hover:bg-zinc-700 disabled:opacity-50"
       >
         {loading ? "Opening…" : "Manage billing"}
-      </button>
+      </Button>
       <button
         type="button"
         onClick={() => openPortal("cancel")}
@@ -165,7 +167,7 @@ export default function PlanTab({ plan }: Props) {
       </div>
 
       {/* Features */}
-      <div className="overflow-hidden rounded-2xl border border-zinc-200 bg-surface-card dark:border-zinc-800">
+      <Card className="overflow-hidden">
         <div className="border-b border-zinc-100 px-6 py-4 dark:border-zinc-800">
           <h3 className="font-semibold text-zinc-900 dark:text-zinc-100">
             {isPaid ? "Your plan includes" : "Free plan includes"}
@@ -206,26 +208,27 @@ export default function PlanTab({ plan }: Props) {
             </ul>
           </div>
         )}
-      </div>
+      </Card>
 
       {/* CTA */}
       {!isPaid ? (
         <div className="grid gap-4 sm:grid-cols-2">
-          <div className="rounded-2xl border border-zinc-200 bg-surface-card p-5 dark:border-zinc-800">
+          <Card className="p-5">
             <p className="text-lg font-bold text-zinc-900 dark:text-zinc-100">
               {BILLING_CONFIG.monthly.priceText.replace("/month", "")}
             </p>
             <p className="mb-4 text-xs text-zinc-500 dark:text-zinc-400">
               {BILLING_CONFIG.monthly.subLabel}
             </p>
-            <button
+            <Button
               type="button"
               onClick={() => openCheckout("monthly")}
-              className="w-full rounded-xl bg-indigo-600 py-3 text-sm font-semibold text-white transition-colors hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600"
+              size="lg"
+              className="w-full"
             >
               Get Monthly
-            </button>
-          </div>
+            </Button>
+          </Card>
           <div className="rounded-2xl border-2 border-emerald-200 bg-emerald-50/30 p-5 dark:border-emerald-900/50 dark:bg-emerald-950/20">
             <div className="mb-1 flex items-center gap-2">
               <p className="text-lg font-bold text-zinc-900 dark:text-zinc-100">
@@ -238,18 +241,19 @@ export default function PlanTab({ plan }: Props) {
             <p className="mb-4 text-xs text-zinc-500 dark:text-zinc-400">
               Yearly · best value
             </p>
-            <button
+            <Button
               type="button"
               onClick={() => openCheckout("yearly")}
-              className="w-full rounded-xl bg-indigo-600 py-3 text-sm font-semibold text-white transition-colors hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600"
+              size="lg"
+              className="w-full"
             >
               Get Yearly
-            </button>
+            </Button>
           </div>
         </div>
       ) : (
         <div className="space-y-4">
-          <div className="rounded-2xl border border-zinc-200 bg-surface-card px-6 py-5 dark:border-zinc-800">
+          <Card className="px-6 py-5">
             <p className="font-medium text-zinc-700 dark:text-zinc-300">
               You’re all set
             </p>
@@ -257,7 +261,7 @@ export default function PlanTab({ plan }: Props) {
               Manage billing, update payment method, or cancel your subscription below. If you cancel, you keep Pro until the end of your current billing period—then access reverts to free.
             </p>
             <ManageOrCancelButtons />
-          </div>
+          </Card>
         </div>
       )}
 

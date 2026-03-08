@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
+import { TextLink } from "@/components/ui";
 import { tutorialUrl } from "@/lib/urls";
 
 interface SearchResult {
@@ -98,7 +99,7 @@ export function SearchPageClient() {
                 No results for &ldquo;{query.trim()}&rdquo;
               </p>
               <p className="mt-2 text-sm text-zinc-500 dark:text-zinc-400">
-                Try different keywords or browse <Link href="/tutorial/go" className="font-medium text-indigo-600 hover:underline dark:text-indigo-400">tutorials</Link> and <Link href="/practice" className="font-medium text-indigo-600 hover:underline dark:text-indigo-400">interview prep</Link>.
+                Try different keywords or browse <TextLink href="/tutorial/go">tutorials</TextLink> and <TextLink href="/practice">interview prep</TextLink>.
               </p>
             </li>
           ) : (

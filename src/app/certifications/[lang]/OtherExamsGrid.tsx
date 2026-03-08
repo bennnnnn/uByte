@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Eyebrow } from "@/components/ui";
 import { LANGUAGES } from "@/lib/languages/registry";
 import { getLangIcon } from "@/lib/languages/icons";
 import type { SupportedLanguage } from "@/lib/languages/types";
@@ -27,12 +28,9 @@ export default function OtherExamsGrid({ currentLang, langSlugs, examConfigByLan
     <section aria-labelledby="other-exams-heading" className="mt-16">
       <div className="mb-6 flex items-end justify-between">
         <div>
-          <h2
-            id="other-exams-heading"
-            className="text-xs font-semibold uppercase tracking-widest text-zinc-400 dark:text-zinc-500"
-          >
+          <Eyebrow id="other-exams-heading">
             Other certifications
-          </h2>
+          </Eyebrow>
         </div>
         <Link
           href="/certifications"
@@ -55,7 +53,7 @@ export default function OtherExamsGrid({ currentLang, langSlugs, examConfigByLan
             <Link
               key={slug}
               href={`/certifications/${slug}`}
-              className="group flex items-center gap-4 rounded-2xl border border-zinc-200 bg-surface-card p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:border-indigo-300 hover:shadow-md dark:border-zinc-800 dark:hover:border-indigo-700"
+              className="group flex items-center gap-4 rounded-2xl border border-zinc-200 bg-surface-card p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:border-indigo-300 hover:shadow-md dark:border-zinc-700 dark:hover:border-indigo-700"
             >
               <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-zinc-100 bg-white text-2xl dark:border-zinc-700/60 dark:bg-zinc-800">
                 {getLangIcon(slug)}

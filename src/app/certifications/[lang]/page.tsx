@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { Card } from "@/components/ui";
 import { notFound } from "next/navigation";
 import { LANGUAGES, getAllLanguageSlugs } from "@/lib/languages/registry";
 import type { SupportedLanguage } from "@/lib/languages/types";
@@ -259,7 +260,7 @@ export default async function PracticeExamLangPage({ params }: Props) {
 
           {/* ── Right: sticky CTA card ───────────────────────────────────── */}
           <aside className="lg:sticky lg:top-6">
-            <div className="overflow-hidden rounded-2xl border border-zinc-200 bg-surface-card shadow-sm dark:border-zinc-700">
+            <Card className="overflow-hidden">
               {/* Card top accent */}
               <div className="h-1 w-full bg-gradient-to-r from-indigo-500 to-violet-400" />
 
@@ -277,7 +278,7 @@ export default async function PracticeExamLangPage({ params }: Props) {
                     <div className="mt-5 flex flex-col gap-3">
                       <Link
                         href="/profile?tab=overview"
-                        className="inline-flex items-center justify-center rounded-xl bg-indigo-600 px-5 py-3 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-indigo-500"
+                        className="inline-flex items-center justify-center gap-2 rounded-xl bg-indigo-600 px-5 py-3 text-sm font-bold text-white shadow-md shadow-indigo-500/20 transition-all hover:-translate-y-0.5 hover:bg-indigo-500"
                       >
                         View certificate
                       </Link>
@@ -345,13 +346,13 @@ export default async function PracticeExamLangPage({ params }: Props) {
                         <>
                           <Link
                             href={`/login?redirect=/certifications/${lang}`}
-                            className="inline-flex items-center justify-center rounded-xl bg-indigo-600 px-5 py-3 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-indigo-500"
+                            className="inline-flex items-center justify-center gap-2 rounded-xl bg-indigo-600 px-5 py-3 text-sm font-bold text-white shadow-md shadow-indigo-500/20 transition-all hover:-translate-y-0.5 hover:bg-indigo-500"
                           >
                             Sign up free
                           </Link>
                           <Link
                             href="/pricing"
-                            className="inline-flex items-center justify-center rounded-xl border border-zinc-200 bg-white px-5 py-3 text-sm font-semibold text-zinc-700 transition-colors hover:bg-zinc-100 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-200 dark:hover:bg-zinc-700"
+                            className="inline-flex items-center justify-center gap-2 rounded-xl border border-zinc-300 bg-white px-5 py-2.5 text-sm font-semibold text-zinc-700 transition-all hover:border-zinc-400 hover:bg-zinc-50 dark:border-zinc-600 dark:bg-surface-card dark:text-zinc-200 dark:hover:border-zinc-500"
                           >
                             See pricing
                           </Link>
@@ -359,7 +360,7 @@ export default async function PracticeExamLangPage({ params }: Props) {
                       ) : (
                         <Link
                           href="/pricing"
-                          className="inline-flex items-center justify-center rounded-xl bg-indigo-600 px-5 py-3 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-indigo-500"
+                          className="inline-flex items-center justify-center gap-2 rounded-xl bg-indigo-600 px-5 py-3 text-sm font-bold text-white shadow-md shadow-indigo-500/20 transition-all hover:-translate-y-0.5 hover:bg-indigo-500"
                         >
                           Upgrade to Pro
                         </Link>
@@ -368,7 +369,7 @@ export default async function PracticeExamLangPage({ params }: Props) {
                   </>
                 )}
               </div>
-            </div>
+            </Card>
           </aside>
         </div>
 

@@ -1,5 +1,6 @@
 "use client";
 
+import { Card } from "@/components/ui";
 import type { Notification } from "./types";
 
 const TYPE_ICONS: Record<string, string> = {
@@ -53,11 +54,11 @@ export default function NotificationsTab({ notifications, onMarkRead }: Props) {
       </div>
 
       {notifications.length === 0 ? (
-        <div className="rounded-2xl border border-zinc-200 bg-surface-card py-16 text-center dark:border-zinc-800">
+        <Card className="py-16 text-center">
           <p className="text-3xl">🔔</p>
           <p className="mt-3 text-sm font-medium text-zinc-500">No notifications yet</p>
           <p className="mt-1 text-xs text-zinc-400">We&apos;ll let you know when something happens.</p>
-        </div>
+        </Card>
       ) : (
         <ul className="space-y-2">
           {notifications.map((n) => (

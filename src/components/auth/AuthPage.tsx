@@ -4,6 +4,7 @@ import { Suspense, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/components/AuthProvider";
+import { Button } from "@/components/ui";
 import Input from "@/components/ui/Input";
 import FormError from "@/components/ui/FormError";
 import GoogleIcon from "@/components/auth/GoogleIcon";
@@ -189,13 +190,14 @@ export default function AuthPage({ variant }: { variant: AuthPageMode }) {
                     />
                   </div>
 
-                  <button
+                  <Button
                     type="submit"
                     disabled={submitting}
-                    className="w-full rounded-2xl bg-indigo-600 py-3 text-sm font-semibold text-white transition-colors hover:bg-indigo-700 disabled:opacity-50"
+                    size="lg"
+                    className="w-full"
                   >
                     {submitting ? "Sending…" : "Send reset link"}
-                  </button>
+                  </Button>
 
                   <button
                     type="button"
@@ -288,13 +290,14 @@ export default function AuthPage({ variant }: { variant: AuthPageMode }) {
                     />
                   </div>
 
-                  <button
+                  <Button
                     type="submit"
                     disabled={submitting}
-                    className="w-full rounded-2xl bg-indigo-600 py-3 text-sm font-semibold text-white transition-colors hover:bg-indigo-700 disabled:opacity-50"
+                    size="lg"
+                    className="w-full"
                   >
                     {submitting ? "Please wait…" : isSignupPage ? "Create account" : "Sign in"}
-                  </button>
+                  </Button>
 
                   <p className="text-sm text-zinc-600 dark:text-zinc-400">
                     {isSignupPage ? "Already have an account? " : "Need an account? "}

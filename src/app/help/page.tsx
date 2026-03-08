@@ -71,7 +71,7 @@ export default function HelpPage() {
             <Link
               key={item.href}
               href={item.href}
-              className="rounded-2xl border border-zinc-200 bg-surface-card p-5 transition-colors hover:border-indigo-300 dark:border-zinc-800 dark:hover:border-indigo-700"
+              className="rounded-2xl border border-zinc-200 bg-surface-card p-5 shadow-sm transition-colors hover:border-indigo-300 dark:border-zinc-700 dark:hover:border-indigo-700"
             >
               <h2 className="text-base font-bold text-zinc-900 dark:text-zinc-100">{item.label}</h2>
               <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">{item.hint}</p>

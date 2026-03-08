@@ -13,7 +13,7 @@ import {
 import { trackConversion } from "@/lib/analytics";
 import { absoluteUrl } from "@/lib/seo";
 import { buildAuthPageHref } from "@/lib/auth-redirect";
-import CheckIcon from "@/components/ui/CheckIcon";
+import { Button, Card, CheckIcon, Eyebrow, GradientText } from "@/components/ui";
 
 const CLIENT_TOKEN     = process.env.NEXT_PUBLIC_PADDLE_CLIENT_TOKEN ?? "";
 
@@ -214,9 +214,9 @@ function PricingContent() {
         <div className="mx-auto max-w-2xl text-center">
           <h1 className="text-2xl font-black tracking-tight text-zinc-900 dark:text-white sm:text-3xl">
             Invest in your skills.{" "}
-            <span className="bg-gradient-to-r from-indigo-500 to-violet-500 bg-clip-text text-transparent dark:from-indigo-400 dark:to-violet-400">
+            <GradientText>
               Get certified.
-            </span>
+            </GradientText>
           </h1>
           <p className="mt-2 text-sm text-zinc-500 dark:text-zinc-400 sm:text-base">
             Tutorials, interview prep, and verifiable certificates — all in one plan.
@@ -258,11 +258,11 @@ function PricingContent() {
         <div className="mx-auto mt-6 grid max-w-4xl gap-6 sm:grid-cols-2">
 
           {/* ── Free card ─────────────────────────────────── */}
-          <div className="flex flex-col rounded-2xl border border-zinc-200 bg-surface-card p-8 shadow-sm dark:border-zinc-700/60">
+          <Card className="flex flex-col p-8">
             <div>
-              <p className="mb-1 text-xs font-bold uppercase tracking-widest text-zinc-400 dark:text-zinc-500">
+              <Eyebrow as="p" className="mb-1">
                 Free
-              </p>
+              </Eyebrow>
               <div className="flex items-baseline gap-2">
                 <span className="text-4xl font-black text-zinc-900 dark:text-white">$0</span>
                 <span className="text-zinc-400 dark:text-zinc-500">forever</span>
@@ -276,7 +276,7 @@ function PricingContent() {
               {!user ? (
                 <Link
                   href={signupHref}
-                  className="block w-full rounded-xl border border-zinc-300 py-3.5 text-center text-sm font-semibold text-zinc-700 transition-colors hover:border-zinc-400 hover:bg-white hover:text-zinc-900 dark:border-zinc-600 dark:text-zinc-300 dark:hover:border-zinc-400 dark:hover:text-white"
+                  className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-zinc-300 bg-white px-5 py-3.5 text-center text-sm font-semibold text-zinc-700 transition-all hover:border-zinc-400 hover:bg-zinc-50 dark:border-zinc-600 dark:bg-surface-card dark:text-zinc-200 dark:hover:border-zinc-500"
                 >
                   Get started free
                 </Link>
@@ -304,7 +304,7 @@ function PricingContent() {
                 </li>
               ))}
             </ul>
-          </div>
+          </Card>
 
           {/* ── Pro card ──────────────────────────────────── */}
           <div className="relative flex flex-col rounded-2xl border-2 border-indigo-400 bg-gradient-to-b from-indigo-50 to-white p-8 shadow-lg shadow-indigo-100 dark:border-indigo-500/60 dark:from-indigo-950/50 dark:to-zinc-900 dark:shadow-indigo-900/20">
@@ -364,7 +364,7 @@ function PricingContent() {
               ) : !user ? (
                 <Link
                   href={signupHref}
-                  className="block w-full rounded-xl bg-indigo-600 py-3.5 text-center text-sm font-bold text-white shadow shadow-indigo-600/20 transition-colors hover:bg-indigo-700"
+                  className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-indigo-600 px-5 py-3.5 text-center text-sm font-bold text-white shadow-md shadow-indigo-500/20 transition-all hover:-translate-y-0.5 hover:bg-indigo-500"
                 >
                   Start free, upgrade anytime
                 </Link>
@@ -373,15 +373,16 @@ function PricingContent() {
                   Coming soon
                 </div>
               ) : (
-                <button
+                <Button
                   type="button"
                   onClick={() => openCheckout(selectedPriceId)}
-                  className="w-full rounded-xl bg-indigo-600 py-3.5 text-sm font-bold text-white shadow shadow-indigo-600/20 transition-colors hover:bg-indigo-700"
+                  size="lg"
+                  className="w-full py-3.5"
                 >
                   {billing === "yearly"
                     ? `Get Pro — ${BILLING_CONFIG.yearly.priceText.replace("/year", "/yr")}`
                     : `Get Pro — ${BILLING_CONFIG.monthly.priceText.replace("/month", "/mo")}`}
-                </button>
+                </Button>
               )}
             </div>
 
@@ -418,11 +419,11 @@ function PricingContent() {
               { icon: "💪", title: "Interview Prep", body: "Hundreds of coding challenges across all languages. AI feedback helps you understand mistakes and improve." },
               { icon: "🏆", title: "Get certified", body: "Timed exams with real scoring. Pass and earn a verifiable digital certificate for your LinkedIn and resume." },
             ].map(({ icon, title, body }) => (
-              <div key={title} className="rounded-2xl border border-zinc-200 bg-surface-card p-5 dark:border-zinc-800">
+              <Card key={title} className="p-5">
                 <span className="text-2xl">{icon}</span>
                 <h3 className="mt-3 font-semibold text-zinc-900 dark:text-zinc-100">{title}</h3>
                 <p className="mt-1.5 text-sm text-zinc-500 dark:text-zinc-400">{body}</p>
-              </div>
+              </Card>
             ))}
           </div>
         </div>

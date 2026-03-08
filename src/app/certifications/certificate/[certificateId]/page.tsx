@@ -7,6 +7,7 @@ import { LANGUAGES } from "@/lib/languages/registry";
 import type { SupportedLanguage } from "@/lib/languages/types";
 import type { CertificatePayload } from "@/lib/exams/api-types";
 import { parseJson, getApiErrorMessage } from "@/lib/fetch-utils";
+import { Button } from "@/components/ui";
 import Spinner from "@/components/Spinner";
 
 function formatDate(iso: string) {
@@ -97,17 +98,18 @@ export default function ExamCertificatePage() {
           ← Certifications
         </Link>
         <div className="flex gap-2">
-          <button
+          <Button
             type="button"
+            variant="secondary"
+            size="lg"
             onClick={handleShare}
-            className="rounded-xl border border-zinc-300 px-4 py-2 text-sm font-semibold text-zinc-700 shadow-sm hover:bg-zinc-50 dark:border-zinc-600 dark:text-zinc-300 dark:hover:bg-zinc-800"
           >
             {copied ? "Copied!" : "Share"}
-          </button>
+          </Button>
           <a
             href={pdfUrl}
             download
-            className="rounded-xl bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-700"
+            className="inline-flex items-center justify-center gap-2 rounded-xl bg-indigo-600 px-5 py-3 text-sm font-bold text-white shadow-md shadow-indigo-500/20 transition-all hover:-translate-y-0.5 hover:bg-indigo-500"
           >
             Download PDF
           </a>
@@ -180,13 +182,13 @@ export default function ExamCertificatePage() {
         <div className="mt-5 flex flex-wrap items-center justify-center gap-3">
           <Link
             href={`/certifications/${data.lang}`}
-            className="inline-flex items-center justify-center rounded-xl bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-indigo-500"
+            className="inline-flex items-center justify-center gap-2 rounded-xl bg-indigo-600 px-5 py-3 text-sm font-bold text-white shadow-md shadow-indigo-500/20 transition-all hover:-translate-y-0.5 hover:bg-indigo-500"
           >
             Get certified in {langConfig?.name ?? data.lang}
           </Link>
           <Link
             href="/certifications"
-            className="inline-flex items-center justify-center rounded-xl border border-zinc-300 bg-white px-5 py-2.5 text-sm font-semibold text-zinc-700 transition-colors hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200"
+            className="inline-flex items-center justify-center gap-2 rounded-xl border border-zinc-300 bg-white px-5 py-2.5 text-sm font-semibold text-zinc-700 transition-all hover:border-zinc-400 hover:bg-zinc-50 dark:border-zinc-600 dark:bg-surface-card dark:text-zinc-200 dark:hover:border-zinc-500"
           >
             Browse all certifications
           </Link>

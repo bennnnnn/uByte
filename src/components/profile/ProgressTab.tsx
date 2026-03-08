@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import ShareButton from "@/components/ShareButton";
+import { Card, TextLink } from "@/components/ui";
 import type { Stats } from "./types";
 import { tutorialUrl } from "@/lib/urls";
 
@@ -36,7 +37,7 @@ export default function ProgressTab({ stats, userId }: Props) {
     <div className="space-y-6">
 
       {/* Progress summary card */}
-      <div className="rounded-2xl border border-zinc-200 bg-surface-card p-6 dark:border-zinc-800">
+      <Card className="p-6">
         <div className="mb-4 flex items-end justify-between">
           <div>
             <p className="text-4xl font-bold text-zinc-900 dark:text-zinc-100">
@@ -53,7 +54,7 @@ export default function ProgressTab({ stats, userId }: Props) {
             style={{ width: `${pct}%` }}
           />
         </div>
-      </div>
+      </Card>
 
       {/* Certificate */}
       {allDone && userId ? (
@@ -75,7 +76,7 @@ export default function ProgressTab({ stats, userId }: Props) {
           </div>
         </div>
       ) : (
-        <div className="flex items-center gap-4 rounded-2xl border border-zinc-200 bg-surface-card p-5 dark:border-zinc-800">
+        <Card className="flex items-center gap-4 p-5">
           <span className="text-3xl">🎓</span>
           <div>
             <p className="font-semibold text-zinc-900 dark:text-zinc-100">Certificate of Completion</p>
@@ -83,7 +84,7 @@ export default function ProgressTab({ stats, userId }: Props) {
               {stats.total_tutorials - stats.completed_count} tutorial{stats.total_tutorials - stats.completed_count !== 1 ? "s" : ""} remaining to earn your certificate
             </p>
           </div>
-        </div>
+        </Card>
       )}
 
       {/* Completed tutorials list */}
@@ -102,13 +103,13 @@ export default function ProgressTab({ stats, userId }: Props) {
             ))}
           </div>
         ) : completedSlugs.length === 0 ? (
-          <div className="rounded-2xl border border-zinc-200 bg-surface-card py-10 text-center dark:border-zinc-800">
+          <Card className="py-10 text-center">
             <p className="text-2xl">📚</p>
             <p className="mt-2 text-sm text-zinc-500">No tutorials completed yet.</p>
-            <Link href="/" className="mt-3 inline-block text-sm font-medium text-indigo-600 hover:underline dark:text-indigo-400">
+            <TextLink href="/" className="mt-3 inline-block text-sm">
               Start learning →
-            </Link>
-          </div>
+            </TextLink>
+          </Card>
         ) : (
           <ul className="space-y-2">
             {completedSlugs.map((slug) => (

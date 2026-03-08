@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { Card } from "@/components/ui";
 import { absoluteUrl, SITE_KEYWORDS } from "@/lib/seo";
 
 export const metadata: Metadata = {
@@ -41,13 +42,13 @@ export default function AboutPage() {
           <div className="mt-6 flex flex-wrap gap-3">
             <Link
               href="/tutorial/go"
-              className="rounded-xl bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-indigo-500"
+              className="inline-flex items-center justify-center gap-2 rounded-xl bg-indigo-600 px-5 py-3 text-sm font-bold text-white shadow-md shadow-indigo-500/20 transition-all hover:-translate-y-0.5 hover:bg-indigo-500"
             >
               Explore Tutorials
             </Link>
             <Link
               href="/practice"
-              className="rounded-xl border border-zinc-300 px-5 py-2.5 text-sm font-semibold text-zinc-700 hover:bg-zinc-50 dark:border-zinc-700 dark:text-zinc-200 dark:hover:bg-zinc-800"
+              className="inline-flex items-center justify-center gap-2 rounded-xl border border-zinc-300 bg-white px-5 py-2.5 text-sm font-semibold text-zinc-700 transition-all hover:border-zinc-400 hover:bg-zinc-50 dark:border-zinc-600 dark:bg-surface-card dark:text-zinc-200 dark:hover:border-zinc-500"
             >
               Interview Practice
             </Link>
@@ -60,10 +61,10 @@ export default function AboutPage() {
             { title: "Interview prep", body: "Coding challenges modeled after real technical interview patterns." },
             { title: "Certifications", body: "Timed certification exams with per-language scoring and shareable certificates." },
           ].map((card) => (
-            <article key={card.title} className="rounded-2xl border border-zinc-200 bg-surface-card p-5 dark:border-zinc-800">
+            <Card key={card.title} as="article" className="p-5">
               <h2 className="text-base font-bold text-zinc-900 dark:text-zinc-100">{card.title}</h2>
               <p className="mt-2 text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">{card.body}</p>
-            </article>
+            </Card>
           ))}
         </section>
       </div>

@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import Link from "next/link";
 import { useAuth } from "@/components/AuthProvider";
-import Input from "@/components/ui/Input";
+import { Button, Card, Input } from "@/components/ui";
 import AuthFormFields from "@/components/auth/AuthFormFields";
 import { apiFetch } from "@/lib/api-client";
 import { submitEmailAuth } from "@/lib/auth-client";
@@ -167,7 +167,7 @@ export default function AuthModal({ onClose, initialMode }: Props) {
       />
 
       {/* Card */}
-      <div className="relative w-full max-w-[400px] rounded-2xl border border-zinc-200/80 bg-surface-card shadow-2xl shadow-zinc-900/10 dark:border-zinc-800 dark:shadow-none">
+      <Card className="relative w-full max-w-[400px] shadow-2xl shadow-zinc-900/10 dark:shadow-none">
         <div className="p-8">
           <div className="mb-6 flex items-start justify-between gap-4">
             <div>
@@ -239,13 +239,14 @@ export default function AuthModal({ onClose, initialMode }: Props) {
                       className="rounded-xl bg-zinc-50/80 dark:bg-zinc-800/80"
                     />
                   </div>
-                  <button
+                  <Button
                     type="submit"
                     disabled={submitting}
-                    className="w-full rounded-xl bg-indigo-600 py-3 text-sm font-semibold text-white transition-colors hover:bg-indigo-700 disabled:opacity-50 dark:bg-indigo-500 dark:hover:bg-indigo-600"
+                    size="lg"
+                    className="w-full"
                   >
                     {submitting ? "Sending…" : "Send reset link"}
-                  </button>
+                  </Button>
                 </form>
                 <button
                   type="button"
@@ -284,7 +285,7 @@ export default function AuthModal({ onClose, initialMode }: Props) {
             </>
           )}
         </div>
-      </div>
+      </Card>
     </div>,
     document.body
   );
