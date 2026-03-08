@@ -1,4 +1,3 @@
-import { randomUUID } from "crypto";
 import { NextRequest, NextResponse } from "next/server";
 
 const CSRF_COOKIE = "csrf_token";
@@ -6,7 +5,7 @@ const CSRF_HEADER = "x-csrf-token";
 
 /** Set a CSRF token cookie on the response (call after login/signup) */
 export function setCsrfCookie(res: NextResponse): string {
-  const token = randomUUID();
+  const token = crypto.randomUUID();
   res.cookies.set(CSRF_COOKIE, token, {
     httpOnly: false, // JS needs to read this
     secure: process.env.NODE_ENV === "production",
