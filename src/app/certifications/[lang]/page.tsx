@@ -4,8 +4,9 @@ import { notFound } from "next/navigation";
 import { LANGUAGES, getAllLanguageSlugs } from "@/lib/languages/registry";
 import type { SupportedLanguage } from "@/lib/languages/types";
 import { getCurrentUser } from "@/lib/auth";
-import { getUserPlan, getExamConfigForLang, getExamConfigForAllLangs } from "@/lib/db";
+import { getUserPlan, getExamConfigForLang, getExamConfigForAllLangs, getProgressCount } from "@/lib/db";
 import { hasPaidAccess } from "@/lib/plans";
+import { getAllTutorials } from "@/lib/tutorials";
 import { getLangIcon } from "@/lib/languages/icons";
 import { getExamDetailContent } from "@/lib/exams/content";
 import { absoluteUrl, buildBreadcrumbJsonLd, buildFaqJsonLd, SITE_KEYWORDS } from "@/lib/seo";
@@ -72,6 +73,10 @@ export default async function PracticeExamLangPage({ params }: Props) {
   ]);
   const plan = user ? await getUserPlan(user.userId) : "free";
   const canTakeExam = hasPaidAccess(plan);
+
+  const totalTutorials = getAllTutorials(lang as SupportedLanguage).length;
+  const completedTutorials = user ? await getProgressCount(user.userId, lang) : 0;
+  const hasStartedTutorials = completedTutorials > 0;
 
   const config = LANGUAGES[lang as SupportedLanguage];
   const name = config?.name ?? lang;
@@ -159,6 +164,55 @@ export default async function PracticeExamLangPage({ params }: Props) {
           </div>
         </div>
       </div>
+
+      {/* ── Tutorial suggestion (non-blocking) ────────────────────────── */}
+      {user && !hasStartedTutorials && totalTutorials > 0 && (
+        <div className="mx-auto max-w-5xl px-6 pt-6">
+          <div className="flex items-start gap-3 rounded-xl border border-amber-200 bg-amber-50 px-5 py-4 dark:border-amber-800/50 dark:bg-amber-950/20">
+            <span className="mt-0.5 text-lg">💡</span>
+            <div className="flex-1">
+              <p className="text-sm font-medium text-zinc-800 dark:text-zinc-200">
+                New to {name}? Our interactive tutorials can help you prepare.
+              </p>
+              <p className="mt-0.5 text-xs text-zinc-500 dark:text-zinc-400">
+                {totalTutorials} hands-on lessons cover the core concepts tested in this exam. Totally optional — take the exam whenever you&apos;re ready.
+              </p>
+            </div>
+            <Link
+              href={`/tutorial/${lang}`}
+              className="shrink-0 rounded-lg border border-amber-300 bg-white px-3 py-1.5 text-xs font-semibold text-amber-700 transition-colors hover:bg-amber-50 dark:border-amber-700 dark:bg-zinc-900 dark:text-amber-400 dark:hover:bg-zinc-800"
+            >
+              View tutorials
+            </Link>
+          </div>
+        </div>
+      )}
+
+      {/* ── Tutorial progress (partially completed) ────────────────────── */}
+      {user && hasStartedTutorials && completedTutorials < totalTutorials && (
+        <div className="mx-auto max-w-5xl px-6 pt-6">
+          <div className="flex items-center gap-3 rounded-xl border border-zinc-200 bg-white px-5 py-4 dark:border-zinc-700 dark:bg-zinc-900">
+            <span className="text-lg">📚</span>
+            <div className="flex-1">
+              <p className="text-sm font-medium text-zinc-800 dark:text-zinc-200">
+                You&apos;ve completed {completedTutorials} of {totalTutorials} {name} tutorials
+              </p>
+              <div className="mt-2 h-1.5 w-full max-w-xs overflow-hidden rounded-full bg-zinc-100 dark:bg-zinc-800">
+                <div
+                  className="h-full rounded-full bg-indigo-500 transition-all"
+                  style={{ width: `${Math.round((completedTutorials / totalTutorials) * 100)}%` }}
+                />
+              </div>
+            </div>
+            <Link
+              href={`/tutorial/${lang}`}
+              className="shrink-0 rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-1.5 text-xs font-semibold text-zinc-600 transition-colors hover:bg-zinc-100 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700"
+            >
+              Continue learning
+            </Link>
+          </div>
+        </div>
+      )}
 
       {/* ── Body: main content + sticky sidebar ─────────────────────────── */}
       <div className="mx-auto max-w-5xl px-6 py-10 sm:py-14">
