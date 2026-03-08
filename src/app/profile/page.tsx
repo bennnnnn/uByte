@@ -224,7 +224,7 @@ function ProfilePage() {
   };
 
   const markNotificationsRead = async () => {
-    await fetch("/api/notifications", { method: "PATCH", credentials: "same-origin" });
+    await apiFetch("/api/notifications", { method: "PATCH" });
     setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
     setUnreadCount(0);
   };
