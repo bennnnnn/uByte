@@ -26,5 +26,7 @@ export const GET = withErrorHandling("GET /api/home-popular", async () => {
       popularPracticeProblems.length > 0
         ? popularPracticeProblems
         : getFallbackPopularPracticeProblems(),
+  }, {
+    headers: { "Cache-Control": "public, s-maxage=120, stale-while-revalidate=300" },
   });
 });

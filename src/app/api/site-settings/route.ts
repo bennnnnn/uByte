@@ -12,5 +12,7 @@ export const GET = withErrorHandling("GET /api/site-settings", async () => {
   for (const [lang, cfg] of Object.entries(configs)) {
     passPercentByLang[lang] = cfg.passPercent;
   }
-  return NextResponse.json({ passPercentByLang });
+  return NextResponse.json({ passPercentByLang }, {
+    headers: { "Cache-Control": "public, s-maxage=300, stale-while-revalidate=600" },
+  });
 });

@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   alternates: { canonical: absoluteUrl("/terms") },
 };
 
-const UPDATED = "28 February 2026";
+const UPDATED = "3 March 2026";
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
@@ -37,11 +37,19 @@ export default function TermsPage() {
         <p>You may not create accounts for others, use bots to create accounts, or share your account.</p>
       </Section>
 
+      <Section title="Plans, Payments, and Refunds">
+        <p><strong>Free tier</strong> — uByte offers a free tier with limited access to tutorials, interview prep problems, and features as described on the pricing page.</p>
+        <p><strong>Pro subscription</strong> — paid subscriptions are billed monthly or annually through Paddle, our Merchant of Record. By subscribing, you agree to Paddle&apos;s <a href="https://www.paddle.com/legal/terms" target="_blank" rel="noopener noreferrer" className="text-indigo-600 hover:underline">Terms of Service</a>. Paddle handles all payment processing, invoicing, and sales tax/VAT.</p>
+        <p><strong>Automatic renewal</strong> — subscriptions renew automatically at the end of each billing period unless cancelled. You can cancel at any time from your Paddle subscription management portal.</p>
+        <p><strong>Refunds</strong> — if you are not satisfied with your Pro subscription, you may request a refund within 14 days of your initial purchase by contacting <a href="mailto:support@ubyte.dev" className="text-indigo-600 hover:underline">support@ubyte.dev</a>. Refunds are processed through Paddle. After the 14-day window, no refunds will be issued for the current billing period, but you may cancel to prevent future charges.</p>
+        <p><strong>Price changes</strong> — we may change subscription prices with 30 days&apos; notice via email. Changes take effect at the next billing cycle.</p>
+      </Section>
+
       <Section title="Acceptable Use">
         <p>You agree not to:</p>
         <ul className="list-disc pl-5 space-y-1">
           <li>Attempt to bypass, exploit, or disrupt the platform or its security</li>
-          <li>Abuse the code runner (e.g. mining, denial-of-service attacks, network scanning)</li>
+          <li>Abuse the code execution service (e.g. mining, denial-of-service attacks, network scanning)</li>
           <li>Use the Service to harass, spam, or harm others</li>
           <li>Scrape the Service in a manner that degrades performance for other users</li>
           <li>Impersonate another person or entity</li>
@@ -50,9 +58,13 @@ export default function TermsPage() {
         <p>We reserve the right to suspend or terminate accounts that violate these rules without notice.</p>
       </Section>
 
-      <Section title="The Code Runner">
-        <p>Interactive code steps send your code to the Piston API (emkc.org), an open-source code execution API. Do not submit secret keys, passwords, or personal information in code you run.</p>
-        <p>Using the code runner to attempt denial-of-service attacks, cryptocurrency mining, or network intrusion is strictly prohibited and may result in immediate account termination and reporting to relevant authorities.</p>
+      <Section title="Code Execution">
+        <p>Interactive tutorial steps and interview prep problems send your code to third-party execution services (Judge0 for Python, JavaScript, Java, C++, and Rust; Go Playground for Go) for compilation and execution. Do not submit secret keys, passwords, or personal information in code you run.</p>
+        <p>Using the code execution service to attempt denial-of-service attacks, cryptocurrency mining, or network intrusion is strictly prohibited and may result in immediate account termination.</p>
+      </Section>
+
+      <Section title="Certifications">
+        <p>Pro subscribers may take certification exams. Upon passing, you receive a verifiable digital certificate. Certificates attest only that you passed the exam at a given time; they do not represent an accredited qualification. We reserve the right to revoke certificates obtained through cheating or other violations of these Terms.</p>
       </Section>
 
       <Section title="Playground Snippets">
@@ -60,8 +72,12 @@ export default function TermsPage() {
         <p>You retain ownership of code you write. By sharing a snippet you grant us a non-exclusive licence to store and serve it. We may delete snippets that violate these Terms or after extended periods of inactivity.</p>
       </Section>
 
+      <Section title="AI Code Feedback">
+        <p>Pro users may receive AI-generated code feedback powered by third-party AI services. AI responses are informational and may contain errors. We are not liable for actions taken based on AI feedback.</p>
+      </Section>
+
       <Section title="Leaderboard and Public Profile Data">
-        <p>Your display name and XP points are visible on the Leaderboard to other logged-in users. By using the Service you consent to this display. You can change your display name from your profile settings at any time.</p>
+        <p>Your display name, XP points, and learning progress are visible on your public profile and the Leaderboard. By using the Service you consent to this display. You can change your display name from your profile settings at any time.</p>
       </Section>
 
       <Section title="Tutorial Content">
@@ -73,7 +89,7 @@ export default function TermsPage() {
         <ul className="list-disc pl-5 space-y-1">
           <li>The Service will be available at all times</li>
           <li>Tutorial content is free of errors</li>
-          <li>Completing tutorials will result in employment or specific skill outcomes</li>
+          <li>Completing tutorials or certifications will result in employment or specific skill outcomes</li>
         </ul>
       </Section>
 
@@ -83,10 +99,12 @@ export default function TermsPage() {
 
       <Section title="Termination">
         <p>You may delete your account at any time from Profile → Settings. We may suspend or terminate your account for violations of these Terms. Upon termination, your data is deleted as described in our Privacy Policy.</p>
+        <p>If you have an active paid subscription at the time of account deletion, your subscription will be cancelled and no further charges will occur. No partial-period refunds are issued for voluntary deletion.</p>
       </Section>
 
       <Section title="Governing Law">
-        <p>These Terms are governed by applicable law. Any disputes shall be resolved through good-faith negotiation. If you have a complaint, contact us at <a href="mailto:support@ubyte.dev" className="text-indigo-600 hover:underline">support@ubyte.dev</a>.</p>
+        <p>These Terms are governed by the laws of the State of Delaware, United States, without regard to its conflict-of-law provisions. Any disputes arising from these Terms or the Service shall first be resolved through good-faith negotiation. If unresolved within 30 days, disputes shall be submitted to binding arbitration under the rules of the American Arbitration Association. Nothing in this section limits your statutory rights under applicable consumer protection law.</p>
+        <p>If you have a complaint, contact us at <a href="mailto:support@ubyte.dev" className="text-indigo-600 hover:underline">support@ubyte.dev</a>.</p>
       </Section>
     </div>
   );

@@ -21,6 +21,9 @@ export const GET = withErrorHandling("GET /api/health", async () => {
       uptime: Math.floor((Date.now() - startTime) / 1000),
       version: process.env.npm_package_version ?? "0.1.0",
     },
-    { status: dbOk ? 200 : 503 }
+    {
+      status: dbOk ? 200 : 503,
+      headers: { "Cache-Control": "no-store" },
+    }
   );
 });
