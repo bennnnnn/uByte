@@ -119,7 +119,7 @@ export default function UserMenuDropdown({ unreadCount, isMobile }: Props) {
             <MenuItem href="/profile?tab=progress" icon={<ProgressIcon />} label="Progress" onClick={close} />
             <MenuItem href="/profile?tab=bookmarks" icon={<BookmarkIcon />} label="Bookmarks" onClick={close} />
             <MenuItem href="/profile?tab=achievements" icon={<AchievementsIcon />} label="Achievements" onClick={close} />
-            <MenuItem href="/certifications" icon={<CertificateIcon />} label="Certifications" onClick={close} />
+            <MenuItem href="/profile?tab=certifications" icon={<CertificateIcon />} label="Certifications" onClick={close} />
 
             {/* Account */}
             <SectionLabel>Account</SectionLabel>

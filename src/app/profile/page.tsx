@@ -13,6 +13,7 @@ import PlanTab from "@/components/profile/PlanTab";
 import AchievementsTab from "@/components/profile/AchievementsTab";
 import NotificationsTab from "@/components/profile/NotificationsTab";
 import BookmarksTab from "@/components/profile/BookmarksTab";
+import CertificationsTab from "@/components/profile/CertificationsTab";
 import SettingsTab from "@/components/profile/SettingsTab";
 import type { Profile, Stats, Badge, Achievement, Bookmark, Notification } from "@/components/profile/types";
 
@@ -53,12 +54,13 @@ function ProfileSkeleton() {
   );
 }
 
-const VALID_TABS = ["overview", "progress", "plan", "achievements", "notifications", "bookmarks", "settings"] as const;
+const VALID_TABS = ["overview", "progress", "certifications", "plan", "achievements", "notifications", "bookmarks", "settings"] as const;
 type Tab = (typeof VALID_TABS)[number];
 
 const TAB_LABELS: Record<Tab, string> = {
   overview: "Overview",
   progress: "Progress",
+  certifications: "Certifications",
   plan: "Plan",
   achievements: "Achievements",
   notifications: "Notifications",
@@ -297,6 +299,9 @@ function ProfilePage() {
           )}
           <PlanTab plan={profile.plan} />
         </>
+      )}
+      {tab === "certifications" && (
+        <CertificationsTab />
       )}
       {tab === "achievements" && (
         <AchievementsTab badges={badges} achievements={achievements} />
