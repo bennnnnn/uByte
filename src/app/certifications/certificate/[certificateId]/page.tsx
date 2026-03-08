@@ -21,14 +21,13 @@ export default function ExamCertificatePage() {
   const { certificateId } = useParams<{ certificateId: string }>();
   const [data, setData] = useState<CertificatePayload | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
     async function load() {
       try {
-        const res = await fetch(`/api/certifications/certificate/${certificateId}`, {
-          credentials: "same-origin",
-        });
+        const res = await fetch(`/api/certifications/certificate/${certificateId}`);
         const json = await parseJson<CertificatePayload & { error?: string }>(res);
         if (cancelled) return;
         if (!res.ok) {
@@ -52,12 +51,13 @@ export default function ExamCertificatePage() {
     const url = window.location.href;
     if (navigator.share) {
       try {
-        await navigator.share({ title: `${data?.name} — Certificate`, url });
+        await navigator.share({ title: `${data?.name} — ${data?.lang} Certificate`, url });
         return;
       } catch { /* user cancelled or not supported */ }
     }
     await navigator.clipboard.writeText(url);
-    alert("Link copied to clipboard!");
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
   };
 
   if (error) {
@@ -65,20 +65,12 @@ export default function ExamCertificatePage() {
       <div className="flex min-h-[80vh] items-center justify-center px-4">
         <div className="w-full max-w-md text-center">
           <p className="mb-3 text-sm text-red-500">{error}</p>
-          <div className="flex flex-col gap-2 sm:flex-row sm:justify-center">
-            <Link
-              href="/profile?tab=overview"
-              className="text-sm font-medium text-indigo-600 hover:text-indigo-700 dark:text-indigo-400"
-            >
-              ← Back to profile
-            </Link>
-            <Link
-              href="/certifications"
-              className="text-sm font-medium text-indigo-600 hover:text-indigo-700 dark:text-indigo-400"
-            >
-              ← Back to certifications
-            </Link>
-          </div>
+          <Link
+            href="/certifications"
+            className="text-sm font-medium text-indigo-600 hover:text-indigo-700 dark:text-indigo-400"
+          >
+            ← Browse certifications
+          </Link>
         </div>
       </div>
     );
@@ -96,12 +88,13 @@ export default function ExamCertificatePage() {
 
   return (
     <div className="flex min-h-[100vh] flex-col items-center justify-center bg-zinc-100 px-4 py-10 dark:bg-zinc-950 print:bg-white">
+      {/* Action bar */}
       <div className="mb-4 flex w-full max-w-3xl items-center justify-between print:hidden">
         <Link
-          href="/profile?tab=overview"
+          href="/certifications"
           className="text-sm text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200"
         >
-          ← Back to profile
+          ← Certifications
         </Link>
         <div className="flex gap-2">
           <button
@@ -109,7 +102,7 @@ export default function ExamCertificatePage() {
             onClick={handleShare}
             className="rounded-xl border border-zinc-300 px-4 py-2 text-sm font-semibold text-zinc-700 shadow-sm hover:bg-zinc-50 dark:border-zinc-600 dark:text-zinc-300 dark:hover:bg-zinc-800"
           >
-            Share
+            {copied ? "Copied!" : "Share"}
           </button>
           <a
             href={pdfUrl}
@@ -121,17 +114,16 @@ export default function ExamCertificatePage() {
         </div>
       </div>
 
+      {/* Certificate card */}
       <div className="w-full max-w-3xl rounded-2xl border-4 border-indigo-500 bg-white p-10 text-center shadow-2xl dark:border-indigo-600 dark:bg-zinc-900 print:shadow-none">
         <div className="mb-6 flex items-center justify-center gap-3">
           <div className="h-px flex-1 bg-indigo-200 dark:bg-indigo-800" />
-          <span className="text-3xl">
-            {langConfig?.slug === "go" ? "🐹" : "🎓"}
-          </span>
+          <span className="text-3xl">🎓</span>
           <div className="h-px flex-1 bg-indigo-200 dark:bg-indigo-800" />
         </div>
 
         <p className="mb-2 text-sm font-semibold uppercase tracking-widest text-indigo-600 dark:text-indigo-400">
-          Certificate
+          Certificate of Completion
         </p>
 
         <p className="mb-4 text-sm text-zinc-500 dark:text-zinc-400">
@@ -155,15 +147,26 @@ export default function ExamCertificatePage() {
           {langConfig?.name ?? data.lang}.
         </p>
 
-        <div className="mt-6 flex items-center justify-between text-xs text-zinc-400">
-          <span>Certificate ID: {data.id}</span>
-          <span>Attempt: {data.attemptId}</span>
-          <span>Issued {formatDate(data.passedAt)}</span>
+        {/* Footer with ID and date */}
+        <div className="mt-6 border-t border-zinc-100 pt-4 dark:border-zinc-800">
+          <div className="flex items-center justify-between text-xs text-zinc-400">
+            <span>Certificate ID: {data.id}</span>
+            <span>Issued {formatDate(data.passedAt)}</span>
+          </div>
         </div>
       </div>
 
-      <p className="mt-4 text-center text-xs text-zinc-400 print:hidden">
-        Your certificate is generated on-demand — nothing is stored. Download or share anytime.
+      {/* Verification badge */}
+      <div className="mt-5 flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-4 py-2 text-sm dark:border-emerald-800/40 dark:bg-emerald-950/20 print:hidden">
+        <svg className="h-4 w-4 text-emerald-600 dark:text-emerald-400" fill="currentColor" viewBox="0 0 20 20">
+          <path fillRule="evenodd" d="M16.403 12.652a3 3 0 010-5.304 3 3 0 00-2.108-3.653 3 3 0 00-3.75-2.164 3 3 0 00-4.59 0 3 3 0 00-3.75 2.164A3 3 0 00.097 7.348a3 3 0 010 5.304 3 3 0 002.108 3.653 3 3 0 003.75 2.164 3 3 0 004.59 0 3 3 0 003.75-2.164 3 3 0 002.108-3.653zM8.75 12.53a.75.75 0 001.06 0l3.5-3.5a.75.75 0 00-1.06-1.06L9.28 10.94l-1.53-1.53a.75.75 0 00-1.06 1.06l2.06 2.06z" clipRule="evenodd" />
+        </svg>
+        <span className="font-medium text-emerald-700 dark:text-emerald-300">Verified certificate</span>
+        <span className="text-emerald-600/70 dark:text-emerald-400/70">· issued by uByte</span>
+      </div>
+
+      <p className="mt-3 text-center text-xs text-zinc-400 print:hidden">
+        This certificate is publicly verifiable. Anyone with this link can confirm its authenticity.
       </p>
     </div>
   );

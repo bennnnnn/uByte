@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { PDFDocument, rgb, StandardFonts } from "pdf-lib";
-import { withErrorHandling, requireAuth } from "@/lib/api-utils";
+import { withErrorHandling } from "@/lib/api-utils";
 import { getCertificateById, getUserById } from "@/lib/db";
 import { LANGUAGES } from "@/lib/languages/registry";
 import type { SupportedLanguage } from "@/lib/languages/types";
@@ -182,9 +182,6 @@ async function buildCertificatePdf(
 export const GET = withErrorHandling(
   "GET /api/certifications/certificate/[certificateId]/pdf",
   async (_req: Request, context?: unknown) => {
-    const { user, response } = await requireAuth();
-    if (!user) return response;
-
     const { certificateId } = (context as { params?: Promise<{ certificateId: string }> }).params
       ? await (context as { params: Promise<{ certificateId: string }> }).params
       : { certificateId: "" };
@@ -193,11 +190,8 @@ export const GET = withErrorHandling(
     if (!cert) {
       return NextResponse.json({ error: "Certificate not found" }, { status: 404 });
     }
-    if (cert.user_id !== user.userId) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-    }
 
-    const owner = await getUserById(user.userId);
+    const owner = await getUserById(cert.user_id);
     const name = owner?.name ?? "Student";
 
     const pdfBytes = await buildCertificatePdf(

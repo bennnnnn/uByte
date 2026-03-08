@@ -178,6 +178,7 @@ export interface UserExamLangStats {
   attemptCount: number;
   lastPassed: boolean | null;
   lastScore: number | null;
+  bestScore: number | null;
   hasCertificate: boolean;
 }
 
@@ -188,7 +189,8 @@ export async function getUserExamStats(userId: number): Promise<UserExamLangStat
     sql`
       SELECT lang, COUNT(*)::int AS attempt_count,
              (array_agg(score ORDER BY submitted_at DESC NULLS LAST))[1] AS last_score,
-             (array_agg(passed ORDER BY submitted_at DESC NULLS LAST))[1] AS last_passed
+             (array_agg(passed ORDER BY submitted_at DESC NULLS LAST))[1] AS last_passed,
+             MAX(score)::int AS best_score
       FROM exam_attempts
       WHERE user_id = ${userId} AND submitted_at IS NOT NULL
       GROUP BY lang
@@ -197,18 +199,19 @@ export async function getUserExamStats(userId: number): Promise<UserExamLangStat
   ]);
   const certLangs = new Set((certRows as { lang: string }[]).map((r) => r.lang));
   const byLang = new Map<string, UserExamLangStats>();
-  for (const r of attemptRows as { lang: string; attempt_count: number; last_score: number | null; last_passed: boolean | null }[]) {
+  for (const r of attemptRows as { lang: string; attempt_count: number; last_score: number | null; last_passed: boolean | null; best_score: number | null }[]) {
     byLang.set(r.lang, {
       lang: r.lang,
       attemptCount: r.attempt_count,
       lastPassed: r.last_passed,
       lastScore: r.last_score,
+      bestScore: r.best_score,
       hasCertificate: certLangs.has(r.lang),
     });
   }
   for (const c of certRows as { lang: string }[]) {
     if (!byLang.has(c.lang)) {
-      byLang.set(c.lang, { lang: c.lang, attemptCount: 0, lastPassed: null, lastScore: null, hasCertificate: true });
+      byLang.set(c.lang, { lang: c.lang, attemptCount: 0, lastPassed: null, lastScore: null, bestScore: null, hasCertificate: true });
     } else {
       (byLang.get(c.lang)!).hasCertificate = true;
     }

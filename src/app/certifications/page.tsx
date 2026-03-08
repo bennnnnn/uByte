@@ -34,6 +34,13 @@ export const metadata: Metadata = {
 
 // ─── Exam Card ────────────────────────────────────────────────────────────────
 
+function getDifficultyFromPassRate(passRate: number, hasData: boolean): { label: string; color: string } {
+  if (!hasData) return { label: "New", color: "bg-zinc-100 text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400" };
+  if (passRate >= 70) return { label: "Beginner", color: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300" };
+  if (passRate >= 40) return { label: "Intermediate", color: "bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300" };
+  return { label: "Advanced", color: "bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300" };
+}
+
 function ExamCard({
   slug,
   examConfig,
@@ -43,7 +50,7 @@ function ExamCard({
 }: {
   slug: string;
   examConfig: { examSize: number; examDurationMinutes: number };
-  stats?: { attemptCount: number; lastPassed: boolean | null; hasCertificate: boolean };
+  stats?: { attemptCount: number; lastPassed: boolean | null; lastScore: number | null; bestScore: number | null; hasCertificate: boolean };
   publicStats?: { usersTaken: number; attemptsSubmitted: number; passRatePercent: number };
   isLoggedIn?: boolean;
 }) {
@@ -56,6 +63,7 @@ function ExamCard({
   const totalAttempts = publicStats?.attemptsSubmitted ?? 0;
   const passRate = publicStats?.passRatePercent ?? 0;
   const hasData = totalAttempts > 0;
+  const difficulty = getDifficultyFromPassRate(passRate, hasData);
 
   const ctaLabel = tryAgain ? "Try again →" : isPassed ? "View cert →" : "Take certification →";
 
@@ -65,7 +73,7 @@ function ExamCard({
       className="group relative flex flex-col overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-lg dark:border-zinc-800 dark:bg-zinc-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/40"
     >
       <div className="flex flex-1 flex-col gap-5 p-6">
-        {/* Top row: icon + name + status */}
+        {/* Top row: icon + name + difficulty + status */}
         <div className="flex items-center gap-3">
           <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-zinc-100 bg-zinc-50 text-2xl dark:border-zinc-700/60 dark:bg-zinc-800">
             {getLangIcon(slug)}
@@ -73,68 +81,74 @@ function ExamCard({
           <div className="min-w-0 flex-1">
             <div className="flex flex-wrap items-center gap-2">
               <h3 className="font-semibold text-zinc-900 dark:text-zinc-100">{config.name}</h3>
+              <span className={`rounded-full px-2 py-0.5 text-[11px] font-semibold ${difficulty.color}`}>
+                {difficulty.label}
+              </span>
               {isPassed && (
                 <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[11px] font-semibold text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300">
-                  ✓ Passed
-                </span>
-              )}
-              {tryAgain && !isPassed && (
-                <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[11px] font-semibold text-amber-800 dark:bg-amber-900/40 dark:text-amber-300">
-                  {userAttempts} attempt{userAttempts !== 1 ? "s" : ""}
+                  ✓ Certified
                 </span>
               )}
             </div>
+            <p className="mt-0.5 text-xs text-zinc-400 dark:text-zinc-500">
+              {examConfig.examSize} questions · {examConfig.examDurationMinutes} min
+            </p>
           </div>
         </div>
 
-        {/* Divider */}
-        <div className="h-px bg-zinc-100 dark:bg-zinc-800" />
-
-        {/* Stats: 2 × 2 */}
-        <div className="grid grid-cols-2 gap-y-4">
-          <div>
-            <p className="text-xs text-zinc-400 dark:text-zinc-500">Questions</p>
-            <p className="mt-1 text-2xl font-bold tabular-nums text-zinc-900 dark:text-zinc-100">
-              {examConfig.examSize}
-            </p>
-          </div>
-          <div>
-            <p className="text-xs text-zinc-400 dark:text-zinc-500">Time limit</p>
-            <p className="mt-1 text-2xl font-bold tabular-nums text-zinc-900 dark:text-zinc-100">
-              {examConfig.examDurationMinutes}
-              <span className="ml-1 text-sm font-normal text-zinc-400">min</span>
-            </p>
-          </div>
-          <div>
-            <p className="text-xs text-zinc-400 dark:text-zinc-500">
-              {isLoggedIn ? "Your attempts" : "Total attempts"}
-            </p>
-            <p className="mt-1 text-2xl font-bold tabular-nums text-zinc-900 dark:text-zinc-100">
-              {isLoggedIn ? (
-                <>
-                  {userAttempts}
-                  <span className="ml-1.5 text-sm font-normal text-zinc-400">
-                    / {hasData ? totalAttempts.toLocaleString() : "0"} total
-                  </span>
-                </>
-              ) : (
-                hasData ? totalAttempts.toLocaleString() : <span className="text-zinc-400">—</span>
+        {/* Personal score (logged-in users with attempts) */}
+        {isLoggedIn && userAttempts > 0 && (
+          <>
+            <div className="h-px bg-zinc-100 dark:bg-zinc-800" />
+            <div className="flex items-center gap-4">
+              {stats?.bestScore != null && (
+                <div className="flex-1">
+                  <p className="text-xs text-zinc-400 dark:text-zinc-500">Best score</p>
+                  <p className={`mt-0.5 text-lg font-bold tabular-nums ${isPassed ? "text-emerald-600 dark:text-emerald-400" : "text-zinc-900 dark:text-zinc-100"}`}>
+                    {stats.bestScore}%
+                  </p>
+                </div>
               )}
-            </p>
-          </div>
-          <div>
-            <p className="text-xs text-zinc-400 dark:text-zinc-500">Pass rate</p>
-            <p className={`mt-1 text-2xl font-bold tabular-nums ${
-              !hasData
-                ? "text-zinc-400 dark:text-zinc-500"
-                : passRate >= 60
-                ? "text-emerald-600 dark:text-emerald-400"
-                : "text-amber-600 dark:text-amber-400"
-            }`}>
-              {hasData ? `${passRate}%` : "New"}
-            </p>
-          </div>
-        </div>
+              {tryAgain && stats?.lastScore != null && (
+                <div className="flex-1">
+                  <p className="text-xs text-zinc-400 dark:text-zinc-500">Last attempt</p>
+                  <p className="mt-0.5 text-lg font-bold tabular-nums text-amber-600 dark:text-amber-400">
+                    {stats.lastScore}%
+                  </p>
+                </div>
+              )}
+              <div className="flex-1">
+                <p className="text-xs text-zinc-400 dark:text-zinc-500">Attempts</p>
+                <p className="mt-0.5 text-lg font-bold tabular-nums text-zinc-900 dark:text-zinc-100">
+                  {userAttempts}
+                </p>
+              </div>
+            </div>
+          </>
+        )}
+
+        {/* Public stats (logged-out or no attempts) */}
+        {(!isLoggedIn || userAttempts === 0) && (
+          <>
+            <div className="h-px bg-zinc-100 dark:bg-zinc-800" />
+            <div className="flex items-center gap-4">
+              <div className="flex-1">
+                <p className="text-xs text-zinc-400 dark:text-zinc-500">Pass rate</p>
+                <p className={`mt-0.5 text-lg font-bold tabular-nums ${
+                  !hasData ? "text-zinc-400" : passRate >= 60 ? "text-emerald-600 dark:text-emerald-400" : "text-amber-600 dark:text-amber-400"
+                }`}>
+                  {hasData ? `${passRate}%` : "—"}
+                </p>
+              </div>
+              <div className="flex-1">
+                <p className="text-xs text-zinc-400 dark:text-zinc-500">Taken by</p>
+                <p className="mt-0.5 text-lg font-bold tabular-nums text-zinc-900 dark:text-zinc-100">
+                  {hasData ? `${totalAttempts.toLocaleString()} users` : "Be first"}
+                </p>
+              </div>
+            </div>
+          </>
+        )}
 
         {/* CTA button */}
         <span className="mt-auto w-full rounded-xl bg-indigo-600 px-4 py-2.5 text-center text-sm font-semibold text-white shadow-sm transition-colors group-hover:bg-indigo-500">
@@ -156,7 +170,7 @@ function ExamCardGrid({
 }: {
   langs: string[];
   examConfigByLang: Record<string, { examSize: number; examDurationMinutes: number }>;
-  statsByLang: Record<string, { attemptCount: number; lastPassed: boolean | null; hasCertificate: boolean }>;
+  statsByLang: Record<string, { attemptCount: number; lastPassed: boolean | null; lastScore: number | null; bestScore: number | null; hasCertificate: boolean }>;
   publicStatsByLang: Record<string, { usersTaken: number; attemptsSubmitted: number; passRatePercent: number }>;
   isLoggedIn: boolean;
   cols?: 2 | 3;
@@ -387,27 +401,121 @@ export default async function PracticeExamsPage() {
 
       <div className="mx-auto max-w-5xl px-6 py-12 sm:py-14">
 
-        {/* ── How it works ─────────────────────────────────────────────────── */}
-        <section className="mb-14">
-          <h2 className="mb-6 text-xs font-semibold uppercase tracking-widest text-zinc-400 dark:text-zinc-500">
-            How it works
-          </h2>
-          <div className="grid gap-4 sm:grid-cols-3">
-            {[
-              { step: "1", title: "Pick a language", body: "Choose from Go, Python, JavaScript, Java, Rust, or C++. Each exam is independently timed and scored." },
-              { step: "2", title: "Take the timed exam", body: "Answer multiple-choice questions within the time limit. The clock starts the moment you begin." },
-              { step: "3", title: "Pass and earn your cert", body: "Meet the pass threshold for that language. Download and share your certificate — it's yours forever." },
-            ].map(({ step, title, body }) => (
-              <div key={step} className="rounded-2xl border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-900">
-                <div className="mb-4 flex h-9 w-9 items-center justify-center rounded-xl bg-indigo-600 text-sm font-bold text-white">
-                  {step}
+        {/* ── Learning journey OR progress dashboard ──────────────────────── */}
+        {isPro && examStats.length > 0 ? (
+          /* Progress dashboard for Pro users with exam history */
+          <section className="mb-14">
+            <h2 className="mb-6 text-xs font-semibold uppercase tracking-widest text-zinc-400 dark:text-zinc-500">
+              Your progress
+            </h2>
+            <div className="rounded-2xl border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-900">
+              <div className="mb-5 flex items-center justify-between">
+                <div>
+                  <p className="text-2xl font-bold text-zinc-900 dark:text-zinc-100">
+                    {passedLangs.length} <span className="text-base font-normal text-zinc-400">/ {EXAM_LANGS.length} certified</span>
+                  </p>
                 </div>
-                <h3 className="font-semibold text-zinc-900 dark:text-zinc-100">{title}</h3>
-                <p className="mt-1.5 text-sm text-zinc-500 dark:text-zinc-400">{body}</p>
+                <div className="text-right">
+                  <p className="text-sm text-zinc-500 dark:text-zinc-400">
+                    {examStats.reduce((s, e) => s + e.attemptCount, 0)} total attempts
+                  </p>
+                </div>
               </div>
-            ))}
-          </div>
-        </section>
+              {/* Progress bar */}
+              <div className="mb-6 h-3 overflow-hidden rounded-full bg-zinc-100 dark:bg-zinc-800">
+                <div
+                  className="h-full rounded-full bg-gradient-to-r from-indigo-500 to-emerald-500 transition-all duration-500"
+                  style={{ width: `${Math.round((passedLangs.length / EXAM_LANGS.length) * 100)}%` }}
+                />
+              </div>
+              {/* Per-language mini cards */}
+              <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
+                {EXAM_LANGS.map((lang) => {
+                  const s = statsByLang[lang];
+                  const passed = s?.hasCertificate;
+                  const attempted = s && s.attemptCount > 0;
+                  return (
+                    <Link
+                      key={lang}
+                      href={`/certifications/${lang}`}
+                      className={`flex flex-col items-center gap-1.5 rounded-xl border p-3 text-center transition-colors hover:border-indigo-300 dark:hover:border-indigo-700 ${
+                        passed
+                          ? "border-emerald-200 bg-emerald-50 dark:border-emerald-800/40 dark:bg-emerald-950/20"
+                          : attempted
+                          ? "border-amber-200 bg-amber-50 dark:border-amber-800/40 dark:bg-amber-950/20"
+                          : "border-zinc-200 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-800"
+                      }`}
+                    >
+                      <span className="text-xl">{getLangIcon(lang)}</span>
+                      <span className="text-xs font-medium text-zinc-700 dark:text-zinc-300">
+                        {LANGUAGES[lang]?.name}
+                      </span>
+                      {passed ? (
+                        <span className="text-[10px] font-semibold text-emerald-600 dark:text-emerald-400">Certified</span>
+                      ) : attempted && s?.bestScore != null ? (
+                        <span className="text-[10px] font-semibold text-amber-600 dark:text-amber-400">Best: {s.bestScore}%</span>
+                      ) : (
+                        <span className="text-[10px] text-zinc-400">Not started</span>
+                      )}
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
+          </section>
+        ) : (
+          /* Learning journey for visitors / free users / Pro with no attempts */
+          <section className="mb-14">
+            <h2 className="mb-6 text-xs font-semibold uppercase tracking-widest text-zinc-400 dark:text-zinc-500">
+              Your path to certification
+            </h2>
+            <div className="relative grid gap-4 sm:grid-cols-3">
+              {/* Connector line (desktop only) */}
+              <div className="pointer-events-none absolute left-0 right-0 top-[3.25rem] hidden h-px bg-gradient-to-r from-indigo-200 via-indigo-300 to-emerald-300 dark:from-indigo-800 dark:via-indigo-700 dark:to-emerald-700 sm:block" />
+
+              {[
+                {
+                  step: "1",
+                  icon: "📖",
+                  title: "Learn the fundamentals",
+                  body: "Start with bite-sized tutorials. Build a solid understanding of syntax, data structures, and core concepts at your own pace.",
+                  link: "/tutorial",
+                  linkLabel: "Browse tutorials",
+                },
+                {
+                  step: "2",
+                  icon: "💪",
+                  title: "Sharpen your skills",
+                  body: "Solve hands-on coding challenges with our built-in IDE. Practice real problems to build confidence and speed before the exam.",
+                  link: "/practice",
+                  linkLabel: "Start practicing",
+                },
+                {
+                  step: "3",
+                  icon: "🏆",
+                  title: "Prove yourself",
+                  body: "Take a timed certification exam. Pass the threshold and earn a shareable digital certificate — proof of your expertise.",
+                  link: "#all-certifications",
+                  linkLabel: "View certifications",
+                },
+              ].map(({ step, icon, title, body, link, linkLabel }) => (
+                <div key={step} className="relative rounded-2xl border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-900">
+                  <div className="relative z-10 mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-indigo-50 text-2xl dark:bg-indigo-950/40">
+                    {icon}
+                  </div>
+                  <h3 className="font-semibold text-zinc-900 dark:text-zinc-100">{title}</h3>
+                  <p className="mt-1.5 text-sm text-zinc-500 dark:text-zinc-400">{body}</p>
+                  <Link
+                    href={link}
+                    className="mt-4 inline-flex text-sm font-medium text-indigo-600 transition-colors hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300"
+                  >
+                    {linkLabel} →
+                  </Link>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
 
         {/* ── Popular certifications (only when real data exists) ───────────────────── */}
         {popularLangs.length > 0 && (
