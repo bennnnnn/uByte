@@ -27,7 +27,7 @@ export default function MobileNav({ lang, tutorials }: { lang: string; tutorials
 
   return (
     <div className="md:hidden">
-      <div className="relative z-20 flex items-center justify-between border-b border-zinc-100 bg-white px-4 py-3 shadow-sm dark:border-zinc-800 dark:bg-zinc-950">
+        <div className="sticky top-0 relative z-20 flex items-center justify-between border-b border-zinc-100 bg-white/90 px-4 py-3 shadow-sm backdrop-blur-md dark:border-zinc-800 dark:bg-zinc-950/90">
         <Link href="/" className="flex items-center gap-2.5 text-zinc-900 dark:text-white">
           <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-indigo-600 text-sm font-bold text-white">U</span>
           <span className="text-lg font-bold">uByte</span>
