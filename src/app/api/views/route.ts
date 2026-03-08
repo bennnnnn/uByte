@@ -3,7 +3,6 @@ import { randomUUID } from "crypto";
 import { getCurrentUser } from "@/lib/auth";
 import { recordPageView, getPageViewCount, clearPageViews } from "@/lib/db";
 import { withErrorHandling } from "@/lib/api-utils";
-import { verifyCsrf } from "@/lib/csrf";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 
 const VISITOR_COOKIE = "visitor_id";
@@ -38,10 +37,9 @@ export const GET = withErrorHandling("GET /api/views", async (request: NextReque
 });
 
 // POST — record a page view, return updated count
+// No CSRF required: this is a low-risk anonymous page-view counter
+// protected by IP-based rate limiting instead.
 export const POST = withErrorHandling("POST /api/views", async (request: NextRequest) => {
-  const csrfError = verifyCsrf(request);
-  if (csrfError) return NextResponse.json({ error: csrfError }, { status: 403 });
-
   const ip = getClientIp(request.headers);
   const { limited } = await checkRateLimit(`views:${ip}`, 60, 60_000);
   if (limited) return NextResponse.json({ viewCount: 0, limited: false });

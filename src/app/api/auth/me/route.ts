@@ -11,10 +11,8 @@ export const GET = withErrorHandling("GET /api/auth/me", async (request: NextReq
       return NextResponse.json({ user: null });
     }
     const response = NextResponse.json({ user: { id: user.userId, name: user.name, email: user.email } });
-    // Backfill CSRF cookie for older sessions created before CSRF rollout.
-    if (!request.cookies.get("csrf_token")?.value) {
-      setCsrfCookie(response);
-    }
+    // Always refresh the CSRF cookie so it stays in sync with the auth session.
+    setCsrfCookie(response);
     return response;
   } catch (err) {
     console.error("GET /api/auth/me error:", err);
