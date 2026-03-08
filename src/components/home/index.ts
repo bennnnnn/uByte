@@ -5,3 +5,5 @@ export { default as PracticeSection } from "./PracticeSection";
 export { default as PracticeExamsSection } from "./PracticeExamsSection";
 export { default as StepsSection } from "./StepsSection";
 export { default as ValuePropBanner } from "./ValuePropBanner";
+export { default as PopularTutorialsSection } from "./PopularTutorialsSection";
+export { default as PopularInterviewPrepSection } from "./PopularInterviewPrepSection";

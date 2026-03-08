@@ -7,6 +7,7 @@ import { LANGUAGES, getAllLanguageSlugs } from "@/lib/languages/registry";
 import { getLangIcon } from "@/lib/languages/icons";
 import { APP_NAME, BASE_URL } from "@/lib/constants";
 import { getExamConfigForAllLangs, getLastActivity, getUserPlan } from "@/lib/db";
+import { getPopularTutorials, getPopularPracticeProblems, getFallbackPopularPracticeProblems } from "@/lib/db/home-popular";
 import { tutorialLangUrl, tutorialUrl } from "@/lib/urls";
 import { absoluteUrl, SITE_KEYWORDS, buildSiteSearchJsonLd } from "@/lib/seo";
 import { getCurrentUser } from "@/lib/auth";
@@ -19,6 +20,8 @@ import {
   PracticeExamsSection,
   StepsSection,
   ValuePropBanner,
+  PopularTutorialsSection,
+  PopularInterviewPrepSection,
 } from "@/components/home";
 import ContinueBanner from "@/components/ContinueBanner";
 import LeftOffBanner from "@/components/LeftOffBanner";
@@ -111,6 +114,14 @@ export default async function Home() {
   const userPlan = user ? await getUserPlan(user.userId) : "free";
   const isPro = userPlan === "pro" || userPlan === "yearly";
 
+  // Popular data — same logic used in /certifications (sort by real usage, no fallback shown)
+  const [popularTutorials, popularProblems] = await Promise.all([
+    getPopularTutorials(),
+    getPopularPracticeProblems(),
+  ]);
+  const popularPracticeProblems =
+    popularProblems.length > 0 ? popularProblems : getFallbackPopularPracticeProblems();
+
   return (
     <div className="min-h-0 flex-1 overflow-y-auto">
       <script
@@ -163,7 +174,13 @@ export default async function Home() {
           </div>
         </section>
 
-        {/* Interview practice */}
+        {/* Popular tutorials — sorted by real completion count */}
+        <PopularTutorialsSection tutorials={popularTutorials} />
+
+        {/* Popular interview prep — sorted by real view count */}
+        <PopularInterviewPrepSection problems={popularPracticeProblems} />
+
+        {/* Interview practice — full section */}
         <PracticeSection problemCount={problemCount} />
 
         {/* Certifications */}
