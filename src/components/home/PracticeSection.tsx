@@ -33,7 +33,7 @@ export default function PracticeSection({ problemCount = 11 }: PracticeSectionPr
             </span>
           </div>
           <p className="mb-5 text-sm text-zinc-600 dark:text-zinc-400">
-            Solve classic problems — Two Sum, LRU Cache, Merge Intervals and more — in any language. Same IDE, built right in.
+            Solve classic problems — Two Sum, Merge Intervals, Trapping Rain Water and more — in any language. Same IDE, built right in.
           </p>
 
           <ul className="mb-5 space-y-1.5">

@@ -34,7 +34,7 @@ export default function NotFound() {
           href="/practice"
           className="rounded-lg border border-zinc-300 px-5 py-2.5 text-sm font-medium text-zinc-700 hover:bg-zinc-50 dark:border-zinc-600 dark:text-zinc-300 dark:hover:bg-zinc-800"
         >
-          Practice
+          Interview Prep
         </Link>
         <Link
           href="/search"

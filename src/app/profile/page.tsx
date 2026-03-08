@@ -260,10 +260,14 @@ function ProfilePage() {
 
       {/* Tabs — horizontal scroll so all tabs visible on small screens */}
       <div className="-mx-1 mb-6 overflow-x-auto overflow-y-hidden">
-        <div className="flex min-w-max gap-1 rounded-xl bg-zinc-100 p-1 dark:bg-zinc-900">
+        <div className="flex min-w-max gap-1 rounded-xl bg-zinc-100 p-1 dark:bg-zinc-900" role="tablist" aria-label="Profile sections">
           {VALID_TABS.map((t) => (
             <button
               key={t}
+              role="tab"
+              aria-selected={tab === t}
+              aria-controls={`tabpanel-${t}`}
+              id={`tab-${t}`}
               onClick={() => setTab(t)}
               className={`relative flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium whitespace-nowrap transition-colors ${
                 tab === t

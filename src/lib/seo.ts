@@ -12,7 +12,7 @@ export const SITE_KEYWORDS = [
   "learn programming",
   "programming languages",
   "coding interview prep",
-  "technical interview practice",
+  "technical interview prep",
   "programming certification",
   "developer certification",
   "practice coding problems",

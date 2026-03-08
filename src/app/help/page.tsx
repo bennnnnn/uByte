@@ -5,7 +5,7 @@ import { absoluteUrl, buildFaqJsonLd, SITE_KEYWORDS } from "@/lib/seo";
 const FAQ_ITEMS = [
   {
     question: "Do I need to install anything to use uByte?",
-    answer: "No. Tutorials, interview practice, and exams all run in your browser.",
+    answer: "No. Tutorials, interview prep, and exams all run in your browser.",
   },
   {
     question: "Which programming languages are available?",
@@ -58,7 +58,7 @@ export default function HelpPage() {
             Answers for learners and teams.
           </h1>
           <p className="mt-4 max-w-2xl text-base text-zinc-600 dark:text-zinc-400">
-            Quick guidance for tutorials, interview practice, certification exams, and account settings.
+            Quick guidance for tutorials, interview prep, certification exams, and account settings.
           </p>
         </section>
 

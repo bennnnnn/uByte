@@ -66,7 +66,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "uByte - Interactive Coding Tutorials and Interview Prep",
     description:
-      "Interactive programming tutorials, interview practice, and certification-style exams across 6 languages.",
+      "Interactive programming tutorials, interview prep, and certification exams across 6 languages.",
   },
   alternates: {
     canonical: BASE_URL,

@@ -9,17 +9,16 @@ import { trackConversion } from "@/lib/analytics";
 import { apiFetch } from "@/lib/api-client";
 
 const FREE_FEATURES = [
-  "First 5 tutorials",
+  "First 5 tutorials per language",
   "Interactive code editor",
   "Progress tracking",
-  "Leaderboard",
 ];
 
 const PRO_FEATURES = [
   "Unlimited tutorials — all languages",
   "AI code feedback",
   "Certification exams & verifiable certificates",
-  "Progress tracking & leaderboard",
+  "Interview prep problems — unlimited",
 ];
 
 interface Props {

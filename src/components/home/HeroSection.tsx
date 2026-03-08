@@ -100,7 +100,7 @@ const FEATURES = [
   "Write real code in your browser — zero setup",
   "Instant pass/fail feedback on every step",
   "Same concepts taught across all 6 languages",
-  "Built-in LeetCode-style interview practice",
+  "Built-in LeetCode-style interview prep",
 ];
 
 interface HeroSectionProps {
@@ -185,7 +185,7 @@ export default function HeroSection({ topicCount = 19, lessonCountGo = 0, proble
                 href="/practice"
                 className="inline-flex items-center gap-2 rounded-xl border border-zinc-200 bg-surface-card px-7 py-3 text-sm font-semibold text-zinc-700 transition-all hover:border-zinc-300 hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-300 dark:hover:border-zinc-600 dark:hover:bg-zinc-700"
               >
-                Interview practice
+                Interview prep
               </Link>
               <Link
                 href="/certifications"

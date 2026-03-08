@@ -26,8 +26,8 @@ const linkBase =
 const chevron =
   "ml-1 inline-block h-3.5 w-3.5 transition-transform duration-200 group-hover:rotate-180";
 
-/** side="left"  → Tutorials + Practice dropdowns
- *  side="right" → Leaderboard + Pricing links (default) */
+/** side="left"  → Tutorials + Interview Prep + Certifications dropdowns
+ *  side="right" → Pricing link (default) */
 export default function HeaderNavLinks({ side = "right" }: { side?: "left" | "right" }) {
   if (side === "left") {
     return (
@@ -47,7 +47,7 @@ export default function HeaderNavLinks({ side = "right" }: { side?: "left" | "ri
               {LANGUAGES.map((l) => (
                 <Link
                   key={l.slug}
-                  href={`/${l.slug}`}
+                  href={`/tutorial/${l.slug}`}
                   className="flex items-center gap-3 rounded-xl px-3 py-2.5 transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-800"
                 >
                   <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-zinc-100 text-base dark:bg-zinc-800">

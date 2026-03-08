@@ -4,7 +4,7 @@ import { absoluteUrl, SITE_KEYWORDS } from "@/lib/seo";
 export const metadata: Metadata = {
   title: "uByte Coding Leaderboard - XP, Streaks, and Practice Progress",
   description:
-    "See top uByte learners ranked by XP, tutorial completions, interview practice progress, and streaks.",
+    "See top uByte learners ranked by XP, tutorial completions, interview prep progress, and streaks.",
   keywords: [
     ...SITE_KEYWORDS,
     "coding leaderboard",

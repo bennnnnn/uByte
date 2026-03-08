@@ -56,6 +56,14 @@ export default function AuthModal({ onClose, initialMode }: Props) {
   }, [mode]);
 
   useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [onClose]);
+
+  useEffect(() => {
     credentialHandlerRef.current = async (credential: string) => {
       setError("");
       setSubmitting(true);
