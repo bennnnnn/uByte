@@ -13,7 +13,7 @@ const FAQ_ITEMS = [
   },
   {
     question: "Are there free lessons?",
-    answer: "Yes. You can begin with free tutorials and free interview practice problems in each language.",
+    answer: "Yes. You can begin with free tutorials and free interview prep problems in each language.",
   },
   {
     question: "How do certificates work?",

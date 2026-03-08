@@ -19,7 +19,7 @@ const CLIENT_TOKEN     = process.env.NEXT_PUBLIC_PADDLE_CLIENT_TOKEN ?? "";
 
 const FREE_FEATURES = [
   `${FREE_TUTORIAL_LIMIT} tutorials per language`,
-  `${FREE_PRACTICE_LIMIT} practice problems per language`,
+  `${FREE_PRACTICE_LIMIT} interview prep problems per language`,
   "Built-in code editor",
   "6 programming languages",
   "Progress tracking",
@@ -27,7 +27,7 @@ const FREE_FEATURES = [
 
 const PRO_FEATURES = [
   "Unlimited tutorials — all languages",
-  "Unlimited practice problems",
+  "Unlimited interview prep problems",
   "AI code feedback on every step",
   "Certification exams with certificates",
   "Verifiable digital certificates",
@@ -37,7 +37,7 @@ const PRO_FEATURES = [
 
 const COMPARISON_FEATURES: { name: string; free: string; pro: string }[] = [
   { name: "Tutorials", free: `${FREE_TUTORIAL_LIMIT} per language`, pro: "Unlimited" },
-  { name: "Practice problems", free: `${FREE_PRACTICE_LIMIT} per language`, pro: "Unlimited" },
+  { name: "Interview prep problems", free: `${FREE_PRACTICE_LIMIT} per language`, pro: "Unlimited" },
   { name: "Languages", free: "6", pro: "6" },
   { name: "Code editor", free: "✓", pro: "✓" },
   { name: "Progress tracking", free: "✓", pro: "✓" },
@@ -49,7 +49,7 @@ const COMPARISON_FEATURES: { name: string; free: string; pro: string }[] = [
 const FAQ_ITEMS = [
   {
     q: "What's included in Pro?",
-    a: "Unlimited tutorials in all 6 languages, unlimited practice problems, AI code feedback on every step, and timed certification exams with verifiable certificates you can add to LinkedIn.",
+    a: "Unlimited tutorials in all 6 languages, unlimited interview prep problems, AI code feedback on every step, and timed certification exams with verifiable certificates you can add to LinkedIn.",
   },
   {
     q: "Can I cancel anytime?",
@@ -57,7 +57,7 @@ const FAQ_ITEMS = [
   },
   {
     q: "How does the free plan work?",
-    a: `You get ${FREE_TUTORIAL_LIMIT} tutorials and ${FREE_PRACTICE_LIMIT} practice problems per language — completely free. Upgrade whenever you're ready for unlimited access and certifications.`,
+    a: `You get ${FREE_TUTORIAL_LIMIT} tutorials and ${FREE_PRACTICE_LIMIT} interview prep problems per language — completely free. Upgrade whenever you're ready for unlimited access and certifications.`,
   },
   {
     q: "Do I get a certificate?",
@@ -146,7 +146,7 @@ function PricingContent() {
     "@type": "Product",
     name: "uByte Pro",
     description:
-      "Full access to coding tutorials, interview practice, and certification-style exams.",
+      "Full access to coding tutorials, interview prep, and certification-style exams.",
     brand: { "@type": "Brand", name: "uByte" },
     offers: [
       {
@@ -219,7 +219,7 @@ function PricingContent() {
             </span>
           </h1>
           <p className="mt-2 text-sm text-zinc-500 dark:text-zinc-400 sm:text-base">
-            Tutorials, practice problems, and verifiable certificates — all in one plan.
+            Tutorials, interview prep, and verifiable certificates — all in one plan.
           </p>
         </div>
 
@@ -268,7 +268,7 @@ function PricingContent() {
                 <span className="text-zinc-400 dark:text-zinc-500">forever</span>
               </div>
               <p className="mt-2 text-sm text-zinc-500 dark:text-zinc-400">
-                Explore tutorials and practice problems for free.
+                Explore tutorials and interview prep problems for free.
               </p>
             </div>
 
@@ -415,7 +415,7 @@ function PricingContent() {
           <div className="grid gap-4 sm:grid-cols-3">
             {[
               { icon: "📖", title: "Learn", body: "Interactive tutorials in Go, Python, JavaScript, Java, Rust, and C++. Bite-sized lessons with built-in code editor." },
-              { icon: "💪", title: "Practice", body: "Hundreds of coding challenges across all languages. AI feedback helps you understand mistakes and improve." },
+              { icon: "💪", title: "Interview Prep", body: "Hundreds of coding challenges across all languages. AI feedback helps you understand mistakes and improve." },
               { icon: "🏆", title: "Get certified", body: "Timed exams with real scoring. Pass and earn a verifiable digital certificate for your LinkedIn and resume." },
             ].map(({ icon, title, body }) => (
               <div key={title} className="rounded-2xl border border-zinc-200 bg-zinc-50 p-5 dark:border-zinc-800 dark:bg-zinc-900">

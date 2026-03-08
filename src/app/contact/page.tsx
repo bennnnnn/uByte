@@ -43,7 +43,7 @@ export default function ContactPage() {
           >
             <h2 className="text-lg font-bold text-zinc-900 dark:text-zinc-100">General Support</h2>
             <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
-              Help with your account, tutorials, practice problems, and exams.
+              Help with your account, tutorials, interview prep, and exams.
             </p>
             <p className="mt-4 text-sm font-semibold text-indigo-600 dark:text-indigo-400">support@ubyte.dev</p>
           </a>

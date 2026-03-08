@@ -100,7 +100,7 @@ export default function LeaderboardPage() {
         <div>
           <h1 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100">Leaderboard</h1>
           <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
-            Top 20 learners by XP · earn XP completing tutorials and solving practice problems
+            Top 20 learners by XP · earn XP completing tutorials and solving interview prep problems
           </p>
         </div>
         <div className="flex rounded-lg border border-zinc-200 bg-zinc-50 p-0.5 dark:border-zinc-700 dark:bg-zinc-800">

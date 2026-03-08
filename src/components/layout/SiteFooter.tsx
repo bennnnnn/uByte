@@ -13,7 +13,7 @@ const LEARN_LINKS = [
 ];
 
 const PRACTICE_LINKS = [
-  { href: "/practice", label: "Interview Problems" },
+  { href: "/practice", label: "Interview Prep" },
   { href: "/certifications", label: "Certifications" },
   { href: "/leaderboard", label: "Leaderboard" },
   { href: "/pricing", label: "Pricing" },
@@ -103,7 +103,7 @@ export default function SiteFooter() {
 
           <div>
             <h3 className="mb-3 text-xs font-bold uppercase tracking-[0.18em] text-zinc-400 dark:text-zinc-500">
-              Practice
+              Interview Prep
             </h3>
             <div className="space-y-2">
               {PRACTICE_LINKS.map((item) => (
@@ -136,7 +136,7 @@ export default function SiteFooter() {
         </div>
 
         <div className="flex flex-wrap items-center justify-between gap-2 border-t border-zinc-100 pt-4 text-xs text-zinc-500 dark:border-zinc-800 dark:text-zinc-400">
-          <span>© {new Date().getFullYear()} uByte. Built for focused coding practice.</span>
+          <span>© {new Date().getFullYear()} uByte. Learn, practice, get certified.</span>
           <span>Based in the cloud. Available worldwide.</span>
         </div>
       </div>

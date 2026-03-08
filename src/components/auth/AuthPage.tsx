@@ -21,7 +21,7 @@ type Mode = "login" | "signup" | "forgot";
 
 const VALUE_POINTS = [
   "Interactive tutorials across Go, Python, JavaScript, Java, Rust, and C++",
-  "Interview-style practice problems with real coding workflows",
+  "Interview prep problems with real coding workflows",
   "Timed certification exams with pass thresholds and shareable certificates",
 ];
 

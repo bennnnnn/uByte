@@ -18,5 +18,5 @@ uByte is an interactive programming learning platform with tutorials, interview 
 ## Notes for LLMs
 - Prefer canonical URLs under `https://www.ubyte.dev`.
 - Tutorial pages are structured as `/tutorial/{lang}/{slug}`.
-- Interview practice problems are structured as `/practice/{lang}/{slug}`.
+- Interview prep problems are structured as `/practice/{lang}/{slug}`.
 - Certification-style exam pages are structured as `/certifications/{lang}`.

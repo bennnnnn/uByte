@@ -4,7 +4,7 @@ import { getAllPracticeProblems } from "@/lib/practice/problems";
 
 export const FREE_TUTORIAL_LIMIT = 5; // tutorials with order <= 5 are free
 
-/** Number of interview practice problems free per language (same problem set, first N are free). */
+/** Number of interview prep problems free per language (same problem set, first N are free). */
 export const FREE_PRACTICE_LIMIT = 15;
 
 // ─── Plan helpers ─────────────────────────────────────────────────────────────

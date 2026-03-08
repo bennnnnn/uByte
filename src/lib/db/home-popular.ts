@@ -100,7 +100,7 @@ export async function getPopularTutorials(): Promise<PopularTutorial[]> {
   }
 }
 
-/** Record a practice problem view (for popularity). */
+/** Record an interview prep problem view (for popularity). */
 export async function recordPracticeView(viewerId: string, problemSlug: string): Promise<void> {
   const sql = getSql();
   try {
@@ -115,7 +115,7 @@ export async function recordPracticeView(viewerId: string, problemSlug: string):
   }
 }
 
-/** Popular practice problems by view count (from practice_views table). */
+/** Popular interview prep problems by view count (from practice_views table). */
 export async function getPopularPracticeProblems(): Promise<PopularPracticeProblem[]> {
   const sql = getSql();
   try {
@@ -141,7 +141,7 @@ export async function getPopularPracticeProblems(): Promise<PopularPracticeProbl
   }
 }
 
-/** Fallback when DB has no data: return all languages and all practice problems. */
+/** Fallback when DB has no data: return all languages and all interview prep problems. */
 export function getFallbackPopularLanguages(): PopularLanguage[] {
   return getAllLanguageSlugs()
     .map((slug) => ({ slug, config: getLanguageConfig(slug) }))

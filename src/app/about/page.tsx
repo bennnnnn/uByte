@@ -35,7 +35,7 @@ export default function AboutPage() {
           </h1>
           <p className="mt-4 max-w-3xl text-base leading-relaxed text-zinc-600 dark:text-zinc-400 sm:text-lg">
             uByte is designed for developers who want to learn by writing code. Every tutorial is interactive, every
-            practice problem is runnable in the browser, and every certification-style exam is built around practical
+            interview prep problem is runnable in the browser, and every certification-style exam is built around practical
             skill checks.
           </p>
           <div className="mt-6 flex flex-wrap gap-3">

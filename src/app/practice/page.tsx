@@ -12,9 +12,9 @@ import { absoluteUrl, SITE_KEYWORDS } from "@/lib/seo";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Coding Interview Practice Problems",
+  title: "Interview Prep — Coding Problems",
   description:
-    "Solve coding interview problems in Go, Python, C++, JavaScript, Java, and Rust. Practice LeetCode-style challenges with an in-browser code runner and instant feedback.",
+    "Solve coding interview problems in Go, Python, C++, JavaScript, Java, and Rust. LeetCode-style challenges with an in-browser code runner and instant feedback.",
   keywords: [
     ...SITE_KEYWORDS,
     "coding interview questions",
@@ -23,15 +23,15 @@ export const metadata: Metadata = {
   ],
   alternates: { canonical: absoluteUrl("/practice") },
   openGraph: {
-    title: "Coding Interview Practice Problems | uByte",
+    title: "Interview Prep — Coding Problems | uByte",
     description:
-      "Practice interview-ready coding problems across 6 languages with instant feedback.",
+      "Interview-ready coding problems across 6 languages with instant feedback.",
     type: "website",
     url: absoluteUrl("/practice"),
   },
   twitter: {
     card: "summary_large_image",
-    title: "Interview Practice | uByte",
+    title: "Interview Prep | uByte",
     description:
       "Solve classic coding interview problems in Go, Python, C++, JavaScript, Java, and Rust.",
   },
@@ -48,7 +48,7 @@ export default async function PracticePage() {
   const listJsonLd = {
     "@context": "https://schema.org",
     "@type": "CollectionPage",
-    name: "Coding interview practice problems",
+    name: "Interview prep — coding problems",
     url: absoluteUrl("/practice"),
     about: "Coding interview preparation and algorithm practice",
     hasPart: featured.map((problem) => ({
@@ -62,7 +62,7 @@ export default async function PracticePage() {
     "@type": "BreadcrumbList",
     itemListElement: [
       { "@type": "ListItem", position: 1, name: "Home", item: absoluteUrl("/") },
-      { "@type": "ListItem", position: 2, name: "Interview Practice", item: absoluteUrl("/practice") },
+      { "@type": "ListItem", position: 2, name: "Interview Prep", item: absoluteUrl("/practice") },
     ],
   };
 
@@ -90,9 +90,9 @@ export default async function PracticePage() {
           </div>
 
           <h1 className="mb-4 text-4xl font-black tracking-tight text-zinc-900 dark:text-zinc-50 sm:text-5xl">
-            Coding Interview{" "}
+            Interview{" "}
             <span className="bg-gradient-to-r from-indigo-600 via-violet-600 to-cyan-500 bg-clip-text text-transparent">
-              Practice
+              Prep
             </span>
           </h1>
           <p className="mb-8 max-w-2xl text-base leading-relaxed text-zinc-600 dark:text-zinc-400 sm:text-lg">

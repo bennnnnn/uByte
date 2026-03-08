@@ -37,7 +37,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "uByte - Programming Tutorials, Interview Prep, and Certifications",
     description:
-      "Interactive programming tutorials, interview practice problems, and certification-style exams.",
+      "Interactive programming tutorials, interview prep, and certification-style exams.",
     type: "website",
     url: absoluteUrl("/"),
   },

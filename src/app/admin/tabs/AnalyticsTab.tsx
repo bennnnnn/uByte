@@ -1,9 +1,9 @@
 /**
- * AnalyticsTab — tutorial completions, practice problems, and step heatmap.
+ * AnalyticsTab — tutorial completions, interview prep problems, and step heatmap.
  *
  * Three section cards:
  *   1. Tutorial completion counts with thumbs up/down satisfaction scores.
- *   2. Practice problem solve rates.
+ *   2. Interview prep problem solve rates.
  *   3. Per-step difficulty heatmap (lazy-loaded when a tutorial is selected).
  */
 
@@ -61,8 +61,8 @@ export default function AnalyticsTab({ data }: Props) {
         </div>
       </SectionCard>
 
-      {/* ── Practice problems ──────────────────────────────────────────── */}
-      <SectionCard title="Practice problems">
+      {/* ── Interview prep problems ────────────────────────────────────── */}
+      <SectionCard title="Interview prep">
         <div className="overflow-auto -mx-5 -mb-5">
           <table className="w-full text-sm">
             <thead className="sticky top-0 bg-zinc-50 dark:bg-zinc-900">
