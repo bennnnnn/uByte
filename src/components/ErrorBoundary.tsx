@@ -40,8 +40,8 @@ export default class ErrorBoundary extends React.Component<Props, State> {
   render() {
     if (this.state.hasError) {
       return (
-        <div className="flex h-full flex-col items-center justify-center gap-4 p-8">
-          <span className="text-4xl">😵</span>
+        <div className="flex h-full flex-col items-center justify-center gap-4 p-8" role="alert" aria-live="assertive">
+          <span className="text-4xl" aria-hidden>😵</span>
           <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">
             Something went wrong
           </h2>
@@ -49,8 +49,9 @@ export default class ErrorBoundary extends React.Component<Props, State> {
             An unexpected error occurred. Try refreshing the page.
           </p>
           <button
-            onClick={() => this.setState({ hasError: false })}
+            onClick={() => window.location.reload()}
             className="rounded-lg bg-indigo-700 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-800"
+            aria-label="Reload the page"
           >
             Try Again
           </button>

@@ -42,9 +42,11 @@ interface Props {
 export default function OverviewTab({ stats, badges, achievements, userId }: Props) {
   const [activity, setActivity] = useState<ActivityItem[]>([]);
   const [activityLoading, setActivityLoading] = useState(true);
+  const [activityError, setActivityError] = useState(false);
   const [examCerts, setExamCerts] = useState<
     { id: string; lang: string; passed_at: string }[]
   >([]);
+  const [certsLoading, setCertsLoading] = useState(!!userId);
 
   const pct = stats.total_tutorials > 0
     ? Math.round((stats.completed_count / stats.total_tutorials) * 100)
@@ -55,7 +57,7 @@ export default function OverviewTab({ stats, badges, achievements, userId }: Pro
     fetch("/api/profile/activity", { credentials: "same-origin" })
       .then((r) => r.json())
       .then((d) => { if (d.activity) setActivity(d.activity); })
-      .catch(() => {})
+      .catch(() => setActivityError(true))
       .finally(() => setActivityLoading(false));
   }, []);
 
@@ -68,7 +70,8 @@ export default function OverviewTab({ stats, badges, achievements, userId }: Pro
           setExamCerts(d.certificates);
         }
       })
-      .catch(() => {});
+      .catch(() => {})
+      .finally(() => setCertsLoading(false));
   }, [userId]);
 
   return (
@@ -102,7 +105,10 @@ export default function OverviewTab({ stats, badges, achievements, userId }: Pro
       </Card>
 
       {/* Exam certificates */}
-      {examCerts.length > 0 && (
+      {certsLoading && (
+        <div className="h-20 animate-pulse rounded-2xl bg-zinc-100 dark:bg-zinc-800" />
+      )}
+      {!certsLoading && examCerts.length > 0 && (
         <Card className="p-5">
           <div className="mb-3 flex items-center justify-between">
             <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
@@ -171,6 +177,8 @@ export default function OverviewTab({ stats, badges, achievements, userId }: Pro
               <div key={i} className="h-12 animate-pulse rounded-xl bg-zinc-100 dark:bg-zinc-800" />
             ))}
           </div>
+        ) : activityError ? (
+          <p className="text-sm text-zinc-400">Could not load activity. Try refreshing the page.</p>
         ) : activity.length === 0 ? (
           <p className="text-sm text-zinc-400">
             No activity yet.{" "}

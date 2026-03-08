@@ -19,6 +19,7 @@ function formatSlug(slug: string): string {
 export default function ProgressTab({ stats, userId }: Props) {
   const [completedSlugs, setCompletedSlugs] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
+  const [fetchError, setFetchError] = useState(false);
 
   const pct = stats.total_tutorials > 0
     ? Math.round((stats.completed_count / stats.total_tutorials) * 100)
@@ -29,7 +30,7 @@ export default function ProgressTab({ stats, userId }: Props) {
     fetch("/api/progress", { credentials: "same-origin" })
       .then((r) => r.json())
       .then((d) => { if (d.progress) setCompletedSlugs(d.progress); })
-      .catch(() => {})
+      .catch(() => setFetchError(true))
       .finally(() => setLoading(false));
   }, []);
 
@@ -102,6 +103,10 @@ export default function ProgressTab({ stats, userId }: Props) {
               <div key={i} className="h-12 animate-pulse rounded-xl bg-zinc-100 dark:bg-zinc-800" />
             ))}
           </div>
+        ) : fetchError ? (
+          <Card className="py-10 text-center">
+            <p className="text-sm text-zinc-500">Could not load progress. Try refreshing the page.</p>
+          </Card>
         ) : completedSlugs.length === 0 ? (
           <Card className="py-10 text-center">
             <p className="text-2xl">📚</p>

@@ -23,21 +23,24 @@ export function SearchPageClient() {
   const [query, setQuery] = useState(initialQ);
   const [results, setResults] = useState<SearchResult[]>([]);
   const [loading, setLoading] = useState(false);
+  const [searchError, setSearchError] = useState(false);
 
   const runSearch = useCallback(
     (q: string) => {
       const trimmed = q.trim();
       if (trimmed.length < 2) {
         setResults([]);
+        setSearchError(false);
         return;
       }
       setLoading(true);
+      setSearchError(false);
       fetch(`/api/search?q=${encodeURIComponent(trimmed)}`)
         .then((r) => r.json())
         .then((d) => {
           setResults(d.results ?? []);
         })
-        .catch(() => setResults([]))
+        .catch(() => { setResults([]); setSearchError(true); })
         .finally(() => setLoading(false));
     },
     []
@@ -91,7 +94,13 @@ export function SearchPageClient() {
         </div>
       )}
 
-      {!loading && query.trim().length >= 2 && (
+      {!loading && searchError && (
+        <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-6 text-center dark:border-red-900/50 dark:bg-red-950/30">
+          <p className="text-sm font-medium text-red-700 dark:text-red-300">Search failed. Please try again.</p>
+        </div>
+      )}
+
+      {!loading && !searchError && query.trim().length >= 2 && (
         <ul className="space-y-2">
           {results.length === 0 ? (
             <li className="rounded-xl border border-zinc-200 bg-zinc-50 px-4 py-10 text-center dark:border-zinc-800 dark:bg-zinc-900/50">

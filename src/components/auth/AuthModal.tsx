@@ -55,9 +55,25 @@ export default function AuthModal({ onClose, initialMode }: Props) {
     firstInputRef.current?.focus();
   }, [mode]);
 
+  const modalRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
+      if (e.key === "Escape") { onClose(); return; }
+      if (e.key !== "Tab" || !modalRef.current) return;
+      const focusable = modalRef.current.querySelectorAll<HTMLElement>(
+        'a[href], button:not([disabled]), input:not([disabled]), textarea:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])'
+      );
+      if (focusable.length === 0) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
     };
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
@@ -175,7 +191,7 @@ export default function AuthModal({ onClose, initialMode }: Props) {
       />
 
       {/* Card */}
-      <Card className="relative w-full max-w-[400px] shadow-2xl shadow-zinc-900/10 dark:shadow-none">
+      <Card ref={modalRef} className="relative w-full max-w-[400px] shadow-2xl shadow-zinc-900/10 dark:shadow-none">
         <div className="p-8">
           <div className="mb-6 flex items-start justify-between gap-4">
             <div>

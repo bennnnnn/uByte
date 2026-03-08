@@ -64,6 +64,7 @@ const AuthFormFields = forwardRef<HTMLFormElement, AuthFormFieldsProps>(function
     <>
       <a
         href={googleHref}
+        aria-label="Continue with Google"
         className={`flex w-full items-center justify-center gap-3 rounded-xl border border-zinc-200 bg-white px-4 py-3 text-sm font-medium text-zinc-700 shadow-sm transition-colors hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-200 dark:hover:bg-zinc-700/80 ${
           submitting ? "pointer-events-none opacity-50" : ""
         }`}
@@ -78,11 +79,13 @@ const AuthFormFields = forwardRef<HTMLFormElement, AuthFormFieldsProps>(function
         <div className="h-px flex-1 bg-zinc-200 dark:bg-zinc-700" />
       </div>
 
-      {error && (
-        <div role="alert" className="mb-4 rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700 dark:bg-red-950/50 dark:text-red-300">
-          {error}
-        </div>
-      )}
+      <div role="alert" aria-live="assertive" aria-atomic="true">
+        {error && (
+          <div className="mb-4 rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700 dark:bg-red-950/50 dark:text-red-300">
+            {error}
+          </div>
+        )}
+      </div>
 
       <form ref={ref} onSubmit={onSubmit} className="space-y-4">
         {mode === "signup" && (
@@ -135,7 +138,7 @@ const AuthFormFields = forwardRef<HTMLFormElement, AuthFormFieldsProps>(function
             minLength={MIN_PASSWORD_LENGTH}
             value={password}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => onPasswordChange(e.target.value)}
-            placeholder="Min. 8 characters (Aa1)"
+            placeholder={`Min. ${MIN_PASSWORD_LENGTH} characters`}
             className={inputClassName}
           />
         </div>
