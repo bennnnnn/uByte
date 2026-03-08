@@ -20,8 +20,12 @@ export interface LangProgress {
   lang: string;
   name: string;
   icon: string;
+  /** Completed lessons (steps) */
   completed: number;
+  /** Total lessons (steps) */
   total: number;
+  /** Number of tutorials (MDX files) completed */
+  completedTutorials?: number;
 }
 
 export interface Stats {

@@ -80,7 +80,7 @@ export default function OverviewTab({ stats, badges, achievements, userId }: Pro
       <Card className="p-5">
         <div className="mb-3 flex items-center justify-between text-sm">
           <span className="font-medium text-zinc-700 dark:text-zinc-300">
-            {stats.completed_count} / {stats.total_tutorials} tutorials
+            {stats.completed_count} / {stats.total_tutorials} lessons
           </span>
           <span className="font-bold text-indigo-600">{pct}%</span>
         </div>
@@ -89,7 +89,7 @@ export default function OverviewTab({ stats, badges, achievements, userId }: Pro
         </div>
         <div className="mt-3 flex items-center justify-between">
           <span className="text-xs text-zinc-400">
-            {stats.total_tutorials - stats.completed_count} tutorial{stats.total_tutorials - stats.completed_count !== 1 ? "s" : ""} remaining
+            {stats.total_tutorials - stats.completed_count} lesson{stats.total_tutorials - stats.completed_count !== 1 ? "s" : ""} remaining
           </span>
           <Link href="/profile?tab=progress" className="text-xs text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200">
             View details →

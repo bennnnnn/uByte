@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
-import { getUserById, getProgressCount, getAchievements, getActivityCount } from "@/lib/db";
+import { getUserById, getProgress, getAchievements, getActivityCount } from "@/lib/db";
 import { BADGES } from "@/lib/badges";
-import { getAllTutorials } from "@/lib/tutorials";
+import { getTotalLessonCount, getSteps } from "@/lib/tutorial-steps";
 import { withErrorHandling, requireAuth } from "@/lib/api-utils";
 import { ALL_LANGUAGE_KEYS } from "@/lib/languages/registry";
 import type { SupportedLanguage } from "@/lib/languages/types";
@@ -21,30 +21,40 @@ export const GET = withErrorHandling("GET /api/profile/stats", async () => {
 
   const langs = ALL_LANGUAGE_KEYS as SupportedLanguage[];
 
-  const [user, totalCompleted, achievements, activityCount, ...perLangCounts] =
+  const [user, achievements, activityCount, ...perLangProgress] =
     await Promise.all([
       getUserById(tokenUser.userId),
-      getProgressCount(tokenUser.userId),
       getAchievements(tokenUser.userId),
       getActivityCount(tokenUser.userId),
-      ...langs.map((lang) => getProgressCount(tokenUser.userId, lang)),
+      ...langs.map((lang) => getProgress(tokenUser.userId, lang)),
     ]);
 
   if (!user) {
     return NextResponse.json({ error: "User not found" }, { status: 404 });
   }
 
-  let totalTutorials = 0;
+  let totalLessons = 0;
+  let completedLessons = 0;
+
   const byLanguage = langs.map((lang, i) => {
-    const total = getAllTutorials(lang).length;
-    totalTutorials += total;
+    const total = getTotalLessonCount(lang);
+    totalLessons += total;
+
+    const completedSlugs = perLangProgress[i];
+    let completed = 0;
+    for (const slug of completedSlugs) {
+      completed += getSteps(lang, slug).length;
+    }
+    completedLessons += completed;
+
     const meta = LANG_META[lang] ?? { icon: "📄", name: lang };
     return {
       lang,
       name: meta.name,
       icon: meta.icon,
-      completed: perLangCounts[i],
+      completed,
       total,
+      completedTutorials: completedSlugs.length,
     };
   });
 
@@ -54,8 +64,8 @@ export const GET = withErrorHandling("GET /api/profile/stats", async () => {
       streak_days: user.streak_days,
       longest_streak: user.longest_streak,
       streak_freezes: (user as unknown as { streak_freezes?: number }).streak_freezes ?? 1,
-      completed_count: totalCompleted,
-      total_tutorials: totalTutorials,
+      completed_count: completedLessons,
+      total_tutorials: totalLessons,
       activity_count: activityCount,
       created_at: user.created_at,
       last_active_at: user.last_active_at,

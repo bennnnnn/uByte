@@ -58,7 +58,7 @@ export default function ProgressTab({ stats, userId }: Props) {
               <span className="text-xl font-normal text-zinc-400"> / {stats.total_tutorials}</span>
             </p>
             <p className="mt-1 text-sm text-zinc-500">
-              tutorials completed across {langs.length} language{langs.length !== 1 ? "s" : ""}
+              lessons completed across {langs.length} language{langs.length !== 1 ? "s" : ""}
             </p>
           </div>
           <p className="text-3xl font-bold text-indigo-600">{totalPct}%</p>
@@ -98,7 +98,7 @@ export default function ProgressTab({ stats, userId }: Props) {
       {!loading && stats.completed_count === 0 && (
         <Card className="py-10 text-center">
           <p className="text-2xl">📚</p>
-          <p className="mt-2 text-sm text-zinc-500">No tutorials completed yet.</p>
+          <p className="mt-2 text-sm text-zinc-500">No lessons completed yet.</p>
           <TextLink href="/" className="mt-3 inline-block text-sm">
             Start learning →
           </TextLink>
@@ -167,7 +167,7 @@ function LanguageProgressCard({
             </div>
           ) : slugs.length === 0 ? (
             <p className="py-4 text-center text-sm text-zinc-400">
-              No tutorials completed.{" "}
+              No lessons completed.{" "}
               <TextLink href={`/tutorial/${lp.lang}`}>Start {lp.name} →</TextLink>
             </p>
           ) : (
@@ -190,7 +190,7 @@ function LanguageProgressCard({
           {!loading && lp.completed < lp.total && slugs.length > 0 && (
             <div className="mt-2 border-t border-zinc-100 pt-2 dark:border-zinc-800">
               <TextLink href={`/tutorial/${lp.lang}`} className="text-xs">
-                Continue {lp.name} tutorials ({lp.total - lp.completed} remaining) →
+                Continue {lp.name} ({lp.total - lp.completed} lessons remaining) →
               </TextLink>
             </div>
           )}

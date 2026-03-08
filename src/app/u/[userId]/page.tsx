@@ -2,7 +2,8 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { getPublicProfile, getCertificatesByUser } from "@/lib/db";
 import { getUserExamStats } from "@/lib/db/exam-attempts";
-import { getAllTutorials } from "@/lib/tutorials";
+import { getTotalLessonCount, getSteps } from "@/lib/tutorial-steps";
+import { getProgress } from "@/lib/db/progress";
 import Avatar from "@/components/Avatar";
 import { Card } from "@/components/ui";
 import ShareProfileButton from "./ShareProfileButton";
@@ -29,7 +30,7 @@ export async function generateMetadata({ params }: { params: Promise<{ userId: s
   const canonical = absoluteUrl(`/u/${userId}`);
   return {
     title: `${profile.name}'s Profile | uByte`,
-    description: `${profile.name} has ${profile.xp} XP and completed ${profile.completed_count} tutorials on uByte.`,
+    description: `${profile.name} has ${profile.xp} XP on uByte.`,
     alternates: { canonical },
     openGraph: {
       title: `${profile.name} on uByte`,
@@ -54,15 +55,21 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
   if (!profile) notFound();
 
   const allLangs = Object.keys(LANGUAGES) as SupportedLanguage[];
-  const tutorialCountByLang: Record<string, number> = {};
-  let totalTutorials = 0;
-  for (const lang of allLangs) {
-    const count = getAllTutorials(lang).length;
-    tutorialCountByLang[lang] = count;
-    totalTutorials += count;
+  const perLangProgress = await Promise.all(
+    allLangs.map((lang) => getProgress(id, lang))
+  );
+
+  let totalLessons = 0;
+  let completedLessons = 0;
+  for (let i = 0; i < allLangs.length; i++) {
+    const lang = allLangs[i];
+    totalLessons += getTotalLessonCount(lang);
+    for (const slug of perLangProgress[i]) {
+      completedLessons += getSteps(lang, slug).length;
+    }
   }
 
-  const pct = totalTutorials > 0 ? Math.round((profile.completed_count / totalTutorials) * 100) : 0;
+  const pct = totalLessons > 0 ? Math.round((completedLessons / totalLessons) * 100) : 0;
   const joinDate = new Date(profile.created_at).toLocaleDateString("en-US", { month: "long", year: "numeric" });
   const statsMap = new Map(examStats.map((s) => [s.lang, s]));
 
@@ -114,7 +121,7 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
         {[
           { label: "XP", value: profile.xp.toLocaleString(), icon: "⭐" },
           { label: "Streak", value: `${profile.streak_days}d`, icon: "🔥", sub: `Best: ${profile.longest_streak}d` },
-          { label: "Tutorials", value: `${profile.completed_count}/${totalTutorials}`, icon: "📖" },
+          { label: "Lessons", value: `${completedLessons}/${totalLessons}`, icon: "📖" },
           { label: "Certificates", value: String(certificates.length), icon: "🏆" },
         ].map((s) => (
           <Card key={s.label} className="p-4">
@@ -128,17 +135,17 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
         ))}
       </div>
 
-      {/* Tutorial progress */}
+      {/* Learning progress */}
       <Card className="mb-8 p-5">
         <div className="mb-3 flex items-center justify-between text-sm">
-          <span className="font-semibold text-zinc-900 dark:text-zinc-100">Tutorial progress</span>
+          <span className="font-semibold text-zinc-900 dark:text-zinc-100">Learning progress</span>
           <span className="font-bold text-indigo-600">{pct}%</span>
         </div>
         <div className="h-2.5 overflow-hidden rounded-full bg-zinc-100 dark:bg-zinc-800">
           <div className="h-full rounded-full bg-indigo-600 transition-all duration-500" style={{ width: `${pct}%` }} />
         </div>
         <p className="mt-2 text-xs text-zinc-400">
-          {profile.completed_count} of {totalTutorials} tutorials completed across {allLangs.length} languages
+          {completedLessons} of {totalLessons} lessons completed across {allLangs.length} languages
         </p>
       </Card>
 
