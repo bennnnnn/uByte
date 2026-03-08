@@ -40,14 +40,12 @@ function ExamCard({
   stats,
   publicStats,
   isLoggedIn = false,
-  variant = "default",
 }: {
   slug: string;
   examConfig: { examSize: number; examDurationMinutes: number };
   stats?: { attemptCount: number; lastPassed: boolean | null; hasCertificate: boolean };
   publicStats?: { usersTaken: number; attemptsSubmitted: number; passRatePercent: number };
   isLoggedIn?: boolean;
-  variant?: "default" | "try-again" | "passed";
 }) {
   const config = LANGUAGES[slug as keyof typeof LANGUAGES];
   if (!config) return null;
@@ -59,28 +57,15 @@ function ExamCard({
   const passRate = publicStats?.passRatePercent ?? 0;
   const hasData = totalAttempts > 0;
 
-  const accentColor =
-    variant === "try-again" ? "from-amber-400 to-amber-200" :
-    variant === "passed"    ? "from-emerald-400 to-emerald-200" :
-                              "from-indigo-500 to-violet-400";
-
-  const borderColor =
-    variant === "try-again" ? "border-amber-200 dark:border-amber-800/50" :
-    variant === "passed"    ? "border-emerald-200 dark:border-emerald-900/40" :
-                              "border-zinc-200 dark:border-zinc-800";
-
   const ctaLabel = tryAgain ? "Try again →" : isPassed ? "View cert →" : "Take certification →";
 
   return (
     <Link
       href={`/certifications/${slug}`}
-      className={`group relative flex flex-col overflow-hidden rounded-2xl border bg-white shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-lg dark:bg-zinc-900 ${borderColor} focus:outline-none focus:ring-2 focus:ring-indigo-500/40`}
+      className="group relative flex flex-col overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-lg dark:border-zinc-800 dark:bg-zinc-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/40"
     >
-      {/* Accent top bar */}
-      <div className={`h-1 w-full shrink-0 bg-gradient-to-r ${accentColor}`} />
-
       <div className="flex flex-1 flex-col gap-5 p-6">
-        {/* Top row: icon + name + status + CTA */}
+        {/* Top row: icon + name + status */}
         <div className="flex items-center gap-3">
           <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-zinc-100 bg-zinc-50 text-2xl dark:border-zinc-700/60 dark:bg-zinc-800">
             {getLangIcon(slug)}
@@ -99,11 +84,7 @@ function ExamCard({
                 </span>
               )}
             </div>
-            <p className="text-xs text-zinc-400 dark:text-zinc-500">Certification Exam · MCQ · Certificate on pass</p>
           </div>
-          <span className="shrink-0 rounded-xl bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-colors group-hover:bg-indigo-500">
-            {ctaLabel}
-          </span>
         </div>
 
         {/* Divider */}
@@ -154,6 +135,11 @@ function ExamCard({
             </p>
           </div>
         </div>
+
+        {/* CTA button */}
+        <span className="mt-auto w-full rounded-xl bg-indigo-600 px-4 py-2.5 text-center text-sm font-semibold text-white shadow-sm transition-colors group-hover:bg-indigo-500">
+          {ctaLabel}
+        </span>
       </div>
     </Link>
   );
@@ -166,7 +152,6 @@ function ExamCardGrid({
   statsByLang,
   publicStatsByLang,
   isLoggedIn,
-  variant,
   cols = 3,
 }: {
   langs: string[];
@@ -174,7 +159,6 @@ function ExamCardGrid({
   statsByLang: Record<string, { attemptCount: number; lastPassed: boolean | null; hasCertificate: boolean }>;
   publicStatsByLang: Record<string, { usersTaken: number; attemptsSubmitted: number; passRatePercent: number }>;
   isLoggedIn: boolean;
-  variant?: "default" | "try-again" | "passed";
   cols?: 2 | 3;
 }) {
   return (
@@ -187,7 +171,6 @@ function ExamCardGrid({
           stats={statsByLang[lang]}
           publicStats={publicStatsByLang[lang]}
           isLoggedIn={isLoggedIn}
-          variant={variant}
         />
       ))}
     </div>
@@ -391,7 +374,7 @@ export default async function PracticeExamsPage() {
             <h2 id="try-again-heading" className="mb-5 text-xs font-semibold uppercase tracking-widest text-zinc-400 dark:text-zinc-500">
               Give it another shot
             </h2>
-            <ExamCardGrid langs={tryAgainLangs} examConfigByLang={examConfigByLang} statsByLang={statsByLang} publicStatsByLang={publicStatsByLang} isLoggedIn={!!user} variant="try-again" cols={2} />
+            <ExamCardGrid langs={tryAgainLangs} examConfigByLang={examConfigByLang} statsByLang={statsByLang} publicStatsByLang={publicStatsByLang} isLoggedIn={!!user} cols={2} />
           </section>
         )}
 
@@ -401,7 +384,7 @@ export default async function PracticeExamsPage() {
             <h2 id="passed-heading" className="mb-5 text-xs font-semibold uppercase tracking-widest text-zinc-400 dark:text-zinc-500">
               You passed
             </h2>
-            <ExamCardGrid langs={passedLangs} examConfigByLang={examConfigByLang} statsByLang={statsByLang} publicStatsByLang={publicStatsByLang} isLoggedIn={!!user} variant="passed" cols={2} />
+            <ExamCardGrid langs={passedLangs} examConfigByLang={examConfigByLang} statsByLang={statsByLang} publicStatsByLang={publicStatsByLang} isLoggedIn={!!user} cols={2} />
           </section>
         )}
 
