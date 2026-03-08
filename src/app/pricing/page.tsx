@@ -200,11 +200,11 @@ function PricingContent() {
           __html: JSON.stringify([pricingJsonLd, faqJsonLd]),
         }}
       />
-      <div className="px-6 pb-20 pt-16 sm:px-8">
+      <div className="px-6 pb-20 pt-8 sm:px-8 sm:pt-10">
 
         {/* ── Success banner ─────────────────────────────── */}
         {showSuccess && (
-          <div className="mx-auto mb-8 max-w-xl rounded-2xl border border-emerald-200 bg-emerald-50 px-6 py-4 text-center dark:border-emerald-900/50 dark:bg-emerald-950/30">
+          <div className="mx-auto mb-6 max-w-xl rounded-2xl border border-emerald-200 bg-emerald-50 px-6 py-4 text-center dark:border-emerald-900/50 dark:bg-emerald-950/30">
             <p className="font-semibold text-emerald-800 dark:text-emerald-300">
               🎉 Payment successful. Welcome to Pro!
             </p>
@@ -214,21 +214,21 @@ function PricingContent() {
           </div>
         )}
 
-        {/* ── Header ─────────────────────────────────────── */}
+        {/* ── Header (compact) ────────────────────────────── */}
         <div className="mx-auto max-w-2xl text-center">
-          <h1 className="text-3xl font-black tracking-tight text-zinc-900 dark:text-white sm:text-4xl lg:text-5xl">
+          <h1 className="text-2xl font-black tracking-tight text-zinc-900 dark:text-white sm:text-3xl">
             Invest in your skills.{" "}
             <span className="bg-gradient-to-r from-indigo-500 to-violet-500 bg-clip-text text-transparent dark:from-indigo-400 dark:to-violet-400">
               Get certified.
             </span>
           </h1>
-          <p className="mx-auto mt-4 max-w-lg text-base text-zinc-500 dark:text-zinc-400 sm:text-lg">
-            Learn with tutorials, practice with real problems, and prove yourself with verifiable certificates. Start free — no card required.
+          <p className="mt-2 text-sm text-zinc-500 dark:text-zinc-400 sm:text-base">
+            Tutorials, practice problems, and verifiable certificates. Start free — no card required.
           </p>
         </div>
 
         {/* ── Billing toggle ─────────────────────────────── */}
-        <div className="mx-auto mt-10 flex max-w-xs justify-center">
+        <div className="mx-auto mt-6 flex max-w-xs justify-center">
           <div className="flex w-full rounded-xl border border-zinc-200 bg-white p-1 shadow-sm dark:border-zinc-700 dark:bg-zinc-800/60">
             <button
               type="button"
@@ -259,7 +259,7 @@ function PricingContent() {
         </div>
 
         {/* ── Cards ──────────────────────────────────────── */}
-        <div className="mx-auto mt-10 grid max-w-4xl gap-6 sm:grid-cols-2">
+        <div className="mx-auto mt-6 grid max-w-4xl gap-6 sm:grid-cols-2">
 
           {/* ── Free card ─────────────────────────────────── */}
           <div className="flex flex-col rounded-2xl border border-zinc-200 bg-zinc-50 p-8 shadow-sm dark:border-zinc-700/60 dark:bg-zinc-900">
