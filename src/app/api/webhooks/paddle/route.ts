@@ -16,6 +16,9 @@ async function verifyPaddleSignature(
     return false;
   }
 
+  console.log("[paddle-webhook] Secret starts with:", secret.substring(0, 12) + "...");
+  console.log("[paddle-webhook] Signature header:", sigHeader.substring(0, 60) + "...");
+
   const parts: Record<string, string> = {};
   for (const part of sigHeader.split(";")) {
     const [k, v] = part.split("=", 2);
@@ -25,25 +28,35 @@ async function verifyPaddleSignature(
   const ts = parts["ts"];
   const h1 = parts["h1"];
   if (!ts || !h1) {
-    console.error("[paddle-webhook] Missing ts or h1 in signature header");
+    console.error("[paddle-webhook] Missing ts or h1 in signature header. Parsed parts:", JSON.stringify(parts));
     return false;
   }
 
+  console.log("[paddle-webhook] ts:", ts, "h1 length:", h1.length);
+
   const TOLERANCE_SECONDS = 300;
-  if (Math.abs(Date.now() / 1000 - parseInt(ts, 10)) > TOLERANCE_SECONDS) {
-    console.error("[paddle-webhook] Timestamp outside tolerance window");
+  const drift = Math.abs(Date.now() / 1000 - parseInt(ts, 10));
+  if (drift > TOLERANCE_SECONDS) {
+    console.error("[paddle-webhook] Timestamp drift:", drift, "seconds (max:", TOLERANCE_SECONDS, ")");
     return false;
   }
 
   try {
-    const { createHmac } = await import("crypto");
+    const { createHmac, timingSafeEqual } = await import("crypto");
+    const signedPayload = `${ts}:${payload}`;
     const expected = createHmac("sha256", secret)
-      .update(`${ts}:${payload}`)
+      .update(signedPayload)
       .digest("hex");
 
-    if (expected.length !== h1.length) return false;
+    console.log("[paddle-webhook] Expected sig:", expected.substring(0, 16) + "...");
+    console.log("[paddle-webhook] Received h1: ", h1.substring(0, 16) + "...");
+    console.log("[paddle-webhook] Payload length:", payload.length, "Signed payload length:", signedPayload.length);
 
-    const { timingSafeEqual } = await import("crypto");
+    if (expected.length !== h1.length) {
+      console.error("[paddle-webhook] Signature length mismatch:", expected.length, "vs", h1.length);
+      return false;
+    }
+
     return timingSafeEqual(
       Buffer.from(expected, "utf-8"),
       Buffer.from(h1, "utf-8")
