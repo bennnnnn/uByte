@@ -1,10 +1,21 @@
 import { NextRequest, NextResponse } from "next/server";
 import { timingSafeEqual } from "crypto";
-import { updateUserPlan, getUserByPaddleCustomerId, getUserById, createNotification, recordSubscriptionEvent } from "@/lib/db";
+import {
+  updateUserPlan,
+  getUserByPaddleCustomerId,
+  getUserById,
+  getUserByEmail,
+  createNotification,
+  recordSubscriptionEvent,
+} from "@/lib/db";
 import { withErrorHandling } from "@/lib/api-utils";
 import { BILLING_CONFIG, YEARLY_PRICE_CENTS, MONTHLY_PRICE_CENTS } from "@/lib/plans";
 
 const WEBHOOK_SECRET = process.env.PADDLE_WEBHOOK_SECRET ?? "";
+const PADDLE_API_KEY = process.env.PADDLE_API_KEY ?? "";
+const CLIENT_TOKEN = process.env.NEXT_PUBLIC_PADDLE_CLIENT_TOKEN ?? "";
+const isSandbox = CLIENT_TOKEN.startsWith("test_");
+const PADDLE_BASE = isSandbox ? "https://sandbox-api.paddle.com" : "https://api.paddle.com";
 
 async function verifyPaddleSignature(
   payload: string,
@@ -50,6 +61,72 @@ async function verifyPaddleSignature(
   return timingSafeEqual(Buffer.from(expected, "utf-8"), Buffer.from(h1, "utf-8"));
 }
 
+/**
+ * Fetch the customer's email from the Paddle API.
+ * Used as a fallback when custom_data.userId is missing from the webhook.
+ */
+async function getPaddleCustomerEmail(customerId: string): Promise<string | null> {
+  if (!PADDLE_API_KEY) return null;
+  try {
+    const res = await fetch(`${PADDLE_BASE}/customers/${encodeURIComponent(customerId)}`, {
+      headers: { Authorization: `Bearer ${PADDLE_API_KEY}` },
+    });
+    if (!res.ok) return null;
+    const data = (await res.json()) as { data?: { email?: string } };
+    return data.data?.email ?? null;
+  } catch (err) {
+    console.error("[paddle-webhook] Failed to fetch customer email:", err);
+    return null;
+  }
+}
+
+/**
+ * Resolve the uByte user ID from a Paddle webhook event using a 3-step fallback:
+ * 1. Paddle customer ID already linked in DB
+ * 2. custom_data.userId passed from the checkout
+ * 3. Fetch the customer's email from Paddle API and look up by email
+ */
+async function resolveUserId(
+  paddleCustomerId: string | undefined,
+  customData: Record<string, string> | null
+): Promise<number | null> {
+  // 1. Already linked by Paddle customer ID
+  if (paddleCustomerId) {
+    const existing = await getUserByPaddleCustomerId(paddleCustomerId);
+    if (existing) {
+      console.log("[paddle-webhook] Resolved user by paddle customer ID:", existing.id);
+      return existing.id;
+    }
+  }
+
+  // 2. Custom data userId passed from checkout widget
+  const clientUserId = customData?.["userId"];
+  if (clientUserId) {
+    const u = await getUserById(parseInt(clientUserId, 10));
+    if (u) {
+      console.log("[paddle-webhook] Resolved user by custom_data.userId:", u.id);
+      return u.id;
+    }
+    console.error("[paddle-webhook] custom_data.userId not found in DB:", clientUserId);
+  }
+
+  // 3. Fetch customer email from Paddle API and look up by email
+  if (paddleCustomerId) {
+    const email = await getPaddleCustomerEmail(paddleCustomerId);
+    if (email) {
+      const u = await getUserByEmail(email);
+      if (u) {
+        console.log("[paddle-webhook] Resolved user by Paddle customer email:", u.id, email);
+        return u.id;
+      }
+      console.error("[paddle-webhook] No uByte user found for Paddle customer email:", email);
+    }
+  }
+
+  console.error("[paddle-webhook] Could not resolve user. customerId:", paddleCustomerId, "customData:", JSON.stringify(customData));
+  return null;
+}
+
 function planFromSubscription(status: string, priceId?: string): string {
   if (!["active", "trialing"].includes(status)) return "free";
   const yearlyPriceId = process.env.NEXT_PUBLIC_PADDLE_YEARLY_PRICE_ID;
@@ -64,8 +141,6 @@ export const POST = withErrorHandling("POST /api/webhooks/paddle", async (reques
 
   const sig = request.headers.get("Paddle-Signature") ?? "";
   const body = await request.text();
-
-  console.log("[paddle-webhook] Received event, signature present:", !!sig);
 
   const valid = await verifyPaddleSignature(body, sig, WEBHOOK_SECRET);
   if (!valid) {
@@ -87,6 +162,8 @@ export const POST = withErrorHandling("POST /api/webhooks/paddle", async (reques
   const paddleCustomerId = data["customer_id"] as string | undefined;
   const status = data["status"] as string | undefined;
 
+  console.log("[paddle-webhook] customer_id:", paddleCustomerId, "custom_data:", JSON.stringify(customData));
+
   const yearlyPriceId = process.env.NEXT_PUBLIC_PADDLE_YEARLY_PRICE_ID;
   const items = data["items"] as { price?: { id?: string } }[] | undefined;
   const purchasedPriceId = items?.[0]?.price?.id;
@@ -96,31 +173,7 @@ export const POST = withErrorHandling("POST /api/webhooks/paddle", async (reques
   switch (event.event_type) {
     case "subscription.activated":
     case "subscription.created": {
-      if (!paddleCustomerId) {
-        console.error("[paddle-webhook] No customer_id in event");
-        break;
-      }
-
-      let uid: number | null = null;
-      const existingUser = await getUserByPaddleCustomerId(paddleCustomerId);
-      if (existingUser) {
-        uid = existingUser.id;
-        console.log("[paddle-webhook] Found user by Paddle customer ID:", uid);
-      } else {
-        const clientUserId = customData?.["userId"];
-        if (clientUserId) {
-          const u = await getUserById(parseInt(clientUserId, 10));
-          if (u) {
-            uid = u.id;
-            console.log("[paddle-webhook] Found user by custom_data userId:", uid);
-          } else {
-            console.error("[paddle-webhook] No user found for custom_data userId:", clientUserId);
-          }
-        } else {
-          console.error("[paddle-webhook] No custom_data.userId and no existing Paddle customer");
-        }
-      }
-
+      const uid = await resolveUserId(paddleCustomerId, customData);
       if (uid) {
         await updateUserPlan(uid, activatedPlan, paddleCustomerId);
         console.log("[paddle-webhook] Updated user", uid, "to plan:", activatedPlan);
@@ -140,32 +193,22 @@ export const POST = withErrorHandling("POST /api/webhooks/paddle", async (reques
     case "subscription.updated": {
       if (paddleCustomerId && status) {
         const plan = planFromSubscription(status, purchasedPriceId);
-        const user = await getUserByPaddleCustomerId(paddleCustomerId);
-        if (user) {
-          await updateUserPlan(user.id, plan);
-          console.log("[paddle-webhook] Updated user", user.id, "plan to:", plan);
+        const uid = await resolveUserId(paddleCustomerId, customData);
+        if (uid) {
+          await updateUserPlan(uid, plan);
+          console.log("[paddle-webhook] Updated user", uid, "plan to:", plan);
         }
       }
       break;
     }
 
     case "subscription.canceled": {
-      if (paddleCustomerId) {
-        const user = await getUserByPaddleCustomerId(paddleCustomerId);
-        if (user) {
-          await updateUserPlan(user.id, "free");
-          await recordSubscriptionEvent(user.id, user.plan, 0, "canceled");
-          console.log("[paddle-webhook] Canceled subscription for user:", user.id);
-        }
-      } else {
-        const userId = customData?.["userId"];
-        if (userId) {
-          const user = await getUserById(parseInt(userId, 10));
-          if (user) {
-            await updateUserPlan(user.id, "free");
-            await recordSubscriptionEvent(user.id, user.plan, 0, "canceled");
-          }
-        }
+      const uid = await resolveUserId(paddleCustomerId, customData);
+      if (uid) {
+        const user = await getUserById(uid);
+        await updateUserPlan(uid, "free");
+        if (user) await recordSubscriptionEvent(uid, user.plan, 0, "canceled");
+        console.log("[paddle-webhook] Canceled subscription for user:", uid);
       }
       break;
     }
