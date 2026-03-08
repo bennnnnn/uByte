@@ -25,13 +25,16 @@ interface CertData {
 export default function CertificationsTab() {
   const [data, setData] = useState<CertData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [fetchError, setFetchError] = useState(false);
 
   useEffect(() => {
+    let cancelled = false;
     fetch("/api/profile/exam-certificates", { credentials: "same-origin" })
       .then((r) => r.json())
-      .then((d) => setData({ certificates: d.certificates ?? [], examStats: d.examStats ?? [] }))
-      .catch(() => setData({ certificates: [], examStats: [] }))
-      .finally(() => setLoading(false));
+      .then((d) => { if (!cancelled) setData({ certificates: d.certificates ?? [], examStats: d.examStats ?? [] }); })
+      .catch(() => { if (!cancelled) setFetchError(true); })
+      .finally(() => { if (!cancelled) setLoading(false); });
+    return () => { cancelled = true; };
   }, []);
 
   if (loading) {
@@ -41,6 +44,14 @@ export default function CertificationsTab() {
           <div key={i} className="h-20 animate-pulse rounded-xl bg-zinc-100 dark:bg-zinc-900" />
         ))}
       </div>
+    );
+  }
+
+  if (fetchError) {
+    return (
+      <Card className="p-8 text-center">
+        <p className="text-sm text-zinc-500 dark:text-zinc-400">Could not load certifications. Try refreshing the page.</p>
+      </Card>
     );
   }
 

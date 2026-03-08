@@ -1,15 +1,15 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { MOBILE_BREAKPOINT } from "@/lib/constants";
 
-const MOBILE_BREAKPOINT = 768;
-
+/** Reactive mobile detection based on viewport width. */
 export function useIsMobile(): boolean {
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
     function check() {
-      setIsMobile(typeof window !== "undefined" && window.innerWidth < MOBILE_BREAKPOINT);
+      setIsMobile(window.innerWidth < MOBILE_BREAKPOINT);
     }
     check();
     window.addEventListener("resize", check);

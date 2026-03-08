@@ -6,13 +6,7 @@ import { getUnlockedSlugs } from "@/lib/db/practice-unlocks";
 import { withErrorHandling } from "@/lib/api-utils";
 import { verifyCsrf } from "@/lib/csrf";
 import { PRACTICE_PROBLEMS } from "@/lib/practice/problems";
-
-/** XP awarded per difficulty on first solve. */
-const XP_BY_DIFFICULTY: Record<string, number> = {
-  easy: 10,
-  medium: 20,
-  hard: 40,
-};
+import { XP_BY_DIFFICULTY } from "@/lib/constants";
 
 /** GET /api/practice-attempt — returns { attempts: Record<slug, "solved"|"failed"> } */
 export const GET = withErrorHandling("GET /api/practice-attempt", async () => {

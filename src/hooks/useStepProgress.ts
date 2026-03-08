@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
-import confetti from "canvas-confetti";
 import type { TutorialStep } from "@/lib/tutorial-steps";
 import type { CodeCheck } from "@/lib/tutorial-steps/types";
 import { useAuth } from "@/components/AuthProvider";
@@ -176,7 +175,7 @@ export function useStepProgress(
   useEffect(() => {
     if (!tutorialDone) return;
     setCountdown(2);
-    confetti({ particleCount: 120, spread: 80, origin: { y: 0.6 } });
+    import("canvas-confetti").then((mod) => mod.default({ particleCount: 120, spread: 80, origin: { y: 0.6 } }));
     const id = setInterval(() => setCountdown((c) => c - 1), 1000);
     return () => clearInterval(id);
   }, [tutorialDone]);

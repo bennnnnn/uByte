@@ -88,24 +88,7 @@ export function getPracticeCategories(): ProblemCategory[] {
   );
 }
 
-/** Count problems per category. */
-export function getCategoryCounts(): Record<string, number> {
-  const counts: Record<string, number> = {};
-  for (const p of PRACTICE_PROBLEMS) {
-    const cat = p.category ?? "other";
-    counts[cat] = (counts[cat] ?? 0) + 1;
-  }
-  return counts;
-}
-
-/** Count problems per difficulty. */
-export function getDifficultyCounts(): Record<Difficulty, number> {
-  const counts: Record<string, number> = { easy: 0, medium: 0, hard: 0 };
-  for (const p of PRACTICE_PROBLEMS) {
-    counts[p.difficulty] = (counts[p.difficulty] ?? 0) + 1;
-  }
-  return counts as Record<Difficulty, number>;
-}
+// getCategoryCounts and getDifficultyCounts were removed — unused.
 
 // ─── Sorting ─────────────────────────────────────────────────────────────────
 

@@ -12,8 +12,9 @@ import { runJudge } from "@/lib/practice/judge-runner";
 import type { SubmissionVerdict } from "@/lib/db/submissions";
 import { PRACTICE_PROBLEMS } from "@/lib/practice/problems";
 
+import { XP_BY_DIFFICULTY } from "@/lib/constants";
+
 const MAX_CODE_LENGTH = 64 * 1024; // 64 KB
-const XP_BY_DIFFICULTY: Record<string, number> = { easy: 10, medium: 20, hard: 40 };
 
 function normalizeCodeForHash(code: string): string {
   return code.replace(/\r\n/g, "\n").trim().replace(/\n{3,}/g, "\n\n");

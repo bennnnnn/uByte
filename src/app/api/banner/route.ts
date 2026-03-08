@@ -1,15 +1,9 @@
 import { NextResponse } from "next/server";
 import { getSiteBanner } from "@/lib/db/site-banner";
+import { withErrorHandling } from "@/lib/api-utils";
 
 /** Public: get current site banner (enabled + message + link). */
-export async function GET() {
-  try {
-    const banner = await getSiteBanner();
-    return NextResponse.json(banner);
-  } catch {
-    return NextResponse.json(
-      { enabled: false, message: "", linkUrl: "/", linkText: "Sign up" },
-      { status: 200 }
-    );
-  }
-}
+export const GET = withErrorHandling("GET /api/banner", async () => {
+  const banner = await getSiteBanner();
+  return NextResponse.json(banner);
+});

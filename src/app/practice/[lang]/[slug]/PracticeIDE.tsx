@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useEffect, useRef, Suspense } from "react";
+import { useState, useCallback, useEffect, useRef, useMemo, Suspense } from "react";
 import Link from "next/link";
 import { DIFFICULTY_BADGE, type PracticeProblem, type ProblemCategory } from "@/lib/practice/types";
 import type { SupportedLanguage } from "@/lib/languages/types";
@@ -16,6 +16,7 @@ import GripDots from "@/components/GripDots";
 import type { PracticeAttemptStatus } from "@/lib/db/practice-attempts";
 import { useAuth } from "@/components/AuthProvider";
 import { apiFetch } from "@/lib/api-client";
+import { useIsMobile } from "@/hooks/useIsMobile";
 
 import { ALL_LANGUAGE_KEYS } from "@/lib/languages/registry";
 
@@ -35,15 +36,17 @@ interface Props {
 }
 
 export function PracticeIDE({ problem, initialLang, categoryFilter = null, listPage = 1, listStatus, listDifficulty }: Props) {
-  const allProblems = getAllPracticeProblems();
-  const categories = getPracticeCategories();
-  const sidebarProblems =
+  const allProblems = useMemo(() => getAllPracticeProblems(), []);
+  const categories = useMemo(() => getPracticeCategories(), []);
+  const sidebarProblems = useMemo(() =>
     categoryFilter === null || categoryFilter === undefined
       ? allProblems
       : sortProblemsByCategoryAndDifficulty(
           allProblems.filter((p) => getCategoryForSlug(p.slug) === categoryFilter),
           categories
-        );
+        ),
+    [allProblems, categories, categoryFilter]
+  );
   const { user } = useAuth();
   const [lang, setLang] = useState<SupportedLanguage>(initialLang);
   const [output, setOutput]           = useState<string | null>(null);
@@ -53,7 +56,7 @@ export function PracticeIDE({ problem, initialLang, categoryFilter = null, listP
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [mobileTab, setMobileTab]     = useState<"desc" | "code">("desc");
-  const [isMobile, setIsMobile]       = useState(false);
+  const isMobile = useIsMobile();
   const [showShortcuts, setShowShortcuts] = useState(false);
 
   // Bookmark — persistent toggle (load from DB on mount)
@@ -148,14 +151,6 @@ export function PracticeIDE({ problem, initialLang, categoryFilter = null, listP
       .catch(() => {});
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.id, problem.slug]);
-
-  // Detect mobile for layout (description panel width)
-  useEffect(() => {
-    function check() { setIsMobile(window.innerWidth < 768); }
-    check();
-    window.addEventListener("resize", check);
-    return () => window.removeEventListener("resize", check);
-  }, []);
 
   // Load notes: DB for logged-in users, localStorage for guests
   useEffect(() => {

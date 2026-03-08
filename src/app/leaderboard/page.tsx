@@ -127,21 +127,7 @@ export default function LeaderboardPage() {
       </div>
 
       <div className="overflow-hidden rounded-xl border border-zinc-200 dark:border-zinc-800">
-        {loading ? (
-          <div className="space-y-0 divide-y divide-zinc-100 dark:divide-zinc-800">
-            {[...Array(5)].map((_, i) => (
-              <div key={i} className="flex items-center gap-4 px-4 py-3">
-                <div className="h-6 w-7 animate-pulse rounded bg-zinc-200 dark:bg-zinc-700" />
-                <div className="h-8 w-8 animate-pulse rounded-full bg-zinc-200 dark:bg-zinc-700" />
-                <div className="flex-1 space-y-1">
-                  <div className="h-4 w-24 animate-pulse rounded bg-zinc-200 dark:bg-zinc-700" />
-                  <div className="h-3 w-32 animate-pulse rounded bg-zinc-100 dark:bg-zinc-800" />
-                </div>
-                <div className="h-5 w-12 animate-pulse rounded bg-zinc-200 dark:bg-zinc-700" />
-              </div>
-            ))}
-          </div>
-        ) : users.length === 0 ? (
+        {users.length === 0 ? (
           <p className="px-6 py-12 text-center text-sm text-zinc-400">
             {period === "week" ? "No one active this week yet — get learning!" : "No users yet — be the first!"}
           </p>

@@ -116,7 +116,7 @@ export async function updateStreak(
   let streak = user.streak_days;
   let longest = user.longest_streak;
   let freeze_used = false;
-  const freezes: number = (user as unknown as { streak_freezes?: number }).streak_freezes ?? 1;
+  const freezes: number = user.streak_freezes ?? 1;
 
   if (user.streak_last_date === today) {
     return { streak_days: streak, longest_streak: longest };

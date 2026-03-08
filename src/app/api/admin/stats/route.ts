@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAdminRevenueStats, getAdminRecentSubscriptionEvents, getAdminRevenueByPeriod } from "@/lib/db";
 import type { RevenuePeriod } from "@/lib/db";
-import { requireAdmin } from "@/lib/api-utils";
+import { withErrorHandling, requireAdmin } from "@/lib/api-utils";
 
 const PERIODS: RevenuePeriod[] = ["7days", "month", "year"];
 
-export async function GET(request: NextRequest) {
+export const GET = withErrorHandling("GET /api/admin/stats", async (request: NextRequest) => {
   const { admin, response } = await requireAdmin();
   if (!admin) return response;
 
@@ -21,4 +21,4 @@ export async function GET(request: NextRequest) {
     stats.revenueByPeriod = await getAdminRevenueByPeriod(period);
   }
   return NextResponse.json(stats);
-}
+});

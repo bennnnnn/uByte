@@ -47,30 +47,35 @@ export default function OverviewTab({ stats, badges, achievements, userId }: Pro
     { id: string; lang: string; passed_at: string }[]
   >([]);
   const [certsLoading, setCertsLoading] = useState(!!userId);
+  const [certsError, setCertsError] = useState(false);
 
   const pct = stats.total_tutorials > 0
     ? Math.round((stats.completed_count / stats.total_tutorials) * 100)
     : 0;
 
   useEffect(() => {
+    let cancelled = false;
     fetch("/api/profile/activity", { credentials: "same-origin" })
       .then((r) => r.json())
-      .then((d) => { if (d.activity) setActivity(d.activity); })
-      .catch(() => setActivityError(true))
-      .finally(() => setActivityLoading(false));
+      .then((d) => { if (!cancelled && d.activity) setActivity(d.activity); })
+      .catch(() => { if (!cancelled) setActivityError(true); })
+      .finally(() => { if (!cancelled) setActivityLoading(false); });
+    return () => { cancelled = true; };
   }, []);
 
   useEffect(() => {
     if (!userId) return;
+    let cancelled = false;
     fetch("/api/profile/exam-certificates", { credentials: "same-origin" })
       .then((r) => r.json())
       .then((d) => {
-        if (Array.isArray(d.certificates)) {
+        if (!cancelled && Array.isArray(d.certificates)) {
           setExamCerts(d.certificates);
         }
       })
-      .catch(() => {})
-      .finally(() => setCertsLoading(false));
+      .catch(() => { if (!cancelled) setCertsError(true); })
+      .finally(() => { if (!cancelled) setCertsLoading(false); });
+    return () => { cancelled = true; };
   }, [userId]);
 
   return (
@@ -101,7 +106,10 @@ export default function OverviewTab({ stats, badges, achievements, userId }: Pro
       {certsLoading && (
         <div className="h-20 animate-pulse rounded-2xl bg-zinc-100 dark:bg-zinc-800" />
       )}
-      {!certsLoading && examCerts.length > 0 && (
+      {!certsLoading && certsError && (
+        <p className="text-sm text-zinc-400">Could not load certificates.</p>
+      )}
+      {!certsLoading && !certsError && examCerts.length > 0 && (
         <Card className="p-5">
           <div className="mb-3 flex items-center justify-between">
             <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">

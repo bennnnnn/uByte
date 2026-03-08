@@ -13,6 +13,7 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/components/AuthProvider";
 import { apiFetch } from "@/lib/api-client";
 import { formatCents } from "./utils";
+import { MONTHLY_PRICE_CENTS, YEARLY_PRICE_CENTS } from "@/lib/plans";
 import type {
   AdminUser,
   TutorialAnalytics,
@@ -100,6 +101,8 @@ export function useAdminData() {
     if (loading) return;
     if (!user) { router.push("/"); return; }
 
+    let cancelled = false;
+
     Promise.all([
       fetch("/api/admin/users", { credentials: "same-origin" }).then(async (r) => {
         if (r.status === 403) { router.push("/"); return null; }
@@ -114,6 +117,7 @@ export function useAdminData() {
       fetch("/api/admin/stats?view=subscription-events", { credentials: "same-origin" }).then(async (r) => r.ok ? r.json() : { events: [] }),
     ])
       .then(([userData, analyticsData, practiceData, revenueData, auditData, eventsData]) => {
+        if (cancelled) return;
         if (userData) setUsers(userData.users ?? []);
         setAnalytics(analyticsData.analytics ?? []);
         setPracticeStats(practiceData?.stats ?? []);
@@ -121,8 +125,10 @@ export function useAdminData() {
         setAuditLog(auditData.log ?? []);
         setSubscriptionEvents(eventsData?.events ?? []);
       })
-      .catch((err) => setError(String(err.message ?? err)))
-      .finally(() => setFetching(false));
+      .catch((err) => { if (!cancelled) setError(String(err.message ?? err)); })
+      .finally(() => { if (!cancelled) setFetching(false); });
+
+    return () => { cancelled = true; };
   }, [user, loading, router]);
 
   /* ── Revenue period switcher ─────────────────────────────────────────── */
@@ -303,7 +309,7 @@ export function useAdminData() {
     : users;
 
   const totalCompletions = analytics.reduce((s, t) => s + t.completed_count, 0);
-  const mrr = revenue ? (revenue.monthlySubscribers * 999 + revenue.yearlySubscribers * 4999) / 12 : 0;
+  const mrr = revenue ? (revenue.monthlySubscribers * MONTHLY_PRICE_CENTS + revenue.yearlySubscribers * YEARLY_PRICE_CENTS) / 12 : 0;
 
   return {
     /* auth */

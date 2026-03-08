@@ -23,6 +23,7 @@ import { tutorialUrl } from "@/lib/urls";
 import { LANGUAGES } from "@/lib/languages/registry";
 import type { SupportedLanguage } from "@/lib/languages/types";
 import GripDots from "@/components/GripDots";
+import { useIsMobile } from "@/hooks/useIsMobile";
 
 interface Props {
   lang: string;
@@ -71,7 +72,7 @@ export default function InteractiveTutorial({
     return 14;
   });
   const [mobileTab, setMobileTab] = useState<"instructions" | "code">("instructions");
-  const [isMobile, setIsMobile] = useState(false);
+  const isMobile = useIsMobile();
 
   const currentStep = currentSteps[stepProgress.stepIndex];
 
@@ -98,14 +99,6 @@ export default function InteractiveTutorial({
     editor.setCode(currentSteps[safeIndex]?.starter ?? "");
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ideLang, stepsForLang]);
-
-  // Detect mobile
-  useEffect(() => {
-    function check() { setIsMobile(window.innerWidth < 768); }
-    check();
-    window.addEventListener("resize", check);
-    return () => window.removeEventListener("resize", check);
-  }, []);
 
   // Auto-switch mobile tab on pass/fail
   useEffect(() => {
@@ -144,7 +137,8 @@ export default function InteractiveTutorial({
   function handleKeyDown(e: React.KeyboardEvent<HTMLTextAreaElement>) {
     if (e.key === "Tab") {
       e.preventDefault();
-      const ta = editor.textareaRef.current!;
+      const ta = editor.textareaRef.current;
+      if (!ta) return;
       const start = ta.selectionStart;
       const end = ta.selectionEnd;
       const next = editor.code.slice(0, start) + "    " + editor.code.slice(end);

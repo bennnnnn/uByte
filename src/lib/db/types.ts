@@ -20,6 +20,7 @@ export interface User {
   failed_login_attempts: number;
   locked_until: string | null;
   token_version: number;
+  streak_freezes: number;
   plan: string;
   /** DB column is named stripe_customer_id for legacy reasons; stores the Paddle customer ID. */
   stripe_customer_id: string | null;
