@@ -32,8 +32,6 @@ const PRO_FEATURES = [
   "Certification exams with certificates",
   "Verifiable digital certificates",
   "Add certs to LinkedIn & resume",
-  "Community chat",
-  "Priority support",
   "New content as it ships",
 ];
 
@@ -46,14 +44,12 @@ const COMPARISON_FEATURES: { name: string; free: string; pro: string }[] = [
   { name: "AI code feedback", free: "—", pro: "✓" },
   { name: "Certification exams", free: "—", pro: "Unlimited" },
   { name: "Verifiable certificates", free: "—", pro: "✓" },
-  { name: "Community chat", free: "—", pro: "✓" },
-  { name: "Priority support", free: "—", pro: "✓" },
 ];
 
 const FAQ_ITEMS = [
   {
     q: "What's included in Pro?",
-    a: "Unlimited tutorials in all 6 languages, unlimited practice problems, AI code feedback on every step, timed certification exams with verifiable certificates, community chat, and priority support.",
+    a: "Unlimited tutorials in all 6 languages, unlimited practice problems, AI code feedback on every step, and timed certification exams with verifiable certificates you can add to LinkedIn.",
   },
   {
     q: "Can I cancel anytime?",
@@ -61,7 +57,7 @@ const FAQ_ITEMS = [
   },
   {
     q: "How does the free plan work?",
-    a: `You get ${FREE_TUTORIAL_LIMIT} tutorials and ${FREE_PRACTICE_LIMIT} practice problems per language — completely free, no card required. Upgrade whenever you're ready for unlimited access and certifications.`,
+    a: `You get ${FREE_TUTORIAL_LIMIT} tutorials and ${FREE_PRACTICE_LIMIT} practice problems per language — completely free. Upgrade whenever you're ready for unlimited access and certifications.`,
   },
   {
     q: "Do I get a certificate?",
@@ -223,7 +219,7 @@ function PricingContent() {
             </span>
           </h1>
           <p className="mt-2 text-sm text-zinc-500 dark:text-zinc-400 sm:text-base">
-            Tutorials, practice problems, and verifiable certificates. Start free — no card required.
+            Tutorials, practice problems, and verifiable certificates — all in one plan.
           </p>
         </div>
 
@@ -263,7 +259,7 @@ function PricingContent() {
 
           {/* ── Free card ─────────────────────────────────── */}
           <div className="flex flex-col rounded-2xl border border-zinc-200 bg-zinc-50 p-8 shadow-sm dark:border-zinc-700/60 dark:bg-zinc-900">
-            <div className="mb-6">
+            <div>
               <p className="mb-1 text-xs font-bold uppercase tracking-widest text-zinc-400 dark:text-zinc-500">
                 Free
               </p>
@@ -272,11 +268,33 @@ function PricingContent() {
                 <span className="text-zinc-400 dark:text-zinc-500">forever</span>
               </div>
               <p className="mt-2 text-sm text-zinc-500 dark:text-zinc-400">
-                Explore tutorials and practice problems — no card required.
+                Explore tutorials and practice problems for free.
               </p>
             </div>
 
-            <ul className="mb-8 flex-1 space-y-3">
+            <div className="mt-5">
+              {!user ? (
+                <Link
+                  href={signupHref}
+                  className="block w-full rounded-xl border border-zinc-300 py-3.5 text-center text-sm font-semibold text-zinc-700 transition-colors hover:border-zinc-400 hover:bg-white hover:text-zinc-900 dark:border-zinc-600 dark:text-zinc-300 dark:hover:border-zinc-400 dark:hover:text-white"
+                >
+                  Get started free
+                </Link>
+              ) : isPaid ? (
+                <div className="rounded-xl border border-zinc-200 py-3.5 text-center text-sm text-zinc-400 dark:border-zinc-700 dark:text-zinc-500">
+                  You&rsquo;re on Pro
+                </div>
+              ) : (
+                <Link
+                  href="/tutorial/go"
+                  className="block rounded-xl border border-zinc-300 py-3.5 text-center text-sm font-semibold text-zinc-700 transition-colors hover:border-indigo-400 hover:bg-indigo-50 hover:text-indigo-700 dark:border-zinc-600 dark:text-zinc-300 dark:hover:border-indigo-600 dark:hover:text-indigo-400"
+                >
+                  Continue learning →
+                </Link>
+              )}
+            </div>
+
+            <ul className="mt-6 space-y-3">
               {FREE_FEATURES.map((f) => (
                 <li key={f} className="flex items-center gap-3 text-sm text-zinc-600 dark:text-zinc-300">
                   <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-zinc-100 dark:bg-zinc-800">
@@ -286,26 +304,6 @@ function PricingContent() {
                 </li>
               ))}
             </ul>
-
-            {!user ? (
-              <Link
-                href={signupHref}
-                className="block w-full rounded-xl border border-zinc-300 py-3.5 text-center text-sm font-semibold text-zinc-700 transition-colors hover:border-zinc-400 hover:bg-white hover:text-zinc-900 dark:border-zinc-600 dark:text-zinc-300 dark:hover:border-zinc-400 dark:hover:text-white"
-              >
-                Get started free
-              </Link>
-            ) : isPaid ? (
-              <div className="rounded-xl border border-zinc-200 py-3.5 text-center text-sm text-zinc-400 dark:border-zinc-700 dark:text-zinc-500">
-                You&rsquo;re on Pro
-              </div>
-            ) : (
-              <Link
-                href="/tutorial/go"
-                className="block rounded-xl border border-zinc-300 py-3.5 text-center text-sm font-semibold text-zinc-700 transition-colors hover:border-indigo-400 hover:bg-indigo-50 hover:text-indigo-700 dark:border-zinc-600 dark:text-zinc-300 dark:hover:border-indigo-600 dark:hover:text-indigo-400"
-              >
-                Continue learning →
-              </Link>
-            )}
           </div>
 
           {/* ── Pro card ──────────────────────────────────── */}
@@ -316,7 +314,7 @@ function PricingContent() {
               </span>
             </div>
 
-            <div className="mb-6">
+            <div>
               <p className="mb-1 text-xs font-bold uppercase tracking-widest text-indigo-600 dark:text-indigo-400">
                 Pro
               </p>
@@ -351,7 +349,43 @@ function PricingContent() {
               )}
             </div>
 
-            <ul className="mb-8 flex-1 space-y-3">
+            <div className="mt-5">
+              {alreadyOnSelected ? (
+                <div className="flex items-center justify-center gap-2 rounded-xl bg-emerald-100 py-3.5 text-sm font-semibold text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300">
+                  <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                  </svg>
+                  Current plan
+                </div>
+              ) : onOtherPlan ? (
+                <div className="rounded-xl border border-zinc-200 py-3.5 text-center text-sm text-zinc-500 dark:border-zinc-700 dark:text-zinc-400">
+                  You&rsquo;re on {billing === "yearly" ? "Monthly" : "Yearly"}
+                </div>
+              ) : !user ? (
+                <Link
+                  href={signupHref}
+                  className="block w-full rounded-xl bg-indigo-600 py-3.5 text-center text-sm font-bold text-white shadow shadow-indigo-600/20 transition-colors hover:bg-indigo-700"
+                >
+                  Start free, upgrade anytime
+                </Link>
+              ) : !selectedPriceId ? (
+                <div className="rounded-xl bg-zinc-100 py-3.5 text-center text-sm text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400">
+                  Coming soon
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => openCheckout(selectedPriceId)}
+                  className="w-full rounded-xl bg-indigo-600 py-3.5 text-sm font-bold text-white shadow shadow-indigo-600/20 transition-colors hover:bg-indigo-700"
+                >
+                  {billing === "yearly"
+                    ? `Get Pro — ${BILLING_CONFIG.yearly.priceText.replace("/year", "/yr")}`
+                    : `Get Pro — ${BILLING_CONFIG.monthly.priceText.replace("/month", "/mo")}`}
+                </button>
+              )}
+            </div>
+
+            <ul className="mt-6 space-y-3">
               {PRO_FEATURES.map((f) => (
                 <li key={f} className="flex items-center gap-3 text-sm text-zinc-700 dark:text-zinc-200">
                   <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-indigo-100 dark:bg-indigo-600/30">
@@ -361,40 +395,6 @@ function PricingContent() {
                 </li>
               ))}
             </ul>
-
-            {alreadyOnSelected ? (
-              <div className="flex items-center justify-center gap-2 rounded-xl bg-emerald-100 py-3.5 text-sm font-semibold text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300">
-                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                </svg>
-                Current plan
-              </div>
-            ) : onOtherPlan ? (
-              <div className="rounded-xl border border-zinc-200 py-3.5 text-center text-sm text-zinc-500 dark:border-zinc-700 dark:text-zinc-400">
-                You&rsquo;re on {billing === "yearly" ? "Monthly" : "Yearly"}
-              </div>
-            ) : !user ? (
-              <Link
-                href={signupHref}
-                className="block w-full rounded-xl bg-indigo-600 py-3.5 text-center text-sm font-bold text-white shadow shadow-indigo-600/20 transition-colors hover:bg-indigo-700"
-              >
-                Start free, upgrade anytime
-              </Link>
-            ) : !selectedPriceId ? (
-              <div className="rounded-xl bg-zinc-100 py-3.5 text-center text-sm text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400">
-                Coming soon
-              </div>
-            ) : (
-              <button
-                type="button"
-                onClick={() => openCheckout(selectedPriceId)}
-                className="w-full rounded-xl bg-indigo-600 py-3.5 text-sm font-bold text-white shadow shadow-indigo-600/20 transition-colors hover:bg-indigo-700"
-              >
-                {billing === "yearly"
-                  ? `Get Pro — ${BILLING_CONFIG.yearly.priceText.replace("/year", "/yr")}`
-                  : `Get Pro — ${BILLING_CONFIG.monthly.priceText.replace("/month", "/mo")}`}
-              </button>
-            )}
 
             {isPaid && (
               <p className="mt-3 text-center text-xs text-zinc-400 dark:text-zinc-500">
@@ -527,7 +527,7 @@ function PricingContent() {
             >
               Start with free tutorials
             </Link>
-            {" "}— no card required. Upgrade whenever you&rsquo;re ready.
+            {" "}— upgrade whenever you&rsquo;re ready.
           </p>
         </div>
       </div>

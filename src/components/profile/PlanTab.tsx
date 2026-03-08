@@ -15,12 +15,10 @@ const FREE_FEATURES = [
 ];
 
 const PRO_FEATURES = [
-  "All 20 tutorials",
+  "Unlimited tutorials — all languages",
   "AI code feedback",
-  "Community chat",
-  "Certificate of completion",
+  "Certification exams & verifiable certificates",
   "Progress tracking & leaderboard",
-  "Priority support",
 ];
 
 interface Props {
