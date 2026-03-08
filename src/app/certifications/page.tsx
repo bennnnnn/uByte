@@ -272,9 +272,6 @@ export default async function PracticeExamsPage() {
         <div className="mx-auto max-w-5xl px-6 py-12 sm:py-16">
           <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
             <div className="max-w-xl">
-              <p className="mb-2 text-xs font-semibold uppercase tracking-widest text-indigo-600 dark:text-indigo-400">
-                Pro feature
-              </p>
               <h1 className="text-4xl font-extrabold tracking-tight text-zinc-900 dark:text-zinc-100 sm:text-5xl">
                 Programming Certifications
               </h1>
@@ -367,7 +364,7 @@ export default async function PracticeExamsPage() {
           </div>
 
           {/* Trust bar */}
-          <div className="mt-10 grid grid-cols-2 gap-4 border-t border-zinc-100 pt-8 dark:border-zinc-800 sm:grid-cols-4">
+          <div className="mt-10 grid grid-cols-3 gap-4 border-t border-zinc-100 pt-8 dark:border-zinc-800">
             <div>
               <p className="text-2xl font-bold text-zinc-900 dark:text-zinc-100">{EXAM_LANGS.length}</p>
               <p className="mt-0.5 text-sm text-zinc-500 dark:text-zinc-400">Languages</p>
@@ -383,10 +380,6 @@ export default async function PracticeExamsPage() {
                 {totalCertificates > 0 ? totalCertificates.toLocaleString() : "—"}
               </p>
               <p className="mt-0.5 text-sm text-zinc-500 dark:text-zinc-400">Certificates issued</p>
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-zinc-900 dark:text-zinc-100">Per exam</p>
-              <p className="mt-0.5 text-sm text-zinc-500 dark:text-zinc-400">Pass threshold</p>
             </div>
           </div>
         </div>
@@ -420,12 +413,9 @@ export default async function PracticeExamsPage() {
         {popularLangs.length > 0 && (
           <section className="mb-14" aria-labelledby="popular-heading">
             <div className="mb-5 flex items-end justify-between">
-              <div>
-                <h2 id="popular-heading" className="text-xs font-semibold uppercase tracking-widest text-zinc-400 dark:text-zinc-500">
-                  Popular right now
-                </h2>
-                <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">Most attempted by other users.</p>
-              </div>
+              <h2 id="popular-heading" className="text-xs font-semibold uppercase tracking-widest text-zinc-400 dark:text-zinc-500">
+                Popular certifications
+              </h2>
               <a href="#all-certifications" className="text-sm font-medium text-indigo-600 hover:underline dark:text-indigo-400">
                 View all →
               </a>
