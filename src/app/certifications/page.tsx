@@ -469,29 +469,21 @@ export default async function PracticeExamsPage() {
             <h2 className="mb-6 text-xs font-semibold uppercase tracking-widest text-zinc-400 dark:text-zinc-500">
               Your path to certification
             </h2>
-            <div className="relative grid gap-4 sm:grid-cols-3">
+            <div className="relative grid gap-4 sm:grid-cols-2">
               {/* Connector line (desktop only) */}
-              <div className="pointer-events-none absolute left-0 right-0 top-[3.25rem] hidden h-px bg-gradient-to-r from-indigo-200 via-indigo-300 to-emerald-300 dark:from-indigo-800 dark:via-indigo-700 dark:to-emerald-700 sm:block" />
+              <div className="pointer-events-none absolute left-0 right-0 top-[3.25rem] hidden h-px bg-gradient-to-r from-indigo-200 to-emerald-300 dark:from-indigo-800 dark:to-emerald-700 sm:block" />
 
               {[
                 {
                   step: "1",
                   icon: "📖",
-                  title: "Learn the fundamentals",
-                  body: "Start with bite-sized tutorials. Build a solid understanding of syntax, data structures, and core concepts at your own pace.",
+                  title: "Build understanding",
+                  body: "Start with bite-sized tutorials. Master syntax, data structures, and core concepts at your own pace — then practice with hands-on coding challenges.",
                   link: "/tutorial",
                   linkLabel: "Browse tutorials",
                 },
                 {
                   step: "2",
-                  icon: "💪",
-                  title: "Sharpen your skills",
-                  body: "Solve hands-on coding challenges with our built-in IDE. Practice real problems to build confidence and speed before the exam.",
-                  link: "/practice",
-                  linkLabel: "Start practicing",
-                },
-                {
-                  step: "3",
                   icon: "🏆",
                   title: "Prove yourself",
                   body: "Take a timed certification exam. Pass the threshold and earn a shareable digital certificate — proof of your expertise.",
