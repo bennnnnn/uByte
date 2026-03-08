@@ -42,21 +42,7 @@ export const PRACTICE_PROBLEMS: PracticeProblem[] = [
   ...HARD_PROBLEMS,
 ];
 
-// ─── Category mapping (slug → category for grouping/filtering) ───────────────
-
-const SLUG_CATEGORY: Record<string, ProblemCategory> = {
-  "two-sum": "array",
-  "valid-parentheses": "stack",
-  "contains-duplicate": "array",
-  "best-time-to-buy-sell-stock": "array",
-  "reverse-string": "string",
-  "climbing-stairs": "dynamic-programming",
-  "three-sum": "array",
-  "maximum-subarray": "array",
-  "longest-substring-without-repeating": "string",
-  "merge-intervals": "sorting",
-  "trapping-rain-water": "array",
-};
+// ─── Category helpers (derived from problem definitions) ─────────────────────
 
 const CATEGORY_LABELS: Record<ProblemCategory, string> = {
   array: "Array",
@@ -70,20 +56,42 @@ const CATEGORY_LABELS: Record<ProblemCategory, string> = {
 };
 
 export function getCategoryForSlug(slug: string): ProblemCategory | null {
-  return SLUG_CATEGORY[slug] ?? null;
+  const problem = PRACTICE_PROBLEMS.find((p) => p.slug === slug);
+  return problem?.category ?? null;
 }
 
 export function getCategoryLabel(cat: ProblemCategory): string {
-  return CATEGORY_LABELS[cat];
+  return CATEGORY_LABELS[cat] ?? cat;
 }
 
+/** Returns only categories that have at least one problem. */
 export function getPracticeCategories(): ProblemCategory[] {
   const set = new Set<ProblemCategory>();
-  for (const slug of Object.keys(SLUG_CATEGORY)) {
-    const c = SLUG_CATEGORY[slug];
-    if (c) set.add(c);
+  for (const p of PRACTICE_PROBLEMS) {
+    if (p.category) set.add(p.category);
   }
-  return Array.from(set).sort((a, b) => CATEGORY_LABELS[a].localeCompare(CATEGORY_LABELS[b]));
+  return Array.from(set).sort((a, b) =>
+    (CATEGORY_LABELS[a] ?? a).localeCompare(CATEGORY_LABELS[b] ?? b)
+  );
+}
+
+/** Count problems per category. */
+export function getCategoryCounts(): Record<string, number> {
+  const counts: Record<string, number> = {};
+  for (const p of PRACTICE_PROBLEMS) {
+    const cat = p.category ?? "other";
+    counts[cat] = (counts[cat] ?? 0) + 1;
+  }
+  return counts;
+}
+
+/** Count problems per difficulty. */
+export function getDifficultyCounts(): Record<Difficulty, number> {
+  const counts: Record<string, number> = { easy: 0, medium: 0, hard: 0 };
+  for (const p of PRACTICE_PROBLEMS) {
+    counts[p.difficulty] = (counts[p.difficulty] ?? 0) + 1;
+  }
+  return counts as Record<Difficulty, number>;
 }
 
 // ─── Sorting ─────────────────────────────────────────────────────────────────

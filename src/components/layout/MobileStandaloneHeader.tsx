@@ -5,6 +5,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import AuthButtons from "@/components/AuthButtons";
 import { LANGUAGES, getAllLanguageSlugs } from "@/lib/languages/registry";
+import { useAuth } from "@/components/AuthProvider";
+import { hasPaidAccess } from "@/lib/plans";
 
 const STANDALONE_PREFIXES = ["/", "/practice", "/certifications", "/search", "/pricing", "/privacy", "/terms", "/leaderboard", "/profile", "/reset-password", "/verify-email", "/certificate", "/admin", "/u"];
 
@@ -54,6 +56,8 @@ function AccordionSection({
 
 export default function MobileStandaloneHeader() {
   const pathname = usePathname();
+  const { user, profile } = useAuth();
+  const isPro = hasPaidAccess(profile?.plan);
   const [open, setOpen] = useState(false);
   const [expandedSection, setExpandedSection] = useState<string | null>(null);
 
@@ -177,16 +181,18 @@ export default function MobileStandaloneHeader() {
             })}
           </AccordionSection>
 
-          {/* Standalone links */}
-          <div className="mt-1 border-t border-zinc-100 pt-1 dark:border-zinc-800">
-            <Link
-              href="/pricing"
-              onClick={close}
-              className="flex items-center rounded-lg px-3 py-2.5 text-sm font-semibold text-zinc-800 transition-colors hover:bg-zinc-100 dark:text-zinc-200 dark:hover:bg-zinc-800"
-            >
-              Pricing
-            </Link>
-          </div>
+          {/* Standalone links — hide Pricing for Pro users */}
+          {!(user && isPro) && (
+            <div className="mt-1 border-t border-zinc-100 pt-1 dark:border-zinc-800">
+              <Link
+                href="/pricing"
+                onClick={close}
+                className="flex items-center rounded-lg px-3 py-2.5 text-sm font-semibold text-zinc-800 transition-colors hover:bg-zinc-100 dark:text-zinc-200 dark:hover:bg-zinc-800"
+              >
+                Pricing
+              </Link>
+            </div>
+          )}
         </nav>
       )}
     </div>

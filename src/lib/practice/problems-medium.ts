@@ -3,6 +3,7 @@ import type { PracticeProblem } from "./types";
 export const MEDIUM_PROBLEMS: PracticeProblem[] = [
   {
     slug: "three-sum",
+    category: "array",
     title: "Three Sum",
     description:
       "Given an integer array `nums`, return all the triplets `[nums[i], nums[j], nums[k]]` such that `i != j`, `i != k`, `j != k`, and `nums[i] + nums[j] + nums[k] == 0`.\n\nThe solution set must not contain duplicate triplets.\n\nHint: Sort the array, then use a fixed pointer + two-pointer technique.",
@@ -246,6 +247,7 @@ fn main() {
   },
   {
     slug: "maximum-subarray",
+    category: "array",
     title: "Maximum Subarray",
     description:
       "Given an integer array `nums`, find the subarray with the largest sum, and return its sum.\n\nA subarray is a contiguous non-empty part of an array.\n\nHint: Use Kadane's algorithm — track the current sum and reset when it goes negative.",
@@ -422,6 +424,7 @@ fn main() {
   },
   {
     slug: "longest-substring-without-repeating",
+    category: "string",
     title: "Longest Substring Without Repeating Characters",
     description:
       "Given a string `s`, find the length of the longest substring without repeating characters.\n\nHint: Use a sliding window — keep a set of current characters, expand the right pointer, and shrink the left pointer when a duplicate is found.",
@@ -591,6 +594,7 @@ fn main() {
   },
   {
     slug: "merge-intervals",
+    category: "sorting",
     title: "Merge Intervals",
     description:
       "Given an array of intervals where `intervals[i] = [start_i, end_i]`, merge all overlapping intervals, and return an array of the non-overlapping intervals that cover all the intervals in the input.\n\nHint: Sort by start time, then greedily merge when the current interval overlaps with the previous one.",

@@ -16,6 +16,14 @@ export interface Profile {
   plan: string;
 }
 
+export interface LangProgress {
+  lang: string;
+  name: string;
+  icon: string;
+  completed: number;
+  total: number;
+}
+
 export interface Stats {
   xp: number;
   streak_days: number;
@@ -25,6 +33,7 @@ export interface Stats {
   activity_count: number;
   created_at: string;
   last_active_at: string | null;
+  byLanguage?: LangProgress[];
 }
 
 export interface Badge {

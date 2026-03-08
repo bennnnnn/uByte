@@ -8,7 +8,6 @@ import { getLangIcon } from "@/lib/languages/icons";
 import type { SupportedLanguage } from "@/lib/languages/types";
 import { DIFFICULTY_BADGE, type Difficulty, type ProblemCategory } from "@/lib/practice/types";
 import { getCategoryForSlug, getCategoryLabel } from "@/lib/practice/problems";
-import { isPracticeProblemFree } from "@/lib/plans";
 import type { PracticeAttemptStatus } from "@/lib/db/practice-attempts";
 
 export interface PracticeListProblem {
@@ -30,8 +29,13 @@ interface Props {
   pageProblems: PracticeListProblem[];
   attempts: Record<string, PracticeAttemptStatus>;
   hasUser: boolean;
+  isPro: boolean;
   solvedCount: number;
   allProblemsLength: number;
+  unlockedSlugs: string[];
+  unlockedCount: number;
+  allowance: number;
+  maxFree: number;
 }
 
 function buildQueryString(opts: { category?: string; status?: string; difficulty?: string; page?: number }): string {
@@ -56,11 +60,20 @@ export function PracticeListClient({
   pageProblems,
   attempts,
   hasUser,
+  isPro,
   solvedCount,
   allProblemsLength,
+  unlockedSlugs,
+  unlockedCount,
+  allowance,
+  maxFree,
 }: Props) {
   const router = useRouter();
   const [selectedLang, setSelectedLang] = useState<SupportedLanguage>(initialLang);
+
+  const unlockedSet = new Set(unlockedSlugs);
+  const slotsRemaining = Math.max(0, allowance - unlockedCount);
+  const isMaxed = unlockedCount >= maxFree;
 
   const buildUrl = useCallback(
     (lang: SupportedLanguage, opts: { page?: number; category?: string; status?: string; difficulty?: string }) => {
@@ -106,7 +119,6 @@ export function PracticeListClient({
   const handleDifficultyChange = useCallback(
     (e: React.ChangeEvent<HTMLSelectElement>) => {
       const value = e.target.value;
-      // Pass "" when "All" is selected so buildUrl omits the difficulty param (undefined would keep current filter)
       const difficulty = value === "" ? "" : value;
       router.push(buildUrl(selectedLang, { difficulty, page: 1 }), { scroll: false });
     },
@@ -122,9 +134,16 @@ export function PracticeListClient({
     return "none";
   };
 
+  const isLocked = (slug: string): boolean => {
+    if (isPro) return false;
+    if (!hasUser) return true;
+    if (unlockedSet.has(slug)) return false;
+    return slotsRemaining <= 0;
+  };
+
   return (
     <div className="min-h-full overflow-y-auto">
-      {/* Top: Language + title (compact) */}
+      {/* Top: Language + title */}
       <section className="border-b border-zinc-100 bg-white dark:border-zinc-800 dark:bg-zinc-950">
         <div className="mx-auto max-w-6xl px-4 py-6 sm:px-6">
           <div className="flex flex-wrap items-center justify-between gap-4">
@@ -163,6 +182,30 @@ export function PracticeListClient({
               ))}
             </div>
           </div>
+
+          {/* Drip progress banner — only for logged-in free users */}
+          {hasUser && !isPro && (
+            <DripBanner
+              unlockedCount={unlockedCount}
+              allowance={allowance}
+              maxFree={maxFree}
+              slotsRemaining={slotsRemaining}
+              isMaxed={isMaxed}
+            />
+          )}
+
+          {/* Not logged in prompt */}
+          {!hasUser && (
+            <div className="mt-4 flex items-center gap-3 rounded-xl border border-indigo-200 bg-indigo-50/50 px-4 py-3 dark:border-indigo-900 dark:bg-indigo-950/30">
+              <span className="text-lg">🔓</span>
+              <p className="flex-1 text-sm text-zinc-700 dark:text-zinc-300">
+                <Link href="/auth?mode=signup" className="font-semibold text-indigo-600 hover:underline dark:text-indigo-400">
+                  Sign up free
+                </Link>{" "}
+                to unlock problems — 2 new ones every day.
+              </p>
+            </div>
+          )}
         </div>
       </section>
 
@@ -205,7 +248,7 @@ export function PracticeListClient({
 
         {/* Right: Status + Difficulty above list, then problems */}
         <main className="min-w-0 flex-1 px-4 py-6 sm:px-6 lg:py-8">
-          {/* Status & Difficulty bar — above the list, easy to see */}
+          {/* Filters bar */}
           <div className="mb-4 flex flex-wrap items-center gap-4 rounded-xl border border-zinc-200 bg-surface-card p-4 dark:border-zinc-700">
             <div className="flex flex-wrap items-center gap-3">
               <span className="text-sm font-medium text-zinc-500 dark:text-zinc-400">Status:</span>
@@ -270,17 +313,27 @@ export function PracticeListClient({
           <div className="overflow-hidden rounded-xl border border-zinc-200 bg-surface-card shadow-sm dark:border-zinc-700">
             <ul className="divide-y divide-zinc-100 dark:divide-zinc-700">
               {pageProblems.map((p, idx) => {
-                const free = isPracticeProblemFree(p.slug);
                 const cat = getCategoryForSlug(p.slug);
                 const status = statusIcon(p.slug);
+                const locked = isLocked(p.slug);
                 return (
                   <li key={p.slug}>
                     <Link
-                      href={buildProblemHref(p.slug)}
-                      className="group flex flex-wrap items-center gap-3 px-4 py-3.5 transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-800/50 sm:flex-nowrap"
+                      href={locked ? "#" : buildProblemHref(p.slug)}
+                      onClick={locked ? (e) => e.preventDefault() : undefined}
+                      className={`group flex flex-wrap items-center gap-3 px-4 py-3.5 transition-colors sm:flex-nowrap ${
+                        locked
+                          ? "cursor-not-allowed opacity-50"
+                          : "hover:bg-zinc-50 dark:hover:bg-zinc-800/50"
+                      }`}
+                      aria-disabled={locked}
                     >
-                      <span className="flex w-6 shrink-0 items-center justify-center" title={status === "solved" ? "Solved" : status === "failed" ? "Attempted" : "Not attempted"}>
-                        {status === "solved" ? (
+                      <span className="flex w-6 shrink-0 items-center justify-center" title={locked ? "Locked" : status === "solved" ? "Solved" : status === "failed" ? "Attempted" : "Not attempted"}>
+                        {locked ? (
+                          <svg className="h-5 w-5 text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                          </svg>
+                        ) : status === "solved" ? (
                           <span className="flex h-5 w-5 items-center justify-center rounded-full bg-emerald-100 text-emerald-600 dark:bg-emerald-900/50 dark:text-emerald-400">
                             <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
                           </span>
@@ -303,17 +356,18 @@ export function PracticeListClient({
                           {getCategoryLabel(cat)}
                         </span>
                       )}
-                      {!free && (
-                        <span className="shrink-0 rounded-md border border-amber-300 bg-amber-50 px-2 py-0.5 text-[10px] font-semibold uppercase text-amber-700 dark:border-amber-700 dark:bg-amber-950/50 dark:text-amber-400">
-                          Pro
-                        </span>
-                      )}
                       <span className={`shrink-0 rounded-md px-2 py-0.5 text-xs font-semibold capitalize ${DIFFICULTY_BADGE[p.difficulty]}`}>
                         {p.difficulty}
                       </span>
-                      <svg className="h-4 w-4 shrink-0 text-zinc-300 group-hover:text-indigo-500 dark:text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-                      </svg>
+                      {locked ? (
+                        <svg className="h-4 w-4 shrink-0 text-zinc-300 dark:text-zinc-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                        </svg>
+                      ) : (
+                        <svg className="h-4 w-4 shrink-0 text-zinc-300 group-hover:text-indigo-500 dark:text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                        </svg>
+                      )}
                     </Link>
                   </li>
                 );
@@ -379,6 +433,57 @@ export function PracticeListClient({
             )}
           </div>
         </main>
+      </div>
+    </div>
+  );
+}
+
+/** Progress banner showing how many free problems are unlocked vs available. */
+function DripBanner({
+  unlockedCount,
+  allowance,
+  maxFree,
+  slotsRemaining,
+  isMaxed,
+}: {
+  unlockedCount: number;
+  allowance: number;
+  maxFree: number;
+  slotsRemaining: number;
+  isMaxed: boolean;
+}) {
+  const pct = maxFree > 0 ? Math.round((unlockedCount / maxFree) * 100) : 0;
+
+  return (
+    <div className="mt-4 rounded-xl border border-zinc-200 bg-surface-card p-4 dark:border-zinc-700">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="flex items-center gap-2">
+          <span className="text-lg">{isMaxed ? "🔒" : "🔓"}</span>
+          <div>
+            <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+              {unlockedCount} of {maxFree} free problems used
+            </p>
+            <p className="text-xs text-zinc-500 dark:text-zinc-400">
+              {isMaxed
+                ? "You've used all your free problems."
+                : slotsRemaining > 0
+                  ? `${slotsRemaining} more available today — come back daily for more!`
+                  : "Come back tomorrow for 2 more free problems!"}
+            </p>
+          </div>
+        </div>
+        <Link
+          href="/pricing"
+          className="shrink-0 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-indigo-700"
+        >
+          Unlock all →
+        </Link>
+      </div>
+      <div className="mt-3 h-2 overflow-hidden rounded-full bg-zinc-100 dark:bg-zinc-800">
+        <div
+          className={`h-full rounded-full transition-all duration-500 ${isMaxed ? "bg-amber-500" : "bg-indigo-600"}`}
+          style={{ width: `${pct}%` }}
+        />
       </div>
     </div>
   );

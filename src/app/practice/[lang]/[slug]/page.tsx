@@ -6,8 +6,9 @@ import type { SupportedLanguage } from "@/lib/languages/types";
 import type { ProblemCategory } from "@/lib/practice/types";
 import { PracticeIDE } from "./PracticeIDE";
 import { getCurrentUser } from "@/lib/auth";
-import { getUserPlan } from "@/lib/db";
-import { hasPaidAccess, isPracticeProblemFree } from "@/lib/plans";
+import { getUserById } from "@/lib/db";
+import { hasPaidAccess } from "@/lib/plans";
+import { tryUnlockProblem } from "@/lib/db/practice-unlocks";
 import UpgradeWall from "@/components/UpgradeWall";
 import { absoluteUrl, SITE_KEYWORDS } from "@/lib/seo";
 
@@ -62,8 +63,31 @@ export default async function PracticeProblemPage({ params, searchParams }: Prop
   if (!problem) notFound();
 
   const user = await getCurrentUser();
-  const plan = user ? await getUserPlan(user.userId) : "free";
-  const canAccess = hasPaidAccess(plan) || isPracticeProblemFree(slug);
+
+  let canAccess = false;
+  let dripMessage = "";
+
+  if (!user) {
+    canAccess = false;
+    dripMessage = "Sign up free to start solving problems — 2 new problems unlock every day.";
+  } else {
+    const profile = await getUserById(user.userId);
+    if (hasPaidAccess(profile?.plan)) {
+      canAccess = true;
+    } else if (profile) {
+      const result = await tryUnlockProblem(user.userId, slug, profile.created_at);
+      canAccess = result.allowed;
+      if (!canAccess) {
+        const remaining = result.allowance - result.unlockedCount;
+        if (remaining <= 0 && result.unlockedCount >= 10) {
+          dripMessage = `You've unlocked all ${result.unlockedCount} free problems. Upgrade to Pro for unlimited access.`;
+        } else {
+          dripMessage = `You've used today's free problems. Come back tomorrow for ${Math.min(2, 10 - result.unlockedCount)} more, or upgrade now for instant access.`;
+        }
+      }
+    }
+  }
+
   if (!canAccess) {
     const backQuery = new URLSearchParams();
     if (sp.category) backQuery.set("category", sp.category);
@@ -74,7 +98,7 @@ export default async function PracticeProblemPage({ params, searchParams }: Prop
     return (
       <UpgradeWall
         tutorialTitle="Interview Prep"
-        subtitle="You've used your free problems for this language. Upgrade to unlock all problems and save progress."
+        subtitle={dripMessage}
         backHref={`/practice/${lang}${backQueryStr ? `?${backQueryStr}` : ""}`}
         backLabel={`← Back to ${LANGUAGES[lang as SupportedLanguage]?.name ?? lang} problems`}
       />

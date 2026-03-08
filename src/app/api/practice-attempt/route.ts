@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
 import { savePracticeAttempt, getPracticeAttempts, addXp, getUserById } from "@/lib/db";
-import { hasPaidAccess, isPracticeProblemFree } from "@/lib/plans";
+import { hasPaidAccess } from "@/lib/plans";
+import { getUnlockedSlugs } from "@/lib/db/practice-unlocks";
 import { withErrorHandling } from "@/lib/api-utils";
 import { verifyCsrf } from "@/lib/csrf";
 import { PRACTICE_PROBLEMS } from "@/lib/practice/problems";
@@ -37,8 +38,11 @@ export const POST = withErrorHandling("POST /api/practice-attempt", async (reque
   }
 
   const profile = await getUserById(user.userId);
-  if (!hasPaidAccess(profile?.plan) && !isPracticeProblemFree(slug)) {
-    return NextResponse.json({ error: "Upgrade to Pro to save practice progress" }, { status: 403 });
+  if (!hasPaidAccess(profile?.plan)) {
+    const unlocked = await getUnlockedSlugs(user.userId);
+    if (!unlocked.includes(slug)) {
+      return NextResponse.json({ error: "Problem not unlocked. Upgrade to Pro for unlimited access." }, { status: 403 });
+    }
   }
 
   if (status !== "solved" && status !== "failed") {

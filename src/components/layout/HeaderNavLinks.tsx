@@ -26,9 +26,7 @@ const linkBase =
 const chevron =
   "ml-1 inline-block h-3.5 w-3.5 transition-transform duration-200 group-hover:rotate-180";
 
-/** side="left"  → Tutorials + Interview Prep + Certifications dropdowns
- *  side="right" → Pricing link (default) */
-export default function HeaderNavLinks({ side = "right" }: { side?: "left" | "right" }) {
+export default function HeaderNavLinks({ side = "left" }: { side?: "left" }) {
   if (side === "left") {
     return (
       <nav className="flex items-center gap-1" aria-label="Main navigation">
@@ -146,11 +144,5 @@ export default function HeaderNavLinks({ side = "right" }: { side?: "left" | "ri
     );
   }
 
-  return (
-    <nav className="flex items-center gap-1" aria-label="Secondary navigation">
-      <Link href="/pricing" className={linkBase}>
-        Pricing
-      </Link>
-    </nav>
-  );
+  return null;
 }

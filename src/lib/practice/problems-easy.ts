@@ -4,6 +4,7 @@ export const EASY_PROBLEMS: PracticeProblem[] = [
   {
     slug: "two-sum",
     title: "Two Sum",
+    category: "array",
     description:
       "Given an array of integers `nums` and an integer `target`, return indices of the two numbers such that they add up to `target`.\n\nYou may assume that each input would have exactly one solution, and you may not use the same element twice.\n\nYou can return the answer in any order.",
     difficulty: "easy",
@@ -248,6 +249,7 @@ fn main() {
   },
   {
     slug: "valid-parentheses",
+    category: "stack",
     title: "Valid Parentheses",
     description:
       "Given a string `s` containing just the characters `'('`, `')'`, `'{'`, `'}'`, `'['` and `']'`, determine if the input string is valid.\n\nAn input string is valid if:\n- Open brackets are closed by the same type of brackets.\n- Open brackets are closed in the correct order.\n- Every close bracket has a corresponding open bracket of the same type.",
@@ -415,6 +417,7 @@ fn main() {
   },
   {
     slug: "contains-duplicate",
+    category: "array",
     title: "Contains Duplicate",
     description:
       "Given an integer array `nums`, return `true` if any value appears at least twice in the array, and return `false` if every element is distinct.",
@@ -594,6 +597,7 @@ fn main() {
   },
   {
     slug: "best-time-to-buy-sell-stock",
+    category: "array",
     title: "Best Time to Buy and Sell Stock",
     description:
       "You are given an array `prices` where `prices[i]` is the price of a given stock on the `i`th day.\n\nYou want to maximize your profit by choosing a single day to buy one stock and choosing a different day in the future to sell that stock.\n\nReturn the maximum profit you can achieve from this transaction. If you cannot achieve any profit, return `0`.",
@@ -774,6 +778,7 @@ fn main() {
   },
   {
     slug: "reverse-string",
+    category: "string",
     title: "Reverse String",
     description:
       "Write a function that reverses a string. The input is given as an array of characters `s`.\n\nYou must do this by modifying the input array in-place with O(1) extra memory.\n\nHint: Use two pointers — one at the start and one at the end, swap, and move inward.",
@@ -954,6 +959,7 @@ fn main() {
   },
   {
     slug: "climbing-stairs",
+    category: "dynamic-programming",
     title: "Climbing Stairs",
     description:
       "You are climbing a staircase. It takes `n` steps to reach the top.\n\nEach time you can either climb `1` or `2` steps. In how many distinct ways can you climb to the top?\n\nHint: This is the Fibonacci sequence — the number of ways to reach step n equals ways(n-1) + ways(n-2).",

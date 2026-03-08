@@ -4,7 +4,7 @@ import { getAllPracticeProblems } from "@/lib/practice/problems";
 import { LANGUAGES, getAllLanguageSlugs } from "@/lib/languages/registry";
 import type { SupportedLanguage } from "@/lib/languages/types";
 import { DIFFICULTY_BADGE } from "@/lib/practice/types";
-import { FREE_PRACTICE_LIMIT } from "@/lib/plans";
+import { MAX_FREE_PROBLEMS } from "@/lib/plans";
 import { getLangIcon, PRACTICE_TAGLINES } from "@/lib/languages/icons";
 import { LangCard } from "@/components/home";
 import { Card, Eyebrow, GradientText, TextLink } from "@/components/ui";
@@ -101,7 +101,7 @@ export default async function PracticePage() {
           <div className="mb-6 flex flex-wrap items-center gap-4">
             <DifficultyPills easy={easy} medium={medium} hard={hard} />
             <span className="text-sm text-zinc-500 dark:text-zinc-400">
-              {problems.length} problems · {FREE_PRACTICE_LIMIT} free per language
+              {problems.length} problems · {MAX_FREE_PROBLEMS} free to start
             </span>
           </div>
 

@@ -10,8 +10,10 @@ import { isSupportedLanguage, LANGUAGES, ALL_LANGUAGE_KEYS } from "@/lib/languag
 import type { SupportedLanguage } from "@/lib/languages/types";
 import type { Difficulty, ProblemCategory } from "@/lib/practice/types";
 import { getCurrentUser } from "@/lib/auth";
-import { getPracticeAttempts } from "@/lib/db";
+import { getPracticeAttempts, getUserById } from "@/lib/db";
 import type { PracticeAttemptStatus } from "@/lib/db/practice-attempts";
+import { getDripStatus } from "@/lib/db/practice-unlocks";
+import { hasPaidAccess } from "@/lib/plans";
 import { PracticeListClient } from "@/components/practice/PracticeListClient";
 import { absoluteUrl, SITE_KEYWORDS } from "@/lib/seo";
 
@@ -65,10 +67,15 @@ export default async function PracticeLangPage({ params, searchParams }: Props) 
   const categories = getPracticeCategories();
 
   const user = await getCurrentUser();
-  const attempts: Record<string, PracticeAttemptStatus> = user
-    ? await getPracticeAttempts(user.userId)
-    : {};
+  const [attempts, profile] = await Promise.all([
+    user ? getPracticeAttempts(user.userId) : ({} as Record<string, PracticeAttemptStatus>),
+    user ? getUserById(user.userId) : null,
+  ]);
   const solvedCount = Object.values(attempts).filter((s) => s === "solved").length;
+  const isPro = hasPaidAccess(profile?.plan);
+  const drip = user && !isPro
+    ? await getDripStatus(user.userId, profile?.created_at ?? new Date())
+    : null;
 
   const categoryFilter = sp.category && categories.includes(sp.category as ProblemCategory)
     ? (sp.category as ProblemCategory)
@@ -119,8 +126,13 @@ export default async function PracticeLangPage({ params, searchParams }: Props) 
       pageProblems={pageProblems}
       attempts={attempts}
       hasUser={!!user}
+      isPro={isPro}
       solvedCount={solvedCount}
       allProblemsLength={allProblems.length}
+      unlockedSlugs={drip?.unlockedSlugs ?? []}
+      unlockedCount={drip?.unlockedCount ?? 0}
+      allowance={drip?.allowance ?? 0}
+      maxFree={drip?.maxFree ?? 10}
     />
   );
 }

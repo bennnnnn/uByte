@@ -3,6 +3,7 @@ import type { PracticeProblem } from "./types";
 export const HARD_PROBLEMS: PracticeProblem[] = [
   {
     slug: "trapping-rain-water",
+    category: "array",
     title: "Trapping Rain Water",
     description:
       "Given `n` non-negative integers representing an elevation map where the width of each bar is `1`, compute how much water it can trap after raining.\n\nHint: For each position, the water trapped equals `min(maxLeft, maxRight) - height[i]`. Use two pointers for an O(n) solution.",

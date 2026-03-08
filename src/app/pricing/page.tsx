@@ -6,7 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/components/AuthProvider";
 import {
   BILLING_CONFIG, MONTHLY_PRICE_ID, YEARLY_PRICE_ID, hasPaidAccess,
-  FREE_TUTORIAL_LIMIT, FREE_PRACTICE_LIMIT,
+  FREE_TUTORIAL_LIMIT, MAX_FREE_PROBLEMS,
   MONTHLY_EQUIVALENT_CENTS, YEARLY_IF_MONTHLY_CENTS, YEARLY_DISCOUNT_PERCENT,
   MONTHLY_PRICE_CENTS, YEARLY_PRICE_CENTS,
 } from "@/lib/plans";
@@ -19,7 +19,7 @@ const CLIENT_TOKEN     = process.env.NEXT_PUBLIC_PADDLE_CLIENT_TOKEN ?? "";
 
 const FREE_FEATURES = [
   `${FREE_TUTORIAL_LIMIT} tutorials per language`,
-  `${FREE_PRACTICE_LIMIT} interview prep problems per language`,
+  `${MAX_FREE_PROBLEMS} interview prep problems (2/day)`,
   "Built-in code editor",
   "6 programming languages",
   "Progress tracking",
@@ -37,7 +37,7 @@ const PRO_FEATURES = [
 
 const COMPARISON_FEATURES: { name: string; free: string; pro: string }[] = [
   { name: "Tutorials", free: `${FREE_TUTORIAL_LIMIT} per language`, pro: "Unlimited" },
-  { name: "Interview prep problems", free: `${FREE_PRACTICE_LIMIT} per language`, pro: "Unlimited" },
+  { name: "Interview prep problems", free: `${MAX_FREE_PROBLEMS} total (2/day)`, pro: "Unlimited" },
   { name: "Languages", free: "6", pro: "6" },
   { name: "Code editor", free: "✓", pro: "✓" },
   { name: "Progress tracking", free: "✓", pro: "✓" },
@@ -57,7 +57,7 @@ const FAQ_ITEMS = [
   },
   {
     q: "How does the free plan work?",
-    a: `You get ${FREE_TUTORIAL_LIMIT} tutorials and ${FREE_PRACTICE_LIMIT} interview prep problems per language — completely free. Upgrade whenever you're ready for unlimited access and certifications.`,
+    a: `You get ${FREE_TUTORIAL_LIMIT} tutorials per language and ${MAX_FREE_PROBLEMS} interview prep problems (2 new ones unlock daily). Upgrade whenever you're ready for unlimited access and certifications.`,
   },
   {
     q: "Do I get a certificate?",

@@ -1,11 +1,17 @@
-import { getAllPracticeProblems } from "@/lib/practice/problems";
+import { DAILY_DRIP, MAX_FREE_PROBLEMS } from "@/lib/db/practice-unlocks";
 
 // ─── Free tier limits ─────────────────────────────────────────────────────────
 
 export const FREE_TUTORIAL_LIMIT = 5; // tutorials with order <= 5 are free
 
-/** Number of interview prep problems free per language (same problem set, first N are free). */
-export const FREE_PRACTICE_LIMIT = 15;
+/**
+ * @deprecated Use drip-based access via `tryUnlockProblem` instead.
+ * Kept for backward compatibility in non-critical display code.
+ */
+export const FREE_PRACTICE_LIMIT = MAX_FREE_PROBLEMS;
+
+// Re-export drip constants so UI code can import from one place
+export { DAILY_DRIP, MAX_FREE_PROBLEMS };
 
 // ─── Plan helpers ─────────────────────────────────────────────────────────────
 
@@ -60,9 +66,10 @@ export const MONTHLY_PRICE_ID = process.env.NEXT_PUBLIC_PADDLE_PRO_PRICE_ID ?? "
 
 // ─── Practice helpers ────────────────────────────────────────────────────────
 
-/** True if this practice problem is in the free tier (first FREE_PRACTICE_LIMIT by list order). */
-export function isPracticeProblemFree(slug: string): boolean {
-  const problems = getAllPracticeProblems();
-  const idx = problems.findIndex((p) => p.slug === slug);
-  return idx >= 0 && idx < FREE_PRACTICE_LIMIT;
+/**
+ * @deprecated Use drip-based gating. This is only kept for the practice list
+ * client display when no user context is available.
+ */
+export function isPracticeProblemFree(_slug: string): boolean {
+  return false;
 }

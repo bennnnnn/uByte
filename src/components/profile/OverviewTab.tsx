@@ -51,7 +51,6 @@ export default function OverviewTab({ stats, badges, achievements, userId }: Pro
   const pct = stats.total_tutorials > 0
     ? Math.round((stats.completed_count / stats.total_tutorials) * 100)
     : 0;
-  const allDone = stats.total_tutorials > 0 && stats.completed_count >= stats.total_tutorials;
 
   useEffect(() => {
     fetch("/api/profile/activity", { credentials: "same-origin" })
@@ -89,15 +88,9 @@ export default function OverviewTab({ stats, badges, achievements, userId }: Pro
           <div className="h-full rounded-full bg-indigo-600 transition-all duration-500" style={{ width: `${pct}%` }} />
         </div>
         <div className="mt-3 flex items-center justify-between">
-          {allDone && userId ? (
-            <TextLink href={`/certificate/${userId}`} className="text-xs">
-              🎓 View your certificate →
-            </TextLink>
-          ) : (
-            <span className="text-xs text-zinc-400">
-              {stats.total_tutorials - stats.completed_count} tutorials to go
-            </span>
-          )}
+          <span className="text-xs text-zinc-400">
+            {stats.total_tutorials - stats.completed_count} tutorial{stats.total_tutorials - stats.completed_count !== 1 ? "s" : ""} remaining
+          </span>
           <Link href="/profile?tab=progress" className="text-xs text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200">
             View details →
           </Link>
