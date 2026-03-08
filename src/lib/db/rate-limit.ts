@@ -9,16 +9,15 @@ export async function dbCheckRateLimit(
   const now = Date.now();
   const windowStart = now - windowMs;
 
-  await sql`DELETE FROM rate_limits WHERE key = ${key} AND hit_at < ${windowStart}`;
+  // Cleanup + count in parallel
+  const [, [countRow]] = await Promise.all([
+    sql`DELETE FROM rate_limits WHERE key = ${key} AND hit_at < ${windowStart}`,
+    sql`SELECT COUNT(*)::int AS c, MIN(hit_at) AS oldest FROM rate_limits WHERE key = ${key} AND hit_at >= ${windowStart}`,
+  ]);
 
-  const [row] = await sql`
-    SELECT COUNT(*)::int AS c, MIN(hit_at) AS oldest
-    FROM rate_limits WHERE key = ${key} AND hit_at >= ${windowStart}
-  `;
-
-  const count = (row?.c as number) ?? 0;
+  const count = (countRow?.c as number) ?? 0;
   if (count >= maxRequests) {
-    const oldest = row?.oldest as number | null;
+    const oldest = countRow?.oldest as number | null;
     const retryAfter = oldest
       ? Math.ceil((oldest + windowMs - now) / 1000)
       : 1;

@@ -102,11 +102,13 @@ export interface JudgeRunResult {
   memoryKb?: number;
 }
 
-const LANGS = ["go", "python", "javascript", "cpp", "java", "rust"] as const;
-type Lang = (typeof LANGS)[number];
+import { isSupportedLanguage } from "@/lib/languages/registry";
+import type { SupportedLanguage } from "@/lib/languages/types";
+
+type Lang = SupportedLanguage;
 
 function isLang(l: string): l is Lang {
-  return LANGS.includes(l as Lang);
+  return isSupportedLanguage(l);
 }
 
 export async function runJudge(

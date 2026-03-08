@@ -6,10 +6,8 @@ import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 import { verifyCsrf } from "@/lib/csrf";
 import { getSteps } from "@/lib/tutorial-steps";
 import { getCachedFeedback, setCachedFeedback } from "@/lib/db/ai-feedback-cache";
-import { isSupportedLanguage } from "@/lib/languages/registry";
-
-const GROK_URL = process.env.XAI_API_URL || "https://api.x.ai/v1/chat/completions";
-const GROK_MODEL = "grok-4";
+import { resolveLanguage } from "@/lib/languages/registry";
+import { callGrokApi } from "@/lib/ai/grok-client";
 
 function normalizeCodeForCache(code: string): string {
   return String(code)
@@ -50,7 +48,7 @@ export const POST = withErrorHandling("POST /api/code-feedback", async (req: Nex
 
   const body = await req.json();
   const { code, output, error, tutorialSlug, stepIndex, lang = "go" } = body;
-  const language = typeof lang === "string" && isSupportedLanguage(lang) ? lang : "go";
+  const language = resolveLanguage(lang);
   const stepIdx = parseInt(String(stepIndex), 10);
 
   const steps = getSteps(language, String(tutorialSlug));
@@ -97,25 +95,11 @@ ${isWrongOutput
 No prefix like "Feedback:" — just the sentence.`;
 
   try {
-    const apiKey = process.env.XAI_API_KEY;
-    if (!apiKey) throw new Error("XAI_API_KEY not set");
-    const res = await fetch(GROK_URL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${apiKey}`,
-      },
-      body: JSON.stringify({
-        model: GROK_MODEL,
-        messages: [{ role: "user", content: prompt }],
-        max_tokens: 80,
-        stream: false,
-        temperature: 0.3,
-      }),
+    const feedback = await callGrokApi({
+      messages: [{ role: "user", content: prompt }],
+      maxTokens: 80,
+      temperature: 0.3,
     });
-    if (!res.ok) throw new Error(await res.text());
-    const data = await res.json();
-    const feedback = (data.choices?.[0]?.message?.content ?? "").trim();
     if (feedback) await setCachedFeedback(cacheKey, feedback);
     return NextResponse.json({ feedback: feedback || null });
   } catch {

@@ -1,15 +1,10 @@
 "use client";
 
-import type { Status } from "@/hooks/useStepProgress";
+import type { StepProgressState } from "@/hooks/useStepProgress";
 
 interface Props {
-  output: string | null;
-  outputIsError: boolean;
-  status: Status;
-  aiFeedback: string | null;
-  aiFeedbackLoading: boolean;
+  progress: StepProgressState;
   expectedOutput: string[];
-  stepIndex: number;
   stepsLength: number;
   onRequestHint: () => void;
   height: number;
@@ -17,17 +12,13 @@ interface Props {
 
 /** Single scroll container: output + inline AI feedback (no chat window, no nested scroll). */
 export default function OutputPanel({
-  output,
-  outputIsError,
-  status,
-  aiFeedback,
-  aiFeedbackLoading,
+  progress,
   expectedOutput,
-  stepIndex,
   stepsLength,
   onRequestHint,
   height,
 }: Props) {
+  const { output, outputIsError, status, aiFeedback, aiFeedbackLoading, stepIndex } = progress;
   return (
     <div
       className="shrink-0 overflow-y-auto overflow-x-hidden bg-zinc-50 p-4 font-mono text-sm dark:bg-zinc-950"

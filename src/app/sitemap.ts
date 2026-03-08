@@ -27,7 +27,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.9,
     },
     {
-      url: abs("/practice-exams"),
+      url: abs("/certifications"),
       lastModified: now,
       changeFrequency: "daily",
       priority: 0.9,
@@ -94,7 +94,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     });
 
     entries.push({
-      url: abs(`/practice-exams/${lang}`),
+      url: abs(`/certifications/${lang}`),
       lastModified: now,
       changeFrequency: "weekly",
       priority: 0.85,

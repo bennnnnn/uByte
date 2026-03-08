@@ -256,18 +256,9 @@ export default function InteractiveTutorial({
           <InstructionsSidebar
             lang={lang}
             step={currentStep}
-            stepIndex={stepProgress.stepIndex}
             steps={currentSteps}
-            status={stepProgress.status}
-            showHint={stepProgress.showHint}
-            onToggleHint={() => stepProgress.setShowHint(!stepProgress.showHint)}
-            failCount={stepProgress.failCount}
-            completedSteps={stepProgress.completedSteps}
-            skippedSteps={stepProgress.skippedSteps}
-            onGoToStep={stepProgress.goToStep}
-            onSkip={stepProgress.skipStep}
+            progress={stepProgress}
             tutorialSlug={tutorialSlug}
-            tutorialDone={stepProgress.tutorialDone}
             nextTutorial={next ? { slug: next.slug, steps: allTutorialSteps[next.slug] ?? [] } : null}
           />
         </aside>
@@ -294,7 +285,7 @@ export default function InteractiveTutorial({
                   <div key={ln} className="absolute left-0 right-0 bg-red-500/10" style={{ top: 16 + (ln - 1) * 24, height: 24 }} />
                 ))}
               </div>
-              <pre ref={editor.preRef} aria-hidden className="pointer-events-none absolute inset-0 overflow-auto whitespace-pre py-4 pl-4 pr-8 text-zinc-100" dangerouslySetInnerHTML={{ __html: editor.highlightGo(editor.code) + "\n" }} />
+              <pre ref={editor.preRef} aria-hidden className="pointer-events-none absolute inset-0 overflow-auto whitespace-pre py-4 pl-4 pr-8 text-zinc-100" dangerouslySetInnerHTML={{ __html: editor.highlightedHtml + "\n" }} />
               <textarea ref={editor.textareaRef} value={editor.code} onChange={(e) => editor.setCode(e.target.value)} onScroll={editor.syncScroll} onKeyDown={handleKeyDown} spellCheck={false} autoCorrect="off" autoCapitalize="off" aria-label="Code editor" className="absolute inset-0 resize-none overflow-auto whitespace-pre bg-transparent py-4 pl-4 pr-8 text-transparent caret-white outline-none selection:bg-indigo-900/50" />
             </div>
           </div>
@@ -353,13 +344,8 @@ export default function InteractiveTutorial({
 
           {/* Output panel — single scroll, inline AI only */}
           <OutputPanel
-            output={stepProgress.output}
-            outputIsError={stepProgress.outputIsError}
-            status={stepProgress.status}
-            aiFeedback={stepProgress.aiFeedback}
-            aiFeedbackLoading={stepProgress.aiFeedbackLoading}
+            progress={stepProgress}
             expectedOutput={currentStep.expectedOutput}
-            stepIndex={stepProgress.stepIndex}
             stepsLength={steps.length}
             onRequestHint={() => stepProgress.requestHint(editor.code)}
             height={outputHeight}

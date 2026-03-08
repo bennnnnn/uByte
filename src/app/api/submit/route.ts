@@ -51,7 +51,7 @@ export const POST = withErrorHandling("POST /api/submit", async (request: NextRe
   const userId = user?.userId ?? null;
   const hash = codeHash(String(code));
 
-  const submissionId = await insertSubmission({
+  const submissionPromise = insertSubmission({
     userId,
     problemId: String(problemId),
     language: String(language),
@@ -67,6 +67,17 @@ export const POST = withErrorHandling("POST /api/submit", async (request: NextRe
     failedActual: result.failedActual ?? null,
   });
 
+  // Run DB queries in parallel where possible
+  const [submissionId, userExtras] = await Promise.all([
+    submissionPromise,
+    user
+      ? Promise.all([
+          getConsecutiveFailures(user.userId, String(problemId)),
+          getUserById(user.userId),
+        ])
+      : null,
+  ]);
+
   const response: Record<string, unknown> = {
     submission_id: submissionId,
     verdict: result.verdict,
@@ -79,11 +90,10 @@ export const POST = withErrorHandling("POST /api/submit", async (request: NextRe
   if (result.failedExpected != null) response.failedExpected = result.failedExpected;
   if (result.failedActual != null) response.failedActual = result.failedActual;
 
-  if (user) {
-    const consecutiveFailures = await getConsecutiveFailures(user.userId, String(problemId));
+  if (user && userExtras) {
+    const [consecutiveFailures, profile] = userExtras;
     (response as Record<string, number>).consecutive_failures = consecutiveFailures;
 
-    const profile = await getUserById(user.userId);
     const canSaveProgress = hasPaidAccess(profile?.plan) || isPracticeProblemFree(String(problemId));
     if (canSaveProgress) {
       if (result.verdict === "accepted") {

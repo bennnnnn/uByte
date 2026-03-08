@@ -3,7 +3,7 @@
 import { useState, useCallback } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { LANGUAGES } from "@/lib/languages/registry";
+import { LANGUAGES, ALL_LANGUAGE_KEYS } from "@/lib/languages/registry";
 import { getLangIcon } from "@/lib/languages/icons";
 import type { SupportedLanguage } from "@/lib/languages/types";
 import { DIFFICULTY_BADGE, type Difficulty, type ProblemCategory } from "@/lib/practice/types";
@@ -147,7 +147,7 @@ export function PracticeListClient({
               </div>
             </div>
             <div className="flex flex-wrap gap-2">
-              {(["go", "python", "cpp", "javascript", "java", "rust"] as SupportedLanguage[]).map((l2) => (
+              {ALL_LANGUAGE_KEYS.map((l2) => (
                 <button
                   key={l2}
                   type="button"

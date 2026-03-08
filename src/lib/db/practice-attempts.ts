@@ -36,19 +36,18 @@ export async function savePracticeAttempt(
   await ensurePracticeAttemptsTable();
   const sql = getSql();
 
-  const existing = await sql`
-    SELECT status FROM practice_attempts
-    WHERE user_id = ${userId} AND problem_slug = ${problemSlug}
-  `;
-  const previousStatus = existing[0]?.status as PracticeAttemptStatus | undefined;
-  const wasFirstSolve = status === "solved" && previousStatus !== "solved";
-
-  await sql`
+  // Atomic upsert: capture previous status to detect failed→solved transitions
+  const [row] = await sql`
     INSERT INTO practice_attempts (user_id, problem_slug, status, updated_at)
     VALUES (${userId}, ${problemSlug}, ${status}, NOW())
     ON CONFLICT (user_id, problem_slug)
     DO UPDATE SET status = EXCLUDED.status, updated_at = NOW()
+    WHERE practice_attempts.status != 'solved'
+    RETURNING (xmax = 0) AS was_insert
   `;
+  // Row is returned when: (a) fresh insert, or (b) update that changed a non-solved row.
+  // Row is NOT returned when the row already had status='solved' (WHERE clause filters it out).
+  const wasFirstSolve = status === "solved" && row != null;
 
   return { wasFirstSolve };
 }

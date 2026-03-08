@@ -49,8 +49,8 @@ function ResetPasswordForm() {
       setError("Passwords don't match.");
       return;
     }
-    if (password.length < 8) {
-      setError("Password must be at least 8 characters.");
+    if (password.length < MIN_PASSWORD_LENGTH) {
+      setError(PASSWORD_POLICY_MESSAGE);
       return;
     }
     if (!isValidPassword(password)) {
@@ -98,7 +98,7 @@ function ResetPasswordForm() {
             id="reset-new-password"
             type="password"
             required
-            minLength={8}
+            minLength={MIN_PASSWORD_LENGTH}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             placeholder="••••••••"
@@ -110,7 +110,7 @@ function ResetPasswordForm() {
             id="reset-confirm-password"
             type="password"
             required
-            minLength={8}
+            minLength={MIN_PASSWORD_LENGTH}
             value={confirm}
             onChange={(e) => setConfirm(e.target.value)}
             placeholder="••••••••"

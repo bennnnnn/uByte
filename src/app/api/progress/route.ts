@@ -5,6 +5,8 @@ import { checkBadges, BADGE_MAP } from "@/lib/badges";
 import { verifyCsrf } from "@/lib/csrf";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 import { withErrorHandling, requireAuth } from "@/lib/api-utils";
+import { getAllTutorials } from "@/lib/tutorials";
+import { resolveLanguage } from "@/lib/languages/registry";
 
 export const GET = withErrorHandling("GET /api/progress", async (request: NextRequest) => {
   const user = await getCurrentUser();
@@ -33,28 +35,34 @@ export const POST = withErrorHandling("POST /api/progress", async (request: Next
 
   const body = await request.json();
   const { slug, completed, lang = "go" } = body;
-  if (!slug || typeof slug !== "string") {
+  if (!slug || typeof slug !== "string" || slug.length > 200) {
     return NextResponse.json({ error: "Slug is required" }, { status: 400 });
   }
-  const language = typeof lang === "string" ? lang : "go";
+  const language = resolveLanguage(lang);
+
+  // Validate that the slug corresponds to a real tutorial
+  const tutorials = getAllTutorials(language);
+  if (!tutorials.some((t) => t.slug === slug)) {
+    return NextResponse.json({ error: "Unknown tutorial" }, { status: 400 });
+  }
 
   if (completed) {
-    // Check before marking — markComplete uses ON CONFLICT DO NOTHING, so XP/badges
-    // must be guarded separately to prevent re-awarding on duplicate requests.
-    const existing = await getProgress(user.userId, language);
-    const isFirstCompletion = !existing.includes(slug);
+    // markComplete uses ON CONFLICT DO NOTHING, so only the first insert succeeds.
+    // We use the DB as the source of truth for first-completion to prevent race conditions.
+    const existingBefore = await getProgress(user.userId, language);
+    const alreadyComplete = existingBefore.includes(slug);
 
     await markComplete(user.userId, slug, language);
 
-    if (isFirstCompletion) {
-      await addXp(user.userId, 10);
-      await logActivity(user.userId, "complete", slug);
-
+    if (!alreadyComplete) {
       const today = new Date().toISOString().slice(0, 10);
-      const dbUserBefore = await getUserById(user.userId);
+      const [, , dbUserBefore, { streak_days }] = await Promise.all([
+        addXp(user.userId, 10),
+        logActivity(user.userId, "complete", slug),
+        getUserById(user.userId),
+        updateStreak(user.userId),
+      ]);
       const isSpeedster = dbUserBefore?.created_at?.startsWith(today) ?? false;
-
-      const { streak_days } = await updateStreak(user.userId);
 
       const newBadges = await checkBadges(user.userId, {
         streakDays: streak_days,
@@ -66,7 +74,6 @@ export const POST = withErrorHandling("POST /api/progress", async (request: Next
         if (badge) await addXp(user.userId, badge.xpReward);
       }
 
-      // Award streak freeze every 7 days (capped at 3 by DB)
       if (streak_days > 0 && streak_days % 7 === 0) {
         await addStreakFreeze(user.userId);
       }

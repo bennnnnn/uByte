@@ -181,7 +181,7 @@ export interface UserExamLangStats {
   hasCertificate: boolean;
 }
 
-/** Get exam attempt and certificate stats per language for the practice-exams page (e.g. "Try again", "Passed"). */
+/** Get exam attempt and certificate stats per language for the certifications page (e.g. "Try again", "Passed"). */
 export async function getUserExamStats(userId: number): Promise<UserExamLangStats[]> {
   const sql = getSql();
   const [attemptRows, certRows] = await Promise.all([

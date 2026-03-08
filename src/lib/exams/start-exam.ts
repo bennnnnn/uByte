@@ -7,7 +7,7 @@ export type StartExamResult =
   | { kind: "error"; message: string };
 
 export async function callStartExamApi(lang: string): Promise<StartExamResult> {
-  const res = await fetch(`/api/practice-exams/${lang}/start`, {
+  const res = await fetch(`/api/certifications/${lang}/start`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     credentials: "same-origin",

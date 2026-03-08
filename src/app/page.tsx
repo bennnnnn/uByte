@@ -158,7 +158,7 @@ export default async function Home() {
         {/* Interview practice */}
         <PracticeSection problemCount={problemCount} />
 
-        {/* Practice exams */}
+        {/* Certifications */}
         <PracticeExamsSection examConfigByLang={examConfigByLang} />
       </div>
     </div>

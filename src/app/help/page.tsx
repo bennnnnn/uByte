@@ -17,19 +17,19 @@ const FAQ_ITEMS = [
   },
   {
     question: "How do certificates work?",
-    answer: "Pass a timed practice exam for a language to unlock a shareable certificate for that language.",
+    answer: "Pass a timed certification exam for a language to unlock a shareable certificate for that language.",
   },
 ];
 
 export const metadata: Metadata = {
   title: "Help Center",
   description:
-    "Find answers about tutorials, interview prep, practice exams, certificates, billing, and account support on uByte.",
+    "Find answers about tutorials, interview prep, certifications, certificates, billing, and account support on uByte.",
   keywords: [
     ...SITE_KEYWORDS,
     "uByte help",
     "coding tutorials faq",
-    "practice exam support",
+    "certification support",
   ],
   alternates: { canonical: absoluteUrl("/help") },
   openGraph: {
@@ -66,7 +66,7 @@ export default function HelpPage() {
           {[
             { href: "/tutorial/go", label: "Tutorials", hint: "Browse language tracks" },
             { href: "/practice", label: "Interview Prep", hint: "Solve coding problems" },
-            { href: "/practice-exams", label: "Certification Exams", hint: "Take timed assessments" },
+            { href: "/certifications", label: "Certifications", hint: "Take timed assessments" },
           ].map((item) => (
             <Link
               key={item.href}

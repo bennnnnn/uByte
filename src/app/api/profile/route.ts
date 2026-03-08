@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { signToken, setAuthCookie, clearAuthCookie } from "@/lib/auth";
-import { User, getUserById, updateUserProfile, updateUserPassword, deleteUser } from "@/lib/db";
+import { User, getUserById, updateUserProfile, updateUserPassword, deleteUser, incrementTokenVersion } from "@/lib/db";
 import { verifyCsrf } from "@/lib/csrf";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 import { withErrorHandling, requireAuth } from "@/lib/api-utils";
-import { isValidPassword, PASSWORD_POLICY_MESSAGE } from "@/lib/password-policy";
+import { isValidPassword, PASSWORD_POLICY_MESSAGE, MIN_PASSWORD_LENGTH } from "@/lib/password-policy";
 
 const VALID_AVATARS = ["gopher", "cool", "ninja", "party", "robot", "wizard", "astro", "pirate"];
 const VALID_THEMES = ["light", "dark", "system"];
@@ -75,8 +75,8 @@ export const PUT = withErrorHandling("PUT /api/profile", async (request: NextReq
     const valid = await bcrypt.compare(body.currentPassword, user.password_hash);
     if (!valid) return NextResponse.json({ error: "Current password is incorrect" }, { status: 400 });
 
-    if (typeof body.newPassword !== "string" || body.newPassword.length < 8) {
-      return NextResponse.json({ error: "New password must be at least 8 characters" }, { status: 400 });
+    if (typeof body.newPassword !== "string" || body.newPassword.length < MIN_PASSWORD_LENGTH) {
+      return NextResponse.json({ error: PASSWORD_POLICY_MESSAGE }, { status: 400 });
     }
     if (!isValidPassword(body.newPassword)) {
       return NextResponse.json({ error: PASSWORD_POLICY_MESSAGE }, { status: 400 });
@@ -84,6 +84,16 @@ export const PUT = withErrorHandling("PUT /api/profile", async (request: NextReq
 
     const hash = await bcrypt.hash(body.newPassword, 10);
     await updateUserPassword(tokenUser.userId, hash);
+
+    // Invalidate all existing sessions, then re-sign for the current session
+    const newVersion = await incrementTokenVersion(tokenUser.userId);
+    const newToken = await signToken({
+      userId: tokenUser.userId,
+      email: tokenUser.email,
+      name: tokenUser.name,
+      tokenVersion: newVersion,
+    });
+    await setAuthCookie(newToken);
     return NextResponse.json({ success: true });
   }
 

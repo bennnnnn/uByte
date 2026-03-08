@@ -3,10 +3,9 @@
 import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { useAuth } from "./AuthProvider";
-import Input from "./ui/Input";
-import GoogleIcon from "./auth/GoogleIcon";
+import AuthFormFields from "./auth/AuthFormFields";
 import { submitEmailAuth } from "@/lib/auth-client";
-import { MIN_PASSWORD_LENGTH, PASSWORD_POLICY_MESSAGE, isValidPassword } from "@/lib/password-policy";
+import { PASSWORD_POLICY_MESSAGE, isValidPassword } from "@/lib/password-policy";
 
 export default function SignupWall({ slug }: { slug: string }) {
   const pathname = usePathname();
@@ -71,106 +70,22 @@ export default function SignupWall({ slug }: { slug: string }) {
           Create a free account to continue learning and track your progress.
         </p>
 
-        {/* Google sign-in (use <a> so the redirect always happens) */}
-        <a
-          href="/api/auth/google"
-          className="mb-4 flex w-full items-center justify-center gap-3 rounded-lg border border-zinc-300 bg-white px-4 py-2.5 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-200 dark:hover:bg-zinc-700"
-        >
-          <GoogleIcon />
-          Continue with Google
-        </a>
-
-        <div className="mb-4 flex items-center gap-3">
-          <div className="h-px flex-1 bg-zinc-200 dark:bg-zinc-700" />
-          <span className="text-xs text-zinc-400">or</span>
-          <div className="h-px flex-1 bg-zinc-200 dark:bg-zinc-700" />
-        </div>
-
-        {error && (
-          <div role="alert" className="mb-4 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-600 dark:bg-red-950 dark:text-red-400">
-            {error}
-          </div>
-        )}
-
-        <form onSubmit={handleSubmit} className="space-y-3">
-          {mode === "signup" && (
-            <div>
-              <label htmlFor="wall-name" className="sr-only">Your name</label>
-              <Input
-                id="wall-name"
-                type="text"
-                required
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="Your name"
-              />
-            </div>
-          )}
-          <div>
-            <label htmlFor="wall-email" className="sr-only">Email address</label>
-            <Input
-              id="wall-email"
-              type="email"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="Email address"
-            />
-          </div>
-          <div>
-            <label htmlFor="wall-password" className="sr-only">Password</label>
-            <Input
-              id="wall-password"
-              type="password"
-              required
-              minLength={8}
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Password (min. 8 characters)"
-            />
-          </div>
-          <button
-            type="submit"
-            disabled={submitting}
-            className="w-full rounded-lg bg-indigo-700 py-2.5 text-sm font-medium text-white transition-colors hover:bg-indigo-800 disabled:opacity-50"
-          >
-            {submitting
-              ? "Please wait..."
-              : mode === "signup"
-                ? "Sign up — it\u2019s free"
-                : "Log in"}
-          </button>
-        </form>
-
-        <p className="mt-4 text-center text-sm text-zinc-500">
-          {mode === "login" ? (
-            <>
-              Don&apos;t have an account?{" "}
-              <button
-                onClick={() => {
-                  setMode("signup");
-                  resetForm();
-                }}
-                className="font-medium text-indigo-700 hover:text-indigo-800"
-              >
-                Sign up
-              </button>
-            </>
-          ) : (
-            <>
-              Already have an account?{" "}
-              <button
-                onClick={() => {
-                  setMode("login");
-                  resetForm();
-                }}
-                className="font-medium text-indigo-700 hover:text-indigo-800"
-              >
-                Log in
-              </button>
-            </>
-          )}
-        </p>
+        <AuthFormFields
+          mode={mode}
+          name={name}
+          email={email}
+          password={password}
+          onNameChange={setName}
+          onEmailChange={setEmail}
+          onPasswordChange={setPassword}
+          error={error}
+          submitting={submitting}
+          onSubmit={handleSubmit}
+          onSwitchMode={(m) => { setMode(m); resetForm(); }}
+          visibleLabels={false}
+          buttonClassName="w-full rounded-lg bg-indigo-700 py-2.5 text-sm font-medium text-white transition-colors hover:bg-indigo-800 disabled:opacity-50"
+          submitLabel={submitting ? "Please wait..." : mode === "signup" ? "Sign up \u2014 it\u2019s free" : "Log in"}
+        />
       </div>
     </div>
   );

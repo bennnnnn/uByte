@@ -1,4 +1,4 @@
-/** API response types for practice exam flows. Use these instead of (data as any). */
+/** API response types for certification flows. Use these instead of (data as any). */
 
 export interface StartExamResponse {
   attemptId: string;

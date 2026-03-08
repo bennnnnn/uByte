@@ -9,7 +9,7 @@ import TutorialRating from "@/components/TutorialRating";
 import TutorialDiscussion from "@/components/TutorialDiscussion";
 import { getSteps, getAllStepsForLanguage } from "@/lib/tutorial-steps";
 import { FREE_TUTORIAL_LIMIT } from "@/lib/plans";
-import { getLanguageConfig, isSupportedLanguage } from "@/lib/languages/registry";
+import { getLanguageConfig, isSupportedLanguage, ALL_LANGUAGE_KEYS } from "@/lib/languages/registry";
 import { BASE_URL, APP_NAME } from "@/lib/constants";
 import { tutorialCanonicalUrl } from "@/lib/urls";
 import { buildBreadcrumbJsonLd } from "@/lib/seo";
@@ -17,8 +17,7 @@ import type { Metadata } from "next";
 
 export async function generateStaticParams() {
   const params: { lang: string; slug: string }[] = [];
-  const langs = ["go", "python", "cpp", "javascript", "java", "rust"] as const;
-  for (const lang of langs) {
+  for (const lang of ALL_LANGUAGE_KEYS) {
     if (!isSupportedLanguage(lang)) continue;
     const tutorials = getAllTutorials(lang);
     for (const t of tutorials) {

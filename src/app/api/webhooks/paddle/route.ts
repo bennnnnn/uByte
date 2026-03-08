@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
+import { timingSafeEqual } from "crypto";
 import { updateUserPlan, getUserByPaddleCustomerId, getUserById, createNotification, recordSubscriptionEvent } from "@/lib/db";
 import { withErrorHandling } from "@/lib/api-utils";
-import { BILLING_CONFIG } from "@/lib/plans";
+import { BILLING_CONFIG, YEARLY_PRICE_CENTS, MONTHLY_PRICE_CENTS } from "@/lib/plans";
 
 const WEBHOOK_SECRET = process.env.PADDLE_WEBHOOK_SECRET ?? "";
 
@@ -38,11 +39,14 @@ async function verifyPaddleSignature(
   const mac = await crypto.subtle.sign("HMAC", key, new TextEncoder().encode(signed));
   const expected = Buffer.from(mac).toString("hex");
 
-  return expected === h1;
+  if (expected.length !== h1.length) return false;
+  return timingSafeEqual(Buffer.from(expected, "utf-8"), Buffer.from(h1, "utf-8"));
 }
 
-function planFromStatus(status: string): string {
-  return ["active", "trialing"].includes(status) ? "pro" : "free";
+function planFromSubscription(status: string, priceId?: string): string {
+  if (!["active", "trialing"].includes(status)) return "free";
+  const yearlyPriceId = process.env.NEXT_PUBLIC_PADDLE_YEARLY_PRICE_ID;
+  return yearlyPriceId && priceId === yearlyPriceId ? "yearly" : "pro";
 }
 
 export const POST = withErrorHandling("POST /api/webhooks/paddle", async (request: NextRequest) => {
@@ -78,9 +82,22 @@ export const POST = withErrorHandling("POST /api/webhooks/paddle", async (reques
 
   switch (event.event_type) {
     case "subscription.activated": {
-      const userId = customData?.["userId"];
-      if (userId && paddleCustomerId) {
-        const uid = parseInt(userId, 10);
+      if (!paddleCustomerId) break;
+
+      // Prefer looking up the user by Paddle customer ID to avoid trusting client-provided userId
+      let uid: number | null = null;
+      const existingUser = await getUserByPaddleCustomerId(paddleCustomerId);
+      if (existingUser) {
+        uid = existingUser.id;
+      } else {
+        const clientUserId = customData?.["userId"];
+        if (clientUserId) {
+          const u = await getUserById(parseInt(clientUserId, 10));
+          if (u) uid = u.id;
+        }
+      }
+
+      if (uid) {
         await updateUserPlan(uid, activatedPlan, paddleCustomerId);
         const planLabel = activatedPlan === "yearly" ? BILLING_CONFIG.yearly.label : BILLING_CONFIG.monthly.label;
         await createNotification(
@@ -89,7 +106,7 @@ export const POST = withErrorHandling("POST /api/webhooks/paddle", async (reques
           `You're now on ${planLabel}!`,
           "All tutorials and features are now unlocked. Enjoy!"
         );
-        const amountCents = activatedPlan === "yearly" ? 4999 : 999;
+        const amountCents = activatedPlan === "yearly" ? YEARLY_PRICE_CENTS : MONTHLY_PRICE_CENTS;
         await recordSubscriptionEvent(uid, activatedPlan, amountCents, "activated");
       }
       break;
@@ -97,7 +114,7 @@ export const POST = withErrorHandling("POST /api/webhooks/paddle", async (reques
 
     case "subscription.updated": {
       if (paddleCustomerId && status) {
-        const plan = planFromStatus(status);
+        const plan = planFromSubscription(status, purchasedPriceId);
         const user = await getUserByPaddleCustomerId(paddleCustomerId);
         if (user) await updateUserPlan(user.id, plan);
       }

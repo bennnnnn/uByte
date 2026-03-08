@@ -78,7 +78,7 @@ export const TAB_LABELS: Record<Tab, string> = {
   analytics: "Analytics",
   revenue: "Revenue",
   audit: "Audit log",
-  exams: "Practice exams",
+  exams: "Certifications",
   banner: "Site banner",
 };
 

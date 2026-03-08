@@ -3,6 +3,8 @@
  * Set env XAI_API_KEY.
  */
 
+import { callGrokApi } from "./grok-client";
+
 export interface AiFeedbackSchema {
   friendly_one_liner: string;
   root_cause: string;
@@ -24,16 +26,12 @@ const SCHEMA_DESC = `Respond with ONLY a single JSON object (no markdown, no exp
 
 Do NOT output full working solution. Do NOT reveal hidden tests. Prefer hints and minimal patch.`;
 
-const GROK_URL = process.env.XAI_API_URL || "https://api.x.ai/v1/chat/completions";
-const GROK_MODEL = "grok-4";
-
 export async function callAiFeedback(
   evidenceBundle: string,
   hintLevel: number,
   verdict: string
 ): Promise<AiFeedbackSchema> {
-  const apiKey = process.env.XAI_API_KEY;
-  if (!apiKey) {
+  if (!process.env.XAI_API_KEY) {
     return {
       friendly_one_liner: "AI feedback is not configured. Set XAI_API_KEY.",
       root_cause: "no_ai_config",
@@ -43,11 +41,10 @@ export async function callAiFeedback(
       confidence: 0,
     };
   }
-  return callGrok(apiKey, evidenceBundle, hintLevel, verdict);
+  return callFeedbackGrok(evidenceBundle, hintLevel, verdict);
 }
 
-async function callGrok(
-  apiKey: string,
+async function callFeedbackGrok(
   evidenceBundle: string,
   hintLevel: number,
   verdict: string
@@ -61,32 +58,16 @@ async function callGrok(
   const system = `You are a friendly coding tutor. ${SCHEMA_DESC} ${levelPrompt} Respond with ONLY a single JSON object.`;
   const user = `Verdict: ${verdict}\n\n${evidenceBundle}\n\nReturn ONLY valid JSON.`;
 
-  const res = await fetch(GROK_URL, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: "Bearer " + apiKey,
-    },
-    body: JSON.stringify({
-      model: GROK_MODEL,
-      messages: [
-        { role: "system", content: system },
-        { role: "user", content: user },
-      ],
-      temperature: 0.3,
-      max_tokens: 1024,
-      stream: false,
-    }),
+  const text = await callGrokApi({
+    messages: [
+      { role: "system", content: system },
+      { role: "user", content: user },
+    ],
+    maxTokens: 1024,
+    temperature: 0.3,
   });
 
-  if (!res.ok) {
-    const errText = await res.text();
-    throw new Error("Grok API error: " + res.status + " " + errText.slice(0, 200));
-  }
-
-  const data = await res.json();
-  const text = data.choices?.[0]?.message?.content ?? "";
-  return await parseAiResponse(text, () => callGrok(apiKey, evidenceBundle + "\n\nReturn ONLY valid JSON.", hintLevel, verdict));
+  return await parseAiResponse(text, () => callFeedbackGrok(evidenceBundle + "\n\nReturn ONLY valid JSON.", hintLevel, verdict));
 }
 
 async function parseAiResponse(

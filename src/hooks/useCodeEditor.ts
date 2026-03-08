@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useMemo } from "react";
 import { getHighlighter } from "@/lib/languages/registry";
 import type { SupportedLanguage } from "@/lib/languages/types";
 
@@ -19,6 +19,7 @@ export interface CodeEditorState {
   setErrorLines: (lines: Set<number>) => void;
   formatting: boolean;
   highlightGo: (code: string) => string;
+  highlightedHtml: string;
   preRef: React.RefObject<HTMLPreElement | null>;
   lineNumRef: React.RefObject<HTMLDivElement | null>;
   highlightRef: React.RefObject<HTMLDivElement | null>;
@@ -33,6 +34,7 @@ export function useCodeEditor(
 ): CodeEditorState {
   const [code, setCode] = useState(initialCode);
   const highlightFn = getHighlighter(lang);
+  const highlightedHtml = useMemo(() => highlightFn(code), [highlightFn, code]);
   const [errorLines, setErrorLines] = useState<Set<number>>(new Set());
   const [formatting, setFormatting] = useState(false);
 
@@ -84,6 +86,7 @@ export function useCodeEditor(
     setErrorLines,
     formatting,
     highlightGo: highlightFn,
+    highlightedHtml,
     preRef,
     lineNumRef,
     highlightRef,

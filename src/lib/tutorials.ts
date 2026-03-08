@@ -4,6 +4,10 @@ import matter from "gray-matter";
 import { getLanguageConfig } from "./languages/registry";
 import type { SupportedLanguage } from "./languages/types";
 
+const _allCache = new Map<string, { data: TutorialMeta[]; ts: number }>();
+const _slugCache = new Map<string, { data: Tutorial | null; ts: number }>();
+const CACHE_TTL = 60_000;
+
 export interface SubTopic {
   id: string;
   title: string;
@@ -51,6 +55,10 @@ function getContentDir(lang: SupportedLanguage): string {
 }
 
 export function getAllTutorials(lang: SupportedLanguage = "go"): TutorialMeta[] {
+  const cacheKey = lang;
+  const hit = _allCache.get(cacheKey);
+  if (hit && Date.now() - hit.ts < CACHE_TTL) return hit.data;
+
   const contentDir = getContentDir(lang);
   if (!fs.existsSync(contentDir)) return [];
 
@@ -73,22 +81,31 @@ export function getAllTutorials(lang: SupportedLanguage = "go"): TutorialMeta[] 
     };
   });
 
-  return tutorials.sort((a, b) => a.order - b.order);
+  const sorted = tutorials.sort((a, b) => a.order - b.order);
+  _allCache.set(cacheKey, { data: sorted, ts: Date.now() });
+  return sorted;
 }
 
 export function getTutorialBySlug(
   slug: string,
   lang: SupportedLanguage = "go"
 ): Tutorial | null {
+  const cacheKey = `${lang}:${slug}`;
+  const hit = _slugCache.get(cacheKey);
+  if (hit && Date.now() - hit.ts < CACHE_TTL) return hit.data;
+
   const contentDir = getContentDir(lang);
   const filePath = path.join(contentDir, `${slug}.mdx`);
 
-  if (!fs.existsSync(filePath)) return null;
+  if (!fs.existsSync(filePath)) {
+    _slugCache.set(cacheKey, { data: null, ts: Date.now() });
+    return null;
+  }
 
   const fileContent = fs.readFileSync(filePath, "utf-8");
   const { data, content } = matter(fileContent);
 
-  return {
+  const tutorial: Tutorial = {
     slug,
     title: data.title ?? slug,
     description: data.description ?? "",
@@ -98,6 +115,8 @@ export function getTutorialBySlug(
     subtopics: extractSubtopics(content),
     content,
   };
+  _slugCache.set(cacheKey, { data: tutorial, ts: Date.now() });
+  return tutorial;
 }
 
 export function getAdjacentTutorials(

@@ -18,11 +18,13 @@ export async function checkRateLimit(
   }
 }
 
-/** Get client IP from request headers */
+const IP_REGEX = /^[\d.a-fA-F:]{3,45}$/;
+
+/** Get client IP from request headers (sanitized) */
 export function getClientIp(headers: Headers): string {
-  return (
+  const raw =
     headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
     headers.get("x-real-ip") ||
-    "unknown"
-  );
+    "unknown";
+  return IP_REGEX.test(raw) ? raw : "unknown";
 }

@@ -1,7 +1,6 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { getNotifications, getUnreadNotificationCount, markNotificationsRead } from "@/lib/db";
-import { withErrorHandling, requireAuth } from "@/lib/api-utils";
-import { verifyCsrf } from "@/lib/csrf";
+import { withErrorHandling, requireAuth, protectedRoute } from "@/lib/api-utils";
 
 export const GET = withErrorHandling("GET /api/notifications", async () => {
   const { user: tokenUser, response } = await requireAuth();
@@ -15,13 +14,9 @@ export const GET = withErrorHandling("GET /api/notifications", async () => {
   return NextResponse.json({ notifications, unreadCount });
 });
 
-export const PATCH = withErrorHandling("PATCH /api/notifications", async (request: NextRequest) => {
-  const { user: tokenUser, response } = await requireAuth();
-  if (!tokenUser) return response;
-
-  const csrfError = verifyCsrf(request);
-  if (csrfError) return NextResponse.json({ error: csrfError }, { status: 403 });
-
-  await markNotificationsRead(tokenUser.userId);
-  return NextResponse.json({ ok: true });
-});
+export const PATCH = withErrorHandling("PATCH /api/notifications",
+  protectedRoute({}, async (_request, user) => {
+    await markNotificationsRead(user.userId);
+    return NextResponse.json({ ok: true });
+  })
+);

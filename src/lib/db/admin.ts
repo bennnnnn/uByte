@@ -332,7 +332,7 @@ export async function getAdminRecentSubscriptionEvents(
   return rows as AdminSubscriptionEventRow[];
 }
 
-// ─── Practice exam stats (admin) ──────────────────────
+// ─── Certification exam stats (admin) ─────────────────
 
 export interface ExamStatsByLang {
   lang: string;

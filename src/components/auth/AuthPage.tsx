@@ -22,7 +22,7 @@ type Mode = "login" | "signup" | "forgot";
 const VALUE_POINTS = [
   "Interactive tutorials across Go, Python, JavaScript, Java, Rust, and C++",
   "Interview-style practice problems with real coding workflows",
-  "Timed practice exams with pass thresholds and shareable certificates",
+  "Timed certification exams with pass thresholds and shareable certificates",
 ];
 
 export default function AuthPage({ variant }: { variant: AuthPageMode }) {
@@ -109,8 +109,8 @@ export default function AuthPage({ variant }: { variant: AuthPageMode }) {
             <div className="max-w-xl">
               <h1 className="mt-4 text-3xl font-black tracking-tight text-zinc-950 sm:text-4xl dark:text-white">
                 {isSignupPage
-                  ? "Build skill with guided tutorials, interview prep, and real practice exams."
-                  : "Pick up your tutorials, interview prep, and practice exams where you left off."}
+                  ? "Build skill with guided tutorials, interview prep, and certifications."
+                  : "Pick up your tutorials, interview prep, and certifications where you left off."}
               </h1>
               <p className="mt-4 max-w-lg text-base leading-7 text-zinc-600 dark:text-zinc-400">
                 Learn by doing with short lessons, real coding practice, and exam-style runs that show measurable progress.

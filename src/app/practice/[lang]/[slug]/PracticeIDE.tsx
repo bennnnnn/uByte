@@ -17,7 +17,9 @@ import type { PracticeAttemptStatus } from "@/lib/db/practice-attempts";
 import { useAuth } from "@/components/AuthProvider";
 import { apiFetch } from "@/lib/api-client";
 
-const LANG_ORDER: SupportedLanguage[] = ["go", "python", "cpp", "javascript", "java", "rust"];
+import { ALL_LANGUAGE_KEYS } from "@/lib/languages/registry";
+
+const LANG_ORDER = ALL_LANGUAGE_KEYS;
 
 interface Props {
   problem: PracticeProblem;

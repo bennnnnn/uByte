@@ -1,9 +1,9 @@
-// Central configuration for practice exams (MCQ).
-// Keeps exam languages and sizing consistent across APIs, DB helpers, and UI.
+import { ALL_LANGUAGE_KEYS } from "@/lib/languages/registry";
+import type { SupportedLanguage } from "@/lib/languages/types";
 
-export const EXAM_LANGS = ["go", "python", "javascript", "java", "rust", "cpp"] as const;
+export const EXAM_LANGS = ALL_LANGUAGE_KEYS;
 
-export type ExamLang = (typeof EXAM_LANGS)[number];
+export type ExamLang = SupportedLanguage;
 
 // Number of questions per attempt.
 export const EXAM_SIZE = 40;
@@ -16,6 +16,6 @@ export const EXAM_DURATION_MINUTES = 45;
 export const EXAM_PASS_PERCENT = 70;
 
 export function isExamLang(lang: string): lang is ExamLang {
-  return (EXAM_LANGS as readonly string[]).includes(lang);
+  return (EXAM_LANGS as string[]).includes(lang);
 }
 

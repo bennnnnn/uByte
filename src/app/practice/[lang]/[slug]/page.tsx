@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { getPracticeProblemBySlug, getAllPracticeProblems, getPracticeCategories } from "@/lib/practice/problems";
-import { isSupportedLanguage, LANGUAGES } from "@/lib/languages/registry";
+import { isSupportedLanguage, LANGUAGES, ALL_LANGUAGE_KEYS } from "@/lib/languages/registry";
 import type { SupportedLanguage } from "@/lib/languages/types";
 import type { ProblemCategory } from "@/lib/practice/types";
 import { PracticeIDE } from "./PracticeIDE";
@@ -49,8 +49,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export async function generateStaticParams() {
   const problems = getAllPracticeProblems();
-  const langs: SupportedLanguage[] = ["go", "python", "cpp", "javascript", "java", "rust"];
-  return langs.flatMap((lang) =>
+  return ALL_LANGUAGE_KEYS.flatMap((lang) =>
     problems.map((p) => ({ lang, slug: p.slug }))
   );
 }

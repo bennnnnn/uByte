@@ -153,8 +153,7 @@ export async function incrementLoginFailure(
   userId: number
 ): Promise<{ attempts: number; locked: boolean }> {
   const sql = getSql();
-  await sql`UPDATE users SET failed_login_attempts = failed_login_attempts + 1 WHERE id = ${userId}`;
-  const [row] = await sql`SELECT failed_login_attempts FROM users WHERE id = ${userId}`;
+  const [row] = await sql`UPDATE users SET failed_login_attempts = failed_login_attempts + 1 WHERE id = ${userId} RETURNING failed_login_attempts`;
   const attempts = (row?.failed_login_attempts as number) ?? 0;
 
   if (attempts >= 5) {
@@ -179,8 +178,7 @@ export async function isUserLocked(userId: number): Promise<boolean> {
 
 export async function incrementTokenVersion(userId: number): Promise<number> {
   const sql = getSql();
-  await sql`UPDATE users SET token_version = token_version + 1 WHERE id = ${userId}`;
-  const [row] = await sql`SELECT token_version FROM users WHERE id = ${userId}`;
+  const [row] = await sql`UPDATE users SET token_version = token_version + 1 WHERE id = ${userId} RETURNING token_version`;
   return (row?.token_version as number) ?? 0;
 }
 

@@ -37,7 +37,7 @@ const PRO_FEATURES = [
 const FAQ_ITEMS = [
   {
     q: "What's included in Pro?",
-    a: "Unlimited tutorials in all 6 languages, AI code feedback on every step, practice exams with certificates, community chat, and priority support.",
+    a: "Unlimited tutorials in all 6 languages, AI code feedback on every step, certifications with certificates, community chat, and priority support.",
   },
   {
     q: "Can I cancel anytime?",

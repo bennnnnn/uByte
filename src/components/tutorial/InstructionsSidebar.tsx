@@ -7,7 +7,7 @@ import { useAuth } from "@/components/AuthProvider";
 import { apiFetch } from "@/lib/api-client";
 import { tutorialUrl } from "@/lib/urls";
 import type { TutorialStep } from "@/lib/tutorial-steps";
-import type { Status } from "@/hooks/useStepProgress";
+import type { StepProgressState } from "@/hooks/useStepProgress";
 
 function InstructionText({ text }: { text: string }) {
   const parts = text.split(/(`[^`]+`)/g);
@@ -29,38 +29,21 @@ function InstructionText({ text }: { text: string }) {
 interface Props {
   lang: string;
   step: TutorialStep;
-  stepIndex: number;
   steps: TutorialStep[];
-  status: Status;
-  showHint: boolean;
-  onToggleHint: () => void;
-  failCount: number;
-  completedSteps: Set<number>;
-  skippedSteps: Set<number>;
-  onGoToStep: (idx: number) => void;
-  onSkip: () => void;
+  progress: StepProgressState;
   tutorialSlug: string;
-  tutorialDone: boolean;
   nextTutorial: { slug: string; steps: { index: number; title: string }[] } | null;
 }
 
 export default function InstructionsSidebar({
   lang,
   step,
-  stepIndex,
   steps,
-  status,
-  showHint,
-  onToggleHint,
-  failCount,
-  completedSteps,
-  skippedSteps,
-  onGoToStep,
-  onSkip,
+  progress,
   tutorialSlug,
-  tutorialDone,
   nextTutorial,
 }: Props) {
+  const { stepIndex, status, showHint, failCount, completedSteps, skippedSteps, tutorialDone } = progress;
   const { user } = useAuth();
   const dotsRef = useRef<HTMLDivElement>(null);
   const [showNote, setShowNote] = useState(false);
@@ -86,6 +69,7 @@ export default function InstructionsSidebar({
   }, [stepIndex, tutorialDone]);
 
   useEffect(() => () => {
+    if (debounceRef.current) clearTimeout(debounceRef.current);
     if (savedTimeoutRef.current) clearTimeout(savedTimeoutRef.current);
   }, []);
 
@@ -130,7 +114,7 @@ export default function InstructionsSidebar({
         {step.hint && (
           <div className="mt-6">
             <button
-              onClick={onToggleHint}
+              onClick={() => progress.setShowHint(!showHint)}
               className="flex items-center gap-1.5 text-sm text-indigo-600 transition-colors hover:text-indigo-500 dark:text-indigo-500 dark:hover:text-indigo-400"
             >
               <span>{showHint ? "▾" : "▸"}</span>
@@ -204,7 +188,7 @@ export default function InstructionsSidebar({
               No worries — check the hint above, or skip this step and come back later.
             </p>
             <button
-              onClick={onSkip}
+              onClick={progress.skipStep}
               className="mt-3 rounded-md border border-amber-300 bg-white px-3 py-1.5 text-xs font-medium text-amber-700 transition-colors hover:bg-amber-100 dark:border-amber-800 dark:bg-zinc-900 dark:text-amber-400 dark:hover:bg-amber-950/50"
             >
               Skip this step →
@@ -245,7 +229,7 @@ export default function InstructionsSidebar({
                     aria-selected={isCurrent}
                     aria-label={`Step ${i + 1}: ${s.title}${isCompleted ? " (done)" : isSkipped ? " (skipped)" : ""}`}
                     title={s.title}
-                    onClick={() => onGoToStep(i)}
+                    onClick={() => progress.goToStep(i)}
                     className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full transition-colors ${
                       isCurrent
                         ? "bg-indigo-500 ring-2 ring-indigo-300 dark:ring-indigo-800"

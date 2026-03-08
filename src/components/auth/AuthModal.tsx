@@ -5,10 +5,10 @@ import { createPortal } from "react-dom";
 import Link from "next/link";
 import { useAuth } from "@/components/AuthProvider";
 import Input from "@/components/ui/Input";
-import GoogleIcon from "@/components/auth/GoogleIcon";
+import AuthFormFields from "@/components/auth/AuthFormFields";
 import { apiFetch } from "@/lib/api-client";
 import { submitEmailAuth } from "@/lib/auth-client";
-import { MIN_PASSWORD_LENGTH, PASSWORD_POLICY_MESSAGE, isValidPassword } from "@/lib/password-policy";
+import { PASSWORD_POLICY_MESSAGE, isValidPassword } from "@/lib/password-policy";
 
 const GSI_CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ?? "";
 const GSI_SCRIPT = "https://accounts.google.com/gsi/client";
@@ -185,7 +185,7 @@ export default function AuthModal({ onClose, initialMode }: Props) {
                 {mode === "forgot"
                   ? "We’ll email you a link to reset your password."
                   : mode === "signup"
-                    ? "Free tutorials, interview prep, and practice exams."
+                    ? "Free tutorials, interview prep, and certifications."
                     : "Sign in to continue to uByte."}
               </p>
             </div>
@@ -258,128 +258,28 @@ export default function AuthModal({ onClose, initialMode }: Props) {
             )
           ) : (
             <>
-              {/* Use <a> so redirect always happens, even if client routing ignores API redirects. */}
-              <a
-                href="/api/auth/google"
-                className={`flex w-full items-center justify-center gap-3 rounded-xl border border-zinc-200 bg-white px-4 py-3 text-sm font-medium text-zinc-700 shadow-sm transition-colors hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-200 dark:hover:bg-zinc-700/80 ${
-                  submitting ? "pointer-events-none opacity-50" : ""
-                }`}
-              >
-                <GoogleIcon className="h-5 w-5 shrink-0" />
-                Continue with Google
-              </a>
-
-              <div className="flex items-center gap-3 py-2">
-                <div className="h-px flex-1 bg-zinc-200 dark:bg-zinc-700" />
-                <span className="text-xs font-medium text-zinc-400">or</span>
-                <div className="h-px flex-1 bg-zinc-200 dark:bg-zinc-700" />
-              </div>
-
-              {error && (
-                <div role="alert" className="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700 dark:bg-red-950/50 dark:text-red-300">
-                  {error}
-                </div>
-              )}
-
-              <form onSubmit={handleSubmit} className="space-y-4">
-                {mode === "signup" && (
-                  <div>
-                    <label htmlFor="auth-name" className="mb-1.5 block text-sm font-medium text-zinc-700 dark:text-zinc-300">
-                      Name
-                    </label>
-                    <Input
-                      ref={mode === "signup" ? firstInputRef : undefined}
-                      id="auth-name"
-                      type="text"
-                      required
-                      value={name}
-                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => setName(e.target.value)}
-                      placeholder="Your name"
-                      className="rounded-xl bg-zinc-50/80 dark:bg-zinc-800/80"
-                    />
-                  </div>
-                )}
-                <div>
-                  <label htmlFor="auth-email" className="mb-1.5 block text-sm font-medium text-zinc-700 dark:text-zinc-300">
-                    Email
-                  </label>
-                  <Input
-                    ref={mode === "login" ? firstInputRef : undefined}
-                    id="auth-email"
-                    type="email"
-                    required
-                    value={email}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
-                    placeholder="you@example.com"
-                    className="rounded-xl bg-zinc-50/80 dark:bg-zinc-800/80"
-                  />
-                </div>
-                <div>
-                  <div className="mb-1.5 flex items-center justify-between">
-                    <label htmlFor="auth-password" className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
-                      Password
-                    </label>
-                    {mode === "login" && (
-                      <button
-                        type="button"
-                        onClick={() => switchMode("forgot")}
-                        className="text-xs font-medium text-indigo-600 hover:text-indigo-700 dark:text-indigo-400"
-                      >
-                        Forgot?
-                      </button>
-                    )}
-                  </div>
-                  <Input
-                    id="auth-password"
-                    type="password"
-                    required
-                    minLength={MIN_PASSWORD_LENGTH}
-                    value={password}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
-                    placeholder="Min. 8 characters (Aa1)"
-                    className="rounded-xl bg-zinc-50/80 dark:bg-zinc-800/80"
-                  />
-                </div>
-                <button
-                  type="submit"
-                  disabled={submitting}
-                  className="w-full rounded-xl bg-indigo-600 py-3 text-sm font-semibold text-white transition-colors hover:bg-indigo-700 disabled:opacity-50 dark:bg-indigo-500 dark:hover:bg-indigo-600"
-                >
-                  {submitting ? "Please wait…" : mode === "login" ? "Sign in" : "Create account"}
-                </button>
-              </form>
+              <AuthFormFields
+                mode={mode}
+                name={name}
+                email={email}
+                password={password}
+                onNameChange={setName}
+                onEmailChange={setEmail}
+                onPasswordChange={setPassword}
+                error={error}
+                submitting={submitting}
+                onSubmit={handleSubmit}
+                onSwitchMode={(m) => switchMode(m)}
+                onForgot={() => switchMode("forgot")}
+                inputClassName="rounded-xl bg-zinc-50/80 dark:bg-zinc-800/80"
+                firstInputRef={firstInputRef}
+              />
 
               <p className="mt-4 text-center text-xs text-zinc-400 dark:text-zinc-500">
                 By continuing, you agree to our{" "}
                 <Link href="/terms" className="underline hover:text-zinc-600 dark:hover:text-zinc-300">Terms</Link>
                 {" "}and{" "}
                 <Link href="/privacy" className="underline hover:text-zinc-600 dark:hover:text-zinc-300">Privacy Policy</Link>.
-              </p>
-
-              <p className="mt-3 text-center text-sm text-zinc-500 dark:text-zinc-400">
-                {mode === "login" ? (
-                  <>
-                    No account?{" "}
-                    <button
-                      type="button"
-                      onClick={() => switchMode("signup")}
-                      className="font-semibold text-indigo-600 hover:text-indigo-700 dark:text-indigo-400"
-                    >
-                      Sign up
-                    </button>
-                  </>
-                ) : (
-                  <>
-                    Already have an account?{" "}
-                    <button
-                      type="button"
-                      onClick={() => switchMode("login")}
-                      className="font-semibold text-indigo-600 hover:text-indigo-700 dark:text-indigo-400"
-                    >
-                      Sign in
-                    </button>
-                  </>
-                )}
               </p>
             </>
           )}

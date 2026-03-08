@@ -5,7 +5,7 @@ import { absoluteUrl, SITE_KEYWORDS } from "@/lib/seo";
 export const metadata: Metadata = {
   title: "About uByte",
   description:
-    "Learn how uByte helps developers with interactive programming tutorials, interview prep, and certification-style practice exams.",
+    "Learn how uByte helps developers with interactive programming tutorials, interview prep, and certifications.",
   keywords: [
     ...SITE_KEYWORDS,
     "about uByte",
@@ -58,7 +58,7 @@ export default function AboutPage() {
           {[
             { title: "Interactive tutorials", body: "Step-by-step lessons with instant feedback in six programming languages." },
             { title: "Interview prep", body: "Coding challenges modeled after real technical interview patterns." },
-            { title: "Certification exams", body: "Timed practice exams with per-language scoring and shareable certificates." },
+            { title: "Certifications", body: "Timed certification exams with per-language scoring and shareable certificates." },
           ].map((card) => (
             <article key={card.title} className="rounded-2xl border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900">
               <h2 className="text-base font-bold text-zinc-900 dark:text-zinc-100">{card.title}</h2>

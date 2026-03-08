@@ -10,7 +10,7 @@ import { LANGUAGES, getAllLanguageSlugs } from "@/lib/languages/registry";
  * Mobile top bar + menu for pages that don't use the [lang] layout (home, practice, search, pricing, etc.).
  * Renders only on mobile (md:hidden) and only when the current route is a "standalone" page.
  */
-const STANDALONE_PREFIXES = ["/", "/practice", "/practice-exams", "/search", "/pricing", "/privacy", "/terms", "/leaderboard", "/profile", "/reset-password", "/verify-email", "/certificate", "/admin", "/u"];
+const STANDALONE_PREFIXES = ["/", "/practice", "/certifications", "/search", "/pricing", "/privacy", "/terms", "/leaderboard", "/profile", "/reset-password", "/verify-email", "/certificate", "/admin", "/u"];
 
 function isStandalonePath(pathname: string): boolean {
   if (pathname === "/") return true;
@@ -116,12 +116,12 @@ export default function MobileStandaloneHeader() {
             })}
           </ul>
 
-          {/* Practice (MCQ exams) */}
+          {/* Certifications (MCQ exams) */}
           <p className="mb-2 mt-4 px-3 text-[10px] font-bold uppercase tracking-widest text-zinc-500 dark:text-zinc-400">
-            Practice
+            Certifications
           </p>
-          <Link href="/practice-exams" onClick={() => setOpen(false)} className="block rounded-lg px-3 py-2 text-sm font-medium text-zinc-800 hover:bg-zinc-200 dark:text-zinc-200 dark:hover:bg-zinc-800">
-            Practice exams
+          <Link href="/certifications" onClick={() => setOpen(false)} className="block rounded-lg px-3 py-2 text-sm font-medium text-zinc-800 hover:bg-zinc-200 dark:text-zinc-200 dark:hover:bg-zinc-800">
+            Certifications
           </Link>
           <ul className="mt-0.5 space-y-0.5">
             {languageSlugs.map((slug) => {
@@ -130,7 +130,7 @@ export default function MobileStandaloneHeader() {
               return (
                 <li key={slug}>
                   <Link
-                    href={`/practice-exams/${slug}`}
+                    href={`/certifications/${slug}`}
                     onClick={() => setOpen(false)}
                     className="block rounded-lg px-3 py-2 text-sm font-medium text-zinc-800 hover:bg-zinc-200 dark:text-zinc-200 dark:hover:bg-zinc-800"
                   >

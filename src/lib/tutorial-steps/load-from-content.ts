@@ -4,6 +4,9 @@ import { getLanguageConfig } from "@/lib/languages/registry";
 import type { SupportedLanguage } from "@/lib/languages/types";
 import type { TutorialStep } from "./types";
 
+const _stepsCache = new Map<string, { data: TutorialStep[] | null; ts: number }>();
+const CACHE_TTL = 60_000;
+
 /**
  * Load tutorial steps from content/<lang>/<slug>.steps.json when present.
  * Enables data-driven, translatable steps (no hardcoded strings in code).
@@ -13,12 +16,19 @@ export function loadStepsFromContent(
   lang: SupportedLanguage,
   slug: string
 ): TutorialStep[] | null {
+  const cacheKey = `${lang}:${slug}`;
+  const hit = _stepsCache.get(cacheKey);
+  if (hit && Date.now() - hit.ts < CACHE_TTL) return hit.data;
+
   const config = getLanguageConfig(lang);
   if (!config?.contentDir) return null;
 
   const contentDir = path.join(process.cwd(), config.contentDir);
   const stepsPath = path.join(contentDir, `${slug}.steps.json`);
-  if (!fs.existsSync(stepsPath)) return null;
+  if (!fs.existsSync(stepsPath)) {
+    _stepsCache.set(cacheKey, { data: null, ts: Date.now() });
+    return null;
+  }
 
   try {
     const raw = fs.readFileSync(stepsPath, "utf-8");
@@ -35,7 +45,9 @@ export function loadStepsFromContent(
         : [],
     }));
 
-    return steps.length > 0 ? steps : null;
+    const result = steps.length > 0 ? steps : null;
+    _stepsCache.set(cacheKey, { data: result, ts: Date.now() });
+    return result;
   } catch {
     return null;
   }

@@ -115,14 +115,14 @@ export default function HeaderNavLinks({ side = "right" }: { side?: "left" | "ri
           <div className="invisible absolute left-0 top-full z-50 mt-1.5 w-56 origin-top-left rounded-2xl border border-zinc-200 bg-white opacity-0 shadow-xl shadow-zinc-200/60 transition-all duration-150 group-hover:visible group-hover:opacity-100 dark:border-zinc-700 dark:bg-zinc-900 dark:shadow-black/40">
             <div className="p-2">
               <Link
-                href="/practice-exams"
+                href="/certifications"
                 className="flex items-center gap-3 rounded-xl px-3 py-2.5 transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-800"
               >
                 <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-amber-100 text-base dark:bg-amber-950/60">
                   📝
                 </span>
                 <span>
-                  <span className="block text-sm font-semibold text-zinc-800 dark:text-zinc-100">Practice exams</span>
+                  <span className="block text-sm font-semibold text-zinc-800 dark:text-zinc-100">Certifications</span>
                   <span className="block text-xs text-zinc-400 dark:text-zinc-500">MCQ by language</span>
                 </span>
               </Link>
@@ -132,7 +132,7 @@ export default function HeaderNavLinks({ side = "right" }: { side?: "left" | "ri
               {PRACTICE_LANGS.map((l) => (
                 <Link
                   key={l.slug}
-                  href={`/practice-exams/${l.slug}`}
+                  href={`/certifications/${l.slug}`}
                   className="flex items-center gap-3 rounded-xl px-3 py-2 transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-800"
                 >
                   <span className="w-6 text-center text-base">{l.icon}</span>

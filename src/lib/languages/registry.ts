@@ -167,6 +167,14 @@ export function isSupportedLanguage(lang: string): lang is SupportedLanguage {
   return lang in LANGUAGES;
 }
 
+/** Safely resolve an unknown lang value to a SupportedLanguage, defaulting to "go". */
+export function resolveLanguage(lang: unknown): SupportedLanguage {
+  return typeof lang === "string" && isSupportedLanguage(lang) ? lang : "go";
+}
+
+/** Ordered list of all supported language keys. Use this instead of hardcoding arrays. */
+export const ALL_LANGUAGE_KEYS: SupportedLanguage[] = Object.keys(LANGUAGES) as SupportedLanguage[];
+
 export function getAllLanguageSlugs(): string[] {
   return Object.values(LANGUAGES).map((l) => l.slug);
 }

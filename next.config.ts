@@ -63,6 +63,9 @@ const nextConfig: NextConfig = {
       { source: "/tutorials/:slug", destination: "/tutorial/go/:slug", permanent: true },
       { source: "/golang/:path*", destination: "/tutorial/go/:path*", permanent: true },
       ...langRedirects,
+      // Rebrand: /practice-exams → /certifications
+      { source: "/practice-exams", destination: "/certifications", permanent: true },
+      { source: "/practice-exams/:path*", destination: "/certifications/:path*", permanent: true },
     ];
   },
   async headers() {

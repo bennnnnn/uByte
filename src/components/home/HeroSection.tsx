@@ -3,7 +3,10 @@
 import { useState } from "react";
 import Link from "next/link";
 
-type Lang = "go" | "python" | "javascript" | "java" | "rust" | "cpp";
+import type { SupportedLanguage } from "@/lib/languages/types";
+import { ALL_LANGUAGE_KEYS } from "@/lib/languages/registry";
+
+type Lang = SupportedLanguage;
 
 const LANG_META: Record<Lang, { label: string; ext: string }> = {
   go:         { label: "Go",     ext: "go"   },
@@ -89,7 +92,7 @@ const STEP_TEXT: Record<Lang, string> = {
   cpp:        'Use std::cout to write "Hello, World!" to stdout.',
 };
 
-const LANG_ORDER: Lang[] = ["go", "python", "javascript", "java", "rust", "cpp"];
+const LANG_ORDER = ALL_LANGUAGE_KEYS;
 
 const FEATURES = [
   "Write real code in your browser — zero setup",
@@ -183,10 +186,10 @@ export default function HeroSection({ topicCount = 19, lessonCountGo = 0, proble
                 Interview practice
               </Link>
               <Link
-                href="/practice-exams"
+                href="/certifications"
                 className="inline-flex items-center gap-2 rounded-xl border border-zinc-200 bg-zinc-50 px-7 py-3 text-sm font-semibold text-zinc-700 transition-all hover:border-zinc-300 hover:bg-zinc-100 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:border-zinc-600 dark:hover:bg-zinc-700"
               >
-                Practice exams
+                Certifications
               </Link>
             </div>
 

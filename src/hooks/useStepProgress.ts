@@ -12,6 +12,8 @@ import { tutorialUrl } from "@/lib/urls";
 
 export type Status = "idle" | "running" | "passed" | "failed";
 
+export type StepProgressState = ReturnType<typeof useStepProgress>;
+
 function checkOutput(output: string, expected: string[]): boolean {
   if (!output.trim()) return false;
   if (expected.length === 0) return true;

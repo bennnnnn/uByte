@@ -6,7 +6,7 @@ import {
   getPracticeCategories,
   sortProblemsByCategoryAndDifficulty,
 } from "@/lib/practice/problems";
-import { isSupportedLanguage, LANGUAGES } from "@/lib/languages/registry";
+import { isSupportedLanguage, LANGUAGES, ALL_LANGUAGE_KEYS } from "@/lib/languages/registry";
 import type { SupportedLanguage } from "@/lib/languages/types";
 import type { Difficulty, ProblemCategory } from "@/lib/practice/types";
 import { getCurrentUser } from "@/lib/auth";
@@ -52,8 +52,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export async function generateStaticParams() {
-  const langs: SupportedLanguage[] = ["go", "python", "cpp", "javascript", "java", "rust"];
-  return langs.map((lang) => ({ lang }));
+  return ALL_LANGUAGE_KEYS.map((lang) => ({ lang }));
 }
 
 export default async function PracticeLangPage({ params, searchParams }: Props) {

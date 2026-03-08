@@ -56,8 +56,7 @@ export const POST = withErrorHandling("POST /api/auth/login", async (request: Ne
   });
   await setAuthCookie(token);
 
-  await logActivity(user.id, "login");
-  await updateStreak(user.id);
+  await Promise.all([logActivity(user.id, "login"), updateStreak(user.id)]);
 
   const res = NextResponse.json({ user: { id: user.id, name: user.name, email: user.email } });
   setCsrfCookie(res);

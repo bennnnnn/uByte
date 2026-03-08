@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useState, useEffect, useCallback } from "react";
+import { createContext, useContext, useState, useEffect, useCallback, useMemo } from "react";
 import { apiFetch } from "@/lib/api-client";
 import { applyTheme } from "@/lib/theme";
 
@@ -153,8 +153,31 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
     fetchUser();
   }, [fetchUser]);
 
+  // ── Shared post-auth hydration (used by login, loginWithGoogle, signup) ──
+  const hydrateAfterAuth = useCallback(async (userData: User) => {
+    setUser(userData);
+    setLimited(false);
+    setViewCount(0);
+    try {
+      const [progRes, profRes] = await Promise.all([
+        fetch("/api/progress?lang=go", { credentials: "same-origin" }),
+        fetch("/api/profile", { credentials: "same-origin" }),
+      ]);
+      const progData = progRes.ok ? await progRes.json() : { progress: [] };
+      setProgress(progData.progress || []);
+      if (profRes.ok) {
+        const profData = await profRes.json();
+        const prof = extractProfile(profData);
+        if (prof) {
+          setProfile(prof);
+          applyTheme(prof.theme);
+        }
+      }
+    } catch { /* ignore */ }
+  }, []);
+
   // ── Auth actions ──
-  const signup = async (name: string, email: string, password: string): Promise<string | null> => {
+  const signup = useCallback(async (name: string, email: string, password: string): Promise<string | null> => {
     const res = await apiFetch("/api/auth/signup", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -162,14 +185,16 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
     });
     const data = await res.json().catch(() => ({}));
     if (!res.ok) return data.error || "Signup failed";
-    if (data.user) setUser(data.user);
-    setProfile({ avatar: "gopher", bio: "", theme: "system", xp: 0, streak_days: 0, plan: "free", emailVerified: false, isAdmin: false });
-    setLimited(false);
-    setViewCount(0);
+    if (data.user) {
+      setUser(data.user);
+      setProfile({ avatar: "gopher", bio: "", theme: "system", xp: 0, streak_days: 0, plan: "free", emailVerified: false, isAdmin: false });
+      setLimited(false);
+      setViewCount(0);
+    }
     return null;
-  };
+  }, []);
 
-  const login = async (email: string, password: string): Promise<string | null> => {
+  const login = useCallback(async (email: string, password: string): Promise<string | null> => {
     const res = await apiFetch("/api/auth/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -180,29 +205,11 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
       return data.error || "Login failed";
     }
     const data = await res.json().catch(() => ({}));
-    if (data.user) setUser(data.user);
-    setLimited(false);
-    setViewCount(0);
-    try {
-      const [progRes, profRes] = await Promise.all([
-        fetch("/api/progress?lang=go", { credentials: "same-origin" }),
-        fetch("/api/profile", { credentials: "same-origin" }),
-      ]);
-      const progData = progRes.ok ? await progRes.json() : { progress: [] };
-      setProgress(progData.progress || []);
-      if (profRes.ok) {
-        const profData = await profRes.json();
-        const prof = extractProfile(profData);
-        if (prof) {
-          setProfile(prof);
-          applyTheme(prof.theme);
-        }
-      }
-    } catch { /* ignore */ }
+    if (data.user) await hydrateAfterAuth(data.user);
     return null;
-  };
+  }, [hydrateAfterAuth]);
 
-  const loginWithGoogle = async (credential: string): Promise<string | null> => {
+  const loginWithGoogle = useCallback(async (credential: string): Promise<string | null> => {
     const res = await apiFetch("/api/auth/google-id-token", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -213,41 +220,23 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
       return data.error || "Google sign-in failed";
     }
     const data = await res.json().catch(() => ({}));
-    if (data.user) setUser(data.user);
-    setLimited(false);
-    setViewCount(0);
-    try {
-      const [progRes, profRes] = await Promise.all([
-        fetch("/api/progress?lang=go", { credentials: "same-origin" }),
-        fetch("/api/profile", { credentials: "same-origin" }),
-      ]);
-      const progData = progRes.ok ? await progRes.json() : { progress: [] };
-      setProgress(progData.progress || []);
-      if (profRes.ok) {
-        const profData = await profRes.json();
-        const prof = extractProfile(profData);
-        if (prof) {
-          setProfile(prof);
-          applyTheme(prof.theme);
-        }
-      }
-    } catch { /* ignore */ }
+    if (data.user) await hydrateAfterAuth(data.user);
     return null;
-  };
+  }, [hydrateAfterAuth]);
 
-  const logout = async () => {
+  const logout = useCallback(async () => {
     await apiFetch("/api/auth/logout", { method: "POST" });
     setUser(null);
     setProgress([]);
     setProfile(null);
-  };
+  }, []);
 
-  const logoutAll = async () => {
+  const logoutAll = useCallback(async () => {
     await apiFetch("/api/auth/logout-all", { method: "POST" });
     setUser(null);
     setProgress([]);
     setProfile(null);
-  };
+  }, []);
 
   // ── Data actions ──
   const recordView = useCallback(async (slug: string) => {
@@ -264,7 +253,7 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
     } catch { /* ignore */ }
   }, [user]);
 
-  const toggleProgress = async (slug: string, lang: string = "go") => {
+  const toggleProgress = useCallback(async (slug: string, lang: string = "go") => {
     if (!user) return;
     const completed = !progress.includes(slug);
     try {
@@ -278,7 +267,7 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
         setProgress(data.progress);
       }
     } catch { /* ignore */ }
-  };
+  }, [user, progress]);
 
   const refreshProfile = useCallback(async () => {
     try {
@@ -290,9 +279,19 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
     } catch { /* ignore */ }
   }, []);
 
+  const userCtx = useMemo(
+    () => ({ user, loading, login, loginWithGoogle, signup, logout, logoutAll }),
+    [user, loading, login, loginWithGoogle, signup, logout, logoutAll]
+  );
+
+  const appDataCtx = useMemo(
+    () => ({ progress, profile, viewCount, limited, recordView, toggleProgress, refreshProfile }),
+    [progress, profile, viewCount, limited, recordView, toggleProgress, refreshProfile]
+  );
+
   return (
-    <UserContext.Provider value={{ user, loading, login, loginWithGoogle, signup, logout, logoutAll }}>
-      <AppDataContext.Provider value={{ progress, profile, viewCount, limited, recordView, toggleProgress, refreshProfile }}>
+    <UserContext.Provider value={userCtx}>
+      <AppDataContext.Provider value={appDataCtx}>
         {children}
       </AppDataContext.Provider>
     </UserContext.Provider>

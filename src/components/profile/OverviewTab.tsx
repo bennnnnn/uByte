@@ -119,7 +119,7 @@ export default function OverviewTab({ stats, badges, achievements, userId }: Pro
                     {new Date(c.passed_at).toLocaleDateString()}
                   </span>
                   <Link
-                    href={`/practice-exams/certificate/${c.id}`}
+                    href={`/certifications/certificate/${c.id}`}
                     className="text-xs font-medium text-indigo-600 hover:underline dark:text-indigo-400"
                   >
                     Download
