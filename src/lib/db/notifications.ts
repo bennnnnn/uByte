@@ -54,3 +54,25 @@ export async function createNotification(
   const sql = getSql();
   await sql`INSERT INTO notifications (user_id, type, title, message) VALUES (${userId}, ${type}, ${title}, ${message})`;
 }
+
+/**
+ * Delete read notifications older than the given number of days.
+ * Unread notifications are never deleted so users don't miss anything.
+ *
+ * Called by the daily cron job at /api/cron/cleanup.
+ * Default: delete read notifications older than 30 days.
+ */
+export async function deleteOldNotifications(olderThanDays = 30): Promise<number> {
+  await ensureNotificationsTable();
+  const sql = getSql();
+  const [row] = await sql`
+    WITH deleted AS (
+      DELETE FROM notifications
+      WHERE read = TRUE
+        AND created_at < NOW() - (${olderThanDays} || ' days')::INTERVAL
+      RETURNING id
+    )
+    SELECT COUNT(*)::int AS count FROM deleted
+  `;
+  return (row?.count as number) ?? 0;
+}
