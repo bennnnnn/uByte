@@ -204,6 +204,12 @@ export default async function PracticeExamsPage() {
   );
   const passedLangs = EXAM_LANGS.filter((lang) => statsByLang[lang]?.hasCertificate);
 
+  // Languages the Pro user hasn't attempted yet
+  const unattemptedLangs = EXAM_LANGS.filter((lang) => !statsByLang[lang] || statsByLang[lang].attemptCount === 0);
+
+  // Pick a suggested language: first failed > first unattempted > first overall
+  const suggestedLang = tryAgainLangs[0] ?? unattemptedLangs[0] ?? EXAM_LANGS[0];
+
   // Popular = langs with real attempt data, sorted by usage
   const popularLangs = EXAM_LANGS
     .filter((lang) => (publicStatsByLang[lang]?.attemptsSubmitted ?? 0) > 0)
@@ -277,18 +283,14 @@ export default async function PracticeExamsPage() {
               </p>
             </div>
 
-            {isPro ? (
-              <span className="inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-4 py-2 text-sm font-semibold text-emerald-700 dark:border-emerald-900/40 dark:bg-emerald-950/20 dark:text-emerald-300">
-                <span className="h-2 w-2 rounded-full bg-emerald-500" />
-                Pro active
-              </span>
-            ) : (
+            {!user ? (
+              /* Not logged in */
               <div className="flex flex-wrap gap-3">
                 <Link
-                  href="/pricing"
+                  href="/login?redirect=/certifications"
                   className="inline-flex items-center justify-center rounded-xl bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-indigo-500"
                 >
-                  Upgrade to Pro
+                  Get started free
                 </Link>
                 <Link
                   href="/pricing"
@@ -296,6 +298,70 @@ export default async function PracticeExamsPage() {
                 >
                   See pricing
                 </Link>
+              </div>
+            ) : !isPro ? (
+              /* Logged in, free plan */
+              <div className="flex flex-wrap gap-3">
+                <Link
+                  href="/pricing"
+                  className="inline-flex items-center justify-center rounded-xl bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-indigo-500"
+                >
+                  Upgrade to Pro
+                </Link>
+                <a
+                  href="#all-certifications"
+                  className="inline-flex items-center justify-center rounded-xl border border-zinc-300 bg-white px-5 py-2.5 text-sm font-semibold text-zinc-700 transition-colors hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-200 dark:hover:bg-zinc-700"
+                >
+                  Browse certifications
+                </a>
+              </div>
+            ) : passedLangs.length === EXAM_LANGS.length ? (
+              /* Pro, all passed */
+              <div className="flex flex-wrap items-center gap-3">
+                <span className="inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-4 py-2 text-sm font-semibold text-emerald-700 dark:border-emerald-900/40 dark:bg-emerald-950/20 dark:text-emerald-300">
+                  <span className="h-2 w-2 rounded-full bg-emerald-500" />
+                  All certified!
+                </span>
+                <Link
+                  href="/profile?tab=overview"
+                  className="inline-flex items-center justify-center rounded-xl border border-zinc-300 bg-white px-5 py-2.5 text-sm font-semibold text-zinc-700 transition-colors hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-200 dark:hover:bg-zinc-700"
+                >
+                  View certificates
+                </Link>
+              </div>
+            ) : tryAgainLangs.length > 0 ? (
+              /* Pro, has failed exams */
+              <div className="flex flex-wrap gap-3">
+                <Link
+                  href={`/certifications/${tryAgainLangs[0]}`}
+                  className="inline-flex items-center justify-center rounded-xl bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-indigo-500"
+                >
+                  Retake {LANGUAGES[tryAgainLangs[0]]?.name} exam
+                </Link>
+                <a
+                  href="#all-certifications"
+                  className="inline-flex items-center justify-center rounded-xl border border-zinc-300 bg-white px-5 py-2.5 text-sm font-semibold text-zinc-700 transition-colors hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-200 dark:hover:bg-zinc-700"
+                >
+                  All certifications
+                </a>
+              </div>
+            ) : (
+              /* Pro, no attempts yet (or some passed, some not attempted) */
+              <div className="flex flex-wrap gap-3">
+                <Link
+                  href={`/certifications/${suggestedLang}`}
+                  className="inline-flex items-center justify-center rounded-xl bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-indigo-500"
+                >
+                  {passedLangs.length > 0
+                    ? `Next: ${LANGUAGES[suggestedLang]?.name} exam`
+                    : "Start your first exam"}
+                </Link>
+                <a
+                  href="#all-certifications"
+                  className="inline-flex items-center justify-center rounded-xl border border-zinc-300 bg-white px-5 py-2.5 text-sm font-semibold text-zinc-700 transition-colors hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-200 dark:hover:bg-zinc-700"
+                >
+                  Browse all
+                </a>
               </div>
             )}
           </div>
@@ -396,31 +462,65 @@ export default async function PracticeExamsPage() {
           <ExamCardGrid langs={langSlugs} examConfigByLang={examConfigByLang} statsByLang={statsByLang} publicStatsByLang={publicStatsByLang} isLoggedIn={!!user} />
         </section>
 
-        {/* ── Bottom CTA (free / logged-out users only) ─────────────────────── */}
-        {!isPro && (
+        {/* ── Bottom CTA ─────────────────────────────────────────────── */}
+        {!user ? (
           <div className="mt-16 rounded-2xl border border-indigo-100 bg-indigo-50 p-8 text-center dark:border-indigo-900/40 dark:bg-indigo-950/20">
-            <h2 className="text-xl font-bold text-zinc-900 dark:text-zinc-100">Ready to test your skills?</h2>
+            <h2 className="text-xl font-bold text-zinc-900 dark:text-zinc-100">Ready to prove your skills?</h2>
             <p className="mx-auto mt-2 max-w-md text-sm text-zinc-500 dark:text-zinc-400">
-              Upgrade to Pro to unlock timed exams, get scored, and earn a shareable certificate for every language you pass.
+              Create a free account to get started, then upgrade to Pro to unlock timed exams and earn shareable certificates.
             </p>
             <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+              <Link
+                href="/login?redirect=/certifications"
+                className="inline-flex items-center justify-center rounded-xl bg-indigo-600 px-6 py-3 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-indigo-500"
+              >
+                Sign up free
+              </Link>
+              <Link
+                href="/pricing"
+                className="inline-flex items-center justify-center rounded-xl border border-zinc-300 bg-white px-6 py-3 text-sm font-semibold text-zinc-700 transition-colors hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200"
+              >
+                See pricing
+              </Link>
+            </div>
+          </div>
+        ) : !isPro ? (
+          <div className="mt-16 rounded-2xl border border-indigo-100 bg-indigo-50 p-8 text-center dark:border-indigo-900/40 dark:bg-indigo-950/20">
+            <h2 className="text-xl font-bold text-zinc-900 dark:text-zinc-100">Unlock all certifications</h2>
+            <p className="mx-auto mt-2 max-w-md text-sm text-zinc-500 dark:text-zinc-400">
+              Upgrade to Pro to take timed exams, get scored, and earn a shareable certificate for every language you pass.
+            </p>
+            <div className="mt-6">
               <Link
                 href="/pricing"
                 className="inline-flex items-center justify-center rounded-xl bg-indigo-600 px-6 py-3 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-indigo-500"
               >
                 Upgrade to Pro
               </Link>
-              {!user && (
-                <Link
-                  href="/login"
-                  className="inline-flex items-center justify-center rounded-xl border border-zinc-300 bg-white px-6 py-3 text-sm font-semibold text-zinc-700 transition-colors hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200"
-                >
-                  Sign in
-                </Link>
-              )}
             </div>
           </div>
-        )}
+        ) : passedLangs.length < EXAM_LANGS.length ? (
+          <div className="mt-16 rounded-2xl border border-zinc-200 bg-white p-8 text-center dark:border-zinc-800 dark:bg-zinc-900">
+            <h2 className="text-xl font-bold text-zinc-900 dark:text-zinc-100">
+              {passedLangs.length === 0 ? "Take your first certification" : `${EXAM_LANGS.length - passedLangs.length} certifications remaining`}
+            </h2>
+            <p className="mx-auto mt-2 max-w-md text-sm text-zinc-500 dark:text-zinc-400">
+              {passedLangs.length === 0
+                ? "You have Pro access. Pick a language and earn your first certificate."
+                : `You've passed ${passedLangs.length} of ${EXAM_LANGS.length}. Keep going to complete the full set.`}
+            </p>
+            <div className="mt-6">
+              <Link
+                href={`/certifications/${suggestedLang}`}
+                className="inline-flex items-center justify-center rounded-xl bg-indigo-600 px-6 py-3 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-indigo-500"
+              >
+                {tryAgainLangs.length > 0
+                  ? `Retake ${LANGUAGES[tryAgainLangs[0]]?.name} exam`
+                  : `Start ${LANGUAGES[suggestedLang]?.name} exam`}
+              </Link>
+            </div>
+          </div>
+        ) : null}
 
         {/* ── Footer nav ────────────────────────────────────────────────────── */}
         <nav
