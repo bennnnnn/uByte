@@ -171,20 +171,25 @@ export const POST = withErrorHandling("POST /api/webhooks/paddle", async (reques
     yearlyPriceId && purchasedPriceId === yearlyPriceId ? "yearly" : "pro";
 
   switch (event.event_type) {
-    // transaction.completed fires on every successful payment and reliably
-    // includes custom_data from the checkout widget — the most robust hook.
-    case "transaction.completed": {
-      console.log("[paddle-webhook] transaction.completed data:", JSON.stringify({ 
+    // Handle both transaction.completed and transaction.updated (when status=completed).
+    // Paddle sends transaction.updated when a transaction transitions to completed status.
+    case "transaction.completed":
+    case "transaction.updated": {
+      if (status !== "completed") {
+        console.log("[paddle-webhook] Skipping transaction event with status:", status);
+        break;
+      }
+      console.log("[paddle-webhook] transaction completed data:", JSON.stringify({ 
         status, paddleCustomerId, customData, purchasedPriceId 
       }));
       const uid = await resolveUserId(paddleCustomerId, customData);
       if (uid) {
         await updateUserPlan(uid, activatedPlan, paddleCustomerId);
-        console.log("[paddle-webhook] transaction.completed — updated user", uid, "to plan:", activatedPlan);
+        console.log("[paddle-webhook] transaction completed — updated user", uid, "to plan:", activatedPlan);
         const amountCents = activatedPlan === "yearly" ? YEARLY_PRICE_CENTS : MONTHLY_PRICE_CENTS;
         await recordSubscriptionEvent(uid, activatedPlan, amountCents, "activated");
       } else {
-        console.error("[paddle-webhook] transaction.completed — could not resolve user");
+        console.error("[paddle-webhook] transaction completed — could not resolve user");
       }
       break;
     }
