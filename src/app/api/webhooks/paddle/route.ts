@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
+import { timingSafeEqual } from "crypto";
 import { updateUserPlan, getUserByPaddleCustomerId, getUserById, createNotification, recordSubscriptionEvent } from "@/lib/db";
+import { withErrorHandling } from "@/lib/api-utils";
 import { BILLING_CONFIG, YEARLY_PRICE_CENTS, MONTHLY_PRICE_CENTS } from "@/lib/plans";
-
-export const runtime = "nodejs";
 
 const WEBHOOK_SECRET = process.env.PADDLE_WEBHOOK_SECRET ?? "";
 
@@ -16,9 +16,6 @@ async function verifyPaddleSignature(
     return false;
   }
 
-  console.log("[paddle-webhook] Secret starts with:", secret.substring(0, 12) + "...");
-  console.log("[paddle-webhook] Signature header:", sigHeader.substring(0, 60) + "...");
-
   const parts: Record<string, string> = {};
   for (const part of sigHeader.split(";")) {
     const [k, v] = part.split("=", 2);
@@ -28,43 +25,29 @@ async function verifyPaddleSignature(
   const ts = parts["ts"];
   const h1 = parts["h1"];
   if (!ts || !h1) {
-    console.error("[paddle-webhook] Missing ts or h1 in signature header. Parsed parts:", JSON.stringify(parts));
+    console.error("[paddle-webhook] Missing ts or h1 in signature header");
     return false;
   }
-
-  console.log("[paddle-webhook] ts:", ts, "h1 length:", h1.length);
 
   const TOLERANCE_SECONDS = 300;
-  const drift = Math.abs(Date.now() / 1000 - parseInt(ts, 10));
-  if (drift > TOLERANCE_SECONDS) {
-    console.error("[paddle-webhook] Timestamp drift:", drift, "seconds (max:", TOLERANCE_SECONDS, ")");
+  if (Math.abs(Date.now() / 1000 - parseInt(ts, 10)) > TOLERANCE_SECONDS) {
+    console.error("[paddle-webhook] Timestamp outside tolerance window");
     return false;
   }
 
-  try {
-    const { createHmac, timingSafeEqual } = await import("crypto");
-    const signedPayload = `${ts}:${payload}`;
-    const expected = createHmac("sha256", secret)
-      .update(signedPayload)
-      .digest("hex");
+  const signed = `${ts}:${payload}`;
+  const key = await crypto.subtle.importKey(
+    "raw",
+    new TextEncoder().encode(secret),
+    { name: "HMAC", hash: "SHA-256" },
+    false,
+    ["sign"]
+  );
+  const mac = await crypto.subtle.sign("HMAC", key, new TextEncoder().encode(signed));
+  const expected = Buffer.from(mac).toString("hex");
 
-    console.log("[paddle-webhook] Expected sig:", expected.substring(0, 16) + "...");
-    console.log("[paddle-webhook] Received h1: ", h1.substring(0, 16) + "...");
-    console.log("[paddle-webhook] Payload length:", payload.length, "Signed payload length:", signedPayload.length);
-
-    if (expected.length !== h1.length) {
-      console.error("[paddle-webhook] Signature length mismatch:", expected.length, "vs", h1.length);
-      return false;
-    }
-
-    return timingSafeEqual(
-      Buffer.from(expected, "utf-8"),
-      Buffer.from(h1, "utf-8")
-    );
-  } catch (err) {
-    console.error("[paddle-webhook] Signature verification error:", err);
-    return false;
-  }
+  if (expected.length !== h1.length) return false;
+  return timingSafeEqual(Buffer.from(expected, "utf-8"), Buffer.from(h1, "utf-8"));
 }
 
 function planFromSubscription(status: string, priceId?: string): string {
@@ -73,131 +56,124 @@ function planFromSubscription(status: string, priceId?: string): string {
   return yearlyPriceId && priceId === yearlyPriceId ? "yearly" : "pro";
 }
 
-export async function POST(request: NextRequest) {
+export const POST = withErrorHandling("POST /api/webhooks/paddle", async (request: NextRequest) => {
+  if (!WEBHOOK_SECRET) {
+    console.error("[paddle-webhook] PADDLE_WEBHOOK_SECRET not set");
+    return NextResponse.json({ error: "Paddle not configured" }, { status: 503 });
+  }
+
+  const sig = request.headers.get("Paddle-Signature") ?? "";
+  const body = await request.text();
+
+  console.log("[paddle-webhook] Received event, signature present:", !!sig);
+
+  const valid = await verifyPaddleSignature(body, sig, WEBHOOK_SECRET);
+  if (!valid) {
+    console.error("[paddle-webhook] Signature verification failed");
+    return NextResponse.json({ error: "Invalid signature" }, { status: 400 });
+  }
+
+  let event: { event_type: string; data: Record<string, unknown> };
   try {
-    if (!WEBHOOK_SECRET) {
-      console.error("[paddle-webhook] PADDLE_WEBHOOK_SECRET not set");
-      return NextResponse.json({ error: "Paddle not configured" }, { status: 503 });
-    }
+    event = JSON.parse(body);
+  } catch {
+    return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
+  }
 
-    const sig = request.headers.get("Paddle-Signature") ?? "";
-    const body = await request.text();
+  console.log("[paddle-webhook] Event type:", event.event_type);
 
-    console.log("[paddle-webhook] Received webhook, signature present:", !!sig);
+  const data = event.data;
+  const customData = data["custom_data"] as Record<string, string> | null;
+  const paddleCustomerId = data["customer_id"] as string | undefined;
+  const status = data["status"] as string | undefined;
 
-    const valid = await verifyPaddleSignature(body, sig, WEBHOOK_SECRET);
-    if (!valid) {
-      console.error("[paddle-webhook] Signature verification failed");
-      return NextResponse.json({ error: "Invalid signature" }, { status: 400 });
-    }
+  const yearlyPriceId = process.env.NEXT_PUBLIC_PADDLE_YEARLY_PRICE_ID;
+  const items = data["items"] as { price?: { id?: string } }[] | undefined;
+  const purchasedPriceId = items?.[0]?.price?.id;
+  const activatedPlan =
+    yearlyPriceId && purchasedPriceId === yearlyPriceId ? "yearly" : "pro";
 
-    let event: { event_type: string; data: Record<string, unknown> };
-    try {
-      event = JSON.parse(body);
-    } catch {
-      return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
-    }
+  switch (event.event_type) {
+    case "subscription.activated":
+    case "subscription.created": {
+      if (!paddleCustomerId) {
+        console.error("[paddle-webhook] No customer_id in event");
+        break;
+      }
 
-    console.log("[paddle-webhook] Event type:", event.event_type);
-
-    const data = event.data;
-    const customData = data["custom_data"] as Record<string, string> | null;
-    const paddleCustomerId = data["customer_id"] as string | undefined;
-    const status = data["status"] as string | undefined;
-
-    console.log("[paddle-webhook] customer_id:", paddleCustomerId, "custom_data:", JSON.stringify(customData));
-
-    const yearlyPriceId = process.env.NEXT_PUBLIC_PADDLE_YEARLY_PRICE_ID;
-    const items = data["items"] as { price?: { id?: string } }[] | undefined;
-    const purchasedPriceId = items?.[0]?.price?.id;
-    const activatedPlan =
-      yearlyPriceId && purchasedPriceId === yearlyPriceId ? "yearly" : "pro";
-
-    switch (event.event_type) {
-      case "subscription.activated":
-      case "subscription.created": {
-        if (!paddleCustomerId) {
-          console.error("[paddle-webhook] No customer_id in event");
-          break;
-        }
-
-        let uid: number | null = null;
-        const existingUser = await getUserByPaddleCustomerId(paddleCustomerId);
-        if (existingUser) {
-          uid = existingUser.id;
-          console.log("[paddle-webhook] Found user by Paddle customer ID:", uid);
-        } else {
-          const clientUserId = customData?.["userId"];
-          if (clientUserId) {
-            const u = await getUserById(parseInt(clientUserId, 10));
-            if (u) {
-              uid = u.id;
-              console.log("[paddle-webhook] Found user by custom_data userId:", uid);
-            } else {
-              console.error("[paddle-webhook] No user found for custom_data userId:", clientUserId);
-            }
+      let uid: number | null = null;
+      const existingUser = await getUserByPaddleCustomerId(paddleCustomerId);
+      if (existingUser) {
+        uid = existingUser.id;
+        console.log("[paddle-webhook] Found user by Paddle customer ID:", uid);
+      } else {
+        const clientUserId = customData?.["userId"];
+        if (clientUserId) {
+          const u = await getUserById(parseInt(clientUserId, 10));
+          if (u) {
+            uid = u.id;
+            console.log("[paddle-webhook] Found user by custom_data userId:", uid);
           } else {
-            console.error("[paddle-webhook] No custom_data.userId and no existing Paddle customer");
+            console.error("[paddle-webhook] No user found for custom_data userId:", clientUserId);
           }
+        } else {
+          console.error("[paddle-webhook] No custom_data.userId and no existing Paddle customer");
         }
-
-        if (uid) {
-          await updateUserPlan(uid, activatedPlan, paddleCustomerId);
-          console.log("[paddle-webhook] Updated user", uid, "to plan:", activatedPlan);
-          const planLabel = activatedPlan === "yearly" ? BILLING_CONFIG.yearly.label : BILLING_CONFIG.monthly.label;
-          await createNotification(
-            uid,
-            "plan",
-            `You're now on ${planLabel}!`,
-            "All tutorials and features are now unlocked. Enjoy!"
-          );
-          const amountCents = activatedPlan === "yearly" ? YEARLY_PRICE_CENTS : MONTHLY_PRICE_CENTS;
-          await recordSubscriptionEvent(uid, activatedPlan, amountCents, "activated");
-        }
-        break;
       }
 
-      case "subscription.updated": {
-        if (paddleCustomerId && status) {
-          const plan = planFromSubscription(status, purchasedPriceId);
-          const user = await getUserByPaddleCustomerId(paddleCustomerId);
-          if (user) {
-            await updateUserPlan(user.id, plan);
-            console.log("[paddle-webhook] Updated user", user.id, "plan to:", plan);
-          }
-        }
-        break;
+      if (uid) {
+        await updateUserPlan(uid, activatedPlan, paddleCustomerId);
+        console.log("[paddle-webhook] Updated user", uid, "to plan:", activatedPlan);
+        const planLabel = activatedPlan === "yearly" ? BILLING_CONFIG.yearly.label : BILLING_CONFIG.monthly.label;
+        await createNotification(
+          uid,
+          "plan",
+          `You're now on ${planLabel}!`,
+          "All tutorials and features are now unlocked. Enjoy!"
+        );
+        const amountCents = activatedPlan === "yearly" ? YEARLY_PRICE_CENTS : MONTHLY_PRICE_CENTS;
+        await recordSubscriptionEvent(uid, activatedPlan, amountCents, "activated");
       }
+      break;
+    }
 
-      case "subscription.canceled": {
-        if (paddleCustomerId) {
-          const user = await getUserByPaddleCustomerId(paddleCustomerId);
+    case "subscription.updated": {
+      if (paddleCustomerId && status) {
+        const plan = planFromSubscription(status, purchasedPriceId);
+        const user = await getUserByPaddleCustomerId(paddleCustomerId);
+        if (user) {
+          await updateUserPlan(user.id, plan);
+          console.log("[paddle-webhook] Updated user", user.id, "plan to:", plan);
+        }
+      }
+      break;
+    }
+
+    case "subscription.canceled": {
+      if (paddleCustomerId) {
+        const user = await getUserByPaddleCustomerId(paddleCustomerId);
+        if (user) {
+          await updateUserPlan(user.id, "free");
+          await recordSubscriptionEvent(user.id, user.plan, 0, "canceled");
+          console.log("[paddle-webhook] Canceled subscription for user:", user.id);
+        }
+      } else {
+        const userId = customData?.["userId"];
+        if (userId) {
+          const user = await getUserById(parseInt(userId, 10));
           if (user) {
             await updateUserPlan(user.id, "free");
             await recordSubscriptionEvent(user.id, user.plan, 0, "canceled");
-            console.log("[paddle-webhook] Canceled subscription for user:", user.id);
-          }
-        } else {
-          const userId = customData?.["userId"];
-          if (userId) {
-            const user = await getUserById(parseInt(userId, 10));
-            if (user) {
-              await updateUserPlan(user.id, "free");
-              await recordSubscriptionEvent(user.id, user.plan, 0, "canceled");
-            }
           }
         }
-        break;
       }
-
-      default:
-        console.log("[paddle-webhook] Unhandled event type:", event.event_type);
-        break;
+      break;
     }
 
-    return NextResponse.json({ received: true });
-  } catch (err) {
-    console.error("[paddle-webhook] Unhandled error:", err);
-    return NextResponse.json({ error: "Internal error" }, { status: 500 });
+    default:
+      console.log("[paddle-webhook] Unhandled event type:", event.event_type);
+      break;
   }
-}
+
+  return NextResponse.json({ received: true });
+});
