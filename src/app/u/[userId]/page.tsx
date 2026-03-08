@@ -5,6 +5,7 @@ import { getUserExamStats } from "@/lib/db/exam-attempts";
 import { getAllTutorials } from "@/lib/tutorials";
 import Avatar from "@/components/Avatar";
 import { Card } from "@/components/ui";
+import ShareProfileButton from "./ShareProfileButton";
 import { LANGUAGES } from "@/lib/languages/registry";
 import type { SupportedLanguage } from "@/lib/languages/types";
 import type { Metadata } from "next";
@@ -95,11 +96,16 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
       <div className="mb-8 flex items-start gap-5">
         <Avatar avatarKey={profile.avatar || "gopher"} size="lg" />
         <div className="min-w-0 flex-1">
-          <h1 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100">{profile.name}</h1>
-          {profile.bio && (
-            <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">{profile.bio}</p>
-          )}
-          <p className="mt-2 text-xs text-zinc-400">Joined {joinDate}</p>
+          <div className="flex items-start justify-between gap-3">
+            <div className="min-w-0">
+              <h1 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100">{profile.name}</h1>
+              {profile.bio && (
+                <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">{profile.bio}</p>
+              )}
+              <p className="mt-2 text-xs text-zinc-400">Joined {joinDate}</p>
+            </div>
+            <ShareProfileButton url={absoluteUrl(`/u/${userId}`)} name={profile.name} />
+          </div>
         </div>
       </div>
 
