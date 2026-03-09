@@ -8,7 +8,6 @@ import { getStarterForLanguage, getAllPracticeProblems, getCategoryForSlug, getP
 import { LANGUAGES } from "@/lib/languages/registry";
 import { useCodeEditor } from "@/hooks/useCodeEditor";
 import { usePanelResize } from "@/hooks/usePanelResize";
-import { useChallengeTimer } from "@/hooks/useChallengeTimer";
 import { useFormatCode } from "@/hooks/useFormatCode";
 import ThemeToggle from "@/components/ThemeToggle";
 import AuthButtons from "@/components/AuthButtons";
@@ -505,7 +504,6 @@ export function PracticeIDE({ problem, initialLang, initialCode, categoryFilter 
     setTimeout(() => setNoteSaved(false), 2000);
   }
 
-  const timer = useChallengeTimer();
   const { format, formatting } = useFormatCode();
   const [statuses, setStatuses] = useState<Record<string, PracticeAttemptStatus>>({});
   const [xpToast, setXpToast] = useState<number | null>(null);
@@ -650,11 +648,6 @@ export function PracticeIDE({ problem, initialLang, initialCode, categoryFilter 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [notes, problem.slug]);
 
-  // Reset the stopwatch when the user navigates to a different problem (don't auto-start)
-  useEffect(() => {
-    timer.reset();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [problem.slug]);
 
   // Keep a ref so handleSubmit/handleRun can always read the latest outputHeight
   // without needing it as a useCallback dependency.
@@ -954,21 +947,8 @@ export function PracticeIDE({ problem, initialLang, initialCode, categoryFilter 
           </span>
         </h1>
 
-        {/* Right: timer + bookmark + theme + user menu */}
+        {/* Right: bookmark + theme + user menu */}
         <div className="flex flex-1 justify-end gap-2 md:flex-initial md:gap-3">
-          {/* Stopwatch — click to start/stop */}
-          <button
-            type="button"
-            onClick={() => timer.running ? timer.stop() : timer.start()}
-            title={timer.running ? "Pause timer" : timer.elapsed > 0 ? "Resume timer" : "Start timer"}
-            className={`hidden items-center gap-1.5 rounded-md border px-2.5 py-1 text-xs font-mono transition-colors sm:flex ${
-              timer.running
-                ? "border-indigo-300 bg-indigo-50 text-indigo-700 dark:border-indigo-700 dark:bg-indigo-950/30 dark:text-indigo-400"
-                : "border-zinc-200 text-zinc-500 hover:border-zinc-300 hover:text-zinc-700 dark:border-zinc-700 dark:text-zinc-400 dark:hover:border-zinc-600"
-            }`}
-          >
-            {timer.running ? "⏸" : "▶"} {timer.display}
-          </button>
           {/* Bookmark */}
           {user && (
             <button
@@ -1228,11 +1208,12 @@ export function PracticeIDE({ problem, initialLang, initialCode, categoryFilter 
                   <div key={ln} className="absolute left-0 right-0 bg-red-500/10" style={{ top: 16 + (ln - 1) * 24, height: 24 }} />
                 ))}
               </div>
+              {/* Content managed imperatively via setCode() — never by React reconciliation */}
               <pre
                 ref={editor.preRef}
                 aria-hidden
+                suppressHydrationWarning
                 className="pointer-events-none absolute inset-0 overflow-auto whitespace-pre py-4 pl-4 pr-8 text-zinc-100"
-                dangerouslySetInnerHTML={{ __html: editor.highlightGo(editor.code) + "\n" }}
               />
               <textarea
                 ref={editor.textareaRef}

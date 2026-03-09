@@ -17,7 +17,6 @@ import OutputPanel from "@/components/tutorial/OutputPanel";
 import InstructionsSidebar from "@/components/tutorial/InstructionsSidebar";
 import CourseOutlineDrawer from "@/components/tutorial/CourseOutlineDrawer";
 import SnapshotDrawer from "@/components/tutorial/SnapshotDrawer";
-import { useChallengeTimer } from "@/hooks/useChallengeTimer";
 import { useFormatCode } from "@/hooks/useFormatCode";
 import { tutorialUrl } from "@/lib/urls";
 import { LANGUAGES } from "@/lib/languages/registry";
@@ -63,11 +62,7 @@ export default function InteractiveTutorial({
   const [showNav, setShowNav] = useState(false);
   const [expandedSlug, setExpandedSlug] = useState(tutorialSlug);
   const [showSnapshots, setShowSnapshots] = useState(false);
-  const [codeCopied, setCodeCopied] = useState(false);
   const [shareCopied, setShareCopied] = useState(false);
-  const [challengeMode, setChallengeMode] = useState(false);
-  const [challengeResult, setChallengeResult] = useState<{ totalMs: number; personalBest: number | null } | null>(null);
-  const challengeTimer = useChallengeTimer();
   const { format, formatting } = useFormatCode();
   const [fontSize, setFontSize] = useState<14 | 16 | 18>(() => {
     try { const s = localStorage.getItem("ide-font-size"); if (s === "16") return 16; if (s === "18") return 18; } catch { /* ignore */ }
@@ -108,23 +103,6 @@ export default function InteractiveTutorial({
     if (stepProgress.status === "failed" && isMobile) setMobileTab("code");
   }, [stepProgress.status, isMobile]);
 
-  // Challenge mode: stop timer on tutorial completion
-  useEffect(() => {
-    if (!challengeMode || !stepProgress.tutorialDone) return;
-    const totalMs = challengeTimer.stop();
-    if (!user) return;
-    apiFetch("/api/challenge", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ slug: tutorialSlug, totalMs, stepsCount: steps.length }),
-    })
-      .then((r) => r.json())
-      .then((d) => setChallengeResult({ totalMs, personalBest: d.personalBest ?? totalMs }))
-      .catch(() => setChallengeResult({ totalMs, personalBest: null }));
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- run only when tutorial completes in challenge mode
-  }, [stepProgress.tutorialDone, challengeMode]);
-
-
   // Load shared code from ?share= URL param on mount (client-side — page is statically generated)
   useEffect(() => {
     try {
@@ -133,13 +111,6 @@ export default function InteractiveTutorial({
     } catch { /* ignore malformed share param */ }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  function handleCopyCode() {
-    navigator.clipboard.writeText(editor.code).then(() => {
-      setCodeCopied(true);
-      setTimeout(() => setCodeCopied(false), 2000);
-    }).catch(() => {});
-  }
 
   function handleShare() {
     try {
@@ -207,36 +178,6 @@ export default function InteractiveTutorial({
         </div>
         <h1 className="min-w-0 max-w-[45%] flex-1 truncate text-center text-sm font-semibold text-zinc-800 dark:text-zinc-100 md:max-w-[40%] md:flex-initial" title={tutorialTitle}>{tutorialTitle}</h1>
         <div className="flex flex-1 justify-end gap-3 md:flex-initial">
-          {user && (
-            <>
-              {challengeMode && (
-                <div className="hidden items-center gap-2 rounded-full border border-amber-300 bg-amber-50 px-3 py-1 shadow-sm dark:border-amber-700 dark:bg-amber-950/80 sm:flex">
-                  <span className="text-xs font-bold text-amber-700 dark:text-amber-400">Challenge</span>
-                  <span className="font-mono text-sm font-bold text-amber-800 dark:text-amber-300">{challengeTimer.display}</span>
-                </div>
-              )}
-              <button
-                onClick={() => {
-                  if (!challengeMode) {
-                    setChallengeMode(true);
-                    challengeTimer.reset();
-                    challengeTimer.start();
-                  } else {
-                    setChallengeMode(false);
-                    challengeTimer.reset();
-                  }
-                }}
-                title="Toggle challenge mode"
-                className={`hidden items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-medium transition-colors sm:flex ${
-                  challengeMode
-                    ? "bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-400"
-                    : "text-zinc-500 hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-zinc-800"
-                }`}
-              >
-                ⏱ {challengeMode ? "Stop" : "Challenge"}
-              </button>
-            </>
-          )}
           <ThemeToggle className="hidden h-8 w-8 items-center justify-center rounded text-zinc-500 transition-colors hover:bg-zinc-200 hover:text-zinc-800 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-200 md:flex" />
           <Suspense fallback={<div className="h-9 w-20 rounded-lg bg-zinc-200 dark:bg-zinc-800 animate-pulse" />}>
             <AuthButtons />
@@ -301,7 +242,8 @@ export default function InteractiveTutorial({
                   <div key={ln} className="absolute left-0 right-0 bg-red-500/10" style={{ top: 16 + (ln - 1) * 24, height: 24 }} />
                 ))}
               </div>
-              <pre ref={editor.preRef} aria-hidden className="pointer-events-none absolute inset-0 overflow-auto whitespace-pre py-4 pl-4 pr-8 text-zinc-100" dangerouslySetInnerHTML={{ __html: editor.highlightedHtml + "\n" }} />
+              {/* Content managed imperatively via setCode() — never by React reconciliation */}
+              <pre ref={editor.preRef} aria-hidden suppressHydrationWarning className="pointer-events-none absolute inset-0 overflow-auto whitespace-pre py-4 pl-4 pr-8 text-zinc-100" />
               <textarea ref={editor.textareaRef} defaultValue={editor.code} onChange={(e) => editor.setCode(e.target.value)} onScroll={editor.syncScroll} onKeyDown={handleKeyDown} spellCheck={false} autoCorrect="off" autoCapitalize="off" aria-label="Code editor" className="absolute inset-0 resize-none overflow-auto whitespace-pre bg-transparent py-4 pl-4 pr-8 text-transparent caret-white outline-none selection:bg-indigo-900/50" />
             </div>
           </div>
@@ -338,17 +280,6 @@ export default function InteractiveTutorial({
               className="rounded-md border border-zinc-300 px-3 py-1.5 text-sm text-zinc-500 transition-colors hover:border-zinc-400 hover:text-zinc-800 disabled:opacity-50 dark:border-zinc-700 dark:text-zinc-400 dark:hover:border-zinc-600 dark:hover:text-zinc-200"
             >
               {formatting ? "…" : "⌥ Format"}
-            </button>
-            <button
-              onClick={handleCopyCode}
-              title="Copy code to clipboard"
-              className={`rounded-md border px-3 py-1.5 text-sm transition-all ${
-                codeCopied
-                  ? "border-emerald-400 bg-emerald-50 text-emerald-700 dark:border-emerald-600 dark:bg-emerald-950/30 dark:text-emerald-400"
-                  : "border-zinc-300 text-zinc-500 hover:border-zinc-400 hover:text-zinc-800 dark:border-zinc-700 dark:text-zinc-400 dark:hover:border-zinc-600 dark:hover:text-zinc-200"
-              }`}
-            >
-              {codeCopied ? "✓ Copied" : "Copy"}
             </button>
             <button
               onClick={handleShare}
@@ -418,18 +349,6 @@ export default function InteractiveTutorial({
             Reset
           </button>
           <button
-            onClick={handleCopyCode}
-            aria-label="Copy code"
-            title="Copy code"
-            className={`flex shrink-0 items-center justify-center rounded-md border px-3 py-2 text-sm transition-all ${
-              codeCopied
-                ? "border-emerald-400 bg-emerald-50 text-emerald-700 dark:border-emerald-600 dark:bg-emerald-950/30 dark:text-emerald-400"
-                : "border-zinc-300 text-zinc-500 dark:border-zinc-700 dark:text-zinc-400"
-            }`}
-          >
-            {codeCopied ? "✓" : "Copy"}
-          </button>
-          <button
             onClick={handleShare}
             aria-label="Share code"
             title="Share code"
@@ -480,17 +399,6 @@ export default function InteractiveTutorial({
             <div className="mb-3 text-5xl">🎉</div>
             <h2 id="congrats-title" className="mb-2 text-2xl font-bold text-zinc-900 dark:text-zinc-100">Tutorial Complete!</h2>
             <p className="mb-2 text-zinc-500 dark:text-zinc-400">You finished <span className="font-medium text-zinc-800 dark:text-zinc-200">{tutorialTitle}</span>. Great work!</p>
-            {challengeResult && (
-              <div className="mb-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 dark:border-amber-800 dark:bg-amber-950/40">
-                <p className="text-sm font-semibold text-amber-700 dark:text-amber-400">🏁 Challenge Complete!</p>
-                <p className="text-xs text-amber-600 dark:text-amber-500">
-                  Time: <span className="font-mono font-bold">{challengeTimer.display}</span>
-                  {challengeResult.personalBest !== null && challengeResult.personalBest <= challengeResult.totalMs && (
-                    <span className="ml-2">🏆 New personal best!</span>
-                  )}
-                </p>
-              </div>
-            )}
             <p className="mb-6 text-xs text-zinc-400 dark:text-zinc-500">{next ? `Continuing to "${next.title}" in ${stepProgress.countdown}…` : `Returning home in ${stepProgress.countdown}…`}</p>
             <div className="flex flex-wrap justify-center gap-3">
               <button onClick={() => stepProgress.setTutorialDone(false)} className="rounded-lg border border-zinc-300 px-4 py-2 text-sm text-zinc-600 transition-colors hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800">Review steps</button>
