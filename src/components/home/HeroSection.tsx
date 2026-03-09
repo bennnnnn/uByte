@@ -97,30 +97,42 @@ const STEP_TEXT: Record<Lang, string> = {
 
 const LANG_ORDER = ALL_LANGUAGE_KEYS;
 
-const FEATURES = [
-  "Write real code in your browser — zero setup, zero installs",
-  "Tutorials → Interview prep → Verifiable certification, all in one",
-  "Instant feedback on every step — know if you're right immediately",
-  "One subscription unlocks all 6 languages, all features",
-];
+function getFeatures(langCount: number) {
+  return [
+    "Write real code in your browser — zero setup, zero installs",
+    "Tutorials → Interview prep → Verifiable certification, all in one",
+    "Instant feedback on every step — know if you're right immediately",
+    `One subscription unlocks all ${langCount} languages, all features`,
+  ];
+}
 
 interface HeroSectionProps {
   /** Number of topics per language (e.g. from getAllTutorials("go").length) */
   topicCount?: number;
-  /** Total lesson (step) count for Go — from getTotalLessonCount("go") */
-  lessonCountGo?: number;
-  /** Number of practice problems (e.g. from getAllPracticeProblems().length) */
+  /** Total lessons summed across ALL languages — updates automatically */
+  totalLessonCount?: number;
+  /** Number of practice problems */
   problemCount?: number;
+  /** Number of registered languages — updates automatically when new langs are added */
+  languageCount?: number;
+  /** Number of languages with a published certification exam */
+  certificationCount?: number;
 }
 
-export default function HeroSection({ topicCount = 19, lessonCountGo = 0, problemCount = 11 }: HeroSectionProps) {
+export default function HeroSection({
+  topicCount = 19,
+  totalLessonCount = 0,
+  problemCount = 11,
+  languageCount = 6,
+  certificationCount = 6,
+}: HeroSectionProps) {
   const [lang, setLang] = useState<Lang>("go");
   const { user, loading, profile } = useAuth();
   const isPro = profile?.plan === "pro" || profile?.plan === "yearly";
   const meta = LANG_META[lang];
   const lines = CODE[lang];
   const problemsLabel = problemCount >= 10 ? `${problemCount}+` : String(problemCount);
-  const lessonsLabel = lessonCountGo > 0 ? String(lessonCountGo) : String(topicCount);
+  const lessonsLabel = totalLessonCount > 0 ? `${totalLessonCount}+` : String(topicCount);
 
   return (
     <section className="relative overflow-hidden">
@@ -144,7 +156,7 @@ export default function HeroSection({ topicCount = 19, lessonCountGo = 0, proble
             {/* Badge */}
             <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-indigo-200 bg-indigo-50 px-4 py-1.5 text-[11px] font-bold uppercase tracking-[0.12em] text-indigo-600 dark:border-indigo-800 dark:bg-indigo-950/50 dark:text-indigo-400">
               <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-indigo-500" />
-              Free to start · No credit card · 6 Languages
+              Free to start · No credit card · {languageCount} Languages
             </div>
 
             {/* Headline */}
@@ -158,12 +170,12 @@ export default function HeroSection({ topicCount = 19, lessonCountGo = 0, proble
             {/* Sub */}
             <p className="mb-8 max-w-[480px] text-base leading-relaxed text-zinc-500 dark:text-zinc-400 sm:text-lg">
               The complete path from beginner to job-ready — interactive tutorials,
-              LeetCode-style interview prep, and verifiable certificates. All in one place, for all 6 languages.
+              LeetCode-style interview prep, and verifiable certificates. All in one place, for all {languageCount} languages.
             </p>
 
             {/* Feature list */}
             <ul className="mb-10 space-y-3">
-              {FEATURES.map((f) => (
+              {getFeatures(languageCount).map((f) => (
                 <li key={f} className="flex items-start gap-3 text-sm text-zinc-600 dark:text-zinc-400">
                   <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-indigo-100 text-[10px] font-bold text-indigo-600 dark:bg-indigo-900/60 dark:text-indigo-400">
                     ✓
@@ -240,19 +252,19 @@ export default function HeroSection({ topicCount = 19, lessonCountGo = 0, proble
             {/* Trust line */}
             <p className="mb-6 text-xs font-medium text-zinc-500 dark:text-zinc-400">
               {isPro
-                ? "You have full access — all 6 languages, certifications, and interview prep."
+                ? `You have full access — all ${languageCount} languages, certifications, and interview prep.`
                 : user
-                ? "Upgrade once. Unlock all 6 languages, certifications, and interview prep."
+                ? `Upgrade once. Unlock all ${languageCount} languages, certifications, and interview prep.`
                 : "Free forever for the basics. Upgrade to unlock everything."}
             </p>
 
             {/* Stats */}
             <div className="flex flex-wrap gap-6 border-t border-zinc-200 pt-8 dark:border-zinc-800">
               {[
-                { n: "6",            label: "Languages"       },
-                { n: lessonsLabel,   label: "Lessons in Go"   },
-                { n: problemsLabel,  label: "Interview Qs"    },
-                { n: "6",            label: "Certifications"  },
+                { n: String(languageCount),    label: "Languages"        },
+                { n: lessonsLabel,             label: "Total Lessons"     },
+                { n: problemsLabel,            label: "Interview Qs"      },
+                { n: String(certificationCount), label: "Certifications" },
               ].map(({ n, label }) => (
                 <div key={label}>
                   <p className="text-2xl font-black text-zinc-900 dark:text-zinc-100">{n}</p>

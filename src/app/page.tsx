@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import { getAllTutorials } from "@/lib/tutorials";
 import { getTotalLessonCount } from "@/lib/tutorial-steps";
+import { ALL_LANGUAGE_KEYS } from "@/lib/languages/registry";
 import { getAllPracticeProblems, getPracticeProblemBySlug } from "@/lib/practice/problems";
 import { LANGUAGES, getAllLanguageSlugs } from "@/lib/languages/registry";
 import { getLangIcon } from "@/lib/languages/icons";
@@ -109,7 +110,15 @@ export default async function Home() {
     }
   }
   const continueTutorialList = getAllTutorials(continueLang).map(({ slug, title }) => ({ slug, title }));
-  const lessonCountGo = getTotalLessonCount("go");
+
+  // Total lessons summed across ALL languages — updates automatically when new tutorials are added
+  const totalLessonCount = ALL_LANGUAGE_KEYS.reduce(
+    (sum, lang) => sum + getTotalLessonCount(lang),
+    0
+  );
+
+  // Number of languages with a published exam config (dynamic — add a new lang and it counts itself)
+  const certificationCount = Object.values(examConfigByLang).filter(Boolean).length;
 
   const userPlan = user ? await getUserPlan(user.userId) : "free";
   const isPro = userPlan === "pro" || userPlan === "yearly";
@@ -135,7 +144,13 @@ export default async function Home() {
       </Suspense>
 
       {/* ── 1. Hero — full bleed, dark ───────────────────────────────── */}
-      <HeroSection topicCount={topicCount} lessonCountGo={lessonCountGo} problemCount={problemCount} />
+      <HeroSection
+        topicCount={topicCount}
+        totalLessonCount={totalLessonCount}
+        problemCount={problemCount}
+        languageCount={ALL_LANGUAGE_KEYS.length}
+        certificationCount={certificationCount}
+      />
 
       {/* ── 2-N. Sections — constrained ─────────────────────────────── */}
       <div className="mx-auto max-w-6xl space-y-16 px-4 py-16 sm:px-6 lg:px-8 lg:py-20">
