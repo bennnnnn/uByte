@@ -200,11 +200,51 @@ export async function updateUserPlan(
 ): Promise<void> {
   const sql = getSql();
   if (paddleCustomerId) {
-    // Column will be renamed to paddle_customer_id in a future migration
     await sql`UPDATE users SET plan = ${plan}, stripe_customer_id = ${paddleCustomerId} WHERE id = ${userId}`;
   } else {
     await sql`UPDATE users SET plan = ${plan} WHERE id = ${userId}`;
   }
+}
+
+/** Ensure the subscription_expires_at column exists. Called lazily from cancellation paths only. */
+async function ensureSubscriptionExpiresAtColumn(): Promise<void> {
+  const sql = getSql();
+  await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS subscription_expires_at TEXT`;
+}
+
+/**
+ * Marks a subscription as cancelled but keeps the plan active until the
+ * billing period ends. Called from the Paddle webhook on subscription.canceled.
+ *
+ * plan becomes "canceling" — hasPaidAccess() treats this as paid until expiry.
+ * A daily cron (see /api/cron/cleanup) downgrades expired "canceling" users.
+ */
+export async function cancelUserPlanGracefully(
+  userId: number,
+  expiresAt: string // ISO-8601 from Paddle current_billing_period.ends_at
+): Promise<void> {
+  const sql = getSql();
+  await ensureSubscriptionExpiresAtColumn();
+  await sql`
+    UPDATE users
+    SET plan = 'canceling', subscription_expires_at = ${expiresAt}
+    WHERE id = ${userId}
+  `;
+}
+
+/** Downgrade all "canceling" users whose billing period has now ended. */
+export async function downgradeExpiredCancelingUsers(): Promise<number> {
+  const sql = getSql();
+  await ensureSubscriptionExpiresAtColumn();
+  const result = await sql`
+    UPDATE users
+    SET plan = 'free', subscription_expires_at = NULL
+    WHERE plan = 'canceling'
+      AND subscription_expires_at IS NOT NULL
+      AND subscription_expires_at::timestamptz < NOW()
+    RETURNING id
+  `;
+  return result.length;
 }
 
 /** Look up user by Paddle customer ID (stored in legacy `stripe_customer_id` column). */

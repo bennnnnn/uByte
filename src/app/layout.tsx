@@ -17,6 +17,7 @@ import ReferralTracker from "@/components/ReferralTracker";
 import OnboardingChecklist from "@/components/OnboardingChecklist";
 import PushPermissionBanner from "@/components/PushPermissionBanner";
 import GoogleOneTap from "@/components/GoogleOneTap";
+import EmailVerificationBanner from "@/components/EmailVerificationBanner";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -66,12 +67,14 @@ export const metadata: Metadata = {
     description:
       "Learn Go, Python, C++, JavaScript, Java, and Rust with interactive tutorials, interview prep, and certification-style exams.",
     url: BASE_URL,
+    images: [{ url: `${BASE_URL}/api/og`, width: 1200, height: 630, alt: "uByte — Interactive Coding Tutorials & Certifications" }],
   },
   twitter: {
     card: "summary_large_image",
     title: "uByte - Interactive Coding Tutorials and Interview Prep",
     description:
       "Interactive programming tutorials, interview prep, and certification exams across 6 languages.",
+    images: [`${BASE_URL}/api/og`],
   },
   alternates: {
     canonical: BASE_URL,
@@ -108,6 +111,8 @@ export default function RootLayout({
           <ToastProvider>
           <div className="flex min-h-dvh flex-col overflow-x-clip">
             <SiteBanner />
+            {/* Soft prompt for unverified email — dismissable for 24 h */}
+            <EmailVerificationBanner />
             <SiteHeader />
             <MobileStandaloneHeader />
             {/* Home / practice: just scrollable content. /tutorial/[lang]: sidebar + content from tutorial layout */}

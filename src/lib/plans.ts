@@ -48,9 +48,14 @@ export { DAILY_DRIP, MAX_FREE_PROBLEMS };
 
 export type BillingPlan = "monthly" | "yearly";
 
-/** Simple check for any paid access (used across UI and API routes). */
+/**
+ * Returns true for any plan that grants paid feature access.
+ * "canceling" — user has cancelled but is still within their billing period.
+ *   They keep full Pro access until the period ends, then the cleanup cron
+ *   downgrades them to "free" (see downgradeExpiredCancelingUsers in users.ts).
+ */
 export function hasPaidAccess(plan?: string | null): boolean {
-  return plan === "yearly" || plan === "pro" || plan === "monthly";
+  return plan === "yearly" || plan === "pro" || plan === "monthly" || plan === "canceling";
 }
 
 // ─── Pricing + Paddle config (shared between client and server) ──────────────

@@ -2,13 +2,14 @@
  * Daily cleanup cron — /api/cron/cleanup
  *
  * Runs once per day (scheduled in vercel.json).
- * Deletes read notifications older than 30 days.
- * Unread notifications are never deleted.
+ * 1. Deletes read notifications older than 30 days.
+ * 2. Downgrades "canceling" users whose billing period has now ended.
+ *    (set by cancelUserPlanGracefully in the Paddle webhook on subscription.canceled)
  *
  * Secured with CRON_SECRET to prevent unauthorised calls.
  */
 import { NextRequest, NextResponse } from "next/server";
-import { deleteOldNotifications } from "@/lib/db";
+import { deleteOldNotifications, downgradeExpiredCancelingUsers } from "@/lib/db";
 import { withErrorHandling } from "@/lib/api-utils";
 
 export const GET = withErrorHandling("GET /api/cron/cleanup", async (request: NextRequest) => {
@@ -21,12 +22,17 @@ export const GET = withErrorHandling("GET /api/cron/cleanup", async (request: Ne
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const deletedNotifications = await deleteOldNotifications(30);
+  const [deletedNotifications, expiredDowngrades] = await Promise.all([
+    deleteOldNotifications(30),
+    downgradeExpiredCancelingUsers(),
+  ]);
 
-  console.log(`[cron/cleanup] Deleted ${deletedNotifications} old read notifications`);
+  console.log(`[cron/cleanup] Deleted ${deletedNotifications} old notifications`);
+  console.log(`[cron/cleanup] Downgraded ${expiredDowngrades} expired canceling subscriptions`);
 
   return NextResponse.json({
     ok: true,
     deleted: { notifications: deletedNotifications },
+    downgraded: { expired_subscriptions: expiredDowngrades },
   });
 });

@@ -63,6 +63,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { timingSafeEqual } from "crypto";
 import {
   updateUserPlan,
+  cancelUserPlanGracefully,
   getUserByPaddleCustomerId,
   getUserById,
   getUserByEmail,
@@ -324,20 +325,33 @@ export const POST = withErrorHandling("POST /api/webhooks/paddle", async (reques
 
     /**
      * CANCELLATION
-     * Fires when a user cancels. Downgrades to free immediately.
+     * Fires when a user requests cancellation. We do NOT immediately downgrade.
+     * Instead we mark the plan as "canceling" with the period-end date so the
+     * user keeps full Pro access until their paid period expires.
      *
-     * NOTE: Paddle cancels at end of billing period by default.
-     * If you want to keep Pro access until period end, you would need to
-     * store the cancellation date and run a cron job to downgrade at expiry.
-     * For now we downgrade immediately on cancellation event.
+     * hasPaidAccess("canceling") returns true (see src/lib/plans.ts).
+     * A daily cron (src/app/api/cron/cleanup) calls downgradeExpiredCancelingUsers()
+     * which flips plan → "free" once subscription_expires_at < NOW().
+     *
+     * Paddle sends current_billing_period.ends_at with this event.
      */
     case "subscription.canceled": {
       const uid = await resolveUserId(paddleCustomerId, customData);
       if (uid) {
         const user = await getUserById(uid);
-        await updateUserPlan(uid, "free");
+        const periodEnd = (event.data as Record<string, unknown>)
+          ?.current_billing_period as { ends_at?: string } | undefined;
+        const expiresAt = periodEnd?.ends_at;
+
+        if (expiresAt) {
+          await cancelUserPlanGracefully(uid, expiresAt);
+          console.log("[paddle-webhook] subscription canceled — user", uid, "access until", expiresAt);
+        } else {
+          // Fallback: no period info — downgrade immediately
+          await updateUserPlan(uid, "free");
+          console.log("[paddle-webhook] subscription canceled (no period end) — user", uid, "downgraded to free");
+        }
         if (user) await recordSubscriptionEvent(uid, user.plan, 0, "canceled");
-        console.log("[paddle-webhook] subscription canceled — user", uid, "downgraded to free");
       }
       break;
     }
