@@ -26,19 +26,23 @@ export default function TutorialGrid({
   lang,
   tutorials,
   stepCountBySlug = {},
+  totalLessons,
 }: {
   lang: string;
   tutorials: Tutorial[];
   stepCountBySlug?: Record<string, number>;
+  /** Pre-computed total from getTotalLessonCount — must match the LangCard badge. */
+  totalLessons?: number;
 }) {
   const { user, progress } = useAuth();
 
-  // Use individual lesson (step) counts when available, fall back to topic counts.
-  const totalLessons = Object.values(stepCountBySlug).reduce((s, n) => s + n, 0);
-  const totalCount = totalLessons > 0 ? totalLessons : tutorials.length;
+  // Prefer the server-computed total (same value shown in LangCard).
+  // Fall back to summing stepCountBySlug, then to topic count.
+  const computedTotal = Object.values(stepCountBySlug).reduce((s, n) => s + n, 0);
+  const totalCount = totalLessons ?? (computedTotal > 0 ? computedTotal : tutorials.length);
 
   // Sum step counts for each completed topic slug; fall back to counting topics.
-  const completedCount = totalLessons > 0
+  const completedCount = computedTotal > 0
     ? progress.reduce((s, slug) => s + (stepCountBySlug[slug] ?? 0), 0)
     : progress.length;
   const [query, setQuery] = useState("");

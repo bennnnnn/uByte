@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { getAllTutorials } from "@/lib/tutorials";
 import { getLanguageConfig, isSupportedLanguage, getAllLanguageSlugs } from "@/lib/languages/registry";
-import { getSteps } from "@/lib/tutorial-steps";
+import { getSteps, getTotalLessonCount } from "@/lib/tutorial-steps";
 import { APP_NAME } from "@/lib/constants";
 import { tutorialUrl, tutorialLangUrl } from "@/lib/urls";
 import { absoluteUrl, buildBreadcrumbJsonLd } from "@/lib/seo";
@@ -61,8 +61,12 @@ export default async function TutorialLangLandingPage({
   const config = getLanguageConfig(lang)!;
   const tutorials = getAllTutorials(lang as SupportedLanguage);
 
-  // Build a map of slug → step count so the client can compute
-  // "X lessons completed" out of the real total (not just topics).
+  // Total lessons — same function used by LangCard on the home page,
+  // so the two numbers are always identical.
+  const totalLessons = getTotalLessonCount(lang as SupportedLanguage);
+
+  // Per-slug step counts so the client can sum completed lessons
+  // (progress[] holds completed topic slugs, not individual steps).
   const stepCountBySlug = Object.fromEntries(
     tutorials.map((t) => [t.slug, getSteps(lang as SupportedLanguage, t.slug).length])
   );
@@ -110,7 +114,7 @@ export default async function TutorialLangLandingPage({
           <h2 className="mb-5 text-xl font-semibold text-zinc-900 dark:text-zinc-100">
             All Tutorials
           </h2>
-          <TutorialGrid lang={lang} tutorials={tutorials} stepCountBySlug={stepCountBySlug} />
+          <TutorialGrid lang={lang} tutorials={tutorials} stepCountBySlug={stepCountBySlug} totalLessons={totalLessons} />
         </>
       ) : (
         <div className="rounded-2xl border border-zinc-200 bg-zinc-50/50 px-8 py-12 text-center dark:border-zinc-800 dark:bg-zinc-900/50">
