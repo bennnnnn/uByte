@@ -16,7 +16,6 @@ import { usePanelResize } from "@/hooks/usePanelResize";
 import OutputPanel from "@/components/tutorial/OutputPanel";
 import InstructionsSidebar from "@/components/tutorial/InstructionsSidebar";
 import CourseOutlineDrawer from "@/components/tutorial/CourseOutlineDrawer";
-import ShortcutsModal from "@/components/tutorial/ShortcutsModal";
 import SnapshotDrawer from "@/components/tutorial/SnapshotDrawer";
 import { useChallengeTimer } from "@/hooks/useChallengeTimer";
 import { tutorialUrl } from "@/lib/urls";
@@ -62,7 +61,6 @@ export default function InteractiveTutorial({
 
   const [showNav, setShowNav] = useState(false);
   const [expandedSlug, setExpandedSlug] = useState(tutorialSlug);
-  const [showShortcuts, setShowShortcuts] = useState(false);
   const [showSnapshots, setShowSnapshots] = useState(false);
   const [codeCopied, setCodeCopied] = useState(false);
   const [shareCopied, setShareCopied] = useState(false);
@@ -124,17 +122,6 @@ export default function InteractiveTutorial({
     // eslint-disable-next-line react-hooks/exhaustive-deps -- run only when tutorial completes in challenge mode
   }, [stepProgress.tutorialDone, challengeMode]);
 
-  // Global ? key → shortcuts modal (only when not typing in textarea)
-  useEffect(() => {
-    function handleGlobalKey(e: KeyboardEvent) {
-      if (e.key === "?" && document.activeElement?.tagName !== "TEXTAREA") {
-        e.preventDefault();
-        setShowShortcuts((v) => !v);
-      }
-    }
-    window.addEventListener("keydown", handleGlobalKey);
-    return () => window.removeEventListener("keydown", handleGlobalKey);
-  }, []);
 
   // Load shared code from ?share= URL param on mount (client-side — page is statically generated)
   useEffect(() => {
@@ -352,7 +339,7 @@ export default function InteractiveTutorial({
             <button
               onClick={handleShare}
               title="Share your code — copies a link to clipboard"
-              className={`flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-sm transition-all ${
+              className={`ml-auto flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-sm transition-all ${
                 shareCopied
                   ? "border-indigo-400 bg-indigo-50 text-indigo-700 dark:border-indigo-600 dark:bg-indigo-950/30 dark:text-indigo-400"
                   : "border-zinc-300 text-zinc-500 hover:border-zinc-400 hover:text-zinc-800 dark:border-zinc-700 dark:text-zinc-400 dark:hover:border-zinc-600 dark:hover:text-zinc-200"
@@ -368,13 +355,6 @@ export default function InteractiveTutorial({
                   Share
                 </>
               )}
-            </button>
-            <button
-              onClick={() => setShowShortcuts(true)}
-              title="Keyboard shortcuts (?)"
-              className="ml-auto flex h-7 w-7 items-center justify-center rounded-md border border-zinc-300 text-xs font-bold text-zinc-400 transition-colors hover:border-zinc-400 hover:text-zinc-600 dark:border-zinc-700 dark:text-zinc-500 dark:hover:border-zinc-600 dark:hover:text-zinc-300"
-            >
-              ?
             </button>
           </div>
 
@@ -453,7 +433,6 @@ export default function InteractiveTutorial({
           </button>
         </div>
       )}
-      {showShortcuts && <ShortcutsModal onClose={() => setShowShortcuts(false)} />}
       {showSnapshots && (
         <SnapshotDrawer
           slug={tutorialSlug}
