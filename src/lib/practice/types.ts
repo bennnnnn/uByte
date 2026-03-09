@@ -17,7 +17,10 @@ export type ProblemCategory =
   | "two-pointers"
   | "sliding-window"
   | "sorting"
-  | "hash-map";
+  | "hash-map"
+  | "binary-search"
+  | "greedy"
+  | "math";
 
 export interface ProblemExample {
   input: string;

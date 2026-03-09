@@ -14,8 +14,11 @@
 import type { PracticeProblem, ProblemCategory, Difficulty } from "./types";
 import type { SupportedLanguage } from "@/lib/languages/types";
 import { EASY_PROBLEMS } from "./problems-easy";
+import { EASY_PROBLEMS_2 } from "./problems-easy-2";
 import { MEDIUM_PROBLEMS } from "./problems-medium";
+import { MEDIUM_PROBLEMS_2 } from "./problems-medium-2";
 import { HARD_PROBLEMS } from "./problems-hard";
+import { HARD_PROBLEMS_2 } from "./problems-hard-2";
 
 // ─── Default starters ───────────────────────────────────────────────────────
 
@@ -51,8 +54,11 @@ const DEFAULT_RUST = `fn main() {\n    // Your code here\n    println!("Hello, W
 
 export const PRACTICE_PROBLEMS: PracticeProblem[] = [
   ...EASY_PROBLEMS,
+  ...EASY_PROBLEMS_2,
   ...MEDIUM_PROBLEMS,
+  ...MEDIUM_PROBLEMS_2,
   ...HARD_PROBLEMS,
+  ...HARD_PROBLEMS_2,
 ];
 
 // ─── Category helpers (derived from problem definitions) ─────────────────────
@@ -66,6 +72,9 @@ const CATEGORY_LABELS: Record<ProblemCategory, string> = {
   "sliding-window": "Sliding Window",
   sorting: "Sorting",
   "hash-map": "Hash Map",
+  "binary-search": "Binary Search",
+  greedy: "Greedy",
+  math: "Math",
 };
 
 export function getCategoryForSlug(slug: string): ProblemCategory | null {
