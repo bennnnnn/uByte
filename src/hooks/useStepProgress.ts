@@ -296,17 +296,15 @@ export function useStepProgress(
       }).catch(() => {});
     }
 
-    // Silently auto-format before checking
+    // Silently auto-format before checking (supports all languages via /api/format-code)
     try {
-      const body = new URLSearchParams({ body: code, imports: "true" });
-      const goFmtUrl = process.env.NEXT_PUBLIC_GO_FMT_URL || "https://go.dev/_/fmt";
-      const fmtRes = await fetch(goFmtUrl, {
+      const fmtRes = await apiFetch("/api/format-code", {
         method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: body.toString(),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code, language: lang }),
       });
       const fmtData = await fmtRes.json();
-      if (fmtData.Body && !fmtData.Error) setCodeFn(fmtData.Body);
+      if (typeof fmtData?.code === "string" && fmtData.changed) setCodeFn(fmtData.code);
     } catch { /* ignore */ }
 
     try {

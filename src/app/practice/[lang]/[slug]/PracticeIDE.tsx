@@ -9,6 +9,7 @@ import { LANGUAGES } from "@/lib/languages/registry";
 import { useCodeEditor } from "@/hooks/useCodeEditor";
 import { usePanelResize } from "@/hooks/usePanelResize";
 import { useChallengeTimer } from "@/hooks/useChallengeTimer";
+import { useFormatCode } from "@/hooks/useFormatCode";
 import ThemeToggle from "@/components/ThemeToggle";
 import AuthButtons from "@/components/AuthButtons";
 import ProblemSidebar from "@/components/practice/ProblemSidebar";
@@ -505,6 +506,7 @@ export function PracticeIDE({ problem, initialLang, initialCode, categoryFilter 
   }
 
   const timer = useChallengeTimer();
+  const { format, formatting } = useFormatCode();
   const [statuses, setStatuses] = useState<Record<string, PracticeAttemptStatus>>({});
   const [xpToast, setXpToast] = useState<number | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -694,13 +696,16 @@ export function PracticeIDE({ problem, initialLang, initialCode, categoryFilter 
     setVerdict(null);
     setAiFeedback(null);
     setAiError(null);
+    // Silently auto-format before submitting (fire-and-forget if it fails)
+    const codeToSubmit = await format(editor.code, lang).catch(() => editor.code);
+    if (codeToSubmit !== editor.code) editor.setCode(codeToSubmit);
     try {
       // Must use apiFetch (not fetch) so the x-csrf-token header is included;
       // plain fetch omits it and the route returns 403 { error: "Missing CSRF token" }.
       const res = await apiFetch("/api/submit", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ problem_id: problem.slug, code: editor.code, language: lang }),
+        body: JSON.stringify({ problem_id: problem.slug, code: codeToSubmit, language: lang }),
       });
       const data = await res.json();
 
@@ -1290,6 +1295,19 @@ export function PracticeIDE({ problem, initialLang, initialCode, categoryFilter 
               }`}
             >
               {resetPending ? "Confirm?" : "Reset"}
+            </button>
+
+            <button
+              type="button"
+              onClick={async () => {
+                const formatted = await format(editor.code, lang);
+                if (formatted !== editor.code) editor.setCode(formatted);
+              }}
+              disabled={formatting}
+              title="Auto-format code"
+              className="rounded-md border border-zinc-300 px-3 py-1.5 text-sm text-zinc-500 transition-colors hover:border-zinc-400 hover:text-zinc-800 disabled:opacity-50 dark:border-zinc-700 dark:text-zinc-400 dark:hover:border-zinc-600 dark:hover:text-zinc-200"
+            >
+              {formatting ? "…" : "⌥ Format"}
             </button>
 
 

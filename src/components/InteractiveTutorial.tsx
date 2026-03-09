@@ -18,6 +18,7 @@ import InstructionsSidebar from "@/components/tutorial/InstructionsSidebar";
 import CourseOutlineDrawer from "@/components/tutorial/CourseOutlineDrawer";
 import SnapshotDrawer from "@/components/tutorial/SnapshotDrawer";
 import { useChallengeTimer } from "@/hooks/useChallengeTimer";
+import { useFormatCode } from "@/hooks/useFormatCode";
 import { tutorialUrl } from "@/lib/urls";
 import { LANGUAGES } from "@/lib/languages/registry";
 import type { SupportedLanguage } from "@/lib/languages/types";
@@ -67,6 +68,7 @@ export default function InteractiveTutorial({
   const [challengeMode, setChallengeMode] = useState(false);
   const [challengeResult, setChallengeResult] = useState<{ totalMs: number; personalBest: number | null } | null>(null);
   const challengeTimer = useChallengeTimer();
+  const { format, formatting } = useFormatCode();
   const [fontSize, setFontSize] = useState<14 | 16 | 18>(() => {
     try { const s = localStorage.getItem("ide-font-size"); if (s === "16") return 16; if (s === "18") return 18; } catch { /* ignore */ }
     return 14;
@@ -324,6 +326,17 @@ export default function InteractiveTutorial({
             </button>
             <button onClick={() => stepProgress.handleReset(currentStep, editor.setCode, editor.setErrorLines)} className="rounded-md border border-zinc-300 px-3 py-1.5 text-sm text-zinc-500 transition-colors hover:border-zinc-400 hover:text-zinc-800 dark:border-zinc-700 dark:text-zinc-400 dark:hover:border-zinc-600 dark:hover:text-zinc-200">
               Reset
+            </button>
+            <button
+              onClick={async () => {
+                const formatted = await format(editor.code, lang);
+                if (formatted !== editor.code) editor.setCode(formatted);
+              }}
+              disabled={formatting}
+              title="Auto-format code"
+              className="rounded-md border border-zinc-300 px-3 py-1.5 text-sm text-zinc-500 transition-colors hover:border-zinc-400 hover:text-zinc-800 disabled:opacity-50 dark:border-zinc-700 dark:text-zinc-400 dark:hover:border-zinc-600 dark:hover:text-zinc-200"
+            >
+              {formatting ? "…" : "⌥ Format"}
             </button>
             <button
               onClick={handleCopyCode}
