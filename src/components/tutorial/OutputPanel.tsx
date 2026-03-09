@@ -1,5 +1,6 @@
 "use client";
 
+import AiFeedbackCard from "@/components/AiFeedbackCard";
 import type { StepProgressState } from "@/hooks/useStepProgress";
 
 interface Props {
@@ -10,7 +11,7 @@ interface Props {
   height: number;
 }
 
-/** Single scroll container: output + inline AI feedback (no chat window, no nested scroll). */
+/** Output panel for the tutorial IDE — shows run output, AI hints, and pass/fail state. */
 export default function OutputPanel({
   progress,
   expectedOutput,
@@ -18,72 +19,96 @@ export default function OutputPanel({
   onRequestHint,
   height,
 }: Props) {
-  const { output, outputIsError, status, aiFeedback, aiFeedbackLoading, stepIndex } = progress;
+  const { output, outputIsError, status, aiFeedback, setAiFeedback, aiFeedbackLoading, stepIndex } = progress;
+
+  const labelColor =
+    outputIsError || status === "failed"
+      ? "text-red-500 dark:text-red-400"
+      : status === "passed"
+      ? "text-emerald-500 dark:text-emerald-400"
+      : "text-zinc-400 dark:text-zinc-500";
+
+  const outputLabel =
+    outputIsError
+      ? "Error"
+      : status === "failed" && output !== null
+      ? "Wrong output"
+      : status === "passed"
+      ? "Output — correct ✓"
+      : "Output";
+
   return (
     <div
       className="shrink-0 overflow-y-auto overflow-x-hidden bg-zinc-50 p-4 font-mono text-sm dark:bg-zinc-950"
       style={{ height }}
       suppressHydrationWarning
     >
-      <p className={`mb-2 text-xs font-semibold uppercase tracking-widest ${
-        outputIsError || status === "failed"
-          ? "text-red-500 dark:text-red-400"
-          : status === "passed"
-          ? "text-emerald-500 dark:text-emerald-400"
-          : "text-zinc-400 dark:text-zinc-500"
-      }`}>
-        {outputIsError
-          ? "Error"
-          : status === "failed" && output !== null
-          ? "Wrong output"
-          : status === "passed"
-          ? "Output — correct ✓"
-          : "Output"}
+      {/* Status label */}
+      <p className={`mb-2 text-xs font-semibold uppercase tracking-widest ${labelColor}`}>
+        {outputLabel}
       </p>
 
+      {/* Output text */}
       {output === null ? (
         <p className="text-xs text-zinc-400 dark:text-zinc-600">
           Click Run to execute, or Check to validate.
         </p>
       ) : (
-        <pre className={`whitespace-pre-wrap break-words text-xs ${
-          outputIsError || status === "failed"
-            ? "text-red-600 dark:text-red-400"
-            : "text-green-600 dark:text-green-400"
-        }`}>{output}</pre>
+        <pre
+          className={`whitespace-pre-wrap break-words text-xs ${
+            outputIsError || status === "failed"
+              ? "text-red-600 dark:text-red-400"
+              : "text-green-600 dark:text-green-400"
+          }`}
+        >
+          {output}
+        </pre>
       )}
 
+      {/* Pass message */}
       {status === "passed" && (
         <p className="mt-2 text-sm font-medium text-emerald-600 dark:text-emerald-400">
-          🎉 {stepIndex < stepsLength - 1 ? "Great job! Moving to the next step…" : "Outstanding! Tutorial complete!"}
+          🎉{" "}
+          {stepIndex < stepsLength - 1
+            ? "Great job! Moving to the next step…"
+            : "Outstanding! Tutorial complete!"}
         </p>
       )}
 
+      {/* Expected output hint */}
       {status === "failed" && output !== null && !outputIsError && expectedOutput.length > 0 && (
         <p className="mt-1 text-xs text-zinc-400 dark:text-zinc-500">
-          Expected: <span className="font-medium text-zinc-500 dark:text-zinc-400">{expectedOutput.join(" · ")}</span>
+          Expected:{" "}
+          <span className="font-medium text-zinc-500 dark:text-zinc-400">
+            {expectedOutput.join(" · ")}
+          </span>
         </p>
       )}
 
+      {/* AI feedback section */}
       {status === "failed" && output !== null && (
-        <div className="mt-3 rounded-lg border border-violet-200 bg-violet-50 font-sans dark:border-violet-800/50 dark:bg-violet-950/20">
+        <div className="mt-3 rounded-lg border border-indigo-200 bg-indigo-50/60 px-3 py-2.5 font-sans dark:border-indigo-800/50 dark:bg-indigo-950/20">
           {aiFeedbackLoading && (
-            <p className="px-3 py-2 text-xs text-violet-500 dark:text-violet-400 animate-pulse">Analyzing your code…</p>
+            <p className="text-xs text-indigo-500 animate-pulse dark:text-indigo-400">
+              Analyzing your code…
+            </p>
           )}
+
           {!aiFeedbackLoading && !aiFeedback && (
-            <div className="flex items-center gap-2 px-3 py-2">
-              <span className="shrink-0 text-[11px] text-violet-400 dark:text-violet-500">✦</span>
+            <div className="flex items-center gap-2">
+              <span className="shrink-0 text-[11px] text-indigo-400 dark:text-indigo-500">✦</span>
               <button
                 type="button"
                 onClick={onRequestHint}
-                className="text-left text-xs font-medium text-violet-600 hover:text-violet-700 dark:text-violet-400 dark:hover:text-violet-300"
+                className="text-left text-xs font-medium text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300"
               >
-                Get hint
+                💡 Get hint
               </button>
             </div>
           )}
+
           {!aiFeedbackLoading && aiFeedback && (
-            <p className="px-3 py-2 text-xs leading-relaxed text-violet-800 dark:text-violet-200">{aiFeedback}</p>
+            <AiFeedbackCard feedback={aiFeedback} onClear={() => setAiFeedback(null)} />
           )}
         </div>
       )}

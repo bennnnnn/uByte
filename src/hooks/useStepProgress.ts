@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import type { TutorialStep } from "@/lib/tutorial-steps";
 import type { CodeCheck } from "@/lib/tutorial-steps/types";
+import type { AiFeedbackSchema } from "@/lib/ai/feedback-client";
 import { useAuth } from "@/components/AuthProvider";
 import { parseErrorLines } from "./useCodeEditor";
 import { apiFetch } from "@/lib/api-client";
@@ -53,7 +54,7 @@ async function runCodeRequest(
   currentCode: string,
   lang: string = "go"
 ): Promise<{ output: string; hasError: boolean }> {
-  const res = await fetch("/api/run-code", {
+  const res = await apiFetch("/api/run-code", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ code: currentCode, language: lang }),
@@ -72,7 +73,8 @@ export interface StepProgressState {
   status: Status;
   output: string | null;
   outputIsError: boolean;
-  aiFeedback: string | null;
+  aiFeedback: AiFeedbackSchema | null;
+  setAiFeedback: (v: AiFeedbackSchema | null) => void;
   aiFeedbackLoading: boolean;
   failCount: number;
   showInlineChat: boolean;
@@ -107,7 +109,7 @@ export function useStepProgress(
   const [status, setStatus] = useState<Status>("idle");
   const [output, setOutput] = useState<string | null>(null);
   const [outputIsError, setOutputIsError] = useState(false);
-  const [aiFeedback, setAiFeedback] = useState<string | null>(null);
+  const [aiFeedback, setAiFeedback] = useState<AiFeedbackSchema | null>(null);
   const [aiFeedbackLoading, setAiFeedbackLoading] = useState(false);
   const [failCount, setFailCount] = useState(0);
   const [showInlineChat, setShowInlineChat] = useState(false);
@@ -140,10 +142,9 @@ export function useStepProgress(
   // ── Save last activity for "You left off at..." (logged-in only) ──
   useEffect(() => {
     if (userId == null) return;
-    fetch("/api/last-activity", {
+    apiFetch("/api/last-activity", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      credentials: "same-origin",
       body: JSON.stringify({ type: "tutorial", lang, slug: tutorialSlug, step: stepIndex }),
     }).catch(() => {});
   }, [userId, lang, tutorialSlug, stepIndex]);
@@ -151,7 +152,7 @@ export function useStepProgress(
   // ── Load completed steps from DB (per-question progress) ──
   useEffect(() => {
     if (userId == null || !tutorialSlug) return;
-    fetch(`/api/progress/steps?slug=${encodeURIComponent(tutorialSlug)}&lang=${encodeURIComponent(lang)}`, { credentials: "same-origin" })
+    apiFetch(`/api/progress/steps?slug=${encodeURIComponent(tutorialSlug)}&lang=${encodeURIComponent(lang)}`)
       .then((r) => r.json())
       .then((d) => {
         const completed: number[] = Array.isArray(d?.steps) ? d.steps : [];
@@ -228,28 +229,33 @@ export function useStepProgress(
     setShowInlineChat(false);
   }
 
-  function fetchAiFeedback(
-    userCode: string,
-    error: string,
-    outputText: string,
-    currentStepIndex: number
-  ) {
+  function fetchAiFeedback(userCode: string, actualOutput: string, isError: boolean, currentStepIndex: number) {
     setAiFeedbackLoading(true);
-    fetch("/api/code-feedback", {
+    setAiFeedback(null);
+    apiFetch("/api/tutorial-hint", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ code: userCode, error, output: outputText, tutorialSlug, stepIndex: currentStepIndex, lang }),
+      body: JSON.stringify({
+        tutorialSlug,
+        stepIndex: currentStepIndex,
+        lang,
+        code: userCode,
+        actualOutput,
+        isError,
+      }),
     })
       .then((r) => r.json())
-      .then((d) => { if (d.feedback) setAiFeedback(d.feedback); })
+      .then((d) => {
+        if (d?.friendly_one_liner) setAiFeedback(d as AiFeedbackSchema);
+      })
       .catch(() => {})
       .finally(() => setAiFeedbackLoading(false));
   }
 
-  /** Call when user clicks "Get hint" — requests AI feedback for current step failure. Pass current editor code. */
+  /** Manual "Get hint" — can also be triggered automatically after 2 failures. */
   function requestHint(code: string) {
     if (status !== "failed") return;
-    fetchAiFeedback(code, outputIsError ? output ?? "" : "", outputIsError ? "" : output ?? "", stepIndex);
+    fetchAiFeedback(code, output ?? "", outputIsError, stepIndex);
   }
 
   async function handleRun(code: string, setErrorLines: (l: Set<number>) => void) {
@@ -307,12 +313,12 @@ export function useStepProgress(
       const { output: out, hasError } = await runCodeRequest(code, lang);
       setOutputIsError(hasError);
       setOutput(out || (hasError ? "Compilation error" : "(no output)"));
-      if (hasError) {
+        if (hasError) {
         setErrorLines(parseErrorLines(out));
         setStatus("failed");
         setFailCount((n) => {
           const next = n + 1;
-          if (next >= 2) fetchAiFeedback(code, out, "", stepIndex);
+          if (next >= 2) fetchAiFeedback(code, out, true, stepIndex);
           return next;
         });
         apiFetch("/api/step-check", {
@@ -336,7 +342,7 @@ export function useStepProgress(
           setStatus("failed");
           setFailCount((n) => {
             const next = n + 1;
-            if (next >= 2) fetchAiFeedback(code, "", out, stepIndex);
+            if (next >= 2) fetchAiFeedback(code, out, false, stepIndex);
             return next;
           });
           apiFetch("/api/step-check", {
@@ -365,7 +371,7 @@ export function useStepProgress(
         setStatus("failed");
         setFailCount((n) => {
           const next = n + 1;
-          if (next >= 2) fetchAiFeedback(code, "", out, stepIndex);
+          if (next >= 2) fetchAiFeedback(code, out, false, stepIndex);
           return next;
         });
         apiFetch("/api/step-check", {
@@ -396,6 +402,7 @@ export function useStepProgress(
     output,
     outputIsError,
     aiFeedback,
+    setAiFeedback,
     aiFeedbackLoading,
     failCount,
     showInlineChat,
