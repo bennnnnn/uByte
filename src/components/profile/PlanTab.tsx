@@ -26,7 +26,7 @@ interface Props {
   plan: string;
 }
 
-function ManageOrCancelButtons() {
+function ManageOrCancelButtons({ canceling = false }: { canceling?: boolean }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -61,14 +61,16 @@ function ManageOrCancelButtons() {
       >
         {loading ? "Opening…" : "Manage billing"}
       </Button>
-      <button
-        type="button"
-        onClick={() => openPortal("cancel")}
-        disabled={loading}
-        className="rounded-xl border border-red-200 bg-white px-4 py-2.5 text-sm font-semibold text-red-600 transition-colors hover:border-red-300 hover:bg-red-50 dark:border-red-900/50 dark:bg-red-950/30 dark:text-red-400 dark:hover:bg-red-950/50 disabled:opacity-50"
-      >
-        Cancel subscription
-      </button>
+      {!canceling && (
+        <button
+          type="button"
+          onClick={() => openPortal("cancel")}
+          disabled={loading}
+          className="rounded-xl border border-red-200 bg-white px-4 py-2.5 text-sm font-semibold text-red-600 transition-colors hover:border-red-300 hover:bg-red-50 dark:border-red-900/50 dark:bg-red-950/30 dark:text-red-400 dark:hover:bg-red-950/50 disabled:opacity-50"
+        >
+          Cancel subscription
+        </button>
+      )}
       {error && <p className="w-full text-sm text-red-600 dark:text-red-400">{error}</p>}
     </div>
   );
@@ -80,6 +82,7 @@ export default function PlanTab({ plan }: Props) {
   const isPaid = hasPaidAccess(plan);
   const isYearly = plan === "yearly";
   const isMonthly = plan === "pro";
+  const isCanceling = plan === "canceling";
   const paddleReady = useRef(false);
 
   // When redirected back from Paddle checkout with ?plan=success,
@@ -96,12 +99,20 @@ export default function PlanTab({ plan }: Props) {
     return () => clearInterval(interval);
   }, [searchParams, refreshProfile]);
 
-  const planLabel = isYearly ? BILLING_CONFIG.yearly.label : isMonthly ? BILLING_CONFIG.monthly.label : "Free";
+  const planLabel = isYearly
+    ? BILLING_CONFIG.yearly.label
+    : isMonthly
+      ? BILLING_CONFIG.monthly.label
+      : isCanceling
+        ? "Pro (Cancelling)"
+        : "Free";
   const planPrice = isYearly
     ? BILLING_CONFIG.yearly.priceText
     : isMonthly
       ? BILLING_CONFIG.monthly.priceText
-      : "Free forever";
+      : isCanceling
+        ? "Access continues until your billing period ends"
+        : "Free forever";
 
   useEffect(() => {
     if (paddleReady.current) return;
@@ -166,8 +177,12 @@ export default function PlanTab({ plan }: Props) {
                   {planLabel}
                 </h3>
                 {isPaid && (
-                  <span className="rounded-full bg-emerald-500 px-2.5 py-0.5 text-xs font-semibold text-white">
-                    Active
+                  <span
+                    className={`rounded-full px-2.5 py-0.5 text-xs font-semibold text-white ${
+                      isCanceling ? "bg-amber-500" : "bg-emerald-500"
+                    }`}
+                  >
+                    {isCanceling ? "Cancelling" : "Active"}
                   </span>
                 )}
               </div>
@@ -278,9 +293,11 @@ export default function PlanTab({ plan }: Props) {
               You’re all set
             </p>
             <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
-              Manage billing, update payment method, or cancel your subscription below. If you cancel, you keep Pro until the end of your current billing period—then access reverts to free.
+              {isCanceling
+                ? "Your subscription has been cancelled. You keep full Pro access until your current billing period ends — then your account reverts to free. Your progress and certificates are never deleted."
+                : "Manage billing, update your payment method, or cancel your subscription below. If you cancel, you keep Pro until the end of your current billing period — then access reverts to free."}
             </p>
-            <ManageOrCancelButtons />
+            <ManageOrCancelButtons canceling={isCanceling} />
           </Card>
         </div>
       )}
