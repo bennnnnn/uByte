@@ -700,13 +700,20 @@ export function PracticeIDE({ problem, initialLang, categoryFilter = null, listP
     setAiFeedback(null);
     setAiError(null);
     try {
-      const res = await fetch("/api/submit", {
+      // Must use apiFetch (not fetch) so the x-csrf-token header is included;
+      // plain fetch omits it and the route returns 403 { error: "Missing CSRF token" }.
+      const res = await apiFetch("/api/submit", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        credentials: "same-origin",
         body: JSON.stringify({ problem_id: problem.slug, code: editor.code, language: lang }),
       });
       const data = await res.json();
+
+      if (!res.ok) {
+        setVerdict({ type: "error", message: data?.error ?? data?.message ?? `Server error (${res.status})` });
+        setOutputHeight(Math.max(outputHeightRef.current, 400));
+        return;
+      }
       const v = {
         type:                data.verdict,
         message:            data.message,
