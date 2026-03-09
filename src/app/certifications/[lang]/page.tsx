@@ -8,6 +8,7 @@ import { getCurrentUser } from "@/lib/auth";
 import { getUserPlan, getExamConfigForLang, getExamConfigForAllLangs, getProgressCount, getUserExamStats, getExamPublicStatsByLang } from "@/lib/db";
 import { hasPaidAccess } from "@/lib/plans";
 import { getAllTutorials } from "@/lib/tutorials";
+import { getTotalLessonCount } from "@/lib/tutorial-steps";
 import { getLangIcon } from "@/lib/languages/icons";
 import { getExamDetailContent } from "@/lib/exams/content";
 import { absoluteUrl, buildBreadcrumbJsonLd, buildFaqJsonLd, SITE_KEYWORDS } from "@/lib/seo";
@@ -76,7 +77,11 @@ export default async function PracticeExamLangPage({ params }: Props) {
   const plan = user ? await getUserPlan(user.userId) : "free";
   const canTakeExam = hasPaidAccess(plan);
 
-  const totalTutorials = getAllTutorials(lang as SupportedLanguage).length;
+  // totalLessons — individual steps, matches the number shown on LangCard / tutorial page.
+  // totalTopics  — number of tutorial topics; getProgressCount also returns a topic count,
+  //                so the progress bar uses topics/topics (apples to apples).
+  const totalLessons = getTotalLessonCount(lang as SupportedLanguage);
+  const totalTopics = getAllTutorials(lang as SupportedLanguage).length;
   const completedTutorials = user ? await getProgressCount(user.userId, lang) : 0;
   const hasStartedTutorials = completedTutorials > 0;
 
@@ -195,7 +200,7 @@ export default async function PracticeExamLangPage({ params }: Props) {
       </div>
 
       {/* ── Tutorial suggestion (non-blocking) ────────────────────────── */}
-      {user && !hasStartedTutorials && totalTutorials > 0 && (
+      {user && !hasStartedTutorials && totalTopics > 0 && (
         <div className="mx-auto max-w-5xl px-6 pt-6">
           <div className="flex items-start gap-3 rounded-xl border border-amber-200 bg-amber-50 px-5 py-4 dark:border-amber-800/50 dark:bg-amber-950/20">
             <span className="mt-0.5 text-lg">💡</span>
@@ -204,7 +209,7 @@ export default async function PracticeExamLangPage({ params }: Props) {
                 New to {name}? Our interactive tutorials can help you prepare.
               </p>
               <p className="mt-0.5 text-xs text-zinc-500 dark:text-zinc-400">
-                {totalTutorials} hands-on lessons cover the core concepts tested in this exam. Totally optional — take the exam whenever you&apos;re ready.
+                {totalLessons} hands-on lessons cover the core concepts tested in this exam. Totally optional — take the exam whenever you&apos;re ready.
               </p>
             </div>
             <Link
@@ -218,18 +223,18 @@ export default async function PracticeExamLangPage({ params }: Props) {
       )}
 
       {/* ── Tutorial progress (partially completed) ────────────────────── */}
-      {user && hasStartedTutorials && completedTutorials < totalTutorials && (
+      {user && hasStartedTutorials && completedTutorials < totalTopics && (
         <div className="mx-auto max-w-5xl px-6 pt-6">
           <div className="flex items-center gap-3 rounded-xl border border-zinc-200 bg-surface-card px-5 py-4 dark:border-zinc-700">
             <span className="text-lg">📚</span>
             <div className="flex-1">
               <p className="text-sm font-medium text-zinc-800 dark:text-zinc-200">
-                You&apos;ve completed {completedTutorials} of {totalTutorials} {name} tutorials
+                You&apos;ve completed {completedTutorials} of {totalTopics} {name} tutorials
               </p>
               <div className="mt-2 h-1.5 w-full max-w-xs overflow-hidden rounded-full bg-zinc-100 dark:bg-zinc-800">
                 <div
                   className="h-full rounded-full bg-indigo-500 transition-all"
-                  style={{ width: `${Math.round((completedTutorials / totalTutorials) * 100)}%` }}
+                  style={{ width: `${Math.round((completedTutorials / totalTopics) * 100)}%` }}
                 />
               </div>
             </div>
