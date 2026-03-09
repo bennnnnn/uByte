@@ -64,6 +64,8 @@ export default function InteractiveTutorial({
   const [expandedSlug, setExpandedSlug] = useState(tutorialSlug);
   const [showShortcuts, setShowShortcuts] = useState(false);
   const [showSnapshots, setShowSnapshots] = useState(false);
+  const [codeCopied, setCodeCopied] = useState(false);
+  const [shareCopied, setShareCopied] = useState(false);
   const [challengeMode, setChallengeMode] = useState(false);
   const [challengeResult, setChallengeResult] = useState<{ totalMs: number; personalBest: number | null } | null>(null);
   const challengeTimer = useChallengeTimer();
@@ -133,6 +135,36 @@ export default function InteractiveTutorial({
     window.addEventListener("keydown", handleGlobalKey);
     return () => window.removeEventListener("keydown", handleGlobalKey);
   }, []);
+
+  // Load shared code from ?share= URL param on mount (client-side — page is statically generated)
+  useEffect(() => {
+    try {
+      const encoded = new URLSearchParams(window.location.search).get("share");
+      if (encoded) editor.setCode(decodeURIComponent(atob(encoded)));
+    } catch { /* ignore malformed share param */ }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  function handleCopyCode() {
+    navigator.clipboard.writeText(editor.code).then(() => {
+      setCodeCopied(true);
+      setTimeout(() => setCodeCopied(false), 2000);
+    }).catch(() => {});
+  }
+
+  function handleShare() {
+    try {
+      const encoded = btoa(encodeURIComponent(editor.code));
+      const url = new URL(window.location.href);
+      url.searchParams.set("share", encoded);
+      navigator.clipboard.writeText(url.toString()).then(() => {
+        setShareCopied(true);
+        setTimeout(() => setShareCopied(false), 2500);
+      }).catch(() => {});
+    } catch {
+      navigator.clipboard.writeText(window.location.href).catch(() => {});
+    }
+  }
 
   function handleKeyDown(e: React.KeyboardEvent<HTMLTextAreaElement>) {
     if (e.key === "Tab") {
@@ -306,6 +338,37 @@ export default function InteractiveTutorial({
             <button onClick={() => stepProgress.handleReset(currentStep, editor.setCode, editor.setErrorLines)} className="rounded-md border border-zinc-300 px-3 py-1.5 text-sm text-zinc-500 transition-colors hover:border-zinc-400 hover:text-zinc-800 dark:border-zinc-700 dark:text-zinc-400 dark:hover:border-zinc-600 dark:hover:text-zinc-200">
               Reset
             </button>
+            <button
+              onClick={handleCopyCode}
+              title="Copy code to clipboard"
+              className={`rounded-md border px-3 py-1.5 text-sm transition-all ${
+                codeCopied
+                  ? "border-emerald-400 bg-emerald-50 text-emerald-700 dark:border-emerald-600 dark:bg-emerald-950/30 dark:text-emerald-400"
+                  : "border-zinc-300 text-zinc-500 hover:border-zinc-400 hover:text-zinc-800 dark:border-zinc-700 dark:text-zinc-400 dark:hover:border-zinc-600 dark:hover:text-zinc-200"
+              }`}
+            >
+              {codeCopied ? "✓ Copied" : "Copy"}
+            </button>
+            <button
+              onClick={handleShare}
+              title="Share your code — copies a link to clipboard"
+              className={`flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-sm transition-all ${
+                shareCopied
+                  ? "border-indigo-400 bg-indigo-50 text-indigo-700 dark:border-indigo-600 dark:bg-indigo-950/30 dark:text-indigo-400"
+                  : "border-zinc-300 text-zinc-500 hover:border-zinc-400 hover:text-zinc-800 dark:border-zinc-700 dark:text-zinc-400 dark:hover:border-zinc-600 dark:hover:text-zinc-200"
+              }`}
+            >
+              {shareCopied ? (
+                <>✓ Link copied!</>
+              ) : (
+                <>
+                  <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+                  </svg>
+                  Share
+                </>
+              )}
+            </button>
             {user && (
               <button onClick={() => setShowSnapshots(true)} title="Code history" className="flex items-center gap-1.5 rounded-md border border-zinc-400 px-3 py-1.5 text-sm font-medium text-zinc-700 transition-colors hover:border-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 dark:border-zinc-600 dark:text-zinc-200 dark:hover:border-zinc-500 dark:hover:bg-zinc-800 dark:hover:text-zinc-100">
                 <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
@@ -368,6 +431,34 @@ export default function InteractiveTutorial({
           </button>
           <button onClick={() => stepProgress.handleReset(currentStep, editor.setCode, editor.setErrorLines)} aria-label="Reset" className="flex shrink-0 items-center justify-center rounded-md border border-zinc-300 px-3 py-2 text-sm text-zinc-500 dark:border-zinc-700 dark:text-zinc-400">
             Reset
+          </button>
+          <button
+            onClick={handleCopyCode}
+            aria-label="Copy code"
+            title="Copy code"
+            className={`flex shrink-0 items-center justify-center rounded-md border px-3 py-2 text-sm transition-all ${
+              codeCopied
+                ? "border-emerald-400 bg-emerald-50 text-emerald-700 dark:border-emerald-600 dark:bg-emerald-950/30 dark:text-emerald-400"
+                : "border-zinc-300 text-zinc-500 dark:border-zinc-700 dark:text-zinc-400"
+            }`}
+          >
+            {codeCopied ? "✓" : "Copy"}
+          </button>
+          <button
+            onClick={handleShare}
+            aria-label="Share code"
+            title="Share code"
+            className={`flex shrink-0 items-center justify-center rounded-md border px-3 py-2 text-sm transition-all ${
+              shareCopied
+                ? "border-indigo-400 bg-indigo-50 text-indigo-700 dark:border-indigo-600 dark:bg-indigo-950/30 dark:text-indigo-400"
+                : "border-zinc-300 text-zinc-500 dark:border-zinc-700 dark:text-zinc-400"
+            }`}
+          >
+            {shareCopied ? "✓" : (
+              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+              </svg>
+            )}
           </button>
         </div>
       )}
