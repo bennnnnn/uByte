@@ -260,31 +260,53 @@ function ProfilePage() {
       />
       <StatsRow stats={stats} />
 
-      {/* Tabs — horizontal scroll so all tabs visible on small screens */}
-      <div className="-mx-1 mb-6 overflow-x-auto overflow-y-hidden">
-        <div className="flex min-w-max gap-1 rounded-xl bg-zinc-100 p-1 dark:bg-zinc-900" role="tablist" aria-label="Profile sections">
-          {VALID_TABS.map((t) => (
-            <button
-              key={t}
-              role="tab"
-              aria-selected={tab === t}
-              aria-controls={`tabpanel-${t}`}
-              id={`tab-${t}`}
-              onClick={() => setTab(t)}
-              className={`relative flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium whitespace-nowrap transition-colors ${
-                tab === t
-                  ? "bg-white text-zinc-900 shadow dark:bg-zinc-800 dark:text-zinc-100"
-                  : "text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-300"
-              }`}
-            >
-              {TAB_LABELS[t]}
-              {t === "notifications" && unreadCount > 0 && (
-                <span className="rounded-full bg-indigo-600 px-1.5 py-0.5 text-[10px] font-bold leading-none text-white">
-                  {unreadCount}
-                </span>
-              )}
-            </button>
-          ))}
+      {/* Tabs — dropdown on mobile, pill row on desktop */}
+      <div className="mb-6">
+        {/* Mobile: native select */}
+        <div className="sm:hidden">
+          <select
+            value={tab}
+            onChange={(e) => setTab(e.target.value as Tab)}
+            className="w-full rounded-xl border border-zinc-200 bg-white px-4 py-2.5 text-sm font-medium text-zinc-900 shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
+            aria-label="Profile section"
+          >
+            {VALID_TABS.map((t) => (
+              <option key={t} value={t}>
+                {TAB_LABELS[t]}
+                {t === "notifications" && unreadCount > 0 ? ` (${unreadCount})` : ""}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* Desktop: scrollable pill tabs */}
+        <div className="hidden sm:block">
+          <div className="-mx-1 overflow-x-auto overflow-y-hidden">
+            <div className="flex min-w-max gap-1 rounded-xl bg-zinc-100 p-1 dark:bg-zinc-900" role="tablist" aria-label="Profile sections">
+              {VALID_TABS.map((t) => (
+                <button
+                  key={t}
+                  role="tab"
+                  aria-selected={tab === t}
+                  aria-controls={`tabpanel-${t}`}
+                  id={`tab-${t}`}
+                  onClick={() => setTab(t)}
+                  className={`relative flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium whitespace-nowrap transition-colors ${
+                    tab === t
+                      ? "bg-white text-zinc-900 shadow dark:bg-zinc-800 dark:text-zinc-100"
+                      : "text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-300"
+                  }`}
+                >
+                  {TAB_LABELS[t]}
+                  {t === "notifications" && unreadCount > 0 && (
+                    <span className="rounded-full bg-indigo-600 px-1.5 py-0.5 text-[10px] font-bold leading-none text-white">
+                      {unreadCount}
+                    </span>
+                  )}
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
 
