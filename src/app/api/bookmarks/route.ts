@@ -11,10 +11,12 @@ export const GET = withErrorHandling("GET /api/bookmarks", async (request: NextR
 
   const { searchParams } = new URL(request.url);
   const offset = Math.max(0, parseInt(searchParams.get("offset") || "0", 10) || 0);
-  const lang = searchParams.get("lang") ?? "go";
+  // Omit language filter when lang param is absent — returns all languages (profile view).
+  // Pass a specific lang when the IDE needs to check if the current problem is bookmarked.
+  const langParam = searchParams.get("lang") ?? undefined;
   const [bookmarks, total] = await Promise.all([
-    getBookmarks(tokenUser.userId, PAGE_SIZE, offset, lang),
-    getBookmarkTotal(tokenUser.userId, lang),
+    getBookmarks(tokenUser.userId, PAGE_SIZE, offset, langParam),
+    getBookmarkTotal(tokenUser.userId, langParam),
   ]);
   return NextResponse.json({ bookmarks, total, hasMore: offset + PAGE_SIZE < total });
 });

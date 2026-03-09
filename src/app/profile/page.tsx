@@ -105,7 +105,7 @@ function ProfilePage() {
       const [profRes, statsRes, bmRes, notifRes] = await Promise.all([
         fetch("/api/profile", { credentials: "same-origin" }),
         fetch("/api/profile/stats", { credentials: "same-origin" }),
-        fetch("/api/bookmarks?lang=go", { credentials: "same-origin" }),
+        fetch("/api/bookmarks", { credentials: "same-origin" }),
         fetch("/api/notifications", { credentials: "same-origin" }),
       ]);
 
@@ -211,7 +211,7 @@ function ProfilePage() {
   const loadMoreBookmarks = async () => {
     setBmLoading(true);
     try {
-      const res = await fetch(`/api/bookmarks?offset=${bookmarks.length}&lang=go`, { credentials: "same-origin" });
+      const res = await fetch(`/api/bookmarks?offset=${bookmarks.length}`, { credentials: "same-origin" });
       if (res.ok) {
         const data = await res.json();
         setBookmarks((prev) => [...prev, ...data.bookmarks]);

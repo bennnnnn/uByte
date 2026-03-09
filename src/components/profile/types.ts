@@ -58,6 +58,7 @@ export interface Bookmark {
   tutorial_slug: string;
   snippet: string;
   note: string;
+  language: string;
   created_at: string;
 }
 
