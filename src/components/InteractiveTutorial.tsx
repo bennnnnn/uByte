@@ -24,6 +24,7 @@ import type { SupportedLanguage } from "@/lib/languages/types";
 import GripDots from "@/components/GripDots";
 import { useIsMobile } from "@/hooks/useIsMobile";
 import GuestConversionPrompt from "@/components/GuestConversionPrompt";
+import GuestTopBanner from "@/components/GuestTopBanner";
 
 interface Props {
   lang: string;
@@ -160,12 +161,14 @@ export default function InteractiveTutorial({
     return <UpgradeWall tutorialTitle={tutorialTitle} />;
   }
 
-  // Show conversion prompt to guests after completing 3+ steps
-  const guestHasProgress = !user && !loading && stepProgress.completedSteps.size >= 3;
+  // Show conversion prompt to guests after completing their very first step
+  const guestHasProgress = !user && !loading && stepProgress.completedSteps.size >= 1;
 
   return (
     <div className="fixed inset-0 z-50 flex flex-col bg-white text-zinc-900 dark:bg-zinc-950 dark:text-zinc-100">
-      {/* Guest conversion prompt — only for logged-out users with meaningful progress */}
+      {/* Persistent top bar for guests — visible from step 0, before any code is run */}
+      <GuestTopBanner show={!user && !loading} />
+      {/* Slide-up prompt after first completed step */}
       <GuestConversionPrompt trigger={guestHasProgress} context="tutorial" />
 
       {isDragging && (
