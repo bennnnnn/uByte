@@ -648,10 +648,9 @@ export function PracticeIDE({ problem, initialLang, initialCode, categoryFilter 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [notes, problem.slug]);
 
-  // Auto-start the stopwatch; reset and restart when the problem changes
+  // Reset the stopwatch when the user navigates to a different problem (don't auto-start)
   useEffect(() => {
     timer.reset();
-    timer.start();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [problem.slug]);
 
@@ -837,15 +836,7 @@ export function PracticeIDE({ problem, initialLang, initialCode, categoryFilter 
     finally { setBookmarkLoading(false); }
   }
 
-  const [codeCopied, setCodeCopied] = useState(false);
   const [shareCopied, setShareCopied] = useState(false);
-
-  function handleCopyCode() {
-    navigator.clipboard.writeText(editor.code).then(() => {
-      setCodeCopied(true);
-      setTimeout(() => setCodeCopied(false), 2000);
-    }).catch(() => {});
-  }
 
   function handleShare() {
     try {
@@ -959,10 +950,19 @@ export function PracticeIDE({ problem, initialLang, initialCode, categoryFilter 
 
         {/* Right: timer + bookmark + theme + user menu */}
         <div className="flex flex-1 justify-end gap-2 md:flex-initial md:gap-3">
-          {/* Stopwatch — same component as tutorial challenge mode */}
-          <div className="hidden items-center gap-1.5 rounded-md border border-zinc-200 px-2.5 py-1 text-xs font-mono text-zinc-500 dark:border-zinc-700 dark:text-zinc-400 sm:flex" title="Time spent on this problem">
-            ⏱ {timer.display}
-          </div>
+          {/* Stopwatch — click to start/stop */}
+          <button
+            type="button"
+            onClick={() => timer.running ? timer.stop() : timer.start()}
+            title={timer.running ? "Pause timer" : timer.elapsed > 0 ? "Resume timer" : "Start timer"}
+            className={`hidden items-center gap-1.5 rounded-md border px-2.5 py-1 text-xs font-mono transition-colors sm:flex ${
+              timer.running
+                ? "border-indigo-300 bg-indigo-50 text-indigo-700 dark:border-indigo-700 dark:bg-indigo-950/30 dark:text-indigo-400"
+                : "border-zinc-200 text-zinc-500 hover:border-zinc-300 hover:text-zinc-700 dark:border-zinc-700 dark:text-zinc-400 dark:hover:border-zinc-600"
+            }`}
+          >
+            {timer.running ? "⏸" : "▶"} {timer.display}
+          </button>
           {/* Bookmark */}
           {user && (
             <button
@@ -1121,7 +1121,7 @@ export function PracticeIDE({ problem, initialLang, initialCode, categoryFilter 
                         <Link
                           href={`/practice/${lang}/${prev.slug}`}
                           scroll={false}
-                          className="flex-1 rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2 text-center text-xs font-medium text-zinc-600 transition-colors hover:border-indigo-300 hover:bg-indigo-50 hover:text-indigo-700 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-400 dark:hover:border-indigo-700 dark:hover:text-indigo-400"
+                          className="flex-1 rounded-lg border border-indigo-200 bg-indigo-50 px-3 py-2 text-center text-xs font-medium text-indigo-600 transition-colors hover:border-indigo-300 hover:bg-indigo-100 hover:text-indigo-700 dark:border-indigo-800/60 dark:bg-indigo-950/30 dark:text-indigo-400 dark:hover:bg-indigo-950/50"
                         >
                           ← Prev
                         </Link>
@@ -1130,7 +1130,7 @@ export function PracticeIDE({ problem, initialLang, initialCode, categoryFilter 
                         <Link
                           href={`/practice/${lang}/${next.slug}`}
                           scroll={false}
-                          className="flex-1 rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2 text-center text-xs font-medium text-zinc-600 transition-colors hover:border-indigo-300 hover:bg-indigo-50 hover:text-indigo-700 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-400 dark:hover:border-indigo-700 dark:hover:text-indigo-400"
+                          className="flex-1 rounded-lg border border-indigo-200 bg-indigo-50 px-3 py-2 text-center text-xs font-medium text-indigo-600 transition-colors hover:border-indigo-300 hover:bg-indigo-100 hover:text-indigo-700 dark:border-indigo-800/60 dark:bg-indigo-950/30 dark:text-indigo-400 dark:hover:bg-indigo-950/50"
                         >
                           Next →
                         </Link>
@@ -1292,18 +1292,6 @@ export function PracticeIDE({ problem, initialLang, initialCode, categoryFilter 
               {resetPending ? "Confirm?" : "Reset"}
             </button>
 
-            <button
-              type="button"
-              onClick={handleCopyCode}
-              title="Copy code to clipboard"
-              className={`rounded-md border px-3 py-1.5 text-sm transition-all ${
-                codeCopied
-                  ? "border-emerald-400 bg-emerald-50 text-emerald-700 dark:border-emerald-600 dark:bg-emerald-950/30 dark:text-emerald-400"
-                  : "border-zinc-300 text-zinc-500 hover:border-zinc-400 hover:text-zinc-800 dark:border-zinc-700 dark:text-zinc-400 dark:hover:border-zinc-600 dark:hover:text-zinc-200"
-              }`}
-            >
-              {codeCopied ? "✓ Copied" : "Copy"}
-            </button>
 
             <button
               type="button"

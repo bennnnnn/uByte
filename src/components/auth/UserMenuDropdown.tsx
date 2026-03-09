@@ -135,7 +135,7 @@ export default function UserMenuDropdown({ unreadCount, isMobile }: Props) {
           </div>
 
           {/* Footer: logout */}
-          <div className="flex items-center justify-end border-t border-zinc-100 px-3 py-2 dark:border-zinc-800">
+          <div className="flex items-center justify-start border-t border-zinc-100 px-3 py-2 dark:border-zinc-800">
             <button
               onClick={() => { close(); logout(); }}
               className="flex items-center gap-2 rounded-lg px-3 py-1.5 text-sm font-medium text-red-600 transition-colors hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-950/50"
