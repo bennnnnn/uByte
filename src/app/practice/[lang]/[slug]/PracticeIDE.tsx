@@ -1236,7 +1236,7 @@ export function PracticeIDE({ problem, initialLang, initialCode, categoryFilter 
               />
               <textarea
                 ref={editor.textareaRef}
-                value={editor.code}
+                defaultValue={editor.code}
                 onChange={(e) => editor.setCode(e.target.value)}
                 onScroll={editor.syncScroll}
                 onKeyDown={handleKeyDown}

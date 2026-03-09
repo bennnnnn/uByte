@@ -302,7 +302,7 @@ export default function InteractiveTutorial({
                 ))}
               </div>
               <pre ref={editor.preRef} aria-hidden className="pointer-events-none absolute inset-0 overflow-auto whitespace-pre py-4 pl-4 pr-8 text-zinc-100" dangerouslySetInnerHTML={{ __html: editor.highlightedHtml + "\n" }} />
-              <textarea ref={editor.textareaRef} value={editor.code} onChange={(e) => editor.setCode(e.target.value)} onScroll={editor.syncScroll} onKeyDown={handleKeyDown} spellCheck={false} autoCorrect="off" autoCapitalize="off" aria-label="Code editor" className="absolute inset-0 resize-none overflow-auto whitespace-pre bg-transparent py-4 pl-4 pr-8 text-transparent caret-white outline-none selection:bg-indigo-900/50" />
+              <textarea ref={editor.textareaRef} defaultValue={editor.code} onChange={(e) => editor.setCode(e.target.value)} onScroll={editor.syncScroll} onKeyDown={handleKeyDown} spellCheck={false} autoCorrect="off" autoCapitalize="off" aria-label="Code editor" className="absolute inset-0 resize-none overflow-auto whitespace-pre bg-transparent py-4 pl-4 pr-8 text-transparent caret-white outline-none selection:bg-indigo-900/50" />
             </div>
           </div>
 

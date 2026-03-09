@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useMemo, useLayoutEffect } from "react";
+import { useState, useRef, useMemo } from "react";
 import { getHighlighter } from "@/lib/languages/registry";
 import type { SupportedLanguage } from "@/lib/languages/types";
 
@@ -32,8 +32,14 @@ export function useCodeEditor(
   initialCode: string,
   lang: SupportedLanguage = "go"
 ): CodeEditorState {
+  // `code` state is consumed by: API calls, line numbers, and as the initial
+  // value for dangerouslySetInnerHTML. The <pre> and <textarea> are kept in
+  // sync via imperative DOM writes so React re-renders (e.g. timer every 100ms)
+  // never touch the textarea or reset the cursor.
   const [code, setCodeState] = useState(initialCode);
   const highlightFn = getHighlighter(lang);
+  // Memoised HTML is used only for the initial dangerouslySetInnerHTML mount;
+  // subsequent updates are imperative so there is no stale-render lag.
   const highlightedHtml = useMemo(() => highlightFn(code), [highlightFn, code]);
   const [errorLines, setErrorLines] = useState<Set<number>>(new Set());
   const [formatting, setFormatting] = useState(false);
@@ -43,38 +49,38 @@ export function useCodeEditor(
   const highlightRef = useRef<HTMLDivElement>(null);
   const textareaRef  = useRef<HTMLTextAreaElement>(null);
 
-  // When an external setCode call changes the value (draft load, reset, format,
-  // language switch), React will rewrite textarea.value via the controlled `value`
-  // prop — which the browser treats as a programmatic write and moves the cursor
-  // to the end. We save the desired cursor position here and restore it right
-  // after React commits the DOM update via useLayoutEffect.
-  const savedCursor = useRef<{ start: number; end: number } | null>(null);
+  // Keep a ref so the imperative update always uses the latest highlighter
+  // without recreating setCode.
+  const highlightFnRef = useRef(highlightFn);
+  highlightFnRef.current = highlightFn;
 
   function setCode(newCode: string) {
+    // ── 1. Update <pre> imperatively ────────────────────────────────────────
+    // This keeps the visible syntax-highlighted layer pixel-perfect in sync
+    // with the textarea immediately — no waiting for React to reconcile.
+    if (preRef.current) {
+      preRef.current.innerHTML = highlightFnRef.current(newCode) + "\n";
+    }
+
+    // ── 2. Update <textarea> for external calls only ─────────────────────
+    // When called from onChange the browser already updated ta.value, so
+    // ta.value === newCode and we skip this block — cursor is untouched.
+    // For external calls (draft load, reset, format, language switch),
+    // ta.value !== newCode so we write it and clamp the cursor to stay valid.
     const ta = textareaRef.current;
     if (ta && ta.value !== newCode) {
-      // External call — ta.value already differs because the user didn't type this.
-      // Save the cursor clamped to the new code's length so it stays valid.
-      savedCursor.current = {
-        start: Math.min(ta.selectionStart ?? 0, newCode.length),
-        end:   Math.min(ta.selectionEnd   ?? 0, newCode.length),
-      };
+      const selStart = Math.min(ta.selectionStart ?? 0, newCode.length);
+      const selEnd   = Math.min(ta.selectionEnd   ?? 0, newCode.length);
+      ta.value = newCode;
+      ta.selectionStart = selStart;
+      ta.selectionEnd   = selEnd;
     }
-    // When called from onChange (user typing), ta.value === newCode already,
-    // so we don't touch savedCursor — React detects the value hasn't changed
-    // vs what it last wrote and skips the DOM write, preserving the cursor.
+
+    // ── 3. Update React state ────────────────────────────────────────────
+    // Consumed by: line numbers, API call bodies, and the initial render of
+    // the <pre> via dangerouslySetInnerHTML (subsequent updates are imperative).
     setCodeState(newCode);
   }
-
-  // Restore cursor position synchronously after React commits the DOM update.
-  // Only runs when `code` changes, and only acts when we saved a position.
-  useLayoutEffect(() => {
-    if (savedCursor.current && textareaRef.current) {
-      textareaRef.current.selectionStart = savedCursor.current.start;
-      textareaRef.current.selectionEnd   = savedCursor.current.end;
-      savedCursor.current = null;
-    }
-  }, [code]);
 
   async function handleFormat() {
     if (lang !== "go") return;
