@@ -16,6 +16,7 @@ import { Suspense } from "react";
 import ReferralTracker from "@/components/ReferralTracker";
 import OnboardingChecklist from "@/components/OnboardingChecklist";
 import PushPermissionBanner from "@/components/PushPermissionBanner";
+import GoogleOneTap from "@/components/GoogleOneTap";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -118,6 +119,8 @@ export default function RootLayout({
           <LazyCookieConsentAndAnalytics />
           {/* Reads ?ref= from URL and persists to localStorage for signup attribution */}
           <Suspense fallback={null}><ReferralTracker /></Suspense>
+          {/* Google One Tap — auto-shows "Continue as [name]" for guests */}
+          <GoogleOneTap />
           {/* Floating checklist for new users — hides once all 3 steps are done */}
           <OnboardingChecklist />
           {/* Asks for push permission after first streak day — shown once */}
