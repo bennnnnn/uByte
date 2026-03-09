@@ -60,7 +60,6 @@ function OutputPanel({
   aiFeedback: { friendly_one_liner: string; hint: string; next_step: string; minimal_patch?: string } | null;
   onRequestAI: (level: number) => void;
   onClearAI: () => void;
-  onExpandPanel: () => void;
 }) {
   const [activeTab, setActiveTab] = useState<"console" | "tests">(
     verdict ? "tests" : "console"
@@ -122,7 +121,7 @@ function OutputPanel({
           <button
             key={tab}
             type="button"
-            onClick={() => { setActiveTab(tab); if (tab === "tests") onExpandPanel(); }}  
+            onClick={() => setActiveTab(tab)}
             className={`flex items-center gap-1.5 border-b-2 px-4 py-2 text-xs font-semibold transition-colors ${
               activeTab === tab
                 ? "border-indigo-500 text-indigo-600 dark:text-indigo-400"
@@ -617,11 +616,10 @@ export function PracticeIDE({ problem, initialLang, categoryFilter = null, listP
     return () => clearInterval(id);
   }, [problem.slug]);
 
-  // Auto-expand output panel when a verdict arrives so users see the test case details
-  useEffect(() => {
-    if (verdict) setOutputHeight(Math.max(outputHeight, 320));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [verdict]);
+  // Keep a ref so handleSubmit/handleRun can always read the latest outputHeight
+  // without needing it as a useCallback dependency.
+  const outputHeightRef = useRef(outputHeight);
+  outputHeightRef.current = outputHeight;
 
   // Global ? key → shortcuts modal
   useEffect(() => {
@@ -709,6 +707,8 @@ export function PracticeIDE({ problem, initialLang, categoryFilter = null, listP
         consecutiveFailures: data.consecutive_failures,
       };
       setVerdict(v);
+      // Expand the panel immediately so chips + detail are visible without scrolling
+      setOutputHeight(Math.max(outputHeightRef.current, 400));
 
       if (data.verdict === "accepted") {
         setStatuses((prev) => ({ ...prev, [problem.slug]: "solved" }));
@@ -1224,7 +1224,6 @@ export function PracticeIDE({ problem, initialLang, categoryFilter = null, listP
             aiFeedback={aiFeedback}
             onRequestAI={requestAiFeedback}
             onClearAI={() => { setAiFeedback(null); setAiError(null); }}
-            onExpandPanel={() => setOutputHeight(Math.max(outputHeight, 360))}
           />
         </div>
       </div>
