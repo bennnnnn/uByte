@@ -1,0 +1,688 @@
+---
+title: "Top 20 Go Interview Questions (With Answers & Code)"
+description: "The most commonly asked Go interview questions, with detailed answers and runnable code examples. Covers goroutines, channels, interfaces, error handling, and more."
+date: "2026-03-03"
+readTime: "18 min read"
+category: "Interview Prep"
+tags: ["Go", "Interview Prep", "Backend Engineering"]
+---
+
+Go has become one of the most in-demand backend languages at companies like Google, Uber, Cloudflare, and Twitch. If you have a Go interview coming up, this guide covers the 20 questions you're most likely to face — with real code, not just definitions.
+
+## Table of Contents
+
+1. [What is a goroutine?](#goroutine)
+2. [What are channels?](#channels)
+3. [What is a goroutine leak?](#goroutine-leak)
+4. [How does `defer` work?](#defer)
+5. [What's the difference between `new` and `make`?](#new-vs-make)
+6. [How does error handling work in Go?](#errors)
+7. [What are interfaces?](#interfaces)
+8. [What is the empty interface?](#empty-interface)
+9. [What is a closure?](#closures)
+10. [How do slices differ from arrays?](#slices)
+11. [How do maps work?](#maps)
+12. [What is a `select` statement?](#select)
+13. [How does Go handle race conditions?](#race-conditions)
+14. [What is the `sync.WaitGroup`?](#waitgroup)
+15. [What is `context` used for?](#context)
+16. [What are Go generics?](#generics)
+17. [What is `panic` and `recover`?](#panic-recover)
+18. [How does Go's garbage collector work?](#gc)
+19. [What is a method set?](#method-set)
+20. [How do you write unit tests in Go?](#testing)
+
+---
+
+## 1. What is a goroutine? {#goroutine}
+
+A **goroutine** is a lightweight thread managed by the Go runtime, not the OS. You start one with the `go` keyword. Goroutines are cheap — you can easily run hundreds of thousands concurrently.
+
+```go
+package main
+
+import (
+    "fmt"
+    "time"
+)
+
+func greet(name string) {
+    fmt.Printf("Hello, %s!\n", name)
+}
+
+func main() {
+    go greet("Alice") // runs concurrently
+    go greet("Bob")
+    time.Sleep(100 * time.Millisecond) // wait for goroutines
+}
+```
+
+**Key points:**
+- Goroutines start with ~8KB stack (grows dynamically)
+- They are multiplexed onto OS threads by the Go scheduler (M:N model)
+- `go` is non-blocking — the calling goroutine continues immediately
+
+---
+
+## 2. What are channels? {#channels}
+
+Channels are typed conduits that let goroutines communicate safely. They enforce a "communicate by sharing memory" philosophy rather than "share memory to communicate."
+
+```go
+package main
+
+import "fmt"
+
+func sum(nums []int, result chan int) {
+    total := 0
+    for _, n := range nums {
+        total += n
+    }
+    result <- total // send
+}
+
+func main() {
+    nums := []int{1, 2, 3, 4, 5, 6}
+    ch := make(chan int)
+
+    go sum(nums[:3], ch)
+    go sum(nums[3:], ch)
+
+    a, b := <-ch, <-ch // receive both
+    fmt.Println("Sum:", a+b) // 21
+}
+```
+
+**Buffered vs unbuffered:**
+- `make(chan int)` — unbuffered: send blocks until receiver is ready
+- `make(chan int, 5)` — buffered: send only blocks when buffer is full
+
+---
+
+## 3. What is a goroutine leak? {#goroutine-leak}
+
+A goroutine leak happens when a goroutine is started but never terminates. This is one of the most common bugs in Go production code.
+
+```go
+// BUG: This goroutine leaks if nothing reads from ch
+func leak() {
+    ch := make(chan int)
+    go func() {
+        val := <-ch // blocks forever — nobody sends
+        fmt.Println(val)
+    }()
+}
+```
+
+**How to prevent leaks:**
+- Always pair goroutines with a done signal (context cancellation, close(ch), or a dedicated quit channel)
+- Use `goleak` in tests to detect leaked goroutines
+
+```go
+// Fixed: use context for cancellation
+func noLeak(ctx context.Context) {
+    ch := make(chan int)
+    go func() {
+        select {
+        case val := <-ch:
+            fmt.Println(val)
+        case <-ctx.Done():
+            return // clean exit
+        }
+    }()
+}
+```
+
+---
+
+## 4. How does `defer` work? {#defer}
+
+`defer` schedules a function call to run when the surrounding function returns — even if it returns via `panic`. Multiple defers execute in **LIFO** (last in, first out) order.
+
+```go
+func readFile(name string) error {
+    f, err := os.Open(name)
+    if err != nil {
+        return err
+    }
+    defer f.Close() // always runs when readFile returns
+
+    // ... read file
+    return nil
+}
+
+func countdown() {
+    for i := 3; i >= 1; i-- {
+        defer fmt.Println(i)
+    }
+}
+// Output: 1, 2, 3  (LIFO order)
+```
+
+**Gotcha:** Deferred functions capture variables by reference, not value.
+
+```go
+func gotcha() {
+    x := 1
+    defer fmt.Println(x) // prints 1, not 2
+    x = 2
+}
+// BUT:
+func gotcha2() {
+    x := 1
+    defer func() { fmt.Println(x) }() // prints 2 (closure captures reference)
+    x = 2
+}
+```
+
+---
+
+## 5. What's the difference between `new` and `make`? {#new-vs-make}
+
+| | `new(T)` | `make(T, ...)` |
+|---|---|---|
+| Returns | `*T` (pointer to zero value) | `T` (initialized value) |
+| Works on | Any type | Only `slice`, `map`, `chan` |
+| Use case | Allocate a pointer to a struct | Initialize built-in reference types |
+
+```go
+// new: allocates and returns a pointer
+p := new(int)    // *int, *p == 0
+s := new([]int)  // *[]int, but the slice is nil
+
+// make: initializes and returns the value directly
+sl := make([]int, 5)      // []int with len=5, cap=5
+m  := make(map[string]int) // empty, ready-to-use map
+ch := make(chan int, 10)   // buffered channel
+```
+
+In practice, `new` is rarely needed. Struct literals (`&MyStruct{}`) are more idiomatic.
+
+---
+
+## 6. How does error handling work in Go? {#errors}
+
+Go returns errors as values — no exceptions. Functions that can fail return `(result, error)`.
+
+```go
+import (
+    "errors"
+    "fmt"
+)
+
+// Custom error type
+type ValidationError struct {
+    Field   string
+    Message string
+}
+
+func (e *ValidationError) Error() string {
+    return fmt.Sprintf("%s: %s", e.Field, e.Message)
+}
+
+func validateAge(age int) error {
+    if age < 0 {
+        return &ValidationError{Field: "age", Message: "must be non-negative"}
+    }
+    if age > 150 {
+        return errors.New("age is unrealistically high")
+    }
+    return nil
+}
+
+func main() {
+    if err := validateAge(-1); err != nil {
+        var ve *ValidationError
+        if errors.As(err, &ve) {
+            fmt.Println("Field:", ve.Field) // "age"
+        }
+    }
+}
+```
+
+**Wrapping errors (Go 1.13+):**
+```go
+// Wrap with context
+return fmt.Errorf("load config: %w", err)
+
+// Unwrap
+errors.Is(err, os.ErrNotExist) // checks wrapped chain
+errors.As(err, &target)         // extracts type from chain
+```
+
+---
+
+## 7. What are interfaces? {#interfaces}
+
+An interface in Go is a set of method signatures. A type **implicitly satisfies** an interface by implementing all its methods — no `implements` keyword.
+
+```go
+type Shape interface {
+    Area() float64
+    Perimeter() float64
+}
+
+type Rectangle struct {
+    Width, Height float64
+}
+
+func (r Rectangle) Area() float64      { return r.Width * r.Height }
+func (r Rectangle) Perimeter() float64 { return 2 * (r.Width + r.Height) }
+
+// Circle also satisfies Shape
+type Circle struct{ Radius float64 }
+func (c Circle) Area() float64      { return 3.14159 * c.Radius * c.Radius }
+func (c Circle) Perimeter() float64 { return 2 * 3.14159 * c.Radius }
+
+func printShape(s Shape) {
+    fmt.Printf("Area: %.2f, Perimeter: %.2f\n", s.Area(), s.Perimeter())
+}
+
+func main() {
+    printShape(Rectangle{3, 4}) // Area: 12.00, Perimeter: 14.00
+    printShape(Circle{5})        // Area: 78.54, Perimeter: 31.42
+}
+```
+
+---
+
+## 8. What is the empty interface? {#empty-interface}
+
+`interface{}` (or `any` in Go 1.18+) has zero methods, so every type satisfies it. Use sparingly — it loses type safety.
+
+```go
+func describe(v any) {
+    fmt.Printf("Type: %T, Value: %v\n", v, v)
+}
+
+describe(42)        // Type: int, Value: 42
+describe("hello")   // Type: string, Value: hello
+describe([]int{1,2}) // Type: []int, Value: [1 2]
+```
+
+Use **type assertions** and **type switches** to recover the concrete type:
+
+```go
+func process(v any) {
+    switch x := v.(type) {
+    case int:
+        fmt.Println("int:", x*2)
+    case string:
+        fmt.Println("string:", strings.ToUpper(x))
+    default:
+        fmt.Printf("unknown type: %T\n", x)
+    }
+}
+```
+
+---
+
+## 9. What is a closure? {#closures}
+
+A closure is a function that references variables from its enclosing scope. Those variables survive the lifetime of the outer function.
+
+```go
+func counter() func() int {
+    count := 0
+    return func() int {
+        count++
+        return count
+    }
+}
+
+func main() {
+    c1 := counter()
+    c2 := counter()
+    fmt.Println(c1(), c1(), c1()) // 1 2 3
+    fmt.Println(c2(), c2())       // 1 2  (independent state)
+}
+```
+
+**Classic interview gotcha — loop variable capture:**
+```go
+// BUG: all goroutines print the same value
+for i := 0; i < 3; i++ {
+    go func() { fmt.Println(i) }() // captures i by reference
+}
+
+// FIX: pass as argument
+for i := 0; i < 3; i++ {
+    go func(n int) { fmt.Println(n) }(i)
+}
+```
+
+---
+
+## 10. How do slices differ from arrays? {#slices}
+
+Arrays have fixed length and are value types. Slices are dynamic, reference a backing array, and are far more common.
+
+```go
+// Array: fixed size, copied on assignment
+arr := [3]int{1, 2, 3}
+copy := arr        // independent copy
+copy[0] = 99
+fmt.Println(arr[0]) // 1 — unaffected
+
+// Slice: header (ptr + len + cap), references backing array
+sl := []int{1, 2, 3}
+sl2 := sl        // same backing array!
+sl2[0] = 99
+fmt.Println(sl[0]) // 99 — affected
+
+// append may allocate a new backing array
+sl3 := append(sl, 4, 5, 6)
+fmt.Println(cap(sl3)) // capacity doubled
+```
+
+---
+
+## 11. How do maps work? {#maps}
+
+Maps are hash tables. They must be initialized with `make` or a literal before use.
+
+```go
+// Declare and initialize
+freq := make(map[string]int)
+
+words := []string{"go", "is", "great", "go", "is", "fast"}
+for _, w := range words {
+    freq[w]++
+}
+
+// Check existence — never use the zero value to detect absence
+if count, ok := freq["go"]; ok {
+    fmt.Printf("'go' appears %d times\n", count)
+}
+
+// Delete
+delete(freq, "is")
+
+// Iterate (order is random)
+for word, count := range freq {
+    fmt.Printf("%s: %d\n", word, count)
+}
+```
+
+**Important:** Maps are not safe for concurrent use. Use `sync.RWMutex` or `sync.Map` for concurrent access.
+
+---
+
+## 12. What is the `select` statement? {#select}
+
+`select` is like a `switch` for channels — it blocks until one of several channel operations can proceed.
+
+```go
+func fetchWithTimeout(url string) (string, error) {
+    resultCh := make(chan string, 1)
+    go func() {
+        // simulate HTTP request
+        time.Sleep(200 * time.Millisecond)
+        resultCh <- "response body"
+    }()
+
+    select {
+    case result := <-resultCh:
+        return result, nil
+    case <-time.After(100 * time.Millisecond):
+        return "", errors.New("request timed out")
+    }
+}
+```
+
+If multiple cases are ready simultaneously, `select` picks one **at random** — this is by design to prevent starvation.
+
+---
+
+## 13. How does Go handle race conditions? {#race-conditions}
+
+Go has a built-in race detector (`go run -race`, `go test -race`). Use `sync.Mutex` or channels to protect shared state.
+
+```go
+type SafeCounter struct {
+    mu    sync.Mutex
+    count int
+}
+
+func (c *SafeCounter) Inc() {
+    c.mu.Lock()
+    defer c.mu.Unlock()
+    c.count++
+}
+
+func (c *SafeCounter) Value() int {
+    c.mu.RLock()  // use RWMutex for read-heavy workloads
+    defer c.mu.RUnlock()
+    return c.count
+}
+```
+
+**Always run `go test -race` in CI.** It catches races that would be extremely hard to find in production.
+
+---
+
+## 14. What is `sync.WaitGroup`? {#waitgroup}
+
+`WaitGroup` waits for a collection of goroutines to finish.
+
+```go
+func processItems(items []string) {
+    var wg sync.WaitGroup
+
+    for _, item := range items {
+        wg.Add(1)
+        go func(s string) {
+            defer wg.Done()
+            fmt.Println("Processing:", s)
+        }(item)
+    }
+
+    wg.Wait() // blocks until all goroutines call Done()
+    fmt.Println("All done")
+}
+```
+
+**Rule:** Call `wg.Add(1)` **before** starting the goroutine, not inside it.
+
+---
+
+## 15. What is `context` used for? {#context}
+
+The `context` package propagates cancellation, deadlines, and request-scoped values across API boundaries and goroutines.
+
+```go
+func fetchUser(ctx context.Context, id int) (*User, error) {
+    req, _ := http.NewRequestWithContext(ctx, "GET",
+        fmt.Sprintf("https://api.example.com/users/%d", id), nil)
+
+    resp, err := http.DefaultClient.Do(req)
+    if err != nil {
+        return nil, err // includes context.Canceled or DeadlineExceeded
+    }
+    defer resp.Body.Close()
+    // ...
+}
+
+func main() {
+    ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+    defer cancel()
+
+    user, err := fetchUser(ctx, 42)
+    // ...
+}
+```
+
+**Best practice:** Always pass `ctx` as the first argument to functions that do I/O. Never store a context in a struct.
+
+---
+
+## 16. What are Go generics? {#generics}
+
+Go 1.18 added generics with type parameters. They let you write type-safe code that works across types without `interface{}`.
+
+```go
+// Generic Map function
+func Map[T, U any](slice []T, fn func(T) U) []U {
+    result := make([]U, len(slice))
+    for i, v := range slice {
+        result[i] = fn(v)
+    }
+    return result
+}
+
+func main() {
+    nums := []int{1, 2, 3, 4}
+    doubled := Map(nums, func(n int) int { return n * 2 })
+    // [2 4 6 8]
+
+    strs := Map(nums, func(n int) string { return fmt.Sprintf("#%d", n) })
+    // ["#1" "#2" "#3" "#4"]
+}
+
+// Type constraint
+type Number interface {
+    int | int64 | float64
+}
+
+func Sum[T Number](nums []T) T {
+    var total T
+    for _, n := range nums {
+        total += n
+    }
+    return total
+}
+```
+
+---
+
+## 17. What is `panic` and `recover`? {#panic-recover}
+
+`panic` stops normal execution and unwinds the stack, running deferred functions. `recover` can catch a panic inside a deferred function.
+
+```go
+func safeDivide(a, b int) (result int, err error) {
+    defer func() {
+        if r := recover(); r != nil {
+            err = fmt.Errorf("recovered from panic: %v", r)
+        }
+    }()
+
+    return a / b, nil // panics if b == 0
+}
+
+func main() {
+    result, err := safeDivide(10, 0)
+    fmt.Println(result, err) // 0, "recovered from panic: runtime error: integer divide by zero"
+}
+```
+
+**When to use:** Only recover from panics at the top of call stacks (e.g., HTTP handlers) to prevent one bad request from crashing the whole server. For normal error conditions, return errors.
+
+---
+
+## 18. How does Go's garbage collector work? {#gc}
+
+Go uses a **concurrent, tri-color mark-and-sweep GC** that runs mostly alongside your program — pauses are typically under 1ms.
+
+Key points for interviews:
+- GC is triggered when heap doubles since last collection
+- You can hint with `runtime.GC()` but rarely need to
+- `GOGC` env var controls aggressiveness (default 100 = collect when heap doubles)
+- `GOMEMLIMIT` (Go 1.19+) sets a soft memory cap
+
+```go
+// Profile allocations: run go test -memprofile mem.out
+// then: go tool pprof mem.out
+```
+
+---
+
+## 19. What is a method set? {#method-set}
+
+A method set defines which methods can be called on a type. It determines interface satisfaction.
+
+```go
+type Animal struct{ Name string }
+
+func (a Animal) Speak() string  { return a.Name + " speaks" }
+func (a *Animal) Rename(n string) { a.Name = n }
+
+// Animal (value) method set:  {Speak}
+// *Animal (pointer) method set: {Speak, Rename}
+
+type Speaker interface{ Speak() string }
+type Renamer interface{ Speak() string; Rename(string) }
+
+var s Speaker = Animal{Name: "Cat"}   // works: Animal satisfies Speaker
+var r Renamer = &Animal{Name: "Dog"}  // works: *Animal satisfies Renamer
+// var r2 Renamer = Animal{...}       // compile error: Animal doesn't have Rename
+```
+
+---
+
+## 20. How do you write unit tests in Go? {#testing}
+
+Go has first-class testing built in with the `testing` package — no frameworks needed.
+
+```go
+// math.go
+package math
+
+func Add(a, b int) int { return a + b }
+
+func Divide(a, b float64) (float64, error) {
+    if b == 0 {
+        return 0, errors.New("division by zero")
+    }
+    return a / b, nil
+}
+```
+
+```go
+// math_test.go
+package math
+
+import (
+    "testing"
+)
+
+func TestAdd(t *testing.T) {
+    cases := []struct {
+        a, b, want int
+    }{
+        {2, 3, 5},
+        {-1, 1, 0},
+        {0, 0, 0},
+    }
+    for _, tc := range cases {
+        t.Run(fmt.Sprintf("%d+%d", tc.a, tc.b), func(t *testing.T) {
+            got := Add(tc.a, tc.b)
+            if got != tc.want {
+                t.Errorf("Add(%d, %d) = %d; want %d", tc.a, tc.b, got, tc.want)
+            }
+        })
+    }
+}
+
+func TestDivide_ByZero(t *testing.T) {
+    _, err := Divide(10, 0)
+    if err == nil {
+        t.Fatal("expected error, got nil")
+    }
+}
+```
+
+Run with `go test ./...` or `go test -v -race ./...` for verbose output with race detection.
+
+---
+
+## What to study next
+
+These 20 questions cover the most common Go interview topics. To go deeper:
+
+- **Concurrency patterns:** fan-out/fan-in, worker pools, pipeline patterns
+- **Profiling:** `pprof`, `trace`, `go tool pprof`
+- **Standard library:** `net/http`, `encoding/json`, `database/sql`
+- **Testing:** table-driven tests, benchmarks, fuzz testing (Go 1.18+)
+
+Ready to practice? [uByte's Go interview prep](/practice/go) has hands-on coding problems in your browser — no setup required.

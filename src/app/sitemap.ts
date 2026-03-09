@@ -2,6 +2,7 @@ import type { MetadataRoute } from "next";
 import { getAllTutorials } from "@/lib/tutorials";
 import { getAllLanguageSlugs } from "@/lib/languages/registry";
 import { getAllPracticeProblems } from "@/lib/practice/problems";
+import { getAllBlogPosts } from "@/lib/blog";
 import { BASE_URL } from "@/lib/constants";
 import { tutorialUrl, tutorialLangUrl } from "@/lib/urls";
 import type { SupportedLanguage } from "@/lib/languages/types";
@@ -13,6 +14,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const languageSlugs = getAllLanguageSlugs();
   const practiceProblems = getAllPracticeProblems();
 
+  const blogPosts = getAllBlogPosts();
   const entries: MetadataRoute.Sitemap = [
     {
       url: abs("/"),
@@ -74,6 +76,19 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "yearly",
       priority: 0.3,
     },
+    {
+      url: abs("/blog"),
+      lastModified: now,
+      changeFrequency: "weekly",
+      priority: 0.8,
+    },
+    // Individual blog posts
+    ...blogPosts.map((post) => ({
+      url: abs(`/blog/${post.slug}`),
+      lastModified: new Date(post.date),
+      changeFrequency: "monthly" as const,
+      priority: 0.75,
+    })),
   ];
 
   for (const lang of languageSlugs) {

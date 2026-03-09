@@ -21,6 +21,7 @@ const PRACTICE_LINKS = [
 
 const COMPANY_LINKS = [
   { href: "/about", label: "About" },
+  { href: "/blog", label: "Blog" },
   { href: "/contact", label: "Contact" },
   { href: "/help", label: "Help Center" },
 ];

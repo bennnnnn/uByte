@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@plugin "@tailwindcss/typography";
 
 /* Enable class-based dark mode so dark: classes respond to .dark on <html> */
 @variant dark (&:where(.dark, .dark *));
@@ -90,4 +91,35 @@ pre.shiki code {
 .bg-dot-grid-28-dark {
   background-image: radial-gradient(circle, #71717a 1px, transparent 1px);
   background-size: 28px 28px;
+}
+
+/* ── Blog post prose (rehype-pretty-code code blocks) ─────────────────────── */
+[data-rehype-pretty-code-figure] {
+  margin: 1.5rem 0;
+}
+[data-rehype-pretty-code-figure] pre {
+  overflow-x: auto;
+  border-radius: 0.75rem;
+  padding: 1.25rem 1.5rem;
+  font-size: 0.875rem;
+  line-height: 1.75;
+}
+[data-rehype-pretty-code-figure] [data-highlighted-line] {
+  background-color: rgba(99, 102, 241, 0.12);
+  border-left: 2px solid #6366f1;
+  padding-left: calc(1.5rem - 2px);
+  margin-left: -1.5rem;
+  margin-right: -1.5rem;
+  padding-right: 1.5rem;
+}
+/* language badge above code blocks */
+[data-rehype-pretty-code-title] {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-family: var(--font-mono);
+  background-color: #6366f1;
+  color: white;
+  padding: 0.2rem 0.75rem;
+  border-radius: 0.5rem 0.5rem 0 0;
+  margin-bottom: -0.25rem;
 }

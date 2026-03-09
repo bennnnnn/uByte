@@ -36,8 +36,9 @@
     "posthog-js": "^1.360.0",
     "react": "19.2.3",
     "react-dom": "19.2.3",
+    "rehype-pretty-code": "^0.14.3",
     "resend": "^6.9.3",
-    "shiki": "^4.0.0",
+    "shiki": "^4.0.2",
     "web-push": "^3.6.7",
     "zod": "^4.3.6"
   },
