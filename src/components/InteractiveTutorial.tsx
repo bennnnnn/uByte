@@ -369,15 +369,6 @@ export default function InteractiveTutorial({
                 </>
               )}
             </button>
-            {user && (
-              <button onClick={() => setShowSnapshots(true)} title="Code history" className="flex items-center gap-1.5 rounded-md border border-zinc-400 px-3 py-1.5 text-sm font-medium text-zinc-700 transition-colors hover:border-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 dark:border-zinc-600 dark:text-zinc-200 dark:hover:border-zinc-500 dark:hover:bg-zinc-800 dark:hover:text-zinc-100">
-                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-                  <circle cx="12" cy="12" r="10" />
-                  <path d="M12 6v6l4 2" />
-                </svg>
-                History
-              </button>
-            )}
             <button
               onClick={() => setShowShortcuts(true)}
               title="Keyboard shortcuts (?)"
