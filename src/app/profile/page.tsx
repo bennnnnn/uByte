@@ -55,7 +55,7 @@ function ProfileSkeleton() {
   );
 }
 
-const VALID_TABS = ["overview", "progress", "certifications", "plan", "achievements", "notifications", "bookmarks", "settings", "referral"] as const;
+const VALID_TABS = ["overview", "progress", "certifications", "plan", "referral", "achievements", "notifications", "bookmarks", "settings"] as const;
 type Tab = (typeof VALID_TABS)[number];
 
 const TAB_LABELS: Record<Tab, string> = {
@@ -63,11 +63,11 @@ const TAB_LABELS: Record<Tab, string> = {
   progress: "Progress",
   certifications: "Certifications",
   plan: "Plan",
+  referral: "Refer & Earn 🎁",
   achievements: "Achievements",
   notifications: "Notifications",
   bookmarks: "Bookmarks",
   settings: "Settings",
-  referral: "Refer & Earn",
 };
 
 function ProfilePage() {
