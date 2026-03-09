@@ -15,6 +15,7 @@ import NotificationsTab from "@/components/profile/NotificationsTab";
 import BookmarksTab from "@/components/profile/BookmarksTab";
 import CertificationsTab from "@/components/profile/CertificationsTab";
 import SettingsTab from "@/components/profile/SettingsTab";
+import ReferralSection from "@/components/profile/ReferralSection";
 import type { Profile, Stats, Badge, Achievement, Bookmark, Notification } from "@/components/profile/types";
 
 export default function ProfilePageWrapper() {
@@ -54,7 +55,7 @@ function ProfileSkeleton() {
   );
 }
 
-const VALID_TABS = ["overview", "progress", "certifications", "plan", "achievements", "notifications", "bookmarks", "settings"] as const;
+const VALID_TABS = ["overview", "progress", "certifications", "plan", "achievements", "notifications", "bookmarks", "settings", "referral"] as const;
 type Tab = (typeof VALID_TABS)[number];
 
 const TAB_LABELS: Record<Tab, string> = {
@@ -66,6 +67,7 @@ const TAB_LABELS: Record<Tab, string> = {
   notifications: "Notifications",
   bookmarks: "Bookmarks",
   settings: "Settings",
+  referral: "Refer & Earn",
 };
 
 function ProfilePage() {
@@ -333,6 +335,16 @@ function ProfilePage() {
           onResetProgress={resetProgress}
           onLogoutAll={async () => { await logoutAll(); router.push("/"); }}
         />
+      )}
+      {tab === "referral" && (
+        <div className="max-w-lg">
+          <h2 className="mb-4 text-xl font-bold text-zinc-900 dark:text-zinc-100">Refer &amp; Earn</h2>
+          <p className="mb-6 text-sm text-zinc-500 dark:text-zinc-400">
+            Invite friends to uByte. For each person who signs up with your link and upgrades to Pro,
+            you earn <span className="font-semibold text-indigo-600 dark:text-indigo-400">30 free days of Pro</span>.
+          </p>
+          <ReferralSection />
+        </div>
       )}
       </div>
     </div>
