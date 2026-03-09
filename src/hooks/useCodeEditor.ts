@@ -32,7 +32,10 @@ export function useCodeEditor(
   initialCode: string,
   lang: SupportedLanguage = "go"
 ): CodeEditorState {
-  const [code, setCode] = useState(initialCode);
+  // `code` state is used ONLY for syntax highlighting.
+  // The textarea's live value lives in the DOM (uncontrolled) so that
+  // React never resets the cursor position on re-renders.
+  const [code, setCodeState] = useState(initialCode);
   const highlightFn = getHighlighter(lang);
   const highlightedHtml = useMemo(() => highlightFn(code), [highlightFn, code]);
   const [errorLines, setErrorLines] = useState<Set<number>>(new Set());
@@ -43,11 +46,34 @@ export function useCodeEditor(
   const highlightRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  async function handleFormat() {
-    if (lang !== "go") {
-      // Format is only supported for Go (go.dev/_/fmt); other languages use Judge0, no client formatter
-      return;
+  /**
+   * Update the editor code.
+   *
+   * When called from onChange (user typing), `textareaRef.current.value`
+   * already has the new value — we only need to sync the React state for
+   * syntax highlighting, which causes no cursor jump because the textarea
+   * is uncontrolled (uses `defaultValue`).
+   *
+   * When called externally (draft load, reset, format, language switch),
+   * we write directly to the DOM with cursor clamping so the position is
+   * preserved (or clamped to the end of the shorter code).
+   */
+  function setCode(newCode: string) {
+    const ta = textareaRef.current;
+    if (ta && ta.value !== newCode) {
+      // Save cursor before touching the DOM value
+      const selStart = ta.selectionStart ?? 0;
+      const selEnd   = ta.selectionEnd   ?? 0;
+      ta.value = newCode;
+      // Clamp so the cursor stays valid if the new code is shorter
+      ta.selectionStart = Math.min(selStart, newCode.length);
+      ta.selectionEnd   = Math.min(selEnd,   newCode.length);
     }
+    setCodeState(newCode);
+  }
+
+  async function handleFormat() {
+    if (lang !== "go") return;
     setFormatting(true);
     try {
       const body = new URLSearchParams({ body: code, imports: "true" });
@@ -65,18 +91,12 @@ export function useCodeEditor(
   }
 
   function syncScroll() {
-    if (textareaRef.current) {
-      if (preRef.current) {
-        preRef.current.scrollTop = textareaRef.current.scrollTop;
-        preRef.current.scrollLeft = textareaRef.current.scrollLeft;
-      }
-      if (lineNumRef.current) {
-        lineNumRef.current.scrollTop = textareaRef.current.scrollTop;
-      }
-      if (highlightRef.current) {
-        highlightRef.current.scrollTop = textareaRef.current.scrollTop;
-      }
-    }
+    const ta = textareaRef.current;
+    if (!ta) return;
+    if (preRef.current)       preRef.current.scrollTop  = ta.scrollTop;
+    if (preRef.current)       preRef.current.scrollLeft = ta.scrollLeft;
+    if (lineNumRef.current)   lineNumRef.current.scrollTop  = ta.scrollTop;
+    if (highlightRef.current) highlightRef.current.scrollTop = ta.scrollTop;
   }
 
   return {
