@@ -583,15 +583,52 @@ export function PracticeIDE({ problem, initialLang, initialCode, categoryFilter 
   const editor = useCodeEditor(initialCode ?? getStarterForLanguage(problem, initialLang), lang);
   const { leftWidth, outputHeight, setOutputHeight, isDragging, startDragH, startDragV, startDragVTouch } = usePanelResize();
 
-  // When language changes, load the starter for the new language
+  // On mount: load saved draft from DB (share param wins — don't overwrite it)
+  useEffect(() => {
+    if (initialCode) return;
+    if (!user) return; // guests have no draft to load
+    apiFetch(`/api/practice-code?slug=${encodeURIComponent(problem.slug)}&lang=${encodeURIComponent(lang)}`)
+      .then((r) => r.json())
+      .then((d) => { if (typeof d?.code === "string" && d.code) editor.setCode(d.code); })
+      .catch(() => {});
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [problem.slug, user?.id]);
+
+  // Debounce-save code draft to DB on every change (1 s idle, logged-in only)
+  const codeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const userRef2 = useRef(user);
+  userRef2.current = user;
+  useEffect(() => {
+    if (codeTimerRef.current) clearTimeout(codeTimerRef.current);
+    codeTimerRef.current = setTimeout(() => {
+      if (!userRef2.current) return; // guests — no save
+      apiFetch("/api/practice-code", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ slug: problem.slug, lang, code: editor.code }),
+      }).catch(() => {});
+    }, 1000);
+    return () => { if (codeTimerRef.current) clearTimeout(codeTimerRef.current); };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [editor.code, problem.slug, lang]);
+
+  // When language changes, load the saved draft for that lang (or fall back to starter)
   const prevLangRef = useRef(lang);
   useEffect(() => {
-    if (lang !== prevLangRef.current) {
+    if (lang === prevLangRef.current) return;
+    prevLangRef.current = lang;
+    setOutput(null);
+    if (!user) {
       editor.setCode(getStarterForLanguage(problem, lang));
-      setOutput(null);
-      prevLangRef.current = lang;
+      return;
     }
-  }, [lang, problem, editor]);
+    apiFetch(`/api/practice-code?slug=${encodeURIComponent(problem.slug)}&lang=${encodeURIComponent(lang)}`)
+      .then((r) => r.json())
+      .then((d) => {
+        editor.setCode(typeof d?.code === "string" && d.code ? d.code : getStarterForLanguage(problem, lang));
+      })
+      .catch(() => editor.setCode(getStarterForLanguage(problem, lang)));
+  }, [lang, problem, editor, user]);
 
   // Record page view
   useEffect(() => {
@@ -901,9 +938,16 @@ export function PracticeIDE({ problem, initialLang, initialCode, categoryFilter 
       resetTimerRef.current = setTimeout(() => setResetPending(false), 3000);
       return;
     }
-    // Second click: confirmed — clear the timer and reset
+    // Second click: confirmed — delete the DB draft and reset to starter
     if (resetTimerRef.current) clearTimeout(resetTimerRef.current);
     setResetPending(false);
+    if (user) {
+      apiFetch("/api/practice-code", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ slug: problem.slug, lang }),
+      }).catch(() => {});
+    }
     editor.setCode(getStarterForLanguage(problem, lang));
     editor.setErrorLines(new Set());
     setOutput(null);
