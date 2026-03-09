@@ -93,7 +93,9 @@ export const POST = withErrorHandling("POST /api/ai-feedback", async (request: N
   }
 
   const evidenceBundle = buildEvidenceBundle(submission, problem);
-  const response = await callAiFeedback(evidenceBundle, hintLevel, submission.verdict);
+  // Use only the first name so the AI greeting feels natural ("Hey Alex!" not "Hey Alex Smith!")
+  const firstName = user.name?.split(" ")[0] ?? undefined;
+  const response = await callAiFeedback(evidenceBundle, hintLevel, submission.verdict, firstName);
 
   await setCachedAiResponse(cacheKey, response as unknown as Record<string, unknown>);
   await incrementTodayAiUsage(user.userId);

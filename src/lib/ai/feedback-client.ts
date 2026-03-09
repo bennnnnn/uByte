@@ -29,11 +29,13 @@ Do NOT output full working solution. Do NOT reveal hidden tests. Prefer hints an
 export async function callAiFeedback(
   evidenceBundle: string,
   hintLevel: number,
-  verdict: string
+  verdict: string,
+  userName?: string,
 ): Promise<AiFeedbackSchema> {
   if (!process.env.XAI_API_KEY) {
+    const greeting = userName ? `Hey ${userName}!` : "Hey!";
     return {
-      friendly_one_liner: "AI feedback is not configured. Set XAI_API_KEY.",
+      friendly_one_liner: `${greeting} AI feedback is not configured — ask your admin to set XAI_API_KEY.`,
       root_cause: "no_ai_config",
       evidence: [],
       hint: "Review the compiler or runtime output above and try a small fix.",
@@ -41,13 +43,14 @@ export async function callAiFeedback(
       confidence: 0,
     };
   }
-  return callFeedbackGrok(evidenceBundle, hintLevel, verdict);
+  return callFeedbackGrok(evidenceBundle, hintLevel, verdict, userName);
 }
 
 async function callFeedbackGrok(
   evidenceBundle: string,
   hintLevel: number,
-  verdict: string
+  verdict: string,
+  userName?: string,
 ): Promise<AiFeedbackSchema> {
   const levelPrompt =
     hintLevel === 1 ? "Give a short, gentle hint (1-2 sentences). Do not give code yet." :
@@ -55,7 +58,11 @@ async function callFeedbackGrok(
     hintLevel === 3 ? "Suggest a concrete fix (minimal_patch) if applicable. No full solution." :
     "Teach the concept briefly; keep hint and next_step actionable. No full solution.";
 
-  const system = `You are a friendly coding tutor. ${SCHEMA_DESC} ${levelPrompt} Respond with ONLY a single JSON object.`;
+  const nameInstruction = userName
+    ? `The learner's name is ${userName}. Address them by first name naturally in friendly_one_liner (e.g. "Nice try, ${userName}!" or "${userName}, your logic is close —"). Do not repeat the name more than once.`
+    : "Address the learner in a friendly, encouraging tone.";
+
+  const system = `You are a friendly coding tutor. ${nameInstruction} ${SCHEMA_DESC} ${levelPrompt} Respond with ONLY a single JSON object.`;
   const user = `Verdict: ${verdict}\n\n${evidenceBundle}\n\nReturn ONLY valid JSON.`;
 
   const text = await callGrokApi({
@@ -67,7 +74,7 @@ async function callFeedbackGrok(
     temperature: 0.3,
   });
 
-  return await parseAiResponse(text, () => callFeedbackGrok(evidenceBundle + "\n\nReturn ONLY valid JSON.", hintLevel, verdict));
+  return await parseAiResponse(text, () => callFeedbackGrok(evidenceBundle + "\n\nReturn ONLY valid JSON.", hintLevel, verdict, userName));
 }
 
 async function parseAiResponse(

@@ -121,9 +121,8 @@ function OutputPanel({
   onRequestAI: () => void;
   onClearAI: () => void;
 }) {
-  const [activeTab, setActiveTab] = useState<"console" | "tests">(
-    verdict ? "tests" : "console"
-  );
+  // Always start on console; the useEffect below switches to tests when a verdict arrives
+  const [activeTab, setActiveTab] = useState<"console" | "tests">("console");
   const [selectedCase, setSelectedCase] = useState<number>(
     verdict?.type === "wrong_answer" ? (verdict.passedCases ?? 0) : 0
   );
@@ -201,8 +200,8 @@ function OutputPanel({
           </button>
         ))}
 
-        {/* Single AI hint button — shown whenever there's a failed submission */}
-        {verdict && verdict.type !== "accepted" && verdict.submissionId != null && (
+        {/* AI hint button — hidden while a hint is already visible to avoid redundant calls */}
+        {verdict && verdict.type !== "accepted" && verdict.submissionId != null && !aiFeedback && (
           <div className="ml-auto px-3">
             <button
               type="button"
@@ -525,7 +524,7 @@ export function PracticeIDE({ problem, initialLang, categoryFilter = null, listP
   const [running, setRunning]         = useState(false);
   const [outputIsError, setOutputIsError] = useState(false);
 
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [mobileTab, setMobileTab]     = useState<"desc" | "code">("desc");
   const isMobile = useIsMobile();
@@ -541,8 +540,14 @@ export function PracticeIDE({ problem, initialLang, categoryFilter = null, listP
   const [notes, setNotes] = useState<string>("");
   const notesKey = `practice-notes-${problem.slug}`;
   const [noteSaved, setNoteSaved] = useState(false);
+  const [noteCollapsed, setNoteCollapsed] = useState(false);
 
-  // Manual save — cancels the debounce timer and saves immediately
+  // Reset collapsed state when navigating to a different problem
+  useEffect(() => {
+    setNoteCollapsed(false);
+  }, [problem.slug]);
+
+  // Manual save — cancels the debounce timer, saves immediately, then collapses the field
   async function saveNotesNow() {
     if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
     if (user) {
@@ -555,6 +560,7 @@ export function PracticeIDE({ problem, initialLang, categoryFilter = null, listP
       try { localStorage.setItem(notesKey, notes); } catch { /* ignore */ }
     }
     setNoteSaved(true);
+    setNoteCollapsed(true);
     setTimeout(() => setNoteSaved(false), 2000);
   }
 
@@ -564,18 +570,7 @@ export function PracticeIDE({ problem, initialLang, categoryFilter = null, listP
   const [statuses, setStatuses] = useState<Record<string, PracticeAttemptStatus>>({});
   const [xpToast, setXpToast] = useState<number | null>(null);
   const [submitting, setSubmitting] = useState(false);
-  const [verdict, setVerdict] = useState<{
-    type: "accepted" | "wrong_answer" | "compile_error" | "runtime_error" | "tle" | "error";
-    message: string;
-    output?: string;
-    passedCases?: number;
-    totalCases?: number;
-    submissionId?: number;
-    failedInput?: string;
-    failedExpected?: string;
-    failedActual?: string;
-    consecutiveFailures?: number;
-  } | null>(null);
+  const [verdict, setVerdict] = useState<VerdictState>(null);
   const [aiFeedback, setAiFeedback] = useState<{
     friendly_one_liner: string;
     hint: string;
@@ -600,20 +595,18 @@ export function PracticeIDE({ problem, initialLang, categoryFilter = null, listP
 
   // Record page view
   useEffect(() => {
-    fetch("/api/practice-view", {
+    apiFetch("/api/practice-view", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ slug: problem.slug }),
-      credentials: "same-origin",
     }).catch(() => {});
   }, [problem.slug]);
 
   // Save last activity for "You left off at..." (logged-in only)
   useEffect(() => {
-    fetch("/api/last-activity", {
+    apiFetch("/api/last-activity", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      credentials: "same-origin",
       body: JSON.stringify({ type: "practice", lang, slug: problem.slug }),
     }).catch(() => {});
   }, [lang, problem.slug]);
@@ -712,7 +705,7 @@ export function PracticeIDE({ problem, initialLang, categoryFilter = null, listP
     setOutput(null);
     setOutputIsError(false);
     try {
-      const res = await fetch("/api/run-code", {
+      const res = await apiFetch("/api/run-code", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ code: editor.code, language: lang }),
@@ -724,29 +717,10 @@ export function PracticeIDE({ problem, initialLang, categoryFilter = null, listP
       if (!res.ok)            { setOutput(data?.Errors ?? data?.error ?? "Run failed."); setOutputIsError(true); return; }
 
       const out: string[] = [];
-      let hasError = false;
-      if (data.CompileErrors) { out.push("Compile error:\n" + data.CompileErrors); setOutputIsError(true); hasError = true; }
-      if (data.Errors)        { out.push(data.Errors); setOutputIsError(true); hasError = true; }
+      if (data.CompileErrors) { out.push("Compile error:\n" + data.CompileErrors); setOutputIsError(true); }
+      if (data.Errors)        { out.push(data.Errors); setOutputIsError(true); }
       if (data.Events)        { for (const e of data.Events) { if (e.Message) out.push(e.Message); } }
       setOutput(out.length ? out.join("\n") : "(no output)");
-
-      // Save attempt status to DB and update local state
-      const attemptStatus: PracticeAttemptStatus = hasError ? "failed" : "solved";
-      setStatuses((prev) => ({ ...prev, [problem.slug]: attemptStatus }));
-      fetch("/api/practice-attempt", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "same-origin",
-        body: JSON.stringify({ slug: problem.slug, status: attemptStatus }),
-      })
-        .then((r) => r.json())
-        .then((d) => {
-          if (d?.xpAwarded > 0) {
-            setXpToast(d.xpAwarded);
-            setTimeout(() => setXpToast(null), 3000);
-          }
-        })
-        .catch(() => {});
     } catch {
       setOutput("Network error. Please try again.");
       setOutputIsError(true);
@@ -799,7 +773,8 @@ export function PracticeIDE({ problem, initialLang, categoryFilter = null, listP
         }
       } else if (["wrong_answer", "runtime_error", "compile_error", "tle"].includes(data.verdict)) {
         setStatuses((prev) => ({ ...prev, [problem.slug]: "failed" }));
-        if (data.consecutive_failures >= 2 && data.submission_id) {
+        // Only auto-trigger AI if there's no existing hint already shown to avoid redundant API calls
+      if (data.consecutive_failures >= 2 && data.submission_id && !aiFeedback) {
           setAiLoading(true);
           setAiError(null);
           apiFetch("/api/ai-feedback", {
@@ -898,7 +873,28 @@ export function PracticeIDE({ problem, initialLang, categoryFilter = null, listP
     finally { setBookmarkLoading(false); }
   }
 
+  const [codeCopied, setCodeCopied] = useState(false);
+
+  function handleCopyCode() {
+    navigator.clipboard.writeText(editor.code).then(() => {
+      setCodeCopied(true);
+      setTimeout(() => setCodeCopied(false), 2000);
+    }).catch(() => {});
+  }
+
+  const [resetPending, setResetPending] = useState(false);
+  const resetTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
   function handleReset() {
+    if (!resetPending) {
+      // First click: ask for confirmation; auto-cancel after 3 seconds
+      setResetPending(true);
+      resetTimerRef.current = setTimeout(() => setResetPending(false), 3000);
+      return;
+    }
+    // Second click: confirmed — clear the timer and reset
+    if (resetTimerRef.current) clearTimeout(resetTimerRef.current);
+    setResetPending(false);
     editor.setCode(getStarterForLanguage(problem, lang));
     editor.setErrorLines(new Set());
     setOutput(null);
@@ -1161,28 +1157,49 @@ export function PracticeIDE({ problem, initialLang, categoryFilter = null, listP
           {/* Notes tab */}
           {descTab === "notes" && (
             <div className="flex min-w-0 flex-1 flex-col p-4 md:p-5">
-              <div className="mb-2 flex items-center justify-between gap-2">
-                <p className="text-xs text-zinc-400 dark:text-zinc-500">
-                  {user ? "Auto-saved as you type." : "Sign in to save notes to your account."}
-                </p>
+              {noteCollapsed ? (
+                /* Collapsed summary — click anywhere to expand */
                 <button
                   type="button"
-                  onClick={saveNotesNow}
-                  className={`flex items-center gap-1 rounded-md border px-2.5 py-1 text-xs font-semibold transition-all ${
-                    noteSaved
-                      ? "border-emerald-400 bg-emerald-50 text-emerald-700 dark:border-emerald-600 dark:bg-emerald-950/40 dark:text-emerald-400"
-                      : "border-zinc-300 text-zinc-500 hover:border-indigo-400 hover:bg-indigo-50 hover:text-indigo-700 dark:border-zinc-600 dark:text-zinc-400 dark:hover:border-indigo-600 dark:hover:text-indigo-400"
-                  }`}
+                  onClick={() => setNoteCollapsed(false)}
+                  className="flex w-full items-start gap-3 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-left transition-colors hover:bg-emerald-100 dark:border-emerald-800 dark:bg-emerald-950/30 dark:hover:bg-emerald-950/50"
                 >
-                  {noteSaved ? "✓ Saved" : "Save"}
+                  <span className="mt-0.5 text-emerald-500">✓</span>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-xs font-semibold text-emerald-700 dark:text-emerald-400">Note saved</p>
+                    <p className="mt-0.5 line-clamp-2 text-xs text-zinc-500 dark:text-zinc-400">
+                      {notes.trim() || "No content yet."}
+                    </p>
+                  </div>
+                  <span className="shrink-0 text-xs text-zinc-400 dark:text-zinc-500">Edit ›</span>
                 </button>
-              </div>
-              <textarea
-                value={notes}
-                onChange={(e) => { setNotes(e.target.value); setNoteSaved(false); }}
-                placeholder="Write your approach, observations, or ideas here…"
-                className="flex-1 resize-none rounded-lg border border-zinc-200 bg-white p-3 text-sm text-zinc-800 placeholder-zinc-400 focus:border-indigo-400 focus:outline-none focus:ring-1 focus:ring-indigo-400 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-200 dark:placeholder-zinc-500 dark:focus:border-indigo-600"
-              />
+              ) : (
+                /* Expanded editor */
+                <>
+                  <div className="mb-2 flex items-center justify-between gap-2">
+                    <p className="text-xs text-zinc-400 dark:text-zinc-500">
+                      {user ? "Auto-saved as you type." : "Sign in to save notes to your account."}
+                    </p>
+                    <button
+                      type="button"
+                      onClick={saveNotesNow}
+                      className={`flex items-center gap-1 rounded-md border px-2.5 py-1 text-xs font-semibold transition-all ${
+                        noteSaved
+                          ? "border-emerald-400 bg-emerald-50 text-emerald-700 dark:border-emerald-600 dark:bg-emerald-950/40 dark:text-emerald-400"
+                          : "border-zinc-300 text-zinc-500 hover:border-indigo-400 hover:bg-indigo-50 hover:text-indigo-700 dark:border-zinc-600 dark:text-zinc-400 dark:hover:border-indigo-600 dark:hover:text-indigo-400"
+                      }`}
+                    >
+                      {noteSaved ? "✓ Saved" : "Save"}
+                    </button>
+                  </div>
+                  <textarea
+                    value={notes}
+                    onChange={(e) => { setNotes(e.target.value); setNoteSaved(false); }}
+                    placeholder="Write your approach, observations, or ideas here…"
+                    className="flex-1 resize-none rounded-lg border border-zinc-200 bg-white p-3 text-sm text-zinc-800 placeholder-zinc-400 focus:border-indigo-400 focus:outline-none focus:ring-1 focus:ring-indigo-400 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-200 dark:placeholder-zinc-500 dark:focus:border-indigo-600"
+                  />
+                </>
+              )}
             </div>
           )}
         </aside>
@@ -1277,10 +1294,27 @@ export function PracticeIDE({ problem, initialLang, categoryFilter = null, listP
             <button
               type="button"
               onClick={handleReset}
-              title="Reset to starter code"
-              className="rounded-md border border-zinc-300 px-3 py-1.5 text-sm text-zinc-500 transition-colors hover:border-zinc-400 hover:text-zinc-800 dark:border-zinc-700 dark:text-zinc-400 dark:hover:border-zinc-600 dark:hover:text-zinc-200"
+              title={resetPending ? "Click again to confirm reset" : "Reset to starter code"}
+              className={`rounded-md border px-3 py-1.5 text-sm transition-all ${
+                resetPending
+                  ? "border-red-400 bg-red-50 text-red-600 dark:border-red-600 dark:bg-red-950/30 dark:text-red-400"
+                  : "border-zinc-300 text-zinc-500 hover:border-zinc-400 hover:text-zinc-800 dark:border-zinc-700 dark:text-zinc-400 dark:hover:border-zinc-600 dark:hover:text-zinc-200"
+              }`}
             >
-              Reset
+              {resetPending ? "Confirm?" : "Reset"}
+            </button>
+
+            <button
+              type="button"
+              onClick={handleCopyCode}
+              title="Copy code to clipboard"
+              className={`rounded-md border px-3 py-1.5 text-sm transition-all ${
+                codeCopied
+                  ? "border-emerald-400 bg-emerald-50 text-emerald-700 dark:border-emerald-600 dark:bg-emerald-950/30 dark:text-emerald-400"
+                  : "border-zinc-300 text-zinc-500 hover:border-zinc-400 hover:text-zinc-800 dark:border-zinc-700 dark:text-zinc-400 dark:hover:border-zinc-600 dark:hover:text-zinc-200"
+              }`}
+            >
+              {codeCopied ? "✓ Copied" : "Copy"}
             </button>
 
             <button
@@ -1355,9 +1389,13 @@ export function PracticeIDE({ problem, initialLang, categoryFilter = null, listP
           <button
             type="button"
             onClick={handleReset}
-            className="flex shrink-0 items-center justify-center rounded-md border border-zinc-300 px-3 py-2 text-sm text-zinc-500 dark:border-zinc-700 dark:text-zinc-400"
+            className={`flex shrink-0 items-center justify-center rounded-md border px-3 py-2 text-sm transition-all ${
+              resetPending
+                ? "border-red-400 bg-red-50 text-red-600 dark:border-red-600 dark:bg-red-950/30 dark:text-red-400"
+                : "border-zinc-300 text-zinc-500 dark:border-zinc-700 dark:text-zinc-400"
+            }`}
           >
-            Reset
+            {resetPending ? "Confirm?" : "Reset"}
           </button>
         </div>
       )}
