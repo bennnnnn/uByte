@@ -10,7 +10,6 @@ import { useCodeEditor } from "@/hooks/useCodeEditor";
 import { usePanelResize } from "@/hooks/usePanelResize";
 import ThemeToggle from "@/components/ThemeToggle";
 import AuthButtons from "@/components/AuthButtons";
-import ShortcutsModal from "@/components/tutorial/ShortcutsModal";
 import ProblemSidebar from "@/components/practice/ProblemSidebar";
 import GripDots from "@/components/GripDots";
 import type { PracticeAttemptStatus } from "@/lib/db/practice-attempts";
@@ -496,6 +495,8 @@ function OutputPanel({
 interface Props {
   problem: PracticeProblem;
   initialLang: SupportedLanguage;
+  /** Pre-filled code from a ?share= URL param — overrides the default starter code. */
+  initialCode?: string;
   /** When set, sidebar shows only problems in this category (matches list filter). */
   categoryFilter?: ProblemCategory | null;
   /** Page number on the list; used for "back to list" link. */
@@ -506,7 +507,7 @@ interface Props {
   listDifficulty?: string;
 }
 
-export function PracticeIDE({ problem, initialLang, categoryFilter = null, listPage = 1, listStatus, listDifficulty }: Props) {
+export function PracticeIDE({ problem, initialLang, initialCode, categoryFilter = null, listPage = 1, listStatus, listDifficulty }: Props) {
   const allProblems = useMemo(() => getAllPracticeProblems(), []);
   const categories = useMemo(() => getPracticeCategories(), []);
   const sidebarProblems = useMemo(() =>
@@ -528,8 +529,6 @@ export function PracticeIDE({ problem, initialLang, categoryFilter = null, listP
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [mobileTab, setMobileTab]     = useState<"desc" | "code">("desc");
   const isMobile = useIsMobile();
-  const [showShortcuts, setShowShortcuts] = useState(false);
-
   // Bookmark — persistent toggle (load from DB on mount)
   const [bookmarkId, setBookmarkId] = useState<number | null>(null);
   const [bookmarkLoading, setBookmarkLoading] = useState(false);
@@ -580,7 +579,8 @@ export function PracticeIDE({ problem, initialLang, categoryFilter = null, listP
   const [aiLoading, setAiLoading] = useState(false);
   const [aiError, setAiError] = useState<string | null>(null);
 
-  const editor = useCodeEditor(getStarterForLanguage(problem, initialLang), lang);
+  // Use shared code from ?share= if present, otherwise fall back to the problem's starter
+  const editor = useCodeEditor(initialCode ?? getStarterForLanguage(problem, initialLang), lang);
   const { leftWidth, outputHeight, setOutputHeight, isDragging, startDragH, startDragV, startDragVTouch } = usePanelResize();
 
   // When language changes, load the starter for the new language
@@ -688,17 +688,6 @@ export function PracticeIDE({ problem, initialLang, categoryFilter = null, listP
   const outputHeightRef = useRef(outputHeight);
   outputHeightRef.current = outputHeight;
 
-  // Global ? key → shortcuts modal
-  useEffect(() => {
-    function handleGlobalKey(e: KeyboardEvent) {
-      if (e.key === "?" && document.activeElement?.tagName !== "TEXTAREA") {
-        e.preventDefault();
-        setShowShortcuts((v) => !v);
-      }
-    }
-    window.addEventListener("keydown", handleGlobalKey);
-    return () => window.removeEventListener("keydown", handleGlobalKey);
-  }, []);
 
   const handleRun = useCallback(async () => {
     setRunning(true);
@@ -877,12 +866,29 @@ export function PracticeIDE({ problem, initialLang, categoryFilter = null, listP
   }
 
   const [codeCopied, setCodeCopied] = useState(false);
+  const [shareCopied, setShareCopied] = useState(false);
 
   function handleCopyCode() {
     navigator.clipboard.writeText(editor.code).then(() => {
       setCodeCopied(true);
       setTimeout(() => setCodeCopied(false), 2000);
     }).catch(() => {});
+  }
+
+  function handleShare() {
+    try {
+      // btoa(encodeURIComponent(code)) produces a URL-safe base64 string
+      const encoded = btoa(encodeURIComponent(editor.code));
+      const url = new URL(window.location.href);
+      url.searchParams.set("share", encoded);
+      navigator.clipboard.writeText(url.toString()).then(() => {
+        setShareCopied(true);
+        setTimeout(() => setShareCopied(false), 2500);
+      }).catch(() => {});
+    } catch {
+      // Fallback: copy plain URL
+      navigator.clipboard.writeText(window.location.href).catch(() => {});
+    }
   }
 
   const [resetPending, setResetPending] = useState(false);
@@ -1322,11 +1328,24 @@ export function PracticeIDE({ problem, initialLang, categoryFilter = null, listP
 
             <button
               type="button"
-              onClick={() => setShowShortcuts(true)}
-              title="Keyboard shortcuts (?)"
-              className="ml-auto flex h-7 w-7 items-center justify-center rounded-md border border-zinc-300 text-xs font-bold text-zinc-400 transition-colors hover:border-zinc-400 hover:text-zinc-600 dark:border-zinc-700 dark:text-zinc-500 dark:hover:border-zinc-600 dark:hover:text-zinc-300"
+              onClick={handleShare}
+              title="Share your code — copies a link to clipboard"
+              className={`ml-auto flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-sm transition-all ${
+                shareCopied
+                  ? "border-indigo-400 bg-indigo-50 text-indigo-700 dark:border-indigo-600 dark:bg-indigo-950/30 dark:text-indigo-400"
+                  : "border-zinc-300 text-zinc-500 hover:border-zinc-400 hover:text-zinc-800 dark:border-zinc-700 dark:text-zinc-400 dark:hover:border-zinc-600 dark:hover:text-zinc-200"
+              }`}
             >
-              ?
+              {shareCopied ? (
+                <>✓ Link copied!</>
+              ) : (
+                <>
+                  <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+                  </svg>
+                  Share
+                </>
+              )}
             </button>
           </div>
 
@@ -1403,7 +1422,6 @@ export function PracticeIDE({ problem, initialLang, categoryFilter = null, listP
         </div>
       )}
 
-      {showShortcuts && <ShortcutsModal onClose={() => setShowShortcuts(false)} />}
     </div>
   );
 }
