@@ -1190,11 +1190,11 @@ export function PracticeIDE({ problem, initialLang, initialCode, categoryFilter 
         <div className={`flex-col overflow-hidden ${mobileTab === "code" ? "flex" : "hidden"} md:flex flex-1`}>
 
           {/* Code editor — identical to InteractiveTutorial */}
-          <div className="flex flex-1 overflow-hidden bg-zinc-950 font-mono leading-6">
+          <div className="flex flex-1 overflow-hidden bg-zinc-950">
             <div
               ref={editor.lineNumRef}
               aria-hidden
-              className="shrink-0 select-none overflow-hidden border-r border-zinc-800 bg-zinc-900 px-3 py-4 text-right text-zinc-600"
+              className="shrink-0 select-none overflow-hidden border-r border-zinc-800 bg-zinc-900 px-3 py-4 font-mono text-sm leading-6 text-right text-zinc-600"
             >
               {editor.code.split("\n").map((_, i) => (
                 <div key={i} className={editor.errorLines.has(i + 1) ? "text-red-400" : ""}>
@@ -1208,12 +1208,16 @@ export function PracticeIDE({ problem, initialLang, initialCode, categoryFilter 
                   <div key={ln} className="absolute left-0 right-0 bg-red-500/10" style={{ top: 16 + (ln - 1) * 24, height: 24 }} />
                 ))}
               </div>
-              {/* Content managed imperatively via setCode() — never by React reconciliation */}
+              {/* Content managed imperatively via setCode() — never by React reconciliation.
+                  font-mono text-sm leading-6 are set EXPLICITLY on both elements (not via
+                  inheritance) so the browser UA stylesheet cannot swap <pre> to a different
+                  system monospace font, which would shift character widths and break
+                  click-to-position. */}
               <pre
                 ref={editor.preRef}
                 aria-hidden
                 suppressHydrationWarning
-                className="pointer-events-none absolute inset-0 overflow-auto whitespace-pre py-4 pl-4 pr-8 text-zinc-100"
+                className="pointer-events-none absolute inset-0 m-0 overflow-auto whitespace-pre py-4 pl-4 pr-8 font-mono text-sm leading-6 text-zinc-100"
               />
               <textarea
                 ref={editor.textareaRef}
@@ -1225,8 +1229,8 @@ export function PracticeIDE({ problem, initialLang, initialCode, categoryFilter 
                 autoCorrect="off"
                 autoCapitalize="off"
                 aria-label="Code editor"
-                className="absolute inset-0 resize-none overflow-auto whitespace-pre bg-transparent py-4 pl-4 pr-8 text-transparent caret-white outline-none selection:bg-indigo-900/50"
                 suppressHydrationWarning
+                className="absolute inset-0 m-0 resize-none overflow-auto whitespace-pre bg-transparent py-4 pl-4 pr-8 font-mono text-sm leading-6 text-transparent caret-white outline-none selection:bg-indigo-900/50"
               />
             </div>
           </div>
