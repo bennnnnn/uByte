@@ -122,7 +122,7 @@ function OutputPanel({
           <button
             key={tab}
             type="button"
-            onClick={() => { setActiveTab(tab); if (tab === "tests") onExpandPanel(); }}
+            onClick={() => { setActiveTab(tab); if (tab === "tests") onExpandPanel(); }}  
             className={`flex items-center gap-1.5 border-b-2 px-4 py-2 text-xs font-semibold transition-colors ${
               activeTab === tab
                 ? "border-indigo-500 text-indigo-600 dark:text-indigo-400"
@@ -593,8 +593,9 @@ export function PracticeIDE({ problem, initialLang, categoryFilter = null, listP
 
   // Auto-expand output panel when a verdict arrives so users see the test case details
   useEffect(() => {
-    if (verdict) setOutputHeight((h) => Math.max(h, 320));
-  }, [verdict, setOutputHeight]);
+    if (verdict) setOutputHeight(Math.max(outputHeight, 320));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [verdict]);
 
   // Global ? key → shortcuts modal
   useEffect(() => {
@@ -1197,7 +1198,7 @@ export function PracticeIDE({ problem, initialLang, categoryFilter = null, listP
             aiFeedback={aiFeedback}
             onRequestAI={requestAiFeedback}
             onClearAI={() => { setAiFeedback(null); setAiError(null); }}
-            onExpandPanel={() => setOutputHeight((h) => Math.max(h, 360))}
+            onExpandPanel={() => setOutputHeight(Math.max(outputHeight, 360))}
           />
         </div>
       </div>
