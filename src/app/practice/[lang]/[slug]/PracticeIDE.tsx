@@ -48,7 +48,6 @@ function OutputPanel({
   aiFeedback,
   onRequestAI,
   onClearAI,
-  onExpandPanel,
 }: {
   verdict: VerdictState;
   output: string | null;
