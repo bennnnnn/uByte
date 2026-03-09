@@ -212,3 +212,34 @@ export async function sendDay7Email(to: string, name: string): Promise<void> {
     `,
   });
 }
+
+/** Contact form submission — forwards user message to the support inbox. */
+export async function sendContactEmail(opts: {
+  fromName: string;
+  fromEmail: string;
+  subject: string;
+  message: string;
+}): Promise<void> {
+  const resend = getResend();
+  if (!resend) return;
+  const SUPPORT = process.env.SUPPORT_EMAIL ?? "support@ubyte.dev";
+  await resend.emails.send({
+    from: FROM,
+    to: SUPPORT,
+    replyTo: opts.fromEmail,
+    subject: `[uByte Contact] ${opts.subject}`,
+    html: `
+      <div style="font-family:sans-serif;max-width:600px;margin:0 auto">
+        <h2 style="color:#4f46e5">New contact form message</h2>
+        <table style="width:100%;border-collapse:collapse;margin-bottom:16px">
+          <tr><td style="padding:4px 8px;font-weight:bold;width:100px">From</td><td>${opts.fromName} &lt;${opts.fromEmail}&gt;</td></tr>
+          <tr><td style="padding:4px 8px;font-weight:bold">Subject</td><td>${opts.subject}</td></tr>
+        </table>
+        <div style="background:#f4f4f5;border-radius:8px;padding:16px;white-space:pre-wrap">${opts.message}</div>
+        <p style="color:#71717a;font-size:12px;margin-top:16px">
+          Reply directly to this email to respond to ${opts.fromName}.
+        </p>
+      </div>
+    `,
+  });
+}

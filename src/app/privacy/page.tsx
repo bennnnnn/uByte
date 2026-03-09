@@ -3,7 +3,7 @@ import { absoluteUrl } from "@/lib/seo";
 
 export const metadata: Metadata = {
   title: "Privacy Policy",
-  description: "How uByte collects, uses, and protects your data.",
+  description: "How uByte collects, uses, and protects your personal data.",
   alternates: { canonical: absoluteUrl("/privacy") },
 };
 
@@ -25,114 +25,139 @@ export default function PrivacyPage() {
       <p className="mb-12 text-sm text-zinc-400">Last updated: {UPDATED}</p>
 
       <Section title="Who We Are">
-        <p>uByte (&ldquo;we&rdquo;, &ldquo;our&rdquo;) operates the website at ubyte.dev — an interactive platform for learning programming languages including Go, Python, JavaScript, Java, Rust, and C++. This policy explains what data we collect, why, and how long we keep it.</p>
-        <p>Questions? Email us at <a href="mailto:privacy@ubyte.dev" className="text-indigo-600 hover:underline">privacy@ubyte.dev</a>.</p>
-      </Section>
-
-      <Section title="Age Requirement">
-        <p>You must be at least <strong>13 years old</strong> to create an account or use uByte. We do not knowingly collect data from children under 13. If you believe a child under 13 has created an account, please contact us and we will delete it promptly.</p>
-      </Section>
-
-      <Section title="Legal Bases for Processing (GDPR)">
-        <p>If you are in the European Economic Area (EEA) or United Kingdom, we process your data under the following legal bases:</p>
-        <ul className="list-disc pl-5 space-y-1">
-          <li><strong>Contract</strong> — processing necessary to provide the Service (account management, progress tracking, code execution, billing).</li>
-          <li><strong>Consent</strong> — optional analytics cookies are only loaded after you click &ldquo;Accept all&rdquo; in our cookie banner.</li>
-          <li><strong>Legitimate interest</strong> — security measures (rate limiting, fraud prevention, error monitoring) and service improvement.</li>
-        </ul>
+        <p>
+          uByte (&ldquo;we&rdquo;, &ldquo;us&rdquo;, &ldquo;our&rdquo;) operates the website{" "}
+          <strong>ubyte.dev</strong> — an online platform for learning programming through
+          interactive tutorials, interview preparation, and certification exams. Our contact
+          email is{" "}
+          <a href="mailto:privacy@ubyte.dev" className="text-indigo-600 hover:underline">
+            privacy@ubyte.dev
+          </a>
+          .
+        </p>
       </Section>
 
       <Section title="Data We Collect">
-        <p><strong>Account data</strong> — when you sign up: your name, email address, and a bcrypt hash of your password (we never store your raw password). If you sign up with Google, we receive your Google ID, name, and email from Google OAuth.</p>
-        <p><strong>Learning data</strong> — the tutorials you have completed, your XP points, streak count, bookmarks (tutorial slug + code snippet + optional note), and any achievements unlocked.</p>
-        <p><strong>Interview prep data</strong> — your practice problem attempts, solutions, and notes.</p>
-        <p><strong>Certification data</strong> — exam attempts, scores, and certificates earned.</p>
-        <p><strong>Playground snippets</strong> — code you share via the Playground &ldquo;Share&rdquo; button is stored so others can view it via the share link.</p>
-        <p><strong>Payment data</strong> — if you subscribe to a paid plan, payment processing is handled entirely by Paddle. We receive your Paddle customer ID and subscription status but never see your full card number or bank details.</p>
-        <p><strong>Anonymous visitor tracking</strong> — if you browse without an account, a random <code>visitor_id</code> UUID is stored in a cookie to count page views. No personal information is in this ID.</p>
-        <p><strong>IP addresses</strong> — we log your IP address transiently for rate limiting (e.g. preventing brute-force login attempts). IP-based records are deleted within 24 hours.</p>
-        <p><strong>Activity log</strong> — we keep a log of significant account actions (e.g. progress reset, password change) for security auditing. Logs are retained for 90 days.</p>
-      </Section>
-
-      <Section title="Cookies We Set">
-        <p>We categorise our cookies as follows:</p>
-        <p className="font-semibold text-zinc-700 dark:text-zinc-300 mt-2">Strictly necessary (always active)</p>
-        <table className="w-full text-left text-xs mt-2">
-          <thead>
-            <tr className="border-b border-zinc-200 dark:border-zinc-700">
-              <th className="py-2 pr-4 font-semibold text-zinc-700 dark:text-zinc-300">Cookie</th>
-              <th className="py-2 pr-4 font-semibold text-zinc-700 dark:text-zinc-300">Purpose</th>
-              <th className="py-2 font-semibold text-zinc-700 dark:text-zinc-300">Duration</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800">
-            <tr><td className="py-2 pr-4"><code>auth_token</code></td><td className="py-2 pr-4">HttpOnly JWT — keeps you logged in</td><td className="py-2">30 days</td></tr>
-            <tr><td className="py-2 pr-4"><code>csrf_token</code></td><td className="py-2 pr-4">Prevents cross-site request forgery</td><td className="py-2">7 days</td></tr>
-            <tr><td className="py-2 pr-4"><code>visitor_id</code></td><td className="py-2 pr-4">Anonymous page-view counting for free-tier limits</td><td className="py-2">1 year</td></tr>
-          </tbody>
-        </table>
-
-        <p className="font-semibold text-zinc-700 dark:text-zinc-300 mt-4">Optional (require consent)</p>
-        <table className="w-full text-left text-xs mt-2">
-          <thead>
-            <tr className="border-b border-zinc-200 dark:border-zinc-700">
-              <th className="py-2 pr-4 font-semibold text-zinc-700 dark:text-zinc-300">Cookie / Storage</th>
-              <th className="py-2 pr-4 font-semibold text-zinc-700 dark:text-zinc-300">Purpose</th>
-              <th className="py-2 font-semibold text-zinc-700 dark:text-zinc-300">Duration</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800">
-            <tr><td className="py-2 pr-4">Vercel Analytics</td><td className="py-2 pr-4">Anonymous page-view statistics to improve the site</td><td className="py-2">Session</td></tr>
-          </tbody>
-        </table>
-
-        <p className="mt-3">Your consent preference is stored in your browser&apos;s <code>localStorage</code> under the key <code>cookie-consent</code>. You can change your choice at any time by clearing your browser&apos;s local storage for ubyte.dev, which will re-display the cookie banner.</p>
-      </Section>
-
-      <Section title="Third-Party Services">
-        <p>We use the following third-party services that may process your data:</p>
-        <p><strong>Paddle</strong> — payment processing for subscriptions. Paddle acts as the Merchant of Record and processes your payment details. We only receive your customer ID and subscription status. See <a href="https://www.paddle.com/legal/privacy" target="_blank" rel="noopener noreferrer" className="text-indigo-600 hover:underline">Paddle&apos;s Privacy Policy</a>.</p>
-        <p><strong>Google OAuth</strong> — if you choose &ldquo;Continue with Google&rdquo;, Google handles authentication and shares your name and email with us. See <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer" className="text-indigo-600 hover:underline">Google&apos;s Privacy Policy</a>.</p>
-        <p><strong>Resend</strong> — transactional email (email verification, password reset). Resend receives your email address to deliver messages. See <a href="https://resend.com/privacy" target="_blank" rel="noopener noreferrer" className="text-indigo-600 hover:underline">Resend&apos;s Privacy Policy</a>.</p>
-        <p><strong>Sentry</strong> — error monitoring. When an error occurs, Sentry receives diagnostic data (browser type, page URL, error details). No personal data is intentionally sent. See <a href="https://sentry.io/privacy/" target="_blank" rel="noopener noreferrer" className="text-indigo-600 hover:underline">Sentry&apos;s Privacy Policy</a>.</p>
-        <p><strong>Vercel Analytics</strong> — anonymous page-view statistics (only loaded after you consent to optional cookies). Data is aggregated and not linked to individuals. See <a href="https://vercel.com/legal/privacy-policy" target="_blank" rel="noopener noreferrer" className="text-indigo-600 hover:underline">Vercel&apos;s Privacy Policy</a>.</p>
-        <p><strong>Code execution services</strong> — code you run in interactive tutorials and interview prep is sent to third-party execution engines (Judge0 for Python, JavaScript, Java, C++, and Rust; Go Playground for Go). Your code is sent for compilation and execution only. Do not submit sensitive information in code you run.</p>
-        <p><strong>xAI (Grok)</strong> — if you use the AI code feedback feature (Pro plan), your code submission is sent to xAI&apos;s API for analysis. See <a href="https://x.ai/legal/privacy-policy" target="_blank" rel="noopener noreferrer" className="text-indigo-600 hover:underline">xAI&apos;s Privacy Policy</a>.</p>
+        <p><strong>Account data</strong> — when you register, we collect your name, email address, and a hashed password (we never store your password in plain text). If you sign in with Google, we receive your name, email, and Google account ID.</p>
+        <p><strong>Learning progress</strong> — tutorial step completions, practice problem attempts, certification exam results, XP points, streaks, and achievements.</p>
+        <p><strong>Code submissions</strong> — code you write and run in tutorials or interview prep is sent to third-party execution services (see &ldquo;Third-Party Services&rdquo; below) to produce output. We do not permanently store the code you run unless you explicitly share a snippet.</p>
+        <p><strong>Shared snippets</strong> — if you click &ldquo;Share&rdquo; in the Playground, the snippet is stored on our servers and accessible via its unique link.</p>
+        <p><strong>Payment data</strong> — subscriptions are processed by Paddle, our Merchant of Record. We never see or store your card details. We receive a Paddle customer ID and subscription status to activate your plan.</p>
+        <p><strong>AI feedback</strong> — Pro users may request AI-generated code feedback. Your code and the step context are sent to a third-party AI API to generate a response. We cache AI responses briefly to reduce API costs.</p>
+        <p><strong>Usage and analytics</strong> — we collect page views and conversion events via Vercel Analytics (privacy-friendly, no cross-site tracking, no cookies). Error reports are collected via Sentry.</p>
+        <p><strong>Push notification subscriptions</strong> — if you consent to notifications, we store your browser push endpoint and encryption keys to deliver streak reminders.</p>
+        <p><strong>Contact messages</strong> — if you contact us via the contact form or email, we retain your message to respond to it.</p>
       </Section>
 
       <Section title="How We Use Your Data">
-        <p>We use your data only to operate the service: authenticating you, saving your progress, displaying leaderboard rankings (name and XP, visible to other users), processing payments through Paddle, sending transactional emails you explicitly request, and preventing abuse via rate limiting.</p>
-        <p>We do not sell your data, share it with advertisers, or use it for purposes beyond operating uByte.</p>
+        <ul className="list-disc space-y-1 pl-5">
+          <li>Provide and personalise the Service (progress tracking, XP, streaks, certificates)</li>
+          <li>Process your subscription and activate Pro features</li>
+          <li>Send transactional emails (email verification, welcome, streak reminders, receipt)</li>
+          <li>Send push notifications if you have opted in (streak reminders only)</li>
+          <li>Detect and prevent abuse, fraud, and security incidents</li>
+          <li>Improve the platform using aggregated, anonymised analytics</li>
+          <li>Respond to support requests</li>
+        </ul>
+        <p>We do not sell your personal data. We do not use your data for advertising.</p>
+      </Section>
+
+      <Section title="Legal Basis (GDPR)">
+        <p>If you are in the European Economic Area (EEA) or UK, our legal bases for processing are:</p>
+        <ul className="list-disc space-y-1 pl-5">
+          <li><strong>Contract</strong> — processing necessary to provide the Service you signed up for (account, progress, payments)</li>
+          <li><strong>Legitimate interests</strong> — security, fraud prevention, analytics, and improving the Service</li>
+          <li><strong>Consent</strong> — push notifications (you can withdraw at any time via your browser settings)</li>
+          <li><strong>Legal obligation</strong> — retaining payment records as required by law</li>
+        </ul>
+      </Section>
+
+      <Section title="Third-Party Services">
+        <p>We share data with the following processors, only to the extent necessary to operate the Service:</p>
+        <ul className="list-disc space-y-1 pl-5">
+          <li><strong>Paddle</strong> (paddle.com) — payment processing and subscription management. Paddle is the Merchant of Record and has its own <a href="https://www.paddle.com/legal/privacy" target="_blank" rel="noopener noreferrer" className="text-indigo-600 hover:underline">Privacy Policy</a>.</li>
+          <li><strong>Neon</strong> (neon.tech) — PostgreSQL database hosting. Data is stored in the US.</li>
+          <li><strong>Vercel</strong> (vercel.com) — hosting and edge network. Logs request metadata for a limited period.</li>
+          <li><strong>Resend</strong> (resend.com) — transactional email delivery.</li>
+          <li><strong>Judge0</strong> — code execution for Python, JavaScript, Java, C++, and Rust. Code is sent to Judge0 servers for compilation and is not permanently stored by them.</li>
+          <li><strong>Go Playground</strong> (go.dev) — code execution and formatting for Go. Subject to Google&apos;s <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer" className="text-indigo-600 hover:underline">Privacy Policy</a>.</li>
+          <li><strong>xAI / Grok API</strong> — AI code feedback for Pro users. Code context is sent to generate feedback and is subject to xAI&apos;s data processing terms.</li>
+          <li><strong>Sentry</strong> (sentry.io) — error monitoring. May capture stack traces and request metadata (never passwords or payment data).</li>
+          <li><strong>Google OAuth</strong> — sign-in with Google. Subject to Google&apos;s Privacy Policy.</li>
+        </ul>
+      </Section>
+
+      <Section title="Cookies and Local Storage">
+        <p>We use a minimal set of cookies and browser storage:</p>
+        <ul className="list-disc space-y-1 pl-5">
+          <li><strong>Authentication cookie</strong> — a signed JWT to keep you logged in. HTTP-only, Secure, SameSite.</li>
+          <li><strong>CSRF token cookie</strong> — protects form submissions from cross-site request forgery.</li>
+          <li><strong>Theme preference</strong> — stored in <code>localStorage</code> to remember light/dark mode. Never sent to our servers.</li>
+          <li><strong>Vercel Analytics</strong> — uses no cookies and performs no cross-site tracking.</li>
+        </ul>
+        <p>We do not use advertising cookies or third-party tracking pixels. If you accept our cookie consent banner, you also consent to Sentry error reporting.</p>
       </Section>
 
       <Section title="Data Retention">
-        <p>Account data is kept until you delete your account (Profile → Settings → Delete Account). Deleted accounts are removed immediately and cascaded — all progress, bookmarks, achievements, and submissions are deleted.</p>
-        <p>Anonymous page-view data is kept for 365 days. Rate-limit records are kept for up to 24 hours. Email verification tokens are cleared on use or overwritten on re-request.</p>
+        <ul className="list-disc space-y-1 pl-5">
+          <li><strong>Account data</strong> — retained until you delete your account</li>
+          <li><strong>Learning progress</strong> — retained until account deletion</li>
+          <li><strong>Shared code snippets</strong> — retained until you delete them or your account is closed; we may also purge inactive snippets after 12 months</li>
+          <li><strong>Payment records</strong> — retained for 7 years as required by tax law (managed by Paddle)</li>
+          <li><strong>Email logs</strong> — basic send/bounce records retained for 90 days</li>
+          <li><strong>Error logs</strong> — retained in Sentry for 90 days</li>
+        </ul>
       </Section>
 
       <Section title="Your Rights">
-        <p>Under GDPR and similar privacy laws, you have the right to:</p>
-        <ul className="list-disc pl-5 space-y-1">
-          <li><strong>Access &amp; export</strong> — download all your data as JSON from your profile settings or via <code>/api/profile/export</code>.</li>
-          <li><strong>Delete</strong> — delete your account and all associated data from Profile → Settings → Delete Account.</li>
-          <li><strong>Correct</strong> — update your name, bio, and avatar from Profile → Settings.</li>
-          <li><strong>Object</strong> — you may object to processing based on our legitimate interest by contacting us.</li>
-          <li><strong>Withdraw consent</strong> — you can withdraw cookie consent at any time by clearing your browser&apos;s localStorage for ubyte.dev.</li>
-          <li><strong>Complain</strong> — you have the right to lodge a complaint with your local data protection authority.</li>
+        <p>Depending on your location, you may have the following rights regarding your personal data:</p>
+        <ul className="list-disc space-y-1 pl-5">
+          <li><strong>Access</strong> — request a copy of the data we hold about you</li>
+          <li><strong>Correction</strong> — update inaccurate data (most can be done via Profile → Settings)</li>
+          <li><strong>Deletion</strong> — delete your account and all associated data via Profile → Settings → Delete account</li>
+          <li><strong>Portability</strong> — request your data in a machine-readable format</li>
+          <li><strong>Objection / Restriction</strong> — object to or restrict certain processing</li>
+          <li><strong>Withdraw consent</strong> — opt out of push notifications at any time via browser settings</li>
         </ul>
-        <p>To exercise any of these rights, email us at <a href="mailto:privacy@ubyte.dev" className="text-indigo-600 hover:underline">privacy@ubyte.dev</a>.</p>
+        <p>
+          To exercise any right, email{" "}
+          <a href="mailto:privacy@ubyte.dev" className="text-indigo-600 hover:underline">
+            privacy@ubyte.dev
+          </a>
+          . We will respond within 30 days. EEA/UK residents may also lodge a complaint with their local data protection authority.
+        </p>
+        <p><strong>California residents (CCPA)</strong> — you have the right to know what personal information we collect, the right to delete it, and the right to opt out of its sale. We do not sell personal information.</p>
+      </Section>
+
+      <Section title="Children">
+        <p>uByte is not directed at children under 13. We do not knowingly collect personal data from children under 13. If you believe a child has provided us with their data, contact us at{" "}
+          <a href="mailto:privacy@ubyte.dev" className="text-indigo-600 hover:underline">privacy@ubyte.dev</a> and we will delete it promptly.</p>
       </Section>
 
       <Section title="International Transfers">
-        <p>Our servers and third-party services may process data outside your country of residence. Where data is transferred outside the EEA, we rely on the provider&apos;s standard contractual clauses or equivalent safeguards.</p>
+        <p>uByte is operated from the United States. If you are accessing the Service from outside the US, your data may be transferred to and processed in the US and other countries where our service providers operate. We ensure appropriate safeguards are in place (such as Standard Contractual Clauses where required) for transfers from the EEA or UK.</p>
       </Section>
 
       <Section title="Security">
-        <p>Passwords are hashed with bcrypt (cost 10). Auth tokens are stored in HttpOnly cookies not accessible to JavaScript. All communication uses HTTPS. We implement CSRF protection, account lockout after repeated failures, and token versioning to invalidate all sessions on logout.</p>
+        <p>We implement industry-standard security measures including HTTPS everywhere, HTTP-only signed cookies, bcrypt password hashing, CSRF protection, rate limiting on authentication endpoints, and input validation. No system is perfectly secure; we cannot guarantee absolute security, but we take reasonable precautions and will notify affected users of any breach as required by law.</p>
       </Section>
 
       <Section title="Changes to This Policy">
-        <p>We will post any changes here and update the &ldquo;Last updated&rdquo; date. For material changes, we will notify registered users via email. Continued use of uByte after changes constitutes acceptance.</p>
+        <p>We may update this Privacy Policy from time to time. We will notify you of material changes by email or by a notice on the platform at least 14 days before the change takes effect. Continued use of the Service after the effective date constitutes acceptance of the updated policy.</p>
+      </Section>
+
+      <Section title="Contact">
+        <p>
+          For privacy-related questions or to exercise your rights, contact us at{" "}
+          <a href="mailto:privacy@ubyte.dev" className="text-indigo-600 hover:underline">
+            privacy@ubyte.dev
+          </a>
+          . For general support, use{" "}
+          <a href="/contact" className="text-indigo-600 hover:underline">
+            our contact form
+          </a>
+          .
+        </p>
       </Section>
     </div>
   );
