@@ -3,6 +3,7 @@
 import { createContext, useContext, useState, useEffect, useCallback, useMemo } from "react";
 import { apiFetch } from "@/lib/api-client";
 import { applyTheme } from "@/lib/theme";
+import { trackConversion } from "@/lib/analytics";
 
 // ─── Types ───────────────────────────────────────────
 
@@ -201,6 +202,7 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
       setProfile({ avatar: "gopher", bio: "", theme: "system", xp: 0, streak_days: 0, plan: "free", emailVerified: false, isAdmin: false });
       setLimited(false);
       setViewCount(0);
+      trackConversion("signup");
     }
     return null;
   }, []);
@@ -216,7 +218,7 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
       return data.error || "Login failed";
     }
     const data = await res.json().catch(() => ({}));
-    if (data.user) await hydrateAfterAuth(data.user);
+    if (data.user) { await hydrateAfterAuth(data.user); trackConversion("login", { method: "email" }); }
     return null;
   }, [hydrateAfterAuth]);
 
@@ -231,7 +233,7 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
       return data.error || "Google sign-in failed";
     }
     const data = await res.json().catch(() => ({}));
-    if (data.user) await hydrateAfterAuth(data.user);
+    if (data.user) { await hydrateAfterAuth(data.user); trackConversion("login", { method: "google" }); }
     return null;
   }, [hydrateAfterAuth]);
 

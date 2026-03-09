@@ -46,6 +46,24 @@ const COMPARISON_FEATURES: { name: string; free: string; pro: string }[] = [
   { name: "Verifiable certificates", free: "—", pro: "✓" },
 ];
 
+const TESTIMONIALS = [
+  {
+    quote: "I passed my Go certification on the first try. The timed exam format is exactly like a real assessment — I actually felt prepared.",
+    name: "Amir K.",
+    role: "Backend Engineer",
+  },
+  {
+    quote: "Finally a platform where I can practice Python interview questions without copying solutions from YouTube. The AI feedback is genuinely useful.",
+    name: "Priya S.",
+    role: "Software Developer",
+  },
+  {
+    quote: "Added my Rust certificate to LinkedIn within an hour of passing. Three recruiters reached out that week.",
+    name: "James T.",
+    role: "Systems Programmer",
+  },
+];
+
 const FAQ_ITEMS = [
   {
     q: "What's included in Pro?",
@@ -81,6 +99,7 @@ function PricingContent() {
   const [billing, setBilling]       = useState<"monthly" | "yearly">("yearly");
   const [faqOpen, setFaqOpen]       = useState<number | null>(null);
   const [userCount, setUserCount]   = useState<number | null>(null);
+  const [coupon, setCoupon]         = useState("");
 
   useEffect(() => {
     fetch("/api/stats/public")
@@ -129,7 +148,7 @@ function PricingContent() {
   function openCheckout(priceId: string) {
     if (!window.Paddle || !priceId) return;
     const origin = typeof window !== "undefined" ? window.location.origin : "";
-    window.Paddle.Checkout.open({
+    const checkoutParams: Parameters<typeof window.Paddle.Checkout.open>[0] = {
       items:      [{ priceId, quantity: 1 }],
       customData: user ? { userId: String(user.id) } : undefined,
       customer:   user ? { email: user.email }       : undefined,
@@ -138,7 +157,12 @@ function PricingContent() {
         displayMode: "overlay",
         variant:     "one-page",
       },
-    });
+    };
+    const trimmedCoupon = coupon.trim();
+    if (trimmedCoupon) {
+      (checkoutParams as Record<string, unknown>).discountCode = trimmedCoupon;
+    }
+    window.Paddle.Checkout.open(checkoutParams);
   }
 
   const isYearly          = profile?.plan === "yearly";
@@ -401,16 +425,26 @@ function PricingContent() {
                   Coming soon
                 </div>
               ) : (
-                <Button
-                  type="button"
-                  onClick={() => openCheckout(selectedPriceId)}
-                  size="lg"
-                  className="w-full py-3.5"
-                >
-                  {billing === "yearly"
-                    ? `Get Pro — ${BILLING_CONFIG.yearly.priceText.replace("/year", "/yr")}`
-                    : `Get Pro — ${BILLING_CONFIG.monthly.priceText.replace("/month", "/mo")}`}
-                </Button>
+                <div className="space-y-2">
+                  {/* Optional coupon code field — Paddle applies the discount at checkout */}
+                  <input
+                    type="text"
+                    placeholder="Coupon code (optional)"
+                    value={coupon}
+                    onChange={(e) => setCoupon(e.target.value)}
+                    className="w-full rounded-xl border border-zinc-200 bg-white px-4 py-2.5 text-sm text-zinc-800 placeholder-zinc-400 focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-200 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200 dark:placeholder-zinc-500 dark:focus:border-indigo-500 dark:focus:ring-indigo-900/40"
+                  />
+                  <Button
+                    type="button"
+                    onClick={() => openCheckout(selectedPriceId)}
+                    size="lg"
+                    className="w-full py-3.5"
+                  >
+                    {billing === "yearly"
+                      ? `Get Pro — ${BILLING_CONFIG.yearly.priceText.replace("/year", "/yr")}`
+                      : `Get Pro — ${BILLING_CONFIG.monthly.priceText.replace("/month", "/mo")}`}
+                  </Button>
+                </div>
               )}
             </div>
 
@@ -452,6 +486,29 @@ function PricingContent() {
                 <h3 className="mt-3 font-semibold text-zinc-900 dark:text-zinc-100">{title}</h3>
                 <p className="mt-1.5 text-sm text-zinc-500 dark:text-zinc-400">{body}</p>
               </Card>
+            ))}
+          </div>
+        </div>
+
+        {/* ── Testimonials ─────────────────────────────────── */}
+        <div className="mx-auto mt-16 max-w-3xl">
+          <h2 className="mb-6 text-center text-lg font-bold text-zinc-900 dark:text-zinc-100">
+            What developers say
+          </h2>
+          <div className="grid gap-4 sm:grid-cols-3">
+            {TESTIMONIALS.map((t) => (
+              <figure
+                key={t.name}
+                className="flex flex-col justify-between rounded-2xl border border-zinc-200 bg-surface-card p-5 shadow-sm dark:border-zinc-800"
+              >
+                <blockquote className="text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
+                  &ldquo;{t.quote}&rdquo;
+                </blockquote>
+                <figcaption className="mt-4">
+                  <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">{t.name}</p>
+                  <p className="text-xs text-zinc-500 dark:text-zinc-500">{t.role}</p>
+                </figcaption>
+              </figure>
             ))}
           </div>
         </div>

@@ -84,6 +84,7 @@ export default function PlanTab({ plan }: Props) {
   const isMonthly = plan === "pro";
   const isCanceling = plan === "canceling";
   const paddleReady = useRef(false);
+  const [coupon, setCoupon] = useState("");
 
   // When redirected back from Paddle checkout with ?plan=success,
   // poll the profile until the plan upgrades (webhook may take a few seconds).
@@ -139,21 +140,19 @@ export default function PlanTab({ plan }: Props) {
     const { priceId } = await res.json();
     if (!window.Paddle || !priceId) return;
     const origin = typeof window !== "undefined" ? window.location.origin : "";
-    window.Paddle.Checkout.open({
+    const params: Parameters<typeof window.Paddle.Checkout.open>[0] = {
       items: [{ priceId, quantity: 1 }],
-      // customData.userId is passed to the transaction and read by the webhook
-      // to link the Paddle customer to the uByte user account.
-      // Keep this in sync with resolveUserId() in /api/webhooks/paddle/route.ts
       customData: user ? { userId: String(user.id) } : undefined,
       customer: user ? { email: user.email } : undefined,
       settings: {
-        // After payment, the plan tab polls refreshProfile() every 2s for up to 20s
-        // so the UI updates as soon as the webhook processes the plan upgrade.
         successUrl: `${origin}/profile?tab=plan&plan=success`,
         displayMode: "overlay",
         variant: "one-page",
       },
-    });
+    };
+    const trimmedCoupon = coupon.trim();
+    if (trimmedCoupon) (params as Record<string, unknown>).discountCode = trimmedCoupon;
+    window.Paddle.Checkout.open(params);
   }
 
   return (
@@ -247,6 +246,15 @@ export default function PlanTab({ plan }: Props) {
 
       {/* CTA */}
       {!isPaid ? (
+        <div className="space-y-3">
+        {/* Coupon input — shown above the checkout buttons when user is on free plan */}
+        <input
+          type="text"
+          placeholder="Coupon code (optional)"
+          value={coupon}
+          onChange={(e) => setCoupon(e.target.value)}
+          className="w-full rounded-xl border border-zinc-200 bg-white px-4 py-2.5 text-sm text-zinc-800 placeholder-zinc-400 focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-200 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200 dark:placeholder-zinc-500 dark:focus:ring-indigo-900/40"
+        />
         <div className="grid gap-4 sm:grid-cols-2">
           <Card className="p-5">
             <p className="text-lg font-bold text-zinc-900 dark:text-zinc-100">
@@ -285,6 +293,7 @@ export default function PlanTab({ plan }: Props) {
               Get Yearly
             </Button>
           </div>
+        </div>
         </div>
       ) : (
         <div className="space-y-4">
