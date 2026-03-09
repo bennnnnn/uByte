@@ -837,11 +837,14 @@ export function PracticeIDE({ problem, initialLang, categoryFilter = null, listP
   }, [verdict?.submissionId]);
 
   const canSubmit = !!problem.testCases?.length;
+  // Pass ALL problems to the sidebar so it can handle its own category filter + pagination.
+  // initialCategory pre-selects the filter when the user arrived from a filtered list page.
   const sidebarProps = {
-    problems: sidebarProblems,
+    problems: allProblems,
     activeSlug: problem.slug,
     lang,
     statuses,
+    initialCategory: categoryFilter ?? undefined,
     listQuery: { category: categoryFilter ?? undefined, page: listPage > 1 ? listPage : undefined, status: listStatus, difficulty: listDifficulty },
   } as const;
 

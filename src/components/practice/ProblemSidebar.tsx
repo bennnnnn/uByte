@@ -1,8 +1,12 @@
 "use client";
 
+import { useState, useMemo } from "react";
 import Link from "next/link";
-import { DIFFICULTY_BADGE, type PracticeProblem } from "@/lib/practice/types";
+import { type PracticeProblem, type ProblemCategory } from "@/lib/practice/types";
 import type { PracticeAttemptStatus } from "@/lib/db/practice-attempts";
+import { getCategoryLabel } from "@/lib/practice/problems";
+
+const PAGE_SIZE = 20;
 
 interface ListQuery {
   category?: string;
@@ -16,10 +20,10 @@ interface Props {
   activeSlug: string;
   lang: string;
   onCollapse: () => void;
-  /** slug → attempt status; undefined means not yet attempted */
   statuses: Record<string, PracticeAttemptStatus>;
-  /** When set, problem links and "back to list" preserve this filter (e.g. from list page). */
   listQuery?: ListQuery;
+  /** Pre-select a category (e.g. when navigating from a filtered list page). */
+  initialCategory?: ProblemCategory;
 }
 
 function buildListQueryString(q: ListQuery | undefined): string {
@@ -40,29 +44,48 @@ export default function ProblemSidebar({
   onCollapse,
   statuses,
   listQuery,
+  initialCategory,
 }: Props) {
+  const [selectedCategory, setSelectedCategory] = useState<ProblemCategory | "all">(
+    initialCategory ?? "all"
+  );
+  const [page, setPage] = useState(1);
+
+  // Unique categories present in this problem set
+  const availableCategories = useMemo<ProblemCategory[]>(() => {
+    const seen = new Set<ProblemCategory>();
+    for (const p of problems) {
+      if (p.category) seen.add(p.category);
+    }
+    return [...seen];
+  }, [problems]);
+
+  // Filter by selected category
+  const filtered = useMemo(
+    () =>
+      selectedCategory === "all"
+        ? problems
+        : problems.filter((p) => p.category === selectedCategory),
+    [problems, selectedCategory]
+  );
+
+  // Paginate
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  const pageProblems = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+
+  function handleCategoryChange(cat: ProblemCategory | "all") {
+    setSelectedCategory(cat);
+    setPage(1);
+  }
+
   const queryString = buildListQueryString(listQuery);
-  const easy   = problems.filter((p) => p.difficulty === "easy").length;
-  const medium = problems.filter((p) => p.difficulty === "medium").length;
-  const hard   = problems.filter((p) => p.difficulty === "hard").length;
 
   return (
     <nav className="flex h-full flex-col overflow-hidden border-r border-zinc-200 bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900">
-      {/* ── Header: difficulty summary + collapse button ─── */}
-      <div className="shrink-0 border-b border-zinc-200 px-3 py-2.5 dark:border-zinc-800">
-        {/* Difficulty badges row */}
-        <div className="mb-2 flex items-center gap-1.5 flex-wrap">
-          <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${DIFFICULTY_BADGE.easy}`}>
-            {easy} Easy
-          </span>
-          <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${DIFFICULTY_BADGE.medium}`}>
-            {medium} Medium
-          </span>
-          <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${DIFFICULTY_BADGE.hard}`}>
-            {hard} Hard
-          </span>
-        </div>
-        {/* Collapse button */}
+
+      {/* ── Header ──────────────────────────────────────── */}
+      <div className="shrink-0 space-y-2 border-b border-zinc-200 px-3 py-2.5 dark:border-zinc-800">
+        {/* Title row + collapse */}
         <div className="flex items-center justify-between">
           <span className="text-[10px] font-semibold uppercase tracking-widest text-zinc-400 dark:text-zinc-500">
             Problems
@@ -78,62 +101,114 @@ export default function ProblemSidebar({
             </svg>
           </button>
         </div>
+
+        {/* Category dropdown */}
+        {availableCategories.length > 0 && (
+          <div className="relative">
+            <select
+              value={selectedCategory}
+              onChange={(e) => handleCategoryChange(e.target.value as ProblemCategory | "all")}
+              className="w-full appearance-none rounded-lg border border-zinc-200 bg-white py-1.5 pl-2.5 pr-7 text-xs font-medium text-zinc-700 shadow-sm transition-colors focus:border-indigo-400 focus:outline-none focus:ring-1 focus:ring-indigo-400 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-200 dark:focus:border-indigo-600"
+            >
+              <option value="all">All Categories ({problems.length})</option>
+              {availableCategories.map((cat) => {
+                const count = problems.filter((p) => p.category === cat).length;
+                return (
+                  <option key={cat} value={cat}>
+                    {getCategoryLabel(cat)} ({count})
+                  </option>
+                );
+              })}
+            </select>
+            {/* Custom chevron */}
+            <svg
+              className="pointer-events-none absolute right-2 top-1/2 h-3 w-3 -translate-y-1/2 text-zinc-400 dark:text-zinc-500"
+              fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+            </svg>
+          </div>
+        )}
       </div>
 
-      {/* ── Problem list ────────────────────────────────── */}
+      {/* ── Problem list ─────────────────────────────────── */}
       <ul className="flex-1 overflow-y-auto py-1">
-        {problems.map((p, idx) => {
-          const isActive = p.slug === activeSlug;
-          const status   = statuses[p.slug];
-
-          return (
-            <li key={p.slug}>
-              <Link
-                href={`/practice/${lang}/${p.slug}${queryString}`}
-                className={`group flex items-center gap-3 px-3 py-2.5 text-sm transition-colors ${
-                  isActive
-                    ? "bg-indigo-50 text-indigo-700 dark:bg-indigo-950/40 dark:text-indigo-300"
-                    : "text-zinc-700 hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-800/60"
-                }`}
-              >
-                {/* Row number */}
-                <span
-                  className={`w-5 shrink-0 text-right text-xs tabular-nums ${
-                    isActive ? "text-indigo-400" : "text-zinc-400 dark:text-zinc-500"
+        {pageProblems.length === 0 ? (
+          <li className="px-4 py-8 text-center text-xs text-zinc-400 dark:text-zinc-500">
+            No problems in this category.
+          </li>
+        ) : (
+          pageProblems.map((p, idx) => {
+            const isActive = p.slug === activeSlug;
+            const status   = statuses[p.slug];
+            const globalIdx = (page - 1) * PAGE_SIZE + idx + 1;
+            return (
+              <li key={p.slug}>
+                <Link
+                  href={`/practice/${lang}/${p.slug}${queryString}`}
+                  className={`group flex items-center gap-3 px-3 py-2.5 text-sm transition-colors ${
+                    isActive
+                      ? "bg-indigo-50 text-indigo-700 dark:bg-indigo-950/40 dark:text-indigo-300"
+                      : "text-zinc-700 hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-800/60"
                   }`}
                 >
-                  {idx + 1}.
-                </span>
-
-                {/* Title */}
-                <span className="flex-1 truncate font-medium leading-snug" title={p.title}>
-                  {p.title}
-                </span>
-
-                {/* Status circle — replaces the old difficulty tag */}
-                <StatusDot status={status} />
-              </Link>
-            </li>
-          );
-        })}
+                  <span
+                    className={`w-5 shrink-0 text-right text-xs tabular-nums ${
+                      isActive ? "text-indigo-400" : "text-zinc-400 dark:text-zinc-500"
+                    }`}
+                  >
+                    {globalIdx}.
+                  </span>
+                  <span className="flex-1 truncate font-medium leading-snug" title={p.title}>
+                    {p.title}
+                  </span>
+                  <StatusDot status={status} />
+                </Link>
+              </li>
+            );
+          })
+        )}
       </ul>
 
-      {/* ── Footer ──────────────────────────────────────── */}
+      {/* ── Pagination ───────────────────────────────────── */}
+      {totalPages > 1 && (
+        <div className="shrink-0 flex items-center justify-between gap-2 border-t border-zinc-200 px-3 py-2 dark:border-zinc-800">
+          <button
+            type="button"
+            onClick={() => setPage((p) => Math.max(1, p - 1))}
+            disabled={page === 1}
+            className="flex h-6 w-6 items-center justify-center rounded text-sm text-zinc-500 transition-colors hover:bg-zinc-200 disabled:opacity-30 dark:text-zinc-400 dark:hover:bg-zinc-700"
+          >
+            ‹
+          </button>
+          <span className="text-[11px] text-zinc-400 dark:text-zinc-500">
+            {(page - 1) * PAGE_SIZE + 1}–{Math.min(page * PAGE_SIZE, filtered.length)} of {filtered.length}
+          </span>
+          <button
+            type="button"
+            onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+            disabled={page === totalPages}
+            className="flex h-6 w-6 items-center justify-center rounded text-sm text-zinc-500 transition-colors hover:bg-zinc-200 disabled:opacity-30 dark:text-zinc-400 dark:hover:bg-zinc-700"
+          >
+            ›
+          </button>
+        </div>
+      )}
+
+      {/* ── Footer ───────────────────────────────────────── */}
       <div className="shrink-0 border-t border-zinc-200 px-3 py-2.5 dark:border-zinc-800">
         <div className="flex flex-col gap-1.5 text-xs text-zinc-400 dark:text-zinc-500">
-          <span>{problems.length} problems{queryString ? " in this category" : ""}</span>
+          <span>
+            {filtered.length !== problems.length
+              ? `${filtered.length} of ${problems.length} problems`
+              : `${problems.length} problem${problems.length !== 1 ? "s" : ""}`}
+          </span>
           <div className="flex items-center gap-2">
-            <Link
-              href={`/practice/${lang}${queryString}`}
-              className="hover:text-indigo-600 dark:hover:text-indigo-400"
-            >
+            <Link href={`/practice/${lang}${queryString}`} className="hover:text-indigo-600 dark:hover:text-indigo-400">
               ← Back to list
             </Link>
             <span className="text-zinc-300 dark:text-zinc-600">·</span>
-            <Link
-              href="/practice"
-              className="hover:text-indigo-600 dark:hover:text-indigo-400"
-            >
+            <Link href="/practice" className="hover:text-indigo-600 dark:hover:text-indigo-400">
               All languages →
             </Link>
           </div>
@@ -146,7 +221,6 @@ export default function ProblemSidebar({
 /** Small status circle: grey = untried, green = solved, red = failed */
 function StatusDot({ status }: { status: PracticeAttemptStatus | undefined }) {
   if (!status) {
-    // Not attempted — empty circle outline
     return (
       <span
         title="Not attempted"
@@ -156,22 +230,15 @@ function StatusDot({ status }: { status: PracticeAttemptStatus | undefined }) {
   }
   if (status === "solved") {
     return (
-      <span
-        title="Solved"
-        className="flex h-3 w-3 shrink-0 items-center justify-center rounded-full bg-emerald-500"
-      >
+      <span title="Solved" className="flex h-3 w-3 shrink-0 items-center justify-center rounded-full bg-emerald-500">
         <svg className="h-2 w-2 text-white" viewBox="0 0 8 8" fill="currentColor">
           <path d="M1.5 4l2 2 3-3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="none" />
         </svg>
       </span>
     );
   }
-  // failed
   return (
-    <span
-      title="Attempted — not passing"
-      className="flex h-3 w-3 shrink-0 items-center justify-center rounded-full bg-red-500"
-    >
+    <span title="Attempted — not passing" className="flex h-3 w-3 shrink-0 items-center justify-center rounded-full bg-red-500">
       <svg className="h-2 w-2 text-white" viewBox="0 0 8 8" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
         <path d="M2 2l4 4M6 2L2 6" />
       </svg>
