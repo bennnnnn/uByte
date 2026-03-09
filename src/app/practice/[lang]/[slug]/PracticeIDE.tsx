@@ -22,6 +22,67 @@ import { ALL_LANGUAGE_KEYS } from "@/lib/languages/registry";
 
 const LANG_ORDER = ALL_LANGUAGE_KEYS;
 
+// ── AI Feedback card (expandable) ────────────────────────────────────────────
+
+function AiFeedbackCard({
+  feedback,
+  onClear,
+}: {
+  feedback: { friendly_one_liner: string; hint: string; next_step: string; minimal_patch?: string };
+  onClear: () => void;
+}) {
+  const [showMore, setShowMore] = useState(false);
+  const hasMore = !!(feedback.next_step || feedback.minimal_patch);
+
+  return (
+    <div className="flex items-start justify-between gap-2">
+      <div className="min-w-0 flex-1 space-y-2">
+        {/* Always-visible: one-liner + hint */}
+        <p className="text-sm font-semibold text-indigo-800 dark:text-indigo-300">
+          🤖 {feedback.friendly_one_liner}
+        </p>
+        <p className="text-xs leading-relaxed text-zinc-700 dark:text-zinc-300">{feedback.hint}</p>
+
+        {/* Expandable section */}
+        {hasMore && (
+          <>
+            {showMore && (
+              <div className="space-y-2 border-t border-indigo-200/60 pt-2 dark:border-indigo-800/60">
+                {feedback.next_step && (
+                  <p className="text-xs text-zinc-600 dark:text-zinc-300">
+                    <span className="font-semibold text-zinc-700 dark:text-zinc-200">Next step: </span>
+                    {feedback.next_step}
+                  </p>
+                )}
+                {feedback.minimal_patch && (
+                  <pre className="overflow-x-auto rounded-lg bg-zinc-900 p-3 text-xs text-zinc-100">
+                    {feedback.minimal_patch}
+                  </pre>
+                )}
+              </div>
+            )}
+            <button
+              type="button"
+              onClick={() => setShowMore((v) => !v)}
+              className="flex items-center gap-1 text-[11px] font-semibold text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300"
+            >
+              {showMore ? "▲ Less" : "▼ More"}
+            </button>
+          </>
+        )}
+      </div>
+      <button
+        type="button"
+        onClick={onClear}
+        className="shrink-0 rounded p-1 text-zinc-400 hover:bg-zinc-200 hover:text-zinc-600 dark:hover:bg-zinc-700"
+        aria-label="Dismiss"
+      >
+        ✕
+      </button>
+    </div>
+  );
+}
+
 // ── Output / Test Cases panel ─────────────────────────────────────────────────
 
 type VerdictState = {
@@ -422,30 +483,10 @@ function OutputPanel({
         )}
         {aiFeedback && (
           <div className="border-t border-indigo-200 bg-indigo-50/60 px-4 py-3 dark:border-indigo-800 dark:bg-indigo-950/30">
-            <div className="flex items-start justify-between gap-2">
-              <div className="min-w-0 flex-1 space-y-1.5">
-                <p className="text-sm font-semibold text-indigo-800 dark:text-indigo-300">🤖 {aiFeedback.friendly_one_liner}</p>
-                <p className="text-xs leading-relaxed text-zinc-700 dark:text-zinc-300">{aiFeedback.hint}</p>
-                {aiFeedback.next_step && (
-                  <p className="text-xs text-zinc-500 dark:text-zinc-400">
-                    <span className="font-semibold">Next step:</span> {aiFeedback.next_step}
-                  </p>
-                )}
-                {aiFeedback.minimal_patch && (
-                  <pre className="mt-2 overflow-x-auto rounded-lg bg-zinc-900 p-3 text-xs text-zinc-100">
-                    {aiFeedback.minimal_patch}
-                  </pre>
-                )}
-              </div>
-              <button
-                type="button"
-                onClick={onClearAI}
-                className="shrink-0 rounded p-1 text-zinc-400 hover:bg-zinc-200 hover:text-zinc-600 dark:hover:bg-zinc-700"
-                aria-label="Dismiss"
-              >
-                ✕
-              </button>
-            </div>
+            <AiFeedbackCard
+              feedback={aiFeedback}
+              onClear={onClearAI}
+            />
           </div>
         )}
       </div>
@@ -499,6 +540,23 @@ export function PracticeIDE({ problem, initialLang, categoryFilter = null, listP
   const [descTab, setDescTab] = useState<"desc" | "notes">("desc");
   const [notes, setNotes] = useState<string>("");
   const notesKey = `practice-notes-${problem.slug}`;
+  const [noteSaved, setNoteSaved] = useState(false);
+
+  // Manual save — cancels the debounce timer and saves immediately
+  async function saveNotesNow() {
+    if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
+    if (user) {
+      await apiFetch("/api/practice-notes", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ slug: problem.slug, note: notes }),
+      }).catch(() => {});
+    } else {
+      try { localStorage.setItem(notesKey, notes); } catch { /* ignore */ }
+    }
+    setNoteSaved(true);
+    setTimeout(() => setNoteSaved(false), 2000);
+  }
 
   // Elapsed timer
   const [elapsed, setElapsed] = useState(0);
@@ -1103,12 +1161,25 @@ export function PracticeIDE({ problem, initialLang, categoryFilter = null, listP
           {/* Notes tab */}
           {descTab === "notes" && (
             <div className="flex min-w-0 flex-1 flex-col p-4 md:p-5">
-              <p className="mb-2 text-xs text-zinc-400 dark:text-zinc-500">
-                {user ? "Notes are saved to your account for this problem." : "Sign in to save notes to your account."}
-              </p>
+              <div className="mb-2 flex items-center justify-between gap-2">
+                <p className="text-xs text-zinc-400 dark:text-zinc-500">
+                  {user ? "Auto-saved as you type." : "Sign in to save notes to your account."}
+                </p>
+                <button
+                  type="button"
+                  onClick={saveNotesNow}
+                  className={`flex items-center gap-1 rounded-md border px-2.5 py-1 text-xs font-semibold transition-all ${
+                    noteSaved
+                      ? "border-emerald-400 bg-emerald-50 text-emerald-700 dark:border-emerald-600 dark:bg-emerald-950/40 dark:text-emerald-400"
+                      : "border-zinc-300 text-zinc-500 hover:border-indigo-400 hover:bg-indigo-50 hover:text-indigo-700 dark:border-zinc-600 dark:text-zinc-400 dark:hover:border-indigo-600 dark:hover:text-indigo-400"
+                  }`}
+                >
+                  {noteSaved ? "✓ Saved" : "Save"}
+                </button>
+              </div>
               <textarea
                 value={notes}
-                onChange={(e) => setNotes(e.target.value)}
+                onChange={(e) => { setNotes(e.target.value); setNoteSaved(false); }}
                 placeholder="Write your approach, observations, or ideas here…"
                 className="flex-1 resize-none rounded-lg border border-zinc-200 bg-white p-3 text-sm text-zinc-800 placeholder-zinc-400 focus:border-indigo-400 focus:outline-none focus:ring-1 focus:ring-indigo-400 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-200 dark:placeholder-zinc-500 dark:focus:border-indigo-600"
               />
