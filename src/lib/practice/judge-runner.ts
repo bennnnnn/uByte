@@ -206,7 +206,11 @@ export async function runJudge(
       };
     }
 
-    if (statusId === 3) {
+    // Status 3 = Accepted (code ran to completion — we do our own line-by-line comparison).
+    // Status 4 = Wrong Answer per Judge0 (only set when expected_output is provided, but
+    //            handle it defensively in case the Judge0 instance is configured differently).
+    // Status 1/2 = In Queue / Processing (wait=true should prevent these, but handle anyway).
+    if (statusId === 3 || statusId === 4) {
       const actualLines = stdout.split("\n");
       let passed = 0;
       for (let i = 0; i < expectedLines.length; i++) {
@@ -233,13 +237,21 @@ export async function runJudge(
         failedTestIndex: failIdx,
         failedInput: tc?.stdin,
         failedExpected: expectedLines[failIdx],
-        failedActual: actualLines[failIdx],
+        failedActual: actualLines[failIdx] ?? "",
+      };
+    }
+
+    // Status 1/2 = still queued/processing (shouldn't happen with wait=true)
+    if (statusId === 1 || statusId === 2) {
+      return {
+        verdict: "error",
+        message: "Judge is busy — please try again in a moment.",
       };
     }
 
     return {
       verdict: "error",
-      message: data.status?.description ?? "Unknown error",
+      message: `Judge returned unexpected status ${statusId}: ${data.status?.description ?? "unknown"}. ${stderr || internalMsg || ""}`.trim(),
       output: stderr || internalMsg || stdout,
     };
   } catch (err) {

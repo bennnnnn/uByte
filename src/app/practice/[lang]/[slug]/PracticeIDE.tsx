@@ -111,7 +111,7 @@ function OutputPanel({
   return (
     <div
       className="flex shrink-0 flex-col overflow-hidden bg-surface-card"
-      style={{ height: outputHeight }}
+      style={{ height: verdict ? Math.max(outputHeight, 400) : outputHeight }}
       suppressHydrationWarning
     >
       {/* ── Tab bar ────────────────────────────────────────────────────── */}
@@ -369,7 +369,6 @@ function OutputPanel({
                       <p className="text-sm font-semibold text-red-700 dark:text-red-300">Submission Error</p>
                       <p className="mt-1 text-xs text-red-600 dark:text-red-400">{verdict.message}</p>
                     </div>
-                    {/* Still show the test cases so the user can inspect what they're up against */}
                     {totalCases > 0 && (
                       <div className="mt-4">
                         <p className="mb-2 text-[11px] font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">Test Cases</p>
@@ -385,6 +384,21 @@ function OutputPanel({
                         </div>
                       </div>
                     )}
+                  </div>
+                )}
+
+                {/* ── Catch-all: show raw verdict info if nothing else matched ── */}
+                {verdict.type !== "accepted" &&
+                  verdict.type !== "wrong_answer" &&
+                  verdict.type !== "compile_error" &&
+                  verdict.type !== "runtime_error" &&
+                  verdict.type !== "tle" &&
+                  verdict.type !== "error" && (
+                  <div className="p-4">
+                    <div className="rounded-lg border border-zinc-200 bg-zinc-50 p-4 dark:border-zinc-700 dark:bg-zinc-800">
+                      <p className="text-xs font-mono text-zinc-500">verdict: {verdict.type}</p>
+                      <p className="mt-1 text-xs text-zinc-600 dark:text-zinc-300">{verdict.message}</p>
+                    </div>
                   </div>
                 )}
               </>
