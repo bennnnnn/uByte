@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { LANGUAGES } from "@/lib/languages/registry";
 import type { SupportedLanguage } from "@/lib/languages/types";
+import { getLangIcon } from "@/lib/languages/icons";
 import type { ExamResultResponse } from "@/lib/exams/api-types";
 import { parseJson, getApiErrorMessage } from "@/lib/fetch-utils";
 import { usePassPercent } from "@/hooks/usePassPercent";
@@ -440,7 +441,7 @@ export default function PracticeExamResultPage() {
                     href={`/certifications/${l}`}
                     className="inline-flex items-center gap-1.5 rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-1.5 text-xs font-semibold text-zinc-600 transition-colors hover:border-indigo-300 hover:bg-indigo-50 hover:text-indigo-700 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-400 dark:hover:border-indigo-700 dark:hover:bg-indigo-950/30 dark:hover:text-indigo-400"
                   >
-                    <span>{cfg?.icon}</span>
+                    <span>{getLangIcon(l)}</span>
                     {cfg?.name ?? l}
                   </Link>
                 );
