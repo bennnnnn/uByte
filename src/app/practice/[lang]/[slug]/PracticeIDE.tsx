@@ -895,7 +895,8 @@ export function PracticeIDE({ problem, initialLang, initialCode, categoryFilter 
       const ta = editor.textareaRef.current!;
       const start = ta.selectionStart;
       const end   = ta.selectionEnd;
-      const next  = editor.code.slice(0, start) + "    " + editor.code.slice(end);
+      // Read from ta.value (DOM) — always current, never stale like editor.code state
+      const next  = ta.value.slice(0, start) + "    " + ta.value.slice(end);
       editor.setCode(next);
       requestAnimationFrame(() => { ta.selectionStart = ta.selectionEnd = start + 4; });
     } else if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
@@ -1235,7 +1236,7 @@ export function PracticeIDE({ problem, initialLang, initialCode, categoryFilter 
               />
               <textarea
                 ref={editor.textareaRef}
-                defaultValue={editor.code}
+                value={editor.code}
                 onChange={(e) => editor.setCode(e.target.value)}
                 onScroll={editor.syncScroll}
                 onKeyDown={handleKeyDown}

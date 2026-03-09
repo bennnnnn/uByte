@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useMemo } from "react";
+import { useState, useRef, useMemo, useLayoutEffect } from "react";
 import { getHighlighter } from "@/lib/languages/registry";
 import type { SupportedLanguage } from "@/lib/languages/types";
 
@@ -32,45 +32,49 @@ export function useCodeEditor(
   initialCode: string,
   lang: SupportedLanguage = "go"
 ): CodeEditorState {
-  // `code` state is used ONLY for syntax highlighting.
-  // The textarea's live value lives in the DOM (uncontrolled) so that
-  // React never resets the cursor position on re-renders.
   const [code, setCodeState] = useState(initialCode);
   const highlightFn = getHighlighter(lang);
   const highlightedHtml = useMemo(() => highlightFn(code), [highlightFn, code]);
   const [errorLines, setErrorLines] = useState<Set<number>>(new Set());
   const [formatting, setFormatting] = useState(false);
 
-  const preRef = useRef<HTMLPreElement>(null);
-  const lineNumRef = useRef<HTMLDivElement>(null);
+  const preRef       = useRef<HTMLPreElement>(null);
+  const lineNumRef   = useRef<HTMLDivElement>(null);
   const highlightRef = useRef<HTMLDivElement>(null);
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const textareaRef  = useRef<HTMLTextAreaElement>(null);
 
-  /**
-   * Update the editor code.
-   *
-   * When called from onChange (user typing), `textareaRef.current.value`
-   * already has the new value — we only need to sync the React state for
-   * syntax highlighting, which causes no cursor jump because the textarea
-   * is uncontrolled (uses `defaultValue`).
-   *
-   * When called externally (draft load, reset, format, language switch),
-   * we write directly to the DOM with cursor clamping so the position is
-   * preserved (or clamped to the end of the shorter code).
-   */
+  // When an external setCode call changes the value (draft load, reset, format,
+  // language switch), React will rewrite textarea.value via the controlled `value`
+  // prop — which the browser treats as a programmatic write and moves the cursor
+  // to the end. We save the desired cursor position here and restore it right
+  // after React commits the DOM update via useLayoutEffect.
+  const savedCursor = useRef<{ start: number; end: number } | null>(null);
+
   function setCode(newCode: string) {
     const ta = textareaRef.current;
     if (ta && ta.value !== newCode) {
-      // Save cursor before touching the DOM value
-      const selStart = ta.selectionStart ?? 0;
-      const selEnd   = ta.selectionEnd   ?? 0;
-      ta.value = newCode;
-      // Clamp so the cursor stays valid if the new code is shorter
-      ta.selectionStart = Math.min(selStart, newCode.length);
-      ta.selectionEnd   = Math.min(selEnd,   newCode.length);
+      // External call — ta.value already differs because the user didn't type this.
+      // Save the cursor clamped to the new code's length so it stays valid.
+      savedCursor.current = {
+        start: Math.min(ta.selectionStart ?? 0, newCode.length),
+        end:   Math.min(ta.selectionEnd   ?? 0, newCode.length),
+      };
     }
+    // When called from onChange (user typing), ta.value === newCode already,
+    // so we don't touch savedCursor — React detects the value hasn't changed
+    // vs what it last wrote and skips the DOM write, preserving the cursor.
     setCodeState(newCode);
   }
+
+  // Restore cursor position synchronously after React commits the DOM update.
+  // Only runs when `code` changes, and only acts when we saved a position.
+  useLayoutEffect(() => {
+    if (savedCursor.current && textareaRef.current) {
+      textareaRef.current.selectionStart = savedCursor.current.start;
+      textareaRef.current.selectionEnd   = savedCursor.current.end;
+      savedCursor.current = null;
+    }
+  }, [code]);
 
   async function handleFormat() {
     if (lang !== "go") return;
@@ -93,9 +97,8 @@ export function useCodeEditor(
   function syncScroll() {
     const ta = textareaRef.current;
     if (!ta) return;
-    if (preRef.current)       preRef.current.scrollTop  = ta.scrollTop;
-    if (preRef.current)       preRef.current.scrollLeft = ta.scrollLeft;
-    if (lineNumRef.current)   lineNumRef.current.scrollTop  = ta.scrollTop;
+    if (preRef.current)       { preRef.current.scrollTop  = ta.scrollTop; preRef.current.scrollLeft = ta.scrollLeft; }
+    if (lineNumRef.current)   lineNumRef.current.scrollTop   = ta.scrollTop;
     if (highlightRef.current) highlightRef.current.scrollTop = ta.scrollTop;
   }
 
