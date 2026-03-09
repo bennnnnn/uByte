@@ -15,6 +15,7 @@ import Script from "next/script";
 import { Suspense } from "react";
 import ReferralTracker from "@/components/ReferralTracker";
 import OnboardingChecklist from "@/components/OnboardingChecklist";
+import PushPermissionBanner from "@/components/PushPermissionBanner";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -119,6 +120,8 @@ export default function RootLayout({
           <Suspense fallback={null}><ReferralTracker /></Suspense>
           {/* Floating checklist for new users — hides once all 3 steps are done */}
           <OnboardingChecklist />
+          {/* Asks for push permission after first streak day — shown once */}
+          <PushPermissionBanner />
           </ToastProvider>
         </AuthProvider>
         <Script

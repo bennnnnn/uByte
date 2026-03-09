@@ -104,12 +104,25 @@ export default async function PracticeProblemPage({ params, searchParams }: Prop
     if (sp.status) backQuery.set("status", sp.status);
     if (sp.difficulty) backQuery.set("difficulty", sp.difficulty);
     const backQueryStr = backQuery.toString();
+    // Build a preview of the problem description to show blurred behind the wall
+    const previewLines = [
+      `// ${problem.title} — ${problem.difficulty.toUpperCase()}`,
+      `// Category: ${problem.category}`,
+      "",
+      ...problem.description.split("\n").slice(0, 6),
+      "",
+      ...(problem.examples?.[0]
+        ? [`Example: ${problem.examples[0].input}`, `Output:  ${problem.examples[0].output}`]
+        : []),
+    ];
     return (
       <UpgradeWall
-        tutorialTitle="Interview Prep"
+        tutorialTitle={problem.title}
         subtitle={dripMessage}
         backHref={`/practice/${lang}${backQueryStr ? `?${backQueryStr}` : ""}`}
         backLabel={`← Back to ${LANGUAGES[lang as SupportedLanguage]?.name ?? lang} problems`}
+        previewLines={previewLines}
+        context="practice"
       />
     );
   }

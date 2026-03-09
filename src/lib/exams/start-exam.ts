@@ -4,6 +4,7 @@ import { parseJson, getApiErrorMessage } from "@/lib/fetch-utils";
 export type StartExamResult =
   | { kind: "success"; attemptId: string }
   | { kind: "redirect"; url: string }
+  | { kind: "upgrade" }
   | { kind: "error"; message: string };
 
 export async function callStartExamApi(lang: string): Promise<StartExamResult> {
@@ -16,7 +17,7 @@ export async function callStartExamApi(lang: string): Promise<StartExamResult> {
 
   if (res.status === 401) return { kind: "redirect", url: "/login" };
   if (res.status === 403 && data?.code === "upgrade_required") {
-    return { kind: "redirect", url: "/pricing" };
+    return { kind: "upgrade" };
   }
   if (!res.ok || !data?.attemptId) {
     return { kind: "error", message: getApiErrorMessage(res, data, "Unable to start exam. Please try again.") };

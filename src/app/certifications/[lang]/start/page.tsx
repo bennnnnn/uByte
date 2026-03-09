@@ -3,11 +3,13 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { callStartExamApi } from "@/lib/exams/start-exam";
+import UpgradeWall from "@/components/UpgradeWall";
 
 export default function PracticeExamStartPage() {
   const { lang } = useParams<{ lang: string }>();
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
+  const [showUpgrade, setShowUpgrade] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -18,6 +20,8 @@ export default function PracticeExamStartPage() {
 
         if (result.kind === "redirect") {
           router.replace(result.url);
+        } else if (result.kind === "upgrade") {
+          setShowUpgrade(true);
         } else if (result.kind === "error") {
           setError(result.message);
         } else {
@@ -32,6 +36,18 @@ export default function PracticeExamStartPage() {
       cancelled = true;
     };
   }, [lang, router]);
+
+  if (showUpgrade) {
+    return (
+      <UpgradeWall
+        tutorialTitle={`${lang.charAt(0).toUpperCase() + lang.slice(1)} Certification`}
+        subtitle="Certification exams are a Pro feature. Upgrade to take timed exams and earn verifiable certificates."
+        backHref={`/certifications/${lang}`}
+        backLabel={`← Back to ${lang} certification`}
+        context="certification"
+      />
+    );
+  }
 
   return (
     <div className="flex min-h-[60vh] items-center justify-center px-4">
