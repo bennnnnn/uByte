@@ -22,10 +22,25 @@ interface Tutorial {
   estimatedMinutes: number;
 }
 
-export default function TutorialGrid({ lang, tutorials }: { lang: string; tutorials: Tutorial[] }) {
+export default function TutorialGrid({
+  lang,
+  tutorials,
+  stepCountBySlug = {},
+}: {
+  lang: string;
+  tutorials: Tutorial[];
+  stepCountBySlug?: Record<string, number>;
+}) {
   const { user, progress } = useAuth();
-  const completedCount = progress.length;
-  const totalCount = tutorials.length;
+
+  // Use individual lesson (step) counts when available, fall back to topic counts.
+  const totalLessons = Object.values(stepCountBySlug).reduce((s, n) => s + n, 0);
+  const totalCount = totalLessons > 0 ? totalLessons : tutorials.length;
+
+  // Sum step counts for each completed topic slug; fall back to counting topics.
+  const completedCount = totalLessons > 0
+    ? progress.reduce((s, slug) => s + (stepCountBySlug[slug] ?? 0), 0)
+    : progress.length;
   const [query, setQuery] = useState("");
   const [diffFilter, setDiffFilter] = useState<DifficultyFilter>("all");
 
@@ -47,7 +62,7 @@ export default function TutorialGrid({ lang, tutorials }: { lang: string; tutori
               Your Progress
             </span>
             <span className="text-zinc-600 dark:text-zinc-300">
-              {completedCount} / {totalCount} completed
+              {completedCount} / {totalCount} lessons completed
             </span>
           </div>
           <div className="h-3 overflow-hidden rounded-full bg-zinc-200 dark:bg-zinc-800">
