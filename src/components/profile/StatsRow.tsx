@@ -14,7 +14,7 @@ export default function StatsRow({ stats }: { stats: Stats }) {
       <StatCard label="XP" value={stats.xp.toString()} icon="⭐" />
       <StatCard label="Streak" value={`${stats.streak_days}d`} icon="🔥" sub={`Best: ${stats.longest_streak}d`} />
       <StatCard label="Freezes" value={(stats.streak_freezes ?? 1).toString()} icon="🛡️" sub="streak shield" tooltip="Streak freeze: used automatically when you miss a day. Earn one every 7-day streak." />
-      <StatCard label="Lessons" value={`${stats.completed_count}/${stats.total_tutorials}`} icon="✅" />
+      <StatCard label="Lessons" value={`${stats.completed_count}/${stats.total_tutorials}`} icon="✅" sub="across all 6 languages" />
       <StatCard label="Activities" value={stats.activity_count.toString()} icon="📊" />
     </div>
   );
