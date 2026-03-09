@@ -22,6 +22,394 @@ import { ALL_LANGUAGE_KEYS } from "@/lib/languages/registry";
 
 const LANG_ORDER = ALL_LANGUAGE_KEYS;
 
+// ── Output / Test Cases panel ─────────────────────────────────────────────────
+
+type VerdictState = {
+  type: "accepted" | "wrong_answer" | "compile_error" | "runtime_error" | "tle" | "error";
+  message: string;
+  output?: string;
+  passedCases?: number;
+  totalCases?: number;
+  submissionId?: number;
+  failedInput?: string;
+  failedExpected?: string;
+  failedActual?: string;
+  consecutiveFailures?: number;
+} | null;
+
+function OutputPanel({
+  verdict,
+  output,
+  outputIsError,
+  outputHeight,
+  problem,
+  aiLoading,
+  aiError,
+  aiFeedback,
+  onRequestAI,
+  onClearAI,
+}: {
+  verdict: VerdictState;
+  output: string | null;
+  outputIsError: boolean;
+  outputHeight: number;
+  problem: PracticeProblem;
+  aiLoading: boolean;
+  aiError: string | null;
+  aiFeedback: { friendly_one_liner: string; hint: string; next_step: string; minimal_patch?: string } | null;
+  onRequestAI: (level: number) => void;
+  onClearAI: () => void;
+}) {
+  const [activeTab, setActiveTab] = useState<"console" | "tests">(
+    verdict ? "tests" : "console"
+  );
+  const [selectedCase, setSelectedCase] = useState<number>(
+    verdict?.type === "wrong_answer" ? (verdict.passedCases ?? 0) : 0
+  );
+
+  // Sync active tab when verdict changes
+  useEffect(() => {
+    if (verdict) setActiveTab("tests");
+    else setActiveTab("console");
+  }, [verdict?.type]);
+
+  // Sync selected case to first failure on new verdict
+  useEffect(() => {
+    if (verdict?.type === "wrong_answer") {
+      setSelectedCase(verdict.passedCases ?? 0);
+    } else {
+      setSelectedCase(0);
+    }
+  }, [verdict]);
+
+  const totalCases = verdict?.totalCases ?? problem.testCases?.length ?? 0;
+  const passedCases = verdict?.passedCases ?? 0;
+  const failedIndex = verdict?.type === "wrong_answer" ? (verdict.passedCases ?? 0) : -1;
+
+  // Test case status for each case
+  function caseStatus(idx: number): "pass" | "fail" | "unknown" {
+    if (!verdict) return "unknown";
+    if (verdict.type === "accepted") return "pass";
+    if (verdict.type === "wrong_answer") {
+      if (idx < passedCases) return "pass";
+      if (idx === failedIndex) return "fail";
+      return "unknown";
+    }
+    return "unknown";
+  }
+
+  const verdictColors = verdict
+    ? verdict.type === "accepted"
+      ? { bg: "bg-emerald-50 dark:bg-emerald-950/40", border: "border-emerald-200 dark:border-emerald-800", text: "text-emerald-700 dark:text-emerald-400" }
+      : verdict.type === "tle"
+      ? { bg: "bg-amber-50 dark:bg-amber-950/40", border: "border-amber-200 dark:border-amber-800", text: "text-amber-700 dark:text-amber-400" }
+      : { bg: "bg-red-50 dark:bg-red-950/40", border: "border-red-200 dark:border-red-800", text: "text-red-700 dark:text-red-400" }
+    : null;
+
+  const selectedTestCase = problem.testCases?.[selectedCase];
+
+  return (
+    <div
+      className="flex shrink-0 flex-col overflow-hidden bg-surface-card"
+      style={{ height: outputHeight }}
+      suppressHydrationWarning
+    >
+      {/* ── Tab bar ────────────────────────────────────────────────────── */}
+      <div className="flex shrink-0 items-center border-b border-zinc-200 bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900">
+        {(["console", "tests"] as const).map((tab) => (
+          <button
+            key={tab}
+            type="button"
+            onClick={() => setActiveTab(tab)}
+            className={`flex items-center gap-1.5 border-b-2 px-4 py-2 text-xs font-semibold transition-colors ${
+              activeTab === tab
+                ? "border-indigo-500 text-indigo-600 dark:text-indigo-400"
+                : "border-transparent text-zinc-400 hover:text-zinc-700 dark:text-zinc-500 dark:hover:text-zinc-300"
+            }`}
+          >
+            {tab === "console" ? "Console" : "Test Cases"}
+            {tab === "tests" && verdict && (
+              <span className={`rounded-full px-1.5 py-0.5 text-[10px] font-bold ${
+                verdict.type === "accepted"
+                  ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-400"
+                  : "bg-red-100 text-red-700 dark:bg-red-900/50 dark:text-red-400"
+              }`}>
+                {verdict.type === "accepted" ? `${totalCases}/${totalCases}` : `${passedCases}/${totalCases}`}
+              </span>
+            )}
+          </button>
+        ))}
+
+        {/* AI buttons in tab bar when not accepted */}
+        {verdict && verdict.type !== "accepted" && verdict.submissionId != null && (
+          <div className="ml-auto flex items-center gap-1 px-2">
+            {([[1, "Hint"], [2, "Explain"], [3, "Fix"]] as const).map(([level, label]) => (
+              <button
+                key={level}
+                type="button"
+                onClick={() => onRequestAI(level)}
+                disabled={aiLoading}
+                className="rounded border border-zinc-300 px-2 py-1 text-[10px] font-semibold text-zinc-600 transition-colors hover:border-indigo-400 hover:bg-indigo-50 hover:text-indigo-700 disabled:opacity-40 dark:border-zinc-700 dark:text-zinc-400 dark:hover:border-indigo-600 dark:hover:bg-indigo-950/30 dark:hover:text-indigo-400"
+              >
+                {aiLoading ? "…" : label}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+
+      <div className="flex-1 overflow-y-auto overflow-x-hidden">
+
+        {/* ── Console tab ─────────────────────────────────────────────── */}
+        {activeTab === "console" && (
+          <div className="p-4 font-mono">
+            {output === null && !verdict ? (
+              <div className="flex flex-col items-center justify-center py-8 text-center">
+                <span className="mb-2 text-2xl">💻</span>
+                <p className="text-sm font-medium text-zinc-500 dark:text-zinc-400">
+                  Click <kbd className="rounded bg-zinc-200 px-1.5 py-0.5 text-xs dark:bg-zinc-700">Run</kbd> to execute your code
+                </p>
+                <p className="mt-1 text-xs text-zinc-400 dark:text-zinc-500">
+                  Or <kbd className="rounded bg-zinc-200 px-1.5 py-0.5 text-xs dark:bg-zinc-700">Submit</kbd> to run against all hidden test cases
+                </p>
+              </div>
+            ) : output !== null ? (
+              <>
+                <div className="mb-2 flex items-center gap-2">
+                  <span className={`text-xs font-bold uppercase tracking-widest ${outputIsError ? "text-red-500" : "text-green-600 dark:text-green-400"}`}>
+                    {outputIsError ? "Error" : "Console Output"}
+                  </span>
+                </div>
+                <pre className={`whitespace-pre-wrap break-words rounded-lg p-3 text-xs ${
+                  outputIsError
+                    ? "bg-red-50 text-red-700 dark:bg-red-950/40 dark:text-red-300"
+                    : "bg-zinc-900 text-green-400 dark:bg-zinc-950"
+                }`}>
+                  {output === "(no output)" ? <span className="text-zinc-500">(no output)</span> : output}
+                </pre>
+                {!outputIsError && output !== "(no output)" && (
+                  <p className="mt-2 text-[11px] text-zinc-400 dark:text-zinc-500">
+                    This is the output of your <code>main()</code>. Click <strong>Submit</strong> to run against all test cases.
+                  </p>
+                )}
+              </>
+            ) : null}
+
+            {/* Compile / runtime error from submit also appears in console */}
+            {verdict && (verdict.type === "compile_error" || verdict.type === "runtime_error") && verdict.output && (
+              <>
+                <div className="mb-2 flex items-center gap-2">
+                  <span className="text-xs font-bold uppercase tracking-widest text-red-500">
+                    {verdict.type === "compile_error" ? "Compile Error" : "Runtime Error"}
+                  </span>
+                </div>
+                <pre className="whitespace-pre-wrap break-words rounded-lg bg-red-950/20 p-3 text-xs text-red-300 dark:bg-red-950/40">
+                  {verdict.output}
+                </pre>
+              </>
+            )}
+          </div>
+        )}
+
+        {/* ── Test Cases tab ──────────────────────────────────────────── */}
+        {activeTab === "tests" && (
+          <div>
+            {!verdict ? (
+              <div className="flex flex-col items-center justify-center py-8 text-center">
+                <span className="mb-2 text-2xl">🧪</span>
+                <p className="text-sm font-medium text-zinc-500 dark:text-zinc-400">
+                  Click <kbd className="rounded bg-zinc-200 px-1.5 py-0.5 text-xs dark:bg-zinc-700">Submit</kbd> to run against all test cases
+                </p>
+                <p className="mt-1 text-xs text-zinc-400 dark:text-zinc-500">
+                  {totalCases} hidden test case{totalCases !== 1 ? "s" : ""}
+                </p>
+              </div>
+            ) : (
+              <>
+                {/* Verdict banner */}
+                {verdictColors && (
+                  <div className={`flex items-center gap-3 border-b px-4 py-3 ${verdictColors.bg} ${verdictColors.border}`}>
+                    <span className="text-2xl">
+                      {verdict.type === "accepted" ? "🎉" : verdict.type === "tle" ? "⏱" : verdict.type === "compile_error" ? "🔧" : verdict.type === "runtime_error" ? "💥" : "❌"}
+                    </span>
+                    <div className="min-w-0 flex-1">
+                      <p className={`font-bold ${verdictColors.text}`}>{verdict.message}</p>
+                      {verdict.totalCases != null && verdict.type !== "compile_error" && verdict.type !== "tle" && verdict.type !== "error" && (
+                        <div className="mt-1.5 flex items-center gap-2">
+                          <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-zinc-200 dark:bg-zinc-700">
+                            <div
+                              className={`h-full rounded-full ${verdict.type === "accepted" ? "bg-emerald-500" : "bg-red-500"}`}
+                              style={{ width: `${(passedCases / totalCases) * 100}%` }}
+                            />
+                          </div>
+                          <span className={`text-xs font-semibold ${verdictColors.text}`}>
+                            {passedCases} / {totalCases} passed
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {/* Test case chips + detail — only for WA / accepted */}
+                {(verdict.type === "accepted" || verdict.type === "wrong_answer") && totalCases > 0 && (
+                  <div className="p-4">
+                    {/* Chips row */}
+                    <div className="mb-4 flex flex-wrap gap-2">
+                      {Array.from({ length: totalCases }).map((_, idx) => {
+                        const status = caseStatus(idx);
+                        return (
+                          <button
+                            key={idx}
+                            type="button"
+                            onClick={() => setSelectedCase(idx)}
+                            className={`flex h-8 items-center gap-1.5 rounded-lg border px-3 text-xs font-semibold transition-all ${
+                              selectedCase === idx
+                                ? status === "pass"
+                                  ? "border-emerald-500 bg-emerald-500 text-white shadow-sm"
+                                  : status === "fail"
+                                  ? "border-red-500 bg-red-500 text-white shadow-sm"
+                                  : "border-zinc-400 bg-zinc-600 text-white"
+                                : status === "pass"
+                                ? "border-emerald-300 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 dark:border-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400"
+                                : status === "fail"
+                                ? "border-red-300 bg-red-50 text-red-700 hover:bg-red-100 dark:border-red-700 dark:bg-red-950/40 dark:text-red-400"
+                                : "border-zinc-200 bg-zinc-100 text-zinc-400 dark:border-zinc-700 dark:bg-zinc-800"
+                            }`}
+                          >
+                            {status === "pass" ? "✓" : status === "fail" ? "✗" : "—"}
+                            <span>Case {idx + 1}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+
+                    {/* Selected test case detail */}
+                    {selectedTestCase && (
+                      <div className="space-y-3">
+                        {/* Input */}
+                        <div>
+                          <p className="mb-1.5 text-[11px] font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">
+                            Input
+                          </p>
+                          <pre className="rounded-lg bg-zinc-100 p-3 font-mono text-xs text-zinc-800 dark:bg-zinc-800 dark:text-zinc-200">
+                            {selectedTestCase.stdin}
+                          </pre>
+                        </div>
+
+                        {/* Expected / Got side by side for failing case */}
+                        {caseStatus(selectedCase) === "fail" && (
+                          <div className="grid gap-3 sm:grid-cols-2">
+                            <div>
+                              <p className="mb-1.5 text-[11px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
+                                Expected Output
+                              </p>
+                              <pre className="rounded-lg border border-emerald-200 bg-emerald-50 p-3 font-mono text-xs text-emerald-800 dark:border-emerald-800 dark:bg-emerald-950/30 dark:text-emerald-300">
+                                {selectedTestCase.expectedOutput}
+                              </pre>
+                            </div>
+                            <div>
+                              <p className="mb-1.5 text-[11px] font-bold uppercase tracking-wider text-red-600 dark:text-red-400">
+                                Your Output
+                              </p>
+                              <pre className="rounded-lg border border-red-200 bg-red-50 p-3 font-mono text-xs text-red-800 dark:border-red-800 dark:bg-red-950/30 dark:text-red-300">
+                                {verdict.failedActual ?? "(empty)"}
+                              </pre>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* For passing cases: just show expected */}
+                        {caseStatus(selectedCase) === "pass" && (
+                          <div>
+                            <p className="mb-1.5 text-[11px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
+                              Output ✓
+                            </p>
+                            <pre className="rounded-lg border border-emerald-200 bg-emerald-50 p-3 font-mono text-xs text-emerald-800 dark:border-emerald-800 dark:bg-emerald-950/30 dark:text-emerald-300">
+                              {selectedTestCase.expectedOutput}
+                            </pre>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Compile / runtime: show error prominently */}
+                {(verdict.type === "compile_error" || verdict.type === "runtime_error") && verdict.output && (
+                  <div className="p-4">
+                    <p className="mb-2 text-xs font-bold uppercase tracking-wider text-red-500">
+                      {verdict.type === "compile_error" ? "Compiler Output" : "Runtime Error"}
+                    </p>
+                    <pre className="whitespace-pre-wrap break-words rounded-lg border border-red-200 bg-red-50 p-3 font-mono text-xs text-red-800 dark:border-red-800 dark:bg-red-950/30 dark:text-red-300">
+                      {verdict.output}
+                    </pre>
+                    <p className="mt-2 text-xs text-zinc-400 dark:text-zinc-500">
+                      Fix the errors above, then click <strong>Submit</strong> again.
+                    </p>
+                  </div>
+                )}
+
+                {/* TLE */}
+                {verdict.type === "tle" && (
+                  <div className="p-4">
+                    <div className="rounded-lg border border-amber-200 bg-amber-50 p-4 dark:border-amber-800 dark:bg-amber-950/30">
+                      <p className="text-sm font-semibold text-amber-800 dark:text-amber-300">Time Limit Exceeded</p>
+                      <p className="mt-1 text-xs text-amber-700 dark:text-amber-400">
+                        Your solution ran too long. Look for nested loops or operations you can replace with a hash map or DP approach.
+                      </p>
+                    </div>
+                  </div>
+                )}
+              </>
+            )}
+          </div>
+        )}
+
+        {/* ── AI feedback ─────────────────────────────────────────────── */}
+        {aiLoading && (
+          <div className="border-t border-zinc-200 px-4 py-3 dark:border-zinc-800">
+            <p className="text-xs text-zinc-400 animate-pulse dark:text-zinc-500">🤖 Analyzing your code…</p>
+          </div>
+        )}
+        {aiError && (
+          <div className="border-t border-red-200 bg-red-50 px-4 py-3 dark:border-red-800 dark:bg-red-950/30">
+            <p className="text-xs text-red-600 dark:text-red-400">{aiError}</p>
+          </div>
+        )}
+        {aiFeedback && (
+          <div className="border-t border-indigo-200 bg-indigo-50/60 px-4 py-3 dark:border-indigo-800 dark:bg-indigo-950/30">
+            <div className="flex items-start justify-between gap-2">
+              <div className="min-w-0 flex-1 space-y-1.5">
+                <p className="text-sm font-semibold text-indigo-800 dark:text-indigo-300">🤖 {aiFeedback.friendly_one_liner}</p>
+                <p className="text-xs leading-relaxed text-zinc-700 dark:text-zinc-300">{aiFeedback.hint}</p>
+                {aiFeedback.next_step && (
+                  <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                    <span className="font-semibold">Next step:</span> {aiFeedback.next_step}
+                  </p>
+                )}
+                {aiFeedback.minimal_patch && (
+                  <pre className="mt-2 overflow-x-auto rounded-lg bg-zinc-900 p-3 text-xs text-zinc-100">
+                    {aiFeedback.minimal_patch}
+                  </pre>
+                )}
+              </div>
+              <button
+                type="button"
+                onClick={onClearAI}
+                className="shrink-0 rounded p-1 text-zinc-400 hover:bg-zinc-200 hover:text-zinc-600 dark:hover:bg-zinc-700"
+                aria-label="Dismiss"
+              >
+                ✕
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 interface Props {
   problem: PracticeProblem;
   initialLang: SupportedLanguage;
@@ -790,116 +1178,19 @@ export function PracticeIDE({ problem, initialLang, categoryFilter = null, listP
             <GripDots />
           </div>
 
-          {/* Output / verdict panel — single scroll container */}
-          <div
-            className="shrink-0 overflow-y-auto overflow-x-hidden bg-surface-card"
-            style={{ height: outputHeight }}
-            suppressHydrationWarning
-          >
-            {/* 1) Verdict banner */}
-            {verdict && (
-              <div className={`flex items-center gap-3 border-b px-4 py-3 ${
-                verdict.type === "accepted"
-                  ? "border-emerald-200 bg-emerald-50 dark:border-emerald-800 dark:bg-emerald-950/40"
-                  : verdict.type === "tle"
-                  ? "border-amber-200 bg-amber-50 dark:border-amber-800 dark:bg-amber-950/40"
-                  : "border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-950/40"
-              }`}>
-                <span className="text-xl">
-                  {verdict.type === "accepted" ? "✅" : verdict.type === "tle" ? "⏱" : "❌"}
-                </span>
-                <div className="min-w-0 flex-1">
-                  <p className={`text-sm font-bold ${
-                    verdict.type === "accepted"
-                      ? "text-emerald-700 dark:text-emerald-400"
-                      : verdict.type === "tle"
-                      ? "text-amber-700 dark:text-amber-400"
-                      : "text-red-700 dark:text-red-400"
-                  }`}>
-                    {verdict.message}
-                  </p>
-                  {verdict.totalCases != null && (
-                    <p className="text-xs text-zinc-500 dark:text-zinc-400">
-                      {verdict.passedCases}/{verdict.totalCases} test cases passed
-                    </p>
-                  )}
-                </div>
-              </div>
-            )}
-            {/* 2) Judge0 factual block: failing test (WA) + output/error */}
-            {verdict && verdict.type === "wrong_answer" && (verdict.failedInput != null || verdict.failedExpected != null || verdict.failedActual != null) && (
-              <div className="border-b border-zinc-200 bg-zinc-100/50 px-4 py-3 dark:border-zinc-800 dark:bg-zinc-800/50">
-                <p className="mb-1.5 text-xs font-semibold uppercase tracking-widest text-zinc-500 dark:text-zinc-400">Failing test</p>
-                {verdict.failedInput != null && <p className="text-xs text-zinc-700 dark:text-zinc-300"><span className="text-zinc-500 dark:text-zinc-500">Input:</span> {verdict.failedInput}</p>}
-                {verdict.failedExpected != null && <p className="text-xs text-zinc-700 dark:text-zinc-300"><span className="text-zinc-500 dark:text-zinc-500">Expected:</span> {verdict.failedExpected}</p>}
-                {verdict.failedActual != null && <p className="text-xs text-amber-700 dark:text-amber-400"><span className="text-zinc-500 dark:text-zinc-500">Got:</span> {verdict.failedActual}</p>}
-              </div>
-            )}
-            <div className="border-b border-zinc-200 px-4 py-3 font-mono text-sm dark:border-zinc-800">
-              {!verdict && output === null ? (
-                <p className="text-xs text-zinc-400 dark:text-zinc-600">
-                  Click <strong>Run</strong> to execute, or <strong>Submit</strong> to grade (all languages).
-                </p>
-              ) : verdict?.output != null ? (
-                <>
-                  <p className="mb-2 text-xs font-semibold uppercase tracking-widest text-zinc-400 dark:text-zinc-500">
-                    {verdict.type === "compile_error" ? "Compile Error" : verdict.type === "runtime_error" ? "Runtime Error" : "Output"}
-                  </p>
-                  <pre className={`whitespace-pre-wrap break-words text-xs ${
-                    verdict.type === "accepted" ? "text-emerald-600 dark:text-emerald-400"
-                    : verdict.type === "wrong_answer" ? "text-zinc-600 dark:text-zinc-300"
-                    : "text-red-600 dark:text-red-400"
-                  }`}>
-                    {verdict.output}
-                  </pre>
-                </>
-              ) : output !== null ? (
-                <>
-                  <p className="mb-2 text-xs font-semibold uppercase tracking-widest text-zinc-400 dark:text-zinc-500">
-                    {outputIsError ? "Error" : "Output"}
-                  </p>
-                  <pre className={`whitespace-pre-wrap break-words text-xs ${outputIsError ? "text-red-600 dark:text-red-400" : "text-green-600 dark:text-green-400"}`}>
-                    {output}
-                  </pre>
-                </>
-              ) : null}
-            </div>
-            {/* 3) AI action buttons — only when verdict != AC and submission_id exists */}
-            {verdict && verdict.type !== "accepted" && verdict.submissionId != null && (
-              <div className="flex flex-wrap items-center gap-2 border-b border-zinc-200 px-4 py-2 dark:border-zinc-800">
-                {verdict.consecutiveFailures != null && verdict.consecutiveFailures >= 2 && (
-                  <span className="text-xs text-zinc-500 dark:text-zinc-400">Want a hint?</span>
-                )}
-                {([[1, "Hint"], [2, "Explain"], [3, "Suggest fix"], [4, "Teach"]] as const).map(([level, label]) => (
-                  <button key={level} type="button" onClick={() => requestAiFeedback(level)} disabled={aiLoading} className="rounded-md bg-zinc-200 px-2.5 py-1.5 text-xs font-medium text-zinc-800 hover:bg-zinc-300 disabled:opacity-50 dark:bg-zinc-700 dark:text-zinc-200 dark:hover:bg-zinc-600">
-                    {label}
-                  </button>
-                ))}
-              </div>
-            )}
-            {/* 4) Inline AI — "Analyzing…" only when /api/ai-feedback is in flight */}
-            {aiLoading && (
-              <div className="border-b border-zinc-200 px-4 py-2 dark:border-zinc-800">
-                <p className="text-xs text-zinc-500 dark:text-zinc-400 animate-pulse">Analyzing your code…</p>
-              </div>
-            )}
-            {aiError && (
-              <p className="border-b border-red-200 bg-red-50 px-4 py-2 text-xs text-red-700 dark:border-red-800 dark:bg-red-950/50 dark:text-red-400">{aiError}</p>
-            )}
-            {aiFeedback && (
-              <div className="border-b border-indigo-200 bg-indigo-50/50 px-4 py-3 dark:border-indigo-800 dark:bg-indigo-950/30">
-                <div className="flex items-start justify-between gap-2">
-                  <div className="min-w-0 flex-1">
-                    <p className="text-sm font-medium text-indigo-800 dark:text-indigo-300">{aiFeedback.friendly_one_liner}</p>
-                    <p className="mt-1.5 text-xs text-zinc-700 dark:text-zinc-300">{aiFeedback.hint}</p>
-                    <p className="mt-1 text-xs text-zinc-600 dark:text-zinc-400">Next: {aiFeedback.next_step}</p>
-                    {aiFeedback.minimal_patch && <pre className="mt-2 overflow-x-auto rounded bg-zinc-800 p-2 text-xs text-zinc-100">{aiFeedback.minimal_patch}</pre>}
-                  </div>
-                  <button type="button" onClick={() => { setAiFeedback(null); setAiError(null); }} title="Clear AI feedback" className="shrink-0 rounded p-1 text-zinc-400 hover:bg-zinc-200 hover:text-zinc-600 dark:hover:bg-zinc-700 dark:hover:text-zinc-300" aria-label="Clear AI">✕</button>
-                </div>
-              </div>
-            )}
-          </div>
+          {/* Output / verdict panel */}
+          <OutputPanel
+            verdict={verdict}
+            output={output}
+            outputIsError={outputIsError}
+            outputHeight={outputHeight}
+            problem={problem}
+            aiLoading={aiLoading}
+            aiError={aiError}
+            aiFeedback={aiFeedback}
+            onRequestAI={requestAiFeedback}
+            onClearAI={() => { setAiFeedback(null); setAiError(null); }}
+          />
         </div>
       </div>
 
