@@ -4,7 +4,7 @@ import { createUser, getUserByEmail, createEmailVerificationToken } from "@/lib/
 import { signToken, setAuthCookie } from "@/lib/auth";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 import { setCsrfCookie } from "@/lib/csrf";
-import { sendVerificationEmail } from "@/lib/email";
+import { sendVerificationEmail, sendWelcomeEmail } from "@/lib/email";
 import crypto from "crypto";
 import { withErrorHandling } from "@/lib/api-utils";
 import { isValidPassword, PASSWORD_POLICY_MESSAGE } from "@/lib/password-policy";
@@ -44,6 +44,8 @@ export const POST = withErrorHandling("POST /api/auth/signup", async (request: N
   sendVerificationEmail(email, name, verifyToken).catch((err) => {
     console.error("Failed to send verification email:", err);
   });
+  // Day-0 welcome email — fire-and-forget, never blocks signup
+  sendWelcomeEmail(email, name).catch(() => {});
 
   const token = await signToken({
     userId: user.id,

@@ -20,6 +20,7 @@ import { useIsMobile } from "@/hooks/useIsMobile";
 
 import { ALL_LANGUAGE_KEYS } from "@/lib/languages/registry";
 import AiFeedbackCard from "@/components/AiFeedbackCard";
+import GuestConversionPrompt from "@/components/GuestConversionPrompt";
 
 const LANG_ORDER = ALL_LANGUAGE_KEYS;
 
@@ -898,8 +899,14 @@ export function PracticeIDE({ problem, initialLang, initialCode, categoryFilter 
     }
   }
 
+  // Show the guest conversion prompt after a first accepted solve
+  const guestFirstSolve = !user && verdict?.type === "accepted";
+
   return (
     <div className="fixed inset-0 z-50 flex flex-col bg-white text-zinc-900 dark:bg-zinc-950 dark:text-zinc-100">
+      {/* Guest conversion prompt — only for logged-out users after first solve */}
+      <GuestConversionPrompt trigger={guestFirstSolve} context="practice" />
+
       {/* XP awarded toast */}
       {xpToast !== null && (
         <div className="pointer-events-none fixed bottom-6 left-1/2 z-[100] -translate-x-1/2 animate-bounce">

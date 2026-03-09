@@ -1,6 +1,11 @@
 /**
  * Transactional email via Resend.
  * Degrades gracefully when RESEND_API_KEY is not set (dev / CI).
+ *
+ * Onboarding drip sequence (triggered by /api/cron/onboarding-drip):
+ *   Day 0 (signup)  → sendWelcomeEmail         — immediate, sent from signup route
+ *   Day 3           → sendDay3Email             — motivate, suggest first tutorial
+ *   Day 7           → sendDay7Email             — one week in, push certifications
  */
 import { Resend } from "resend";
 
@@ -90,6 +95,119 @@ export async function sendVerificationEmail(
         <a href="${link}" style="display:inline-block;margin:16px 0;padding:12px 24px;background:#0891b2;color:#fff;border-radius:8px;text-decoration:none;font-weight:600">Verify email</a>
         <p style="color:#6b7280;font-size:13px">If you didn't sign up for uByte, you can safely ignore this email.</p>
         <p style="color:#6b7280;font-size:12px">Or copy this link: ${link}</p>
+      </div>
+    `,
+  });
+}
+
+// ─── Onboarding drip ────────────────────────────────────────────────────────
+
+/** Day 0 — sent immediately after successful signup. */
+export async function sendWelcomeEmail(to: string, name: string): Promise<void> {
+  const resend = getResend();
+  if (!resend) return;
+
+  const firstName = name.split(" ")[0];
+  await resend.emails.send({
+    from: FROM,
+    to,
+    subject: `Welcome to uByte, ${firstName}! 🚀 Your coding journey starts now`,
+    html: `
+      <div style="font-family:sans-serif;max-width:520px;margin:auto;color:#18181b">
+        <div style="background:#4f46e5;padding:32px;border-radius:12px 12px 0 0;text-align:center">
+          <span style="color:#fff;font-size:28px;font-weight:800;letter-spacing:-1px">uByte</span>
+        </div>
+        <div style="background:#f9fafb;padding:32px;border-radius:0 0 12px 12px;border:1px solid #e5e7eb;border-top:none">
+          <h2 style="margin:0 0 8px">Hey ${firstName}, welcome aboard! 👋</h2>
+          <p style="color:#6b7280">You just joined thousands of developers levelling up their coding skills on uByte. Here's what you can do right now:</p>
+          <table style="width:100%;border-collapse:collapse;margin:20px 0">
+            <tr><td style="padding:10px 0;border-bottom:1px solid #e5e7eb">
+              <strong>📖 Interactive Tutorials</strong><br>
+              <span style="color:#6b7280;font-size:14px">Step-by-step lessons in Go, Python, JavaScript, C++, Java, and Rust — with a live code editor.</span>
+            </td></tr>
+            <tr><td style="padding:10px 0;border-bottom:1px solid #e5e7eb">
+              <strong>💼 Interview Prep</strong><br>
+              <span style="color:#6b7280;font-size:14px">Solve real interview problems from arrays to dynamic programming. Get instant AI hints.</span>
+            </td></tr>
+            <tr><td style="padding:10px 0">
+              <strong>🏅 Certifications</strong><br>
+              <span style="color:#6b7280;font-size:14px">Prove your skills with language certifications you can share on LinkedIn.</span>
+            </td></tr>
+          </table>
+          <div style="text-align:center;margin:24px 0">
+            <a href="${BASE_URL}/tutorial/go/getting-started" style="display:inline-block;padding:14px 28px;background:#4f46e5;color:#fff;border-radius:8px;text-decoration:none;font-weight:700;font-size:15px">Start your first lesson →</a>
+          </div>
+          <p style="color:#9ca3af;font-size:12px;text-align:center">You're receiving this because you just signed up at uByte.</p>
+        </div>
+      </div>
+    `,
+  });
+}
+
+/** Day 3 — encourage users who may not have returned yet. */
+export async function sendDay3Email(to: string, name: string): Promise<void> {
+  const resend = getResend();
+  if (!resend) return;
+
+  const firstName = name.split(" ")[0];
+  await resend.emails.send({
+    from: FROM,
+    to,
+    subject: `${firstName}, ready for your first challenge? 🎯`,
+    html: `
+      <div style="font-family:sans-serif;max-width:520px;margin:auto;color:#18181b">
+        <div style="background:#4f46e5;padding:24px 32px;border-radius:12px 12px 0 0">
+          <span style="color:#fff;font-size:22px;font-weight:800">uByte</span>
+        </div>
+        <div style="background:#f9fafb;padding:32px;border-radius:0 0 12px 12px;border:1px solid #e5e7eb;border-top:none">
+          <h2 style="margin:0 0 8px">Hey ${firstName} 👋</h2>
+          <p style="color:#6b7280">It's been a few days since you joined uByte. Have you had a chance to write any code yet?</p>
+          <div style="background:#fff;border:1px solid #e5e7eb;border-radius:10px;padding:20px;margin:20px 0">
+            <p style="margin:0 0 12px;font-weight:600">🔥 Try this today — it only takes 5 minutes:</p>
+            <p style="color:#6b7280;margin:0 0 16px;font-size:14px">Pick a language, open the first tutorial step, and run your first piece of code. The feeling of seeing it work is addictive.</p>
+            <a href="${BASE_URL}/tutorial" style="display:inline-block;padding:12px 24px;background:#4f46e5;color:#fff;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px">Open tutorials →</a>
+          </div>
+          <p style="color:#6b7280;font-size:14px">Or jump straight into an interview prep problem:</p>
+          <a href="${BASE_URL}/practice" style="color:#4f46e5;font-size:14px">Browse interview questions →</a>
+          <hr style="border:none;border-top:1px solid #e5e7eb;margin:24px 0">
+          <p style="color:#9ca3af;font-size:12px">You're receiving this because you signed up at uByte. <a href="${BASE_URL}/profile" style="color:#9ca3af">Manage preferences</a>.</p>
+        </div>
+      </div>
+    `,
+  });
+}
+
+/** Day 7 — celebrate one week, push certifications and Pro. */
+export async function sendDay7Email(to: string, name: string): Promise<void> {
+  const resend = getResend();
+  if (!resend) return;
+
+  const firstName = name.split(" ")[0];
+  await resend.emails.send({
+    from: FROM,
+    to,
+    subject: `One week on uByte 🎉 — ready to earn a certification?`,
+    html: `
+      <div style="font-family:sans-serif;max-width:520px;margin:auto;color:#18181b">
+        <div style="background:#4f46e5;padding:24px 32px;border-radius:12px 12px 0 0">
+          <span style="color:#fff;font-size:22px;font-weight:800">uByte</span>
+        </div>
+        <div style="background:#f9fafb;padding:32px;border-radius:0 0 12px 12px;border:1px solid #e5e7eb;border-top:none">
+          <h2 style="margin:0 0 8px">One week in, ${firstName}! 🎉</h2>
+          <p style="color:#6b7280">You've been on uByte for a week. Whether you've been grinding problems or just exploring, you're on the right track.</p>
+          <div style="background:#fff;border:2px solid #4f46e5;border-radius:10px;padding:20px;margin:20px 0">
+            <p style="margin:0 0 4px;font-weight:700;color:#4f46e5">🏅 Ready to certify?</p>
+            <p style="color:#6b7280;margin:0 0 16px;font-size:14px">Take a language certification and earn a shareable certificate. It's a great addition to your LinkedIn profile or resume.</p>
+            <a href="${BASE_URL}/certifications" style="display:inline-block;padding:12px 24px;background:#4f46e5;color:#fff;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px">Take a certification →</a>
+          </div>
+          <div style="background:#fff;border:1px solid #e5e7eb;border-radius:10px;padding:20px;margin:16px 0">
+            <p style="margin:0 0 4px;font-weight:700">⚡ Unlock everything with Pro</p>
+            <p style="color:#6b7280;margin:0 0 16px;font-size:14px">Get full access to all tutorials, unlimited interview problems, and AI-powered hints with a Pro subscription.</p>
+            <a href="${BASE_URL}/pricing" style="color:#4f46e5;font-size:14px;font-weight:600">See Pro plans →</a>
+          </div>
+          <hr style="border:none;border-top:1px solid #e5e7eb;margin:24px 0">
+          <p style="color:#9ca3af;font-size:12px">You're receiving this because you signed up at uByte. <a href="${BASE_URL}/profile" style="color:#9ca3af">Manage preferences</a>.</p>
+        </div>
       </div>
     `,
   });

@@ -23,6 +23,7 @@ import { LANGUAGES } from "@/lib/languages/registry";
 import type { SupportedLanguage } from "@/lib/languages/types";
 import GripDots from "@/components/GripDots";
 import { useIsMobile } from "@/hooks/useIsMobile";
+import GuestConversionPrompt from "@/components/GuestConversionPrompt";
 
 interface Props {
   lang: string;
@@ -159,8 +160,14 @@ export default function InteractiveTutorial({
     return <UpgradeWall tutorialTitle={tutorialTitle} />;
   }
 
+  // Show conversion prompt to guests after completing 3+ steps
+  const guestHasProgress = !user && !loading && stepProgress.completedSteps.size >= 3;
+
   return (
     <div className="fixed inset-0 z-50 flex flex-col bg-white text-zinc-900 dark:bg-zinc-950 dark:text-zinc-100">
+      {/* Guest conversion prompt — only for logged-out users with meaningful progress */}
+      <GuestConversionPrompt trigger={guestHasProgress} context="tutorial" />
+
       {isDragging && (
         <div className="fixed inset-0 z-[52]" style={{ cursor: isDragging === "h" ? "col-resize" : "row-resize" }} />
       )}
