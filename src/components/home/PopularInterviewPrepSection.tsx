@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { getLangIcon } from "@/lib/languages/icons";
 import { getPracticeProblemBySlug } from "@/lib/practice/problems";
 import { DIFFICULTY_BADGE } from "@/lib/practice/types";
 import type { PopularPracticeProblem } from "@/lib/db/home-popular";
@@ -8,8 +7,6 @@ import SectionHeading from "./SectionHeading";
 interface Props {
   problems: PopularPracticeProblem[];
 }
-
-const LANG_SLUGS = ["go", "python", "javascript", "java", "rust", "cpp"];
 
 export default function PopularInterviewPrepSection({ problems }: Props) {
   if (problems.length === 0) return null;
@@ -41,14 +38,11 @@ export default function PopularInterviewPrepSection({ problems }: Props) {
             <Link
               key={p.slug}
               href={`/practice/go/${p.slug}`}
-              className="group flex items-start gap-4 rounded-xl border border-zinc-200 bg-surface-card p-4 transition-all hover:-translate-y-0.5 hover:border-indigo-200 hover:shadow-md dark:border-zinc-700 dark:hover:border-indigo-700"
+              className="group flex items-center gap-4 rounded-xl border border-zinc-200 bg-surface-card p-4 transition-all hover:-translate-y-0.5 hover:border-indigo-200 hover:shadow-md dark:border-zinc-700 dark:hover:border-indigo-700"
             >
-              {/* Language icons strip */}
-              <div className="mt-0.5 flex shrink-0 flex-col gap-1">
-                {LANG_SLUGS.slice(0, 3).map((lang) => (
-                  <span key={lang} className="text-base leading-none">{getLangIcon(lang)}</span>
-                ))}
-              </div>
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-zinc-100 text-lg dark:bg-zinc-800">
+                🎯
+              </span>
 
               <div className="min-w-0 flex-1">
                 <p className="truncate text-sm font-semibold text-zinc-800 group-hover:text-indigo-600 dark:text-zinc-200 dark:group-hover:text-indigo-400">
