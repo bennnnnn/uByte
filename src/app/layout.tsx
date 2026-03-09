@@ -12,6 +12,9 @@ import SiteBanner from "@/components/SiteBanner";
 import { APP_NAME, BASE_URL } from "@/lib/constants";
 import { SITE_KEYWORDS } from "@/lib/seo";
 import Script from "next/script";
+import { Suspense } from "react";
+import ReferralTracker from "@/components/ReferralTracker";
+import OnboardingChecklist from "@/components/OnboardingChecklist";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -112,6 +115,10 @@ export default function RootLayout({
             <SiteFooter />
           </div>
           <LazyCookieConsentAndAnalytics />
+          {/* Reads ?ref= from URL and persists to localStorage for signup attribution */}
+          <Suspense fallback={null}><ReferralTracker /></Suspense>
+          {/* Floating checklist for new users — hides once all 3 steps are done */}
+          <OnboardingChecklist />
           </ToastProvider>
         </AuthProvider>
         <Script

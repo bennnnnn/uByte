@@ -285,3 +285,10 @@ export async function verifyEmail(token: string): Promise<User | undefined> {
   `;
   return user as User;
 }
+
+/** Returns the total number of registered users (for social proof on pricing page). */
+export async function getTotalUserCount(): Promise<number> {
+  const sql = getSql();
+  const rows = await sql`SELECT COUNT(*) AS cnt FROM users`;
+  return Number(rows[0]?.cnt ?? 0);
+}

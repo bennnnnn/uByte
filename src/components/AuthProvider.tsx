@@ -178,10 +178,21 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
 
   // ── Auth actions ──
   const signup = useCallback(async (name: string, email: string, password: string): Promise<string | null> => {
+    // Pick up referral code stored by ReferralTracker when user arrived via ?ref= link
+    let referralCode: string | null = null;
+    try {
+      const raw = localStorage.getItem("ubyte_ref");
+      if (raw) {
+        const { code, expires } = JSON.parse(raw) as { code: string; expires: number };
+        if (Date.now() < expires) referralCode = code;
+        localStorage.removeItem("ubyte_ref"); // consume — one use only
+      }
+    } catch { /* ignore */ }
+
     const res = await apiFetch("/api/auth/signup", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, email, password }),
+      body: JSON.stringify({ name, email, password, ...(referralCode ? { referralCode } : {}) }),
     });
     const data = await res.json().catch(() => ({}));
     if (!res.ok) return data.error || "Signup failed";

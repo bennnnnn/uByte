@@ -80,6 +80,14 @@ function PricingContent() {
   const paddleReady = useRef(false);
   const [billing, setBilling]       = useState<"monthly" | "yearly">("yearly");
   const [faqOpen, setFaqOpen]       = useState<number | null>(null);
+  const [userCount, setUserCount]   = useState<number | null>(null);
+
+  useEffect(() => {
+    fetch("/api/stats/public")
+      .then((r) => r.json())
+      .then((j: { userCount: number }) => { if (j.userCount > 0) setUserCount(j.userCount); })
+      .catch(() => {});
+  }, []);
   const showSuccess = searchParams.get("success") === "1";
   const planParam = searchParams.get("plan");
   const signupParam = searchParams.get("signup") === "1";
@@ -221,6 +229,26 @@ function PricingContent() {
           <p className="mt-2 text-sm text-zinc-500 dark:text-zinc-400 sm:text-base">
             Tutorials, interview prep, and verifiable certificates — all in one plan.
           </p>
+        </div>
+
+        {/* ── Social proof bar ─────────────────────────────── */}
+        <div className="mx-auto mt-5 flex max-w-lg flex-wrap items-center justify-center gap-x-6 gap-y-2">
+          <span className="flex items-center gap-1.5 text-sm font-medium text-zinc-600 dark:text-zinc-400">
+            <span className="text-base">👩‍💻</span>
+            {userCount
+              ? `${userCount.toLocaleString()}+ developers enrolled`
+              : "Developers worldwide"}
+          </span>
+          <span className="hidden text-zinc-300 dark:text-zinc-700 sm:block">·</span>
+          <span className="flex items-center gap-1.5 text-sm font-medium text-zinc-600 dark:text-zinc-400">
+            <span className="text-base">🏅</span>
+            Verifiable certificates
+          </span>
+          <span className="hidden text-zinc-300 dark:text-zinc-700 sm:block">·</span>
+          <span className="flex items-center gap-1.5 text-sm font-medium text-zinc-600 dark:text-zinc-400">
+            <span className="text-base">✦</span>
+            Cancel anytime
+          </span>
         </div>
 
         {/* ── Billing toggle ─────────────────────────────── */}

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Card, TextLink } from "@/components/ui";
 import type { Badge, Achievement, Stats, ActivityItem } from "./types";
+import ReferralSection from "./ReferralSection";
 
 const ACTION_ICONS: Record<string, string> = {
   complete: "✅",
@@ -209,6 +210,9 @@ export default function OverviewTab({ stats, badges, achievements, userId }: Pro
           </ul>
         )}
       </div>
+
+      {/* Referral section */}
+      <ReferralSection />
     </div>
   );
 }

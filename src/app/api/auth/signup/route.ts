@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
-import { createUser, getUserByEmail, createEmailVerificationToken } from "@/lib/db";
+import { createUser, getUserByEmail, createEmailVerificationToken, getReferrerByCode, recordReferralSignup } from "@/lib/db";
 import { signToken, setAuthCookie } from "@/lib/auth";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 import { setCsrfCookie } from "@/lib/csrf";
@@ -19,7 +19,7 @@ export const POST = withErrorHandling("POST /api/auth/signup", async (request: N
     );
   }
 
-  const { name, email, password } = await request.json();
+  const { name, email, password, referralCode } = await request.json();
   if (!name || !email || !password) {
     return NextResponse.json({ error: "All fields are required" }, { status: 400 });
   }
@@ -46,6 +46,17 @@ export const POST = withErrorHandling("POST /api/auth/signup", async (request: N
   });
   // Day-0 welcome email — fire-and-forget, never blocks signup
   sendWelcomeEmail(email, name).catch(() => {});
+
+  // Attribute referral if the new user came via an invite link
+  if (typeof referralCode === "string" && /^[a-z0-9]{6,16}$/i.test(referralCode)) {
+    getReferrerByCode(referralCode)
+      .then((referrerId) => {
+        if (referrerId && referrerId !== user.id) {
+          return recordReferralSignup(referrerId, user.id);
+        }
+      })
+      .catch(() => {}); // non-critical — never fail signup
+  }
 
   const token = await signToken({
     userId: user.id,
