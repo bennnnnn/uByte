@@ -48,6 +48,7 @@ function OutputPanel({
   aiFeedback,
   onRequestAI,
   onClearAI,
+  onExpandPanel,
 }: {
   verdict: VerdictState;
   output: string | null;
@@ -59,6 +60,7 @@ function OutputPanel({
   aiFeedback: { friendly_one_liner: string; hint: string; next_step: string; minimal_patch?: string } | null;
   onRequestAI: (level: number) => void;
   onClearAI: () => void;
+  onExpandPanel: () => void;
 }) {
   const [activeTab, setActiveTab] = useState<"console" | "tests">(
     verdict ? "tests" : "console"
@@ -120,7 +122,7 @@ function OutputPanel({
           <button
             key={tab}
             type="button"
-            onClick={() => setActiveTab(tab)}
+            onClick={() => { setActiveTab(tab); if (tab === "tests") onExpandPanel(); }}
             className={`flex items-center gap-1.5 border-b-2 px-4 py-2 text-xs font-semibold transition-colors ${
               activeTab === tab
                 ? "border-indigo-500 text-indigo-600 dark:text-indigo-400"
@@ -485,7 +487,7 @@ export function PracticeIDE({ problem, initialLang, categoryFilter = null, listP
   const [aiError, setAiError] = useState<string | null>(null);
 
   const editor = useCodeEditor(getStarterForLanguage(problem, initialLang), lang);
-  const { leftWidth, outputHeight, isDragging, startDragH, startDragV, startDragVTouch } = usePanelResize();
+  const { leftWidth, outputHeight, setOutputHeight, isDragging, startDragH, startDragV, startDragVTouch } = usePanelResize();
 
   // When language changes, load the starter for the new language
   const prevLangRef = useRef(lang);
@@ -588,6 +590,11 @@ export function PracticeIDE({ problem, initialLang, categoryFilter = null, listP
     }, 1000);
     return () => clearInterval(id);
   }, [problem.slug]);
+
+  // Auto-expand output panel when a verdict arrives so users see the test case details
+  useEffect(() => {
+    if (verdict) setOutputHeight((h) => Math.max(h, 320));
+  }, [verdict, setOutputHeight]);
 
   // Global ? key → shortcuts modal
   useEffect(() => {
@@ -1190,6 +1197,7 @@ export function PracticeIDE({ problem, initialLang, categoryFilter = null, listP
             aiFeedback={aiFeedback}
             onRequestAI={requestAiFeedback}
             onClearAI={() => { setAiFeedback(null); setAiError(null); }}
+            onExpandPanel={() => setOutputHeight((h) => Math.max(h, 360))}
           />
         </div>
       </div>

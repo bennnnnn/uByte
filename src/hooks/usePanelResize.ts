@@ -5,6 +5,7 @@ import { useState, useRef, useEffect } from "react";
 export interface PanelResizeState {
   leftWidth: number;
   outputHeight: number;
+  setOutputHeight: (h: number) => void;
   isDragging: false | "h" | "v";
   startDragH: (e: React.MouseEvent) => void;
   startDragV: (e: React.MouseEvent) => void;
@@ -14,7 +15,7 @@ export interface PanelResizeState {
 
 export function usePanelResize(): PanelResizeState {
   const [leftWidth, setLeftWidth] = useState(320);
-  const [outputHeight, setOutputHeight] = useState(176);
+  const [outputHeight, setOutputHeight] = useState(240);
   const [isDragging, setIsDragging] = useState<false | "h" | "v">(false);
 
   const dragState = useRef<{ type: "h" | "v"; startX: number; startY: number; startValue: number } | null>(null);
@@ -96,5 +97,5 @@ export function usePanelResize(): PanelResizeState {
     setIsDragging("v");
   }
 
-  return { leftWidth, outputHeight, isDragging, startDragH, startDragV, startDragHTouch, startDragVTouch };
+  return { leftWidth, outputHeight, setOutputHeight, isDragging, startDragH, startDragV, startDragHTouch, startDragVTouch };
 }
