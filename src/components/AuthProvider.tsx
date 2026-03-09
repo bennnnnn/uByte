@@ -203,6 +203,7 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
       setLimited(false);
       setViewCount(0);
       trackConversion("signup");
+      try { localStorage.setItem("ubyte_has_account", "1"); } catch { /* noop */ }
     }
     return null;
   }, []);
@@ -218,7 +219,11 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
       return data.error || "Login failed";
     }
     const data = await res.json().catch(() => ({}));
-    if (data.user) { await hydrateAfterAuth(data.user); trackConversion("login", { method: "email" }); }
+    if (data.user) {
+      await hydrateAfterAuth(data.user);
+      trackConversion("login", { method: "email" });
+      try { localStorage.setItem("ubyte_has_account", "1"); } catch { /* noop */ }
+    }
     return null;
   }, [hydrateAfterAuth]);
 
@@ -233,7 +238,11 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
       return data.error || "Google sign-in failed";
     }
     const data = await res.json().catch(() => ({}));
-    if (data.user) { await hydrateAfterAuth(data.user); trackConversion("login", { method: "google" }); }
+    if (data.user) {
+      await hydrateAfterAuth(data.user);
+      trackConversion("login", { method: "google" });
+      try { localStorage.setItem("ubyte_has_account", "1"); } catch { /* noop */ }
+    }
     return null;
   }, [hydrateAfterAuth]);
 

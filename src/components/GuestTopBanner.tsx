@@ -14,6 +14,9 @@ import { useState, useEffect, lazy, Suspense } from "react";
 const AuthModal = lazy(() => import("@/components/auth/AuthModal"));
 
 const LS_KEY = "ubyte_guest_top_banner_dismissed";
+// Set to "1" after any successful login or signup (see AuthProvider).
+// Prevents showing this banner to returning users who are just logged out.
+const LS_HAS_ACCOUNT = "ubyte_has_account";
 
 interface Props {
   /** Only render for guests — pass `!user` from the parent. */
@@ -26,7 +29,11 @@ export default function GuestTopBanner({ show }: Props) {
 
   useEffect(() => {
     if (!show) return;
-    if (typeof localStorage !== "undefined" && localStorage.getItem(LS_KEY)) return;
+    try {
+      // Don't show to users who have an account — they're just logged out
+      if (localStorage.getItem(LS_HAS_ACCOUNT)) return;
+      if (localStorage.getItem(LS_KEY)) return;
+    } catch { /* noop */ }
     setVisible(true);
   }, [show]);
 
