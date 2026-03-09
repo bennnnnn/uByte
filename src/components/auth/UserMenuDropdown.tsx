@@ -4,7 +4,6 @@ import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { useAuth } from "@/components/AuthProvider";
 import Avatar from "@/components/Avatar";
-import ThemeToggle from "@/components/ThemeToggle";
 
 interface MenuItemProps {
   href: string;
@@ -135,9 +134,8 @@ export default function UserMenuDropdown({ unreadCount, isMobile }: Props) {
             )}
           </div>
 
-          {/* Footer: theme + logout */}
-          <div className="flex items-center justify-between border-t border-zinc-100 px-3 py-2 dark:border-zinc-800">
-            <ThemeToggle className="flex h-8 w-8 items-center justify-center rounded-lg text-zinc-400 transition-colors hover:bg-zinc-100 hover:text-zinc-700 dark:hover:bg-zinc-800 dark:hover:text-zinc-200" />
+          {/* Footer: logout */}
+          <div className="flex items-center justify-end border-t border-zinc-100 px-3 py-2 dark:border-zinc-800">
             <button
               onClick={() => { close(); logout(); }}
               className="flex items-center gap-2 rounded-lg px-3 py-1.5 text-sm font-medium text-red-600 transition-colors hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-950/50"

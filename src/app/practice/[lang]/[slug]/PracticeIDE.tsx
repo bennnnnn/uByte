@@ -8,6 +8,7 @@ import { getStarterForLanguage, getAllPracticeProblems, getCategoryForSlug, getP
 import { LANGUAGES } from "@/lib/languages/registry";
 import { useCodeEditor } from "@/hooks/useCodeEditor";
 import { usePanelResize } from "@/hooks/usePanelResize";
+import { useChallengeTimer } from "@/hooks/useChallengeTimer";
 import ThemeToggle from "@/components/ThemeToggle";
 import AuthButtons from "@/components/AuthButtons";
 import ProblemSidebar from "@/components/practice/ProblemSidebar";
@@ -503,9 +504,7 @@ export function PracticeIDE({ problem, initialLang, initialCode, categoryFilter 
     setTimeout(() => setNoteSaved(false), 2000);
   }
 
-  // Elapsed timer
-  const [elapsed, setElapsed] = useState(0);
-  const elapsedRef = useRef(0);
+  const timer = useChallengeTimer();
   const [statuses, setStatuses] = useState<Record<string, PracticeAttemptStatus>>({});
   const [xpToast, setXpToast] = useState<number | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -649,15 +648,11 @@ export function PracticeIDE({ problem, initialLang, initialCode, categoryFilter 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [notes, problem.slug]);
 
-  // Elapsed timer — reset when problem changes
+  // Auto-start the stopwatch; reset and restart when the problem changes
   useEffect(() => {
-    elapsedRef.current = 0;
-    setElapsed(0);
-    const id = setInterval(() => {
-      elapsedRef.current += 1;
-      setElapsed(elapsedRef.current);
-    }, 1000);
-    return () => clearInterval(id);
+    timer.reset();
+    timer.start();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [problem.slug]);
 
   // Keep a ref so handleSubmit/handleRun can always read the latest outputHeight
@@ -964,9 +959,9 @@ export function PracticeIDE({ problem, initialLang, initialCode, categoryFilter 
 
         {/* Right: timer + bookmark + theme + user menu */}
         <div className="flex flex-1 justify-end gap-2 md:flex-initial md:gap-3">
-          {/* Elapsed timer */}
-          <div className="hidden items-center gap-1 rounded-md border border-zinc-200 px-2.5 py-1 text-xs font-mono text-zinc-500 dark:border-zinc-700 dark:text-zinc-400 sm:flex" title="Time spent on this problem">
-            ⏱ {String(Math.floor(elapsed / 60)).padStart(2, "0")}:{String(elapsed % 60).padStart(2, "0")}
+          {/* Stopwatch — same component as tutorial challenge mode */}
+          <div className="hidden items-center gap-1.5 rounded-md border border-zinc-200 px-2.5 py-1 text-xs font-mono text-zinc-500 dark:border-zinc-700 dark:text-zinc-400 sm:flex" title="Time spent on this problem">
+            ⏱ {timer.display}
           </div>
           {/* Bookmark */}
           {user && (
