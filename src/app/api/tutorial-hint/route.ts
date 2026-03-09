@@ -2,7 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { createHash } from "crypto";
 import { getCurrentUser } from "@/lib/auth";
 import { getCachedAiResponse, setCachedAiResponse } from "@/lib/db/ai-feedback-responses";
-import { canMakeAiCall, incrementTodayAiUsage, isInCooldown, setLastAiCallAt, AI_COOLDOWN_SECONDS } from "@/lib/db/ai-usage";
+import { canMakeAiCall, getLifetimeAiHintCount, incrementTodayAiUsage, isInCooldown, setLastAiCallAt, AI_COOLDOWN_SECONDS, FREE_HINT_LIMIT } from "@/lib/db/ai-usage";
+import { getUserById } from "@/lib/db";
+import { hasPaidAccess } from "@/lib/plans";
 import { callAiFeedback } from "@/lib/ai/feedback-client";
 import { withErrorHandling } from "@/lib/api-utils";
 import { verifyCsrf } from "@/lib/csrf";
@@ -54,7 +56,19 @@ export const POST = withErrorHandling("POST /api/tutorial-hint", async (request:
   const cached = await getCachedAiResponse(cacheKey);
   if (cached) return NextResponse.json(cached);
 
-  // Quota check
+  // Free-plan lifetime limit check
+  const dbUser = await getUserById(user.userId);
+  if (!hasPaidAccess(dbUser?.plan)) {
+    const lifetimeUsed = await getLifetimeAiHintCount(user.userId);
+    if (lifetimeUsed >= FREE_HINT_LIMIT) {
+      return NextResponse.json(
+        { error: "upgrade_required", hintsUsed: lifetimeUsed, limit: FREE_HINT_LIMIT },
+        { status: 402 }
+      );
+    }
+  }
+
+  // Daily quota check (Pro users)
   const { allowed, used, limit } = await canMakeAiCall(user.userId);
   if (!allowed) {
     return NextResponse.json(

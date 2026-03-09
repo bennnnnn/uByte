@@ -26,6 +26,9 @@ const COOLDOWN_SECONDS = 10;
 export const AI_QUOTA_DAILY = MAX_AI_CALLS_PER_DAY;
 export const AI_COOLDOWN_SECONDS = COOLDOWN_SECONDS;
 
+/** Free users get this many AI hints across their entire lifetime (tutorial + practice). */
+export const FREE_HINT_LIMIT = 5;
+
 /** Get today's usage count for user. Returns 0 if no row or table missing. */
 export async function getTodayAiUsageCount(userId: number): Promise<number> {
   const sql = getSql();
@@ -61,6 +64,25 @@ export async function incrementTodayAiUsage(userId: number): Promise<void> {
       await ensureAiUsageTables();
       await doInsert();
     }
+  }
+}
+
+/** Total AI hints used by a user across all time (sums every day in ai_usage_daily). */
+export async function getLifetimeAiHintCount(userId: number): Promise<number> {
+  const sql = getSql();
+  try {
+    const [row] = await sql`
+      SELECT COALESCE(SUM(count), 0)::int AS total
+      FROM ai_usage_daily
+      WHERE user_id = ${userId}
+    `;
+    return (row?.total as number) ?? 0;
+  } catch (err: unknown) {
+    if ((err as { code?: string })?.code === TABLE_MISSING) {
+      await ensureAiUsageTables();
+      return 0;
+    }
+    throw err;
   }
 }
 

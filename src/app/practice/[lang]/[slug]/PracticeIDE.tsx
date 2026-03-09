@@ -47,6 +47,7 @@ function OutputPanel({
   problem,
   aiLoading,
   aiError,
+  aiUpgradeRequired,
   aiFeedback,
   onRequestAI,
   onClearAI,
@@ -58,6 +59,7 @@ function OutputPanel({
   problem: PracticeProblem;
   aiLoading: boolean;
   aiError: string | null;
+  aiUpgradeRequired: boolean;
   aiFeedback: { friendly_one_liner: string; hint: string; next_step: string; minimal_patch?: string } | null;
   onRequestAI: () => void;
   onClearAI: () => void;
@@ -144,20 +146,35 @@ function OutputPanel({
         {/* AI hint button — hidden while a hint is already visible to avoid redundant calls */}
         {verdict && verdict.type !== "accepted" && verdict.submissionId != null && !aiFeedback && (
           <div className="ml-auto px-3">
-            <button
-              type="button"
-              onClick={onRequestAI}
-              disabled={aiLoading}
-              className="flex items-center gap-1.5 rounded-lg border border-indigo-300 bg-indigo-50 px-3 py-1 text-xs font-semibold text-indigo-700 transition-colors hover:bg-indigo-100 disabled:opacity-40 dark:border-indigo-700 dark:bg-indigo-950/40 dark:text-indigo-400 dark:hover:bg-indigo-950/70"
-            >
-              {aiLoading ? (
-                <>
-                  <span className="animate-spin">⟳</span> Thinking…
-                </>
-              ) : (
-                <>💡 Get hint</>
-              )}
-            </button>
+            {aiUpgradeRequired ? (
+              /* Inline upgrade prompt — shown in the same toolbar area */
+              <div className="flex items-center gap-2 rounded-lg border border-indigo-200 bg-indigo-50 px-3 py-1.5 dark:border-indigo-800 dark:bg-indigo-950/40">
+                <span className="text-xs text-indigo-600 dark:text-indigo-400">
+                  💡 5 free hints used —
+                </span>
+                <a
+                  href="/pricing"
+                  className="text-xs font-bold text-indigo-700 underline underline-offset-2 hover:text-indigo-500 dark:text-indigo-300"
+                >
+                  Upgrade for unlimited →
+                </a>
+              </div>
+            ) : (
+              <button
+                type="button"
+                onClick={onRequestAI}
+                disabled={aiLoading}
+                className="flex items-center gap-1.5 rounded-lg border border-indigo-300 bg-indigo-50 px-3 py-1 text-xs font-semibold text-indigo-700 transition-colors hover:bg-indigo-100 disabled:opacity-40 dark:border-indigo-700 dark:bg-indigo-950/40 dark:text-indigo-400 dark:hover:bg-indigo-950/70"
+              >
+                {aiLoading ? (
+                  <>
+                    <span className="animate-spin">⟳</span> Thinking…
+                  </>
+                ) : (
+                  <>💡 Get hint</>
+                )}
+              </button>
+            )}
           </div>
         )}
       </div>
@@ -518,6 +535,7 @@ export function PracticeIDE({ problem, initialLang, initialCode, categoryFilter 
   } | null>(null);
   const [aiLoading, setAiLoading] = useState(false);
   const [aiError, setAiError] = useState<string | null>(null);
+  const [aiUpgradeRequired, setAiUpgradeRequired] = useState(false);
 
   // Use shared code from ?share= if present, otherwise fall back to the problem's starter
   const editor = useCodeEditor(initialCode ?? getStarterForLanguage(problem, initialLang), lang);
@@ -736,6 +754,7 @@ export function PracticeIDE({ problem, initialLang, initialCode, categoryFilter 
       if (data.consecutive_failures >= 2 && data.submission_id && !aiFeedback) {
           setAiLoading(true);
           setAiError(null);
+          setAiUpgradeRequired(false);
           apiFetch("/api/ai-feedback", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -743,7 +762,9 @@ export function PracticeIDE({ problem, initialLang, initialCode, categoryFilter 
           })
             .then(async (res) => {
               const d = await res.json();
-              if (res.ok && d?.friendly_one_liner != null) {
+              if (res.status === 402 && d?.error === "upgrade_required") {
+                setAiUpgradeRequired(true);
+              } else if (res.ok && d?.friendly_one_liner != null) {
                 setAiFeedback({
                   friendly_one_liner: d.friendly_one_liner ?? "",
                   hint: d.hint ?? "",
@@ -771,6 +792,7 @@ export function PracticeIDE({ problem, initialLang, initialCode, categoryFilter 
     setAiLoading(true);
     setAiError(null);
     setAiFeedback(null);
+    setAiUpgradeRequired(false);
     try {
       const res = await apiFetch("/api/ai-feedback", {
         method: "POST",
@@ -778,6 +800,10 @@ export function PracticeIDE({ problem, initialLang, initialCode, categoryFilter 
         body: JSON.stringify({ submission_id: sid, hint_level: 1 }),
       });
       const data = await res.json();
+      if (res.status === 402 && data?.error === "upgrade_required") {
+        setAiUpgradeRequired(true);
+        return;
+      }
       if (!res.ok) {
         setAiError(data?.message ?? data?.error ?? "Request failed");
         return;
@@ -1348,9 +1374,10 @@ export function PracticeIDE({ problem, initialLang, initialCode, categoryFilter 
             problem={problem}
             aiLoading={aiLoading}
             aiError={aiError}
+            aiUpgradeRequired={aiUpgradeRequired}
             aiFeedback={aiFeedback}
             onRequestAI={() => requestAiFeedback()}
-            onClearAI={() => { setAiFeedback(null); setAiError(null); }}
+            onClearAI={() => { setAiFeedback(null); setAiError(null); setAiUpgradeRequired(false); }}
           />
         </div>
       </div>

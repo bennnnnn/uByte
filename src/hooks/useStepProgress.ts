@@ -76,6 +76,7 @@ export interface StepProgressState {
   aiFeedback: AiFeedbackSchema | null;
   setAiFeedback: (v: AiFeedbackSchema | null) => void;
   aiFeedbackLoading: boolean;
+  aiFeedbackUpgrade: boolean;
   failCount: number;
   showInlineChat: boolean;
   setShowInlineChat: (v: boolean) => void;
@@ -111,6 +112,7 @@ export function useStepProgress(
   const [outputIsError, setOutputIsError] = useState(false);
   const [aiFeedback, setAiFeedback] = useState<AiFeedbackSchema | null>(null);
   const [aiFeedbackLoading, setAiFeedbackLoading] = useState(false);
+  const [aiFeedbackUpgrade, setAiFeedbackUpgrade] = useState(false);
   const [failCount, setFailCount] = useState(0);
   const [showInlineChat, setShowInlineChat] = useState(false);
   const [tutorialDone, setTutorialDone] = useState(false);
@@ -232,6 +234,7 @@ export function useStepProgress(
   function fetchAiFeedback(userCode: string, actualOutput: string, isError: boolean, currentStepIndex: number) {
     setAiFeedbackLoading(true);
     setAiFeedback(null);
+    setAiFeedbackUpgrade(false);
     apiFetch("/api/tutorial-hint", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -244,9 +247,13 @@ export function useStepProgress(
         isError,
       }),
     })
-      .then((r) => r.json())
-      .then((d) => {
-        if (d?.friendly_one_liner) setAiFeedback(d as AiFeedbackSchema);
+      .then(async (r) => {
+        const d = await r.json();
+        if (r.status === 402 && d?.error === "upgrade_required") {
+          setAiFeedbackUpgrade(true);
+        } else if (d?.friendly_one_liner) {
+          setAiFeedback(d as AiFeedbackSchema);
+        }
       })
       .catch(() => {})
       .finally(() => setAiFeedbackLoading(false));
@@ -402,6 +409,7 @@ export function useStepProgress(
     aiFeedback,
     setAiFeedback,
     aiFeedbackLoading,
+    aiFeedbackUpgrade,
     failCount,
     showInlineChat,
     setShowInlineChat,

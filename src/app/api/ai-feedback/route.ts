@@ -2,7 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
 import { getSubmissionById } from "@/lib/db/submissions";
 import { getCachedAiResponse, setCachedAiResponse } from "@/lib/db/ai-feedback-responses";
-import { canMakeAiCall, incrementTodayAiUsage, isInCooldown, setLastAiCallAt, AI_COOLDOWN_SECONDS } from "@/lib/db/ai-usage";
+import { canMakeAiCall, getLifetimeAiHintCount, incrementTodayAiUsage, isInCooldown, setLastAiCallAt, AI_COOLDOWN_SECONDS, FREE_HINT_LIMIT } from "@/lib/db/ai-usage";
+import { getUserById } from "@/lib/db";
+import { hasPaidAccess } from "@/lib/plans";
 import { getPracticeProblemBySlug } from "@/lib/practice/problems";
 import { buildEvidenceBundle, buildFailureSignature } from "@/lib/ai/evidence-bundle";
 import { runHeuristics } from "@/lib/ai/heuristics";
@@ -67,6 +69,18 @@ export const POST = withErrorHandling("POST /api/ai-feedback", async (request: N
   const cached = await getCachedAiResponse(cacheKey);
   if (cached) {
     return NextResponse.json(cached);
+  }
+
+  // Free-plan lifetime limit check
+  const dbUser = await getUserById(user.userId);
+  if (!hasPaidAccess(dbUser?.plan)) {
+    const lifetimeUsed = await getLifetimeAiHintCount(user.userId);
+    if (lifetimeUsed >= FREE_HINT_LIMIT) {
+      return NextResponse.json(
+        { error: "upgrade_required", hintsUsed: lifetimeUsed, limit: FREE_HINT_LIMIT },
+        { status: 402 }
+      );
+    }
   }
 
   // Quota
