@@ -171,7 +171,7 @@ function OutputPanel({
   return (
     <div
       className="flex shrink-0 flex-col overflow-hidden bg-surface-card"
-      style={{ height: verdict ? Math.max(outputHeight, 400) : outputHeight }}
+      style={{ height: outputHeight }}
       suppressHydrationWarning
     >
       {/* ── Tab bar ────────────────────────────────────────────────────── */}

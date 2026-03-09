@@ -39,9 +39,11 @@ export function usePanelResize(): PanelResizeState {
       const ds = dragState.current;
       if (!ds) return;
       if (ds.type === "h") {
-        setLeftWidth(Math.max(200, Math.min(620, ds.startValue + (clientX - ds.startX))));
+        // Leave at least 300px for the right panel (editor + output)
+        setLeftWidth(Math.max(200, Math.min(window.innerWidth - 300, ds.startValue + (clientX - ds.startX))));
       } else {
-        setOutputHeight(Math.max(60, Math.min(520, ds.startValue + (ds.startY - clientY))));
+        // Leave at least 150px for the code editor above; allow output to shrink to just the tab bar (~40px)
+        setOutputHeight(Math.max(40, Math.min(window.innerHeight - 150, ds.startValue + (ds.startY - clientY))));
       }
     }
     function onMouseMove(e: MouseEvent) {
