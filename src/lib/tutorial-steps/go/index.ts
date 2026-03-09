@@ -4,6 +4,7 @@ import { steps as variablesAndTypes } from "./variables-and-types";
 import { steps as fmtPackage } from "./fmt-package";
 import { steps as controlFlow } from "./control-flow";
 import { steps as loops } from "./loops";
+import { steps as arrays } from "./arrays";
 import { steps as arraysAndSlices } from "./arrays-and-slices";
 import { steps as maps } from "./maps";
 import { steps as functions } from "./functions";
@@ -25,7 +26,10 @@ export const goSteps: Record<string, TutorialStep[]> = {
   "fmt-package": fmtPackage,
   "control-flow": controlFlow,
   loops: loops,
-  "arrays-and-slices": arraysAndSlices,
+  // "arrays" and "slices" are the actual tutorial slugs (separate MDX files).
+  // "arrays-and-slices" is kept only as a legacy key so existing references don't break.
+  arrays: arrays,
+  slices: arraysAndSlices,
   maps: maps,
   functions: functions,
   pointers: pointers,

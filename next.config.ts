@@ -25,6 +25,13 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
+  // Ensure content/ directory (MDX + .steps.json files) is bundled for every
+  // serverless function. Without this, Next.js output-file tracing may omit it
+  // for some functions (e.g. home page), causing getTotalLessonCount to fall
+  // back to TS step definitions and return a different count than the tutorial page.
+  outputFileTracingIncludes: {
+    "**/*": ["./content/**/*"],
+  },
   experimental: {
     // Inline CSS so styles arrive with HTML — removes render-blocking CSS request (~280ms LCP win).
     inlineCss: true,
