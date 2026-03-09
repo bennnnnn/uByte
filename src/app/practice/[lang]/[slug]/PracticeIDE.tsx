@@ -232,19 +232,23 @@ function OutputPanel({
                 {verdictColors && (
                   <div className={`flex items-center gap-3 border-b px-4 py-3 ${verdictColors.bg} ${verdictColors.border}`}>
                     <span className="text-2xl">
-                      {verdict.type === "accepted" ? "🎉" : verdict.type === "tle" ? "⏱" : verdict.type === "compile_error" ? "🔧" : verdict.type === "runtime_error" ? "💥" : "❌"}
+                      {verdict.type === "accepted" ? "🎉"
+                        : verdict.type === "tle" ? "⏱"
+                        : verdict.type === "compile_error" ? "🔧"
+                        : verdict.type === "runtime_error" ? "💥"
+                        : "❌"}
                     </span>
                     <div className="min-w-0 flex-1">
                       <p className={`font-bold ${verdictColors.text}`}>{verdict.message}</p>
-                      {verdict.totalCases != null && verdict.type !== "compile_error" && verdict.type !== "tle" && verdict.type !== "error" && (
+                      {(verdict.type === "wrong_answer" || verdict.type === "accepted") && totalCases > 0 && (
                         <div className="mt-1.5 flex items-center gap-2">
                           <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-zinc-200 dark:bg-zinc-700">
                             <div
                               className={`h-full rounded-full ${verdict.type === "accepted" ? "bg-emerald-500" : "bg-red-500"}`}
-                              style={{ width: `${(passedCases / totalCases) * 100}%` }}
+                              style={{ width: `${totalCases > 0 ? (passedCases / totalCases) * 100 : 0}%` }}
                             />
                           </div>
-                          <span className={`text-xs font-semibold ${verdictColors.text}`}>
+                          <span className={`shrink-0 text-xs font-semibold ${verdictColors.text}`}>
                             {passedCases} / {totalCases} passed
                           </span>
                         </div>
@@ -253,10 +257,10 @@ function OutputPanel({
                   </div>
                 )}
 
-                {/* Test case chips + detail — only for WA / accepted */}
+                {/* ── Wrong Answer / Accepted: chip row + per-case detail ── */}
                 {(verdict.type === "accepted" || verdict.type === "wrong_answer") && totalCases > 0 && (
                   <div className="p-4">
-                    {/* Chips row */}
+                    {/* Chips */}
                     <div className="mb-4 flex flex-wrap gap-2">
                       {Array.from({ length: totalCases }).map((_, idx) => {
                         const status = caseStatus(idx);
@@ -286,47 +290,36 @@ function OutputPanel({
                       })}
                     </div>
 
-                    {/* Selected test case detail */}
+                    {/* Per-case detail */}
                     {selectedTestCase && (
                       <div className="space-y-3">
-                        {/* Input */}
                         <div>
-                          <p className="mb-1.5 text-[11px] font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">
-                            Input
-                          </p>
+                          <p className="mb-1.5 text-[11px] font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">Input</p>
                           <pre className="rounded-lg bg-zinc-100 p-3 font-mono text-xs text-zinc-800 dark:bg-zinc-800 dark:text-zinc-200">
                             {selectedTestCase.stdin}
                           </pre>
                         </div>
 
-                        {/* Expected / Got side by side for failing case */}
                         {caseStatus(selectedCase) === "fail" && (
                           <div className="grid gap-3 sm:grid-cols-2">
                             <div>
-                              <p className="mb-1.5 text-[11px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
-                                Expected Output
-                              </p>
+                              <p className="mb-1.5 text-[11px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">Expected Output</p>
                               <pre className="rounded-lg border border-emerald-200 bg-emerald-50 p-3 font-mono text-xs text-emerald-800 dark:border-emerald-800 dark:bg-emerald-950/30 dark:text-emerald-300">
                                 {selectedTestCase.expectedOutput}
                               </pre>
                             </div>
                             <div>
-                              <p className="mb-1.5 text-[11px] font-bold uppercase tracking-wider text-red-600 dark:text-red-400">
-                                Your Output
-                              </p>
+                              <p className="mb-1.5 text-[11px] font-bold uppercase tracking-wider text-red-600 dark:text-red-400">Your Output</p>
                               <pre className="rounded-lg border border-red-200 bg-red-50 p-3 font-mono text-xs text-red-800 dark:border-red-800 dark:bg-red-950/30 dark:text-red-300">
-                                {verdict.failedActual ?? "(empty)"}
+                                {verdict.failedActual != null && verdict.failedActual !== "" ? verdict.failedActual : "(no output — did your function return a value?)"}
                               </pre>
                             </div>
                           </div>
                         )}
 
-                        {/* For passing cases: just show expected */}
                         {caseStatus(selectedCase) === "pass" && (
                           <div>
-                            <p className="mb-1.5 text-[11px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
-                              Output ✓
-                            </p>
+                            <p className="mb-1.5 text-[11px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">Output ✓</p>
                             <pre className="rounded-lg border border-emerald-200 bg-emerald-50 p-3 font-mono text-xs text-emerald-800 dark:border-emerald-800 dark:bg-emerald-950/30 dark:text-emerald-300">
                               {selectedTestCase.expectedOutput}
                             </pre>
@@ -337,30 +330,63 @@ function OutputPanel({
                   </div>
                 )}
 
-                {/* Compile / runtime: show error prominently */}
-                {(verdict.type === "compile_error" || verdict.type === "runtime_error") && verdict.output && (
+                {/* ── Compile error ── */}
+                {verdict.type === "compile_error" && (
                   <div className="p-4">
-                    <p className="mb-2 text-xs font-bold uppercase tracking-wider text-red-500">
-                      {verdict.type === "compile_error" ? "Compiler Output" : "Runtime Error"}
-                    </p>
+                    <p className="mb-2 text-xs font-bold uppercase tracking-wider text-red-500">Compiler Output</p>
                     <pre className="whitespace-pre-wrap break-words rounded-lg border border-red-200 bg-red-50 p-3 font-mono text-xs text-red-800 dark:border-red-800 dark:bg-red-950/30 dark:text-red-300">
-                      {verdict.output}
+                      {verdict.output || "Compilation failed — no output captured."}
                     </pre>
-                    <p className="mt-2 text-xs text-zinc-400 dark:text-zinc-500">
-                      Fix the errors above, then click <strong>Submit</strong> again.
-                    </p>
+                    <p className="mt-2 text-xs text-zinc-400 dark:text-zinc-500">Fix the errors above, then submit again.</p>
                   </div>
                 )}
 
-                {/* TLE */}
+                {/* ── Runtime error ── */}
+                {verdict.type === "runtime_error" && (
+                  <div className="p-4">
+                    <p className="mb-2 text-xs font-bold uppercase tracking-wider text-red-500">Runtime Error</p>
+                    <pre className="whitespace-pre-wrap break-words rounded-lg border border-red-200 bg-red-50 p-3 font-mono text-xs text-red-800 dark:border-red-800 dark:bg-red-950/30 dark:text-red-300">
+                      {verdict.output || "Your code crashed — no stderr captured."}
+                    </pre>
+                    <p className="mt-2 text-xs text-zinc-400 dark:text-zinc-500">Fix the runtime error above, then submit again.</p>
+                  </div>
+                )}
+
+                {/* ── TLE ── */}
                 {verdict.type === "tle" && (
                   <div className="p-4">
                     <div className="rounded-lg border border-amber-200 bg-amber-50 p-4 dark:border-amber-800 dark:bg-amber-950/30">
                       <p className="text-sm font-semibold text-amber-800 dark:text-amber-300">Time Limit Exceeded</p>
                       <p className="mt-1 text-xs text-amber-700 dark:text-amber-400">
-                        Your solution ran too long. Look for nested loops or operations you can replace with a hash map or DP approach.
+                        Your solution took too long. Look for nested loops you can replace with a hash map, prefix sum, or DP table.
                       </p>
                     </div>
+                  </div>
+                )}
+
+                {/* ── Generic error (e.g. missing harness, judge unavailable) ── */}
+                {verdict.type === "error" && (
+                  <div className="p-4">
+                    <div className="rounded-lg border border-red-200 bg-red-50 p-4 dark:border-red-800 dark:bg-red-950/30">
+                      <p className="text-sm font-semibold text-red-700 dark:text-red-300">Submission Error</p>
+                      <p className="mt-1 text-xs text-red-600 dark:text-red-400">{verdict.message}</p>
+                    </div>
+                    {/* Still show the test cases so the user can inspect what they're up against */}
+                    {totalCases > 0 && (
+                      <div className="mt-4">
+                        <p className="mb-2 text-[11px] font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">Test Cases</p>
+                        <div className="space-y-2">
+                          {problem.testCases?.map((tc, idx) => (
+                            <div key={idx} className="rounded-lg border border-zinc-200 p-3 dark:border-zinc-700">
+                              <p className="mb-1 text-[10px] font-semibold text-zinc-400">Case {idx + 1}</p>
+                              <p className="font-mono text-xs text-zinc-600 dark:text-zinc-400">
+                                <span className="text-zinc-400">Input:</span> {tc.stdin}
+                              </p>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 )}
               </>
