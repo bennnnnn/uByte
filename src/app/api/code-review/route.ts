@@ -7,9 +7,10 @@ import { callCodeReview } from "@/lib/ai/code-review-client";
 import { withErrorHandling } from "@/lib/api-utils";
 import { verifyCsrf } from "@/lib/csrf";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
+import { ALL_LANGUAGE_KEYS } from "@/lib/languages/registry";
 import type { SupportedLanguage } from "@/lib/languages/types";
 
-const SUPPORTED_LANGS: SupportedLanguage[] = ["go", "python", "javascript", "java", "cpp", "rust"];
+const SUPPORTED_LANGS: SupportedLanguage[] = ALL_LANGUAGE_KEYS;
 
 /** POST /api/code-review — full AI code review for any submitted code. */
 export const POST = withErrorHandling("POST /api/code-review", async (request: NextRequest) => {

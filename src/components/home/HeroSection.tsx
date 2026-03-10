@@ -19,6 +19,7 @@ const LANG_META: Record<Lang, { label: string; ext: string }> = {
   java:       { label: "Java",   ext: "java" },
   rust:       { label: "Rust",   ext: "rs"   },
   cpp:        { label: "C++",    ext: "cpp"  },
+  csharp:     { label: "C#",     ext: "cs"   },
 };
 
 // Token color classes (avoids inline style attributes)
@@ -85,6 +86,17 @@ const CODE: Record<Lang, T[][]> = {
     [{ t: "  return ", c: K }, { t: "0", c: N }, { t: ";", c: D }],
     [{ t: "}", c: D }],
   ],
+  csharp: [
+    [{ t: "// greeting.cs", c: C }],
+    [],
+    [{ t: "using ", c: K }, { t: "System", c: P }, { t: ";", c: D }],
+    [],
+    [{ t: "class ", c: K }, { t: "Program", c: F }, { t: " {", c: D }],
+    [{ t: "  static void ", c: K }, { t: "Main", c: F }, { t: "() {", c: D }],
+    [{ t: "    Console", c: P }, { t: ".", c: D }, { t: "WriteLine", c: F }, { t: '("Hello, World!");', c: S }],
+    [{ t: "  }", c: D }],
+    [{ t: "}", c: D }],
+  ],
 };
 
 const STEP_TEXT: Record<Lang, string> = {
@@ -94,6 +106,7 @@ const STEP_TEXT: Record<Lang, string> = {
   java:       'Call System.out.println() inside the main method.',
   rust:       'Use the println!() macro to output "Hello, World!".',
   cpp:        'Use std::cout to write "Hello, World!" to stdout.',
+  csharp:     'Use Console.WriteLine() inside the Main method.',
 };
 
 const LANG_ORDER = ALL_LANGUAGE_KEYS;

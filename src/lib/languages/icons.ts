@@ -8,6 +8,7 @@ export const LANG_ICONS: Record<SupportedLanguage, string> = {
   javascript: "🟨",
   java: "☕",
   rust: "🦀",
+  csharp: "💜",
 };
 
 /** Short taglines for practice section per language */
@@ -18,6 +19,7 @@ export const PRACTICE_TAGLINES: Record<SupportedLanguage, string> = {
   java: "OOP, generics & collections",
   rust: "Ownership, lifetimes & safety",
   cpp: "Pointers, STL & performance",
+  csharp: "LINQ, async/await & .NET",
 };
 
 export function getLangIcon(slug: string): string {

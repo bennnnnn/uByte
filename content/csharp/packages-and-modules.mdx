@@ -1,0 +1,108 @@
+---
+title: "Namespaces and Modules"
+description: "Namespaces, using directives, file-scoped namespaces, access modifiers, and NuGet packages in C#."
+order: 14
+difficulty: "intermediate"
+estimatedMinutes: 10
+---
+
+## Namespaces
+
+Namespaces prevent name collisions and organize code logically:
+
+```csharp
+namespace MyApp.Models {
+    public class User {
+        public string Name { get; set; } = "";
+    }
+}
+
+namespace MyApp.Services {
+    using MyApp.Models;  // bring User into scope
+
+    public class UserService {
+        public User Create(string name) => new User { Name = name };
+    }
+}
+```
+
+---
+
+## File-Scoped Namespaces (C# 10+)
+
+Removes one level of indentation — the namespace applies to the whole file:
+
+```csharp
+namespace MyApp.Models;   // no braces needed
+
+public class Product {
+    public string Name { get; set; } = "";
+}
+```
+
+---
+
+## using Directives
+
+```csharp
+using System;                      // namespace import
+using System.Collections.Generic;
+using static System.Math;          // import static members
+using Alias = System.DateTime;     // alias
+
+double r = Sqrt(16);              // from static import
+Alias now = Alias.Now;
+```
+
+---
+
+## Global Usings (C# 10+)
+
+Add to a single file (e.g., `GlobalUsings.cs`) and they apply project-wide:
+
+```csharp
+global using System;
+global using System.Collections.Generic;
+global using System.Linq;
+```
+
+---
+
+## Partial Classes
+
+Split a class across multiple files — common in auto-generated code:
+
+```csharp
+// File1.cs
+partial class Customer {
+    public string Name { get; set; } = "";
+}
+
+// File2.cs
+partial class Customer {
+    public void Greet() => Console.WriteLine($"Hi, {Name}");
+}
+```
+
+---
+
+## NuGet Packages
+
+C#'s package manager. Install via CLI:
+
+```bash
+dotnet add package Newtonsoft.Json
+dotnet add package Dapper
+```
+
+Or in `.csproj`:
+
+```xml
+<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+```
+
+---
+
+## What's Next?
+
+Your code is well-organized. Next: **concurrency** — async/await, Task, and parallel programming.

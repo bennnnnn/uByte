@@ -1,0 +1,132 @@
+---
+title: "Pattern Matching and switch"
+description: "switch expressions, type patterns, property patterns, positional patterns, and guard clauses in C#."
+order: 19
+difficulty: "intermediate"
+estimatedMinutes: 12
+---
+
+## Classic switch Statement
+
+```csharp
+string command = "start";
+switch (command) {
+    case "start":
+        Console.WriteLine("Starting...");
+        break;
+    case "stop":
+        Console.WriteLine("Stopping...");
+        break;
+    default:
+        Console.WriteLine("Unknown command");
+        break;
+}
+```
+
+---
+
+## switch Expression (C# 8+)
+
+Returns a value — no `break` needed, exhaustive matching enforced:
+
+```csharp
+int code = 404;
+string message = code switch {
+    200 => "OK",
+    201 => "Created",
+    400 => "Bad Request",
+    401 => "Unauthorized",
+    403 => "Forbidden",
+    404 => "Not Found",
+    >= 500 and <= 599 => "Server Error",
+    _ => "Unknown",
+};
+Console.WriteLine(message);  // Not Found
+```
+
+---
+
+## Type Pattern Matching
+
+```csharp
+object obj = "hello";
+string desc = obj switch {
+    int n    => $"Integer: {n}",
+    string s => $"String of length {s.Length}",
+    double d => $"Double: {d:F2}",
+    null     => "null value",
+    _        => "unknown type",
+};
+Console.WriteLine(desc);  // String of length 5
+```
+
+---
+
+## Property Patterns
+
+Match on an object's properties:
+
+```csharp
+record Point(int X, int Y);
+
+string Quadrant(Point p) => p switch {
+    { X: > 0, Y: > 0 } => "I",
+    { X: < 0, Y: > 0 } => "II",
+    { X: < 0, Y: < 0 } => "III",
+    { X: > 0, Y: < 0 } => "IV",
+    _                   => "Origin or axis",
+};
+
+Console.WriteLine(Quadrant(new Point(3, -2)));   // IV
+```
+
+---
+
+## Positional Patterns (with Deconstruct)
+
+```csharp
+string Classify((int x, int y) point) => point switch {
+    (0, 0) => "origin",
+    (_, 0) => "x-axis",
+    (0, _) => "y-axis",
+    _      => "other",
+};
+```
+
+---
+
+## when Guard Clauses
+
+```csharp
+static string Categorize(int n) => n switch {
+    < 0             => "negative",
+    0               => "zero",
+    var x when x % 2 == 0 => "positive even",
+    _               => "positive odd",
+};
+```
+
+---
+
+## is Pattern in if Statements
+
+```csharp
+if (obj is string { Length: > 10 } s) {
+    Console.WriteLine($"Long string: {s}");
+}
+
+if (obj is not null) {
+    Console.WriteLine("Not null");
+}
+```
+
+---
+
+## Congratulations!
+
+You've completed the **C# track** on uByte! You know:
+- Types, classes, interfaces, generics
+- LINQ, async/await, error handling
+- HTTP, JSON, testing, and pattern matching
+
+Ready for more? Try **interview prep** problems in C# or earn your C# **certification**.

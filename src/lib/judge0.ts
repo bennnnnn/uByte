@@ -12,6 +12,7 @@ export const JUDGE0_LANG_IDS: Record<string, number> = {
   java: 62,
   rust: 73,
   cpp: 54,
+  csharp: 51, // C# (Mono 6.6.0.161)
 };
 
 export function b64(s: string): string {

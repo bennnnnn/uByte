@@ -219,6 +219,33 @@ function buildFaq(examSize: number, examDurationMinutes: number, passMin: number
   ];
 }
 
+function buildCsharpContent(cfg: ExamConfigNumbers, passPercent: number): ExamDetailContent {
+  const { examSize, examDurationMinutes } = cfg;
+  const passMin = Math.ceil((examSize * passPercent) / 100);
+  return {
+    tagline: "Demonstrate your C# and .NET knowledge with a timed, multiple-choice assessment.",
+    objective:
+      "This exam validates your understanding of C# fundamentals through modern .NET: types, OOP, LINQ, async/await, and the standard library. Passing signals readiness for .NET development roles.",
+    topics: [
+      "Value types, reference types, and nullable types",
+      "Classes, structs, records, and inheritance",
+      "Interfaces, generics, and constraints",
+      "Properties, indexers, and operator overloading",
+      "LINQ — Where, Select, OrderBy, GroupBy, aggregates",
+      "async/await, Task, Task<T>, and CancellationToken",
+      "Exception handling: try/catch/finally, custom exceptions",
+      "Namespaces, using directives, and access modifiers",
+      "Collections: Array, List<T>, Dictionary<K,V>, HashSet<T>",
+      "Pattern matching: switch expressions, type and property patterns",
+      "System.Text.Json serialization and deserialization",
+      "HttpClient and REST fundamentals",
+    ],
+    rules: buildRules(examSize, examDurationMinutes, passMin, passPercent),
+    audience: "Developers who have completed the C# tutorials or have equivalent .NET experience.",
+    faq: buildFaq(examSize, examDurationMinutes, passMin, passPercent),
+  };
+}
+
 export function getExamDetailContent(
   lang: string,
   config?: ExamConfigNumbers,
@@ -226,12 +253,13 @@ export function getExamDetailContent(
 ): ExamDetailContent | null {
   const cfg = config ?? { examSize: EXAM_SIZE, examDurationMinutes: EXAM_DURATION_MINUTES };
   switch (lang) {
-    case "go": return buildGoContent(cfg, passPercent);
-    case "python": return buildPythonContent(cfg, passPercent);
+    case "go":         return buildGoContent(cfg, passPercent);
+    case "python":     return buildPythonContent(cfg, passPercent);
     case "javascript": return buildJavaScriptContent(cfg, passPercent);
-    case "java": return buildJavaContent(cfg, passPercent);
-    case "rust": return buildRustContent(cfg, passPercent);
-    case "cpp": return buildCppContent(cfg, passPercent);
+    case "java":       return buildJavaContent(cfg, passPercent);
+    case "rust":       return buildRustContent(cfg, passPercent);
+    case "cpp":        return buildCppContent(cfg, passPercent);
+    case "csharp":     return buildCsharpContent(cfg, passPercent);
     default: return null;
   }
 }

@@ -1,0 +1,101 @@
+---
+title: "Functions and Methods"
+description: "Static methods, parameters, return types, overloads, optional/named args, and expression bodies in C#."
+order: 8
+difficulty: "beginner"
+estimatedMinutes: 12
+---
+
+## Basic Method
+
+```csharp
+static int Add(int a, int b) {
+    return a + b;
+}
+Console.WriteLine(Add(3, 4));  // 7
+```
+
+---
+
+## Expression-Bodied Members
+
+For one-liners, use `=>`:
+
+```csharp
+static int Square(int n) => n * n;
+static string Greet(string name) => $"Hello, {name}!";
+```
+
+---
+
+## Multiple Return Values (Tuples)
+
+```csharp
+static (int Min, int Max) MinMax(int[] arr) {
+    return (arr.Min(), arr.Max());
+}
+
+var (min, max) = MinMax(new[] { 3, 1, 4, 1, 5 });
+Console.WriteLine($"{min} – {max}");  // 1 – 5
+```
+
+---
+
+## Optional Parameters
+
+```csharp
+static string Greet(string name, string greeting = "Hello") {
+    return $"{greeting}, {name}!";
+}
+
+Greet("Alice");              // Hello, Alice!
+Greet("Bob", "Hi");          // Hi, Bob!
+```
+
+---
+
+## Named Arguments
+
+```csharp
+static void Config(int timeout = 30, bool retry = true) { ... }
+
+Config(retry: false, timeout: 60);  // order doesn't matter
+```
+
+---
+
+## ref and out Parameters
+
+```csharp
+static void Swap(ref int a, ref int b) {
+    int temp = a; a = b; b = temp;
+}
+
+int x = 1, y = 2;
+Swap(ref x, ref y);  // x=2, y=1
+
+// out — method sets the value
+static bool TryDouble(int n, out int result) {
+    result = n * 2;
+    return n > 0;
+}
+TryDouble(5, out int doubled);  // doubled = 10
+```
+
+---
+
+## Method Overloading
+
+Same name, different signatures:
+
+```csharp
+static int Add(int a, int b) => a + b;
+static double Add(double a, double b) => a + b;
+static string Add(string a, string b) => a + b;
+```
+
+---
+
+## What's Next?
+
+You can write reusable methods. Next: **properties and ref types** — fields, properties, `get`/`set`, and value vs reference semantics.

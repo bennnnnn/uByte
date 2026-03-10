@@ -1,0 +1,107 @@
+---
+title: "Interfaces and Generics"
+description: "Defining interfaces, implementing multiple interfaces, generic types and constraints in C#."
+order: 12
+difficulty: "intermediate"
+estimatedMinutes: 12
+---
+
+## Defining an Interface
+
+An interface is a **contract** — it defines what a type can do, not how:
+
+```csharp
+interface IShape {
+    double Area();
+    double Perimeter();
+    string Describe() => $"Area={Area():F2}";  // default implementation (C# 8+)
+}
+```
+
+---
+
+## Implementing Interfaces
+
+```csharp
+class Rectangle : IShape {
+    public double Width  { get; }
+    public double Height { get; }
+
+    public Rectangle(double w, double h) { Width = w; Height = h; }
+
+    public double Area()      => Width * Height;
+    public double Perimeter() => 2 * (Width + Height);
+}
+
+IShape s = new Rectangle(3, 4);
+Console.WriteLine(s.Describe());  // Area=12.00
+```
+
+---
+
+## Multiple Interfaces
+
+```csharp
+interface IPrintable { void Print(); }
+interface IComparable<T> { int CompareTo(T other); }
+
+class Score : IShape, IPrintable {
+    // must implement all members of both interfaces
+}
+```
+
+---
+
+## Generic Classes
+
+Write code that works with any type:
+
+```csharp
+class Stack<T> {
+    private readonly List<T> _items = new();
+
+    public void Push(T item) => _items.Add(item);
+
+    public T Pop() {
+        var last = _items[^1];
+        _items.RemoveAt(_items.Count - 1);
+        return last;
+    }
+
+    public int Count => _items.Count;
+}
+
+var stack = new Stack<int>();
+stack.Push(1); stack.Push(2); stack.Push(3);
+Console.WriteLine(stack.Pop());  // 3
+```
+
+---
+
+## Generic Constraints
+
+```csharp
+// T must implement IComparable<T>
+static T Max<T>(T a, T b) where T : IComparable<T> =>
+    a.CompareTo(b) >= 0 ? a : b;
+
+Console.WriteLine(Max(3, 7));         // 7
+Console.WriteLine(Max("apple","zoo")); // zoo
+```
+
+Common constraints: `where T : class`, `where T : struct`, `where T : new()`, `where T : SomeBaseClass`.
+
+---
+
+## Covariance and Contravariance
+
+```csharp
+IEnumerable<string> strings = new List<string>();
+IEnumerable<object> objects = strings;  // covariant (out T) — OK
+```
+
+---
+
+## What's Next?
+
+You can write flexible, type-safe abstractions. Next: **error handling** — exceptions, try/catch/finally, custom exceptions.

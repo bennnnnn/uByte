@@ -1,0 +1,74 @@
+---
+title: "Print Formatting"
+description: "Master Console output, string interpolation, composite formatting, and format specifiers in C#."
+order: 3
+difficulty: "beginner"
+estimatedMinutes: 10
+---
+
+## Console Output
+
+```csharp
+Console.Write("No newline at end");
+Console.WriteLine("Adds newline");
+Console.WriteLine();           // blank line
+```
+
+---
+
+## String Interpolation
+
+Prefix with `$` to embed any expression:
+
+```csharp
+string name = "Alice";
+int score = 95;
+Console.WriteLine($"Player {name} scored {score} points.");
+// Expressions work too:
+Console.WriteLine($"Double: {score * 2}");
+```
+
+---
+
+## Composite Formatting
+
+Use `{0}`, `{1}` placeholders:
+
+```csharp
+Console.WriteLine("Hello, {0}! You are {1} years old.", "Bob", 30);
+string.Format("Pi is approximately {0:F2}", 3.14159);  // Pi is approximately 3.14
+```
+
+---
+
+## Format Specifiers
+
+| Specifier | Meaning | Example |
+|-----------|---------|---------|
+| `D` / `d` | Integer | `{42:D5}` → `00042` |
+| `F` / `f` | Fixed-point | `{3.1:F2}` → `3.10` |
+| `N` / `n` | Number with commas | `{1234567:N0}` → `1,234,567` |
+| `C` / `c` | Currency | `{9.99:C}` → `$9.99` |
+| `X` / `x` | Hexadecimal | `{255:X}` → `FF` |
+| `P` / `p` | Percent | `{0.75:P}` → `75.00 %` |
+
+---
+
+## Verbatim & Raw Strings
+
+```csharp
+// Verbatim — backslashes treated literally
+string path = @"C:\Users\Alice\file.txt";
+
+// Multi-line verbatim
+string sql = @"
+    SELECT *
+    FROM users
+    WHERE active = 1";
+```
+
+---
+
+## What's Next?
+
+You can format any output. Next: **control flow** — if/else, switch expressions, and ternary operators.

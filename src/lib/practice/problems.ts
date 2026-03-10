@@ -54,6 +54,7 @@ int main() {
 const DEFAULT_JS = `// Your code here\nconsole.log("Hello, World!");`;
 const DEFAULT_JAVA = `public class Main {\n    public static void main(String[] args) {\n        // Your code here\n    }\n}`;
 const DEFAULT_RUST = `fn main() {\n    // Your code here\n    println!("Hello, World!");\n}`;
+const DEFAULT_CSHARP = `using System;\n\nclass Program {\n    static void Main() {\n        // Your code here\n    }\n}`;
 
 // ─── Combined problems ──────────────────────────────────────────────────────
 
@@ -153,6 +154,7 @@ export function getStarterForLanguage(
     case "javascript": return DEFAULT_JS;
     case "java":       return DEFAULT_JAVA;
     case "rust":       return DEFAULT_RUST;
+    case "csharp":     return DEFAULT_CSHARP;
     default:           return DEFAULT_GO;
   }
 }

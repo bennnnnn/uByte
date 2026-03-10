@@ -1,0 +1,91 @@
+---
+title: "Control Flow"
+description: "if/else, switch expressions, ternary operator, and pattern matching in C#."
+order: 4
+difficulty: "beginner"
+estimatedMinutes: 10
+---
+
+## if / else if / else
+
+```csharp
+int score = 85;
+
+if (score >= 90) {
+    Console.WriteLine("A");
+} else if (score >= 80) {
+    Console.WriteLine("B");
+} else {
+    Console.WriteLine("C or below");
+}
+```
+
+---
+
+## Ternary Operator
+
+```csharp
+string status = score >= 60 ? "Pass" : "Fail";
+Console.WriteLine(status);  // Pass
+```
+
+---
+
+## Null-Coalescing Assignment
+
+```csharp
+string? name = null;
+name ??= "Anonymous";       // assign only if null
+Console.WriteLine(name);    // Anonymous
+```
+
+---
+
+## switch Statement
+
+```csharp
+string day = "Monday";
+switch (day) {
+    case "Monday":
+    case "Tuesday":
+        Console.WriteLine("Early week");
+        break;
+    case "Friday":
+        Console.WriteLine("Almost weekend!");
+        break;
+    default:
+        Console.WriteLine("Other day");
+        break;
+}
+```
+
+---
+
+## switch Expression (C# 8+)
+
+```csharp
+string result = score switch {
+    >= 90 => "A",
+    >= 80 => "B",
+    >= 70 => "C",
+    _     => "F",
+};
+Console.WriteLine(result);
+```
+
+---
+
+## Pattern Matching with `is`
+
+```csharp
+object obj = "Hello";
+if (obj is string s && s.Length > 3) {
+    Console.WriteLine($"Long string: {s}");
+}
+```
+
+---
+
+## What's Next?
+
+You control program branching. Next: **loops** — for, while, do/while, foreach, and LINQ-style iteration.

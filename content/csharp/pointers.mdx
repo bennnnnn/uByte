@@ -1,0 +1,116 @@
+---
+title: "Properties and Value Semantics"
+description: "Fields, auto-properties, computed properties, init-only setters, and value vs reference semantics in C#."
+order: 9
+difficulty: "intermediate"
+estimatedMinutes: 12
+---
+
+## Fields vs Properties
+
+**Fields** are raw data; **properties** wrap them with `get`/`set` logic:
+
+```csharp
+class Person {
+    // auto-property: compiler generates the backing field
+    public string Name { get; set; } = "";
+    public int Age  { get; set; }
+
+    // computed property — no backing field
+    public bool IsAdult => Age >= 18;
+}
+
+var p = new Person { Name = "Alice", Age = 25 };
+Console.WriteLine(p.IsAdult);  // true
+```
+
+---
+
+## init-Only Properties (C# 9+)
+
+Set once during object initialisation:
+
+```csharp
+class Point {
+    public int X { get; init; }
+    public int Y { get; init; }
+}
+
+var pt = new Point { X = 3, Y = 4 };
+// pt.X = 5;  ← compile error after construction
+```
+
+---
+
+## Required Properties (C# 11+)
+
+```csharp
+class User {
+    public required string Email { get; set; }
+}
+// var u = new User();  ← compile error if Email not set
+var u = new User { Email = "a@b.com" };
+```
+
+---
+
+## Backing Field with Validation
+
+```csharp
+class BankAccount {
+    private decimal _balance;
+
+    public decimal Balance {
+        get => _balance;
+        set {
+            if (value < 0) throw new ArgumentOutOfRangeException(nameof(value));
+            _balance = value;
+        }
+    }
+}
+```
+
+---
+
+## Value vs Reference Semantics
+
+**struct** = value type (copied on assignment):
+
+```csharp
+struct Vector2 { public float X, Y; }
+
+Vector2 a = new Vector2 { X = 1, Y = 2 };
+Vector2 b = a;   // copy
+b.X = 99;
+Console.WriteLine(a.X);  // still 1
+```
+
+**class** = reference type (shared on assignment):
+
+```csharp
+class Box { public int Value; }
+
+Box a = new Box { Value = 1 };
+Box b = a;        // same object
+b.Value = 99;
+Console.WriteLine(a.Value);  // 99!
+```
+
+---
+
+## records — Immutable Value Objects (C# 9+)
+
+```csharp
+record Product(string Name, decimal Price);
+
+var p1 = new Product("Book", 9.99m);
+var p2 = p1 with { Price = 12.99m };  // non-destructive mutation
+Console.WriteLine(p1.Price);  // 9.99
+Console.WriteLine(p2.Price);  // 12.99
+```
+
+---
+
+## What's Next?
+
+You understand C# data modeling primitives. Next: **structs and classes** — constructors, inheritance, encapsulation.

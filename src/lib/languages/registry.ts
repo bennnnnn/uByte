@@ -5,6 +5,7 @@ import { highlightJavaScript } from "@/lib/highlight-javascript";
 import { highlightCpp } from "@/lib/highlight-cpp";
 import { highlightJava } from "@/lib/highlight-java";
 import { highlightRust } from "@/lib/highlight-rust";
+import { highlightCsharp } from "@/lib/highlight-csharp";
 
 export const LANGUAGES: Record<SupportedLanguage, LanguageConfig> = {
   go: {
@@ -135,6 +136,28 @@ export const LANGUAGES: Record<SupportedLanguage, LanguageConfig> = {
       ],
     },
   },
+  csharp: {
+    id: "csharp",
+    name: "C#",
+    slug: "csharp",
+    contentDir: "content/csharp",
+    defaultStarter: 'using System;\n\nclass Program {\n    static void Main() {\n        // Your code here\n        Console.WriteLine("Hello, World!");\n    }\n}',
+    fileExtension: ".cs",
+    seo: {
+      defaultTitle: "uByte — Learn C# Programming",
+      defaultDescription: "C# fundamentals to async/await and LINQ. Hands-on lessons with in-browser coding and instant feedback. Free starter tutorials; Pro for the full track.",
+      keywords: [
+        "C# programming",
+        "Learn C#",
+        "C# tutorial",
+        "C# for beginners",
+        "free C# course",
+        "interactive C#",
+        ".NET programming",
+        "uByte",
+      ],
+    },
+  },
 };
 
 /** Get highlighter function for a language (client-side syntax highlighting) */
@@ -152,6 +175,8 @@ export function getHighlighter(lang: SupportedLanguage): (code: string) => strin
       return highlightJava;
     case "rust":
       return highlightRust;
+    case "csharp":
+      return highlightCsharp;
     default:
       return (code: string) =>
         code.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");

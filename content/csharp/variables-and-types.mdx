@@ -1,0 +1,86 @@
+---
+title: "Variables and Types"
+description: "Learn value types, reference types, constants, type conversion, and nullability in C#."
+order: 2
+difficulty: "beginner"
+estimatedMinutes: 12
+---
+
+## Value vs Reference Types
+
+C# has two categories of types:
+
+**Value types** store data directly:
+```csharp
+int x = 10;
+bool flag = true;
+char letter = 'A';
+double price = 9.99;
+```
+
+**Reference types** store a reference (pointer) to data:
+```csharp
+string name = "Alice";
+int[] numbers = { 1, 2, 3 };
+```
+
+---
+
+## Constants
+
+Use `const` for compile-time constants:
+
+```csharp
+const double Pi = 3.14159;
+const string AppName = "uByte";
+```
+
+Use `readonly` for values set once at runtime:
+
+```csharp
+readonly DateTime startTime = DateTime.Now;
+```
+
+---
+
+## Type Conversion
+
+**Implicit** (safe, no data loss):
+```csharp
+int i = 42;
+long l = i;       // int → long (widening)
+double d = i;     // int → double
+```
+
+**Explicit cast** (may lose precision):
+```csharp
+double pi = 3.99;
+int truncated = (int)pi;   // 3
+```
+
+**Parse from string**:
+```csharp
+int n = int.Parse("42");
+bool ok = int.TryParse("abc", out int result);  // ok = false, safe
+```
+
+---
+
+## Nullable Types
+
+Add `?` to allow a value type to hold `null`:
+
+```csharp
+int? age = null;
+if (age.HasValue) {
+    Console.WriteLine(age.Value);
+}
+// Null-coalescing: use default when null
+int display = age ?? 0;
+```
+
+---
+
+## What's Next?
+
+You know the type system. Next: **print formatting** — `Console.Write`, `Console.WriteLine`, string interpolation, and format specifiers.

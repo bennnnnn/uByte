@@ -1,0 +1,109 @@
+---
+title: "Testing Basics"
+description: "Unit testing with xUnit, Assert, test-driven development, and mocking fundamentals in C#."
+order: 16
+difficulty: "intermediate"
+estimatedMinutes: 12
+---
+
+## Why Test?
+
+Tests catch regressions, document intent, and enable confident refactoring. The C# ecosystem has three major test frameworks: **xUnit** (most popular), NUnit, and MSTest.
+
+---
+
+## Setting Up xUnit
+
+```bash
+dotnet new xunit -n MyApp.Tests
+cd MyApp.Tests
+dotnet add reference ../MyApp/MyApp.csproj
+```
+
+---
+
+## Writing Your First Test
+
+```csharp
+using Xunit;
+
+public class MathTests {
+    [Fact]
+    public void Add_TwoNumbers_ReturnsSum() {
+        // Arrange
+        int a = 3, b = 4;
+
+        // Act
+        int result = MathHelper.Add(a, b);
+
+        // Assert
+        Assert.Equal(7, result);
+    }
+}
+```
+
+---
+
+## Common Assertions
+
+```csharp
+Assert.Equal(expected, actual);
+Assert.NotEqual(a, b);
+Assert.True(condition);
+Assert.False(condition);
+Assert.Null(obj);
+Assert.NotNull(obj);
+Assert.Throws<DivideByZeroException>(() => Divide(1, 0));
+Assert.Contains("hello", "say hello world");
+```
+
+---
+
+## Parameterized Tests (Theory)
+
+```csharp
+[Theory]
+[InlineData(2, 4)]
+[InlineData(3, 9)]
+[InlineData(5, 25)]
+public void Square_ReturnsCorrectValue(int input, int expected) {
+    Assert.Equal(expected, input * input);
+}
+```
+
+---
+
+## Setup and Teardown
+
+```csharp
+public class DatabaseTests : IDisposable {
+    private readonly FakeDatabase _db;
+
+    public DatabaseTests() {
+        _db = new FakeDatabase();  // runs before each test
+    }
+
+    [Fact]
+    public void InsertAndRetrieve() {
+        _db.Insert(new User { Name = "Alice" });
+        Assert.Single(_db.GetAll());
+    }
+
+    public void Dispose() => _db.Cleanup();  // runs after each test
+}
+```
+
+---
+
+## Running Tests
+
+```bash
+dotnet test           # run all tests
+dotnet test --filter "FullyQualifiedName~Add"  # filter by name
+```
+
+---
+
+## What's Next?
+
+You can write reliable, testable code. Next: **HTTP basics** — HttpClient, REST calls, and response handling.

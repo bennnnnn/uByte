@@ -1,0 +1,103 @@
+---
+title: "JSON Encoding"
+description: "Serialize and deserialize JSON with System.Text.Json, custom converters, and JsonNode in C#."
+order: 18
+difficulty: "intermediate"
+estimatedMinutes: 10
+---
+
+## System.Text.Json
+
+Built-in since .NET 3.0 — no extra packages needed:
+
+```csharp
+using System.Text.Json;
+```
+
+---
+
+## Serialize (Object → JSON)
+
+```csharp
+var user = new { Name = "Alice", Age = 30, Tags = new[] { "dev", "cs" } };
+
+string json = JsonSerializer.Serialize(user);
+Console.WriteLine(json);
+// {"Name":"Alice","Age":30,"Tags":["dev","cs"]}
+
+// Pretty-print
+string pretty = JsonSerializer.Serialize(user,
+    new JsonSerializerOptions { WriteIndented = true });
+```
+
+---
+
+## Deserialize (JSON → Object)
+
+Define a class matching your JSON:
+
+```csharp
+class Post {
+    public int Id { get; set; }
+    public string Title { get; set; } = "";
+    public string Body  { get; set; } = "";
+}
+
+string json = """{"id":1,"title":"Hello","body":"World"}""";
+var post = JsonSerializer.Deserialize<Post>(json,
+    new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+
+Console.WriteLine(post?.Title);  // Hello
+```
+
+---
+
+## JsonSerializerOptions
+
+```csharp
+var options = new JsonSerializerOptions {
+    PropertyNamingPolicy = JsonNamingPolicy.CamelCase,  // Name → name
+    WriteIndented        = true,
+    DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+};
+```
+
+---
+
+## Attributes
+
+```csharp
+class Product {
+    [JsonPropertyName("product_name")]
+    public string Name { get; set; } = "";
+
+    [JsonIgnore]
+    public string InternalCode { get; set; } = "";
+}
+```
+
+---
+
+## Dynamic JSON with JsonNode (C# 6+)
+
+When you don't know the schema:
+
+```csharp
+var node = JsonNode.Parse(json);
+string? title = node?["title"]?.GetValue<string>();
+```
+
+---
+
+## Streams (Memory-Efficient)
+
+```csharp
+using var stream = File.OpenRead("data.json");
+var data = await JsonSerializer.DeserializeAsync<List<Post>>(stream);
+```
+
+---
+
+## What's Next?
+
+You can work with any JSON API or file. Next: **switch expressions and pattern matching** — advanced control flow, type patterns, and property patterns.

@@ -1,0 +1,100 @@
+---
+title: "Dictionaries and Sets"
+description: "Dictionary<K,V>, HashSet<T>, iteration, and common collection patterns in C#."
+order: 7
+difficulty: "beginner"
+estimatedMinutes: 10
+---
+
+## Dictionary\<TKey, TValue\>
+
+Key-value pairs with O(1) average lookup:
+
+```csharp
+using System.Collections.Generic;
+
+var capitals = new Dictionary<string, string> {
+    ["France"] = "Paris",
+    ["Germany"] = "Berlin",
+};
+capitals["Italy"] = "Rome";
+Console.WriteLine(capitals["France"]);  // Paris
+Console.WriteLine(capitals.Count);      // 3
+```
+
+---
+
+## Safe Lookup
+
+```csharp
+if (capitals.TryGetValue("Spain", out string city)) {
+    Console.WriteLine(city);
+} else {
+    Console.WriteLine("Not found");
+}
+
+// Null-safe alternative (returns null if missing)
+string? result = capitals.GetValueOrDefault("Spain");
+```
+
+---
+
+## Iterating
+
+```csharp
+foreach (var (key, value) in capitals) {
+    Console.WriteLine($"{key} → {value}");
+}
+
+// Keys and values separately
+foreach (string country in capitals.Keys) { ... }
+foreach (string cap in capitals.Values) { ... }
+```
+
+---
+
+## Checking Existence
+
+```csharp
+bool hasKey = capitals.ContainsKey("France");     // true
+bool hasVal = capitals.ContainsValue("Paris");    // true
+capitals.Remove("Germany");
+```
+
+---
+
+## HashSet\<T\>
+
+Unordered collection of **unique** values:
+
+```csharp
+var set = new HashSet<int> { 1, 2, 3 };
+set.Add(2);              // ignored — already present
+Console.WriteLine(set.Count);  // 3
+bool has = set.Contains(3);    // true
+
+// Set operations
+var a = new HashSet<int> { 1, 2, 3 };
+var b = new HashSet<int> { 2, 3, 4 };
+a.IntersectWith(b);   // a = {2,3}
+a.UnionWith(b);       // a = {2,3,4}
+```
+
+---
+
+## Word Frequency (Classic Pattern)
+
+```csharp
+string[] words = { "go", "code", "go", "learn", "code", "go" };
+var freq = new Dictionary<string, int>();
+foreach (var w in words) {
+    freq[w] = freq.GetValueOrDefault(w) + 1;
+}
+// freq: { "go": 3, "code": 2, "learn": 1 }
+```
+
+---
+
+## What's Next?
+
+You can store and look up any keyed data. Next: **functions** — parameters, return types, overloads, and expression-bodied members.

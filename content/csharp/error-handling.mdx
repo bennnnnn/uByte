@@ -1,0 +1,104 @@
+---
+title: "Error Handling"
+description: "Exceptions, try/catch/finally, custom exceptions, and the Result pattern in C#."
+order: 13
+difficulty: "intermediate"
+estimatedMinutes: 12
+---
+
+## try / catch / finally
+
+```csharp
+try {
+    int[] arr = new int[3];
+    arr[10] = 1;                        // throws IndexOutOfRangeException
+} catch (IndexOutOfRangeException ex) {
+    Console.WriteLine($"Index error: {ex.Message}");
+} catch (Exception ex) {               // catch-all
+    Console.WriteLine($"Unexpected: {ex.Message}");
+} finally {
+    Console.WriteLine("Always runs");   // cleanup code
+}
+```
+
+---
+
+## Throwing Exceptions
+
+```csharp
+static int Divide(int a, int b) {
+    if (b == 0) throw new DivideByZeroException("Cannot divide by zero");
+    return a / b;
+}
+```
+
+Rethrow preserving stack trace:
+
+```csharp
+catch (Exception ex) {
+    Log(ex);
+    throw;  // re-throw (not 'throw ex')
+}
+```
+
+---
+
+## Custom Exceptions
+
+```csharp
+class ValidationException : Exception {
+    public string Field { get; }
+
+    public ValidationException(string field, string message)
+        : base(message) {
+        Field = field;
+    }
+}
+
+throw new ValidationException("Email", "Invalid email format");
+```
+
+---
+
+## Exception Filters (C# 6+)
+
+```csharp
+try {
+    // ...
+} catch (HttpException ex) when (ex.StatusCode == 404) {
+    Console.WriteLine("Not found");
+} catch (HttpException ex) when (ex.StatusCode >= 500) {
+    Console.WriteLine("Server error");
+}
+```
+
+---
+
+## using Statement — Automatic Disposal
+
+For types that implement `IDisposable`:
+
+```csharp
+using var stream = new FileStream("data.txt", FileMode.Open);
+// stream.Dispose() is called automatically at end of scope
+```
+
+---
+
+## The TryXxx Pattern (No Exceptions for Control Flow)
+
+```csharp
+if (int.TryParse("abc", out int n)) {
+    Console.WriteLine(n);
+} else {
+    Console.WriteLine("Not a number");
+}
+```
+
+Prefer `TryXxx` over try/catch for expected failure paths — it's faster and cleaner.
+
+---
+
+## What's Next?
+
+You can handle failures gracefully. Next: **namespaces and modules** — organizing code, using directives, and assembly structure.

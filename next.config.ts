@@ -54,7 +54,11 @@ const nextConfig: NextConfig = {
     removeConsole: process.env.NODE_ENV === "production" ? { exclude: ["error", "warn"] } : false,
   },
   async redirects() {
-    const tutorialLangs = ["go", "python", "cpp", "javascript", "java", "rust"];
+    // Derive from the registry so adding a new language here is automatic.
+    // Import inline to avoid Next.js config tree-shaking issues.
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { getAllLanguageSlugs } = require("./src/lib/languages/registry") as { getAllLanguageSlugs: () => string[] };
+    const tutorialLangs = getAllLanguageSlugs();
     const langRedirects = tutorialLangs.flatMap((lang) => [
       { source: `/${lang}`, destination: `/tutorial/${lang}`, permanent: true },
       { source: `/${lang}/:path*`, destination: `/tutorial/${lang}/:path*`, permanent: true },

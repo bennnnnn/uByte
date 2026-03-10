@@ -1,0 +1,111 @@
+---
+title: "Structs and Classes"
+description: "Defining classes, constructors, access modifiers, inheritance, and structs in C#."
+order: 10
+difficulty: "intermediate"
+estimatedMinutes: 15
+---
+
+## Defining a Class
+
+```csharp
+class Animal {
+    public string Name { get; }
+    public int Age  { get; }
+
+    public Animal(string name, int age) {
+        Name = name;
+        Age  = age;
+    }
+
+    public virtual string Speak() => "...";
+
+    public override string ToString() => $"{Name} (age {Age})";
+}
+```
+
+---
+
+## Inheritance
+
+```csharp
+class Dog : Animal {
+    public Dog(string name, int age) : base(name, age) { }
+
+    public override string Speak() => "Woof!";
+}
+
+var d = new Dog("Rex", 3);
+Console.WriteLine(d.Speak());  // Woof!
+Console.WriteLine(d);          // Rex (age 3)
+```
+
+---
+
+## Access Modifiers
+
+| Modifier | Visible From |
+|----------|-------------|
+| `public` | Everywhere |
+| `private` | Same class only |
+| `protected` | Same class + subclasses |
+| `internal` | Same assembly |
+| `private protected` | Same class + subclasses in same assembly |
+
+---
+
+## abstract Classes
+
+Cannot be instantiated; force subclasses to implement:
+
+```csharp
+abstract class Shape {
+    public abstract double Area();
+    public void Print() => Console.WriteLine($"Area = {Area():F2}");
+}
+
+class Circle : Shape {
+    double _r;
+    public Circle(double r) => _r = r;
+    public override double Area() => Math.PI * _r * _r;
+}
+```
+
+---
+
+## sealed Classes
+
+Prevent further inheritance:
+
+```csharp
+sealed class Singleton { /* ... */ }
+```
+
+---
+
+## Structs
+
+Lightweight value types — use when:
+- Small and logically representing a single value
+- Short-lived, frequently created objects
+- Performance-critical code (no heap allocation)
+
+```csharp
+struct Point {
+    public double X { get; }
+    public double Y { get; }
+    public Point(double x, double y) { X = x; Y = y; }
+    public double Distance(Point other) =>
+        Math.Sqrt(Math.Pow(X - other.X, 2) + Math.Pow(Y - other.Y, 2));
+}
+
+var p1 = new Point(0, 0);
+var p2 = new Point(3, 4);
+Console.WriteLine(p1.Distance(p2));  // 5
+```
+
+---
+
+## What's Next?
+
+You can model complex data. Next: **methods in depth** — extension methods, static classes, operator overloading.

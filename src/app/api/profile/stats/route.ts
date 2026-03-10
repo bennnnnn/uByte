@@ -34,14 +34,9 @@ import { withErrorHandling, requireAuth } from "@/lib/api-utils";
 import { ALL_LANGUAGE_KEYS } from "@/lib/languages/registry";
 import type { SupportedLanguage } from "@/lib/languages/types";
 
-const LANG_META: Record<string, { icon: string; name: string }> = {
-  go:         { icon: "🐹", name: "Go" },
-  python:     { icon: "🐍", name: "Python" },
-  javascript: { icon: "🟨", name: "JavaScript" },
-  java:       { icon: "☕", name: "Java" },
-  rust:       { icon: "🦀", name: "Rust" },
-  cpp:        { icon: "⚙️", name: "C++" },
-};
+// Derive icons/names from the shared registry so adding a language here is automatic.
+import { LANG_ICONS } from "@/lib/languages/icons";
+import { LANGUAGES } from "@/lib/languages/registry";
 
 export const GET = withErrorHandling("GET /api/profile/stats", async () => {
   const { user: tokenUser, response } = await requireAuth();
@@ -72,7 +67,7 @@ export const GET = withErrorHandling("GET /api/profile/stats", async () => {
     const completed = stepCountMap.get(lang) ?? 0;
     completedLessons += completed;
 
-    const meta = LANG_META[lang] ?? { icon: "📄", name: lang };
+    const meta = { icon: LANG_ICONS[lang] ?? "📝", name: LANGUAGES[lang]?.name ?? lang };
     return {
       lang,
       name: meta.name,

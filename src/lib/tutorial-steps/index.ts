@@ -5,18 +5,37 @@ import { cppSteps } from "./cpp";
 import { javascriptSteps } from "./javascript";
 import { javaSteps } from "./java";
 import { rustSteps } from "./rust";
+import { csharpSteps } from "./csharp";
 import type { SupportedLanguage } from "../languages/types";
 import { loadStepsFromContent } from "./load-from-content";
 import { getAllTutorials } from "../tutorials";
 
-/** Steps per language. Fallback when content/<lang>/<slug>.steps.json is not present. */
+/**
+ * Steps per language. Fallback when content/<lang>/<slug>.steps.json is not present.
+ *
+ * HOW TO ADD A NEW LANGUAGE:
+ *   1. Add language key to SupportedLanguage in src/lib/languages/types.ts
+ *   2. Add language config in src/lib/languages/registry.ts
+ *   3. Create src/lib/highlight-<lang>.ts and wire into registry getHighlighter()
+ *   4. Create src/lib/languages/icons.ts entries (LANG_ICONS + PRACTICE_TAGLINES)
+ *   5. Add Judge0 language ID to src/lib/judge0.ts
+ *   6. Create content/<lang>/*.mdx tutorial files
+ *   7. Create src/lib/tutorial-steps/<lang>/index.ts + step files
+ *   8. Add the import and entry below in stepsByLanguage
+ *   9. Add default starter in src/lib/practice/problems.ts (DEFAULT_X + switch case)
+ *  10. Add exam content in src/lib/exams/content.ts (if certifications needed)
+ *
+ * Everything else (profile stats, tutorial pages, practice pages, sitemap, nav)
+ * auto-updates from the registry and this map.
+ */
 const stepsByLanguage: Record<SupportedLanguage, Record<string, TutorialStep[]>> = {
-  go: goSteps,
-  python: pythonSteps,
-  cpp: cppSteps,
+  go:         goSteps,
+  python:     pythonSteps,
+  cpp:        cppSteps,
   javascript: javascriptSteps,
-  java: javaSteps,
-  rust: rustSteps,
+  java:       javaSteps,
+  rust:       rustSteps,
+  csharp:     csharpSteps,
 };
 
 /**

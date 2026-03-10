@@ -1,0 +1,114 @@
+---
+title: "Async/Await and Concurrency"
+description: "async/await, Task, Task<T>, parallel execution, cancellation, and thread safety in C#."
+order: 15
+difficulty: "intermediate"
+estimatedMinutes: 15
+---
+
+## The async/await Pattern
+
+Mark a method `async` to use `await` inside it. Awaiting a `Task` releases the thread until the work completes:
+
+```csharp
+using System.Net.Http;
+
+static async Task<string> FetchPageAsync(string url) {
+    using var client = new HttpClient();
+    return await client.GetStringAsync(url);
+}
+
+// Call with await at the top level
+string html = await FetchPageAsync("https://example.com");
+Console.WriteLine(html[..100]);
+```
+
+---
+
+## Task and Task\<T\>
+
+```csharp
+// Fire-and-forget
+Task.Run(() => Console.WriteLine("Background work"));
+
+// With return value
+Task<int> task = Task.Run(() => 42);
+int result = await task;
+
+// Delay
+await Task.Delay(1000);  // non-blocking sleep
+```
+
+---
+
+## Running Tasks in Parallel
+
+```csharp
+var t1 = FetchPageAsync("https://example.com");
+var t2 = FetchPageAsync("https://microsoft.com");
+
+// Wait for both concurrently
+var results = await Task.WhenAll(t1, t2);
+Console.WriteLine($"Got {results.Length} pages");
+```
+
+---
+
+## CancellationToken
+
+Allow long-running operations to be cancelled:
+
+```csharp
+using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
+
+try {
+    await DoWorkAsync(cts.Token);
+} catch (OperationCanceledException) {
+    Console.WriteLine("Timed out");
+}
+
+static async Task DoWorkAsync(CancellationToken ct) {
+    for (int i = 0; i < 100; i++) {
+        ct.ThrowIfCancellationRequested();
+        await Task.Delay(100, ct);
+    }
+}
+```
+
+---
+
+## lock — Thread Safety
+
+```csharp
+class Counter {
+    private int _count;
+    private readonly object _lock = new();
+
+    public void Increment() {
+        lock (_lock) {
+            _count++;
+        }
+    }
+
+    public int Value => _count;
+}
+```
+
+---
+
+## Parallel.ForEach
+
+CPU-bound parallel work:
+
+```csharp
+var items = Enumerable.Range(1, 1000).ToList();
+Parallel.ForEach(items, item => {
+    // heavy computation per item
+});
+```
+
+---
+
+## What's Next?
+
+You can write non-blocking, high-performance code. Next: **testing** — unit tests with xUnit, assertions, and test-driven development.
