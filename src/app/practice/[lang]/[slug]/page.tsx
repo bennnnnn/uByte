@@ -14,7 +14,7 @@ import { absoluteUrl, SITE_KEYWORDS } from "@/lib/seo";
 
 type Props = {
   params: Promise<{ lang: string; slug: string }>;
-  searchParams: Promise<{ category?: string; page?: string; status?: string; difficulty?: string; share?: string; mode?: string; deadline?: string }>;
+  searchParams: Promise<{ category?: string; page?: string; status?: string; difficulty?: string; share?: string; mode?: string; deadline?: string; daily?: string }>;
 };
 
 /** Decode a base64+URI-encoded shared code snippet — returns undefined on any error. */
@@ -73,13 +73,20 @@ export default async function PracticeProblemPage({ params, searchParams }: Prop
 
   const user = await getCurrentUser();
 
-  let canAccess = false;
+  // Daily challenge is always free — verify the slug matches today's actual daily problem.
+  const isDailyChallenge = sp.daily === "1" && (() => {
+    const all = getAllPracticeProblems();
+    const epochDay = Math.floor(Date.now() / (1000 * 60 * 60 * 24));
+    return all.length > 0 && all[epochDay % all.length]?.slug === slug;
+  })();
+
+  let canAccess = isDailyChallenge; // daily challenge bypasses the paywall
   let dripMessage = "";
 
-  if (!user) {
+  if (!isDailyChallenge && !user) {
     canAccess = false;
-    dripMessage = "Sign up free to start solving problems — 2 new problems unlock every day.";
-  } else {
+    dripMessage = "Sign up free to start solving problems. The daily challenge is always free — no account needed.";
+  } else if (!isDailyChallenge) {
     const profile = await getUserById(user.userId);
     if (hasPaidAccess(profile?.plan)) {
       canAccess = true;
