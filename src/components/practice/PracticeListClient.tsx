@@ -211,7 +211,7 @@ export function PracticeListClient({
             <div className="mt-4 flex items-center gap-3 rounded-xl border border-indigo-200 bg-indigo-50/50 px-4 py-3 dark:border-indigo-900 dark:bg-indigo-950/30">
               <span className="text-lg">🔓</span>
               <p className="flex-1 text-sm text-zinc-700 dark:text-zinc-300">
-                <Link href="/auth?mode=signup" className="font-semibold text-indigo-600 hover:underline dark:text-indigo-400">
+                <Link href="/signup" className="font-semibold text-indigo-600 hover:underline dark:text-indigo-400">
                   Sign up free
                 </Link>{" "}
                 to unlock problems — 2 new ones every day.
