@@ -158,7 +158,7 @@ export function useStepProgress(
     }).catch(() => {});
   }, [userId, lang, tutorialSlug, stepIndex]);
 
-  // ── Load completed steps from DB (per-question progress) ──
+  // ── Restore step progress from DB on mount ──
   useEffect(() => {
     if (userId == null || !tutorialSlug) return;
     apiFetch(`/api/progress/steps?slug=${encodeURIComponent(tutorialSlug)}&lang=${encodeURIComponent(lang)}`)
@@ -166,10 +166,13 @@ export function useStepProgress(
       .then((d) => {
         const completed: number[] = Array.isArray(d?.steps) ? d.steps : [];
         const skipped: number[] = Array.isArray(d?.skippedSteps) ? d.skippedSteps : [];
-        // If ALL steps for this tutorial were already saved in the DB, the tutorial
-        // was previously completed. Pre-set markedRef so the completion useEffect
-        // below does NOT fire and accidentally call toggleProgress with completed=false
-        // (which would call markIncomplete and wipe the progress row).
+
+        // IMPORTANT: if all steps are already in the DB, the tutorial was previously
+        // completed. Set markedRef=true NOW (before setCompletedSteps triggers a
+        // re-render) so the "tutorial completion" effect below never fires on reload.
+        // Without this, the effect would see completedSteps.size===steps.length,
+        // call toggleProgress, and — because the slug is already in progressByLang —
+        // accidentally send completed=false (markIncomplete), wiping the DB row.
         if (steps.length > 0 && (completed.length + skipped.length) >= steps.length) {
           markedRef.current = true;
         }
@@ -179,13 +182,11 @@ export function useStepProgress(
       .catch(() => {});
   }, [userId, tutorialSlug, lang, steps.length]);
 
-  // ── Tutorial completion ──
+  // ── Chapter completion — fires once when the user passes the LAST step ──
   useEffect(() => {
-    // NOTE: intentionally omitting `progress` from both deps and the condition.
-    // `progress` in context only holds Go slugs, so `!progress.includes(slug)` would
-    // incorrectly block saving when a non-Go language shares a slug with an already-
-    // completed Go tutorial (e.g. both Go and Rust have an "introduction" tutorial).
-    // Deduplication is handled by: (1) markedRef per-mount, (2) ON CONFLICT DO NOTHING in DB.
+    // markedRef guards against double-firing (e.g. on re-renders or after DB restore).
+    // toggleProgress always sends completed=true; ON CONFLICT DO NOTHING makes it safe
+    // to call more than once. See AuthProvider.tsx for the two-table progress model.
     if (completedSteps.size === steps.length && steps.length > 0 && !markedRef.current) {
       markedRef.current = true;
       setTutorialDone(true);
@@ -401,7 +402,8 @@ export function useStepProgress(
         setAiFeedbackLoginRequired(false);
         hintInflightRef.current = false;
         setCompletedSteps((prev) => new Set([...prev, stepIndex]));
-        // Increment the live step count so the progress bar updates instantly.
+        // Increment the in-memory step count so the progress bar updates immediately
+        // without waiting for a DB refetch. The DB write happens via /api/progress/steps.
         if (userId != null) incrementStepCount(lang);
         apiFetch("/api/step-check", {
           method: "POST",

@@ -1,3 +1,21 @@
+/**
+ * progress.ts — tutorial-level completion tracking
+ *
+ * ─── PROGRESS MODEL ────────────────────────────────────────────────────────
+ * This table tracks CHAPTER completion, NOT lesson (step) completion.
+ *
+ *   progress  (THIS FILE)
+ *     • One row per (user_id, language, tutorial_slug).
+ *     • Written only when a user passes ALL steps in a chapter.
+ *     • Used for: ✓ checkmarks on tutorial cards, XP, streaks, badges.
+ *     • DO NOT use for progress bar counts — partial chapters count as zero.
+ *
+ *   step_progress  (see lib/db/step-progress.ts)
+ *     • One row per (user_id, language, tutorial_slug, step_index).
+ *     • Written for every individual step pass.
+ *     • Source of truth for ALL "X / 101 lessons" progress bars.
+ * ───────────────────────────────────────────────────────────────────────────
+ */
 import { getSql } from "./client";
 import { clearStepProgress } from "./step-progress";
 

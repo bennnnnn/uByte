@@ -1,15 +1,29 @@
 /**
- * Profile stats API.
+ * Profile stats API — /api/profile/stats
  *
- * Progress is measured in LESSONS (steps within tutorials), not tutorials (MDX files).
- * This matches the homepage display ("X lessons" on tutorial cards).
+ * ─── PROGRESS MODEL ────────────────────────────────────────────────────────
+ * A "lesson" = one individual STEP inside a tutorial chapter.
+ * Go has ~20 chapters (tutorial slugs) but 101 lessons (steps).
  *
- * - total_tutorials  = sum of getTotalLessonCount(lang) across all languages
- * - completed_count  = for each completed tutorial, sum its step count
- * - byLanguage[]     = per-language breakdown with the same lesson-based counts
+ * TWO tables, two purposes:
+ *   step_progress  — one row per (user, lang, tutorial_slug, step_index)
+ *                    Written every time a user passes a single step.
+ *                    Source of truth for ALL progress bars and counts.
+ *                    skipped=TRUE rows are NOT counted in progress.
  *
- * Lesson counts are dynamic — adding new tutorials/steps updates automatically.
- * See src/lib/tutorial-steps/index.ts for the resolution order and how to add tutorials.
+ *   progress       — one row per (user, lang, tutorial_slug)
+ *                    Written only when a user finishes ALL steps in a chapter.
+ *                    Used only for: green checkmarks on tutorial cards,
+ *                    badges, streak/XP rewards.
+ *
+ * DO NOT count progress from the `progress` table for display numbers —
+ * partial chapters would show as zero. Always use step_progress counts.
+ * ───────────────────────────────────────────────────────────────────────────
+ *
+ * Response fields:
+ *   completed_count  = total non-skipped steps across all languages
+ *   total_tutorials  = total available steps across all languages
+ *   byLanguage[]     = per-language breakdown (same lesson-based counts)
  */
 import { NextResponse } from "next/server";
 import { getUserById, getAchievements, getActivityCount } from "@/lib/db";

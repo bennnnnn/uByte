@@ -49,23 +49,34 @@ const UserContext = createContext<UserContextType>({
 
 // ─── App Data Context (progress, profile, views) ────
 
+/**
+ * PROGRESS MODEL — two separate concepts, do NOT mix:
+ *
+ *  progressByLang   — completed CHAPTER slugs per language (from `progress` table).
+ *                     A chapter is only here when ALL its steps are done.
+ *                     Use for: ✓ checkmarks on tutorial cards, "Tutorial complete" modal.
+ *
+ *  stepCountByLang  — count of individually passed steps per language (from `step_progress`).
+ *                     Counts every step the moment it's passed, even in a partial chapter.
+ *                     Use for: ALL "X / 101 lessons" progress bars & profile stats.
+ *
+ * Adding to stepCountByLang:
+ *   • On login  → loaded from DB via GET /api/progress/all (stepCounts field).
+ *   • Each step → incrementStepCount(lang) called in useStepProgress.handleCheck.
+ */
 interface AppDataContextType {
-  /** Completed tutorial slugs for every language. Key = language id (e.g. "go", "rust"). */
+  /** Chapter slugs fully completed per language. For checkmarks only — NOT for progress bars. */
   progressByLang: Record<string, string[]>;
-  /** Convenience alias — slugs completed in Go. Kept for backward compat. */
+  /** Convenience alias — Go slugs. Kept for backward compat. */
   progress: string[];
-  /**
-   * Count of individually completed (non-skipped) steps per language.
-   * This is what drives the "X / 101 lessons" progress bars.
-   * Loaded from step_progress table on login; incremented locally on each step pass.
-   */
+  /** Individual steps passed per language. Source of truth for all progress bars. */
   stepCountByLang: Record<string, number>;
   profile: ProfileData | null;
   viewCount: number;
   limited: boolean;
   recordView: (slug: string) => Promise<void>;
   toggleProgress: (slug: string, lang?: string) => Promise<void>;
-  /** Increment the local step count for a language when a step is passed. */
+  /** Call when a step is passed (not skipped) to update the progress bar instantly. */
   incrementStepCount: (lang: string) => void;
   refreshProfile: () => Promise<void>;
 }

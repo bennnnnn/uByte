@@ -1,3 +1,26 @@
+/**
+ * step-progress.ts — individual step completion tracking
+ *
+ * ─── PROGRESS MODEL ────────────────────────────────────────────────────────
+ * A "lesson" = one STEP inside a tutorial chapter.
+ * Go has ~20 chapters but 101 lessons (steps total).
+ *
+ * TWO tables, two purposes — do NOT mix them up:
+ *
+ *   step_progress  (THIS FILE)
+ *     • One row per (user_id, language, tutorial_slug, step_index).
+ *     • Written when a user passes or skips any individual step.
+ *     • skipped=TRUE rows exist but are EXCLUDED from progress counts.
+ *     • Source of truth for ALL "X / 101 lessons" progress bars.
+ *
+ *   progress  (see lib/db/progress.ts)
+ *     • One row per (user_id, language, tutorial_slug).
+ *     • Written only when a user finishes EVERY step in a chapter.
+ *     • Used only for: ✓ checkmarks on tutorial cards, XP rewards, badges.
+ *     • DO NOT use this table for progress bar counts — partial chapters
+ *       would count as zero.
+ * ───────────────────────────────────────────────────────────────────────────
+ */
 import { getSql } from "./client";
 
 const DEFAULT_LANG = "go";
