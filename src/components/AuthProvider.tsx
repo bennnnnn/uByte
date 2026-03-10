@@ -131,9 +131,27 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
           fetch("/api/progress/all", { credentials: "same-origin" }),
           fetch("/api/profile", { credentials: "same-origin" }),
         ]);
-        const progData = progRes.ok ? await progRes.json() : { progress: {} };
         const profData = profRes.ok ? await profRes.json() : {};
-        setProgressByLang(progData.progress || {});
+        // If /api/progress/all fails or returns empty, fall back to Go-only
+        // so the user doesn't see a blank dashboard.
+        let byLang: Record<string, string[]> = {};
+        if (progRes.ok) {
+          const progData = await progRes.json().catch(() => ({}));
+          byLang = (progData.progress && Object.keys(progData.progress).length > 0)
+            ? progData.progress
+            : {};
+        }
+        if (Object.keys(byLang).length === 0) {
+          // Fallback: load at least Go progress the old way
+          const goRes = await fetch("/api/progress?lang=go", { credentials: "same-origin" });
+          if (goRes.ok) {
+            const goData = await goRes.json().catch(() => ({}));
+            if (Array.isArray(goData.progress) && goData.progress.length > 0) {
+              byLang = { go: goData.progress };
+            }
+          }
+        }
+        setProgressByLang(byLang);
         const prof = extractProfile(profData);
         if (prof) {
           setProfile(prof);
@@ -170,8 +188,23 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
         fetch("/api/progress/all", { credentials: "same-origin" }),
         fetch("/api/profile", { credentials: "same-origin" }),
       ]);
-      const progData = progRes.ok ? await progRes.json() : { progress: {} };
-      setProgressByLang(progData.progress || {});
+      let byLang: Record<string, string[]> = {};
+      if (progRes.ok) {
+        const progData = await progRes.json().catch(() => ({}));
+        byLang = (progData.progress && Object.keys(progData.progress).length > 0)
+          ? progData.progress
+          : {};
+      }
+      if (Object.keys(byLang).length === 0) {
+        const goRes = await fetch("/api/progress?lang=go", { credentials: "same-origin" });
+        if (goRes.ok) {
+          const goData = await goRes.json().catch(() => ({}));
+          if (Array.isArray(goData.progress) && goData.progress.length > 0) {
+            byLang = { go: goData.progress };
+          }
+        }
+      }
+      setProgressByLang(byLang);
       if (profRes.ok) {
         const profData = await profRes.json();
         const prof = extractProfile(profData);

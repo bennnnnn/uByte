@@ -17,33 +17,39 @@ let _migrated = false;
 async function ensureLanguageColumn(): Promise<void> {
   if (_migrated) return;
   const sql = getSql();
+  try {
+    // Step 1: add language column — sets default 'go' for all existing rows.
+    // IF NOT EXISTS makes this a no-op once the column is there.
+    await sql`ALTER TABLE progress ADD COLUMN IF NOT EXISTS language TEXT NOT NULL DEFAULT 'go'`;
 
-  // Step 1: add language column — sets default 'go' for all existing rows.
-  // IF NOT EXISTS makes this a no-op once the column is there.
-  await sql`ALTER TABLE progress ADD COLUMN IF NOT EXISTS language TEXT NOT NULL DEFAULT 'go'`;
+    // Step 1b: backfill any rows that got NULL (possible if the column was previously
+    // added as nullable in a partial migration run).
+    await sql`UPDATE progress SET language = 'go' WHERE language IS NULL OR language = ''`;
 
-  // Step 1b: backfill any rows that got NULL (possible if the column was previously
-  // added as nullable in a partial migration run).
-  await sql`UPDATE progress SET language = 'go' WHERE language IS NULL OR language = ''`;
+    // Step 2: add the 3-column unique constraint.
+    // Error 42P07 = constraint already exists — safe to ignore.
+    await sql`
+      ALTER TABLE progress
+      ADD CONSTRAINT progress_user_id_language_tutorial_slug_key
+      UNIQUE (user_id, language, tutorial_slug)
+    `.catch((e: unknown) => {
+      if ((e as { code?: string })?.code !== "42P07") throw e;
+    });
 
-  // Step 2: add the 3-column unique constraint.
-  // Error 42P07 = constraint already exists — safe to ignore.
-  await sql`
-    ALTER TABLE progress
-    ADD CONSTRAINT progress_user_id_language_tutorial_slug_key
-    UNIQUE (user_id, language, tutorial_slug)
-  `.catch((e: unknown) => {
-    if ((e as { code?: string })?.code !== "42P07") throw e;
-  });
+    // Step 3: drop the old 2-column constraint.
+    // IF EXISTS makes this a no-op once already dropped.
+    await sql`
+      ALTER TABLE progress
+      DROP CONSTRAINT IF EXISTS progress_user_id_tutorial_slug_key
+    `;
 
-  // Step 3: drop the old 2-column constraint.
-  // IF EXISTS makes this a no-op once already dropped.
-  await sql`
-    ALTER TABLE progress
-    DROP CONSTRAINT IF EXISTS progress_user_id_tutorial_slug_key
-  `;
-
-  _migrated = true;
+    _migrated = true;
+  } catch (err) {
+    // Non-fatal: log and continue. The SELECT that follows will succeed if the
+    // column already exists (from a previous successful migration run), or fail
+    // with a clear error if the schema is genuinely broken.
+    console.warn("[progress] ensureLanguageColumn migration warning:", err);
+  }
 }
 
 export async function getProgress(userId: number, language: string = DEFAULT_LANG): Promise<string[]> {
@@ -67,18 +73,28 @@ export async function getAllProgressByUser(
 ): Promise<Map<string, string[]>> {
   await ensureLanguageColumn();
   const sql = getSql();
-  const rows = await sql`
-    SELECT language, tutorial_slug FROM progress
-    WHERE user_id = ${userId}
-    ORDER BY completed_at
-  `;
-  const result = new Map<string, string[]>();
-  for (const r of rows) {
-    const lang = (r.language as string | null) ?? "go";
-    if (!result.has(lang)) result.set(lang, []);
-    result.get(lang)!.push(r.tutorial_slug as string);
+  try {
+    const rows = await sql`
+      SELECT language, tutorial_slug FROM progress
+      WHERE user_id = ${userId}
+      ORDER BY completed_at
+    `;
+    const result = new Map<string, string[]>();
+    for (const r of rows) {
+      const lang = (r.language as string | null) ?? "go";
+      if (!result.has(lang)) result.set(lang, []);
+      result.get(lang)!.push(r.tutorial_slug as string);
+    }
+    return result;
+  } catch {
+    // Fallback if language column doesn't exist yet: return Go-only progress
+    // so the user doesn't see a blank dashboard while the migration is pending.
+    const rows = await sql`
+      SELECT tutorial_slug FROM progress WHERE user_id = ${userId}
+    `;
+    const slugs = rows.map((r) => r.tutorial_slug as string);
+    return slugs.length > 0 ? new Map([["go", slugs]]) : new Map();
   }
-  return result;
 }
 
 /** If language is omitted, returns total count across all languages (for stats/leaderboard). */
