@@ -43,10 +43,9 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
 
 interface Props {
   unreadCount: number;
-  isMobile?: boolean;
 }
 
-export default function UserMenuDropdown({ unreadCount, isMobile }: Props) {
+export default function UserMenuDropdown({ unreadCount }: Props) {
   const { user, profile, logout } = useAuth();
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);

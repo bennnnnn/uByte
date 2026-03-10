@@ -11,20 +11,12 @@ import { hasPaidAccess } from "@/lib/plans";
 import { tryUnlockProblem } from "@/lib/db/practice-unlocks";
 import UpgradeWall from "@/components/UpgradeWall";
 import { absoluteUrl, SITE_KEYWORDS } from "@/lib/seo";
+import { tryDecodeShareCode } from "@/lib/share-code";
 
 type Props = {
   params: Promise<{ lang: string; slug: string }>;
   searchParams: Promise<{ category?: string; page?: string; status?: string; difficulty?: string; share?: string; mode?: string; deadline?: string; daily?: string }>;
 };
-
-/** Decode a base64+URI-encoded shared code snippet — returns undefined on any error. */
-function tryDecodeShare(encoded: string): string | undefined {
-  try {
-    return decodeURIComponent(atob(encoded));
-  } catch {
-    return undefined;
-  }
-}
 
 export const dynamic = "force-dynamic";
 
@@ -144,7 +136,7 @@ export default async function PracticeProblemPage({ params, searchParams }: Prop
   const listDifficulty = ["easy", "medium", "hard"].includes(sp.difficulty ?? "") ? sp.difficulty : undefined;
 
   // Decode shared code from ?share= param (set by the Share button on the client)
-  const sharedCode = sp.share ? tryDecodeShare(sp.share) : undefined;
+  const sharedCode = sp.share ? tryDecodeShareCode(sp.share) : undefined;
 
   const interviewMode = sp.mode === "interview";
   const interviewDeadline = interviewMode && sp.deadline ? parseInt(sp.deadline, 10) : undefined;

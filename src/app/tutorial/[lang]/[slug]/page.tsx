@@ -149,10 +149,7 @@ export default async function TutorialPage({
         steps={steps}
         allTutorials={allTutorials}
         allTutorialSteps={allTutorialSteps}
-        prev={prev ? { slug: prev.slug, title: prev.title } : null}
         next={next ? { slug: next.slug, title: next.title } : null}
-        currentOrder={tutorial.order}
-        totalTutorials={allTutorials.length}
         isFree={tutorial.order <= FREE_TUTORIAL_LIMIT}
       />
       <div className="px-6 pb-8">

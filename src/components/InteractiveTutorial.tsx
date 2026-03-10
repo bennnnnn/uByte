@@ -4,7 +4,6 @@ import { useState, useEffect, useRef, Suspense } from "react";
 import Link from "next/link";
 import type { TutorialStep } from "@/lib/tutorial-steps";
 import { useAuth } from "@/components/AuthProvider";
-import { apiFetch } from "@/lib/api-client";
 import ThemeToggle from "@/components/ThemeToggle";
 import AuthButtons from "@/components/AuthButtons";
 import ShareButton from "@/components/ShareButton";
@@ -27,6 +26,9 @@ import GuestConversionPrompt from "@/components/GuestConversionPrompt";
 import GuestTopBanner from "@/components/GuestTopBanner";
 import { CodeEditor } from "@/components/editor/CodeEditor";
 import { EditorToolbar } from "@/components/editor/EditorToolbar";
+import { useShareCode } from "@/hooks/useShareCode";
+import { useEditorKeyDown } from "@/hooks/useEditorKeyDown";
+import { tryDecodeShareCode } from "@/lib/share-code";
 
 interface Props {
   lang: string;
@@ -35,10 +37,7 @@ interface Props {
   steps: TutorialStep[];
   allTutorials: { slug: string; title: string; order: number; difficulty: string; estimatedMinutes: number }[];
   allTutorialSteps: Record<string, { index: number; title: string }[]>;
-  prev: { slug: string; title: string } | null;
   next: { slug: string; title: string } | null;
-  currentOrder: number;
-  totalTutorials: number;
   isFree: boolean;
 }
 
@@ -66,7 +65,7 @@ export default function InteractiveTutorial({
   const [showNav, setShowNav] = useState(false);
   const [expandedSlug, setExpandedSlug] = useState(tutorialSlug);
   const [showSnapshots, setShowSnapshots] = useState(false);
-  const [shareCopied, setShareCopied] = useState(false);
+  const { shareCopied, handleShare } = useShareCode(() => editor.code);
   const { format, formatting } = useFormatCode();
   const [fontSize, setFontSize] = useState<14 | 16 | 18>(() => {
     try { const s = localStorage.getItem("ide-font-size"); if (s === "16") return 16; if (s === "18") return 18; } catch { /* ignore */ }
@@ -109,47 +108,19 @@ export default function InteractiveTutorial({
 
   // Load shared code from ?share= URL param on mount (client-side — page is statically generated)
   useEffect(() => {
-    try {
-      const encoded = new URLSearchParams(window.location.search).get("share");
-      if (encoded) editor.setCode(decodeURIComponent(atob(encoded)));
-    } catch { /* ignore malformed share param */ }
+    const encoded = new URLSearchParams(window.location.search).get("share");
+    if (encoded) {
+      const decoded = tryDecodeShareCode(encoded);
+      if (decoded) editor.setCode(decoded);
+    }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  function handleShare() {
-    try {
-      const encoded = btoa(encodeURIComponent(editor.code));
-      const url = new URL(window.location.href);
-      url.searchParams.set("share", encoded);
-      navigator.clipboard.writeText(url.toString()).then(() => {
-        setShareCopied(true);
-        setTimeout(() => setShareCopied(false), 2500);
-      }).catch(() => {});
-    } catch {
-      navigator.clipboard.writeText(window.location.href).catch(() => {});
-    }
-  }
-
-  function handleKeyDown(e: React.KeyboardEvent<HTMLTextAreaElement>) {
-    if (e.key === "Tab") {
-      e.preventDefault();
-      const ta = editor.textareaRef.current;
-      if (!ta) return;
-      const start = ta.selectionStart;
-      const end = ta.selectionEnd;
-      // Read from ta.value (DOM) — always current, never stale like editor.code state
-      const next = ta.value.slice(0, start) + "    " + ta.value.slice(end);
-      editor.setCode(next);
-      requestAnimationFrame(() => { ta.selectionStart = ta.selectionEnd = start + 4; });
-    } else if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
-      e.preventDefault();
-      if (e.shiftKey) {
-        stepProgress.handleCheck(editor.code, currentStep, editor.setCode, editor.setErrorLines);
-      } else {
-        stepProgress.handleRun(editor.code, editor.setErrorLines);
-      }
-    }
-  }
+  const handleKeyDown = useEditorKeyDown({
+    editor,
+    onRun: () => stepProgress.handleRun(editor.code, editor.setErrorLines),
+    onCheck: () => stepProgress.handleCheck(editor.code, currentStep, editor.setCode, editor.setErrorLines),
+  });
 
   if (!currentStep) {
     return (

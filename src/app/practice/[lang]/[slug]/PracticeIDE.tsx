@@ -21,6 +21,8 @@ import GuestConversionPrompt from "@/components/GuestConversionPrompt";
 import { CodeEditor } from "@/components/editor/CodeEditor";
 import { EditorToolbar } from "@/components/editor/EditorToolbar";
 import { OutputPanel, type VerdictState } from "./OutputPanel";
+import { useShareCode } from "@/hooks/useShareCode";
+import { useEditorKeyDown } from "@/hooks/useEditorKeyDown";
 
 const LANG_ORDER = ALL_LANGUAGE_KEYS;
 
@@ -500,23 +502,7 @@ export function PracticeIDE({ problem, initialLang, initialCode, categoryFilter 
     finally { setBookmarkLoading(false); }
   }
 
-  const [shareCopied, setShareCopied] = useState(false);
-
-  function handleShare() {
-    try {
-      // btoa(encodeURIComponent(code)) produces a URL-safe base64 string
-      const encoded = btoa(encodeURIComponent(editor.code));
-      const url = new URL(window.location.href);
-      url.searchParams.set("share", encoded);
-      navigator.clipboard.writeText(url.toString()).then(() => {
-        setShareCopied(true);
-        setTimeout(() => setShareCopied(false), 2500);
-      }).catch(() => {});
-    } catch {
-      // Fallback: copy plain URL
-      navigator.clipboard.writeText(window.location.href).catch(() => {});
-    }
-  }
+  const { shareCopied, handleShare } = useShareCode(() => editor.code);
 
   const [resetPending, setResetPending] = useState(false);
   const resetTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -547,22 +533,7 @@ export function PracticeIDE({ problem, initialLang, initialCode, categoryFilter 
     setAiError(null);
   }
 
-  /** Tab → 4 spaces indent; Ctrl/Cmd+Enter → run */
-  function handleKeyDown(e: React.KeyboardEvent<HTMLTextAreaElement>) {
-    if (e.key === "Tab") {
-      e.preventDefault();
-      const ta = editor.textareaRef.current!;
-      const start = ta.selectionStart;
-      const end   = ta.selectionEnd;
-      // Read from ta.value (DOM) — always current, never stale like editor.code state
-      const next  = ta.value.slice(0, start) + "    " + ta.value.slice(end);
-      editor.setCode(next);
-      requestAnimationFrame(() => { ta.selectionStart = ta.selectionEnd = start + 4; });
-    } else if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
-      e.preventDefault();
-      handleRun();
-    }
-  }
+  const handleKeyDown = useEditorKeyDown({ editor, onRun: handleRun });
 
   // Show the guest conversion prompt after a first accepted solve
   const guestFirstSolve = !user && verdict?.type === "accepted";
