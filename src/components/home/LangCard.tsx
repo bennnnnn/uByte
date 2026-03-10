@@ -10,7 +10,7 @@ const THEMES: Record<ColorScheme, { card: string; iconBg: string; badge: string;
     arrow: "text-indigo-600 dark:text-indigo-400",
   },
   amber: {
-    card: "border-amber-200 bg-gradient-to-br from-white to-amber-50/60 hover:border-amber-400 hover:shadow-amber-100 dark:border-amber-900/40 dark:from-zinc-900 dark:to-amber-950/20 dark:hover:border-amber-700",
+    card: "border-amber-200 bg-gradient-to-br from-white to-amber-50/60 hover:border-amber-400 hover:shadow-amber-100 dark:border-amber-900/40 dark:from-zinc-900 dark:to-amber-950/20 dark:hover:border-amber-700 dark:hover:shadow-amber-950/50",
     iconBg: "bg-amber-50 dark:bg-amber-950/50",
     badge: "bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-400",
     arrow: "text-amber-600 dark:text-amber-400",

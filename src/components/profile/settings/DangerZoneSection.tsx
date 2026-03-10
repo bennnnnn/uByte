@@ -89,7 +89,7 @@ export default function DangerZoneSection({ onDeleteAccount, onResetProgress, on
 
       {/* Danger zone */}
       <section>
-        <SettingsSectionHeader title="Danger Zone" titleClassName="text-red-600" />
+        <SettingsSectionHeader title="Danger Zone" titleClassName="text-red-600 dark:text-red-400" />
         <div className="space-y-3">
           {!resetConfirm ? (
             <button onClick={() => setResetConfirm(true)} className="rounded-lg border border-orange-300 px-6 py-2.5 text-sm font-medium text-orange-600 hover:bg-orange-50 dark:border-orange-800 dark:hover:bg-orange-950">

@@ -97,7 +97,7 @@ export default function AuthButtons() {
               <Link
                 href={signupHref}
                 onClick={() => setMenuOpen(false)}
-                className="flex w-full items-center rounded-lg bg-indigo-600 px-3 py-2.5 text-sm font-medium text-white transition-colors hover:bg-indigo-700"
+                className="flex w-full items-center rounded-lg bg-indigo-600 px-3 py-2.5 text-sm font-medium text-white transition-colors hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600"
               >
                 Sign up
               </Link>

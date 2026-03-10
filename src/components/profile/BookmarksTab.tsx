@@ -111,7 +111,7 @@ export default function BookmarksTab({ bookmarks, hasMore, total, onDelete, onLo
                   </svg>
                 </button>
               </div>
-              <pre className="mb-2 overflow-x-auto rounded-lg bg-zinc-900 p-3 text-xs text-zinc-100">{bm.snippet}</pre>
+              <pre className="mb-2 overflow-x-auto rounded-lg bg-zinc-900 p-3 text-xs text-zinc-100 dark:bg-zinc-800">{bm.snippet}</pre>
               {bm.note && <p className="text-xs italic text-zinc-500">{bm.note}</p>}
             </div>
           ))}

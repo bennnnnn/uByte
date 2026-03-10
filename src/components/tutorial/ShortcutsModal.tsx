@@ -36,7 +36,7 @@ export default function ShortcutsModal({ onClose }: Props) {
         className="w-full max-w-sm overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-2xl dark:border-zinc-800 dark:bg-zinc-900"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between border-b border-zinc-100 px-5 py-4 dark:border-zinc-800">
+        <div className="flex items-center justify-between border-b border-zinc-200 px-5 py-4 dark:border-zinc-800">
           <h2 className="font-semibold text-zinc-900 dark:text-zinc-100">Keyboard Shortcuts</h2>
           <button
             onClick={onClose}

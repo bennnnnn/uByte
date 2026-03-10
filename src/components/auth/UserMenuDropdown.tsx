@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { useAuth } from "@/components/AuthProvider";
 import Avatar from "@/components/Avatar";
+import { hasPaidAccess } from "@/lib/plans";
 
 interface MenuItemProps {
   href: string;
@@ -25,7 +26,7 @@ function MenuItem({ href, icon, label, badge, accent, onClick }: MenuItemProps) 
           : "text-zinc-700 hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-800"
       }`}
     >
-      <span className="flex h-5 w-5 shrink-0 items-center justify-center text-zinc-400">{icon}</span>
+      <span className={`flex h-5 w-5 shrink-0 items-center justify-center ${accent ? "text-indigo-500 dark:text-indigo-400" : "text-zinc-400"}`}>{icon}</span>
       <span className="flex-1">{label}</span>
       {badge}
     </Link>
@@ -62,7 +63,7 @@ export default function UserMenuDropdown({ unreadCount, isMobile }: Props) {
   if (!user) return null;
 
   const close = () => setOpen(false);
-  const isPro = profile?.plan === "yearly" || profile?.plan === "pro";
+  const isPro = hasPaidAccess(profile?.plan);
 
   return (
     <div className="relative z-10" ref={ref}>
@@ -125,7 +126,7 @@ export default function UserMenuDropdown({ unreadCount, isMobile }: Props) {
             <MenuItem href="/profile?tab=referral" icon={<ReferralIcon />} label="Refer & Earn 🎁" accent onClick={close} />
             <MenuItem href="/profile?tab=plan" icon={<PlanIcon />} label="Plan & billing" onClick={close} />
             <MenuItem href="/profile?tab=settings" icon={<SettingsIcon />} label="Settings" onClick={close} />
-            <MenuItem href={`/u/${user.id}`} icon={<ProfileIcon />} label="Profile" onClick={close} />
+            <MenuItem href={`/u/${user.id}`} icon={<ProfileIcon />} label="Public profile" onClick={close} />
 
             {profile?.isAdmin && (
               <>

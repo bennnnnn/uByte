@@ -52,7 +52,7 @@ export default function SnapshotDrawer({ slug, stepIndex, lang = "go", onRestore
 
       {/* Drawer */}
       <div className="fixed inset-y-0 right-0 z-[56] flex w-80 flex-col border-l border-zinc-200 bg-white shadow-xl dark:border-zinc-800 dark:bg-zinc-900">
-        <div className="flex items-center justify-between border-b border-zinc-100 px-5 py-4 dark:border-zinc-800">
+        <div className="flex items-center justify-between border-b border-zinc-200 px-5 py-4 dark:border-zinc-800">
           <h2 className="font-semibold text-zinc-900 dark:text-zinc-100">Code History</h2>
           <button
             onClick={onClose}

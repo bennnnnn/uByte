@@ -57,13 +57,13 @@ export default function ReferralSection() {
           <p className="text-2xl font-black text-zinc-900 dark:text-zinc-100">
             {data?.signups ?? "—"}
           </p>
-          <p className="text-xs text-zinc-500">Signed up</p>
+          <p className="text-xs text-zinc-500 dark:text-zinc-400">Signed up</p>
         </div>
         <div className="text-center">
           <p className="text-2xl font-black text-indigo-600 dark:text-indigo-400">
             {data?.subscribed ?? "—"}
           </p>
-          <p className="text-xs text-zinc-500">Went Pro</p>
+          <p className="text-xs text-zinc-500 dark:text-zinc-400">Went Pro</p>
         </div>
       </div>
 

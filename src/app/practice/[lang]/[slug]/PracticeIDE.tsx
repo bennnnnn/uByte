@@ -224,7 +224,7 @@ function OutputPanel({
                     {verdict.type === "compile_error" ? "Compile Error" : "Runtime Error"}
                   </span>
                 </div>
-                <pre className="whitespace-pre-wrap break-words rounded-lg bg-red-950/20 p-3 text-xs text-red-300 dark:bg-red-950/40">
+                <pre className="whitespace-pre-wrap break-words rounded-lg bg-red-50 p-3 text-xs text-red-700 dark:bg-red-950/40 dark:text-red-300">
                   {verdict.output}
                 </pre>
               </>

@@ -392,7 +392,7 @@ function PricingContent() {
                     <span className="font-semibold text-emerald-600 dark:text-emerald-400">
                       {BILLING_CONFIG.yearly.priceText.replace("/year", " billed yearly")}
                     </span>
-                    <span className="mx-1.5 text-zinc-400 line-through dark:text-zinc-600">${(YEARLY_IF_MONTHLY_CENTS / 100).toFixed(2)}</span>
+                    <span className="mx-1.5 text-zinc-400 line-through dark:text-zinc-500">${(YEARLY_IF_MONTHLY_CENTS / 100).toFixed(2)}</span>
                   </p>
                   <p className="mt-1 text-sm font-medium text-emerald-600 dark:text-emerald-400">
                     You save ${((YEARLY_IF_MONTHLY_CENTS - YEARLY_PRICE_CENTS) / 100).toFixed(2)} per year
