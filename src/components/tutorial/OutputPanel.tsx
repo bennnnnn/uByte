@@ -20,7 +20,7 @@ export default function OutputPanel({
   onRequestHint,
   height,
 }: Props) {
-  const { output, outputIsError, status, aiFeedback, setAiFeedback, aiFeedbackLoading, aiFeedbackUpgrade, stepIndex } = progress;
+  const { output, outputIsError, status, aiFeedback, setAiFeedback, aiFeedbackLoading, aiFeedbackUpgrade, aiFeedbackLoginRequired, stepIndex } = progress;
 
   const labelColor =
     outputIsError || status === "failed"
@@ -95,6 +95,32 @@ export default function OutputPanel({
             </p>
           )}
 
+          {/* Login prompt — shown for guests who try to use a hint */}
+          {!aiFeedbackLoading && aiFeedbackLoginRequired && !aiFeedbackUpgrade && !aiFeedback && (
+            <div className="space-y-1.5">
+              <p className="text-xs font-semibold text-indigo-700 dark:text-indigo-300">
+                💡 Sign in to use AI hints
+              </p>
+              <p className="text-xs text-zinc-600 dark:text-zinc-400">
+                Create a free account to get AI-powered hints when you&apos;re stuck.
+              </p>
+              <div className="flex gap-2">
+                <Link
+                  href="/signup"
+                  className="inline-block rounded-lg bg-indigo-600 px-3 py-1.5 text-xs font-bold text-white transition hover:bg-indigo-500"
+                >
+                  Sign up free →
+                </Link>
+                <Link
+                  href="/login"
+                  className="inline-block rounded-lg border border-indigo-200 px-3 py-1.5 text-xs font-medium text-indigo-700 transition hover:bg-indigo-50 dark:border-indigo-700 dark:text-indigo-400 dark:hover:bg-indigo-950/40"
+                >
+                  Log in
+                </Link>
+              </div>
+            </div>
+          )}
+
           {/* Upgrade prompt — shown inline when free hint limit is reached */}
           {!aiFeedbackLoading && aiFeedbackUpgrade && (
             <div className="space-y-1.5">
@@ -113,7 +139,7 @@ export default function OutputPanel({
             </div>
           )}
 
-          {!aiFeedbackLoading && !aiFeedback && !aiFeedbackUpgrade && (
+          {!aiFeedbackLoading && !aiFeedback && !aiFeedbackUpgrade && !aiFeedbackLoginRequired && (
             <div className="flex items-center gap-2">
               <span className="shrink-0 text-[11px] text-indigo-400 dark:text-indigo-500">✦</span>
               <button

@@ -77,6 +77,7 @@ export interface StepProgressState {
   setAiFeedback: (v: AiFeedbackSchema | null) => void;
   aiFeedbackLoading: boolean;
   aiFeedbackUpgrade: boolean;
+  aiFeedbackLoginRequired: boolean;
   failCount: number;
   showInlineChat: boolean;
   setShowInlineChat: (v: boolean) => void;
@@ -113,6 +114,7 @@ export function useStepProgress(
   const [aiFeedback, setAiFeedback] = useState<AiFeedbackSchema | null>(null);
   const [aiFeedbackLoading, setAiFeedbackLoading] = useState(false);
   const [aiFeedbackUpgrade, setAiFeedbackUpgrade] = useState(false);
+  const [aiFeedbackLoginRequired, setAiFeedbackLoginRequired] = useState(false);
   const [failCount, setFailCount] = useState(0);
 
   // Set to true synchronously the moment a hint fetch starts (before any React re-render),
@@ -215,6 +217,7 @@ export function useStepProgress(
     setCompletedSteps((prev) => new Set([...prev, stepIndex]));
     setStatus("passed");
     setFailCount(0);
+    setAiFeedbackLoginRequired(false);
     hintInflightRef.current = false;
     // Persist to DB as skipped so it's distinguished from genuinely completed steps on refresh
     if (userId != null) {
@@ -235,11 +238,18 @@ export function useStepProgress(
     setFailCount(0);
     setAiFeedback(null);
     setAiFeedbackUpgrade(false);
+    setAiFeedbackLoginRequired(false);
     hintInflightRef.current = false;
     setShowInlineChat(false);
   }
 
   function fetchAiFeedback(userCode: string, actualOutput: string, isError: boolean, currentStepIndex: number) {
+    // Guest users — show a sign-in prompt instead of calling the API.
+    if (userId == null) {
+      setAiFeedbackLoginRequired(true);
+      hintInflightRef.current = false;
+      return;
+    }
     hintInflightRef.current = true; // Set synchronously — prevents re-entry before React re-renders.
     setAiFeedbackLoading(true);
     // Keep the existing hint visible while the new one loads — don't blank it eagerly.
@@ -376,6 +386,7 @@ export function useStepProgress(
         setFailCount(0);
         setAiFeedback(null);          // Step done — clear hint so the next step starts fresh.
         setAiFeedbackUpgrade(false);
+        setAiFeedbackLoginRequired(false);
         hintInflightRef.current = false;
         setCompletedSteps((prev) => new Set([...prev, stepIndex]));
         apiFetch("/api/step-check", {
@@ -418,6 +429,7 @@ export function useStepProgress(
     setErrorLines(new Set());
     setAiFeedback(null);
     setAiFeedbackUpgrade(false);
+    setAiFeedbackLoginRequired(false);
     hintInflightRef.current = false;
   }
 
@@ -432,6 +444,7 @@ export function useStepProgress(
     setAiFeedback,
     aiFeedbackLoading,
     aiFeedbackUpgrade,
+    aiFeedbackLoginRequired,
     failCount,
     showInlineChat,
     setShowInlineChat,

@@ -48,6 +48,7 @@ function OutputPanel({
   aiLoading,
   aiError,
   aiUpgradeRequired,
+  aiLoginRequired,
   aiFeedback,
   onRequestAI,
   onClearAI,
@@ -60,6 +61,7 @@ function OutputPanel({
   aiLoading: boolean;
   aiError: string | null;
   aiUpgradeRequired: boolean;
+  aiLoginRequired: boolean;
   aiFeedback: { friendly_one_liner: string; hint: string; next_step: string; minimal_patch?: string } | null;
   onRequestAI: () => void;
   onClearAI: () => void;
@@ -143,11 +145,30 @@ function OutputPanel({
           </button>
         ))}
 
-        {/* AI hint button — hidden while a hint is already visible to avoid redundant calls */}
+        {/* AI hint button/prompt area — hidden while a hint is already visible */}
         {verdict && verdict.type !== "accepted" && verdict.submissionId != null && !aiFeedback && (
           <div className="ml-auto px-3">
-            {aiUpgradeRequired ? (
-              /* Inline upgrade prompt — shown in the same toolbar area */
+            {aiLoginRequired ? (
+              /* Inline login prompt — shown for guests */
+              <div className="flex items-center gap-2 rounded-lg border border-indigo-200 bg-indigo-50 px-3 py-1.5 dark:border-indigo-800 dark:bg-indigo-950/40">
+                <span className="text-xs text-indigo-600 dark:text-indigo-400">
+                  💡 Sign in for AI hints —
+                </span>
+                <a
+                  href="/signup"
+                  className="text-xs font-bold text-indigo-700 underline underline-offset-2 hover:text-indigo-500 dark:text-indigo-300"
+                >
+                  Sign up free →
+                </a>
+                <a
+                  href="/login"
+                  className="text-xs text-indigo-600 underline underline-offset-2 hover:text-indigo-500 dark:text-indigo-400"
+                >
+                  Log in
+                </a>
+              </div>
+            ) : aiUpgradeRequired ? (
+              /* Inline upgrade prompt — shown when free hint limit is reached */
               <div className="flex items-center gap-2 rounded-lg border border-indigo-200 bg-indigo-50 px-3 py-1.5 dark:border-indigo-800 dark:bg-indigo-950/40">
                 <span className="text-xs text-indigo-600 dark:text-indigo-400">
                   💡 5 free hints used —
@@ -536,6 +557,7 @@ export function PracticeIDE({ problem, initialLang, initialCode, categoryFilter 
   const [aiLoading, setAiLoading] = useState(false);
   const [aiError, setAiError] = useState<string | null>(null);
   const [aiUpgradeRequired, setAiUpgradeRequired] = useState(false);
+  const [aiLoginRequired, setAiLoginRequired] = useState(false);
 
   // Use shared code from ?share= if present, otherwise fall back to the problem's starter
   const editor = useCodeEditor(initialCode ?? getStarterForLanguage(problem, initialLang), lang);
@@ -747,14 +769,15 @@ export function PracticeIDE({ problem, initialLang, initialCode, categoryFilter 
         setStatuses((prev) => ({ ...prev, [problem.slug]: "solved" }));
         setAiFeedback(null);  // Problem solved — clear hint so panel is clean.
         setAiUpgradeRequired(false);
+        setAiLoginRequired(false);
         if (data.xpAwarded > 0) {
           setXpToast(data.xpAwarded);
           setTimeout(() => setXpToast(null), 3500);
         }
       } else if (["wrong_answer", "runtime_error", "compile_error", "tle"].includes(data.verdict)) {
         setStatuses((prev) => ({ ...prev, [problem.slug]: "failed" }));
-        // Only auto-trigger AI if there's no hint already showing and none is in-flight.
-        if (data.consecutive_failures >= 2 && data.submission_id && !aiFeedback && !aiLoading) {
+        // Only auto-trigger AI for logged-in users when no hint is already showing.
+        if (user && data.consecutive_failures >= 2 && data.submission_id && !aiFeedback && !aiLoading) {
           setAiLoading(true);
           setAiError(null);
           setAiUpgradeRequired(false);
@@ -790,6 +813,11 @@ export function PracticeIDE({ problem, initialLang, initialCode, categoryFilter 
   }, [editor.code, lang, problem.slug, aiFeedback, aiLoading]);
 
   const requestAiFeedback = useCallback(async () => {
+    // Guest users — show a sign-in prompt instead of calling the API.
+    if (!user) {
+      setAiLoginRequired(true);
+      return;
+    }
     const sid = verdict?.submissionId;
     if (!sid) return;
     setAiLoading(true);
@@ -1378,9 +1406,10 @@ export function PracticeIDE({ problem, initialLang, initialCode, categoryFilter 
             aiLoading={aiLoading}
             aiError={aiError}
             aiUpgradeRequired={aiUpgradeRequired}
+            aiLoginRequired={aiLoginRequired}
             aiFeedback={aiFeedback}
             onRequestAI={() => requestAiFeedback()}
-            onClearAI={() => { setAiFeedback(null); setAiError(null); setAiUpgradeRequired(false); }}
+            onClearAI={() => { setAiFeedback(null); setAiError(null); setAiUpgradeRequired(false); setAiLoginRequired(false); }}
           />
         </div>
       </div>
