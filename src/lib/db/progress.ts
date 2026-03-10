@@ -17,41 +17,33 @@ let _migrated = false;
 async function ensureLanguageColumn(): Promise<void> {
   if (_migrated) return;
   const sql = getSql();
-  try {
-    // Step 1: add column with default 'go' so existing rows become 'go'
-    await sql`ALTER TABLE progress ADD COLUMN IF NOT EXISTS language TEXT NOT NULL DEFAULT 'go'`;
 
-    // Step 2: add the 3-column unique constraint if missing
-    await sql`
-      DO $$
-      BEGIN
-        IF NOT EXISTS (
-          SELECT 1 FROM pg_constraint
-          WHERE conname = 'progress_user_id_language_tutorial_slug_key'
-        ) THEN
-          ALTER TABLE progress ADD CONSTRAINT progress_user_id_language_tutorial_slug_key
-            UNIQUE (user_id, language, tutorial_slug);
-        END IF;
-      END $$
-    `;
+  // Step 1: add language column — sets default 'go' for all existing rows.
+  // IF NOT EXISTS makes this a no-op once the column is there.
+  await sql`ALTER TABLE progress ADD COLUMN IF NOT EXISTS language TEXT NOT NULL DEFAULT 'go'`;
 
-    // Step 3: drop the old 2-column constraint now the new one is in place
-    await sql`
-      DO $$
-      BEGIN
-        IF EXISTS (
-          SELECT 1 FROM pg_constraint
-          WHERE conname = 'progress_user_id_tutorial_slug_key'
-        ) THEN
-          ALTER TABLE progress DROP CONSTRAINT progress_user_id_tutorial_slug_key;
-        END IF;
-      END $$
-    `;
+  // Step 1b: backfill any rows that got NULL (possible if the column was previously
+  // added as nullable in a partial migration run).
+  await sql`UPDATE progress SET language = 'go' WHERE language IS NULL OR language = ''`;
 
-    _migrated = true;
-  } catch {
-    // Non-fatal: if migration fails, fall through — next call will retry
-  }
+  // Step 2: add the 3-column unique constraint.
+  // Error 42P07 = constraint already exists — safe to ignore.
+  await sql`
+    ALTER TABLE progress
+    ADD CONSTRAINT progress_user_id_language_tutorial_slug_key
+    UNIQUE (user_id, language, tutorial_slug)
+  `.catch((e: unknown) => {
+    if ((e as { code?: string })?.code !== "42P07") throw e;
+  });
+
+  // Step 3: drop the old 2-column constraint.
+  // IF EXISTS makes this a no-op once already dropped.
+  await sql`
+    ALTER TABLE progress
+    DROP CONSTRAINT IF EXISTS progress_user_id_tutorial_slug_key
+  `;
+
+  _migrated = true;
 }
 
 export async function getProgress(userId: number, language: string = DEFAULT_LANG): Promise<string[]> {

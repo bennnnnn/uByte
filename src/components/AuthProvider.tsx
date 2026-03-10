@@ -279,14 +279,19 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
 
   const toggleProgress = useCallback(async (slug: string, lang: string = "go") => {
     if (!user) return;
-    const completed = !progress.includes(slug);
+    // The in-memory `progress` list only tracks Go slugs (fetched with ?lang=go on login).
+    // For other languages, always mark as complete — we rely on ON CONFLICT DO NOTHING in
+    // the DB to prevent duplicates, and the API checks existence before awarding XP.
+    const completed = lang === "go" ? !progress.includes(slug) : true;
     try {
       const res = await apiFetch("/api/progress", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ slug, completed, lang }),
       });
-      if (res.ok) {
+      if (res.ok && lang === "go") {
+        // Only refresh the in-memory list for Go — non-Go progress is fetched
+        // per-tutorial on mount and stored in the DB, not in this context.
         const data = await res.json();
         setProgress(data.progress);
       }

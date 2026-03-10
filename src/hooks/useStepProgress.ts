@@ -174,12 +174,17 @@ export function useStepProgress(
 
   // ── Tutorial completion ──
   useEffect(() => {
-    if (completedSteps.size === steps.length && steps.length > 0 && !markedRef.current && !progress.includes(tutorialSlug)) {
+    // NOTE: intentionally omitting `progress` from both deps and the condition.
+    // `progress` in context only holds Go slugs, so `!progress.includes(slug)` would
+    // incorrectly block saving when a non-Go language shares a slug with an already-
+    // completed Go tutorial (e.g. both Go and Rust have an "introduction" tutorial).
+    // Deduplication is handled by: (1) markedRef per-mount, (2) ON CONFLICT DO NOTHING in DB.
+    if (completedSteps.size === steps.length && steps.length > 0 && !markedRef.current) {
       markedRef.current = true;
       setTutorialDone(true);
       toggleProgress(tutorialSlug, lang);
     }
-  }, [completedSteps, steps.length, tutorialSlug, toggleProgress, progress, lang]);
+  }, [completedSteps, steps.length, tutorialSlug, toggleProgress, lang]);
 
   // ── Auto-advance countdown + confetti ──
   useEffect(() => {
