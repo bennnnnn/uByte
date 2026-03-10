@@ -5,7 +5,6 @@ import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "./AuthProvider";
 import UserMenuDropdown from "./auth/UserMenuDropdown";
-import ThemeToggle from "./ThemeToggle";
 import { useIsMobile } from "@/hooks/useIsMobile";
 import { buildAuthPageHref } from "@/lib/auth-redirect";
 import { hasPaidAccess } from "@/lib/plans";
@@ -87,10 +86,6 @@ export default function AuthButtons() {
         </button>
         {menuOpen && (
           <div className="absolute right-0 top-full z-[100] mt-2 w-56 overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-lg dark:border-zinc-800 dark:bg-zinc-900">
-            <div className="flex items-center justify-between border-b border-zinc-100 px-4 py-3 dark:border-zinc-800">
-              <span className="text-sm text-zinc-600 dark:text-zinc-400">Appearance</span>
-              <ThemeToggle className="flex h-8 w-8 items-center justify-center rounded text-zinc-500 transition-colors hover:bg-zinc-100 hover:text-zinc-800 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-200" />
-            </div>
             <div className="p-2">
               <Link
                 href={loginHref}
