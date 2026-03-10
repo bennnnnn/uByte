@@ -41,7 +41,8 @@ export default function CourseOutlineDrawer({
   onExpandSlug,
   onGoToStep,
 }: Props) {
-  const { progress } = useAuth();
+  const { progressByLang } = useAuth();
+  const progress = progressByLang[lang] ?? [];
 
   return (
     <>

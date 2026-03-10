@@ -11,7 +11,8 @@ interface Tutorial {
 }
 
 export default function ContinueBanner({ lang, tutorials }: { lang: string; tutorials: Tutorial[] }) {
-  const { user, progress } = useAuth();
+  const { user, progressByLang } = useAuth();
+  const progress = progressByLang[lang] ?? [];
   const [lastStep, setLastStep] = useState<number | null>(null);
 
   const nextTutorial = tutorials.find((t) => !progress.includes(t.slug));

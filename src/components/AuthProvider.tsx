@@ -50,6 +50,9 @@ const UserContext = createContext<UserContextType>({
 // ─── App Data Context (progress, profile, views) ────
 
 interface AppDataContextType {
+  /** Completed tutorial slugs for every language. Key = language id (e.g. "go", "rust"). */
+  progressByLang: Record<string, string[]>;
+  /** Convenience alias — slugs completed in Go. Kept for backward compat. */
   progress: string[];
   profile: ProfileData | null;
   viewCount: number;
@@ -60,6 +63,7 @@ interface AppDataContextType {
 }
 
 const AppDataContext = createContext<AppDataContextType>({
+  progressByLang: {},
   progress: [],
   profile: null,
   viewCount: 0,
@@ -111,7 +115,7 @@ function extractProfile(data: { profile?: Record<string, unknown> }): ProfileDat
 export default function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
-  const [progress, setProgress] = useState<string[]>([]);
+  const [progressByLang, setProgressByLang] = useState<Record<string, string[]>>({});
   const [profile, setProfile] = useState<ProfileData | null>(null);
   const [viewCount, setViewCount] = useState(0);
   const [limited, setLimited] = useState(false);
@@ -124,12 +128,12 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
       setUser(data.user);
       if (data.user) {
         const [progRes, profRes] = await Promise.all([
-          fetch("/api/progress?lang=go", { credentials: "same-origin" }),
+          fetch("/api/progress/all", { credentials: "same-origin" }),
           fetch("/api/profile", { credentials: "same-origin" }),
         ]);
-        const progData = progRes.ok ? await progRes.json() : { progress: [] };
+        const progData = progRes.ok ? await progRes.json() : { progress: {} };
         const profData = profRes.ok ? await profRes.json() : {};
-        setProgress(progData.progress || []);
+        setProgressByLang(progData.progress || {});
         const prof = extractProfile(profData);
         if (prof) {
           setProfile(prof);
@@ -163,11 +167,11 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
     setViewCount(0);
     try {
       const [progRes, profRes] = await Promise.all([
-        fetch("/api/progress?lang=go", { credentials: "same-origin" }),
+        fetch("/api/progress/all", { credentials: "same-origin" }),
         fetch("/api/profile", { credentials: "same-origin" }),
       ]);
-      const progData = progRes.ok ? await progRes.json() : { progress: [] };
-      setProgress(progData.progress || []);
+      const progData = progRes.ok ? await progRes.json() : { progress: {} };
+      setProgressByLang(progData.progress || {});
       if (profRes.ok) {
         const profData = await profRes.json();
         const prof = extractProfile(profData);
@@ -251,14 +255,14 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
   const logout = useCallback(async () => {
     await apiFetch("/api/auth/logout", { method: "POST" });
     setUser(null);
-    setProgress([]);
+    setProgressByLang({});
     setProfile(null);
   }, []);
 
   const logoutAll = useCallback(async () => {
     await apiFetch("/api/auth/logout-all", { method: "POST" });
     setUser(null);
-    setProgress([]);
+    setProgressByLang({});
     setProfile(null);
   }, []);
 
@@ -279,24 +283,21 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
 
   const toggleProgress = useCallback(async (slug: string, lang: string = "go") => {
     if (!user) return;
-    // The in-memory `progress` list only tracks Go slugs (fetched with ?lang=go on login).
-    // For other languages, always mark as complete — we rely on ON CONFLICT DO NOTHING in
-    // the DB to prevent duplicates, and the API checks existence before awarding XP.
-    const completed = lang === "go" ? !progress.includes(slug) : true;
+    const existing = progressByLang[lang] ?? [];
+    const completed = !existing.includes(slug);
     try {
       const res = await apiFetch("/api/progress", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ slug, completed, lang }),
       });
-      if (res.ok && lang === "go") {
-        // Only refresh the in-memory list for Go — non-Go progress is fetched
-        // per-tutorial on mount and stored in the DB, not in this context.
+      if (res.ok) {
         const data = await res.json();
-        setProgress(data.progress);
+        // Update only the slice for this language — other languages are unchanged.
+        setProgressByLang((prev) => ({ ...prev, [lang]: data.progress as string[] }));
       }
     } catch { /* ignore */ }
-  }, [user, progress]);
+  }, [user, progressByLang]);
 
   const refreshProfile = useCallback(async () => {
     try {
@@ -314,8 +315,17 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
   );
 
   const appDataCtx = useMemo(
-    () => ({ progress, profile, viewCount, limited, recordView, toggleProgress, refreshProfile }),
-    [progress, profile, viewCount, limited, recordView, toggleProgress, refreshProfile]
+    () => ({
+      progressByLang,
+      progress: progressByLang["go"] ?? [],   // backward-compat alias
+      profile,
+      viewCount,
+      limited,
+      recordView,
+      toggleProgress,
+      refreshProfile,
+    }),
+    [progressByLang, profile, viewCount, limited, recordView, toggleProgress, refreshProfile]
   );
 
   return (

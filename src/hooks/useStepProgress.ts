@@ -102,7 +102,7 @@ export function useStepProgress(
   setCode: (c: string) => void,
   userId?: number
 ): StepProgressState {
-  const { toggleProgress, progress } = useAuth();
+  const { toggleProgress } = useAuth();
   const router = useRouter();
 
   const [stepIndex, setStepIndex] = useState(0);

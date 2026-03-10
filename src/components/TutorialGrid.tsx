@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { useAuth } from "./AuthProvider";
 import { tutorialUrl } from "@/lib/urls";
@@ -34,25 +34,11 @@ export default function TutorialGrid({
   /** Pre-computed total from getTotalLessonCount — must match the LangCard badge. */
   totalLessons?: number;
 }) {
-  const { user, progress: goProgress } = useAuth();
+  const { user, progressByLang } = useAuth();
 
-  // AuthProvider only loads Go progress on login. For other languages we fetch
-  // the language-specific slugs from the API on mount.
-  const [langProgress, setLangProgress] = useState<string[]>([]);
-  const [progressLoaded, setProgressLoaded] = useState(lang === "go");
-
-  useEffect(() => {
-    if (lang === "go") return; // AuthProvider already has Go progress
-    if (!user) { setLangProgress([]); setProgressLoaded(true); return; }
-    fetch(`/api/progress?lang=${encodeURIComponent(lang)}`, { credentials: "same-origin" })
-      .then((r) => r.json())
-      .then((d) => setLangProgress((d.progress as string[]) ?? []))
-      .catch(() => setLangProgress([]))
-      .finally(() => setProgressLoaded(true));
-  }, [user, lang]);
-
-  // Use AuthProvider's pre-loaded list for Go; language-specific fetch for others.
-  const progress = lang === "go" ? goProgress : langProgress;
+  // AuthProvider loads all-language progress on login via /api/progress/all.
+  // No per-language fetch needed — just read the right slice.
+  const progress = progressByLang[lang] ?? [];
 
   // Prefer the server-computed total (same value shown in LangCard).
   // Fall back to summing stepCountBySlug, then to topic count.
@@ -79,26 +65,20 @@ export default function TutorialGrid({
     <>
       {user && totalCount > 0 && (
         <div className="mb-8">
-          {!progressLoaded ? (
-            <div className="h-12 animate-pulse rounded-xl bg-zinc-100 dark:bg-zinc-800" />
-          ) : (
-            <>
-              <div className="mb-2 flex items-center justify-between text-sm">
-                <span className="font-medium text-zinc-800 dark:text-zinc-200">
-                  Your Progress
-                </span>
-                <span className="text-zinc-600 dark:text-zinc-300">
-                  {completedCount} / {totalCount} lessons completed
-                </span>
-              </div>
-              <div className="h-3 overflow-hidden rounded-full bg-zinc-200 dark:bg-zinc-800">
-                <div
-                  className="h-full rounded-full bg-indigo-600 transition-all duration-500"
-                  style={{ width: `${(completedCount / totalCount) * 100}%` }}
-                />
-              </div>
-            </>
-          )}
+          <div className="mb-2 flex items-center justify-between text-sm">
+            <span className="font-medium text-zinc-800 dark:text-zinc-200">
+              Your Progress
+            </span>
+            <span className="text-zinc-600 dark:text-zinc-300">
+              {completedCount} / {totalCount} lessons completed
+            </span>
+          </div>
+          <div className="h-3 overflow-hidden rounded-full bg-zinc-200 dark:bg-zinc-800">
+            <div
+              className="h-full rounded-full bg-indigo-600 transition-all duration-500"
+              style={{ width: `${(completedCount / totalCount) * 100}%` }}
+            />
+          </div>
         </div>
       )}
 

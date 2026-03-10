@@ -20,8 +20,8 @@ export default function TutorialNav({
   prev: NavTutorial | null;
   next: NavTutorial | null;
 }) {
-  const { user, progress, toggleProgress } = useAuth();
-  const isCompleted = progress.includes(slug);
+  const { user, progressByLang, toggleProgress } = useAuth();
+  const isCompleted = (progressByLang[lang] ?? []).includes(slug);
 
   const handleNext = () => {
     if (user && !isCompleted) {

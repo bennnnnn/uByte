@@ -32,7 +32,8 @@ interface SidebarItem {
 
 export default function Sidebar({ lang, tutorials }: { lang: string; tutorials: SidebarItem[] }) {
   const { pathname, expanded, activeHash, toggleExpand } = useNavState(tutorials, lang);
-  const { progress, profile } = useAuth();
+  const { progressByLang, profile } = useAuth();
+  const progress = progressByLang[lang] ?? [];
   const userHasPaidAccess = hasPaidAccess(profile?.plan);
   const [query, setQuery] = useState("");
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);

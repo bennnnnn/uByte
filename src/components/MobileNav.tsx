@@ -23,7 +23,8 @@ export default function MobileNav({ lang, tutorials }: { lang: string; tutorials
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
   const { pathname, expanded, activeHash, toggleExpand } = useNavState(tutorials, lang);
-  const { progress } = useAuth();
+  const { progressByLang } = useAuth();
+  const progress = progressByLang[lang] ?? [];
 
   return (
     <div className="md:hidden">
