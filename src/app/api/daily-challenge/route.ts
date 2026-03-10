@@ -18,28 +18,34 @@ export const GET = withErrorHandling("GET /api/daily-challenge", async () => {
 
   // Count how many users solved this problem today
   const sql = getSql();
-  const [row] = await sql`
-    SELECT COUNT(DISTINCT user_id)::int AS count
-    FROM practice_attempts
-    WHERE problem_id = ${problem.slug}
-      AND status = 'solved'
-      AND created_at::date = ${today}::date
-  `;
-  const solvedToday = (row as { count: number }).count ?? 0;
-
-  // Check if the current user solved it today
-  const authUser = await getCurrentUser();
+  let solvedToday = 0;
   let userSolvedToday = false;
-  if (authUser) {
-    const [userRow] = await sql`
-      SELECT 1 FROM practice_attempts
-      WHERE user_id = ${authUser.userId}
-        AND problem_id = ${problem.slug}
+
+  try {
+    const [row] = await sql`
+      SELECT COUNT(DISTINCT user_id)::int AS count
+      FROM practice_attempts
+      WHERE problem_slug = ${problem.slug}
         AND status = 'solved'
-        AND created_at::date = ${today}::date
-      LIMIT 1
+        AND updated_at::date = ${today}::date
     `;
-    userSolvedToday = !!userRow;
+    solvedToday = (row as { count: number }).count ?? 0;
+
+    // Check if the current user solved it today
+    const authUser = await getCurrentUser();
+    if (authUser) {
+      const [userRow] = await sql`
+        SELECT 1 FROM practice_attempts
+        WHERE user_id = ${authUser.userId}
+          AND problem_slug = ${problem.slug}
+          AND status = 'solved'
+          AND updated_at::date = ${today}::date
+        LIMIT 1
+      `;
+      userSolvedToday = !!userRow;
+    }
+  } catch {
+    // DB stats are non-critical — continue with defaults (0 solvers, not solved)
   }
 
   return NextResponse.json({

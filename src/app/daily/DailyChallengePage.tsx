@@ -33,8 +33,8 @@ export default function DailyChallengePage() {
     Promise.all([
       apiFetch("/api/daily-challenge").then((r) => r.json()),
       apiFetch("/api/leaderboard?period=week").then((r) => r.json()),
-    ]).then(([d, l]) => {
-      setDaily(d);
+    ])    .then(([d, l]) => {
+      setDaily(d?.slug ? d : null);
       setLeaders(Array.isArray(l) ? l.slice(0, 10) : []);
     }).catch(() => {}).finally(() => setLoading(false));
   }, []);
