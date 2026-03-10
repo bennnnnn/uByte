@@ -9,6 +9,7 @@ import { getLangIcon } from "@/lib/languages/icons";
 import { EXAM_DURATION_MINUTES, EXAM_LANGS } from "@/lib/exams/config";
 import type { AttemptPayload, SubmitExamResponse } from "@/lib/exams/api-types";
 import { parseJson, getApiErrorMessage } from "@/lib/fetch-utils";
+import { apiFetch } from "@/lib/api-client";
 import { usePassPercent } from "@/hooks/usePassPercent";
 import Spinner from "@/components/Spinner";
 
@@ -157,10 +158,9 @@ export default function PracticeExamAttemptPage() {
     setSubmitting(true);
     setError(null);
     try {
-      const res = await fetch(`/api/certifications/attempt/${attempt.attemptId}/submit`, {
+      const res = await apiFetch(`/api/certifications/attempt/${attempt.attemptId}/submit`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        credentials: "same-origin",
         body: JSON.stringify({ answers }),
       });
       const data = await parseJson<SubmitExamResponse & { error?: string }>(res);
