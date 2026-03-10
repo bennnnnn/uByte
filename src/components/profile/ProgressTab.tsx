@@ -165,12 +165,24 @@ function LanguageProgressCard({
                 <div key={i} className="h-10 animate-pulse rounded-lg bg-zinc-100 dark:bg-zinc-800" />
               ))}
             </div>
-          ) : slugs.length === 0 ? (
+          ) : lp.completed === 0 ? (
+            // No steps completed at all — genuine empty state
             <p className="py-4 text-center text-sm text-zinc-400">
               No lessons completed.{" "}
               <TextLink href={`/tutorial/${lp.lang}`}>Start {lp.name} →</TextLink>
             </p>
+          ) : slugs.length === 0 ? (
+            // Steps completed but no full chapter finished yet — show progress summary
+            <div className="py-3 text-center">
+              <p className="text-sm text-zinc-500">
+                {lp.completed} lesson{lp.completed !== 1 ? "s" : ""} completed — keep going to finish your first chapter!
+              </p>
+              <TextLink href={`/tutorial/${lp.lang}`} className="mt-2 inline-block text-xs">
+                Continue {lp.name} →
+              </TextLink>
+            </div>
           ) : (
+            // At least one full chapter done — list completed chapters
             <ul className="space-y-1.5">
               {slugs.map((slug) => (
                 <li key={slug}>
@@ -187,7 +199,7 @@ function LanguageProgressCard({
               ))}
             </ul>
           )}
-          {!loading && lp.completed < lp.total && slugs.length > 0 && (
+          {!loading && lp.completed > 0 && lp.completed < lp.total && slugs.length > 0 && (
             <div className="mt-2 border-t border-zinc-100 pt-2 dark:border-zinc-800">
               <TextLink href={`/tutorial/${lp.lang}`} className="text-xs">
                 Continue {lp.name} ({lp.total - lp.completed} lessons remaining) →
