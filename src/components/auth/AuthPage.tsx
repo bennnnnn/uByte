@@ -20,10 +20,16 @@ import {
 
 type Mode = "login" | "signup" | "forgot";
 
-const VALUE_POINTS = [
-  "Interactive tutorials across Go, Python, JavaScript, Java, Rust, and C++",
-  "Interview prep problems with real coding workflows",
-  "Timed certification exams with pass thresholds and shareable certificates",
+const SIGNUP_VALUE_POINTS = [
+  "Interactive tutorials in Go, Python, JavaScript, Java, Rust, and C++",
+  "Hundreds of interview prep problems with instant feedback",
+  "Timed certification exams with shareable certificates",
+];
+
+const LOGIN_VALUE_POINTS = [
+  "Your XP, streaks, and completed lessons are waiting",
+  "Pick up the daily challenge or continue your tutorial",
+  "One login away from your next certification",
 ];
 
 export default function AuthPage({ variant }: { variant: AuthPageMode }) {
@@ -116,19 +122,21 @@ export default function AuthPage({ variant }: { variant: AuthPageMode }) {
             <div className="max-w-xl">
               <h1 className="mt-4 text-3xl font-black tracking-tight text-zinc-950 sm:text-4xl dark:text-white">
                 {isSignupPage
-                  ? "Build skill with guided tutorials, interview prep, and certifications."
-                  : "Pick up your tutorials, interview prep, and certifications where you left off."}
+                  ? "Learn to code. Get hired. Earn certifications."
+                  : "Good to have you back."}
               </h1>
               <p className="mt-4 max-w-lg text-base leading-7 text-zinc-600 dark:text-zinc-400">
-                Learn by doing with short lessons, real coding practice, and exam-style runs that show measurable progress.
+                {isSignupPage
+                  ? "Short, interactive lessons with a real code editor — no setup needed."
+                  : "Sign in to continue where you left off, track your streak, and unlock new challenges."}
               </p>
             </div>
 
             <div className="mt-8 space-y-3">
-              {VALUE_POINTS.map((point) => (
+              {(isSignupPage ? SIGNUP_VALUE_POINTS : LOGIN_VALUE_POINTS).map((point) => (
                 <div key={point} className="flex items-start gap-3 px-1 py-2">
                   <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-indigo-600 text-[11px] font-black text-white">
-                    +
+                    ✓
                   </span>
                   <p className="text-sm leading-6 text-zinc-700 dark:text-zinc-300">{point}</p>
                 </div>
@@ -280,7 +288,7 @@ export default function AuthPage({ variant }: { variant: AuthPageMode }) {
                           onClick={() => switchMode("forgot")}
                           className="text-xs font-semibold uppercase tracking-[0.14em] text-indigo-600 transition-colors hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300"
                         >
-                          Forgot?
+                          Forgot password?
                         </button>
                       )}
                     </div>
@@ -291,7 +299,7 @@ export default function AuthPage({ variant }: { variant: AuthPageMode }) {
                       minLength={MIN_PASSWORD_LENGTH}
                       value={password}
                       onChange={(event) => setPassword(event.target.value)}
-                      placeholder="6+ chars, Aa1"
+                      placeholder={isSignupPage ? "At least 6 characters" : "Your password"}
                       className="rounded-2xl border-zinc-200 bg-surface-card px-4 py-3 dark:border-zinc-800"
                     />
                   </div>
@@ -302,16 +310,16 @@ export default function AuthPage({ variant }: { variant: AuthPageMode }) {
                     size="lg"
                     className="w-full"
                   >
-                    {submitting ? "Please wait…" : isSignupPage ? "Create account" : "Sign in"}
+                    {submitting ? (isSignupPage ? "Creating account…" : "Signing in…") : isSignupPage ? "Create free account" : "Sign in"}
                   </Button>
 
                   <p className="text-sm text-zinc-600 dark:text-zinc-400">
-                    {isSignupPage ? "Already have an account? " : "Need an account? "}
+                    {isSignupPage ? "Already have an account? " : "Don't have an account? "}
                     <Link
                       href={isSignupPage ? loginHref : signupHref}
                       className="font-semibold text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300"
                     >
-                      {isSignupPage ? "Sign in" : "Create one"}
+                      {isSignupPage ? "Sign in" : "Sign up free"}
                     </Link>
                   </p>
                 </form>
