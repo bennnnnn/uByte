@@ -5,7 +5,6 @@ import Link from "next/link";
 import { DIFFICULTY_BADGE, type PracticeProblem, type ProblemCategory } from "@/lib/practice/types";
 import type { SupportedLanguage } from "@/lib/languages/types";
 import { getStarterForLanguage, getAllPracticeProblems, getCategoryForSlug, getPracticeCategories, sortProblemsByCategoryAndDifficulty } from "@/lib/practice/problems";
-import { LANGUAGES } from "@/lib/languages/registry";
 import { useCodeEditor } from "@/hooks/useCodeEditor";
 import { usePanelResize } from "@/hooks/usePanelResize";
 import { useFormatCode } from "@/hooks/useFormatCode";
@@ -17,549 +16,13 @@ import type { PracticeAttemptStatus } from "@/lib/db/practice-attempts";
 import { useAuth } from "@/components/AuthProvider";
 import { apiFetch } from "@/lib/api-client";
 import { useIsMobile } from "@/hooks/useIsMobile";
-
 import { ALL_LANGUAGE_KEYS } from "@/lib/languages/registry";
-import AiFeedbackCard from "@/components/AiFeedbackCard";
 import GuestConversionPrompt from "@/components/GuestConversionPrompt";
+import { CodeEditor } from "@/components/editor/CodeEditor";
+import { EditorToolbar } from "@/components/editor/EditorToolbar";
+import { OutputPanel, type VerdictState } from "./OutputPanel";
 
 const LANG_ORDER = ALL_LANGUAGE_KEYS;
-
-// ── Output / Test Cases panel ─────────────────────────────────────────────────
-
-type VerdictState = {
-  type: "accepted" | "wrong_answer" | "compile_error" | "runtime_error" | "tle" | "error";
-  message: string;
-  output?: string;
-  passedCases?: number;
-  totalCases?: number;
-  submissionId?: number;
-  failedInput?: string;
-  failedExpected?: string;
-  failedActual?: string;
-  consecutiveFailures?: number;
-} | null;
-
-function OutputPanel({
-  verdict,
-  output,
-  outputIsError,
-  outputHeight,
-  problem,
-  aiLoading,
-  aiError,
-  aiUpgradeRequired,
-  aiLoginRequired,
-  aiFeedback,
-  onRequestAI,
-  onClearAI,
-  codeReview,
-  codeReviewLoading,
-  codeReviewUpgrade,
-  onRequestCodeReview,
-  onClearCodeReview,
-  interviewMode,
-}: {
-  verdict: VerdictState;
-  output: string | null;
-  outputIsError: boolean;
-  outputHeight: number;
-  problem: PracticeProblem;
-  aiLoading: boolean;
-  aiError: string | null;
-  aiUpgradeRequired: boolean;
-  aiLoginRequired: boolean;
-  aiFeedback: { friendly_one_liner: string; hint: string; next_step: string; minimal_patch?: string } | null;
-  onRequestAI: () => void;
-  onClearAI: () => void;
-  codeReview: import("@/lib/ai/code-review-client").CodeReviewSchema | null;
-  codeReviewLoading: boolean;
-  codeReviewUpgrade: boolean;
-  onRequestCodeReview: () => void;
-  onClearCodeReview: () => void;
-  interviewMode: boolean;
-}) {
-  // Always start on console; the useEffect below switches to tests when a verdict arrives
-  const [activeTab, setActiveTab] = useState<"console" | "tests">("console");
-  const [selectedCase, setSelectedCase] = useState<number>(
-    verdict?.type === "wrong_answer" ? (verdict.passedCases ?? 0) : 0
-  );
-
-  // Sync active tab when verdict changes
-  useEffect(() => {
-    if (verdict) setActiveTab("tests");
-    else setActiveTab("console");
-  }, [verdict?.type]);
-
-  // Sync selected case to first failure on new verdict
-  useEffect(() => {
-    if (verdict?.type === "wrong_answer") {
-      setSelectedCase(verdict.passedCases ?? 0);
-    } else {
-      setSelectedCase(0);
-    }
-  }, [verdict]);
-
-  const totalCases = verdict?.totalCases ?? problem.testCases?.length ?? 0;
-  const passedCases = verdict?.passedCases ?? 0;
-  const failedIndex = verdict?.type === "wrong_answer" ? (verdict.passedCases ?? 0) : -1;
-
-  // Test case status for each case
-  function caseStatus(idx: number): "pass" | "fail" | "unknown" {
-    if (!verdict) return "unknown";
-    if (verdict.type === "accepted") return "pass";
-    if (verdict.type === "wrong_answer") {
-      if (idx < passedCases) return "pass";
-      if (idx === failedIndex) return "fail";
-      return "unknown";
-    }
-    return "unknown";
-  }
-
-  const verdictColors = verdict
-    ? verdict.type === "accepted"
-      ? { bg: "bg-emerald-50 dark:bg-emerald-950/40", border: "border-emerald-200 dark:border-emerald-800", text: "text-emerald-700 dark:text-emerald-400" }
-      : verdict.type === "tle"
-      ? { bg: "bg-amber-50 dark:bg-amber-950/40", border: "border-amber-200 dark:border-amber-800", text: "text-amber-700 dark:text-amber-400" }
-      : { bg: "bg-red-50 dark:bg-red-950/40", border: "border-red-200 dark:border-red-800", text: "text-red-700 dark:text-red-400" }
-    : null;
-
-  const selectedTestCase = problem.testCases?.[selectedCase];
-
-  return (
-    <div
-      className="flex shrink-0 flex-col overflow-hidden bg-surface-card"
-      style={{ height: outputHeight }}
-      suppressHydrationWarning
-    >
-      {/* ── Tab bar ────────────────────────────────────────────────────── */}
-      <div className="flex shrink-0 items-center border-b border-zinc-200 bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900">
-        {(["console", "tests"] as const).map((tab) => (
-          <button
-            key={tab}
-            type="button"
-            onClick={() => setActiveTab(tab)}
-            className={`flex items-center gap-1.5 border-b-2 px-4 py-2 text-xs font-semibold transition-colors ${
-              activeTab === tab
-                ? "border-indigo-500 text-indigo-600 dark:text-indigo-400"
-                : "border-transparent text-zinc-400 hover:text-zinc-700 dark:text-zinc-500 dark:hover:text-zinc-300"
-            }`}
-          >
-            {tab === "console" ? "Console" : "Test Cases"}
-            {tab === "tests" && verdict && (
-              <span className={`rounded-full px-1.5 py-0.5 text-[10px] font-bold ${
-                verdict.type === "accepted"
-                  ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-400"
-                  : "bg-red-100 text-red-700 dark:bg-red-900/50 dark:text-red-400"
-              }`}>
-                {verdict.type === "accepted" ? `${totalCases}/${totalCases}` : `${passedCases}/${totalCases}`}
-              </span>
-            )}
-          </button>
-        ))}
-
-        {/* AI hint button/prompt area — hidden while a hint is already visible */}
-        {verdict && verdict.type !== "accepted" && verdict.submissionId != null && !aiFeedback && (
-          <div className="ml-auto px-3">
-            {aiLoginRequired ? (
-              /* Inline login prompt — shown for guests */
-              <div className="flex items-center gap-2 rounded-lg border border-indigo-200 bg-indigo-50 px-3 py-1.5 dark:border-indigo-800 dark:bg-indigo-950/40">
-                <span className="text-xs text-indigo-600 dark:text-indigo-400">
-                  💡 Sign in for AI hints —
-                </span>
-                <a
-                  href="/signup"
-                  className="text-xs font-bold text-indigo-700 underline underline-offset-2 hover:text-indigo-500 dark:text-indigo-300"
-                >
-                  Sign up free →
-                </a>
-                <a
-                  href="/login"
-                  className="text-xs text-indigo-600 underline underline-offset-2 hover:text-indigo-500 dark:text-indigo-400"
-                >
-                  Log in
-                </a>
-              </div>
-            ) : aiUpgradeRequired ? (
-              /* Inline upgrade prompt — shown when free hint limit is reached */
-              <div className="flex items-center gap-2 rounded-lg border border-indigo-200 bg-indigo-50 px-3 py-1.5 dark:border-indigo-800 dark:bg-indigo-950/40">
-                <span className="text-xs text-indigo-600 dark:text-indigo-400">
-                  💡 5 free hints used —
-                </span>
-                <a
-                  href="/pricing"
-                  className="text-xs font-bold text-indigo-700 underline underline-offset-2 hover:text-indigo-500 dark:text-indigo-300"
-                >
-                  Upgrade for unlimited →
-                </a>
-              </div>
-            ) : (
-              <button
-                type="button"
-                onClick={onRequestAI}
-                disabled={aiLoading}
-                className="flex items-center gap-1.5 rounded-lg border border-indigo-300 bg-indigo-50 px-3 py-1 text-xs font-semibold text-indigo-700 transition-colors hover:bg-indigo-100 disabled:opacity-40 dark:border-indigo-700 dark:bg-indigo-950/40 dark:text-indigo-400 dark:hover:bg-indigo-950/70"
-              >
-                {aiLoading ? (
-                  <>
-                    <span className="animate-spin">⟳</span> Thinking…
-                  </>
-                ) : (
-                  <>💡 Get hint</>
-                )}
-              </button>
-            )}
-          </div>
-        )}
-      </div>
-
-      <div className="flex-1 overflow-y-auto overflow-x-hidden">
-
-        {/* ── Console tab ─────────────────────────────────────────────── */}
-        {activeTab === "console" && (
-          <div className="p-4 font-mono">
-            {output === null && !verdict ? (
-              <div className="flex flex-col items-center justify-center py-8 text-center">
-                <span className="mb-2 text-2xl">💻</span>
-                <p className="text-sm font-medium text-zinc-500 dark:text-zinc-400">
-                  Click <kbd className="rounded bg-zinc-200 px-1.5 py-0.5 text-xs dark:bg-zinc-700">Run</kbd> to execute your code
-                </p>
-                <p className="mt-1 text-xs text-zinc-400 dark:text-zinc-500">
-                  Or <kbd className="rounded bg-zinc-200 px-1.5 py-0.5 text-xs dark:bg-zinc-700">Submit</kbd> to run against all hidden test cases
-                </p>
-              </div>
-            ) : output !== null ? (
-              <>
-                <div className="mb-2 flex items-center gap-2">
-                  <span className={`text-xs font-bold uppercase tracking-widest ${outputIsError ? "text-red-500" : "text-green-600 dark:text-green-400"}`}>
-                    {outputIsError ? "Error" : "Console Output"}
-                  </span>
-                </div>
-                <pre className={`whitespace-pre-wrap break-words rounded-lg p-3 text-xs ${
-                  outputIsError
-                    ? "bg-red-50 text-red-700 dark:bg-red-950/40 dark:text-red-300"
-                    : "bg-zinc-900 text-green-400 dark:bg-zinc-950"
-                }`}>
-                  {output === "(no output)" ? <span className="text-zinc-500">(no output)</span> : output}
-                </pre>
-                {!outputIsError && output !== "(no output)" && (
-                  <p className="mt-2 text-[11px] text-zinc-400 dark:text-zinc-500">
-                    This is the output of your <code>main()</code>. Click <strong>Submit</strong> to run against all test cases.
-                  </p>
-                )}
-              </>
-            ) : null}
-
-            {/* Compile / runtime error from submit also appears in console */}
-            {verdict && (verdict.type === "compile_error" || verdict.type === "runtime_error") && verdict.output && (
-              <>
-                <div className="mb-2 flex items-center gap-2">
-                  <span className="text-xs font-bold uppercase tracking-widest text-red-500">
-                    {verdict.type === "compile_error" ? "Compile Error" : "Runtime Error"}
-                  </span>
-                </div>
-                <pre className="whitespace-pre-wrap break-words rounded-lg bg-red-50 p-3 text-xs text-red-700 dark:bg-red-950/40 dark:text-red-300">
-                  {verdict.output}
-                </pre>
-              </>
-            )}
-          </div>
-        )}
-
-        {/* ── Test Cases tab ──────────────────────────────────────────── */}
-        {activeTab === "tests" && (
-          <div>
-            {!verdict ? (
-              <div className="flex flex-col items-center justify-center py-8 text-center">
-                <span className="mb-2 text-2xl">🧪</span>
-                <p className="text-sm font-medium text-zinc-500 dark:text-zinc-400">
-                  Click <kbd className="rounded bg-zinc-200 px-1.5 py-0.5 text-xs dark:bg-zinc-700">Submit</kbd> to run against all test cases
-                </p>
-                <p className="mt-1 text-xs text-zinc-400 dark:text-zinc-500">
-                  {totalCases} hidden test case{totalCases !== 1 ? "s" : ""}
-                </p>
-              </div>
-            ) : (
-              <>
-                {/* Verdict banner */}
-                {verdictColors && (
-                  <div className={`flex items-center gap-3 border-b px-4 py-3 ${verdictColors.bg} ${verdictColors.border}`}>
-                    <span className="text-2xl">
-                      {verdict.type === "accepted" ? "🎉"
-                        : verdict.type === "tle" ? "⏱"
-                        : verdict.type === "compile_error" ? "🔧"
-                        : verdict.type === "runtime_error" ? "💥"
-                        : "❌"}
-                    </span>
-                    <div className="min-w-0 flex-1">
-                      <p className={`font-bold ${verdictColors.text}`}>{verdict.message}</p>
-                      {(verdict.type === "wrong_answer" || verdict.type === "accepted") && totalCases > 0 && (
-                        <div className="mt-1.5 flex items-center gap-2">
-                          <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-zinc-200 dark:bg-zinc-700">
-                            <div
-                              className={`h-full rounded-full ${verdict.type === "accepted" ? "bg-emerald-500" : "bg-red-500"}`}
-                              style={{ width: `${totalCases > 0 ? (passedCases / totalCases) * 100 : 0}%` }}
-                            />
-                          </div>
-                          <span className={`shrink-0 text-xs font-semibold ${verdictColors.text}`}>
-                            {passedCases} / {totalCases} passed
-                          </span>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                )}
-
-                {/* ── Wrong Answer / Accepted: chip row + per-case detail ── */}
-                {(verdict.type === "accepted" || verdict.type === "wrong_answer") && totalCases > 0 && (
-                  <div className="p-4">
-                    {/* Chips */}
-                    <div className="mb-4 flex flex-wrap gap-2">
-                      {Array.from({ length: totalCases }).map((_, idx) => {
-                        const status = caseStatus(idx);
-                        return (
-                          <button
-                            key={idx}
-                            type="button"
-                            onClick={() => setSelectedCase(idx)}
-                            className={`flex h-8 items-center gap-1.5 rounded-lg border px-3 text-xs font-semibold transition-all ${
-                              selectedCase === idx
-                                ? status === "pass"
-                                  ? "border-emerald-500 bg-emerald-500 text-white shadow-sm"
-                                  : status === "fail"
-                                  ? "border-red-500 bg-red-500 text-white shadow-sm"
-                                  : "border-zinc-400 bg-zinc-600 text-white"
-                                : status === "pass"
-                                ? "border-emerald-300 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 dark:border-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400"
-                                : status === "fail"
-                                ? "border-red-300 bg-red-50 text-red-700 hover:bg-red-100 dark:border-red-700 dark:bg-red-950/40 dark:text-red-400"
-                                : "border-zinc-200 bg-zinc-100 text-zinc-400 dark:border-zinc-700 dark:bg-zinc-800"
-                            }`}
-                          >
-                            {status === "pass" ? "✓" : status === "fail" ? "✗" : "—"}
-                            <span>Case {idx + 1}</span>
-                          </button>
-                        );
-                      })}
-                    </div>
-
-                    {/* Per-case detail */}
-                    {selectedTestCase && (
-                      <div className="space-y-3">
-                        <div>
-                          <p className="mb-1.5 text-[11px] font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">Input</p>
-                          <pre className="rounded-lg bg-zinc-100 p-3 font-mono text-xs text-zinc-800 dark:bg-zinc-800 dark:text-zinc-200">
-                            {selectedTestCase.stdin}
-                          </pre>
-                        </div>
-
-                        {caseStatus(selectedCase) === "fail" && (
-                          <div className="grid gap-3 sm:grid-cols-2">
-                            <div>
-                              <p className="mb-1.5 text-[11px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">Expected Output</p>
-                              <pre className="rounded-lg border border-emerald-200 bg-emerald-50 p-3 font-mono text-xs text-emerald-800 dark:border-emerald-800 dark:bg-emerald-950/30 dark:text-emerald-300">
-                                {selectedTestCase.expectedOutput}
-                              </pre>
-                            </div>
-                            <div>
-                              <p className="mb-1.5 text-[11px] font-bold uppercase tracking-wider text-red-600 dark:text-red-400">Your Output</p>
-                              <pre className="rounded-lg border border-red-200 bg-red-50 p-3 font-mono text-xs text-red-800 dark:border-red-800 dark:bg-red-950/30 dark:text-red-300">
-                                {verdict.failedActual != null && verdict.failedActual !== "" ? verdict.failedActual : "(no output — did your function return a value?)"}
-                              </pre>
-                            </div>
-                          </div>
-                        )}
-
-                        {caseStatus(selectedCase) === "pass" && (
-                          <div>
-                            <p className="mb-1.5 text-[11px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">Output ✓</p>
-                            <pre className="rounded-lg border border-emerald-200 bg-emerald-50 p-3 font-mono text-xs text-emerald-800 dark:border-emerald-800 dark:bg-emerald-950/30 dark:text-emerald-300">
-                              {selectedTestCase.expectedOutput}
-                            </pre>
-                          </div>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                )}
-
-                {/* ── Compile error ── */}
-                {verdict.type === "compile_error" && (
-                  <div className="p-4">
-                    <p className="mb-2 text-xs font-bold uppercase tracking-wider text-red-500">Compiler Output</p>
-                    <pre className="whitespace-pre-wrap break-words rounded-lg border border-red-200 bg-red-50 p-3 font-mono text-xs text-red-800 dark:border-red-800 dark:bg-red-950/30 dark:text-red-300">
-                      {verdict.output || "Compilation failed — no output captured."}
-                    </pre>
-                    <p className="mt-2 text-xs text-zinc-400 dark:text-zinc-500">Fix the errors above, then submit again.</p>
-                  </div>
-                )}
-
-                {/* ── Runtime error ── */}
-                {verdict.type === "runtime_error" && (
-                  <div className="p-4">
-                    <p className="mb-2 text-xs font-bold uppercase tracking-wider text-red-500">Runtime Error</p>
-                    <pre className="whitespace-pre-wrap break-words rounded-lg border border-red-200 bg-red-50 p-3 font-mono text-xs text-red-800 dark:border-red-800 dark:bg-red-950/30 dark:text-red-300">
-                      {verdict.output || "Your code crashed — no stderr captured."}
-                    </pre>
-                    <p className="mt-2 text-xs text-zinc-400 dark:text-zinc-500">Fix the runtime error above, then submit again.</p>
-                  </div>
-                )}
-
-                {/* ── TLE ── */}
-                {verdict.type === "tle" && (
-                  <div className="p-4">
-                    <div className="rounded-lg border border-amber-200 bg-amber-50 p-4 dark:border-amber-800 dark:bg-amber-950/30">
-                      <p className="text-sm font-semibold text-amber-800 dark:text-amber-300">Time Limit Exceeded</p>
-                      <p className="mt-1 text-xs text-amber-700 dark:text-amber-400">
-                        Your solution took too long. Look for nested loops you can replace with a hash map, prefix sum, or DP table.
-                      </p>
-                    </div>
-                  </div>
-                )}
-
-                {/* ── Generic error (e.g. missing harness, judge unavailable) ── */}
-                {verdict.type === "error" && (
-                  <div className="p-4">
-                    <div className="rounded-lg border border-red-200 bg-red-50 p-4 dark:border-red-800 dark:bg-red-950/30">
-                      <p className="text-sm font-semibold text-red-700 dark:text-red-300">Submission Error</p>
-                      <p className="mt-1 text-xs text-red-600 dark:text-red-400">{verdict.message}</p>
-                    </div>
-                    {totalCases > 0 && (
-                      <div className="mt-4">
-                        <p className="mb-2 text-[11px] font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">Test Cases</p>
-                        <div className="space-y-2">
-                          {problem.testCases?.map((tc, idx) => (
-                            <div key={idx} className="rounded-lg border border-zinc-200 p-3 dark:border-zinc-700">
-                              <p className="mb-1 text-[10px] font-semibold text-zinc-400">Case {idx + 1}</p>
-                              <p className="font-mono text-xs text-zinc-600 dark:text-zinc-400">
-                                <span className="text-zinc-400">Input:</span> {tc.stdin}
-                              </p>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                )}
-
-                {/* ── Catch-all: show raw verdict info if nothing else matched ── */}
-                {verdict.type !== "accepted" &&
-                  verdict.type !== "wrong_answer" &&
-                  verdict.type !== "compile_error" &&
-                  verdict.type !== "runtime_error" &&
-                  verdict.type !== "tle" &&
-                  verdict.type !== "error" && (
-                  <div className="p-4">
-                    <div className="rounded-lg border border-zinc-200 bg-zinc-50 p-4 dark:border-zinc-700 dark:bg-zinc-800">
-                      <p className="text-xs font-mono text-zinc-500">verdict: {verdict.type}</p>
-                      <p className="mt-1 text-xs text-zinc-600 dark:text-zinc-300">{verdict.message}</p>
-                    </div>
-                  </div>
-                )}
-              </>
-            )}
-          </div>
-        )}
-
-        {/* ── AI feedback ─────────────────────────────────────────────── */}
-        {aiLoading && (
-          <div className="border-t border-zinc-200 px-4 py-3 dark:border-zinc-800">
-            <p className="text-xs text-zinc-400 animate-pulse dark:text-zinc-500">🤖 Analyzing your code…</p>
-          </div>
-        )}
-        {aiError && (
-          <div className="border-t border-red-200 bg-red-50 px-4 py-3 dark:border-red-800 dark:bg-red-950/30">
-            <p className="text-xs text-red-600 dark:text-red-400">{aiError}</p>
-          </div>
-        )}
-        {aiFeedback && (
-          <div className="border-t border-indigo-200 bg-indigo-50/60 px-4 py-3 dark:border-indigo-800 dark:bg-indigo-950/30">
-            <AiFeedbackCard
-              feedback={aiFeedback}
-              onClear={onClearAI}
-            />
-          </div>
-        )}
-
-        {/* ── Code review / Interview debrief ──────────────────────── */}
-        {codeReviewLoading && (
-          <div className="border-t border-violet-200 px-4 py-3 dark:border-violet-800">
-            <p className="text-xs text-violet-500 animate-pulse dark:text-violet-400">
-              {interviewMode ? "🎤 Generating your interview debrief…" : "🔍 Reviewing your code…"}
-            </p>
-          </div>
-        )}
-        {codeReviewUpgrade && !codeReview && (
-          <div className="border-t border-violet-200 bg-violet-50/60 px-4 py-3 dark:border-violet-800 dark:bg-violet-950/20">
-            <p className="text-xs font-semibold text-violet-700 dark:text-violet-300">AI code review is a Pro feature</p>
-            <a href="/pricing" className="mt-1 inline-block text-xs font-bold text-violet-600 underline underline-offset-2 hover:text-violet-500 dark:text-violet-400">
-              Upgrade to Pro →
-            </a>
-          </div>
-        )}
-        {codeReview && (
-          <div className="border-t border-violet-200 bg-violet-50/40 px-4 py-4 dark:border-violet-800 dark:bg-violet-950/20">
-            <div className="mb-3 flex items-center justify-between">
-              <p className="text-xs font-bold uppercase tracking-wider text-violet-600 dark:text-violet-400">
-                {interviewMode ? "🎤 Interview Debrief" : "🔍 Code Review"}
-              </p>
-              <div className="flex items-center gap-2">
-                <span className={`text-xs font-bold ${codeReview.score >= 7 ? "text-emerald-600 dark:text-emerald-400" : codeReview.score >= 5 ? "text-amber-600 dark:text-amber-400" : "text-red-600 dark:text-red-400"}`}>
-                  {codeReview.score}/10
-                </span>
-                <button onClick={onClearCodeReview} className="text-xs text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300">✕</button>
-              </div>
-            </div>
-            <p className="mb-3 text-sm text-zinc-700 dark:text-zinc-300">{codeReview.summary}</p>
-            <div className="mb-3 grid grid-cols-2 gap-2 text-xs">
-              <div className="rounded-lg bg-white px-3 py-2 dark:bg-zinc-800">
-                <span className="font-semibold text-zinc-500 dark:text-zinc-400">Time</span>
-                <p className="font-mono text-zinc-800 dark:text-zinc-200">{codeReview.time_complexity}</p>
-              </div>
-              <div className="rounded-lg bg-white px-3 py-2 dark:bg-zinc-800">
-                <span className="font-semibold text-zinc-500 dark:text-zinc-400">Space</span>
-                <p className="font-mono text-zinc-800 dark:text-zinc-200">{codeReview.space_complexity}</p>
-              </div>
-            </div>
-            {codeReview.strengths.length > 0 && (
-              <div className="mb-2">
-                <p className="mb-1 text-xs font-semibold text-emerald-600 dark:text-emerald-400">✓ Strengths</p>
-                <ul className="space-y-0.5 text-xs text-zinc-600 dark:text-zinc-400">
-                  {codeReview.strengths.map((s, i) => <li key={i}>• {s}</li>)}
-                </ul>
-              </div>
-            )}
-            {codeReview.improvements.length > 0 && (
-              <div className="mb-2">
-                <p className="mb-1 text-xs font-semibold text-amber-600 dark:text-amber-400">↑ Improvements</p>
-                <ul className="space-y-0.5 text-xs text-zinc-600 dark:text-zinc-400">
-                  {codeReview.improvements.map((s, i) => <li key={i}>• {s}</li>)}
-                </ul>
-              </div>
-            )}
-            {codeReview.code_style && (
-              <p className="text-xs text-zinc-500 dark:text-zinc-500 italic">{codeReview.code_style}</p>
-            )}
-          </div>
-        )}
-
-        {/* "Review my code" button — shows when code is written and no review is loading/shown */}
-        {!codeReview && !codeReviewLoading && verdict && (
-          <div className="border-t border-zinc-100 px-4 py-2 dark:border-zinc-800">
-            <button
-              type="button"
-              onClick={onRequestCodeReview}
-              disabled={codeReviewLoading}
-              className="flex items-center gap-1.5 text-xs font-medium text-violet-600 hover:text-violet-800 dark:text-violet-400 dark:hover:text-violet-300"
-            >
-              <span>🔍</span>
-              {interviewMode ? "Get interview debrief" : "Review my code"}
-            </button>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
 
 interface Props {
   problem: PracticeProblem;
@@ -1414,65 +877,19 @@ export function PracticeIDE({ problem, initialLang, initialCode, categoryFilter 
         {/* ── Right panel: editor + toolbar + output ───────────────── */}
         <div className={`flex-col overflow-hidden ${mobileTab === "code" ? "flex" : "hidden"} md:flex flex-1`}>
 
-          {/* Code editor — identical to InteractiveTutorial */}
-          <div className="flex flex-1 overflow-hidden bg-zinc-950">
-            <div
-              ref={editor.lineNumRef}
-              aria-hidden
-              className="shrink-0 select-none overflow-hidden border-r border-zinc-800 bg-zinc-900 px-3 py-4 font-mono text-sm leading-6 text-right text-zinc-600"
-            >
-              {editor.code.split("\n").map((_, i) => (
-                <div key={i} className={editor.errorLines.has(i + 1) ? "text-red-400" : ""}>
-                  {editor.errorLines.has(i + 1) ? "▶" : i + 1}
-                </div>
-              ))}
-            </div>
-            <div className="relative flex-1 overflow-hidden">
-              <div ref={editor.highlightRef} aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
-                {[...editor.errorLines].map((ln) => (
-                  <div key={ln} className="absolute left-0 right-0 bg-red-500/10" style={{ top: 16 + (ln - 1) * 24, height: 24 }} />
-                ))}
-              </div>
-              {/* Content managed imperatively via setCode() — never by React reconciliation.
-                  font-mono text-sm leading-6 are set EXPLICITLY on both elements (not via
-                  inheritance) so the browser UA stylesheet cannot swap <pre> to a different
-                  system monospace font, which would shift character widths and break
-                  click-to-position. */}
-              <pre
-                ref={editor.preRef}
-                aria-hidden
-                suppressHydrationWarning
-                className="pointer-events-none absolute inset-0 m-0 overflow-auto whitespace-pre py-4 pl-4 pr-8 font-mono text-sm leading-6 text-zinc-100"
-              />
-              <textarea
-                ref={editor.textareaRef}
-                defaultValue={editor.code}
-                onChange={(e) => editor.setCode(e.target.value)}
-                onScroll={editor.syncScroll}
-                onKeyDown={handleKeyDown}
-                spellCheck={false}
-                autoCorrect="off"
-                autoCapitalize="off"
-                aria-label="Code editor"
-                suppressHydrationWarning
-                className="absolute inset-0 m-0 resize-none overflow-auto whitespace-pre bg-transparent py-4 pl-4 pr-8 font-mono text-sm leading-6 text-transparent caret-white outline-none selection:bg-indigo-900/50"
-              />
-            </div>
-          </div>
+          {/* Shared code editor surface */}
+          <CodeEditor editor={editor} onKeyDown={handleKeyDown} />
 
-          {/* Toolbar — desktop only; mobile uses single bottom bar when on code tab */}
-          <div className="hidden shrink-0 items-center gap-2 border-t border-zinc-200 bg-zinc-50 px-4 py-2 dark:border-zinc-800 dark:bg-zinc-900 md:flex">
-            <select
-              value={lang}
-              onChange={(e) => setLang(e.target.value as SupportedLanguage)}
-              title="Code language"
-              className="rounded-md border border-zinc-300 bg-white px-2.5 py-1.5 text-sm text-zinc-700 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-200"
-            >
-              {LANG_ORDER.map((l) => (
-                <option key={l} value={l}>{LANGUAGES[l]?.name ?? l}</option>
-              ))}
-            </select>
-
+          {/* Shared toolbar — desktop only */}
+          <EditorToolbar
+            lang={lang}
+            onLangChange={setLang}
+            langOptions={LANG_ORDER}
+            formatting={formatting}
+            onFormat={async () => { const f = await format(editor.code, lang); if (f !== editor.code) editor.setCode(f); }}
+            shareCopied={shareCopied}
+            onShare={handleShare}
+          >
             <button
               type="button"
               onClick={handleRun}
@@ -1482,7 +899,6 @@ export function PracticeIDE({ problem, initialLang, initialCode, categoryFilter 
             >
               {running ? "Running…" : "▶ Run"}
             </button>
-
             {canSubmit && (
               <button
                 type="button"
@@ -1494,7 +910,6 @@ export function PracticeIDE({ problem, initialLang, initialCode, categoryFilter 
                 {submitting ? "Judging…" : "✓ Submit"}
               </button>
             )}
-
             <button
               type="button"
               onClick={handleReset}
@@ -1507,43 +922,7 @@ export function PracticeIDE({ problem, initialLang, initialCode, categoryFilter 
             >
               {resetPending ? "Confirm?" : "Reset"}
             </button>
-
-            <button
-              type="button"
-              onClick={async () => {
-                const formatted = await format(editor.code, lang);
-                if (formatted !== editor.code) editor.setCode(formatted);
-              }}
-              disabled={formatting}
-              title="Auto-format code"
-              className="rounded-md border border-zinc-300 px-3 py-1.5 text-sm text-zinc-500 transition-colors hover:border-zinc-400 hover:text-zinc-800 disabled:opacity-50 dark:border-zinc-700 dark:text-zinc-400 dark:hover:border-zinc-600 dark:hover:text-zinc-200"
-            >
-              {formatting ? "…" : "⌥ Format"}
-            </button>
-
-
-            <button
-              type="button"
-              onClick={handleShare}
-              title="Share your code — copies a link to clipboard"
-              className={`ml-auto flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-sm transition-all ${
-                shareCopied
-                  ? "border-indigo-400 bg-indigo-50 text-indigo-700 dark:border-indigo-600 dark:bg-indigo-950/30 dark:text-indigo-400"
-                  : "border-zinc-300 text-zinc-500 hover:border-zinc-400 hover:text-zinc-800 dark:border-zinc-700 dark:text-zinc-400 dark:hover:border-zinc-600 dark:hover:text-zinc-200"
-              }`}
-            >
-              {shareCopied ? (
-                <>✓ Link copied!</>
-              ) : (
-                <>
-                  <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
-                  </svg>
-                  Share
-                </>
-              )}
-            </button>
-          </div>
+          </EditorToolbar>
 
           {/* Vertical resize handle — touch-friendly on mobile */}
           <div
@@ -1581,19 +960,18 @@ export function PracticeIDE({ problem, initialLang, initialCode, categoryFilter 
         </div>
       </div>
 
-      {/* Mobile bottom bar — only when on Code tab (not on Instructions) */}
+      {/* Mobile bottom bar — shared EditorToolbar in mobile mode */}
       {mobileTab === "code" && (
-        <div className="fixed bottom-0 left-0 right-0 z-[54] flex items-center gap-2 border-t border-zinc-200 bg-zinc-50 px-3 py-2 md:hidden dark:border-zinc-800 dark:bg-zinc-900">
-          <select
-            value={lang}
-            onChange={(e) => setLang(e.target.value as SupportedLanguage)}
-            title="Language"
-            className="w-24 shrink-0 rounded-md border border-zinc-300 bg-white px-2 py-2 text-sm text-zinc-700 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-200"
-          >
-            {LANG_ORDER.map((l) => (
-              <option key={l} value={l}>{LANGUAGES[l]?.name ?? l}</option>
-            ))}
-          </select>
+        <EditorToolbar
+          lang={lang}
+          onLangChange={setLang}
+          langOptions={LANG_ORDER}
+          formatting={formatting}
+          onFormat={async () => { const f = await format(editor.code, lang); if (f !== editor.code) editor.setCode(f); }}
+          shareCopied={shareCopied}
+          onShare={handleShare}
+          mobile
+        >
           <button
             type="button"
             onClick={handleRun}
@@ -1623,7 +1001,7 @@ export function PracticeIDE({ problem, initialLang, initialCode, categoryFilter 
           >
             {resetPending ? "Confirm?" : "Reset"}
           </button>
-        </div>
+        </EditorToolbar>
       )}
 
     </div>

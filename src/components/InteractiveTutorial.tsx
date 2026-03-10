@@ -25,6 +25,8 @@ import GripDots from "@/components/GripDots";
 import { useIsMobile } from "@/hooks/useIsMobile";
 import GuestConversionPrompt from "@/components/GuestConversionPrompt";
 import GuestTopBanner from "@/components/GuestTopBanner";
+import { CodeEditor } from "@/components/editor/CodeEditor";
+import { EditorToolbar } from "@/components/editor/EditorToolbar";
 
 interface Props {
   lang: string;
@@ -237,85 +239,46 @@ export default function InteractiveTutorial({
 
         {/* Right panel */}
         <div className={`flex-col overflow-hidden ${mobileTab === "code" ? "flex" : "hidden"} md:flex flex-1`}>
-          {/* Code editor */}
-          <div className="flex flex-1 overflow-hidden bg-zinc-950" style={{ fontSize: isMobile ? fontSize : undefined }}>
-            <div ref={editor.lineNumRef} aria-hidden className="shrink-0 select-none overflow-hidden border-r border-zinc-800 bg-zinc-900 px-3 py-4 font-mono text-sm leading-6 text-right text-zinc-600">
-              {editor.code.split("\n").map((_, i) => (
-                <div key={i} className={editor.errorLines.has(i + 1) ? "text-red-400" : ""}>
-                  {editor.errorLines.has(i + 1) ? "▶" : i + 1}
-                </div>
-              ))}
-            </div>
-            <div className="relative flex-1 overflow-hidden">
-              <div ref={editor.highlightRef} aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
-                {[...editor.errorLines].map((ln) => (
-                  <div key={ln} className="absolute left-0 right-0 bg-red-500/10" style={{ top: 16 + (ln - 1) * 24, height: 24 }} />
-                ))}
-              </div>
-              {/* Content managed imperatively via setCode() — never by React reconciliation.
-                  font-mono text-sm leading-6 are set EXPLICITLY on both elements (not via
-                  inheritance) so the browser UA stylesheet cannot swap <pre> to a different
-                  system monospace font, which would shift character widths and break
-                  click-to-position. */}
-              <pre ref={editor.preRef} aria-hidden suppressHydrationWarning className="pointer-events-none absolute inset-0 m-0 overflow-auto whitespace-pre py-4 pl-4 pr-8 font-mono text-sm leading-6 text-zinc-100" />
-              <textarea ref={editor.textareaRef} defaultValue={editor.code} onChange={(e) => editor.setCode(e.target.value)} onScroll={editor.syncScroll} onKeyDown={handleKeyDown} spellCheck={false} autoCorrect="off" autoCapitalize="off" aria-label="Code editor" suppressHydrationWarning className="absolute inset-0 m-0 resize-none overflow-auto whitespace-pre bg-transparent py-4 pl-4 pr-8 font-mono text-sm leading-6 text-transparent caret-white outline-none selection:bg-indigo-900/50" />
-            </div>
-          </div>
+          {/* Shared code editor surface */}
+          <CodeEditor editor={editor} onKeyDown={handleKeyDown} fontSize={isMobile ? fontSize : undefined} />
 
-          {/* Toolbar — desktop only; mobile uses single bottom bar when on Code tab */}
-          <div className="hidden shrink-0 items-center gap-2 border-t border-zinc-200 bg-zinc-50 px-4 py-2 dark:border-zinc-800 dark:bg-zinc-900 md:flex">
-            <select
-              value={ideLang}
-              onChange={(e) => setIdeLang(e.target.value as SupportedLanguage)}
-              aria-label="Code language"
-              className="rounded-md border border-zinc-300 bg-white px-2.5 py-1.5 text-sm text-zinc-700 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-200"
+          {/* Shared toolbar — desktop only */}
+          <EditorToolbar
+            lang={ideLang}
+            onLangChange={setIdeLang}
+            langOptions={Object.keys(LANGUAGES) as SupportedLanguage[]}
+            formatting={formatting}
+            onFormat={async () => { const f = await format(editor.code, ideLang); if (f !== editor.code) editor.setCode(f); }}
+            shareCopied={shareCopied}
+            onShare={handleShare}
+            extraLeft={stepsLoading ? <span className="text-xs text-zinc-500">Loading…</span> : undefined}
+          >
+            <button
+              type="button"
+              onClick={() => stepProgress.handleRun(editor.code, editor.setErrorLines)}
+              disabled={stepProgress.status === "running"}
+              title="Run code (Ctrl+Enter)"
+              className="flex items-center gap-1.5 rounded-md bg-green-100 px-3 py-1.5 text-sm font-medium text-green-800 transition-colors hover:bg-green-200 disabled:opacity-50 dark:bg-green-900/40 dark:text-green-300 dark:hover:bg-green-900/70"
             >
-              {(Object.keys(LANGUAGES) as SupportedLanguage[]).map((l) => (
-                <option key={l} value={l}>{LANGUAGES[l].name}</option>
-              ))}
-            </select>
-            {stepsLoading && <span className="text-xs text-zinc-500">Loading…</span>}
-            <button onClick={() => stepProgress.handleRun(editor.code, editor.setErrorLines)} disabled={stepProgress.status === "running"} title="Run code (Ctrl+Enter)" className="flex items-center gap-1.5 rounded-md bg-green-100 px-3 py-1.5 text-sm font-medium text-green-800 transition-colors hover:bg-green-200 disabled:opacity-50 dark:bg-green-900/40 dark:text-green-300 dark:hover:bg-green-900/70">
               {stepProgress.status === "running" ? "Running…" : "▶ Run"}
             </button>
-            <button onClick={() => stepProgress.handleCheck(editor.code, currentStep, editor.setCode, editor.setErrorLines)} disabled={stepProgress.status === "running"} title="Check answer (Ctrl+Shift+Enter)" className="flex items-center gap-1.5 rounded-md bg-indigo-700 px-3 py-1.5 text-sm font-medium text-white transition-colors hover:bg-indigo-800 disabled:opacity-50">
+            <button
+              type="button"
+              onClick={() => stepProgress.handleCheck(editor.code, currentStep, editor.setCode, editor.setErrorLines)}
+              disabled={stepProgress.status === "running"}
+              title="Check answer (Ctrl+Shift+Enter)"
+              className="flex items-center gap-1.5 rounded-md bg-indigo-700 px-3 py-1.5 text-sm font-medium text-white transition-colors hover:bg-indigo-800 disabled:opacity-50"
+            >
               ✓ Check
             </button>
-            <button onClick={() => stepProgress.handleReset(currentStep, editor.setCode, editor.setErrorLines)} className="rounded-md border border-zinc-300 px-3 py-1.5 text-sm text-zinc-500 transition-colors hover:border-zinc-400 hover:text-zinc-800 dark:border-zinc-700 dark:text-zinc-400 dark:hover:border-zinc-600 dark:hover:text-zinc-200">
+            <button
+              type="button"
+              onClick={() => stepProgress.handleReset(currentStep, editor.setCode, editor.setErrorLines)}
+              className="rounded-md border border-zinc-300 px-3 py-1.5 text-sm text-zinc-500 transition-colors hover:border-zinc-400 hover:text-zinc-800 dark:border-zinc-700 dark:text-zinc-400 dark:hover:border-zinc-600 dark:hover:text-zinc-200"
+            >
               Reset
             </button>
-            <button
-              onClick={async () => {
-                const formatted = await format(editor.code, ideLang);
-                if (formatted !== editor.code) editor.setCode(formatted);
-              }}
-              disabled={formatting}
-              title="Auto-format code"
-              className="rounded-md border border-zinc-300 px-3 py-1.5 text-sm text-zinc-500 transition-colors hover:border-zinc-400 hover:text-zinc-800 disabled:opacity-50 dark:border-zinc-700 dark:text-zinc-400 dark:hover:border-zinc-600 dark:hover:text-zinc-200"
-            >
-              {formatting ? "…" : "⌥ Format"}
-            </button>
-            <button
-              onClick={handleShare}
-              title="Share your code — copies a link to clipboard"
-              className={`ml-auto flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-sm transition-all ${
-                shareCopied
-                  ? "border-indigo-400 bg-indigo-50 text-indigo-700 dark:border-indigo-600 dark:bg-indigo-950/30 dark:text-indigo-400"
-                  : "border-zinc-300 text-zinc-500 hover:border-zinc-400 hover:text-zinc-800 dark:border-zinc-700 dark:text-zinc-400 dark:hover:border-zinc-600 dark:hover:text-zinc-200"
-              }`}
-            >
-              {shareCopied ? (
-                <>✓ Link copied!</>
-              ) : (
-                <>
-                  <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
-                  </svg>
-                  Share
-                </>
-              )}
-            </button>
-          </div>
+          </EditorToolbar>
 
           {/* Vertical resize handle — touch-friendly on mobile */}
           <div
@@ -340,45 +303,45 @@ export default function InteractiveTutorial({
         </div>
       </div>
 
-      {/* Mobile bottom bar — only when on Code tab (not on Instructions) */}
+      {/* Mobile bottom bar — shared EditorToolbar in mobile mode */}
       {mobileTab === "code" && (
-        <div className="fixed bottom-0 left-0 right-0 z-[54] flex items-center gap-2 border-t border-zinc-200 bg-zinc-50 px-3 py-2 md:hidden dark:border-zinc-800 dark:bg-zinc-900">
-          <select
-            value={ideLang}
-            onChange={(e) => setIdeLang(e.target.value as SupportedLanguage)}
-            aria-label="Code language"
-            className="w-24 shrink-0 rounded-md border border-zinc-300 bg-white px-2 py-2 text-sm text-zinc-700 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-200"
+        <EditorToolbar
+          lang={ideLang}
+          onLangChange={setIdeLang}
+          langOptions={Object.keys(LANGUAGES) as SupportedLanguage[]}
+          formatting={formatting}
+          onFormat={async () => { const f = await format(editor.code, ideLang); if (f !== editor.code) editor.setCode(f); }}
+          shareCopied={shareCopied}
+          onShare={handleShare}
+          mobile
+        >
+          <button
+            type="button"
+            onClick={() => stepProgress.handleRun(editor.code, editor.setErrorLines)}
+            disabled={stepProgress.status === "running"}
+            aria-label={stepProgress.status === "running" ? "Running" : "Run code"}
+            className="flex flex-1 items-center justify-center gap-1 rounded-md bg-green-100 py-2 text-sm font-medium text-green-800 disabled:opacity-50 dark:bg-green-900/40 dark:text-green-300"
           >
-            {(Object.keys(LANGUAGES) as SupportedLanguage[]).map((l) => (
-              <option key={l} value={l}>{LANGUAGES[l].name}</option>
-            ))}
-          </select>
-          <button onClick={() => stepProgress.handleRun(editor.code, editor.setErrorLines)} disabled={stepProgress.status === "running"} aria-label={stepProgress.status === "running" ? "Running" : "Run code"} className="flex flex-1 items-center justify-center gap-1 rounded-md bg-green-100 py-2 text-sm font-medium text-green-800 disabled:opacity-50 dark:bg-green-900/40 dark:text-green-300">
             {stepProgress.status === "running" ? "…" : "▶ Run"}
           </button>
-          <button onClick={() => stepProgress.handleCheck(editor.code, currentStep, editor.setCode, editor.setErrorLines)} disabled={stepProgress.status === "running"} aria-label="Check answer" className="flex flex-1 items-center justify-center gap-1 rounded-md bg-indigo-700 py-2 text-sm font-medium text-white disabled:opacity-50">
+          <button
+            type="button"
+            onClick={() => stepProgress.handleCheck(editor.code, currentStep, editor.setCode, editor.setErrorLines)}
+            disabled={stepProgress.status === "running"}
+            aria-label="Check answer"
+            className="flex flex-1 items-center justify-center gap-1 rounded-md bg-indigo-700 py-2 text-sm font-medium text-white disabled:opacity-50"
+          >
             ✓ Check
           </button>
-          <button onClick={() => stepProgress.handleReset(currentStep, editor.setCode, editor.setErrorLines)} aria-label="Reset" className="flex shrink-0 items-center justify-center rounded-md border border-zinc-300 px-3 py-2 text-sm text-zinc-500 dark:border-zinc-700 dark:text-zinc-400">
+          <button
+            type="button"
+            onClick={() => stepProgress.handleReset(currentStep, editor.setCode, editor.setErrorLines)}
+            aria-label="Reset"
+            className="flex shrink-0 items-center justify-center rounded-md border border-zinc-300 px-3 py-2 text-sm text-zinc-500 dark:border-zinc-700 dark:text-zinc-400"
+          >
             Reset
           </button>
-          <button
-            onClick={handleShare}
-            aria-label="Share code"
-            title="Share code"
-            className={`flex shrink-0 items-center justify-center rounded-md border px-3 py-2 text-sm transition-all ${
-              shareCopied
-                ? "border-indigo-400 bg-indigo-50 text-indigo-700 dark:border-indigo-600 dark:bg-indigo-950/30 dark:text-indigo-400"
-                : "border-zinc-300 text-zinc-500 dark:border-zinc-700 dark:text-zinc-400"
-            }`}
-          >
-            {shareCopied ? "✓" : (
-              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
-              </svg>
-            )}
-          </button>
-        </div>
+        </EditorToolbar>
       )}
       {showSnapshots && (
         <SnapshotDrawer
