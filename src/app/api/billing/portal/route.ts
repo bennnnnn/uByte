@@ -70,39 +70,60 @@ export const GET = withErrorHandling("GET /api/billing/portal", async () => {
   }
 
   try {
-    // List subscriptions for this customer to get subscription IDs for deep links
+    // Fetch subscriptions so we can deep-link to the cancel page.
+    // We try active first, then all non-cancelled statuses as fallback.
     const subRes = await fetch(
-      `${PADDLE_BASE}/subscriptions?customer_id=${encodeURIComponent(customerId)}&status=active`,
-      {
+      `${PADDLE_BASE}/subscriptions?customer_id=${encodeURIComponent(customerId)}`,
+      { headers: { Authorization: `Bearer ${PADDLE_API_KEY}` } }
+    );
+    let subscriptionIds: string[] = [];
+    if (subRes.ok) {
+      const subData = (await subRes.json()) as { data?: { id: string; status: string }[] };
+      subscriptionIds = (subData.data ?? [])
+        .filter((s) => !["canceled", "paused"].includes(s.status))
+        .map((s) => s.id)
+        .filter(Boolean);
+    } else {
+      const subErr = await subRes.text();
+      console.warn("[billing-portal] Could not fetch subscriptions:", subRes.status, subErr);
+    }
+
+    async function createPortalSession(body: Record<string, unknown>) {
+      return fetch(`${PADDLE_BASE}/customers/${encodeURIComponent(customerId!)}/portal-sessions`, {
+        method: "POST",
         headers: {
           Authorization: `Bearer ${PADDLE_API_KEY}`,
           "Content-Type": "application/json",
         },
-      }
-    );
-    let subscriptionIds: string[] = [];
-    if (subRes.ok) {
-      const subData = (await subRes.json()) as { data?: { id: string }[] };
-      subscriptionIds = (subData.data ?? []).map((s) => s.id).filter(Boolean);
+        body: JSON.stringify(body),
+      });
     }
 
-    const body: { subscription_ids?: string[] } = {};
-    if (subscriptionIds.length > 0) body.subscription_ids = subscriptionIds;
+    // First attempt: include subscription IDs for the deep cancel link
+    let portalRes = subscriptionIds.length > 0
+      ? await createPortalSession({ subscription_ids: subscriptionIds })
+      : await createPortalSession({});
 
-    const portalRes = await fetch(`${PADDLE_BASE}/customers/${encodeURIComponent(customerId)}/portal-sessions`, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${PADDLE_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(body),
-    });
+    // Fallback: retry with empty body if the subscription_ids caused a Paddle error
+    if (!portalRes.ok && subscriptionIds.length > 0) {
+      console.warn("[billing-portal] Retrying portal session without subscription_ids");
+      portalRes = await createPortalSession({});
+    }
 
     if (!portalRes.ok) {
-      const errText = await portalRes.text();
-      console.error("Paddle portal-sessions error:", portalRes.status, errText);
+      const errBody = await portalRes.text();
+      console.error("[billing-portal] Paddle portal-sessions error:", portalRes.status, errBody);
+      // Surface the Paddle error type so it's easier to diagnose (never raw user data)
+      let hint = "";
+      try {
+        const parsed = JSON.parse(errBody) as { error?: { type?: string; detail?: string } };
+        const type = parsed.error?.type ?? "";
+        if (type === "request_error") hint = " (API key may be missing the customer:write scope)";
+        else if (type === "not_found") hint = " (customer not found in this environment — check sandbox vs live)";
+        else if (type === "forbidden") hint = " (API key does not have permission to create portal sessions)";
+      } catch { /* ignore parse errors */ }
       return NextResponse.json(
-        { error: "Could not open billing portal", portalUrl: null, cancelUrl: null },
+        { error: `Could not open billing portal${hint}. Please contact support.`, portalUrl: null, cancelUrl: null },
         { status: 502 }
       );
     }
@@ -122,9 +143,9 @@ export const GET = withErrorHandling("GET /api/billing/portal", async () => {
 
     return NextResponse.json({ portalUrl, cancelUrl });
   } catch (e) {
-    console.error("Billing portal error:", e);
+    console.error("[billing-portal] Unexpected error:", e);
     return NextResponse.json(
-      { error: "Failed to load billing portal", portalUrl: null, cancelUrl: null },
+      { error: "Failed to load billing portal. Please try again.", portalUrl: null, cancelUrl: null },
       { status: 500 }
     );
   }
