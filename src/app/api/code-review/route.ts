@@ -9,7 +9,7 @@ import { verifyCsrf } from "@/lib/csrf";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 import type { SupportedLanguage } from "@/lib/languages/types";
 
-const SUPPORTED_LANGS: SupportedLanguage[] = ["go", "python", "javascript", "typescript", "java", "cpp", "rust"];
+const SUPPORTED_LANGS: SupportedLanguage[] = ["go", "python", "javascript", "java", "cpp", "rust"];
 
 /** POST /api/code-review — full AI code review for any submitted code. */
 export const POST = withErrorHandling("POST /api/code-review", async (request: NextRequest) => {
