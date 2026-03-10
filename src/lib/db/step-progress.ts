@@ -109,6 +109,30 @@ export async function markStepComplete(
 }
 
 /**
+ * Returns how many non-skipped steps the user has completed per tutorial slug
+ * for a given language. Used by the profile progress breakdown.
+ * Returns only tutorials that have at least one completed step.
+ */
+export async function getStepProgressSummaryByLanguage(
+  userId: number,
+  language: string
+): Promise<Map<string, number>> {
+  await ensureTable();
+  const sql = getSql();
+  const rows = await sql`
+    SELECT tutorial_slug, COUNT(*)::int AS cnt
+    FROM step_progress
+    WHERE user_id = ${userId} AND language = ${language} AND skipped = FALSE
+    GROUP BY tutorial_slug
+  `;
+  const result = new Map<string, number>();
+  for (const r of rows) {
+    result.set(r.tutorial_slug as string, r.cnt as number);
+  }
+  return result;
+}
+
+/**
  * Count non-skipped completed steps per language for a user.
  * Used by /api/progress/all and the profile stats API so that
  * progress bars count individual steps, not whole tutorials.

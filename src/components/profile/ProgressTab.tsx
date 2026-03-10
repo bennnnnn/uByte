@@ -6,45 +6,27 @@ import { Card, TextLink } from "@/components/ui";
 import type { Stats, LangProgress } from "./types";
 import { tutorialUrl } from "@/lib/urls";
 
+const PAGE_SIZE = 8;
+
+interface TutorialSummary {
+  slug: string;
+  title: string;
+  completedSteps: number;
+  totalSteps: number;
+}
+
 interface Props {
   stats: Stats;
-  userId?: number;
+  userId?: number; // kept for API compat; not currently used client-side
 }
 
-function formatSlug(slug: string): string {
-  return slug.split("-").map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
-}
-
-export default function ProgressTab({ stats, userId }: Props) {
-  const [progressByLang, setProgressByLang] = useState<Record<string, string[]>>({});
-  const [loading, setLoading] = useState(true);
-  const [fetchError, setFetchError] = useState(false);
+export default function ProgressTab({ stats }: Props) {
   const [expandedLang, setExpandedLang] = useState<string | null>(null);
 
   const langs = stats.byLanguage ?? [];
   const totalPct = stats.total_tutorials > 0
     ? Math.round((stats.completed_count / stats.total_tutorials) * 100)
     : 0;
-
-  useEffect(() => {
-    if (langs.length === 0) { setLoading(false); return; }
-
-    Promise.all(
-      langs.map((lp) =>
-        fetch(`/api/progress?lang=${lp.lang}`, { credentials: "same-origin" })
-          .then((r) => r.json())
-          .then((d) => ({ lang: lp.lang, slugs: (d.progress as string[]) ?? [] }))
-      )
-    )
-      .then((results) => {
-        const map: Record<string, string[]> = {};
-        for (const r of results) map[r.lang] = r.slugs;
-        setProgressByLang(map);
-      })
-      .catch(() => setFetchError(true))
-      .finally(() => setLoading(false));
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   return (
     <div className="space-y-6">
@@ -79,8 +61,6 @@ export default function ProgressTab({ stats, userId }: Props) {
             <LanguageProgressCard
               key={lp.lang}
               lp={lp}
-              slugs={progressByLang[lp.lang] ?? []}
-              loading={loading}
               expanded={expandedLang === lp.lang}
               onToggle={() => setExpandedLang((prev) => (prev === lp.lang ? null : lp.lang))}
             />
@@ -88,14 +68,8 @@ export default function ProgressTab({ stats, userId }: Props) {
         </div>
       )}
 
-      {fetchError && (
-        <Card className="py-10 text-center">
-          <p className="text-sm text-zinc-500">Could not load detailed progress. Try refreshing the page.</p>
-        </Card>
-      )}
-
       {/* Empty state */}
-      {!loading && stats.completed_count === 0 && (
+      {stats.completed_count === 0 && (
         <Card className="py-10 text-center">
           <p className="text-2xl">📚</p>
           <p className="mt-2 text-sm text-zinc-500">No lessons completed yet.</p>
@@ -110,19 +84,34 @@ export default function ProgressTab({ stats, userId }: Props) {
 
 function LanguageProgressCard({
   lp,
-  slugs,
-  loading,
   expanded,
   onToggle,
 }: {
   lp: LangProgress;
-  slugs: string[];
-  loading: boolean;
   expanded: boolean;
   onToggle: () => void;
 }) {
+  const [tutorials, setTutorials] = useState<TutorialSummary[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [page, setPage] = useState(0);
+
   const pct = lp.total > 0 ? Math.round((lp.completed / lp.total) * 100) : 0;
   const isComplete = lp.total > 0 && lp.completed >= lp.total;
+
+  // Fetch per-tutorial step breakdown the first time the card is expanded
+  useEffect(() => {
+    if (!expanded || tutorials.length > 0 || lp.completed === 0) return;
+    setLoading(true);
+    fetch(`/api/progress/steps/summary?lang=${lp.lang}`, { credentials: "same-origin" })
+      .then((r) => r.json())
+      .then((d) => setTutorials(Array.isArray(d.tutorials) ? d.tutorials : []))
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, [expanded, lp.lang, lp.completed, tutorials.length]);
+
+  // Pagination
+  const totalPages = Math.ceil(tutorials.length / PAGE_SIZE);
+  const paginated = tutorials.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
 
   return (
     <Card className="overflow-hidden">
@@ -139,7 +128,7 @@ function LanguageProgressCard({
           <div className="flex items-center justify-between">
             <span className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">{lp.name}</span>
             <span className="text-sm font-bold text-zinc-600 dark:text-zinc-300">
-              {lp.completed}/{lp.total}
+              {lp.completed} / {lp.total} lessons
             </span>
           </div>
           <div className="mt-1.5 h-2 overflow-hidden rounded-full bg-zinc-100 dark:bg-zinc-800">
@@ -158,53 +147,97 @@ function LanguageProgressCard({
       </button>
 
       {expanded && (
-        <div className="border-t border-zinc-100 px-4 py-3 dark:border-zinc-800">
+        <div className="border-t border-zinc-100 dark:border-zinc-800">
           {loading ? (
-            <div className="space-y-2">
+            <div className="space-y-2 p-4">
               {[...Array(3)].map((_, i) => (
                 <div key={i} className="h-10 animate-pulse rounded-lg bg-zinc-100 dark:bg-zinc-800" />
               ))}
             </div>
           ) : lp.completed === 0 ? (
-            // No steps completed at all — genuine empty state
-            <p className="py-4 text-center text-sm text-zinc-400">
-              No lessons completed.{" "}
+            <p className="px-4 py-5 text-center text-sm text-zinc-400">
+              No lessons completed yet.{" "}
               <TextLink href={`/tutorial/${lp.lang}`}>Start {lp.name} →</TextLink>
             </p>
-          ) : slugs.length === 0 ? (
-            // Steps completed but no full chapter finished yet — show progress summary
-            <div className="py-3 text-center">
-              <p className="text-sm text-zinc-500">
-                {lp.completed} lesson{lp.completed !== 1 ? "s" : ""} completed — keep going to finish your first chapter!
-              </p>
-              <TextLink href={`/tutorial/${lp.lang}`} className="mt-2 inline-block text-xs">
-                Continue {lp.name} →
-              </TextLink>
-            </div>
           ) : (
-            // At least one full chapter done — list completed chapters
-            <ul className="space-y-1.5">
-              {slugs.map((slug) => (
-                <li key={slug}>
-                  <Link
-                    href={tutorialUrl(lp.lang, slug)}
-                    className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm transition-colors hover:bg-zinc-100 dark:hover:bg-zinc-800"
+            <>
+              <ul className="divide-y divide-zinc-100 dark:divide-zinc-800">
+                {paginated.map((t) => {
+                  const done = t.totalSteps > 0 && t.completedSteps >= t.totalSteps;
+                  const stepPct = t.totalSteps > 0
+                    ? Math.round((t.completedSteps / t.totalSteps) * 100)
+                    : 0;
+                  return (
+                    <li key={t.slug}>
+                      <Link
+                        href={tutorialUrl(lp.lang, t.slug)}
+                        className="flex items-center gap-3 px-4 py-3 transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-800/50"
+                      >
+                        {/* Done/partial indicator */}
+                        <span className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-bold ${
+                          done
+                            ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-400"
+                            : "bg-indigo-50 text-indigo-600 dark:bg-indigo-950 dark:text-indigo-400"
+                        }`}>
+                          {done
+                            ? <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>
+                            : `${stepPct}%`
+                          }
+                        </span>
+                        <div className="min-w-0 flex-1">
+                          <p className="truncate text-sm font-medium text-zinc-800 dark:text-zinc-200">
+                            {t.title}
+                          </p>
+                          <div className="mt-1 flex items-center gap-2">
+                            <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-zinc-100 dark:bg-zinc-800">
+                              <div
+                                className={`h-full rounded-full ${done ? "bg-emerald-500" : "bg-indigo-500"}`}
+                                style={{ width: `${stepPct}%` }}
+                              />
+                            </div>
+                            <span className="shrink-0 text-xs text-zinc-400">
+                              {t.completedSteps}/{t.totalSteps}
+                            </span>
+                          </div>
+                        </div>
+                      </Link>
+                    </li>
+                  );
+                })}
+              </ul>
+
+              {/* Pagination */}
+              {totalPages > 1 && (
+                <div className="flex items-center justify-between border-t border-zinc-100 px-4 py-2 dark:border-zinc-800">
+                  <button
+                    onClick={() => setPage((p) => Math.max(0, p - 1))}
+                    disabled={page === 0}
+                    className="rounded px-2 py-1 text-xs text-zinc-500 transition-colors hover:bg-zinc-100 disabled:opacity-40 dark:hover:bg-zinc-800"
                   >
-                    <svg className="h-4 w-4 shrink-0 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
-                    </svg>
-                    <span className="text-zinc-700 dark:text-zinc-300">{formatSlug(slug)}</span>
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          )}
-          {!loading && lp.completed > 0 && lp.completed < lp.total && slugs.length > 0 && (
-            <div className="mt-2 border-t border-zinc-100 pt-2 dark:border-zinc-800">
-              <TextLink href={`/tutorial/${lp.lang}`} className="text-xs">
-                Continue {lp.name} ({lp.total - lp.completed} lessons remaining) →
-              </TextLink>
-            </div>
+                    ← Prev
+                  </button>
+                  <span className="text-xs text-zinc-400">
+                    {page + 1} / {totalPages}
+                  </span>
+                  <button
+                    onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
+                    disabled={page >= totalPages - 1}
+                    className="rounded px-2 py-1 text-xs text-zinc-500 transition-colors hover:bg-zinc-100 disabled:opacity-40 dark:hover:bg-zinc-800"
+                  >
+                    Next →
+                  </button>
+                </div>
+              )}
+
+              {/* Continue CTA */}
+              {!isComplete && (
+                <div className="border-t border-zinc-100 px-4 py-2.5 dark:border-zinc-800">
+                  <TextLink href={`/tutorial/${lp.lang}`} className="text-xs">
+                    Continue {lp.name} ({lp.total - lp.completed} lessons remaining) →
+                  </TextLink>
+                </div>
+              )}
+            </>
           )}
         </div>
       )}
