@@ -3,31 +3,20 @@ import { clearStepProgress } from "./step-progress";
 
 const DEFAULT_LANG = "go";
 
-
 /**
- * One-time lazy migration: adds the language column + correct unique constraint
- * to the progress table. Safe to call on every server start — it's a no-op
- * once the column and constraint already exist.
- *
- * Why lazy instead of a separate migration script? The DB may be used by
- * Vercel serverless functions that don't run migration scripts on deploy.
- * Running it here ensures the migration happens automatically on first use.
+ * Lazy migration — called only before WRITES, never before reads.
+ * Non-throwing so a DDL hiccup never blocks inserts; the write has its own fallback.
  */
 let _migrated = false;
 async function ensureLanguageColumn(): Promise<void> {
   if (_migrated) return;
   const sql = getSql();
   try {
-    // Step 1: add language column — sets default 'go' for all existing rows.
-    // IF NOT EXISTS makes this a no-op once the column is there.
+    // Add language column with default 'go' (no-op if already present)
     await sql`ALTER TABLE progress ADD COLUMN IF NOT EXISTS language TEXT NOT NULL DEFAULT 'go'`;
-
-    // Step 1b: backfill any rows that got NULL (possible if the column was previously
-    // added as nullable in a partial migration run).
+    // Backfill any pre-migration NULLs
     await sql`UPDATE progress SET language = 'go' WHERE language IS NULL OR language = ''`;
-
-    // Step 2: add the 3-column unique constraint.
-    // Error 42P07 = constraint already exists — safe to ignore.
+    // Add 3-column unique constraint; ignore 42P07 (already exists)
     await sql`
       ALTER TABLE progress
       ADD CONSTRAINT progress_user_id_language_tutorial_slug_key
@@ -35,86 +24,90 @@ async function ensureLanguageColumn(): Promise<void> {
     `.catch((e: unknown) => {
       if ((e as { code?: string })?.code !== "42P07") throw e;
     });
-
-    // Step 3: drop the old 2-column constraint.
-    // IF EXISTS makes this a no-op once already dropped.
-    await sql`
-      ALTER TABLE progress
-      DROP CONSTRAINT IF EXISTS progress_user_id_tutorial_slug_key
-    `;
-
+    // Drop old 2-column constraint (IF EXISTS = no-op once gone)
+    await sql`ALTER TABLE progress DROP CONSTRAINT IF EXISTS progress_user_id_tutorial_slug_key`;
     _migrated = true;
   } catch (err) {
-    // Non-fatal: log and continue. The SELECT that follows will succeed if the
-    // column already exists (from a previous successful migration run), or fail
-    // with a clear error if the schema is genuinely broken.
-    console.warn("[progress] ensureLanguageColumn migration warning:", err);
+    console.warn("[progress] ensureLanguageColumn warning:", err);
   }
 }
 
-export async function getProgress(userId: number, language: string = DEFAULT_LANG): Promise<string[]> {
-  await ensureLanguageColumn();
-  const sql = getSql();
-  const rows = await sql`
-    SELECT tutorial_slug FROM progress
-    WHERE user_id = ${userId} AND language = ${language}
-    ORDER BY completed_at
-  `;
-  return rows.map((r) => r.tutorial_slug as string);
-}
-
 /**
- * Fetches completed tutorial slugs for ALL languages in a single query.
- * Returns a map of language → slug[].  Use this on the public profile page
- * instead of calling getProgress() once per language.
+ * Get completed tutorial slugs for a language.
+ *
+ * Uses COALESCE(language, 'go') so rows that were stored before the language
+ * column existed (language IS NULL) are still returned for Go queries, even if
+ * the migration hasn't backfilled them yet. Falls back gracefully if the column
+ * doesn't exist at all.
  */
-export async function getAllProgressByUser(
-  userId: number
-): Promise<Map<string, string[]>> {
-  await ensureLanguageColumn();
+export async function getProgress(userId: number, language: string = DEFAULT_LANG): Promise<string[]> {
   const sql = getSql();
   try {
     const rows = await sql`
-      SELECT language, tutorial_slug FROM progress
+      SELECT tutorial_slug FROM progress
+      WHERE user_id = ${userId}
+        AND COALESCE(language, ${DEFAULT_LANG}) = ${language}
+      ORDER BY completed_at
+    `;
+    return rows.map((r) => r.tutorial_slug as string);
+  } catch {
+    // language column doesn't exist — treat all rows as Go
+    if (language !== DEFAULT_LANG) return [];
+    const rows = await sql`
+      SELECT tutorial_slug FROM progress WHERE user_id = ${userId} ORDER BY completed_at
+    `;
+    return rows.map((r) => r.tutorial_slug as string);
+  }
+}
+
+/**
+ * All completed tutorial slugs grouped by language — used by /api/progress/all
+ * and the public profile page.
+ *
+ * COALESCE maps pre-migration NULLs → 'go' so old data is never lost.
+ */
+export async function getAllProgressByUser(userId: number): Promise<Map<string, string[]>> {
+  const sql = getSql();
+  try {
+    const rows = await sql`
+      SELECT COALESCE(language, ${DEFAULT_LANG}) AS language, tutorial_slug
+      FROM progress
       WHERE user_id = ${userId}
       ORDER BY completed_at
     `;
     const result = new Map<string, string[]>();
     for (const r of rows) {
-      const lang = (r.language as string | null) ?? "go";
+      const lang = (r.language as string) ?? DEFAULT_LANG;
       if (!result.has(lang)) result.set(lang, []);
       result.get(lang)!.push(r.tutorial_slug as string);
     }
     return result;
   } catch {
-    // Fallback if language column doesn't exist yet: return Go-only progress
-    // so the user doesn't see a blank dashboard while the migration is pending.
-    const rows = await sql`
-      SELECT tutorial_slug FROM progress WHERE user_id = ${userId}
-    `;
+    // language column doesn't exist — return all slugs as Go
+    const rows = await sql`SELECT tutorial_slug FROM progress WHERE user_id = ${userId}`;
     const slugs = rows.map((r) => r.tutorial_slug as string);
-    return slugs.length > 0 ? new Map([["go", slugs]]) : new Map();
+    return slugs.length > 0 ? new Map([[DEFAULT_LANG, slugs]]) : new Map();
   }
 }
 
-/** If language is omitted, returns total count across all languages (for stats/leaderboard). */
-export async function getProgressCount(
-  userId: number,
-  language?: string
-): Promise<number> {
+/** If language is omitted, returns total count across all languages. */
+export async function getProgressCount(userId: number, language?: string): Promise<number> {
   const sql = getSql();
   if (language === undefined) {
-    const [row] = await sql`
-      SELECT COUNT(*)::int AS c FROM progress WHERE user_id = ${userId}
-    `;
+    const [row] = await sql`SELECT COUNT(*)::int AS c FROM progress WHERE user_id = ${userId}`;
     return (row?.c as number) ?? 0;
   }
-  await ensureLanguageColumn();
-  const [row] = await sql`
-    SELECT COUNT(*)::int AS c FROM progress
-    WHERE user_id = ${userId} AND language = ${language}
-  `;
-  return (row?.c as number) ?? 0;
+  try {
+    const [row] = await sql`
+      SELECT COUNT(*)::int AS c FROM progress
+      WHERE user_id = ${userId} AND COALESCE(language, ${DEFAULT_LANG}) = ${language}
+    `;
+    return (row?.c as number) ?? 0;
+  } catch {
+    if (language !== DEFAULT_LANG) return 0;
+    const [row] = await sql`SELECT COUNT(*)::int AS c FROM progress WHERE user_id = ${userId}`;
+    return (row?.c as number) ?? 0;
+  }
 }
 
 export async function markComplete(
@@ -124,11 +117,26 @@ export async function markComplete(
 ): Promise<void> {
   await ensureLanguageColumn();
   const sql = getSql();
-  await sql`
-    INSERT INTO progress (user_id, tutorial_slug, language)
-    VALUES (${userId}, ${tutorialSlug}, ${language})
-    ON CONFLICT (user_id, language, tutorial_slug) DO NOTHING
-  `;
+  try {
+    // Preferred path: uses the 3-column unique constraint
+    await sql`
+      INSERT INTO progress (user_id, tutorial_slug, language)
+      VALUES (${userId}, ${tutorialSlug}, ${language})
+      ON CONFLICT (user_id, language, tutorial_slug) DO NOTHING
+    `;
+  } catch {
+    // Fallback: constraint might not exist yet — use safe WHERE NOT EXISTS insert
+    await sql`
+      INSERT INTO progress (user_id, tutorial_slug, language)
+      SELECT ${userId}, ${tutorialSlug}, ${language}
+      WHERE NOT EXISTS (
+        SELECT 1 FROM progress
+        WHERE user_id = ${userId}
+          AND tutorial_slug = ${tutorialSlug}
+          AND COALESCE(language, ${DEFAULT_LANG}) = ${language}
+      )
+    `;
+  }
 }
 
 export async function markIncomplete(
@@ -136,11 +144,12 @@ export async function markIncomplete(
   tutorialSlug: string,
   language: string = DEFAULT_LANG
 ): Promise<void> {
-  await ensureLanguageColumn();
   const sql = getSql();
   await sql`
     DELETE FROM progress
-    WHERE user_id = ${userId} AND tutorial_slug = ${tutorialSlug} AND language = ${language}
+    WHERE user_id = ${userId}
+      AND tutorial_slug = ${tutorialSlug}
+      AND COALESCE(language, ${DEFAULT_LANG}) = ${language}
   `;
 }
 
