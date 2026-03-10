@@ -112,6 +112,13 @@ export default async function PracticeLangPage({ params, searchParams }: Props) 
     difficulty: p.difficulty,
   }));
 
+  // Pass all sorted problems so the client can do instant text search without a round-trip.
+  const searchableProblems = sorted.map((p) => ({
+    slug: p.slug,
+    title: p.title,
+    difficulty: p.difficulty,
+  }));
+
   return (
     <PracticeListClient
       initialLang={l}
@@ -124,6 +131,7 @@ export default async function PracticeLangPage({ params, searchParams }: Props) 
       start={start}
       sortedLength={sorted.length}
       pageProblems={pageProblems}
+      searchableProblems={searchableProblems}
       attempts={attempts}
       hasUser={!!user}
       isPro={isPro}

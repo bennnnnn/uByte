@@ -1,0 +1,497 @@
+---
+title: "Top 20 JavaScript Interview Questions (2025 Edition)"
+description: "Comprehensive JavaScript interview prep: closures, event loop, promises, prototypes, ES2024 features, and common coding challenges — with runnable examples."
+date: "2025-04-02"
+author: "uByte Team"
+tags: ["javascript", "interview", "web-development"]
+category: "Interview Prep"
+readTime: "12 min read"
+---
+
+JavaScript runs in every browser and on the server via Node.js, making it one of the most in-demand skills in 2025. Whether you're interviewing at a product company or a FAANG giant, these 20 questions cover the concepts that interviewers return to most — closures, the event loop, prototypal inheritance, and modern async patterns.
+
+## Core Concepts
+
+### 1. What is a closure and why is it useful?
+
+A closure is a function that **retains access to its outer scope** even after the outer function has returned.
+
+```javascript
+function makeCounter(start = 0) {
+  let count = start;   // this variable is "closed over"
+
+  return {
+    increment() { return ++count; },
+    decrement() { return --count; },
+    value()     { return count; },
+  };
+}
+
+const counter = makeCounter(10);
+console.log(counter.increment()); // 11
+console.log(counter.increment()); // 12
+console.log(counter.value());     // 12
+```
+
+Closures are the foundation of **module patterns**, **memoization**, **partial application**, and **private state** in JavaScript.
+
+---
+
+### 2. Explain the event loop, call stack, and task queue
+
+JavaScript is single-threaded. The event loop continuously:
+
+1. Runs all synchronous code (call stack).
+2. Processes **microtasks** (Promises, `queueMicrotask`) — empties the queue completely.
+3. Processes one **macrotask** (setTimeout, setInterval, I/O callbacks).
+4. Repeats.
+
+```javascript
+console.log("1");
+
+setTimeout(() => console.log("2"), 0);    // macrotask
+
+Promise.resolve().then(() => console.log("3")); // microtask
+
+console.log("4");
+
+// Output: 1, 4, 3, 2
+```
+
+Microtasks always run before the next macrotask, even if the macrotask was queued first.
+
+---
+
+### 3. What is the difference between `var`, `let`, and `const`?
+
+| Feature | `var` | `let` | `const` |
+|---------|-------|-------|---------|
+| Scope | Function | Block | Block |
+| Hoisting | Yes (undefined) | Yes (TDZ) | Yes (TDZ) |
+| Re-declare | Yes | No | No |
+| Re-assign | Yes | Yes | No |
+
+TDZ = Temporal Dead Zone — the variable exists but cannot be accessed before its declaration.
+
+```javascript
+console.log(x); // undefined  (var hoisted)
+var x = 5;
+
+console.log(y); // ReferenceError: Cannot access 'y' before initialization
+let y = 10;
+```
+
+Prefer `const` by default, use `let` when you need to reassign, and avoid `var`.
+
+---
+
+### 4. How does prototypal inheritance work?
+
+Every JavaScript object has a hidden `[[Prototype]]` link to another object. When you access a property, the engine walks the **prototype chain** until it finds it or reaches `null`.
+
+```javascript
+function Animal(name) {
+  this.name = name;
+}
+Animal.prototype.speak = function () {
+  return `${this.name} makes a sound.`;
+};
+
+function Dog(name) {
+  Animal.call(this, name);  // inherit own properties
+}
+Dog.prototype = Object.create(Animal.prototype);
+Dog.prototype.constructor = Dog;
+Dog.prototype.speak = function () {
+  return `${this.name} barks.`;
+};
+
+const dog = new Dog("Rex");
+console.log(dog.speak());              // Rex barks.
+console.log(dog instanceof Animal);    // true
+```
+
+Modern code uses `class` syntax, which is syntactic sugar over prototype chains.
+
+---
+
+### 5. What is `this` and how is its value determined?
+
+`this` depends on **how a function is called**, not where it is defined.
+
+```javascript
+const obj = {
+  name: "uByte",
+  greet() {
+    console.log(this.name);  // "uByte" — method call
+  },
+  greetArrow: () => {
+    console.log(this?.name); // undefined — arrow fn captures outer this (window/undefined)
+  },
+};
+
+obj.greet();        // uByte
+obj.greetArrow();   // undefined
+```
+
+Rules in order of precedence: `new` binding → explicit binding (`call`/`apply`/`bind`) → implicit binding (method call) → default binding (global or `undefined` in strict mode).
+
+---
+
+## Asynchronous JavaScript
+
+### 6. What is the difference between a Promise and `async/await`?
+
+They solve the same problem — async/await is **syntactic sugar** over Promises:
+
+```javascript
+// Promise chain
+function fetchUser(id) {
+  return fetch(`/api/users/${id}`)
+    .then((res) => res.json())
+    .then((data) => data.name)
+    .catch((err) => console.error(err));
+}
+
+// async/await — same logic, more readable
+async function fetchUserAsync(id) {
+  try {
+    const res = await fetch(`/api/users/${id}`);
+    const data = await res.json();
+    return data.name;
+  } catch (err) {
+    console.error(err);
+  }
+}
+```
+
+Under the hood, `async` functions return Promises and `await` pauses execution of the async function (not the event loop).
+
+---
+
+### 7. How do you run multiple async operations concurrently?
+
+Use `Promise.all` to run in parallel:
+
+```javascript
+async function loadDashboard(userId) {
+  // Sequential — slow (waits for each one)
+  const user    = await fetchUser(userId);
+  const posts   = await fetchPosts(userId);
+  const friends = await fetchFriends(userId);
+
+  // Parallel — fast (all start at the same time)
+  const [user2, posts2, friends2] = await Promise.all([
+    fetchUser(userId),
+    fetchPosts(userId),
+    fetchFriends(userId),
+  ]);
+}
+```
+
+Other combinators: `Promise.allSettled` (don't fail on rejection), `Promise.race` (first to settle wins), `Promise.any` (first to fulfill wins).
+
+---
+
+### 8. What is debouncing vs throttling?
+
+- **Debounce** — delay execution until the user **stops** triggering the event (e.g., search input).
+- **Throttle** — execute at most once per interval (e.g., scroll handler).
+
+```javascript
+function debounce(fn, delay) {
+  let timer;
+  return (...args) => {
+    clearTimeout(timer);
+    timer = setTimeout(() => fn(...args), delay);
+  };
+}
+
+function throttle(fn, interval) {
+  let lastCall = 0;
+  return (...args) => {
+    const now = Date.now();
+    if (now - lastCall >= interval) {
+      lastCall = now;
+      fn(...args);
+    }
+  };
+}
+
+const onSearch = debounce((query) => fetchResults(query), 300);
+const onScroll = throttle(() => updateHeader(), 100);
+```
+
+---
+
+## Functions & Scope
+
+### 9. What is currying?
+
+Currying transforms a function with multiple arguments into a **chain of single-argument functions**:
+
+```javascript
+const multiply = (a) => (b) => a * b;
+
+const double = multiply(2);
+const triple = multiply(3);
+
+console.log(double(5));  // 10
+console.log(triple(5));  // 15
+
+// Practical use: partial application
+const addTax = (rate) => (price) => price * (1 + rate);
+const addVAT = addTax(0.2);
+console.log(addVAT(100));  // 120
+```
+
+---
+
+### 10. Explain `call`, `apply`, and `bind`
+
+All three allow you to **set `this` explicitly**:
+
+```javascript
+function introduce(greeting, punctuation) {
+  return `${greeting}, I'm ${this.name}${punctuation}`;
+}
+
+const person = { name: "Alice" };
+
+introduce.call(person, "Hi", "!");    // Hi, I'm Alice!
+introduce.apply(person, ["Hey", "."]);// Hey, I'm Alice.
+const bound = introduce.bind(person, "Hello");
+bound("?");                           // Hello, I'm Alice?
+```
+
+- `call` — invoke immediately, args spread.
+- `apply` — invoke immediately, args as array.
+- `bind` — return a new function with `this` permanently set.
+
+---
+
+## Data & Types
+
+### 11. What is the difference between `==` and `===`?
+
+`==` performs **type coercion** before comparing. `===` requires both value and type to match.
+
+```javascript
+0 == "0"    // true  (string coerced to number)
+0 === "0"   // false (different types)
+null == undefined  // true  (special rule)
+null === undefined // false
+
+// Common gotcha
+[] == false  // true  ([] → "" → 0, false → 0)
+[] === false // false
+```
+
+Always use `===` unless you explicitly need coercion.
+
+---
+
+### 12. How does object destructuring with default values work?
+
+```javascript
+const config = { timeout: 3000 };
+
+const {
+  timeout = 5000,      // uses provided value
+  retries = 3,         // uses default (key missing)
+  host = "localhost",  // uses default (key missing)
+} = config;
+
+console.log(timeout, retries, host); // 3000 3 'localhost'
+
+// Renaming while destructuring
+const { timeout: t, retries: r = 3 } = config;
+console.log(t, r); // 3000 3
+```
+
+---
+
+### 13. What is the spread operator and the rest parameter?
+
+```javascript
+// Rest — collects remaining args into an array
+function sum(...nums) {
+  return nums.reduce((a, b) => a + b, 0);
+}
+sum(1, 2, 3, 4);  // 10
+
+// Spread — expands an iterable into individual elements
+const arr1 = [1, 2, 3];
+const arr2 = [4, 5, 6];
+const combined = [...arr1, ...arr2]; // [1, 2, 3, 4, 5, 6]
+
+// Shallow clone an object
+const obj = { a: 1, b: 2 };
+const copy = { ...obj, c: 3 };  // { a: 1, b: 2, c: 3 }
+```
+
+---
+
+## Common Coding Questions
+
+### 14. Implement a deep clone without `structuredClone`
+
+```javascript
+function deepClone(value) {
+  if (value === null || typeof value !== "object") return value;
+  if (Array.isArray(value)) return value.map(deepClone);
+  return Object.fromEntries(
+    Object.entries(value).map(([k, v]) => [k, deepClone(v)])
+  );
+}
+
+const original = { a: 1, b: { c: [2, 3] } };
+const clone = deepClone(original);
+clone.b.c.push(99);
+console.log(original.b.c); // [2, 3] — unaffected
+```
+
+Note: `structuredClone` (Node 17+, modern browsers) handles dates, maps, sets, etc. Use it in production.
+
+---
+
+### 15. Flatten a nested array to any depth
+
+```javascript
+// Using built-in
+[1, [2, [3, [4]]]].flat(Infinity); // [1, 2, 3, 4]
+
+// Manual recursive implementation
+function flattenDeep(arr) {
+  return arr.reduce(
+    (acc, val) =>
+      Array.isArray(val) ? acc.concat(flattenDeep(val)) : acc.concat(val),
+    []
+  );
+}
+```
+
+---
+
+### 16. Implement `Array.prototype.map` from scratch
+
+```javascript
+function myMap(arr, callback) {
+  const result = [];
+  for (let i = 0; i < arr.length; i++) {
+    result.push(callback(arr[i], i, arr));
+  }
+  return result;
+}
+
+myMap([1, 2, 3], (x) => x * 2); // [2, 4, 6]
+```
+
+---
+
+### 17. What is memoization and implement it generically
+
+```javascript
+function memoize(fn) {
+  const cache = new Map();
+  return function (...args) {
+    const key = JSON.stringify(args);
+    if (cache.has(key)) return cache.get(key);
+    const result = fn.apply(this, args);
+    cache.set(key, result);
+    return result;
+  };
+}
+
+const expensiveFn = memoize((n) => {
+  console.log(`computing ${n}`);
+  return n * n;
+});
+
+expensiveFn(5); // computing 5 → 25
+expensiveFn(5); // (cache hit)  → 25
+```
+
+---
+
+### 18. Implement a simple `EventEmitter`
+
+```javascript
+class EventEmitter {
+  #listeners = new Map();
+
+  on(event, fn) {
+    if (!this.#listeners.has(event)) this.#listeners.set(event, []);
+    this.#listeners.get(event).push(fn);
+    return this;
+  }
+
+  off(event, fn) {
+    const fns = this.#listeners.get(event) ?? [];
+    this.#listeners.set(event, fns.filter((f) => f !== fn));
+    return this;
+  }
+
+  emit(event, ...args) {
+    for (const fn of this.#listeners.get(event) ?? []) fn(...args);
+    return this;
+  }
+}
+
+const emitter = new EventEmitter();
+emitter.on("data", (x) => console.log("received:", x));
+emitter.emit("data", 42); // received: 42
+```
+
+---
+
+### 19. What are WeakMap and WeakSet?
+
+`WeakMap` and `WeakSet` hold **weak references** — they do not prevent garbage collection of their keys/values.
+
+```javascript
+let obj = { id: 1 };
+const cache = new WeakMap();
+cache.set(obj, { computed: 42 });
+
+obj = null; // original object can now be GC'd; cache entry disappears automatically
+```
+
+Use cases:
+- Storing private data keyed to DOM elements.
+- Caching computed properties for objects without memory leaks.
+
+---
+
+### 20. Coding challenge: group anagrams together
+
+```javascript
+function groupAnagrams(strs) {
+  const map = new Map();
+
+  for (const str of strs) {
+    const key = [...str].sort().join("");
+    if (!map.has(key)) map.set(key, []);
+    map.get(key).push(str);
+  }
+
+  return [...map.values()];
+}
+
+groupAnagrams(["eat", "tea", "tan", "ate", "nat", "bat"]);
+// [["eat","tea","ate"], ["tan","nat"], ["bat"]]
+```
+
+Time: O(n · k log k) where n = number of strings, k = max string length.
+
+---
+
+## Practice Makes Perfect
+
+Reading answers only gets you so far. You need to write JavaScript code to make it stick. On uByte you can:
+
+- Work through [interactive JavaScript tutorials](/tutorial/javascript) in a live editor — no setup.
+- Tackle [JavaScript interview problems](/practice/javascript) with instant test feedback.
+- Get AI-powered hints when you're stuck.
+
+Start coding today and build the muscle memory that interviewers are looking for.

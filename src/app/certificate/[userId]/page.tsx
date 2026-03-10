@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { BASE_URL } from "@/lib/constants";
 import { absoluteUrl, buildBreadcrumbJsonLd } from "@/lib/seo";
+import CertShareButtons from "@/components/CertShareButtons";
 
 interface CertData {
   userId: number;
@@ -155,11 +156,15 @@ export default async function CertificatePage({ params }: { params: Promise<{ us
           </div>
         </div>
 
-        {/* Share hint */}
-        <p className="mt-6 text-center text-sm text-zinc-400">
-          Share this page to show off your achievement.{" "}
+        {/* Share buttons */}
+        <CertShareButtons
+          name={`${data.totalTutorials} Go Tutorials`}
+          certUrl={absoluteUrl(`/certificate/${userId}`)}
+        />
+
+        <p className="mt-4 text-center text-xs text-zinc-400">
           <Link href="/" className="text-indigo-600 hover:text-indigo-700">
-            Back to tutorials
+            ← Back to tutorials
           </Link>
         </p>
       </div>

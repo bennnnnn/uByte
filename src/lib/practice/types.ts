@@ -20,7 +20,11 @@ export type ProblemCategory =
   | "hash-map"
   | "binary-search"
   | "greedy"
-  | "math";
+  | "math"
+  | "graph"
+  | "heap"
+  | "tree"
+  | "backtracking";
 
 export interface ProblemExample {
   input: string;

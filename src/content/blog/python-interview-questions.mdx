@@ -1,0 +1,570 @@
+---
+title: "Top 25 Python Interview Questions (With Answers & Code Examples)"
+description: "Ace your next Python interview. Covers data structures, OOP, generators, decorators, async, and more — with clear answers and runnable code."
+date: "2025-03-15"
+author: "uByte Team"
+tags: ["python", "interview", "data-structures"]
+category: "Interview Prep"
+readTime: "14 min read"
+---
+
+Python consistently ranks in the top three most-used languages in developer surveys, which means Python interview questions are everywhere — from FAANG rounds to early-stage startup take-homes. This guide covers the 25 questions that come up most often, complete with concise answers and code you can run today.
+
+## Core Language Fundamentals
+
+### 1. What is the difference between a list and a tuple?
+
+Both are ordered sequences, but **lists are mutable** (you can change elements after creation) while **tuples are immutable**.
+
+```python
+my_list = [1, 2, 3]
+my_list[0] = 99       # OK
+
+my_tuple = (1, 2, 3)
+my_tuple[0] = 99      # TypeError: 'tuple' object does not support item assignment
+```
+
+Tuples are faster to iterate and can be used as dictionary keys; use them for data that should not change (coordinates, RGB values, database rows).
+
+---
+
+### 2. What is a Python decorator?
+
+A decorator is a function that **wraps another function** to extend its behaviour without modifying it directly.
+
+```python
+import time
+
+def timer(func):
+    def wrapper(*args, **kwargs):
+        start = time.perf_counter()
+        result = func(*args, **kwargs)
+        elapsed = time.perf_counter() - start
+        print(f"{func.__name__} took {elapsed:.4f}s")
+        return result
+    return wrapper
+
+@timer
+def slow_add(a, b):
+    time.sleep(0.1)
+    return a + b
+
+slow_add(2, 3)  # prints: slow_add took 0.1001s
+```
+
+Common built-in decorators: `@staticmethod`, `@classmethod`, `@property`, `@functools.cache`.
+
+---
+
+### 3. Explain Python's GIL (Global Interpreter Lock)
+
+The GIL is a mutex that **allows only one thread to execute Python bytecode at a time**. It protects CPython's memory management from race conditions.
+
+Practical implications:
+- CPU-bound multithreading gives little speedup — use `multiprocessing` instead.
+- I/O-bound tasks (network calls, disk reads) benefit from threads because the GIL is released while waiting for I/O.
+
+```python
+import threading
+import multiprocessing
+
+# For CPU-bound work, prefer multiprocessing:
+def cpu_work(n):
+    return sum(i * i for i in range(n))
+
+with multiprocessing.Pool() as pool:
+    results = pool.map(cpu_work, [10**6, 10**6, 10**6, 10**6])
+```
+
+---
+
+### 4. What are generators and when should you use them?
+
+Generators produce values **lazily** — they yield one item at a time instead of building the whole sequence in memory.
+
+```python
+def fibonacci():
+    a, b = 0, 1
+    while True:
+        yield a
+        a, b = b, a + b
+
+fib = fibonacci()
+first_ten = [next(fib) for _ in range(10)]
+# [0, 1, 1, 2, 3, 5, 8, 13, 21, 34]
+```
+
+Use generators when:
+- The dataset is too large to fit in memory.
+- You only need to iterate once.
+- You want to pipeline transformations lazily.
+
+---
+
+### 5. What is the difference between `__str__` and `__repr__`?
+
+- `__repr__` — unambiguous representation, aimed at **developers**. Should ideally be valid Python to recreate the object.
+- `__str__` — readable representation, aimed at **end users**.
+
+```python
+class Point:
+    def __init__(self, x, y):
+        self.x, self.y = x, y
+
+    def __repr__(self):
+        return f"Point({self.x!r}, {self.y!r})"
+
+    def __str__(self):
+        return f"({self.x}, {self.y})"
+
+p = Point(3, 4)
+print(repr(p))  # Point(3, 4)  ← developer view
+print(str(p))   # (3, 4)       ← user view
+```
+
+If only `__repr__` is defined, `str()` falls back to it.
+
+---
+
+## Data Structures & Algorithms
+
+### 6. How do you find duplicates in a list efficiently?
+
+Use a `set` to track seen elements — O(n) time and space:
+
+```python
+def find_duplicates(nums: list[int]) -> list[int]:
+    seen = set()
+    duplicates = set()
+    for n in nums:
+        if n in seen:
+            duplicates.add(n)
+        seen.add(n)
+    return list(duplicates)
+
+print(find_duplicates([1, 2, 3, 2, 4, 3, 5]))  # [2, 3]
+```
+
+Or with `collections.Counter`:
+
+```python
+from collections import Counter
+
+def find_duplicates_v2(nums):
+    return [n for n, count in Counter(nums).items() if count > 1]
+```
+
+---
+
+### 7. Explain list comprehensions and when NOT to use them
+
+A list comprehension is a concise way to build lists:
+
+```python
+squares = [x ** 2 for x in range(10) if x % 2 == 0]
+# [0, 4, 16, 36, 64]
+```
+
+**Avoid** them when:
+1. The logic is complex and hurts readability.
+2. You only need to iterate (use a generator expression instead).
+3. Side effects are involved — use a regular `for` loop.
+
+---
+
+### 8. What is the time complexity of common dict operations?
+
+| Operation | Average | Worst case |
+|-----------|---------|------------|
+| `d[key]`  | O(1)    | O(n)       |
+| `d[key] = val` | O(1) | O(n)  |
+| `key in d` | O(1)  | O(n)       |
+| `del d[key]` | O(1) | O(n)     |
+
+Worst case O(n) occurs due to hash collisions — very rare in practice with Python's hash randomization.
+
+---
+
+### 9. How does Python's `defaultdict` differ from a regular dict?
+
+`defaultdict` automatically creates a default value for missing keys:
+
+```python
+from collections import defaultdict
+
+# Grouping words by first letter
+words = ["apple", "avocado", "banana", "blueberry", "cherry"]
+by_letter = defaultdict(list)
+for word in words:
+    by_letter[word[0]].append(word)
+
+print(dict(by_letter))
+# {'a': ['apple', 'avocado'], 'b': ['banana', 'blueberry'], 'c': ['cherry']}
+```
+
+Equivalent with a regular dict requires `.setdefault()` or a check each time.
+
+---
+
+### 10. Implement a stack and a queue using Python built-ins
+
+```python
+# Stack — use a list (append/pop are O(1) at the end)
+stack = []
+stack.append(1)
+stack.append(2)
+stack.pop()   # 2
+
+# Queue — use collections.deque (O(1) for both ends)
+from collections import deque
+queue = deque()
+queue.append(1)
+queue.append(2)
+queue.popleft()  # 1
+```
+
+Do not use `list.pop(0)` for queues — it is O(n) because all elements shift.
+
+---
+
+## Object-Oriented Python
+
+### 11. What is the MRO (Method Resolution Order)?
+
+MRO determines the order Python searches for a method in a class hierarchy. It uses the **C3 linearization** algorithm. You can inspect it with `ClassName.__mro__`.
+
+```python
+class A:
+    def hello(self): print("A")
+
+class B(A):
+    def hello(self): print("B")
+
+class C(A):
+    def hello(self): print("C")
+
+class D(B, C):
+    pass
+
+D().hello()          # B — found in B first
+print(D.__mro__)     # (<class 'D'>, <class 'B'>, <class 'C'>, <class 'A'>, <class 'object'>)
+```
+
+---
+
+### 12. What are `@staticmethod` and `@classmethod`?
+
+```python
+class Circle:
+    PI = 3.14159
+
+    def __init__(self, radius):
+        self.radius = radius
+
+    def area(self):                    # instance method — gets self
+        return self.PI * self.radius ** 2
+
+    @classmethod
+    def from_diameter(cls, diameter): # class method — gets cls, not self
+        return cls(diameter / 2)
+
+    @staticmethod
+    def is_valid_radius(r):           # no self or cls — a plain utility function
+        return r > 0
+```
+
+- Use `@classmethod` for alternative constructors.
+- Use `@staticmethod` for utility functions logically related to the class but not needing its state.
+
+---
+
+### 13. What is `__slots__` and why use it?
+
+`__slots__` restricts instance attributes to a fixed set and stores them in a compact C array instead of a `__dict__`. This reduces memory usage by 30–50% for classes with many instances.
+
+```python
+class Point:
+    __slots__ = ("x", "y")
+
+    def __init__(self, x, y):
+        self.x, self.y = x, y
+
+p = Point(1, 2)
+p.z = 3   # AttributeError — z not in __slots__
+```
+
+---
+
+## Error Handling & Best Practices
+
+### 14. How do you write custom exceptions?
+
+```python
+class InsufficientFundsError(ValueError):
+    def __init__(self, amount, balance):
+        self.amount = amount
+        self.balance = balance
+        super().__init__(
+            f"Cannot withdraw {amount}; balance is only {balance}"
+        )
+
+def withdraw(balance, amount):
+    if amount > balance:
+        raise InsufficientFundsError(amount, balance)
+    return balance - amount
+
+try:
+    withdraw(100, 200)
+except InsufficientFundsError as e:
+    print(e.amount, e.balance)   # 200 100
+```
+
+---
+
+### 15. What is the `with` statement and how does a context manager work?
+
+A context manager guarantees that setup and teardown code runs, even if an exception occurs. It implements `__enter__` and `__exit__`.
+
+```python
+class ManagedFile:
+    def __init__(self, path):
+        self.path = path
+
+    def __enter__(self):
+        self.file = open(self.path)
+        return self.file
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.file.close()
+        return False  # don't suppress exceptions
+
+with ManagedFile("data.txt") as f:
+    data = f.read()
+```
+
+Or use `contextlib.contextmanager` for a generator-based approach.
+
+---
+
+## Concurrency & Async
+
+### 16. What is `asyncio` and when should you use it?
+
+`asyncio` is Python's single-threaded concurrency framework based on an **event loop**. It is ideal for **I/O-bound** tasks (HTTP requests, database calls, file I/O) where you spend most time waiting.
+
+```python
+import asyncio
+import aiohttp
+
+async def fetch(session, url):
+    async with session.get(url) as response:
+        return await response.text()
+
+async def main():
+    urls = ["https://httpbin.org/get"] * 5
+    async with aiohttp.ClientSession() as session:
+        results = await asyncio.gather(*(fetch(session, u) for u in urls))
+    print(len(results), "responses")
+
+asyncio.run(main())
+```
+
+Use `asyncio` when you have many concurrent I/O operations. For CPU-bound parallelism, use `multiprocessing`.
+
+---
+
+### 17. What is the difference between `threading` and `multiprocessing`?
+
+| Feature | `threading` | `multiprocessing` |
+|---------|-------------|-------------------|
+| Parallelism | Limited by GIL | True parallelism |
+| Best for | I/O-bound tasks | CPU-bound tasks |
+| Memory | Shared memory | Separate memory spaces |
+| Overhead | Low | Higher (process startup) |
+
+---
+
+## Advanced Topics
+
+### 18. What are Python metaclasses?
+
+A metaclass is the **class of a class** — it controls how classes are created. `type` is the default metaclass.
+
+```python
+class SingletonMeta(type):
+    _instances = {}
+
+    def __call__(cls, *args, **kwargs):
+        if cls not in cls._instances:
+            cls._instances[cls] = super().__call__(*args, **kwargs)
+        return cls._instances[cls]
+
+class Database(metaclass=SingletonMeta):
+    def __init__(self):
+        self.connection = "open"
+
+a = Database()
+b = Database()
+print(a is b)  # True
+```
+
+Metaclasses are powerful but rarely needed — consider `__init_subclass__` or class decorators as simpler alternatives.
+
+---
+
+### 19. How does Python manage memory?
+
+Python uses **reference counting** as its primary mechanism. Every object tracks how many references point to it; when the count drops to zero, the object is deallocated immediately.
+
+For **cyclic references** (A → B → A), reference counting alone fails. Python's **cyclic garbage collector** (`gc` module) periodically finds and breaks cycles.
+
+```python
+import gc
+
+gc.collect()         # trigger a full collection
+gc.get_count()       # (gen0, gen1, gen2) counts
+```
+
+You can disable the GC (`gc.disable()`) in performance-sensitive code that creates no cycles.
+
+---
+
+### 20. What are `*args` and `**kwargs`?
+
+```python
+def greet(*args, **kwargs):
+    for name in args:
+        print(f"Hello, {name}!")
+    for key, val in kwargs.items():
+        print(f"{key} = {val}")
+
+greet("Alice", "Bob", lang="Python", version=3)
+# Hello, Alice!
+# Hello, Bob!
+# lang = Python
+# version = 3
+```
+
+- `*args` captures extra positional arguments as a tuple.
+- `**kwargs` captures extra keyword arguments as a dict.
+
+---
+
+### 21. Explain `functools.lru_cache`
+
+`lru_cache` memoizes function results. Subsequent calls with the same arguments return the cached result instantly.
+
+```python
+from functools import lru_cache
+
+@lru_cache(maxsize=128)
+def fib(n):
+    if n < 2:
+        return n
+    return fib(n - 1) + fib(n - 2)
+
+print(fib(50))  # instant; without cache, exponential time
+print(fib.cache_info())  # CacheInfo(hits=48, misses=51, ...)
+```
+
+---
+
+### 22. What is duck typing?
+
+If an object walks like a duck and quacks like a duck, it is a duck. Python checks whether an object has the right methods/attributes at runtime rather than enforcing an inheritance relationship.
+
+```python
+class Dog:
+    def speak(self): return "Woof"
+
+class Cat:
+    def speak(self): return "Meow"
+
+def make_noise(animal):
+    print(animal.speak())
+
+make_noise(Dog())  # Woof — no need to inherit from Animal
+make_noise(Cat())  # Meow
+```
+
+---
+
+### 23. How do `==` and `is` differ?
+
+- `==` compares **values** (calls `__eq__`).
+- `is` compares **identity** (same object in memory).
+
+```python
+a = [1, 2, 3]
+b = [1, 2, 3]
+
+print(a == b)   # True  — same values
+print(a is b)   # False — different objects
+
+c = a
+print(a is c)   # True  — same object
+```
+
+Never use `is` to compare values. `is None` is an intentional exception because `None` is a singleton.
+
+---
+
+### 24. What is `__init__` vs `__new__`?
+
+- `__new__` is called first and **creates** the instance (allocates memory). Returns the new object.
+- `__init__` **initialises** the already-created object. Does not return anything.
+
+You rarely override `__new__` unless implementing singletons or immutable types (like subclassing `int`).
+
+```python
+class ImmutablePoint(tuple):
+    def __new__(cls, x, y):
+        return super().__new__(cls, (x, y))  # tuple is immutable, set in __new__
+
+    @property
+    def x(self): return self[0]
+
+    @property
+    def y(self): return self[1]
+
+p = ImmutablePoint(3, 4)
+print(p.x, p.y)  # 3 4
+```
+
+---
+
+### 25. Coding challenge: find the longest substring without repeating characters
+
+Classic sliding window problem:
+
+```python
+def length_of_longest_substring(s: str) -> int:
+    seen = {}
+    left = max_len = 0
+
+    for right, char in enumerate(s):
+        if char in seen and seen[char] >= left:
+            left = seen[char] + 1
+        seen[char] = right
+        max_len = max(max_len, right - left + 1)
+
+    return max_len
+
+print(length_of_longest_substring("abcabcbb"))  # 3  ("abc")
+print(length_of_longest_substring("bbbbb"))     # 1  ("b")
+print(length_of_longest_substring("pwwkew"))    # 3  ("wke")
+```
+
+Time: O(n) — each character visited at most twice. Space: O(min(n, alphabet size)).
+
+---
+
+## How to Prepare
+
+The best way to prepare for a Python interview is to write real Python code every day. On uByte you can:
+
+- Work through **interactive Python tutorials** with a built-in editor — no setup needed.
+- Practice **LeetCode-style problems** in Python with instant test feedback and AI hints.
+- Earn a **Python certificate** to show on your LinkedIn profile.
+
+Start with our [Python tutorials](/tutorial/python) or jump straight into [Python interview problems](/practice/python).

@@ -22,6 +22,8 @@ import { MEDIUM_PROBLEMS_3 } from "./problems-medium-3";
 import { HARD_PROBLEMS } from "./problems-hard";
 import { HARD_PROBLEMS_2 } from "./problems-hard-2";
 import { HARD_PROBLEMS_3 } from "./problems-hard-3";
+import { MEDIUM_PROBLEMS_4 } from "./problems-medium-4";
+import { HARD_PROBLEMS_4 } from "./problems-hard-4";
 
 // ─── Default starters ───────────────────────────────────────────────────────
 
@@ -65,6 +67,8 @@ export const PRACTICE_PROBLEMS: PracticeProblem[] = [
   ...HARD_PROBLEMS,
   ...HARD_PROBLEMS_2,
   ...HARD_PROBLEMS_3,
+  ...MEDIUM_PROBLEMS_4,
+  ...HARD_PROBLEMS_4,
 ];
 
 // ─── Category helpers (derived from problem definitions) ─────────────────────
@@ -81,6 +85,10 @@ const CATEGORY_LABELS: Record<ProblemCategory, string> = {
   "binary-search": "Binary Search",
   greedy: "Greedy",
   math: "Math",
+  graph: "Graph",
+  heap: "Heap",
+  tree: "Tree",
+  backtracking: "Backtracking",
 };
 
 export function getCategoryForSlug(slug: string): ProblemCategory | null {

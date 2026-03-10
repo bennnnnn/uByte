@@ -1,0 +1,409 @@
+---
+title: "Data Structures Cheat Sheet for Coding Interviews (2025)"
+description: "Time & space complexity for every major data structure. Arrays, hash maps, trees, graphs, heaps — with code examples in Python, Go, and JavaScript."
+date: "2025-04-20"
+author: "uByte Team"
+tags: ["data-structures", "algorithms", "interview", "python", "go", "javascript"]
+category: "Fundamentals"
+readTime: "10 min read"
+---
+
+Coding interviews test your ability to choose the **right data structure for the problem**. A wrong choice can turn an O(n log n) solution into O(n²). This cheat sheet gives you the complexity guarantees and common patterns for every major structure, with code examples you can run right now.
+
+## Complexity Quick Reference
+
+| Data Structure | Access | Search | Insert | Delete | Space |
+|----------------|--------|--------|--------|--------|-------|
+| Array          | O(1)   | O(n)   | O(n)   | O(n)   | O(n)  |
+| Stack / Queue  | O(n)   | O(n)   | O(1)   | O(1)   | O(n)  |
+| Hash Map       | —      | O(1)*  | O(1)*  | O(1)*  | O(n)  |
+| Linked List    | O(n)   | O(n)   | O(1)** | O(1)** | O(n)  |
+| Binary Search Tree | O(log n)* | O(log n)* | O(log n)* | O(log n)* | O(n) |
+| Heap           | O(1)† | O(n)   | O(log n) | O(log n) | O(n) |
+| Trie           | O(k)   | O(k)   | O(k)   | O(k)   | O(n·k)|
+
+\* Amortised / average case. † Min/max only.
+\*\* With a reference to the node.
+
+---
+
+## Arrays
+
+Arrays are the foundation of coding interviews. Know these patterns cold.
+
+**Sliding window** — O(n) for problems asking about a contiguous subarray/substring.
+
+```python
+def max_sum_subarray(nums: list[int], k: int) -> int:
+    """Maximum sum of any subarray of length k."""
+    window_sum = sum(nums[:k])
+    best = window_sum
+    for i in range(k, len(nums)):
+        window_sum += nums[i] - nums[i - k]
+        best = max(best, window_sum)
+    return best
+
+print(max_sum_subarray([1, 4, 2, 9, 7, 3, 1], 3))  # 18  (9+7+2)
+```
+
+**Two pointers** — O(n) for sorted arrays or problems with pair/triplet searches.
+
+```python
+def two_sum_sorted(nums: list[int], target: int) -> tuple[int, int]:
+    """Assumes nums is sorted."""
+    left, right = 0, len(nums) - 1
+    while left < right:
+        s = nums[left] + nums[right]
+        if s == target:
+            return left, right
+        elif s < target:
+            left += 1
+        else:
+            right -= 1
+    return -1, -1
+```
+
+**Binary search** — O(log n). Any time a sorted array appears, think binary search.
+
+```python
+import bisect
+
+nums = [1, 3, 5, 7, 9, 11]
+idx = bisect.bisect_left(nums, 7)  # 3 — insertion point for 7
+```
+
+---
+
+## Hash Maps
+
+The most useful data structure for interview problems. Hash maps give you O(1) average-case lookups and are the answer to almost every "find duplicates", "count frequency", or "group items" question.
+
+```python
+from collections import Counter, defaultdict
+
+# Frequency count
+words = ["apple", "banana", "apple", "cherry", "banana", "apple"]
+freq = Counter(words)
+print(freq.most_common(2))  # [('apple', 3), ('banana', 2)]
+
+# Grouping
+names = ["Alice", "Bob", "Anna", "Charlie", "Beth"]
+by_initial = defaultdict(list)
+for name in names:
+    by_initial[name[0]].append(name)
+# {'A': ['Alice', 'Anna'], 'B': ['Bob', 'Beth'], 'C': ['Charlie']}
+```
+
+```go
+// Go equivalent
+freq := make(map[string]int)
+for _, word := range words {
+    freq[word]++
+}
+```
+
+**Interview pattern**: if a brute-force solution has nested loops, ask "can I trade space for time using a hash map?"
+
+---
+
+## Stacks & Queues
+
+**Stack (LIFO)** — think DFS, expression evaluation, "next greater element" problems.
+
+```python
+# Monotonic decreasing stack — find the next greater element
+def next_greater(nums: list[int]) -> list[int]:
+    result = [-1] * len(nums)
+    stack = []  # stores indices
+    for i, n in enumerate(nums):
+        while stack and nums[stack[-1]] < n:
+            result[stack.pop()] = n
+        stack.append(i)
+    return result
+
+print(next_greater([4, 1, 2, 3]))  # [-1, 2, 3, -1]
+```
+
+**Queue (FIFO)** — think BFS, level-order traversal.
+
+```python
+from collections import deque
+
+def bfs(graph: dict, start: str) -> list[str]:
+    visited = set([start])
+    queue = deque([start])
+    order = []
+    while queue:
+        node = queue.popleft()
+        order.append(node)
+        for neighbour in graph.get(node, []):
+            if neighbour not in visited:
+                visited.add(neighbour)
+                queue.append(neighbour)
+    return order
+```
+
+**Deque** — double-ended queue; O(1) append/pop from both ends. Use for sliding window maximum.
+
+---
+
+## Linked Lists
+
+Core patterns: **fast/slow pointers** (cycle detection, finding the middle), **reversing a list**, and **merging two sorted lists**.
+
+```python
+class ListNode:
+    def __init__(self, val=0, next=None):
+        self.val, self.next = val, next
+
+# Detect cycle — Floyd's algorithm
+def has_cycle(head: ListNode | None) -> bool:
+    slow = fast = head
+    while fast and fast.next:
+        slow = slow.next
+        fast = fast.next.next
+        if slow is fast:
+            return True
+    return False
+
+# Reverse a linked list — O(n) time, O(1) space
+def reverse_list(head: ListNode | None) -> ListNode | None:
+    prev = None
+    curr = head
+    while curr:
+        nxt = curr.next
+        curr.next = prev
+        prev = curr
+        curr = nxt
+    return prev
+```
+
+---
+
+## Trees
+
+**Binary trees** are the most common interview structure. Know these traversals:
+
+```python
+from typing import Optional
+
+class TreeNode:
+    def __init__(self, val=0, left=None, right=None):
+        self.val, self.left, self.right = val, left, right
+
+# Inorder (left → root → right) — gives sorted output for BSTs
+def inorder(root: Optional[TreeNode]) -> list[int]:
+    if not root:
+        return []
+    return inorder(root.left) + [root.val] + inorder(root.right)
+
+# Maximum depth
+def max_depth(root: Optional[TreeNode]) -> int:
+    if not root:
+        return 0
+    return 1 + max(max_depth(root.left), max_depth(root.right))
+
+# Level-order (BFS)
+def level_order(root: Optional[TreeNode]) -> list[list[int]]:
+    if not root:
+        return []
+    result, queue = [], deque([root])
+    while queue:
+        level = []
+        for _ in range(len(queue)):
+            node = queue.popleft()
+            level.append(node.val)
+            if node.left: queue.append(node.left)
+            if node.right: queue.append(node.right)
+        result.append(level)
+    return result
+```
+
+**BST property**: left subtree < root < right subtree. Inorder traversal gives sorted output.
+
+---
+
+## Heaps (Priority Queues)
+
+A heap gives you O(1) access to the minimum (min-heap) or maximum (max-heap) and O(log n) insert/delete.
+
+```python
+import heapq
+
+# Min-heap by default in Python
+nums = [3, 1, 4, 1, 5, 9]
+heapq.heapify(nums)         # O(n) in-place
+smallest = heapq.heappop(nums)  # 1
+
+# Max-heap: negate values
+nums = [3, 1, 4, 1, 5, 9]
+max_heap = [-x for x in nums]
+heapq.heapify(max_heap)
+largest = -heapq.heappop(max_heap)  # 9
+
+# K largest elements — O(n log k)
+def k_largest(nums: list[int], k: int) -> list[int]:
+    return heapq.nlargest(k, nums)
+```
+
+**Interview pattern**: "find the kth largest/smallest", "merge k sorted lists", "top k frequent elements" → heap.
+
+---
+
+## Graphs
+
+Two representations: **adjacency list** (sparse graphs, most interviews) and **adjacency matrix** (dense graphs, O(1) edge lookup).
+
+```python
+# Adjacency list
+graph = {
+    "A": ["B", "C"],
+    "B": ["A", "D", "E"],
+    "C": ["A", "F"],
+    "D": [],
+    "E": ["D"],
+    "F": [],
+}
+
+# DFS — recursive
+def dfs(graph: dict, node: str, visited: set) -> list[str]:
+    visited.add(node)
+    result = [node]
+    for neighbour in graph[node]:
+        if neighbour not in visited:
+            result.extend(dfs(graph, neighbour, visited))
+    return result
+
+# Detect cycle in directed graph using DFS + recursion stack
+def has_cycle_directed(graph: dict) -> bool:
+    WHITE, GRAY, BLACK = 0, 1, 2
+    color = {node: WHITE for node in graph}
+
+    def dfs(u):
+        color[u] = GRAY
+        for v in graph[u]:
+            if color[v] == GRAY:
+                return True
+            if color[v] == WHITE and dfs(v):
+                return True
+        color[u] = BLACK
+        return False
+
+    return any(dfs(node) for node in graph if color[node] == WHITE)
+```
+
+```go
+// BFS in Go
+func bfs(graph map[string][]string, start string) []string {
+    visited := map[string]bool{start: true}
+    queue := []string{start}
+    var order []string
+
+    for len(queue) > 0 {
+        node := queue[0]
+        queue = queue[1:]
+        order = append(order, node)
+        for _, neighbour := range graph[node] {
+            if !visited[neighbour] {
+                visited[neighbour] = true
+                queue = append(queue, neighbour)
+            }
+        }
+    }
+    return order
+}
+```
+
+---
+
+## Tries (Prefix Trees)
+
+Tries are ideal for **autocomplete**, **word search**, and prefix-matching problems. Insert and search are O(k) where k is the word length.
+
+```python
+class TrieNode:
+    def __init__(self):
+        self.children: dict[str, "TrieNode"] = {}
+        self.is_end = False
+
+class Trie:
+    def __init__(self):
+        self.root = TrieNode()
+
+    def insert(self, word: str) -> None:
+        node = self.root
+        for ch in word:
+            node = node.children.setdefault(ch, TrieNode())
+        node.is_end = True
+
+    def search(self, word: str) -> bool:
+        node = self.root
+        for ch in word:
+            if ch not in node.children:
+                return False
+            node = node.children[ch]
+        return node.is_end
+
+    def starts_with(self, prefix: str) -> bool:
+        node = self.root
+        for ch in prefix:
+            if ch not in node.children:
+                return False
+            node = node.children[ch]
+        return True
+```
+
+---
+
+## Dynamic Programming: When to Use It
+
+DP is not a data structure, but it is the most feared topic in coding interviews. The key questions:
+
+1. **Does the problem ask for an optimal value** (min/max/count)?
+2. **Does it have overlapping subproblems** (same sub-computations repeated)?
+3. **Does it have optimal substructure** (optimal solution uses optimal solutions to subproblems)?
+
+If yes to all three → reach for DP.
+
+```python
+# Classic: 0/1 Knapsack
+def knapsack(weights: list[int], values: list[int], capacity: int) -> int:
+    n = len(weights)
+    dp = [[0] * (capacity + 1) for _ in range(n + 1)]
+
+    for i in range(1, n + 1):
+        for w in range(capacity + 1):
+            dp[i][w] = dp[i - 1][w]
+            if weights[i - 1] <= w:
+                dp[i][w] = max(dp[i][w], dp[i - 1][w - weights[i - 1]] + values[i - 1])
+
+    return dp[n][capacity]
+
+print(knapsack([2, 3, 4, 5], [3, 4, 5, 6], 8))  # 10
+```
+
+---
+
+## Quick Interview Tips
+
+**Step 1** — Clarify the problem. Ask about edge cases, input size, and expected output format.
+
+**Step 2** — State the brute-force O(n²) solution. Confirm with the interviewer before optimising.
+
+**Step 3** — Identify the bottleneck. Is it repeated lookups? → hash map. Is it tracking min/max? → heap. Is it overlapping subproblems? → DP.
+
+**Step 4** — Write clean code. Name variables clearly. Add a brief comment for non-obvious logic.
+
+**Step 5** — Test with examples. Walk through your code with the provided test cases, then check edge cases (empty input, single element, all duplicates).
+
+---
+
+## Practice These Patterns
+
+The fastest way to internalise these patterns is to solve problems every day. On uByte:
+
+- [Interview problems in Python](/practice/python) — Two Sum, sliding window, DP, and more.
+- [Interview problems in Go](/practice/go) — same problems, Go solutions.
+- [Interview problems in JavaScript](/practice/javascript) — frontend and full-stack interview prep.
+
+Start with easy problems, get comfortable with hash maps and two pointers, then progress to trees and DP.

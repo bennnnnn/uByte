@@ -27,6 +27,8 @@ interface Props {
   start: number;
   sortedLength: number;
   pageProblems: PracticeListProblem[];
+  /** All problems after server-side filters — used for instant client-side text search. */
+  searchableProblems: PracticeListProblem[];
   attempts: Record<string, PracticeAttemptStatus>;
   hasUser: boolean;
   isPro: boolean;
@@ -58,6 +60,7 @@ export function PracticeListClient({
   start,
   sortedLength,
   pageProblems,
+  searchableProblems,
   attempts,
   hasUser,
   isPro,
@@ -70,10 +73,19 @@ export function PracticeListClient({
 }: Props) {
   const router = useRouter();
   const [selectedLang, setSelectedLang] = useState<SupportedLanguage>(initialLang);
+  const [searchQuery, setSearchQuery] = useState("");
 
   const unlockedSet = new Set(unlockedSlugs);
   const slotsRemaining = Math.max(0, allowance - unlockedCount);
   const isMaxed = unlockedCount >= maxFree;
+
+  // When a search query is active, bypass server pagination and filter client-side.
+  const trimmedSearch = searchQuery.trim().toLowerCase();
+  const isSearching = trimmedSearch.length > 0;
+  const displayProblems = isSearching
+    ? searchableProblems.filter((p) => p.title.toLowerCase().includes(trimmedSearch))
+    : pageProblems;
+  const displayStart = isSearching ? 0 : start;
 
   const buildUrl = useCallback(
     (lang: SupportedLanguage, opts: { page?: number; category?: string; status?: string; difficulty?: string }) => {
@@ -248,6 +260,23 @@ export function PracticeListClient({
 
         {/* Right: Status + Difficulty above list, then problems */}
         <main className="min-w-0 flex-1 px-4 py-6 sm:px-6 lg:py-8">
+          {/* Search */}
+          <div className="mb-4 relative">
+            <svg
+              className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400"
+              fill="none" viewBox="0 0 24 24" stroke="currentColor"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-4.35-4.35M17 11A6 6 0 105 11a6 6 0 0012 0z" />
+            </svg>
+            <input
+              type="search"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search problems…"
+              className="w-full rounded-xl border border-zinc-200 bg-white py-2.5 pl-10 pr-4 text-sm text-zinc-900 placeholder-zinc-400 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:placeholder-zinc-500"
+            />
+          </div>
+
           {/* Filters bar */}
           <div className="mb-4 flex flex-wrap items-center gap-4 rounded-xl border border-zinc-200 bg-surface-card p-4 dark:border-zinc-700">
             <div className="flex flex-wrap items-center gap-3">
@@ -305,14 +334,22 @@ export function PracticeListClient({
               </select>
             </div>
             <p className="ml-auto text-sm text-zinc-500 dark:text-zinc-400">
-              Showing {sortedLength} problem{sortedLength !== 1 ? "s" : ""}
+              Showing {isSearching ? displayProblems.length : sortedLength} problem{(isSearching ? displayProblems.length : sortedLength) !== 1 ? "s" : ""}
+              {isSearching && ` for "${searchQuery.trim()}"`}
             </p>
           </div>
 
           {/* Problem list */}
           <div className="overflow-hidden rounded-xl border border-zinc-200 bg-surface-card shadow-sm dark:border-zinc-700">
+            {isSearching && displayProblems.length === 0 && (
+              <div className="py-16 text-center text-zinc-500 dark:text-zinc-400">
+                <div className="mb-2 text-4xl">🔍</div>
+                <p className="font-medium">No problems found for &quot;{searchQuery.trim()}&quot;</p>
+                <p className="mt-1 text-sm">Try a different keyword.</p>
+              </div>
+            )}
             <ul className="divide-y divide-zinc-100 dark:divide-zinc-700">
-              {pageProblems.map((p, idx) => {
+              {displayProblems.map((p, idx) => {
                 const cat = getCategoryForSlug(p.slug);
                 const status = statusIcon(p.slug);
                 const locked = isLocked(p.slug);
@@ -346,7 +383,7 @@ export function PracticeListClient({
                         )}
                       </span>
                       <span className="w-7 shrink-0 text-center text-sm font-bold tabular-nums text-zinc-400 group-hover:text-indigo-500 dark:text-zinc-500 dark:group-hover:text-indigo-400">
-                        {start + idx + 1}
+                        {displayStart + idx + 1}
                       </span>
                       <span className="min-w-0 flex-1 font-medium text-zinc-900 group-hover:text-indigo-700 dark:text-zinc-100 dark:group-hover:text-indigo-400">
                         {p.title}
@@ -374,7 +411,7 @@ export function PracticeListClient({
               })}
             </ul>
 
-            {totalPages > 1 && (
+            {totalPages > 1 && !isSearching && (
               <div className="flex flex-wrap items-center justify-between gap-4 border-t border-zinc-100 bg-surface-card px-4 py-4 dark:border-zinc-700 sm:px-6">
                 <p className="text-sm text-zinc-500 dark:text-zinc-400">
                   Page {currentPage} of {totalPages}
