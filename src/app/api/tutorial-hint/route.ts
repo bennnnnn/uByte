@@ -8,6 +8,7 @@ import { hasPaidAccess } from "@/lib/plans";
 import { callAiFeedback } from "@/lib/ai/feedback-client";
 import { withErrorHandling } from "@/lib/api-utils";
 import { verifyCsrf } from "@/lib/csrf";
+import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 import { getSteps } from "@/lib/tutorial-steps";
 import type { SupportedLanguage } from "@/lib/languages/types";
 
@@ -22,6 +23,13 @@ export const POST = withErrorHandling("POST /api/tutorial-hint", async (request:
 
   const csrfError = verifyCsrf(request);
   if (csrfError) return NextResponse.json({ error: csrfError }, { status: 403 });
+
+  // Hard burst limit — prevents hammering before the per-user AI quota check
+  const ip = getClientIp(request.headers);
+  const { limited, retryAfter } = await checkRateLimit(`tutorial-hint:${ip}:${user.userId}`, 20, 60_000);
+  if (limited) {
+    return NextResponse.json({ error: "Too many requests" }, { status: 429, headers: { "Retry-After": String(retryAfter) } });
+  }
 
   const body = await request.json();
   const { tutorialSlug, stepIndex, lang, code, actualOutput, isError } = body ?? {};

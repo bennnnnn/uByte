@@ -259,6 +259,16 @@ export async function sendDay7Email(to: string, name: string): Promise<void> {
   });
 }
 
+/** Escape user-supplied text before embedding in HTML to prevent XSS. */
+function escapeHtml(str: string): string {
+  return str
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
 /** Contact form submission — forwards user message to the support inbox. */
 export async function sendContactEmail(opts: {
   fromName: string;
@@ -269,6 +279,9 @@ export async function sendContactEmail(opts: {
   const resend = getResend();
   if (!resend) return;
   const SUPPORT = process.env.SUPPORT_EMAIL ?? "support@ubyte.dev";
+  const name    = escapeHtml(opts.fromName);
+  const subject = escapeHtml(opts.subject);
+  const message = escapeHtml(opts.message);
   await resend.emails.send({
     from: FROM,
     to: SUPPORT,
@@ -278,12 +291,12 @@ export async function sendContactEmail(opts: {
       <div style="font-family:sans-serif;max-width:600px;margin:0 auto">
         <h2 style="color:#4f46e5">New contact form message</h2>
         <table style="width:100%;border-collapse:collapse;margin-bottom:16px">
-          <tr><td style="padding:4px 8px;font-weight:bold;width:100px">From</td><td>${opts.fromName} &lt;${opts.fromEmail}&gt;</td></tr>
-          <tr><td style="padding:4px 8px;font-weight:bold">Subject</td><td>${opts.subject}</td></tr>
+          <tr><td style="padding:4px 8px;font-weight:bold;width:100px">From</td><td>${name} &lt;${escapeHtml(opts.fromEmail)}&gt;</td></tr>
+          <tr><td style="padding:4px 8px;font-weight:bold">Subject</td><td>${subject}</td></tr>
         </table>
-        <div style="background:#f4f4f5;border-radius:8px;padding:16px;white-space:pre-wrap">${opts.message}</div>
+        <div style="background:#f4f4f5;border-radius:8px;padding:16px;white-space:pre-wrap">${message}</div>
         <p style="color:#71717a;font-size:12px;margin-top:16px">
-          Reply directly to this email to respond to ${opts.fromName}.
+          Reply directly to this email to respond to ${name}.
         </p>
       </div>
     `,

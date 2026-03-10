@@ -3,7 +3,7 @@ import Link from "next/link";
 import { getPublicProfile, getCertificatesByUser } from "@/lib/db";
 import { getUserExamStats } from "@/lib/db/exam-attempts";
 import { getTotalLessonCount, getSteps } from "@/lib/tutorial-steps";
-import { getProgress } from "@/lib/db/progress";
+import { getAllProgressByUser } from "@/lib/db/progress";
 import Avatar from "@/components/Avatar";
 import { Card } from "@/components/ui";
 import ShareProfileButton from "./ShareProfileButton";
@@ -55,16 +55,13 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
   if (!profile) notFound();
 
   const allLangs = Object.keys(LANGUAGES) as SupportedLanguage[];
-  const perLangProgress = await Promise.all(
-    allLangs.map((lang) => getProgress(id, lang))
-  );
+  const progressByLang = await getAllProgressByUser(id);
 
   let totalLessons = 0;
   let completedLessons = 0;
-  for (let i = 0; i < allLangs.length; i++) {
-    const lang = allLangs[i];
+  for (const lang of allLangs) {
     totalLessons += getTotalLessonCount(lang);
-    for (const slug of perLangProgress[i]) {
+    for (const slug of progressByLang.get(lang) ?? []) {
       completedLessons += getSteps(lang, slug).length;
     }
   }

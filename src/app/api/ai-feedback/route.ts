@@ -11,6 +11,7 @@ import { runHeuristics } from "@/lib/ai/heuristics";
 import { callAiFeedback } from "@/lib/ai/feedback-client";
 import { withErrorHandling } from "@/lib/api-utils";
 import { verifyCsrf } from "@/lib/csrf";
+import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 
 const MODEL_NAME = "grok-4";
 
@@ -23,6 +24,13 @@ export const POST = withErrorHandling("POST /api/ai-feedback", async (request: N
 
   const csrfError = verifyCsrf(request);
   if (csrfError) return NextResponse.json({ error: csrfError }, { status: 403 });
+
+  // Hard burst limit — prevents hammering before the per-user AI quota check
+  const ip = getClientIp(request.headers);
+  const { limited, retryAfter } = await checkRateLimit(`ai-feedback:${ip}:${user.userId}`, 20, 60_000);
+  if (limited) {
+    return NextResponse.json({ error: "Too many requests" }, { status: 429, headers: { "Retry-After": String(retryAfter) } });
+  }
 
   const body = await request.json();
   const submissionId = body?.submission_id != null ? Number(body.submission_id) : NaN;

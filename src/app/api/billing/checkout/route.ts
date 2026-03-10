@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { withErrorHandling, requireAuth } from "@/lib/api-utils";
 import { verifyCsrf } from "@/lib/csrf";
+import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 import { MONTHLY_PRICE_ID, YEARLY_PRICE_ID } from "@/lib/plans";
 
 const CheckoutBody = z.object({ plan: z.enum(["monthly", "yearly"]) });
@@ -15,6 +16,8 @@ export const POST = withErrorHandling("POST /api/billing/checkout", async (reque
   }
   const { user, response } = await requireAuth();
   if (!user) return response;
+  const { limited } = await checkRateLimit(`billing-checkout:${getClientIp(request.headers)}:${user.userId}`, 10, 60_000);
+  if (limited) return NextResponse.json({ error: "Too many requests" }, { status: 429 });
 
   const parsed = CheckoutBody.safeParse(await request.json());
   if (!parsed.success) {

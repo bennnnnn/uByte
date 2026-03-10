@@ -26,6 +26,29 @@ export async function getProgress(userId: number, language: string = DEFAULT_LAN
   }
 }
 
+/**
+ * Fetches completed tutorial slugs for ALL languages in a single query.
+ * Returns a map of language → slug[].  Use this on the public profile page
+ * instead of calling getProgress() once per language.
+ */
+export async function getAllProgressByUser(
+  userId: number
+): Promise<Map<string, string[]>> {
+  const sql = getSql();
+  const rows = await sql`
+    SELECT language, tutorial_slug FROM progress
+    WHERE user_id = ${userId}
+    ORDER BY completed_at
+  `;
+  const result = new Map<string, string[]>();
+  for (const r of rows) {
+    const lang = (r.language as string | null) ?? "go";
+    if (!result.has(lang)) result.set(lang, []);
+    result.get(lang)!.push(r.tutorial_slug as string);
+  }
+  return result;
+}
+
 /** If language is omitted, returns total count across all languages (for stats/leaderboard). */
 export async function getProgressCount(
   userId: number,

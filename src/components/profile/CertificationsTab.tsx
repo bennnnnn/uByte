@@ -75,7 +75,7 @@ export default function CertificationsTab() {
           </h3>
           <div className="grid gap-3 sm:grid-cols-2">
             {earned.map((lang) => {
-              const cert = certMap.get(lang)!;
+              const cert = certMap.get(lang);
               const meta = LANG_META[lang];
               const stat = statsMap.get(lang);
               return (
@@ -96,18 +96,18 @@ export default function CertificationsTab() {
                       {stat?.bestScore != null ? `Best score: ${stat.bestScore}%` : ""}
                       {stat?.bestScore != null && stat?.attemptCount ? " · " : ""}
                       {stat?.attemptCount ? `${stat.attemptCount} attempt${stat.attemptCount > 1 ? "s" : ""}` : ""}
-                      {cert.passed_at ? ` · ${new Date(cert.passed_at).toLocaleDateString()}` : ""}
+                      {cert?.passed_at ? ` · ${new Date(cert.passed_at).toLocaleDateString()}` : ""}
                     </p>
                   </div>
                   <div className="flex shrink-0 gap-2">
                     <Link
-                      href={`/certifications/certificate/${cert.id}`}
+                      href={`/certifications/certificate/${cert?.id}`}
                       className="rounded-lg bg-indigo-600 px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-indigo-700"
                     >
                       View
                     </Link>
                     <Link
-                      href={`/api/certifications/certificate/${cert.id}/pdf`}
+                      href={`/api/certifications/certificate/${cert?.id}/pdf`}
                       className="rounded-lg border border-zinc-200 px-3 py-1.5 text-xs font-medium text-zinc-700 transition-colors hover:bg-zinc-50 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800"
                     >
                       PDF
@@ -129,7 +129,7 @@ export default function CertificationsTab() {
           <div className="grid gap-3 sm:grid-cols-2">
             {attempted.map((lang) => {
               const meta = LANG_META[lang];
-              const stat = statsMap.get(lang)!;
+              const stat = statsMap.get(lang);
               return (
                 <Card key={lang} className="flex items-center gap-4 p-4">
                   <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-amber-50 text-2xl dark:bg-amber-950/40">
@@ -141,13 +141,13 @@ export default function CertificationsTab() {
                         {meta.name} Certification
                       </p>
                       <span className="shrink-0 rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-bold uppercase text-amber-700 dark:bg-amber-950 dark:text-amber-300">
-                        {stat.lastPassed === false ? "Not passed" : "Attempted"}
+                        {stat?.lastPassed === false ? "Not passed" : "Attempted"}
                       </span>
                     </div>
                     <p className="mt-0.5 text-xs text-zinc-500 dark:text-zinc-400">
-                      {stat.bestScore != null ? `Best score: ${stat.bestScore}%` : ""}
-                      {stat.bestScore != null && stat.attemptCount ? " · " : ""}
-                      {stat.attemptCount} attempt{stat.attemptCount > 1 ? "s" : ""}
+                      {stat?.bestScore != null ? `Best score: ${stat.bestScore}%` : ""}
+                      {stat?.bestScore != null && stat?.attemptCount ? " · " : ""}
+                      {stat?.attemptCount ?? 0} attempt{(stat?.attemptCount ?? 0) > 1 ? "s" : ""}
                     </p>
                   </div>
                   <Link

@@ -38,7 +38,8 @@ export async function generateMetadata({
   const tutorial = getTutorialBySlug(slug, lang);
   if (!tutorial) return { title: "Not Found" };
 
-  const config = getLanguageConfig(lang)!;
+  const config = getLanguageConfig(lang);
+  if (!config) return { title: "Not Found" };
   const canonicalUrl = tutorialCanonicalUrl(BASE_URL, lang, slug);
   const ogTitle = `${tutorial.title} | ${APP_NAME}`;
   const description = `${tutorial.description} Free interactive ${config.name} tutorial with live code examples on ${APP_NAME}.`;
@@ -90,7 +91,8 @@ export default async function TutorialPage({
   const tutorial = getTutorialBySlug(slug, lang);
   if (!tutorial) notFound();
 
-  const config = getLanguageConfig(lang)!;
+  const config = getLanguageConfig(lang);
+  if (!config) notFound();
   const { prev, next } = getAdjacentTutorials(slug, lang);
   const allStepsForLang = getAllStepsForLanguage(lang);
   const steps = getSteps(lang, slug);

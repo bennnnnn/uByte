@@ -69,6 +69,7 @@ import {
   getUserByEmail,
   createNotification,
   recordSubscriptionEvent,
+  recordReferralSubscription,
 } from "@/lib/db";
 import { withErrorHandling } from "@/lib/api-utils";
 import { BILLING_CONFIG, YEARLY_PRICE_CENTS, MONTHLY_PRICE_CENTS } from "@/lib/plans";
@@ -271,6 +272,9 @@ export const POST = withErrorHandling("POST /api/webhooks/paddle", async (reques
         console.log("[paddle-webhook] transaction completed — updated user", uid, "to plan:", activatedPlan);
         const amountCents = activatedPlan === "yearly" ? YEARLY_PRICE_CENTS : MONTHLY_PRICE_CENTS;
         await recordSubscriptionEvent(uid, activatedPlan, amountCents, "activated");
+        await recordReferralSubscription(uid).catch((err) =>
+          console.error("[paddle-webhook] recordReferralSubscription failed:", err)
+        );
       } else {
         console.error("[paddle-webhook] transaction completed — could not resolve user");
       }
@@ -299,6 +303,9 @@ export const POST = withErrorHandling("POST /api/webhooks/paddle", async (reques
         );
         const amountCents = activatedPlan === "yearly" ? YEARLY_PRICE_CENTS : MONTHLY_PRICE_CENTS;
         await recordSubscriptionEvent(uid, activatedPlan, amountCents, "activated");
+        await recordReferralSubscription(uid).catch((err) =>
+          console.error("[paddle-webhook] recordReferralSubscription failed:", err)
+        );
       }
       break;
     }

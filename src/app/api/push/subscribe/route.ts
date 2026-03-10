@@ -7,12 +7,15 @@ import { getCurrentUser } from "@/lib/auth";
 import { savePushSubscription, deletePushSubscription } from "@/lib/db";
 import { withErrorHandling } from "@/lib/api-utils";
 import { verifyCsrf } from "@/lib/csrf";
+import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 
 export const POST = withErrorHandling("POST /api/push/subscribe", async (req: NextRequest) => {
   const csrfError = verifyCsrf(req);
   if (csrfError) return NextResponse.json({ error: csrfError }, { status: 403 });
   const user = await getCurrentUser();
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const { limited } = await checkRateLimit(`push-subscribe:${getClientIp(req.headers)}:${user.userId}`, 10, 60_000);
+  if (limited) return NextResponse.json({ error: "Too many requests" }, { status: 429 });
 
   const body = await req.json() as {
     endpoint?: string;

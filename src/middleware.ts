@@ -16,7 +16,7 @@ export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // ── Admin route protection ──────────────────────────────────────────────────
-  if (pathname.startsWith("/api/admin") || pathname === "/admin") {
+  if (pathname.startsWith("/api/admin") || pathname.startsWith("/admin")) {
     const token = request.cookies.get("auth_token")?.value;
     if (!token) {
       if (pathname.startsWith("/api/")) {
@@ -52,6 +52,7 @@ export async function middleware(request: NextRequest) {
 export const config = {
   matcher: [
     "/api/admin/:path*",
+    "/admin/:path*",
     "/admin",
     // Match all page navigations (not static files or _next assets)
     "/((?!_next/static|_next/image|favicon.ico|sw.js|manifest.json|.*\\.).*)",

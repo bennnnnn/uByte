@@ -44,7 +44,7 @@ export default function GrowthTab({ data }: Props) {
     const dateMap = new Map(days.map((d) => [d.date, d]));
     for (const u of users) {
       const day = u.created_at?.slice(0, 10);
-      if (day && dateMap.has(day)) dateMap.get(day)!.count++;
+      if (day && dateMap.has(day)) { const entry = dateMap.get(day); if (entry) entry.count++; }
     }
     return days;
   }, [users]);
