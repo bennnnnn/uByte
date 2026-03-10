@@ -108,7 +108,7 @@ function OnboardingInner() {
     setTimeout(() => setCopied(false), 2000);
   }
 
-  const firstName = profile?.name?.split(" ")[0] ?? user?.name?.split(" ")[0] ?? "there";
+  const firstName = user?.name?.split(" ")[0] ?? "there";
 
   if (!user) return null;
 
