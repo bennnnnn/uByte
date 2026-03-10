@@ -22,6 +22,7 @@ export interface ProfileData {
   plan: string;
   emailVerified: boolean;
   isAdmin: boolean;
+  onboarding_goal?: string | null;
 }
 
 // ─── Auth Context (user, login, signup, logout) ──────
@@ -101,6 +102,7 @@ function extractProfile(data: { profile?: Record<string, unknown> }): ProfileDat
     plan: (p.plan as string) || "free",
     emailVerified: !!(p.email_verified as number),
     isAdmin: !!(p.is_admin as number),
+    onboarding_goal: (p.onboarding_goal as string | null) ?? null,
   };
 }
 
