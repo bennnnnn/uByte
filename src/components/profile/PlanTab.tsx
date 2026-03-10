@@ -26,8 +26,15 @@ interface Props {
   plan: string;
 }
 
-function ManageOrCancelButtons({ canceling = false }: { canceling?: boolean }) {
+function ManageOrCancelButtons({
+  canceling = false,
+  onSyncPlan,
+}: {
+  canceling?: boolean;
+  onSyncPlan?: () => Promise<void>;
+}) {
   const [loading, setLoading] = useState(false);
+  const [syncing, setSyncing] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   async function openPortal(action: "manage" | "cancel") {
@@ -36,17 +43,22 @@ function ManageOrCancelButtons({ canceling = false }: { canceling?: boolean }) {
     try {
       const res = await fetch("/api/billing/portal", { credentials: "same-origin" });
       const data = (await res.json()) as { portalUrl?: string | null; cancelUrl?: string | null; error?: string };
-      if (data.error) {
-        setError(data.error);
-        return;
-      }
-      if (!res.ok) {
-        setError("Could not open billing portal. Please try again.");
-        return;
-      }
+      if (data.error) { setError(data.error); return; }
+      if (!res.ok) { setError("Could not open billing portal. Please try again."); return; }
       const url = action === "cancel" && data.cancelUrl ? data.cancelUrl : data.portalUrl;
-      if (url) window.open(url, "_blank", "noopener,noreferrer");
-      else setError("Billing portal URL was not returned. Please contact support.");
+      if (!url) { setError("Billing portal URL was not returned. Please contact support."); return; }
+
+      // Open the portal, then sync plan status when the user returns to this tab
+      const popup = window.open(url, "_blank", "noopener,noreferrer");
+      if (popup) {
+        const pollClosed = setInterval(async () => {
+          if (popup.closed) {
+            clearInterval(pollClosed);
+            setSyncing(true);
+            try { await onSyncPlan?.(); } finally { setSyncing(false); }
+          }
+        }, 800);
+      }
     } catch {
       setError("Something went wrong. Please try again.");
     } finally {
@@ -61,15 +73,15 @@ function ManageOrCancelButtons({ canceling = false }: { canceling?: boolean }) {
         variant="secondary"
         size="lg"
         onClick={() => openPortal("manage")}
-        disabled={loading}
+        disabled={loading || syncing}
       >
-        {loading ? "Opening…" : "Manage billing"}
+        {loading ? "Opening…" : syncing ? "Refreshing status…" : "Manage billing"}
       </Button>
       {!canceling && (
         <button
           type="button"
           onClick={() => openPortal("cancel")}
-          disabled={loading}
+          disabled={loading || syncing}
           className="rounded-xl border border-red-200 bg-white px-4 py-2.5 text-sm font-semibold text-red-600 transition-colors hover:border-red-300 hover:bg-red-50 dark:border-red-900/50 dark:bg-red-950/30 dark:text-red-400 dark:hover:bg-red-950/50 disabled:opacity-50"
         >
           Cancel subscription
@@ -83,12 +95,17 @@ function ManageOrCancelButtons({ canceling = false }: { canceling?: boolean }) {
 export default function PlanTab({ plan }: Props) {
   const { user, refreshProfile } = useAuth();
   const searchParams = useSearchParams();
-  const isPaid = hasPaidAccess(plan);
-  const isYearly = plan === "yearly";
-  const isMonthly = plan === "pro";
-  const isCanceling = plan === "canceling";
+  const [currentPlan, setCurrentPlan] = useState(plan);
+  const [expiresAt, setExpiresAt] = useState<string | null>(null);
+  const isPaid = hasPaidAccess(currentPlan);
+  const isYearly = currentPlan === "yearly";
+  const isMonthly = currentPlan === "pro";
+  const isCanceling = currentPlan === "canceling";
   const paddleReady = useRef(false);
   const [coupon, setCoupon] = useState("");
+
+  // Keep local plan in sync if parent prop changes (e.g. after webhook arrives)
+  useEffect(() => { setCurrentPlan(plan); }, [plan]);
 
   // When redirected back from Paddle checkout with ?plan=success,
   // poll the profile until the plan upgrades (webhook may take a few seconds).
@@ -104,6 +121,25 @@ export default function PlanTab({ plan }: Props) {
     return () => clearInterval(interval);
   }, [searchParams, refreshProfile]);
 
+  // Sync plan status from Paddle directly — called when user closes the portal popup
+  async function syncPlan() {
+    try {
+      const res = await fetch("/api/billing/sync", { credentials: "same-origin" });
+      if (!res.ok) return;
+      const data = (await res.json()) as { synced?: boolean; plan?: string; expiresAt?: string };
+      if (data.synced && data.plan) {
+        setCurrentPlan(data.plan);
+        if (data.expiresAt) setExpiresAt(data.expiresAt);
+        // Also refresh the auth profile so the header/nav reflects the new plan
+        await refreshProfile();
+      }
+    } catch { /* non-fatal */ }
+  }
+
+  const expiryDisplay = expiresAt
+    ? new Date(expiresAt).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })
+    : null;
+
   const planLabel = isYearly
     ? BILLING_CONFIG.yearly.label
     : isMonthly
@@ -116,7 +152,9 @@ export default function PlanTab({ plan }: Props) {
     : isMonthly
       ? BILLING_CONFIG.monthly.priceText
       : isCanceling
-        ? "Access continues until your billing period ends"
+        ? expiryDisplay
+          ? `Active until ${expiryDisplay}`
+          : "Access continues until your billing period ends"
         : "Free forever";
 
   useEffect(() => {
@@ -301,16 +339,32 @@ export default function PlanTab({ plan }: Props) {
         </div>
       ) : (
         <div className="space-y-4">
+          {isCanceling && (
+            <div className="flex items-start gap-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 dark:border-amber-900/50 dark:bg-amber-950/30">
+              <span className="mt-0.5 text-lg">⚠️</span>
+              <div>
+                <p className="text-sm font-semibold text-amber-800 dark:text-amber-200">
+                  Subscription cancelled
+                </p>
+                <p className="mt-0.5 text-sm text-amber-700 dark:text-amber-300">
+                  {expiryDisplay
+                    ? `You have full Pro access until ${expiryDisplay}. After that your account reverts to free.`
+                    : "You keep full Pro access until your current billing period ends, then your account reverts to free."}
+                  {" "}Your progress and certificates are never deleted.
+                </p>
+              </div>
+            </div>
+          )}
           <Card className="px-6 py-5">
             <p className="font-medium text-zinc-700 dark:text-zinc-300">
-              You’re all set
+              {isCanceling ? "Billing" : "You’re all set"}
             </p>
             <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
               {isCanceling
-                ? "Your subscription has been cancelled. You keep full Pro access until your current billing period ends — then your account reverts to free. Your progress and certificates are never deleted."
+                ? "Want to reactivate? Use the button below to manage your billing."
                 : "Manage billing, update your payment method, or cancel your subscription below. If you cancel, you keep Pro until the end of your current billing period — then access reverts to free."}
             </p>
-            <ManageOrCancelButtons canceling={isCanceling} />
+            <ManageOrCancelButtons canceling={isCanceling} onSyncPlan={syncPlan} />
           </Card>
         </div>
       )}
