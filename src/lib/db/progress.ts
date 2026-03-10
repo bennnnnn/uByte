@@ -73,6 +73,7 @@ export async function getProgress(userId: number, language: string = DEFAULT_LAN
 export async function getAllProgressByUser(
   userId: number
 ): Promise<Map<string, string[]>> {
+  await ensureLanguageColumn();
   const sql = getSql();
   const rows = await sql`
     SELECT language, tutorial_slug FROM progress
