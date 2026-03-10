@@ -11,12 +11,14 @@ export async function getProgress(userId: number, language: string = DEFAULT_LAN
   try {
     const rows = await sql`
       SELECT tutorial_slug FROM progress
-      WHERE user_id = ${userId} AND (language = ${language} OR language IS NULL)
+      WHERE user_id = ${userId} AND COALESCE(language, ${DEFAULT_LANG}) = ${language}
       ORDER BY completed_at
     `;
     return rows.map((r) => r.tutorial_slug as string);
   } catch (err: unknown) {
     if ((err as { code?: string })?.code === UNDEFINED_COLUMN) {
+      // language column doesn't exist yet — only fall back to unfiltered for the default language
+      if (language !== DEFAULT_LANG) return [];
       const rows = await sql`
         SELECT tutorial_slug FROM progress WHERE user_id = ${userId} ORDER BY completed_at
       `;
@@ -64,11 +66,12 @@ export async function getProgressCount(
   try {
     const [row] = await sql`
       SELECT COUNT(*)::int AS c FROM progress
-      WHERE user_id = ${userId} AND (language = ${language} OR language IS NULL)
+      WHERE user_id = ${userId} AND COALESCE(language, ${DEFAULT_LANG}) = ${language}
     `;
     return (row?.c as number) ?? 0;
   } catch (err: unknown) {
     if ((err as { code?: string })?.code === UNDEFINED_COLUMN) {
+      if (language !== DEFAULT_LANG) return 0;
       const [row] = await sql`
         SELECT COUNT(*)::int AS c FROM progress WHERE user_id = ${userId}
       `;
@@ -112,7 +115,7 @@ export async function markIncomplete(
   try {
     await sql`
       DELETE FROM progress
-      WHERE user_id = ${userId} AND tutorial_slug = ${tutorialSlug} AND (language = ${language} OR language IS NULL)
+      WHERE user_id = ${userId} AND tutorial_slug = ${tutorialSlug} AND COALESCE(language, ${DEFAULT_LANG}) = ${language}
     `;
   } catch (err: unknown) {
     if ((err as { code?: string })?.code === UNDEFINED_COLUMN) {
