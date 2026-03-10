@@ -114,6 +114,16 @@ export function useStepProgress(
   const [aiFeedbackLoading, setAiFeedbackLoading] = useState(false);
   const [aiFeedbackUpgrade, setAiFeedbackUpgrade] = useState(false);
   const [failCount, setFailCount] = useState(0);
+
+  // Refs so callbacks (setFailCount updater, etc.) always see fresh values without needing
+  // them in their dependency arrays, avoiding stale-closure bugs.
+  const aiFeedbackRef = useRef(aiFeedback);
+  aiFeedbackRef.current = aiFeedback;
+  const aiFeedbackLoadingRef = useRef(aiFeedbackLoading);
+  aiFeedbackLoadingRef.current = aiFeedbackLoading;
+  // Tracks what code was used to generate the current hint so we only re-request
+  // after the user has meaningfully changed their code.
+  const hintCodeRef = useRef<string>("");
   const [showInlineChat, setShowInlineChat] = useState(false);
   const [tutorialDone, setTutorialDone] = useState(false);
   const [countdown, setCountdown] = useState(3);
@@ -228,13 +238,16 @@ export function useStepProgress(
     setShowHint(false);
     setFailCount(0);
     setAiFeedback(null);
+    setAiFeedbackUpgrade(false);
+    hintCodeRef.current = "";
     setShowInlineChat(false);
   }
 
   function fetchAiFeedback(userCode: string, actualOutput: string, isError: boolean, currentStepIndex: number) {
     setAiFeedbackLoading(true);
-    setAiFeedback(null);
+    // Keep the existing hint visible while the new one loads — don't blank it eagerly.
     setAiFeedbackUpgrade(false);
+    hintCodeRef.current = userCode;
     apiFetch("/api/tutorial-hint", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -250,6 +263,7 @@ export function useStepProgress(
       .then(async (r) => {
         const d = await r.json();
         if (r.status === 402 && d?.error === "upgrade_required") {
+          setAiFeedback(null);
           setAiFeedbackUpgrade(true);
         } else if (d?.friendly_one_liner) {
           setAiFeedback(d as AiFeedbackSchema);
@@ -269,7 +283,7 @@ export function useStepProgress(
     setStatus("running");
     setOutput(null);
     setErrorLines(new Set());
-    setAiFeedback(null);
+    // Intentionally do NOT clear aiFeedback here — Run is a preview, the hint stays relevant.
     try {
       const { output: out, hasError } = await runCodeRequest(code, lang);
       setOutputIsError(hasError);
@@ -291,7 +305,8 @@ export function useStepProgress(
   ) {
     setStatus("running");
     setOutput(null);
-    setAiFeedback(null);
+    // Intentionally do NOT clear aiFeedback here — keep the hint visible while re-checking.
+    // It is only cleared on pass (step done) or when navigating away.
     setErrorLines(new Set());
 
     // Auto-snapshot before checking (fire-and-forget, only when logged in)
@@ -323,7 +338,10 @@ export function useStepProgress(
         setStatus("failed");
         setFailCount((n) => {
           const next = n + 1;
-          if (next >= 2) fetchAiFeedback(code, out, true, stepIndex);
+          const codeChanged = normCode(code) !== normCode(hintCodeRef.current);
+          if (next >= 2 && (!aiFeedbackRef.current && !aiFeedbackLoadingRef.current || codeChanged)) {
+            fetchAiFeedback(code, out, true, stepIndex);
+          }
           return next;
         });
         apiFetch("/api/step-check", {
@@ -347,7 +365,10 @@ export function useStepProgress(
           setStatus("failed");
           setFailCount((n) => {
             const next = n + 1;
-            if (next >= 2) fetchAiFeedback(code, out, false, stepIndex);
+            const codeChanged = normCode(code) !== normCode(hintCodeRef.current);
+            if (next >= 2 && (!aiFeedbackRef.current && !aiFeedbackLoadingRef.current || codeChanged)) {
+              fetchAiFeedback(code, out, false, stepIndex);
+            }
             return next;
           });
           apiFetch("/api/step-check", {
@@ -359,6 +380,9 @@ export function useStepProgress(
         }
         setStatus("passed");
         setFailCount(0);
+        setAiFeedback(null);          // Step done — clear hint so the next step starts fresh.
+        setAiFeedbackUpgrade(false);
+        hintCodeRef.current = "";
         setCompletedSteps((prev) => new Set([...prev, stepIndex]));
         apiFetch("/api/step-check", {
           method: "POST",
@@ -376,7 +400,10 @@ export function useStepProgress(
         setStatus("failed");
         setFailCount((n) => {
           const next = n + 1;
-          if (next >= 2) fetchAiFeedback(code, out, false, stepIndex);
+          const codeChanged = normCode(code) !== normCode(hintCodeRef.current);
+          if (next >= 2 && (!aiFeedbackRef.current && !aiFeedbackLoadingRef.current || codeChanged)) {
+            fetchAiFeedback(code, out, false, stepIndex);
+          }
           return next;
         });
         apiFetch("/api/step-check", {

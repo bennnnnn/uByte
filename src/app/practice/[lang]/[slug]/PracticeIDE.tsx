@@ -706,7 +706,8 @@ export function PracticeIDE({ problem, initialLang, initialCode, categoryFilter 
   const handleSubmit = useCallback(async () => {
     setSubmitting(true);
     setVerdict(null);
-    setAiFeedback(null);
+    // Intentionally do NOT clear aiFeedback here — keep the hint visible during re-submit.
+    // It is cleared on accept (problem solved) or when the user manually dismisses it.
     setAiError(null);
     // Silently auto-format before submitting (fire-and-forget if it fails)
     const codeToSubmit = await format(editor.code, lang).catch(() => editor.code);
@@ -744,14 +745,16 @@ export function PracticeIDE({ problem, initialLang, initialCode, categoryFilter 
 
       if (data.verdict === "accepted") {
         setStatuses((prev) => ({ ...prev, [problem.slug]: "solved" }));
+        setAiFeedback(null);  // Problem solved — clear hint so panel is clean.
+        setAiUpgradeRequired(false);
         if (data.xpAwarded > 0) {
           setXpToast(data.xpAwarded);
           setTimeout(() => setXpToast(null), 3500);
         }
       } else if (["wrong_answer", "runtime_error", "compile_error", "tle"].includes(data.verdict)) {
         setStatuses((prev) => ({ ...prev, [problem.slug]: "failed" }));
-        // Only auto-trigger AI if there's no existing hint already shown to avoid redundant API calls
-      if (data.consecutive_failures >= 2 && data.submission_id && !aiFeedback) {
+        // Only auto-trigger AI if there's no hint already showing and none is in-flight.
+        if (data.consecutive_failures >= 2 && data.submission_id && !aiFeedback && !aiLoading) {
           setAiLoading(true);
           setAiError(null);
           setAiUpgradeRequired(false);
@@ -784,14 +787,14 @@ export function PracticeIDE({ problem, initialLang, initialCode, categoryFilter 
     } finally {
       setSubmitting(false);
     }
-  }, [editor.code, lang, problem.slug]);
+  }, [editor.code, lang, problem.slug, aiFeedback, aiLoading]);
 
   const requestAiFeedback = useCallback(async () => {
     const sid = verdict?.submissionId;
     if (!sid) return;
     setAiLoading(true);
     setAiError(null);
-    setAiFeedback(null);
+    // Keep the existing hint visible while the new one loads — don't blank it eagerly.
     setAiUpgradeRequired(false);
     try {
       const res = await apiFetch("/api/ai-feedback", {
