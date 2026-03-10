@@ -857,7 +857,7 @@ export function PracticeIDE({ problem, initialLang, initialCode, categoryFilter 
         });
         if (res.ok) {
           const data = await res.json();
-          setBookmarkId(data?.bookmark?.id ?? -1);
+          setBookmarkId(data?.bookmark?.id ?? null);
         }
       }
     } catch { /* ignore */ }

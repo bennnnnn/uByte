@@ -8,6 +8,7 @@ import type { SupportedLanguage } from "@/lib/languages/types";
 import { ALL_LANGUAGE_KEYS } from "@/lib/languages/registry";
 import { GradientText } from "@/components/ui";
 import { useAuth } from "@/components/AuthProvider";
+import { hasPaidAccess } from "@/lib/plans";
 
 type Lang = SupportedLanguage;
 
@@ -128,7 +129,7 @@ export default function HeroSection({
 }: HeroSectionProps) {
   const [lang, setLang] = useState<Lang>("go");
   const { user, loading, profile } = useAuth();
-  const isPro = profile?.plan === "pro" || profile?.plan === "yearly";
+  const isPro = hasPaidAccess(profile?.plan);
   const meta = LANG_META[lang];
   const lines = CODE[lang];
   const problemsLabel = problemCount >= 10 ? `${problemCount}+` : String(problemCount);
@@ -363,7 +364,7 @@ export default function HeroSection({
                   </svg>
                   Run
                 </span>
-                <span className="flex items-center gap-1.5 rounded-lg border border-emerald-200 bg-emerald-50 px-3.5 py-1.5 text-[11px] font-bold text-emerald-600">
+                <span className="flex items-center gap-1.5 rounded-lg border border-emerald-200 bg-emerald-50 px-3.5 py-1.5 text-[11px] font-bold text-emerald-600 dark:border-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-400">
                   ✓ Check
                 </span>
                 <span className="ml-auto text-[10px] text-zinc-300 dark:text-zinc-500">◉ Format</span>
@@ -375,9 +376,9 @@ export default function HeroSection({
                   Output
                 </p>
                 <div className="flex items-center justify-between">
-                  <span className="font-mono text-xs text-emerald-600">Hello, World!</span>
-                  <span className="flex items-center gap-1.5 text-[11px] font-bold text-emerald-600">
-                    <span className="flex h-4 w-4 items-center justify-center rounded-full bg-emerald-100 text-[9px]">✓</span>
+                  <span className="font-mono text-xs text-emerald-600 dark:text-emerald-400">Hello, World!</span>
+                  <span className="flex items-center gap-1.5 text-[11px] font-bold text-emerald-600 dark:text-emerald-400">
+                    <span className="flex h-4 w-4 items-center justify-center rounded-full bg-emerald-100 text-[9px] dark:bg-emerald-900/50">✓</span>
                     Correct!
                   </span>
                 </div>

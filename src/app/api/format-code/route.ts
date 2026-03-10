@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { withErrorHandling } from "@/lib/api-utils";
-import { checkRateLimit } from "@/lib/rate-limit";
+import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 
 const GO_FMT_URL = process.env.NEXT_PUBLIC_GO_FMT_URL || "https://go.dev/_/fmt";
 
@@ -58,8 +58,8 @@ async function formatJavaScript(code: string): Promise<string> {
  *   (real formatters require a full runtime — use Judge0 exec environment instead)
  */
 export const POST = withErrorHandling("POST /api/format-code", async (request: NextRequest) => {
-  const ip = request.headers.get("x-forwarded-for") ?? "unknown";
-  const { limited } = await checkRateLimit(`fmt:${ip}`, 30, 60);
+  const ip = getClientIp(request.headers);
+  const { limited } = await checkRateLimit(`fmt:${ip}`, 30, 60_000);
   if (limited) return NextResponse.json({ error: "Too many requests" }, { status: 429 });
 
   const body = await request.json();

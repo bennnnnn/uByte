@@ -288,7 +288,7 @@ export function useStepProgress(
       setStatus("idle");
     } catch {
       setOutputIsError(true);
-      setOutput("Could not reach the Go compiler. Please try again.");
+      setOutput("Could not reach the compiler. Please try again.");
       setStatus("idle");
     }
   }
@@ -406,7 +406,7 @@ export function useStepProgress(
         }).catch(() => {});
       }
     } catch {
-      setOutput("Could not reach the Go compiler. Please try again.");
+      setOutput("Could not reach the compiler. Please try again.");
       setStatus("failed");
     }
   }

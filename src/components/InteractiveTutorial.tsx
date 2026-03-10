@@ -286,7 +286,7 @@ export default function InteractiveTutorial({
             </button>
             <button
               onClick={async () => {
-                const formatted = await format(editor.code, lang);
+                const formatted = await format(editor.code, ideLang);
                 if (formatted !== editor.code) editor.setCode(formatted);
               }}
               disabled={formatting}

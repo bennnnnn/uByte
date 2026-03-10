@@ -63,7 +63,7 @@ export default async function CertificatePage({ params }: { params: Promise<{ us
       <div className="flex min-h-[60vh] items-center justify-center">
         <div className="text-center">
           <p className="mb-4 text-zinc-500">User not found.</p>
-          <Link href="/" className="text-sm text-indigo-600 hover:text-indigo-700">Back to tutorials</Link>
+          <Link href="/" className="text-sm text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300">Back to uByte</Link>
         </div>
       </div>
     );
@@ -82,10 +82,10 @@ export default async function CertificatePage({ params }: { params: Promise<{ us
           <div className="mb-4 h-2 overflow-hidden rounded-full bg-zinc-200 dark:bg-zinc-800">
             <div
               className="h-full rounded-full bg-indigo-500"
-              style={{ width: `${(data.completedCount / data.totalTutorials) * 100}%` }}
+              style={{ width: `${data.totalTutorials > 0 ? (data.completedCount / data.totalTutorials) * 100 : 0}%` }}
             />
           </div>
-          <Link href="/" className="text-sm text-indigo-600 hover:text-indigo-700">Start learning</Link>
+          <Link href="/" className="text-sm text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300">Start learning</Link>
         </div>
       </div>
     );
@@ -163,8 +163,8 @@ export default async function CertificatePage({ params }: { params: Promise<{ us
         />
 
         <p className="mt-4 text-center text-xs text-zinc-400">
-          <Link href="/" className="text-indigo-600 hover:text-indigo-700">
-            ← Back to tutorials
+          <Link href="/" className="text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300">
+            ← Back to uByte
           </Link>
         </p>
       </div>

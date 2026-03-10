@@ -7,6 +7,7 @@ import { createAttempt } from "@/lib/db/exam-attempts";
 import { getExamConfigForLang } from "@/lib/db/exam-settings";
 import { withErrorHandling } from "@/lib/api-utils";
 import { isExamLang } from "@/lib/exams/config";
+import { verifyCsrf } from "@/lib/csrf";
 
 function shuffle<T>(arr: T[]): T[] {
   const out = [...arr];
@@ -21,6 +22,8 @@ function shuffle<T>(arr: T[]): T[] {
 export const POST = withErrorHandling(
   "POST /api/certifications/[lang]/start",
   async (request: NextRequest, context?: unknown) => {
+    const csrfError = verifyCsrf(request);
+    if (csrfError) return NextResponse.json({ error: csrfError }, { status: 403 });
     const user = await getCurrentUser();
     if (!user) return NextResponse.json({ error: "Sign in to start an exam" }, { status: 401 });
 

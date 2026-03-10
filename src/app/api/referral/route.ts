@@ -6,8 +6,9 @@ import { NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
 import { getOrCreateReferralCode, getReferralStats } from "@/lib/db";
 import { BASE_URL } from "@/lib/constants";
+import { withErrorHandling } from "@/lib/api-utils";
 
-export async function GET() {
+export const GET = withErrorHandling("GET /api/referral", async () => {
   const user = await getCurrentUser();
   if (!user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -20,4 +21,4 @@ export async function GET() {
     signups: stats.signups,
     subscribed: stats.subscribed,
   });
-}
+});

@@ -6,8 +6,11 @@ import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
 import { savePushSubscription, deletePushSubscription } from "@/lib/db";
 import { withErrorHandling } from "@/lib/api-utils";
+import { verifyCsrf } from "@/lib/csrf";
 
 export const POST = withErrorHandling("POST /api/push/subscribe", async (req: NextRequest) => {
+  const csrfError = verifyCsrf(req);
+  if (csrfError) return NextResponse.json({ error: csrfError }, { status: 403 });
   const user = await getCurrentUser();
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
@@ -26,6 +29,8 @@ export const POST = withErrorHandling("POST /api/push/subscribe", async (req: Ne
 });
 
 export const DELETE = withErrorHandling("DELETE /api/push/subscribe", async (req: NextRequest) => {
+  const csrfError = verifyCsrf(req);
+  if (csrfError) return NextResponse.json({ error: csrfError }, { status: 403 });
   const user = await getCurrentUser();
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 

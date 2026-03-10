@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { MONTHLY_PRICE_CENTS } from "@/lib/plans";
 
 const PILLARS = [
   {
@@ -60,7 +61,7 @@ export default function ValuePropBanner({ isPro = false }: ValuePropBannerProps)
           href="/pricing"
           className="inline-flex items-center justify-center gap-2 rounded-xl bg-white px-6 py-3 text-sm font-bold text-indigo-700 shadow transition-all hover:-translate-y-0.5 hover:bg-indigo-50"
         >
-          See plans — from $9.99/mo
+          See plans — from ${(MONTHLY_PRICE_CENTS / 100).toFixed(2)}/mo
         </Link>
         <Link
           href="/tutorial/go"

@@ -11,6 +11,7 @@ import { getCorrectAndExplanationBatch } from "@/lib/db/exam-questions";
 import { createCertificate } from "@/lib/db/exam-certificates";
 import { withErrorHandling } from "@/lib/api-utils";
 import { getExamConfigForLang } from "@/lib/db/exam-settings";
+import { verifyCsrf } from "@/lib/csrf";
 import {
   EXAM_SUBMIT_GRACE_MS,
   hasAttemptExpired,
@@ -20,6 +21,8 @@ import {
 export const POST = withErrorHandling(
   "POST /api/certifications/attempt/[attemptId]/submit",
   async (request: NextRequest, context?: unknown) => {
+    const csrfError = verifyCsrf(request);
+    if (csrfError) return NextResponse.json({ error: csrfError }, { status: 403 });
     const user = await getCurrentUser();
     if (!user) return NextResponse.json({ error: "Unauthorised" }, { status: 401 });
 

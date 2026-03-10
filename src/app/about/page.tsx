@@ -120,7 +120,7 @@ export default function AboutPage() {
         </section>
 
         {/* CTA */}
-        <section className="rounded-3xl bg-indigo-600 p-8 text-center">
+        <section className="rounded-3xl bg-indigo-600 p-8 text-center dark:bg-indigo-700">
           <h2 className="mb-2 text-2xl font-black text-white">Ready to start?</h2>
           <p className="mb-6 text-indigo-200">
             Free to try. No credit card. Pick a language and write your first line of code in 30 seconds.
