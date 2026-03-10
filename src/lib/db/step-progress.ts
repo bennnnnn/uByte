@@ -85,6 +85,29 @@ export async function markStepComplete(
   `;
 }
 
+/**
+ * Count non-skipped completed steps per language for a user.
+ * Used by /api/progress/all and the profile stats API so that
+ * progress bars count individual steps, not whole tutorials.
+ */
+export async function getCompletedStepCountByLanguage(
+  userId: number
+): Promise<Map<string, number>> {
+  await ensureTable();
+  const sql = getSql();
+  const rows = await sql`
+    SELECT language, COUNT(*)::int AS cnt
+    FROM step_progress
+    WHERE user_id = ${userId} AND skipped = FALSE
+    GROUP BY language
+  `;
+  const result = new Map<string, number>();
+  for (const r of rows) {
+    result.set(r.language as string, r.cnt as number);
+  }
+  return result;
+}
+
 /** Clear all step progress for a user (e.g. on profile reset). */
 export async function clearStepProgress(userId: number): Promise<void> {
   await ensureTable();

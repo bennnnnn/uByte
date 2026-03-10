@@ -102,7 +102,7 @@ export function useStepProgress(
   setCode: (c: string) => void,
   userId?: number
 ): StepProgressState {
-  const { toggleProgress } = useAuth();
+  const { toggleProgress, incrementStepCount } = useAuth();
   const router = useRouter();
 
   const [stepIndex, setStepIndex] = useState(0);
@@ -401,6 +401,8 @@ export function useStepProgress(
         setAiFeedbackLoginRequired(false);
         hintInflightRef.current = false;
         setCompletedSteps((prev) => new Set([...prev, stepIndex]));
+        // Increment the live step count so the progress bar updates instantly.
+        if (userId != null) incrementStepCount(lang);
         apiFetch("/api/step-check", {
           method: "POST",
           headers: { "Content-Type": "application/json" },

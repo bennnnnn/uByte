@@ -54,22 +54,32 @@ interface AppDataContextType {
   progressByLang: Record<string, string[]>;
   /** Convenience alias — slugs completed in Go. Kept for backward compat. */
   progress: string[];
+  /**
+   * Count of individually completed (non-skipped) steps per language.
+   * This is what drives the "X / 101 lessons" progress bars.
+   * Loaded from step_progress table on login; incremented locally on each step pass.
+   */
+  stepCountByLang: Record<string, number>;
   profile: ProfileData | null;
   viewCount: number;
   limited: boolean;
   recordView: (slug: string) => Promise<void>;
   toggleProgress: (slug: string, lang?: string) => Promise<void>;
+  /** Increment the local step count for a language when a step is passed. */
+  incrementStepCount: (lang: string) => void;
   refreshProfile: () => Promise<void>;
 }
 
 const AppDataContext = createContext<AppDataContextType>({
   progressByLang: {},
   progress: [],
+  stepCountByLang: {},
   profile: null,
   viewCount: 0,
   limited: false,
   recordView: async () => {},
   toggleProgress: async (slug: string, lang?: string) => { void slug; void lang; },
+  incrementStepCount: () => {},
   refreshProfile: async () => {},
 });
 
@@ -116,6 +126,7 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [progressByLang, setProgressByLang] = useState<Record<string, string[]>>({});
+  const [stepCountByLang, setStepCountByLang] = useState<Record<string, number>>({});
   const [profile, setProfile] = useState<ProfileData | null>(null);
   const [viewCount, setViewCount] = useState(0);
   const [limited, setLimited] = useState(false);
@@ -135,11 +146,13 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
         // If /api/progress/all fails or returns empty, fall back to Go-only
         // so the user doesn't see a blank dashboard.
         let byLang: Record<string, string[]> = {};
+        let stepCounts: Record<string, number> = {};
         if (progRes.ok) {
           const progData = await progRes.json().catch(() => ({}));
           byLang = (progData.progress && Object.keys(progData.progress).length > 0)
             ? progData.progress
             : {};
+          stepCounts = progData.stepCounts ?? {};
         }
         if (Object.keys(byLang).length === 0) {
           // Fallback: load at least Go progress the old way
@@ -152,6 +165,7 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
           }
         }
         setProgressByLang(byLang);
+        setStepCountByLang(stepCounts);
         const prof = extractProfile(profData);
         if (prof) {
           setProfile(prof);
@@ -189,11 +203,13 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
         fetch("/api/profile", { credentials: "same-origin" }),
       ]);
       let byLang: Record<string, string[]> = {};
+      let stepCounts: Record<string, number> = {};
       if (progRes.ok) {
         const progData = await progRes.json().catch(() => ({}));
         byLang = (progData.progress && Object.keys(progData.progress).length > 0)
           ? progData.progress
           : {};
+        stepCounts = progData.stepCounts ?? {};
       }
       if (Object.keys(byLang).length === 0) {
         const goRes = await fetch("/api/progress?lang=go", { credentials: "same-origin" });
@@ -205,6 +221,7 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
         }
       }
       setProgressByLang(byLang);
+      setStepCountByLang(stepCounts);
       if (profRes.ok) {
         const profData = await profRes.json();
         const prof = extractProfile(profData);
@@ -289,6 +306,7 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
     await apiFetch("/api/auth/logout", { method: "POST" });
     setUser(null);
     setProgressByLang({});
+    setStepCountByLang({});
     setProfile(null);
   }, []);
 
@@ -296,6 +314,7 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
     await apiFetch("/api/auth/logout-all", { method: "POST" });
     setUser(null);
     setProgressByLang({});
+    setStepCountByLang({});
     setProfile(null);
   }, []);
 
@@ -333,6 +352,11 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
     } catch { /* ignore */ }
   }, [user]);
 
+  /** Called by useStepProgress each time a step is genuinely passed (not skipped). */
+  const incrementStepCount = useCallback((lang: string) => {
+    setStepCountByLang((prev) => ({ ...prev, [lang]: (prev[lang] ?? 0) + 1 }));
+  }, []);
+
   const refreshProfile = useCallback(async () => {
     try {
       const res = await fetch("/api/profile", { credentials: "same-origin" });
@@ -352,14 +376,16 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
     () => ({
       progressByLang,
       progress: progressByLang["go"] ?? [],   // backward-compat alias
+      stepCountByLang,
       profile,
       viewCount,
       limited,
       recordView,
       toggleProgress,
+      incrementStepCount,
       refreshProfile,
     }),
-    [progressByLang, profile, viewCount, limited, recordView, toggleProgress, refreshProfile]
+    [progressByLang, stepCountByLang, profile, viewCount, limited, recordView, toggleProgress, incrementStepCount, refreshProfile]
   );
 
   return (

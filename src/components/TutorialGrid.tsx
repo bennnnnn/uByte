@@ -34,21 +34,18 @@ export default function TutorialGrid({
   /** Pre-computed total from getTotalLessonCount — must match the LangCard badge. */
   totalLessons?: number;
 }) {
-  const { user, progressByLang } = useAuth();
+  const { user, progressByLang, stepCountByLang } = useAuth();
 
-  // AuthProvider loads all-language progress on login via /api/progress/all.
-  // No per-language fetch needed — just read the right slice.
+  // Tutorial-level slugs — used only for the green checkmark on each tutorial card.
   const progress = progressByLang[lang] ?? [];
 
-  // Prefer the server-computed total (same value shown in LangCard).
-  // Fall back to summing stepCountBySlug, then to topic count.
+  // Lesson count = individual steps, not completed tutorials.
+  // stepCountByLang[lang] comes from the step_progress table (loaded on login,
+  // incremented locally on each step pass) so partial progress is visible immediately.
+  const completedCount = stepCountByLang[lang] ?? 0;
+
   const computedTotal = Object.values(stepCountBySlug).reduce((s, n) => s + n, 0);
   const totalCount = totalLessons ?? (computedTotal > 0 ? computedTotal : tutorials.length);
-
-  // Sum step counts for each completed topic slug; fall back to counting topics.
-  const completedCount = computedTotal > 0
-    ? progress.reduce((s, slug) => s + (stepCountBySlug[slug] ?? 0), 0)
-    : progress.length;
   const [query, setQuery] = useState("");
   const [diffFilter, setDiffFilter] = useState<DifficultyFilter>("all");
 

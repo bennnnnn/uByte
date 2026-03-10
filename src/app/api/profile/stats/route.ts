@@ -12,9 +12,10 @@
  * See src/lib/tutorial-steps/index.ts for the resolution order and how to add tutorials.
  */
 import { NextResponse } from "next/server";
-import { getUserById, getProgress, getAchievements, getActivityCount } from "@/lib/db";
+import { getUserById, getAchievements, getActivityCount } from "@/lib/db";
+import { getCompletedStepCountByLanguage } from "@/lib/db/step-progress";
 import { BADGES } from "@/lib/badges";
-import { getTotalLessonCount, getSteps } from "@/lib/tutorial-steps";
+import { getTotalLessonCount } from "@/lib/tutorial-steps";
 import { withErrorHandling, requireAuth } from "@/lib/api-utils";
 import { ALL_LANGUAGE_KEYS } from "@/lib/languages/registry";
 import type { SupportedLanguage } from "@/lib/languages/types";
@@ -34,12 +35,13 @@ export const GET = withErrorHandling("GET /api/profile/stats", async () => {
 
   const langs = ALL_LANGUAGE_KEYS as SupportedLanguage[];
 
-  const [user, achievements, activityCount, ...perLangProgress] =
+  const [user, achievements, activityCount, stepCountMap] =
     await Promise.all([
       getUserById(tokenUser.userId),
       getAchievements(tokenUser.userId),
       getActivityCount(tokenUser.userId),
-      ...langs.map((lang) => getProgress(tokenUser.userId, lang)),
+      // Count individual completed steps (not whole tutorials) so partial progress counts.
+      getCompletedStepCountByLanguage(tokenUser.userId),
     ]);
 
   if (!user) {
@@ -49,15 +51,11 @@ export const GET = withErrorHandling("GET /api/profile/stats", async () => {
   let totalLessons = 0;
   let completedLessons = 0;
 
-  const byLanguage = langs.map((lang, i) => {
+  const byLanguage = langs.map((lang) => {
     const total = getTotalLessonCount(lang);
     totalLessons += total;
 
-    const completedSlugs = perLangProgress[i];
-    let completed = 0;
-    for (const slug of completedSlugs) {
-      completed += getSteps(lang, slug).length;
-    }
+    const completed = stepCountMap.get(lang) ?? 0;
     completedLessons += completed;
 
     const meta = LANG_META[lang] ?? { icon: "📄", name: lang };
@@ -67,7 +65,6 @@ export const GET = withErrorHandling("GET /api/profile/stats", async () => {
       icon: meta.icon,
       completed,
       total,
-      completedTutorials: completedSlugs.length,
     };
   });
 
