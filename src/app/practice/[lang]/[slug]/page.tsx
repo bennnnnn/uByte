@@ -86,7 +86,7 @@ export default async function PracticeProblemPage({ params, searchParams }: Prop
   if (!isDailyChallenge && !user) {
     canAccess = false;
     dripMessage = "Sign up free to start solving problems. The daily challenge is always free — no account needed.";
-  } else if (!isDailyChallenge) {
+  } else if (!isDailyChallenge && user) {
     const profile = await getUserById(user.userId);
     if (hasPaidAccess(profile?.plan)) {
       canAccess = true;
