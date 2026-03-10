@@ -265,6 +265,12 @@ export async function downgradeExpiredCancelingUsers(): Promise<number> {
   return result.length;
 }
 
+/** Save a Paddle customer ID to an existing user record (without changing their plan). */
+export async function savePaddleCustomerId(userId: number, paddleCustomerId: string): Promise<void> {
+  const sql = getSql();
+  await sql`UPDATE users SET stripe_customer_id = ${paddleCustomerId} WHERE id = ${userId} AND stripe_customer_id IS NULL`;
+}
+
 /** Look up user by Paddle customer ID (stored in legacy `stripe_customer_id` column). */
 export async function getUserByPaddleCustomerId(paddleCustomerId: string): Promise<User | undefined> {
   const sql = getSql();

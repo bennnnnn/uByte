@@ -36,15 +36,19 @@ function ManageOrCancelButtons({ canceling = false }: { canceling?: boolean }) {
     try {
       const res = await fetch("/api/billing/portal", { credentials: "same-origin" });
       const data = (await res.json()) as { portalUrl?: string | null; cancelUrl?: string | null; error?: string };
-      if (!res.ok || data.error) {
-        setError(data.error ?? "Could not open billing portal.");
+      if (data.error) {
+        setError(data.error);
+        return;
+      }
+      if (!res.ok) {
+        setError("Could not open billing portal. Please try again.");
         return;
       }
       const url = action === "cancel" && data.cancelUrl ? data.cancelUrl : data.portalUrl;
       if (url) window.open(url, "_blank", "noopener,noreferrer");
-      else setError("Billing portal is not available. Please try again later.");
+      else setError("Billing portal URL was not returned. Please contact support.");
     } catch {
-      setError("Something went wrong.");
+      setError("Something went wrong. Please try again.");
     } finally {
       setLoading(false);
     }

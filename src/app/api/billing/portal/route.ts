@@ -15,7 +15,7 @@
  */
 import { NextResponse } from "next/server";
 import { withErrorHandling, requireAuth } from "@/lib/api-utils";
-import { getUserById } from "@/lib/db";
+import { getUserById, savePaddleCustomerId } from "@/lib/db";
 
 const PADDLE_API_KEY = process.env.PADDLE_API_KEY ?? "";
 const PADDLE_CLIENT_TOKEN = process.env.NEXT_PUBLIC_PADDLE_CLIENT_TOKEN ?? "";
@@ -31,7 +31,7 @@ export const GET = withErrorHandling("GET /api/billing/portal", async () => {
 
   const dbUser = await getUserById(user.userId);
   // Legacy column name — actually stores the Paddle customer ID
-  const customerId = dbUser?.stripe_customer_id ?? null;
+  let customerId = dbUser?.stripe_customer_id ?? null;
 
   if (!PADDLE_API_KEY) {
     return NextResponse.json(
@@ -39,9 +39,32 @@ export const GET = withErrorHandling("GET /api/billing/portal", async () => {
       { status: 200 }
     );
   }
+
+  // Fallback: if stripe_customer_id is missing (e.g. webhook fired subscription.updated before
+  // transaction.completed), look up the Paddle customer by email and save it for future calls.
+  if (!customerId && dbUser?.email) {
+    try {
+      const searchRes = await fetch(
+        `${PADDLE_BASE}/customers?email=${encodeURIComponent(dbUser.email)}&per_page=1`,
+        { headers: { Authorization: `Bearer ${PADDLE_API_KEY}` } }
+      );
+      if (searchRes.ok) {
+        const searchData = (await searchRes.json()) as { data?: { id: string }[] };
+        const found = searchData.data?.[0]?.id;
+        if (found) {
+          customerId = found;
+          // Persist so subsequent calls are instant
+          await savePaddleCustomerId(user.userId, found).catch(() => {});
+        }
+      }
+    } catch {
+      // Non-fatal — fall through to the "no billing account" error below
+    }
+  }
+
   if (!customerId) {
     return NextResponse.json(
-      { error: "No billing account linked to this profile. If you subscribed recently, try again in a few minutes or contact support.", portalUrl: null, cancelUrl: null },
+      { error: "No billing account found. If you subscribed recently, try refreshing in a moment. Otherwise contact support.", portalUrl: null, cancelUrl: null },
       { status: 200 }
     );
   }

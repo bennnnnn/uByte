@@ -323,7 +323,7 @@ export const POST = withErrorHandling("POST /api/webhooks/paddle", async (reques
         const plan = planFromSubscription(status, purchasedPriceId);
         const uid = await resolveUserId(paddleCustomerId, customData);
         if (uid) {
-          await updateUserPlan(uid, plan);
+          await updateUserPlan(uid, plan, paddleCustomerId);
           console.log("[paddle-webhook] subscription updated — user", uid, "plan:", plan);
         }
       }
