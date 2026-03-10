@@ -166,11 +166,18 @@ export function useStepProgress(
       .then((d) => {
         const completed: number[] = Array.isArray(d?.steps) ? d.steps : [];
         const skipped: number[] = Array.isArray(d?.skippedSteps) ? d.skippedSteps : [];
+        // If ALL steps for this tutorial were already saved in the DB, the tutorial
+        // was previously completed. Pre-set markedRef so the completion useEffect
+        // below does NOT fire and accidentally call toggleProgress with completed=false
+        // (which would call markIncomplete and wipe the progress row).
+        if (steps.length > 0 && (completed.length + skipped.length) >= steps.length) {
+          markedRef.current = true;
+        }
         setCompletedSteps((prev) => new Set([...prev, ...completed, ...skipped]));
         setSkippedSteps((prev) => new Set([...prev, ...skipped]));
       })
       .catch(() => {});
-  }, [userId, tutorialSlug, lang]);
+  }, [userId, tutorialSlug, lang, steps.length]);
 
   // ── Tutorial completion ──
   useEffect(() => {

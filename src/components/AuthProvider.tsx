@@ -316,13 +316,14 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
 
   const toggleProgress = useCallback(async (slug: string, lang: string = "go") => {
     if (!user) return;
-    const existing = progressByLang[lang] ?? [];
-    const completed = !existing.includes(slug);
+    // Always mark as completed — never untoggle. The hook (useStepProgress) only
+    // calls this when the user genuinely finishes all steps. The DB uses
+    // ON CONFLICT DO NOTHING so double-calls are safe and idempotent.
     try {
       const res = await apiFetch("/api/progress", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ slug, completed, lang }),
+        body: JSON.stringify({ slug, completed: true, lang }),
       });
       if (res.ok) {
         const data = await res.json();
@@ -330,7 +331,7 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
         setProgressByLang((prev) => ({ ...prev, [lang]: data.progress as string[] }));
       }
     } catch { /* ignore */ }
-  }, [user, progressByLang]);
+  }, [user]);
 
   const refreshProfile = useCallback(async () => {
     try {
