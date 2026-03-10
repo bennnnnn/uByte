@@ -6,7 +6,25 @@ import { verifyCsrf } from "@/lib/csrf";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 import { withErrorHandling, requireAuth } from "@/lib/api-utils";
 import { getAllTutorials } from "@/lib/tutorials";
+import { getAllStepsForLanguage } from "@/lib/tutorial-steps";
 import { resolveLanguage } from "@/lib/languages/registry";
+
+/**
+ * Returns true when the given slug corresponds to a real tutorial for the language.
+ *
+ * Tries MDX file scan first (getAllTutorials). If that returns empty — e.g. because
+ * content/ is not accessible in this serverless invocation — falls back to the
+ * TS-defined step map so legitimate saves are never silently blocked.
+ */
+function isKnownTutorial(slug: string, language: string): boolean {
+  const mdxTutorials = getAllTutorials(language as Parameters<typeof getAllTutorials>[0]);
+  if (mdxTutorials.length > 0) {
+    return mdxTutorials.some((t) => t.slug === slug);
+  }
+  // MDX scan returned nothing — fall back to TS step definitions
+  const stepsMap = getAllStepsForLanguage(language as Parameters<typeof getAllStepsForLanguage>[0]);
+  return slug in stepsMap;
+}
 
 export const GET = withErrorHandling("GET /api/progress", async (request: NextRequest) => {
   const user = await getCurrentUser();
@@ -40,9 +58,9 @@ export const POST = withErrorHandling("POST /api/progress", async (request: Next
   }
   const language = resolveLanguage(lang);
 
-  // Validate that the slug corresponds to a real tutorial
-  const tutorials = getAllTutorials(language);
-  if (!tutorials.some((t) => t.slug === slug)) {
+  // Validate that the slug corresponds to a real tutorial.
+  // Falls back to TS step definitions when MDX files aren't accessible (serverless cold start).
+  if (!isKnownTutorial(slug, language)) {
     return NextResponse.json({ error: "Unknown tutorial" }, { status: 400 });
   }
 

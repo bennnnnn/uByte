@@ -41,11 +41,7 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
   );
 }
 
-interface Props {
-  unreadCount: number;
-}
-
-export default function UserMenuDropdown({ unreadCount }: Props) {
+export default function UserMenuDropdown() {
   const { user, profile, logout } = useAuth();
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -73,11 +69,6 @@ export default function UserMenuDropdown({ unreadCount }: Props) {
         aria-expanded={open}
       >
         <Avatar avatarKey={profile?.avatar ?? "gopher"} size="sm" />
-        {unreadCount > 0 && (
-          <span className="absolute -right-0.5 -top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-indigo-600 text-[9px] font-bold text-white">
-            {unreadCount > 9 ? "9+" : unreadCount}
-          </span>
-        )}
         <svg
           className={`h-3.5 w-3.5 text-zinc-400 transition-transform ${open ? "rotate-180" : ""}`}
           fill="none" viewBox="0 0 24 24" stroke="currentColor"

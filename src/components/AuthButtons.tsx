@@ -66,7 +66,7 @@ export default function AuthButtons() {
           </Link>
         )}
         <NotificationBell unreadCount={unreadCount} />
-        <UserMenuDropdown unreadCount={unreadCount} />
+        <UserMenuDropdown />
       </div>
     );
   }
