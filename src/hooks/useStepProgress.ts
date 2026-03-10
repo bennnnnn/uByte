@@ -115,15 +115,10 @@ export function useStepProgress(
   const [aiFeedbackUpgrade, setAiFeedbackUpgrade] = useState(false);
   const [failCount, setFailCount] = useState(0);
 
-  // Refs so callbacks (setFailCount updater, etc.) always see fresh values without needing
-  // them in their dependency arrays, avoiding stale-closure bugs.
-  const aiFeedbackRef = useRef(aiFeedback);
-  aiFeedbackRef.current = aiFeedback;
-  const aiFeedbackLoadingRef = useRef(aiFeedbackLoading);
-  aiFeedbackLoadingRef.current = aiFeedbackLoading;
-  // Tracks what code was used to generate the current hint so we only re-request
-  // after the user has meaningfully changed their code.
-  const hintCodeRef = useRef<string>("");
+  // Set to true synchronously the moment a hint fetch starts (before any React re-render),
+  // so subsequent auto-trigger checks inside setFailCount updaters always see the right value
+  // regardless of whether React has re-rendered yet.  Reset when the step changes or passes.
+  const hintInflightRef = useRef(false);
   const [showInlineChat, setShowInlineChat] = useState(false);
   const [tutorialDone, setTutorialDone] = useState(false);
   const [countdown, setCountdown] = useState(3);
@@ -220,6 +215,7 @@ export function useStepProgress(
     setCompletedSteps((prev) => new Set([...prev, stepIndex]));
     setStatus("passed");
     setFailCount(0);
+    hintInflightRef.current = false;
     // Persist to DB as skipped so it's distinguished from genuinely completed steps on refresh
     if (userId != null) {
       apiFetch("/api/progress/steps", {
@@ -239,15 +235,15 @@ export function useStepProgress(
     setFailCount(0);
     setAiFeedback(null);
     setAiFeedbackUpgrade(false);
-    hintCodeRef.current = "";
+    hintInflightRef.current = false;
     setShowInlineChat(false);
   }
 
   function fetchAiFeedback(userCode: string, actualOutput: string, isError: boolean, currentStepIndex: number) {
+    hintInflightRef.current = true; // Set synchronously — prevents re-entry before React re-renders.
     setAiFeedbackLoading(true);
     // Keep the existing hint visible while the new one loads — don't blank it eagerly.
     setAiFeedbackUpgrade(false);
-    hintCodeRef.current = userCode;
     apiFetch("/api/tutorial-hint", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -338,8 +334,7 @@ export function useStepProgress(
         setStatus("failed");
         setFailCount((n) => {
           const next = n + 1;
-          const codeChanged = normCode(code) !== normCode(hintCodeRef.current);
-          if (next >= 2 && (!aiFeedbackRef.current && !aiFeedbackLoadingRef.current || codeChanged)) {
+          if (next >= 2 && !hintInflightRef.current) {
             fetchAiFeedback(code, out, true, stepIndex);
           }
           return next;
@@ -365,8 +360,7 @@ export function useStepProgress(
           setStatus("failed");
           setFailCount((n) => {
             const next = n + 1;
-            const codeChanged = normCode(code) !== normCode(hintCodeRef.current);
-            if (next >= 2 && (!aiFeedbackRef.current && !aiFeedbackLoadingRef.current || codeChanged)) {
+            if (next >= 2 && !hintInflightRef.current) {
               fetchAiFeedback(code, out, false, stepIndex);
             }
             return next;
@@ -382,7 +376,7 @@ export function useStepProgress(
         setFailCount(0);
         setAiFeedback(null);          // Step done — clear hint so the next step starts fresh.
         setAiFeedbackUpgrade(false);
-        hintCodeRef.current = "";
+        hintInflightRef.current = false;
         setCompletedSteps((prev) => new Set([...prev, stepIndex]));
         apiFetch("/api/step-check", {
           method: "POST",
@@ -400,8 +394,7 @@ export function useStepProgress(
         setStatus("failed");
         setFailCount((n) => {
           const next = n + 1;
-          const codeChanged = normCode(code) !== normCode(hintCodeRef.current);
-          if (next >= 2 && (!aiFeedbackRef.current && !aiFeedbackLoadingRef.current || codeChanged)) {
+          if (next >= 2 && !hintInflightRef.current) {
             fetchAiFeedback(code, out, false, stepIndex);
           }
           return next;
@@ -424,6 +417,8 @@ export function useStepProgress(
     setStatus("idle");
     setErrorLines(new Set());
     setAiFeedback(null);
+    setAiFeedbackUpgrade(false);
+    hintInflightRef.current = false;
   }
 
   return {
