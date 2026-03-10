@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/components/AuthProvider";
 import { trackConversion } from "@/lib/analytics";
 import { apiFetch } from "@/lib/api-client";
+import Link from "next/link";
 import ProfileHeader from "@/components/profile/ProfileHeader";
 import StatsRow from "@/components/profile/StatsRow";
 import OverviewTab from "@/components/profile/OverviewTab";
@@ -258,6 +259,25 @@ function ProfilePage() {
         emailVerified={!!profile.email_verified}
         isGoogleAccount={profile.is_google}
       />
+
+      {/* Public profile link */}
+      <div className="mb-5 flex items-center justify-between rounded-xl border border-zinc-200 bg-zinc-50 px-4 py-2.5 dark:border-zinc-700 dark:bg-zinc-800/50">
+        <div className="min-w-0">
+          <p className="text-xs text-zinc-500 dark:text-zinc-400">Your public profile</p>
+          <p className="truncate text-sm font-medium text-zinc-700 dark:text-zinc-300">
+            ubyte.dev/u/{profile.id}
+          </p>
+        </div>
+        <Link
+          href={`/u/${profile.id}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="ml-4 shrink-0 rounded-lg bg-indigo-600 px-3 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-indigo-500"
+        >
+          View →
+        </Link>
+      </div>
+
       <StatsRow stats={stats} />
 
       {/* Tabs — dropdown on mobile, pill row on desktop */}
