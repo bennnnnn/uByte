@@ -144,6 +144,52 @@ export async function sendWelcomeEmail(to: string, name: string): Promise<void> 
   });
 }
 
+/** Day 1 — 24h check-in: reinforce the value and nudge to complete first lesson. */
+export async function sendDay1Email(to: string, name: string): Promise<void> {
+  const resend = getResend();
+  if (!resend) return;
+
+  const firstName = name.split(" ")[0];
+  await resend.emails.send({
+    from: FROM,
+    to,
+    subject: `${firstName}, your first lesson is waiting 👩‍💻`,
+    html: `
+      <div style="font-family:sans-serif;max-width:520px;margin:auto;color:#18181b">
+        <div style="background:#4f46e5;padding:24px 32px;border-radius:12px 12px 0 0">
+          <span style="color:#fff;font-size:22px;font-weight:800">uByte</span>
+        </div>
+        <div style="background:#f9fafb;padding:32px;border-radius:0 0 12px 12px;border:1px solid #e5e7eb;border-top:none">
+          <h2 style="margin:0 0 8px">Hey ${firstName}, still thinking about it? 🤔</h2>
+          <p style="color:#6b7280">You signed up yesterday — the hardest part is starting. Your first lesson takes less than 5 minutes and you'll write real, running code.</p>
+          <div style="background:#fff;border:1px solid #e5e7eb;border-radius:10px;padding:20px;margin:20px 0">
+            <p style="margin:0 0 12px;font-weight:600">Pick where to start:</p>
+            <table style="width:100%;border-collapse:collapse">
+              <tr><td style="padding:8px 0;border-bottom:1px solid #f3f4f6">
+                <a href="${BASE_URL}/tutorial/go/getting-started" style="color:#4f46e5;font-weight:600;text-decoration:none">📖 Learn Go from scratch</a>
+                <span style="color:#9ca3af;font-size:13px;display:block">Interactive, step-by-step — great for beginners</span>
+              </td></tr>
+              <tr><td style="padding:8px 0;border-bottom:1px solid #f3f4f6">
+                <a href="${BASE_URL}/practice/go" style="color:#4f46e5;font-weight:600;text-decoration:none">💼 Solve an interview problem</a>
+                <span style="color:#9ca3af;font-size:13px;display:block">Practice the coding questions that get you hired</span>
+              </td></tr>
+              <tr><td style="padding:8px 0">
+                <a href="${BASE_URL}/daily" style="color:#4f46e5;font-weight:600;text-decoration:none">⚡ Today's daily challenge</a>
+                <span style="color:#9ca3af;font-size:13px;display:block">One problem a day keeps interview rust away</span>
+              </td></tr>
+            </table>
+          </div>
+          <div style="text-align:center;margin:24px 0">
+            <a href="${BASE_URL}" style="display:inline-block;padding:14px 28px;background:#4f46e5;color:#fff;border-radius:8px;text-decoration:none;font-weight:700;font-size:15px">Open uByte →</a>
+          </div>
+          <hr style="border:none;border-top:1px solid #e5e7eb;margin:24px 0">
+          <p style="color:#9ca3af;font-size:12px">You're receiving this because you signed up at uByte. <a href="${BASE_URL}/profile" style="color:#9ca3af">Manage preferences</a>.</p>
+        </div>
+      </div>
+    `,
+  });
+}
+
 /** Day 3 — encourage users who may not have returned yet. */
 export async function sendDay3Email(to: string, name: string): Promise<void> {
   const resend = getResend();

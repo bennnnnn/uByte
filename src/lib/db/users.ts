@@ -4,6 +4,24 @@ import { hashToken } from "@/lib/token-security";
 
 const EMAIL_VERIFY_TOKEN_TTL_MS = 24 * 60 * 60 * 1000;
 
+let _onboardingGoalReady = false;
+async function ensureOnboardingGoalColumn(): Promise<void> {
+  if (_onboardingGoalReady) return;
+  const sql = getSql();
+  try {
+    await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS onboarding_goal TEXT`;
+  } catch {
+    // Ignore — column may already exist.
+  }
+  _onboardingGoalReady = true;
+}
+
+export async function setOnboardingGoal(userId: number, goal: string): Promise<void> {
+  await ensureOnboardingGoalColumn();
+  const sql = getSql();
+  await sql`UPDATE users SET onboarding_goal = ${goal} WHERE id = ${userId}`;
+}
+
 let _emailVerifyExpiryReady = false;
 async function ensureEmailVerificationExpiryColumn(): Promise<void> {
   if (_emailVerifyExpiryReady) return;

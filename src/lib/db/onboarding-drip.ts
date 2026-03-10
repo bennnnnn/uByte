@@ -1,7 +1,7 @@
 /**
  * Onboarding email drip log.
  * Tracks which drip emails have been sent so the cron never double-sends.
- * email_type values: 'day3' | 'day7'
+ * email_type values: 'day1' | 'day3' | 'day7'
  *
  * The table is auto-created on first use (CREATE TABLE IF NOT EXISTS).
  * The welcome email (day0) is sent inline from /api/auth/signup and is
@@ -26,10 +26,12 @@ async function ensureTable(): Promise<void> {
   _ready = true;
 }
 
+export type DripEmailType = "day1" | "day3" | "day7";
+
 /** Returns true if the given email type has already been sent to this user. */
 export async function hasReceivedDripEmail(
   userId: number,
-  emailType: "day3" | "day7"
+  emailType: DripEmailType
 ): Promise<boolean> {
   await ensureTable();
   const sql = getSql();
@@ -44,7 +46,7 @@ export async function hasReceivedDripEmail(
 /** Marks the given drip email as sent for this user. */
 export async function markDripEmailSent(
   userId: number,
-  emailType: "day3" | "day7"
+  emailType: DripEmailType
 ): Promise<void> {
   await ensureTable();
   const sql = getSql();
@@ -59,7 +61,7 @@ export async function markDripEmailSent(
  *  have NOT yet received the given drip email. */
 export async function getUsersForDrip(
   daysAgo: number,
-  emailType: "day3" | "day7"
+  emailType: DripEmailType
 ): Promise<Array<{ id: number; name: string; email: string }>> {
   await ensureTable();
   const sql = getSql();

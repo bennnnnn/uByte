@@ -14,7 +14,7 @@ import { absoluteUrl, SITE_KEYWORDS } from "@/lib/seo";
 
 type Props = {
   params: Promise<{ lang: string; slug: string }>;
-  searchParams: Promise<{ category?: string; page?: string; status?: string; difficulty?: string; share?: string }>;
+  searchParams: Promise<{ category?: string; page?: string; status?: string; difficulty?: string; share?: string; mode?: string; deadline?: string }>;
 };
 
 /** Decode a base64+URI-encoded shared code snippet — returns undefined on any error. */
@@ -139,6 +139,9 @@ export default async function PracticeProblemPage({ params, searchParams }: Prop
   // Decode shared code from ?share= param (set by the Share button on the client)
   const sharedCode = sp.share ? tryDecodeShare(sp.share) : undefined;
 
+  const interviewMode = sp.mode === "interview";
+  const interviewDeadline = interviewMode && sp.deadline ? parseInt(sp.deadline, 10) : undefined;
+
   return (
     <PracticeIDE
       problem={problem}
@@ -148,6 +151,8 @@ export default async function PracticeProblemPage({ params, searchParams }: Prop
       listStatus={listStatus}
       listDifficulty={listDifficulty}
       initialCode={sharedCode}
+      interviewMode={interviewMode}
+      interviewDeadline={interviewDeadline}
     />
   );
 }

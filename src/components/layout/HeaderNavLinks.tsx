@@ -97,6 +97,24 @@ export default function HeaderNavLinks({ side = "left" }: { side?: "left" }) {
                   <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300">{l.label}</span>
                 </Link>
               ))}
+
+              <div className="my-1.5 border-t border-zinc-100 dark:border-zinc-800" />
+
+              <Link href="/daily" className="flex items-center gap-3 rounded-xl px-3 py-2.5 transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-800">
+                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-amber-100 text-base dark:bg-amber-950/60">⚡</span>
+                <span>
+                  <span className="block text-sm font-semibold text-zinc-800 dark:text-zinc-100">Daily challenge</span>
+                  <span className="block text-xs text-zinc-400 dark:text-zinc-500">One new problem every day</span>
+                </span>
+              </Link>
+
+              <Link href="/interview" className="flex items-center gap-3 rounded-xl px-3 py-2.5 transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-800">
+                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-violet-100 text-base dark:bg-violet-950/60">🎤</span>
+                <span>
+                  <span className="block text-sm font-semibold text-zinc-800 dark:text-zinc-100">Interview simulator</span>
+                  <span className="block text-xs text-zinc-400 dark:text-zinc-500">Timed mock interview + AI debrief</span>
+                </span>
+              </Link>
             </div>
           </div>
         </div>

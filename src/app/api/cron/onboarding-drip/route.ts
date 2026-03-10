@@ -12,7 +12,7 @@
  */
 import { NextRequest, NextResponse } from "next/server";
 import { getUsersForDrip, markDripEmailSent } from "@/lib/db";
-import { sendDay3Email, sendDay7Email } from "@/lib/email";
+import { sendDay1Email, sendDay3Email, sendDay7Email } from "@/lib/email";
 import { withErrorHandling } from "@/lib/api-utils";
 
 export const GET = withErrorHandling("GET /api/cron/onboarding-drip", async (request: NextRequest) => {
@@ -25,8 +25,21 @@ export const GET = withErrorHandling("GET /api/cron/onboarding-drip", async (req
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
+  let day1Sent = 0;
   let day3Sent = 0;
   let day7Sent = 0;
+
+  // ── Day 1 email ────────────────────────────────────────────────────────────
+  const day1Users = await getUsersForDrip(1, "day1");
+  for (const user of day1Users) {
+    try {
+      await sendDay1Email(user.email, user.name);
+      await markDripEmailSent(user.id, "day1");
+      day1Sent++;
+    } catch {
+      // Skip failed sends — don't abort the batch
+    }
+  }
 
   // ── Day 3 email ────────────────────────────────────────────────────────────
   const day3Users = await getUsersForDrip(3, "day3");
@@ -52,5 +65,5 @@ export const GET = withErrorHandling("GET /api/cron/onboarding-drip", async (req
     }
   }
 
-  return NextResponse.json({ day3Sent, day7Sent });
+  return NextResponse.json({ day1Sent, day3Sent, day7Sent });
 });

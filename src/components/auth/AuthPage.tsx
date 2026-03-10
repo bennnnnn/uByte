@@ -97,7 +97,13 @@ export default function AuthPage({ variant }: { variant: AuthPageMode }) {
       return;
     }
 
-    router.replace(nextPath);
+    // New signups go through onboarding; logins go to their original destination.
+    if (mode === "signup") {
+      const onboardingDest = nextPath && nextPath !== "/" ? `/onboarding?next=${encodeURIComponent(nextPath)}` : "/onboarding";
+      router.replace(onboardingDest);
+    } else {
+      router.replace(nextPath);
+    }
   }
 
   if (user) return null;

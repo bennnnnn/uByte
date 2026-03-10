@@ -52,6 +52,12 @@ function OutputPanel({
   aiFeedback,
   onRequestAI,
   onClearAI,
+  codeReview,
+  codeReviewLoading,
+  codeReviewUpgrade,
+  onRequestCodeReview,
+  onClearCodeReview,
+  interviewMode,
 }: {
   verdict: VerdictState;
   output: string | null;
@@ -65,6 +71,12 @@ function OutputPanel({
   aiFeedback: { friendly_one_liner: string; hint: string; next_step: string; minimal_patch?: string } | null;
   onRequestAI: () => void;
   onClearAI: () => void;
+  codeReview: import("@/lib/ai/code-review-client").CodeReviewSchema | null;
+  codeReviewLoading: boolean;
+  codeReviewUpgrade: boolean;
+  onRequestCodeReview: () => void;
+  onClearCodeReview: () => void;
+  interviewMode: boolean;
 }) {
   // Always start on console; the useEffect below switches to tests when a verdict arrives
   const [activeTab, setActiveTab] = useState<"console" | "tests">("console");
@@ -467,6 +479,83 @@ function OutputPanel({
             />
           </div>
         )}
+
+        {/* ── Code review / Interview debrief ──────────────────────── */}
+        {codeReviewLoading && (
+          <div className="border-t border-violet-200 px-4 py-3 dark:border-violet-800">
+            <p className="text-xs text-violet-500 animate-pulse dark:text-violet-400">
+              {interviewMode ? "🎤 Generating your interview debrief…" : "🔍 Reviewing your code…"}
+            </p>
+          </div>
+        )}
+        {codeReviewUpgrade && !codeReview && (
+          <div className="border-t border-violet-200 bg-violet-50/60 px-4 py-3 dark:border-violet-800 dark:bg-violet-950/20">
+            <p className="text-xs font-semibold text-violet-700 dark:text-violet-300">AI code review is a Pro feature</p>
+            <a href="/pricing" className="mt-1 inline-block text-xs font-bold text-violet-600 underline underline-offset-2 hover:text-violet-500 dark:text-violet-400">
+              Upgrade to Pro →
+            </a>
+          </div>
+        )}
+        {codeReview && (
+          <div className="border-t border-violet-200 bg-violet-50/40 px-4 py-4 dark:border-violet-800 dark:bg-violet-950/20">
+            <div className="mb-3 flex items-center justify-between">
+              <p className="text-xs font-bold uppercase tracking-wider text-violet-600 dark:text-violet-400">
+                {interviewMode ? "🎤 Interview Debrief" : "🔍 Code Review"}
+              </p>
+              <div className="flex items-center gap-2">
+                <span className={`text-xs font-bold ${codeReview.score >= 7 ? "text-emerald-600 dark:text-emerald-400" : codeReview.score >= 5 ? "text-amber-600 dark:text-amber-400" : "text-red-600 dark:text-red-400"}`}>
+                  {codeReview.score}/10
+                </span>
+                <button onClick={onClearCodeReview} className="text-xs text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300">✕</button>
+              </div>
+            </div>
+            <p className="mb-3 text-sm text-zinc-700 dark:text-zinc-300">{codeReview.summary}</p>
+            <div className="mb-3 grid grid-cols-2 gap-2 text-xs">
+              <div className="rounded-lg bg-white px-3 py-2 dark:bg-zinc-800">
+                <span className="font-semibold text-zinc-500 dark:text-zinc-400">Time</span>
+                <p className="font-mono text-zinc-800 dark:text-zinc-200">{codeReview.time_complexity}</p>
+              </div>
+              <div className="rounded-lg bg-white px-3 py-2 dark:bg-zinc-800">
+                <span className="font-semibold text-zinc-500 dark:text-zinc-400">Space</span>
+                <p className="font-mono text-zinc-800 dark:text-zinc-200">{codeReview.space_complexity}</p>
+              </div>
+            </div>
+            {codeReview.strengths.length > 0 && (
+              <div className="mb-2">
+                <p className="mb-1 text-xs font-semibold text-emerald-600 dark:text-emerald-400">✓ Strengths</p>
+                <ul className="space-y-0.5 text-xs text-zinc-600 dark:text-zinc-400">
+                  {codeReview.strengths.map((s, i) => <li key={i}>• {s}</li>)}
+                </ul>
+              </div>
+            )}
+            {codeReview.improvements.length > 0 && (
+              <div className="mb-2">
+                <p className="mb-1 text-xs font-semibold text-amber-600 dark:text-amber-400">↑ Improvements</p>
+                <ul className="space-y-0.5 text-xs text-zinc-600 dark:text-zinc-400">
+                  {codeReview.improvements.map((s, i) => <li key={i}>• {s}</li>)}
+                </ul>
+              </div>
+            )}
+            {codeReview.code_style && (
+              <p className="text-xs text-zinc-500 dark:text-zinc-500 italic">{codeReview.code_style}</p>
+            )}
+          </div>
+        )}
+
+        {/* "Review my code" button — shows when code is written and no review is loading/shown */}
+        {!codeReview && !codeReviewLoading && verdict && (
+          <div className="border-t border-zinc-100 px-4 py-2 dark:border-zinc-800">
+            <button
+              type="button"
+              onClick={onRequestCodeReview}
+              disabled={codeReviewLoading}
+              className="flex items-center gap-1.5 text-xs font-medium text-violet-600 hover:text-violet-800 dark:text-violet-400 dark:hover:text-violet-300"
+            >
+              <span>🔍</span>
+              {interviewMode ? "Get interview debrief" : "Review my code"}
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -485,9 +574,13 @@ interface Props {
   listStatus?: "solved" | "unsolved";
   /** Difficulty filter on the list; preserved in sidebar links. */
   listDifficulty?: string;
+  /** When true, shows a countdown timer and full AI debrief on submit. */
+  interviewMode?: boolean;
+  /** Unix timestamp (ms) when the interview session expires. */
+  interviewDeadline?: number;
 }
 
-export function PracticeIDE({ problem, initialLang, initialCode, categoryFilter = null, listPage = 1, listStatus, listDifficulty }: Props) {
+export function PracticeIDE({ problem, initialLang, initialCode, categoryFilter = null, listPage = 1, listStatus, listDifficulty, interviewMode = false, interviewDeadline }: Props) {
   const allProblems = useMemo(() => getAllPracticeProblems(), []);
   const categories = useMemo(() => getPracticeCategories(), []);
   const sidebarProblems = useMemo(() =>
@@ -558,6 +651,12 @@ export function PracticeIDE({ problem, initialLang, initialCode, categoryFilter 
   const [aiError, setAiError] = useState<string | null>(null);
   const [aiUpgradeRequired, setAiUpgradeRequired] = useState(false);
   const [aiLoginRequired, setAiLoginRequired] = useState(false);
+  const [codeReview, setCodeReview] = useState<import("@/lib/ai/code-review-client").CodeReviewSchema | null>(null);
+  const [codeReviewLoading, setCodeReviewLoading] = useState(false);
+  const [codeReviewUpgrade, setCodeReviewUpgrade] = useState(false);
+  const [interviewTimeLeft, setInterviewTimeLeft] = useState<number | null>(
+    interviewDeadline ? Math.max(0, Math.round((interviewDeadline - Date.now()) / 1000)) : null
+  );
 
   // Use shared code from ?share= if present, otherwise fall back to the problem's starter
   const editor = useCodeEditor(initialCode ?? getStarterForLanguage(problem, initialLang), lang);
@@ -635,6 +734,18 @@ export function PracticeIDE({ problem, initialLang, initialCode, categoryFilter 
       .then((d) => { if (d?.attempts) setStatuses(d.attempts); })
       .catch(() => {});
   }, []);
+
+  // Interview mode countdown timer
+  useEffect(() => {
+    if (!interviewMode || !interviewDeadline) return;
+    const tick = () => {
+      const remaining = Math.max(0, Math.round((interviewDeadline - Date.now()) / 1000));
+      setInterviewTimeLeft(remaining);
+    };
+    tick();
+    const id = setInterval(tick, 1000);
+    return () => clearInterval(id);
+  }, [interviewMode, interviewDeadline]);
 
   // Load bookmark state for this problem on mount
   useEffect(() => {
@@ -770,6 +881,10 @@ export function PracticeIDE({ problem, initialLang, initialCode, categoryFilter 
         setAiFeedback(null);  // Problem solved — clear hint so panel is clean.
         setAiUpgradeRequired(false);
         setAiLoginRequired(false);
+        // In interview mode, auto-trigger the full code review on solve
+        if (interviewMode && user) {
+          setTimeout(() => requestCodeReview(), 300);
+        }
         if (data.xpAwarded > 0) {
           setXpToast(data.xpAwarded);
           setTimeout(() => setXpToast(null), 3500);
@@ -851,6 +966,36 @@ export function PracticeIDE({ problem, initialLang, initialCode, categoryFilter 
       setAiLoading(false);
     }
   }, [verdict?.submissionId]);
+
+  const requestCodeReview = useCallback(async () => {
+    if (!user) { setAiLoginRequired(true); return; }
+    if (codeReviewLoading) return;
+    setCodeReviewLoading(true);
+    setCodeReviewUpgrade(false);
+    try {
+      const res = await apiFetch("/api/code-review", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          code: editor.code,
+          lang,
+          problem_title: problem.title,
+          verdict: verdict?.type ?? undefined,
+        }),
+      });
+      const data = await res.json();
+      if (res.status === 402 && data?.error === "upgrade_required") {
+        setCodeReviewUpgrade(true);
+        return;
+      }
+      if (!res.ok) return;
+      setCodeReview(data);
+    } catch {
+      // silently fail
+    } finally {
+      setCodeReviewLoading(false);
+    }
+  }, [user, codeReviewLoading, editor.code, lang, problem.title, verdict?.type]);
 
   const canSubmit = !!problem.testCases?.length;
   // Pass ALL problems to the sidebar so it can handle its own category filter + pagination.
@@ -959,10 +1104,26 @@ export function PracticeIDE({ problem, initialLang, initialCode, categoryFilter 
   // Show the guest conversion prompt after a first accepted solve
   const guestFirstSolve = !user && verdict?.type === "accepted";
 
+  // Format mm:ss for interview timer
+  const timerDisplay = interviewTimeLeft !== null ? (() => {
+    const m = Math.floor(interviewTimeLeft / 60);
+    const s = interviewTimeLeft % 60;
+    return `${m}:${s.toString().padStart(2, "0")}`;
+  })() : null;
+  const timerWarning = interviewTimeLeft !== null && interviewTimeLeft <= 300; // <= 5 min
+
   return (
     <div className="fixed inset-0 z-50 flex flex-col bg-white text-zinc-900 dark:bg-zinc-950 dark:text-zinc-100">
       {/* Guest conversion prompt — only for logged-out users after first solve */}
       <GuestConversionPrompt trigger={guestFirstSolve} context="practice" />
+
+      {/* Interview mode banner */}
+      {interviewMode && timerDisplay !== null && (
+        <div className={`flex items-center justify-between px-4 py-1.5 text-xs font-semibold ${timerWarning ? "bg-red-600 text-white" : "bg-indigo-600 text-white"}`}>
+          <span>🎤 Interview Mode — solve this problem as you would in a real interview</span>
+          <span className={`font-mono ${timerWarning ? "animate-pulse" : ""}`}>⏱ {timerDisplay}</span>
+        </div>
+      )}
 
       {/* XP awarded toast */}
       {xpToast !== null && (
@@ -1410,6 +1571,12 @@ export function PracticeIDE({ problem, initialLang, initialCode, categoryFilter 
             aiFeedback={aiFeedback}
             onRequestAI={() => requestAiFeedback()}
             onClearAI={() => { setAiFeedback(null); setAiError(null); setAiUpgradeRequired(false); setAiLoginRequired(false); }}
+            codeReview={codeReview}
+            codeReviewLoading={codeReviewLoading}
+            codeReviewUpgrade={codeReviewUpgrade}
+            onRequestCodeReview={() => requestCodeReview()}
+            onClearCodeReview={() => { setCodeReview(null); setCodeReviewUpgrade(false); }}
+            interviewMode={interviewMode}
           />
         </div>
       </div>
