@@ -64,12 +64,32 @@ const TAB_LABELS: Record<Tab, string> = {
   progress: "Progress",
   certifications: "Certifications",
   plan: "Plan",
-  referral: "Refer & Earn 🎁",
+  referral: "Refer & Earn",
   achievements: "Achievements",
   notifications: "Notifications",
   bookmarks: "Bookmarks",
   settings: "Settings",
 };
+
+const TAB_ICONS: Record<Tab, string> = {
+  overview:       "◈",
+  progress:       "📈",
+  certifications: "🏅",
+  plan:           "💳",
+  referral:       "🎁",
+  achievements:   "🏆",
+  notifications:  "🔔",
+  bookmarks:      "🔖",
+  settings:       "⚙️",
+};
+
+// Sidebar groups — keeps the nav organised on desktop
+const SIDEBAR_GROUPS: { label: string; tabs: Tab[] }[] = [
+  { label: "Learning",  tabs: ["overview", "progress", "certifications", "achievements"] },
+  { label: "Account",   tabs: ["plan", "referral"] },
+  { label: "Activity",  tabs: ["notifications", "bookmarks"] },
+  { label: "Settings",  tabs: ["settings"] },
+];
 
 function ProfilePage() {
   const { user, loading, logout, logoutAll } = useAuth();
@@ -249,7 +269,7 @@ function ProfilePage() {
 
   return (
     <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
-      <div className="mx-auto w-full max-w-4xl flex-1 px-6 py-12">
+      <div className="mx-auto w-full max-w-5xl flex-1 px-6 py-12">
       <ProfileHeader
         name={profile.name}
         email={profile.email}
@@ -280,114 +300,120 @@ function ProfilePage() {
 
       <StatsRow stats={stats} />
 
-      {/* Tabs — dropdown on mobile, pill row on desktop */}
-      <div className="mb-6">
-        {/* Mobile: native select */}
-        <div className="sm:hidden">
-          <select
-            value={tab}
-            onChange={(e) => setTab(e.target.value as Tab)}
-            className="w-full rounded-xl border border-zinc-200 bg-white px-4 py-2.5 text-sm font-medium text-zinc-900 shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
-            aria-label="Profile section"
-          >
-            {VALID_TABS.map((t) => (
-              <option key={t} value={t}>
-                {TAB_LABELS[t]}
-                {t === "notifications" && unreadCount > 0 ? ` (${unreadCount})` : ""}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        {/* Desktop: scrollable pill tabs */}
-        <div className="hidden sm:block">
-          <div className="-mx-1 overflow-x-auto overflow-y-hidden">
-            <div className="flex min-w-max gap-1 rounded-xl bg-zinc-100 p-1 dark:bg-zinc-900" role="tablist" aria-label="Profile sections">
-              {VALID_TABS.map((t) => (
-                <button
-                  key={t}
-                  role="tab"
-                  aria-selected={tab === t}
-                  aria-controls={`tabpanel-${t}`}
-                  id={`tab-${t}`}
-                  onClick={() => setTab(t)}
-                  className={`relative flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium whitespace-nowrap transition-colors ${
-                    tab === t
-                      ? "bg-white text-zinc-900 shadow dark:bg-zinc-800 dark:text-zinc-100"
-                      : "text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-300"
-                  }`}
-                >
-                  {TAB_LABELS[t]}
-                  {t === "notifications" && unreadCount > 0 && (
-                    <span className="rounded-full bg-indigo-600 px-1.5 py-0.5 text-[10px] font-bold leading-none text-white">
-                      {unreadCount}
-                    </span>
-                  )}
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
+      {/* Mobile: native select dropdown */}
+      <div className="mb-6 sm:hidden">
+        <select
+          value={tab}
+          onChange={(e) => setTab(e.target.value as Tab)}
+          className="w-full rounded-xl border border-zinc-200 bg-white px-4 py-2.5 text-sm font-medium text-zinc-900 shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
+          aria-label="Profile section"
+        >
+          {VALID_TABS.map((t) => (
+            <option key={t} value={t}>
+              {TAB_LABELS[t]}
+              {t === "notifications" && unreadCount > 0 ? ` (${unreadCount})` : ""}
+            </option>
+          ))}
+        </select>
       </div>
 
-      {/* Tab content */}
-      {tab === "overview" && (
-        <OverviewTab stats={stats} badges={badges} achievements={achievements} userId={profile.id} />
-      )}
-      {tab === "progress" && (
-        <ProgressTab stats={stats} userId={profile.id} />
-      )}
-      {tab === "plan" && (
-        <>
-          {planSuccess && (
-            <div className="mb-6 rounded-2xl border border-emerald-200 bg-emerald-50 px-6 py-4 dark:border-emerald-900/50 dark:bg-emerald-950/30">
-              <p className="font-semibold text-emerald-800 dark:text-emerald-200">Payment successful. Welcome to Pro!</p>
-              <p className="mt-1 text-sm text-emerald-700 dark:text-emerald-300">Your plan is active. Check your email for the receipt.</p>
+      {/* Desktop: sidebar nav + content */}
+      <div className="flex gap-8">
+
+        {/* Sidebar — hidden on mobile */}
+        <aside className="hidden w-44 shrink-0 sm:block">
+          <nav className="sticky top-6 space-y-5">
+            {SIDEBAR_GROUPS.map((group) => (
+              <div key={group.label}>
+                <p className="mb-1 px-3 text-[11px] font-semibold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">
+                  {group.label}
+                </p>
+                <ul className="space-y-0.5">
+                  {group.tabs.map((t) => (
+                    <li key={t}>
+                      <button
+                        onClick={() => setTab(t)}
+                        aria-current={tab === t ? "page" : undefined}
+                        className={`flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
+                          tab === t
+                            ? "bg-indigo-50 text-indigo-700 dark:bg-indigo-950/40 dark:text-indigo-300"
+                            : "text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-200"
+                        }`}
+                      >
+                        <span className="text-base leading-none">{TAB_ICONS[t]}</span>
+                        {TAB_LABELS[t]}
+                        {t === "notifications" && unreadCount > 0 && (
+                          <span className="ml-auto rounded-full bg-indigo-600 px-1.5 py-0.5 text-[10px] font-bold leading-none text-white">
+                            {unreadCount}
+                          </span>
+                        )}
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </nav>
+        </aside>
+
+        {/* Tab content */}
+        <div className="min-w-0 flex-1">
+          {tab === "overview" && (
+            <OverviewTab stats={stats} badges={badges} achievements={achievements} userId={profile.id} />
+          )}
+          {tab === "progress" && (
+            <ProgressTab stats={stats} userId={profile.id} />
+          )}
+          {tab === "plan" && (
+            <>
+              {planSuccess && (
+                <div className="mb-6 rounded-2xl border border-emerald-200 bg-emerald-50 px-6 py-4 dark:border-emerald-900/50 dark:bg-emerald-950/30">
+                  <p className="font-semibold text-emerald-800 dark:text-emerald-200">Payment successful. Welcome to Pro!</p>
+                  <p className="mt-1 text-sm text-emerald-700 dark:text-emerald-300">Your plan is active. Check your email for the receipt.</p>
+                </div>
+              )}
+              <PlanTab plan={profile.plan} />
+            </>
+          )}
+          {tab === "certifications" && <CertificationsTab />}
+          {tab === "achievements" && <AchievementsTab badges={badges} achievements={achievements} />}
+          {tab === "notifications" && (
+            <NotificationsTab notifications={notifications} onMarkRead={markNotificationsRead} />
+          )}
+          {tab === "bookmarks" && (
+            <BookmarksTab
+              bookmarks={bookmarks}
+              hasMore={bmHasMore}
+              total={bmTotal}
+              onDelete={deleteBookmark}
+              onLoadMore={loadMoreBookmarks}
+              loadingMore={bmLoading}
+            />
+          )}
+          {tab === "settings" && (
+            <SettingsTab
+              profile={profile}
+              plan={profile.plan}
+              onSave={saveProfile}
+              onChangePassword={changePassword}
+              onDeleteAccount={deleteAccount}
+              onResetProgress={resetProgress}
+              onLogoutAll={async () => { await logoutAll(); router.push("/"); }}
+            />
+          )}
+          {tab === "referral" && (
+            <div className="max-w-lg">
+              <h2 className="mb-4 text-xl font-bold text-zinc-900 dark:text-zinc-100">Refer &amp; Earn</h2>
+              <p className="mb-6 text-sm text-zinc-500 dark:text-zinc-400">
+                Invite friends to uByte. For each person who signs up with your link and upgrades to Pro,
+                you earn <span className="font-semibold text-indigo-600 dark:text-indigo-400">30 free days of Pro</span>.
+              </p>
+              <ReferralSection />
             </div>
           )}
-          <PlanTab plan={profile.plan} />
-        </>
-      )}
-      {tab === "certifications" && (
-        <CertificationsTab />
-      )}
-      {tab === "achievements" && (
-        <AchievementsTab badges={badges} achievements={achievements} />
-      )}
-      {tab === "notifications" && (
-        <NotificationsTab notifications={notifications} onMarkRead={markNotificationsRead} />
-      )}
-      {tab === "bookmarks" && (
-        <BookmarksTab
-          bookmarks={bookmarks}
-          hasMore={bmHasMore}
-          total={bmTotal}
-          onDelete={deleteBookmark}
-          onLoadMore={loadMoreBookmarks}
-          loadingMore={bmLoading}
-        />
-      )}
-      {tab === "settings" && (
-        <SettingsTab
-          profile={profile}
-          plan={profile.plan}
-          onSave={saveProfile}
-          onChangePassword={changePassword}
-          onDeleteAccount={deleteAccount}
-          onResetProgress={resetProgress}
-          onLogoutAll={async () => { await logoutAll(); router.push("/"); }}
-        />
-      )}
-      {tab === "referral" && (
-        <div className="max-w-lg">
-          <h2 className="mb-4 text-xl font-bold text-zinc-900 dark:text-zinc-100">Refer &amp; Earn</h2>
-          <p className="mb-6 text-sm text-zinc-500 dark:text-zinc-400">
-            Invite friends to uByte. For each person who signs up with your link and upgrades to Pro,
-            you earn <span className="font-semibold text-indigo-600 dark:text-indigo-400">30 free days of Pro</span>.
-          </p>
-          <ReferralSection />
         </div>
-      )}
+
+      </div>
       </div>
     </div>
   );
