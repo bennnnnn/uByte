@@ -162,8 +162,8 @@ export default function HeroSection({
       <div className="pointer-events-none absolute inset-0 hidden bg-dot-grid-28-dark opacity-[0.2] dark:block" />
 
       {/* ── Content ───────────────────────────────────────────────────── */}
-      <div className="relative mx-auto flex min-h-[calc(100dvh-3.5rem)] max-w-7xl flex-col px-6 lg:px-8">
-        <div className="grid flex-1 items-center gap-10 py-16 lg:grid-cols-[1fr_1.1fr] lg:gap-14 lg:py-14">
+      <div className="relative mx-auto flex max-w-7xl flex-col px-4 sm:min-h-[calc(100dvh-3.5rem)] sm:px-6 lg:px-8">
+        <div className="grid flex-1 items-center gap-8 py-10 sm:gap-10 sm:py-16 lg:grid-cols-[1fr_1.1fr] lg:gap-14 lg:py-14">
 
           {/* ── LEFT: Copy ────────────────────────────────────────────── */}
           <div className="animate-in fade-in slide-in-from-bottom-4 duration-700 ease-out">
@@ -174,7 +174,7 @@ export default function HeroSection({
             </div>
 
             {/* Headline */}
-            <h1 className="mb-5 text-[2.75rem] font-black leading-[1.04] tracking-tight text-zinc-900 dark:text-zinc-50 sm:text-5xl lg:text-[3.25rem] xl:text-[3.75rem]">
+            <h1 className="mb-5 text-[2rem] font-black leading-[1.08] tracking-tight text-zinc-900 dark:text-zinc-50 sm:text-[2.75rem] sm:leading-[1.04] lg:text-[3.25rem] xl:text-[3.75rem]">
               Learn. Practice.
               <GradientText className="mt-1 block">
                 Get certified.
@@ -289,15 +289,15 @@ export default function HeroSection({
           </div>
 
           {/* ── RIGHT: IDE mockup ─────────────────────────────────────── */}
-          <div className="relative">
-            {/* Floating success badge */}
-            <div className="absolute -right-3 -top-5 z-10 flex items-center gap-2 rounded-xl border border-emerald-200 bg-surface-card px-3.5 py-2 text-xs font-semibold text-emerald-600 shadow-lg shadow-zinc-200/60 dark:border-emerald-800 dark:text-emerald-400 dark:shadow-zinc-900/80">
+          <div className="relative pb-6 sm:pb-8">
+            {/* Floating success badge — kept inside bounds on mobile */}
+            <div className="absolute right-2 top-0 z-10 flex -translate-y-1/2 items-center gap-2 rounded-xl border border-emerald-200 bg-surface-card px-3.5 py-2 text-xs font-semibold text-emerald-600 shadow-lg shadow-zinc-200/60 dark:border-emerald-800 dark:text-emerald-400 dark:shadow-zinc-900/80 sm:-right-3 sm:-top-5 sm:translate-y-0">
               <span className="flex h-5 w-5 items-center justify-center rounded-full bg-emerald-100 text-[11px] dark:bg-emerald-900/50">✓</span>
               Step passed! +10 XP
             </div>
 
-            {/* Floating streak badge */}
-            <div className="absolute -bottom-4 -left-3 z-10 flex items-center gap-2 rounded-xl border border-amber-200 bg-surface-card px-3.5 py-2 text-xs font-semibold text-amber-600 shadow-lg shadow-zinc-200/60 dark:border-amber-800 dark:text-amber-400 dark:shadow-zinc-900/80">
+            {/* Floating streak badge — kept inside bounds on mobile */}
+            <div className="absolute bottom-0 left-2 z-10 flex translate-y-1/2 items-center gap-2 rounded-xl border border-amber-200 bg-surface-card px-3.5 py-2 text-xs font-semibold text-amber-600 shadow-lg shadow-zinc-200/60 dark:border-amber-800 dark:text-amber-400 dark:shadow-zinc-900/80 sm:-bottom-4 sm:-left-3 sm:translate-y-0">
               <span className="text-base">🔥</span>
               3-day streak
             </div>

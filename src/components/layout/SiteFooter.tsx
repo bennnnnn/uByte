@@ -11,6 +11,7 @@ const LEARN_LINKS = [
   { href: "/tutorial/java", label: "Java Tutorials" },
   { href: "/tutorial/rust", label: "Rust Tutorials" },
   { href: "/tutorial/cpp", label: "C++ Tutorials" },
+  { href: "/tutorial/csharp", label: "C# Tutorials" },
 ];
 
 const PRACTICE_LINKS = [
@@ -78,8 +79,8 @@ export default function SiteFooter() {
       </div>
 
       <div className="relative mx-auto max-w-6xl px-6 pb-4 pt-10">
-        <div className="mb-8 grid gap-8 md:grid-cols-[1.4fr_1fr_1fr_1fr_1fr]">
-          <div>
+        <div className="mb-8 grid gap-x-6 gap-y-8 grid-cols-2 sm:grid-cols-3 md:grid-cols-[1.4fr_1fr_1fr_1fr_1fr]">
+          <div className="col-span-2 sm:col-span-3 md:col-span-1">
             <Link href="/" className="inline-flex items-center gap-2.5">
               <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-indigo-600 text-sm font-bold text-white">
                 U
@@ -136,7 +137,7 @@ export default function SiteFooter() {
           </div>
         </div>
 
-        <div className="flex flex-wrap items-center justify-between gap-2 border-t border-zinc-100 pt-4 text-xs text-zinc-500 dark:border-zinc-800 dark:text-zinc-400">
+        <div className="flex flex-col gap-1 border-t border-zinc-100 pt-4 text-xs text-zinc-500 dark:border-zinc-800 dark:text-zinc-400 sm:flex-row sm:items-center sm:justify-between sm:gap-2">
           <span>© {new Date().getFullYear()} uByte. Learn, practice, get certified.</span>
           <span>Based in the cloud. Available worldwide.</span>
         </div>

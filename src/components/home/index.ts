@@ -7,3 +7,4 @@ export { default as StepsSection } from "./StepsSection";
 export { default as ValuePropBanner } from "./ValuePropBanner";
 export { default as PopularTutorialsSection } from "./PopularTutorialsSection";
 export { default as PopularInterviewPrepSection } from "./PopularInterviewPrepSection";
+export { default as TestimonialsStrip } from "./TestimonialsStrip";

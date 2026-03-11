@@ -25,9 +25,8 @@
  *
  * ─── DATABASE NOTE ──────────────────────────────────────────────────────────
  *
- * The plan is stored in users.plan as a string: "free" | "pro" | "yearly" | "monthly"
- * The Paddle customer ID is stored in users.stripe_customer_id (legacy column name).
- * A future DB migration should rename it to users.paddle_customer_id.
+ * The plan is stored in users.plan as a string: "free" | "pro" | "yearly" | "monthly" | "trial"
+ * The Paddle customer ID is stored in users.paddle_customer_id.
  */
 import { DAILY_DRIP, MAX_FREE_PROBLEMS } from "@/lib/db/practice-unlocks";
 
@@ -50,12 +49,24 @@ export type BillingPlan = "monthly" | "yearly";
 
 /**
  * Returns true for any plan that grants paid feature access.
- * "canceling" — user has cancelled but is still within their billing period.
- *   They keep full Pro access until the period ends, then the cleanup cron
- *   downgrades them to "free" (see downgradeExpiredCancelingUsers in users.ts).
+ * "canceling"     — user has cancelled but is still within their billing period.
+ * "trial"         — active 7-day free trial (monthly price).
+ * "trial_yearly"  — active 7-day free trial (yearly price).
  */
 export function hasPaidAccess(plan?: string | null): boolean {
-  return plan === "yearly" || plan === "pro" || plan === "monthly" || plan === "canceling";
+  return (
+    plan === "yearly" ||
+    plan === "pro" ||
+    plan === "monthly" ||
+    plan === "canceling" ||
+    plan === "trial" ||
+    plan === "trial_yearly"
+  );
+}
+
+/** Returns true if the user is on a free trial (has access but hasn't paid yet). */
+export function isTrialPlan(plan?: string | null): boolean {
+  return plan === "trial" || plan === "trial_yearly";
 }
 
 // ─── Pricing + Paddle config (shared between client and server) ──────────────

@@ -77,13 +77,14 @@ export const POST = withErrorHandling("POST /api/code-feedback", async (req: Nex
 
   const safeCode = String(code).slice(0, 1200).replace(/`{3}/g, "` ` `");
 
-  const prompt = `A student is learning Go. They're working on: "${step.title}"
+  const langLabel = language.charAt(0).toUpperCase() + language.slice(1);
+  const prompt = `A student is learning ${langLabel}. They're working on: "${step.title}"
 
 Task: ${step.instruction.slice(0, 300)}
 ${expected}
 
 Their code:
-\`\`\`go
+\`\`\`${language}
 ${safeCode}
 \`\`\`
 

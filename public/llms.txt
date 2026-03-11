@@ -6,7 +6,7 @@ uByte is an interactive programming learning platform with tutorials, interview 
 - Programming tutorials
 - Coding interview preparation
 - Certifications and certificates
-- Languages: Go, Python, C++, JavaScript, Java, Rust
+- Languages: Go, Python, C++, JavaScript, Java, Rust, C#
 
 ## Key Public URLs
 - Home: https://www.ubyte.dev/

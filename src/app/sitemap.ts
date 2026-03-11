@@ -82,6 +82,18 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "weekly",
       priority: 0.8,
     },
+    {
+      url: abs("/interview"),
+      lastModified: now,
+      changeFrequency: "weekly",
+      priority: 0.85,
+    },
+    {
+      url: abs("/daily"),
+      lastModified: now,
+      changeFrequency: "daily",
+      priority: 0.8,
+    },
     // Individual blog posts
     ...blogPosts.map((post) => ({
       url: abs(`/blog/${post.slug}`),

@@ -123,7 +123,7 @@ export async function sendWelcomeEmail(to: string, name: string): Promise<void> 
           <table style="width:100%;border-collapse:collapse;margin:20px 0">
             <tr><td style="padding:10px 0;border-bottom:1px solid #e5e7eb">
               <strong>📖 Interactive Tutorials</strong><br>
-              <span style="color:#6b7280;font-size:14px">Step-by-step lessons in Go, Python, JavaScript, C++, Java, and Rust — with a live code editor.</span>
+              <span style="color:#6b7280;font-size:14px">Step-by-step lessons in Go, Python, JavaScript, C++, Java, Rust, and C# — with a live code editor.</span>
             </td></tr>
             <tr><td style="padding:10px 0;border-bottom:1px solid #e5e7eb">
               <strong>💼 Interview Prep</strong><br>
@@ -253,6 +253,178 @@ export async function sendDay7Email(to: string, name: string): Promise<void> {
           </div>
           <hr style="border:none;border-top:1px solid #e5e7eb;margin:24px 0">
           <p style="color:#9ca3af;font-size:12px">You're receiving this because you signed up at uByte. <a href="${BASE_URL}/profile" style="color:#9ca3af">Manage preferences</a>.</p>
+        </div>
+      </div>
+    `,
+  });
+}
+
+/** Weekly progress digest — sent every Sunday to active users. */
+export async function sendWeeklyDigestEmail(opts: {
+  to: string;
+  name: string;
+  streakDays: number;
+  xp: number;
+  problemsThisWeek: number;
+  tutorialsThisWeek: number;
+}): Promise<void> {
+  const resend = getResend();
+  if (!resend) return;
+
+  const { to, name, streakDays, xp, problemsThisWeek, tutorialsThisWeek } = opts;
+  const firstName = name.split(" ")[0];
+  const totalActivity = problemsThisWeek + tutorialsThisWeek;
+
+  // Motivational headline based on activity level
+  const headline =
+    totalActivity >= 10
+      ? `Incredible week, ${firstName}! 🔥`
+      : totalActivity >= 5
+      ? `Solid progress this week, ${firstName}! 💪`
+      : `Good start this week, ${firstName}! 🚀`;
+
+  const activityRows = [
+    problemsThisWeek > 0 && `<tr><td style="padding:10px 0;border-bottom:1px solid #e5e7eb"><strong>💼 Problems solved</strong><span style="float:right;font-size:22px;font-weight:800;color:#4f46e5">${problemsThisWeek}</span></td></tr>`,
+    tutorialsThisWeek > 0 && `<tr><td style="padding:10px 0;border-bottom:1px solid #e5e7eb"><strong>📖 Tutorial steps</strong><span style="float:right;font-size:22px;font-weight:800;color:#4f46e5">${tutorialsThisWeek}</span></td></tr>`,
+    `<tr><td style="padding:10px 0;border-bottom:1px solid #e5e7eb"><strong>🔥 Current streak</strong><span style="float:right;font-size:22px;font-weight:800;color:#f59e0b">${streakDays} days</span></td></tr>`,
+    `<tr><td style="padding:10px 0"><strong>⭐ Total XP</strong><span style="float:right;font-size:22px;font-weight:800;color:#0891b2">${xp.toLocaleString()}</span></td></tr>`,
+  ].filter(Boolean).join("");
+
+  await resend.emails.send({
+    from: FROM,
+    to,
+    subject: `Your uByte weekly recap — ${problemsThisWeek} problems, ${tutorialsThisWeek} lessons this week`,
+    html: `
+      <div style="font-family:sans-serif;max-width:520px;margin:auto;color:#18181b">
+        <div style="background:#4f46e5;padding:32px;border-radius:12px 12px 0 0;text-align:center">
+          <span style="color:#fff;font-size:28px;font-weight:800;letter-spacing:-1px">uByte</span>
+          <p style="color:#c7d2fe;margin:4px 0 0;font-size:13px">Weekly Progress Report</p>
+        </div>
+        <div style="background:#f9fafb;padding:32px;border-radius:0 0 12px 12px;border:1px solid #e5e7eb;border-top:none">
+          <h2 style="margin:0 0 4px">${headline}</h2>
+          <p style="color:#6b7280;margin:0 0 24px">Here's what you achieved on uByte this week:</p>
+
+          <table style="width:100%;border-collapse:collapse">
+            ${activityRows}
+          </table>
+
+          <div style="background:#fff;border:2px solid #4f46e5;border-radius:10px;padding:16px;margin:24px 0;text-align:center">
+            <p style="margin:0 0 4px;font-weight:700;color:#4f46e5">Keep the momentum going!</p>
+            <p style="color:#6b7280;margin:0 0 14px;font-size:13px">
+              ${streakDays >= 7
+                ? `${streakDays}-day streak — you're on a roll. Don't break it!`
+                : "Build your streak — code every day and watch it grow."}
+            </p>
+            <a href="${BASE_URL}" style="display:inline-block;padding:12px 24px;background:#4f46e5;color:#fff;border-radius:8px;text-decoration:none;font-weight:700;font-size:14px">Continue learning →</a>
+          </div>
+
+          <div style="background:#fff;border:1px solid #e5e7eb;border-radius:10px;padding:14px;margin:0 0 20px">
+            <p style="margin:0 0 8px;font-size:13px;font-weight:600;color:#374151">This week on uByte:</p>
+            <table style="width:100%;border-collapse:collapse;font-size:13px">
+              <tr>
+                <td style="padding:4px 0"><a href="${BASE_URL}/daily" style="color:#4f46e5;text-decoration:none">⚡ Today's daily challenge</a></td>
+              </tr>
+              <tr>
+                <td style="padding:4px 0"><a href="${BASE_URL}/practice" style="color:#4f46e5;text-decoration:none">💼 Browse all interview problems</a></td>
+              </tr>
+              <tr>
+                <td style="padding:4px 0"><a href="${BASE_URL}/certifications" style="color:#4f46e5;text-decoration:none">🏅 Take a certification exam</a></td>
+              </tr>
+            </table>
+          </div>
+
+          <p style="color:#9ca3af;font-size:11px;text-align:center">
+            You're receiving this because you've been active on uByte this week.<br>
+            <a href="${BASE_URL}/profile" style="color:#9ca3af">Manage email preferences</a> · <a href="${BASE_URL}" style="color:#9ca3af">uByte</a>
+          </p>
+        </div>
+      </div>
+    `,
+  });
+}
+
+/** Sent after a user successfully upgrades to Pro or Yearly. */
+export async function sendUpgradeEmail(
+  to: string,
+  name: string,
+  plan: string
+): Promise<void> {
+  const resend = getResend();
+  if (!resend) return;
+
+  const firstName = name.split(" ")[0];
+  const planLabel = plan.includes("yearly") ? "Yearly Pro" : "Monthly Pro";
+  await resend.emails.send({
+    from: FROM,
+    to,
+    subject: `Welcome to ${planLabel}, ${firstName}! 🎉 — uByte`,
+    html: `
+      <div style="font-family:sans-serif;max-width:520px;margin:auto;color:#18181b">
+        <div style="background:#4f46e5;padding:32px;border-radius:12px 12px 0 0;text-align:center">
+          <span style="color:#fff;font-size:28px;font-weight:800;letter-spacing:-1px">uByte</span>
+        </div>
+        <div style="background:#f9fafb;padding:32px;border-radius:0 0 12px 12px;border:1px solid #e5e7eb;border-top:none">
+          <h2 style="margin:0 0 8px">You're officially Pro, ${firstName}! 🚀</h2>
+          <p style="color:#6b7280">Your <strong>${planLabel}</strong> is now active. Here's everything that's now unlocked:</p>
+          <table style="width:100%;border-collapse:collapse;margin:20px 0">
+            <tr><td style="padding:10px 0;border-bottom:1px solid #e5e7eb">
+              <strong>📖 Unlimited tutorials</strong><br>
+              <span style="color:#6b7280;font-size:14px">All languages, all lessons — no limits.</span>
+            </td></tr>
+            <tr><td style="padding:10px 0;border-bottom:1px solid #e5e7eb">
+              <strong>💼 Unlimited interview prep</strong><br>
+              <span style="color:#6b7280;font-size:14px">Every practice problem, with AI hints on demand.</span>
+            </td></tr>
+            <tr><td style="padding:10px 0">
+              <strong>🏅 Certification exams</strong><br>
+              <span style="color:#6b7280;font-size:14px">Take exams, earn verifiable certificates, add them to LinkedIn.</span>
+            </td></tr>
+          </table>
+          <div style="text-align:center;margin:24px 0">
+            <a href="${BASE_URL}" style="display:inline-block;padding:14px 28px;background:#4f46e5;color:#fff;border-radius:8px;text-decoration:none;font-weight:700;font-size:15px">Start learning →</a>
+          </div>
+          <p style="color:#9ca3af;font-size:12px;text-align:center">You're receiving this because you just upgraded to ${planLabel} on uByte.</p>
+        </div>
+      </div>
+    `,
+  });
+}
+
+/** Sent when a user earns a certification. */
+export async function sendCertificationEmail(
+  to: string,
+  name: string,
+  language: string,
+  certificateUrl: string
+): Promise<void> {
+  const resend = getResend();
+  if (!resend) return;
+
+  const firstName = name.split(" ")[0];
+  const langLabel = language.charAt(0).toUpperCase() + language.slice(1);
+  await resend.emails.send({
+    from: FROM,
+    to,
+    subject: `You earned your ${langLabel} certificate! 🏅 — uByte`,
+    html: `
+      <div style="font-family:sans-serif;max-width:520px;margin:auto;color:#18181b">
+        <div style="background:#4f46e5;padding:32px;border-radius:12px 12px 0 0;text-align:center">
+          <span style="color:#fff;font-size:28px;font-weight:800;letter-spacing:-1px">uByte</span>
+        </div>
+        <div style="background:#f9fafb;padding:32px;border-radius:0 0 12px 12px;border:1px solid #e5e7eb;border-top:none">
+          <div style="text-align:center;margin-bottom:20px">
+            <span style="font-size:56px">🏅</span>
+          </div>
+          <h2 style="margin:0 0 8px;text-align:center">Congratulations, ${firstName}!</h2>
+          <p style="color:#6b7280;text-align:center">You've passed the <strong>${langLabel} certification</strong> on uByte. Your certificate is ready.</p>
+          <div style="background:#fff;border:2px solid #4f46e5;border-radius:10px;padding:20px;margin:20px 0;text-align:center">
+            <p style="margin:0 0 4px;font-weight:700;color:#4f46e5">Your ${langLabel} Certificate</p>
+            <p style="color:#6b7280;margin:0 0 16px;font-size:14px">Verifiable, shareable, and ready for LinkedIn or your resume.</p>
+            <a href="${certificateUrl}" style="display:inline-block;padding:12px 24px;background:#4f46e5;color:#fff;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px">View your certificate →</a>
+          </div>
+          <p style="color:#6b7280;font-size:14px;text-align:center">Share it with the world — you earned it!</p>
+          <hr style="border:none;border-top:1px solid #e5e7eb;margin:24px 0">
+          <p style="color:#9ca3af;font-size:12px;text-align:center">You're receiving this because you just earned a certificate on uByte. <a href="${BASE_URL}/profile" style="color:#9ca3af">Manage preferences</a>.</p>
         </div>
       </div>
     `,

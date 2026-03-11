@@ -113,3 +113,54 @@ export async function recordReferralSubscription(referredUserId: number): Promis
     WHERE referred_user_id = ${referredUserId} AND subscribed_at IS NULL
   `;
 }
+
+/**
+ * Rewards the referrer when a referred user subscribes for the first time.
+ * Extends the referrer's subscription by 30 days (or grants 30 days from today if free).
+ * Only fires once per referred user (idempotent via rewarded_at column).
+ */
+export async function rewardReferrer(referredUserId: number): Promise<void> {
+  await ensureTables();
+  const sql = getSql();
+
+  // Add rewarded_at column if it doesn't exist (schema migration-lite approach)
+  await sql`
+    ALTER TABLE referral_conversions
+    ADD COLUMN IF NOT EXISTS rewarded_at TEXT
+  `.catch(() => {});
+
+  // Find the referrer for this user (only if not already rewarded)
+  const rows = await sql`
+    SELECT referrer_id FROM referral_conversions
+    WHERE referred_user_id = ${referredUserId}
+      AND subscribed_at IS NOT NULL
+      AND rewarded_at IS NULL
+    LIMIT 1
+  `;
+  if (rows.length === 0) return;
+
+  const referrerId = rows[0].referrer_id as number;
+
+  // Extend the referrer's subscription by 30 days
+  await sql`
+    UPDATE users
+    SET subscription_expires_at = (
+      CASE
+        WHEN subscription_expires_at IS NOT NULL AND subscription_expires_at::timestamptz > NOW()
+          THEN (subscription_expires_at::timestamptz + INTERVAL '30 days')::text
+        ELSE (NOW() + INTERVAL '30 days')::text
+      END
+    ),
+    plan = CASE WHEN plan = 'free' THEN 'pro' ELSE plan END
+    WHERE id = ${referrerId}
+  `;
+
+  // Mark as rewarded
+  await sql`
+    UPDATE referral_conversions
+    SET rewarded_at = NOW()::text
+    WHERE referred_user_id = ${referredUserId}
+  `;
+
+  console.log(`[referrals] Rewarded referrer ${referrerId} +30 days for referred user ${referredUserId}`);
+}

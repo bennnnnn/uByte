@@ -30,8 +30,7 @@ export const GET = withErrorHandling("GET /api/billing/portal", async () => {
   if (!user) return response;
 
   const dbUser = await getUserById(user.userId);
-  // Legacy column name — actually stores the Paddle customer ID
-  let customerId = dbUser?.stripe_customer_id ?? null;
+  let customerId = dbUser?.paddle_customer_id ?? null;
 
   if (!PADDLE_API_KEY) {
     return NextResponse.json(
@@ -40,7 +39,7 @@ export const GET = withErrorHandling("GET /api/billing/portal", async () => {
     );
   }
 
-  // Fallback: if stripe_customer_id is missing (e.g. webhook fired subscription.updated before
+  // Fallback: if paddle_customer_id is missing (e.g. webhook fired subscription.updated before
   // transaction.completed), look up the Paddle customer by email and save it for future calls.
   if (!customerId && dbUser?.email) {
     try {

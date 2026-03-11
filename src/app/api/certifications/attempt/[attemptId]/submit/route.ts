@@ -17,6 +17,8 @@ import {
   hasAttemptExpired,
   isDisplayedAnswerCorrect,
 } from "@/lib/exams/attempt-utils";
+import { sendCertificationEmail } from "@/lib/email";
+import { BASE_URL } from "@/lib/constants";
 
 export const POST = withErrorHandling(
   "POST /api/certifications/attempt/[attemptId]/submit",
@@ -107,6 +109,13 @@ export const POST = withErrorHandling(
       let certificateId: string | null = null;
       if (passed) {
         certificateId = await createCertificate(user.userId, attempt.lang, attemptId);
+        // Send congratulations email (fire-and-forget)
+        if (user.email && certificateId) {
+          const certUrl = `${BASE_URL}/certifications/certificate/${certificateId}`;
+          sendCertificationEmail(user.email, user.name, attempt.lang, certUrl).catch((err) =>
+            console.error("[submit] sendCertificationEmail failed:", err)
+          );
+        }
       }
 
       return NextResponse.json({ score, passed, correct, total, certificateId, results });

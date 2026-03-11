@@ -42,15 +42,13 @@
  *
  * ─── DATABASE NOTE ──────────────────────────────────────────────────────────
  *
- * The users table has a column named `stripe_customer_id` — this is a legacy
- * name from an earlier Stripe integration that was never used. It now stores
- * the Paddle customer ID (ctm_...). A future DB migration should rename it to
- * `paddle_customer_id`. The code handles this correctly despite the name.
+ * The Paddle customer ID (ctm_...) is stored in users.paddle_customer_id.
+ * (Migration 013 renamed the legacy `stripe_customer_id` column.)
  *
  * ─── HOW USER LOOKUP WORKS ──────────────────────────────────────────────────
  *
- * When a webhook arrives, we resolve the uByte user via 3 fallbacks in order:
- * 1. Paddle customer ID (ctm_...) already saved in users.stripe_customer_id
+ * When a webhook arrives, we resolve the uByte user via 4 fallbacks in order:
+ * 1. Paddle customer ID (ctm_...) already saved in users.paddle_customer_id
  * 2. custom_data.userId passed from the checkout widget at purchase time
  * 3. Fetch the customer's email from Paddle API, look up by email in DB
  *
@@ -64,6 +62,7 @@ import { timingSafeEqual } from "crypto";
 import {
   updateUserPlan,
   cancelUserPlanGracefully,
+  setTrialExpiry,
   getUserByPaddleCustomerId,
   getUserById,
   getUserByEmail,
@@ -73,6 +72,9 @@ import {
 } from "@/lib/db";
 import { withErrorHandling } from "@/lib/api-utils";
 import { BILLING_CONFIG, YEARLY_PRICE_CENTS, MONTHLY_PRICE_CENTS } from "@/lib/plans";
+import { resolveCheckoutNonce } from "@/lib/db/checkout-sessions";
+import { rewardReferrer } from "@/lib/db/referrals";
+import { sendUpgradeEmail } from "@/lib/email";
 
 const WEBHOOK_SECRET = process.env.PADDLE_WEBHOOK_SECRET ?? "";
 const PADDLE_API_KEY = process.env.PADDLE_API_KEY ?? "";
@@ -155,13 +157,17 @@ async function getPaddleCustomerEmail(customerId: string): Promise<string | null
 
 /**
  * Resolve the uByte user ID from a Paddle webhook event.
- * Three-step fallback — see file header comment for details.
+ * Four-step fallback in priority order:
+ * 1. Paddle customer ID already saved (most reliable, works for renewals)
+ * 2. Server-generated nonce from customData.checkoutNonce (secure, first purchase)
+ * 3. Email lookup via Paddle API (reliable fallback, requires PADDLE_API_KEY)
+ * 4. Legacy: raw customData.userId (kept as last resort; deprecated in new checkouts)
  */
 async function resolveUserId(
   paddleCustomerId: string | undefined,
   customData: Record<string, string> | null
 ): Promise<number | null> {
-  // Step 1: Paddle customer ID already linked in users.stripe_customer_id
+  // Step 1: Paddle customer ID already linked in users.paddle_customer_id
   if (paddleCustomerId) {
     const existing = await getUserByPaddleCustomerId(paddleCustomerId);
     if (existing) {
@@ -170,15 +176,15 @@ async function resolveUserId(
     }
   }
 
-  // Step 2: custom_data.userId passed from Paddle.Checkout.open({ customData })
-  const clientUserId = customData?.["userId"];
-  if (clientUserId) {
-    const u = await getUserById(parseInt(clientUserId, 10));
-    if (u) {
-      console.log("[paddle-webhook] Resolved user by custom_data.userId:", u.id);
-      return u.id;
+  // Step 2: Server-generated nonce (secure, set by /api/billing/checkout)
+  const nonce = customData?.["checkoutNonce"];
+  if (nonce) {
+    const uid = await resolveCheckoutNonce(nonce);
+    if (uid) {
+      console.log("[paddle-webhook] Resolved user by checkout nonce:", uid);
+      return uid;
     }
-    console.error("[paddle-webhook] custom_data.userId not found in DB:", clientUserId);
+    console.warn("[paddle-webhook] Checkout nonce not found or expired:", nonce);
   }
 
   // Step 3: Fetch email from Paddle API and match to uByte account by email
@@ -194,6 +200,17 @@ async function resolveUserId(
     }
   }
 
+  // Step 4 (legacy): raw customData.userId — kept for backward compatibility only
+  const clientUserId = customData?.["userId"];
+  if (clientUserId) {
+    const u = await getUserById(parseInt(clientUserId, 10));
+    if (u) {
+      console.warn("[paddle-webhook] Resolved user by legacy custom_data.userId (deprecated):", u.id);
+      return u.id;
+    }
+    console.error("[paddle-webhook] custom_data.userId not found in DB:", clientUserId);
+  }
+
   console.error("[paddle-webhook] Could not resolve user. customerId:", paddleCustomerId, "customData:", JSON.stringify(customData));
   return null;
 }
@@ -203,7 +220,11 @@ async function resolveUserId(
  * Used by subscription.updated to handle upgrades, downgrades, and pauses.
  */
 function planFromSubscription(status: string, priceId?: string): string {
-  if (!["active", "trialing"].includes(status)) return "free";
+  if (status === "trialing") {
+    const yearlyPriceId = process.env.NEXT_PUBLIC_PADDLE_YEARLY_PRICE_ID;
+    return yearlyPriceId && priceId === yearlyPriceId ? "trial_yearly" : "trial";
+  }
+  if (status !== "active") return "free";
   const yearlyPriceId = process.env.NEXT_PUBLIC_PADDLE_YEARLY_PRICE_ID;
   return yearlyPriceId && priceId === yearlyPriceId ? "yearly" : "pro";
 }
@@ -275,6 +296,16 @@ export const POST = withErrorHandling("POST /api/webhooks/paddle", async (reques
         await recordReferralSubscription(uid).catch((err) =>
           console.error("[paddle-webhook] recordReferralSubscription failed:", err)
         );
+        await rewardReferrer(uid).catch((err) =>
+          console.error("[paddle-webhook] rewardReferrer failed:", err)
+        );
+        // Send upgrade welcome email (fire-and-forget)
+        const user = await getUserById(uid).catch(() => null);
+        if (user?.email) {
+          sendUpgradeEmail(user.email, user.name, activatedPlan).catch((err) =>
+            console.error("[paddle-webhook] sendUpgradeEmail failed:", err)
+          );
+        }
       } else {
         console.error("[paddle-webhook] transaction completed — could not resolve user");
       }
@@ -284,28 +315,56 @@ export const POST = withErrorHandling("POST /api/webhooks/paddle", async (reques
     /**
      * BACKUP ACTIVATION TRIGGER
      * subscription.activated / subscription.created fire after the subscription
-     * is set up. custom_data may be absent here (it's attached to the transaction),
-     * but resolveUserId will fall back to the Paddle API email lookup.
-     * Also sends the user an in-app notification.
+     * is set up. Handles both trialing (free trial) and active (paid) states.
+     * custom_data may be absent here — resolveUserId falls back to email lookup.
      */
     case "subscription.activated":
     case "subscription.created": {
       const uid = await resolveUserId(paddleCustomerId, customData);
       if (uid) {
-        await updateUserPlan(uid, activatedPlan, paddleCustomerId);
-        console.log("[paddle-webhook] subscription — updated user", uid, "to plan:", activatedPlan);
-        const planLabel = activatedPlan === "yearly" ? BILLING_CONFIG.yearly.label : BILLING_CONFIG.monthly.label;
-        await createNotification(
-          uid,
-          "plan",
-          `You're now on ${planLabel}!`,
-          "All tutorials and features are now unlocked. Enjoy!"
-        );
-        const amountCents = activatedPlan === "yearly" ? YEARLY_PRICE_CENTS : MONTHLY_PRICE_CENTS;
-        await recordSubscriptionEvent(uid, activatedPlan, amountCents, "activated");
-        await recordReferralSubscription(uid).catch((err) =>
-          console.error("[paddle-webhook] recordReferralSubscription failed:", err)
-        );
+        // Use planFromSubscription so trialing → "trial" / "trial_yearly" correctly
+        const subPlan = status ? planFromSubscription(status, purchasedPriceId) : activatedPlan;
+        const isTrial = subPlan.startsWith("trial");
+
+        await updateUserPlan(uid, subPlan, paddleCustomerId);
+
+        // For trials, store the period end date so the UI can show a countdown
+        if (isTrial) {
+          const billingPeriod = data["current_billing_period"] as { ends_at?: string } | undefined;
+          if (billingPeriod?.ends_at) {
+            await setTrialExpiry(uid, billingPeriod.ends_at).catch((err) =>
+              console.error("[paddle-webhook] setTrialExpiry failed:", err)
+            );
+          }
+        }
+        console.log("[paddle-webhook] subscription — updated user", uid, "to plan:", subPlan, "(status:", status, ")");
+
+        if (isTrial) {
+          await createNotification(
+            uid,
+            "plan",
+            "Your 7-day free trial has started! 🎉",
+            "You have full Pro access for 7 days. No charge until your trial ends."
+          );
+        } else {
+          const planLabel = subPlan === "yearly" ? BILLING_CONFIG.yearly.label : BILLING_CONFIG.monthly.label;
+          await createNotification(
+            uid,
+            "plan",
+            `You're now on ${planLabel}!`,
+            "All tutorials and features are now unlocked. Enjoy!"
+          );
+          // Only reward referrer + send upgrade email for real paid activations
+          await recordReferralSubscription(uid).catch((err) =>
+            console.error("[paddle-webhook] recordReferralSubscription failed:", err)
+          );
+          await rewardReferrer(uid).catch((err) =>
+            console.error("[paddle-webhook] rewardReferrer failed:", err)
+          );
+        }
+
+        const amountCents = isTrial ? 0 : (subPlan === "yearly" ? YEARLY_PRICE_CENTS : MONTHLY_PRICE_CENTS);
+        await recordSubscriptionEvent(uid, subPlan, amountCents, "activated");
       }
       break;
     }
@@ -323,8 +382,28 @@ export const POST = withErrorHandling("POST /api/webhooks/paddle", async (reques
         const plan = planFromSubscription(status, purchasedPriceId);
         const uid = await resolveUserId(paddleCustomerId, customData);
         if (uid) {
+          const prevUser = await getUserById(uid).catch(() => null);
+          const wasOnTrial = prevUser?.plan?.startsWith("trial");
+
           await updateUserPlan(uid, plan, paddleCustomerId);
-          console.log("[paddle-webhook] subscription updated — user", uid, "plan:", plan);
+          console.log("[paddle-webhook] subscription updated — user", uid, "plan:", plan, "(prev:", prevUser?.plan, ")");
+
+          // Trial → active conversion: fire upgrade email + referral rewards
+          if (wasOnTrial && plan !== "free" && !plan.startsWith("trial")) {
+            const amountCents = plan === "yearly" ? YEARLY_PRICE_CENTS : MONTHLY_PRICE_CENTS;
+            await recordSubscriptionEvent(uid, plan, amountCents, "activated");
+            await recordReferralSubscription(uid).catch((err) =>
+              console.error("[paddle-webhook] recordReferralSubscription failed:", err)
+            );
+            await rewardReferrer(uid).catch((err) =>
+              console.error("[paddle-webhook] rewardReferrer failed:", err)
+            );
+            if (prevUser?.email) {
+              sendUpgradeEmail(prevUser.email, prevUser.name, plan).catch((err) =>
+                console.error("[paddle-webhook] sendUpgradeEmail (trial→paid) failed:", err)
+              );
+            }
+          }
         }
       }
       break;

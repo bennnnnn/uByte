@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/components/AuthProvider";
 import { getAllPracticeProblems } from "@/lib/practice/problems";
+import { getAllLanguageSlugs, LANGUAGES } from "@/lib/languages/registry";
 import type { Difficulty } from "@/lib/practice/types";
 
 const DURATIONS = [
@@ -34,12 +35,19 @@ const DIFFICULTIES: { value: Difficulty; label: string; color: string; selectedC
   },
 ];
 
+const LANG_ICONS: Record<string, string> = {
+  go: "🐹", python: "🐍", javascript: "🟨", java: "☕", rust: "🦀", cpp: "⚙️", csharp: "💜",
+};
+
 export default function InterviewSimulatorPage() {
   const { user } = useAuth();
   const router = useRouter();
   const [difficulty, setDifficulty] = useState<Difficulty>("medium");
   const [duration, setDuration] = useState(45);
+  const [language, setLanguage] = useState("go");
   const [starting, setStarting] = useState(false);
+
+  const languageSlugs = getAllLanguageSlugs();
 
   function startInterview() {
     setStarting(true);
@@ -51,7 +59,7 @@ export default function InterviewSimulatorPage() {
     // Pick a random problem
     const problem = problems[Math.floor(Math.random() * problems.length)];
     const deadline = Date.now() + duration * 60 * 1000;
-    router.push(`/practice/go/${problem.slug}?mode=interview&deadline=${deadline}`);
+    router.push(`/practice/${language}/${problem.slug}?mode=interview&deadline=${deadline}`);
   }
 
   if (!user) {
@@ -90,6 +98,32 @@ export default function InterviewSimulatorPage() {
           <li className="flex items-start gap-2"><span className="mt-0.5 text-indigo-400">•</span> A visible countdown timer — just like a real interview</li>
           <li className="flex items-start gap-2"><span className="mt-0.5 text-indigo-400">•</span> Full AI debrief after you submit: complexity, style, improvements</li>
         </ul>
+      </div>
+
+      {/* Language */}
+      <div className="mb-6">
+        <p className="mb-3 text-sm font-semibold text-zinc-700 dark:text-zinc-300">Language</p>
+        <div className="flex flex-wrap gap-2">
+          {languageSlugs.map((slug) => {
+            const config = LANGUAGES[slug as keyof typeof LANGUAGES];
+            if (!config) return null;
+            return (
+              <button
+                key={slug}
+                type="button"
+                onClick={() => setLanguage(slug)}
+                className={`flex items-center gap-1.5 rounded-lg border-2 px-3 py-2 text-sm font-medium transition-all ${
+                  language === slug
+                    ? "border-indigo-500 bg-indigo-50 text-indigo-700 dark:border-indigo-400 dark:bg-indigo-950/30 dark:text-indigo-300"
+                    : "border-zinc-200 bg-white text-zinc-700 hover:border-zinc-400 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:border-zinc-500"
+                }`}
+              >
+                <span>{LANG_ICONS[slug] ?? ""}</span>
+                {config.name}
+              </button>
+            );
+          })}
+        </div>
       </div>
 
       {/* Difficulty */}

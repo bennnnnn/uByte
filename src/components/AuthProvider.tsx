@@ -20,6 +20,7 @@ export interface ProfileData {
   xp: number;
   streak_days: number;
   plan: string;
+  subscription_expires_at?: string | null;
   emailVerified: boolean;
   isAdmin: boolean;
   onboarding_goal?: string | null;
@@ -125,6 +126,7 @@ function extractProfile(data: { profile?: Record<string, unknown> }): ProfileDat
     xp: (p.xp as number) || 0,
     streak_days: (p.streak_days as number) || 0,
     plan: (p.plan as string) || "free",
+    subscription_expires_at: (p.subscription_expires_at as string | null) ?? null,
     emailVerified: !!(p.email_verified as number),
     isAdmin: !!(p.is_admin as number),
     onboarding_goal: (p.onboarding_goal as string | null) ?? null,

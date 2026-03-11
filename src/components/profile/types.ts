@@ -14,6 +14,7 @@ export interface Profile {
   email_verified: number;
   is_admin: number;
   plan: string;
+  subscription_expires_at?: string | null;
 }
 
 export interface LangProgress {

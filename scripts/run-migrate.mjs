@@ -1,10 +1,20 @@
 #!/usr/bin/env node
 /**
- * Run scripts/migrate.sql against the database.
+ * Run database migrations against the Neon PostgreSQL database.
+ *
+ * Execution order:
+ *   1. scripts/migrate.sql             — base schema (CREATE TABLE IF NOT EXISTS)
+ *   2. scripts/migrations/NNN_*.sql    — numbered migrations in ascending order
+ *
+ * All statements are idempotent (IF NOT EXISTS / DO NOTHING / ON CONFLICT).
+ * Safe to re-run at any time.
+ *
+ * Usage:
+ *   node scripts/run-migrate.mjs       (or: npm run migrate)
+ *
  * Loads DATABASE_URL from .env.local if present.
- * Usage: node scripts/run-migrate.mjs   (or: npm run migrate)
  */
-import { readFileSync, existsSync } from "fs";
+import { readFileSync, existsSync, readdirSync } from "fs";
 import { fileURLToPath } from "url";
 import { dirname, join } from "path";
 import { neon } from "@neondatabase/serverless";
@@ -35,35 +45,65 @@ if (!url) {
 }
 
 const sql = neon(url);
-const migratePath = join(__dirname, "migrate.sql");
-const fullSql = readFileSync(migratePath, "utf8");
 
-// Remove single-line comments, then split into statements (each CREATE TABLE / CREATE INDEX)
-const cleaned = fullSql
-  .split("\n")
-  .filter((line) => !line.trim().startsWith("--"))
-  .join("\n");
+/**
+ * Parse a SQL file into individual statements, stripping single-line comments.
+ * Splits at ";\n" followed by a SQL keyword (CREATE, INSERT, ALTER, DROP, etc.).
+ */
+function parseStatements(sqlText) {
+  const cleaned = sqlText
+    .split("\n")
+    .filter((line) => !line.trim().startsWith("--"))
+    .join("\n");
 
-// Split into statements: split at ";\n" followed by "CREATE" or "INSERT" (each statement ends with ";")
-const statements = cleaned
-  .split(/;\s*\n\s*(?=(?:CREATE|INSERT)\s)/i)
-  .map((s) => s.trim())
-  .filter(Boolean)
-  .map((s) => (s.endsWith(";") ? s : s + ";"));
+  return cleaned
+    .split(/;\s*\n\s*(?=(?:CREATE|INSERT|ALTER|DROP|UPDATE|DELETE|DO)\s)/i)
+    .map((s) => s.trim())
+    .filter(Boolean)
+    .map((s) => (s.endsWith(";") ? s : s + ";"));
+}
 
-async function run() {
-  try {
-    for (let i = 0; i < statements.length; i++) {
-      const st = statements[i];
-      if (!st) continue;
+async function runFile(filePath, label) {
+  console.log(`\n── ${label}`);
+  const fullSql = readFileSync(filePath, "utf8");
+  const statements = parseStatements(fullSql);
+
+  for (const st of statements) {
+    if (!st.trim() || st.trim() === ";") continue;
+    try {
       await sql.query(st, []);
-      console.log(`  OK: ${st.slice(0, 60).replace(/\s+/g, " ")}...`);
+      console.log(`  ✓ ${st.slice(0, 70).replace(/\s+/g, " ").trimEnd()}…`);
+    } catch (err) {
+      console.error(`  ✗ Failed: ${st.slice(0, 120)}`);
+      console.error(`    Error: ${err.message}`);
+      throw err;
     }
-    console.log("Migration completed successfully.");
-  } catch (err) {
-    console.error("Migration failed:", err.message);
-    process.exit(1);
   }
 }
 
-run();
+async function run() {
+  // 1. Base schema
+  const basePath = join(__dirname, "migrate.sql");
+  if (existsSync(basePath)) {
+    await runFile(basePath, "migrate.sql (base schema)");
+  }
+
+  // 2. Numbered migrations — run in ascending filename order
+  const migrationsDir = join(__dirname, "migrations");
+  if (existsSync(migrationsDir)) {
+    const files = readdirSync(migrationsDir)
+      .filter((f) => f.endsWith(".sql") && /^\d{3}_/.test(f))
+      .sort(); // lexicographic sort = numeric order for NNN_ prefix
+
+    for (const file of files) {
+      await runFile(join(migrationsDir, file), `migrations/${file}`);
+    }
+  }
+
+  console.log("\n✅ All migrations completed successfully.\n");
+}
+
+run().catch((err) => {
+  console.error("\n❌ Migration failed:", err.message);
+  process.exit(1);
+});

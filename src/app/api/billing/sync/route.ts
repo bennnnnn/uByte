@@ -34,7 +34,7 @@ export const GET = withErrorHandling("GET /api/billing/sync", async () => {
   }
 
   const dbUser = await getUserById(user.userId);
-  const customerId = dbUser?.stripe_customer_id ?? null;
+  const customerId = dbUser?.paddle_customer_id ?? null;
   if (!customerId) {
     return NextResponse.json({ synced: false, reason: "no_customer" });
   }

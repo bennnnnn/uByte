@@ -4,6 +4,7 @@ import { withErrorHandling, requireAuth } from "@/lib/api-utils";
 import { verifyCsrf } from "@/lib/csrf";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 import { MONTHLY_PRICE_ID, YEARLY_PRICE_ID } from "@/lib/plans";
+import { createCheckoutSession } from "@/lib/db/checkout-sessions";
 
 const CheckoutBody = z.object({ plan: z.enum(["monthly", "yearly"]) });
 
@@ -30,5 +31,9 @@ export const POST = withErrorHandling("POST /api/billing/checkout", async (reque
     return NextResponse.json({ error: "Pricing not configured" }, { status: 503 });
   }
 
-  return NextResponse.json({ priceId, clientToken: CLIENT_TOKEN });
+  // Create a server-side nonce tied to this user's ID.
+  // The client passes this nonce as customData.checkoutNonce — never the raw userId.
+  const checkoutNonce = await createCheckoutSession(user.userId, plan);
+
+  return NextResponse.json({ priceId, clientToken: CLIENT_TOKEN, checkoutNonce });
 });

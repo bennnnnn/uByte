@@ -27,6 +27,7 @@ function buildProfile(user: User) {
     is_admin: user.is_admin,
     email_verified: user.email_verified,
     plan: user.plan ?? "free",
+    subscription_expires_at: user.subscription_expires_at ?? null,
   };
 }
 

@@ -5,7 +5,7 @@ import { compileMDX } from "next-mdx-remote/rsc";
 import rehypePrettyCode from "rehype-pretty-code";
 import { getAllBlogPosts, getBlogPost } from "@/lib/blog";
 import { absoluteUrl } from "@/lib/seo";
-import { BASE_URL } from "@/lib/constants";
+import { APP_NAME, BASE_URL } from "@/lib/constants";
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -24,6 +24,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: post.title,
     description: post.description,
+    authors: [{ name: APP_NAME, url: BASE_URL }],
     alternates: { canonical: absoluteUrl(`/blog/${slug}`) },
     openGraph: {
       type: "article",
@@ -31,6 +32,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       description: post.description,
       url: absoluteUrl(`/blog/${slug}`),
       publishedTime: post.date,
+      authors: [BASE_URL],
       tags: post.tags,
       images: [{ url: `${BASE_URL}/api/og?title=${ogTitle}&description=${ogDesc}`, width: 1200, height: 630 }],
     },
@@ -54,6 +56,12 @@ export default async function BlogPostPage({ params }: Props) {
   const post = getBlogPost(slug);
   if (!post) notFound();
 
+  const allPosts = getAllBlogPosts();
+  // Related posts: same category or overlapping tags, excluding current post
+  const related = allPosts
+    .filter((p) => p.slug !== slug && (p.category === post.category || p.tags.some((t) => post.tags.includes(t))))
+    .slice(0, 3);
+
   const { content } = await compileMDX({
     source: post.content,
     options: {
@@ -69,14 +77,25 @@ export default async function BlogPostPage({ params }: Props) {
     headline: post.title,
     description: post.description,
     datePublished: post.date,
-    author: { "@type": "Organization", name: "uByte" },
-    publisher: {
+    dateModified: post.date,
+    author: {
       "@type": "Organization",
       name: "uByte",
       url: BASE_URL,
     },
+    publisher: {
+      "@type": "Organization",
+      name: "uByte",
+      url: BASE_URL,
+      logo: { "@type": "ImageObject", url: `${BASE_URL}/favicon.ico` },
+    },
+    mainEntityOfPage: {
+      "@type": "WebPage",
+      "@id": absoluteUrl(`/blog/${slug}`),
+    },
     url: absoluteUrl(`/blog/${slug}`),
     keywords: post.tags.join(", "),
+    articleSection: post.category,
   };
 
   return (
@@ -134,8 +153,50 @@ export default async function BlogPostPage({ params }: Props) {
           {content}
         </article>
 
-        {/* CTA */}
-        <div className="mt-16 rounded-2xl border border-indigo-100 bg-indigo-50/60 p-7 dark:border-indigo-900/40 dark:bg-indigo-950/30">
+        {/* Related posts */}
+        {related.length > 0 && (
+          <div className="mt-12">
+            <h2 className="mb-4 text-lg font-bold text-zinc-900 dark:text-zinc-100">
+              Related articles
+            </h2>
+            <div className="grid gap-4 sm:grid-cols-3">
+              {related.map((rp) => (
+                <Link
+                  key={rp.slug}
+                  href={`/blog/${rp.slug}`}
+                  className="group rounded-xl border border-zinc-200 bg-white p-4 transition-shadow hover:shadow-md dark:border-zinc-800 dark:bg-zinc-900"
+                >
+                  <span className="mb-1 block text-xs font-semibold uppercase tracking-wider text-indigo-500 dark:text-indigo-400">
+                    {rp.category}
+                  </span>
+                  <p className="text-sm font-semibold leading-snug text-zinc-800 group-hover:text-indigo-600 dark:text-zinc-200 dark:group-hover:text-indigo-400">
+                    {rp.title}
+                  </p>
+                  <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">{rp.readTime}</p>
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Newsletter / subscribe CTA */}
+        <div className="mt-10 rounded-2xl border border-zinc-200 bg-zinc-50 p-6 dark:border-zinc-800 dark:bg-zinc-900/60">
+          <h2 className="mb-1 text-base font-bold text-zinc-900 dark:text-zinc-100">
+            Get new articles in your inbox
+          </h2>
+          <p className="mb-4 text-sm text-zinc-600 dark:text-zinc-400">
+            We write about Go, Python, interview prep, and software engineering careers. No spam — unsubscribe anytime.
+          </p>
+          <Link
+            href="/signup"
+            className="inline-block rounded-lg bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-indigo-500"
+          >
+            Create a free account →
+          </Link>
+        </div>
+
+        {/* Practice CTA */}
+        <div className="mt-6 rounded-2xl border border-indigo-100 bg-indigo-50/60 p-7 dark:border-indigo-900/40 dark:bg-indigo-950/30">
           <h2 className="mb-1 text-lg font-bold text-zinc-900 dark:text-zinc-100">
             Practice what you just read
           </h2>

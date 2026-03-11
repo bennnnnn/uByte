@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS users (
   locked_until TEXT,
   token_version INTEGER DEFAULT 0,
   plan TEXT DEFAULT 'free',
-  stripe_customer_id TEXT
+  paddle_customer_id TEXT
 );
 
 CREATE TABLE IF NOT EXISTS progress (

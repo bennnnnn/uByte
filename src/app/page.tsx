@@ -22,10 +22,12 @@ import {
   ValuePropBanner,
   PopularTutorialsSection,
   PopularInterviewPrepSection,
+  TestimonialsStrip,
 } from "@/components/home";
 import ContinueBanner from "@/components/ContinueBanner";
 import LeftOffBanner from "@/components/LeftOffBanner";
 import GoogleOAuthError from "@/components/GoogleOAuthError";
+import ReferralPromptBanner from "@/components/ReferralPromptBanner";
 
 export const metadata: Metadata = {
   title: "uByte — Learn, Practice, and Get Certified in 7 Languages",
@@ -151,6 +153,9 @@ export default async function Home() {
         certificationCount={certificationCount}
       />
 
+      {/* ── Referral prompt banner — client-rendered, dismissable ─────── */}
+      <ReferralPromptBanner />
+
       {/* ── 2-N. Sections — constrained ─────────────────────────────── */}
       <div className="mx-auto max-w-6xl space-y-16 px-4 py-16 sm:px-6 lg:px-8 lg:py-20">
 
@@ -165,6 +170,9 @@ export default async function Home() {
 
         {/* Why upgrade — value proposition banner (hidden for Pro users) */}
         <ValuePropBanner isPro={isPro} />
+
+        {/* Social proof — developer testimonials */}
+        <TestimonialsStrip />
 
         {/* Languages */}
         <section aria-labelledby="languages-heading">

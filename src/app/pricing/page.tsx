@@ -38,7 +38,7 @@ const PRO_FEATURES = [
 const COMPARISON_FEATURES: { name: string; free: string; pro: string }[] = [
   { name: "Tutorials", free: `${FREE_TUTORIAL_LIMIT} per language`, pro: "Unlimited" },
   { name: "Interview prep problems", free: `${MAX_FREE_PROBLEMS} total (2/day)`, pro: "Unlimited" },
-  { name: "Languages", free: "6", pro: "6" },
+  { name: "Languages", free: "7", pro: "7" },
   { name: "Code editor", free: "✓", pro: "✓" },
   { name: "Progress tracking", free: "✓", pro: "✓" },
   { name: "AI code feedback", free: "—", pro: "✓" },
@@ -145,13 +145,34 @@ function PricingContent() {
     return () => { document.head.removeChild(script); };
   }, []);
 
-  function openCheckout(priceId: string) {
+  async function openCheckout(priceId: string) {
     if (!window.Paddle || !priceId) return;
     const origin = typeof window !== "undefined" ? window.location.origin : "";
+
+    // Fetch a server-generated nonce (tied to authenticated userId server-side).
+    // This prevents a malicious actor from spoofing another user's ID in customData.
+    let checkoutNonce: string | undefined;
+    if (user) {
+      try {
+        const billing = profile?.plan === "yearly" ? "yearly" : "monthly";
+        const res = await fetch("/api/billing/checkout", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ plan: billing }),
+        });
+        if (res.ok) {
+          const data = await res.json() as { checkoutNonce?: string };
+          checkoutNonce = data.checkoutNonce;
+        }
+      } catch {
+        // Non-fatal: webhook will fall back to email lookup if nonce is missing
+      }
+    }
+
     const checkoutParams: Parameters<typeof window.Paddle.Checkout.open>[0] = {
       items:      [{ priceId, quantity: 1 }],
-      customData: user ? { userId: String(user.id) } : undefined,
-      customer:   user ? { email: user.email }       : undefined,
+      customData: checkoutNonce ? { checkoutNonce } : undefined,
+      customer:   user ? { email: user.email } : undefined,
       settings: {
         successUrl:  `${origin}/pricing?success=1`,
         displayMode: "overlay",

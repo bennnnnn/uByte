@@ -206,11 +206,7 @@ export async function getUserPlan(userId: number): Promise<string> {
   return (row?.plan as string) ?? "free";
 }
 
-/**
- * Update user plan. The DB column `stripe_customer_id` is a legacy name —
- * it actually stores the Paddle customer ID. A future migration will rename
- * the column to `paddle_customer_id`.
- */
+/** Update user plan and optionally save the Paddle customer ID. */
 export async function updateUserPlan(
   userId: number,
   plan: string,
@@ -218,7 +214,7 @@ export async function updateUserPlan(
 ): Promise<void> {
   const sql = getSql();
   if (paddleCustomerId) {
-    await sql`UPDATE users SET plan = ${plan}, stripe_customer_id = ${paddleCustomerId} WHERE id = ${userId}`;
+    await sql`UPDATE users SET plan = ${plan}, paddle_customer_id = ${paddleCustomerId} WHERE id = ${userId}`;
   } else {
     await sql`UPDATE users SET plan = ${plan} WHERE id = ${userId}`;
   }
@@ -228,6 +224,16 @@ export async function updateUserPlan(
 async function ensureSubscriptionExpiresAtColumn(): Promise<void> {
   const sql = getSql();
   await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS subscription_expires_at TEXT`;
+}
+
+/**
+ * Stores the trial end date (current_billing_period.ends_at from Paddle) so the
+ * UI can show a countdown. Does NOT change the plan column.
+ */
+export async function setTrialExpiry(userId: number, expiresAt: string): Promise<void> {
+  const sql = getSql();
+  await ensureSubscriptionExpiresAtColumn();
+  await sql`UPDATE users SET subscription_expires_at = ${expiresAt} WHERE id = ${userId}`;
 }
 
 /**
@@ -268,13 +274,13 @@ export async function downgradeExpiredCancelingUsers(): Promise<number> {
 /** Save a Paddle customer ID to an existing user record (without changing their plan). */
 export async function savePaddleCustomerId(userId: number, paddleCustomerId: string): Promise<void> {
   const sql = getSql();
-  await sql`UPDATE users SET stripe_customer_id = ${paddleCustomerId} WHERE id = ${userId} AND stripe_customer_id IS NULL`;
+  await sql`UPDATE users SET paddle_customer_id = ${paddleCustomerId} WHERE id = ${userId} AND paddle_customer_id IS NULL`;
 }
 
-/** Look up user by Paddle customer ID (stored in legacy `stripe_customer_id` column). */
+/** Look up user by Paddle customer ID. */
 export async function getUserByPaddleCustomerId(paddleCustomerId: string): Promise<User | undefined> {
   const sql = getSql();
-  const [row] = await sql`SELECT * FROM users WHERE stripe_customer_id = ${paddleCustomerId}`;
+  const [row] = await sql`SELECT * FROM users WHERE paddle_customer_id = ${paddleCustomerId}`;
   return row as User | undefined;
 }
 

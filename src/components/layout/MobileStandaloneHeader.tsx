@@ -16,7 +16,7 @@ function isStandalonePath(pathname: string): boolean {
 }
 
 const LANG_ICONS: Record<string, string> = {
-  go: "🐹", python: "🐍", javascript: "🟨", java: "☕", rust: "🦀", cpp: "⚙️",
+  go: "🐹", python: "🐍", javascript: "🟨", java: "☕", rust: "🦀", cpp: "⚙️", csharp: "💜",
 };
 
 function AccordionSection({
@@ -136,6 +136,22 @@ export default function MobileStandaloneHeader() {
             >
               <span className="text-base">🎯</span>
               All problems
+            </Link>
+            <Link
+              href="/interview"
+              onClick={close}
+              className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium text-indigo-600 transition-colors hover:bg-indigo-50 dark:text-indigo-400 dark:hover:bg-indigo-950/40"
+            >
+              <span className="text-base">🎤</span>
+              Interview Simulator
+            </Link>
+            <Link
+              href="/daily"
+              onClick={close}
+              className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium text-indigo-600 transition-colors hover:bg-indigo-50 dark:text-indigo-400 dark:hover:bg-indigo-950/40"
+            >
+              <span className="text-base">⚡</span>
+              Daily Challenge
             </Link>
             {languageSlugs.map((slug) => {
               const config = LANGUAGES[slug as keyof typeof LANGUAGES];

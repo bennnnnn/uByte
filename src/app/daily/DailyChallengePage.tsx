@@ -5,7 +5,23 @@ import Link from "next/link";
 import { apiFetch } from "@/lib/api-client";
 import { useAuth } from "@/components/AuthProvider";
 import Avatar from "@/components/Avatar";
+import { getAllLanguageSlugs, LANGUAGES } from "@/lib/languages/registry";
 import type { LeaderboardEntry } from "@/lib/db/types";
+
+const LANG_ICONS: Record<string, string> = {
+  go: "🐹", python: "🐍", javascript: "🟨", java: "☕", rust: "🦀", cpp: "⚙️", csharp: "💜",
+};
+
+function getPreferredLanguage(): string {
+  if (typeof window === "undefined") return "go";
+  return localStorage.getItem("preferred_lang") ?? "go";
+}
+
+function savePreferredLanguage(lang: string): void {
+  if (typeof window !== "undefined") {
+    localStorage.setItem("preferred_lang", lang);
+  }
+}
 
 interface DailyData {
   slug: string;
@@ -28,6 +44,14 @@ export default function DailyChallengePage() {
   const [daily, setDaily] = useState<DailyData | null>(null);
   const [leaders, setLeaders] = useState<LeaderboardEntry[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedLang, setSelectedLang] = useState("go");
+
+  const languageSlugs = getAllLanguageSlugs();
+
+  // Initialise preferred language from localStorage (client-only)
+  useEffect(() => {
+    setSelectedLang(getPreferredLanguage());
+  }, []);
 
   useEffect(() => {
     Promise.all([
@@ -38,6 +62,11 @@ export default function DailyChallengePage() {
       setLeaders(Array.isArray(l) ? l.slice(0, 10) : []);
     }).catch(() => {}).finally(() => setLoading(false));
   }, []);
+
+  function handleLangChange(lang: string) {
+    setSelectedLang(lang);
+    savePreferredLanguage(lang);
+  }
 
   const todayFormatted = daily?.date
     ? new Date(daily.date + "T00:00:00Z").toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", timeZone: "UTC" })
@@ -100,9 +129,33 @@ export default function DailyChallengePage() {
             )}
           </div>
 
-          <div className="mt-5 flex gap-3">
+          {/* Language selector */}
+          <div className="mt-4 flex flex-wrap gap-1.5">
+            {languageSlugs.map((slug) => {
+              const config = LANGUAGES[slug as keyof typeof LANGUAGES];
+              if (!config) return null;
+              return (
+                <button
+                  key={slug}
+                  type="button"
+                  onClick={() => handleLangChange(slug)}
+                  title={config.name}
+                  className={`flex items-center gap-1 rounded-lg border px-2.5 py-1 text-xs font-medium transition-all ${
+                    selectedLang === slug
+                      ? "border-indigo-500 bg-indigo-50 text-indigo-700 dark:border-indigo-400 dark:bg-indigo-950/30 dark:text-indigo-300"
+                      : "border-zinc-200 bg-white text-zinc-600 hover:border-zinc-400 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-400"
+                  }`}
+                >
+                  <span>{LANG_ICONS[slug] ?? ""}</span>
+                  <span className="hidden sm:inline">{config.name}</span>
+                </button>
+              );
+            })}
+          </div>
+
+          <div className="mt-4 flex gap-3">
             <Link
-              href={`/practice/go/${daily.slug}${daily.userSolvedToday ? "" : "?daily=1"}`}
+              href={`/practice/${selectedLang}/${daily.slug}${daily.userSolvedToday ? "" : "?daily=1"}`}
               className="flex-1 rounded-xl bg-indigo-600 px-5 py-3 text-center text-sm font-bold text-white transition-colors hover:bg-indigo-500"
             >
               {daily.userSolvedToday ? "Solve again →" : "Solve challenge →"}

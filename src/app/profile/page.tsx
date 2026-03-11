@@ -372,7 +372,7 @@ function ProfilePage() {
                   <p className="mt-1 text-sm text-emerald-700 dark:text-emerald-300">Your plan is active. Check your email for the receipt.</p>
                 </div>
               )}
-              <PlanTab plan={profile.plan} />
+              <PlanTab plan={profile.plan} expiresAtProp={profile.subscription_expires_at} />
             </>
           )}
           {tab === "certifications" && <CertificationsTab />}

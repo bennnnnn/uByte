@@ -92,15 +92,16 @@ function ManageOrCancelButtons({
   );
 }
 
-export default function PlanTab({ plan }: Props) {
+export default function PlanTab({ plan, expiresAtProp }: Props & { expiresAtProp?: string | null }) {
   const { user, refreshProfile } = useAuth();
   const searchParams = useSearchParams();
   const [currentPlan, setCurrentPlan] = useState(plan);
-  const [expiresAt, setExpiresAt] = useState<string | null>(null);
+  const [expiresAt, setExpiresAt] = useState<string | null>(expiresAtProp ?? null);
   const isPaid = hasPaidAccess(currentPlan);
   const isYearly = currentPlan === "yearly";
   const isMonthly = currentPlan === "pro";
   const isCanceling = currentPlan === "canceling";
+  const isTrial = currentPlan === "trial" || currentPlan === "trial_yearly";
   const paddleReady = useRef(false);
   const [coupon, setCoupon] = useState("");
 
@@ -144,18 +145,24 @@ export default function PlanTab({ plan }: Props) {
     ? BILLING_CONFIG.yearly.label
     : isMonthly
       ? BILLING_CONFIG.monthly.label
-      : isCanceling
-        ? "Pro (Cancelling)"
-        : "Free";
+      : isTrial
+        ? `Free Trial (${currentPlan === "trial_yearly" ? "Yearly" : "Monthly"})`
+        : isCanceling
+          ? "Pro (Cancelling)"
+          : "Free";
   const planPrice = isYearly
     ? BILLING_CONFIG.yearly.priceText
     : isMonthly
       ? BILLING_CONFIG.monthly.priceText
-      : isCanceling
+      : isTrial
         ? expiryDisplay
-          ? `Active until ${expiryDisplay}`
-          : "Access continues until your billing period ends"
-        : "Free forever";
+          ? `Trial ends ${expiryDisplay}`
+          : "7-day free trial — full Pro access"
+        : isCanceling
+          ? expiryDisplay
+            ? `Active until ${expiryDisplay}`
+            : "Access continues until your billing period ends"
+          : "Free forever";
 
   useEffect(() => {
     if (paddleReady.current) return;
@@ -220,10 +227,14 @@ export default function PlanTab({ plan }: Props) {
                 {isPaid && (
                   <span
                     className={`rounded-full px-2.5 py-0.5 text-xs font-semibold text-white ${
-                      isCanceling ? "bg-amber-500" : "bg-emerald-500"
+                      isTrial
+                        ? "bg-violet-500"
+                        : isCanceling
+                          ? "bg-amber-500"
+                          : "bg-emerald-500"
                     }`}
                   >
-                    {isCanceling ? "Cancelling" : "Active"}
+                    {isTrial ? "Trial" : isCanceling ? "Cancelling" : "Active"}
                   </span>
                 )}
               </div>
@@ -337,6 +348,62 @@ export default function PlanTab({ plan }: Props) {
           </div>
         </div>
         </div>
+      ) : isTrial ? (
+        /* Trial CTA — prompt to subscribe before trial ends */
+        <div className="space-y-3">
+          <div className="flex items-start gap-3 rounded-xl border border-violet-200 bg-violet-50 px-4 py-3 dark:border-violet-900/50 dark:bg-violet-950/30">
+            <span className="mt-0.5 text-lg">✨</span>
+            <div>
+              <p className="text-sm font-semibold text-violet-800 dark:text-violet-200">
+                Free trial active
+              </p>
+              <p className="mt-0.5 text-sm text-violet-700 dark:text-violet-300">
+                {expiryDisplay
+                  ? `Your trial ends on ${expiryDisplay}. Subscribe before then to keep full Pro access without interruption.`
+                  : "You have full Pro access during your 7-day trial. Subscribe to keep access when it ends."}
+              </p>
+            </div>
+          </div>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Card className="p-5">
+              <p className="text-lg font-bold text-zinc-900 dark:text-zinc-100">
+                {BILLING_CONFIG.monthly.priceText.replace("/month", "")}
+              </p>
+              <p className="mb-4 text-xs text-zinc-500 dark:text-zinc-400">
+                {BILLING_CONFIG.monthly.subLabel}
+              </p>
+              <Button
+                type="button"
+                onClick={() => openCheckout("monthly")}
+                size="lg"
+                className="w-full"
+              >
+                Subscribe Monthly
+              </Button>
+            </Card>
+            <div className="rounded-2xl border-2 border-emerald-200 bg-emerald-50/30 p-5 dark:border-emerald-900/50 dark:bg-emerald-950/20">
+              <div className="mb-1 flex items-center gap-2">
+                <p className="text-lg font-bold text-zinc-900 dark:text-zinc-100">
+                  {BILLING_CONFIG.yearly.priceText.replace("/year", "")}
+                </p>
+                <span className="rounded-full bg-emerald-500 px-2 py-0.5 text-[10px] font-bold text-white">
+                  {BILLING_CONFIG.yearly.subLabel}
+                </span>
+              </div>
+              <p className="mb-4 text-xs text-zinc-500 dark:text-zinc-400">
+                Yearly · best value
+              </p>
+              <Button
+                type="button"
+                onClick={() => openCheckout("yearly")}
+                size="lg"
+                className="w-full"
+              >
+                Subscribe Yearly
+              </Button>
+            </div>
+          </div>
+        </div>
       ) : (
         <div className="space-y-4">
           {isCanceling && (
@@ -357,7 +424,7 @@ export default function PlanTab({ plan }: Props) {
           )}
           <Card className="px-6 py-5">
             <p className="font-medium text-zinc-700 dark:text-zinc-300">
-              {isCanceling ? "Billing" : "You’re all set"}
+              {isCanceling ? "Billing" : "You\u2019re all set"}
             </p>
             <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
               {isCanceling

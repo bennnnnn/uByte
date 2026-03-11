@@ -28,6 +28,7 @@ export * from "./submissions";
 export * from "./onboarding-drip";
 export * from "./referrals";
 export * from "./push-subscriptions";
+export * from "./weekly-digest";
 export * from "./exam-questions";
 export * from "./exam-attempts";
 export * from "./exam-certificates";

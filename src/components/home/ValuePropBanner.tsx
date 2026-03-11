@@ -39,7 +39,7 @@ export default function ValuePropBanner({ isPro = false }: ValuePropBannerProps)
           Everything you need to go from learner to hire-ready.
         </h2>
         <p className="mt-2 text-sm font-medium text-indigo-200 sm:text-base">
-          One subscription. Three powerful tools. All 6 languages.
+          One subscription. Three powerful tools. All 7 languages.
         </p>
       </div>
 

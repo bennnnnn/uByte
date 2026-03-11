@@ -4,11 +4,61 @@ import { useState, useRef, useMemo, useEffect } from "react";
 import { getHighlighter } from "@/lib/languages/registry";
 import type { SupportedLanguage } from "@/lib/languages/types";
 
-export function parseErrorLines(errorText: string): Set<number> {
+export function parseErrorLines(errorText: string, lang = "go"): Set<number> {
   const lines = new Set<number>();
-  const re = /\.go:(\d+):\d+:/g;
-  let m;
-  while ((m = re.exec(errorText)) !== null) lines.add(parseInt(m[1], 10));
+
+  const patterns: RegExp[] = [];
+
+  switch (lang) {
+    case "go":
+      // ./main.go:12:5: undefined ...  OR  .go:12:5:
+      patterns.push(/\.go:(\d+):\d+:/g);
+      break;
+    case "python":
+      // File "script.py", line 12
+      patterns.push(/File "[^"]*",\s*line\s+(\d+)/g);
+      // also plain "line N," from tracebacks
+      patterns.push(/\bline\s+(\d+)[,\s]/g);
+      break;
+    case "javascript":
+      // script.js:12:5  OR  :12:5
+      patterns.push(/(?:script\.js|\.js):(\d+):\d+/g);
+      patterns.push(/:(\d+):\d+\b/g);
+      break;
+    case "java":
+      // Main.java:12: error
+      patterns.push(/\.java:(\d+):/g);
+      // javac: error on line 12
+      patterns.push(/line\s+(\d+)/g);
+      break;
+    case "csharp":
+      // Main.cs(12,5): error
+      patterns.push(/\.cs\((\d+),\d+\):/g);
+      // fallback: :12:5:
+      patterns.push(/:(\d+):\d+:/g);
+      break;
+    case "cpp":
+      // main.cpp:12:5: error
+      patterns.push(/\.cpp:(\d+):\d+:/g);
+      patterns.push(/\.cc:(\d+):\d+:/g);
+      patterns.push(/\.h:(\d+):\d+:/g);
+      break;
+    case "rust":
+      // --> src/main.rs:12:5
+      patterns.push(/-->\s*[^:]+:(\d+):\d+/g);
+      break;
+    default:
+      // Generic fallback: :NNN: pattern
+      patterns.push(/:(\d+):/g);
+  }
+
+  for (const re of patterns) {
+    let m;
+    while ((m = re.exec(errorText)) !== null) {
+      const n = parseInt(m[1], 10);
+      if (n > 0) lines.add(n);
+    }
+  }
   return lines;
 }
 
