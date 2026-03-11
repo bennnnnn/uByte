@@ -12,8 +12,9 @@ import { callAiFeedback } from "@/lib/ai/feedback-client";
 import { withErrorHandling } from "@/lib/api-utils";
 import { verifyCsrf } from "@/lib/csrf";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
+import { HINTS_MODEL } from "@/lib/ai/gateway-client";
 
-const MODEL_NAME = "grok-4";
+const MODEL_NAME = HINTS_MODEL;
 
 /** POST /api/ai-feedback — submission_id, hint_level (1-4). Returns cached or heuristic or AI JSON. */
 export const POST = withErrorHandling("POST /api/ai-feedback", async (request: NextRequest) => {

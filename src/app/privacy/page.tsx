@@ -81,7 +81,7 @@ export default function PrivacyPage() {
           <li><strong>Resend</strong> (resend.com) — transactional email delivery.</li>
           <li><strong>Judge0</strong> — code execution for Python, JavaScript, Java, C++, and Rust. Code is sent to Judge0 servers for compilation and is not permanently stored by them.</li>
           <li><strong>Go Playground</strong> (go.dev) — code execution and formatting for Go. Subject to Google&apos;s <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer" className="text-indigo-600 hover:underline">Privacy Policy</a>.</li>
-          <li><strong>xAI / Grok API</strong> — AI code feedback for Pro users. Code context is sent to generate feedback and is subject to xAI&apos;s data processing terms.</li>
+          <li><strong>Vercel AI Gateway</strong> — AI code hints and feedback for Pro users. Code context is routed through Vercel&apos;s AI Gateway (ai.vercel.dev) and is subject to <a href="https://vercel.com/legal/privacy-policy" target="_blank" rel="noopener noreferrer" className="text-indigo-600 hover:underline">Vercel&apos;s Privacy Policy</a>.</li>
           <li><strong>Sentry</strong> (sentry.io) — error monitoring. May capture stack traces and request metadata (never passwords or payment data).</li>
           <li><strong>Google OAuth</strong> — sign-in with Google. Subject to Google&apos;s Privacy Policy.</li>
         </ul>

@@ -1,7 +1,6 @@
 /**
  * AI feedback client — tutorial hints and inline step feedback.
  * Routes through Vercel AI Gateway → google/gemini-2.5-flash-lite (0.3s, $0.10/M).
- * Falls back to Grok via XAI_API_KEY if VERCEL_AI_GATEWAY_TOKEN is absent.
  */
 
 import { callGateway, HINTS_MODEL } from "./gateway-client";
@@ -33,8 +32,7 @@ export async function callAiFeedback(
   verdict: string,
   userName?: string,
 ): Promise<AiFeedbackSchema> {
-  const hasCredentials = process.env.VERCEL_AI_GATEWAY_TOKEN ?? process.env.VERCEL_TOKEN ?? process.env.XAI_API_KEY;
-  if (!hasCredentials) {
+  if (!process.env.VERCEL_AI_GATEWAY_TOKEN && !process.env.VERCEL_TOKEN) {
     const greeting = userName ? `Hey ${userName}!` : "Hey!";
     return {
       friendly_one_liner: `${greeting} AI feedback is not configured — set VERCEL_AI_GATEWAY_TOKEN in Vercel project settings.`,

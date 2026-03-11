@@ -7,7 +7,7 @@ import { verifyCsrf } from "@/lib/csrf";
 import { getSteps } from "@/lib/tutorial-steps";
 import { getCachedFeedback, setCachedFeedback } from "@/lib/db/ai-feedback-cache";
 import { resolveLanguage } from "@/lib/languages/registry";
-import { callGrokApi } from "@/lib/ai/grok-client";
+import { callGateway, HINTS_MODEL } from "@/lib/ai/gateway-client";
 
 function normalizeCodeForCache(code: string): string {
   return String(code)
@@ -95,7 +95,8 @@ ${isWrongOutput
 No prefix like "Feedback:" — just the sentence.`;
 
   try {
-    const feedback = await callGrokApi({
+    const feedback = await callGateway({
+      model: HINTS_MODEL,
       messages: [{ role: "user", content: prompt }],
       maxTokens: 80,
       temperature: 0.3,

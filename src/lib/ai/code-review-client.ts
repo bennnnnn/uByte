@@ -5,7 +5,6 @@
  *
  * Routes through Vercel AI Gateway → openai/gpt-5.1-codex-mini (1.1s, $0.25/$2.00/M).
  * Code-specialized model gives better complexity analysis and style feedback.
- * Falls back to Grok via XAI_API_KEY if VERCEL_AI_GATEWAY_TOKEN is absent.
  */
 import { callGateway, CODE_REVIEW_MODEL } from "./gateway-client";
 
@@ -35,8 +34,7 @@ export async function callCodeReview(
   verdict?: string,
   userName?: string,
 ): Promise<CodeReviewSchema> {
-  const hasCredentials = process.env.VERCEL_AI_GATEWAY_TOKEN ?? process.env.VERCEL_TOKEN ?? process.env.XAI_API_KEY;
-  if (!hasCredentials) {
+  if (!process.env.VERCEL_AI_GATEWAY_TOKEN && !process.env.VERCEL_TOKEN) {
     return {
       summary: "AI code review is not configured. Set VERCEL_AI_GATEWAY_TOKEN in Vercel project settings.",
       time_complexity: "Unknown",
