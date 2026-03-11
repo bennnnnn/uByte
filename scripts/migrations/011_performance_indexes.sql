@@ -5,9 +5,9 @@
 CREATE INDEX IF NOT EXISTS idx_rate_limits_key_hit
   ON rate_limits(key, hit_at);
 
--- progress: queried by user_id + lang for tutorial completion checks
-CREATE INDEX IF NOT EXISTS idx_progress_user_lang
-  ON progress(user_id, lang);
+-- progress: queried by user_id for tutorial completion checks
+CREATE INDEX IF NOT EXISTS idx_progress_user_id
+  ON progress(user_id);
 
 -- submissions: queried by user_id + problem_id for consecutive failures
 CREATE INDEX IF NOT EXISTS idx_submissions_user_problem
@@ -24,11 +24,6 @@ CREATE INDEX IF NOT EXISTS idx_notifications_user
 -- tutorial_messages: queried by tutorial_slug ordered by created_at
 CREATE INDEX IF NOT EXISTS idx_tutorial_messages_slug_created
   ON tutorial_messages(tutorial_slug, created_at DESC);
-
--- users: queried by paddle_customer_id in webhooks
-CREATE INDEX IF NOT EXISTS idx_users_paddle_customer
-  ON users(paddle_customer_id)
-  WHERE paddle_customer_id IS NOT NULL;
 
 -- users: leaderboard sorts by xp DESC
 CREATE INDEX IF NOT EXISTS idx_users_xp_desc

@@ -16,3 +16,8 @@ BEGIN
   END IF;
 END;
 $$;
+
+-- Index on paddle_customer_id for fast webhook lookups (created here, after the rename)
+CREATE INDEX IF NOT EXISTS idx_users_paddle_customer
+  ON users(paddle_customer_id)
+  WHERE paddle_customer_id IS NOT NULL;
