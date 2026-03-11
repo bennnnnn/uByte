@@ -19,6 +19,19 @@ export function b64(s: string): string {
   return Buffer.from(s).toString("base64");
 }
 
+/**
+ * Prepend `from __future__ import annotations` to Python code so that
+ * PEP-563 postponed evaluation is active. This lets modern type-hint
+ * syntax (`list[int]`, `dict[str, int]`, etc.) run on Judge0's Python 3.8
+ * runtime without a TypeError.  No-op for every other language.
+ */
+export function prepareCodeForJudge(code: string, lang: string): string {
+  if (lang !== "python") return code;
+  const FUTURE = "from __future__ import annotations";
+  if (code.includes(FUTURE)) return code;
+  return `${FUTURE}\n${code}`;
+}
+
 export function fromb64(s: string | null | undefined): string {
   if (!s) return "";
   return Buffer.from(s, "base64").toString("utf-8");

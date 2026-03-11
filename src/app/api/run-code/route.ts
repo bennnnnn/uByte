@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 import { withErrorHandling } from "@/lib/api-utils";
 import { isSupportedLanguage } from "@/lib/languages/registry";
-import { JUDGE0_URL, JUDGE0_LANG_IDS, b64, normaliseJudge0RunOutput } from "@/lib/judge0";
+import { JUDGE0_URL, JUDGE0_LANG_IDS, b64, normaliseJudge0RunOutput, prepareCodeForJudge } from "@/lib/judge0";
 
 const MAX_CODE_LENGTH = 64 * 1024; // 64 KB
 const TIMEOUT_MS = 20_000;
@@ -61,7 +61,7 @@ export const POST = withErrorHandling("POST /api/run-code", async (request: Next
         method:  "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          source_code:     b64(code),
+          source_code:     b64(prepareCodeForJudge(code, lang)),
           language_id:     langId,
           stdin:           b64(""),
           cpu_time_limit:  10,    // seconds

@@ -1,5 +1,5 @@
 import { getPracticeProblemBySlug } from "@/lib/practice/problems";
-import { JUDGE0_URL, JUDGE0_LANG_IDS, b64, fromb64, maybeDecodeJudge0Message } from "@/lib/judge0";
+import { JUDGE0_URL, JUDGE0_LANG_IDS, b64, fromb64, maybeDecodeJudge0Message, prepareCodeForJudge } from "@/lib/judge0";
 
 function normalizeLine(s: string): string {
   return s
@@ -145,7 +145,7 @@ export async function runJudge(
     lang === "cpp" ? extractCppSolution(code) :
     lang === "java" ? extractJavaSolution(code) :
     extractRustSolution(code);
-  const judgeCode = harness.replace("{{SOLUTION}}", solution);
+  const judgeCode = prepareCodeForJudge(harness.replace("{{SOLUTION}}", solution), lang);
 
   const stdin = problem.testCases.map((tc) => tc.stdin).join("\n");
   const expectedLines = problem.testCases.map((tc) => tc.expectedOutput);
