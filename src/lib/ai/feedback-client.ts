@@ -45,7 +45,22 @@ export async function callAiFeedback(
       confidence: 0,
     };
   }
-  return callFeedbackGateway(evidenceBundle, hintLevel, verdict, userName);
+
+  try {
+    return await callFeedbackGateway(evidenceBundle, hintLevel, verdict, userName);
+  } catch {
+    // AI provider error (rate limit, outage, invalid key) — return a graceful fallback
+    // so the hint section always shows something rather than silently failing.
+    const greeting = userName ? `${userName}, ` : "";
+    return {
+      friendly_one_liner: `${greeting}AI hint is temporarily unavailable. Check the output above for clues.`,
+      root_cause: "ai_unavailable",
+      evidence: [],
+      hint: "Compare your actual output with the expected output shown below the editor. Look for spacing, capitalisation, or extra characters.",
+      next_step: "Fix the difference and click Check again.",
+      confidence: 0,
+    };
+  }
 }
 
 async function callFeedbackGateway(

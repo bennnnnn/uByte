@@ -286,10 +286,34 @@ export function useStepProgress(
           setAiFeedbackUpgrade(true);
         } else if (d?.friendly_one_liner) {
           setAiFeedback(d as AiFeedbackSchema);
+        } else {
+          // API returned an unexpected error shape — show a generic fallback
+          // so the hint section never silently disappears.
+          setAiFeedback({
+            friendly_one_liner: "Hint is temporarily unavailable. Check the output above.",
+            root_cause: "ai_unavailable",
+            evidence: [],
+            hint: "Compare your output with the expected output. Look for spacing, capitalisation, or missing characters.",
+            next_step: "Fix the difference and click Check again.",
+            confidence: 0,
+          });
         }
       })
-      .catch(() => {})
-      .finally(() => setAiFeedbackLoading(false));
+      .catch(() => {
+        // Network or parse error — show a fallback so the user isn't left with nothing.
+        setAiFeedback({
+          friendly_one_liner: "Could not reach the hint service. Check your connection and try again.",
+          root_cause: "network_error",
+          evidence: [],
+          hint: "Review the expected output shown below the editor.",
+          next_step: "Fix the difference and click Check again.",
+          confidence: 0,
+        });
+      })
+      .finally(() => {
+        setAiFeedbackLoading(false);
+        hintInflightRef.current = false;
+      });
   }
 
   /** Manual "Get hint" — can also be triggered automatically after 2 failures. */
