@@ -2,26 +2,18 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { getPublicProfile, getCertificatesByUser } from "@/lib/db";
 import { getUserExamStats } from "@/lib/db/exam-attempts";
-import { getTotalLessonCount, getSteps } from "@/lib/tutorial-steps";
-import { getAllProgressByUser } from "@/lib/db/progress";
+import { getTotalLessonCount } from "@/lib/tutorial-steps";
+import { getCompletedStepCountByLanguage } from "@/lib/db/step-progress";
 import Avatar from "@/components/Avatar";
 import { Card } from "@/components/ui";
 import ShareProfileButton from "./ShareProfileButton";
 import { LANGUAGES } from "@/lib/languages/registry";
+import { LANG_ICONS } from "@/lib/languages/icons";
 import type { SupportedLanguage } from "@/lib/languages/types";
 import type { Metadata } from "next";
 
 import { BASE_URL } from "@/lib/constants";
 import { absoluteUrl, buildBreadcrumbJsonLd } from "@/lib/seo";
-
-const LANG_META: Record<string, { icon: string; name: string }> = {
-  go:         { icon: "🐹", name: "Go" },
-  python:     { icon: "🐍", name: "Python" },
-  javascript: { icon: "🟨", name: "JavaScript" },
-  java:       { icon: "☕", name: "Java" },
-  rust:       { icon: "🦀", name: "Rust" },
-  cpp:        { icon: "⚙️", name: "C++" },
-};
 
 export async function generateMetadata({ params }: { params: Promise<{ userId: string }> }): Promise<Metadata> {
   const { userId } = await params;
@@ -55,15 +47,16 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
   if (!profile) notFound();
 
   const allLangs = Object.keys(LANGUAGES) as SupportedLanguage[];
-  const progressByLang = await getAllProgressByUser(id);
+
+  // Use step_progress counts (individual steps) not the progress table (chapter completions).
+  // This matches the profile tab and tutorial cards — partial chapters count too.
+  const stepCountMap = await getCompletedStepCountByLanguage(id);
 
   let totalLessons = 0;
   let completedLessons = 0;
   for (const lang of allLangs) {
     totalLessons += getTotalLessonCount(lang);
-    for (const slug of progressByLang.get(lang) ?? []) {
-      completedLessons += getSteps(lang, slug).length;
-    }
+    completedLessons += stepCountMap.get(lang) ?? 0;
   }
 
   const pct = totalLessons > 0 ? Math.round((completedLessons / totalLessons) * 100) : 0;
@@ -152,7 +145,7 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
         {certificates.length > 0 ? (
           <div className="grid gap-3 sm:grid-cols-2">
             {certificates.map((cert) => {
-              const meta = LANG_META[cert.lang] ?? { icon: "📄", name: cert.lang };
+              const meta = { icon: LANG_ICONS[cert.lang as SupportedLanguage] ?? "📄", name: LANGUAGES[cert.lang as SupportedLanguage]?.name ?? cert.lang };
               const stat = statsMap.get(cert.lang);
               return (
                 <Card key={cert.id} className="flex items-center gap-4 p-4">
@@ -193,7 +186,7 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
             {examStats
               .filter((s) => !s.hasCertificate && s.attemptCount > 0)
               .map((stat) => {
-                const meta = LANG_META[stat.lang] ?? { icon: "📄", name: stat.lang };
+                const meta = { icon: LANG_ICONS[stat.lang as SupportedLanguage] ?? "📄", name: LANGUAGES[stat.lang as SupportedLanguage]?.name ?? stat.lang };
                 return (
                   <Card key={stat.lang} className="flex items-center gap-4 p-4">
                     <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-amber-50 text-2xl dark:bg-amber-950/40">
