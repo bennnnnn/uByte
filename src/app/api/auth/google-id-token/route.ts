@@ -10,7 +10,8 @@ import {
 import { signToken, setAuthCookie } from "@/lib/auth";
 import { setCsrfCookie } from "@/lib/csrf";
 import { withErrorHandling } from "@/lib/api-utils";
-import { sendGoogleLinkedEmail } from "@/lib/email";
+import { sendGoogleLinkedEmail, sendWelcomeEmail } from "@/lib/email";
+import { getReferrerByCode, recordReferralSignup } from "@/lib/db";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
@@ -30,7 +31,7 @@ export const POST = withErrorHandling("POST /api/auth/google-id-token", async (r
     return NextResponse.json({ error: "Google sign-in is not configured" }, { status: 503 });
   }
 
-  let body: { credential?: string };
+  let body: { credential?: string; referralCode?: string };
   try {
     body = await request.json();
   } catch {
@@ -38,6 +39,7 @@ export const POST = withErrorHandling("POST /api/auth/google-id-token", async (r
   }
 
   const credential = body.credential?.trim();
+  const referralCode = typeof body.referralCode === "string" ? body.referralCode.trim() : "";
   if (!credential) {
     return NextResponse.json({ error: "Missing credential" }, { status: 400 });
   }
@@ -73,6 +75,7 @@ export const POST = withErrorHandling("POST /api/auth/google-id-token", async (r
   }
 
   let user = await getUserByGoogleId(googleId);
+  let isNewUser = false;
   if (!user) {
     const existing = await getUserByEmail(email);
     if (existing) {
@@ -81,6 +84,20 @@ export const POST = withErrorHandling("POST /api/auth/google-id-token", async (r
       sendGoogleLinkedEmail(user.email, user.name).catch(() => {});
     } else {
       user = await createUserWithGoogle(name, email, googleId);
+      isNewUser = true;
+    }
+  }
+
+  if (isNewUser) {
+    sendWelcomeEmail(user.email, user.name).catch(() => {});
+    if (referralCode && /^[a-z0-9]{6,16}$/i.test(referralCode)) {
+      getReferrerByCode(referralCode)
+        .then((referrerId) => {
+          if (referrerId && referrerId !== user!.id) {
+            return recordReferralSignup(referrerId, user!.id);
+          }
+        })
+        .catch(() => {});
     }
   }
 
@@ -96,6 +113,7 @@ export const POST = withErrorHandling("POST /api/auth/google-id-token", async (r
     email: user.email,
     name: user.name,
     tokenVersion: user.token_version ?? 0,
+    isAdmin: user.is_admin === 1,
   });
   await setAuthCookie(token);
   await logActivity(user.id, "login_google");

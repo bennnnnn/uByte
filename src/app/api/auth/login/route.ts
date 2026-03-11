@@ -56,6 +56,7 @@ export const POST = withErrorHandling("POST /api/auth/login", async (request: Ne
     email: user.email,
     name: user.name,
     tokenVersion: user.token_version ?? 0,
+    isAdmin: user.is_admin === 1,
   });
   await setAuthCookie(token);
 

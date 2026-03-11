@@ -14,6 +14,7 @@ export const GET = withErrorHandling("GET /api/auth/google", async (request: Nex
   const state = randomBytes(16).toString("hex");
   const mode = request.nextUrl.searchParams.get("mode") === "signup" ? "signup" : "login";
   const nextPath = getSafeNextPath(request.nextUrl.searchParams.get("next"));
+  const referralCode = request.nextUrl.searchParams.get("ref") ?? "";
 
   const params = new URLSearchParams({
     client_id: GOOGLE_CLIENT_ID,
@@ -37,6 +38,9 @@ export const GET = withErrorHandling("GET /api/auth/google", async (request: Nex
   });
   setOauthFlowCookie(res, "oauth_mode", mode);
   setOauthFlowCookie(res, "oauth_next", nextPath);
+  if (referralCode && /^[a-z0-9]{6,16}$/i.test(referralCode)) {
+    setOauthFlowCookie(res, "oauth_ref", referralCode);
+  }
 
   return res;
 });

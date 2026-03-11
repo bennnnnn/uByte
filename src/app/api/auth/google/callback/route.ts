@@ -10,8 +10,9 @@ import {
 import { signToken, setAuthCookie } from "@/lib/auth";
 import { setCsrfCookie } from "@/lib/csrf";
 import { withErrorHandling } from "@/lib/api-utils";
-import { sendGoogleLinkedEmail } from "@/lib/email";
+import { sendGoogleLinkedEmail, sendWelcomeEmail } from "@/lib/email";
 import { buildAuthPageHref, getSafeNextPath, type AuthPageMode } from "@/lib/auth-redirect";
+import { getReferrerByCode, recordReferralSignup } from "@/lib/db";
 
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
@@ -24,6 +25,7 @@ export const GET = withErrorHandling("GET /api/auth/google/callback", async (req
   const storedState = request.cookies.get("oauth_state")?.value;
   const authMode = getOauthMode(request.cookies.get("oauth_mode")?.value);
   const nextPath = getSafeNextPath(request.cookies.get("oauth_next")?.value);
+  const referralCode = request.cookies.get("oauth_ref")?.value ?? "";
 
   if (!state || !storedState || state !== storedState) {
     return createAuthRedirect(origin, authMode, nextPath, "oauth_invalid_state");
@@ -77,6 +79,7 @@ export const GET = withErrorHandling("GET /api/auth/google/callback", async (req
     }
 
     let user = await getUserByGoogleId(googleId);
+    let isNewUser = false;
     if (!user) {
       const existing = await getUserByEmail(email);
       if (existing) {
@@ -89,6 +92,22 @@ export const GET = withErrorHandling("GET /api/auth/google/callback", async (req
           email,
           googleId
         );
+        isNewUser = true;
+      }
+    }
+
+    if (isNewUser) {
+      // Day-0 welcome email — fire-and-forget
+      sendWelcomeEmail(user.email, user.name).catch(() => {});
+      // Track referral if user arrived via an invite link
+      if (referralCode && /^[a-z0-9]{6,16}$/i.test(referralCode)) {
+        getReferrerByCode(referralCode)
+          .then((referrerId) => {
+            if (referrerId && referrerId !== user!.id) {
+              return recordReferralSignup(referrerId, user!.id);
+            }
+          })
+          .catch(() => {});
       }
     }
 
@@ -101,6 +120,7 @@ export const GET = withErrorHandling("GET /api/auth/google/callback", async (req
       email: user.email,
       name: user.name,
       tokenVersion: user.token_version ?? 0,
+      isAdmin: user.is_admin === 1,
     });
     await setAuthCookie(token);
     await logActivity(user.id, "login_google");
@@ -124,6 +144,7 @@ function clearOauthFlowCookies(response: NextResponse) {
   response.cookies.delete("oauth_state");
   response.cookies.delete("oauth_mode");
   response.cookies.delete("oauth_next");
+  response.cookies.delete("oauth_ref");
 }
 
 function createAuthRedirect(

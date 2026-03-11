@@ -94,6 +94,7 @@ export const PUT = withErrorHandling("PUT /api/profile", async (request: NextReq
       email: tokenUser.email,
       name: tokenUser.name,
       tokenVersion: newVersion,
+      isAdmin: tokenUser.isAdmin,
     });
     await setAuthCookie(newToken);
     return NextResponse.json({ success: true });
@@ -122,6 +123,7 @@ export const PUT = withErrorHandling("PUT /api/profile", async (request: NextReq
       email: tokenUser.email,
       name: updates.name,
       tokenVersion: tokenUser.tokenVersion ?? 0,
+      isAdmin: tokenUser.isAdmin,
     });
     await setAuthCookie(token);
   }

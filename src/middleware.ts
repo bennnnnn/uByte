@@ -25,7 +25,14 @@ export async function middleware(request: NextRequest) {
       return NextResponse.redirect(new URL("/", request.url));
     }
     try {
-      await jwtVerify(token, getSecret());
+      const { payload } = await jwtVerify(token, getSecret());
+      // Reject non-admins at the edge — no DB call needed since isAdmin is in the JWT
+      if (!payload.isAdmin) {
+        if (pathname.startsWith("/api/")) {
+          return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+        }
+        return NextResponse.redirect(new URL("/", request.url));
+      }
     } catch {
       if (pathname.startsWith("/api/")) {
         return NextResponse.json({ error: "Not authenticated" }, { status: 401 });

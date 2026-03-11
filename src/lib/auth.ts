@@ -15,6 +15,7 @@ export interface TokenPayload {
   email: string;
   name: string;
   tokenVersion: number;
+  isAdmin?: boolean;
 }
 
 /** Session duration: 30 days. Reasonable for a learning platform without requiring frequent re-login. */
@@ -31,11 +32,11 @@ export async function signToken(payload: TokenPayload): Promise<string> {
 export async function verifyToken(token: string): Promise<TokenPayload | null> {
   try {
     const { payload } = await jwtVerify(token, getSecret());
-    const { userId, email, name, tokenVersion } = payload as Record<string, unknown>;
+    const { userId, email, name, tokenVersion, isAdmin } = payload as Record<string, unknown>;
     if (typeof userId !== "number" || typeof email !== "string" || typeof name !== "string") {
       return null;
     }
-    return { userId, email, name, tokenVersion: (tokenVersion as number) ?? 0 };
+    return { userId, email, name, tokenVersion: (tokenVersion as number) ?? 0, isAdmin: isAdmin === true };
   } catch {
     return null;
   }
