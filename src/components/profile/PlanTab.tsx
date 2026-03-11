@@ -186,12 +186,12 @@ export default function PlanTab({ plan, expiresAtProp }: Props & { expiresAtProp
       body: JSON.stringify({ plan: billingPlan }),
     });
     if (!res.ok) return;
-    const { priceId } = await res.json();
+    const { priceId, checkoutNonce } = await res.json() as { priceId?: string; checkoutNonce?: string };
     if (!window.Paddle || !priceId) return;
     const origin = typeof window !== "undefined" ? window.location.origin : "";
     const params: Parameters<typeof window.Paddle.Checkout.open>[0] = {
       items: [{ priceId, quantity: 1 }],
-      customData: user ? { userId: String(user.id) } : undefined,
+      customData: checkoutNonce ? { checkoutNonce } : (user ? { userId: String(user.id) } : undefined),
       customer: user ? { email: user.email } : undefined,
       settings: {
         successUrl: `${origin}/profile?tab=plan&plan=success`,

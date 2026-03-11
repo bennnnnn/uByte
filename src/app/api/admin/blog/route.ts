@@ -4,6 +4,7 @@
  */
 import { NextRequest, NextResponse } from "next/server";
 import { withErrorHandling, requireAdmin } from "@/lib/api-utils";
+import { verifyCsrf } from "@/lib/csrf";
 import { getAllDbBlogPosts, createDbBlogPost } from "@/lib/db/blog-posts";
 
 function slugify(title: string): string {
@@ -25,6 +26,9 @@ export const GET = withErrorHandling("GET /api/admin/blog", async () => {
 });
 
 export const POST = withErrorHandling("POST /api/admin/blog", async (request: NextRequest) => {
+  const csrfError = verifyCsrf(request);
+  if (csrfError) return NextResponse.json({ error: "Invalid CSRF token" }, { status: 403 });
+
   const { admin, response } = await requireAdmin();
   if (!admin) return response;
 

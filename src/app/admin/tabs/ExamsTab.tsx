@@ -56,7 +56,7 @@ export default function ExamsTab({ data }: Props) {
                           <NumberInput value={cfg.examSize} min={1} max={200} onChange={(v) => setExamSettings((s) => s ? { ...s, [lang]: { ...cfg, examSize: v } } : s)} />
                         </td>
                         <td className="py-2.5 pr-4 text-right">
-                          <NumberInput value={cfg.examDurationMinutes} min={5} max={180} onChange={(v) => setExamSettings((s) => s ? { ...s, [lang]: { ...cfg, examDurationMinutes: v } } : s)} />
+                          <NumberInput value={cfg.examDurationMinutes} min={5} max={300} onChange={(v) => setExamSettings((s) => s ? { ...s, [lang]: { ...cfg, examDurationMinutes: v } } : s)} />
                         </td>
                         <td className="py-2.5 text-right">
                           <NumberInput value={cfg.passPercent} min={1} max={100} onChange={(v) => setExamSettings((s) => s ? { ...s, [lang]: { ...cfg, passPercent: v } } : s)} />

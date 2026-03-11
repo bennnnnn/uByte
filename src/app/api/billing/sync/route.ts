@@ -107,5 +107,17 @@ export const GET = withErrorHandling("GET /api/billing/sync", async () => {
     return NextResponse.json({ synced: true, plan: correctPlan, expiresAt: trialEndsAt });
   }
 
+  // past_due — payment failed but subscription not yet cancelled; preserve access
+  if (latest.status === "past_due") {
+    console.log("[billing-sync] past_due subscription — preserving current plan for user", user.userId);
+    return NextResponse.json({ synced: true, plan: dbUser?.plan ?? "pro" });
+  }
+
+  // paused — Paddle-paused subscription; preserve access until explicitly cancelled
+  if (latest.status === "paused") {
+    console.log("[billing-sync] paused subscription — preserving current plan for user", user.userId);
+    return NextResponse.json({ synced: true, plan: dbUser?.plan ?? "pro" });
+  }
+
   return NextResponse.json({ synced: true, plan: dbUser?.plan ?? "free" });
 });

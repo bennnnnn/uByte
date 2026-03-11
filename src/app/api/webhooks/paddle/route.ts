@@ -70,6 +70,7 @@ import {
   recordSubscriptionEvent,
   recordReferralSubscription,
 } from "@/lib/db";
+import { getSql } from "@/lib/db/client";
 import { withErrorHandling } from "@/lib/api-utils";
 import { BILLING_CONFIG, YEARLY_PRICE_CENTS, MONTHLY_PRICE_CENTS } from "@/lib/plans";
 import { resolveCheckoutNonce } from "@/lib/db/checkout-sessions";
@@ -216,17 +217,44 @@ async function resolveUserId(
 }
 
 /**
+ * Idempotency guard — returns true if this event_id has already been processed.
+ * On first call, inserts the event_id; on conflict (duplicate), returns true.
+ * The paddle_webhook_events table is created by migration 015.
+ */
+async function isDuplicateEvent(eventId: string, eventType: string): Promise<boolean> {
+  try {
+    const sql = getSql();
+    const result = await sql`
+      INSERT INTO paddle_webhook_events (event_id, event_type)
+      VALUES (${eventId}, ${eventType})
+      ON CONFLICT (event_id) DO NOTHING
+      RETURNING event_id
+    `;
+    // If nothing was inserted, it's a duplicate
+    return result.length === 0;
+  } catch (err) {
+    // If the table doesn't exist yet (migration pending), log and continue processing
+    console.warn("[paddle-webhook] isDuplicateEvent check failed (table missing?):", err);
+    return false;
+  }
+}
+
+/**
  * Map a subscription status + price ID to a uByte plan string.
  * Used by subscription.updated to handle upgrades, downgrades, and pauses.
  */
-function planFromSubscription(status: string, priceId?: string): string {
+function planFromSubscription(status: string, priceId?: string): string | null {
   if (status === "trialing") {
     const yearlyPriceId = process.env.NEXT_PUBLIC_PADDLE_YEARLY_PRICE_ID;
     return yearlyPriceId && priceId === yearlyPriceId ? "trial_yearly" : "trial";
   }
-  if (status !== "active") return "free";
-  const yearlyPriceId = process.env.NEXT_PUBLIC_PADDLE_YEARLY_PRICE_ID;
-  return yearlyPriceId && priceId === yearlyPriceId ? "yearly" : "pro";
+  if (status === "active") {
+    const yearlyPriceId = process.env.NEXT_PUBLIC_PADDLE_YEARLY_PRICE_ID;
+    return yearlyPriceId && priceId === yearlyPriceId ? "yearly" : "pro";
+  }
+  // past_due / paused — keep existing plan (return null = no-op)
+  if (status === "past_due" || status === "paused") return null;
+  return "free";
 }
 
 export const POST = withErrorHandling("POST /api/webhooks/paddle", async (request: NextRequest) => {
@@ -252,7 +280,16 @@ export const POST = withErrorHandling("POST /api/webhooks/paddle", async (reques
     return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
   }
 
-  console.log("[paddle-webhook] Event type:", event.event_type);
+  const eventId = (event as Record<string, unknown>).event_id as string | undefined;
+  console.log("[paddle-webhook] Event type:", event.event_type, "event_id:", eventId);
+
+  if (eventId) {
+    const duplicate = await isDuplicateEvent(eventId, event.event_type);
+    if (duplicate) {
+      console.log("[paddle-webhook] Duplicate event — already processed:", eventId);
+      return NextResponse.json({ received: true, duplicate: true });
+    }
+  }
 
   const data = event.data;
   const customData = data["custom_data"] as Record<string, string> | null;
@@ -323,7 +360,7 @@ export const POST = withErrorHandling("POST /api/webhooks/paddle", async (reques
       const uid = await resolveUserId(paddleCustomerId, customData);
       if (uid) {
         // Use planFromSubscription so trialing → "trial" / "trial_yearly" correctly
-        const subPlan = status ? planFromSubscription(status, purchasedPriceId) : activatedPlan;
+        const subPlan = status ? (planFromSubscription(status, purchasedPriceId) ?? activatedPlan) : activatedPlan;
         const isTrial = subPlan.startsWith("trial");
 
         await updateUserPlan(uid, subPlan, paddleCustomerId);
@@ -380,6 +417,10 @@ export const POST = withErrorHandling("POST /api/webhooks/paddle", async (reques
     case "subscription.updated": {
       if (paddleCustomerId && status) {
         const plan = planFromSubscription(status, purchasedPriceId);
+        if (plan === null) {
+          console.log("[paddle-webhook] subscription.updated — status", status, "is past_due/paused; preserving existing plan");
+          break;
+        }
         const uid = await resolveUserId(paddleCustomerId, customData);
         if (uid) {
           const prevUser = await getUserById(uid).catch(() => null);

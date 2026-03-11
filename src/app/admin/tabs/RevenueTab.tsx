@@ -18,7 +18,13 @@ interface Props {
 export default function RevenueTab({ data }: Props) {
   const { revenue, revenueSeries, subscriptionEvents, mrr } = data;
 
-  if (!revenue) return null;
+  if (!revenue) {
+    return (
+      <div className="flex min-h-[200px] items-center justify-center rounded-xl border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900">
+        <p className="text-sm text-zinc-400 dark:text-zinc-500">Revenue data unavailable. Check admin stats API.</p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-5">

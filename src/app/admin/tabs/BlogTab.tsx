@@ -9,6 +9,7 @@
  */
 
 import { useEffect, useState, useCallback } from "react";
+import { apiFetch } from "@/lib/api-client";
 import { SectionCard } from "../components";
 
 interface BlogPost {
@@ -105,9 +106,8 @@ export default function BlogTab() {
     try {
       const url    = isNew ? "/api/admin/blog" : `/api/admin/blog/${editing!.id}`;
       const method = isNew ? "POST" : "PUT";
-      const res = await fetch(url, {
+      const res = await apiFetch(url, {
         method,
-        credentials: "same-origin",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),
       });
@@ -127,7 +127,7 @@ export default function BlogTab() {
 
   async function deletePost(post: BlogPost) {
     if (!confirm(`Delete "${post.title}"? This cannot be undone.`)) return;
-    const res = await fetch(`/api/admin/blog/${post.id}`, { method: "DELETE", credentials: "same-origin" });
+    const res = await apiFetch(`/api/admin/blog/${post.id}`, { method: "DELETE" });
     if (res.ok) {
       setPosts((p) => p.filter((x) => x.id !== post.id));
       if (editing?.id === post.id) closeEditor();

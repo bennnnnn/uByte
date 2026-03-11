@@ -180,7 +180,7 @@ function ActionsMenu({
       {divider}
 
       {/* Plan switcher */}
-      {(["free", "pro", "yearly"] as const).map((p) => (
+      {(["free", "pro", "monthly", "yearly"] as const).map((p) => (
         <button key={p} type="button" onClick={() => doAction(userId, "set_plan", "Set " + name + " to " + p + "?", { plan: p })} disabled={plan === p} className={`${btnCls} text-zinc-600 disabled:opacity-40 dark:text-zinc-400`}>
           Set plan: <span className="font-semibold">{p}</span>
         </button>

@@ -4,6 +4,7 @@
  */
 import { NextRequest, NextResponse } from "next/server";
 import { withErrorHandling, requireAdmin } from "@/lib/api-utils";
+import { verifyCsrf } from "@/lib/csrf";
 import { updateDbBlogPost, deleteDbBlogPost } from "@/lib/db/blog-posts";
 
 interface Props {
@@ -11,6 +12,9 @@ interface Props {
 }
 
 export const PUT = withErrorHandling("PUT /api/admin/blog/[id]", async (request: NextRequest, ctx?: unknown) => {
+  const csrfError = verifyCsrf(request);
+  if (csrfError) return NextResponse.json({ error: "Invalid CSRF token" }, { status: 403 });
+
   const { admin, response } = await requireAdmin();
   if (!admin) return response;
 
@@ -47,6 +51,9 @@ export const PUT = withErrorHandling("PUT /api/admin/blog/[id]", async (request:
 });
 
 export const DELETE = withErrorHandling("DELETE /api/admin/blog/[id]", async (request: NextRequest, ctx?: unknown) => {
+  const csrfError = verifyCsrf(request);
+  if (csrfError) return NextResponse.json({ error: "Invalid CSRF token" }, { status: 403 });
+
   const { admin, response } = await requireAdmin();
   if (!admin) return response;
 
