@@ -13,8 +13,91 @@ import { apiFetch } from "@/lib/api-client";
 import { usePassPercent } from "@/hooks/usePassPercent";
 import Spinner from "@/components/Spinner";
 
-// ── Choice letter labels ──────────────────────────────────────────────────────
+// ── Constants ─────────────────────────────────────────────────────────────────
 const CHOICE_LABELS = ["A", "B", "C", "D", "E", "F"];
+const PAGE_SIZE = 10;
+
+// ── Pre-exam warning overlay ──────────────────────────────────────────────────
+function ExamStartWarning({
+  langName, totalQuestions, passPercent, durationMinutes, onStart, onLeave,
+}: {
+  langName: string; totalQuestions: number; passPercent: number;
+  durationMinutes: number; onStart: () => void; onLeave: () => void;
+}) {
+  async function handleStart() {
+    try {
+      await document.documentElement.requestFullscreen();
+    } catch { /* fullscreen unavailable — proceed anyway */ }
+    onStart();
+  }
+
+  const rules: { text: string; type: "info" | "warn" | "danger" }[] = [
+    { text: `${totalQuestions} multiple-choice questions, shown ${PAGE_SIZE} at a time`, type: "info" },
+    { text: `${durationMinutes} minutes — timer started when you clicked "Begin exam"`, type: "info" },
+    { text: `Score ${passPercent}% or higher to earn your certificate`, type: "info" },
+    { text: "Switching tabs or minimising the window auto-submits your exam immediately", type: "danger" },
+    { text: "You cannot pause, undo answers, or restart once you begin", type: "warn" },
+  ];
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-zinc-950/80 p-4 backdrop-blur-sm">
+      <div className="w-full max-w-lg rounded-2xl bg-white p-8 shadow-2xl dark:bg-zinc-900">
+        {/* Icon */}
+        <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-amber-100 dark:bg-amber-900/40">
+          <svg className="h-7 w-7 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round"
+              d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+          </svg>
+        </div>
+
+        <h1 className="mb-1 text-xl font-bold text-zinc-900 dark:text-zinc-100">Before you begin</h1>
+        <p className="mb-6 text-sm text-zinc-500 dark:text-zinc-400">
+          You are about to take the{" "}
+          <strong className="font-semibold text-zinc-700 dark:text-zinc-200">{langName}</strong> certification exam.
+        </p>
+
+        <ul className="mb-7 space-y-3">
+          {rules.map(({ text, type }, i) => (
+            <li key={i} className="flex items-start gap-3 text-sm">
+              <span className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[10px] font-bold ${
+                type === "danger"
+                  ? "bg-red-100 text-red-600 dark:bg-red-900/40 dark:text-red-400"
+                  : type === "warn"
+                    ? "bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-400"
+                    : "bg-zinc-100 text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400"
+              }`}>
+                {type === "danger" ? "!" : i + 1}
+              </span>
+              <span className={`leading-snug ${
+                type === "danger"
+                  ? "font-semibold text-red-700 dark:text-red-300"
+                  : type === "warn"
+                    ? "text-amber-700 dark:text-amber-400"
+                    : "text-zinc-600 dark:text-zinc-300"
+              }`}>
+                {text}
+              </span>
+            </li>
+          ))}
+        </ul>
+
+        <div className="flex gap-3">
+          <button type="button" onClick={onLeave}
+            className="flex-1 rounded-xl border border-zinc-200 py-3 text-sm font-semibold text-zinc-700 transition-colors hover:bg-zinc-50 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800">
+            Not now
+          </button>
+          <button type="button" onClick={handleStart}
+            className="flex-1 rounded-xl bg-amber-600 py-3 text-sm font-bold text-white shadow-lg shadow-amber-500/25 transition-all hover:-translate-y-0.5 hover:bg-amber-500">
+            I understand — start exam
+          </button>
+        </div>
+        <p className="mt-3 text-center text-[11px] text-zinc-400 dark:text-zinc-500">
+          The exam will enter fullscreen for better focus
+        </p>
+      </div>
+    </div>
+  );
+}
 
 // ── Confirm modal ─────────────────────────────────────────────────────────────
 function ConfirmModal({
@@ -50,7 +133,7 @@ function ConfirmModal({
 
 // ── Timer display ─────────────────────────────────────────────────────────────
 function TimerDisplay({ remainingSeconds, durationMinutes }: { remainingSeconds: number | null; durationMinutes: number }) {
-  const isUrgent = remainingSeconds != null && remainingSeconds <= 5 * 60;
+  const isUrgent  = remainingSeconds != null && remainingSeconds <= 5 * 60;
   const isWarning = remainingSeconds != null && remainingSeconds <= 15 * 60;
 
   const minutes = remainingSeconds != null ? Math.floor(remainingSeconds / 60) : null;
@@ -63,7 +146,6 @@ function TimerDisplay({ remainingSeconds, durationMinutes }: { remainingSeconds:
     ? Math.max(0, Math.min(1, remainingSeconds / (durationMinutes * 60)))
     : 1;
 
-  // SVG circle timer
   const R = 20;
   const C = 2 * Math.PI * R;
   const dash = fraction * C;
@@ -72,16 +154,10 @@ function TimerDisplay({ remainingSeconds, durationMinutes }: { remainingSeconds:
     <div className="flex items-center gap-3">
       <div className="relative flex h-14 w-14 shrink-0 items-center justify-center">
         <svg className="-rotate-90" width="56" height="56" viewBox="0 0 56 56">
-          <circle cx="28" cy="28" r={R} fill="none" strokeWidth="3.5"
-            className="stroke-zinc-200 dark:stroke-zinc-700" />
-          <circle cx="28" cy="28" r={R} fill="none" strokeWidth="3.5"
-            strokeLinecap="round"
+          <circle cx="28" cy="28" r={R} fill="none" strokeWidth="3.5" className="stroke-zinc-200 dark:stroke-zinc-700" />
+          <circle cx="28" cy="28" r={R} fill="none" strokeWidth="3.5" strokeLinecap="round"
             strokeDasharray={`${dash} ${C}`}
-            className={
-              isUrgent ? "stroke-red-500 transition-all" :
-              isWarning ? "stroke-amber-500 transition-all" :
-              "stroke-emerald-500 transition-all"
-            }
+            className={isUrgent ? "stroke-red-500 transition-all" : isWarning ? "stroke-amber-500 transition-all" : "stroke-emerald-500 transition-all"}
           />
         </svg>
         <span className={`absolute text-xs font-bold tabular-nums ${
@@ -108,6 +184,7 @@ function TimerDisplay({ remainingSeconds, durationMinutes }: { remainingSeconds:
 export default function PracticeExamAttemptPage() {
   const { lang, attemptId } = useParams<{ lang: string; attemptId: string }>();
   const router = useRouter();
+
   const [attempt, setAttempt] = useState<AttemptPayload | null>(null);
   const [answers, setAnswers] = useState<Record<number, number>>({});
   const [loading, setLoading] = useState(true);
@@ -115,14 +192,21 @@ export default function PracticeExamAttemptPage() {
   const [error, setError] = useState<string | null>(null);
   const [remainingSeconds, setRemainingSeconds] = useState<number | null>(null);
   const [autoSubmitted, setAutoSubmitted] = useState(false);
+  const [tabViolation, setTabViolation] = useState(false);
   const [showSubmitConfirm, setShowSubmitConfirm] = useState(false);
   const [showLeaveConfirm, setShowLeaveConfirm] = useState(false);
   const [pendingLeaveUrl, setPendingLeaveUrl] = useState<string | null>(null);
   const [activeQuestion, setActiveQuestion] = useState(0);
+  const [examStarted, setExamStarted] = useState(false);
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+
   const passPercent = usePassPercent(lang);
   const questionRefs = useRef<(HTMLDivElement | null)[]>([]);
+  // Queue a scroll to this question index after the next render
+  const pendingScrollRef = useRef<number | null>(null);
 
-  // Load attempt
+  // ── Load attempt ────────────────────────────────────────────────────────────
   useEffect(() => {
     let cancelled = false;
     async function load() {
@@ -148,10 +232,51 @@ export default function PracticeExamAttemptPage() {
   const answeredCount = useMemo(() => Object.keys(answers).length, [answers]);
   const allAnswered = !!attempt && answeredCount === totalQuestions;
 
-  const handleChange = (qid: number, idx: number) => {
-    setAnswers((prev) => ({ ...prev, [qid]: idx }));
-  };
+  // Visible questions — grow in PAGE_SIZE increments as the user progresses
+  const visibleQuestions = useMemo(
+    () => attempt?.questions.slice(0, Math.min(visibleCount, totalQuestions)) ?? [],
+    [attempt, visibleCount, totalQuestions]
+  );
 
+  // ── Scroll queue — fires after every render ──────────────────────────────
+  useEffect(() => {
+    if (pendingScrollRef.current === null) return;
+    const idx = pendingScrollRef.current;
+    const el = questionRefs.current[idx];
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth", block: "start" });
+      pendingScrollRef.current = null;
+    }
+  });
+
+  // ── Track fullscreen state ───────────────────────────────────────────────
+  useEffect(() => {
+    const handler = () => setIsFullscreen(!!document.fullscreenElement);
+    document.addEventListener("fullscreenchange", handler);
+    return () => document.removeEventListener("fullscreenchange", handler);
+  }, []);
+
+  const reEnterFullscreen = useCallback(() => {
+    document.documentElement.requestFullscreen?.().catch(() => {});
+  }, []);
+
+  // ── Handle answer change + auto-scroll ──────────────────────────────────
+  const handleChange = useCallback((qid: number, choiceIdx: number) => {
+    setAnswers((prev) => ({ ...prev, [qid]: choiceIdx }));
+
+    if (!attempt) return;
+    const qIdx = attempt.questions.findIndex((q) => q.id === qid);
+    const nextIdx = qIdx + 1;
+    if (nextIdx >= totalQuestions) return; // last question — no scroll
+
+    if (nextIdx >= visibleCount) {
+      // Next question not yet visible — expand the page, then scroll
+      setVisibleCount((prev) => Math.min(prev + PAGE_SIZE, totalQuestions));
+    }
+    pendingScrollRef.current = nextIdx;
+  }, [attempt, totalQuestions, visibleCount]);
+
+  // ── Submit ───────────────────────────────────────────────────────────────
   const handleSubmit = useCallback(async (opts?: { force?: boolean }) => {
     if (!attempt) return;
     if (!opts?.force && !allAnswered) return;
@@ -174,6 +299,8 @@ export default function PracticeExamAttemptPage() {
       params.set("score", String(score));
       params.set("passed", passed ? "1" : "0");
       if (certificateId) params.set("cert", certificateId);
+      // Exit fullscreen before navigating away
+      if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
       router.push(`/certifications/${lang}/result/${attempt.attemptId}?${params.toString()}`);
     } catch {
       setError("Network error. Please try again.");
@@ -181,6 +308,7 @@ export default function PracticeExamAttemptPage() {
     }
   }, [allAnswered, answers, attempt, lang, router]);
 
+  // ── Language switch ──────────────────────────────────────────────────────
   const handleSwitchLanguage = (nextLang: string) => {
     if (nextLang === lang) return;
     setPendingLeaveUrl(`/certifications/${nextLang}`);
@@ -188,12 +316,13 @@ export default function PracticeExamAttemptPage() {
   };
 
   const confirmLeave = useCallback(() => {
+    if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
     if (pendingLeaveUrl) router.push(pendingLeaveUrl);
     setShowLeaveConfirm(false);
     setPendingLeaveUrl(null);
   }, [pendingLeaveUrl, router]);
 
-  // Prevent accidental close
+  // ── beforeunload protection ──────────────────────────────────────────────
   useEffect(() => {
     if (!attempt || autoSubmitted) return;
     const onBeforeUnload = (e: BeforeUnloadEvent) => { e.preventDefault(); };
@@ -201,9 +330,23 @@ export default function PracticeExamAttemptPage() {
     return () => window.removeEventListener("beforeunload", onBeforeUnload);
   }, [attempt, autoSubmitted]);
 
+  // ── Tab-switch auto-submit ───────────────────────────────────────────────
+  useEffect(() => {
+    if (!attempt || autoSubmitted || !examStarted) return;
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        setTabViolation(true);
+        setAutoSubmitted(true);
+        void handleSubmit({ force: true });
+      }
+    };
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    return () => document.removeEventListener("visibilitychange", handleVisibilityChange);
+  }, [attempt, autoSubmitted, examStarted, handleSubmit]);
+
+  // ── Timer ────────────────────────────────────────────────────────────────
   const durationMinutes = attempt?.durationMinutes ?? EXAM_DURATION_MINUTES;
 
-  // Timer
   useEffect(() => {
     if (!attempt) return;
     const durationSec = durationMinutes * 60;
@@ -225,11 +368,11 @@ export default function PracticeExamAttemptPage() {
     return () => window.clearInterval(id);
   }, [attempt, durationMinutes, handleSubmit]);
 
-  // Track active question via IntersectionObserver
+  // ── Active question via IntersectionObserver ─────────────────────────────
   useEffect(() => {
     if (!attempt) return;
     const observers: IntersectionObserver[] = [];
-    attempt.questions.forEach((_, idx) => {
+    visibleQuestions.forEach((_, idx) => {
       const el = questionRefs.current[idx];
       if (!el) return;
       const obs = new IntersectionObserver(
@@ -240,12 +383,24 @@ export default function PracticeExamAttemptPage() {
       observers.push(obs);
     });
     return () => observers.forEach((o) => o.disconnect());
-  }, [attempt]);
+  }, [attempt, visibleQuestions]);
 
   const scrollToQuestion = (idx: number) => {
     questionRefs.current[idx]?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
+  // ── Sidebar: jump to any question, expanding pages as needed ────────────
+  const jumpToQuestion = (idx: number) => {
+    if (idx >= visibleCount) {
+      // Expand pages to include this question
+      setVisibleCount(Math.ceil((idx + 1) / PAGE_SIZE) * PAGE_SIZE);
+      pendingScrollRef.current = idx;
+    } else {
+      scrollToQuestion(idx);
+    }
+  };
+
+  // ── Loading / error states ───────────────────────────────────────────────
   if (loading) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center">
@@ -268,9 +423,23 @@ export default function PracticeExamAttemptPage() {
   }
 
   const langConfig = LANGUAGES[attempt.lang as SupportedLanguage];
+  const allVisibleAnswered = visibleQuestions.every((q) => answers[q.id] !== undefined);
+  const hasMoreToLoad = visibleCount < totalQuestions;
 
   return (
     <div className="min-h-full bg-surface-page">
+
+      {/* ── Pre-exam warning overlay ──────────────────────────────────────── */}
+      {!examStarted && (
+        <ExamStartWarning
+          langName={langConfig?.name ?? attempt.lang}
+          totalQuestions={totalQuestions}
+          passPercent={passPercent}
+          durationMinutes={durationMinutes}
+          onStart={() => setExamStarted(true)}
+          onLeave={() => router.push(`/certifications/${lang}`)}
+        />
+      )}
 
       {/* ── Sticky exam header ───────────────────────────────────────────── */}
       <div className="sticky top-0 z-30 border-b border-zinc-200 bg-white/95 backdrop-blur-sm dark:border-zinc-800 dark:bg-zinc-950/95">
@@ -304,6 +473,21 @@ export default function PracticeExamAttemptPage() {
           {/* Timer */}
           <TimerDisplay remainingSeconds={remainingSeconds} durationMinutes={durationMinutes} />
 
+          {/* Fullscreen re-enter button — shown when fullscreen was exited */}
+          {examStarted && !isFullscreen && (
+            <button
+              type="button"
+              onClick={reEnterFullscreen}
+              title="Re-enter fullscreen"
+              className="hidden shrink-0 items-center gap-1.5 rounded-lg border border-amber-300 bg-amber-50 px-2.5 py-1.5 text-xs font-semibold text-amber-700 transition-colors hover:bg-amber-100 dark:border-amber-700 dark:bg-amber-950/40 dark:text-amber-300 sm:flex"
+            >
+              <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75h-4.5m4.5 0v4.5m0-4.5L15 9m5.25 11.25h-4.5m4.5 0v-4.5m0 4.5L15 15" />
+              </svg>
+              Fullscreen
+            </button>
+          )}
+
           {/* Switch language */}
           <select
             value={attempt.lang}
@@ -324,6 +508,20 @@ export default function PracticeExamAttemptPage() {
             style={{ width: `${(answeredCount / Math.max(totalQuestions, 1)) * 100}%` }}
           />
         </div>
+
+        {/* Fullscreen-exit warning bar */}
+        {examStarted && !isFullscreen && (
+          <div className="flex items-center justify-center gap-2 bg-amber-50 px-4 py-1.5 text-[11px] font-medium text-amber-700 dark:bg-amber-950/50 dark:text-amber-400">
+            <svg className="h-3.5 w-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
+            </svg>
+            Fullscreen exited — switching tabs will auto-submit your exam.
+            <button type="button" onClick={reEnterFullscreen}
+              className="ml-1 underline underline-offset-2 hover:no-underline">
+              Re-enter fullscreen
+            </button>
+          </div>
+        )}
       </div>
 
       {/* ── Body ─────────────────────────────────────────────────────────── */}
@@ -331,14 +529,20 @@ export default function PracticeExamAttemptPage() {
 
         {/* Questions */}
         <div className="min-w-0 flex-1 space-y-5">
-          {attempt.questions.map((q, idx) => {
+
+          {/* Page label */}
+          <p className="text-xs font-semibold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">
+            Questions {1}–{visibleQuestions.length} of {totalQuestions}
+          </p>
+
+          {visibleQuestions.map((q, idx) => {
             const isAnswered = answers[q.id] !== undefined;
             return (
               <div
                 key={q.id}
                 id={`q-${q.id}`}
                 ref={(el) => { questionRefs.current[idx] = el; }}
-                className={`scroll-mt-24 rounded-2xl border p-5 transition-all ${
+                className={`scroll-mt-28 rounded-2xl border p-5 transition-all ${
                   isAnswered
                     ? "border-amber-200 bg-white shadow-sm dark:border-amber-900/50 dark:bg-zinc-900"
                     : "border-zinc-200 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-900"
@@ -360,7 +564,7 @@ export default function PracticeExamAttemptPage() {
                   </p>
                 </div>
 
-                {/* Choices — full-width clickable cards */}
+                {/* Choices */}
                 <div className="space-y-2.5 pl-10" role="radiogroup" aria-labelledby={`q-${q.id}-label`}>
                   {q.choices.map((choice, cIdx) => {
                     const selected = answers[q.id] === cIdx;
@@ -393,68 +597,115 @@ export default function PracticeExamAttemptPage() {
             );
           })}
 
-          {/* Submit area */}
-          <div className="rounded-2xl border border-dashed border-zinc-300 bg-white p-6 text-center dark:border-zinc-700 dark:bg-zinc-900">
-            {autoSubmitted ? (
-              <p className="text-sm font-medium text-red-600 dark:text-red-400">
-                ⏱ Time&apos;s up — submitting your answers now…
-              </p>
-            ) : (
-              <>
-                <p className="mb-1 text-sm font-semibold text-zinc-800 dark:text-zinc-200">
-                  {allAnswered ? "All questions answered — ready to submit!" : `${totalQuestions - answeredCount} question${totalQuestions - answeredCount !== 1 ? "s" : ""} remaining`}
+          {/* Load next page button — shown when current page is fully answered */}
+          {hasMoreToLoad && (
+            <div className={`rounded-2xl border-2 border-dashed p-6 text-center transition-all ${
+              allVisibleAnswered
+                ? "border-amber-300 bg-amber-50/50 dark:border-amber-800 dark:bg-amber-950/20"
+                : "border-zinc-200 bg-zinc-50/50 dark:border-zinc-800 dark:bg-zinc-900/50"
+            }`}>
+              {allVisibleAnswered ? (
+                <>
+                  <p className="mb-1 text-sm font-semibold text-amber-800 dark:text-amber-300">
+                    Page complete! {totalQuestions - visibleCount} questions remaining.
+                  </p>
+                  <p className="mb-4 text-xs text-zinc-400 dark:text-zinc-500">
+                    Continue to questions {visibleCount + 1}–{Math.min(visibleCount + PAGE_SIZE, totalQuestions)}.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const nextStart = visibleCount;
+                      setVisibleCount((prev) => Math.min(prev + PAGE_SIZE, totalQuestions));
+                      pendingScrollRef.current = nextStart;
+                    }}
+                    className="inline-flex items-center gap-2 rounded-xl bg-amber-600 px-5 py-2.5 text-sm font-bold text-white shadow-md shadow-amber-500/25 transition-all hover:-translate-y-0.5 hover:bg-amber-500"
+                  >
+                    Next {Math.min(PAGE_SIZE, totalQuestions - visibleCount)} questions
+                    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                    </svg>
+                  </button>
+                </>
+              ) : (
+                <p className="text-sm text-zinc-400 dark:text-zinc-500">
+                  Answer all {visibleQuestions.length} questions above to continue.
                 </p>
-                <p className="mb-5 text-xs text-zinc-400 dark:text-zinc-500">
-                  You can&apos;t change your answers after submitting.
+              )}
+            </div>
+          )}
+
+          {/* Submit area — shown only when all questions are loaded */}
+          {!hasMoreToLoad && (
+            <div className="rounded-2xl border border-dashed border-zinc-300 bg-white p-6 text-center dark:border-zinc-700 dark:bg-zinc-900">
+              {autoSubmitted ? (
+                <p className="text-sm font-medium text-red-600 dark:text-red-400">
+                  {tabViolation
+                    ? "Tab switch detected — auto-submitting your exam…"
+                    : "⏱ Time's up — submitting your answers now…"}
                 </p>
-                <button
-                  type="button"
-                  onClick={() => setShowSubmitConfirm(true)}
-                  disabled={submitting || !allAnswered}
-                  className="inline-flex items-center gap-2 rounded-xl bg-amber-600 px-6 py-2.5 text-sm font-bold text-white shadow-md shadow-amber-500/25 transition-all hover:-translate-y-0.5 hover:bg-amber-500 disabled:translate-y-0 disabled:cursor-not-allowed disabled:opacity-50"
-                >
-                  {submitting ? (
-                    <>
-                      <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
-                      Submitting…
-                    </>
-                  ) : (
-                    <>
-                      Submit exam
-                      <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                      </svg>
-                    </>
-                  )}
-                </button>
-                {error && <p className="mt-3 text-xs text-red-500">{error}</p>}
-              </>
-            )}
-          </div>
+              ) : (
+                <>
+                  <p className="mb-1 text-sm font-semibold text-zinc-800 dark:text-zinc-200">
+                    {allAnswered
+                      ? "All questions answered — ready to submit!"
+                      : `${totalQuestions - answeredCount} question${totalQuestions - answeredCount !== 1 ? "s" : ""} remaining`}
+                  </p>
+                  <p className="mb-5 text-xs text-zinc-400 dark:text-zinc-500">
+                    You can't change your answers after submitting.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => setShowSubmitConfirm(true)}
+                    disabled={submitting || !allAnswered}
+                    className="inline-flex items-center gap-2 rounded-xl bg-amber-600 px-6 py-2.5 text-sm font-bold text-white shadow-md shadow-amber-500/25 transition-all hover:-translate-y-0.5 hover:bg-amber-500 disabled:translate-y-0 disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    {submitting ? (
+                      <>
+                        <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                        Submitting…
+                      </>
+                    ) : (
+                      <>
+                        Submit exam
+                        <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                        </svg>
+                      </>
+                    )}
+                  </button>
+                  {error && <p className="mt-3 text-xs text-red-500">{error}</p>}
+                </>
+              )}
+            </div>
+          )}
         </div>
 
         {/* ── Sidebar: question navigator ──────────────────────────────────── */}
-        <aside className="hidden lg:block lg:w-52 lg:shrink-0">
-          <div className="sticky top-24 rounded-2xl border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-900">
+        <aside className="hidden lg:block lg:w-56 lg:shrink-0">
+          <div className="sticky top-28 rounded-2xl border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-900">
             <p className="mb-3 text-[11px] font-bold uppercase tracking-wider text-zinc-400">
               Questions
             </p>
             <div className="grid grid-cols-5 gap-1.5">
               {attempt.questions.map((q, idx) => {
                 const answered = answers[q.id] !== undefined;
-                const active = activeQuestion === idx;
+                const active   = activeQuestion === idx;
+                const loaded   = idx < visibleCount;
                 return (
                   <button
                     key={q.id}
                     type="button"
-                    onClick={() => scrollToQuestion(idx)}
-                    title={`Question ${idx + 1}${answered ? " (answered)" : ""}`}
+                    onClick={() => jumpToQuestion(idx)}
+                    title={`Question ${idx + 1}${answered ? " (answered)" : !loaded ? " (not yet loaded)" : ""}`}
                     className={`flex h-8 w-full items-center justify-center rounded-lg text-xs font-semibold transition-all ${
                       answered
                         ? "bg-amber-500 text-white shadow-sm"
                         : active
-                        ? "border border-amber-400 bg-amber-50 text-amber-700 dark:border-amber-700 dark:bg-amber-950/40 dark:text-amber-300"
-                        : "bg-zinc-100 text-zinc-500 hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-400 dark:hover:bg-zinc-700"
+                          ? "border border-amber-400 bg-amber-50 text-amber-700 dark:border-amber-700 dark:bg-amber-950/40 dark:text-amber-300"
+                          : !loaded
+                            ? "border border-dashed border-zinc-300 bg-white text-zinc-300 dark:border-zinc-700 dark:bg-transparent dark:text-zinc-600"
+                            : "bg-zinc-100 text-zinc-500 hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-400 dark:hover:bg-zinc-700"
                     }`}
                   >
                     {idx + 1}
@@ -470,20 +721,28 @@ export default function PracticeExamAttemptPage() {
               </div>
               <div className="flex items-center gap-2">
                 <span className="h-3 w-3 rounded bg-zinc-200 dark:bg-zinc-700" />
-                <span>Unanswered ({totalQuestions - answeredCount})</span>
+                <span>Unanswered ({Math.max(0, visibleCount - answeredCount)})</span>
               </div>
+              {hasMoreToLoad && (
+                <div className="flex items-center gap-2">
+                  <span className="h-3 w-3 rounded border border-dashed border-zinc-300 dark:border-zinc-600" />
+                  <span>Not yet shown ({totalQuestions - visibleCount})</span>
+                </div>
+              )}
             </div>
 
-            <div className="mt-4 border-t border-zinc-100 pt-4 dark:border-zinc-800">
-              <button
-                type="button"
-                onClick={() => setShowSubmitConfirm(true)}
-                disabled={!allAnswered || submitting}
-                className="w-full rounded-xl bg-amber-600 py-2 text-xs font-bold text-white transition-colors hover:bg-amber-500 disabled:cursor-not-allowed disabled:opacity-40"
-              >
-                Submit exam
-              </button>
-            </div>
+            {!hasMoreToLoad && (
+              <div className="mt-4 border-t border-zinc-100 pt-4 dark:border-zinc-800">
+                <button
+                  type="button"
+                  onClick={() => setShowSubmitConfirm(true)}
+                  disabled={!allAnswered || submitting}
+                  className="w-full rounded-xl bg-amber-600 py-2 text-xs font-bold text-white transition-colors hover:bg-amber-500 disabled:cursor-not-allowed disabled:opacity-40"
+                >
+                  Submit exam
+                </button>
+              </div>
+            )}
           </div>
         </aside>
       </div>
