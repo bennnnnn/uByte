@@ -10,7 +10,7 @@
  */
 import { NextResponse } from "next/server";
 import { withErrorHandling, requireAuth } from "@/lib/api-utils";
-import { getUserById, cancelUserPlanGracefully, updateUserPlan } from "@/lib/db";
+import { getUserById, cancelUserPlanGracefully, updateUserPlan, setTrialExpiry } from "@/lib/db";
 
 const PADDLE_API_KEY = process.env.PADDLE_API_KEY ?? "";
 const PADDLE_CLIENT_TOKEN = process.env.NEXT_PUBLIC_PADDLE_CLIENT_TOKEN ?? "";
@@ -56,8 +56,9 @@ export const GET = withErrorHandling("GET /api/billing/sync", async () => {
   const latest = active ?? subs[0];
 
   if (!latest) {
-    // No subscriptions at all — downgrade to free if still showing as paid
-    if (["pro", "yearly", "canceling"].includes(dbUser?.plan ?? "")) {
+    // No subscriptions at all — downgrade to free if still showing as paid/trial
+    const paidPlans = ["pro", "yearly", "canceling", "trial", "trial_yearly"];
+    if (paidPlans.includes(dbUser?.plan ?? "")) {
       await updateUserPlan(user.userId, "free");
     }
     return NextResponse.json({ synced: true, plan: "free" });
@@ -85,12 +86,25 @@ export const GET = withErrorHandling("GET /api/billing/sync", async () => {
   }
 
   // Active subscription — ensure plan is correct in DB
-  if (["active", "trialing"].includes(latest.status)) {
+  if (latest.status === "active") {
     const correctPlan = yearlyPriceId && priceId === yearlyPriceId ? "yearly" : "pro";
     if (dbUser?.plan !== correctPlan) {
       await updateUserPlan(user.userId, correctPlan, customerId);
     }
     return NextResponse.json({ synced: true, plan: correctPlan });
+  }
+
+  // Trialing — map to "trial" / "trial_yearly" and refresh the expiry date
+  if (latest.status === "trialing") {
+    const correctPlan = yearlyPriceId && priceId === yearlyPriceId ? "trial_yearly" : "trial";
+    if (dbUser?.plan !== correctPlan) {
+      await updateUserPlan(user.userId, correctPlan, customerId);
+    }
+    const trialEndsAt = latest.current_billing_period?.ends_at ?? null;
+    if (trialEndsAt) {
+      await setTrialExpiry(user.userId, trialEndsAt);
+    }
+    return NextResponse.json({ synced: true, plan: correctPlan, expiresAt: trialEndsAt });
   }
 
   return NextResponse.json({ synced: true, plan: dbUser?.plan ?? "free" });

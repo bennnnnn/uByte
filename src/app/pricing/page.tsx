@@ -399,7 +399,10 @@ function PricingContent() {
                     </span>
                     <span className="text-zinc-500 dark:text-zinc-400">/month</span>
                   </div>
-                  <p className="mt-1.5 text-sm text-zinc-500 dark:text-zinc-400">
+                  <p className="mt-1.5 text-sm font-semibold text-indigo-600 dark:text-indigo-400">
+                    7-day free trial included
+                  </p>
+                  <p className="mt-0.5 text-xs text-zinc-500 dark:text-zinc-400">
                     {BILLING_CONFIG.monthly.subLabel}. Switch to yearly to save {YEARLY_DISCOUNT_PERCENT}%.
                   </p>
                 </div>
@@ -409,7 +412,10 @@ function PricingContent() {
                     <span className="text-4xl font-black text-zinc-900 dark:text-white">${(MONTHLY_EQUIVALENT_CENTS / 100).toFixed(2)}</span>
                     <span className="text-zinc-500 dark:text-zinc-400">/month</span>
                   </div>
-                  <p className="mt-1.5 text-sm">
+                  <p className="mt-1.5 text-sm font-semibold text-indigo-600 dark:text-indigo-400">
+                    7-day free trial included
+                  </p>
+                  <p className="mt-0.5 text-sm">
                     <span className="font-semibold text-emerald-600 dark:text-emerald-400">
                       {BILLING_CONFIG.yearly.priceText.replace("/year", " billed yearly")}
                     </span>
@@ -439,7 +445,7 @@ function PricingContent() {
                   href={signupHref}
                   className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-indigo-600 px-5 py-3.5 text-center text-sm font-bold text-white shadow-md shadow-indigo-500/20 transition-all hover:-translate-y-0.5 hover:bg-indigo-500"
                 >
-                  Start free, upgrade anytime
+                  Start 7-day free trial
                 </Link>
               ) : !selectedPriceId ? (
                 <div className="rounded-xl bg-zinc-100 py-3.5 text-center text-sm text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400">
@@ -462,9 +468,12 @@ function PricingContent() {
                     className="w-full py-3.5"
                   >
                     {billing === "yearly"
-                      ? `Get Pro — ${BILLING_CONFIG.yearly.priceText.replace("/year", "/yr")}`
-                      : `Get Pro — ${BILLING_CONFIG.monthly.priceText.replace("/month", "/mo")}`}
+                      ? `Start 7-day trial — ${BILLING_CONFIG.yearly.priceText.replace("/year", "/yr")} after`
+                      : `Start 7-day trial — ${BILLING_CONFIG.monthly.priceText.replace("/month", "/mo")} after`}
                   </Button>
+                  <p className="text-center text-[11px] text-zinc-400 dark:text-zinc-500">
+                    No charge for 7 days · Cancel anytime
+                  </p>
                 </div>
               )}
             </div>
