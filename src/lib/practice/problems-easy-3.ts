@@ -82,6 +82,14 @@ fn main() {
     println!("{}", is_anagram("anagram".to_string(), "nagaram".to_string())); // true
     println!("{}", is_anagram("rat".to_string(), "car".to_string()));          // false
 }`,
+      csharp: `using System.Collections.Generic;
+
+public class Solution {
+    public bool IsAnagram(string s, string t) {
+        // TODO: check if t is an anagram of s
+        return false;
+    }
+}`,
     },
     testCases: [
       { stdin: "anagram|nagaram", expectedOutput: "true" },
@@ -156,6 +164,20 @@ fn main() {
     let s = p[0].to_string(); let t = if p.len() > 1 { p[1].to_string() } else { String::new() };
     println!("{}", is_anagram(s, t));
   }
+}`,
+      csharp: `using System;
+
+{{SOLUTION}}
+class __Judge__ {
+    static void Main() {
+        string line;
+        while ((line = Console.ReadLine()) != null) {
+            line = line.Trim();
+            if (line.Length == 0) continue;
+            var parts = line.Split(new char[]{'|'}, 2);
+            Console.WriteLine(new Solution().IsAnagram(parts[0], parts[1]).ToString().ToLower());
+        }
+    }
 }`,
     },
   },
@@ -246,6 +268,14 @@ fn main() {
     println!("{}", roman_to_int("LVIII".to_string()));  // 58
     println!("{}", roman_to_int("MCMXCIV".to_string())); // 1994
 }`,
+      csharp: `using System.Collections.Generic;
+
+public class Solution {
+    public int RomanToInt(string s) {
+        // TODO: convert a Roman numeral to an integer
+        return 0;
+    }
+}`,
     },
     testCases: [
       { stdin: "III", expectedOutput: "3" },
@@ -311,6 +341,19 @@ fn main() {
     if line.is_empty() { continue; }
     println!("{}", roman_to_int(line));
   }
+}`,
+      csharp: `using System;
+
+{{SOLUTION}}
+class __Judge__ {
+    static void Main() {
+        string line;
+        while ((line = Console.ReadLine()) != null) {
+            line = line.Trim();
+            if (line.Length == 0) continue;
+            Console.WriteLine(new Solution().RomanToInt(line));
+        }
+    }
 }`,
     },
   },
@@ -395,6 +438,12 @@ fn main() {
     println!("{}", find_max_consecutive_ones(vec![1,1,0,1,1,1])); // 3
     println!("{}", find_max_consecutive_ones(vec![1,0,1,1,0,1])); // 2
 }`,
+      csharp: `public class Solution {
+    public int FindMaxConsecutiveOnes(int[] nums) {
+        // TODO: find the maximum consecutive 1s
+        return 0;
+    }
+}`,
     },
     testCases: [
       { stdin: "1 1 0 1 1 1", expectedOutput: "3" },
@@ -468,6 +517,21 @@ fn main() {
     let nums: Vec<i32> = line.split_whitespace().filter_map(|s| s.parse().ok()).collect();
     println!("{}", find_max_consecutive_ones(nums));
   }
+}`,
+      csharp: `using System;
+using System.Linq;
+
+{{SOLUTION}}
+class __Judge__ {
+    static void Main() {
+        string line;
+        while ((line = Console.ReadLine()) != null) {
+            line = line.Trim();
+            if (line.Length == 0) continue;
+            int[] nums = line.Split(new char[]{' '}, StringSplitOptions.RemoveEmptyEntries).Select(int.Parse).ToArray();
+            Console.WriteLine(new Solution().FindMaxConsecutiveOnes(nums));
+        }
+    }
 }`,
     },
   },
@@ -559,6 +623,12 @@ fn main() {
     println!("{}", is_power_of_two(16)); // true
     println!("{}", is_power_of_two(3));  // false
 }`,
+      csharp: `public class Solution {
+    public bool IsPowerOfTwo(int n) {
+        // TODO: check if n is a power of two
+        return false;
+    }
+}`,
     },
     testCases: [
       { stdin: "1", expectedOutput: "true" },
@@ -625,6 +695,20 @@ fn main() {
     let n: i32 = line.parse().unwrap_or(0);
     println!("{}", is_power_of_two(n));
   }
+}`,
+      csharp: `using System;
+
+{{SOLUTION}}
+class __Judge__ {
+    static void Main() {
+        string line;
+        while ((line = Console.ReadLine()) != null) {
+            line = line.Trim();
+            if (line.Length == 0) continue;
+            int n = int.Parse(line);
+            Console.WriteLine(new Solution().IsPowerOfTwo(n).ToString().ToLower());
+        }
+    }
 }`,
     },
   },
@@ -713,6 +797,12 @@ fn main() {
     println!("{}", reverse_words("the sky is blue".to_string()));
     println!("{}", reverse_words("  hello world  ".to_string()));
 }`,
+      csharp: `public class Solution {
+    public string ReverseWords(string s) {
+        // TODO: reverse the words in the string
+        return "";
+    }
+}`,
     },
     testCases: [
       { stdin: "the sky is blue", expectedOutput: "blue is sky the" },
@@ -775,6 +865,19 @@ fn main() {
     if line.trim().is_empty() { continue; }
     println!("{}", reverse_words(line));
   }
+}`,
+      csharp: `using System;
+
+{{SOLUTION}}
+class __Judge__ {
+    static void Main() {
+        string line;
+        while ((line = Console.ReadLine()) != null) {
+            line = line.Trim();
+            if (line.Length == 0) continue;
+            Console.WriteLine(new Solution().ReverseWords(line));
+        }
+    }
 }`,
     },
   },
@@ -861,6 +964,12 @@ fn main() {
     println!("{}", remove_duplicates(&mut a)); // 2
     println!("{}", remove_duplicates(&mut b)); // 5
 }`,
+      csharp: `public class Solution {
+    public int RemoveDuplicates(int[] nums) {
+        // TODO: remove duplicates in-place and return the new length
+        return 0;
+    }
+}`,
     },
     testCases: [
       { stdin: "1 1 2", expectedOutput: "2" },
@@ -934,6 +1043,21 @@ fn main() {
     let mut nums: Vec<i32> = line.split_whitespace().filter_map(|s| s.parse().ok()).collect();
     println!("{}", remove_duplicates(&mut nums));
   }
+}`,
+      csharp: `using System;
+using System.Linq;
+
+{{SOLUTION}}
+class __Judge__ {
+    static void Main() {
+        string line;
+        while ((line = Console.ReadLine()) != null) {
+            line = line.Trim();
+            if (line.Length == 0) continue;
+            int[] nums = line.Split(new char[]{' '}, StringSplitOptions.RemoveEmptyEntries).Select(int.Parse).ToArray();
+            Console.WriteLine(new Solution().RemoveDuplicates(nums));
+        }
+    }
 }`,
     },
   },
@@ -1027,6 +1151,12 @@ fn main() {
     println!("{}", longest_common_prefix(a));
     println!("{}", longest_common_prefix(b));
 }`,
+      csharp: `public class Solution {
+    public string LongestCommonPrefix(string[] strs) {
+        // TODO: find the longest common prefix among all strings
+        return "";
+    }
+}`,
     },
     testCases: [
       { stdin: "flower|flow|flight", expectedOutput: "fl" },
@@ -1097,6 +1227,20 @@ fn main() {
     let strs: Vec<String> = line.split('|').map(|s| s.to_string()).collect();
     println!("{}", longest_common_prefix(strs));
   }
+}`,
+      csharp: `using System;
+
+{{SOLUTION}}
+class __Judge__ {
+    static void Main() {
+        string line;
+        while ((line = Console.ReadLine()) != null) {
+            line = line.Trim();
+            if (line.Length == 0) continue;
+            string[] strs = line.Split('|');
+            Console.WriteLine(new Solution().LongestCommonPrefix(strs));
+        }
+    }
 }`,
     },
   },
@@ -1195,6 +1339,14 @@ fn main() {
     res.sort();
     println!("{:?}", res); // [2, 3]
 }`,
+      csharp: `using System.Collections.Generic;
+
+public class Solution {
+    public IList<int> FindDuplicates(int[] nums) {
+        // TODO: find all elements that appear twice
+        return new List<int>();
+    }
+}`,
     },
     testCases: [
       { stdin: "4 3 2 7 8 2 3 1", expectedOutput: "[2 3]" },
@@ -1284,6 +1436,23 @@ fn main() {
     let inner: Vec<String> = res.iter().map(|x| x.to_string()).collect();
     println!("[{}]", inner.join(" "));
   }
+}`,
+      csharp: `using System;
+using System.Collections.Generic;
+using System.Linq;
+
+{{SOLUTION}}
+class __Judge__ {
+    static string FmtArr(IList<int> a) => "[" + string.Join(" ", a) + "]";
+    static void Main() {
+        string line;
+        while ((line = Console.ReadLine()) != null) {
+            line = line.Trim();
+            if (line.Length == 0) continue;
+            int[] nums = line.Split(new char[]{' '}, StringSplitOptions.RemoveEmptyEntries).Select(int.Parse).ToArray();
+            Console.WriteLine(FmtArr(new Solution().FindDuplicates(nums)));
+        }
+    }
 }`,
     },
   },

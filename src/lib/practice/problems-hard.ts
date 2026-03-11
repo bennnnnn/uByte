@@ -82,6 +82,12 @@ fn main() {
     println!("{}", trap(vec![0,1,0,2,1,0,1,3,2,1,2,1])); // 6
     println!("{}", trap(vec![4,2,0,3,2,5]));               // 9
 }`,
+      csharp: `public class Solution {
+    public int Trap(int[] height) {
+        // TODO: two-pointer approach to calculate trapped rain water
+        return 0;
+    }
+}`,
     },
     testCases: [
       { stdin: "0 1 0 2 1 0 1 3 2 1 2 1", expectedOutput: "6" },
@@ -173,6 +179,21 @@ fn main() {
   }
 }
 `,
+      csharp: `using System;
+using System.Linq;
+
+{{SOLUTION}}
+class __Judge__ {
+    static void Main() {
+        string line;
+        while ((line = Console.ReadLine()) != null) {
+            line = line.Trim();
+            if (line.Length == 0) continue;
+            int[] height = line.Split(new char[]{' '}, StringSplitOptions.RemoveEmptyEntries).Select(int.Parse).ToArray();
+            Console.WriteLine(new Solution().Trap(height));
+        }
+    }
+}`,
     },
   },
 ];

@@ -103,6 +103,14 @@ fn main() {
     println!("{}", word_break("leetcode".to_string(), vec!["leet".to_string(),"code".to_string()])); // true
     println!("{}", word_break("catsandog".to_string(), vec!["cats".to_string(),"dog".to_string(),"sand".to_string(),"and".to_string(),"cat".to_string()])); // false
 }`,
+      csharp: `using System.Collections.Generic;
+
+public class Solution {
+    public bool WordBreak(string s, IList<string> wordDict) {
+        // TODO: DP to check if s can be segmented using wordDict
+        return false;
+    }
+}`,
     },
     testCases: [
       { stdin: "leetcode|leet code", expectedOutput: "true" },
@@ -212,6 +220,24 @@ fn main() {
   }
 }
 `,
+      csharp: `using System;
+using System.Collections.Generic;
+using System.Linq;
+
+{{SOLUTION}}
+class __Judge__ {
+    static void Main() {
+        string line;
+        while ((line = Console.ReadLine()) != null) {
+            line = line.Trim();
+            if (line.Length == 0) continue;
+            var parts = line.Split(new char[]{'|'}, 2);
+            string s = parts[0].Trim();
+            var dict = parts[1].Trim().Split(new char[]{' '}, StringSplitOptions.RemoveEmptyEntries).ToList();
+            Console.WriteLine(new Solution().WordBreak(s, dict).ToString().ToLower());
+        }
+    }
+}`,
     },
   },
 
@@ -307,6 +333,12 @@ fn main() {
     println!("{}", longest_valid_parentheses(")()())")); // 4
     println!("{}", longest_valid_parentheses(")("));     // 0
 }`,
+      csharp: `public class Solution {
+    public int LongestValidParentheses(string s) {
+        // TODO: find the longest valid parentheses substring
+        return 0;
+    }
+}`,
     },
     testCases: [
       { stdin: "(()", expectedOutput: "2" },
@@ -380,6 +412,19 @@ fn main() {
   }
 }
 `,
+      csharp: `using System;
+
+{{SOLUTION}}
+class __Judge__ {
+    static void Main() {
+        string line;
+        while ((line = Console.ReadLine()) != null) {
+            line = line.Trim();
+            if (line.Length == 0) continue;
+            Console.WriteLine(new Solution().LongestValidParentheses(line));
+        }
+    }
+}`,
     },
   },
 ];

@@ -99,6 +99,14 @@ fn main() {
     let result = two_sum(nums, target);
     println!("{:?}", result); // expect [0, 1]
 }`,
+      csharp: `using System.Collections.Generic;
+
+public class Solution {
+    public int[] TwoSum(int[] nums, int target) {
+        // TODO: return indices of two numbers that add up to target
+        return new int[]{};
+    }
+}`,
     },
     testCases: [
       { stdin: "2 7 11 15|9", expectedOutput: "[0 1]" },
@@ -245,6 +253,25 @@ fn main() {
   }
 }
 `,
+      csharp: `using System;
+using System.Collections.Generic;
+using System.Linq;
+
+{{SOLUTION}}
+class __Judge__ {
+        static string FmtArr(int[] a) => "[" + string.Join(" ", a) + "]";
+    static void Main() {
+        string line;
+        while ((line = Console.ReadLine()) != null) {
+            line = line.Trim();
+            if (line.Length == 0) continue;
+            var parts = line.Split(new char[]{'|'}, 2);
+            int[] nums = parts[0].Trim().Split(new char[]{' '}, StringSplitOptions.RemoveEmptyEntries).Select(int.Parse).ToArray();
+            int target = int.Parse(parts[1].Trim());
+            Console.WriteLine(FmtArr(new Solution().TwoSum(nums, target)));
+        }
+    }
+}`,
     },
   },
   {
@@ -332,6 +359,12 @@ fn main() {
     println!("{}", is_valid("()[]{}"));  // true
     println!("{}", is_valid("(]"));      // false
 }`,
+      csharp: `public class Solution {
+    public bool IsValid(string s) {
+        // TODO: use a stack to check valid parentheses
+        return false;
+    }
+}`,
     },
     testCases: [
       { stdin: "()", expectedOutput: "true" },
@@ -413,6 +446,19 @@ fn main() {
   }
 }
 `,
+      csharp: `using System;
+
+{{SOLUTION}}
+class __Judge__ {
+    static void Main() {
+        string line;
+        while ((line = Console.ReadLine()) != null) {
+            line = line.Trim();
+            if (line.Length == 0) continue;
+            Console.WriteLine(new Solution().IsValid(line).ToString().ToLower());
+        }
+    }
+}`,
     },
   },
   {
@@ -498,6 +544,14 @@ fn contains_duplicate(nums: Vec<i32>) -> bool {
 fn main() {
     println!("{}", contains_duplicate(vec![1, 2, 3, 1])); // true
     println!("{}", contains_duplicate(vec![1, 2, 3, 4])); // false
+}`,
+      csharp: `using System.Collections.Generic;
+
+public class Solution {
+    public bool ContainsDuplicate(int[] nums) {
+        // TODO: return true if any value appears more than once
+        return false;
+    }
 }`,
     },
     testCases: [
@@ -593,6 +647,21 @@ fn main() {
   }
 }
 `,
+      csharp: `using System;
+using System.Linq;
+
+{{SOLUTION}}
+class __Judge__ {
+    static void Main() {
+        string line;
+        while ((line = Console.ReadLine()) != null) {
+            line = line.Trim();
+            if (line.Length == 0) continue;
+            int[] nums = line.Split(new char[]{' '}, StringSplitOptions.RemoveEmptyEntries).Select(int.Parse).ToArray();
+            Console.WriteLine(new Solution().ContainsDuplicate(nums).ToString().ToLower());
+        }
+    }
+}`,
     },
   },
   {
@@ -681,6 +750,12 @@ console.log(maxProfit([7, 6, 4, 3, 1]));     // 0`,
 fn main() {
     println!("{}", max_profit(vec![7, 1, 5, 3, 6, 4])); // 5
     println!("{}", max_profit(vec![7, 6, 4, 3, 1]));     // 0
+}`,
+      csharp: `public class Solution {
+    public int MaxProfit(int[] prices) {
+        // TODO: find the maximum profit from a single buy/sell
+        return 0;
+    }
 }`,
     },
     testCases: [
@@ -774,6 +849,21 @@ fn main() {
   }
 }
 `,
+      csharp: `using System;
+using System.Linq;
+
+{{SOLUTION}}
+class __Judge__ {
+    static void Main() {
+        string line;
+        while ((line = Console.ReadLine()) != null) {
+            line = line.Trim();
+            if (line.Length == 0) continue;
+            int[] prices = line.Split(new char[]{' '}, StringSplitOptions.RemoveEmptyEntries).Select(int.Parse).ToArray();
+            Console.WriteLine(new Solution().MaxProfit(prices));
+        }
+    }
+}`,
     },
   },
   {
@@ -863,6 +953,11 @@ fn main() {
     reverse_string(&mut s);
     let result: String = s.into_iter().collect();
     println!("{}", result); // "olleh"
+}`,
+      csharp: `public class Solution {
+    public void ReverseString(char[] s) {
+        // TODO: reverse s in-place using two pointers
+    }
 }`,
     },
     testCases: [
@@ -955,6 +1050,21 @@ fn main() {
   }
 }
 `,
+      csharp: `using System;
+
+{{SOLUTION}}
+class __Judge__ {
+    static void Main() {
+        string line;
+        while ((line = Console.ReadLine()) != null) {
+            line = line.Trim();
+            if (line.Length == 0) continue;
+            char[] s = line.ToCharArray();
+            new Solution().ReverseString(s);
+            Console.WriteLine(new string(s));
+        }
+    }
+}`,
     },
   },
   {
@@ -1037,6 +1147,12 @@ fn main() {
     println!("{}", climb_stairs(2)); // 2
     println!("{}", climb_stairs(3)); // 3
     println!("{}", climb_stairs(5)); // 8
+}`,
+      csharp: `public class Solution {
+    public int ClimbStairs(int n) {
+        // TODO: use dynamic programming (Fibonacci pattern)
+        return 0;
+    }
 }`,
     },
     testCases: [
@@ -1127,6 +1243,20 @@ fn main() {
   }
 }
 `,
+      csharp: `using System;
+
+{{SOLUTION}}
+class __Judge__ {
+    static void Main() {
+        string line;
+        while ((line = Console.ReadLine()) != null) {
+            line = line.Trim();
+            if (line.Length == 0) continue;
+            int n = int.Parse(line);
+            Console.WriteLine(new Solution().ClimbStairs(n));
+        }
+    }
+}`,
     },
   },
 ];

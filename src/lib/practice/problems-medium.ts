@@ -92,6 +92,14 @@ fn main() {
     println!("{:?}", three_sum(vec![-1, 0, 1, 2, -1, -4]));
     println!("{:?}", three_sum(vec![0, 0, 0]));
 }`,
+      csharp: `using System.Collections.Generic;
+
+public class Solution {
+    public IList<IList<int>> ThreeSum(int[] nums) {
+        // TODO: find all unique triplets that sum to zero
+        return new List<IList<int>>();
+    }
+}`,
     },
     testCases: [
       { stdin: "-1 0 1 2 -1 -4", expectedOutput: "[[-1 -1 2] [-1 0 1]]" },
@@ -243,6 +251,23 @@ fn main() {
   }
 }
 `,
+      csharp: `using System;
+using System.Collections.Generic;
+using System.Linq;
+
+{{SOLUTION}}
+class __Judge__ {
+    static string Fmt(IList<IList<int>> res) => "[" + string.Join(" ", res.Select(r => "[" + string.Join(" ", r) + "]")) + "]";
+    static void Main() {
+        string line;
+        while ((line = Console.ReadLine()) != null) {
+            line = line.Trim();
+            if (line.Length == 0) continue;
+            int[] nums = line.Split(new char[]{' '}, StringSplitOptions.RemoveEmptyEntries).Select(int.Parse).ToArray();
+            Console.WriteLine(Fmt(new Solution().ThreeSum(nums)));
+        }
+    }
+}`,
     },
   },
   {
@@ -328,6 +353,12 @@ console.log(maxSubArray([5, 4, -1, 7, 8]));                  // 23`,
 fn main() {
     println!("{}", max_sub_array(vec![-2, 1, -3, 4, -1, 2, 1, -5, 4])); // 6
     println!("{}", max_sub_array(vec![5, 4, -1, 7, 8]));                  // 23
+}`,
+      csharp: `public class Solution {
+    public int MaxSubArray(int[] nums) {
+        // TODO: find the subarray with the largest sum (Kadane's algorithm)
+        return 0;
+    }
 }`,
     },
     testCases: [
@@ -420,6 +451,21 @@ fn main() {
   }
 }
 `,
+      csharp: `using System;
+using System.Linq;
+
+{{SOLUTION}}
+class __Judge__ {
+    static void Main() {
+        string line;
+        while ((line = Console.ReadLine()) != null) {
+            line = line.Trim();
+            if (line.Length == 0) continue;
+            int[] nums = line.Split(new char[]{' '}, StringSplitOptions.RemoveEmptyEntries).Select(int.Parse).ToArray();
+            Console.WriteLine(new Solution().MaxSubArray(nums));
+        }
+    }
+}`,
     },
   },
   {
@@ -518,6 +564,14 @@ fn main() {
     println!("{}", length_of_longest_substring("bbbbb"));    // 1
     println!("{}", length_of_longest_substring("pwwkew"));   // 3
 }`,
+      csharp: `using System.Collections.Generic;
+
+public class Solution {
+    public int LengthOfLongestSubstring(string s) {
+        // TODO: sliding window to find the longest substring without repeating chars
+        return 0;
+    }
+}`,
     },
     testCases: [
       { stdin: "abcabcbb", expectedOutput: "3" },
@@ -590,6 +644,19 @@ fn main() {
   }
 }
 `,
+      csharp: `using System;
+
+{{SOLUTION}}
+class __Judge__ {
+    static void Main() {
+        string line;
+        while ((line = Console.ReadLine()) != null) {
+            line = line.Trim();
+            if (line.Length == 0) continue;
+            Console.WriteLine(new Solution().LengthOfLongestSubstring(line));
+        }
+    }
+}`,
     },
   },
   {
@@ -684,6 +751,14 @@ public class Main {
 fn main() {
     println!("{:?}", merge(vec![vec![1,3],vec![2,6],vec![8,10],vec![15,18]]));
     println!("{:?}", merge(vec![vec![1,4],vec![4,5]]));
+}`,
+      csharp: `using System.Collections.Generic;
+
+public class Solution {
+    public int[][] Merge(int[][] intervals) {
+        // TODO: merge all overlapping intervals
+        return intervals;
+    }
 }`,
     },
     testCases: [
@@ -862,6 +937,22 @@ fn main() {
   }
 }
 `,
+      csharp: `using System;
+using System.Collections.Generic;
+using System.Linq;
+
+{{SOLUTION}}class __Judge__ {
+    static string Fmt(int[][] res) => "[" + string.Join(" ", res.Select(r => "[" + string.Join(" ", r) + "]")) + "]";
+    static void Main() {
+        string line;
+        while ((line = Console.ReadLine()) != null) {
+            line = line.Trim();
+            if (line.Length == 0) continue;
+            int[][] intervals = line.Split('|').Select(p => p.Trim().Split(new char[]{' '}, StringSplitOptions.RemoveEmptyEntries).Select(int.Parse).ToArray()).ToArray();
+            Console.WriteLine(Fmt(new Solution().Merge(intervals)));
+        }
+    }
+}`,
     },
   },
 ];

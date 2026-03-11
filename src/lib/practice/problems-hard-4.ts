@@ -82,6 +82,12 @@ fn main() {
     println!("{:.5}", find_median_sorted_arrays(vec![1, 3], vec![2]));    // 2.00000
     println!("{:.5}", find_median_sorted_arrays(vec![1, 2], vec![3, 4])); // 2.50000
 }`,
+      csharp: `public class Solution {
+    public double FindMedianSortedArrays(int[] nums1, int[] nums2) {
+        // TODO: O(log(min(m,n))) binary search approach
+        return 0.0;
+    }
+}`,
     },
     // stdin: "1 3|2"  →  nums1 | nums2
     testCases: [
@@ -196,6 +202,23 @@ fn main() {
   }
 }
 `,
+      csharp: `using System;
+using System.Linq;
+
+{{SOLUTION}}
+class __Judge__ {
+    static void Main() {
+        string line;
+        while ((line = Console.ReadLine()) != null) {
+            line = line.Trim();
+            if (line.Length == 0) continue;
+            var parts = line.Split(new char[]{'|'}, 2);
+            int[] nums1 = parts[0].Trim().Split(new char[]{' '}, StringSplitOptions.RemoveEmptyEntries).Select(int.Parse).ToArray();
+            int[] nums2 = parts[1].Trim().Split(new char[]{' '}, StringSplitOptions.RemoveEmptyEntries).Select(int.Parse).ToArray();
+            Console.WriteLine(new Solution().FindMedianSortedArrays(nums1, nums2).ToString("F5"));
+        }
+    }
+}`,
     },
   },
 
@@ -291,6 +314,12 @@ fn main() {
     println!("{}", is_match("aa", "a*"));      // true
     println!("{}", is_match("ab", ".*"));      // true
     println!("{}", is_match("aab", "c*a*b"));  // true
+}`,
+      csharp: `public class Solution {
+    public bool IsMatch(string s, string p) {
+        // TODO: implement regex matching with '.' and '*'
+        return false;
+    }
 }`,
     },
     testCases: [
@@ -392,6 +421,20 @@ fn main() {
   }
 }
 `,
+      csharp: `using System;
+
+{{SOLUTION}}
+class __Judge__ {
+    static void Main() {
+        string line;
+        while ((line = Console.ReadLine()) != null) {
+            line = line.Trim();
+            if (line.Length == 0) continue;
+            var parts = line.Split(new char[]{'|'}, 2);
+            Console.WriteLine(new Solution().IsMatch(parts[0], parts[1]).ToString().ToLower());
+        }
+    }
+}`,
     },
   },
 
@@ -477,6 +520,12 @@ fn main() {
     println!("{}", total_n_queens(1)); // 1
     println!("{}", total_n_queens(8)); // 92
 }`,
+      csharp: `public class Solution {
+    public int TotalNQueens(int n) {
+        // TODO: count the number of distinct N-Queens solutions
+        return 0;
+    }
+}`,
     },
     testCases: [
       { stdin: "1", expectedOutput: "1" },
@@ -559,6 +608,20 @@ fn main() {
   }
 }
 `,
+      csharp: `using System;
+
+{{SOLUTION}}
+class __Judge__ {
+    static void Main() {
+        string line;
+        while ((line = Console.ReadLine()) != null) {
+            line = line.Trim();
+            if (line.Length == 0) continue;
+            int n = int.Parse(line);
+            Console.WriteLine(new Solution().TotalNQueens(n));
+        }
+    }
+}`,
     },
   },
 ];

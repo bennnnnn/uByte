@@ -83,6 +83,14 @@ fn main() {
     println!("{}", min_window("ADOBECODEBANC".to_string(), "ABC".to_string())); // BANC
     println!("{}", min_window("a".to_string(), "aa".to_string()));              // (empty)
 }`,
+      csharp: `using System.Collections.Generic;
+
+public class Solution {
+    public string MinWindow(string s, string t) {
+        // TODO: sliding window to find minimum window containing all chars of t
+        return "";
+    }
+}`,
     },
     testCases: [
       { stdin: "ADOBECODEBANC|ABC", expectedOutput: "BANC" },
@@ -155,6 +163,20 @@ fn main() {
     let s = p[0].to_string(); let t = if p.len()>1{p[1].to_string()}else{String::new()};
     println!("{}", min_window(s, t));
   }
+}`,
+      csharp: `using System;
+
+{{SOLUTION}}
+class __Judge__ {
+    static void Main() {
+        string line;
+        while ((line = Console.ReadLine()) != null) {
+            line = line.Trim();
+            if (line.Length == 0) continue;
+            var parts = line.Split(new char[]{'|'}, 2);
+            Console.WriteLine(new Solution().MinWindow(parts[0], parts[1]));
+        }
+    }
 }`,
     },
   },
@@ -244,6 +266,12 @@ fn main() {
     println!("{}", largest_rectangle_area(vec![2,1,5,6,2,3])); // 10
     println!("{}", largest_rectangle_area(vec![2,4]));          // 4
 }`,
+      csharp: `public class Solution {
+    public int LargestRectangleArea(int[] heights) {
+        // TODO: stack-based approach to find the largest rectangle
+        return 0;
+    }
+}`,
     },
     testCases: [
       { stdin: "2 1 5 6 2 3", expectedOutput: "10" },
@@ -318,6 +346,21 @@ fn main() {
     let heights: Vec<i32> = line.split_whitespace().filter_map(|s|s.parse().ok()).collect();
     println!("{}", largest_rectangle_area(heights));
   }
+}`,
+      csharp: `using System;
+using System.Linq;
+
+{{SOLUTION}}
+class __Judge__ {
+    static void Main() {
+        string line;
+        while ((line = Console.ReadLine()) != null) {
+            line = line.Trim();
+            if (line.Length == 0) continue;
+            int[] heights = line.Split(new char[]{' '}, StringSplitOptions.RemoveEmptyEntries).Select(int.Parse).ToArray();
+            Console.WriteLine(new Solution().LargestRectangleArea(heights));
+        }
+    }
 }`,
     },
   },
@@ -404,6 +447,12 @@ fn main() {
     println!("{}", min_distance("horse".to_string(), "ros".to_string()));          // 3
     println!("{}", min_distance("intention".to_string(), "execution".to_string())); // 5
 }`,
+      csharp: `public class Solution {
+    public int MinDistance(string word1, string word2) {
+        // TODO: DP to compute edit distance (Levenshtein)
+        return 0;
+    }
+}`,
     },
     testCases: [
       { stdin: "horse|ros", expectedOutput: "3" },
@@ -483,6 +532,20 @@ fn main() {
     let w1 = p[0].to_string(); let w2 = if p.len()>1{p[1].to_string()}else{String::new()};
     println!("{}", min_distance(w1, w2));
   }
+}`,
+      csharp: `using System;
+
+{{SOLUTION}}
+class __Judge__ {
+    static void Main() {
+        string line;
+        while ((line = Console.ReadLine()) != null) {
+            line = line.Trim();
+            if (line.Length == 0) continue;
+            var parts = line.Split(new char[]{'|'}, 2);
+            Console.WriteLine(new Solution().MinDistance(parts[0], parts[1]));
+        }
+    }
 }`,
     },
   },

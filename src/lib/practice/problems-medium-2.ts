@@ -86,6 +86,12 @@ console.log("[" + r.join(" ") + "]"); // [24 12 8 6]`,
 fn main() {
     println!("{:?}", product_except_self(vec![1, 2, 3, 4])); // [24, 12, 8, 6]
 }`,
+      csharp: `public class Solution {
+    public int[] ProductExceptSelf(int[] nums) {
+        // TODO: return products of all elements except self
+        return new int[nums.Length];
+    }
+}`,
     },
     testCases: [
       { stdin: "1 2 3 4", expectedOutput: "[24 12 8 6]" },
@@ -186,6 +192,22 @@ fn main() {
   }
 }
 `,
+      csharp: `using System;
+using System.Linq;
+
+{{SOLUTION}}
+class __Judge__ {
+    static string FmtArr(int[] a) => "[" + string.Join(" ", a) + "]";
+    static void Main() {
+        string line;
+        while ((line = Console.ReadLine()) != null) {
+            line = line.Trim();
+            if (line.Length == 0) continue;
+            int[] nums = line.Split(new char[]{' '}, StringSplitOptions.RemoveEmptyEntries).Select(int.Parse).ToArray();
+            Console.WriteLine(FmtArr(new Solution().ProductExceptSelf(nums)));
+        }
+    }
+}`,
     },
   },
 
@@ -268,6 +290,12 @@ console.log(rob([2, 7, 9, 3, 1])); // 12`,
 fn main() {
     println!("{}", rob(vec![1, 2, 3, 1]));    // 4
     println!("{}", rob(vec![2, 7, 9, 3, 1])); // 12
+}`,
+      csharp: `public class Solution {
+    public int Rob(int[] nums) {
+        // TODO: find max money you can rob without robbing adjacent houses
+        return 0;
+    }
 }`,
     },
     testCases: [
@@ -361,6 +389,21 @@ fn main() {
   }
 }
 `,
+      csharp: `using System;
+using System.Linq;
+
+{{SOLUTION}}
+class __Judge__ {
+    static void Main() {
+        string line;
+        while ((line = Console.ReadLine()) != null) {
+            line = line.Trim();
+            if (line.Length == 0) continue;
+            int[] nums = line.Split(new char[]{' '}, StringSplitOptions.RemoveEmptyEntries).Select(int.Parse).ToArray();
+            Console.WriteLine(new Solution().Rob(nums));
+        }
+    }
+}`,
     },
   },
 
@@ -452,6 +495,12 @@ fn main() {
     println!("{}", coin_change(vec![1, 5, 10], 11)); // 2
     println!("{}", coin_change(vec![2], 3));           // -1
     println!("{}", coin_change(vec![1, 2, 5], 11));   // 3
+}`,
+      csharp: `public class Solution {
+    public int CoinChange(int[] coins, int amount) {
+        // TODO: find minimum number of coins to make amount, or -1
+        return -1;
+    }
 }`,
     },
     testCases: [
@@ -562,6 +611,23 @@ fn main() {
   }
 }
 `,
+      csharp: `using System;
+using System.Linq;
+
+{{SOLUTION}}
+class __Judge__ {
+    static void Main() {
+        string line;
+        while ((line = Console.ReadLine()) != null) {
+            line = line.Trim();
+            if (line.Length == 0) continue;
+            var parts = line.Split(new char[]{'|'}, 2);
+            int[] coins = parts[0].Trim().Split(new char[]{' '}, StringSplitOptions.RemoveEmptyEntries).Select(int.Parse).ToArray();
+            int amount = int.Parse(parts[1].Trim());
+            Console.WriteLine(new Solution().CoinChange(coins, amount));
+        }
+    }
+}`,
     },
   },
 
@@ -649,6 +715,12 @@ fn main() {
     println!("{}", find_min(vec![3, 4, 5, 1, 2]));        // 1
     println!("{}", find_min(vec![4, 5, 6, 7, 0, 1, 2]));  // 0
     println!("{}", find_min(vec![11, 13, 15, 17]));        // 11
+}`,
+      csharp: `public class Solution {
+    public int FindMin(int[] nums) {
+        // TODO: find the minimum element in a rotated sorted array
+        return 0;
+    }
 }`,
     },
     testCases: [
@@ -742,6 +814,21 @@ fn main() {
   }
 }
 `,
+      csharp: `using System;
+using System.Linq;
+
+{{SOLUTION}}
+class __Judge__ {
+    static void Main() {
+        string line;
+        while ((line = Console.ReadLine()) != null) {
+            line = line.Trim();
+            if (line.Length == 0) continue;
+            int[] nums = line.Split(new char[]{' '}, StringSplitOptions.RemoveEmptyEntries).Select(int.Parse).ToArray();
+            Console.WriteLine(new Solution().FindMin(nums));
+        }
+    }
+}`,
     },
   },
 
@@ -830,6 +917,12 @@ fn main() {
     println!("{}", max_product(vec![2, 3, -2, 4]));  // 6
     println!("{}", max_product(vec![-2, 0, -1]));     // 0
     println!("{}", max_product(vec![-2, 3, -4]));     // 24
+}`,
+      csharp: `public class Solution {
+    public int MaxProduct(int[] nums) {
+        // TODO: find the subarray with the largest product
+        return 0;
+    }
 }`,
     },
     testCases: [
@@ -923,6 +1016,21 @@ fn main() {
   }
 }
 `,
+      csharp: `using System;
+using System.Linq;
+
+{{SOLUTION}}
+class __Judge__ {
+    static void Main() {
+        string line;
+        while ((line = Console.ReadLine()) != null) {
+            line = line.Trim();
+            if (line.Length == 0) continue;
+            int[] nums = line.Split(new char[]{' '}, StringSplitOptions.RemoveEmptyEntries).Select(int.Parse).ToArray();
+            Console.WriteLine(new Solution().MaxProduct(nums));
+        }
+    }
+}`,
     },
   },
 
@@ -1010,6 +1118,12 @@ fn main() {
     println!("{}", search(vec![4, 5, 6, 7, 0, 1, 2], 0)); // 4
     println!("{}", search(vec![4, 5, 6, 7, 0, 1, 2], 3)); // -1
     println!("{}", search(vec![1], 0));                     // -1
+}`,
+      csharp: `public class Solution {
+    public int Search(int[] nums, int target) {
+        // TODO: binary search in a rotated sorted array
+        return -1;
+    }
 }`,
     },
     testCases: [
@@ -1120,6 +1234,23 @@ fn main() {
   }
 }
 `,
+      csharp: `using System;
+using System.Linq;
+
+{{SOLUTION}}
+class __Judge__ {
+    static void Main() {
+        string line;
+        while ((line = Console.ReadLine()) != null) {
+            line = line.Trim();
+            if (line.Length == 0) continue;
+            var parts = line.Split(new char[]{'|'}, 2);
+            int[] nums = parts[0].Trim().Split(new char[]{' '}, StringSplitOptions.RemoveEmptyEntries).Select(int.Parse).ToArray();
+            int target = int.Parse(parts[1].Trim());
+            Console.WriteLine(new Solution().Search(nums, target));
+        }
+    }
+}`,
     },
   },
 ];

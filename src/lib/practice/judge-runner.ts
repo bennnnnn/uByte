@@ -76,6 +76,13 @@ function extractRustSolution(code: string): string {
   return s.trim();
 }
 
+// C# starters use `public class Solution { ... }`.
+// We strip `using` directives (the harness supplies them) and return the Solution class body.
+function extractCSharpSolution(code: string): string {
+  // Remove top-level `using` statements
+  return code.replace(/^\s*using\s+[^;]+;\s*$/gm, "").trim();
+}
+
 export type JudgeVerdict =
   | "accepted"
   | "wrong_answer"
@@ -125,12 +132,13 @@ export async function runJudge(
   }
   const lang = isLang(language) ? language : "go";
   const harness =
-    lang === "go" ? problem.judgeHarness?.go :
-    lang === "python" ? problem.judgeHarness?.python :
+    lang === "go"         ? problem.judgeHarness?.go :
+    lang === "python"     ? problem.judgeHarness?.python :
     lang === "javascript" ? problem.judgeHarness?.javascript :
-    lang === "cpp" ? problem.judgeHarness?.cpp :
-    lang === "java" ? problem.judgeHarness?.java :
-    problem.judgeHarness?.rust;
+    lang === "cpp"        ? problem.judgeHarness?.cpp :
+    lang === "java"       ? problem.judgeHarness?.java :
+    lang === "csharp"     ? problem.judgeHarness?.csharp :
+                            problem.judgeHarness?.rust;
   if (!harness) {
     return { verdict: "error", message: `No judge harness for ${lang} on this problem.` };
   }
@@ -139,12 +147,13 @@ export async function runJudge(
   }
 
   const solution =
-    lang === "go" ? extractGoSolution(code) :
-    lang === "python" ? extractPythonSolution(code) :
+    lang === "go"         ? extractGoSolution(code) :
+    lang === "python"     ? extractPythonSolution(code) :
     lang === "javascript" ? extractJavaScriptSolution(code) :
-    lang === "cpp" ? extractCppSolution(code) :
-    lang === "java" ? extractJavaSolution(code) :
-    extractRustSolution(code);
+    lang === "cpp"        ? extractCppSolution(code) :
+    lang === "java"       ? extractJavaSolution(code) :
+    lang === "csharp"     ? extractCSharpSolution(code) :
+                            extractRustSolution(code);
   const judgeCode = prepareCodeForJudge(harness.replace("{{SOLUTION}}", solution), lang);
 
   const stdin = problem.testCases.map((tc) => tc.stdin).join("\n");

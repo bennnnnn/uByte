@@ -127,6 +127,12 @@ fn main() {
     println!("{}", num_islands(&mut g1)); // 1
     println!("{}", num_islands(&mut g2)); // 3
 }`,
+      csharp: `public class Solution {
+    public int NumIslands(char[][] grid) {
+        // TODO: DFS/BFS to count islands
+        return 0;
+    }
+}`,
     },
     // stdin: rows joined by "|" using "0"/"1" chars. e.g. "11110|11010|11011|00001"
     testCases: [
@@ -228,6 +234,21 @@ fn main() {
   }
 }
 `,
+      csharp: `using System;
+using System.Linq;
+
+{{SOLUTION}}
+class __Judge__ {
+    static void Main() {
+        string line;
+        while ((line = Console.ReadLine()) != null) {
+            line = line.Trim();
+            if (line.Length == 0) continue;
+            char[][] grid = line.Split('|').Select(r => r.ToCharArray()).ToArray();
+            Console.WriteLine(new Solution().NumIslands(grid));
+        }
+    }
+}`,
     },
   },
 
@@ -313,6 +334,12 @@ public class Main {
 fn main() {
     println!("{}", find_kth_largest(vec![3, 2, 1, 5, 6, 4], 2));           // 5
     println!("{}", find_kth_largest(vec![3, 2, 3, 1, 2, 4, 5, 5, 6], 4));  // 4
+}`,
+      csharp: `public class Solution {
+    public int FindKthLargest(int[] nums, int k) {
+        // TODO: find the kth largest element (1-indexed)
+        return 0;
+    }
 }`,
     },
     // stdin: "3 2 1 5 6 4|2"  → nums | k
@@ -422,6 +449,23 @@ fn main() {
   }
 }
 `,
+      csharp: `using System;
+using System.Linq;
+
+{{SOLUTION}}
+class __Judge__ {
+    static void Main() {
+        string line;
+        while ((line = Console.ReadLine()) != null) {
+            line = line.Trim();
+            if (line.Length == 0) continue;
+            var parts = line.Split(new char[]{'|'}, 2);
+            int[] nums = parts[0].Trim().Split(new char[]{' '}, StringSplitOptions.RemoveEmptyEntries).Select(int.Parse).ToArray();
+            int k = int.Parse(parts[1].Trim());
+            Console.WriteLine(new Solution().FindKthLargest(nums, k));
+        }
+    }
+}`,
     },
   },
 
@@ -512,6 +556,12 @@ fn main() {
     println!("{}", length_of_lis(vec![10, 9, 2, 5, 3, 7, 101, 18])); // 4
     println!("{}", length_of_lis(vec![0, 1, 0, 3, 2, 3]));            // 4
     println!("{}", length_of_lis(vec![7, 7, 7, 7, 7]));               // 1
+}`,
+      csharp: `public class Solution {
+    public int LengthOfLIS(int[] nums) {
+        // TODO: find the length of the longest increasing subsequence
+        return 0;
+    }
 }`,
     },
     testCases: [
@@ -607,6 +657,21 @@ fn main() {
   }
 }
 `,
+      csharp: `using System;
+using System.Linq;
+
+{{SOLUTION}}
+class __Judge__ {
+    static void Main() {
+        string line;
+        while ((line = Console.ReadLine()) != null) {
+            line = line.Trim();
+            if (line.Length == 0) continue;
+            int[] nums = line.Split(new char[]{' '}, StringSplitOptions.RemoveEmptyEntries).Select(int.Parse).ToArray();
+            Console.WriteLine(new Solution().LengthOfLIS(nums));
+        }
+    }
+}`,
     },
   },
 
@@ -698,6 +763,14 @@ fn main() {
     let res = letter_combinations("23");
     println!("{}", res.join(" "));
 }`,
+      csharp: `using System.Collections.Generic;
+
+public class Solution {
+    public IList<string> LetterCombinations(string digits) {
+        // TODO: return all possible letter combinations for the phone digits
+        return new List<string>();
+    }
+}`,
     },
     testCases: [
       { stdin: "23", expectedOutput: "ad ae af bd be bf cd ce cf" },
@@ -785,6 +858,22 @@ fn main() {
   }
 }
 `,
+      csharp: `using System;
+using System.Collections.Generic;
+using System.Linq;
+
+{{SOLUTION}}
+class __Judge__ {
+    static void Main() {
+        string line;
+        while ((line = Console.ReadLine()) != null) {
+            line = line.Trim();
+            if (line.Length == 0) continue;
+            var res = new Solution().LetterCombinations(line);
+            Console.WriteLine(string.Join(" ", res));
+        }
+    }
+}`,
     },
   },
 ];

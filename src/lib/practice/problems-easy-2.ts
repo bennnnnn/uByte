@@ -84,6 +84,14 @@ fn main() {
     println!("{}", missing_number(vec![3, 0, 1])); // 2
     println!("{}", missing_number(vec![0, 1]));     // 2
 }`,
+      csharp: `using System.Linq;
+
+public class Solution {
+    public int MissingNumber(int[] nums) {
+        // TODO: find the missing number in 0..n
+        return 0;
+    }
+}`,
     },
     testCases: [
       { stdin: "3 0 1", expectedOutput: "2" },
@@ -176,6 +184,21 @@ fn main() {
   }
 }
 `,
+      csharp: `using System;
+using System.Linq;
+
+{{SOLUTION}}
+class __Judge__ {
+    static void Main() {
+        string line;
+        while ((line = Console.ReadLine()) != null) {
+            line = line.Trim();
+            if (line.Length == 0) continue;
+            int[] nums = line.Split(new char[]{' '}, StringSplitOptions.RemoveEmptyEntries).Select(int.Parse).ToArray();
+            Console.WriteLine(new Solution().MissingNumber(nums));
+        }
+    }
+}`,
     },
   },
 
@@ -258,6 +281,12 @@ console.log(singleNumber([4, 1, 2, 1, 2]));  // 4`,
 fn main() {
     println!("{}", single_number(vec![2, 2, 1]));        // 1
     println!("{}", single_number(vec![4, 1, 2, 1, 2]));  // 4
+}`,
+      csharp: `public class Solution {
+    public int SingleNumber(int[] nums) {
+        // TODO: find the element that appears only once
+        return 0;
+    }
 }`,
     },
     testCases: [
@@ -350,6 +379,21 @@ fn main() {
   }
 }
 `,
+      csharp: `using System;
+using System.Linq;
+
+{{SOLUTION}}
+class __Judge__ {
+    static void Main() {
+        string line;
+        while ((line = Console.ReadLine()) != null) {
+            line = line.Trim();
+            if (line.Length == 0) continue;
+            int[] nums = line.Split(new char[]{' '}, StringSplitOptions.RemoveEmptyEntries).Select(int.Parse).ToArray();
+            Console.WriteLine(new Solution().SingleNumber(nums));
+        }
+    }
+}`,
     },
   },
 
@@ -442,6 +486,11 @@ fn main() {
     let mut nums = vec![0, 1, 0, 3, 12];
     move_zeroes(&mut nums);
     println!("{:?}", nums); // [1, 3, 12, 0, 0]
+}`,
+      csharp: `public class Solution {
+    public void MoveZeroes(int[] nums) {
+        // TODO: move all zeroes to the end in-place
+    }
 }`,
     },
     testCases: [
@@ -553,6 +602,23 @@ fn main() {
   }
 }
 `,
+      csharp: `using System;
+using System.Linq;
+
+{{SOLUTION}}
+class __Judge__ {
+    static string FmtArr(int[] a) => "[" + string.Join(" ", a) + "]";
+    static void Main() {
+        string line;
+        while ((line = Console.ReadLine()) != null) {
+            line = line.Trim();
+            if (line.Length == 0) continue;
+            int[] nums = line.Split(new char[]{' '}, StringSplitOptions.RemoveEmptyEntries).Select(int.Parse).ToArray();
+            new Solution().MoveZeroes(nums);
+            Console.WriteLine(FmtArr(nums));
+        }
+    }
+}`,
     },
   },
 
@@ -642,6 +708,15 @@ fn main() {
     println!("{}", is_palindrome_str("racecar")); // true
     println!("{}", is_palindrome_str("hello"));   // false
 }`,
+      csharp: `using System;
+using System.Linq;
+
+public class Solution {
+    public bool IsPalindrome(string s) {
+        // TODO: check if s is a palindrome (alphanumeric only, case-insensitive)
+        return false;
+    }
+}`,
     },
     testCases: [
       { stdin: "racecar", expectedOutput: "true" },
@@ -719,6 +794,19 @@ fn main() {
   }
 }
 `,
+      csharp: `using System;
+
+{{SOLUTION}}
+class __Judge__ {
+    static void Main() {
+        string line;
+        while ((line = Console.ReadLine()) != null) {
+            line = line.Trim();
+            if (line.Length == 0) continue;
+            Console.WriteLine(new Solution().IsPalindrome(line).ToString().ToLower());
+        }
+    }
+}`,
     },
   },
 
@@ -811,6 +899,14 @@ fn main() {
     println!("{}", first_uniq_char("loveleetcode")); // 2
     println!("{}", first_uniq_char("aabb"));         // -1
 }`,
+      csharp: `using System.Collections.Generic;
+
+public class Solution {
+    public int FirstUniqChar(string s) {
+        // TODO: return the index of the first non-repeating character, or -1
+        return -1;
+    }
+}`,
     },
     testCases: [
       { stdin: "leetcode", expectedOutput: "0" },
@@ -884,6 +980,19 @@ fn main() {
   }
 }
 `,
+      csharp: `using System;
+
+{{SOLUTION}}
+class __Judge__ {
+    static void Main() {
+        string line;
+        while ((line = Console.ReadLine()) != null) {
+            line = line.Trim();
+            if (line.Length == 0) continue;
+            Console.WriteLine(new Solution().FirstUniqChar(line));
+        }
+    }
+}`,
     },
   },
 
@@ -965,6 +1074,12 @@ console.log(majorityElement([2, 2, 1, 1, 1, 2, 2])); // 2`,
 fn main() {
     println!("{}", majority_element(vec![3, 2, 3]));              // 3
     println!("{}", majority_element(vec![2, 2, 1, 1, 1, 2, 2])); // 2
+}`,
+      csharp: `public class Solution {
+    public int MajorityElement(int[] nums) {
+        // TODO: find the element that appears more than n/2 times
+        return 0;
+    }
 }`,
     },
     testCases: [
@@ -1057,6 +1172,21 @@ fn main() {
   }
 }
 `,
+      csharp: `using System;
+using System.Linq;
+
+{{SOLUTION}}
+class __Judge__ {
+    static void Main() {
+        string line;
+        while ((line = Console.ReadLine()) != null) {
+            line = line.Trim();
+            if (line.Length == 0) continue;
+            int[] nums = line.Split(new char[]{' '}, StringSplitOptions.RemoveEmptyEntries).Select(int.Parse).ToArray();
+            Console.WriteLine(new Solution().MajorityElement(nums));
+        }
+    }
+}`,
     },
   },
 
@@ -1144,6 +1274,12 @@ console.log("[" + plusOne([9]).join(" ") + "]");        // [1 0]`,
 fn main() {
     println!("{:?}", plus_one(vec![1, 2, 3])); // [1, 2, 4]
     println!("{:?}", plus_one(vec![9]));         // [1, 0]
+}`,
+      csharp: `public class Solution {
+    public int[] PlusOne(int[] digits) {
+        // TODO: increment the large integer represented by digits
+        return digits;
+    }
 }`,
     },
     testCases: [
@@ -1246,6 +1382,22 @@ fn main() {
   }
 }
 `,
+      csharp: `using System;
+using System.Linq;
+
+{{SOLUTION}}
+class __Judge__ {
+    static string FmtArr(int[] a) => "[" + string.Join(" ", a) + "]";
+    static void Main() {
+        string line;
+        while ((line = Console.ReadLine()) != null) {
+            line = line.Trim();
+            if (line.Length == 0) continue;
+            int[] digits = line.Split(new char[]{' '}, StringSplitOptions.RemoveEmptyEntries).Select(int.Parse).ToArray();
+            Console.WriteLine(FmtArr(new Solution().PlusOne(digits)));
+        }
+    }
+}`,
     },
   },
 
@@ -1338,6 +1490,12 @@ fn main() {
     println!("{}", fib(5));  // 5
     println!("{}", fib(10)); // 55
 }`,
+      csharp: `public class Solution {
+    public int Fib(int n) {
+        // TODO: return the nth Fibonacci number
+        return 0;
+    }
+}`,
     },
     testCases: [
       { stdin: "0", expectedOutput: "0" },
@@ -1423,6 +1581,20 @@ fn main() {
   }
 }
 `,
+      csharp: `using System;
+
+{{SOLUTION}}
+class __Judge__ {
+    static void Main() {
+        string line;
+        while ((line = Console.ReadLine()) != null) {
+            line = line.Trim();
+            if (line.Length == 0) continue;
+            int n = int.Parse(line);
+            Console.WriteLine(new Solution().Fib(n));
+        }
+    }
+}`,
     },
   },
 ];

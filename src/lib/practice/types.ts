@@ -46,6 +46,7 @@ export interface JudgeHarness {
   cpp?: string;
   java?: string;
   rust?: string;
+  csharp?: string;
 }
 
 export interface PracticeProblem {

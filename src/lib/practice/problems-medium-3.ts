@@ -83,6 +83,14 @@ fn main() {
     println!("{}", check_inclusion("ab".to_string(), "eidbaooo".to_string())); // true
     println!("{}", check_inclusion("ab".to_string(), "eidboaoo".to_string())); // false
 }`,
+      csharp: `using System.Collections.Generic;
+
+public class Solution {
+    public bool CheckInclusion(string s1, string s2) {
+        // TODO: check if any permutation of s1 is a substring of s2
+        return false;
+    }
+}`,
     },
     testCases: [
       { stdin: "ab|eidbaooo", expectedOutput: "true" },
@@ -155,6 +163,20 @@ fn main() {
     let s1 = p[0].to_string(); let s2 = if p.len()>1{p[1].to_string()}else{String::new()};
     println!("{}", check_inclusion(s1, s2));
   }
+}`,
+      csharp: `using System;
+
+{{SOLUTION}}
+class __Judge__ {
+    static void Main() {
+        string line;
+        while ((line = Console.ReadLine()) != null) {
+            line = line.Trim();
+            if (line.Length == 0) continue;
+            var parts = line.Split(new char[]{'|'}, 2);
+            Console.WriteLine(new Solution().CheckInclusion(parts[0], parts[1]).ToString().ToLower());
+        }
+    }
 }`,
     },
   },
@@ -251,6 +273,14 @@ fn main() {
     let mut res = top_k_frequent(vec![1,1,1,2,2,3], 2);
     res.sort();
     println!("{:?}", res); // [1, 2]
+}`,
+      csharp: `using System.Collections.Generic;
+
+public class Solution {
+    public int[] TopKFrequent(int[] nums, int k) {
+        // TODO: return the k most frequent elements
+        return new int[]{};
+    }
 }`,
     },
     testCases: [
@@ -351,6 +381,24 @@ fn main() {
     println!("[{}]", inner.join(" "));
   }
 }`,
+      csharp: `using System;
+using System.Linq;
+
+{{SOLUTION}}
+class __Judge__ {
+    static string FmtArr(int[] a) => "[" + string.Join(" ", a) + "]";
+    static void Main() {
+        string line;
+        while ((line = Console.ReadLine()) != null) {
+            line = line.Trim();
+            if (line.Length == 0) continue;
+            var parts = line.Split(new char[]{'|'}, 2);
+            int[] nums = parts[0].Trim().Split(new char[]{' '}, StringSplitOptions.RemoveEmptyEntries).Select(int.Parse).ToArray();
+            int k = int.Parse(parts[1].Trim());
+            Console.WriteLine(FmtArr(new Solution().TopKFrequent(nums, k).OrderBy(x => x).ToArray()));
+        }
+    }
+}`,
     },
   },
 
@@ -435,6 +483,12 @@ fn main() {
     println!("{}", can_jump(vec![2,3,1,1,4])); // true
     println!("{}", can_jump(vec![3,2,1,0,4])); // false
 }`,
+      csharp: `public class Solution {
+    public bool CanJump(int[] nums) {
+        // TODO: determine if you can reach the last index
+        return false;
+    }
+}`,
     },
     testCases: [
       { stdin: "2 3 1 1 4", expectedOutput: "true" },
@@ -509,6 +563,21 @@ fn main() {
     let nums: Vec<i32> = line.split_whitespace().filter_map(|s|s.parse().ok()).collect();
     println!("{}", can_jump(nums));
   }
+}`,
+      csharp: `using System;
+using System.Linq;
+
+{{SOLUTION}}
+class __Judge__ {
+    static void Main() {
+        string line;
+        while ((line = Console.ReadLine()) != null) {
+            line = line.Trim();
+            if (line.Length == 0) continue;
+            int[] nums = line.Split(new char[]{' '}, StringSplitOptions.RemoveEmptyEntries).Select(int.Parse).ToArray();
+            Console.WriteLine(new Solution().CanJump(nums).ToString().ToLower());
+        }
+    }
 }`,
     },
   },
@@ -595,6 +664,12 @@ fn main() {
     println!("{}", max_area(vec![1,8,6,2,5,4,8,3,7])); // 49
     println!("{}", max_area(vec![1,1]));                // 1
 }`,
+      csharp: `public class Solution {
+    public int MaxArea(int[] height) {
+        // TODO: two-pointer approach to find max water
+        return 0;
+    }
+}`,
     },
     testCases: [
       { stdin: "1 8 6 2 5 4 8 3 7", expectedOutput: "49" },
@@ -668,6 +743,21 @@ fn main() {
     let nums: Vec<i32> = line.split_whitespace().filter_map(|s|s.parse().ok()).collect();
     println!("{}", max_area(nums));
   }
+}`,
+      csharp: `using System;
+using System.Linq;
+
+{{SOLUTION}}
+class __Judge__ {
+    static void Main() {
+        string line;
+        while ((line = Console.ReadLine()) != null) {
+            line = line.Trim();
+            if (line.Length == 0) continue;
+            int[] height = line.Split(new char[]{' '}, StringSplitOptions.RemoveEmptyEntries).Select(int.Parse).ToArray();
+            Console.WriteLine(new Solution().MaxArea(height));
+        }
+    }
 }`,
     },
   },
@@ -753,6 +843,12 @@ fn main() {
     println!("{}", unique_paths(3, 7)); // 28
     println!("{}", unique_paths(3, 2)); // 3
 }`,
+      csharp: `public class Solution {
+    public int UniquePaths(int m, int n) {
+        // TODO: count unique paths from top-left to bottom-right
+        return 0;
+    }
+}`,
     },
     testCases: [
       { stdin: "3|7", expectedOutput: "28" },
@@ -828,6 +924,22 @@ fn main() {
     let n: i32 = p[1].trim().parse().unwrap_or(1);
     println!("{}", unique_paths(m, n));
   }
+}`,
+      csharp: `using System;
+
+{{SOLUTION}}
+class __Judge__ {
+    static void Main() {
+        string line;
+        while ((line = Console.ReadLine()) != null) {
+            line = line.Trim();
+            if (line.Length == 0) continue;
+            var parts = line.Split(new char[]{'|'}, 2);
+            int m = int.Parse(parts[0].Trim());
+            int n = int.Parse(parts[1].Trim());
+            Console.WriteLine(new Solution().UniquePaths(m, n));
+        }
+    }
 }`,
     },
   },
@@ -915,6 +1027,12 @@ fn main() {
     println!("{}", min_sub_array_len(7, vec![2,3,1,2,4,3])); // 2
     println!("{}", min_sub_array_len(4, vec![1,4,4]));        // 1
 }`,
+      csharp: `public class Solution {
+    public int MinSubArrayLen(int target, int[] nums) {
+        // TODO: sliding window to find smallest subarray with sum >= target
+        return 0;
+    }
+}`,
     },
     testCases: [
       { stdin: "7|2 3 1 2 4 3", expectedOutput: "2" },
@@ -999,6 +1117,23 @@ fn main() {
     let nums: Vec<i32> = p[1].split_whitespace().filter_map(|s|s.parse().ok()).collect();
     println!("{}", min_sub_array_len(target, nums));
   }
+}`,
+      csharp: `using System;
+using System.Linq;
+
+{{SOLUTION}}
+class __Judge__ {
+    static void Main() {
+        string line;
+        while ((line = Console.ReadLine()) != null) {
+            line = line.Trim();
+            if (line.Length == 0) continue;
+            var parts = line.Split(new char[]{'|'}, 2);
+            int target = int.Parse(parts[0].Trim());
+            int[] nums = parts[1].Trim().Split(new char[]{' '}, StringSplitOptions.RemoveEmptyEntries).Select(int.Parse).ToArray();
+            Console.WriteLine(new Solution().MinSubArrayLen(target, nums));
+        }
+    }
 }`,
     },
   },
@@ -1090,6 +1225,12 @@ fn main() {
     println!("{}", num_decodings("226".to_string()));  // 3
     println!("{}", num_decodings("06".to_string()));   // 0
 }`,
+      csharp: `public class Solution {
+    public int NumDecodings(string s) {
+        // TODO: count the number of ways to decode the string
+        return 0;
+    }
+}`,
     },
     testCases: [
       { stdin: "12", expectedOutput: "2" },
@@ -1153,6 +1294,19 @@ fn main() {
     if line.is_empty() { continue; }
     println!("{}", num_decodings(line));
   }
+}`,
+      csharp: `using System;
+
+{{SOLUTION}}
+class __Judge__ {
+    static void Main() {
+        string line;
+        while ((line = Console.ReadLine()) != null) {
+            line = line.Trim();
+            if (line.Length == 0) continue;
+            Console.WriteLine(new Solution().NumDecodings(line));
+        }
+    }
 }`,
     },
   },
@@ -1239,6 +1393,12 @@ fn main() {
     println!("{}", least_interval(vec!['A','A','A','B','B','B'], 2)); // 8
     println!("{}", least_interval(vec!['A','A','A','B','B','B'], 0)); // 6
 }`,
+      csharp: `public class Solution {
+    public int LeastInterval(char[] tasks, int n) {
+        // TODO: find the least interval to complete all tasks
+        return 0;
+    }
+}`,
     },
     testCases: [
       { stdin: "A A A B B B|2", expectedOutput: "8" },
@@ -1324,6 +1484,23 @@ fn main() {
     let tasks: Vec<char> = p[0].split_whitespace().filter_map(|s| s.chars().next()).collect();
     println!("{}", least_interval(tasks, n));
   }
+}`,
+      csharp: `using System;
+using System.Linq;
+
+{{SOLUTION}}
+class __Judge__ {
+    static void Main() {
+        string line;
+        while ((line = Console.ReadLine()) != null) {
+            line = line.Trim();
+            if (line.Length == 0) continue;
+            var parts = line.Split(new char[]{'|'}, 2);
+            char[] tasks = parts[0].Trim().Split(new char[]{' '}, StringSplitOptions.RemoveEmptyEntries).Select(s => s[0]).ToArray();
+            int n = int.Parse(parts[1].Trim());
+            Console.WriteLine(new Solution().LeastInterval(tasks, n));
+        }
+    }
 }`,
     },
   },
