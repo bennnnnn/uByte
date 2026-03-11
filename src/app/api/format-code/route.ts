@@ -2,9 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { withErrorHandling } from "@/lib/api-utils";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 
-const GO_FMT_URL = process.env.NEXT_PUBLIC_GO_FMT_URL || "https://go.dev/_/fmt";
+const GO_FMT_URL   = process.env.NEXT_PUBLIC_GO_FMT_URL || "https://go.dev/_/fmt";
+const RUST_FMT_URL = "https://play.rust-lang.org/format";
 
-/** Normalize any code: trim trailing whitespace per line, unify line endings, collapse 3+ blank lines to 2. */
+/** Trim trailing whitespace, unify line endings, collapse 3+ blank lines to 2. */
 function basicNormalize(code: string): string {
   return code
     .replace(/\r\n/g, "\n")
@@ -15,6 +16,7 @@ function basicNormalize(code: string): string {
     .trim();
 }
 
+/** gofmt + goimports via the official Go playground endpoint. */
 async function formatGo(code: string): Promise<string> {
   const body = new URLSearchParams({ body: code, imports: "true" });
   const res = await fetch(GO_FMT_URL, {
@@ -23,14 +25,29 @@ async function formatGo(code: string): Promise<string> {
     body: body.toString(),
   });
   if (!res.ok) return code;
-  const data = await res.json();
+  const data = await res.json() as { Body?: string; Error?: string };
   return data.Body && !data.Error ? data.Body : code;
 }
 
+/**
+ * rustfmt via the official Rust Playground endpoint.
+ * Same pattern as Go — free, no extra dependencies.
+ */
+async function formatRust(code: string): Promise<string> {
+  const res = await fetch(RUST_FMT_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ code, edition: "2021" }),
+  });
+  if (!res.ok) return code;
+  const data = await res.json() as { success?: boolean; code?: string };
+  return data.success && data.code ? data.code : code;
+}
+
+/** Prettier babel parser — JS/TS. Dynamic import stays server-side. */
 async function formatJavaScript(code: string): Promise<string> {
-  // Dynamic import keeps prettier out of the client bundle
-  const prettier = await import("prettier");
-  const babelPlugin = await import("prettier/plugins/babel");
+  const prettier     = await import("prettier");
+  const babelPlugin  = await import("prettier/plugins/babel");
   const estreePlugin = await import("prettier/plugins/estree");
   try {
     return await prettier.format(code, {
@@ -47,15 +64,34 @@ async function formatJavaScript(code: string): Promise<string> {
   }
 }
 
+/** prettier-plugin-java — server-side only, never bundled client-side. */
+async function formatJava(code: string): Promise<string> {
+  const prettier   = await import("prettier");
+  const javaPlugin = await import("prettier-plugin-java");
+  try {
+    return await prettier.format(code, {
+      parser: "java",
+      plugins: [javaPlugin.default],
+      printWidth: 100,
+      tabWidth: 4,
+    });
+  } catch {
+    return basicNormalize(code);
+  }
+}
+
 /**
  * POST /api/format-code
  * Body: { code: string; language: string }
  * Returns: { code: string; changed: boolean }
  *
- * - go         → go.dev/_/fmt (gofmt + goimports)
- * - javascript → prettier/babel
- * - python, rust, java, cpp → basic whitespace normalization only
- *   (real formatters require a full runtime — use Judge0 exec environment instead)
+ * Language coverage:
+ *   go         → gofmt + goimports   (go.dev/_/fmt — official)
+ *   rust       → rustfmt             (play.rust-lang.org/format — official)
+ *   javascript → prettier/babel
+ *   java       → prettier-plugin-java
+ *   python, cpp, csharp → basic whitespace normalization
+ *     (no reliable free formatter API for these languages)
  */
 export const POST = withErrorHandling("POST /api/format-code", async (request: NextRequest) => {
   const ip = getClientIp(request.headers);
@@ -75,12 +111,18 @@ export const POST = withErrorHandling("POST /api/format-code", async (request: N
     case "go":
       formatted = await formatGo(code);
       break;
+    case "rust":
+      formatted = await formatRust(code);
+      break;
     case "javascript":
       formatted = await formatJavaScript(code);
       break;
+    case "java":
+      formatted = await formatJava(code);
+      break;
     default:
-      // Python, Rust, Java, C++ — normalize whitespace only; full formatting
-      // requires server-side runtimes not available in this environment.
+      // Python, C++, C# — normalize whitespace only.
+      // No reliable free formatter API exists for these languages.
       formatted = basicNormalize(code);
   }
 
