@@ -320,6 +320,7 @@ export async function getUsersAtRiskOfLosingStreak(): Promise<Pick<User, "id" | 
       AND streak_days > 0
       AND email IS NOT NULL
       AND email_verified = 1
+      AND COALESCE(email_marketing, 1) = 1
   `;
   return rows as Pick<User, "id" | "email" | "name" | "streak_days">[];
 }
@@ -366,4 +367,17 @@ export async function getTotalUserCount(): Promise<number> {
   const sql = getSql();
   const rows = await sql`SELECT COUNT(*) AS cnt FROM users`;
   return Number(rows[0]?.cnt ?? 0);
+}
+
+/** Set a user's marketing email opt-in/out preference. */
+export async function setEmailMarketingPreference(userId: number, subscribed: boolean): Promise<void> {
+  const sql = getSql();
+  await sql`UPDATE users SET email_marketing = ${subscribed ? 1 : 0} WHERE id = ${userId}`;
+}
+
+/** Unsubscribe a user from marketing emails by email address (used for one-click unsubscribe). */
+export async function unsubscribeByEmail(email: string): Promise<boolean> {
+  const sql = getSql();
+  const rows = await sql`UPDATE users SET email_marketing = 0 WHERE email = ${email} RETURNING id`;
+  return rows.length > 0;
 }

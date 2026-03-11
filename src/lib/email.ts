@@ -10,7 +10,18 @@
 import { Resend } from "resend";
 
 import { BASE_URL } from "@/lib/constants";
+import { makeUnsubscribeUrl } from "@/lib/unsubscribe";
 const FROM = process.env.RESEND_FROM_EMAIL ?? "noreply@resend.dev";
+
+/** Standard unsubscribe footer for all marketing emails. */
+function unsubFooter(email: string): string {
+  const url = makeUnsubscribeUrl(email);
+  return `<p style="color:#9ca3af;font-size:11px;text-align:center;margin-top:16px">
+    You're receiving this because you have an account on uByte.<br>
+    <a href="${url}" style="color:#9ca3af">Unsubscribe from marketing emails</a> ·
+    <a href="${BASE_URL}/profile" style="color:#9ca3af">Manage preferences</a>
+  </p>`;
+}
 
 function getResend(): Resend | null {
   const key = process.env.RESEND_API_KEY;
@@ -26,7 +37,6 @@ export async function sendStreakReminderEmail(
   const resend = getResend();
   if (!resend) return;
 
-  const siteUrl = BASE_URL;
   await resend.emails.send({
     from: FROM,
     to,
@@ -36,9 +46,9 @@ export async function sendStreakReminderEmail(
         <h2 style="color:#0891b2">Your streak is at risk!</h2>
         <p>Hi ${name},</p>
         <p>You have a <strong>${streakDays}-day</strong> streak on uByte — don't let it slip today!</p>
-        <a href="${siteUrl}" style="display:inline-block;margin:16px 0;padding:12px 24px;background:#0891b2;color:#fff;border-radius:8px;text-decoration:none;font-weight:600">Keep my streak 🔥</a>
+        <a href="${BASE_URL}" style="display:inline-block;margin:16px 0;padding:12px 24px;background:#0891b2;color:#fff;border-radius:8px;text-decoration:none;font-weight:600">Keep my streak 🔥</a>
         <p style="color:#6b7280;font-size:13px">Complete any tutorial step to keep your streak going.</p>
-        <p style="color:#6b7280;font-size:12px">You're receiving this because you have an active streak on uByte. <a href="${siteUrl}/profile" style="color:#6b7280">Manage your preferences</a>.</p>
+        ${unsubFooter(to)}
       </div>
     `,
   });
@@ -137,7 +147,7 @@ export async function sendWelcomeEmail(to: string, name: string): Promise<void> 
           <div style="text-align:center;margin:24px 0">
             <a href="${BASE_URL}/tutorial/go/getting-started" style="display:inline-block;padding:14px 28px;background:#4f46e5;color:#fff;border-radius:8px;text-decoration:none;font-weight:700;font-size:15px">Start your first lesson →</a>
           </div>
-          <p style="color:#9ca3af;font-size:12px;text-align:center">You're receiving this because you just signed up at uByte.</p>
+          ${unsubFooter(to)}
         </div>
       </div>
     `,
@@ -183,7 +193,7 @@ export async function sendDay1Email(to: string, name: string): Promise<void> {
             <a href="${BASE_URL}" style="display:inline-block;padding:14px 28px;background:#4f46e5;color:#fff;border-radius:8px;text-decoration:none;font-weight:700;font-size:15px">Open uByte →</a>
           </div>
           <hr style="border:none;border-top:1px solid #e5e7eb;margin:24px 0">
-          <p style="color:#9ca3af;font-size:12px">You're receiving this because you signed up at uByte. <a href="${BASE_URL}/profile" style="color:#9ca3af">Manage preferences</a>.</p>
+          ${unsubFooter(to)}
         </div>
       </div>
     `,
@@ -216,7 +226,7 @@ export async function sendDay3Email(to: string, name: string): Promise<void> {
           <p style="color:#6b7280;font-size:14px">Or jump straight into an interview prep problem:</p>
           <a href="${BASE_URL}/practice" style="color:#4f46e5;font-size:14px">Browse interview questions →</a>
           <hr style="border:none;border-top:1px solid #e5e7eb;margin:24px 0">
-          <p style="color:#9ca3af;font-size:12px">You're receiving this because you signed up at uByte. <a href="${BASE_URL}/profile" style="color:#9ca3af">Manage preferences</a>.</p>
+          ${unsubFooter(to)}
         </div>
       </div>
     `,
@@ -252,7 +262,7 @@ export async function sendDay7Email(to: string, name: string): Promise<void> {
             <a href="${BASE_URL}/pricing" style="color:#4f46e5;font-size:14px;font-weight:600">See Pro plans →</a>
           </div>
           <hr style="border:none;border-top:1px solid #e5e7eb;margin:24px 0">
-          <p style="color:#9ca3af;font-size:12px">You're receiving this because you signed up at uByte. <a href="${BASE_URL}/profile" style="color:#9ca3af">Manage preferences</a>.</p>
+          ${unsubFooter(to)}
         </div>
       </div>
     `,
@@ -333,10 +343,7 @@ export async function sendWeeklyDigestEmail(opts: {
             </table>
           </div>
 
-          <p style="color:#9ca3af;font-size:11px;text-align:center">
-            You're receiving this because you've been active on uByte this week.<br>
-            <a href="${BASE_URL}/profile" style="color:#9ca3af">Manage email preferences</a> · <a href="${BASE_URL}" style="color:#9ca3af">uByte</a>
-          </p>
+          ${unsubFooter(to)}
         </div>
       </div>
     `,
@@ -426,6 +433,167 @@ export async function sendCertificationEmail(
           <hr style="border:none;border-top:1px solid #e5e7eb;margin:24px 0">
           <p style="color:#9ca3af;font-size:12px;text-align:center">You're receiving this because you just earned a certificate on uByte. <a href="${BASE_URL}/profile" style="color:#9ca3af">Manage preferences</a>.</p>
         </div>
+      </div>
+    `,
+  });
+}
+
+/** Day 14 — win-back for users who haven't logged in since signup week. */
+export async function sendDay14WinBackEmail(to: string, name: string): Promise<void> {
+  const resend = getResend();
+  if (!resend) return;
+
+  const firstName = name.split(" ")[0];
+  await resend.emails.send({
+    from: FROM,
+    to,
+    subject: `${firstName}, are you still there? 👋`,
+    html: `
+      <div style="font-family:sans-serif;max-width:520px;margin:auto;color:#18181b">
+        <div style="background:#4f46e5;padding:24px 32px;border-radius:12px 12px 0 0">
+          <span style="color:#fff;font-size:22px;font-weight:800">uByte</span>
+        </div>
+        <div style="background:#f9fafb;padding:32px;border-radius:0 0 12px 12px;border:1px solid #e5e7eb;border-top:none">
+          <h2 style="margin:0 0 8px">Hey ${firstName}, we miss you 👋</h2>
+          <p style="color:#6b7280">It's been two weeks since you signed up. We know life gets busy — but your coding skills won't build themselves!</p>
+          <div style="background:#fff;border:2px solid #4f46e5;border-radius:10px;padding:20px;margin:20px 0">
+            <p style="margin:0 0 8px;font-weight:700;color:#4f46e5">Pick up right where you left off</p>
+            <p style="color:#6b7280;margin:0 0 16px;font-size:14px">Even 10 minutes a day adds up. Start with one lesson or one practice problem — that's all it takes to build momentum.</p>
+            <a href="${BASE_URL}/tutorial" style="display:inline-block;padding:12px 24px;background:#4f46e5;color:#fff;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px">Resume my journey →</a>
+          </div>
+          <p style="color:#6b7280;font-size:14px">Or try the daily challenge — a new problem every day, takes about 15 minutes:</p>
+          <a href="${BASE_URL}/daily" style="color:#4f46e5;font-size:14px;font-weight:600">⚡ Today's challenge →</a>
+          <hr style="border:none;border-top:1px solid #e5e7eb;margin:24px 0">
+          ${unsubFooter(to)}
+        </div>
+      </div>
+    `,
+  });
+}
+
+/** Day 30 — final win-back for churned users. */
+export async function sendDay30WinBackEmail(to: string, name: string): Promise<void> {
+  const resend = getResend();
+  if (!resend) return;
+
+  const firstName = name.split(" ")[0];
+  await resend.emails.send({
+    from: FROM,
+    to,
+    subject: `Last chance to restart your coding habit, ${firstName}`,
+    html: `
+      <div style="font-family:sans-serif;max-width:520px;margin:auto;color:#18181b">
+        <div style="background:#18181b;padding:24px 32px;border-radius:12px 12px 0 0">
+          <span style="color:#fff;font-size:22px;font-weight:800">uByte</span>
+        </div>
+        <div style="background:#f9fafb;padding:32px;border-radius:0 0 12px 12px;border:1px solid #e5e7eb;border-top:none">
+          <h2 style="margin:0 0 8px">One month. Same offer. Zero excuses.</h2>
+          <p style="color:#6b7280">Hi ${firstName},</p>
+          <p style="color:#6b7280">It's been 30 days since you joined uByte. We're not going to spam you after this — but we do want to give you one last nudge.</p>
+          <div style="background:#fff;border:1px solid #e5e7eb;border-radius:10px;padding:20px;margin:20px 0">
+            <p style="margin:0 0 8px;font-weight:700">What you're missing:</p>
+            <table style="width:100%;border-collapse:collapse;font-size:14px;color:#6b7280">
+              <tr><td style="padding:6px 0;border-bottom:1px solid #f3f4f6">📖 Interactive coding lessons in 7 languages</td></tr>
+              <tr><td style="padding:6px 0;border-bottom:1px solid #f3f4f6">💼 Real interview questions with AI hints</td></tr>
+              <tr><td style="padding:6px 0">🏅 Certifications to add to your LinkedIn</td></tr>
+            </table>
+          </div>
+          <div style="text-align:center;margin:24px 0">
+            <a href="${BASE_URL}" style="display:inline-block;padding:14px 28px;background:#18181b;color:#fff;border-radius:8px;text-decoration:none;font-weight:700;font-size:15px">I'm back — let's go →</a>
+          </div>
+          <p style="color:#9ca3af;font-size:13px;text-align:center">This is our last automated email about your progress. We respect your inbox.</p>
+          <hr style="border:none;border-top:1px solid #e5e7eb;margin:24px 0">
+          ${unsubFooter(to)}
+        </div>
+      </div>
+    `,
+  });
+}
+
+/** Trial ending soon — sent 2 days before trial expiry. */
+export async function sendTrialEndingEmail(
+  to: string,
+  name: string,
+  daysLeft: number,
+  plan: "trial" | "trial_yearly"
+): Promise<void> {
+  const resend = getResend();
+  if (!resend) return;
+
+  const firstName = name.split(" ")[0];
+  const planType = plan === "trial_yearly" ? "Yearly" : "Monthly";
+  const isUrgent = daysLeft <= 1;
+
+  await resend.emails.send({
+    from: FROM,
+    to,
+    subject: isUrgent
+      ? `⚠️ Your uByte trial ends tomorrow — subscribe to keep access`
+      : `Your uByte free trial ends in ${daysLeft} days`,
+    html: `
+      <div style="font-family:sans-serif;max-width:520px;margin:auto;color:#18181b">
+        <div style="background:${isUrgent ? "#b45309" : "#4f46e5"};padding:24px 32px;border-radius:12px 12px 0 0">
+          <span style="color:#fff;font-size:22px;font-weight:800">uByte</span>
+          <p style="color:${isUrgent ? "#fde68a" : "#c7d2fe"};margin:4px 0 0;font-size:13px">
+            ${isUrgent ? "Trial ending tomorrow" : `Trial ending in ${daysLeft} days`}
+          </p>
+        </div>
+        <div style="background:#f9fafb;padding:32px;border-radius:0 0 12px 12px;border:1px solid #e5e7eb;border-top:none">
+          <h2 style="margin:0 0 8px">${isUrgent ? `⚠️ Last day, ${firstName}!` : `Hey ${firstName}, your trial is almost up`}</h2>
+          <p style="color:#6b7280">
+            Your 7-day free trial ${isUrgent ? "ends tomorrow" : `ends in ${daysLeft} days`}.
+            After that, you'll lose access to all Pro features unless you subscribe.
+          </p>
+          <div style="background:#fff;border:2px solid ${isUrgent ? "#b45309" : "#4f46e5"};border-radius:10px;padding:20px;margin:20px 0">
+            <p style="margin:0 0 4px;font-weight:700;color:${isUrgent ? "#b45309" : "#4f46e5"}">What you'll keep with a subscription:</p>
+            <table style="width:100%;border-collapse:collapse;margin:12px 0;font-size:14px;color:#6b7280">
+              <tr><td style="padding:6px 0;border-bottom:1px solid #f3f4f6">📖 Unlimited tutorials in all 7 languages</td></tr>
+              <tr><td style="padding:6px 0;border-bottom:1px solid #f3f4f6">💼 All 70+ interview practice problems + AI hints</td></tr>
+              <tr><td style="padding:6px 0">🏅 Certification exams + shareable certificates</td></tr>
+            </table>
+            <a href="${BASE_URL}/pricing" style="display:inline-block;padding:12px 24px;background:${isUrgent ? "#b45309" : "#4f46e5"};color:#fff;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px">
+              Subscribe to ${planType} Pro →
+            </a>
+          </div>
+          <p style="color:#9ca3af;font-size:12px;text-align:center">No charge during the trial. Cancel anytime after subscribing.</p>
+          <hr style="border:none;border-top:1px solid #e5e7eb;margin:24px 0">
+          <p style="color:#9ca3af;font-size:11px;text-align:center">
+            You're receiving this because you're on a free trial at uByte.<br>
+            <a href="${BASE_URL}/profile" style="color:#9ca3af">Manage preferences</a>
+          </p>
+        </div>
+      </div>
+    `,
+  });
+}
+
+/** Password reset — sent when a user requests a password reset. */
+export async function sendPasswordResetEmail(
+  to: string,
+  name: string,
+  resetToken: string
+): Promise<void> {
+  const resend = getResend();
+  if (!resend) {
+    if (process.env.NODE_ENV !== "production") {
+      console.info(`[email] password-reset token for ${to}: ${resetToken}`);
+    }
+    return;
+  }
+
+  const resetLink = `${BASE_URL}/reset-password?token=${resetToken}`;
+  await resend.emails.send({
+    from: FROM,
+    to,
+    subject: "Reset your password — uByte",
+    html: `
+      <div style="font-family:sans-serif;max-width:480px;margin:auto">
+        <h2 style="color:#4f46e5">Reset your password</h2>
+        <p>Hi ${name},</p>
+        <p>Click the button below to reset your password. This link expires in 1 hour.</p>
+        <a href="${resetLink}" style="display:inline-block;margin:16px 0;padding:12px 24px;background:#4f46e5;color:#fff;border-radius:8px;text-decoration:none;font-weight:600">Reset password</a>
+        <p style="color:#6b7280;font-size:13px">If you didn't request this, you can safely ignore this email.</p>
+        <p style="color:#6b7280;font-size:12px">Or copy this link: ${resetLink}</p>
       </div>
     `,
   });

@@ -86,6 +86,7 @@ export async function getUsersForWeeklyDigest(): Promise<WeeklyDigestUser[]> {
     -- Not already sent this week
     WHERE u.email_verified = 1
       AND u.email IS NOT NULL
+      AND COALESCE(u.email_marketing, 1) = 1
       AND NOT EXISTS (
         SELECT 1 FROM weekly_digest_log dl
         WHERE dl.user_id = u.id

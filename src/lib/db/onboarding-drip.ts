@@ -26,7 +26,7 @@ async function ensureTable(): Promise<void> {
   _ready = true;
 }
 
-export type DripEmailType = "day1" | "day3" | "day7";
+export type DripEmailType = "day1" | "day3" | "day7" | "day14" | "day30" | "trial_ending_2d" | "trial_ending_1d";
 
 /** Returns true if the given email type has already been sent to this user. */
 export async function hasReceivedDripEmail(
@@ -70,6 +70,7 @@ export async function getUsersForDrip(
     FROM users u
     WHERE
       u.email_verified = 1
+      AND COALESCE(u.email_marketing, 1) = 1
       AND u.created_at::timestamptz >= NOW() - INTERVAL '1 day' * ${daysAgo + 0.5}
       AND u.created_at::timestamptz <  NOW() - INTERVAL '1 day' * ${daysAgo - 0.5}
       AND NOT EXISTS (
@@ -78,4 +79,65 @@ export async function getUsersForDrip(
       )
   `;
   return rows as Array<{ id: number; name: string; email: string }>;
+}
+
+/**
+ * Returns users for win-back drip (day14 / day30):
+ * - Signed up ~N days ago
+ * - Have NOT been active (last_active_at) in the past 7 days
+ * - Have NOT received this win-back email yet
+ * - Email verified and marketing opted in
+ */
+export async function getUsersForWinBack(
+  daysAgo: number,
+  emailType: "day14" | "day30"
+): Promise<Array<{ id: number; name: string; email: string }>> {
+  await ensureTable();
+  const sql = getSql();
+  const rows = await sql`
+    SELECT u.id, u.name, u.email
+    FROM users u
+    WHERE
+      u.email_verified = 1
+      AND COALESCE(u.email_marketing, 1) = 1
+      AND u.created_at::timestamptz >= NOW() - INTERVAL '1 day' * ${daysAgo + 0.5}
+      AND u.created_at::timestamptz <  NOW() - INTERVAL '1 day' * ${daysAgo - 0.5}
+      AND (
+        u.last_active_at IS NULL
+        OR u.last_active_at::timestamptz < NOW() - INTERVAL '7 days'
+      )
+      AND NOT EXISTS (
+        SELECT 1 FROM onboarding_email_log l
+        WHERE l.user_id = u.id AND l.email_type = ${emailType}
+      )
+  `;
+  return rows as Array<{ id: number; name: string; email: string }>;
+}
+
+/**
+ * Returns users whose trial ends in ~N days and haven't received the warning email.
+ * email_type: 'trial_ending_2d' | 'trial_ending_1d'
+ */
+export async function getUsersForTrialEndingWarning(
+  daysUntilExpiry: number,
+  emailType: string
+): Promise<Array<{ id: number; name: string; email: string; plan: string; daysLeft: number }>> {
+  await ensureTable();
+  const sql = getSql();
+  const rows = await sql`
+    SELECT u.id, u.name, u.email, u.plan,
+           EXTRACT(DAY FROM (u.subscription_expires_at::timestamptz - NOW()))::int AS days_left
+    FROM users u
+    WHERE
+      u.email_verified = 1
+      AND u.plan IN ('trial', 'trial_yearly')
+      AND u.subscription_expires_at IS NOT NULL
+      AND u.subscription_expires_at::timestamptz >= NOW() + INTERVAL '1 day' * ${daysUntilExpiry - 0.5}
+      AND u.subscription_expires_at::timestamptz <  NOW() + INTERVAL '1 day' * ${daysUntilExpiry + 0.5}
+      AND NOT EXISTS (
+        SELECT 1 FROM onboarding_email_log l
+        WHERE l.user_id = u.id AND l.email_type = ${emailType}
+      )
+  `;
+  return rows as Array<{ id: number; name: string; email: string; plan: string; daysLeft: number }>;
 }

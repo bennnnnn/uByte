@@ -28,6 +28,7 @@ function buildProfile(user: User) {
     email_verified: user.email_verified,
     plan: user.plan ?? "free",
     subscription_expires_at: user.subscription_expires_at ?? null,
+    email_marketing: user.email_marketing !== 0,
   };
 }
 
@@ -95,6 +96,13 @@ export const PUT = withErrorHandling("PUT /api/profile", async (request: NextReq
       tokenVersion: newVersion,
     });
     await setAuthCookie(newToken);
+    return NextResponse.json({ success: true });
+  }
+
+  // Email marketing preference toggle (standalone — doesn't require other fields)
+  if (typeof body.email_marketing === "boolean") {
+    const { setEmailMarketingPreference } = await import("@/lib/db/users");
+    await setEmailMarketingPreference(tokenUser.userId, body.email_marketing);
     return NextResponse.json({ success: true });
   }
 

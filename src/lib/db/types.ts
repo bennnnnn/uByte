@@ -25,6 +25,7 @@ export interface User {
   paddle_customer_id: string | null;
   subscription_expires_at?: string | null;
   onboarding_goal?: string | null;
+  email_marketing: number;
 }
 
 export interface LeaderboardEntry {

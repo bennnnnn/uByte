@@ -26,6 +26,31 @@ export default function SettingsTab({ profile, onSave, onChangePassword, onDelet
   const [editAvatar, setEditAvatar] = useState(profile.avatar);
   const [editTheme, setEditTheme] = useState(profile.theme || "dark");
   const [saving, setSaving] = useState(false);
+  const [emailMarketing, setEmailMarketing] = useState(profile.email_marketing !== false);
+  const [emailSaving, setEmailSaving] = useState(false);
+
+  async function handleEmailMarketingToggle(enabled: boolean) {
+    setEmailMarketing(enabled);
+    setEmailSaving(true);
+    try {
+      const res = await fetch("/api/profile", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json", "x-csrf-token": "1" },
+        body: JSON.stringify({ email_marketing: enabled }),
+      });
+      if (res.ok) {
+        toast(enabled ? "Marketing emails enabled." : "You've been unsubscribed from marketing emails.");
+      } else {
+        setEmailMarketing(!enabled);
+        toast("Failed to update preference.", "error");
+      }
+    } catch {
+      setEmailMarketing(!enabled);
+      toast("Failed to update preference.", "error");
+    } finally {
+      setEmailSaving(false);
+    }
+  }
 
   async function handleSave() {
     setSaving(true);
@@ -56,6 +81,37 @@ export default function SettingsTab({ profile, onSave, onChangePassword, onDelet
           {saving ? "Saving..." : "Save Changes"}
         </Button>
       </div>
+      {/* Email preferences */}
+      <div className="rounded-2xl border border-zinc-200 bg-surface-card p-6 dark:border-zinc-800">
+        <h3 className="mb-1 text-base font-semibold text-zinc-900 dark:text-zinc-100">Email preferences</h3>
+        <p className="mb-4 text-sm text-zinc-500 dark:text-zinc-400">
+          Control which emails you receive from uByte. Transactional emails (password resets, security alerts) are always sent.
+        </p>
+        <label className="flex cursor-pointer items-start gap-3">
+          <div className="relative mt-0.5 flex-shrink-0">
+            <input
+              type="checkbox"
+              checked={emailMarketing}
+              disabled={emailSaving}
+              onChange={(e) => handleEmailMarketingToggle(e.target.checked)}
+              className="sr-only"
+            />
+            <div
+              onClick={() => !emailSaving && handleEmailMarketingToggle(!emailMarketing)}
+              className={`h-5 w-9 cursor-pointer rounded-full transition-colors ${emailMarketing ? "bg-indigo-600" : "bg-zinc-300 dark:bg-zinc-600"} ${emailSaving ? "opacity-60" : ""}`}
+            >
+              <div className={`mt-0.5 ml-0.5 h-4 w-4 rounded-full bg-white shadow transition-transform ${emailMarketing ? "translate-x-4" : "translate-x-0"}`} />
+            </div>
+          </div>
+          <div>
+            <p className="text-sm font-medium text-zinc-800 dark:text-zinc-200">Marketing &amp; progress emails</p>
+            <p className="mt-0.5 text-xs text-zinc-500 dark:text-zinc-400">
+              Weekly digest, streak reminders, onboarding tips, and win-back nudges.
+            </p>
+          </div>
+        </label>
+      </div>
+
       <DangerZoneSection onDeleteAccount={onDeleteAccount} onResetProgress={onResetProgress} onLogoutAll={onLogoutAll} onToast={toast} />
     </div>
   );

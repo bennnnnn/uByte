@@ -1,0 +1,53 @@
+/**
+ * GET /api/unsubscribe?token=<hmac>
+ *
+ * One-click unsubscribe endpoint. The token is HMAC-SHA256(email, UNSUBSCRIBE_SECRET).
+ * Email is passed as a separate query param so we can look up the user.
+ *
+ * URL shape: /api/unsubscribe?email=<encoded>&token=<hmac>
+ *
+ * On success: redirects to /unsubscribed (a simple confirmation page).
+ * On failure: redirects to / (silent fail — never reveal whether an email exists).
+ */
+import { NextRequest, NextResponse } from "next/server";
+import { createHmac } from "crypto";
+import { unsubscribeByEmail } from "@/lib/db/users";
+
+function makeToken(email: string): string {
+  const secret = process.env.UNSUBSCRIBE_SECRET ?? process.env.JWT_SECRET ?? "fallback-secret";
+  return createHmac("sha256", secret).update(email.toLowerCase().trim()).digest("hex");
+}
+
+export async function GET(request: NextRequest): Promise<NextResponse> {
+  const { searchParams } = new URL(request.url);
+  const email = searchParams.get("email")?.trim().toLowerCase() ?? "";
+  const token = searchParams.get("token") ?? "";
+
+  if (!email || !token) {
+    return NextResponse.redirect(new URL("/", request.url));
+  }
+
+  const expected = makeToken(email);
+  // Constant-time comparison
+  if (expected.length !== token.length || !timingSafeEqual(expected, token)) {
+    return NextResponse.redirect(new URL("/", request.url));
+  }
+
+  await unsubscribeByEmail(email).catch(() => {});
+  return NextResponse.redirect(new URL("/unsubscribed", request.url));
+}
+
+function timingSafeEqual(a: string, b: string): boolean {
+  try {
+    const { timingSafeEqual: tse } = require("crypto") as typeof import("crypto");
+    return tse(Buffer.from(a), Buffer.from(b));
+  } catch {
+    return a === b;
+  }
+}
+
+/** Generate an unsubscribe URL for use in emails. */
+export function makeUnsubscribeUrl(email: string, baseUrl: string): string {
+  const token = makeToken(email);
+  return `${baseUrl}/api/unsubscribe?email=${encodeURIComponent(email)}&token=${token}`;
+}
