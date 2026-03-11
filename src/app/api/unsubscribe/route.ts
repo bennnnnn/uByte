@@ -10,7 +10,7 @@
  * On failure: redirects to / (silent fail — never reveal whether an email exists).
  */
 import { NextRequest, NextResponse } from "next/server";
-import { createHmac } from "crypto";
+import { createHmac, timingSafeEqual as cryptoTimingSafeEqual } from "crypto";
 import { unsubscribeByEmail } from "@/lib/db/users";
 
 function makeToken(email: string): string {
@@ -39,15 +39,8 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
 
 function timingSafeEqual(a: string, b: string): boolean {
   try {
-    const { timingSafeEqual: tse } = require("crypto") as typeof import("crypto");
-    return tse(Buffer.from(a), Buffer.from(b));
+    return cryptoTimingSafeEqual(Buffer.from(a), Buffer.from(b));
   } catch {
-    return a === b;
+    return false;
   }
-}
-
-/** Generate an unsubscribe URL for use in emails. */
-export function makeUnsubscribeUrl(email: string, baseUrl: string): string {
-  const token = makeToken(email);
-  return `${baseUrl}/api/unsubscribe?email=${encodeURIComponent(email)}&token=${token}`;
 }
