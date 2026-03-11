@@ -492,8 +492,8 @@ export function OutputPanel({
           </div>
         )}
 
-        {/* "Review my code" button */}
-        {!codeReview && !codeReviewLoading && verdict && (
+        {/* "Get interview debrief" button — interview simulation only */}
+        {interviewMode && !codeReview && !codeReviewLoading && verdict && (
           <div className="border-t border-zinc-100 px-4 py-2 dark:border-zinc-800">
             <button
               type="button"
@@ -502,7 +502,7 @@ export function OutputPanel({
               className="flex items-center gap-1.5 text-xs font-medium text-violet-600 hover:text-violet-800 dark:text-violet-400 dark:hover:text-violet-300"
             >
               <span>🔍</span>
-              {interviewMode ? "Get interview debrief" : "Review my code"}
+              Get interview debrief
             </button>
           </div>
         )}
