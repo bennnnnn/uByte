@@ -68,6 +68,21 @@ export async function getPushSubscriptionsForUser(
   }));
 }
 
+/** Deletes push subscriptions older than the given number of days. Returns count deleted. */
+export async function deleteOldPushSubscriptions(olderThanDays: number): Promise<number> {
+  await ensureTable();
+  const sql = getSql();
+  const [row] = await sql`
+    WITH deleted AS (
+      DELETE FROM push_subscriptions
+      WHERE created_at::timestamptz < NOW() - (${olderThanDays} || ' days')::interval
+      RETURNING id
+    )
+    SELECT COUNT(*)::int AS count FROM deleted
+  `;
+  return (row?.count as number) ?? 0;
+}
+
 /** Returns all subscriptions for a list of user IDs (used by cron). */
 export async function getPushSubscriptionsForUsers(
   userIds: number[]

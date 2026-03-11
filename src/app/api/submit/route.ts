@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createHash } from "crypto";
 import { getCurrentUser } from "@/lib/auth";
 import { insertSubmission, getConsecutiveFailures } from "@/lib/db/submissions";
-import { savePracticeAttempt, addXp, getUserById } from "@/lib/db";
+import { savePracticeAttempt, addXp, getUserById, updateStreak } from "@/lib/db";
 import { hasPaidAccess } from "@/lib/plans";
 import { getUnlockedSlugs } from "@/lib/db/practice-unlocks";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
@@ -112,6 +112,8 @@ export const POST = withErrorHandling("POST /api/submit", async (request: NextRe
     if (canSaveProgress) {
       if (result.verdict === "accepted") {
         const { wasFirstSolve } = await savePracticeAttempt(user.userId, String(problemId), "solved");
+        // Extend streak on every accepted submission (not just first solve)
+        updateStreak(user.userId).catch(() => {});
         if (wasFirstSolve) {
           const problem = PRACTICE_PROBLEMS.find((p) => p.slug === problemId);
           const xp = problem ? (XP_BY_DIFFICULTY[problem.difficulty] ?? 10) : 10;

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
-import { savePracticeAttempt, getPracticeAttempts, addXp, getUserById } from "@/lib/db";
+import { savePracticeAttempt, getPracticeAttempts, addXp, getUserById, updateStreak } from "@/lib/db";
 import { hasPaidAccess } from "@/lib/plans";
 import { getUnlockedSlugs } from "@/lib/db/practice-unlocks";
 import { withErrorHandling } from "@/lib/api-utils";
@@ -44,6 +44,10 @@ export const POST = withErrorHandling("POST /api/practice-attempt", async (reque
   }
 
   const { wasFirstSolve } = await savePracticeAttempt(user.userId, slug, status);
+
+  if (status === "solved") {
+    updateStreak(user.userId).catch(() => {});
+  }
 
   if (wasFirstSolve) {
     const problem = PRACTICE_PROBLEMS.find((p) => p.slug === slug);

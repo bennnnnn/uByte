@@ -17,6 +17,7 @@ import {
   getSafeNextPath,
   type AuthPageMode,
 } from "@/lib/auth-redirect";
+import { readStoredReferralCode } from "@/components/ReferralTracker";
 
 type Mode = "login" | "signup" | "forgot";
 
@@ -48,7 +49,9 @@ export default function AuthPage({ variant }: { variant: AuthPageMode }) {
   const nextPath = getSafeNextPath(searchParams.get("next"));
   const loginHref = buildAuthPageHref("login", nextPath);
   const signupHref = buildAuthPageHref("signup", nextPath);
-  const googleHref = buildGoogleAuthHref(variant, nextPath);
+  // Read referral code from localStorage so it survives the OAuth redirect
+  const storedRef = typeof window !== "undefined" ? readStoredReferralCode() : null;
+  const googleHref = buildGoogleAuthHref(variant, nextPath, storedRef);
   const isSignupPage = variant === "signup";
 
   useEffect(() => {

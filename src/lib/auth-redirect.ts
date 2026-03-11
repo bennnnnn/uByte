@@ -28,13 +28,18 @@ export function buildAuthPageHref(
 
 export function buildGoogleAuthHref(
   mode: AuthPageMode,
-  nextPath?: string | null
+  nextPath?: string | null,
+  referralCode?: string | null
 ): string {
   const params = new URLSearchParams({ mode });
   const safeNext = getSafeNextPath(nextPath);
 
   if (safeNext !== DEFAULT_NEXT_PATH) {
     params.set("next", safeNext);
+  }
+
+  if (referralCode && /^[a-z0-9]{6,16}$/i.test(referralCode)) {
+    params.set("ref", referralCode);
   }
 
   return `/api/auth/google?${params.toString()}`;

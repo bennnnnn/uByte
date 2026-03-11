@@ -10,6 +10,7 @@
  */
 import { NextRequest, NextResponse } from "next/server";
 import { deleteOldNotifications, downgradeExpiredCancelingUsers } from "@/lib/db";
+import { deleteOldPushSubscriptions } from "@/lib/db/push-subscriptions";
 import { withErrorHandling } from "@/lib/api-utils";
 
 export const GET = withErrorHandling("GET /api/cron/cleanup", async (request: NextRequest) => {
@@ -22,17 +23,20 @@ export const GET = withErrorHandling("GET /api/cron/cleanup", async (request: Ne
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const [deletedNotifications, expiredDowngrades] = await Promise.all([
+  const [deletedNotifications, expiredDowngrades, deletedPushSubs] = await Promise.all([
     deleteOldNotifications(30),
     downgradeExpiredCancelingUsers(),
+    // Push subscriptions older than 90 days are expired by browser vendors — clean them up
+    deleteOldPushSubscriptions(90),
   ]);
 
   console.log(`[cron/cleanup] Deleted ${deletedNotifications} old notifications`);
   console.log(`[cron/cleanup] Downgraded ${expiredDowngrades} expired canceling subscriptions`);
+  console.log(`[cron/cleanup] Deleted ${deletedPushSubs} stale push subscriptions`);
 
   return NextResponse.json({
     ok: true,
-    deleted: { notifications: deletedNotifications },
+    deleted: { notifications: deletedNotifications, push_subscriptions: deletedPushSubs },
     downgraded: { expired_subscriptions: expiredDowngrades },
   });
 });

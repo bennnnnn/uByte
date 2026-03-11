@@ -19,6 +19,10 @@ import {
 } from "@/lib/exams/attempt-utils";
 import { sendCertificationEmail } from "@/lib/email";
 import { BASE_URL } from "@/lib/constants";
+import { addXp } from "@/lib/db";
+
+/** XP awarded for passing a language certification exam. */
+const CERT_PASS_XP = 100;
 
 export const POST = withErrorHandling(
   "POST /api/certifications/attempt/[attemptId]/submit",
@@ -109,6 +113,10 @@ export const POST = withErrorHandling(
       let certificateId: string | null = null;
       if (passed) {
         certificateId = await createCertificate(user.userId, attempt.lang, attemptId);
+        // Award XP for passing (fire-and-forget — never blocks the response)
+        addXp(user.userId, CERT_PASS_XP).catch((err) =>
+          console.error("[submit] addXp failed:", err)
+        );
         // Send congratulations email (fire-and-forget)
         if (user.email && certificateId) {
           const certUrl = `${BASE_URL}/certifications/certificate/${certificateId}`;
@@ -118,7 +126,15 @@ export const POST = withErrorHandling(
         }
       }
 
-      return NextResponse.json({ score, passed, correct, total, certificateId, results });
+      return NextResponse.json({
+        score,
+        passed,
+        correct,
+        total,
+        certificateId,
+        results,
+        xpAwarded: passed ? CERT_PASS_XP : 0,
+      });
     } catch (error) {
       if (!finalized) {
         await releaseAttemptSubmitLock(attemptId);
