@@ -1,6 +1,6 @@
 /**
  * AI feedback client — tutorial hints and inline step feedback.
- * Routes through Vercel AI Gateway → google/gemini-2.5-flash-lite (0.3s, $0.10/M).
+ * Routes through Vercel AI Gateway → openai/gpt-oss-120b (0.1s, $0.25/M).
  * Falls back to Grok via XAI_API_KEY if VERCEL_AI_GATEWAY_TOKEN is absent.
  */
 

@@ -24,9 +24,18 @@
 
 const GATEWAY_URL = "https://ai.vercel.dev/v1/chat/completions";
 
-/** Fast, cheap model for tutorial hints and inline feedback. */
-export const HINTS_MODEL        = "google/gemini-2.5-flash-lite";
-/** Code-specialized model for full post-solve code reviews. */
+/**
+ * 0.1s latency, 466 tps, $0.25/$0.69 per million tokens.
+ * 120B open-source model — fast enough for real-time hints, large enough
+ * to reliably follow the structured JSON schema every time.
+ */
+export const HINTS_MODEL        = "openai/gpt-oss-120b";
+
+/**
+ * Code-specialized model for full post-solve code reviews.
+ * 1.1s latency, 136 tps, $0.25/$2.00 per million tokens.
+ * Worth the extra latency for complexity analysis and style feedback quality.
+ */
 export const CODE_REVIEW_MODEL  = "openai/gpt-5.1-codex-mini";
 
 const DEFAULT_TIMEOUT_MS = 15_000;
