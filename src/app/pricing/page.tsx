@@ -14,6 +14,7 @@ import { trackConversion } from "@/lib/analytics";
 import { absoluteUrl } from "@/lib/seo";
 import { buildAuthPageHref } from "@/lib/auth-redirect";
 import { Button, Card, CheckIcon, Eyebrow, GradientText } from "@/components/ui";
+import { apiFetch } from "@/lib/api-client";
 
 const CLIENT_TOKEN     = process.env.NEXT_PUBLIC_PADDLE_CLIENT_TOKEN ?? "";
 
@@ -94,7 +95,7 @@ const FAQ_ITEMS = [
 function PricingContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { user, profile } = useAuth();
+  const { user, profile, refreshProfile } = useAuth();
   const paddleReady = useRef(false);
   const [billing, setBilling]       = useState<"monthly" | "yearly">("yearly");
   const [faqOpen, setFaqOpen]       = useState<number | null>(null);
@@ -122,6 +123,16 @@ function PricingContent() {
       else if (planParam === "yearly") setBilling("yearly");
     });
   }, [planParam]);
+
+  // After a successful checkout, sync the plan from Paddle and refresh the profile.
+  // This ensures the UI reflects the correct plan even if the webhook is delayed.
+  useEffect(() => {
+    if (!showSuccess || !user) return;
+    apiFetch("/api/billing/sync").then((res) => {
+      if (res.ok) refreshProfile();
+    }).catch(() => {});
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [showSuccess, user]);
 
   // Preserve old pricing links that still use ?signup=1 by forwarding to the page-based signup flow.
   useEffect(() => {
@@ -151,14 +162,16 @@ function PricingContent() {
 
     // Fetch a server-generated nonce (tied to authenticated userId server-side).
     // This prevents a malicious actor from spoofing another user's ID in customData.
+    // Must use apiFetch so the CSRF token is included — plain fetch returns 403.
     let checkoutNonce: string | undefined;
     if (user) {
       try {
-        const billing = profile?.plan === "yearly" ? "yearly" : "monthly";
-        const res = await fetch("/api/billing/checkout", {
+        // Use the plan being PURCHASED (derived from the priceId), not the current plan
+        const purchasePlan = priceId === YEARLY_PRICE_ID ? "yearly" : "monthly";
+        const res = await apiFetch("/api/billing/checkout", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ plan: billing }),
+          body: JSON.stringify({ plan: purchasePlan }),
         });
         if (res.ok) {
           const data = await res.json() as { checkoutNonce?: string };
