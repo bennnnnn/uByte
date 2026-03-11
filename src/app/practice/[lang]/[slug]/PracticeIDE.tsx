@@ -7,7 +7,6 @@ import type { SupportedLanguage } from "@/lib/languages/types";
 import { getStarterForLanguage, getAllPracticeProblems, getCategoryForSlug, getPracticeCategories, sortProblemsByCategoryAndDifficulty } from "@/lib/practice/problems";
 import { useCodeEditor } from "@/hooks/useCodeEditor";
 import { usePanelResize } from "@/hooks/usePanelResize";
-import { useFormatCode } from "@/hooks/useFormatCode";
 import ThemeToggle from "@/components/ThemeToggle";
 import AuthButtons from "@/components/AuthButtons";
 import ProblemSidebar from "@/components/practice/ProblemSidebar";
@@ -101,7 +100,6 @@ export function PracticeIDE({ problem, initialLang, initialCode, categoryFilter 
     setTimeout(() => setNoteSaved(false), 2000);
   }
 
-  const { format, formatting } = useFormatCode();
   const [statuses, setStatuses] = useState<Record<string, PracticeAttemptStatus>>({});
   const [xpToast, setXpToast] = useState<number | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -307,9 +305,6 @@ export function PracticeIDE({ problem, initialLang, initialCode, categoryFilter 
     // Intentionally do NOT clear aiFeedback here — keep the hint visible during re-submit.
     // It is cleared on accept (problem solved) or when the user manually dismisses it.
     setAiError(null);
-    // Silently auto-format before submitting (fire-and-forget if it fails)
-    const codeToSubmit = await format(editor.code, lang).catch(() => editor.code);
-    if (codeToSubmit !== editor.code) editor.setCode(codeToSubmit);
     try {
       // Must use apiFetch (not fetch) so the x-csrf-token header is included;
       // plain fetch omits it and the route returns 403 { error: "Missing CSRF token" }.
@@ -856,8 +851,6 @@ export function PracticeIDE({ problem, initialLang, initialCode, categoryFilter 
             lang={lang}
             onLangChange={setLang}
             langOptions={LANG_ORDER}
-            formatting={formatting}
-            onFormat={async () => { const f = await format(editor.code, lang); if (f !== editor.code) editor.setCode(f); }}
             shareCopied={shareCopied}
             onShare={handleShare}
           >
@@ -937,8 +930,6 @@ export function PracticeIDE({ problem, initialLang, initialCode, categoryFilter 
           lang={lang}
           onLangChange={setLang}
           langOptions={LANG_ORDER}
-          formatting={formatting}
-          onFormat={async () => { const f = await format(editor.code, lang); if (f !== editor.code) editor.setCode(f); }}
           shareCopied={shareCopied}
           onShare={handleShare}
           mobile

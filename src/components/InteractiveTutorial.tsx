@@ -16,7 +16,6 @@ import OutputPanel from "@/components/tutorial/OutputPanel";
 import InstructionsSidebar from "@/components/tutorial/InstructionsSidebar";
 import CourseOutlineDrawer from "@/components/tutorial/CourseOutlineDrawer";
 import SnapshotDrawer from "@/components/tutorial/SnapshotDrawer";
-import { useFormatCode } from "@/hooks/useFormatCode";
 import { tutorialUrl } from "@/lib/urls";
 import { LANGUAGES } from "@/lib/languages/registry";
 import type { SupportedLanguage } from "@/lib/languages/types";
@@ -67,7 +66,6 @@ export default function InteractiveTutorial({
   const [expandedSlug, setExpandedSlug] = useState(tutorialSlug);
   const [showSnapshots, setShowSnapshots] = useState(false);
   const { shareCopied, handleShare } = useShareCode(() => editor.code);
-  const { format, formatting } = useFormatCode();
   const [fontSize, setFontSize] = useState<14 | 16 | 18>(() => {
     try { const s = localStorage.getItem("ide-font-size"); if (s === "16") return 16; if (s === "18") return 18; } catch { /* ignore */ }
     return 14;
@@ -298,8 +296,6 @@ export default function InteractiveTutorial({
             lang={ideLang}
             onLangChange={setIdeLang}
             langOptions={Object.keys(LANGUAGES) as SupportedLanguage[]}
-            formatting={formatting}
-            onFormat={async () => { const f = await format(editor.code, ideLang); if (f !== editor.code) editor.setCode(f); }}
             shareCopied={shareCopied}
             onShare={handleShare}
             extraLeft={stepsLoading ? <span className="text-xs text-zinc-500">Loading…</span> : undefined}
@@ -360,8 +356,6 @@ export default function InteractiveTutorial({
           lang={ideLang}
           onLangChange={setIdeLang}
           langOptions={Object.keys(LANGUAGES) as SupportedLanguage[]}
-          formatting={formatting}
-          onFormat={async () => { const f = await format(editor.code, ideLang); if (f !== editor.code) editor.setCode(f); }}
           shareCopied={shareCopied}
           onShare={handleShare}
           mobile

@@ -11,17 +11,13 @@ const SHARE_ICON = (
 );
 
 interface EditorToolbarProps {
-  /** Current language value */
   lang: SupportedLanguage;
   onLangChange: (lang: SupportedLanguage) => void;
   /** Ordered list of languages to show in the selector */
   langOptions: SupportedLanguage[];
-  /** Whether a format operation is in progress */
-  formatting: boolean;
-  onFormat: () => void;
   shareCopied: boolean;
   onShare: () => void;
-  /** Action buttons (Run / Check or Submit / Reset) rendered between lang select and format */
+  /** Action buttons (Run / Check or Submit / Reset) rendered between lang select and share */
   children?: ReactNode;
   /** Extra content after the lang selector, before children (e.g. "Loading…" spinner) */
   extraLeft?: ReactNode;
@@ -31,14 +27,12 @@ interface EditorToolbarProps {
 
 /**
  * Shared toolbar used by the tutorial IDE and the practice IDE.
- * Renders the language selector, action buttons (via children), format, and share.
+ * Renders the language selector, action buttons (via children), and share.
  */
 export function EditorToolbar({
   lang,
   onLangChange,
   langOptions,
-  formatting,
-  onFormat,
   shareCopied,
   onShare,
   children,
@@ -91,15 +85,6 @@ export function EditorToolbar({
       </select>
       {extraLeft}
       {children}
-      <button
-        type="button"
-        onClick={onFormat}
-        disabled={formatting}
-        title="Auto-format code"
-        className="rounded-md border border-zinc-300 px-3 py-1.5 text-sm text-zinc-500 transition-colors hover:border-zinc-400 hover:text-zinc-800 disabled:opacity-50 dark:border-zinc-700 dark:text-zinc-400 dark:hover:border-zinc-600 dark:hover:text-zinc-200"
-      >
-        {formatting ? "…" : "⌥ Format"}
-      </button>
       <button
         type="button"
         onClick={onShare}

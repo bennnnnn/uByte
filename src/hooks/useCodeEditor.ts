@@ -17,14 +17,12 @@ export interface CodeEditorState {
   setCode: (code: string) => void;
   errorLines: Set<number>;
   setErrorLines: (lines: Set<number>) => void;
-  formatting: boolean;
   highlightGo: (code: string) => string;
   highlightedHtml: string;
   preRef: React.RefObject<HTMLPreElement | null>;
   lineNumRef: React.RefObject<HTMLDivElement | null>;
   highlightRef: React.RefObject<HTMLDivElement | null>;
   textareaRef: React.RefObject<HTMLTextAreaElement | null>;
-  handleFormat: () => Promise<void>;
   syncScroll: () => void;
 }
 
@@ -42,7 +40,6 @@ export function useCodeEditor(
   // NOT used to drive the <pre> content after mount — that is imperative only.
   const [code, setCodeState] = useState(initialCode);
   const [errorLines, setErrorLines] = useState<Set<number>>(new Set());
-  const [formatting, setFormatting] = useState(false);
 
   const preRef       = useRef<HTMLPreElement>(null);
   const lineNumRef   = useRef<HTMLDivElement>(null);
@@ -87,24 +84,6 @@ export function useCodeEditor(
     setCodeState(newCode);
   }
 
-  async function handleFormat() {
-    if (lang !== "go") return;
-    setFormatting(true);
-    try {
-      const body = new URLSearchParams({ body: code, imports: "true" });
-      const goFmtUrl = process.env.NEXT_PUBLIC_GO_FMT_URL || "https://go.dev/_/fmt";
-      const res = await fetch(goFmtUrl, {
-        method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: body.toString(),
-      });
-      const data = await res.json();
-      if (data.Body && !data.Error) setCode(data.Body);
-    } catch { /* ignore */ } finally {
-      setFormatting(false);
-    }
-  }
-
   function syncScroll() {
     const ta = textareaRef.current;
     if (!ta) return;
@@ -118,14 +97,12 @@ export function useCodeEditor(
     setCode,
     errorLines,
     setErrorLines,
-    formatting,
     highlightGo: highlightFn,
     highlightedHtml,
     preRef,
     lineNumRef,
     highlightRef,
     textareaRef,
-    handleFormat,
     syncScroll,
   };
 }
