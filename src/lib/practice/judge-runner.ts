@@ -77,10 +77,31 @@ function extractRustSolution(code: string): string {
 }
 
 // C# starters use `public class Solution { ... }`.
-// We strip `using` directives (the harness supplies them) and return the Solution class body.
+// We strip `using` directives (harness provides them) and remove any `class Program { ... }`
+// boilerplate (the default starter) so the harness can supply its own entry point.
 function extractCSharpSolution(code: string): string {
-  // Remove top-level `using` statements
-  return code.replace(/^\s*using\s+[^;]+;\s*$/gm, "").trim();
+  let s = code;
+
+  // Remove top-level `using` directives — harness provides its own.
+  s = s.replace(/^\s*using\s+[^;]+;\s*$/gm, "").trim();
+
+  // Remove `class Program { ... }` (default non-harness starter) using brace counting
+  // so nested braces inside the class body are handled correctly.
+  const progMatch = s.match(/\bclass\s+Program\s*\{/);
+  if (progMatch?.index !== undefined) {
+    let depth = 0;
+    let end = progMatch.index;
+    for (let i = progMatch.index; i < s.length; i++) {
+      if (s[i] === "{") depth++;
+      else if (s[i] === "}") {
+        depth--;
+        if (depth === 0) { end = i + 1; break; }
+      }
+    }
+    s = (s.slice(0, progMatch.index) + s.slice(end)).trim();
+  }
+
+  return s.trim();
 }
 
 export type JudgeVerdict =
