@@ -39,8 +39,10 @@ function categoryColor(category: string) {
   return CATEGORY_COLORS[category] ?? "bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300";
 }
 
-export default function BlogPage() {
-  const posts = getAllBlogPosts();
+export const dynamic = "force-dynamic";
+
+export default async function BlogPage() {
+  const posts = await getAllBlogPosts();
 
   return (
     <div className="min-h-full overflow-y-auto">

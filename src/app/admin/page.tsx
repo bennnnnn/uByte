@@ -14,7 +14,7 @@ import { useAdminData } from "./hooks";
 import { Spinner, TabIcon } from "./components";
 import { TAB_LABELS } from "./types";
 import type { Tab } from "./types";
-import { UsersTab, AnalyticsTab, RevenueTab, GrowthTab, ExamsTab, BannerTab, AuditTab } from "./tabs";
+import { UsersTab, AnalyticsTab, RevenueTab, GrowthTab, ExamsTab, BannerTab, AuditTab, BlogTab } from "./tabs";
 
 /* ── Tab header subtitles (concise one-liners per tab) ───────────────────── */
 const TAB_SUBTITLES: Record<Tab, string> = {
@@ -25,12 +25,13 @@ const TAB_SUBTITLES: Record<Tab, string> = {
   audit:     "Admin action history",
   exams:     "Questions, attempts, pass threshold, settings & upload",
   banner:    "Site-wide announcement banner",
+  blog:      "Create and edit blog posts without touching the repo",
 };
 
 /* ── Sidebar section definitions ─────────────────────────────────────────── */
 const SIDEBAR_SECTIONS: { label: string; tabs: Tab[] }[] = [
   { label: "Overview", tabs: ["users", "analytics", "revenue", "growth"] },
-  { label: "Manage",   tabs: ["exams", "banner"] },
+  { label: "Manage",   tabs: ["exams", "banner", "blog"] },
   { label: "History",  tabs: ["audit"] },
 ];
 
@@ -216,6 +217,7 @@ export default function AdminPage() {
           {tab === "exams"     && <ExamsTab     data={data} />}
           {tab === "banner"    && <BannerTab    data={data} />}
           {tab === "audit"     && <AuditTab     data={data} />}
+          {tab === "blog"      && <BlogTab />}
         </div>
       </main>
 

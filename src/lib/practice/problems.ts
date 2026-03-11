@@ -24,6 +24,9 @@ import { HARD_PROBLEMS_2 } from "./problems-hard-2";
 import { HARD_PROBLEMS_3 } from "./problems-hard-3";
 import { MEDIUM_PROBLEMS_4 } from "./problems-medium-4";
 import { HARD_PROBLEMS_4 } from "./problems-hard-4";
+import { EASY_PROBLEMS_4 } from "./problems-easy-4";
+import { MEDIUM_PROBLEMS_5 } from "./problems-medium-5";
+import { HARD_PROBLEMS_5 } from "./problems-hard-5";
 
 // ─── Default starters ───────────────────────────────────────────────────────
 
@@ -70,6 +73,9 @@ export const PRACTICE_PROBLEMS: PracticeProblem[] = [
   ...HARD_PROBLEMS_3,
   ...MEDIUM_PROBLEMS_4,
   ...HARD_PROBLEMS_4,
+  ...EASY_PROBLEMS_4,
+  ...MEDIUM_PROBLEMS_5,
+  ...HARD_PROBLEMS_5,
 ];
 
 // ─── Category helpers (derived from problem definitions) ─────────────────────
@@ -90,6 +96,7 @@ const CATEGORY_LABELS: Record<ProblemCategory, string> = {
   heap: "Heap",
   tree: "Tree",
   backtracking: "Backtracking",
+  design: "Design",
 };
 
 export function getCategoryForSlug(slug: string): ProblemCategory | null {

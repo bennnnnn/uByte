@@ -2,7 +2,7 @@ import type { MetadataRoute } from "next";
 import { getAllTutorials } from "@/lib/tutorials";
 import { getAllLanguageSlugs } from "@/lib/languages/registry";
 import { getAllPracticeProblems } from "@/lib/practice/problems";
-import { getAllBlogPosts } from "@/lib/blog";
+import { getMdxBlogSlugs } from "@/lib/blog";
 import { BASE_URL } from "@/lib/constants";
 import { tutorialUrl, tutorialLangUrl } from "@/lib/urls";
 import type { SupportedLanguage } from "@/lib/languages/types";
@@ -14,7 +14,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const languageSlugs = getAllLanguageSlugs();
   const practiceProblems = getAllPracticeProblems();
 
-  const blogPosts = getAllBlogPosts();
+  const blogSlugs = getMdxBlogSlugs();
   const entries: MetadataRoute.Sitemap = [
     {
       url: abs("/"),
@@ -94,10 +94,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "daily",
       priority: 0.8,
     },
-    // Individual blog posts
-    ...blogPosts.map((post) => ({
-      url: abs(`/blog/${post.slug}`),
-      lastModified: new Date(post.date),
+    // Individual blog posts (MDX only; DB posts are dynamic)
+    ...blogSlugs.map((slug) => ({
+      url: abs(`/blog/${slug}`),
+      lastModified: now,
       changeFrequency: "monthly" as const,
       priority: 0.75,
     })),

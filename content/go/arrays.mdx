@@ -16,6 +16,9 @@ You will learn and practice:
 - **How to read values** - first item, last item, and length with `len`
 - **How to loop through an array** - print every element with `for`
 - **How to total values** - sum numbers stored in an array
+- **Comparing arrays** - equality check with `==`
+- **Multidimensional arrays** - 2D grids with `[rows][cols]Type`
+- **Passing arrays to functions** - value copy semantics vs. pointers
 
 Each section below is short and beginner-friendly. The exercises follow the same order.
 
@@ -170,6 +173,85 @@ func main() {
 ```
 
 This same idea will carry into the next lesson on slices.
+
+---
+
+---
+
+## Comparing Arrays
+
+Two arrays are equal if they have the same type and every element is equal. You can compare them directly with `==`.
+
+```gorun
+// compare-arrays.go
+package main
+
+import "fmt"
+
+func main() {
+    a := [3]int{1, 2, 3}
+    b := [3]int{1, 2, 3}
+    c := [3]int{1, 2, 4}
+
+    fmt.Println(a == b) // true
+    fmt.Println(a == c) // false
+}
+```
+
+Note: arrays of different sizes are **different types** — `[3]int` and `[4]int` cannot be compared.
+
+---
+
+## Multidimensional Arrays
+
+A 2D array is an array of arrays. Declare it as `[rows][cols]Type` and index with two brackets.
+
+```gorun
+// 2d-array.go
+package main
+
+import "fmt"
+
+func main() {
+    grid := [2][3]int{
+        {1, 2, 3},
+        {4, 5, 6},
+    }
+
+    // Print each row
+    for _, row := range grid {
+        fmt.Println(row)
+    }
+
+    // Access individual element
+    fmt.Println("row 1, col 2:", grid[1][2]) // 6
+}
+```
+
+---
+
+## Passing Arrays to Functions
+
+In Go, arrays are **value types** — a function receives a copy of the array. Changes inside the function do not affect the original.
+
+```gorun
+// array-copy.go
+package main
+
+import "fmt"
+
+func addOne(arr [3]int) {
+    arr[0] = 100 // modifies the copy, not the original
+}
+
+func main() {
+    nums := [3]int{1, 2, 3}
+    addOne(nums)
+    fmt.Println(nums) // [1 2 3] — unchanged
+}
+```
+
+To modify the original, pass a pointer to the array: `arr *[3]int`.
 
 ---
 

@@ -8,7 +8,18 @@ estimatedMinutes: 15
 
 ## Concepts in this chapter
 
-You will learn and practice: **json.Marshal** and struct tags; **json.Unmarshal** into a struct; **omitempty** and custom tags.
+You will learn and practice:
+
+- **json.Marshal** — encode a Go value to JSON bytes
+- **Struct tags** — control field names with `json:"name"`
+- **json.Unmarshal** — decode JSON into a struct
+- **omitempty** — skip zero-value fields in output
+- **Maps and slices** — encode/decode dynamic shapes
+- **Pretty printing** — `json.MarshalIndent` for readable output
+- **Nested structs** — compose complex JSON documents
+- **json.Decoder / json.Encoder** — streaming JSON for large payloads
+- **Unknown fields** — `json.RawMessage` to defer parsing
+- **Custom marshal/unmarshal** — implement `json.Marshaler` / `json.Unmarshaler`
 
 Each section below has a short explanation; then you'll code the same ideas in the exercises (one concept per exercise).
 
@@ -50,3 +61,191 @@ You can marshal and unmarshal Go maps and slices directly — useful when the JS
 ## Pretty Printing
 
 `json.MarshalIndent` adds newlines and indentation — great for logs, debugging, and human-readable config files.
+
+```gorun
+// pretty-print.go
+package main
+
+import (
+	"encoding/json"
+	"fmt"
+)
+
+type Config struct {
+	Host string `json:"host"`
+	Port int    `json:"port"`
+}
+
+func main() {
+	cfg := Config{Host: "localhost", Port: 8080}
+	data, _ := json.MarshalIndent(cfg, "", "  ")
+	fmt.Println(string(data))
+}
+```
+
+---
+
+## Nested Structs
+
+You can embed structs inside other structs; `json.Marshal` handles the full tree automatically, producing nested JSON objects.
+
+```gorun
+// nested-structs.go
+package main
+
+import (
+	"encoding/json"
+	"fmt"
+)
+
+type Address struct {
+	Street string `json:"street"`
+	City   string `json:"city"`
+}
+
+type Person struct {
+	Name    string  `json:"name"`
+	Age     int     `json:"age"`
+	Address Address `json:"address"`
+}
+
+func main() {
+	p := Person{
+		Name: "Alice",
+		Age:  30,
+		Address: Address{Street: "123 Main St", City: "Golang City"},
+	}
+	data, _ := json.MarshalIndent(p, "", "  ")
+	fmt.Println(string(data))
+
+	// Round-trip
+	var p2 Person
+	json.Unmarshal(data, &p2)
+	fmt.Println(p2.Address.City)
+}
+```
+
+---
+
+## Streaming with json.Decoder and json.Encoder
+
+For large payloads or streaming sources (HTTP bodies, files), use `json.NewDecoder` / `json.NewEncoder` instead of buffering the whole payload in memory.
+
+```gorun
+// streaming-json.go
+package main
+
+import (
+	"bytes"
+	"encoding/json"
+	"fmt"
+)
+
+type Item struct {
+	ID   int    `json:"id"`
+	Name string `json:"name"`
+}
+
+func main() {
+	// Encode directly to a buffer (simulates writing to http.ResponseWriter)
+	var buf bytes.Buffer
+	enc := json.NewEncoder(&buf)
+	enc.SetIndent("", "  ")
+	items := []Item{{1, "apple"}, {2, "banana"}}
+	enc.Encode(items)
+
+	// Decode from the same buffer
+	dec := json.NewDecoder(&buf)
+	var decoded []Item
+	dec.Decode(&decoded)
+	for _, item := range decoded {
+		fmt.Printf("%d: %s\n", item.ID, item.Name)
+	}
+}
+```
+
+---
+
+## Deferring Parsing with json.RawMessage
+
+`json.RawMessage` lets you hold part of a JSON document in raw bytes and decode it later — ideal for heterogeneous payloads (e.g. an event envelope where the body differs per event type).
+
+```gorun
+// raw-message.go
+package main
+
+import (
+	"encoding/json"
+	"fmt"
+)
+
+type Event struct {
+	Type    string          `json:"type"`
+	Payload json.RawMessage `json:"payload"` // decoded later
+}
+
+type ClickPayload struct {
+	X, Y int
+}
+
+func main() {
+	raw := []byte(`{"type":"click","payload":{"X":10,"Y":20}}`)
+	var ev Event
+	json.Unmarshal(raw, &ev)
+	fmt.Println("type:", ev.Type)
+
+	if ev.Type == "click" {
+		var p ClickPayload
+		json.Unmarshal(ev.Payload, &p)
+		fmt.Printf("click at (%d, %d)\n", p.X, p.Y)
+	}
+}
+```
+
+---
+
+## Custom Marshal / Unmarshal
+
+Implement the `json.Marshaler` and `json.Unmarshaler` interfaces to take full control over how a type is encoded or decoded.
+
+```gorun
+// custom-marshal.go
+package main
+
+import (
+	"encoding/json"
+	"fmt"
+	"strings"
+)
+
+// Tags stored as comma-separated string in JSON, []string in Go
+type Tags []string
+
+func (t Tags) MarshalJSON() ([]byte, error) {
+	return json.Marshal(strings.Join(t, ","))
+}
+
+func (t *Tags) UnmarshalJSON(data []byte) error {
+	var s string
+	if err := json.Unmarshal(data, &s); err != nil {
+		return err
+	}
+	*t = strings.Split(s, ",")
+	return nil
+}
+
+type Article struct {
+	Title string `json:"title"`
+	Tags  Tags   `json:"tags"`
+}
+
+func main() {
+	a := Article{Title: "Go JSON", Tags: Tags{"go", "json", "tutorial"}}
+	data, _ := json.Marshal(a)
+	fmt.Println(string(data))
+
+	var a2 Article
+	json.Unmarshal(data, &a2)
+	fmt.Println(a2.Tags) // [go json tutorial]
+}
+```

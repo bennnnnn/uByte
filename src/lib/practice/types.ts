@@ -24,7 +24,8 @@ export type ProblemCategory =
   | "graph"
   | "heap"
   | "tree"
-  | "backtracking";
+  | "backtracking"
+  | "design";
 
 export interface ProblemExample {
   input: string;

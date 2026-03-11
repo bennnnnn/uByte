@@ -10,3 +10,4 @@ export { default as GrowthTab }    from "./GrowthTab";
 export { default as ExamsTab }     from "./ExamsTab";
 export { default as BannerTab }    from "./BannerTab";
 export { default as AuditTab }     from "./AuditTab";
+export { default as BlogTab }      from "./BlogTab";

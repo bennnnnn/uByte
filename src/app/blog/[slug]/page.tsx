@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { compileMDX } from "next-mdx-remote/rsc";
 import rehypePrettyCode from "rehype-pretty-code";
-import { getAllBlogPosts, getBlogPost } from "@/lib/blog";
+import { getMdxBlogSlugs, getBlogPost, getAllBlogPosts } from "@/lib/blog";
 import { absoluteUrl } from "@/lib/seo";
 import { APP_NAME, BASE_URL } from "@/lib/constants";
 
@@ -11,13 +11,15 @@ interface Props {
   params: Promise<{ slug: string }>;
 }
 
+export const dynamic = "force-dynamic";
+
 export async function generateStaticParams() {
-  return getAllBlogPosts().map((post) => ({ slug: post.slug }));
+  return getMdxBlogSlugs().map((slug) => ({ slug }));
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const post = getBlogPost(slug);
+  const post = await getBlogPost(slug);
   if (!post) return {};
   const ogTitle = encodeURIComponent(post.title);
   const ogDesc = encodeURIComponent(post.description);
@@ -53,10 +55,10 @@ const rehypePrettyCodeOptions: any = {
 
 export default async function BlogPostPage({ params }: Props) {
   const { slug } = await params;
-  const post = getBlogPost(slug);
+  const post = await getBlogPost(slug);
   if (!post) notFound();
 
-  const allPosts = getAllBlogPosts();
+  const allPosts = await getAllBlogPosts();
   // Related posts: same category or overlapping tags, excluding current post
   const related = allPosts
     .filter((p) => p.slug !== slug && (p.category === post.category || p.tags.some((t) => post.tags.includes(t))))
