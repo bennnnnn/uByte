@@ -1,9 +1,13 @@
 /**
- * AI code review client — gives a full, structured review of submitted code.
- * Different from tutorial-hint / ai-feedback which are focused on hints for failing code.
+ * AI code review client — full structured review of submitted code.
+ * Different from tutorial-hint / ai-feedback (which give hints for failing steps).
  * This is for a comprehensive post-solve or on-demand review.
+ *
+ * Routes through Vercel AI Gateway → openai/gpt-5.1-codex-mini (1.1s, $0.25/$2.00/M).
+ * Code-specialized model gives better complexity analysis and style feedback.
+ * Falls back to Grok via XAI_API_KEY if VERCEL_AI_GATEWAY_TOKEN is absent.
  */
-import { callGrokApi } from "./grok-client";
+import { callGateway, CODE_REVIEW_MODEL } from "./gateway-client";
 
 export interface CodeReviewSchema {
   summary: string;
@@ -31,13 +35,14 @@ export async function callCodeReview(
   verdict?: string,
   userName?: string,
 ): Promise<CodeReviewSchema> {
-  if (!process.env.XAI_API_KEY) {
+  const hasCredentials = process.env.VERCEL_AI_GATEWAY_TOKEN ?? process.env.VERCEL_TOKEN ?? process.env.XAI_API_KEY;
+  if (!hasCredentials) {
     return {
-      summary: "AI code review is not configured. Ask your admin to set XAI_API_KEY.",
+      summary: "AI code review is not configured. Set VERCEL_AI_GATEWAY_TOKEN in Vercel project settings.",
       time_complexity: "Unknown",
       space_complexity: "Unknown",
       strengths: [],
-      improvements: ["Set up XAI_API_KEY to enable AI code review."],
+      improvements: ["Set VERCEL_AI_GATEWAY_TOKEN to enable AI code review."],
       code_style: "N/A",
       score: 0,
     };
@@ -53,7 +58,8 @@ export async function callCodeReview(
   const system = `You are an expert code reviewer and senior software engineer. ${nameInstruction} ${SCHEMA_DESC} Be specific, actionable, and encouraging. Do NOT reveal test cases or full working solutions.`;
   const userMsg = `${context}${verdictCtx}Language: ${lang}\n\nCode:\n\`\`\`${lang}\n${code.trim()}\n\`\`\`\n\nReturn ONLY valid JSON.`;
 
-  const text = await callGrokApi({
+  const text = await callGateway({
+    model: CODE_REVIEW_MODEL,
     messages: [
       { role: "system", content: system },
       { role: "user", content: userMsg },

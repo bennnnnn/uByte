@@ -1,9 +1,10 @@
 /**
- * AI feedback client: Grok (X.AI). Returns strict JSON shape.
- * Set env XAI_API_KEY.
+ * AI feedback client — tutorial hints and inline step feedback.
+ * Routes through Vercel AI Gateway → google/gemini-2.5-flash-lite (0.3s, $0.10/M).
+ * Falls back to Grok via XAI_API_KEY if VERCEL_AI_GATEWAY_TOKEN is absent.
  */
 
-import { callGrokApi } from "./grok-client";
+import { callGateway, HINTS_MODEL } from "./gateway-client";
 
 export interface AiFeedbackSchema {
   friendly_one_liner: string;
@@ -32,10 +33,11 @@ export async function callAiFeedback(
   verdict: string,
   userName?: string,
 ): Promise<AiFeedbackSchema> {
-  if (!process.env.XAI_API_KEY) {
+  const hasCredentials = process.env.VERCEL_AI_GATEWAY_TOKEN ?? process.env.VERCEL_TOKEN ?? process.env.XAI_API_KEY;
+  if (!hasCredentials) {
     const greeting = userName ? `Hey ${userName}!` : "Hey!";
     return {
-      friendly_one_liner: `${greeting} AI feedback is not configured — ask your admin to set XAI_API_KEY.`,
+      friendly_one_liner: `${greeting} AI feedback is not configured — set VERCEL_AI_GATEWAY_TOKEN in Vercel project settings.`,
       root_cause: "no_ai_config",
       evidence: [],
       hint: "Review the compiler or runtime output above and try a small fix.",
@@ -43,10 +45,10 @@ export async function callAiFeedback(
       confidence: 0,
     };
   }
-  return callFeedbackGrok(evidenceBundle, hintLevel, verdict, userName);
+  return callFeedbackGateway(evidenceBundle, hintLevel, verdict, userName);
 }
 
-async function callFeedbackGrok(
+async function callFeedbackGateway(
   evidenceBundle: string,
   hintLevel: number,
   verdict: string,
@@ -65,7 +67,8 @@ async function callFeedbackGrok(
   const system = `You are a friendly coding tutor. ${nameInstruction} ${SCHEMA_DESC} ${levelPrompt} Respond with ONLY a single JSON object.`;
   const user = `Verdict: ${verdict}\n\n${evidenceBundle}\n\nReturn ONLY valid JSON.`;
 
-  const text = await callGrokApi({
+  const text = await callGateway({
+    model: HINTS_MODEL,
     messages: [
       { role: "system", content: system },
       { role: "user", content: user },
@@ -74,7 +77,7 @@ async function callFeedbackGrok(
     temperature: 0.3,
   });
 
-  return await parseAiResponse(text, () => callFeedbackGrok(evidenceBundle + "\n\nReturn ONLY valid JSON.", hintLevel, verdict, userName));
+  return await parseAiResponse(text, () => callFeedbackGateway(evidenceBundle + "\n\nReturn ONLY valid JSON.", hintLevel, verdict, userName));
 }
 
 async function parseAiResponse(
