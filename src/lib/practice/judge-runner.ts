@@ -65,8 +65,15 @@ function extractJavaSolution(code: string): string {
   const classStart = classMatch.index + classMatch[0].length;
   const rest = s.slice(classStart);
   const mainRel = rest.search(/\bpublic\s+static\s+void\s+main\s*\(/);
-  const body = mainRel >= 0 ? rest.slice(0, mainRel) : rest;
-  return body.trim().replace(/\}\s*$/, "").trim();
+  if (mainRel >= 0) {
+    // Slice from after "class Main {" up to (not including) the main() method.
+    // The class's closing "}" lives *after* main(), so we must NOT strip a trailing
+    // "}" here — the trailing "}" we see is the last solution method's own closing brace.
+    return rest.slice(0, mainRel).trim();
+  }
+  // No main() found: the whole rest is the class body including its closing "}".
+  // Strip that one trailing "}" so the harness's own class wrapper isn't double-closed.
+  return rest.trim().replace(/\}\s*$/, "").trim();
 }
 
 function extractRustSolution(code: string): string {
