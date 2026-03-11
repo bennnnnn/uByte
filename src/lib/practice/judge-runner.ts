@@ -175,6 +175,22 @@ export async function runJudge(
     lang === "java"       ? extractJavaSolution(code) :
     lang === "csharp"     ? extractCSharpSolution(code) :
                             extractRustSolution(code);
+
+  // C# harnesses call `new Solution()` — the user must define a `public class Solution`.
+  // If the code only contains the old default `class Program` boilerplate (no Solution class),
+  // return a helpful message rather than a confusing compiler error.
+  if (lang === "csharp" && !solution.includes("class Solution")) {
+    return {
+      verdict: "compile_error",
+      message: "Compilation Error",
+      output:
+        "Your C# code must define a `public class Solution { ... }` with your solution method.\n" +
+        "Click Reset to load the correct starter template, then implement your solution inside the class.",
+      compileOutput:
+        "No `class Solution` found — please use the provided starter code format.",
+    };
+  }
+
   const judgeCode = prepareCodeForJudge(harness.replace("{{SOLUTION}}", solution), lang);
 
   const stdin = problem.testCases.map((tc) => tc.stdin).join("\n");
