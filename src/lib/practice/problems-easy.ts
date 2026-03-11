@@ -161,7 +161,7 @@ for (const lineRaw of lines) {
   if (!line) continue;
   const [a, b] = line.split("|");
   const nums = a.trim().split(/\\s+/).filter(Boolean).map(Number);
-  const target = Number((b ?? "").trim());
+  const target = Number(( b || "").trim());
   console.log(fmt(twoSum(nums, target)));
 }
 `,

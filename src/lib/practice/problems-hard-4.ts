@@ -140,8 +140,8 @@ for (const raw of lines) {
   const line = raw.trim();
   if (!line) continue;
   const [a, b] = line.split("|");
-  const nums1 = (a ?? "").trim().split(/\s+/).map(Number);
-  const nums2 = (b ?? "").trim().split(/\s+/).map(Number);
+  const nums1 = ( a || "").trim().split(/\s+/).map(Number);
+  const nums2 = ( b || "").trim().split(/\s+/).map(Number);
   console.log(findMedianSortedArrays(nums1, nums2).toFixed(5));
 }
 `,
@@ -364,7 +364,7 @@ for (const raw of lines) {
   const line = raw.trim();
   if (!line) continue;
   const [a, b] = line.split("|");
-  console.log(String(isMatch((a ?? "").trim(), (b ?? "").trim())));
+  console.log(String(isMatch(( a || "").trim(), ( b || "").trim())));
 }
 `,
       cpp: `#include <bits/stdc++.h>

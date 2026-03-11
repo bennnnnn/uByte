@@ -155,8 +155,8 @@ for (const lineRaw of lines) {
   const line = lineRaw.trim();
   if (!line) continue;
   const [a, b] = line.split("|");
-  const s = (a ?? "").trim();
-  const wordDict = (b ?? "").trim().split(/\s+/).filter(Boolean);
+  const s = ( a || "").trim();
+  const wordDict = ( b || "").trim().split(/\s+/).filter(Boolean);
   console.log(String(wordBreak(s, wordDict)));
 }
 `,

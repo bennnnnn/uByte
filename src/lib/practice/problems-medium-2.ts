@@ -550,7 +550,7 @@ for (const lineRaw of lines) {
   if (!line) continue;
   const [a, b] = line.split("|");
   const coins = a.trim().split(/\s+/).filter(Boolean).map(Number);
-  const amount = Number((b ?? "0").trim());
+  const amount = Number((b || "0").trim());
   console.log(String(coinChange(coins, amount)));
 }
 `,
@@ -1173,7 +1173,7 @@ for (const lineRaw of lines) {
   if (!line) continue;
   const [a, b] = line.split("|");
   const nums = a.trim().split(/\s+/).filter(Boolean).map(Number);
-  const target = Number((b ?? "0").trim());
+  const target = Number((b || "0").trim());
   console.log(String(search(nums, target)));
 }
 `,

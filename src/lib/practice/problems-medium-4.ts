@@ -389,8 +389,8 @@ for (const raw of lines) {
   const line = raw.trim();
   if (!line) continue;
   const [a, b] = line.split("|");
-  const nums = (a ?? "").trim().split(/\s+/).map(Number);
-  const k = parseInt((b ?? "").trim(), 10);
+  const nums = ( a || "").trim().split(/\s+/).map(Number);
+  const k = parseInt(( b || "").trim(), 10);
   console.log(String(findKthLargest(nums, k)));
 }
 `,
