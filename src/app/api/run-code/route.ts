@@ -28,6 +28,17 @@ export const POST = withErrorHandling("POST /api/run-code", async (request: Next
   }
 
   const lang = typeof language === "string" && isSupportedLanguage(language) ? language : "go";
+
+  // C# practice starters use `public class Solution` with no Main().
+  // Inject a stub entry point so clicking Run produces a message instead of CS5001.
+  let runCode = code;
+  if (lang === "csharp" && !/\bstatic\s+(void|int)\s+Main\s*\(/.test(code)) {
+    runCode =
+      code +
+      '\nclass __Runner__ { static void Main() {' +
+      ' System.Console.WriteLine("Solution class loaded. Click Submit to run against all test cases."); } }';
+  }
+
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), TIMEOUT_MS);
 
@@ -61,7 +72,7 @@ export const POST = withErrorHandling("POST /api/run-code", async (request: Next
         method:  "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          source_code:     b64(prepareCodeForJudge(code, lang)),
+          source_code:     b64(prepareCodeForJudge(runCode, lang)),
           language_id:     langId,
           stdin:           b64(""),
           cpu_time_limit:  10,    // seconds
