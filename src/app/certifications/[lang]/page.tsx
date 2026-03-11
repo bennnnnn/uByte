@@ -342,7 +342,7 @@ export default async function PracticeExamLangPage({ params }: Props) {
                       "Timed exam with real scoring",
                       "Verifiable certificate on pass",
                       "Add to LinkedIn and resume",
-                      "All 6 language exams included",
+                      "All 7 language exams included",
                       "Unlimited retakes",
                     ]} />
 

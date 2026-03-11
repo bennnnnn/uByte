@@ -5,7 +5,7 @@ const PILLARS = [
   {
     icon: "📖",
     title: "Tutorials",
-    desc: "Step-by-step interactive lessons. Write real code in your browser across all 6 languages.",
+    desc: "Step-by-step interactive lessons. Write real code in your browser across all 7 languages.",
   },
   {
     icon: "🎯",

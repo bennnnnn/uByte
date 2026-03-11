@@ -21,7 +21,7 @@ const FREE_FEATURES = [
   `${FREE_TUTORIAL_LIMIT} tutorials per language`,
   `${MAX_FREE_PROBLEMS} interview prep problems (2/day)`,
   "Built-in code editor",
-  "6 programming languages",
+  "7 programming languages",
   "Progress tracking",
 ];
 
@@ -67,7 +67,7 @@ const TESTIMONIALS = [
 const FAQ_ITEMS = [
   {
     q: "What's included in Pro?",
-    a: "Unlimited tutorials in all 6 languages, unlimited interview prep problems, AI code feedback on every step, and timed certification exams with verifiable certificates you can add to LinkedIn.",
+    a: "Unlimited tutorials in all 7 languages, unlimited interview prep problems, AI code feedback on every step, and timed certification exams with verifiable certificates you can add to LinkedIn.",
   },
   {
     q: "Can I cancel anytime?",

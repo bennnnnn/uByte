@@ -33,7 +33,7 @@ export default function PracticeSection({ problemCount = 11 }: PracticeSectionPr
             </span>
           </div>
           <p className="mb-5 text-sm text-zinc-600 dark:text-zinc-400">
-            The problems interviewers actually ask. Solve Two Sum, Merge Intervals, Trapping Rain Water, and more — in any of the 6 languages, without leaving uByte.
+            The problems interviewers actually ask. Solve Two Sum, Merge Intervals, Trapping Rain Water, and more — in any of the 7 languages, without leaving uByte.
           </p>
 
           <ul className="mb-5 space-y-1.5">

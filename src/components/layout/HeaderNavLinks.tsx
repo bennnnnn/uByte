@@ -9,6 +9,7 @@ const LANGUAGES = [
   { slug: "java",       icon: "☕", label: "Java",       sub: "Enterprise & OOP"      },
   { slug: "rust",       icon: "🦀", label: "Rust",       sub: "Systems programming"   },
   { slug: "cpp",        icon: "⚙️", label: "C++",        sub: "Performance & control" },
+  { slug: "csharp",     icon: "💜", label: "C#",         sub: ".NET & game dev"       },
 ];
 
 const PRACTICE_LANGS = [
@@ -18,6 +19,7 @@ const PRACTICE_LANGS = [
   { slug: "java",       icon: "☕", label: "Java"       },
   { slug: "rust",       icon: "🦀", label: "Rust"       },
   { slug: "cpp",        icon: "⚙️", label: "C++"        },
+  { slug: "csharp",     icon: "💜", label: "C#"         },
 ];
 
 const linkBase =
@@ -139,7 +141,7 @@ export default function HeaderNavLinks({ side = "left" }: { side?: "left" }) {
                 </span>
                 <span>
                   <span className="block text-sm font-semibold text-zinc-800 dark:text-zinc-100">Certifications</span>
-                  <span className="block text-xs text-zinc-400 dark:text-zinc-500">MCQ by language</span>
+                  <span className="block text-xs text-zinc-400 dark:text-zinc-500">Coding exams by language</span>
                 </span>
               </Link>
 

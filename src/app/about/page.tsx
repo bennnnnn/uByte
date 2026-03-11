@@ -27,7 +27,7 @@ const VALUES = [
   },
   {
     title: "Depth over breadth",
-    body: "Six languages, done properly. Structured tutorials, realistic interview problems, and timed certification exams — not a shallow tour of every syntax feature.",
+    body: "Seven languages, done properly. Structured tutorials, realistic interview problems, and timed certification exams — not a shallow tour of every syntax feature.",
   },
   {
     title: "Proof that travels",
@@ -102,7 +102,7 @@ export default function AboutPage() {
 
         {/* Languages */}
         <section className="mb-14 rounded-3xl border border-zinc-200 bg-surface-card p-8 shadow-sm dark:border-zinc-800">
-          <h2 className="mb-2 text-2xl font-bold text-zinc-900 dark:text-zinc-100">Six languages, done right</h2>
+          <h2 className="mb-2 text-2xl font-bold text-zinc-900 dark:text-zinc-100">Seven languages, done right</h2>
           <p className="mb-6 text-base text-zinc-600 dark:text-zinc-400">
             Each language has a full tutorial track, curated interview prep problems, and a timed certification exam.
           </p>

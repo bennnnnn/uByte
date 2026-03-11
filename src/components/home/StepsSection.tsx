@@ -2,7 +2,7 @@ import SectionHeading from "./SectionHeading";
 
 const STEPS = [
   { number: "01", icon: "📖", label: "Learn",     desc: "Short, focused tutorials with real code examples. Zero setup — write and run code right in your browser." },
-  { number: "02", icon: "🎯", label: "Practice",  desc: "Solve LeetCode-style problems to sharpen the skills interviewers actually test. Same IDE, all 6 languages." },
+  { number: "02", icon: "🎯", label: "Practice",  desc: "Solve LeetCode-style problems to sharpen the skills interviewers actually test. Same IDE, all 7 languages." },
   { number: "03", icon: "📋", label: "Certify",   desc: "Take a timed exam and earn a verifiable certificate you can share on LinkedIn or your résumé." },
   { number: "04", icon: "🚀", label: "Get hired", desc: "Walk into any technical interview job-ready — with proof of your skills to back it up." },
 ];

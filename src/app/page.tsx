@@ -17,7 +17,6 @@ import {
   LangCard,
   SectionHeading,
   HeroSection,
-  PracticeSection,
   PracticeExamsSection,
   StepsSection,
   ValuePropBanner,
@@ -29,9 +28,9 @@ import LeftOffBanner from "@/components/LeftOffBanner";
 import GoogleOAuthError from "@/components/GoogleOAuthError";
 
 export const metadata: Metadata = {
-  title: "uByte — Learn, Practice, and Get Certified in 6 Languages",
+  title: "uByte — Learn, Practice, and Get Certified in 7 Languages",
   description:
-    "The complete path from beginner to job-ready. Interactive tutorials, LeetCode-style interview prep, and verifiable certificates — all in Go, Python, JavaScript, Java, Rust, and C++.",
+    "The complete path from beginner to job-ready. Interactive tutorials, LeetCode-style interview prep, and verifiable certificates — all in Go, Python, JavaScript, Java, Rust, C++, and C#.",
   keywords: [
     ...SITE_KEYWORDS,
     "coding bootcamp alternative",
@@ -41,9 +40,9 @@ export const metadata: Metadata = {
   ],
   alternates: { canonical: absoluteUrl("/") },
   openGraph: {
-    title: "uByte — Learn, Practice, and Get Certified in 6 Languages",
+    title: "uByte — Learn, Practice, and Get Certified in 7 Languages",
     description:
-      "Interactive tutorials, LeetCode-style interview prep, and verifiable certificates for Go, Python, JavaScript, Java, Rust, and C++.",
+      "Interactive tutorials, LeetCode-style interview prep, and verifiable certificates for Go, Python, JavaScript, Java, Rust, C++, and C#.",
     type: "website",
     url: absoluteUrl("/"),
   },
@@ -171,8 +170,8 @@ export default async function Home() {
         <section aria-labelledby="languages-heading">
           <SectionHeading
             id="languages-heading"
-            title="Six languages. One subscription."
-            subtitle="Go, Python, JavaScript, Java, Rust, and C++ — all with the same interactive step-by-step structure. Start one, continue all."
+            title="Seven languages. One subscription."
+            subtitle="Go, Python, JavaScript, Java, Rust, C++, and C# — all in the same interactive IDE. Start one, continue all."
           />
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {languageEntries.map(({ slug, config }) => (
@@ -194,9 +193,6 @@ export default async function Home() {
 
         {/* Popular interview prep — sorted by real view count */}
         <PopularInterviewPrepSection problems={popularPracticeProblems} />
-
-        {/* Interview practice — full section */}
-        <PracticeSection problemCount={problemCount} />
 
         {/* Certifications */}
         <PracticeExamsSection examConfigByLang={examConfigByLang} />
