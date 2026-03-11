@@ -29,6 +29,7 @@ import { EditorToolbar } from "@/components/editor/EditorToolbar";
 import { useShareCode } from "@/hooks/useShareCode";
 import { useEditorKeyDown } from "@/hooks/useEditorKeyDown";
 import { tryDecodeShareCode } from "@/lib/share-code";
+import { apiFetch } from "@/lib/api-client";
 
 interface Props {
   lang: string;
@@ -90,15 +91,78 @@ export default function InteractiveTutorial({
       .finally(() => setStepsLoading(false));
   }, [ideLang, lang, tutorialSlug]);
 
-  // When IDE language or steps change, reset editor to the starter for the current step
   const stepIndexRef = useRef(stepProgress.stepIndex);
   stepIndexRef.current = stepProgress.stepIndex;
-  useEffect(() => {
+
+  // True while an async draft-load is in flight — prevents the debounce-save from
+  // firing before the real draft arrives and accidentally overwriting it with starter code.
+  const draftLoadingRef = useRef(false);
+  const saveDraftTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  /**
+   * Load the saved draft for (tutorialSlug, stepIndex, lang) from the DB.
+   * Falls back to the step's starter code if no draft exists.
+   *
+   * Called when: language changes, new language steps finish loading, or
+   * the user navigates to a different step.
+   */
+  function loadDraft(stepIndex: number, langOverride?: SupportedLanguage) {
     if (currentSteps.length === 0) return;
-    const safeIndex = Math.min(stepIndexRef.current, currentSteps.length - 1);
-    editor.setCode(currentSteps[safeIndex]?.starter ?? "");
+    const targetLang = langOverride ?? ideLang;
+    const safeIndex  = Math.min(stepIndex, currentSteps.length - 1);
+    const starter    = currentSteps[safeIndex]?.starter ?? "";
+
+    if (!user) {
+      editor.setCode(starter);
+      return;
+    }
+
+    draftLoadingRef.current = true;
+    apiFetch(
+      `/api/code-drafts?slug=${encodeURIComponent(tutorialSlug)}` +
+      `&key=${encodeURIComponent(`step-${safeIndex}`)}` +
+      `&lang=${encodeURIComponent(targetLang)}`
+    )
+      .then((r) => r.json())
+      .then((d: { code?: string }) => {
+        editor.setCode(typeof d?.code === "string" && d.code ? d.code : starter);
+      })
+      .catch(() => { editor.setCode(starter); })
+      .finally(() => { draftLoadingRef.current = false; });
+  }
+
+  // When IDE language or its steps change, load the draft (or starter) for the current step
+  useEffect(() => {
+    loadDraft(stepIndexRef.current);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ideLang, stepsForLang]);
+
+  // When the user navigates to a different step, load the draft for that step
+  useEffect(() => {
+    loadDraft(stepProgress.stepIndex);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [stepProgress.stepIndex]);
+
+  // Debounce-save code to DB on every change (1 s idle, logged-in only)
+  useEffect(() => {
+    if (saveDraftTimerRef.current) clearTimeout(saveDraftTimerRef.current);
+    saveDraftTimerRef.current = setTimeout(() => {
+      if (!user || draftLoadingRef.current) return;
+      const safeIndex = Math.min(stepProgress.stepIndex, currentSteps.length - 1);
+      apiFetch("/api/code-drafts", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          slug: tutorialSlug,
+          key: `step-${safeIndex}`,
+          code: editor.code,
+          lang: ideLang,
+        }),
+      }).catch(() => {});
+    }, 1000);
+    return () => { if (saveDraftTimerRef.current) clearTimeout(saveDraftTimerRef.current); };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [editor.code]);
 
   // Auto-switch mobile tab on pass/fail
   useEffect(() => {
@@ -115,6 +179,22 @@ export default function InteractiveTutorial({
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  /** Reset to starter and delete the saved draft for the current step. */
+  function handleReset() {
+    // Cancel any in-flight save so it doesn't undo the delete
+    if (saveDraftTimerRef.current) clearTimeout(saveDraftTimerRef.current);
+    // Delete from DB (fire-and-forget)
+    if (user) {
+      const safeIndex = Math.min(stepProgress.stepIndex, currentSteps.length - 1);
+      apiFetch("/api/code-drafts", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ slug: tutorialSlug, key: `step-${safeIndex}`, lang: ideLang }),
+      }).catch(() => {});
+    }
+    stepProgress.handleReset(currentStep, editor.setCode, editor.setErrorLines);
+  }
 
   const handleKeyDown = useEditorKeyDown({
     editor,
@@ -244,7 +324,7 @@ export default function InteractiveTutorial({
             </button>
             <button
               type="button"
-              onClick={() => stepProgress.handleReset(currentStep, editor.setCode, editor.setErrorLines)}
+              onClick={handleReset}
               className="rounded-md border border-zinc-300 px-3 py-1.5 text-sm text-zinc-500 transition-colors hover:border-zinc-400 hover:text-zinc-800 dark:border-zinc-700 dark:text-zinc-400 dark:hover:border-zinc-600 dark:hover:text-zinc-200"
             >
               Reset
@@ -306,7 +386,7 @@ export default function InteractiveTutorial({
           </button>
           <button
             type="button"
-            onClick={() => stepProgress.handleReset(currentStep, editor.setCode, editor.setErrorLines)}
+            onClick={handleReset}
             aria-label="Reset"
             className="flex shrink-0 items-center justify-center rounded-md border border-zinc-300 px-3 py-2 text-sm text-zinc-500 dark:border-zinc-700 dark:text-zinc-400"
           >
