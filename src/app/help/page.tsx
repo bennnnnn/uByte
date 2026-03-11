@@ -65,7 +65,7 @@ const FAQ_ITEMS = [
   {
     question: "How do I delete my account?",
     answer:
-      "Email support@ubyte.dev with your account email and we'll permanently delete your data within 30 days, in compliance with GDPR and CCPA.",
+      "You can delete your account instantly from your Profile → Settings → Danger Zone. All your data is permanently removed immediately. If you need help, email support@ubyte.dev.",
   },
 ];
 

@@ -11,6 +11,7 @@ import { hasPaidAccess } from "@/lib/plans";
 import { tryUnlockProblem } from "@/lib/db/practice-unlocks";
 import UpgradeWall from "@/components/UpgradeWall";
 import { absoluteUrl, SITE_KEYWORDS } from "@/lib/seo";
+import { APP_NAME, BASE_URL } from "@/lib/constants";
 import { tryDecodeShareCode } from "@/lib/share-code";
 
 type Props = {
@@ -141,17 +142,41 @@ export default async function PracticeProblemPage({ params, searchParams }: Prop
   const interviewMode = sp.mode === "interview";
   const interviewDeadline = interviewMode && sp.deadline ? parseInt(sp.deadline, 10) : undefined;
 
+  const langName = LANGUAGES[lang as SupportedLanguage]?.name ?? lang;
+  const canonicalUrl = absoluteUrl(`/practice/${lang}/${slug}`);
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "LearningResource",
+    name: `${problem.title} — ${langName} Coding Problem`,
+    description: problem.description.slice(0, 300),
+    url: canonicalUrl,
+    learningResourceType: "Coding exercise",
+    educationalLevel: problem.difficulty,
+    inLanguage: "en",
+    provider: {
+      "@type": "Organization",
+      name: APP_NAME,
+      url: BASE_URL,
+    },
+  };
+
   return (
-    <PracticeIDE
-      problem={problem}
-      initialLang={lang as SupportedLanguage}
-      categoryFilter={categoryFilter}
-      listPage={listPage}
-      listStatus={listStatus}
-      listDifficulty={listDifficulty}
-      initialCode={sharedCode}
-      interviewMode={interviewMode}
-      interviewDeadline={interviewDeadline}
-    />
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <PracticeIDE
+        problem={problem}
+        initialLang={lang as SupportedLanguage}
+        categoryFilter={categoryFilter}
+        listPage={listPage}
+        listStatus={listStatus}
+        listDifficulty={listDifficulty}
+        initialCode={sharedCode}
+        interviewMode={interviewMode}
+        interviewDeadline={interviewDeadline}
+      />
+    </>
   );
 }

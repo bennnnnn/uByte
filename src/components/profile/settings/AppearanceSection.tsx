@@ -12,7 +12,7 @@ export default function AppearanceSection({ editTheme, onChangeTheme }: Props) {
     <section>
       <h3 className="mb-2 text-lg font-semibold text-zinc-900 dark:text-zinc-100">Appearance</h3>
       <div className="flex gap-2">
-        {(["light", "dark"] as const).map((t) => (
+        {(["light", "dark", "system"] as const).map((t) => (
           <button
             key={t}
             onClick={() => { onChangeTheme(t); applyTheme(t); }}
@@ -22,7 +22,7 @@ export default function AppearanceSection({ editTheme, onChangeTheme }: Props) {
                 : "border-zinc-300 text-zinc-600 hover:border-zinc-400 dark:border-zinc-700 dark:text-zinc-400 dark:hover:border-zinc-500"
             }`}
           >
-            {t === "light" ? "☀️" : "🌙"} {t}
+            {t === "light" ? "☀️" : t === "dark" ? "🌙" : "💻"} {t}
           </button>
         ))}
       </div>

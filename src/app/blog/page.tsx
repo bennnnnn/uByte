@@ -5,7 +5,7 @@ import { absoluteUrl, SITE_KEYWORDS } from "@/lib/seo";
 import { BASE_URL } from "@/lib/constants";
 
 export const metadata: Metadata = {
-  title: "Blog",
+  title: "Blog — Programming Tutorials & Guides",
   description:
     "Programming tutorials, interview prep guides, and language deep-dives from the uByte team. Go, Python, Rust, JavaScript, Java, and C++.",
   keywords: [
@@ -25,6 +25,11 @@ export const metadata: Metadata = {
       "In-depth programming tutorials, interview prep guides, and language comparisons from the uByte team.",
     url: absoluteUrl("/blog"),
     images: [{ url: `${BASE_URL}/api/og?title=Blog&description=Programming+tutorials+%26+guides`, width: 1200, height: 630 }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "uByte Blog — Programming Tutorials & Guides",
+    description: "In-depth programming tutorials, interview prep guides, and language comparisons from the uByte team.",
   },
 };
 

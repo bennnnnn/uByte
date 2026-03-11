@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useToast } from "@/components/Toast";
 import Button from "@/components/ui/Button";
+import { apiFetch } from "@/lib/api-client";
 import type { Profile } from "./types";
 import ProfileSection from "./settings/ProfileSection";
 import PasswordSection from "./settings/PasswordSection";
@@ -33,9 +34,9 @@ export default function SettingsTab({ profile, onSave, onChangePassword, onDelet
     setEmailMarketing(enabled);
     setEmailSaving(true);
     try {
-      const res = await fetch("/api/profile", {
+      const res = await apiFetch("/api/profile", {
         method: "PUT",
-        headers: { "Content-Type": "application/json", "x-csrf-token": "1" },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email_marketing: enabled }),
       });
       if (res.ok) {

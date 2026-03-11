@@ -12,7 +12,7 @@ import { FREE_TUTORIAL_LIMIT } from "@/lib/plans";
 import { getLanguageConfig, isSupportedLanguage, ALL_LANGUAGE_KEYS } from "@/lib/languages/registry";
 import { BASE_URL, APP_NAME } from "@/lib/constants";
 import { tutorialCanonicalUrl } from "@/lib/urls";
-import { buildBreadcrumbJsonLd } from "@/lib/seo";
+import { buildBreadcrumbJsonLd, absoluteUrl } from "@/lib/seo";
 import type { Metadata } from "next";
 
 export async function generateStaticParams() {
@@ -127,7 +127,7 @@ export default async function TutorialPage({
     isPartOf: {
       "@type": "Course",
       name: config.seo.defaultTitle,
-      url: BASE_URL,
+      url: absoluteUrl(`/tutorial/${lang}`),
     },
   };
   const breadcrumbJsonLd = buildBreadcrumbJsonLd([
