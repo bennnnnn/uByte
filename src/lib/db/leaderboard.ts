@@ -10,7 +10,7 @@ export async function getLeaderboard(limit = 20, period: LeaderboardPeriod = "al
   const sql = getSql();
 
   const weekFilter = period === "week"
-    ? sql`WHERE u.last_active_at IS NOT NULL AND u.last_active_at >= (NOW() - INTERVAL '7 days')::text`
+    ? sql`WHERE u.last_active_at IS NOT NULL AND u.last_active_at::timestamptz >= NOW() - INTERVAL '7 days'`
     : sql``;
 
   const rows = await sql`

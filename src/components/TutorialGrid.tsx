@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useAuth } from "./AuthProvider";
 import { tutorialUrl } from "@/lib/urls";
+import { FREE_TUTORIAL_LIMIT, hasPaidAccess } from "@/lib/plans";
 
 type Difficulty = "beginner" | "intermediate" | "advanced";
 type DifficultyFilter = "all" | Difficulty;
@@ -34,7 +35,8 @@ export default function TutorialGrid({
   /** Pre-computed total from getTotalLessonCount — must match the LangCard badge. */
   totalLessons?: number;
 }) {
-  const { user, progressByLang, stepCountByLang } = useAuth();
+  const { user, progressByLang, stepCountByLang, profile } = useAuth();
+  const isPaid = hasPaidAccess(profile?.plan ?? "free");
 
   // Tutorial-level slugs — used only for the green checkmark on each tutorial card.
   const progress = progressByLang[lang] ?? [];
@@ -126,17 +128,33 @@ export default function TutorialGrid({
           {filtered.map((tutorial, i) => {
             const isCompleted = progress.includes(tutorial.slug);
             const originalIndex = tutorials.indexOf(tutorial);
+            // Tutorials beyond FREE_TUTORIAL_LIMIT require a paid plan
+            const isLocked = !isPaid && (originalIndex + 1) > FREE_TUTORIAL_LIMIT;
             return (
               <Link
                 key={tutorial.slug}
                 href={tutorialUrl(lang, tutorial.slug)}
-                className="group relative rounded-xl border border-zinc-200 p-5 transition-all hover:border-indigo-300 hover:shadow-md dark:border-zinc-800 dark:hover:border-indigo-800"
+                className={`group relative rounded-xl border p-5 transition-all ${
+                  isLocked
+                    ? "border-zinc-200 bg-zinc-50/50 hover:border-zinc-300 dark:border-zinc-800 dark:bg-zinc-900/30 dark:hover:border-zinc-700"
+                    : "border-zinc-200 hover:border-indigo-300 hover:shadow-md dark:border-zinc-800 dark:hover:border-indigo-800"
+                }`}
               >
+                {isLocked && (
+                  <span className="absolute right-3 top-3 flex items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-700 dark:bg-amber-950 dark:text-amber-400">
+                    <svg className="h-3 w-3" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
+                    </svg>
+                    Pro
+                  </span>
+                )}
                 <div className="mb-2 flex items-center gap-3">
                   <span
                     className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-bold ${
                       isCompleted
                         ? "bg-green-100 text-green-700 dark:bg-green-950 dark:text-green-400"
+                        : isLocked
+                        ? "bg-zinc-100 text-zinc-400 dark:bg-zinc-800 dark:text-zinc-500"
                         : "bg-indigo-50 text-indigo-700 dark:bg-indigo-950 dark:text-indigo-400"
                     }`}
                   >
@@ -148,7 +166,11 @@ export default function TutorialGrid({
                       (query ? originalIndex : i) + 1
                     )}
                   </span>
-                  <h3 className="text-base font-semibold text-zinc-900 group-hover:text-indigo-700 dark:text-zinc-100 dark:group-hover:text-indigo-400">
+                  <h3 className={`text-base font-semibold ${
+                    isLocked
+                      ? "text-zinc-500 dark:text-zinc-400"
+                      : "text-zinc-900 group-hover:text-indigo-700 dark:text-zinc-100 dark:group-hover:text-indigo-400"
+                  }`}>
                     {tutorial.title}
                   </h3>
                 </div>

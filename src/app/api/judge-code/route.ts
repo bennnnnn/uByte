@@ -86,6 +86,25 @@ function extractRustSolution(code: string): string {
   return s.trim();
 }
 
+function extractCSharpSolution(code: string): string {
+  let s = code;
+  s = s.replace(/^\s*using\s+[^;]+;\s*$/gm, "").trim();
+  const progMatch = s.match(/\bclass\s+Program\s*\{/);
+  if (progMatch?.index !== undefined) {
+    let depth = 0;
+    let end = progMatch.index;
+    for (let i = progMatch.index; i < s.length; i++) {
+      if (s[i] === "{") depth++;
+      else if (s[i] === "}") {
+        depth--;
+        if (depth === 0) { end = i + 1; break; }
+      }
+    }
+    s = (s.slice(0, progMatch.index) + s.slice(end)).trim();
+  }
+  return s.trim();
+}
+
 export type JudgeVerdict =
   | "accepted"
   | "wrong_answer"
@@ -151,10 +170,11 @@ export const POST = withErrorHandling("POST /api/judge-code", async (request: Ne
       language === "javascript" ||
       language === "cpp" ||
       language === "java" ||
-      language === "rust") ? language : null;
+      language === "rust" ||
+      language === "csharp") ? language : null;
   if (!lang) {
     return NextResponse.json(
-      { verdict: "error" as const, message: "Judge is available for Go, Python, JavaScript, C++, Java, and Rust only right now." },
+      { verdict: "error" as const, message: "Judge is available for Go, Python, JavaScript, C++, Java, Rust, and C# only right now." },
       { status: 501 }
     );
   }
@@ -165,6 +185,7 @@ export const POST = withErrorHandling("POST /api/judge-code", async (request: Ne
     lang === "javascript" ? problem.judgeHarness?.javascript :
     lang === "cpp" ? problem.judgeHarness?.cpp :
     lang === "java" ? problem.judgeHarness?.java :
+    lang === "csharp" ? problem.judgeHarness?.csharp :
     problem.judgeHarness?.rust;
   if (!harness) {
     return NextResponse.json(
@@ -186,7 +207,18 @@ export const POST = withErrorHandling("POST /api/judge-code", async (request: Ne
     lang === "javascript" ? extractJavaScriptSolution(code) :
     lang === "cpp" ? extractCppSolution(code) :
     lang === "java" ? extractJavaSolution(code) :
+    lang === "csharp" ? extractCSharpSolution(code) :
     extractRustSolution(code);
+
+  if (lang === "csharp" && !solution.includes("class Solution")) {
+    return NextResponse.json<JudgeResult>({
+      verdict: "compile_error",
+      message: "Compilation Error",
+      output:
+        "Your C# code must define a `public class Solution { ... }` with your solution method.\n" +
+        "Click Reset to load the correct starter template.",
+    });
+  }
   const judgeCode = harness.replace("{{SOLUTION}}", solution);
 
   const stdin = problem.testCases.map((tc) => tc.stdin).join("\n");
