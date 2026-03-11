@@ -25,11 +25,12 @@
 const GATEWAY_URL = "https://ai.vercel.dev/v1/chat/completions";
 
 /**
- * 0.1s latency, 466 tps, $0.25/$0.69 per million tokens.
- * 120B open-source model — fast enough for real-time hints, large enough
- * to reliably follow the structured JSON schema every time.
+ * 0.3s latency, 213 tps, $0.10/$0.40 per million tokens.
+ * Purpose-built commercial model — proven strong instruction following and
+ * reliable structured JSON output. 1M token context window.
+ * Cheaper than gpt-oss-120b and better tested for strict schema compliance.
  */
-export const HINTS_MODEL        = "openai/gpt-oss-120b";
+export const HINTS_MODEL        = "google/gemini-2.5-flash-lite";
 
 /**
  * Code-specialized model for full post-solve code reviews.
