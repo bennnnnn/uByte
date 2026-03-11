@@ -311,7 +311,7 @@ export function PracticeIDE({ problem, initialLang, initialCode, categoryFilter 
       const res = await apiFetch("/api/submit", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ problem_id: problem.slug, code: codeToSubmit, language: lang }),
+        body: JSON.stringify({ problem_id: problem.slug, code: editor.code, language: lang }),
       });
       const data = await res.json();
 
