@@ -1,37 +1,148 @@
 [
   {
-    "title": "Create a Map",
-    "instruction": "Create a `map[string]int` with alice→30, bob→25, carol→35. Then print alice's age.",
-    "hint": "ages := map[string]int{\"alice\": 30, \"bob\": 25, \"carol\": 35} — fmt.Println(\"alice\", ages[\"alice\"])",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\t// TODO: create a map with alice=30, bob=25, carol=35\n\t// TODO: print alice's age\n}",
-    "expectedOutput": ["alice", "30"]
+    "title": "What is a map",
+    "instruction": "Think about a physical dictionary.\n\nYou look up the word \"ephemeral\" and it gives you the definition. You look up \"serendipity\" and it gives you that definition. You do not search by page number — you search by word.\n\nA map works the same way. You look up a key and get its value back.\n\nRun this. Then try looking up a different country.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tcapitals := map[string]string{\n\t\t\"France\":  \"Paris\",\n\t\t\"Japan\":   \"Tokyo\",\n\t\t\"Brazil\":  \"Brasilia\",\n\t}\n\tfmt.Println(capitals[\"Japan\"])\n\tfmt.Println(capitals[\"France\"])\n}",
+    "expectedOutput": ["Tokyo", "Paris"],
+    "successMessage": "Look up by key, get the value. That is the entire concept of a map."
   },
   {
-    "title": "Check if a Key Exists",
-    "instruction": "Map lookups return (value, ok). Look up \"go\" in the langs map; if found print \"found\", otherwise \"not found\".",
-    "hint": "if _, ok := langs[\"go\"]; ok { fmt.Println(\"found\") } else { fmt.Println(\"not found\") }",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tlangs := map[string]int{\"go\": 2009, \"python\": 1991}\n\t// TODO: two-value form and print \"found\" or \"not found\"\n\t_ = langs\n}",
-    "expectedOutput": ["found"]
+    "title": "Declare a map with make",
+    "instruction": "When you want an empty map to fill later, use `make`.\n\n`make(map[string]int)` creates an empty map where keys are strings and values are integers.\n\nThe key type goes first, value type second — both inside the brackets.\n\nAdd two scores to the map and print both.",
+    "hint": "scores[\"Alex\"] = 90  then scores[\"Sam\"] = 85  then fmt.Println(scores)",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tscores := make(map[string]int)\n\t// TODO: add score for \"Alex\" = 90\n\t// TODO: add score for \"Sam\" = 85\n\t// TODO: print scores\n}",
+    "expectedOutput": [],
+    "codeChecks": [
+      { "pattern": "make\\(map\\[string\\]int\\)", "required": true, "message": "Keep the make(map[string]int) declaration." },
+      { "pattern": "scores\\[\"Alex\"\\]\\s*=\\s*90", "required": true, "message": "Add Alex's score: scores[\"Alex\"] = 90" },
+      { "pattern": "scores\\[\"Sam\"\\]\\s*=\\s*85", "required": true, "message": "Add Sam's score: scores[\"Sam\"] = 85" },
+      { "pattern": "Println\\(scores\\)", "required": true, "message": "Print the map: fmt.Println(scores)" },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO lines with your code." }
+    ],
+    "successMessage": "make(map[keyType]valueType) — empty map, ready to fill. Same make you used for slices."
   },
   {
-    "title": "Delete a Key",
-    "instruction": "Use `delete(ages, \"bob\")` to remove \"bob\". Then check if \"bob\" exists and print \"not found\" if it's gone.",
-    "hint": "delete(ages, \"bob\") — then if _, ok := ages[\"bob\"]; !ok { fmt.Println(\"not found\") }",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tages := map[string]int{\"alice\": 30, \"bob\": 25}\n\t// TODO: delete \"bob\", then check and print \"not found\" if missing\n\t_ = ages\n}",
-    "expectedOutput": ["not found"]
+    "title": "Declare with values",
+    "instruction": "When you already have the data, declare and fill in one shot.\n\n```\nscores := map[string]int{\n    \"Alex\": 90,\n    \"Sam\":  85,\n}\n```\n\nNote the comma after the last value — Go requires it when each entry is on its own line.\n\nAdd two more people to the map literal and print it.",
+    "hint": "Add two more entries inside the curly braces, each on its own line with a comma at the end.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tscores := map[string]int{\n\t\t\"Alex\": 90,\n\t\t\"Sam\":  85,\n\t\t// TODO: add Jordan and Casey\n\t}\n\tfmt.Println(scores)\n}",
+    "expectedOutput": [],
+    "codeChecks": [
+      { "pattern": "\"Jordan\"\\s*:\\s*\\d+", "required": true, "message": "Add Jordan with a score: \"Jordan\": 88," },
+      { "pattern": "\"Casey\"\\s*:\\s*\\d+", "required": true, "message": "Add Casey with a score: \"Casey\": 76," },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your two entries." }
+    ],
+    "successMessage": "Map literal syntax. Key: value, — the comma at the end of each line is required in Go when closing brace is on its own line."
   },
   {
-    "title": "Iterate over a Map",
-    "instruction": "Use `for range` on the scores map to print each player's name and score on one line (e.g. \"alice: 10\").",
+    "title": "Add and update a key",
+    "instruction": "Adding a new key and updating an existing key use the exact same syntax.\n\n`scores[\"Jordan\"] = 78` — if Jordan does not exist, it is added. If Jordan already exists, the value is replaced.\n\nGo does not distinguish between insert and update. It is always just assignment.\n\nAdd a new person, then update an existing score, then print the map.",
+    "hint": "scores[\"River\"] = 92  then scores[\"Alex\"] = 95  then fmt.Println(scores)",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tscores := map[string]int{\n\t\t\"Alex\": 90,\n\t\t\"Sam\":  85,\n\t}\n\tfmt.Println(scores)\n\t// TODO: add a new person \"River\" with score 92\n\t// TODO: update \"Alex\" to 95\n\tfmt.Println(scores)\n}",
+    "expectedOutput": [],
+    "codeChecks": [
+      { "pattern": "scores\\[\"River\"\\]\\s*=\\s*92", "required": true, "message": "Add River: scores[\"River\"] = 92" },
+      { "pattern": "scores\\[\"Alex\"\\]\\s*=\\s*95", "required": true, "message": "Update Alex: scores[\"Alex\"] = 95" },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO lines with your code." }
+    ],
+    "successMessage": "Same line adds and updates. If the key exists, the value changes. If not, the key is created. One syntax, two behaviours."
+  },
+  {
+    "title": "Read a value",
+    "instruction": "Reading from a map returns the value — or the zero value if the key does not exist.\n\nFor `map[string]int`, a missing key returns `0`. For `map[string]string`, it returns `\"\"`.\n\nNo error. No crash. Just silently zero.\n\nRun this. Notice what prints for a key that does not exist.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tscores := map[string]int{\n\t\t\"Alex\": 90,\n\t\t\"Sam\":  85,\n\t}\n\tfmt.Println(scores[\"Alex\"])\n\tfmt.Println(scores[\"Sam\"])\n\tfmt.Println(scores[\"Jordan\"])\n}",
+    "expectedOutput": ["90", "85", "0"],
+    "successMessage": "Jordan is not in the map — Go returned 0 instead of crashing. That is convenient but also dangerous: you cannot tell if the key was missing or if the real value happened to be 0. That is what the next step fixes."
+  },
+  {
+    "title": "Check if a key exists",
+    "instruction": "The two-value assignment solves the ambiguity from the last step.\n\n`val, ok := scores[\"Jordan\"]`\n\n- `val` is the value (zero if key missing)\n- `ok` is `true` if the key exists, `false` if not\n\nThis is called the ok idiom. You will see it constantly in Go.\n\nAdd a check for a key that exists and one that does not.",
+    "hint": "val, ok := scores[\"Alex\"]  then fmt.Println(val, ok). Repeat for a missing key.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tscores := map[string]int{\n\t\t\"Alex\": 90,\n\t\t\"Sam\":  85,\n\t}\n\t// TODO: check if \"Alex\" exists and print val and ok\n\t// TODO: check if \"Jordan\" exists and print val and ok\n}",
+    "expectedOutput": ["90 true", "0 false"],
+    "codeChecks": [
+      { "pattern": "val\\s*,\\s*ok\\s*:=\\s*scores\\[\"Alex\"\\]", "required": true, "message": "Use the two-value form: val, ok := scores[\"Alex\"]" },
+      { "pattern": "scores\\[\"Jordan\"\\]", "required": true, "message": "Also check for a missing key: scores[\"Jordan\"]" },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO lines with your code." }
+    ],
+    "successMessage": "val, ok — the ok idiom. It is Go's standard pattern for safe lookups. You will use this for maps, type assertions, channel reads, and more."
+  },
+  {
+    "title": "Delete a key",
+    "instruction": "`delete(map, key)` removes a key-value pair entirely.\n\nIf the key does not exist, nothing happens — no error.\n\nDelete two people from the scores map and print the result.",
+    "hint": "delete(scores, \"Sam\")  then delete(scores, \"Jordan\")  then fmt.Println(scores)",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tscores := map[string]int{\n\t\t\"Alex\":   90,\n\t\t\"Sam\":    85,\n\t\t\"Jordan\": 78,\n\t\t\"Casey\":  92,\n\t}\n\tfmt.Println(scores)\n\t// TODO: delete \"Sam\" and \"Jordan\"\n\tfmt.Println(scores)\n}",
+    "expectedOutput": [],
+    "codeChecks": [
+      { "pattern": "delete\\(scores,\\s*\"Sam\"\\)", "required": true, "message": "Delete Sam: delete(scores, \"Sam\")" },
+      { "pattern": "delete\\(scores,\\s*\"Jordan\"\\)", "required": true, "message": "Delete Jordan: delete(scores, \"Jordan\")" },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your delete calls." }
+    ],
+    "successMessage": "delete() takes the map and the key. Two entries gone. The remaining two are unaffected."
+  },
+  {
+    "title": "len on a map",
+    "instruction": "`len(map)` returns how many key-value pairs are in the map.\n\nAdd two entries, delete one, and print the length after each operation.",
+    "hint": "fmt.Println(len(inventory))  after each change.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tinventory := map[string]int{\n\t\t\"apples\":  10,\n\t\t\"bananas\": 5,\n\t}\n\tfmt.Println(len(inventory))\n\t// TODO: add \"oranges\": 8 and print len\n\t// TODO: delete \"bananas\" and print len\n}",
+    "expectedOutput": ["2", "3", "2"],
+    "codeChecks": [
+      { "pattern": "inventory\\[\"oranges\"\\]\\s*=\\s*8", "required": true, "message": "Add oranges: inventory[\"oranges\"] = 8" },
+      { "pattern": "delete\\(inventory,\\s*\"bananas\"\\)", "required": true, "message": "Delete bananas: delete(inventory, \"bananas\")" },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO lines with your code." }
+    ],
+    "successMessage": "len works on maps just like slices. It tells you how many entries are currently stored."
+  },
+  {
+    "title": "Loop over a map",
+    "instruction": "`for key, val := range myMap` iterates over every key-value pair.\n\nImportant: maps are unordered. Every time you loop, the keys may come out in a different order. Go does this intentionally — do not rely on the order.\n\nLoop through the scores and print each one as `\"Alex: 90\"`.",
     "hint": "for name, score := range scores { fmt.Printf(\"%s: %d\\n\", name, score) }",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tscores := map[string]int{\"alice\": 10, \"bob\": 20, \"carol\": 30}\n\t// TODO: range over scores and print each \"name: score\"\n\t_ = scores\n}",
-    "expectedOutput": ["alice", "bob", "carol"]
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tscores := map[string]int{\n\t\t\"Alex\":   90,\n\t\t\"Sam\":    85,\n\t\t\"Jordan\": 78,\n\t}\n\t// TODO: loop and print \"Name: score\"\n}",
+    "expectedOutput": [],
+    "codeChecks": [
+      { "pattern": "range\\s+scores", "required": true, "message": "Use range to loop: for name, score := range scores" },
+      { "pattern": "Printf\\(", "required": true, "message": "Use fmt.Printf to format the output." },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your loop." }
+    ],
+    "successMessage": "Looping works. But notice the output order may vary each run — maps have no guaranteed order. If you need sorted output, sort the keys first."
   },
   {
-    "title": "Word Count",
-    "instruction": "Split \"the cat sat on the mat\" by spaces, count each word in a map, then print the count for \"the\" (should be 2).",
-    "hint": "for _, w := range strings.Split(sentence, \" \") { counts[w]++ } — fmt.Println(\"the\", counts[\"the\"])",
-    "starter": "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n)\n\nfunc main() {\n\tsentence := \"the cat sat on the mat\"\n\tcounts := map[string]int{}\n\t// TODO: split and count each word\n\t// TODO: print the count for \"the\"\n\t_ = sentence\n\t_ = counts\n}",
-    "expectedOutput": ["the", "2"]
+    "title": "Map with slice values",
+    "instruction": "A map's value can be any type — including a slice.\n\n`map[string][]string` maps a string key to a list of strings.\n\nThis is perfect for things like: one person mapped to their list of hobbies.\n\nAdd a third person with two hobbies, then loop and print all of them.",
+    "hint": "hobbies[\"Casey\"] = []string{\"Gaming\", \"Cooking\"}  then loop and print.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\thobbies := map[string][]string{\n\t\t\"Alex\": {\"Reading\", \"Hiking\", \"Chess\"},\n\t\t\"Sam\":  {\"Painting\", \"Running\"},\n\t}\n\t// TODO: add Casey with two hobbies\n\tfor name, list := range hobbies {\n\t\tfmt.Println(name, \":\", list)\n\t}\n}",
+    "expectedOutput": [],
+    "codeChecks": [
+      { "pattern": "hobbies\\[\"Casey\"\\]\\s*=\\s*\\[\\]string\\{", "required": true, "message": "Add Casey: hobbies[\"Casey\"] = []string{\"...\", \"...\"}" },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your assignment." }
+    ],
+    "successMessage": "map[string][]string — a map where each value is a slice. One key, many values. You will see this pattern a lot."
+  },
+  {
+    "title": "Nested maps",
+    "instruction": "A map can also hold other maps.\n\n`map[string]map[string]int` — outer key maps to an inner map.\n\nUseful for hierarchical data: country → city → population.\n\nAdd a third country with two cities, then print the population of one specific city.",
+    "hint": "population[\"Brazil\"] = map[string]int{\"Sao Paulo\": 12300000, \"Rio\": 6700000}  then fmt.Println(population[\"Brazil\"][\"Sao Paulo\"])",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tpopulation := map[string]map[string]int{\n\t\t\"France\": {\"Paris\": 2161000, \"Lyon\": 515695},\n\t\t\"Japan\":  {\"Tokyo\": 13960000, \"Osaka\": 2691185},\n\t}\n\t// TODO: add Brazil with two cities and their populations\n\t// TODO: print the population of one Brazilian city\n}",
+    "expectedOutput": [],
+    "codeChecks": [
+      { "pattern": "population\\[\"Brazil\"\\]\\s*=\\s*map\\[string\\]int\\{", "required": true, "message": "Add Brazil: population[\"Brazil\"] = map[string]int{\"City\": number, ...}" },
+      { "pattern": "population\\[\"Brazil\"\\]\\[\"", "required": true, "message": "Access a Brazilian city: population[\"Brazil\"][\"CityName\"]" },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO lines with your code." }
+    ],
+    "successMessage": "Nested maps. Access with double brackets: map[outer][inner]. Useful for any hierarchical data."
+  },
+  {
+    "title": "Build a word counter",
+    "instruction": "Classic map use case: count how many times each word appears.\n\nLoop through the words slice. For each word, add 1 to its count in the map. If the word is not in the map yet, Go returns 0 — so `counts[word] += 1` works perfectly on the first hit too.\n\nAdd the counting loop, then print the map.",
+    "hint": "for _, word := range words { counts[word]++ }  then fmt.Println(counts)",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\twords := []string{\"go\", \"is\", \"fast\", \"go\", \"is\", \"go\", \"great\"}\n\tcounts := make(map[string]int)\n\t// TODO: loop through words and count each one\n\t// TODO: print counts\n}",
+    "expectedOutput": [],
+    "codeChecks": [
+      { "pattern": "counts\\[word\\]\\+\\+|counts\\[word\\]\\s*\\+=\\s*1|counts\\[word\\]\\s*=\\s*counts\\[word\\]\\s*\\+\\s*1", "required": true, "message": "Increment the count for each word: counts[word]++" },
+      { "pattern": "range\\s+words", "required": true, "message": "Loop through the words slice: for _, word := range words" },
+      { "pattern": "Println\\(counts\\)", "required": true, "message": "Print counts: fmt.Println(counts)" },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO lines with your code." }
+    ],
+    "successMessage": "Word counter done. This exact pattern powers search indexing, analytics dashboards, log parsers, and autocomplete engines. Maps make it trivial."
   }
 ]
