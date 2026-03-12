@@ -1,38 +1,156 @@
 [
   {
-    "title": "Value Receiver — Area",
-    "instruction": "Define Rectangle with Width and Height and an Area() int method. Create 5x10 and print area.",
-    "hint": "func (r Rectangle) Area() int { return r.Width * r.Height }",
-    "starter": "package main\n\nimport \"fmt\"\n\n// TODO: define Rectangle with Width, Height and Area() method\n\nfunc main() {\n\tr := Rectangle{Width: 5, Height: 10}\n\tfmt.Println(r.Area())\n}",
-    "expectedOutput": [
-      "50"
-    ]
+    "title": "What is a method",
+    "instruction": "A method is just a function with one extra thing: a receiver.\n\nThe receiver goes between `func` and the method name:\n\n```\nfunc (p Person) Greet() {\n    fmt.Println(\"Hi, I'm\", p.Name)\n}\n```\n\nThat `(p Person)` part says: this function belongs to the `Person` type. Call it with `p.Greet()` — not `Greet(p)`.\n\nRun this. Then change the greeting to include the person's age too.",
+    "hint": "fmt.Printf(\"Hi, I'm %s and I'm %d years old\\n\", p.Name, p.Age)",
+    "starter": "package main\n\nimport \"fmt\"\n\ntype Person struct {\n\tName string\n\tAge  int\n}\n\nfunc (p Person) Greet() {\n\tfmt.Println(\"Hi, I'm\", p.Name)\n}\n\nfunc main() {\n\tp := Person{Name: \"Alex\", Age: 25}\n\tp.Greet()\n}",
+    "expectedOutput": [],
+    "codeChecks": [
+      { "pattern": "p\\.Age", "required": true, "message": "Include p.Age in the greeting." }
+    ],
+    "successMessage": "p.Greet() — clean and readable. The method knows it belongs to Person. That is the whole idea."
   },
   {
-    "title": "Pointer Receiver — Increment",
-    "instruction": "Define Counter with Count int and Increment() with pointer receiver. Create counter, call Increment three times, print count.",
-    "hint": "func (c *Counter) Increment() { c.Count++ }",
-    "starter": "package main\n\nimport \"fmt\"\n\n// TODO: define Counter and Increment() with pointer receiver\n\nfunc main() {\n\tc := Counter{}\n\tc.Increment()\n\tc.Increment()\n\tc.Increment()\n\tfmt.Println(c.Count)\n}",
-    "expectedOutput": [
-      "3"
-    ]
+    "title": "Define a method",
+    "instruction": "Write your own method.\n\nAdd a `Describe()` method to `Car` that prints: `\"2020 Toyota Camry\"`\n\nThe format is: `Year Make Model`.\n\nThen call it.",
+    "hint": "func (c Car) Describe() { fmt.Println(c.Year, c.Make, c.Model) }",
+    "starter": "package main\n\nimport \"fmt\"\n\ntype Car struct {\n\tMake  string\n\tModel string\n\tYear  int\n}\n\n// TODO: add a Describe() method to Car\n\nfunc main() {\n\tc := Car{Make: \"Toyota\", Model: \"Camry\", Year: 2020}\n\t// TODO: call c.Describe()\n}",
+    "expectedOutput": ["2020 Toyota Camry"],
+    "codeChecks": [
+      { "pattern": "func\\s*\\(\\s*\\w+\\s+Car\\s*\\)\\s*Describe\\s*\\(", "required": true, "message": "Define a Describe() method on Car: func (c Car) Describe() { ... }" },
+      { "pattern": "c\\.Describe\\(\\)", "required": true, "message": "Call c.Describe() in main." },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comments with your code." }
+    ],
+    "successMessage": "Your method, your type, your call. The Car now knows how to describe itself."
   },
   {
-    "title": "Stringer Interface",
-    "instruction": "Define Person and String() method returning \"<Name> (<Age>)\". Print a Person.",
-    "hint": "func (p Person) String() string { return fmt.Sprintf(\"%s (%d)\", p.Name, p.Age) }",
-    "starter": "package main\n\nimport \"fmt\"\n\ntype Person struct { Name string; Age int }\n\n// TODO: define String() on Person\n\nfunc main() {\n\tp := Person{Name: \"Alice\", Age: 30}\n\tfmt.Println(p)\n}",
-    "expectedOutput": [
-      "Alice (30)"
-    ]
+    "title": "Value receiver — reads but does not change",
+    "instruction": "A value receiver receives a copy of the struct. Changes inside the method do not affect the original.\n\nThis is fine when you are only reading — like printing, calculating, comparing.\n\nRun this. Notice that calling `tryRename` does not change `p.Name` — because it got a copy.",
+    "starter": "package main\n\nimport \"fmt\"\n\ntype Person struct {\n\tName string\n}\n\nfunc (p Person) tryRename(newName string) {\n\tp.Name = newName\n\tfmt.Println(\"Inside method:\", p.Name)\n}\n\nfunc main() {\n\tp := Person{Name: \"Alex\"}\n\tp.tryRename(\"Jordan\")\n\tfmt.Println(\"Outside method:\", p.Name)\n}",
+    "expectedOutput": ["Inside method: Jordan", "Outside method: Alex"],
+    "successMessage": "Jordan inside, Alex outside. The method changed its copy, not the original. Value receivers are safe for read-only operations — nothing unexpected can happen."
   },
   {
-    "title": "Method Chaining (Builder)",
-    "instruction": "Chain .Add(\"Hello\").Add(\"World\") on Builder and print Build() result.",
-    "hint": "b := &Builder{}; fmt.Println(b.Add(\"Hello\").Add(\"World\").Build())",
-    "starter": "package main\n\nimport \"fmt\"\n\ntype Builder struct { result string }\nfunc (b *Builder) Add(s string) *Builder { if b.result != \"\" { b.result += \" \" }; b.result += s; return b }\nfunc (b *Builder) Build() string { return b.result }\n\nfunc main() {\n\t// TODO: chain Add(\"Hello\").Add(\"World\") and print Build()\n}",
-    "expectedOutput": [
-      "Hello World"
-    ]
+    "title": "Pointer receiver — actually changes the struct",
+    "instruction": "To modify the original struct from a method, use a pointer receiver: `(p *Person)`.\n\nNow the method receives the address — not a copy — and changes stick.\n\nAdd a `Birthday()` method with a pointer receiver that increments `p.Age`. Call it and print the age before and after.",
+    "hint": "func (p *Person) Birthday() { p.Age++ }  then p.Birthday()",
+    "starter": "package main\n\nimport \"fmt\"\n\ntype Person struct {\n\tName string\n\tAge  int\n}\n\n// TODO: add a Birthday() method with a pointer receiver\n\nfunc main() {\n\tp := Person{Name: \"Sam\", Age: 29}\n\tfmt.Println(p.Age)\n\t// TODO: call p.Birthday() and print p.Age again\n}",
+    "expectedOutput": ["29", "30"],
+    "codeChecks": [
+      { "pattern": "func\\s*\\(\\s*\\w+\\s+\\*Person\\s*\\)\\s*Birthday\\s*\\(", "required": true, "message": "Define Birthday() with a pointer receiver: func (p *Person) Birthday() { p.Age++ }" },
+      { "pattern": "p\\.Birthday\\(\\)", "required": true, "message": "Call p.Birthday() and print p.Age after." },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comments with your code." }
+    ],
+    "successMessage": "29 before, 30 after. The pointer receiver method reached into the original struct and changed it. Happy birthday, Sam."
+  },
+  {
+    "title": "Value vs pointer receiver — side by side",
+    "instruction": "Rule of thumb:\n- **Reading only?** Use a value receiver\n- **Mutating the struct?** Use a pointer receiver\n- **Large struct?** Use a pointer receiver to avoid copying\n\nRun this. Both methods live on `Counter`. `Show()` reads, `Increment()` mutates.",
+    "starter": "package main\n\nimport \"fmt\"\n\ntype Counter struct {\n\tValue int\n}\n\nfunc (c Counter) Show() {\n\tfmt.Println(\"Count:\", c.Value)\n}\n\nfunc (c *Counter) Increment() {\n\tc.Value++\n}\n\nfunc main() {\n\tc := Counter{Value: 0}\n\tc.Show()\n\tc.Increment()\n\tc.Increment()\n\tc.Increment()\n\tc.Show()\n}",
+    "expectedOutput": ["Count: 0", "Count: 3"],
+    "successMessage": "Show uses a value receiver — it only reads. Increment uses a pointer receiver — it mutates. Mix both on the same type freely, just follow the rule."
+  },
+  {
+    "title": "Methods with parameters",
+    "instruction": "Methods can accept parameters just like regular functions.\n\n`func (r Rectangle) Scale(factor float64) Rectangle`\n\nThis takes a `factor`, scales the rectangle, and returns a new one.\n\nAdd a call that scales the rectangle by 2 and prints the new dimensions.",
+    "hint": "big := r.Scale(2)  fmt.Println(big.Width, big.Height)",
+    "starter": "package main\n\nimport \"fmt\"\n\ntype Rectangle struct {\n\tWidth  float64\n\tHeight float64\n}\n\nfunc (r Rectangle) Scale(factor float64) Rectangle {\n\treturn Rectangle{Width: r.Width * factor, Height: r.Height * factor}\n}\n\nfunc main() {\n\tr := Rectangle{Width: 5, Height: 3}\n\t// TODO: scale r by 2 and print the new Width and Height\n}",
+    "expectedOutput": ["10 6"],
+    "codeChecks": [
+      { "pattern": "r\\.Scale\\(2\\)", "required": true, "message": "Call r.Scale(2) to scale the rectangle." },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
+    ],
+    "successMessage": "5×3 scaled by 2 becomes 10×6. Methods with parameters are just functions — same syntax, same rules, just attached to a type."
+  },
+  {
+    "title": "Methods with return values",
+    "instruction": "Methods return values the same way functions do.\n\nAdd two methods to `Rectangle`:\n- `Area() float64` — returns width × height\n- `Perimeter() float64` — returns 2 × (width + height)\n\nCall both and print the results.",
+    "hint": "func (r Rectangle) Area() float64 { return r.Width * r.Height }",
+    "starter": "package main\n\nimport \"fmt\"\n\ntype Rectangle struct {\n\tWidth  float64\n\tHeight float64\n}\n\n// TODO: add Area() float64 method\n// TODO: add Perimeter() float64 method\n\nfunc main() {\n\tr := Rectangle{Width: 6, Height: 4}\n\tfmt.Println(r.Area())\n\tfmt.Println(r.Perimeter())\n}",
+    "expectedOutput": ["24", "20"],
+    "codeChecks": [
+      { "pattern": "func\\s*\\(\\s*\\w+\\s+Rectangle\\s*\\)\\s*Area\\s*\\(\\s*\\)\\s*float64", "required": true, "message": "Add Area() float64 method to Rectangle." },
+      { "pattern": "func\\s*\\(\\s*\\w+\\s+Rectangle\\s*\\)\\s*Perimeter\\s*\\(\\s*\\)\\s*float64", "required": true, "message": "Add Perimeter() float64 method to Rectangle." },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comments with your methods." }
+    ],
+    "successMessage": "6×4 = area 24, perimeter 20. The Rectangle type now knows how to calculate its own properties. That is object-oriented thinking in Go."
+  },
+  {
+    "title": "Multiple methods on one type",
+    "instruction": "A type can have as many methods as you need. They all live separately in code but belong to the same type.\n\nRun this. `Rectangle` now has `Area()`, `Perimeter()`, and `IsSquare()`. Then add a `Describe()` method that prints all three in one line.\n\nFormat: `\"6 x 4 | Area: 24.00 | Perimeter: 20.00 | Square: false\"`",
+    "hint": "func (r Rectangle) Describe() { fmt.Printf(\"%.0f x %.0f | Area: %.2f | Perimeter: %.2f | Square: %v\\n\", r.Width, r.Height, r.Area(), r.Perimeter(), r.IsSquare()) }",
+    "starter": "package main\n\nimport \"fmt\"\n\ntype Rectangle struct {\n\tWidth  float64\n\tHeight float64\n}\n\nfunc (r Rectangle) Area() float64      { return r.Width * r.Height }\nfunc (r Rectangle) Perimeter() float64 { return 2 * (r.Width + r.Height) }\nfunc (r Rectangle) IsSquare() bool     { return r.Width == r.Height }\n\n// TODO: add Describe() method that prints all three\n\nfunc main() {\n\tr := Rectangle{Width: 6, Height: 4}\n\tr.Describe()\n}",
+    "expectedOutput": ["6 x 4 | Area: 24.00 | Perimeter: 20.00 | Square: false"],
+    "codeChecks": [
+      { "pattern": "func\\s*\\(\\s*\\w+\\s+Rectangle\\s*\\)\\s*Describe\\s*\\(", "required": true, "message": "Add a Describe() method to Rectangle." },
+      { "pattern": "r\\.Area\\(\\)", "required": true, "message": "Call r.Area() inside Describe." },
+      { "pattern": "r\\.Perimeter\\(\\)", "required": true, "message": "Call r.Perimeter() inside Describe." },
+      { "pattern": "r\\.IsSquare\\(\\)", "required": true, "message": "Call r.IsSquare() inside Describe." },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your method." }
+    ],
+    "successMessage": "One Describe() calls three other methods. Methods calling methods — this is how real programs are structured."
+  },
+  {
+    "title": "Return self for sequential calls",
+    "instruction": "Go does not have built-in method chaining. But if your method returns a pointer to the same type, you can call multiple methods in sequence.\n\n`b.SetTitle(\"Go\").SetPrice(29.99).Print()`\n\nRun this and see how each setter returns `*Book` to allow the next call.",
+    "starter": "package main\n\nimport \"fmt\"\n\ntype Book struct {\n\tTitle  string\n\tPrice  float64\n\tPages  int\n}\n\nfunc (b *Book) SetTitle(t string) *Book  { b.Title = t; return b }\nfunc (b *Book) SetPrice(p float64) *Book { b.Price = p; return b }\nfunc (b *Book) SetPages(n int) *Book     { b.Pages = n; return b }\nfunc (b *Book) Print() {\n\tfmt.Printf(\"%s — $%.2f — %d pages\\n\", b.Title, b.Price, b.Pages)\n}\n\nfunc main() {\n\tb := &Book{}\n\tb.SetTitle(\"Learning Go\").SetPrice(39.99).SetPages(350).Print()\n}",
+    "expectedOutput": ["Learning Go — $39.99 — 350 pages"],
+    "successMessage": "Each setter returns the pointer to self, enabling the next call. You see this pattern in query builders, HTTP clients, and configuration APIs all over Go."
+  },
+  {
+    "title": "Methods on non-struct types",
+    "instruction": "You can add methods to any named type — not just structs.\n\n`type Celsius float64` is a named type based on `float64`. You can attach methods to it.\n\nAdd a `ToKelvin()` method to `Celsius` that returns `float64(c + 273.15)`. Call it and print the result.",
+    "hint": "func (c Celsius) ToKelvin() float64 { return float64(c + 273.15) }",
+    "starter": "package main\n\nimport \"fmt\"\n\ntype Celsius float64\n\nfunc (c Celsius) ToFahrenheit() float64 {\n\treturn float64(c*9/5 + 32)\n}\n\n// TODO: add ToKelvin() float64 method\n\nfunc main() {\n\ttemp := Celsius(100)\n\tfmt.Printf(\"%.2f°C = %.2f°F\\n\", temp, temp.ToFahrenheit())\n\t// TODO: print ToKelvin result\n}",
+    "expectedOutput": ["100.00°C = 212.00°F", "100.00°C = 373.15K"],
+    "codeChecks": [
+      { "pattern": "func\\s*\\(\\s*\\w+\\s+Celsius\\s*\\)\\s*ToKelvin\\s*\\(", "required": true, "message": "Add a ToKelvin() float64 method to Celsius." },
+      { "pattern": "273\\.15", "required": true, "message": "Add 273.15 to convert Celsius to Kelvin." },
+      { "pattern": "ToKelvin\\(\\)", "required": true, "message": "Call temp.ToKelvin() and print the result." },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comments with your code." }
+    ],
+    "successMessage": "Methods on a float64-based type. You just made numbers smarter. This pattern is used for units, currencies, IDs — any type where the underlying value has domain-specific behaviour."
+  },
+  {
+    "title": "String() — fmt prints it automatically",
+    "instruction": "If you add a `String() string` method to your type, `fmt.Println` will call it automatically.\n\nThis is Go's way of letting your types control how they are printed — no special interface keyword needed yet, just the right method signature.\n\nAdd a `String() string` method to `Temperature` that returns `\"23.50°C\"`. Then just call `fmt.Println(t)` and see it use your method.",
+    "hint": "func (t Temperature) String() string { return fmt.Sprintf(\"%.2f°C\", t.Value) }",
+    "starter": "package main\n\nimport \"fmt\"\n\ntype Temperature struct {\n\tValue float64\n}\n\n// TODO: add String() string method that returns \"23.50°C\" format\n\nfunc main() {\n\tt := Temperature{Value: 23.5}\n\tfmt.Println(t)\n}",
+    "expectedOutput": ["23.50°C"],
+    "codeChecks": [
+      { "pattern": "func\\s*\\(\\s*\\w+\\s+Temperature\\s*\\)\\s*String\\s*\\(\\s*\\)\\s*string", "required": true, "message": "Add String() string method to Temperature." },
+      { "pattern": "Sprintf|Printf", "required": true, "message": "Use fmt.Sprintf to format the string inside String()." },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your method." }
+    ],
+    "successMessage": "fmt.Println called your String() method without you asking it to. This is Go's interface system at work — and you just used it without knowing. Next chapter: Interfaces."
+  },
+  {
+    "title": "Fix the broken method",
+    "instruction": "The `Restock` method below is supposed to add items to a product's stock. But it does not work — the stock stays at 10 after the call.\n\nFind the bug and fix it.",
+    "hint": "The method uses a value receiver (p Product). Change it to a pointer receiver (p *Product) so it modifies the original.",
+    "starter": "package main\n\nimport \"fmt\"\n\ntype Product struct {\n\tName  string\n\tStock int\n}\n\n// BUG: this method does not modify the original\nfunc (p Product) Restock(amount int) {\n\tp.Stock += amount\n}\n\nfunc main() {\n\titem := Product{Name: \"Coffee\", Stock: 10}\n\titem.Restock(50)\n\tfmt.Println(item.Stock)\n}",
+    "expectedOutput": ["60"],
+    "codeChecks": [
+      { "pattern": "func\\s*\\(\\s*\\w+\\s+\\*Product\\s*\\)\\s*Restock\\s*\\(", "required": true, "message": "Change the receiver to *Product: func (p *Product) Restock(amount int)" }
+    ],
+    "successMessage": "One character change — (p Product) to (p *Product) — and it works. The most common method bug in Go. You will never forget this."
+  },
+  {
+    "title": "Build a shape calculator",
+    "instruction": "No starter code.\n\nBuild two types with their own methods:\n\n**Circle** (radius float64)\n- `Area() float64` → π × r²  (use 3.14159 for π)\n- `Perimeter() float64` → 2 × π × r\n- `Describe()` → prints `\"Circle | r=5.00 | Area: 78.54 | Perimeter: 31.42\"`\n\n**Rectangle** (Width, Height float64)\n- `Area() float64` → w × h\n- `Perimeter() float64` → 2 × (w + h)\n- `Describe()` → prints `\"Rectangle | 8.00 x 3.00 | Area: 24.00 | Perimeter: 22.00\"`\n\nCreate one of each and call Describe on both.",
+    "hint": "const pi = 3.14159  func (c Circle) Area() float64 { return pi * c.Radius * c.Radius }",
+    "starter": "package main\n\nimport \"fmt\"\n\n// Build your shapes here\n\nfunc main() {\n}",
+    "expectedOutput": ["Circle | r=5.00 | Area: 78.54 | Perimeter: 31.42", "Rectangle | 8.00 x 3.00 | Area: 24.00 | Perimeter: 22.00"],
+    "codeChecks": [
+      { "pattern": "type\\s+Circle\\s+struct", "required": true, "message": "Define a Circle struct." },
+      { "pattern": "type\\s+Rectangle\\s+struct", "required": true, "message": "Define a Rectangle struct." },
+      { "pattern": "func\\s*\\(\\s*\\w+\\s+Circle\\s*\\)\\s*Area", "required": true, "message": "Add an Area() method to Circle." },
+      { "pattern": "func\\s*\\(\\s*\\w+\\s+Circle\\s*\\)\\s*Perimeter", "required": true, "message": "Add a Perimeter() method to Circle." },
+      { "pattern": "func\\s*\\(\\s*\\w+\\s+Circle\\s*\\)\\s*Describe", "required": true, "message": "Add a Describe() method to Circle." },
+      { "pattern": "func\\s*\\(\\s*\\w+\\s+Rectangle\\s*\\)\\s*Area", "required": true, "message": "Add an Area() method to Rectangle." },
+      { "pattern": "func\\s*\\(\\s*\\w+\\s+Rectangle\\s*\\)\\s*Perimeter", "required": true, "message": "Add a Perimeter() method to Rectangle." },
+      { "pattern": "func\\s*\\(\\s*\\w+\\s+Rectangle\\s*\\)\\s*Describe", "required": true, "message": "Add a Describe() method to Rectangle." }
+    ],
+    "successMessage": "Two types. Six methods. One clean program. You just built a fully object-oriented shape calculator in Go — without a single class keyword. That is the Go way."
   }
 ]
