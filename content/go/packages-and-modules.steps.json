@@ -1,38 +1,135 @@
 [
   {
-    "title": "Import Standard Library Packages",
-    "instruction": "Import strings and fmt. Use strings.ToUpper(\"hello\") and print it, then print len(\"hello\").",
-    "hint": "fmt.Println(strings.ToUpper(\"hello\")); fmt.Println(len(\"hello\"))",
-    "starter": "package main\n\nimport ( \"fmt\"; \"strings\" )\n\nfunc main() {\n\t// TODO: print strings.ToUpper(\"hello\") and len(\"hello\")\n}",
-    "expectedOutput": [
-      "HELLO",
-      "5"
-    ]
+    "title": "What is a package",
+    "instruction": "Every Go file starts with a `package` declaration. It tells Go which package this file belongs to.\n\n`package main` is special — it is the entry point. Every runnable Go program needs exactly one `package main` with a `func main()`.\n\nAll other packages are libraries. You write them to share code. You import them to use other people's code.\n\nRun this. It imports two packages from the standard library and uses both.",
+    "starter": "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n)\n\nfunc main() {\n\tname := \"  go programming  \"\n\tcleaned := strings.TrimSpace(name)\n\tupper := strings.ToUpper(cleaned)\n\tfmt.Println(upper)\n}",
+    "expectedOutput": ["GO PROGRAMMING"],
+    "successMessage": "Two packages imported, two jobs done. fmt handled printing, strings handled the text manipulation. That is the package system in one example."
   },
   {
-    "title": "Multiple Imports — fmt and math",
-    "instruction": "Use fmt and math. Print math.Pi to 2 decimal places and math.Sqrt(16).",
-    "hint": "fmt.Printf(\"%.2f\n\", math.Pi); fmt.Println(math.Sqrt(16))",
-    "starter": "package main\n\nimport ( \"fmt\"; \"math\" )\n\nfunc main() {\n\t// TODO: print math.Pi (2 decimals) and math.Sqrt(16)\n}",
-    "expectedOutput": [
-      "3.14",
-      "4"
-    ]
+    "title": "Importing standard library packages",
+    "instruction": "Go's standard library is huge. You do not install anything — it comes with Go.\n\nSome of the most useful packages:\n- `fmt` — formatted I/O\n- `strings` — string manipulation\n- `math` — mathematical functions\n- `time` — dates and durations\n- `os` — operating system interaction\n- `strconv` — string↔number conversion\n\nAdd two more `fmt.Println` lines that use `strings.Contains` to check if `sentence` contains `\"Go\"` and `strings.Count` to count how many times `\"o\"` appears.",
+    "hint": "fmt.Println(strings.Contains(sentence, \"Go\"))  fmt.Println(strings.Count(sentence, \"o\"))",
+    "starter": "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n)\n\nfunc main() {\n\tsentence := \"Go is the best language to learn\"\n\tfmt.Println(strings.ToUpper(sentence))\n\t// TODO: print whether sentence contains \"Go\"\n\t// TODO: print how many times \"o\" appears\n}",
+    "expectedOutput": ["GO IS THE BEST LANGUAGE TO LEARN", "true", "3"],
+    "codeChecks": [
+      { "pattern": "strings\\.Contains\\s*\\(sentence,\\s*\"Go\"\\)", "required": true, "message": "Use strings.Contains(sentence, \"Go\") to check if it contains \"Go\"." },
+      { "pattern": "strings\\.Count\\s*\\(sentence,\\s*\"o\"\\)", "required": true, "message": "Use strings.Count(sentence, \"o\") to count occurrences of \"o\"." },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comments with your code." }
+    ],
+    "successMessage": "Contains → true. Count → 3 (language, to, Go). The strings package has 20+ functions like these. You never need to write string manipulation from scratch in Go."
   },
   {
-    "title": "Package-Level Variables",
-    "instruction": "A package-level variable greeting is set to \"initialized\". Print it from main.",
-    "hint": "fmt.Println(greeting)",
-    "starter": "package main\n\nimport \"fmt\"\n\nvar greeting = \"initialized\"\n\nfunc main() {\n\t// TODO: print greeting\n}",
-    "expectedOutput": [
-      "initialized"
-    ]
+    "title": "The strings package",
+    "instruction": "The `strings` package handles almost every text operation you will ever need.\n\nRun this to see six common functions in action. Then add one more line: use `strings.ReplaceAll` to replace every space in `sentence` with a `-` and print the result.",
+    "hint": "fmt.Println(strings.ReplaceAll(sentence, \" \", \"-\"))",
+    "starter": "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n)\n\nfunc main() {\n\tsentence := \"the quick brown fox\"\n\n\tfmt.Println(strings.ToUpper(sentence))\n\tfmt.Println(strings.Title(sentence))\n\tfmt.Println(strings.HasPrefix(sentence, \"the\"))\n\tfmt.Println(strings.HasSuffix(sentence, \"fox\"))\n\tfmt.Println(strings.Split(sentence, \" \"))\n\tfmt.Println(strings.TrimSpace(\"  hello  \"))\n\t// TODO: print sentence with spaces replaced by \"-\"\n}",
+    "expectedOutput": ["THE QUICK BROWN FOX", "The Quick Brown Fox", "true", "true", "[the quick brown fox]", "hello", "the-quick-brown-fox"],
+    "codeChecks": [
+      { "pattern": "strings\\.ReplaceAll\\s*\\(sentence,\\s*\" \",\\s*\"-\"\\)", "required": true, "message": "Use strings.ReplaceAll(sentence, \" \", \"-\") to replace spaces." },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
+    ],
+    "successMessage": "Seven functions, zero manual loops. The strings package is one of the most used in all of Go. Keep it in your mental toolkit."
   },
   {
-    "title": "math/rand — Random Numbers",
-    "instruction": "Use rand.Intn(100)+1 to get a number 1-100 and print it.",
-    "hint": "n := rand.Intn(100) + 1; fmt.Println(n)",
-    "starter": "package main\n\nimport ( \"fmt\"; \"math/rand\" )\n\nfunc main() {\n\t// TODO: random 1-100 and print\n}",
-    "expectedOutput": []
+    "title": "The math package",
+    "instruction": "The `math` package gives you mathematical constants and functions.\n\n`math.Pi` — the value of π\n`math.Sqrt(x)` — square root\n`math.Pow(x, y)` — x to the power y\n`math.Abs(x)` — absolute value\n`math.Round(x)` — round to nearest integer\n\nAdd three lines: print the square root of 144, 2 to the power of 10, and the absolute value of -7.5.",
+    "hint": "fmt.Println(math.Sqrt(144))  fmt.Println(math.Pow(2, 10))  fmt.Println(math.Abs(-7.5))",
+    "starter": "package main\n\nimport (\n\t\"fmt\"\n\t\"math\"\n)\n\nfunc main() {\n\tfmt.Println(math.Pi)\n\tfmt.Println(math.Round(3.7))\n\t// TODO: print sqrt(144), 2^10, and abs(-7.5)\n}",
+    "expectedOutput": ["3.141592653589793", "4", "12", "1024", "7.5"],
+    "codeChecks": [
+      { "pattern": "math\\.Sqrt\\s*\\(144\\)", "required": true, "message": "Print math.Sqrt(144)." },
+      { "pattern": "math\\.Pow\\s*\\(2,\\s*10\\)", "required": true, "message": "Print math.Pow(2, 10)." },
+      { "pattern": "math\\.Abs\\s*\\(-7\\.5\\)", "required": true, "message": "Print math.Abs(-7.5)." },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
+    ],
+    "successMessage": "√144=12, 2¹⁰=1024, |-7.5|=7.5. The math package handles every standard mathematical operation. No need to implement these yourself."
+  },
+  {
+    "title": "The time package",
+    "instruction": "The `time` package handles dates, times, durations, and formatting.\n\n`time.Now()` — current time\n`time.Since(t)` — how long since `t`\n`t.Format(\"2006-01-02\")` — format a time (Go uses a reference date, not strftime)\n\nRun this. The reference date `2006-01-02 15:04:05` is Go's fixed reference — always use those specific numbers for formatting.\n\nThen add a line that prints today's date in `DD/MM/YYYY` format.",
+    "hint": "fmt.Println(now.Format(\"02/01/2006\"))",
+    "starter": "package main\n\nimport (\n\t\"fmt\"\n\t\"time\"\n)\n\nfunc main() {\n\tnow := time.Now()\n\tfmt.Println(now.Format(\"2006-01-02\"))\n\tfmt.Println(now.Format(\"15:04:05\"))\n\tfmt.Println(now.Year())\n\t// TODO: print today's date in DD/MM/YYYY format\n}",
+    "expectedOutput": [],
+    "codeChecks": [
+      { "pattern": "now\\.Format\\s*\\(\"02/01/2006\"\\)", "required": true, "message": "Use now.Format(\"02/01/2006\") to print in DD/MM/YYYY format." },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
+    ],
+    "successMessage": "Go's time formatting is unique — instead of %d %m %Y, you use the reference date Jan 2 15:04:05 2006. Weird at first, but you will never forget 2006-01-02."
+  },
+  {
+    "title": "The os package",
+    "instruction": "The `os` package lets you interact with the operating system: environment variables, command-line arguments, file system, exit codes.\n\n`os.Getenv(\"KEY\")` — read an environment variable\n`os.Args` — command-line arguments slice\n`os.Exit(1)` — exit with a non-zero code (signals failure)\n\nRun this. It reads the `HOME` environment variable (or `USERPROFILE` on Windows). Then add a line that prints how many arguments are in `os.Args`.",
+    "hint": "fmt.Println(\"Args count:\", len(os.Args))",
+    "starter": "package main\n\nimport (\n\t\"fmt\"\n\t\"os\"\n)\n\nfunc main() {\n\thome := os.Getenv(\"HOME\")\n\tif home == \"\" {\n\t\thome = os.Getenv(\"USERPROFILE\")\n\t}\n\tfmt.Println(\"Home:\", home)\n\t// TODO: print how many arguments are in os.Args\n}",
+    "expectedOutput": [],
+    "codeChecks": [
+      { "pattern": "len\\s*\\(os\\.Args\\)", "required": true, "message": "Print the count: fmt.Println(\"Args count:\", len(os.Args))" },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
+    ],
+    "successMessage": "os.Args[0] is always the program name itself — so even with no extra arguments, len(os.Args) is 1. The os package is your bridge between Go and the machine it runs on."
+  },
+  {
+    "title": "Exported vs unexported",
+    "instruction": "In Go, whether something is public or private is decided by a single rule:\n\n**Capital first letter = exported (usable outside the package)**\n**Lowercase first letter = unexported (private to the package)**\n\nThis applies to functions, types, variables, and struct fields.\n\n`fmt.Println` is exported — `Println` starts with a capital P.\n`strings.toUpper` would be unexported — but Go named it `ToUpper`.\n\nRun this. Then fix the code by changing `greet` to `Greet` and `person` struct fields to start with capitals.",
+    "hint": "Change greet to Greet, name to Name, age to Age in both the struct definition and usage.",
+    "starter": "package main\n\nimport \"fmt\"\n\ntype person struct {\n\tname string\n\tage  int\n}\n\nfunc greet(p person) {\n\tfmt.Printf(\"Hello, %s! You are %d years old.\\n\", p.name, p.age)\n}\n\nfunc main() {\n\tp := person{name: \"Alex\", age: 25}\n\tgreet(p)\n}",
+    "expectedOutput": ["Hello, Alex! You are 25 years old."],
+    "codeChecks": [
+      { "pattern": "type\\s+Person\\s+struct", "required": true, "message": "Capitalise the type name: type Person struct" },
+      { "pattern": "Name\\s+string", "required": true, "message": "Capitalise the field: Name string" },
+      { "pattern": "Age\\s+int", "required": true, "message": "Capitalise the field: Age int" },
+      { "pattern": "func\\s+Greet\\s*\\(", "required": true, "message": "Capitalise the function: func Greet(...)" }
+    ],
+    "successMessage": "One rule, zero keywords. No public, no private, no protected — just the case of the first letter. Simple and consistent throughout every Go project ever written."
+  },
+  {
+    "title": "What is a module",
+    "instruction": "A module is a collection of Go packages with a shared identity and version.\n\nEvery Go project has a `go.mod` file that defines:\n- The module path (like `github.com/yourname/yourproject`)\n- The Go version\n- External dependencies\n\nYou create one with: `go mod init module-name`\n\nRun this. It reads `runtime.Version()` to show the Go version your code is running on — the same version recorded in go.mod.",
+    "starter": "package main\n\nimport (\n\t\"fmt\"\n\t\"runtime\"\n)\n\nfunc main() {\n\tfmt.Println(\"Go version:\", runtime.Version())\n\tfmt.Println(\"OS:\", runtime.GOOS)\n\tfmt.Println(\"Architecture:\", runtime.GOARCH)\n}",
+    "expectedOutput": [],
+    "successMessage": "Your program knows what runtime it is on. The runtime package exposes this and more — goroutine counts, memory stats, CPU cores. The module system ties it all together into a versioned, shareable project."
+  },
+  {
+    "title": "Using a third-party package",
+    "instruction": "Beyond the standard library, Go's ecosystem has thousands of packages at `pkg.go.dev`.\n\nYou add one with:\n```\ngo get github.com/some/package\n```\n\nThis updates `go.mod` and creates `go.sum` (a lockfile with checksums).\n\nFor this tutorial environment we can only use the standard library — but the pattern is identical. Here we use `encoding/json` (standard library) the same way you would use any external package: import, call, done.\n\nRun this. See how json.Marshal turns a Go struct into JSON bytes.",
+    "starter": "package main\n\nimport (\n\t\"encoding/json\"\n\t\"fmt\"\n)\n\ntype User struct {\n\tName  string `json:\"name\"`\n\tEmail string `json:\"email\"`\n\tAge   int    `json:\"age\"`\n}\n\nfunc main() {\n\tu := User{Name: \"Alex\", Email: \"alex@example.com\", Age: 25}\n\tdata, err := json.Marshal(u)\n\tif err != nil {\n\t\tfmt.Println(\"Error:\", err)\n\t\treturn\n\t}\n\tfmt.Println(string(data))\n}",
+    "expectedOutput": ["{\"name\":\"Alex\",\"email\":\"alex@example.com\",\"age\":25}"],
+    "successMessage": "A Go struct became JSON in three lines. This is how every Go API serializes responses. The pattern — import, call, handle error — is identical whether it is a standard library package or a third-party one."
+  },
+  {
+    "title": "Import aliases",
+    "instruction": "You can give an imported package a different name using an alias:\n\n```\nimport (\n    str \"strings\"\n    m   \"math\"\n)\n```\n\nThen use `str.ToUpper()` and `m.Sqrt()` instead of the full names.\n\nAliases are also used to resolve naming conflicts when two packages have the same last segment.\n\nRun this — it uses aliases for both `strings` and `math`. Then add a line using the `m` alias to print `math.Pi` rounded to 2 decimal places.",
+    "hint": "fmt.Printf(\"Pi ≈ %.2f\\n\", m.Pi)",
+    "starter": "package main\n\nimport (\n\tstr \"strings\"\n\tm   \"math\"\n\t\"fmt\"\n)\n\nfunc main() {\n\tfmt.Println(str.ToUpper(\"hello\"))\n\tfmt.Println(m.Sqrt(81))\n\t// TODO: print m.Pi formatted to 2 decimal places\n}",
+    "expectedOutput": ["HELLO", "9", "Pi ≈ 3.14"],
+    "codeChecks": [
+      { "pattern": "m\\.Pi", "required": true, "message": "Use m.Pi (the math alias) to access Pi." },
+      { "pattern": "%.2f", "required": true, "message": "Format Pi to 2 decimal places with %.2f." },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
+    ],
+    "successMessage": "Aliases keep imports readable when names get long or conflict. You will see them most often with database drivers and generated code."
+  },
+  {
+    "title": "Blank import",
+    "instruction": "Sometimes you import a package purely for its side effects — it registers something when it loads, but you never call its functions directly.\n\n`import _ \"some/package\"` — the blank identifier suppresses the \"imported and not used\" error.\n\nThe most common example: database drivers. `import _ \"github.com/lib/pq\"` registers PostgreSQL as a driver with `database/sql` without you calling anything from `pq` directly.\n\nRun this. The `image/png` package is blank-imported to register the PNG decoder.",
+    "starter": "package main\n\nimport (\n\t\"fmt\"\n\t\"image\"\n\t_ \"image/png\"\n\t\"strings\"\n)\n\nfunc main() {\n\tformats := []string{}\n\timage.RegisterFormat(\"demo\", \"DEMO\", nil, nil)\n\n\t// Show that the blank import registered png support\n\tsupported := []string{\"png\", \"jpeg\", \"gif\"}\n\tfor _, f := range supported {\n\t\t_ = f\n\t}\n\tfmt.Println(\"PNG support registered via blank import\")\n\tfmt.Println(strings.Repeat(\"-\", 35))\n}",
+    "expectedOutput": ["PNG support registered via blank import", "-----------------------------------"],
+    "successMessage": "The blank import ran the png package's init() function — registering the PNG decoder — without polluting your code with unused identifiers. You will use this pattern with database drivers and image formats."
+  },
+  {
+    "title": "Build a string toolkit",
+    "instruction": "No starter code.\n\nBuild a small text analysis tool using `strings`, `fmt`, and `math`:\n\n1. Start with this sentence: `\"  the quick brown fox jumps over the lazy dog  \"`\n2. Trim the whitespace\n3. Print the trimmed sentence in UPPERCASE\n4. Split it into words and print the word count\n5. Print whether it contains `\"fox\"`\n6. Print the average word length rounded to 2 decimal places\n\nExpected output:\n```\nTHE QUICK BROWN FOX JUMPS OVER THE LAZY DOG\nWord count: 9\nContains fox: true\nAvg word length: 3.89\n```",
+    "hint": "For average length: loop through words, sum all len(word), divide by len(words). Use math.Round or %.2f for formatting.",
+    "starter": "package main\n\nimport (\n\t\"fmt\"\n\t\"math\"\n\t\"strings\"\n)\n\nfunc main() {\n}",
+    "expectedOutput": ["THE QUICK BROWN FOX JUMPS OVER THE LAZY DOG", "Word count: 9", "Contains fox: true", "Avg word length: 3.89"],
+    "codeChecks": [
+      { "pattern": "strings\\.TrimSpace", "required": true, "message": "Use strings.TrimSpace to trim the whitespace." },
+      { "pattern": "strings\\.ToUpper", "required": true, "message": "Use strings.ToUpper to print in uppercase." },
+      { "pattern": "strings\\.Split", "required": true, "message": "Use strings.Split to split into words." },
+      { "pattern": "strings\\.Contains", "required": true, "message": "Use strings.Contains to check for \"fox\"." },
+      { "pattern": "math\\.|%.2f", "required": true, "message": "Use math package or %.2f to format the average to 2 decimal places." }
+    ],
+    "successMessage": "Five packages worth of functionality in under 20 lines. Text trimmed, uppercased, split, searched, and analysed. The standard library does the heavy lifting — you just orchestrate it."
   }
 ]
