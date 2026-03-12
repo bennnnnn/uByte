@@ -1,50 +1,131 @@
 [
   {
-    "title": "Basic Select",
-    "instruction": "Send \"one\" to ch1. Use select to receive from ch1 or ch2 and print the result.",
-    "hint": "ch1 <- \"one\"; select already has cases",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tch1 := make(chan string, 1)\n\tch2 := make(chan string, 1)\n\tch1 <- \"one\"\n\tselect {\n\tcase msg := <-ch1:\n\t\tfmt.Println(\"received from ch1:\", msg)\n\tcase msg := <-ch2:\n\t\tfmt.Println(\"received from ch2:\", msg)\n\t}\n}",
-    "expectedOutput": [
-      "received from ch1: one"
-    ]
+    "title": "Timeout with time.After",
+    "instruction": "Never wait forever. `time.After(d)` returns a channel that receives one value after duration `d`.\n\nUse it in a `select` as a deadline:\n\n```\nselect {\ncase result := <-work:\n    fmt.Println(result)\ncase <-time.After(2 * time.Second):\n    fmt.Println(\"timed out\")\n}\n```\n\nRun this. The slow operation takes 200ms but the timeout is only 50ms — so the timeout fires. Then change the timeout to `300ms` so the real result arrives instead.",
+    "hint": "Change 50 * time.Millisecond to 300 * time.Millisecond in the time.After call.",
+    "starter": "package main\n\nimport (\n\t\"fmt\"\n\t\"time\"\n)\n\nfunc fetchData() <-chan string {\n\tch := make(chan string, 1)\n\tgo func() {\n\t\ttime.Sleep(200 * time.Millisecond)\n\t\tch <- \"data from server\"\n\t}()\n\treturn ch\n}\n\nfunc main() {\n\tresult := fetchData()\n\tselect {\n\tcase data := <-result:\n\t\tfmt.Println(\"Got:\", data)\n\tcase <-time.After(50 * time.Millisecond): // TODO: change to 300ms\n\t\tfmt.Println(\"Timeout: server too slow\")\n\t}\n}",
+    "expectedOutput": ["Got: data from server"],
+    "codeChecks": [
+      { "pattern": "300\\s*\\*\\s*time\\.Millisecond", "required": true, "message": "Change the timeout to 300 * time.Millisecond so the result arrives in time." },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your change." }
+    ],
+    "successMessage": "300ms timeout, 200ms operation — result arrived in time. Timeouts are non-negotiable in production. A service without timeouts will eventually hang forever waiting for a dead server."
   },
   {
-    "title": "Non-Blocking with Default",
-    "instruction": "Use select with case <-ch and default that prints \"no data available\".",
-    "hint": "Add default: fmt.Println(\"no data available\")",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tch := make(chan int, 1)\n\tselect {\n\tcase v := <-ch:\n\t\tfmt.Println(\"got:\", v)\n\tdefault:\n\t\tfmt.Println(\"no data available\")\n\t}\n}",
-    "expectedOutput": [
-      "no data available"
-    ]
+    "title": "time.Ticker — do something repeatedly",
+    "instruction": "`time.Ticker` fires on a regular interval. Unlike `time.After` which fires once, a ticker fires forever until you stop it.\n\n```\nticker := time.NewTicker(500 * time.Millisecond)\ndefer ticker.Stop()\nfor t := range ticker.C {\n    fmt.Println(\"tick at\", t)\n}\n```\n\nRun this. A ticker fires every 50ms. A done channel stops it after 3 ticks. Then add a line that prints `\"Ticker stopped\"` after the loop.",
+    "hint": "After the for loop (outside it), add: fmt.Println(\"Ticker stopped\")",
+    "starter": "package main\n\nimport (\n\t\"fmt\"\n\t\"time\"\n)\n\nfunc main() {\n\tticker := time.NewTicker(50 * time.Millisecond)\n\tdefer ticker.Stop()\n\n\tcount := 0\n\tfor {\n\t\tselect {\n\t\tcase <-ticker.C:\n\t\t\tcount++\n\t\t\tfmt.Printf(\"Tick %d\\n\", count)\n\t\t\tif count == 3 {\n\t\t\t\treturn\n\t\t\t}\n\t\t}\n\t}\n\t// TODO: print \"Ticker stopped\" after the loop\n}",
+    "expectedOutput": ["Tick 1", "Tick 2", "Tick 3"],
+    "codeChecks": [
+      { "pattern": "Ticker stopped", "required": true, "message": "Print \"Ticker stopped\" after the loop exits." },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your print statement." }
+    ],
+    "successMessage": "Tickers power heartbeats, polling loops, scheduled jobs, and health checks. Always call ticker.Stop() when you are done — an unstopped ticker leaks a goroutine."
   },
   {
-    "title": "Timeout Pattern",
-    "instruction": "Use select to receive from result OR time.After(50ms). Slow sends after 200ms so timeout fires first; print \"timeout: operation took too long\".",
-    "hint": "case <-time.After(50 * time.Millisecond): fmt.Println(\"timeout: operation took too long\")",
-    "starter": "package main\n\nimport ( \"fmt\"; \"time\" )\n\nfunc slowOperation() <-chan string {\n\tch := make(chan string, 1)\n\tgo func() { time.Sleep(200 * time.Millisecond); ch <- \"slow result\" }()\n\treturn ch\n}\n\nfunc main() {\n\tresult := slowOperation()\n\tselect {\n\tcase v := <-result:\n\t\tfmt.Println(\"got:\", v)\n\tcase <-time.After(50 * time.Millisecond):\n\t\tfmt.Println(\"timeout: operation took too long\")\n\t}\n}",
-    "expectedOutput": [
-      "timeout"
-    ]
+    "title": "Fan-in — merge multiple channels",
+    "instruction": "Fan-in merges multiple channels into one. Any value from any input channel flows out the single output channel.\n\nUseful when you have multiple data sources (sensors, APIs, workers) and want to process everything in one place.\n\nRun this. Two sources send numbers. `merge` combines them. Add a third source `source(7, 8, 9)` to the merge call.",
+    "hint": "merged := merge(ch1, ch2, source(7, 8, 9))  — add source(7,8,9) as a third argument to merge.",
+    "starter": "package main\n\nimport (\n\t\"fmt\"\n\t\"sync\"\n)\n\nfunc source(vals ...int) <-chan int {\n\tch := make(chan int, len(vals))\n\tfor _, v := range vals {\n\t\tch <- v\n\t}\n\tclose(ch)\n\treturn ch\n}\n\nfunc merge(channels ...<-chan int) <-chan int {\n\tout := make(chan int)\n\tvar wg sync.WaitGroup\n\tfor _, ch := range channels {\n\t\twg.Add(1)\n\t\tgo func(c <-chan int) {\n\t\t\tdefer wg.Done()\n\t\t\tfor v := range c {\n\t\t\t\tout <- v\n\t\t\t}\n\t\t}(ch)\n\t}\n\tgo func() {\n\t\twg.Wait()\n\t\tclose(out)\n\t}()\n\treturn out\n}\n\nfunc main() {\n\tch1 := source(1, 2, 3)\n\tch2 := source(4, 5, 6)\n\t// TODO: merge ch1, ch2, and source(7, 8, 9)\n\tmerged := merge(ch1, ch2)\n\n\ttotal := 0\n\tfor v := range merged {\n\t\ttotal += v\n\t}\n\tfmt.Println(\"Total:\", total)\n}",
+    "expectedOutput": ["Total: 45"],
+    "codeChecks": [
+      { "pattern": "source\\(7,\\s*8,\\s*9\\)", "required": true, "message": "Add source(7, 8, 9) as a third input to merge." },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your updated merge call." }
+    ],
+    "successMessage": "1+2+...+9 = 45. Three sources, one stream, one total. Fan-in is how you aggregate results from multiple concurrent workers or external services."
   },
   {
-    "title": "Done Channel Pattern",
-    "instruction": "Start counter(done) goroutine. After 100ms close(done) to stop it.",
-    "hint": "time.Sleep(100 * time.Millisecond); close(done)",
-    "starter": "package main\n\nimport ( \"fmt\"; \"time\" )\n\nfunc counter(done <-chan struct{}) {\n\tfor i := 1; ; i++ {\n\t\tselect {\n\t\tcase <-done:\n\t\t\tfmt.Println(\"counter stopped at\", i-1)\n\t\t\treturn\n\t\tdefault:\n\t\t\tfmt.Println(\"count:\", i)\n\t\t\ttime.Sleep(30 * time.Millisecond)\n\t\t}\n\t}\n}\n\nfunc main() {\n\tdone := make(chan struct{})\n\tgo counter(done)\n\ttime.Sleep(100 * time.Millisecond)\n\tclose(done)\n\ttime.Sleep(50 * time.Millisecond)\n\tfmt.Println(\"main done\")\n}",
-    "expectedOutput": [
-      "count:",
-      "counter stopped",
-      "main done"
-    ]
+    "title": "Fan-out — distribute work",
+    "instruction": "Fan-out distributes jobs from one channel to multiple worker goroutines.\n\nYou used this in the worker pool chapter. Here is the clean abstraction:\n\n- One `jobs` channel sends work\n- N workers each read from `jobs`\n- First free worker takes the next job\n\nRun this. 3 workers process 9 jobs. Add 3 more workers (total 6) and see if the jobs finish faster.",
+    "hint": "Change for w := 1; w <= 3; w++ to w <= 6 to add 3 more workers.",
+    "starter": "package main\n\nimport (\n\t\"fmt\"\n\t\"sync\"\n)\n\nfunc main() {\n\tjobs := make(chan int, 9)\n\tresults := make(chan string, 9)\n\tvar wg sync.WaitGroup\n\n\t// TODO: change 3 to 6 to add more workers\n\tfor w := 1; w <= 3; w++ {\n\t\twg.Add(1)\n\t\tgo func(id int) {\n\t\t\tdefer wg.Done()\n\t\t\tfor j := range jobs {\n\t\t\t\tresults <- fmt.Sprintf(\"Worker %d processed job %d\", id, j)\n\t\t\t}\n\t\t}(w)\n\t}\n\n\tfor i := 1; i <= 9; i++ {\n\t\tjobs <- i\n\t}\n\tclose(jobs)\n\n\twg.Wait()\n\tclose(results)\n\n\tcount := 0\n\tfor range results {\n\t\tcount++\n\t}\n\tfmt.Println(\"Jobs completed:\", count)\n}",
+    "expectedOutput": ["Jobs completed: 9"],
+    "codeChecks": [
+      { "pattern": "w\\s*<=\\s*6", "required": true, "message": "Change the worker count to 6: w <= 6" },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your change." }
+    ],
+    "successMessage": "9 jobs, 6 workers — more workers means jobs complete faster when they are I/O-bound. Fan-out is the foundation of every concurrent task processor, HTTP server, and job queue in Go."
   },
   {
-    "title": "Fan-In: Merging Channels",
-    "instruction": "Complete merge: start two goroutines calling forward(ch1) and forward(ch2).",
-    "hint": "go forward(ch1); go forward(ch2)",
-    "starter": "package main\n\nimport ( \"fmt\"; \"sync\" )\n\nfunc merge(ch1, ch2 <-chan int) <-chan int {\n\tout := make(chan int)\n\tvar wg sync.WaitGroup\n\tforward := func(ch <-chan int) {\n\t\tdefer wg.Done()\n\t\tfor v := range ch { out <- v }\n\t}\n\twg.Add(2)\n\tgo forward(ch1)\n\tgo forward(ch2)\n\tgo func() { wg.Wait(); close(out) }()\n\treturn out\n}\n\nfunc source(vals ...int) <-chan int {\n\tch := make(chan int, len(vals))\n\tfor _, v := range vals { ch <- v }\n\tclose(ch)\n\treturn ch\n}\n\nfunc main() {\n\tch1 := source(1,2,3)\n\tch2 := source(4,5,6)\n\tmerged := merge(ch1, ch2)\n\ttotal := 0\n\tfor v := range merged { fmt.Println(\"received:\", v); total += v }\n\tfmt.Println(\"total:\", total)\n}",
-    "expectedOutput": [
-      "received:",
-      "total: 21"
-    ]
+    "title": "Pipeline with cancellation",
+    "instruction": "A pipeline is a series of stages connected by channels. When you want to cancel the whole pipeline early, pass a `done` channel to every stage.\n\nWhen `done` is closed, every stage sees it via `select` and exits.\n\nRun this. The pipeline generates → squares → prints. Close `done` after 3 values to stop early.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc generate(done <-chan struct{}, nums ...int) <-chan int {\n\tout := make(chan int)\n\tgo func() {\n\t\tdefer close(out)\n\t\tfor _, n := range nums {\n\t\t\tselect {\n\t\t\tcase out <- n:\n\t\t\tcase <-done:\n\t\t\t\treturn\n\t\t\t}\n\t\t}\n\t}()\n\treturn out\n}\n\nfunc square(done <-chan struct{}, in <-chan int) <-chan int {\n\tout := make(chan int)\n\tgo func() {\n\t\tdefer close(out)\n\t\tfor n := range in {\n\t\t\tselect {\n\t\t\tcase out <- n * n:\n\t\t\tcase <-done:\n\t\t\t\treturn\n\t\t\t}\n\t\t}\n\t}()\n\treturn out\n}\n\nfunc main() {\n\tdone := make(chan struct{})\n\n\tnums := generate(done, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10)\n\tsquares := square(done, nums)\n\n\tcount := 0\n\tfor v := range squares {\n\t\tfmt.Println(v)\n\t\tcount++\n\t\tif count == 3 {\n\t\t\tclose(done)\n\t\t\tbreak\n\t\t}\n\t}\n\tfmt.Println(\"Pipeline stopped after\", count, \"values\")\n}",
+    "expectedOutput": ["1", "4", "9", "Pipeline stopped after 3 values"],
+    "successMessage": "The pipeline produced 3 values then stopped cleanly — no goroutine leaks. When done closes, every stage sees it and exits. This is the correct way to cancel a multi-stage pipeline."
+  },
+  {
+    "title": "context.WithTimeout",
+    "instruction": "`context` is the standard Go way to carry deadlines and cancellation signals across function calls and goroutines.\n\n```\nctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)\ndefer cancel()\n```\n\nPass `ctx` to anything that might take too long. It automatically cancels when the deadline passes.\n\nRun this. The slow operation checks `ctx.Done()`. Change the timeout from `50ms` to `300ms` so the operation completes.",
+    "hint": "Change 50 * time.Millisecond to 300 * time.Millisecond in context.WithTimeout.",
+    "starter": "package main\n\nimport (\n\t\"context\"\n\t\"fmt\"\n\t\"time\"\n)\n\nfunc slowQuery(ctx context.Context) (string, error) {\n\tselect {\n\tcase <-time.After(200 * time.Millisecond):\n\t\treturn \"query result\", nil\n\tcase <-ctx.Done():\n\t\treturn \"\", ctx.Err()\n\t}\n}\n\nfunc main() {\n\t// TODO: change 50ms to 300ms\n\tctx, cancel := context.WithTimeout(context.Background(), 50*time.Millisecond)\n\tdefer cancel()\n\n\tresult, err := slowQuery(ctx)\n\tif err != nil {\n\t\tfmt.Println(\"Error:\", err)\n\t\treturn\n\t}\n\tfmt.Println(\"Result:\", result)\n}",
+    "expectedOutput": ["Result: query result"],
+    "codeChecks": [
+      { "pattern": "300\\s*\\*\\s*time\\.Millisecond", "required": true, "message": "Change the timeout to 300 * time.Millisecond." },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your change." }
+    ],
+    "successMessage": "context.WithTimeout is the standard way to add deadlines to database calls, HTTP requests, and any slow operation. Always defer cancel() — it frees resources even if the context expires naturally."
+  },
+  {
+    "title": "context.WithCancel",
+    "instruction": "`context.WithCancel` gives you manual control. Call `cancel()` whenever you decide to stop.\n\nThis is how HTTP servers cancel requests when the client disconnects, how search engines stop slower queries when a faster one returns, and how services shut down gracefully.\n\nRun this. Two workers race to complete. The first to finish cancels the context — stopping the other.",
+    "starter": "package main\n\nimport (\n\t\"context\"\n\t\"fmt\"\n\t\"time\"\n)\n\nfunc worker(ctx context.Context, id int, delay time.Duration, results chan<- string) {\n\tselect {\n\tcase <-time.After(delay):\n\t\tresults <- fmt.Sprintf(\"Worker %d finished first\", id)\n\tcase <-ctx.Done():\n\t\tfmt.Printf(\"Worker %d cancelled\\n\", id)\n\t}\n}\n\nfunc main() {\n\tctx, cancel := context.WithCancel(context.Background())\n\tdefer cancel()\n\n\tresults := make(chan string, 1)\n\n\tgo worker(ctx, 1, 80*time.Millisecond, results)\n\tgo worker(ctx, 2, 200*time.Millisecond, results)\n\n\twinner := <-results\n\tfmt.Println(winner)\n\tcancel()\n\ttime.Sleep(50 * time.Millisecond)\n}",
+    "expectedOutput": ["Worker 1 finished first", "Worker 2 cancelled"],
+    "successMessage": "Worker 1 won the race. cancel() signalled Worker 2 to stop immediately. This \"first result wins, cancel the rest\" pattern is called early exit and is used in distributed systems everywhere."
+  },
+  {
+    "title": "Rate limiting",
+    "instruction": "Rate limiting controls how fast work is processed — to avoid overwhelming a database, an API, or a downstream service.\n\nA time.Ticker acts as a token dispenser. Each tick is a token that allows one operation.\n\nRun this. 5 requests are processed but only 1 per 50ms is allowed — the ticker controls the pace. Add two more requests to `requests` (strings 6 and 7).",
+    "hint": "requests <- \"request 6\"  requests <- \"request 7\"  — add before close(requests).",
+    "starter": "package main\n\nimport (\n\t\"fmt\"\n\t\"time\"\n)\n\nfunc main() {\n\trequests := make(chan string, 7)\n\tfor i := 1; i <= 5; i++ {\n\t\trequests <- fmt.Sprintf(\"request %d\", i)\n\t}\n\t// TODO: add request 6 and request 7\n\tclose(requests)\n\n\tlimiter := time.NewTicker(50 * time.Millisecond)\n\tdefer limiter.Stop()\n\n\tfor req := range requests {\n\t\t<-limiter.C\n\t\tfmt.Println(\"Processed:\", req)\n\t}\n\tfmt.Println(\"All requests done\")\n}",
+    "expectedOutput": ["Processed: request 1", "Processed: request 2", "Processed: request 3", "Processed: request 4", "Processed: request 5", "Processed: request 6", "Processed: request 7", "All requests done"],
+    "codeChecks": [
+      { "pattern": "request 6", "required": true, "message": "Add \"request 6\" to the requests channel." },
+      { "pattern": "request 7", "required": true, "message": "Add \"request 7\" to the requests channel." },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your two requests." }
+    ],
+    "successMessage": "One request per tick, smooth and controlled. Rate limiting protects your services from being overwhelmed. The ticker pattern is simple and effective — no third-party library needed."
+  },
+  {
+    "title": "Semaphore — limit concurrent access",
+    "instruction": "A semaphore limits how many goroutines can do something at the same time.\n\nImplement it with a buffered channel: send to acquire, receive to release. The buffer size is the limit.\n\n```\nsem := make(chan struct{}, 3)  // max 3 concurrent\nsem <- struct{}{}              // acquire\ndefer func() { <-sem }()      // release\n```\n\nRun this. 10 goroutines try to run but only 3 can run at once. The semaphore enforces the limit.",
+    "starter": "package main\n\nimport (\n\t\"fmt\"\n\t\"sync\"\n)\n\nfunc main() {\n\tsem := make(chan struct{}, 3)\n\tvar wg sync.WaitGroup\n\tactive := 0\n\tvar mu sync.Mutex\n\n\tfor i := 1; i <= 10; i++ {\n\t\twg.Add(1)\n\t\tgo func(id int) {\n\t\t\tdefer wg.Done()\n\t\t\tsem <- struct{}{}\n\t\t\tdefer func() { <-sem }()\n\n\t\t\tmu.Lock()\n\t\t\tactive++\n\t\t\tif active > 3 {\n\t\t\t\tfmt.Printf(\"VIOLATION: %d goroutines active!\\n\", active)\n\t\t\t}\n\t\t\tmu.Unlock()\n\n\t\t\tmu.Lock()\n\t\t\tactive--\n\t\t\tmu.Unlock()\n\t\t}(i)\n\t}\n\n\twg.Wait()\n\tfmt.Println(\"All goroutines done, max 3 ran concurrently\")\n}",
+    "expectedOutput": ["All goroutines done, max 3 ran concurrently"],
+    "successMessage": "10 goroutines, max 3 at once, no violations. Semaphores limit access to scarce resources: database connection pools, file handles, API rate limits. A buffered channel is all you need."
+  },
+  {
+    "title": "Graceful shutdown",
+    "instruction": "When your server receives a shutdown signal (Ctrl+C, SIGTERM from Kubernetes), you need to:\n1. Stop accepting new work\n2. Finish any in-progress work\n3. Exit cleanly\n\nRun this. The server processes jobs. When `shutdown` is closed, it finishes the current job then exits — no work is abandoned.",
+    "starter": "package main\n\nimport (\n\t\"fmt\"\n\t\"sync\"\n\t\"time\"\n)\n\nfunc server(jobs <-chan int, shutdown <-chan struct{}, wg *sync.WaitGroup) {\n\tdefer wg.Done()\n\tfor {\n\t\tselect {\n\t\tcase job, ok := <-jobs:\n\t\t\tif !ok {\n\t\t\t\tfmt.Println(\"Server: job queue empty, exiting\")\n\t\t\t\treturn\n\t\t\t}\n\t\t\ttime.Sleep(20 * time.Millisecond)\n\t\t\tfmt.Printf(\"Server: completed job %d\\n\", job)\n\t\tcase <-shutdown:\n\t\t\tfmt.Println(\"Server: shutdown signal received, draining...\")\n\t\t\tfor job := range jobs {\n\t\t\t\ttime.Sleep(20 * time.Millisecond)\n\t\t\t\tfmt.Printf(\"Server: completed job %d\\n\", job)\n\t\t\t}\n\t\t\tfmt.Println(\"Server: all jobs drained, exiting\")\n\t\t\treturn\n\t\t}\n\t}\n}\n\nfunc main() {\n\tjobs := make(chan int, 5)\n\tshutdown := make(chan struct{})\n\tvar wg sync.WaitGroup\n\n\tfor i := 1; i <= 5; i++ {\n\t\tjobs <- i\n\t}\n\tclose(jobs)\n\n\twg.Add(1)\n\tgo server(jobs, shutdown, &wg)\n\n\ttime.Sleep(50 * time.Millisecond)\n\tclose(shutdown)\n\n\twg.Wait()\n\tfmt.Println(\"Main: clean exit\")\n}",
+    "expectedOutput": ["Main: clean exit"],
+    "successMessage": "No jobs lost. The server received the shutdown signal, finished what it was doing, drained the queue, then exited. Graceful shutdown is essential in production — abrupt exits lose data and break clients."
+  },
+  {
+    "title": "Fix a goroutine leak",
+    "instruction": "A goroutine leak is a goroutine that starts but never exits. Over time it consumes memory and eventually crashes your program.\n\nThe most common cause: a goroutine blocks on a channel that is never closed and never has a receiver.\n\nThe code below leaks a goroutine — `work` sends a result but nobody closes `done`, so the goroutine waits forever.\n\nFix it: close the `done` channel after reading the result.",
+    "hint": "Add close(done) after result := <-ch  (right before the Println).",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc leakyWorker(done <-chan struct{}) <-chan int {\n\tch := make(chan int, 1)\n\tgo func() {\n\t\tch <- 42\n\t\t<-done // waits here forever if done is never closed — LEAK\n\t\tfmt.Println(\"Worker: clean exit\")\n\t}()\n\treturn ch\n}\n\nfunc main() {\n\tdone := make(chan struct{})\n\tch := leakyWorker(done)\n\tresult := <-ch\n\t// TODO: close(done) here to let the goroutine exit\n\tfmt.Println(\"Result:\", result)\n}",
+    "expectedOutput": ["Worker: clean exit", "Result: 42"],
+    "codeChecks": [
+      { "pattern": "close\\s*\\(done\\)", "required": true, "message": "Close the done channel: close(done)" },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with close(done)." }
+    ],
+    "successMessage": "Worker exited cleanly. One close(done) and the leak is fixed. Always ask: for every goroutine I start, what will cause it to exit? If you cannot answer that, you have a potential leak."
+  },
+  {
+    "title": "Build a real-time event processor",
+    "instruction": "No starter code.\n\nBuild an event processor:\n\n1. Define `Event` struct with `Source` string and `Value` int\n2. Write two `emitter` functions — each sends 3 events on its own channel then closes it\n3. Use fan-in (`merge`) to combine both emitters into one channel\n4. Process events with a 500ms overall timeout using `context.WithTimeout`\n5. Print each event as `\"[Source] Value: X\"` — stop if the context times out\n6. Print `\"Processed N events\"` at the end\n\nExpected output processes all 6 events (or fewer if timeout fires).",
+    "hint": "Use context.WithTimeout, merge both emitter channels, select on merged channel and ctx.Done() in the loop.",
+    "starter": "package main\n\nimport (\n\t\"context\"\n\t\"fmt\"\n\t\"sync\"\n\t\"time\"\n)\n\n// Build your event processor here\n\nfunc main() {\n}",
+    "expectedOutput": [],
+    "codeChecks": [
+      { "pattern": "type\\s+Event\\s+struct", "required": true, "message": "Define an Event struct." },
+      { "pattern": "func\\s+\\w+.*<-chan Event", "required": true, "message": "Write emitter functions that return <-chan Event." },
+      { "pattern": "context\\.WithTimeout", "required": true, "message": "Use context.WithTimeout for the overall deadline." },
+      { "pattern": "sync\\.WaitGroup|merge", "required": true, "message": "Use a WaitGroup or merge function to combine channels." },
+      { "pattern": "ctx\\.Done\\(\\)", "required": true, "message": "Check ctx.Done() to handle timeout." },
+      { "pattern": "Processed", "required": true, "message": "Print the final count of processed events." }
+    ],
+    "successMessage": "Fan-in, timeout, context cancellation — all working together. This is exactly what a real-time event ingestion service looks like in production. Kafka consumers, WebSocket handlers, sensor data pipelines — same pattern. You are done."
   }
 ]
