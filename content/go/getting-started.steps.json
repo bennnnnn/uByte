@@ -1,47 +1,47 @@
 [
   {
-    "title": "Your First Go Program",
-    "instruction": "Welcome to Go! Every Go program has two required pieces: `package main` tells Go this is a runnable program, and `func main()` is where execution begins. The program below is already complete — just click **Run** to see it work.",
-    "hint": "No changes needed — just press Run and see \"Hello, World!\" appear in the output.",
+    "title": "Run your first program",
+    "instruction": "Here it is — your very first Go program. You don't need to change anything yet. Just hit Run and watch what happens.\n\nLook at the output panel. Do you see \"Hello, World!\"? That's your computer following the instruction you gave it. One line of text, exactly as requested.",
+    "hint": "No changes needed at all! Just press the Run button and watch the output appear.",
     "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tfmt.Println(\"Hello, World!\")\n}",
     "expectedOutput": ["Hello, World!"]
   },
   {
-    "title": "Say Your Name",
-    "instruction": "Great — Go is running! Now make it personal. Change the message so it prints **your** name. For example, if your name is Alex, print `Hello, Alex!`.",
-    "hint": "Change the text inside Println to \"Hello, Alex!\" — replace Alex with your own name.",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\t// TODO: print \"Hello, <your name>!\"\n\tfmt.Println(\"Hello, World!\")\n}",
+    "title": "Make it say your name",
+    "instruction": "Now let's make it personal. Change the message so the program says hello to you.\n\nIf your name is Jordan, it should print: Hello, Jordan!\n\nEverything between the quote marks is what gets printed. That's the only thing you need to change.",
+    "hint": "Find the part that says \"Hello, World!\" and replace World with your own name. Keep the quote marks on both sides.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tfmt.Println(\"Hello, World!\")\n}",
     "expectedOutput": ["Hello,"]
   },
   {
-    "title": "Print Two Lines",
-    "instruction": "Each call to `fmt.Println()` prints one line and then moves to the next line automatically. Print two lines: your name on the first line, and your hometown on the second line.\n\nYou're starting to build a student profile — we'll use this idea a lot throughout the course.",
-    "hint": "Call fmt.Println() twice — once for your name, once for your hometown.",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\t// TODO: print your name on line 1\n\t// TODO: print your hometown on line 2\n}",
+    "title": "Print two lines",
+    "instruction": "Each time you write fmt.Println, it prints one line and then moves to the next line automatically. Like pressing Enter after you type something.\n\nAdd a second fmt.Println below the first one. Make the first line say your name, and the second line say your hometown. They should print one after the other.",
+    "hint": "Copy the fmt.Println line and paste it right below. Then change the text inside the quotes for each one. Two lines of code, two lines of output.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tfmt.Println(\"Your name here\")\n\t// Add a second Println below this line\n}",
     "expectedOutput": []
   },
   {
-    "title": "Fill in the Blanks with Printf",
-    "instruction": "`fmt.Printf()` lets you insert values into a template using **format verbs**. `%s` is a placeholder for a string, `%d` for a whole number, and `\\n` moves to the next line.\n\nThe variables `name` and `year` are already set. Use `fmt.Printf` to print:\n```\nWelcome to Riverside Academy, 2025\n```",
-    "hint": "fmt.Printf(\"Welcome to %s, %d\\n\", name, year) — %s inserts the string, %d inserts the number.",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tname := \"Riverside Academy\"\n\tyear := 2025\n\t// TODO: use fmt.Printf to print \"Welcome to Riverside Academy, 2025\"\n\t_ = name\n\t_ = year\n}",
-    "expectedOutput": ["Welcome to Riverside Academy, 2025"]
+    "title": "Introduce yourself",
+    "instruction": "Let's print a proper 3-line introduction. Print these three things, each on its own line:\n\nYour name\nYour age\nOne fun fact about yourself\n\nYou'll need three separate fmt.Println calls — one for each line.",
+    "hint": "You need three lines of code, each starting with fmt.Println. Put a different piece of information in each one. Something like: fmt.Println(\"My name is Sam\"), fmt.Println(\"I am 24\"), fmt.Println(\"I can juggle\").",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\t// Print your name, age, and a fun fact\n\t// Each on its own line\n}",
+    "expectedOutput": []
   },
   {
-    "title": "Build a String with Sprintf",
-    "instruction": "`fmt.Sprintf()` works exactly like Printf but **returns a string** instead of printing it — perfect when you need to build a message and use it later.\n\nBuild the string `\"Student ID: 1042\"` using Sprintf with the variable `id`, store it in `badge`, then print it.",
-    "hint": "badge := fmt.Sprintf(\"Student ID: %d\", id) — then fmt.Println(badge).",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tid := 1042\n\t// TODO: use fmt.Sprintf to build \"Student ID: 1042\" and store in badge\n\tbadge := \"\"\n\t_ = id\n\tfmt.Println(badge)\n}",
-    "expectedOutput": ["Student ID: 1042"]
-  },
-  {
-    "title": "Document Your Code with Comments",
-    "instruction": "Comments start with `//` and are completely ignored by Go — they exist only for humans reading the code. Good comments explain *why* something is done, not just *what*.\n\nAdd a comment above the Println explaining what the program is for, then make sure the program still prints `\"Riverside Academy — Student Tracker\"`.",
-    "hint": "// This program is the entry point for Riverside Academy's student tracker",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\t// TODO: add a comment explaining what this program does\n\tfmt.Println(\"Riverside Academy — Student Tracker\")\n}",
-    "expectedOutput": ["Riverside Academy"],
+    "title": "Leave a comment",
+    "instruction": "Comments are notes you leave in your code for yourself or other people. The computer ignores them completely — they're just for humans.\n\nA comment starts with two forward slashes: //\n\nAdd a comment above each fmt.Println explaining what it prints. The program should still produce the same output — comments don't affect what runs.",
+    "hint": "A comment looks like this: // This line prints my name. Place it on the line directly above the Println it describes. You should end up with three comments and three Println calls.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tfmt.Println(\"My name is Alex\")\n\tfmt.Println(\"I am 22 years old\")\n\tfmt.Println(\"I enjoy hiking\")\n}",
+    "expectedOutput": ["My name is Alex", "I am 22 years old", "I enjoy hiking"],
     "codeChecks": [
-      { "pattern": "^\\s*//", "message": "Add a // comment above the Println." }
+      { "pattern": "^\\s*//", "message": "Add at least one comment — a line that starts with //" }
     ]
+  },
+  {
+    "title": "Fix the broken program",
+    "instruction": "Something is wrong with this program. It won't run. Your job is to figure out what's broken and fix it.\n\nThis is an important skill — reading error messages and finding bugs. Every programmer does this constantly. Don't panic when you see an error. Read it, look at your code, and find the mismatch.\n\nHint: Go is very picky about quote marks and capitalization.",
+    "hint": "Look carefully at the Println calls. One of them has a problem with the quote marks, and one has a capitalization issue. Fix both and the program will run.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tfmt.Println(\"This line is fine\")\n\tfmt.println(\"this line has a capital letter problem\")\n\tfmt.Println(\"this line has a missing quote)\n}",
+    "expectedOutput": ["This line is fine", "this line has a capital letter problem", "this line has a missing quote"]
   }
 ]
