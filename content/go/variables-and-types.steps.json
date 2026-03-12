@@ -1,58 +1,75 @@
 [
   {
-    "title": "Your First Variable — the Labeled Box",
-    "instruction": "Think of a variable as a **labeled box**. The label is the name, and what you put inside is the value. In Go, you create a variable with `var`:\n\n```\nvar name string = \"Alice\"\n```\n\nThis creates a box labeled `name`, declares that it holds text (`string`), and puts `\"Alice\"` inside it.\n\nCreate a variable `name` with the value `\"Alice\"` and print it.",
-    "hint": "var name string = \"Alice\" — then fmt.Println(name).",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\t// TODO: create a variable named \"name\" with the value \"Alice\"\n\t// TODO: print name\n}",
-    "expectedOutput": ["Alice"]
+    "title": "Store your name in a variable",
+    "instruction": "In Chapter 1, you printed your name by typing it directly inside Println. That works, but it's a one-time thing. A variable lets you store your name once and use it anywhere.\n\nHere's how you create a variable in Go:\n\n    name := \"Alex\"\n\nThe := means create this variable and put this value in it. Go figures out the type on its own.\n\nCreate a variable called name with your actual name in it, then print it using fmt.Println.",
+    "hint": "Write name := \"YourName\" on one line, then fmt.Println(name) on the next. Make sure your name is inside double quotes.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\t// TODO: create a variable called name with your name in it\n\t// TODO: print name using fmt.Println\n}",
+    "expectedOutput": [],
+    "codeChecks": [
+      { "pattern": "name\\s*:=", "required": true, "message": "Create a variable using :=  like this: name := \"YourName\"" },
+      { "pattern": "Println\\(name\\)", "required": true, "message": "Print the variable by writing: fmt.Println(name)" },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comments with your actual code." }
+    ]
   },
   {
-    "title": "The Quick Way — Short Declaration",
-    "instruction": "Writing `var name string = \"Alice\"` every time is verbose. Inside a function, `:=` does the same thing in one step — Go figures out the type for you:\n\n```\nname := \"Alice\"  // Go infers this is a string\n```\n\nThis is the most common way to declare variables in Go. Declare `name` as `\"Alice\"` and `age` as `17` using `:=`, then print both on separate lines.",
-    "hint": "name := \"Alice\" and age := 17 on separate lines — then print each.",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\t// TODO: declare name := \"Alice\"\n\t// TODO: declare age := 17\n\t// TODO: print name, then print age\n}",
-    "expectedOutput": ["Alice", "17"]
+    "title": "Now add your age",
+    "instruction": "You're flying! You just created your first variable.\n\nNow let's add a second one. Your age is a number — not text — so it does NOT go in quotes. Go will see the number and automatically know it's an integer.\n\n    age := 24\n\nThe name variable is already there. Add an age variable with your actual age, then print both — name first, then age.",
+    "hint": "age := 24 goes below the name line. Then add a second fmt.Println(age) below the one for name. No quotes around the number!",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tname := \"Alex\"\n\t// TODO: create a variable called age with your age in it\n\tfmt.Println(name)\n\t// TODO: print age\n}",
+    "expectedOutput": ["Alex"],
+    "codeChecks": [
+      { "pattern": "age\\s*:=\\s*\\d+", "required": true, "message": "Create an age variable with a number — like: age := 24. No quotes around the number." },
+      { "pattern": "Println\\(age\\)", "required": true, "message": "Print age using fmt.Println(age)" },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comments with your actual code." }
+    ]
   },
   {
-    "title": "A Float for GPA",
-    "instruction": "Numbers with decimal points are `float64` in Go. Alice's GPA is 3.8 — that's a float.\n\nYou now have three facts about this student. Declare all three and print them:\n- `name` = `\"Alice\"` (string)\n- `age` = `17` (int)\n- `gpa` = `3.8` (float64)\n\nPrint each on its own line.",
-    "hint": "gpa := 3.8 — Go infers float64. Print all three with separate Println calls.",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tname := \"Alice\"\n\tage := 17\n\t// TODO: declare gpa as 3.8\n\tfmt.Println(name)\n\tfmt.Println(age)\n\t// TODO: print gpa\n}",
-    "expectedOutput": ["Alice", "17", "3.8"]
+    "title": "Prices need decimals — meet float64",
+    "instruction": "Your favorite coffee costs $4.99. Can you store that in an int? Nope — integers are whole numbers only. 4.99 has a decimal point, so you need a float64.\n\nGo figures it out automatically. The moment it sees a decimal point in your number, it treats it as a float64.\n\n    price := 4.99\n\nAdd a price variable set to 4.99 and print all three variables: name, age, and price.",
+    "hint": "price := 4.99 — no quotes, just the number with the decimal. Then add fmt.Println(price) after the other two Println calls.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tname := \"Alex\"\n\tage := 24\n\t// TODO: create a variable called price set to 4.99\n\tfmt.Println(name)\n\tfmt.Println(age)\n\t// TODO: print price\n}",
+    "expectedOutput": ["Alex", "24", "4.99"],
+    "codeChecks": [
+      { "pattern": "price\\s*:=\\s*\\d+\\.\\d+", "required": true, "message": "Create a price variable with a decimal number — like: price := 4.99" },
+      { "pattern": "Println\\(price\\)", "required": true, "message": "Print price using fmt.Println(price)" },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comments with your actual code." }
+    ]
   },
   {
-    "title": "True or False — Booleans",
-    "instruction": "A `bool` holds either `true` or `false` — nothing else. It's perfect for yes/no questions: \"Is this student enrolled?\" \n\nAdd a fourth variable: `enrolled := true`. Then print all four student details.",
-    "hint": "enrolled := true — then fmt.Println(enrolled). It will print the word \"true\".",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tname := \"Alice\"\n\tage := 17\n\tgpa := 3.8\n\t// TODO: declare enrolled as true\n\tfmt.Println(name)\n\tfmt.Println(age)\n\tfmt.Println(gpa)\n\t// TODO: print enrolled\n}",
-    "expectedOutput": ["Alice", "17", "3.8", "true"]
+    "title": "Yes or no — the bool",
+    "instruction": "Last data type for today, and honestly the most dramatic one. A bool can only ever be two things: true or false. That's the whole type. No maybes.\n\nAre you a morning person? If yes: isMorningPerson := true. If no: isMorningPerson := false. Your call — nobody's judging.\n\nAdd a variable called isMorningPerson and set it to either true or false, then print all four variables.",
+    "hint": "isMorningPerson := true (or false if you're a night owl). Then fmt.Println(isMorningPerson). No quotes around true or false — they're special keywords, not text.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tname := \"Alex\"\n\tage := 24\n\tprice := 4.99\n\t// TODO: create isMorningPerson as true or false\n\tfmt.Println(name)\n\tfmt.Println(age)\n\tfmt.Println(price)\n\t// TODO: print isMorningPerson\n}",
+    "expectedOutput": ["Alex", "24", "4.99"],
+    "codeChecks": [
+      { "pattern": "isMorningPerson\\s*:=\\s*(true|false)", "required": true, "message": "Create isMorningPerson and set it to true or false — no quotes." },
+      { "pattern": "Println\\(isMorningPerson\\)", "required": true, "message": "Print isMorningPerson using fmt.Println(isMorningPerson)" },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comments with your actual code." }
+    ]
   },
   {
-    "title": "Zero Values — Empty Boxes",
-    "instruction": "What happens if you create a variable but don't give it a value? In Go, every variable gets a **zero value** automatically — Go never leaves a box empty:\n\n- `int` → `0`\n- `float64` → `0`\n- `string` → `\"\"` (empty string)\n- `bool` → `false`\n\nDeclare a `var score int` without any value, and a `var comment string` without any value. Print both — you should see `0` and an empty line.",
-    "hint": "var score int — no = needed. fmt.Println(score) will print 0. fmt.Println(comment) will print a blank line.",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tvar score int\n\tvar comment string\n\t// TODO: print score (should be 0)\n\t// TODO: print comment (should be empty)\n}",
-    "expectedOutput": ["0"]
+    "title": "Change your name to a nickname",
+    "instruction": "Here's something cool. Variables can change. That's literally what the word variable means — something that varies.\n\nYou update a variable using just = (single equals, not :=). The := creates it the first time. The = changes it afterwards.\n\nThe program already creates name and prints it. Update name to your nickname after the first print, then print it again. You should see your real name first, then your nickname.",
+    "hint": "After the first fmt.Println(name), write: name = \"Nickname\" — single = not := because the variable already exists. Then add another fmt.Println(name).",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tname := \"Alex\"\n\tfmt.Println(name)\n\t// TODO: change name to your nickname using =\n\t// TODO: print name again\n}",
+    "expectedOutput": ["Alex"],
+    "codeChecks": [
+      { "pattern": "name\\s*=\\s*\"", "required": true, "message": "Update name using a single = sign: name = \"Nickname\"  — not :=" },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comments with your actual code." }
+    ]
   },
   {
-    "title": "Updating a Variable",
-    "instruction": "Variables can change — that's the whole point. Alice just got her exam back: she scored `78` initially, but the teacher added `5` bonus points.\n\nStart with `score := 78`, add 5 to it, then print the updated score.",
-    "hint": "score = score + 5 — or the shorthand: score += 5.",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tscore := 78\n\t// TODO: add 5 bonus points to score\n\tfmt.Println(score)\n}",
-    "expectedOutput": ["83"]
-  },
-  {
-    "title": "Type Conversion",
-    "instruction": "Go never converts types automatically — you have to be explicit. Alice's GPA is `3.8` (float64), but the school system needs it as an integer (it truncates the decimal).\n\nConvert `gpa` from `float64` to `int` and print the result. You should see `3`.",
-    "hint": "intGpa := int(gpa) — wrapping a value with a type name converts it. Print intGpa.",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tgpa := 3.8\n\t// TODO: convert gpa to int and store in intGpa\n\t// TODO: print intGpa (should be 3)\n\t_ = gpa\n}",
-    "expectedOutput": ["3"]
-  },
-  {
-    "title": "Constants — Values That Never Change",
-    "instruction": "Some values should never change — the minimum passing grade, the maximum GPA, the school's name. Use `const` for these:\n\n```go\nconst maxGPA = 4.0\n```\n\nA constant declared with `const` cannot be updated later — Go will refuse to compile if you try.\n\nA `const` named `minPassScore` is already set to `60`. Alice scored `83`. Calculate how many points above the minimum she scored (`83 - 60 = 23`) and print the result.",
-    "hint": "margin := aliceScore - minPassScore — then print margin.",
-    "starter": "package main\n\nimport \"fmt\"\n\nconst minPassScore = 60\n\nfunc main() {\n\taliceScore := 83\n\t// TODO: calculate how many points above minPassScore Alice scored\n\t// TODO: print the result (should be 23)\n\t_ = aliceScore\n}",
-    "expectedOutput": ["23"]
+    "title": "Your complete profile",
+    "instruction": "Alright, let's put everything together. You've now met all four data types:\n\n- string  — text, in double quotes\n- int     — whole numbers, no quotes\n- float64 — decimal numbers, no quotes\n- bool    — true or false, no quotes\n\nCreate all four from scratch with your own values and print each one. Here's what the output should roughly look like:\n\n    Jordan\n    27\n    3.75\n    true\n\nUse your own name, age, a GPA (make one up if you want), and whether you're a student.",
+    "hint": "You need four := lines and four Println calls. One for each type. Check the reading material if you need a reminder on the syntax.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\t// TODO: create name (string)\n\t// TODO: create age (int)\n\t// TODO: create gpa (float64)\n\t// TODO: create isStudent (bool)\n\t// TODO: print all four\n}",
+    "expectedOutput": [],
+    "codeChecks": [
+      { "pattern": ":=\\s*\"", "required": true, "message": "Create a string variable — it should have double quotes around the value." },
+      { "pattern": ":=\\s*\\d+\\.", "required": true, "message": "Create a float64 variable — it should be a number with a decimal point like 3.75." },
+      { "pattern": ":=\\s*(true|false)", "required": true, "message": "Create a bool variable — set it to true or false (no quotes)." },
+      { "pattern": "Println", "required": true, "message": "Print your variables using fmt.Println." },
+      { "pattern": "TODO", "required": false, "message": "Replace all the TODO comments with your actual code." }
+    ]
   }
 ]

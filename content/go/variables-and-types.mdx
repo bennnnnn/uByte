@@ -1,40 +1,15 @@
 ---
-title: "Variables & Types"
-description: "Store student information with variables — the labeled boxes that hold your data."
+title: "Variables & Data Types"
+description: "Store information in your programs — names, numbers, prices, yes/no answers. Everything your program needs to remember."
 order: 2
 difficulty: "beginner"
-estimatedMinutes: 14
-concepts: ["var", ":=", "string", "int", "float64", "bool", "zero values", "type conversion", "const"]
+estimatedMinutes: 15
+concepts: [":=", "string", "int", "float64", "bool", "printing variables", "updating variables"]
 ---
 
-## Variables Are Labeled Boxes
+## You just hit a problem
 
-Imagine a row of boxes on a shelf. Each box has a label (the variable name) and contains something (the value). Before you can use a box, you have to create it and tell Go what kind of thing it will hold — that's the **type**.
-
-```
-┌─────────┐   ┌─────────┐   ┌─────────┐
-│  Alice  │   │   17    │   │   3.8   │
-│  name   │   │   age   │   │   gpa   │
-└─────────┘   └─────────┘   └─────────┘
-  string          int          float64
-```
-
----
-
-## Declaring Variables
-
-### The explicit way: `var`
-
-```go
-var name string = "Alice"
-var age int = 17
-```
-
-This is crystal clear: the variable is named `name`, it holds a `string`, and the value is `"Alice"`.
-
-### The short way: `:=`
-
-Inside a function, `:=` does the same thing in one step — Go figures out the type from the value:
+In Chapter 1, you printed your name like this:
 
 ```gorun
 package main
@@ -42,28 +17,135 @@ package main
 import "fmt"
 
 func main() {
-    name := "Alice"   // Go infers: string
-    age  := 17        // Go infers: int
-    gpa  := 3.8       // Go infers: float64
+    fmt.Println("Alex")
+}
+```
 
+That works fine. But what if you needed to use your name in 10 different places in your program? You'd have to type "Alex" 10 separate times. And the moment you want to change it, you'd have to hunt down all 10 places and update each one.
+
+There has to be a better way. And there is. It's called a variable.
+
+---
+
+## What is a variable?
+
+Think about the contacts app on your phone. You don't memorize your mom's phone number — you store it under the name "Mom". Whenever you want to call her, you just look up "Mom" and the phone fills in the number for you.
+
+A variable is exactly that. It's a name you give to a piece of information so you can use it later without remembering the actual value. You give it a name, you put a value in it, and from that point on you can use the name anywhere you need the value.
+
+In Go, creating a variable looks like this:
+
+```go
+name := "Alex"
+```
+
+That's it. Three things happening here:
+
+- name is what you're calling it (you pick this)
+- := is Go's way of saying "create this variable and put this value in it"
+- "Alex" is the value going into it
+
+From this point on, anywhere you write name in your program, Go replaces it with "Alex".
+
+---
+
+## Printing a variable
+
+Remember fmt.Println from Chapter 1? It works exactly the same way with variables. Instead of putting the text directly inside the parentheses, you put the variable name:
+
+```gorun
+package main
+
+import "fmt"
+
+func main() {
+    name := "Alex"
     fmt.Println(name)
+}
+```
+
+Run that. You'll see Alex printed. Not the word "name" — the value stored inside it. That's the whole point.
+
+---
+
+## The four types of data
+
+Every variable in Go holds a specific type of data. Go needs to know what kind of information is going in so it can handle it properly. There are four types you'll use constantly:
+
+---
+
+### Strings — text
+
+A string is any text: names, sentences, email addresses, usernames. You wrap it in double quotes.
+
+```gorun
+package main
+
+import "fmt"
+
+func main() {
+    firstName := "Alex"
+    city := "New York"
+    fmt.Println(firstName)
+    fmt.Println(city)
+}
+```
+
+The name "string" comes from the idea of characters strung together in a line. Every character in "Alex" is one bead on a string: A, l, e, x.
+
+---
+
+### Integers — whole numbers
+
+An int holds whole numbers. Ages, scores, counts, years. No decimal point — just a plain number.
+
+```gorun
+package main
+
+import "fmt"
+
+func main() {
+    age := 24
+    score := 87
+    year := 2025
     fmt.Println(age)
+    fmt.Println(score)
+    fmt.Println(year)
+}
+```
+
+Notice there are no quotes around numbers. Quotes mean text. 24 is a number. "24" is the characters 2 and 4 as text — completely different things in Go's eyes.
+
+---
+
+### Float64 — numbers with decimals
+
+When you need a decimal point — prices, temperatures, GPAs, percentages — you use float64.
+
+```gorun
+package main
+
+import "fmt"
+
+func main() {
+    price := 9.99
+    temperature := 98.6
+    gpa := 3.7
+    fmt.Println(price)
+    fmt.Println(temperature)
     fmt.Println(gpa)
 }
 ```
 
-`:=` is by far the most common form — you'll use it constantly throughout this course.
+Go will figure out it's a float64 automatically whenever you write a number with a decimal point. You don't have to say float64 yourself.
 
 ---
 
-## The Four Basic Types
+### Booleans — yes or no
 
-| Type | What it holds | Example |
-|------|--------------|---------|
-| `string` | text | `"Alice"` |
-| `int` | whole numbers | `17`, `0`, `-5` |
-| `float64` | decimal numbers | `3.8`, `9.99` |
-| `bool` | true or false | `true`, `false` |
+A bool can only ever be one of two values: true or false. That's it. No maybe. No sometimes. Just true or false.
+
+This sounds too simple to be useful, but booleans end up being everywhere. Is this user logged in? Is the payment complete? Does the student have an active enrollment?
 
 ```gorun
 package main
@@ -71,27 +153,23 @@ package main
 import "fmt"
 
 func main() {
-    name     := "Alice"   // string
-    age      := 17        // int
-    gpa      := 3.8       // float64
-    enrolled := true      // bool
-
-    fmt.Println(name, age, gpa, enrolled)
+    isLoggedIn := true
+    paymentDone := false
+    fmt.Println(isLoggedIn)
+    fmt.Println(paymentDone)
 }
 ```
 
 ---
 
-## Zero Values — Go Never Leaves a Box Empty
+## Updating a variable
 
-What happens if you create a variable but don't put anything in it? Go fills it with a safe **zero value** automatically:
+The word "variable" literally means something that can vary — that can change. So yes, you can change the value inside a variable after you create it.
 
-| Type | Zero value |
-|------|-----------|
-| `int` | `0` |
-| `float64` | `0` |
-| `string` | `""` (empty string) |
-| `bool` | `false` |
+The key difference:
+
+- := creates a new variable (use this the first time)
+- = updates an existing one (use this every time after)
 
 ```gorun
 package main
@@ -99,23 +177,26 @@ package main
 import "fmt"
 
 func main() {
-    var score int
-    var comment string
-    var active bool
+    score := 70
+    fmt.Println(score)
 
-    fmt.Println(score)    // 0
-    fmt.Println(comment)  // (blank line)
-    fmt.Println(active)   // false
+    score = 85
+    fmt.Println(score)
+
+    score = score + 10
+    fmt.Println(score)
 }
 ```
 
-This matters — if you forget to set a value, you get a predictable result, not a crash.
+Run that. You'll see 70, then 85, then 95. The same variable, updated three times.
+
+A common mistake is using := when you mean =. If you do score := 85 a second time, Go will complain that you're trying to create a variable that already exists. Just use = for updates.
 
 ---
 
-## Updating Variables
+## Using multiple variables together
 
-Variables can change. That's the whole point of a *variable*:
+Programs almost always work with several pieces of information at the same time. You can create as many variables as you need and use them all together:
 
 ```gorun
 package main
@@ -123,52 +204,22 @@ package main
 import "fmt"
 
 func main() {
-    score := 78
-    fmt.Println(score)  // 78
+    name := "Alex"
+    age := 24
+    score := 87.5
+    passed := true
 
-    score = score + 5   // bonus points
-    fmt.Println(score)  // 83
-
-    score += 2          // shorthand for score = score + 2
-    fmt.Println(score)  // 85
+    fmt.Println(name)
+    fmt.Println(age)
+    fmt.Println(score)
+    fmt.Println(passed)
 }
 ```
 
-Note: updating uses `=` (single equals), not `:=`. The `:=` is only for the *first time* a variable is created.
+Each variable has its own name, its own type, and its own value — completely independent from the others.
 
 ---
 
-## Type Conversion — Explicit, Always
+## What's next
 
-Go **never converts types automatically**. If you need a `float64` as an `int`, you must say so explicitly:
-
-```gorun
-package main
-
-import "fmt"
-
-func main() {
-    gpa := 3.8
-    intGpa := int(gpa)  // decimal part is truncated, not rounded
-    fmt.Println(intGpa) // 3
-}
-```
-
----
-
-## Constants — Values That Must Never Change
-
-Some values should be fixed for the lifetime of the program: the minimum passing score, the school name, the maximum GPA. Use `const` for these:
-
-```go
-const minPassScore = 60
-const schoolName = "Riverside Academy"
-```
-
-If you try to change a `const` later, Go will refuse to compile. That's a feature — it protects you from accidents.
-
----
-
-## What's Next
-
-You now have all the data for a student — name, age, GPA, score, enrollment status. In **Chapter 3: fmt Package**, you'll learn how to display all of that information in a clean, professional format.
+You can now store information in your programs. But right now everything prints on separate lines in a basic format. In Chapter 3 you'll learn how to combine variables into proper sentences and control exactly how they look when they print — like "Name: Alex, Age: 24, Score: 87.5" all on one line.
