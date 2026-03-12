@@ -35,6 +35,12 @@ export const POST = withErrorHandling("POST /api/code-snapshots", async (request
   if (!slug || typeof stepIndex !== "number" || !code) {
     return NextResponse.json({ error: "Invalid payload" }, { status: 400 });
   }
+  if (typeof code === "string" && code.length > 64 * 1024) {
+    return NextResponse.json({ error: "Code exceeds maximum length" }, { status: 400 });
+  }
+  if (!/^[a-z0-9][a-z0-9-]*$/.test(slug)) {
+    return NextResponse.json({ error: "Invalid slug" }, { status: 400 });
+  }
 
   await saveSnapshot(user.userId, slug, stepIndex, code, typeof lang === "string" ? lang : "go");
   return NextResponse.json({ ok: true });

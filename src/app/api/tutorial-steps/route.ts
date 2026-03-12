@@ -20,6 +20,9 @@ export const GET = withErrorHandling("GET /api/tutorial-steps", async (request: 
   if (!isSupportedLanguage(lang)) {
     return NextResponse.json({ error: "Unsupported language" }, { status: 400 });
   }
+  if (!/^[a-z0-9][a-z0-9-]*$/.test(slug)) {
+    return NextResponse.json({ error: "Invalid slug" }, { status: 400 });
+  }
 
   const tutorial = getTutorialBySlug(slug, lang as SupportedLanguage);
   if (tutorial && tutorial.order > FREE_TUTORIAL_LIMIT) {

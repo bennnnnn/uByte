@@ -21,11 +21,20 @@ function checkOutput(output: string, expected: string[]): boolean {
   return expected.every((s) => lower.includes(s.toLowerCase()));
 }
 
+/**
+ * TODO comment pattern — matches all common single-line comment styles:
+ *   // TODO   (C-family, Go, Java, Rust, JS/TS, Swift, Kotlin, C#)
+ *   #  TODO   (Python, Ruby, Shell, YAML)
+ *   -- TODO   (SQL, Lua, Haskell)
+ *   /* TODO   (block comment opener used as a line comment)
+ */
+const TODO_LINE_RE = /^\s*(\/\/|#|--|\/\*)\s*TODO\b/;
+
 /** Strip TODO comment lines and collapse whitespace — used for meaningful-change detection. */
 function normCode(code: string): string {
   return code
     .split("\n")
-    .filter((line) => !/^\s*(\/\/|#)\s*TODO\b/.test(line))
+    .filter((line) => !TODO_LINE_RE.test(line))
     .join("\n")
     .replace(/\s+/g, " ")
     .trim();
@@ -37,15 +46,32 @@ function normCode(code: string): string {
  * Catches both "left the TODO in" and "just deleted the TODO line" cases.
  */
 function todoNotCompleted(code: string, starter: string): boolean {
-  if (!/^\s*(\/\/|#)\s*TODO\b/m.test(starter)) return false; // starter had no TODOs
+  // Check all supported comment styles in the starter
+  if (!TODO_LINE_RE.test(starter)) return false;
   return normCode(code) === normCode(starter);
+}
+
+/**
+ * Run a single regex against user code with a hard character limit to prevent
+ * ReDoS attacks from pathological patterns on large inputs.
+ */
+const MAX_CHECK_INPUT = 8_000; // chars — beyond this, truncate before testing
+
+function safeRegexTest(pattern: string, flags: string, input: string): boolean {
+  try {
+    const safeInput = input.length > MAX_CHECK_INPUT ? input.slice(0, MAX_CHECK_INPUT) : input;
+    return new RegExp(pattern, flags).test(safeInput);
+  } catch {
+    // Invalid regex in steps.json — treat as not matching
+    return false;
+  }
 }
 
 /** Validate per-step code rules. Returns the first failing message, or null. */
 function runCodeChecks(code: string, checks: CodeCheck[] | undefined): string | null {
   if (!checks?.length) return null;
   for (const { pattern, flags = "im", required = true, message } of checks) {
-    const matches = new RegExp(pattern, flags).test(code);
+    const matches = safeRegexTest(pattern, flags, code);
     if (required && !matches) return message;
     if (!required && matches) return message;
   }

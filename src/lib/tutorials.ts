@@ -54,6 +54,13 @@ function getContentDir(lang: SupportedLanguage): string {
   return path.join(process.cwd(), config.contentDir);
 }
 
+/** Only allow slugs that are safe filesystem names — no path traversal. */
+const SAFE_SLUG_RE = /^[a-z0-9][a-z0-9-]*$/;
+
+function isSafeSlug(slug: string): boolean {
+  return SAFE_SLUG_RE.test(slug) && !slug.includes("..");
+}
+
 export function getAllTutorials(lang: SupportedLanguage = "go"): TutorialMeta[] {
   const cacheKey = lang;
   const hit = _allCache.get(cacheKey);
@@ -90,12 +97,18 @@ export function getTutorialBySlug(
   slug: string,
   lang: SupportedLanguage = "go"
 ): Tutorial | null {
+  // Guard against path traversal attacks via crafted slug values.
+  if (!isSafeSlug(slug)) return null;
+
   const cacheKey = `${lang}:${slug}`;
   const hit = _slugCache.get(cacheKey);
   if (hit && Date.now() - hit.ts < CACHE_TTL) return hit.data;
 
   const contentDir = getContentDir(lang);
   const filePath = path.join(contentDir, `${slug}.mdx`);
+
+  // Defence in depth: confirm resolved path stays inside contentDir.
+  if (!filePath.startsWith(contentDir + path.sep)) return null;
 
   if (!fs.existsSync(filePath)) {
     _slugCache.set(cacheKey, { data: null, ts: Date.now() });
