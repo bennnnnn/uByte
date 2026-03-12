@@ -175,6 +175,25 @@ export default function LeaderboardPage() {
           </ul>
         )}
       </div>
+
+      {/* "Not on the list" nudge — shown when user is logged in but not in the top results.
+          Helps new users understand how to appear here instead of wondering why they're absent. */}
+      {user && users.length > 0 && !users.some((u) => u.id === user.id) && (
+        <div className="mt-4 rounded-xl border border-dashed border-zinc-200 px-5 py-4 text-center dark:border-zinc-700">
+          <p className="text-sm font-medium text-zinc-600 dark:text-zinc-400">
+            You&apos;re not on the leaderboard yet.
+          </p>
+          <p className="mt-0.5 text-xs text-zinc-400 dark:text-zinc-500">
+            Complete tutorials and solve problems to earn XP and appear here.
+          </p>
+          <Link
+            href="/tutorial/go"
+            className="mt-3 inline-flex items-center gap-1.5 rounded-lg bg-indigo-600 px-4 py-2 text-xs font-semibold text-white transition-colors hover:bg-indigo-500"
+          >
+            Start earning XP →
+          </Link>
+        </div>
+      )}
     </div>
   );
 }

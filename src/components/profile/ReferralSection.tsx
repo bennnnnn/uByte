@@ -67,6 +67,13 @@ export default function ReferralSection() {
         </div>
       </div>
 
+      {/* Zero-state hint — shown once data has loaded and no one has used the link yet */}
+      {data && data.signups === 0 && (
+        <p className="mb-3 rounded-lg bg-indigo-50 px-3 py-2 text-xs text-indigo-700 dark:bg-indigo-950/40 dark:text-indigo-300">
+          Share your link below to get started. You earn one free Pro month for every friend who subscribes.
+        </p>
+      )}
+
       {/* Invite link */}
       {data ? (
         <div className="flex items-center gap-2 rounded-xl border border-zinc-200 bg-zinc-50 px-3 py-2 dark:border-zinc-700 dark:bg-zinc-800/60">
