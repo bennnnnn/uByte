@@ -1,51 +1,149 @@
 [
   {
-    "title": "The Fixed Classroom — Your First Array",
-    "instruction": "In Chapter 5, you used loops to process scores. But where were those scores *stored*? It's time to talk about **arrays**.\n\nAn array is like a **classroom with a fixed number of seats**. You decide the size when you create it, and it never changes. A classroom with 5 seats:\n\n```go\nvar seats [5]string\n```\n\nThis creates 5 empty string slots. Declare an array `seats` of 5 strings and print it — you'll see the zero values (empty strings).",
-    "hint": "var seats [5]string — then fmt.Println(seats). You'll see [    ] since strings start as empty.",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\t// TODO: declare seats as an array of 5 strings\n\t// TODO: print seats\n}",
-    "expectedOutput": ["[    ]"]
+    "title": "What is an array",
+    "instruction": "Imagine a parking lot with exactly 5 numbered spots: 0, 1, 2, 3, 4.\n\nEvery spot holds exactly one car. The number of spots never changes. All spots are the same size.\n\nAn array is that parking lot — a fixed number of slots, all the same type, each with a number.\n\nRun this and see five slots, all starting at zero.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tvar scores [5]int\n\tfmt.Println(scores)\n}",
+    "expectedOutput": ["[0 0 0 0 0]"],
+    "successMessage": "Five slots, all zero. Go fills every slot with the zero value of the type when you declare an array without values."
   },
   {
-    "title": "Assign Students to Seats",
-    "instruction": "Array **indices start at 0**, not 1. The first seat is `seats[0]`, the second is `seats[1]`, and so on.\n\nAssign these students to the classroom:\n- Seat 0: `\"Alice\"`\n- Seat 1: `\"Bob\"`\n- Seat 2: `\"Carol\"`\n- Seat 3: `\"David\"`\n- Seat 4: `\"Eve\"`\n\nThen print the whole array.",
-    "hint": "seats[0] = \"Alice\" — repeat for each seat, then fmt.Println(seats).",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tvar seats [5]string\n\t// TODO: assign Alice, Bob, Carol, David, Eve to seats 0-4\n\tfmt.Println(seats)\n}",
-    "expectedOutput": ["[Alice Bob Carol David Eve]"]
+    "title": "Declare an array with values",
+    "instruction": "You can fill an array with values right when you create it.\n\n`names := [3]string{\"Alex\", \"Sam\", \"Jordan\"}`\n\nThe number in brackets is the size. It must match exactly how many values you provide.\n\nChange the three names to your own choices and run it.",
+    "hint": "Replace the three names inside the curly braces with your own. Keep the size [3] and the quotes.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tnames := [3]string{\"Alex\", \"Sam\", \"Jordan\"}\n\tfmt.Println(names)\n}",
+    "expectedOutput": [],
+    "codeChecks": [
+      { "pattern": "\\[3\\]string\\{\"[^\"]+\",\\s*\"[^\"]+\",\\s*\"[^\"]+\"\\}", "required": true, "message": "Keep the [3]string format and provide three string values in curly braces." },
+      { "pattern": "\"Alex\"", "required": false, "message": "Change the names to your own choices." }
+    ],
+    "successMessage": "Size in brackets. Type after. Values inside curly braces. That is the full declaration syntax."
   },
   {
-    "title": "Who's First? Who's Last?",
-    "instruction": "You can access any individual seat using its index. The first seat is `seats[0]`. The last seat (in a 5-element array) is `seats[4]` — or more robustly, `seats[len(seats)-1]`.\n\nPrint the **first** student, then the **last** student on separate lines.",
-    "hint": "fmt.Println(seats[0]) for the first. fmt.Println(seats[len(seats)-1]) for the last.",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tseats := [5]string{\"Alice\", \"Bob\", \"Carol\", \"David\", \"Eve\"}\n\t// TODO: print the first student\n\t// TODO: print the last student\n}",
-    "expectedOutput": ["Alice", "Eve"]
+    "title": "Access by index",
+    "instruction": "Array slots are numbered starting at 0 — not 1.\n\nSo for an array of size 3:\n- `names[0]` is the first item\n- `names[1]` is the second\n- `names[2]` is the third — the last one\n\nThis trips up almost everyone at first. There is no slot 3 in a 3-item array.\n\nPrint each name on its own line using its index.",
+    "hint": "fmt.Println(names[0]), fmt.Println(names[1]), fmt.Println(names[2])  — three separate lines.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tnames := [3]string{\"Alex\", \"Sam\", \"Jordan\"}\n\t// TODO: print each name using its index\n}",
+    "expectedOutput": ["Alex", "Sam", "Jordan"],
+    "codeChecks": [
+      { "pattern": "names\\[0\\]", "required": true, "message": "Access the first element with names[0]" },
+      { "pattern": "names\\[1\\]", "required": true, "message": "Access the second element with names[1]" },
+      { "pattern": "names\\[2\\]", "required": true, "message": "Access the third element with names[2]" },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
+    ],
+    "successMessage": "Indexes start at 0. Always. In every programming language. You will get used to it."
   },
   {
-    "title": "Print Every Student",
-    "instruction": "Use the loop skills from Chapter 5 to print every student in the classroom — one per line. Loop from index `0` to `len(seats)-1`.",
-    "hint": "for i := 0; i < len(seats); i++ { fmt.Println(seats[i]) }",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tseats := [5]string{\"Alice\", \"Bob\", \"Carol\", \"David\", \"Eve\"}\n\t// TODO: loop through seats and print each student\n}",
-    "expectedOutput": ["Alice", "Bob", "Carol", "David", "Eve"]
+    "title": "Update a value",
+    "instruction": "You can change any slot after the array is created. Use the same index syntax — but with `=` instead of just reading.\n\n`scores[2] = 99`\n\nThis program prints the scores before and after an update. Change slot `[1]` from its current value to `88` and run it.",
+    "hint": "scores[1] = 88  — add this line between the two Println calls.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tscores := [4]int{70, 65, 80, 90}\n\tfmt.Println(scores)\n\t// TODO: change scores[1] to 88\n\tfmt.Println(scores)\n}",
+    "expectedOutput": ["[70 65 80 90]", "[70 88 80 90]"],
+    "codeChecks": [
+      { "pattern": "scores\\[1\\]\\s*=\\s*88", "required": true, "message": "Update slot 1: scores[1] = 88" },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your assignment." }
+    ],
+    "successMessage": "Read with brackets. Write with brackets and equals. The slot changes, everything else stays."
   },
   {
-    "title": "Total the Exam Scores",
-    "instruction": "Each of the 5 students has an exam score. Sum all the scores and print the total.\n\nThis combines your loop skills (Chapter 5) with array indexing — a very common pattern you'll use constantly.",
-    "hint": "sum := 0. Then loop: sum += scores[i]. Print sum after the loop.",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tscores := [5]int{72, 88, 65, 91, 54}\n\tsum := 0\n\t// TODO: loop through scores and add each to sum\n\tfmt.Println(sum)\n}",
-    "expectedOutput": ["370"]
+    "title": "The length of an array",
+    "instruction": "`len()` tells you how many slots an array has.\n\nThis sounds obvious when you wrote the array yourself. But it matters when you are working with arrays you did not create — coming from a function, a file, a database.\n\nRun this. Then add a line that prints the length of the `names` array.",
+    "hint": "fmt.Println(len(names))  — len() works on any array.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tscores := [5]int{10, 20, 30, 40, 50}\n\tnames  := [3]string{\"Alex\", \"Sam\", \"Jordan\"}\n\tfmt.Println(len(scores))\n\t// TODO: print the length of names\n}",
+    "expectedOutput": ["5", "3"],
+    "codeChecks": [
+      { "pattern": "len\\(names\\)", "required": true, "message": "Use len(names) to get the length of the names array." },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your Println." }
+    ],
+    "successMessage": "len() is how you ask an array how big it is. You will use this constantly — especially inside loops."
   },
   {
-    "title": "Who Sits Here? — Searching an Array",
-    "instruction": "The principal asks: \"Is Carol in the classroom?\" Loop through `seats` and print `\"Found Carol\"` if her name appears, or `\"Carol not found\"` if it doesn't. Use the `break` from Chapter 5 to stop once you find her.",
-    "hint": "Loop and check if seats[i] == \"Carol\". If found, print \"Found Carol\" and break. After the loop, if never found, print \"Carol not found\".",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tseats := [5]string{\"Alice\", \"Bob\", \"Carol\", \"David\", \"Eve\"}\n\tfound := false\n\tfor i := 0; i < len(seats); i++ {\n\t\t// TODO: if seats[i] == \"Carol\", set found to true and break\n\t}\n\tif found {\n\t\tfmt.Println(\"Found Carol\")\n\t} else {\n\t\tfmt.Println(\"Carol not found\")\n\t}\n}",
-    "expectedOutput": ["Found Carol"]
+    "title": "Loop through an array",
+    "instruction": "Now loops and arrays click together.\n\nInstead of printing `scores[0]`, `scores[1]`, `scores[2]`... one by one, use a loop with `len()` to print every element automatically — no matter how big the array gets.\n\nAdd the loop to print all five scores.",
+    "hint": "for i := 0; i < len(scores); i++ { fmt.Println(scores[i]) }",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tscores := [5]int{82, 91, 74, 88, 95}\n\t// TODO: loop through scores and print each one\n}",
+    "expectedOutput": ["82", "91", "74", "88", "95"],
+    "codeChecks": [
+      { "pattern": "for\\s+i\\s*:=\\s*0", "required": true, "message": "Start your loop at i := 0 since arrays are zero-indexed." },
+      { "pattern": "len\\(scores\\)", "required": true, "message": "Use len(scores) as the loop condition." },
+      { "pattern": "scores\\[i\\]", "required": true, "message": "Access each element using scores[i] inside the loop." },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your loop." }
+    ],
+    "successMessage": "One loop, any size. This pattern — loop from 0 to len — is one of the most common things you will write in Go."
   },
   {
-    "title": "Swap Two Seats",
-    "instruction": "Bob and David want to swap seats. To swap two values in an array, you need a **temporary variable** to hold one value while you move the other:\n\n```\ntemp = a\na = b\nb = temp\n```\n\nSwap seats 1 (Bob) and 3 (David), then print the whole array.",
-    "hint": "temp := seats[1]; seats[1] = seats[3]; seats[3] = temp — then fmt.Println(seats).",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tseats := [5]string{\"Alice\", \"Bob\", \"Carol\", \"David\", \"Eve\"}\n\t// TODO: swap seats[1] and seats[3] using a temp variable\n\tfmt.Println(seats)\n}",
-    "expectedOutput": ["[Alice David Carol Bob Eve]"]
+    "title": "range — the cleaner loop",
+    "instruction": "`for i, v := range array` is a cleaner way to loop.\n\n- `i` is the index (0, 1, 2...)\n- `v` is the value at that index\n\nNo manual counter. No `len()`. Go handles it.\n\nChange the existing loop to use `range` instead.",
+    "hint": "for i, v := range names { fmt.Println(i, v) }  — replace the entire for loop.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tnames := [4]string{\"Alex\", \"Sam\", \"Jordan\", \"Casey\"}\n\tfor i := 0; i < len(names); i++ {\n\t\tfmt.Println(i, names[i])\n\t}\n}",
+    "expectedOutput": ["0 Alex", "1 Sam", "2 Jordan", "3 Casey"],
+    "codeChecks": [
+      { "pattern": "range\\s+names", "required": true, "message": "Use range to loop: for i, v := range names" },
+      { "pattern": "for\\s+i\\s*:=\\s*0", "required": false, "message": "Replace the old loop with a range loop." }
+    ],
+    "successMessage": "range gives you the index and value in one shot. Cleaner, less error-prone, more Go-like."
+  },
+  {
+    "title": "The blank identifier _",
+    "instruction": "Sometimes you only want the value from `range`, not the index.\n\nBut Go requires you to use every variable you declare. If you declare `i` and never use it, Go refuses to compile.\n\nThe fix: use `_` (blank identifier) in place of the index. It tells Go: I know this exists, I am intentionally ignoring it.\n\n`for _, v := range names`\n\nChange the loop to use `_` and only print the names without the index number.",
+    "hint": "for _, name := range names { fmt.Println(name) }  — _ discards the index.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tnames := [4]string{\"Alex\", \"Sam\", \"Jordan\", \"Casey\"}\n\tfor i, v := range names {\n\t\tfmt.Println(i, v)\n\t}\n}",
+    "expectedOutput": ["Alex", "Sam", "Jordan", "Casey"],
+    "codeChecks": [
+      { "pattern": "_,", "required": true, "message": "Use _ to discard the index: for _, v := range names" },
+      { "pattern": "Println\\(i,", "required": false, "message": "Remove the index from the Println — only print the value." }
+    ],
+    "successMessage": "_ is Go's way of saying: I know there is something here, I just do not need it. You will see it everywhere."
+  },
+  {
+    "title": "Multi-dimensional array",
+    "instruction": "An array can hold other arrays. This creates a grid — rows and columns.\n\n`var grid [3][3]int` is a 3x3 grid of integers.\n\nAccess a cell with two indexes: `grid[row][column]`\n\nRun this. Then change the value at row 1, column 2 to `99`.",
+    "hint": "grid[1][2] = 99  — add this line before the loop.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tgrid := [3][3]int{\n\t\t{1, 2, 3},\n\t\t{4, 5, 6},\n\t\t{7, 8, 9},\n\t}\n\t// TODO: change grid[1][2] to 99\n\tfor _, row := range grid {\n\t\tfmt.Println(row)\n\t}\n}",
+    "expectedOutput": ["[1 2 3]", "[4 5 99]", "[7 8 9]"],
+    "codeChecks": [
+      { "pattern": "grid\\[1\\]\\[2\\]\\s*=\\s*99", "required": true, "message": "Set grid[1][2] = 99 before the loop." },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your assignment." }
+    ],
+    "successMessage": "Row first, column second. grid[1][2] is row 1, column 2. Spreadsheets, game boards, image pixels — all multi-dimensional arrays."
+  },
+  {
+    "title": "Arrays are fixed size",
+    "instruction": "This is the one big limitation of arrays: the size is set when you create them and cannot change.\n\nThis program tries to create an array with 3 slots but give it 5 values.\n\nRun it. Read the error. Then fix it by either changing the size to 5 or removing the extra values.",
+    "hint": "Change [3]string to [5]string to fit all five names.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tnames := [3]string{\"Alex\", \"Sam\", \"Jordan\", \"Casey\", \"River\"}\n\tfmt.Println(names)\n}",
+    "expectedOutput": ["[Alex Sam Jordan Casey River]"],
+    "codeChecks": [
+      { "pattern": "\\[5\\]string", "required": true, "message": "Change [3]string to [5]string to fit all five values." }
+    ],
+    "successMessage": "You cannot stretch an array. That rigidness is a feature — it guarantees the size is always known. When you need a list that can grow, that is what slices are for. Next chapter."
+  },
+  {
+    "title": "Find the largest value",
+    "instruction": "A classic loop pattern: go through every element and keep track of the largest one seen so far.\n\nStart by assuming the first element is the largest. Then check each subsequent element — if it is bigger, update your record.\n\nAdd the loop to find and print the highest score.",
+    "hint": "Start with largest := scores[0]. Then loop from index 1. If scores[i] > largest, update largest. Print largest after the loop.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tscores := [6]int{72, 88, 95, 61, 79, 91}\n\t// TODO: find and print the largest score\n}",
+    "expectedOutput": ["95"],
+    "codeChecks": [
+      { "pattern": "largest\\s*:=\\s*scores\\[0\\]", "required": true, "message": "Start with largest := scores[0] as your initial best guess." },
+      { "pattern": "scores\\[i\\]\\s*>\\s*largest|largest\\s*<\\s*scores\\[i\\]", "required": true, "message": "Compare each element: if scores[i] > largest, update largest." },
+      { "pattern": "Println\\(largest\\)", "required": true, "message": "Print largest after the loop ends." },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your loop." }
+    ],
+    "successMessage": "Scanning for a max value is one of the most common things programs do. Search engines, leaderboards, analytics — all built on this pattern."
+  },
+  {
+    "title": "Build a leaderboard",
+    "instruction": "No starter code.\n\nCreate two arrays of size 5:\n- `players` — five player names (strings)\n- `scores`  — five scores (ints)\n\nThen loop through both at the same time using the index, and print each line as:\n`\"1. Alex - 95\"`\n\nThe number at the start is the rank (index + 1).",
+    "hint": "for i := 0; i < len(players); i++ { fmt.Printf(\"%d. %s - %d\\n\", i+1, players[i], scores[i]) }",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\t// Create players and scores arrays here\n\t// Then loop and print the leaderboard\n}",
+    "expectedOutput": [],
+    "codeChecks": [
+      { "pattern": "\\[5\\]string", "required": true, "message": "Create a players array of type [5]string." },
+      { "pattern": "\\[5\\]int", "required": true, "message": "Create a scores array of type [5]int." },
+      { "pattern": "players\\[i\\]", "required": true, "message": "Access player names using players[i] inside the loop." },
+      { "pattern": "scores\\[i\\]", "required": true, "message": "Access scores using scores[i] inside the loop." },
+      { "pattern": "i\\s*\\+\\s*1", "required": true, "message": "Use i+1 for the rank number so it starts at 1 not 0." }
+    ],
+    "successMessage": "A leaderboard from scratch. Two arrays, one loop, formatted output. That is a real feature in a real app."
   }
 ]

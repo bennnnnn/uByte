@@ -1,158 +1,18 @@
 ---
 title: "Arrays"
-description: "Store a fixed list of students — like a classroom where every seat is numbered and the count never changes."
+description: "Store multiple values in one variable. Fixed size, same type, numbered from zero."
 order: 7
 difficulty: "beginner"
-estimatedMinutes: 12
-concepts: ["array declaration", "indexing", "len", "zero values", "array literal", "looping arrays", "swap"]
+estimatedMinutes: 18
+concepts: ["array declaration", "index", "len", "for loop with array", "range", "blank identifier", "multi-dimensional array"]
 ---
 
-## A Fixed Number of Seats
+## One variable, many values
 
-Imagine a physical classroom. It has 30 chairs bolted to the floor. You can put different students in those chairs, but you can't add a 31st chair or remove one. The count is fixed.
+So far every variable has held exactly one value. One name. One score. One age.
 
-That's exactly what a Go array is: a **fixed-size, ordered collection** of values of the same type. You choose the size when you create it, and it never changes.
+But what if you have five scores? Ten names? A hundred items?
 
-```go
-var seats [5]string   // 5 seats, all empty strings to start
-```
+You could create a hundred separate variables. Or you could use an array — one variable that holds many values, all in a row, all the same type.
 
----
-
-## Creating Arrays
-
-**With zero values** (Go fills in the defaults):
-
-```go
-var scores [5]int     // [0 0 0 0 0]
-var names  [3]string  // [  ]  (three empty strings)
-```
-
-**With values already in it** (array literal):
-
-```gorun
-package main
-
-import "fmt"
-
-func main() {
-    seats := [5]string{"Alice", "Bob", "Carol", "David", "Eve"}
-    scores := [5]int{72, 88, 65, 91, 54}
-
-    fmt.Println(seats)
-    fmt.Println(scores)
-}
-```
-
----
-
-## Accessing Elements by Index
-
-Array indices start at **0**, not 1. In a 5-element array:
-
-```
-Index:  0        1      2       3       4
-       Alice    Bob    Carol   David   Eve
-```
-
-```gorun
-package main
-
-import "fmt"
-
-func main() {
-    seats := [5]string{"Alice", "Bob", "Carol", "David", "Eve"}
-
-    fmt.Println(seats[0])              // Alice  — first seat
-    fmt.Println(seats[4])              // Eve    — last seat (index = length - 1)
-    fmt.Println(seats[len(seats)-1])   // Eve    — safer way to get the last element
-}
-```
-
-Using `len(seats)-1` for the last element is safer than hardcoding `4` — if the array size ever changes, the code still works.
-
----
-
-## Updating Elements
-
-```gorun
-package main
-
-import "fmt"
-
-func main() {
-    seats := [5]string{"Alice", "Bob", "Carol", "David", "Eve"}
-
-    seats[2] = "Frank"  // Carol left; Frank takes seat 2
-    fmt.Println(seats)
-}
-```
-
----
-
-## Looping Through an Array
-
-Use the `for` loop from Chapter 5 to process every element:
-
-```gorun
-package main
-
-import "fmt"
-
-func main() {
-    scores := [5]int{72, 88, 65, 91, 54}
-    sum := 0
-
-    for i := 0; i < len(scores); i++ {
-        sum += scores[i]
-    }
-
-    fmt.Println("Total:", sum)
-    fmt.Println("Average:", sum/len(scores))
-}
-```
-
----
-
-## The Swap Pattern
-
-To swap two elements, you need a **temporary variable** — otherwise you'd overwrite the first value before saving it:
-
-```gorun
-package main
-
-import "fmt"
-
-func main() {
-    seats := [5]string{"Alice", "Bob", "Carol", "David", "Eve"}
-
-    // Swap Bob (index 1) and David (index 3)
-    temp := seats[1]
-    seats[1] = seats[3]
-    seats[3] = temp
-
-    fmt.Println(seats)  // [Alice David Carol Bob Eve]
-}
-```
-
----
-
-## The Limitation: Fixed Size
-
-Arrays are perfect when you know exactly how many items you'll have. But what if enrollment changes — a student joins mid-semester, or drops out?
-
-You can't do this with an array:
-
-```go
-// This won't work — [5]string is fixed at 5 forever
-var seats [5]string
-seats[5] = "Frank"  // PANIC: index out of range
-```
-
-**Chapter 7: Slices** solves exactly this problem with a collection type that can grow and shrink.
-
----
-
-## What's Next
-
-In **Chapter 7: Slices**, you'll meet Go's flexible, resizable list type. Slices are built *on top of* arrays but remove the fixed-size restriction — they're the collection type you'll use most often in real Go programs.
+Twelve steps.
