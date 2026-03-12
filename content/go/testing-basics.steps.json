@@ -1,53 +1,137 @@
 [
   {
-    "title": "Your First Test",
-    "instruction": "Implement add(a, b int) int to return a+b. Result 5 should print PASS.",
-    "hint": "return a + b",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc add(a, b int) int { return 0 }\n\nfunc main() {\n\tresult := add(2, 3)\n\tif result == 5 { fmt.Println(\"PASS: add(2, 3) = 5\") } else { fmt.Printf(\"FAIL: got %d\n\", result) }\n}",
-    "expectedOutput": [
-      "PASS"
-    ]
+    "title": "What is a test in Go",
+    "instruction": "In Go, a test is just a function with a specific signature:\n\n```\nfunc TestSomething(t *testing.T) {\n    // test code here\n}\n```\n\nRules:\n- File name must end in `_test.go`\n- Function name must start with `Test`\n- Takes one parameter: `t *testing.T`\n- Run all tests with: `go test ./...`\n\nRun this. It has one function being tested (`add`) and one test for it. Notice how `t.Errorf` reports a failure with a formatted message.",
+    "starter": "package main\n\nimport (\n\t\"fmt\"\n\t\"testing\"\n)\n\nfunc add(a, b int) int {\n\treturn a + b\n}\n\nfunc TestAdd(t *testing.T) {\n\tresult := add(2, 3)\n\tif result != 5 {\n\t\tt.Errorf(\"add(2, 3) = %d, want 5\", result)\n\t}\n\tfmt.Println(\"TestAdd passed\")\n}\n\nfunc main() {\n\tTestAdd(&testing.T{})\n}",
+    "expectedOutput": ["TestAdd passed"],
+    "successMessage": "The test passed — add(2, 3) returned 5 as expected. In a real project you would run `go test` from the terminal and see PASS or FAIL for each test function. The structure is always the same."
   },
   {
-    "title": "Table-Driven Tests",
-    "instruction": "Implement multiply(a, b int) int. All four cases should print PASS.",
-    "hint": "return a * b",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc multiply(a, b int) int { return 0 }\n\nfunc main() {\n\tcases := []struct{ a, b, want int }{{2,3,6},{0,5,0},{-1,4,-4},{7,7,49}}\n\tfor _, tc := range cases {\n\t\tgot := multiply(tc.a, tc.b)\n\t\tif got == tc.want { fmt.Printf(\"PASS: multiply(%d, %d) = %d\n\", tc.a, tc.b, got) } else { fmt.Printf(\"FAIL\n\") }\n\t}\n}",
-    "expectedOutput": [
-      "PASS: multiply(2, 3)",
-      "PASS: multiply(7, 7)"
-    ]
+    "title": "t.Errorf — report a failure",
+    "instruction": "`t.Errorf` marks the test as failed and logs a message — but the test keeps running.\n\nThe message format is a convention: `\"functionName(inputs) = actual, want expected\"`\n\nAdd a second test case: call `add(-1, 1)` and verify it equals `0`. If it does not, use `t.Errorf` with the same format.",
+    "hint": "got := add(-1, 1)  if got != 0 { t.Errorf(\"add(-1, 1) = %d, want 0\", got) }",
+    "starter": "package main\n\nimport (\n\t\"fmt\"\n\t\"testing\"\n)\n\nfunc add(a, b int) int {\n\treturn a + b\n}\n\nfunc TestAdd(t *testing.T) {\n\tgot := add(2, 3)\n\tif got != 5 {\n\t\tt.Errorf(\"add(2, 3) = %d, want 5\", got)\n\t}\n\t// TODO: test add(-1, 1) == 0\n\tfmt.Println(\"Both cases checked\")\n}\n\nfunc main() {\n\tTestAdd(&testing.T{})\n}",
+    "expectedOutput": ["Both cases checked"],
+    "codeChecks": [
+      { "pattern": "add\\(-1,\\s*1\\)", "required": true, "message": "Call add(-1, 1) and capture the result." },
+      { "pattern": "t\\.Errorf", "required": true, "message": "Use t.Errorf to report if the result is wrong." },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your test case." }
+    ],
+    "successMessage": "Two cases, one test function. Both pass. t.Errorf is how you say \"this is wrong\" without stopping the whole test — other cases still run and you see all failures at once."
   },
   {
-    "title": "Test Helper Functions",
-    "instruction": "Implement subtract (a-b) and check(label, got, want) that prints PASS or FAIL.",
-    "hint": "subtract return a - b; check: if got==want print PASS [label] else FAIL",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc subtract(a, b int) int { return 0 }\nfunc check(label string, got, want int) {}\n\nfunc main() {\n\tcheck(\"10-3\", subtract(10, 3), 7)\n\tcheck(\"5-5\", subtract(5, 5), 0)\n\tcheck(\"1-9\", subtract(1, 9), -8)\n}",
-    "expectedOutput": [
-      "PASS [10-3]",
-      "PASS [5-5]",
-      "PASS [1-9]"
-    ]
+    "title": "t.Fatal — stop on first failure",
+    "instruction": "Sometimes a failure makes the rest of the test pointless. Use `t.Fatalf` to stop immediately.\n\nFor example: if you cannot connect to the database, there is no point running the next 20 queries.\n\nRun this. Notice that when `divide` returns an error, `t.Fatalf` stops — the second check never runs. Then change `10, 0` to `10, 2` and see both checks pass.",
+    "hint": "Change divide(10, 0) to divide(10, 2) in main's test call.",
+    "starter": "package main\n\nimport (\n\t\"errors\"\n\t\"fmt\"\n\t\"testing\"\n)\n\nfunc divide(a, b float64) (float64, error) {\n\tif b == 0 {\n\t\treturn 0, errors.New(\"cannot divide by zero\")\n\t}\n\treturn a / b, nil\n}\n\nfunc runTest(a, b float64, t *testing.T) {\n\tresult, err := divide(a, b)\n\tif err != nil {\n\t\tt.Fatalf(\"divide(%v, %v) returned error: %v\", a, b, err)\n\t}\n\tif result != a/b {\n\t\tt.Errorf(\"divide(%v, %v) = %v, want %v\", a, b, result, a/b)\n\t}\n\tfmt.Printf(\"divide(%.0f, %.0f) = %.1f ✓\\n\", a, b, result)\n}\n\nfunc main() {\n\tt := &testing.T{}\n\trunTest(10, 2, t)\n\trunTest(20, 4, t)\n\tfmt.Println(\"All division tests passed\")\n}",
+    "expectedOutput": ["divide(10, 2) = 5.0 ✓", "divide(20, 4) = 5.0 ✓", "All division tests passed"],
+    "successMessage": "t.Fatalf stops the test immediately — useful when a failure makes all subsequent assertions meaningless. t.Errorf continues — useful when you want to see all failures at once."
   },
   {
-    "title": "Testing Edge Cases",
-    "instruction": "Implement clamp(val, min, max int): return min if val<min, max if val>max, else val. All 5 PASS.",
-    "hint": "if val < min return min; if val > max return max; return val",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc clamp(val, min, max int) int { return val }\n\nfunc main() {\n\tcases := []struct{ val, min, max, want int; label string }{\n\t\t{5,0,10,5,\"in range\"}, {-3,0,10,0,\"below min\"}, {15,0,10,10,\"above max\"}, {0,0,10,0,\"at min\"}, {10,0,10,10,\"at max\"}\n\t}\n\tpassed := 0\n\tfor _, tc := range cases {\n\t\tgot := clamp(tc.val, tc.min, tc.max)\n\t\tif got == tc.want { fmt.Printf(\"PASS [%s]\n\", tc.label); passed++ } else { fmt.Printf(\"FAIL\n\") }\n\t}\n\tfmt.Printf(\"%d/5 passed\n\", passed)\n}",
-    "expectedOutput": [
-      "PASS [in range]",
-      "PASS [below min]",
-      "5/5 passed"
-    ]
+    "title": "Table-driven tests",
+    "instruction": "The most common Go testing pattern: define a slice of test cases, loop through them.\n\n```\ntests := []struct {\n    a, b     int\n    expected int\n}{\n    {1, 2, 3},\n    {0, 0, 0},\n    {-1, 1, 0},\n}\nfor _, tt := range tests {\n    got := add(tt.a, tt.b)\n    if got != tt.expected { ... }\n}\n```\n\nAdd two more test cases to the table: `{10, -3, 7}` and `{100, 200, 300}`.",
+    "hint": "Add {10, -3, 7} and {100, 200, 300} to the tests slice.",
+    "starter": "package main\n\nimport (\n\t\"fmt\"\n\t\"testing\"\n)\n\nfunc add(a, b int) int { return a + b }\n\nfunc TestAdd(t *testing.T) {\n\ttests := []struct {\n\t\ta, b     int\n\t\texpected int\n\t}{\n\t\t{1, 2, 3},\n\t\t{0, 0, 0},\n\t\t{-1, 1, 0},\n\t\t// TODO: add {10, -3, 7} and {100, 200, 300}\n\t}\n\n\tpassed := 0\n\tfor _, tt := range tests {\n\t\tgot := add(tt.a, tt.b)\n\t\tif got != tt.expected {\n\t\t\tt.Errorf(\"add(%d, %d) = %d, want %d\", tt.a, tt.b, got, tt.expected)\n\t\t} else {\n\t\t\tpassed++\n\t\t}\n\t}\n\tfmt.Printf(\"%d/%d cases passed\\n\", passed, len(tests))\n}\n\nfunc main() {\n\tTestAdd(&testing.T{})\n}",
+    "expectedOutput": ["5/5 cases passed"],
+    "codeChecks": [
+      { "pattern": "\\{10,\\s*-3,\\s*7\\}", "required": true, "message": "Add {10, -3, 7} to the test table." },
+      { "pattern": "\\{100,\\s*200,\\s*300\\}", "required": true, "message": "Add {100, 200, 300} to the test table." },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your two test cases." }
+    ],
+    "successMessage": "5/5 passed. Table-driven tests are the gold standard in Go. Add a new case to the table, the loop handles it. No duplication, no copy-paste."
   },
   {
-    "title": "Benchmark: Measuring Performance",
-    "instruction": "Implement buildWithPlus (result += \"x\" in loop) and buildWithBuilder (sb.WriteByte(\"x\")). Print which is faster.",
-    "hint": "buildWithPlus: for i:=0;i<n;i++ { result += \"x\" }. buildWithBuilder: for i:=0;i<n;i++ { sb.WriteByte(120) }; return sb.String()",
-    "starter": "package main\n\nimport ( \"fmt\"; \"strings\"; \"time\" )\n\nfunc buildWithPlus(n int) string { return \"\" }\nfunc buildWithBuilder(n int) string { var sb strings.Builder; return sb.String() }\n\nfunc main() {\n\tstart := time.Now()\n\tfor i := 0; i < 1000; i++ { buildWithPlus(500) }\n\tt1 := time.Since(start)\n\tstart = time.Now()\n\tfor i := 0; i < 1000; i++ { buildWithBuilder(500) }\n\tt2 := time.Since(start)\n\tfmt.Printf(\"plus: %v builder: %v\n\", t1, t2)\n\tif t2 < t1 { fmt.Println(\"Winner: strings.Builder is faster!\") } else { fmt.Println(\"Winner: string + is faster!\") }\n}",
-    "expectedOutput": [
-      "strings.Builder",
-      "faster"
-    ]
+    "title": "Testing error cases",
+    "instruction": "Your tests should cover failure paths too — not just the happy path.\n\nFor a function that returns `(result, error)`, test both:\n1. When it should succeed — verify `err == nil` and check the result\n2. When it should fail — verify `err != nil`\n\nAdd a test case for `divide(10, 0)` that checks an error is returned.",
+    "hint": "{ a: 10, b: 0, wantErr: true }  — in the loop: if tt.wantErr { if err == nil { t.Errorf(...) } } else { if err != nil { t.Errorf(...) } }",
+    "starter": "package main\n\nimport (\n\t\"errors\"\n\t\"fmt\"\n\t\"testing\"\n)\n\nfunc divide(a, b float64) (float64, error) {\n\tif b == 0 {\n\t\treturn 0, errors.New(\"cannot divide by zero\")\n\t}\n\treturn a / b, nil\n}\n\nfunc TestDivide(t *testing.T) {\n\ttests := []struct {\n\t\ta, b    float64\n\t\twant    float64\n\t\twantErr bool\n\t}{\n\t\t{10, 2, 5, false},\n\t\t{9, 3, 3, false},\n\t\t// TODO: add {10, 0, 0, true} — expects an error\n\t}\n\n\tpassed := 0\n\tfor _, tt := range tests {\n\t\tgot, err := divide(tt.a, tt.b)\n\t\tif tt.wantErr {\n\t\t\tif err == nil {\n\t\t\t\tt.Errorf(\"divide(%v, %v): expected error but got none\", tt.a, tt.b)\n\t\t\t} else {\n\t\t\t\tpassed++\n\t\t\t}\n\t\t} else {\n\t\t\tif err != nil {\n\t\t\t\tt.Errorf(\"divide(%v, %v): unexpected error: %v\", tt.a, tt.b, err)\n\t\t\t} else if got != tt.want {\n\t\t\t\tt.Errorf(\"divide(%v, %v) = %v, want %v\", tt.a, tt.b, got, tt.want)\n\t\t\t} else {\n\t\t\t\tpassed++\n\t\t\t}\n\t\t}\n\t}\n\tfmt.Printf(\"%d/%d cases passed\\n\", passed, len(tests))\n}\n\nfunc main() {\n\tTestDivide(&testing.T{})\n}",
+    "expectedOutput": ["3/3 cases passed"],
+    "codeChecks": [
+      { "pattern": "\\{10,\\s*0,\\s*0,\\s*true\\}", "required": true, "message": "Add the error case: {10, 0, 0, true}" },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with the error test case." }
+    ],
+    "successMessage": "3/3 passed — including the error case. Always test failure paths. The bugs that hurt most are the ones in code nobody thought to test."
+  },
+  {
+    "title": "t.Run — subtests with names",
+    "instruction": "`t.Run` gives each test case its own name. When a test fails, you see exactly which case broke — not just a line number.\n\n```\nt.Run(\"negative numbers\", func(t *testing.T) {\n    // ...\n})\n```\n\nUpdate the loop to use `t.Run` with the format `\"add(a, b)\"` as the test name.",
+    "hint": "t.Run(fmt.Sprintf(\"add(%d,%d)\", tt.a, tt.b), func(t *testing.T) { ... })",
+    "starter": "package main\n\nimport (\n\t\"fmt\"\n\t\"testing\"\n)\n\nfunc add(a, b int) int { return a + b }\n\nfunc TestAdd(t *testing.T) {\n\ttests := []struct {\n\t\ta, b     int\n\t\texpected int\n\t}{\n\t\t{1, 2, 3},\n\t\t{-5, 5, 0},\n\t\t{100, 200, 300},\n\t}\n\n\tpassed := 0\n\tfor _, tt := range tests {\n\t\t// TODO: wrap in t.Run(fmt.Sprintf(\"add(%d,%d)\", tt.a, tt.b), func(t *testing.T) { ... })\n\t\tgot := add(tt.a, tt.b)\n\t\tif got != tt.expected {\n\t\t\tt.Errorf(\"got %d, want %d\", got, tt.expected)\n\t\t} else {\n\t\t\tpassed++\n\t\t\tfmt.Printf(\"add(%d,%d) ✓\\n\", tt.a, tt.b)\n\t\t}\n\t}\n\tfmt.Printf(\"%d/%d passed\\n\", passed, len(tests))\n}\n\nfunc main() {\n\tTestAdd(&testing.T{})\n}",
+    "expectedOutput": ["add(1,2) ✓", "add(-5,5) ✓", "add(100,200) ✓", "3/3 passed"],
+    "codeChecks": [
+      { "pattern": "t\\.Run\\s*\\(", "required": true, "message": "Wrap each test case in t.Run(name, func(t *testing.T) { ... })." },
+      { "pattern": "Sprintf", "required": true, "message": "Use fmt.Sprintf to create the test name from tt.a and tt.b." },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your t.Run call." }
+    ],
+    "successMessage": "Named subtests. When this fails in a real project, Go reports exactly which subtest failed: TestAdd/add(-5,5). No guessing which input broke."
+  },
+  {
+    "title": "Testing with interfaces — mocking",
+    "instruction": "Real code often depends on external things: databases, APIs, email services. You cannot call those in tests.\n\nThe solution: define the dependency as an interface. In tests, swap in a fake implementation.\n\nRun this. `EmailSender` is an interface. `mockSender` is a fake that records calls instead of sending real email. The test verifies `SendWelcomeEmail` calls `Send` with the right message — no real email sent.",
+    "starter": "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"testing\"\n)\n\ntype EmailSender interface {\n\tSend(to, subject, body string) error\n}\n\ntype mockSender struct {\n\tsentTo      string\n\tsentSubject string\n}\n\nfunc (m *mockSender) Send(to, subject, body string) error {\n\tm.sentTo = to\n\tm.sentSubject = subject\n\treturn nil\n}\n\nfunc SendWelcomeEmail(sender EmailSender, userEmail string) {\n\tsender.Send(userEmail, \"Welcome to uByte!\", \"Thanks for signing up.\")\n}\n\nfunc TestSendWelcomeEmail(t *testing.T) {\n\tmock := &mockSender{}\n\tSendWelcomeEmail(mock, \"alex@example.com\")\n\n\tif mock.sentTo != \"alex@example.com\" {\n\t\tt.Errorf(\"sent to %s, want alex@example.com\", mock.sentTo)\n\t}\n\tif !strings.Contains(mock.sentSubject, \"Welcome\") {\n\t\tt.Errorf(\"subject %q does not contain Welcome\", mock.sentSubject)\n\t}\n\tfmt.Println(\"Email mock test passed\")\n\tfmt.Println(\"Sent to:\", mock.sentTo)\n\tfmt.Println(\"Subject:\", mock.sentSubject)\n}\n\nfunc main() {\n\tTestSendWelcomeEmail(&testing.T{})\n}",
+    "expectedOutput": ["Email mock test passed", "Sent to: alex@example.com", "Subject: Welcome to uByte!"],
+    "successMessage": "No real email sent. The mock recorded the call, the test verified the behaviour. This pattern — interface + fake implementation — is how all professional Go testing works."
+  },
+  {
+    "title": "Benchmarks",
+    "instruction": "A benchmark measures how fast your code runs.\n\n```\nfunc BenchmarkAdd(b *testing.B) {\n    for i := 0; i < b.N; i++ {\n        add(100, 200)\n    }\n}\n```\n\n`b.N` is set automatically by the testing framework — it runs enough iterations to get a stable measurement. Run with `go test -bench=.`\n\nRun this benchmark. It times two string-building approaches. Notice which is faster.",
+    "starter": "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"testing\"\n)\n\nfunc buildWithPlus(n int) string {\n\ts := \"\"\n\tfor i := 0; i < n; i++ {\n\t\ts += \"x\"\n\t}\n\treturn s\n}\n\nfunc buildWithBuilder(n int) string {\n\tvar b strings.Builder\n\tfor i := 0; i < n; i++ {\n\t\tb.WriteString(\"x\")\n\t}\n\treturn b.String()\n}\n\nfunc BenchmarkPlus(b *testing.B) {\n\tfor i := 0; i < b.N; i++ {\n\t\tbuildWithPlus(100)\n\t}\n}\n\nfunc BenchmarkBuilder(b *testing.B) {\n\tfor i := 0; i < b.N; i++ {\n\t\tbuildWithBuilder(100)\n\t}\n}\n\nfunc main() {\n\t// Run a quick comparison manually\n\tfmt.Println(len(buildWithPlus(100)), \"chars via +\")\n\tfmt.Println(len(buildWithBuilder(100)), \"chars via Builder\")\n}",
+    "expectedOutput": ["100 chars via +", "100 chars via Builder"],
+    "successMessage": "Both produce the same result but strings.Builder is significantly faster for large strings — it avoids creating a new string object on each iteration. Benchmarks reveal these differences."
+  },
+  {
+    "title": "Test helpers with t.Helper()",
+    "instruction": "When you have repeated assertion logic, extract it into a helper function and call `t.Helper()` inside it.\n\nThis tells Go: if this helper fails, report the line in the calling test — not the line inside the helper. Much easier to debug.\n\nRun this. The `assertEqual` helper is used three times. Then add a fourth call that checks `multiply(3, 3)` equals `9`.",
+    "hint": "assertEqual(t, multiply(3, 3), 9)",
+    "starter": "package main\n\nimport (\n\t\"fmt\"\n\t\"testing\"\n)\n\nfunc multiply(a, b int) int { return a * b }\n\nfunc assertEqual(t *testing.T, got, want int) {\n\tt.Helper()\n\tif got != want {\n\t\tt.Errorf(\"got %d, want %d\", got, want)\n\t}\n}\n\nfunc TestMultiply(t *testing.T) {\n\tassertEqual(t, multiply(2, 3), 6)\n\tassertEqual(t, multiply(0, 100), 0)\n\tassertEqual(t, multiply(-4, 5), -20)\n\t// TODO: assert multiply(3, 3) == 9\n\tfmt.Println(\"All multiply tests passed\")\n}\n\nfunc main() {\n\tTestMultiply(&testing.T{})\n}",
+    "expectedOutput": ["All multiply tests passed"],
+    "codeChecks": [
+      { "pattern": "assertEqual\\s*\\(t,\\s*multiply\\(3,\\s*3\\),\\s*9\\)", "required": true, "message": "Add: assertEqual(t, multiply(3, 3), 9)" },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your assertion." }
+    ],
+    "successMessage": "t.Helper() is a small thing that makes debugging much easier. Without it, every failure points to line 12 (inside assertEqual). With it, Go points to the exact test line that failed."
+  },
+  {
+    "title": "Test a real function — isPalindrome",
+    "instruction": "Write tests for a function you define yourself.\n\n`isPalindrome(s string) bool` returns `true` if the string reads the same forwards and backwards (case-insensitive).\n\n`\"racecar\"` → true. `\"hello\"` → false. `\"Racecar\"` → true.\n\nFirst implement `isPalindrome`. Then write a table-driven test with at least 5 cases.",
+    "hint": "strings.ToLower + reverse the string and compare. Or: loop from both ends checking characters.",
+    "starter": "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"testing\"\n)\n\n// TODO: implement isPalindrome(s string) bool\n\nfunc TestIsPalindrome(t *testing.T) {\n\ttests := []struct {\n\t\tinput string\n\t\twant  bool\n\t}{\n\t\t// TODO: add at least 5 test cases\n\t}\n\n\tpassed := 0\n\tfor _, tt := range tests {\n\t\tgot := isPalindrome(tt.input)\n\t\tif got != tt.want {\n\t\t\tt.Errorf(\"isPalindrome(%q) = %v, want %v\", tt.input, got, tt.want)\n\t\t} else {\n\t\t\tpassed++\n\t\t}\n\t}\n\tfmt.Printf(\"%d/%d cases passed\\n\", passed, len(tests))\n}\n\nfunc main() {\n\tTestIsPalindrome(&testing.T{})\n}",
+    "expectedOutput": [],
+    "codeChecks": [
+      { "pattern": "func\\s+isPalindrome\\s*\\(", "required": true, "message": "Implement the isPalindrome function." },
+      { "pattern": "strings\\.ToLower|ToLower", "required": true, "message": "Use strings.ToLower to make the check case-insensitive." },
+      { "pattern": "\\{\"racecar\",\\s*true\\}|\\{\"hello\",\\s*false\\}", "required": true, "message": "Add at least one palindrome and one non-palindrome test case." },
+      { "pattern": "TODO", "required": false, "message": "Replace both TODO comments with your implementation and test cases." }
+    ],
+    "successMessage": "You implemented and tested a function from scratch. The test is the specification. If someone breaks isPalindrome later, your tests catch it immediately."
+  },
+  {
+    "title": "Fix the failing test",
+    "instruction": "The test exists. The function is broken.\n\n`clamp(value, min, max int) int` should return:\n- `min` if value is below min\n- `max` if value is above max\n- `value` otherwise\n\nBut the implementation is wrong. Fix `clamp` so all test cases pass.",
+    "hint": "if value < min { return min }  if value > max { return max }  return value",
+    "starter": "package main\n\nimport (\n\t\"fmt\"\n\t\"testing\"\n)\n\n// BUG: this implementation is wrong — fix it\nfunc clamp(value, min, max int) int {\n\tif value < min {\n\t\treturn max\n\t}\n\tif value > max {\n\t\treturn min\n\t}\n\treturn value\n}\n\nfunc TestClamp(t *testing.T) {\n\ttests := []struct {\n\t\tvalue, min, max int\n\t\twant            int\n\t}{\n\t\t{5, 1, 10, 5},\n\t\t{0, 1, 10, 1},\n\t\t{15, 1, 10, 10},\n\t\t{1, 1, 10, 1},\n\t\t{10, 1, 10, 10},\n\t}\n\n\tpassed := 0\n\tfor _, tt := range tests {\n\t\tgot := clamp(tt.value, tt.min, tt.max)\n\t\tif got != tt.want {\n\t\t\tt.Errorf(\"clamp(%d, %d, %d) = %d, want %d\", tt.value, tt.min, tt.max, got, tt.want)\n\t\t} else {\n\t\t\tpassed++\n\t\t}\n\t}\n\tfmt.Printf(\"%d/%d cases passed\\n\", passed, len(tests))\n}\n\nfunc main() {\n\tTestClamp(&testing.T{})\n}",
+    "expectedOutput": ["5/5 cases passed"],
+    "codeChecks": [
+      { "pattern": "return\\s+min", "required": true, "message": "Return min when value < min." },
+      { "pattern": "return\\s+max", "required": true, "message": "Return max when value > max." }
+    ],
+    "successMessage": "5/5 passed. The test was right — the function was wrong. That is the value of tests: they are the objective referee. Fix the code, run the tests, trust the result."
+  },
+  {
+    "title": "Build a tested calculator",
+    "instruction": "No starter code.\n\nBuild a calculator with full test coverage:\n\n1. Implement four functions: `add`, `subtract`, `multiply`, `divide` (returns `float64, error`)\n2. Write a `TestCalculator` function with a table-driven test covering:\n   - At least 2 cases per operation\n   - The divide-by-zero error case\n3. Use `t.Run` to name each subtest\n4. Print the pass count at the end\n\nExpected output ends with:\n```\n9/9 cases passed\n```\n(or more, depending on how many cases you add)",
+    "hint": "Use a struct with fields: op string, a, b float64, want float64, wantErr bool. Switch on op to call the right function.",
+    "starter": "package main\n\nimport (\n\t\"fmt\"\n\t\"testing\"\n)\n\n// Implement your four functions here\n\nfunc TestCalculator(t *testing.T) {\n\t// Table-driven test with t.Run and error cases\n}\n\nfunc main() {\n\tTestCalculator(&testing.T{})\n}",
+    "expectedOutput": [],
+    "codeChecks": [
+      { "pattern": "func\\s+add\\s*\\(", "required": true, "message": "Implement the add function." },
+      { "pattern": "func\\s+subtract\\s*\\(", "required": true, "message": "Implement the subtract function." },
+      { "pattern": "func\\s+multiply\\s*\\(", "required": true, "message": "Implement the multiply function." },
+      { "pattern": "func\\s+divide\\s*\\(", "required": true, "message": "Implement the divide function." },
+      { "pattern": "t\\.Run\\s*\\(", "required": true, "message": "Use t.Run to name each subtest." },
+      { "pattern": "wantErr|error", "required": true, "message": "Include a divide-by-zero error test case." },
+      { "pattern": "cases passed", "required": true, "message": "Print the pass count at the end." }
+    ],
+    "successMessage": "A fully tested calculator. Four functions, nine-plus test cases, named subtests, error coverage. This is production-quality Go code. You now test like a professional."
   }
 ]
