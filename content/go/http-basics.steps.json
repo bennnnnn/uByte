@@ -1,57 +1,147 @@
 [
   {
-    "title": "HTTP Handler Functions",
-    "instruction": "Complete helloHandler to write Hello, Go! to the response using fmt.Fprint.",
-    "hint": "fmt.Fprint(w, \"Hello, Go!\")",
-    "starter": "package main\n\nimport ( \"fmt\"; \"net/http\"; \"net/http/httptest\" )\n\nfunc helloHandler(w http.ResponseWriter, r *http.Request) {\n\t// TODO: write Hello, Go! to w\n}\n\nfunc main() {\n\treq, _ := http.NewRequest(\"GET\", \"/\", nil)\n\trec := httptest.NewRecorder()\n\thelloHandler(rec, req)\n\tfmt.Println(\"Status:\", rec.Code)\n\tfmt.Println(\"Body:\", rec.Body.String())\n}",
-    "expectedOutput": [
-      "Status: 200",
-      "Hello, Go!"
-    ]
+    "title": "Your first HTTP server",
+    "instruction": "Three lines of Go start a web server:\n\n```\nhttp.HandleFunc(\"/\", handler)\nhttp.ListenAndServe(\":8080\", nil)\n```\n\n`HandleFunc` registers a route. `ListenAndServe` starts listening on port 8080.\n\nThe handler function takes two parameters:\n- `w http.ResponseWriter` — write your response here\n- `r *http.Request` — the incoming request\n\nRun this. It simulates a single request to show the output without blocking.",
+    "starter": "package main\n\nimport (\n\t\"fmt\"\n\t\"net/http\"\n\t\"net/http/httptest\"\n)\n\nfunc homeHandler(w http.ResponseWriter, r *http.Request) {\n\tfmt.Fprintln(w, \"Welcome to my Go server!\")\n}\n\nfunc main() {\n\treq := httptest.NewRequest(\"GET\", \"/\", nil)\n\tw := httptest.NewRecorder()\n\thomeHandler(w, req)\n\tfmt.Print(w.Body.String())\n}",
+    "expectedOutput": ["Welcome to my Go server!"],
+    "successMessage": "An HTTP handler in Go: two parameters, write to w, done. In a real server you would call http.ListenAndServe(\":8080\", nil) and your handler would serve real requests."
   },
   {
-    "title": "Parsing URLs",
-    "instruction": "Parse the URL in raw using url.Parse. Print scheme, host, path, and q query param.",
-    "hint": "u, err := url.Parse(raw)",
-    "starter": "package main\n\nimport ( \"fmt\"; \"net/url\" )\n\nfunc main() {\n\traw := \"https://api.example.com/v1/search?q=golang&page=2\"\n\tu, err := url.Parse(\"\")\n\tif err != nil { fmt.Println(\"Error:\", err); return }\n\tfmt.Println(\"Scheme:\", u.Scheme)\n\tfmt.Println(\"Host:\", u.Host)\n\tfmt.Println(\"Path:\", u.Path)\n\tfmt.Println(\"q:\", u.Query().Get(\"q\"))\n}",
-    "expectedOutput": [
-      "Scheme: https",
-      "api.example.com",
-      "/v1/search",
-      "q: golang"
-    ]
+    "title": "Writing a response",
+    "instruction": "`http.ResponseWriter` is an `io.Writer` — you can use `fmt.Fprintln`, `fmt.Fprintf`, or `w.Write()` to send a response.\n\nYou can also set the status code and headers before writing:\n```\nw.WriteHeader(http.StatusOK)       // 200\nw.Header().Set(\"Content-Type\", \"text/plain\")\n```\n\nAdd a second handler `greetHandler` that sets the `Content-Type` to `text/plain` and responds with `\"Hello, [name]!\"` where name comes from the URL query parameter `name`. Then call it with name `\"Alex\"`.",
+    "hint": "name := r.URL.Query().Get(\"name\")  fmt.Fprintf(w, \"Hello, %s!\", name)",
+    "starter": "package main\n\nimport (\n\t\"fmt\"\n\t\"net/http\"\n\t\"net/http/httptest\"\n)\n\nfunc greetHandler(w http.ResponseWriter, r *http.Request) {\n\tw.Header().Set(\"Content-Type\", \"text/plain\")\n\t// TODO: get \"name\" from query params and respond with \"Hello, [name]!\"\n}\n\nfunc main() {\n\treq := httptest.NewRequest(\"GET\", \"/greet?name=Alex\", nil)\n\tw := httptest.NewRecorder()\n\tgreetHandler(w, req)\n\tfmt.Print(w.Body.String())\n}",
+    "expectedOutput": ["Hello, Alex!"],
+    "codeChecks": [
+      { "pattern": "r\\.URL\\.Query\\(\\)\\.Get\\(\"name\"\\)", "required": true, "message": "Get the name parameter: r.URL.Query().Get(\"name\")" },
+      { "pattern": "fmt\\.Fprintf\\(w|fmt\\.Fprintln\\(w", "required": true, "message": "Write the response to w using fmt.Fprintf or fmt.Fprintln." },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
+    ],
+    "successMessage": "Query parameters are read with r.URL.Query().Get(\"key\"). Headers are set before writing the body. This is the foundation of every Go HTTP handler."
   },
   {
-    "title": "Reading Query Parameters",
-    "instruction": "In greetHandler, if name is empty set to World. Write Hello, {name}! to w.",
-    "hint": "if name == \"\" { name = \"World\" }; fmt.Fprintf(w, \"Hello, %s!\", name)",
-    "starter": "package main\n\nimport ( \"fmt\"; \"net/http\"; \"net/http/httptest\" )\n\nfunc greetHandler(w http.ResponseWriter, r *http.Request) {\n\tname := r.URL.Query().Get(\"name\")\n\t// TODO: default name to World, write Hello name\n}\n\nfunc main() {\n\treq, _ := http.NewRequest(\"GET\", \"/greet?name=Gopher\", nil)\n\trec := httptest.NewRecorder()\n\tgreetHandler(rec, req)\n\tfmt.Println(rec.Body.String())\n\treq2, _ := http.NewRequest(\"GET\", \"/greet\", nil)\n\trec2 := httptest.NewRecorder()\n\tgreetHandler(rec2, req2)\n\tfmt.Println(rec2.Body.String())\n}",
-    "expectedOutput": [
-      "Hello, Gopher!",
-      "Hello, World!"
-    ]
+    "title": "Status codes",
+    "instruction": "HTTP status codes tell the client what happened:\n- `200` — OK\n- `201` — Created\n- `400` — Bad Request\n- `404` — Not Found\n- `500` — Internal Server Error\n\n`w.WriteHeader(http.StatusNotFound)` — use the named constants, not magic numbers.\n\nRun this. Two requests — one found, one not. Add the missing `404` case: if `id` is not `\"42\"`, write a `404` status and `\"user not found\"` message.",
+    "hint": "w.WriteHeader(http.StatusNotFound)  fmt.Fprintln(w, \"user not found\")",
+    "starter": "package main\n\nimport (\n\t\"fmt\"\n\t\"net/http\"\n\t\"net/http/httptest\"\n)\n\nfunc userHandler(w http.ResponseWriter, r *http.Request) {\n\tid := r.URL.Query().Get(\"id\")\n\tif id == \"42\" {\n\t\tw.WriteHeader(http.StatusOK)\n\t\tfmt.Fprintln(w, \"Found user: Alex\")\n\t} else {\n\t\t// TODO: write 404 status and \"user not found\"\n\t}\n}\n\nfunc main() {\n\tfor _, id := range []string{\"42\", \"99\"} {\n\t\treq := httptest.NewRequest(\"GET\", \"/?id=\"+id, nil)\n\t\tw := httptest.NewRecorder()\n\t\tuserHandler(w, req)\n\t\tfmt.Printf(\"Status: %d | Body: %s\", w.Code, w.Body.String())\n\t}\n}",
+    "expectedOutput": ["Status: 200 | Body: Found user: Alex", "Status: 404 | Body: user not found"],
+    "codeChecks": [
+      { "pattern": "w\\.WriteHeader\\(http\\.StatusNotFound\\)", "required": true, "message": "Write the 404 status: w.WriteHeader(http.StatusNotFound)" },
+      { "pattern": "user not found", "required": true, "message": "Write \"user not found\" in the body." },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
+    ],
+    "successMessage": "200 for found, 404 for not found. Always use http.StatusXxx constants — they are self-documenting and less error-prone than raw numbers."
   },
   {
-    "title": "HTTP Status Codes",
-    "instruction": "In resourceHandler, return 404 when id==missing else 200. Write not found or found: id.",
-    "hint": "if id == \"missing\" { w.WriteHeader(404); fmt.Fprint(w, \"not found\") } else { w.WriteHeader(200); fmt.Fprint(w, \"found: \"+id) }",
-    "starter": "package main\n\nimport ( \"fmt\"; \"net/http\"; \"net/http/httptest\" )\n\nfunc resourceHandler(w http.ResponseWriter, r *http.Request) {\n\tid := r.URL.Query().Get(\"id\")\n\t// TODO: 404 if id==missing, else 200 and found: id\n\t_ = id\n}\n\nfunc main() {\n\treq, _ := http.NewRequest(\"GET\", \"/?id=missing\", nil)\n\trec := httptest.NewRecorder()\n\tresourceHandler(rec, req)\n\tfmt.Println(rec.Code, rec.Body.String())\n\treq2, _ := http.NewRequest(\"GET\", \"/?id=42\", nil)\n\trec2 := httptest.NewRecorder()\n\tresourceHandler(rec2, req2)\n\tfmt.Println(rec2.Code, rec2.Body.String())\n}",
-    "expectedOutput": [
-      "status=404",
-      "status=200",
-      "not found",
-      "found: 42"
-    ]
+    "title": "Responding with JSON",
+    "instruction": "Most APIs respond with JSON. The pattern:\n1. Set `Content-Type: application/json`\n2. Use `json.NewEncoder(w).Encode(value)` to write JSON directly to the response\n\nAdd a second user to the `users` map (any name for id `\"7\"`), then handle it in `userHandler` and return JSON.",
+    "hint": "\"7\": User{ID: 7, Name: \"Jordan\", Email: \"jordan@example.com\"}",
+    "starter": "package main\n\nimport (\n\t\"encoding/json\"\n\t\"fmt\"\n\t\"net/http\"\n\t\"net/http/httptest\"\n)\n\ntype User struct {\n\tID    int    `json:\"id\"`\n\tName  string `json:\"name\"`\n\tEmail string `json:\"email\"`\n}\n\nvar users = map[string]User{\n\t\"1\": {ID: 1, Name: \"Alex\", Email: \"alex@example.com\"},\n\t// TODO: add user with id \"7\"\n}\n\nfunc userHandler(w http.ResponseWriter, r *http.Request) {\n\tid := r.URL.Query().Get(\"id\")\n\tuser, ok := users[id]\n\tif !ok {\n\t\tw.WriteHeader(http.StatusNotFound)\n\t\tfmt.Fprintln(w, `{\"error\":\"not found\"}`)\n\t\treturn\n\t}\n\tw.Header().Set(\"Content-Type\", \"application/json\")\n\tjson.NewEncoder(w).Encode(user)\n}\n\nfunc main() {\n\tfor _, id := range []string{\"1\", \"7\", \"99\"} {\n\t\treq := httptest.NewRequest(\"GET\", \"/?id=\"+id, nil)\n\t\tw := httptest.NewRecorder()\n\t\tuserHandler(w, req)\n\t\tfmt.Printf(\"[%d] %s\", w.Code, w.Body.String())\n\t}\n}",
+    "expectedOutput": ["[200] {\"id\":1,\"name\":\"Alex\",\"email\":\"alex@example.com\"}", "[200] {\"id\":7,", "[404] {\"error\":\"not found\"}"],
+    "codeChecks": [
+      { "pattern": "\"7\":\\s*User\\{", "required": true, "message": "Add a second user with key \"7\" to the users map." },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your user entry." }
+    ],
+    "successMessage": "JSON responses, status codes, 404 handling — this is a real API pattern. json.NewEncoder(w).Encode writes directly to the response without allocating an extra buffer."
   },
   {
-    "title": "Building Query Strings",
-    "instruction": "Use url.Values: set q=hello world, page=1, add tag=go and tag=web. Print Encode().",
-    "hint": "v.Set(\"q\", \"hello world\"); v.Set(\"page\", \"1\"); v.Add(\"tag\", \"go\"); v.Add(\"tag\", \"web\")",
-    "starter": "package main\n\nimport ( \"fmt\"; \"net/url\" )\n\nfunc main() {\n\tv := url.Values{}\n\t// TODO: set q, page, add tag twice\n\tfmt.Println(v.Encode())\n}",
-    "expectedOutput": [
-      "hello+world",
-      "page=1",
-      "tag=go"
-    ]
+    "title": "Reading a request body",
+    "instruction": "For POST and PUT requests, the client sends data in the request body.\n\nDecode it with `json.NewDecoder(r.Body).Decode(&v)`.\n\nAlways close the body: `defer r.Body.Close()`\n\nRun this. The handler reads a JSON body and echoes back the user's name. Change the request body to your own name and email.",
+    "hint": "Change the body JSON from Alex to your own name.",
+    "starter": "package main\n\nimport (\n\t\"encoding/json\"\n\t\"fmt\"\n\t\"net/http\"\n\t\"net/http/httptest\"\n\t\"strings\"\n)\n\ntype CreateUserRequest struct {\n\tName  string `json:\"name\"`\n\tEmail string `json:\"email\"`\n}\n\nfunc createUserHandler(w http.ResponseWriter, r *http.Request) {\n\tdefer r.Body.Close()\n\n\tvar req CreateUserRequest\n\tif err := json.NewDecoder(r.Body).Decode(&req); err != nil {\n\t\tw.WriteHeader(http.StatusBadRequest)\n\t\tfmt.Fprintln(w, `{\"error\":\"invalid body\"}`)\n\t\treturn\n\t}\n\n\tw.WriteHeader(http.StatusCreated)\n\tfmt.Fprintf(w, \"Created user: %s (%s)\\n\", req.Name, req.Email)\n}\n\nfunc main() {\n\tbody := `{\"name\":\"Alex\",\"email\":\"alex@example.com\"}`\n\treq := httptest.NewRequest(\"POST\", \"/users\", strings.NewReader(body))\n\treq.Header.Set(\"Content-Type\", \"application/json\")\n\tw := httptest.NewRecorder()\n\tcreateUserHandler(w, req)\n\tfmt.Printf(\"Status: %d\\n\", w.Code)\n\tfmt.Print(w.Body.String())\n}",
+    "expectedOutput": [],
+    "codeChecks": [
+      { "pattern": "\"name\":\"Alex\"", "required": false, "message": "Change the name in the body JSON to your own name." }
+    ],
+    "successMessage": "POST body decoded in two lines. json.NewDecoder(r.Body).Decode(&req) handles everything — parsing, type conversion, error reporting. The 201 Created status signals a successful creation."
+  },
+  {
+    "title": "Multiple routes",
+    "instruction": "Register multiple routes with `http.HandleFunc`:\n\n```\nhttp.HandleFunc(\"/\", homeHandler)\nhttp.HandleFunc(\"/users\", usersHandler)\nhttp.HandleFunc(\"/health\", healthHandler)\n```\n\nAdd a third route `/about` that responds with `\"About this API\"`.",
+    "hint": "http.HandleFunc(\"/about\", func(w http.ResponseWriter, r *http.Request) { fmt.Fprintln(w, \"About this API\") })",
+    "starter": "package main\n\nimport (\n\t\"fmt\"\n\t\"net/http\"\n\t\"net/http/httptest\"\n)\n\nfunc main() {\n\tmux := http.NewServeMux()\n\tmux.HandleFunc(\"/\", func(w http.ResponseWriter, r *http.Request) {\n\t\tfmt.Fprintln(w, \"Home\")\n\t})\n\tmux.HandleFunc(\"/health\", func(w http.ResponseWriter, r *http.Request) {\n\t\tfmt.Fprintln(w, `{\"status\":\"ok\"}`)\n\t})\n\t// TODO: add /about route that responds with \"About this API\"\n\n\tfor _, path := range []string{\"/\", \"/health\", \"/about\"} {\n\t\treq := httptest.NewRequest(\"GET\", path, nil)\n\t\tw := httptest.NewRecorder()\n\t\tmux.ServeHTTP(w, req)\n\t\tfmt.Printf(\"%s → %s\", path, w.Body.String())\n\t}\n}",
+    "expectedOutput": ["/ → Home", "/health → {\"status\":\"ok\"}", "/about → About this API"],
+    "codeChecks": [
+      { "pattern": "mux\\.HandleFunc\\(\"/about\"", "required": true, "message": "Register an /about route: mux.HandleFunc(\"/about\", ...)" },
+      { "pattern": "About this API", "required": true, "message": "The /about handler should respond with \"About this API\"." },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your route." }
+    ],
+    "successMessage": "Three routes, three handlers. http.NewServeMux() is Go's built-in router. For simple APIs it is all you need — no third-party router required."
+  },
+  {
+    "title": "Method checking — GET vs POST",
+    "instruction": "REST APIs use different HTTP methods for different operations:\n- `GET` — read data\n- `POST` — create data\n- `PUT` / `PATCH` — update data\n- `DELETE` — delete data\n\nCheck the method with `r.Method`.\n\nAdd a `case http.MethodPost` that responds with `\"Creating a user...\"` and status 201.",
+    "hint": "case http.MethodPost:  w.WriteHeader(http.StatusCreated)  fmt.Fprintln(w, \"Creating a user...\")",
+    "starter": "package main\n\nimport (\n\t\"fmt\"\n\t\"net/http\"\n\t\"net/http/httptest\"\n)\n\nfunc usersHandler(w http.ResponseWriter, r *http.Request) {\n\tswitch r.Method {\n\tcase http.MethodGet:\n\t\tfmt.Fprintln(w, \"Listing users...\")\n\t// TODO: add case http.MethodPost → 201 + \"Creating a user...\"\n\tdefault:\n\t\tw.WriteHeader(http.StatusMethodNotAllowed)\n\t\tfmt.Fprintln(w, \"Method not allowed\")\n\t}\n}\n\nfunc main() {\n\tfor _, method := range []string{\"GET\", \"POST\", \"DELETE\"} {\n\t\treq := httptest.NewRequest(method, \"/users\", nil)\n\t\tw := httptest.NewRecorder()\n\t\tusersHandler(w, req)\n\t\tfmt.Printf(\"%s [%d]: %s\", method, w.Code, w.Body.String())\n\t}\n}",
+    "expectedOutput": ["GET [200]: Listing users...", "POST [201]: Creating a user...", "DELETE [405]: Method not allowed"],
+    "codeChecks": [
+      { "pattern": "case\\s+http\\.MethodPost:", "required": true, "message": "Add case http.MethodPost: to the switch." },
+      { "pattern": "http\\.StatusCreated", "required": true, "message": "Use w.WriteHeader(http.StatusCreated) for 201." },
+      { "pattern": "Creating a user", "required": true, "message": "Respond with \"Creating a user...\" for POST." },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your POST case." }
+    ],
+    "successMessage": "GET lists, POST creates, DELETE gets 405. Method checking keeps your API semantically correct — different actions on the same URL, different HTTP methods."
+  },
+  {
+    "title": "Middleware",
+    "instruction": "Middleware is a function that wraps a handler — it runs before and/or after the handler.\n\nCommon uses: logging, authentication, CORS headers, timing.\n\n```\nfunc loggingMiddleware(next http.HandlerFunc) http.HandlerFunc {\n    return func(w http.ResponseWriter, r *http.Request) {\n        fmt.Println(\"Request:\", r.Method, r.URL.Path)\n        next(w, r)  // call the real handler\n    }\n}\n```\n\nRun this. Then add a `timingMiddleware` that prints `\"Handler finished\"` after calling `next`.",
+    "hint": "func timingMiddleware(next http.HandlerFunc) http.HandlerFunc { return func(w http.ResponseWriter, r *http.Request) { next(w, r); fmt.Println(\"Handler finished\") } }",
+    "starter": "package main\n\nimport (\n\t\"fmt\"\n\t\"net/http\"\n\t\"net/http/httptest\"\n)\n\nfunc loggingMiddleware(next http.HandlerFunc) http.HandlerFunc {\n\treturn func(w http.ResponseWriter, r *http.Request) {\n\t\tfmt.Println(r.Method, r.URL.Path)\n\t\tnext(w, r)\n\t}\n}\n\n// TODO: define timingMiddleware that prints \"Handler finished\" after next runs\n\nfunc homeHandler(w http.ResponseWriter, r *http.Request) {\n\tfmt.Fprintln(w, \"Hello!\")\n}\n\nfunc main() {\n\t// TODO: wrap homeHandler with both middlewares\n\thandler := loggingMiddleware(homeHandler)\n\treq := httptest.NewRequest(\"GET\", \"/\", nil)\n\tw := httptest.NewRecorder()\n\thandler(w, req)\n\tfmt.Print(w.Body.String())\n}",
+    "expectedOutput": ["GET /", "Handler finished", "Hello!"],
+    "codeChecks": [
+      { "pattern": "func\\s+timingMiddleware\\s*\\(", "required": true, "message": "Define a timingMiddleware function." },
+      { "pattern": "Handler finished", "required": true, "message": "Print \"Handler finished\" after calling next." },
+      { "pattern": "timingMiddleware\\(", "required": true, "message": "Wrap the handler with timingMiddleware." },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comments with your middleware." }
+    ],
+    "successMessage": "The middleware chain: logging → timing → handler → timing finishes. Middlewares are composable — stack as many as you need. Every real Go server uses this pattern."
+  },
+  {
+    "title": "Making an HTTP GET request",
+    "instruction": "Go is not just a server — it is also a great HTTP client.\n\n`http.Get(url)` makes a GET request and returns a response.\n\nAlways close the body: `defer resp.Body.Close()`\n\nRead the body with `io.ReadAll(resp.Body)`.\n\nRun this — it calls a public JSON API and prints the status and first 100 characters of the response.",
+    "starter": "package main\n\nimport (\n\t\"fmt\"\n\t\"io\"\n\t\"net/http\"\n)\n\nfunc main() {\n\tresp, err := http.Get(\"https://httpbin.org/get\")\n\tif err != nil {\n\t\tfmt.Println(\"Error:\", err)\n\t\treturn\n\t}\n\tdefer resp.Body.Close()\n\n\tbody, err := io.ReadAll(resp.Body)\n\tif err != nil {\n\t\tfmt.Println(\"Read error:\", err)\n\t\treturn\n\t}\n\n\tfmt.Println(\"Status:\", resp.StatusCode)\n\tfmt.Println(\"Body preview:\", string(body[:100]))\n}",
+    "expectedOutput": ["Status: 200"],
+    "successMessage": "http.Get, check the error, defer close, read the body. Three steps for every HTTP client call. The same pattern works for any URL — internal services, third-party APIs, webhooks."
+  },
+  {
+    "title": "Making an HTTP POST request",
+    "instruction": "`http.Post` sends a POST with a body:\n\n```\nresp, err := http.Post(url, \"application/json\", strings.NewReader(body))\n```\n\nFor more control (custom headers, timeouts), use `http.NewRequest` + `http.Client`.\n\nRun this. It POSTs JSON to httpbin which echoes back what you sent. Change the payload name to your own.",
+    "hint": "Change \"Alex\" in the JSON payload to your name.",
+    "starter": "package main\n\nimport (\n\t\"fmt\"\n\t\"io\"\n\t\"net/http\"\n\t\"strings\"\n)\n\nfunc main() {\n\tpayload := `{\"name\":\"Alex\",\"course\":\"Go\"}`\n\tresp, err := http.Post(\n\t\t\"https://httpbin.org/post\",\n\t\t\"application/json\",\n\t\tstrings.NewReader(payload),\n\t)\n\tif err != nil {\n\t\tfmt.Println(\"Error:\", err)\n\t\treturn\n\t}\n\tdefer resp.Body.Close()\n\n\tbody, _ := io.ReadAll(resp.Body)\n\tfmt.Println(\"Status:\", resp.StatusCode)\n\t_ = body\n\tfmt.Println(\"POST sent successfully\")\n}",
+    "expectedOutput": ["Status: 200", "POST sent successfully"],
+    "codeChecks": [
+      { "pattern": "\"name\":\"Alex\"", "required": false, "message": "Change the name in the payload to your own name." }
+    ],
+    "successMessage": "POST with a JSON body — the foundation of every API call you will make. http.Post for simple cases, http.NewRequest + http.Client when you need headers, timeouts, or retries."
+  },
+  {
+    "title": "Setting request headers",
+    "instruction": "Many APIs require headers — authentication tokens, content types, API keys.\n\nUse `http.NewRequest` to build a request with custom headers before sending it:\n\n```\nreq, _ := http.NewRequest(\"GET\", url, nil)\nreq.Header.Set(\"Authorization\", \"Bearer \"+token)\nclient := &http.Client{}\nresp, err := client.Do(req)\n```\n\nAdd a second header `X-Request-ID` with value `\"abc-123\"` to the request.",
+    "hint": "req.Header.Set(\"X-Request-ID\", \"abc-123\")",
+    "starter": "package main\n\nimport (\n\t\"fmt\"\n\t\"net/http\"\n\t\"net/http/httptest\"\n)\n\nfunc echoHeadersHandler(w http.ResponseWriter, r *http.Request) {\n\tfmt.Fprintln(w, \"Auth:\", r.Header.Get(\"Authorization\"))\n\tfmt.Fprintln(w, \"Request-ID:\", r.Header.Get(\"X-Request-ID\"))\n}\n\nfunc main() {\n\treq := httptest.NewRequest(\"GET\", \"/\", nil)\n\treq.Header.Set(\"Authorization\", \"Bearer token123\")\n\t// TODO: set X-Request-ID header to \"abc-123\"\n\n\tw := httptest.NewRecorder()\n\techoHeadersHandler(w, req)\n\tfmt.Print(w.Body.String())\n}",
+    "expectedOutput": ["Auth: Bearer token123", "Request-ID: abc-123"],
+    "codeChecks": [
+      { "pattern": "req\\.Header\\.Set\\(\"X-Request-ID\",\\s*\"abc-123\"\\)", "required": true, "message": "Set the X-Request-ID header: req.Header.Set(\"X-Request-ID\", \"abc-123\")" },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your header." }
+    ],
+    "successMessage": "Headers set, headers read. Bearer tokens, API keys, request IDs, CORS headers — all follow the same pattern. r.Header.Get on the server, req.Header.Set on the client."
+  },
+  {
+    "title": "Build a mini REST API",
+    "instruction": "No starter code.\n\nBuild a mini REST API for a todo list:\n\n1. Define a `Todo` struct with `ID` int, `Title` string, `Done` bool (all JSON tagged)\n2. Create a `[]Todo` slice with 2 initial todos\n3. Write a `listHandler` that responds with the todos as JSON\n4. Write an `addHandler` that reads a JSON body, appends a new Todo, and responds with 201\n5. Route `GET /todos` → listHandler, `POST /todos` → addHandler (check `r.Method`)\n6. Test: GET first, then POST a new todo, then GET again — the list should grow\n\nExpected final GET output includes all 3 todos as JSON.",
+    "hint": "Use json.NewEncoder(w).Encode(todos) to respond. Use json.NewDecoder(r.Body).Decode(&newTodo) to read the body.",
+    "starter": "package main\n\nimport (\n\t\"encoding/json\"\n\t\"fmt\"\n\t\"net/http\"\n\t\"net/http/httptest\"\n\t\"strings\"\n)\n\n// Build your todo API here\n\nfunc main() {\n}",
+    "expectedOutput": [],
+    "codeChecks": [
+      { "pattern": "type\\s+Todo\\s+struct", "required": true, "message": "Define a Todo struct." },
+      { "pattern": "`json:\"id\"`|`json:\"title\"`", "required": true, "message": "Add JSON tags to the Todo struct fields." },
+      { "pattern": "func\\s+listHandler\\s*\\(", "required": true, "message": "Define a listHandler function." },
+      { "pattern": "func\\s+addHandler\\s*\\(", "required": true, "message": "Define an addHandler function." },
+      { "pattern": "r\\.Method", "required": true, "message": "Check r.Method to route GET vs POST." },
+      { "pattern": "json\\.NewEncoder\\(w\\)\\.Encode", "required": true, "message": "Use json.NewEncoder(w).Encode to respond with JSON." },
+      { "pattern": "json\\.NewDecoder\\(r\\.Body\\)\\.Decode", "required": true, "message": "Use json.NewDecoder(r.Body).Decode to read the POST body." },
+      { "pattern": "http\\.StatusCreated", "required": true, "message": "Return 201 Created for successful POST." }
+    ],
+    "successMessage": "A working REST API — list, add, check. GET returns JSON, POST reads JSON and appends, the list grows. This is how every Go API is structured in production. You just built one."
   }
 ]
