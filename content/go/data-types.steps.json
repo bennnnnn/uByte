@@ -1,68 +1,161 @@
 [
   {
-    "title": "Text lives in a string",
-    "instruction": "Think about a name tag at a conference. It has text on it — your name, your company, maybe a title. It is not a number. You cannot do math with it. It is just... text.\n\nIn Go, any piece of text is called a string. Your name is a string. A sentence is a string. An email address is a string. Even the number \"42\" written inside quotes is a string — because it is just the characters 4 and 2, not a real number you can calculate with.\n\nYou recognize a string by two things: it is always wrapped in double quotes.\n\n    favoriteFood := \"Pizza\"\n\nCreate a variable called favoriteFood and put your actual favorite food in it as a string. Then print it.",
-    "hint": "favoriteFood := \"Pizza\"  — whatever your favorite food is goes inside the double quotes. Then fmt.Println(favoriteFood).",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\t// TODO: create a string variable called favoriteFood with your favorite food\n\t// TODO: print it\n}",
-    "expectedOutput": [],
-    "codeChecks": [
-      { "pattern": "favoriteFood\\s*:=\\s*\"\\S+\"", "required": true, "message": "Create a string variable: favoriteFood := \"Pizza\" (use your real favorite food, in double quotes)" },
-      { "pattern": "Println\\(favoriteFood\\)", "required": true, "message": "Print it: fmt.Println(favoriteFood)" },
-      { "pattern": "TODO", "required": false, "message": "Replace the TODO lines with your actual code." }
-    ]
+    "title": "What is a data type",
+    "instruction": "Think about a moving truck.\n\nYou would not put liquid in a cardboard box. You would not put a piano in a plastic bag. Different things need different containers.\n\nData works the same way. Text needs one kind of container. A whole number needs another. A yes/no answer needs another.\n\nIn Go, these containers are called data types. Every variable has one.\n\nRun this and see three different types in action.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tname := \"Alex\"\n\tage := 25\n\tactive := true\n\tfmt.Println(name)\n\tfmt.Println(age)\n\tfmt.Println(active)\n}",
+    "expectedOutput": ["Alex", "25", "true"],
+    "successMessage": "Three variables, three types. Each one holds a different kind of data."
   },
   {
-    "title": "Counting things needs an int",
-    "instruction": "You have 3 brothers. You are 24 years old. Your team scored 87 points. The year is 2025.\n\nNotice what all of these have in common: they are whole numbers. No decimal point. You can count them on your fingers (well, maybe not 2025, but you get the idea).\n\nIn Go, whole numbers are called int. No quotes around them — they are real numbers, not text.\n\n    age := 24\n\nSee the difference from a string? No quotes. Just the number.\n\nCreate a variable called age with your actual age as a whole number. Then print it.",
-    "hint": "age := 24  — just the number, nothing else. No quotes, no decimal point. Then fmt.Println(age).",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\t// TODO: create an int variable called age with your age\n\t// TODO: print it\n}",
+    "title": "string — text",
+    "instruction": "A `string` holds text. Any text. A single letter, a word, a sentence, an email address.\n\nYou always wrap it in double quotes. That is how Go knows it is text and not code.\n\nCreate a variable called `email` with any email address as a string. Then print it.",
+    "hint": "email := \"you@example.com\"  — text always goes inside double quotes.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\t// TODO: create a string variable called email\n\t// TODO: print it\n}",
     "expectedOutput": [],
     "codeChecks": [
-      { "pattern": "age\\s*:=\\s*\\d+", "required": true, "message": "Create an int variable: age := 24 (your real age, no quotes, no decimal)" },
-      { "pattern": "Println\\(age\\)", "required": true, "message": "Print it: fmt.Println(age)" },
-      { "pattern": "TODO", "required": false, "message": "Replace the TODO lines with your actual code." }
-    ]
+      { "pattern": "email\\s*:=\\s*\"[^\"]+\"", "required": true, "message": "Create a string variable: email := \"you@example.com\"" },
+      { "pattern": "Println\\(email\\)", "required": true, "message": "Print it: fmt.Println(email)" },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO lines with actual code." }
+    ],
+    "successMessage": "Strings are the most common type you will use. Any text, always in double quotes."
   },
   {
-    "title": "Some numbers need a decimal point",
-    "instruction": "You walk into a coffee shop. Your latte costs $4.75. You are not paying $4 or $5 — you are paying exactly $4.75.\n\nWhole numbers cannot represent that. 4 is not 4.75. You need something that can handle the part after the dot.\n\nIn Go, numbers with decimal points are called float64. Prices, temperatures, GPAs, heights — anything that needs precision uses float64.\n\n    price := 4.75\n\nThe moment Go sees a dot in your number, it automatically treats it as float64. No extra keyword needed.\n\nCreate a variable called price with any price you like — make it realistic, something with a decimal point. Then print it.",
-    "hint": "price := 4.99  — the decimal point is everything here. No quotes. Then fmt.Println(price).",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\t// TODO: create a float64 variable called price with a decimal number\n\t// TODO: print it\n}",
+    "title": "int — whole numbers",
+    "instruction": "`int` holds whole numbers. No decimal point. Ages, counts, scores, years.\n\nWhen you just write a plain number without a decimal, Go gives it the type `int` by default.\n\n`int` adjusts to the computer it runs on — 64-bit on modern machines, 32-bit on older ones. For most programs, `int` is all you need.\n\nCreate a variable called `year` with the current year. Print it.",
+    "hint": "year := 2025  — no quotes, no decimal point.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\t// TODO: create an int variable called year\n\t// TODO: print it\n}",
     "expectedOutput": [],
     "codeChecks": [
-      { "pattern": "price\\s*:=\\s*\\d+\\.\\d+", "required": true, "message": "Create a float64 variable: price := 4.99 (must include a decimal point, no quotes)" },
-      { "pattern": "Println\\(price\\)", "required": true, "message": "Print it: fmt.Println(price)" },
-      { "pattern": "TODO", "required": false, "message": "Replace the TODO lines with your actual code." }
-    ]
+      { "pattern": "year\\s*:=\\s*\\d+", "required": true, "message": "Create an int variable: year := 2025" },
+      { "pattern": "Println\\(year\\)", "required": true, "message": "Print it: fmt.Println(year)" },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO lines with actual code." }
+    ],
+    "successMessage": "int is the default number type. It covers most use cases."
   },
   {
-    "title": "Yes or no — that is a bool",
-    "instruction": "Is the light on? Yes or no. Are you logged in? Yes or no. Is the task done? Yes or no.\n\nSome questions in life only have two possible answers. In Go, we have a type built exactly for that: bool.\n\nA bool can only ever hold one of two values: true or false. Nothing else. Not \"yes\". Not 1. Just the words true or false, with no quotes around them.\n\n    isLoggedIn := true\n    taskDone := false\n\nWhy no quotes? Because true and false are special keywords in Go, not text. If you write \"true\" in quotes, Go thinks it is a string — just the four letters t, r, u, e. Very different thing.\n\nCreate a variable called isWeekend. Set it to true if today is a weekend, false if it is a weekday. Then print it.",
-    "hint": "isWeekend := true  or  isWeekend := false  — no quotes around true or false. Then fmt.Println(isWeekend).",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\t// TODO: create a bool variable called isWeekend (true or false, no quotes)\n\t// TODO: print it\n}",
-    "expectedOutput": [],
-    "codeChecks": [
-      { "pattern": "isWeekend\\s*:=\\s*(true|false)", "required": true, "message": "Create a bool variable: isWeekend := true  (or false — no quotes, these are not strings)" },
-      { "pattern": "Println\\(isWeekend\\)", "required": true, "message": "Print it: fmt.Println(isWeekend)" },
-      { "pattern": "TODO", "required": false, "message": "Replace the TODO lines with your actual code." }
-    ]
+    "title": "int8, int16, int32, int64 — sized integers",
+    "instruction": "Sometimes you need to control exactly how much memory a number uses. That is what sized integers are for.\n\nThe number after `int` is how many bits it uses — and bits determine the range:\n\n- `int8`  — 8 bits  — range: -128 to 127\n- `int16` — 16 bits — range: -32,768 to 32,767\n- `int32` — 32 bits — range: -2 billion to 2 billion\n- `int64` — 64 bits — range: very very large numbers\n\nSmaller types use less memory. Larger types hold bigger numbers. You pick based on what your data needs.\n\nRun this to see them all.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tvar small  int8  = 100\n\tvar medium int16 = 30000\n\tvar large  int32 = 2000000000\n\tvar huge   int64 = 9000000000000\n\tfmt.Println(small)\n\tfmt.Println(medium)\n\tfmt.Println(large)\n\tfmt.Println(huge)\n}",
+    "expectedOutput": ["100", "30000", "2000000000", "9000000000000"],
+    "successMessage": "Same idea as int but with a specific size. Use the smallest one that fits your data."
   },
   {
-    "title": "Your complete profile",
-    "instruction": "Think of a user profile on any app — Instagram, LinkedIn, a game. It stores different kinds of information about you: your name (text), your age (whole number), your rating or score (decimal), whether you are verified (yes or no).\n\nThat is exactly what you are building now. Four variables, four different types.\n\nCreate all four:\n- name — a string with your name\n- age — an int with your age (whole number, no quotes)\n- height — a float64 with your height in meters like 1.75 (must have a decimal)\n- isStudent — a bool, true if you are a student, false if not (no quotes)\n\nThen print all four, one per line.\n\nYou are doing great. This is what real programs look like.",
-    "hint": "Four := lines, four Println lines. name gets quotes, age gets a plain number, height gets a decimal, isStudent gets true or false with no quotes.",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\t// TODO: create name (string), age (int), height (float64), isStudent (bool)\n\t// TODO: print all four\n}",
+    "title": "uint — unsigned integers",
+    "instruction": "Regular `int` can hold negative numbers. But sometimes your value can never be negative — a file size, a pixel count, an ID number.\n\nFor those, use `uint` (unsigned integer). It only holds zero and positive numbers, which means it can hold twice the positive range.\n\n- `uint8`  — 0 to 255\n- `uint16` — 0 to 65,535\n- `uint32` — 0 to 4 billion\n- `uint64` — 0 to very very large\n\nAdd a `var` declaration for `pixelCount` as `uint32` with the value `1920`, then print it.",
+    "hint": "var pixelCount uint32 = 1920",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tvar fileSize uint64 = 5000000\n\tfmt.Println(fileSize)\n\t// TODO: add pixelCount as uint32 with value 1920\n\t// TODO: print pixelCount\n}",
+    "expectedOutput": ["5000000", "1920"],
+    "codeChecks": [
+      { "pattern": "var\\s+pixelCount\\s+uint32\\s*=\\s*1920", "required": true, "message": "Declare pixelCount as uint32: var pixelCount uint32 = 1920" },
+      { "pattern": "Println\\(pixelCount\\)", "required": true, "message": "Print it: fmt.Println(pixelCount)" },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO lines with actual code." }
+    ],
+    "successMessage": "uint is int without the negative side. Use it when your value can never go below zero."
+  },
+  {
+    "title": "float32 and float64 — decimal numbers",
+    "instruction": "When a whole number is not precise enough, you need a float.\n\n- `float32` — 32 bits, about 7 decimal digits of precision\n- `float64` — 64 bits, about 15 decimal digits of precision\n\nAlways use `float64` unless you have a specific reason not to. It is more precise and it is what Go uses by default when it sees a decimal number.\n\nCreate a `temperature` variable as `float32` with value `36.6`, and a `distance` variable as `float64` with value `12345.6789`. Print both.",
+    "hint": "var temperature float32 = 36.6  and  var distance float64 = 12345.6789",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\t// TODO: create temperature as float32 = 36.6\n\t// TODO: create distance as float64 = 12345.6789\n\t// TODO: print both\n}",
     "expectedOutput": [],
     "codeChecks": [
-      { "pattern": "name\\s*:=\\s*\"\\S+\"", "required": true, "message": "Create name as a string: name := \"YourName\" (in double quotes)" },
-      { "pattern": "age\\s*:=\\s*\\d+", "required": true, "message": "Create age as an int: age := 24 (no quotes, no decimal)" },
-      { "pattern": "height\\s*:=\\s*\\d+\\.\\d+", "required": true, "message": "Create height as a float64: height := 1.75 (must have a decimal point)" },
-      { "pattern": "isStudent\\s*:=\\s*(true|false)", "required": true, "message": "Create isStudent as a bool: isStudent := true  (or false, no quotes)" },
-      { "pattern": "Println\\(name\\)", "required": true, "message": "Print name: fmt.Println(name)" },
-      { "pattern": "Println\\(age\\)", "required": true, "message": "Print age: fmt.Println(age)" },
-      { "pattern": "Println\\(height\\)", "required": true, "message": "Print height: fmt.Println(height)" },
-      { "pattern": "Println\\(isStudent\\)", "required": true, "message": "Print isStudent: fmt.Println(isStudent)" },
-      { "pattern": "TODO", "required": false, "message": "Replace the TODO lines with your actual code." }
-    ]
+      { "pattern": "var\\s+temperature\\s+float32", "required": true, "message": "Declare temperature as float32: var temperature float32 = 36.6" },
+      { "pattern": "var\\s+distance\\s+float64", "required": true, "message": "Declare distance as float64: var distance float64 = 12345.6789" },
+      { "pattern": "Println\\(temperature\\)", "required": true, "message": "Print temperature: fmt.Println(temperature)" },
+      { "pattern": "Println\\(distance\\)", "required": true, "message": "Print distance: fmt.Println(distance)" },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO lines with actual code." }
+    ],
+    "successMessage": "float64 is the one you will use almost every time. More precision, same effort."
+  },
+  {
+    "title": "bool — true or false",
+    "instruction": "A `bool` holds exactly one of two values: `true` or `false`.\n\nThat is it. Nothing else fits.\n\nNo quotes. `true` and `false` are keywords in Go — not text, not numbers.\n\nCreate two bool variables: `isOnline` set to `true`, and `isPremium` set to `false`. Print both.",
+    "hint": "isOnline := true  and  isPremium := false  — no quotes around true or false.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\t// TODO: create isOnline (true) and isPremium (false)\n\t// TODO: print both\n}",
+    "expectedOutput": ["true", "false"],
+    "codeChecks": [
+      { "pattern": "isOnline\\s*:=\\s*true", "required": true, "message": "Create isOnline: isOnline := true  (no quotes)" },
+      { "pattern": "isPremium\\s*:=\\s*false", "required": true, "message": "Create isPremium: isPremium := false  (no quotes)" },
+      { "pattern": "Println\\(isOnline\\)", "required": true, "message": "Print isOnline: fmt.Println(isOnline)" },
+      { "pattern": "Println\\(isPremium\\)", "required": true, "message": "Print isPremium: fmt.Println(isPremium)" },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO lines with actual code." }
+    ],
+    "successMessage": "Bools power every decision in your program. Every if, every condition, every check — it all comes down to true or false."
+  },
+  {
+    "title": "byte — a single character as a number",
+    "instruction": "`byte` is an alias for `uint8`. It holds a number from 0 to 255.\n\nIts main job is representing a single character. Every character on your keyboard has a number assigned to it — that system is called ASCII.\n\n- `'A'` = 65\n- `'a'` = 97\n- `'0'` = 48\n\nNotice single quotes for a character, not double quotes.\n\nRun this and see what number the letter 'G' maps to.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tvar letter byte = 'G'\n\tfmt.Println(letter)\n}",
+    "expectedOutput": ["71"],
+    "successMessage": "'G' is 71 in ASCII. Every character your computer shows on screen is secretly a number."
+  },
+  {
+    "title": "rune — a Unicode character",
+    "instruction": "`rune` is an alias for `int32`. It holds a single Unicode character.\n\nThe difference from `byte`:\n- `byte` handles ASCII — basic English letters and symbols (0-255)\n- `rune` handles Unicode — every character in every language on earth (over 1 million possible values)\n\nIf your program will ever work with non-English text — Arabic, Chinese, emoji — you need `rune`.\n\nRun this and see the Unicode value of the character.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tvar letter rune = '\\u0041'\n\tvar emoji  rune = '\\U0001F600'\n\tfmt.Println(letter)\n\tfmt.Println(emoji)\n}",
+    "expectedOutput": ["65", "128512"],
+    "successMessage": "rune handles the entire world's writing systems. byte handles the basics. Now you know the difference."
+  },
+  {
+    "title": "Type inference — Go figures it out",
+    "instruction": "You have been using `:=` without ever writing the type name. That is because Go looks at the value and figures out the type on its own.\n\nThis is called type inference.\n\n`name := \"Alex\"` → Go sees quotes → `string`\n`age := 25` → Go sees a whole number → `int`\n`price := 4.99` → Go sees a decimal → `float64`\n`active := true` → Go sees true/false → `bool`\n\nYou can print the actual type of any variable using `%T` in `fmt.Printf`.\n\nRun this and see the types Go assigned.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tname   := \"Alex\"\n\tage    := 25\n\tprice  := 4.99\n\tactive := true\n\tfmt.Printf(\"%T\\n\", name)\n\tfmt.Printf(\"%T\\n\", age)\n\tfmt.Printf(\"%T\\n\", price)\n\tfmt.Printf(\"%T\\n\", active)\n}",
+    "expectedOutput": ["string", "int", "float64", "bool"],
+    "successMessage": "Go reads your value and picks the right type automatically. You only need to be explicit when you want a specific sized type."
+  },
+  {
+    "title": "\"42\" is not 42",
+    "instruction": "This is a trap that catches a lot of beginners.\n\n`42` is a number. You can do math with it.\n`\"42\"` is a string — the characters 4 and 2. You cannot do math with it.\n\nThey look similar but Go treats them as completely different things.\n\nThis program has a bug because of this exact mistake. Fix it so both numbers add up correctly.",
+    "hint": "Remove the quotes around 42 on the second line. A number should never have quotes around it.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\ta := 10\n\tb := \"42\"\n\tfmt.Println(a + b)\n}",
+    "expectedOutput": ["52"],
+    "codeChecks": [
+      { "pattern": "b\\s*:=\\s*\"42\"", "required": false, "message": "Remove the quotes from 42. It should be a number: b := 42" }
+    ],
+    "successMessage": "Quotes mean text. No quotes means number. Never mix them."
+  },
+  {
+    "title": "Type conversion — changing from one type to another",
+    "instruction": "Go will not automatically mix types. If you want to use an `int` where a `float64` is needed, you have to convert it yourself.\n\nThe syntax is simple: wrap the value with the type name.\n\n`float64(myInt)` converts an int to float64\n`int(myFloat)` converts a float64 to int (drops the decimal)\n`int64(myInt)` converts int to int64\n\nThe code below tries to add an `int` and a `float64` directly. Fix it by converting `score` to `float64` before the addition.",
+    "hint": "Change the Println line to: fmt.Println(float64(score) + bonus)",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tscore := 95\n\tbonus := 4.5\n\tfmt.Println(score + bonus)\n}",
+    "expectedOutput": ["99.5"],
+    "codeChecks": [
+      { "pattern": "float64\\(score\\)", "required": true, "message": "Convert score to float64 before adding: float64(score) + bonus" }
+    ],
+    "successMessage": "Go never converts types silently. You are always in control of when and how a conversion happens."
+  },
+  {
+    "title": "Types do not change",
+    "instruction": "Once a variable has a type, it keeps that type forever.\n\nYou cannot store a string in an int variable. You cannot store a float in a bool variable. Go will refuse and give you an error.\n\nThis program tries to do exactly that. Read the error, understand why, then fix it by changing the second assignment to a valid int value.",
+    "hint": "score is an int. You cannot assign \"one hundred\" (a string) to it. Change it to the number 100.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tscore := 95\n\tfmt.Println(score)\n\tscore = \"one hundred\"\n\tfmt.Println(score)\n}",
+    "expectedOutput": ["95", "100"],
+    "codeChecks": [
+      { "pattern": "score\\s*=\\s*\"one hundred\"", "required": false, "message": "score is an int. Replace \"one hundred\" with the number 100." }
+    ],
+    "successMessage": "Types are permanent. That rigidness is actually a feature — it catches a whole class of bugs before your program ever runs."
+  },
+  {
+    "title": "Use six types in one program",
+    "instruction": "No starter code this time.\n\nCreate six variables using six different types:\n- `username` — string\n- `level` — int\n- `score` — int64\n- `accuracy` — float64\n- `isActive` — bool\n- `grade` — byte (set it to `'A'`)\n\nPrint all six.",
+    "hint": "username := \"...\", level := 1, var score int64 = 1000, accuracy := 98.5, isActive := true, var grade byte = 'A'",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\t// Build your variables here\n}",
+    "expectedOutput": [],
+    "codeChecks": [
+      { "pattern": "username\\s*:=\\s*\"[^\"]+\"", "required": true, "message": "Create username as a string" },
+      { "pattern": "level\\s*:=\\s*\\d+", "required": true, "message": "Create level as an int" },
+      { "pattern": "int64", "required": true, "message": "Create score as int64 using the var keyword" },
+      { "pattern": "accuracy\\s*:=\\s*\\d+\\.\\d+", "required": true, "message": "Create accuracy as a float64 with a decimal value" },
+      { "pattern": "isActive\\s*:=\\s*(true|false)", "required": true, "message": "Create isActive as a bool" },
+      { "pattern": "byte\\s*=\\s*'[A-Z]'", "required": true, "message": "Create grade as a byte set to a letter like 'A'" },
+      { "pattern": "Println\\(username\\)", "required": true, "message": "Print username" },
+      { "pattern": "Println\\(level\\)", "required": true, "message": "Print level" },
+      { "pattern": "Println\\(score\\)", "required": true, "message": "Print score" },
+      { "pattern": "Println\\(accuracy\\)", "required": true, "message": "Print accuracy" },
+      { "pattern": "Println\\(isActive\\)", "required": true, "message": "Print isActive" },
+      { "pattern": "Println\\(grade\\)", "required": true, "message": "Print grade" }
+    ],
+    "successMessage": "Six types, one program. You now know every basic data type in Go."
   }
 ]
