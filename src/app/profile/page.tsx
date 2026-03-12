@@ -29,7 +29,7 @@ export default function ProfilePageWrapper() {
 
 function ProfileSkeleton() {
   return (
-    <div className="mx-auto max-w-4xl animate-pulse px-6 py-12">
+    <div className="mx-auto max-w-4xl animate-pulse px-4 py-12 sm:px-6">
       <div className="mb-8 flex items-start gap-5">
         <div className="h-16 w-16 rounded-full bg-zinc-200 dark:bg-zinc-800" />
         <div className="flex-1 space-y-2 pt-1">
@@ -269,7 +269,7 @@ function ProfilePage() {
 
   return (
     <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
-      <div className="mx-auto w-full max-w-5xl flex-1 px-6 py-12">
+      <div className="mx-auto w-full max-w-5xl flex-1 px-4 py-12 sm:px-6">
       <ProfileHeader
         name={profile.name}
         email={profile.email}

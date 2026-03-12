@@ -49,7 +49,7 @@ export default function LeaderboardPage() {
 
   if (loading) {
     return (
-      <div className="mx-auto max-w-3xl animate-pulse px-6 py-12">
+      <div className="mx-auto max-w-3xl animate-pulse px-4 py-12 sm:px-6">
         <div className="mb-6 h-8 w-48 rounded bg-zinc-200 dark:bg-zinc-800" />
         <div className="space-y-3">
           {[...Array(10)].map((_, i) => (
@@ -96,7 +96,7 @@ export default function LeaderboardPage() {
   }
 
   return (
-    <div className="mx-auto max-w-3xl px-6 py-12">
+    <div className="mx-auto max-w-3xl px-4 py-12 sm:px-6">
       <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100">Leaderboard</h1>

@@ -97,19 +97,20 @@ function ExamCard({
         {/* Divider */}
         <div className="h-px bg-zinc-100 dark:bg-zinc-800" />
 
-        {/* Exam info + stats */}
-        <div className="flex items-center gap-4">
-          <div className="flex-1">
+        {/* Exam info + stats
+            grid-cols-2 on mobile (2×2) avoids 4 columns squeezing into ~60px each on narrow cards */}
+        <div className="grid grid-cols-2 gap-x-4 gap-y-3 sm:grid-cols-4">
+          <div>
             <p className="text-xs text-zinc-400 dark:text-zinc-500">Questions</p>
             <p className="mt-0.5 text-lg font-bold tabular-nums text-zinc-900 dark:text-zinc-100">{examConfig.examSize}</p>
           </div>
-          <div className="flex-1">
+          <div>
             <p className="text-xs text-zinc-400 dark:text-zinc-500">Time limit</p>
             <p className="mt-0.5 text-lg font-bold tabular-nums text-zinc-900 dark:text-zinc-100">
               {examConfig.examDurationMinutes}<span className="ml-0.5 text-sm font-normal text-zinc-400">min</span>
             </p>
           </div>
-          <div className="flex-1">
+          <div>
             <p className="text-xs text-zinc-400 dark:text-zinc-500">Attempts</p>
             <p className="mt-0.5 text-lg font-bold tabular-nums text-zinc-900 dark:text-zinc-100">
               {isLoggedIn && userAttempts > 0
@@ -117,7 +118,7 @@ function ExamCard({
                 : hasData ? totalAttempts.toLocaleString() : "—"}
             </p>
           </div>
-          <div className="flex-1">
+          <div>
             <p className="text-xs text-zinc-400 dark:text-zinc-500">Pass rate</p>
             <p className={`mt-0.5 text-lg font-bold tabular-nums ${
               !hasData ? "text-zinc-400" : passRate >= 60 ? "text-emerald-600 dark:text-emerald-400" : "text-amber-600 dark:text-amber-400"
@@ -260,7 +261,7 @@ export default async function PracticeExamsPage() {
 
       {/* ── Hero ─────────────────────────────────────────────────────────── */}
       <div className="border-b border-zinc-200 bg-surface-card dark:border-zinc-800">
-        <div className="mx-auto max-w-5xl px-6 py-12 sm:py-16">
+        <div className="mx-auto max-w-5xl px-4 py-12 sm:px-6 sm:py-16">
           <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
             <div className="max-w-xl">
               <h1 className="text-4xl font-extrabold tracking-tight text-zinc-900 dark:text-zinc-100 sm:text-5xl">

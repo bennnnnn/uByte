@@ -262,7 +262,8 @@ function PricingContent() {
           __html: JSON.stringify([pricingJsonLd, faqJsonLd]),
         }}
       />
-      <div className="px-6 pb-20 pt-8 sm:px-8 sm:pt-10">
+      {/* px-4 on mobile prevents content touching screen edges on small phones */}
+      <div className="px-4 pb-20 pt-8 sm:px-6 sm:pt-10">
 
         {/* ── Success banner ─────────────────────────────── */}
         {showSuccess && (
@@ -561,8 +562,10 @@ function PricingContent() {
           <h2 className="mb-6 text-center text-lg font-bold text-zinc-900 dark:text-zinc-100">
             Compare plans
           </h2>
-          <div className="overflow-hidden rounded-2xl border border-zinc-200 dark:border-zinc-700">
-            <table className="w-full text-sm">
+          {/* overflow-x-auto lets the table scroll horizontally on narrow phones
+              instead of overflowing and breaking the layout */}
+          <div className="overflow-x-auto rounded-2xl border border-zinc-200 dark:border-zinc-700">
+            <table className="w-full min-w-[420px] text-sm">
               <thead>
                 <tr className="border-b border-zinc-200 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-800/50">
                   <th className="px-5 py-3 text-left font-semibold text-zinc-700 dark:text-zinc-300">Feature</th>

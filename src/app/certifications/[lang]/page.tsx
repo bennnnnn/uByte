@@ -135,7 +135,7 @@ export default async function PracticeExamLangPage({ params }: Props) {
 
       {/* ── Hero ──────────────────────────────────────────────────────────── */}
       <div className="border-b border-zinc-200 bg-surface-card dark:border-zinc-800">
-        <div className="mx-auto max-w-5xl px-6 py-10 sm:py-14">
+        <div className="mx-auto max-w-5xl px-4 py-10 sm:px-6 sm:py-14">
           <div className="flex flex-col gap-8 sm:flex-row sm:items-start sm:justify-between">
             {/* Left: identity + tagline + stat chips */}
             <div className="flex items-start gap-5">
@@ -184,8 +184,13 @@ export default async function PracticeExamLangPage({ params }: Props) {
             }
             if (stats.length === 0) return null;
             return (
+              // Responsive grid: 2 cols on mobile so ~5 stats don't squeeze into 60px columns
               <div className={`mt-8 grid gap-4 border-t border-zinc-200 pt-6 dark:border-zinc-800 ${
-                stats.length >= 5 ? "grid-cols-5" : stats.length >= 4 ? "grid-cols-4" : stats.length === 3 ? "grid-cols-3" : stats.length === 2 ? "grid-cols-2" : "grid-cols-1"
+                stats.length >= 5 ? "grid-cols-2 sm:grid-cols-3 lg:grid-cols-5"
+                : stats.length >= 4 ? "grid-cols-2 sm:grid-cols-4"
+                : stats.length === 3 ? "grid-cols-2 sm:grid-cols-3"
+                : stats.length === 2 ? "grid-cols-2"
+                : "grid-cols-1"
               }`}>
                 {stats.map((s) => (
                   <div key={s.label}>
