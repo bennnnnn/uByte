@@ -43,6 +43,11 @@ export function loadStepsFromContent(
       expectedOutput: Array.isArray(item.expectedOutput)
         ? (item.expectedOutput as string[])
         : [],
+      // codeChecks must be explicitly mapped — omitting this caused all
+      // pattern-based validations in steps.json to be silently ignored.
+      codeChecks: Array.isArray(item.codeChecks)
+        ? (item.codeChecks as import("./types").CodeCheck[])
+        : undefined,
     }));
 
     const result = steps.length > 0 ? steps : null;

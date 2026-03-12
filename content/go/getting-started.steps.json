@@ -35,12 +35,12 @@
   },
   {
     "title": "Leave a comment",
-    "instruction": "A comment is a note you leave in your code. It starts with // and the computer ignores it completely — it's purely for humans reading the code.\n\nThis program has three Println calls. Add a comment above each one explaining what it prints. The output should stay exactly the same — comments don't change what runs.",
-    "hint": "A comment looks like this: // This prints a greeting. Put it on the line directly above the Println it describes. You'll add three comments total.",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tfmt.Println(\"Riverside Academy\")\n\tfmt.Println(\"Student Tracker\")\n\tfmt.Println(\"Version 1.0\")\n}",
+    "instruction": "A comment is a note you leave in your code. It starts with // and the computer ignores it completely — it's purely for humans reading the code.\n\nThis program has three Println calls. Replace each TODO line with a real comment explaining what that Println prints. The output should stay exactly the same — comments don't change what runs.",
+    "hint": "Replace // TODO with a real comment like: // This prints the school name. Do this for all three Println calls.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\t// TODO: replace this with a comment explaining what the next line prints\n\tfmt.Println(\"Riverside Academy\")\n\t// TODO: replace this with a comment explaining what the next line prints\n\tfmt.Println(\"Student Tracker\")\n\t// TODO: replace this with a comment explaining what the next line prints\n\tfmt.Println(\"Version 1.0\")\n}",
     "expectedOutput": ["Riverside Academy", "Student Tracker", "Version 1.0"],
     "codeChecks": [
-      { "pattern": "^\\s*//", "message": "Add at least one comment — a line that starts with //" }
+      { "pattern": "TODO", "required": false, "message": "Replace all three TODO lines with real comments — don't just leave them as TODO." }
     ]
   },
   {
