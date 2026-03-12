@@ -1,51 +1,107 @@
 [
   {
-    "title": "Println vs Printf — What's the Difference?",
-    "instruction": "In Chapter 1 you used `fmt.Println()`. Now meet its sibling: `fmt.Printf()`.\n\n- `Println` adds a newline automatically and uses default formatting.\n- `Printf` gives you full control — you write a template with `%s`, `%d`, `%f` placeholders.\n\nThe variables `name` and `age` are already set (you saw these in Chapter 2!). Use `fmt.Printf` to print `\"Name: Alice, Age: 17\"` on one line.",
-    "hint": "fmt.Printf(\"Name: %s, Age: %d\\n\", name, age) — %s for string, %d for integer, \\n for newline.",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tname := \"Alice\"\n\tage := 17\n\t// TODO: use Printf to print \"Name: Alice, Age: 17\"\n\t_ = name\n\t_ = age\n}",
-    "expectedOutput": ["Name: Alice, Age: 17"]
+    "title": "Print vs Println — spot the difference",
+    "instruction": "`fmt.Println` prints your text and then moves to the next line.\n`fmt.Print` prints your text and stays on the same line.\n\nSounds minor. Watch what happens.\n\nRun this and look carefully at the output.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tfmt.Print(\"Hello \")\n\tfmt.Print(\"there \")\n\tfmt.Print(\"friend\")\n\tfmt.Println()\n\tfmt.Println(\"Now I'm on a new line\")\n}",
+    "expectedOutput": ["Hello there friend", "Now I'm on a new line"],
+    "successMessage": "Print stays put. Println moves on. You will use both — now you know why they exist."
   },
   {
-    "title": "Format a Float — Control Decimal Places",
-    "instruction": "Alice's GPA is `3.8`, but the school system displays it as `3.80` — always two decimal places. Use `%.2f` to control how many decimal places are shown.\n\nPrint `\"GPA: 3.80\"` using Printf.",
-    "hint": "fmt.Printf(\"GPA: %.2f\\n\", gpa) — the .2 before f means exactly 2 decimal places.",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tgpa := 3.8\n\t// TODO: print \"GPA: 3.80\" using Printf with %.2f\n\t_ = gpa\n}",
-    "expectedOutput": ["GPA: 3.80"]
+    "title": "Printf — your first format verb",
+    "instruction": "`fmt.Printf` lets you build output by mixing text with variables using format verbs.\n\nA format verb is a placeholder that starts with `%`. Go swaps it with the actual value.\n\n- `%s` → a string\n- `%d` → an integer\n- `%f` → a float\n\n`fmt.Printf(\"My name is %s and I am %d years old\\n\", name, age)`\n\nChange the name and age to yours, then run it.",
+    "hint": "Replace \"Alex\" with your name and 25 with your age. Leave the format string exactly as it is.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tname := \"Alex\"\n\tage := 25\n\tfmt.Printf(\"My name is %s and I am %d years old\\n\", name, age)\n}",
+    "expectedOutput": [],
+    "codeChecks": [
+      { "pattern": "Printf\\(\"My name is %s and I am %d years old\\\\n\",\\s*name,\\s*age\\)", "required": true, "message": "Keep the Printf format string as is. Only change the name and age values." },
+      { "pattern": "name\\s*:=\\s*\"Alex\"", "required": false, "message": "Change the name from Alex to your own name." }
+    ],
+    "successMessage": "That is Printf. One line, multiple values, full control over how they appear."
   },
   {
-    "title": "Print a Full Student Profile",
-    "instruction": "Combine everything from Chapter 2. Use Printf to print a formatted student profile — one field per line:\n```\nName:     Alice\nAge:      17\nGPA:      3.80\nEnrolled: true\n```",
-    "hint": "Call fmt.Printf four times, one for each field. Use %s, %d, %.2f, and %t (for booleans).",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tname := \"Alice\"\n\tage := 17\n\tgpa := 3.8\n\tenrolled := true\n\t// TODO: use Printf four times to print the profile above\n\t_ = name\n\t_ = age\n\t_ = gpa\n\t_ = enrolled\n}",
-    "expectedOutput": ["Name:", "Alice", "Age:", "17", "GPA:", "3.80", "Enrolled:", "true"]
+    "title": "More format verbs",
+    "instruction": "Go has a format verb for almost everything.\n\n- `%v` → the value in its default format (works on anything)\n- `%T` → the type of the variable\n- `%t` → a bool\n- `%b` → a number in binary\n- `%x` → a number in hexadecimal\n\nRun this. One number, printed five different ways.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tn := 42\n\tfmt.Printf(\"default:  %v\\n\", n)\n\tfmt.Printf(\"type:     %T\\n\", n)\n\tfmt.Printf(\"binary:   %b\\n\", n)\n\tfmt.Printf(\"hex:      %x\\n\", n)\n\tfmt.Printf(\"decimal:  %d\\n\", n)\n}",
+    "expectedOutput": ["default:  42", "type:     int", "binary:   101010", "hex:      2a", "decimal:  42"],
+    "successMessage": "42 in binary is 101010. 42 in hex is 2a. Same number, totally different faces. Computers are wild."
   },
   {
-    "title": "Build a String with Sprintf",
-    "instruction": "Sometimes you want to **build** a string and store it — not print it immediately. `fmt.Sprintf()` works exactly like Printf but returns the result as a string.\n\nBuild Alice's ID badge: `\"[1042] Alice — Grade 11\"` using Sprintf with the variables below, then print it.",
-    "hint": "badge := fmt.Sprintf(\"[%d] %s — Grade %d\", id, name, grade) — then fmt.Println(badge).",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tid := 1042\n\tname := \"Alice\"\n\tgrade := 11\n\t// TODO: use Sprintf to build \"[1042] Alice — Grade 11\" and store in badge\n\tbadge := \"\"\n\t_ = id\n\t_ = name\n\t_ = grade\n\tfmt.Println(badge)\n}",
-    "expectedOutput": ["[1042] Alice — Grade 11"]
+    "title": "Width and alignment",
+    "instruction": "You can tell Go exactly how wide a value should be when printed.\n\n`%10s` → right-align in 10 characters (pad with spaces on the left)\n`%-10s` → left-align in 10 characters (pad with spaces on the right)\n`%05d` → pad a number with zeros on the left until it is 5 digits wide\n\nRun this and see how things line up.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tfmt.Printf(\"%10s | %-10s\\n\", \"right\", \"left\")\n\tfmt.Printf(\"%10s | %-10s\\n\", \"Go\", \"is fun\")\n\tfmt.Printf(\"%10s | %-10s\\n\", \"id:\", \"001\")\n\tfmt.Printf(\"order #%05d\\n\", 42)\n}",
+    "expectedOutput": ["right | left", "Go | is fun", "id: | 001", "order #00042"],
+    "successMessage": "Width and alignment make your output readable. Think receipts, tables, logs — anything that needs columns."
   },
   {
-    "title": "Print a Separator Line",
-    "instruction": "The school report needs a clean separator between sections. Use `fmt.Printf` with `%s` and the `strings.Repeat` function to print a line of 30 dashes: `\"------------------------------\"`.",
-    "hint": "fmt.Printf(\"%s\\n\", strings.Repeat(\"-\", 30)) — strings.Repeat repeats a string N times.",
-    "starter": "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n)\n\nfunc main() {\n\t// TODO: print a line of 30 dashes using fmt.Printf and strings.Repeat\n\t_ = strings\n}",
-    "expectedOutput": ["------------------------------"]
+    "title": "Decimal precision",
+    "instruction": "By default `%f` prints 6 decimal places, which is usually too many.\n\n`%.2f` → exactly 2 decimal places\n`%8.2f` → 8 characters wide, 2 decimal places\n\nYour coffee costs $4.5, not $4.500000.\n\nChange the format strings to show price with 2 decimal places and percentage with 1 decimal place.",
+    "hint": "Use %.2f for price and %.1f for percentage. Run it and check the output.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tprice := 4.5\n\tpercentage := 87.333333\n\tfmt.Printf(\"Price: $%f\\n\", price)\n\tfmt.Printf(\"Score: %f%%\\n\", percentage)\n}",
+    "expectedOutput": ["Price: $4.50", "Score: 87.3%"],
+    "codeChecks": [
+      { "pattern": "%.2f", "required": true, "message": "Use %.2f to format the price to 2 decimal places." },
+      { "pattern": "%.1f", "required": true, "message": "Use %.1f to format the percentage to 1 decimal place." }
+    ],
+    "successMessage": "Clean numbers. Nobody wants to see $4.500000 on a price tag."
   },
   {
-    "title": "Print the Type of a Variable",
-    "instruction": "The verb `%T` prints the Go **type** of any value — super useful when debugging. Print Alice's score (`83`) and its type on one line:\n```\nvalue: 83, type: int\n```",
-    "hint": "fmt.Printf(\"value: %v, type: %T\\n\", score, score) — %v is the default format, %T is the type.",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tscore := 83\n\t// TODO: print score's value and type using %v and %T\n\t_ = score\n}",
-    "expectedOutput": ["value: 83, type: int"]
+    "title": "Sprintf — build a string, don't print it",
+    "instruction": "`fmt.Sprintf` works exactly like `Printf` but instead of printing, it returns the result as a string.\n\nWhy? Because sometimes you need to build a message and use it later — store it in a variable, pass it somewhere, log it.\n\n`label := fmt.Sprintf(\"User #%d: %s\", id, name)`\n\nCreate a `greeting` variable using `Sprintf` that says `\"Welcome back, [your name]! You have 3 messages.\"` — then print it.",
+    "hint": "greeting := fmt.Sprintf(\"Welcome back, %s! You have %d messages.\", name, 3)  — then fmt.Println(greeting).",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tname := \"Alex\"\n\t// TODO: build greeting using Sprintf\n\t// TODO: print greeting\n}",
+    "expectedOutput": [],
+    "codeChecks": [
+      { "pattern": "Sprintf\\(", "required": true, "message": "Use fmt.Sprintf to build the greeting string." },
+      { "pattern": "greeting\\s*:=", "required": true, "message": "Store the result in a variable called greeting." },
+      { "pattern": "Println\\(greeting\\)", "required": true, "message": "Print the greeting using fmt.Println(greeting)." },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO lines with actual code." }
+    ],
+    "successMessage": "Sprintf is Printf that hands you the result instead of printing it. You will use this constantly."
   },
   {
-    "title": "Build the Full Report",
-    "instruction": "Put it all together. Use Sprintf to build a one-line summary string for Alice's full report:\n```\nReport | Alice | Score: 83 | GPA: 3.80\n```\nStore it in `report` and print it.",
-    "hint": "fmt.Sprintf(\"Report | %s | Score: %d | GPA: %.2f\", name, score, gpa)",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tname := \"Alice\"\n\tscore := 83\n\tgpa := 3.8\n\t// TODO: use Sprintf to build the report string\n\treport := \"\"\n\t_ = name\n\t_ = score\n\t_ = gpa\n\tfmt.Println(report)\n}",
-    "expectedOutput": ["Report | Alice | Score: 83 | GPA: 3.80"]
+    "title": "Escape sequences",
+    "instruction": "Some characters cannot just be typed into a string. They need a special code called an escape sequence.\n\n- `\\n` → newline (go to the next line)\n- `\\t` → tab (big horizontal gap)\n- `\\\\` → a literal backslash\n- `\\\"` → a quote character inside a string\n\nRun this and see each one in action.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tfmt.Println(\"Line one\\nLine two\")\n\tfmt.Println(\"Name:\\tAlex\")\n\tfmt.Println(\"Path: C:\\\\Users\\\\Alex\")\n\tfmt.Println(\"She said \\\"hello\\\"\")\n}",
+    "expectedOutput": ["Line one", "Line two", "Name:\tAlex", "Path: C:\\Users\\Alex", "She said \"hello\""],
+    "successMessage": "Escape sequences let you put special characters inside strings. \\n and \\t are the ones you will use most."
+  },
+  {
+    "title": "Println with multiple arguments",
+    "instruction": "You already know `fmt.Println(oneValue)` — but it can take multiple values at once.\n\n`fmt.Println(a, b, c)` prints all of them on one line, separated by spaces. No format string needed.\n\nAdd `city` and `country` variables, then print all four values — `name`, `age`, `city`, `country` — in a single `Println` call.",
+    "hint": "fmt.Println(name, age, city, country)  — all four in one call, separated by commas.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tname := \"Alex\"\n\tage := 25\n\t// TODO: add city and country variables\n\t// TODO: print all four in one Println call\n}",
+    "expectedOutput": [],
+    "codeChecks": [
+      { "pattern": "city\\s*:=\\s*\"[^\"]+\"", "required": true, "message": "Create a city variable with your city." },
+      { "pattern": "country\\s*:=\\s*\"[^\"]+\"", "required": true, "message": "Create a country variable with your country." },
+      { "pattern": "Println\\(name,\\s*age,\\s*city,\\s*country\\)", "required": true, "message": "Print all four in one Println call: fmt.Println(name, age, city, country)" },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO lines with actual code." }
+    ],
+    "successMessage": "Println handles multiple values and inserts spaces automatically. Quick and clean."
+  },
+  {
+    "title": "Printf with multiple verbs",
+    "instruction": "A single `Printf` can hold as many format verbs as you need.\n\nThe values you pass after the format string fill in the verbs left to right. First value goes to the first verb, second to the second, and so on.\n\nRun this. Then add one more line that prints: `\"Go version: 1.21, released: 2023\"`",
+    "hint": "fmt.Printf(\"Go version: %.2f, released: %d\\n\", 1.21, 2023)",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tname := \"Alex\"\n\tage := 25\n\tscore := 98.5\n\tfmt.Printf(\"%s is %d years old with a score of %.1f\\n\", name, age, score)\n\t// TODO: add a line: \"Go version: 1.21, released: 2023\"\n}",
+    "expectedOutput": ["Alex is 25 years old with a score of 98.5", "Go version: 1.21, released: 2023"],
+    "codeChecks": [
+      { "pattern": "Printf\\([^)]*1\\.21[^)]*2023", "required": true, "message": "Add a Printf line that prints the Go version and release year." },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO line with actual code." }
+    ],
+    "successMessage": "One format string, many values. The order of values matches the order of verbs — always."
+  },
+  {
+    "title": "Build a formatted profile card",
+    "instruction": "No starter code.\n\nUsing only what you learned in this chapter, build a profile card that outputs exactly this:\n\n```\n===== PROFILE =====\nName:     Alex\nAge:      25\nScore:    98.50\nActive:   true\n===================\n```\n\nUse `Printf` with width formatting for the label column. Use `%.2f` for the score.",
+    "hint": "fmt.Printf(\"%-10s%s\\n\", \"Name:\", name)  — %-10s left-aligns the label in 10 characters. Use %.2f for score.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tname   := \"Alex\"\n\tage    := 25\n\tscore  := 98.5\n\tactive := true\n\t// Build the profile card here\n}",
+    "expectedOutput": ["===== PROFILE =====", "Name:", "Age:", "Score:", "Active:", "==================="],
+    "codeChecks": [
+      { "pattern": "Printf\\(", "required": true, "message": "Use fmt.Printf to format the output." },
+      { "pattern": "%.2f", "required": true, "message": "Use %.2f to format the score to 2 decimal places." },
+      { "pattern": "=====", "required": true, "message": "Add the header and footer lines with ===== PROFILE ===== and ===================" }
+    ],
+    "successMessage": "Clean, aligned, professional output. This is the difference between code that works and code that looks like it was made by someone who knows what they are doing."
   }
 ]

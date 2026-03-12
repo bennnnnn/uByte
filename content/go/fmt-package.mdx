@@ -1,128 +1,16 @@
 ---
 title: "The fmt Package"
-description: "Display student data beautifully — control every detail of how your output looks."
+description: "Print things properly. Format numbers, align text, build strings, and control every detail of your output."
 order: 4
 difficulty: "beginner"
-estimatedMinutes: 12
-concepts: ["Println", "Printf", "Sprintf", "format verbs", "padding", "Fprintf"]
+estimatedMinutes: 15
+concepts: ["Print", "Println", "Printf", "Sprintf", "format verbs", "width", "padding", "precision", "escape sequences"]
 ---
 
-## Your Data Looks Messy — Let's Fix That
+## Making your output look good
 
-In Chapter 2, you stored Alice's information in variables. But if you just `Println` everything, it looks rough:
+So far you have been printing things with `fmt.Println`. It works. But it is a bit like cooking a full meal and then eating it standing over the sink.
 
-```
-Alice
-17
-3.8
-true
-```
+The `fmt` package can do a lot more. You can format numbers, align text into columns, control decimal places, build strings dynamically, and more.
 
-The `fmt` package is your formatting toolkit. With it, you control exactly how data is presented — like a word processor for your output.
-
----
-
-## Format Verbs — Placeholders for Values
-
-`fmt.Printf` takes a **template string** with placeholders called format verbs, then fills them in with values:
-
-```gorun
-package main
-
-import "fmt"
-
-func main() {
-    name := "Alice"
-    age  := 17
-    gpa  := 3.8
-
-    fmt.Printf("Name: %s\n", name)      // %s for strings
-    fmt.Printf("Age:  %d\n", age)       // %d for integers
-    fmt.Printf("GPA:  %.2f\n", gpa)     // %.2f = float, 2 decimal places
-}
-```
-
-The most useful verbs:
-
-| Verb | Used for | Example output |
-|------|----------|----------------|
-| `%s` | string | `Alice` |
-| `%d` | integer | `17` |
-| `%f` | float (default 6 decimals) | `3.800000` |
-| `%.2f` | float with 2 decimals | `3.80` |
-| `%t` | bool | `true` |
-| `%v` | any value, default format | works on everything |
-| `%T` | the type of a value | `int`, `string`, etc. |
-| `\n` | newline | moves to the next line |
-
----
-
-## Sprintf — Build a String Without Printing It
-
-`fmt.Printf` prints immediately. `fmt.Sprintf` does the same formatting but **returns a string** instead — perfect for building messages you'll use later:
-
-```gorun
-package main
-
-import "fmt"
-
-func main() {
-    id    := 1042
-    name  := "Alice"
-    grade := 11
-
-    // Build the badge string, then use it
-    badge := fmt.Sprintf("[%d] %s — Grade %d", id, name, grade)
-    fmt.Println(badge)
-    fmt.Println("Badge length:", len(badge))
-}
-```
-
----
-
-## Controlling Float Precision
-
-```gorun
-package main
-
-import "fmt"
-
-func main() {
-    gpa := 3.8
-
-    fmt.Printf("%.0f\n", gpa)  // 4   (0 decimal places, rounded)
-    fmt.Printf("%.1f\n", gpa)  // 3.8 (1 decimal place)
-    fmt.Printf("%.2f\n", gpa)  // 3.80 (2 decimal places — standard for GPAs)
-    fmt.Printf("%.4f\n", gpa)  // 3.8000 (4 decimal places)
-}
-```
-
-The `.2` between `%` and `f` controls the precision — how many digits appear after the decimal point.
-
----
-
-## Printing Types for Debugging
-
-When something looks wrong, `%T` tells you what type Go thinks a variable is:
-
-```gorun
-package main
-
-import "fmt"
-
-func main() {
-    score := 83
-    gpa   := 3.8
-    name  := "Alice"
-
-    fmt.Printf("score: %v (type: %T)\n", score, score)
-    fmt.Printf("gpa:   %v (type: %T)\n", gpa, gpa)
-    fmt.Printf("name:  %v (type: %T)\n", name, name)
-}
-```
-
----
-
-## What's Next
-
-You can now store data (Chapter 2) and display it beautifully (Chapter 3). In **Chapter 4: Control Flow**, you'll make *decisions* with that data — like determining whether Alice passed her exam or earned a spot on the honor roll.
+Ten steps. By the end you will never look at `fmt.Println` the same way again.
