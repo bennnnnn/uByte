@@ -1,51 +1,129 @@
 [
   {
-    "title": "Launch a Goroutine",
-    "instruction": "Start a goroutine that prints \"from goroutine\". Sleep 100ms in main so it runs.",
-    "hint": "go func() { fmt.Println(\"from goroutine\") }()",
-    "starter": "package main\n\nimport ( \"fmt\"; \"time\" )\n\nfunc main() {\n\t// TODO: go goroutine that prints \"from goroutine\"\n\ttime.Sleep(100 * time.Millisecond)\n}",
-    "expectedOutput": [
-      "from goroutine"
-    ]
+    "title": "What is a goroutine",
+    "instruction": "A goroutine is a function that runs concurrently with other functions.\n\nStart one with the `go` keyword:\n\n```\ngo someFunction()\n```\n\nThat is it. One word. Go handles all the scheduling — no threads, no callbacks, no async/await.\n\nRun this. Two functions run concurrently. Notice the output order might vary — both are running at the same time.",
+    "starter": "package main\n\nimport (\n\t\"fmt\"\n\t\"time\"\n)\n\nfunc printNumbers() {\n\tfor i := 1; i <= 3; i++ {\n\t\tfmt.Println(\"Number:\", i)\n\t\ttime.Sleep(10 * time.Millisecond)\n\t}\n}\n\nfunc printLetters() {\n\tfor _, c := range []string{\"A\", \"B\", \"C\"} {\n\t\tfmt.Println(\"Letter:\", c)\n\t\ttime.Sleep(10 * time.Millisecond)\n\t}\n}\n\nfunc main() {\n\tgo printNumbers()\n\tgo printLetters()\n\ttime.Sleep(100 * time.Millisecond)\n\tfmt.Println(\"Done\")\n}",
+    "expectedOutput": ["Done"],
+    "successMessage": "Numbers and letters interleaved — two functions running at the same time. The go keyword is all it takes. In most languages this would require threads, thread pools, and a lot of boilerplate."
   },
   {
-    "title": "WaitGroup",
-    "instruction": "Launch 3 goroutines (worker 1, 2, 3), use WaitGroup to wait for all.",
-    "hint": "wg.Add(1); go func(n int) { defer wg.Done(); fmt.Printf(\"worker %d\n\", n) }(i)",
-    "starter": "package main\n\nimport ( \"fmt\"; \"sync\" )\n\nfunc main() {\n\tvar wg sync.WaitGroup\n\tfor i := 1; i <= 3; i++ {\n\t\t// TODO: wg.Add(1), go worker that prints and wg.Done()\n\t}\n\twg.Wait()\n}",
-    "expectedOutput": [
-      "worker 1",
-      "worker 2",
-      "worker 3"
-    ]
+    "title": "Channels — communicate between goroutines",
+    "instruction": "A channel is a pipe between goroutines. One goroutine sends a value, another receives it.\n\n```\nch := make(chan int)   // create a channel\nch <- 42              // send 42 into the channel\nvalue := <-ch         // receive from the channel\n```\n\nSending and receiving block until both sides are ready — a built-in synchronisation mechanism.\n\nRun this. The goroutine sends a result back through the channel. Main receives and prints it.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc square(n int, ch chan int) {\n\tch <- n * n\n}\n\nfunc main() {\n\tch := make(chan int)\n\tgo square(7, ch)\n\tresult := <-ch\n\tfmt.Println(\"7 squared:\", result)\n}",
+    "expectedOutput": ["7 squared: 49"],
+    "successMessage": "The goroutine computed 7² and sent it back through the channel. Main blocked on <-ch until the result arrived. No shared variables, no locks — just a channel."
   },
   {
-    "title": "Channel Send and Receive",
-    "instruction": "Create chan int, launch goroutine that sends 42, receive and print in main.",
-    "hint": "go func() { ch <- 42 }(); fmt.Println(<-ch)",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tch := make(chan int)\n\t// TODO: goroutine send 42, receive and print\n}",
-    "expectedOutput": [
-      "42"
-    ]
+    "title": "Send and receive multiple values",
+    "instruction": "A channel can send as many values as you need. The receiver collects them in order.\n\nStart three goroutines, each computing a square and sending the result back. Receive all three results and print them.\n\nAdd a third goroutine that sends `square(9, ch)` and receive its result.",
+    "hint": "go square(9, ch)  then result3 := <-ch  fmt.Println(\"9 squared:\", result3)",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc square(n int, ch chan int) {\n\tch <- n * n\n}\n\nfunc main() {\n\tch := make(chan int)\n\n\tgo square(3, ch)\n\tgo square(6, ch)\n\t// TODO: add go square(9, ch)\n\n\tresult1 := <-ch\n\tresult2 := <-ch\n\t// TODO: receive third result and print \"9 squared: X\"\n\n\tfmt.Println(\"3 squared:\", result1)\n\tfmt.Println(\"6 squared:\", result2)\n}",
+    "expectedOutput": [],
+    "codeChecks": [
+      { "pattern": "go\\s+square\\(9,\\s*ch\\)", "required": true, "message": "Add: go square(9, ch)" },
+      { "pattern": "<-ch", "required": true, "message": "Receive the third result from the channel." },
+      { "pattern": "9 squared:", "required": true, "message": "Print \"9 squared:\" and the result." },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comments with your code." }
+    ],
+    "successMessage": "Three goroutines, three results, one channel. The results may come back in any order — goroutines run concurrently and the channel collects them as they finish."
   },
   {
-    "title": "Buffered Channel",
-    "instruction": "Create buffered channel size 3, send a b c, receive and print all three.",
-    "hint": "ch <- \"a\"; ch <- \"b\"; ch <- \"c\"; then receive 3 times",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tch := make(chan string, 3)\n\t// TODO: send a b c, receive and print\n}",
-    "expectedOutput": [
-      "a",
-      "b",
-      "c"
-    ]
+    "title": "WaitGroup — wait for goroutines to finish",
+    "instruction": "`sync.WaitGroup` lets you wait for a group of goroutines to complete.\n\n```\nvar wg sync.WaitGroup\nwg.Add(1)        // one goroutine to wait for\ngo func() {\n    defer wg.Done()  // signal when done\n    // ...\n}()\nwg.Wait()        // block until all Done() are called\n```\n\nRun this. Three goroutines each process a job. `wg.Wait()` blocks until all three call `wg.Done()`.",
+    "starter": "package main\n\nimport (\n\t\"fmt\"\n\t\"sync\"\n)\n\nfunc processJob(id int, wg *sync.WaitGroup) {\n\tdefer wg.Done()\n\tfmt.Printf(\"Job %d done\\n\", id)\n}\n\nfunc main() {\n\tvar wg sync.WaitGroup\n\n\tfor i := 1; i <= 3; i++ {\n\t\twg.Add(1)\n\t\tgo processJob(i, &wg)\n\t}\n\n\twg.Wait()\n\tfmt.Println(\"All jobs complete\")\n}",
+    "expectedOutput": ["All jobs complete"],
+    "successMessage": "wg.Wait() blocked until all three goroutines called wg.Done(). The \"All jobs complete\" line printed last — guaranteed. WaitGroup is the standard way to coordinate a group of goroutines."
   },
   {
-    "title": "Select Statement",
-    "instruction": "Send on done from goroutine; use select to print \"done\" when it arrives.",
-    "hint": "select { case <-done: fmt.Println(\"done\") case <-other: ... }",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tdone := make(chan bool)\n\tother := make(chan bool)\n\tgo func() { done <- true }()\n\t// TODO: select on done or other, print \"done\" when done\n}",
-    "expectedOutput": [
-      "done"
-    ]
+    "title": "Buffered channels",
+    "instruction": "A regular channel blocks until the receiver is ready. A buffered channel has a queue — you can send without blocking until the buffer is full.\n\n`ch := make(chan int, 3)` — buffer of 3. Send up to 3 values before anyone receives.\n\nRun this. Values are sent without a matching receiver because the buffer holds them. Then they are drained one by one.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tch := make(chan int, 3)\n\n\tch <- 10\n\tch <- 20\n\tch <- 30\n\n\tfmt.Println(<-ch)\n\tfmt.Println(<-ch)\n\tfmt.Println(<-ch)\n}",
+    "expectedOutput": ["10", "20", "30"],
+    "successMessage": "No goroutines needed — the buffer held all three values. Buffered channels decouple senders from receivers. Use them when you know the maximum number of pending values ahead of time."
+  },
+  {
+    "title": "Range over a channel",
+    "instruction": "You can loop over a channel with `range` — it receives values until the channel is closed.\n\n`close(ch)` signals that no more values will be sent. The range loop exits automatically.\n\nRun this. The producer sends 5 values and closes the channel. The range loop receives all of them.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc producer(ch chan int) {\n\tfor i := 1; i <= 5; i++ {\n\t\tch <- i\n\t}\n\tclose(ch)\n}\n\nfunc main() {\n\tch := make(chan int)\n\tgo producer(ch)\n\n\tfor v := range ch {\n\t\tfmt.Println(v)\n\t}\n\tfmt.Println(\"Channel closed, loop done\")\n}",
+    "expectedOutput": ["1", "2", "3", "4", "5", "Channel closed, loop done"],
+    "successMessage": "range on a channel is clean and safe. The loop exits the moment the channel closes. Always close a channel from the sender side — closing a channel you are receiving from is a bug."
+  },
+  {
+    "title": "select — handle multiple channels",
+    "instruction": "`select` is like a `switch` for channels. It waits for whichever channel is ready first:\n\n```\nselect {\ncase msg := <-ch1:\n    fmt.Println(\"from ch1:\", msg)\ncase msg := <-ch2:\n    fmt.Println(\"from ch2:\", msg)\n}\n```\n\nIf multiple channels are ready simultaneously, Go picks one at random.\n\nRun this. Two goroutines send at different speeds. `select` handles whichever arrives first.",
+    "starter": "package main\n\nimport (\n\t\"fmt\"\n\t\"time\"\n)\n\nfunc main() {\n\tfast := make(chan string)\n\tslow := make(chan string)\n\n\tgo func() {\n\t\ttime.Sleep(10 * time.Millisecond)\n\t\tfast <- \"fast result\"\n\t}()\n\n\tgo func() {\n\t\ttime.Sleep(50 * time.Millisecond)\n\t\tslow <- \"slow result\"\n\t}()\n\n\tfor i := 0; i < 2; i++ {\n\t\tselect {\n\t\tcase msg := <-fast:\n\t\t\tfmt.Println(\"Fast:\", msg)\n\t\tcase msg := <-slow:\n\t\t\tfmt.Println(\"Slow:\", msg)\n\t\t}\n\t}\n}",
+    "expectedOutput": ["Fast: fast result", "Slow: slow result"],
+    "successMessage": "Fast arrived first, slow second. select handles whichever channel is ready — no polling, no busy-waiting. This is how Go implements timeouts, cancellations, and fan-in patterns."
+  },
+  {
+    "title": "select with default — non-blocking",
+    "instruction": "Add a `default` case to `select` to make it non-blocking. If no channel is ready, the default runs immediately.\n\n```\nselect {\ncase msg := <-ch:\n    fmt.Println(msg)\ndefault:\n    fmt.Println(\"nothing ready yet\")\n}\n```\n\nRun this. The channel has nothing yet — the default fires. Then a value is sent and the channel case fires.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tch := make(chan string, 1)\n\n\tselect {\n\tcase msg := <-ch:\n\t\tfmt.Println(\"Received:\", msg)\n\tdefault:\n\t\tfmt.Println(\"Nothing ready\")\n\t}\n\n\tch <- \"hello\"\n\n\tselect {\n\tcase msg := <-ch:\n\t\tfmt.Println(\"Received:\", msg)\n\tdefault:\n\t\tfmt.Println(\"Nothing ready\")\n\t}\n}",
+    "expectedOutput": ["Nothing ready", "Received: hello"],
+    "successMessage": "Non-blocking channel reads — perfect for checking queues, implementing try-locks, or polling without sleeping. The default case turns select into a non-blocking peek."
+  },
+  {
+    "title": "Mutex — protect shared data",
+    "instruction": "When multiple goroutines access the same variable, you get a race condition — unpredictable results.\n\n`sync.Mutex` protects shared data with a lock:\n\n```\nvar mu sync.Mutex\nmu.Lock()\nsharedVar++\nmu.Unlock()\n```\n\nOr use `defer mu.Unlock()` right after `Lock()` to always unlock even if the function panics.\n\nRun this. A counter is incremented by 100 goroutines safely.",
+    "starter": "package main\n\nimport (\n\t\"fmt\"\n\t\"sync\"\n)\n\ntype SafeCounter struct {\n\tmu    sync.Mutex\n\tvalue int\n}\n\nfunc (c *SafeCounter) Increment() {\n\tc.mu.Lock()\n\tdefer c.mu.Unlock()\n\tc.value++\n}\n\nfunc (c *SafeCounter) Value() int {\n\tc.mu.Lock()\n\tdefer c.mu.Unlock()\n\treturn c.value\n}\n\nfunc main() {\n\tcounter := &SafeCounter{}\n\tvar wg sync.WaitGroup\n\n\tfor i := 0; i < 100; i++ {\n\t\twg.Add(1)\n\t\tgo func() {\n\t\t\tdefer wg.Done()\n\t\t\tcounter.Increment()\n\t\t}()\n\t}\n\n\twg.Wait()\n\tfmt.Println(\"Final count:\", counter.Value())\n}",
+    "expectedOutput": ["Final count: 100"],
+    "successMessage": "100 goroutines, 100 increments, exactly 100 every time. Without the mutex you would get random results between 1 and 100. The mutex ensures only one goroutine touches value at a time."
+  },
+  {
+    "title": "Done channel — signal cancellation",
+    "instruction": "A done channel signals goroutines to stop.\n\n`close(done)` broadcasts to everyone waiting on it — all goroutines reading from a closed channel receive the zero value immediately.\n\nRun this. The worker goroutine checks `<-done` via select. When main closes the channel, the worker exits cleanly.",
+    "starter": "package main\n\nimport (\n\t\"fmt\"\n\t\"time\"\n)\n\nfunc worker(done <-chan struct{}) {\n\tfor {\n\t\tselect {\n\t\tcase <-done:\n\t\t\tfmt.Println(\"Worker: shutting down\")\n\t\t\treturn\n\t\tdefault:\n\t\t\tfmt.Println(\"Worker: doing work...\")\n\t\t\ttime.Sleep(20 * time.Millisecond)\n\t\t}\n\t}\n}\n\nfunc main() {\n\tdone := make(chan struct{})\n\tgo worker(done)\n\ttime.Sleep(60 * time.Millisecond)\n\tclose(done)\n\ttime.Sleep(30 * time.Millisecond)\n\tfmt.Println(\"Main: done\")\n}",
+    "expectedOutput": ["Worker: doing work...", "Worker: shutting down", "Main: done"],
+    "successMessage": "close(done) broadcast the stop signal to the worker instantly. The empty struct{} channel uses zero memory — chan struct{} is the idiomatic Go signal channel. context.Context builds on this same idea."
+  },
+  {
+    "title": "Worker pool",
+    "instruction": "A worker pool runs a fixed number of goroutines to process jobs from a queue channel.\n\nThis limits resource usage — instead of spawning 10,000 goroutines, you run 3 workers that each process many jobs.\n\nRun this. 3 workers process 9 jobs from the jobs channel. Add 3 more jobs to the queue.",
+    "hint": "for i := 10; i <= 12; i++ { jobs <- i }  (add before close(jobs))",
+    "starter": "package main\n\nimport (\n\t\"fmt\"\n\t\"sync\"\n)\n\nfunc worker(id int, jobs <-chan int, results chan<- int, wg *sync.WaitGroup) {\n\tdefer wg.Done()\n\tfor j := range jobs {\n\t\tresults <- j * j\n\t\tfmt.Printf(\"Worker %d processed job %d\\n\", id, j)\n\t}\n}\n\nfunc main() {\n\tjobs := make(chan int, 12)\n\tresults := make(chan int, 12)\n\tvar wg sync.WaitGroup\n\n\tfor w := 1; w <= 3; w++ {\n\t\twg.Add(1)\n\t\tgo worker(w, jobs, results, &wg)\n\t}\n\n\tfor i := 1; i <= 9; i++ {\n\t\tjobs <- i\n\t}\n\t// TODO: add jobs 10, 11, 12\n\tclose(jobs)\n\n\twg.Wait()\n\tclose(results)\n\n\ttotal := 0\n\tfor r := range results {\n\t\ttotal += r\n\t}\n\tfmt.Println(\"Sum of squares:\", total)\n}",
+    "expectedOutput": ["Sum of squares: 650"],
+    "codeChecks": [
+      { "pattern": "jobs\\s*<-\\s*10", "required": true, "message": "Send job 10 to the jobs channel." },
+      { "pattern": "jobs\\s*<-\\s*11", "required": true, "message": "Send job 11 to the jobs channel." },
+      { "pattern": "jobs\\s*<-\\s*12", "required": true, "message": "Send job 12 to the jobs channel." },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with the three new jobs." }
+    ],
+    "successMessage": "12 jobs, 3 workers, sum of 1²+2²+...+12² = 650. Worker pools are everywhere in Go — HTTP servers, background processors, batch pipelines. Fixed workers, unlimited jobs."
+  },
+  {
+    "title": "Race condition — spot and fix it",
+    "instruction": "A race condition happens when two goroutines access the same variable without synchronisation. The result is unpredictable.\n\nThe code below has a race condition on `count`. Run it a few times — the result varies.\n\nFix it by adding a `sync.Mutex` to protect `count`.",
+    "hint": "Add var mu sync.Mutex above the loop. Inside the goroutine: mu.Lock(); count++; mu.Unlock() — or use defer.",
+    "starter": "package main\n\nimport (\n\t\"fmt\"\n\t\"sync\"\n)\n\nfunc main() {\n\tcount := 0\n\tvar wg sync.WaitGroup\n\t// BUG: count is accessed without a lock — add sync.Mutex\n\n\tfor i := 0; i < 50; i++ {\n\t\twg.Add(1)\n\t\tgo func() {\n\t\t\tdefer wg.Done()\n\t\t\tcount++\n\t\t}()\n\t}\n\n\twg.Wait()\n\tfmt.Println(\"Count:\", count)\n}",
+    "expectedOutput": ["Count: 50"],
+    "codeChecks": [
+      { "pattern": "sync\\.Mutex", "required": true, "message": "Add a sync.Mutex to protect the count variable." },
+      { "pattern": "\\.Lock\\(\\)", "required": true, "message": "Call mu.Lock() before incrementing count." },
+      { "pattern": "\\.Unlock\\(\\)", "required": true, "message": "Call mu.Unlock() after incrementing count." }
+    ],
+    "successMessage": "Count: 50, every single time. The mutex serialises access to count — only one goroutine at a time. Run `go test -race` on your projects to catch race conditions automatically."
+  },
+  {
+    "title": "Goroutines are cheap",
+    "instruction": "A goroutine starts with about 2KB of stack memory (growing as needed). You can run thousands without issue.\n\nThis example launches 1,000 goroutines. Each increments a counter. In most languages this would be thousands of OS threads — each using megabytes. In Go it is lightweight and fast.\n\nRun this.",
+    "starter": "package main\n\nimport (\n\t\"fmt\"\n\t\"sync\"\n\t\"sync/atomic\"\n)\n\nfunc main() {\n\tvar count int64\n\tvar wg sync.WaitGroup\n\n\tfor i := 0; i < 1000; i++ {\n\t\twg.Add(1)\n\t\tgo func() {\n\t\t\tdefer wg.Done()\n\t\t\tatomic.AddInt64(&count, 1)\n\t\t}()\n\t}\n\n\twg.Wait()\n\tfmt.Println(\"Goroutines ran:\", count)\n}",
+    "expectedOutput": ["Goroutines ran: 1000"],
+    "successMessage": "1,000 goroutines, exact count, no locks needed (atomic operations). In real Go servers, tens of thousands of goroutines run concurrently — one per incoming request — without breaking a sweat."
+  },
+  {
+    "title": "Build a concurrent pipeline",
+    "instruction": "No starter code.\n\nBuild a three-stage pipeline:\n\n1. `generate(nums ...int) <-chan int` — sends numbers into a channel, closes it when done\n2. `square(in <-chan int) <-chan int` — receives numbers, sends their squares\n3. `filter(in <-chan int, min int) <-chan int` — only passes through values ≥ min\n\nIn main: generate 1–10, square them, filter results ≥ 25, print each passing value.\n\nExpected output (squares of 5,6,7,8,9,10 that are ≥ 25):\n```\n25\n36\n49\n64\n81\n100\n```",
+    "hint": "Each stage: make a channel, start a goroutine that reads from in and writes to out, returns the out channel.",
+    "starter": "package main\n\nimport \"fmt\"\n\n// Build your pipeline here\n\nfunc main() {\n}",
+    "expectedOutput": ["25", "36", "49", "64", "81", "100"],
+    "codeChecks": [
+      { "pattern": "func\\s+generate\\s*\\(", "required": true, "message": "Define a generate function that returns a channel." },
+      { "pattern": "func\\s+square\\s*\\(", "required": true, "message": "Define a square function that squares values from a channel." },
+      { "pattern": "func\\s+filter\\s*\\(", "required": true, "message": "Define a filter function that filters values from a channel." },
+      { "pattern": "<-chan int", "required": true, "message": "Each stage should return a <-chan int (receive-only channel)." },
+      { "pattern": "close\\(", "required": true, "message": "Close the output channel when your goroutine is done." },
+      { "pattern": "for\\s+\\w+\\s*:=\\s*range", "required": true, "message": "Use range to read from channels in each stage." }
+    ],
+    "successMessage": "A three-stage concurrent pipeline. Numbers flow through stages like water through pipes — generated, squared, filtered — each stage running concurrently. This is how Go handles data streaming at scale. You now know concurrency."
   }
 ]
