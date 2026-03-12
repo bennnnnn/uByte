@@ -14,6 +14,7 @@ import GripDots from "@/components/GripDots";
 import type { PracticeAttemptStatus } from "@/lib/db/practice-attempts";
 import { useAuth } from "@/components/AuthProvider";
 import { apiFetch } from "@/lib/api-client";
+import { trackConversion } from "@/lib/analytics";
 import { useIsMobile } from "@/hooks/useIsMobile";
 import { ALL_LANGUAGE_KEYS } from "@/lib/languages/registry";
 import GuestConversionPrompt from "@/components/GuestConversionPrompt";
@@ -338,6 +339,8 @@ export function PracticeIDE({ problem, initialLang, initialCode, categoryFilter 
 
       if (data.verdict === "accepted") {
         setStatuses((prev) => ({ ...prev, [problem.slug]: "solved" }));
+        // Track the conversion event for PostHog / Vercel Analytics funnel.
+        trackConversion("problem_solved", { lang: String(lang), slug: problem.slug, difficulty: problem.difficulty });
         setAiFeedback(null);  // Problem solved — clear hint so panel is clean.
         setAiUpgradeRequired(false);
         setAiLoginRequired(false);

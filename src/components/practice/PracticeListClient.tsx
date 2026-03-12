@@ -348,6 +348,19 @@ export function PracticeListClient({
                 <p className="mt-1 text-sm">Try a different keyword.</p>
               </div>
             )}
+            {/* Filter empty state — shown when active filters return nothing (not a search) */}
+            {!isSearching && displayProblems.length === 0 && (categoryFilter || statusFilter || difficultyFilter) && (
+              <div className="py-16 text-center text-zinc-500 dark:text-zinc-400">
+                <p className="font-medium">No problems match the selected filters.</p>
+                <button
+                  type="button"
+                  onClick={() => router.push(buildUrl(selectedLang, { page: 1 }), { scroll: false })}
+                  className="mt-3 rounded-lg border border-zinc-200 px-4 py-1.5 text-sm font-medium transition-colors hover:border-zinc-300 hover:bg-zinc-50 dark:border-zinc-700 dark:hover:bg-zinc-800"
+                >
+                  Clear filters
+                </button>
+              </div>
+            )}
             <ul className="divide-y divide-zinc-100 dark:divide-zinc-700">
               {displayProblems.map((p, idx) => {
                 const cat = getCategoryForSlug(p.slug);

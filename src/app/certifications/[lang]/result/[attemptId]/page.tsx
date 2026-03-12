@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
+import { trackConversion } from "@/lib/analytics";
 import { LANGUAGES } from "@/lib/languages/registry";
 import type { SupportedLanguage } from "@/lib/languages/types";
 import { getLangIcon } from "@/lib/languages/icons";
@@ -217,7 +218,9 @@ export default function PracticeExamResultPage() {
         const r = data as ExamResultResponse;
         setResult(r);
         if (r.passed) {
-          // slight delay so the page renders first
+          // Track exam pass for PostHog / Vercel Analytics funnel.
+          trackConversion("exam_passed", { lang: String(lang), score: r.score });
+          // Slight delay so the page renders before confetti fires.
           setTimeout(() => setShowConfetti(true), 300);
           setTimeout(() => setShowConfetti(false), 4000);
         }

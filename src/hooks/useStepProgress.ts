@@ -9,6 +9,7 @@ import { useAuth } from "@/components/AuthProvider";
 import { parseErrorLines } from "./useCodeEditor";
 import { apiFetch } from "@/lib/api-client";
 import { tutorialUrl } from "@/lib/urls";
+import { trackConversion } from "@/lib/analytics";
 
 export type Status = "idle" | "running" | "passed" | "failed";
 
@@ -127,6 +128,14 @@ export function useStepProgress(
   const [showHint, setShowHint] = useState(false);
   const markedRef = useRef(false);
 
+  // ── Analytics: fire started_tutorial once per session when user is logged in ──
+  useEffect(() => {
+    if (!userId || !tutorialSlug) return;
+    trackConversion("started_tutorial", { lang, slug: tutorialSlug });
+  // Intentionally runs once per tutorial mount — PostHog deduplicates on the server side.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   // ── Deep-link: read ?step=N from URL on mount ──
   useEffect(() => {
     const sp = new URLSearchParams(window.location.search);
@@ -191,6 +200,8 @@ export function useStepProgress(
       markedRef.current = true;
       setTutorialDone(true);
       toggleProgress(tutorialSlug, lang);
+      // Fire analytics only when the tutorial is genuinely finished, not on DB restore.
+      trackConversion("completed_tutorial", { lang, slug: tutorialSlug });
     }
   }, [completedSteps, steps.length, tutorialSlug, toggleProgress, lang]);
 

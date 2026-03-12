@@ -66,7 +66,15 @@ export default async function BlogPage() {
         </section>
 
         {posts.length === 0 ? (
-          <p className="text-zinc-500 dark:text-zinc-400">No posts yet. Check back soon.</p>
+          <div className="rounded-2xl border border-dashed border-zinc-200 px-6 py-14 text-center dark:border-zinc-700">
+            <p className="mb-3 text-zinc-500 dark:text-zinc-400">No posts yet. Check back soon.</p>
+            <Link
+              href="/tutorial/go"
+              className="inline-flex items-center gap-1.5 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-indigo-500"
+            >
+              Browse tutorials →
+            </Link>
+          </div>
         ) : (
           <div className="space-y-6">
             {posts.map((post) => (

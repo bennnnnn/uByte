@@ -109,6 +109,19 @@ export default function OverviewTab({ stats, badges, achievements, userId }: Pro
       {!certsLoading && certsError && (
         <p className="text-sm text-zinc-400">Could not load certificates.</p>
       )}
+      {!certsLoading && !certsError && examCerts.length === 0 && (
+        <Card className="p-5">
+          <div className="mb-1 flex items-center justify-between">
+            <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">Exam certificates</h2>
+          </div>
+          <p className="text-sm text-zinc-400 dark:text-zinc-500">
+            No certificates yet.{" "}
+            <Link href="/certifications" className="font-medium text-indigo-600 hover:underline dark:text-indigo-400">
+              Take a certification exam →
+            </Link>
+          </p>
+        </Card>
+      )}
       {!certsLoading && !certsError && examCerts.length > 0 && (
         <Card className="p-5">
           <div className="mb-3 flex items-center justify-between">
@@ -150,7 +163,12 @@ export default function OverviewTab({ stats, badges, achievements, userId }: Pro
           )}
         </div>
         {achievements.length === 0 ? (
-          <p className="text-sm text-zinc-400">No badges yet — keep learning to earn your first!</p>
+          <p className="text-sm text-zinc-400">
+            No badges yet.{" "}
+            <Link href="/tutorial/go" className="font-medium text-indigo-600 hover:underline dark:text-indigo-400">
+              Start a tutorial to earn your first →
+            </Link>
+          </p>
         ) : (
           <div className="flex flex-wrap gap-2">
             {achievements.slice(0, 4).map((a) => {
