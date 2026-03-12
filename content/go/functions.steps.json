@@ -1,37 +1,169 @@
 [
   {
-    "title": "Define and Call a Function",
-    "instruction": "Define a function `greet(name string) string` that returns `\"Hello, \" + name + \"!\"`. Call it with \"Alice\" and print the result.",
-    "hint": "func greet(name string) string { return \"Hello, \" + name + \"!\" }",
-    "starter": "package main\n\nimport \"fmt\"\n\n// TODO: define greet(name string) string\n\nfunc main() {\n\t// TODO: call greet(\"Alice\") and print the result\n}",
-    "expectedOutput": ["Hello, Alice!"]
+    "title": "What is a function",
+    "instruction": "Think about a TV remote. You press the volume-up button and the volume goes up. You do not think about what happens inside the TV. You just press and it works.\n\nA function is the same idea. You give a chunk of code a name. Then you just call that name — and everything inside runs.\n\nRun this. The `sayHello` function is defined above main and called from inside it.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc sayHello() {\n\tfmt.Println(\"Hello from a function!\")\n}\n\nfunc main() {\n\tsayHello()\n\tsayHello()\n\tsayHello()\n}",
+    "expectedOutput": ["Hello from a function!", "Hello from a function!", "Hello from a function!"],
+    "successMessage": "Three calls, one definition. Change the message inside sayHello and all three lines change. That is the point of functions."
   },
   {
-    "title": "Parameters and Return Values",
-    "instruction": "Define `add(a int, b int) int` that returns the sum of the two numbers. Call it with 4 and 6, then print the result.",
-    "hint": "Write `func add(a int, b int) int { return a + b }`.",
-    "starter": "package main\n\nimport \"fmt\"\n\n// TODO: define add(a int, b int) int\n\nfunc main() {\n\tfmt.Println(add(4, 6))\n}",
-    "expectedOutput": ["10"]
+    "title": "Define and call your own function",
+    "instruction": "Now write one yourself.\n\nA function definition looks like this:\n\n```\nfunc functionName() {\n    // code here\n}\n```\n\nDefine a function called `printDivider` that prints `\"----------\"`. Then call it three times from main.",
+    "hint": "func printDivider() { fmt.Println(\"----------\") }  — put it above func main(), then call printDivider() three times inside main.",
+    "starter": "package main\n\nimport \"fmt\"\n\n// TODO: define printDivider here\n\nfunc main() {\n\t// TODO: call printDivider three times\n}",
+    "expectedOutput": ["----------", "----------", "----------"],
+    "codeChecks": [
+      { "pattern": "func\\s+printDivider\\s*\\(\\)", "required": true, "message": "Define the function: func printDivider() { ... }" },
+      { "pattern": "(printDivider\\(\\).*\\n.*){2}|printDivider\\(\\)[\\s\\S]*printDivider\\(\\)[\\s\\S]*printDivider\\(\\)", "required": true, "flags": "m", "message": "Call printDivider() three times inside main." },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comments with your code." }
+    ],
+    "successMessage": "Your function, your name, your call. That is all there is to defining and using a function."
   },
   {
-    "title": "Multiple Return Values",
-    "instruction": "Define `minMax(nums []int) (int, int)` that returns the smallest and largest number in the slice. Call it with `[]int{3, 1, 4, 1, 5}` and print both results.",
-    "hint": "Start `min` and `max` with `nums[0]`, then compare the rest inside a loop.",
-    "starter": "package main\n\nimport \"fmt\"\n\n// TODO: define minMax(nums []int) (int, int)\n\nfunc main() {\n\tmin, max := minMax([]int{3, 1, 4, 1, 5})\n\tfmt.Println(min)\n\tfmt.Println(max)\n}",
-    "expectedOutput": ["1", "5"]
+    "title": "Parameters — give the function inputs",
+    "instruction": "A function with no parameters always does exactly the same thing. More useful is a function that accepts inputs and does something with them.\n\n`func greet(name string)` — this function takes one string and uses it.\n\nChange the name passed to `greet` to your own name and run it.",
+    "hint": "Change \"Alex\" to your name in the greet() call inside main.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc greet(name string) {\n\tfmt.Println(\"Hey\", name, \"— welcome to Go!\")\n}\n\nfunc main() {\n\tgreet(\"Alex\")\n}",
+    "expectedOutput": [],
+    "codeChecks": [
+      { "pattern": "greet\\(\"Alex\"\\)", "required": false, "message": "Change the name from \"Alex\" to your own name." }
+    ],
+    "successMessage": "Parameters let you pass information into a function. Same function, different input, different result."
   },
   {
-    "title": "Variadic Function",
-    "instruction": "Define `sum(nums ...int) int` that returns the total of all arguments. Call it with 1, 2, 3, 4, and 5 and print the result.",
-    "hint": "Loop over `nums` and keep a running total.",
-    "starter": "package main\n\nimport \"fmt\"\n\n// TODO: define sum(nums ...int) int\n\nfunc main() {\n\tfmt.Println(sum(1, 2, 3, 4, 5))\n}",
-    "expectedOutput": ["15"]
+    "title": "Multiple parameters",
+    "instruction": "Functions can take more than one parameter. Separate them with commas.\n\n`func add(a int, b int) int` — takes two ints.\n\nIf two parameters have the same type, you can shorten it: `func add(a, b int)`.\n\nAdd a call to `describe` with your own name and age, then run it.",
+    "hint": "describe(\"Alex\", 25)  — replace Alex and 25 with your own name and age.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc describe(name string, age int) {\n\tfmt.Printf(\"%s is %d years old\\n\", name, age)\n}\n\nfunc main() {\n\tdescribe(\"Sam\", 30)\n\t// TODO: call describe with your own name and age\n}",
+    "expectedOutput": [],
+    "codeChecks": [
+      { "pattern": "describe\\(\"[^\"]+\",\\s*\\d+\\)", "required": true, "message": "Call describe with a name and age: describe(\"YourName\", yourAge)" },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your call." }
+    ],
+    "successMessage": "Multiple parameters, one function. Order matters — the values you pass must match the parameter order."
   },
   {
-    "title": "Use a Helper Function",
-    "instruction": "Define a helper function `isEven(n int) bool` that returns true when a number is even. Call it with 8 and print the result.",
-    "hint": "An even number has remainder 0 when divided by 2.",
-    "starter": "package main\n\nimport \"fmt\"\n\n// TODO: define isEven(n int) bool\n\nfunc main() {\n\tfmt.Println(isEven(8))\n}",
-    "expectedOutput": ["true"]
+    "title": "Return a value",
+    "instruction": "Functions can give something back using `return`.\n\nYou declare the return type after the parameter list:\n\n`func double(n int) int { return n * 2 }`\n\nThe `int` after the closing parenthesis is the return type.\n\nCall `square` with three different numbers and print each result.",
+    "hint": "fmt.Println(square(4))  fmt.Println(square(7))  fmt.Println(square(10))",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc square(n int) int {\n\treturn n * n\n}\n\nfunc main() {\n\t// TODO: call square with 4, 7, and 10 and print each result\n}",
+    "expectedOutput": ["16", "49", "100"],
+    "codeChecks": [
+      { "pattern": "square\\(4\\)", "required": true, "message": "Call square(4) and print the result." },
+      { "pattern": "square\\(7\\)", "required": true, "message": "Call square(7) and print the result." },
+      { "pattern": "square\\(10\\)", "required": true, "message": "Call square(10) and print the result." },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your three calls." }
+    ],
+    "successMessage": "Return sends a value back to wherever the function was called. You can use it directly in Println, assign it to a variable, or pass it to another function."
+  },
+  {
+    "title": "Multiple return values",
+    "instruction": "Go can return more than one value from a function. This is one of Go's most useful features.\n\n`func minMax(a, b int) (int, int)` — returns two ints.\n\nThis is how Go handles errors too: `result, err := doSomething()`.\n\nCall `divide` and print both the result and the remainder.",
+    "hint": "result, remainder := divide(17, 5)  then fmt.Println(result, remainder)",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc divide(a, b int) (int, int) {\n\treturn a / b, a % b\n}\n\nfunc main() {\n\t// TODO: call divide(17, 5) and print both return values\n}",
+    "expectedOutput": ["3 2"],
+    "codeChecks": [
+      { "pattern": "divide\\(17,\\s*5\\)", "required": true, "message": "Call divide(17, 5)" },
+      { "pattern": ":=\\s*divide|divide\\(17", "required": true, "message": "Capture both return values: result, remainder := divide(17, 5)" },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
+    ],
+    "successMessage": "17 divided by 5 is 3 with a remainder of 2. Two values, one return. This pattern is everywhere in Go — especially for error handling."
+  },
+  {
+    "title": "Named return values",
+    "instruction": "You can give return values names. This makes it clear what each one represents.\n\n```\nfunc stats(nums []int) (min, max int) {\n    min = nums[0]\n    max = nums[0]\n    // ...\n    return  // naked return — returns min and max\n}\n```\n\nThe named variables are pre-declared. A bare `return` sends them back.\n\nRun this and see what it returns for the given slice.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc firstAndLast(nums []int) (first, last int) {\n\tfirst = nums[0]\n\tlast = nums[len(nums)-1]\n\treturn\n}\n\nfunc main() {\n\tf, l := firstAndLast([]int{10, 20, 30, 40, 50})\n\tfmt.Println(\"First:\", f)\n\tfmt.Println(\"Last:\", l)\n}",
+    "expectedOutput": ["First: 10", "Last: 50"],
+    "successMessage": "Named returns act like pre-declared variables inside the function. The naked return sends them back. Use named returns when the names make the code clearer."
+  },
+  {
+    "title": "Variadic functions",
+    "instruction": "A variadic function accepts any number of arguments.\n\n`func sum(nums ...int)` — the `...` means zero or more ints.\n\nInside the function, `nums` is a slice. You can loop it, pass it around, use `len()` on it.\n\nCall `sum` with different numbers of arguments and print each result.",
+    "hint": "fmt.Println(sum(1, 2, 3))  fmt.Println(sum(10, 20))  fmt.Println(sum(5))",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc sum(nums ...int) int {\n\ttotal := 0\n\tfor _, n := range nums {\n\t\ttotal += n\n\t}\n\treturn total\n}\n\nfunc main() {\n\t// TODO: call sum with 1,2,3 then with 10,20 then with just 5\n}",
+    "expectedOutput": ["6", "30", "5"],
+    "codeChecks": [
+      { "pattern": "sum\\(1,\\s*2,\\s*3\\)", "required": true, "message": "Call sum(1, 2, 3)" },
+      { "pattern": "sum\\(10,\\s*20\\)", "required": true, "message": "Call sum(10, 20)" },
+      { "pattern": "sum\\(5\\)", "required": true, "message": "Call sum(5)" },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your calls." }
+    ],
+    "successMessage": "Any number of arguments. fmt.Println itself is variadic — that is how it handles fmt.Println(a, b, c) without complaining."
+  },
+  {
+    "title": "Functions as values",
+    "instruction": "In Go, functions are values. You can assign them to variables, store them in maps, pass them to other functions.\n\n`var double func(int) int = func(n int) int { return n * 2 }`\n\nOr shorter: `double := func(n int) int { return n * 2 }`\n\nRun this. Then add your own `triple` function variable that multiplies by 3 and call it.",
+    "hint": "triple := func(n int) int { return n * 3 }  then fmt.Println(triple(5))",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tdouble := func(n int) int {\n\t\treturn n * 2\n\t}\n\tfmt.Println(double(5))\n\t// TODO: create a triple function variable and call it with 5\n}",
+    "expectedOutput": ["10", "15"],
+    "codeChecks": [
+      { "pattern": "triple\\s*:=\\s*func", "required": true, "message": "Create a triple function variable: triple := func(n int) int { return n * 3 }" },
+      { "pattern": "triple\\(5\\)", "required": true, "message": "Call triple(5) and print the result." },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
+    ],
+    "successMessage": "Functions are first-class values in Go. You can store them, pass them, return them. This unlocks patterns like callbacks and middleware."
+  },
+  {
+    "title": "Anonymous functions",
+    "instruction": "An anonymous function has no name. It is defined and used inline.\n\nUseful when you need a small function once and do not want to name it.\n\n```\nresult := func(a, b int) int {\n    return a + b\n}(3, 4)  // called immediately\n```\n\nRun this. Then add an anonymous function that multiplies two numbers and prints the result immediately.",
+    "hint": "fmt.Println(func(a, b int) int { return a * b }(6, 7))",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tresult := func(a, b int) int {\n\t\treturn a + b\n\t}(10, 5)\n\tfmt.Println(result)\n\t// TODO: create and immediately call an anonymous function that multiplies 6 * 7\n}",
+    "expectedOutput": ["15", "42"],
+    "codeChecks": [
+      { "pattern": "func\\s*\\(.*\\).*\\{[\\s\\S]*\\}\\s*\\(6,\\s*7\\)", "required": true, "flags": "m", "message": "Define and immediately call an anonymous function with (6, 7)." },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
+    ],
+    "successMessage": "Define it. Use it. Done. No name needed for one-time-use logic."
+  },
+  {
+    "title": "Closures",
+    "instruction": "A closure is a function that remembers variables from the scope where it was created — even after that scope is gone.\n\nThe counter below remembers `count` between calls. Each call to `counter()` increments and returns it.\n\nRun it. Then create a second counter and verify the two counters are independent.",
+    "hint": "c2 := makeCounter()  then call c2() a couple of times and print. It starts at 1 independently.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc makeCounter() func() int {\n\tcount := 0\n\treturn func() int {\n\t\tcount++\n\t\treturn count\n\t}\n}\n\nfunc main() {\n\tc1 := makeCounter()\n\tfmt.Println(c1())\n\tfmt.Println(c1())\n\tfmt.Println(c1())\n\t// TODO: create c2 := makeCounter() and call it twice\n}",
+    "expectedOutput": ["1", "2", "3", "1", "2"],
+    "codeChecks": [
+      { "pattern": "c2\\s*:=\\s*makeCounter\\(\\)", "required": true, "message": "Create a second counter: c2 := makeCounter()" },
+      { "pattern": "c2\\(\\)", "required": true, "message": "Call c2() and print the result." },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
+    ],
+    "successMessage": "c1 and c2 each have their own count. They share the same function definition but have separate state. That is a closure."
+  },
+  {
+    "title": "Recursion",
+    "instruction": "A recursive function calls itself.\n\nIt sounds circular, but it works as long as there is a base case — a condition where it stops calling itself.\n\n```\nfunc countdown(n int) {\n    if n == 0 { return }  // base case\n    fmt.Println(n)\n    countdown(n - 1)      // calls itself\n}\n```\n\nRun this factorial function. Then call it with 6 and print the result.",
+    "hint": "fmt.Println(factorial(6))  — 6! = 720",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc factorial(n int) int {\n\tif n == 0 {\n\t\treturn 1\n\t}\n\treturn n * factorial(n-1)\n}\n\nfunc main() {\n\tfmt.Println(factorial(5))\n\t// TODO: call factorial(6) and print the result\n}",
+    "expectedOutput": ["120", "720"],
+    "codeChecks": [
+      { "pattern": "factorial\\(6\\)", "required": true, "message": "Call factorial(6) and print the result." },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your call." }
+    ],
+    "successMessage": "5! = 120. 6! = 720. The function kept calling itself until it hit n == 0, then unwound back up. Recursion is elegant for tree traversal, file systems, and math."
+  },
+  {
+    "title": "defer",
+    "instruction": "`defer` schedules a function call to run at the very end of the surrounding function — no matter what happens in between.\n\nCommon uses: closing a file, releasing a lock, printing a goodbye message.\n\nRun this and notice the order of output. Deferred calls run last, in reverse order if there are multiple.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tdefer fmt.Println(\"This runs last\")\n\tdefer fmt.Println(\"This runs second-to-last\")\n\tfmt.Println(\"This runs first\")\n\tfmt.Println(\"This runs second\")\n}",
+    "expectedOutput": ["This runs first", "This runs second", "This runs second-to-last", "This runs last"],
+    "successMessage": "defer runs after everything else, in reverse order (last deferred = first to run at cleanup). Think of it as a cleanup guarantee — even if the function panics, the deferred call still runs."
+  },
+  {
+    "title": "Build a calculator",
+    "instruction": "No starter code.\n\nWrite four functions:\n- `add(a, b float64) float64`\n- `subtract(a, b float64) float64`\n- `multiply(a, b float64) float64`\n- `divide(a, b float64) float64` — return 0 if b is 0\n\nThen call all four with `10` and `3` and print each result using `%.2f`.",
+    "hint": "Define each function above main. In main: fmt.Printf(\"Add: %.2f\\n\", add(10, 3)) etc.",
+    "starter": "package main\n\nimport \"fmt\"\n\n// Define your four functions here\n\nfunc main() {\n\t// Call all four with 10 and 3\n}",
+    "expectedOutput": ["Add: 13.00", "Subtract: 7.00", "Multiply: 30.00", "Divide: 3.33"],
+    "codeChecks": [
+      { "pattern": "func\\s+add\\s*\\(", "required": true, "message": "Define an add function." },
+      { "pattern": "func\\s+subtract\\s*\\(", "required": true, "message": "Define a subtract function." },
+      { "pattern": "func\\s+multiply\\s*\\(", "required": true, "message": "Define a multiply function." },
+      { "pattern": "func\\s+divide\\s*\\(", "required": true, "message": "Define a divide function." },
+      { "pattern": "add\\(10", "required": true, "message": "Call add(10, 3) and print the result." },
+      { "pattern": "subtract\\(10", "required": true, "message": "Call subtract(10, 3) and print the result." },
+      { "pattern": "multiply\\(10", "required": true, "message": "Call multiply(10, 3) and print the result." },
+      { "pattern": "divide\\(10", "required": true, "message": "Call divide(10, 3) and print the result." },
+      { "pattern": "%.2f", "required": true, "message": "Use %.2f to format the output to 2 decimal places." }
+    ],
+    "successMessage": "Four functions, one calculator. Every serious program is just functions calling other functions. You now know how to build them all."
   }
 ]

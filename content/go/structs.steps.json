@@ -1,37 +1,183 @@
 [
   {
-    "title": "Define a Struct",
-    "instruction": "Define a `Person` struct with `Name string` and `Age int`. Create a Person with name \"Alice\" and age 30, then print both fields on separate lines.",
-    "hint": "type Person struct { Name string; Age int } — p := Person{Name: \"Alice\", Age: 30}",
-    "starter": "package main\n\nimport \"fmt\"\n\n// TODO: define Person struct with Name and Age\n\nfunc main() {\n\t// TODO: create Person{Name: \"Alice\", Age: 30} and print Name then Age\n}",
-    "expectedOutput": ["Alice", "30"]
+    "title": "What is a struct",
+    "instruction": "Imagine a contact card. One card holds a person's name, their phone number, their email — all related, all together.\n\nA struct is exactly that. It is a custom type that groups related fields under one name.\n\nRun this. A `Person` struct is defined with two fields: `Name` and `Age`. Then we create one and print it.",
+    "starter": "package main\n\nimport \"fmt\"\n\ntype Person struct {\n\tName string\n\tAge  int\n}\n\nfunc main() {\n\tp := Person{Name: \"Alex\", Age: 25}\n\tfmt.Println(p)\n}",
+    "expectedOutput": ["{Alex 25}"],
+    "successMessage": "One variable, two pieces of information. That is a struct. Notice Go prints it as {Alex 25} — all fields together in curly braces."
   },
   {
-    "title": "Read and Update Fields",
-    "instruction": "Create a `Person` struct value for Alice with age 30. Increase the age to 31, then print the name and the updated age on separate lines.",
-    "hint": "After creating the struct, update it with `p.Age = 31`.",
-    "starter": "package main\n\nimport \"fmt\"\n\ntype Person struct {\n\tName string\n\tAge  int\n}\n\nfunc main() {\n\t// TODO: create Alice with age 30\n\t// TODO: change age to 31\n\t// TODO: print name and age\n}",
-    "expectedOutput": ["Alice", "31"]
+    "title": "Define a struct",
+    "instruction": "The syntax for defining a struct is:\n\n```\ntype TypeName struct {\n    FieldName FieldType\n    FieldName FieldType\n}\n```\n\nField names start with a capital letter (so they are exported and accessible everywhere).\n\nDefine a `Car` struct with three fields: `Make` (string), `Model` (string), and `Year` (int). Then create one and print it.",
+    "hint": "type Car struct { Make string; Model string; Year int }  — then c := Car{Make: \"Toyota\", Model: \"Camry\", Year: 2020} and fmt.Println(c)",
+    "starter": "package main\n\nimport \"fmt\"\n\n// TODO: define a Car struct with Make (string), Model (string), and Year (int)\n\nfunc main() {\n\t// TODO: create a Car and print it\n}",
+    "expectedOutput": [],
+    "codeChecks": [
+      { "pattern": "type\\s+Car\\s+struct\\s*\\{", "required": true, "message": "Define a struct called Car: type Car struct { ... }" },
+      { "pattern": "Make\\s+string", "required": true, "message": "Add a Make string field to the struct." },
+      { "pattern": "Model\\s+string", "required": true, "message": "Add a Model string field to the struct." },
+      { "pattern": "Year\\s+int", "required": true, "message": "Add a Year int field to the struct." },
+      { "pattern": "Car\\{", "required": true, "message": "Create a Car value: c := Car{Make: ..., Model: ..., Year: ...}" },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comments with your code." }
+    ],
+    "successMessage": "Your own custom type — defined, created, and printed. Every real Go application is full of types like this."
   },
   {
-    "title": "Nested Structs",
-    "instruction": "Define an `Address` struct with `City string`. Add an `Address` field to `Person`. Create a Person in London and print the city.",
-    "hint": "type Address struct { City string }; type Person struct { Name string; Address Address }",
-    "starter": "package main\n\nimport \"fmt\"\n\n// TODO: define Address with City, Person with Name and Address\n\nfunc main() {\n\tp := Person{\n\t\tName:    \"Alice\",\n\t\tAddress: Address{City: \"London\"},\n\t}\n\tfmt.Println(p.Address.City)\n}",
-    "expectedOutput": ["London"]
+    "title": "Access fields with dot notation",
+    "instruction": "To read a specific field, use a dot: `person.Name`, `person.Age`.\n\nYou do not have to print the whole struct at once. Pull out exactly what you need.\n\nPrint `Name` and `Age` on separate lines using dot notation.",
+    "hint": "fmt.Println(p.Name)  fmt.Println(p.Age)",
+    "starter": "package main\n\nimport \"fmt\"\n\ntype Person struct {\n\tName string\n\tAge  int\n}\n\nfunc main() {\n\tp := Person{Name: \"Jordan\", Age: 28}\n\t// TODO: print p.Name on one line, then p.Age on another\n}",
+    "expectedOutput": ["Jordan", "28"],
+    "codeChecks": [
+      { "pattern": "p\\.Name", "required": true, "message": "Access the Name field: p.Name" },
+      { "pattern": "p\\.Age", "required": true, "message": "Access the Age field: p.Age" },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
+    ],
+    "successMessage": "Dot notation is how you access every field in Go. Clean, readable, no guessing."
   },
   {
-    "title": "Anonymous Struct",
-    "instruction": "Create an anonymous struct inline with `Name` and `Score` fields, set them to \"Bob\" and 95, and print both.",
-    "hint": "entry := struct{ Name string; Score int }{Name: \"Bob\", Score: 95}",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\t// TODO: anonymous struct with Name and Score, then print them\n}",
-    "expectedOutput": ["Bob", "95"]
+    "title": "Update a field",
+    "instruction": "Fields work like variables. You can reassign them after creation.\n\n`p.Age = 26` — updates the Age field directly.\n\nUpdate `p.City` to \"Paris\" and `p.Age` to 31, then print the whole struct.",
+    "hint": "p.City = \"Paris\"  p.Age = 31  fmt.Println(p)",
+    "starter": "package main\n\nimport \"fmt\"\n\ntype Person struct {\n\tName string\n\tAge  int\n\tCity string\n}\n\nfunc main() {\n\tp := Person{Name: \"Sam\", Age: 30, City: \"London\"}\n\t// TODO: update City to \"Paris\" and Age to 31, then print p\n}",
+    "expectedOutput": ["{Sam 31 Paris}"],
+    "codeChecks": [
+      { "pattern": "p\\.City\\s*=\\s*\"Paris\"", "required": true, "message": "Update City: p.City = \"Paris\"" },
+      { "pattern": "p\\.Age\\s*=\\s*31", "required": true, "message": "Update Age: p.Age = 31" },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
+    ],
+    "successMessage": "Same struct, updated fields. Notice the name stayed as Sam because we only changed Age and City."
   },
   {
-    "title": "Struct List with Slices",
-    "instruction": "Create a slice of two `Person` values: Alice age 30 and Bob age 28. Print the name of the second person.",
-    "hint": "Use `people := []Person{{Name: \"Alice\", Age: 30}, {Name: \"Bob\", Age: 28}}`.",
-    "starter": "package main\n\nimport \"fmt\"\n\ntype Person struct {\n\tName string\n\tAge  int\n}\n\nfunc main() {\n\t// TODO: create a slice with Alice and Bob\n\t// TODO: print the second person's name\n}",
-    "expectedOutput": ["Bob"]
+    "title": "Zero values in structs",
+    "instruction": "When you declare a struct without setting all fields, Go fills the rest with zero values — empty string for strings, 0 for ints, false for bools.\n\nRun this and see what an unfilled struct looks like. You will recognise the zero values from the Variables chapter.",
+    "starter": "package main\n\nimport \"fmt\"\n\ntype Product struct {\n\tName     string\n\tPrice    float64\n\tInStock  bool\n\tQuantity int\n}\n\nfunc main() {\n\tvar p Product\n\tfmt.Println(p.Name)\n\tfmt.Println(p.Price)\n\tfmt.Println(p.InStock)\n\tfmt.Println(p.Quantity)\n}",
+    "expectedOutput": ["", "0", "false", "0"],
+    "successMessage": "Empty string, zero float, false bool, zero int. Every field gets its type's zero value. Safe and predictable — Go never leaves memory uninitialised."
+  },
+  {
+    "title": "Struct as a function parameter",
+    "instruction": "You can pass a struct into a function the same way you pass any value.\n\nWhen you do, Go makes a copy. Changing the struct inside the function does not affect the original.\n\nCall `printPerson` with a person of your choice — your name and age.",
+    "hint": "printPerson(Person{Name: \"Your Name\", Age: yourAge})",
+    "starter": "package main\n\nimport \"fmt\"\n\ntype Person struct {\n\tName string\n\tAge  int\n}\n\nfunc printPerson(p Person) {\n\tfmt.Printf(\"Name: %s, Age: %d\\n\", p.Name, p.Age)\n}\n\nfunc main() {\n\t// TODO: call printPerson with your own name and age\n}",
+    "expectedOutput": [],
+    "codeChecks": [
+      { "pattern": "printPerson\\(", "required": true, "message": "Call printPerson() with a Person value." },
+      { "pattern": "Person\\{Name:", "required": true, "message": "Create a Person struct with a Name field." },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your call." }
+    ],
+    "successMessage": "Structs flow through functions just like ints and strings. Clean, readable, no globals required."
+  },
+  {
+    "title": "Struct as a return value",
+    "instruction": "Functions can return structs too.\n\nThis is how Go constructors work — a function that builds and returns a struct for you:\n\n`func newPerson(name string, age int) Person { return Person{Name: name, Age: age} }`\n\nAdd a `newProduct` function that takes a name and price and returns a `Product`. Call it and print the result.",
+    "hint": "func newProduct(name string, price float64) Product { return Product{Name: name, Price: price} }",
+    "starter": "package main\n\nimport \"fmt\"\n\ntype Product struct {\n\tName  string\n\tPrice float64\n}\n\n// TODO: define newProduct(name string, price float64) Product\n\nfunc main() {\n\tp := newProduct(\"Laptop\", 999.99)\n\tfmt.Println(p.Name, p.Price)\n}",
+    "expectedOutput": ["Laptop 999.99"],
+    "codeChecks": [
+      { "pattern": "func\\s+newProduct\\s*\\(", "required": true, "message": "Define a newProduct function that returns a Product." },
+      { "pattern": "return\\s+Product\\{", "required": true, "message": "Return a Product struct from newProduct." },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your function definition." }
+    ],
+    "successMessage": "Constructor pattern. One function, clean creation. This pattern is used everywhere in Go — especially in larger codebases."
+  },
+  {
+    "title": "Pointer to a struct",
+    "instruction": "When you pass a struct normally, Go copies it. Changes inside the function are lost.\n\nUse a pointer to pass the original — not a copy:\n\n`func birthday(p *Person) { p.Age++ }`\n\nCreate a Person, call `birthday`, and see that Age actually changed.",
+    "hint": "p := &Person{Name: \"Alex\", Age: 25}  birthday(p)  fmt.Println(p.Age)",
+    "starter": "package main\n\nimport \"fmt\"\n\ntype Person struct {\n\tName string\n\tAge  int\n}\n\nfunc birthday(p *Person) {\n\tp.Age++\n}\n\nfunc main() {\n\t// TODO: create a Person pointer, call birthday, print the Age\n}",
+    "expectedOutput": ["26"],
+    "codeChecks": [
+      { "pattern": "&Person\\{", "required": true, "message": "Create a pointer to a Person: p := &Person{...}" },
+      { "pattern": "birthday\\(p\\)", "required": true, "message": "Call birthday(p) with the pointer." },
+      { "pattern": "p\\.Age", "required": true, "message": "Print p.Age after calling birthday." },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
+    ],
+    "successMessage": "The age went up because birthday received a pointer — not a copy. The & creates a pointer, the * in the parameter says 'this is a pointer, modify the original'."
+  },
+  {
+    "title": "Nested structs",
+    "instruction": "A struct can contain another struct as a field.\n\nThis is how you model real-world relationships: a `Person` has an `Address`. An `Order` has a `Customer` and a list of `Items`.\n\nRun this. Then update `p.Address.City` to \"New York\" and print the full address.",
+    "hint": "p.Address.City = \"New York\"  fmt.Println(p.Address)",
+    "starter": "package main\n\nimport \"fmt\"\n\ntype Address struct {\n\tStreet string\n\tCity   string\n\tCountry string\n}\n\ntype Person struct {\n\tName    string\n\tAge     int\n\tAddress Address\n}\n\nfunc main() {\n\tp := Person{\n\t\tName: \"Alex\",\n\t\tAge:  25,\n\t\tAddress: Address{\n\t\t\tStreet:  \"123 Main St\",\n\t\t\tCity:    \"Chicago\",\n\t\t\tCountry: \"USA\",\n\t\t},\n\t}\n\tfmt.Println(p.Address.City)\n\t// TODO: update p.Address.City to \"New York\" and print p.Address\n}",
+    "expectedOutput": ["Chicago", "{123 Main St New York USA}"],
+    "codeChecks": [
+      { "pattern": "p\\.Address\\.City\\s*=\\s*\"New York\"", "required": true, "message": "Update p.Address.City to \"New York\"" },
+      { "pattern": "fmt\\.Println\\(p\\.Address\\)", "required": true, "message": "Print the full p.Address." },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
+    ],
+    "successMessage": "Nested fields accessed with dot-dot notation. Real data is rarely flat — nested structs let you model it naturally."
+  },
+  {
+    "title": "Anonymous struct",
+    "instruction": "Sometimes you need a struct for one specific thing and do not need to reuse it. An anonymous struct has no type name — it is defined and used inline.\n\n```\nconfig := struct {\n    Host string\n    Port int\n}{Host: \"localhost\", Port: 8080}\n```\n\nRun this. Notice there is no `type Config struct` declaration anywhere — the struct is defined right where it is used.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tpoint := struct {\n\t\tX int\n\t\tY int\n\t}{X: 10, Y: 20}\n\n\tfmt.Println(\"X:\", point.X)\n\tfmt.Println(\"Y:\", point.Y)\n}",
+    "expectedOutput": ["X: 10", "Y: 20"],
+    "successMessage": "No type declaration needed. Anonymous structs are great for one-off groupings — test data, config values, small response shapes. No name, no fuss."
+  },
+  {
+    "title": "Slice of structs",
+    "instruction": "In real programs you rarely have just one struct. You have a list of them — a slice of structs.\n\n`people := []Person{{...}, {...}, {...}}`\n\nLoop through the slice and print each person's name and age.",
+    "hint": "for _, p := range people { fmt.Printf(\"%s is %d\\n\", p.Name, p.Age) }",
+    "starter": "package main\n\nimport \"fmt\"\n\ntype Person struct {\n\tName string\n\tAge  int\n}\n\nfunc main() {\n\tpeople := []Person{\n\t\t{Name: \"Alex\", Age: 25},\n\t\t{Name: \"Jordan\", Age: 30},\n\t\t{Name: \"Sam\", Age: 22},\n\t}\n\t// TODO: loop through people and print each name and age\n}",
+    "expectedOutput": ["Alex is 25", "Jordan is 30", "Sam is 22"],
+    "codeChecks": [
+      { "pattern": "range\\s+people", "required": true, "message": "Loop through people with range: for _, p := range people" },
+      { "pattern": "p\\.Name", "required": true, "message": "Access p.Name inside the loop." },
+      { "pattern": "p\\.Age", "required": true, "message": "Access p.Age inside the loop." },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your loop." }
+    ],
+    "successMessage": "Slice of structs — the backbone of almost every Go application. User lists, product catalogs, API responses. All of these are slices of structs."
+  },
+  {
+    "title": "Methods",
+    "instruction": "A method is a function attached to a struct. Instead of `printPerson(p)` you write `p.Print()`.\n\nThe receiver `(p Person)` before the function name links the method to the type:\n\n```\nfunc (p Person) Greet() {\n    fmt.Println(\"Hello, I'm\", p.Name)\n}\n```\n\nAdd a `Summary()` method to `Product` that prints `\"Name: X, Price: $Y.YY\"`. Then call it.",
+    "hint": "func (p Product) Summary() { fmt.Printf(\"Name: %s, Price: $%.2f\\n\", p.Name, p.Price) }",
+    "starter": "package main\n\nimport \"fmt\"\n\ntype Product struct {\n\tName  string\n\tPrice float64\n}\n\n// TODO: add a Summary() method to Product\n\nfunc main() {\n\tp := Product{Name: \"Headphones\", Price: 79.99}\n\tp.Summary()\n}",
+    "expectedOutput": ["Name: Headphones, Price: $79.99"],
+    "codeChecks": [
+      { "pattern": "func\\s*\\(\\s*\\w+\\s+Product\\s*\\)\\s*Summary\\s*\\(", "required": true, "message": "Add a method: func (p Product) Summary() { ... }" },
+      { "pattern": "p\\.Summary\\(\\)", "required": true, "message": "Call p.Summary() in main." },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your method definition." }
+    ],
+    "successMessage": "Methods belong to a type. p.Summary() is cleaner than printProduct(p). And it scales — add a dozen methods, everything stays organised."
+  },
+  {
+    "title": "Pointer receiver methods",
+    "instruction": "A method with a pointer receiver can modify the struct it is attached to.\n\n`func (p *Person) HaveBirthday() { p.Age++ }`\n\nThe `*` makes it a pointer receiver — changes to `p` inside the method affect the original.\n\nCall `HaveBirthday` and print the age before and after.",
+    "hint": "fmt.Println(p.Age)  p.HaveBirthday()  fmt.Println(p.Age)",
+    "starter": "package main\n\nimport \"fmt\"\n\ntype Person struct {\n\tName string\n\tAge  int\n}\n\nfunc (p *Person) HaveBirthday() {\n\tp.Age++\n}\n\nfunc main() {\n\tp := Person{Name: \"Alex\", Age: 24}\n\t// TODO: print p.Age, call p.HaveBirthday(), print p.Age again\n}",
+    "expectedOutput": ["24", "25"],
+    "codeChecks": [
+      { "pattern": "p\\.HaveBirthday\\(\\)", "required": true, "message": "Call p.HaveBirthday() on the struct." },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
+    ],
+    "successMessage": "24 before, 25 after. The pointer receiver method mutated the real struct, not a copy. Use pointer receivers whenever a method needs to change the struct."
+  },
+  {
+    "title": "Struct tags",
+    "instruction": "Struct tags are metadata attached to fields. They tell encoding libraries how to handle each field.\n\nThe most common use is JSON encoding:\n\n```\ntype User struct {\n    Name  string `json:\"name\"`\n    Email string `json:\"email\"`\n}\n```\n\nThe tag `json:\"name\"` tells Go's JSON encoder to use `name` (lowercase) in the JSON output instead of `Name`.\n\nRun this and see the JSON output.",
+    "starter": "package main\n\nimport (\n\t\"encoding/json\"\n\t\"fmt\"\n)\n\ntype User struct {\n\tName  string `json:\"name\"`\n\tEmail string `json:\"email\"`\n\tAge   int    `json:\"age\"`\n}\n\nfunc main() {\n\tu := User{Name: \"Alex\", Email: \"alex@example.com\", Age: 25}\n\tdata, _ := json.Marshal(u)\n\tfmt.Println(string(data))\n}",
+    "expectedOutput": ["{\"name\":\"Alex\",\"email\":\"alex@example.com\",\"age\":25}"],
+    "successMessage": "The Go struct with capital letters became lowercase JSON keys. Struct tags control serialization — JSON, XML, database column names, form parsing. You'll use them in every real API."
+  },
+  {
+    "title": "Build a contact book",
+    "instruction": "No starter code.\n\nBuild a contact book from scratch:\n\n1. Define a `Contact` struct with fields: `Name` (string), `Phone` (string), `Email` (string), `City` (string)\n2. Add a `Print()` method that prints all four fields formatted\n3. Create a `[]Contact` slice with at least 3 contacts\n4. Loop through and call `.Print()` on each one\n\nOutput format for each contact:\n```\nName: Alex | Phone: 555-0101 | Email: alex@email.com | City: NYC\n```",
+    "hint": "func (c Contact) Print() { fmt.Printf(\"Name: %s | Phone: %s | Email: %s | City: %s\\n\", c.Name, c.Phone, c.Email, c.City) }",
+    "starter": "package main\n\nimport \"fmt\"\n\n// Your contact book goes here\n\nfunc main() {\n}",
+    "expectedOutput": [],
+    "codeChecks": [
+      { "pattern": "type\\s+Contact\\s+struct\\s*\\{", "required": true, "message": "Define a Contact struct." },
+      { "pattern": "Name\\s+string", "required": true, "message": "Add a Name string field to Contact." },
+      { "pattern": "Phone\\s+string", "required": true, "message": "Add a Phone string field to Contact." },
+      { "pattern": "Email\\s+string", "required": true, "message": "Add an Email string field to Contact." },
+      { "pattern": "City\\s+string", "required": true, "message": "Add a City string field to Contact." },
+      { "pattern": "func\\s*\\(\\s*\\w+\\s+Contact\\s*\\)\\s*Print\\s*\\(", "required": true, "message": "Add a Print() method to Contact." },
+      { "pattern": "\\[\\]Contact\\{", "required": true, "message": "Create a slice of Contacts: contacts := []Contact{...}" },
+      { "pattern": "range\\s+contacts", "required": true, "message": "Loop through contacts with range." },
+      { "pattern": "\\.Print\\(\\)", "required": true, "message": "Call .Print() on each contact." }
+    ],
+    "successMessage": "A complete contact book. Custom type, method, slice, loop — all the pieces working together. This is how Go programs are built in the real world. You are ready."
   }
 ]
