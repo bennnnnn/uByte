@@ -32,11 +32,10 @@ function ExamStartWarning({
   }
 
   const rules: { text: string; type: "info" | "warn" | "danger" }[] = [
-    { text: `${totalQuestions} multiple-choice questions, shown ${PAGE_SIZE} at a time`, type: "info" },
-    { text: `${durationMinutes} minutes — timer started when you clicked "Begin exam"`, type: "info" },
-    { text: `Score ${passPercent}% or higher to earn your certificate`, type: "info" },
-    { text: "Switching tabs or minimising the window auto-submits your exam immediately", type: "danger" },
-    { text: "You cannot pause, undo answers, or restart once you begin", type: "warn" },
+    { text: `${totalQuestions} questions · ${passPercent}% correct required to pass`, type: "info" },
+    { text: `${durationMinutes}-minute time limit · the timer is already running`, type: "info" },
+    { text: "Navigating away or switching tabs will automatically submit your exam", type: "danger" },
+    { text: "Answers are final once submitted and cannot be changed", type: "warn" },
   ];
 
   return (
@@ -66,7 +65,7 @@ function ExamStartWarning({
                     ? "bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-400"
                     : "bg-zinc-100 text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400"
               }`}>
-                {type === "danger" ? "!" : i + 1}
+                {i + 1}
               </span>
               <span className={`leading-snug ${
                 type === "danger"
@@ -260,21 +259,23 @@ export default function PracticeExamAttemptPage() {
     document.documentElement.requestFullscreen?.().catch(() => {});
   }, []);
 
-  // ── Handle answer change + auto-scroll ──────────────────────────────────
+  // ── Handle answer change ─────────────────────────────────────────────────
   const handleChange = useCallback((qid: number, choiceIdx: number) => {
     setAnswers((prev) => ({ ...prev, [qid]: choiceIdx }));
+  }, []);
 
-    if (!attempt) return;
-    const qIdx = attempt.questions.findIndex((q) => q.id === qid);
-    const nextIdx = qIdx + 1;
-    if (nextIdx >= totalQuestions) return; // last question — no scroll
-
-    if (nextIdx >= visibleCount) {
-      // Next question not yet visible — expand the page, then scroll
+  // ── Auto-advance to next page when all visible questions are answered ────
+  useEffect(() => {
+    if (!attempt || visibleCount >= totalQuestions) return;
+    const allVisibleDone = visibleQuestions.every((q) => answers[q.id] !== undefined);
+    if (!allVisibleDone) return;
+    const nextStart = visibleCount;
+    const timer = setTimeout(() => {
       setVisibleCount((prev) => Math.min(prev + PAGE_SIZE, totalQuestions));
-    }
-    pendingScrollRef.current = nextIdx;
-  }, [attempt, totalQuestions, visibleCount]);
+      pendingScrollRef.current = nextStart;
+    }, 600);
+    return () => clearTimeout(timer);
+  }, [answers, attempt, visibleCount, visibleQuestions, totalQuestions]);
 
   // ── Submit ───────────────────────────────────────────────────────────────
   const handleSubmit = useCallback(async (opts?: { force?: boolean }) => {
