@@ -40,7 +40,8 @@
     "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\t// TODO: replace this with a comment explaining what the next line prints\n\tfmt.Println(\"Riverside Academy\")\n\t// TODO: replace this with a comment explaining what the next line prints\n\tfmt.Println(\"Student Tracker\")\n\t// TODO: replace this with a comment explaining what the next line prints\n\tfmt.Println(\"Version 1.0\")\n}",
     "expectedOutput": ["Riverside Academy", "Student Tracker", "Version 1.0"],
     "codeChecks": [
-      { "pattern": "TODO", "required": false, "message": "Replace all three TODO lines with real comments — don't just leave them as TODO." }
+      { "pattern": "//\\s*\\S+", "required": true,  "message": "You need at least one real comment. A comment starts with // followed by some text — like: // This prints the school name." },
+      { "pattern": "TODO",       "required": false, "message": "Replace the TODO lines with your own comments. Don't leave TODO in there." }
     ]
   },
   {
