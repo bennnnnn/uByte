@@ -1,0 +1,144 @@
+---
+title: "Variables"
+description: "Stop hardcoding everything. Learn how to store information in your programs so you can use it, change it, and reuse it."
+order: 2
+difficulty: "beginner"
+estimatedMinutes: 12
+concepts: [":=", "variable declaration", "printing variables", "updating variables", "multiple variables"]
+---
+
+## The problem with Chapter 1
+
+In Chapter 1, you printed your name like this:
+
+```gorun
+package main
+
+import "fmt"
+
+func main() {
+    fmt.Println("Alex")
+    fmt.Println("Alex")
+    fmt.Println("Alex")
+}
+```
+
+Now imagine you needed your name in 50 different places in your program. You'd type it 50 times. Then one day you want to change it to a nickname and you have to find all 50 places and update each one manually.
+
+There is a much better way. It's called a variable.
+
+---
+
+## What is a variable?
+
+Think about your phone's contacts app. You don't memorize your friend's phone number. You save it under a name — "Jamie" — and whenever you need it, you just tap Jamie and the phone fills in the number for you.
+
+A variable is the same idea. You give a name to a piece of information, and from that point on you use the name instead of the value. Change the value in one place, and it updates everywhere automatically.
+
+---
+
+## Creating your first variable
+
+In Go, you create a variable with :=
+
+```go
+name := "Alex"
+```
+
+Three things are happening here:
+
+- name is what you're calling it. You pick this. Make it descriptive.
+- := means "create this variable and store this value in it"
+- "Alex" is the value going in
+
+That's it. No complicated syntax. Go figures out everything else on its own.
+
+Now you can use name anywhere in your program:
+
+```gorun
+package main
+
+import "fmt"
+
+func main() {
+    name := "Alex"
+    fmt.Println(name)
+    fmt.Println(name)
+    fmt.Println(name)
+}
+```
+
+Run it. Three lines, but you only typed "Alex" once. Want to change the name? Change it in one place.
+
+---
+
+## Variable naming rules
+
+You can name your variable almost anything. A few rules:
+
+- Start with a letter (not a number)
+- No spaces — use camelCase instead: firstName not first name
+- Make it descriptive — score is better than s, username is better than u
+
+Go is case-sensitive. score and Score are two completely different variables.
+
+---
+
+## Updating a variable
+
+Variables can change. That's literally what the word variable means.
+
+When you first create a variable you use :=
+
+When you want to change it later you use just =
+
+```gorun
+package main
+
+import "fmt"
+
+func main() {
+    score := 70
+    fmt.Println(score)
+
+    score = 85
+    fmt.Println(score)
+
+    score = score + 10
+    fmt.Println(score)
+}
+```
+
+Run it. You'll see 70, then 85, then 95. Same variable, different value each time.
+
+The most common beginner mistake is using := to update a variable that already exists. Go will give you an error: "no new variables on left side of :=". If you see that error, switch to just =.
+
+---
+
+## Multiple variables
+
+You can create as many variables as you need. Each one gets its own name:
+
+```gorun
+package main
+
+import "fmt"
+
+func main() {
+    firstName := "Alex"
+    lastName := "Rivera"
+    city := "Chicago"
+
+    fmt.Println(firstName)
+    fmt.Println(lastName)
+    fmt.Println(city)
+}
+```
+
+Each variable is completely independent. Changing firstName has zero effect on city.
+
+---
+
+## What's next
+
+Right now all your variables hold text. But what about numbers? Prices? Yes or no answers? In Chapter 3 you'll meet the different types of data Go can store — and why it matters which one you use.

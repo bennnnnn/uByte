@@ -1,0 +1,173 @@
+---
+title: "Data Types"
+description: "Not all information is the same. Learn the four types of data Go works with and when to use each one."
+order: 3
+difficulty: "beginner"
+estimatedMinutes: 13
+concepts: ["string", "int", "float64", "bool", "type inference"]
+---
+
+## Variables hold different kinds of information
+
+In Chapter 2 you learned how to create variables. But there's something we skipped: not all information is the same.
+
+Your name is text. Your age is a whole number. Your GPA is a number with a decimal. Whether you're logged in is a yes or no. These are all completely different kinds of data, and Go needs to know which kind it's dealing with so it can handle it correctly.
+
+Go calls these kinds data types.
+
+There are four types you'll use in almost every program you write.
+
+---
+
+## String — text
+
+A string is any text. Names, sentences, usernames, addresses, anything made of characters. You wrap it in double quotes.
+
+```gorun
+package main
+
+import "fmt"
+
+func main() {
+    username := "alex99"
+    message := "Welcome back!"
+    country := "Canada"
+
+    fmt.Println(username)
+    fmt.Println(message)
+    fmt.Println(country)
+}
+```
+
+The name "string" comes from the idea of characters strung together in a line, like beads on a necklace. The string "Alex" is four beads: A, l, e, x.
+
+One important rule: "42" and 42 are completely different things. "42" is a string — the characters 4 and 2. 42 is a number you can do math with. Never confuse the two.
+
+---
+
+## Int — whole numbers
+
+An int holds whole numbers. Ages, scores, counts, years, quantities. No decimal point. Just a plain number, no quotes.
+
+```gorun
+package main
+
+import "fmt"
+
+func main() {
+    age := 24
+    score := 87
+    year := 2025
+    livesRemaining := 3
+
+    fmt.Println(age)
+    fmt.Println(score)
+    fmt.Println(year)
+    fmt.Println(livesRemaining)
+}
+```
+
+You can do math with ints: add, subtract, multiply, divide. Try changing score := 87 to score := 80 + 7. Same result.
+
+---
+
+## Float64 — numbers with decimals
+
+When a whole number is not precise enough, you need float64. Prices, temperatures, GPAs, percentages — anything that needs a decimal point.
+
+```gorun
+package main
+
+import "fmt"
+
+func main() {
+    price := 9.99
+    temperature := 98.6
+    gpa := 3.75
+    batteryLevel := 0.85
+
+    fmt.Println(price)
+    fmt.Println(temperature)
+    fmt.Println(gpa)
+    fmt.Println(batteryLevel)
+}
+```
+
+The moment Go sees a decimal point in your number, it automatically treats it as float64. You don't have to say float64 yourself.
+
+One thing to know: if you write 9 Go sees an int. If you write 9.0 Go sees a float64. The decimal point is the signal.
+
+---
+
+## Bool — yes or no
+
+A bool can only ever hold one of two values: true or false. That's it. No maybe. No sometimes. Just true or false.
+
+```gorun
+package main
+
+import "fmt"
+
+func main() {
+    isLoggedIn := true
+    hasSubscription := false
+    isWeekend := true
+    taskCompleted := false
+
+    fmt.Println(isLoggedIn)
+    fmt.Println(hasSubscription)
+    fmt.Println(isWeekend)
+    fmt.Println(taskCompleted)
+}
+```
+
+Bools sound simple, but they end up everywhere. Almost every decision a program makes — "show this menu or not", "allow this action or not", "send the email or not" — comes down to a bool somewhere.
+
+Do not put true or false in quotes. "true" is a string (the five characters t, r, u, e). true is a boolean. Very different things.
+
+---
+
+## Go figures out the type for you
+
+You may have noticed you never had to write the word string or int or float64 or bool anywhere. That's because Go looks at the value you assigned and figures out the type on its own. This is called type inference.
+
+```go
+name := "Alex"      // Go sees quotes → string
+age  := 24          // Go sees a whole number → int
+gpa  := 3.75        // Go sees a decimal → float64
+active := true      // Go sees true/false → bool
+```
+
+This is why := is so convenient. One line, and Go handles the type automatically.
+
+---
+
+## All four types together
+
+Here's what a complete set of variables looks like with all four types:
+
+```gorun
+package main
+
+import "fmt"
+
+func main() {
+    name    := "Jordan"
+    age     := 27
+    gpa     := 3.8
+    enrolled := true
+
+    fmt.Println(name)
+    fmt.Println(age)
+    fmt.Println(gpa)
+    fmt.Println(enrolled)
+}
+```
+
+Four variables, four types, four values. Run it and see all four print correctly.
+
+---
+
+## What's next
+
+You can store names, numbers, decimals, and yes/no values. But your output still looks pretty basic — everything on its own line with no labels. In Chapter 4 you'll learn how to format and combine this information into clean, readable output like "Name: Jordan, Age: 27, GPA: 3.80".

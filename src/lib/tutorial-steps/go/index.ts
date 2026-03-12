@@ -1,6 +1,5 @@
 import type { TutorialStep } from "../types";
 import { steps as gettingStarted } from "./getting-started";
-import { steps as variablesAndTypes } from "./variables-and-types";
 import { steps as fmtPackage } from "./fmt-package";
 import { steps as controlFlow } from "./control-flow";
 import { steps as loops } from "./loops";
@@ -22,7 +21,7 @@ import { steps as selectStatement } from "./select-statement";
 
 export const goSteps: Record<string, TutorialStep[]> = {
   "getting-started": gettingStarted,
-  "variables-and-types": variablesAndTypes,
+  // "variables" and "data-types" steps load from content/go/*.steps.json (no TS fallback needed)
   "fmt-package": fmtPackage,
   "control-flow": controlFlow,
   loops: loops,

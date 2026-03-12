@@ -1,0 +1,68 @@
+[
+  {
+    "title": "Your first string",
+    "instruction": "A string is any text — names, messages, addresses, anything. You wrap it in double quotes.\n\nCreate a variable called favoriteFood and give it the name of your favorite food as a string. Then print it.",
+    "hint": "favoriteFood := \"Pizza\"  — your text goes inside double quotes. Then fmt.Println(favoriteFood).",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\t// TODO: create a string variable called favoriteFood\n\t// TODO: print it\n}",
+    "expectedOutput": [],
+    "codeChecks": [
+      { "pattern": "favoriteFood\\s*:=\\s*\"\\S+\"", "required": true, "message": "Create a string variable: favoriteFood := \"Pizza\" (use your real favorite food)" },
+      { "pattern": "Println\\(favoriteFood\\)", "required": true, "message": "Print it: fmt.Println(favoriteFood)" },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO lines with your actual code." }
+    ]
+  },
+  {
+    "title": "Your first int",
+    "instruction": "An int is a whole number — no decimal point, no quotes. Ages, scores, years, counts. All ints.\n\nCreate a variable called age with your age as a whole number. Then print it.\n\nRemember: no quotes around the number.",
+    "hint": "age := 24  — just the number, no quotes, no decimal. Then fmt.Println(age).",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\t// TODO: create an int variable called age\n\t// TODO: print it\n}",
+    "expectedOutput": [],
+    "codeChecks": [
+      { "pattern": "age\\s*:=\\s*\\d+", "required": true, "message": "Create an int variable: age := 24 (use your real age, no quotes)" },
+      { "pattern": "Println\\(age\\)", "required": true, "message": "Print it: fmt.Println(age)" },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO lines with your actual code." }
+    ]
+  },
+  {
+    "title": "Your first float64",
+    "instruction": "When you need a decimal point, you use float64. Prices, temperatures, percentages.\n\nCreate a variable called price with any price you choose — something with a decimal like 4.99 or 12.50. Then print it.",
+    "hint": "price := 4.99  — the decimal point is what makes it a float64. No quotes. Then fmt.Println(price).",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\t// TODO: create a float64 variable called price\n\t// TODO: print it\n}",
+    "expectedOutput": [],
+    "codeChecks": [
+      { "pattern": "price\\s*:=\\s*\\d+\\.\\d+", "required": true, "message": "Create a float64 variable: price := 4.99 (must have a decimal point)" },
+      { "pattern": "Println\\(price\\)", "required": true, "message": "Print it: fmt.Println(price)" },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO lines with your actual code." }
+    ]
+  },
+  {
+    "title": "Your first bool",
+    "instruction": "A bool holds exactly one of two values: true or false. That's all it can ever be.\n\nCreate a variable called isWeekend. Set it to true or false depending on whether today is actually a weekend for you. Then print it.\n\nImportant: do NOT put true or false in quotes. They are not strings.",
+    "hint": "isWeekend := true  or  isWeekend := false  — no quotes. Then fmt.Println(isWeekend).",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\t// TODO: create a bool variable called isWeekend (set it to true or false)\n\t// TODO: print it\n}",
+    "expectedOutput": [],
+    "codeChecks": [
+      { "pattern": "isWeekend\\s*:=\\s*(true|false)", "required": true, "message": "Create a bool variable: isWeekend := true  (or false — no quotes!)" },
+      { "pattern": "Println\\(isWeekend\\)", "required": true, "message": "Print it: fmt.Println(isWeekend)" },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO lines with your actual code." }
+    ]
+  },
+  {
+    "title": "All four types — your complete profile",
+    "instruction": "You have learned all four basic data types. Let's use them all together.\n\nCreate four variables:\n- name (string) — your name\n- age (int) — your age as a whole number\n- height (float64) — your height in meters like 1.75\n- isStudent (bool) — true if you are a student, false if not\n\nThen print all four.",
+    "hint": "Four := lines — one for each type. name gets quotes, age gets a whole number, height gets a decimal, isStudent gets true or false (no quotes). Then four Println calls.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\t// TODO: create name (string), age (int), height (float64), isStudent (bool)\n\t// TODO: print all four\n}",
+    "expectedOutput": [],
+    "codeChecks": [
+      { "pattern": "name\\s*:=\\s*\"\\S+\"", "required": true, "message": "Create name as a string: name := \"YourName\"" },
+      { "pattern": "age\\s*:=\\s*\\d+", "required": true, "message": "Create age as an int: age := 24" },
+      { "pattern": "height\\s*:=\\s*\\d+\\.\\d+", "required": true, "message": "Create height as a float64: height := 1.75 (must have a decimal)" },
+      { "pattern": "isStudent\\s*:=\\s*(true|false)", "required": true, "message": "Create isStudent as a bool: isStudent := true  (or false, no quotes)" },
+      { "pattern": "Println\\(name\\)", "required": true, "message": "Print name: fmt.Println(name)" },
+      { "pattern": "Println\\(age\\)", "required": true, "message": "Print age: fmt.Println(age)" },
+      { "pattern": "Println\\(height\\)", "required": true, "message": "Print height: fmt.Println(height)" },
+      { "pattern": "Println\\(isStudent\\)", "required": true, "message": "Print isStudent: fmt.Println(isStudent)" },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO lines with your actual code." }
+    ]
+  }
+]
