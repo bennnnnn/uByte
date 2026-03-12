@@ -1,37 +1,51 @@
 [
   {
-    "title": "Declare an Array",
-    "instruction": "Declare an array of 3 integers named `nums`, then print the whole array. It should print the zero values.",
-    "hint": "Use `var nums [3]int` and then `fmt.Println(nums)`.",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\t// TODO: declare nums as an array of 3 ints\n\t// TODO: print nums\n}",
-    "expectedOutput": ["[0 0 0]"]
+    "title": "The Fixed Classroom — Your First Array",
+    "instruction": "In Chapter 5, you used loops to process scores. But where were those scores *stored*? It's time to talk about **arrays**.\n\nAn array is like a **classroom with a fixed number of seats**. You decide the size when you create it, and it never changes. A classroom with 5 seats:\n\n```go\nvar seats [5]string\n```\n\nThis creates 5 empty string slots. Declare an array `seats` of 5 strings and print it — you'll see the zero values (empty strings).",
+    "hint": "var seats [5]string — then fmt.Println(seats). You'll see [    ] since strings start as empty.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\t// TODO: declare seats as an array of 5 strings\n\t// TODO: print seats\n}",
+    "expectedOutput": ["[    ]"]
   },
   {
-    "title": "Assign by Index",
-    "instruction": "Create an array of 3 strings named `colors`. Set index 0 to `\"red\"`, index 1 to `\"green\"`, and index 2 to `\"blue\"`. Print the whole array.",
-    "hint": "Declare `var colors [3]string`, then assign `colors[0]`, `colors[1]`, and `colors[2]`.",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tvar colors [3]string\n\t// TODO: assign red, green, blue by index\n\tfmt.Println(colors)\n}",
-    "expectedOutput": ["[red green blue]"]
+    "title": "Assign Students to Seats",
+    "instruction": "Array **indices start at 0**, not 1. The first seat is `seats[0]`, the second is `seats[1]`, and so on.\n\nAssign these students to the classroom:\n- Seat 0: `\"Alice\"`\n- Seat 1: `\"Bob\"`\n- Seat 2: `\"Carol\"`\n- Seat 3: `\"David\"`\n- Seat 4: `\"Eve\"`\n\nThen print the whole array.",
+    "hint": "seats[0] = \"Alice\" — repeat for each seat, then fmt.Println(seats).",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tvar seats [5]string\n\t// TODO: assign Alice, Bob, Carol, David, Eve to seats 0-4\n\tfmt.Println(seats)\n}",
+    "expectedOutput": ["[Alice Bob Carol David Eve]"]
   },
   {
-    "title": "First and Last Value",
-    "instruction": "Create `scores := [4]int{10, 20, 30, 40}`. Print the first value, then print the last value.",
-    "hint": "The first value is `scores[0]`. The last value is `scores[len(scores)-1]`.",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tscores := [4]int{10, 20, 30, 40}\n\t// TODO: print the first value\n\t// TODO: print the last value\n}",
-    "expectedOutput": ["10", "40"]
+    "title": "Who's First? Who's Last?",
+    "instruction": "You can access any individual seat using its index. The first seat is `seats[0]`. The last seat (in a 5-element array) is `seats[4]` — or more robustly, `seats[len(seats)-1]`.\n\nPrint the **first** student, then the **last** student on separate lines.",
+    "hint": "fmt.Println(seats[0]) for the first. fmt.Println(seats[len(seats)-1]) for the last.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tseats := [5]string{\"Alice\", \"Bob\", \"Carol\", \"David\", \"Eve\"}\n\t// TODO: print the first student\n\t// TODO: print the last student\n}",
+    "expectedOutput": ["Alice", "Eve"]
   },
   {
-    "title": "Loop Through an Array",
-    "instruction": "Loop through `[3]int{2, 4, 6}` and print each number on its own line.",
-    "hint": "Use `for i := 0; i < len(nums); i++ { fmt.Println(nums[i]) }`.",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tnums := [3]int{2, 4, 6}\n\t// TODO: loop through nums and print each value\n}",
-    "expectedOutput": ["2", "4", "6"]
+    "title": "Print Every Student",
+    "instruction": "Use the loop skills from Chapter 5 to print every student in the classroom — one per line. Loop from index `0` to `len(seats)-1`.",
+    "hint": "for i := 0; i < len(seats); i++ { fmt.Println(seats[i]) }",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tseats := [5]string{\"Alice\", \"Bob\", \"Carol\", \"David\", \"Eve\"}\n\t// TODO: loop through seats and print each student\n}",
+    "expectedOutput": ["Alice", "Bob", "Carol", "David", "Eve"]
   },
   {
-    "title": "Sum an Array",
-    "instruction": "Sum the values in `[5]int{1, 2, 3, 4, 5}` and print the total.",
-    "hint": "Start with `sum := 0`, then add each element inside a loop.",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tnums := [5]int{1, 2, 3, 4, 5}\n\tsum := 0\n\t// TODO: add each array element to sum\n\tfmt.Println(sum)\n}",
-    "expectedOutput": ["15"]
+    "title": "Total the Exam Scores",
+    "instruction": "Each of the 5 students has an exam score. Sum all the scores and print the total.\n\nThis combines your loop skills (Chapter 5) with array indexing — a very common pattern you'll use constantly.",
+    "hint": "sum := 0. Then loop: sum += scores[i]. Print sum after the loop.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tscores := [5]int{72, 88, 65, 91, 54}\n\tsum := 0\n\t// TODO: loop through scores and add each to sum\n\tfmt.Println(sum)\n}",
+    "expectedOutput": ["370"]
+  },
+  {
+    "title": "Who Sits Here? — Searching an Array",
+    "instruction": "The principal asks: \"Is Carol in the classroom?\" Loop through `seats` and print `\"Found Carol\"` if her name appears, or `\"Carol not found\"` if it doesn't. Use the `break` from Chapter 5 to stop once you find her.",
+    "hint": "Loop and check if seats[i] == \"Carol\". If found, print \"Found Carol\" and break. After the loop, if never found, print \"Carol not found\".",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tseats := [5]string{\"Alice\", \"Bob\", \"Carol\", \"David\", \"Eve\"}\n\tfound := false\n\tfor i := 0; i < len(seats); i++ {\n\t\t// TODO: if seats[i] == \"Carol\", set found to true and break\n\t}\n\tif found {\n\t\tfmt.Println(\"Found Carol\")\n\t} else {\n\t\tfmt.Println(\"Carol not found\")\n\t}\n}",
+    "expectedOutput": ["Found Carol"]
+  },
+  {
+    "title": "Swap Two Seats",
+    "instruction": "Bob and David want to swap seats. To swap two values in an array, you need a **temporary variable** to hold one value while you move the other:\n\n```\ntemp = a\na = b\nb = temp\n```\n\nSwap seats 1 (Bob) and 3 (David), then print the whole array.",
+    "hint": "temp := seats[1]; seats[1] = seats[3]; seats[3] = temp — then fmt.Println(seats).",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tseats := [5]string{\"Alice\", \"Bob\", \"Carol\", \"David\", \"Eve\"}\n\t// TODO: swap seats[1] and seats[3] using a temp variable\n\tfmt.Println(seats)\n}",
+    "expectedOutput": ["[Alice David Carol Bob Eve]"]
   }
 ]

@@ -1,472 +1,164 @@
 ---
 title: "Control Flow"
-description: "Master if/else statements and switch in Go to make decisions in your code."
+description: "Make decisions in your code — determine who passed, who made the honor roll, and who's eligible for a scholarship."
 order: 4
 difficulty: "beginner"
-estimatedMinutes: 15
+estimatedMinutes: 12
+concepts: ["if", "else", "else if", "switch", "&&", "||", "comparison operators"]
 ---
 
-## Concepts in this chapter
+## Code That Decides
 
-You will learn and practice:
+Until now, your programs have run the same way every time — straight from top to bottom. But real programs need to **make decisions**. Should a student pass or fail? What letter grade did they earn? Is this student eligible for a scholarship?
 
-- **if** — run a block when a condition is true
-- **if / else if / else** — chain conditions; first match runs
-- **if with init** — short statement before condition (e.g. `if v, ok := m[k]; ok { }`)
-- **switch** — cleaner multi-way branching
-- **FizzBuzz** — combine conditions and loops (multiples of 3, 5, 15)
-
-Each section below has a short explanation; then you'll code the same ideas in the exercises (one concept per exercise).
+That's what control flow is for — it lets your program choose different paths based on conditions.
 
 ---
 
-## What is Control Flow?
-
-Control flow determines the order in which your code runs. Instead of always executing top to bottom, you can make **decisions** — running different code depending on conditions. Go gives you two main tools for this: `if/else` statements and `switch` statements.
-
----
-
-## If Statements
-
-The `if` statement runs a block of code only when a condition is `true`. In Go, you don't need parentheses `()` around the condition, but the curly braces `{}` are **always required**:
+## if — Only Run This When True
 
 ```gorun
-// if-basic.go
 package main
 
 import "fmt"
 
 func main() {
-    temperature := 35
+    score := 83
 
-    if temperature > 30 {
-        fmt.Println("It's hot outside!")
-    }
-
-    age := 20
-    if age >= 18 {
-        fmt.Println("You are an adult")
-    }
-
-    // Conditions use comparison operators: >, <, >=, <=, ==, !=
-    score := 85
-    if score >= 90 {
-        fmt.Println("You got an A!")
+    if score >= 60 {
+        fmt.Println("Pass")
     }
 }
 ```
 
+The block inside `{}` only runs when the condition is `true`. If `score` were `50`, nothing would be printed.
+
 ---
 
-## If / Else If / Else
-
-Chain multiple conditions together to handle different cases:
+## if-else — Handle Both Cases
 
 ```gorun
-// if-else.go
 package main
 
 import "fmt"
 
 func main() {
-    age := 18
+    score := 54
 
-    if age >= 21 {
-        fmt.Println("You can drink in the US")
-    } else if age >= 18 {
-        fmt.Println("You can vote!")
-    } else if age >= 16 {
-        fmt.Println("You can drive!")
+    if score >= 60 {
+        fmt.Println("Pass")
     } else {
-        fmt.Println("Too young for these activities")
+        fmt.Println("Fail")
     }
+}
+```
 
-    // Grading example
-    score := 78
+One path runs when the condition is true, the other when it's false. The program always takes exactly one path.
+
+---
+
+## else if — Multiple Conditions in Sequence
+
+Riverside Academy awards letter grades. You need to check several score ranges in order — that's what `else if` is for:
+
+```gorun
+package main
+
+import "fmt"
+
+func main() {
+    score := 83
+
     if score >= 90 {
-        fmt.Println("Grade: A")
+        fmt.Println("A")
     } else if score >= 80 {
-        fmt.Println("Grade: B")
+        fmt.Println("B")
     } else if score >= 70 {
-        fmt.Println("Grade: C")
+        fmt.Println("C")
     } else if score >= 60 {
-        fmt.Println("Grade: D")
+        fmt.Println("D")
     } else {
-        fmt.Println("Grade: F")
+        fmt.Println("F")
     }
 }
 ```
 
-**How it works:**
-- Go evaluates conditions from top to bottom
-- It runs the **first** block where the condition is `true`
-- If no condition is true, the `else` block runs (if present)
-- Only **one** block ever executes
+Go evaluates from top to bottom and takes the first condition that's true. Since `83 >= 80` is true, it prints `"B"` and skips everything else.
 
 ---
 
-## If with Initialization Statement
+## switch — Cleaner Than Long if-else Chains
 
-Go has a powerful pattern — you can declare a variable inside the `if` statement itself. The variable only exists within the `if/else` block:
-
-```gorun
-// if-init.go
-package main
-
-import (
-    "fmt"
-    "strconv"
-)
-
-func main() {
-    // Declare and check in one line
-    // The variable 'num' only exists inside this if/else block
-    if num, err := strconv.Atoi("42"); err != nil {
-        fmt.Println("Error parsing number:", err)
-    } else {
-        fmt.Println("Parsed number:", num)
-    }
-    // 'num' and 'err' are NOT accessible here
-
-    // Another example: check length inline
-    if length := len("Hello, Go!"); length > 5 {
-        fmt.Printf("String is %d characters (more than 5)\n", length)
-    }
-
-    // This pattern is VERY common for error handling in Go:
-    // if err := doSomething(); err != nil {
-    //     handle error
-    // }
-}
-```
-
-This pattern keeps variables scoped tightly to where they're used, which is considered good Go style.
-
----
-
-## Logical Operators in Conditions
-
-Combine multiple conditions using `&&` (AND), `||` (OR), and `!` (NOT):
+When you're comparing the same variable against many specific values, `switch` is much cleaner than a chain of `else if`:
 
 ```gorun
-// logical-operators.go
 package main
 
 import "fmt"
 
 func main() {
-    age := 25
-    hasLicense := true
-    isBanned := false
+    subject := "SCI"
 
-    // AND: both conditions must be true
-    if age >= 18 && hasLicense {
-        fmt.Println("You can drive")
-    }
-
-    // OR: at least one condition must be true
-    if age < 13 || age > 65 {
-        fmt.Println("Discount ticket available")
-    } else {
-        fmt.Println("Regular ticket price")
-    }
-
-    // NOT: inverts the condition
-    if !isBanned {
-        fmt.Println("Access granted")
-    }
-
-    // Combining multiple operators
-    if age >= 18 && hasLicense && !isBanned {
-        fmt.Println("Full driving privileges")
-    }
-}
-```
-
-> **Short-circuit evaluation:** Go evaluates `&&` and `||` left to right and stops as soon as the result is determined. In `false && expensive()`, the function `expensive()` is never called.
-
----
-
-## Nested If Statements
-
-You can nest `if` statements, but keep it reasonable — too much nesting makes code hard to read:
-
-```gorun
-// nested-if.go
-package main
-
-import "fmt"
-
-func main() {
-    username := "admin"
-    password := "secret123"
-    isEnabled := true
-
-    if username == "admin" {
-        if password == "secret123" {
-            if isEnabled {
-                fmt.Println("Login successful!")
-            } else {
-                fmt.Println("Account is disabled")
-            }
-        } else {
-            fmt.Println("Wrong password")
-        }
-    } else {
-        fmt.Println("Unknown user")
-    }
-
-    // Better: use early returns or combine conditions
-    // (we'll see this pattern more in the Functions tutorial)
-}
-```
-
-> **Go style tip:** Prefer "early returns" over deep nesting. Instead of nesting 3 levels deep, check for the error case first and return early.
-
----
-
-## Switch Statements
-
-Switch is a cleaner alternative to long `if/else if/else` chains. It compares one value against multiple cases. In Go, cases **don't fall through** by default — you don't need `break` like in C or JavaScript:
-
-```gorun
-// switch.go
-package main
-
-import "fmt"
-
-func main() {
-    day := "Wednesday"
-
-    switch day {
-    case "Monday":
-        fmt.Println("Start of the work week")
-    case "Tuesday", "Wednesday", "Thursday":
-        fmt.Println("Midweek — keep going!")
-    case "Friday":
-        fmt.Println("TGIF!")
-    case "Saturday", "Sunday":
-        fmt.Println("Weekend! 🎉")
+    switch subject {
+    case "MAT", "SCI":
+        fmt.Println("STEM")
+    case "ENG", "HIS":
+        fmt.Println("Humanities")
     default:
-        fmt.Println("Unknown day")
+        fmt.Println("General")
     }
 }
 ```
 
-**Key differences from other languages:**
-- No `break` needed — Go only runs the matched case
-- Multiple values per case (comma-separated): `case "Tuesday", "Wednesday"`
-- `default` handles all unmatched values
+One case can match multiple values (separated by commas). The `default` runs if nothing else matches — like the final `else`.
 
 ---
 
-## Switch Without a Condition
+## Combining Conditions: && and ||
 
-Drop the condition to create a clean `if/else if` chain. Each case has its own condition:
+Real decisions often involve multiple conditions:
 
-```gorun
-// switch-no-condition.go
-package main
-
-import "fmt"
-
-func classifyTemperature(temp int) string {
-    switch {
-    case temp < 0:
-        return "Freezing ❄️"
-    case temp < 15:
-        return "Cold 🧥"
-    case temp < 25:
-        return "Comfortable 😊"
-    case temp < 35:
-        return "Warm ☀️"
-    default:
-        return "Hot! 🔥"
-    }
-}
-
-func classifyGrade(score int) string {
-    switch {
-    case score >= 90:
-        return "A"
-    case score >= 80:
-        return "B"
-    case score >= 70:
-        return "C"
-    case score >= 60:
-        return "D"
-    default:
-        return "F"
-    }
-}
-
-func main() {
-    temps := []int{-5, 10, 22, 30, 40}
-    for _, t := range temps {
-        fmt.Printf("%3d°C → %s\n", t, classifyTemperature(t))
-    }
-
-    fmt.Println()
-
-    scores := []int{95, 82, 74, 65, 50}
-    for _, s := range scores {
-        fmt.Printf("Score %d → Grade %s\n", s, classifyGrade(s))
-    }
-}
-```
-
-This is often cleaner than a chain of `if/else if` statements, especially when classifying values into categories.
-
----
-
-## Switch with Initialization
-
-Just like `if`, you can include an initialization statement in a `switch`:
+- `&&` — AND: **both** conditions must be true
+- `||` — OR: **at least one** condition must be true
 
 ```gorun
-// switch-init.go
-package main
-
-import (
-    "fmt"
-    "time"
-)
-
-func main() {
-    // Initialize 'day' right in the switch statement
-    switch day := time.Now().Weekday(); day {
-    case time.Saturday, time.Sunday:
-        fmt.Println("It's the weekend!")
-    default:
-        fmt.Printf("It's %s — a workday.\n", day)
-    }
-    // 'day' is not accessible outside the switch
-}
-```
-
----
-
-## Type Switch
-
-A special form of switch that checks the **type** of an interface value instead of its value. This becomes very useful once you learn about interfaces:
-
-```gorun
-// type-switch.go
-package main
-
-import "fmt"
-
-func describe(value interface{}) string {
-    switch v := value.(type) {
-    case int:
-        return fmt.Sprintf("Integer: %d", v)
-    case string:
-        return fmt.Sprintf("String: %q (length %d)", v, len(v))
-    case bool:
-        return fmt.Sprintf("Boolean: %t", v)
-    case []int:
-        return fmt.Sprintf("Int slice with %d elements", len(v))
-    default:
-        return fmt.Sprintf("Unknown type: %T", v)
-    }
-}
-
-func main() {
-    fmt.Println(describe(42))
-    fmt.Println(describe("hello"))
-    fmt.Println(describe(true))
-    fmt.Println(describe([]int{1, 2, 3}))
-    fmt.Println(describe(3.14))
-}
-```
-
----
-
-## Fallthrough (Rare)
-
-If you ever need C-style fall-through behavior, use the `fallthrough` keyword explicitly. This is rarely used in practice:
-
-```gorun
-// fallthrough.go
 package main
 
 import "fmt"
 
 func main() {
-    num := 5
+    score := 92
+    gpa   := 3.8
 
-    switch {
-    case num > 0:
-        fmt.Println("Positive")
-        fallthrough // continue to next case
-    case num > -10:
-        fmt.Println("Greater than -10")
-        // no fallthrough here — stops
-    case num > -100:
-        fmt.Println("Greater than -100")
+    // Honor roll: high score AND high GPA
+    if score >= 90 && gpa >= 3.5 {
+        fmt.Println("Honor Roll")
+    }
+
+    // Scholarship: high score OR high GPA
+    if score >= 85 || gpa >= 3.5 {
+        fmt.Println("Scholarship Eligible")
     }
 }
 ```
 
 ---
 
-## Putting It All Together
+## Comparison Operators
 
-```gorun
-// control-flow-example.go
-package main
+| Operator | Meaning |
+|----------|---------|
+| `==` | equal to |
+| `!=` | not equal to |
+| `>` | greater than |
+| `<` | less than |
+| `>=` | greater than or equal to |
+| `<=` | less than or equal to |
 
-import "fmt"
-
-func checkAccess(age int, isMember bool, balance float64) {
-    fmt.Printf("\nAge: %d, Member: %t, Balance: $%.2f\n", age, isMember, balance)
-
-    // First check: age requirement
-    if age < 18 {
-        fmt.Println("❌ Access denied: must be 18 or older")
-        return
-    }
-
-    // Determine tier based on membership and balance
-    switch {
-    case isMember && balance >= 100:
-        fmt.Println("✅ Premium access granted")
-    case isMember:
-        fmt.Println("✅ Standard member access")
-    case balance >= 50:
-        fmt.Println("✅ Guest access (sufficient balance)")
-    default:
-        fmt.Println("❌ Access denied: become a member or add funds")
-    }
-}
-
-func main() {
-    checkAccess(16, true, 200)   // too young
-    checkAccess(25, true, 150)   // premium
-    checkAccess(30, true, 20)    // standard member
-    checkAccess(22, false, 75)   // guest access
-    checkAccess(19, false, 10)   // denied
-}
-```
+**Important:** `=` assigns a value. `==` compares two values. They look similar but do completely different things.
 
 ---
 
-<ChallengeBlock
-  title="FizzBuzz"
-  description="Print numbers from 1 to 20. For multiples of 3 print 'Fizz', for multiples of 5 print 'Buzz', and for multiples of both 3 and 5 print 'FizzBuzz'."
-  hint="Check for divisibility with the % operator. Make sure you check for FizzBuzz (divisible by both) before checking for Fizz or Buzz alone."
-  starter={`package main
+## What's Next
 
-import "fmt"
-
-func main() {
-\tfor i := 1; i <= 20; i++ {
-\t\t// TODO: print Fizz, Buzz, FizzBuzz, or the number
-\t\tfmt.Println(i)
-\t}
-}`}
-/>
-
-## What's Next?
-
-Now you can make decisions in your code! Next, let's learn about **loops** — how to repeat actions using Go's single, versatile `for` keyword.
+You can decide what to do for **one** student. In **Chapter 5: Loops**, you'll apply these same decisions to a whole class of students automatically — without writing the same code 30 times.

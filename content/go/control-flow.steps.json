@@ -1,37 +1,51 @@
 [
   {
-    "title": "if Statement",
-    "instruction": "An `if` runs a block only when the condition is true. Check if `x` (set to 15) is greater than 10; if so, print \"greater than 10\".",
-    "hint": "if x > 10 { fmt.Println(\"greater than 10\") }",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tx := 15\n\t// TODO: if x > 10, print \"greater than 10\"\n\t_ = x\n}",
-    "expectedOutput": ["greater than 10"]
-  },
-  {
-    "title": "if-else",
-    "instruction": "Use `if-else` to run different code by condition. If score (72) is 60 or higher print \"Pass\", otherwise print \"Fail\".",
-    "hint": "if score >= 60 { fmt.Println(\"Pass\") } else { fmt.Println(\"Fail\") }",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tscore := 72\n\t// TODO: print \"Pass\" if score >= 60, else \"Fail\"\n\t_ = score\n}",
+    "title": "Did Alice Pass? — if Statement",
+    "instruction": "In Chapter 2, you stored Alice's score (`83`). In Chapter 3, you formatted it nicely. Now let's **decide** something with it.\n\nAn `if` block runs only when a condition is true. The minimum passing score at Riverside Academy is `60`.\n\nWrite an `if` that prints `\"Pass\"` if `score` is 60 or higher.",
+    "hint": "if score >= 60 { fmt.Println(\"Pass\") }",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tscore := 83\n\t// TODO: if score >= 60, print \"Pass\"\n\t_ = score\n}",
     "expectedOutput": ["Pass"]
   },
   {
-    "title": "if with Init Statement",
-    "instruction": "Go lets you run a short statement before the condition in an `if`. Look up the key \"go\" in the map `langs`. If it exists print \"found\", else \"not found\".",
-    "hint": "if v, ok := langs[\"go\"]; ok { fmt.Println(\"found:\", v) } else { fmt.Println(\"not found\") }",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tlangs := map[string]int{\"go\": 2009, \"python\": 1991}\n\t// TODO: use if v, ok := langs[\"go\"]; ok { ... }\n\t_ = langs\n}",
-    "expectedOutput": ["found"]
+    "title": "Pass or Fail — if-else",
+    "instruction": "What if a student *didn't* pass? An `if-else` handles both cases — one block runs when the condition is true, the other when it's false.\n\nBob scored `54`. Print `\"Pass\"` if his score is 60 or higher, otherwise print `\"Fail\"`.",
+    "hint": "if score >= 60 { fmt.Println(\"Pass\") } else { fmt.Println(\"Fail\") }",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tscore := 54\n\t// TODO: print \"Pass\" if score >= 60, else \"Fail\"\n\t_ = score\n}",
+    "expectedOutput": ["Fail"]
   },
   {
-    "title": "switch Statement",
-    "instruction": "Use a `switch` on `day` (\"Monday\") to print \"Weekday\" for Monday–Friday and \"Weekend\" for Saturday–Sunday.",
-    "hint": "switch day { case \"Monday\", \"Tuesday\", ...: fmt.Println(\"Weekday\") case \"Saturday\", \"Sunday\": fmt.Println(\"Weekend\") }",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tday := \"Monday\"\n\t// TODO: switch on day, print \"Weekday\" or \"Weekend\"\n\t_ = day\n}",
-    "expectedOutput": ["Weekday"]
+    "title": "Letter Grade — else if Chain",
+    "instruction": "The academy awards letter grades based on score:\n- 90–100 → `\"A\"`\n- 80–89 → `\"B\"`\n- 70–79 → `\"C\"`\n- 60–69 → `\"D\"`\n- below 60 → `\"F\"`\n\nAlice scored `83`. Use an `if / else if / else` chain to print her letter grade.",
+    "hint": "Start with if score >= 90 { \"A\" } else if score >= 80 { \"B\" } ... else { \"F\" }",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tscore := 83\n\t// TODO: use if/else if/else to print the letter grade\n\t_ = score\n}",
+    "expectedOutput": ["B"]
   },
   {
-    "title": "FizzBuzz",
-    "instruction": "Loop from 1 to 15. For multiples of 3 print \"Fizz\", of 5 print \"Buzz\", of both print \"FizzBuzz\", else print the number. Check FizzBuzz first.",
-    "hint": "Check i%15==0 first for FizzBuzz, then i%3==0 for Fizz, then i%5==0 for Buzz, else print i.",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tfor i := 1; i <= 15; i++ {\n\t\t// TODO: FizzBuzz logic\n\t\tfmt.Println(i)\n\t}\n}",
-    "expectedOutput": ["Fizz", "Buzz", "FizzBuzz"]
+    "title": "Department Lookup — switch Statement",
+    "instruction": "A `switch` is cleaner than a long `if-else` chain when you're comparing the same variable against many values. It also handles multiple values per case.\n\nPrint the department name for a student's subject code:\n- `\"MAT\"` or `\"SCI\"` → `\"STEM\"`\n- `\"ENG\"` or `\"HIS\"` → `\"Humanities\"`\n- anything else → `\"General\"`\n\n`subject` is `\"SCI\"`. Print the department.",
+    "hint": "switch subject { case \"MAT\", \"SCI\": fmt.Println(\"STEM\") case \"ENG\", \"HIS\": fmt.Println(\"Humanities\") default: fmt.Println(\"General\") }",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tsubject := \"SCI\"\n\t// TODO: switch on subject, print the department\n\t_ = subject\n}",
+    "expectedOutput": ["STEM"]
+  },
+  {
+    "title": "Compare Two Students",
+    "instruction": "Alice scored `83` and Bob scored `54`. Use an `if-else` to print who scored higher:\n- `\"Alice scored higher\"` if Alice's score is greater\n- `\"Bob scored higher\"` if Bob's score is greater\n- `\"It's a tie\"` if they're equal",
+    "hint": "if aliceScore > bobScore { ... } else if bobScore > aliceScore { ... } else { ... }",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\taliceScore := 83\n\tbobScore := 54\n\t// TODO: print who scored higher\n\t_ = aliceScore\n\t_ = bobScore\n}",
+    "expectedOutput": ["Alice scored higher"]
+  },
+  {
+    "title": "Honor Roll Check",
+    "instruction": "A student makes the honor roll if their score is 90 or above **AND** their GPA is 3.5 or above. Use `&&` (AND) to combine two conditions.\n\nAlice has score `92` and GPA `3.8`. Print `\"Honor Roll\"` if both conditions are met, otherwise print `\"Not on Honor Roll\"`.",
+    "hint": "if score >= 90 && gpa >= 3.5 { fmt.Println(\"Honor Roll\") } else { ... }",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tscore := 92\n\tgpa := 3.8\n\t// TODO: print \"Honor Roll\" if score >= 90 AND gpa >= 3.5\n\t_ = score\n\t_ = gpa\n}",
+    "expectedOutput": ["Honor Roll"]
+  },
+  {
+    "title": "Scholarship Eligibility",
+    "instruction": "A student is eligible for a scholarship if their score is 85 or above **OR** they are on the honor roll (GPA 3.5+).\n\nUse `||` (OR) to check the eligibility. Carol has score `72` and GPA `3.7`. Print `\"Eligible\"` or `\"Not Eligible\"`.",
+    "hint": "if score >= 85 || gpa >= 3.5 { fmt.Println(\"Eligible\") } else { ... }",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tscore := 72\n\tgpa := 3.7\n\t// TODO: print \"Eligible\" if score >= 85 OR gpa >= 3.5\n\t_ = score\n\t_ = gpa\n}",
+    "expectedOutput": ["Eligible"]
   }
 ]

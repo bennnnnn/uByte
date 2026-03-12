@@ -1,311 +1,118 @@
 ---
 title: "Getting Started with Go"
-description: "Install Go, set up VS Code, and write your first Hello World program."
+description: "Run your first Go program and learn the building blocks you'll use in every single program you write."
 order: 1
 difficulty: "beginner"
 estimatedMinutes: 10
+concepts: ["package main", "func main", "fmt.Println", "fmt.Printf", "fmt.Sprintf", "comments"]
 ---
 
-## Concepts in this chapter
+## What Is Go, and Why Should You Care?
 
-You will learn and practice:
+Go (also called Golang) is a programming language created by Google in 2009. It was designed to be **fast to run** and **fast to write** — engineers who were frustrated with slow build times and complicated code invented Go to fix those problems.
 
-- **package main** — executable program (not a library)
-- **func main()** — entry point where execution starts
-- **fmt.Println()** — print a line with newline
-- **fmt.Printf()** — formatted output with verbs (`%s`, `%d`, `\n`)
-- **fmt.Sprintf()** — format into a string instead of printing
-- **Comments** — `//` single-line and `/* */` multi-line
+Today, Go powers some of the world's busiest systems: Docker, Kubernetes, Cloudflare, Dropbox, and Uber all use it heavily. It's also one of the highest-paying languages to know.
 
-Each section below has a short explanation; then you'll code the same ideas in the exercises (one concept per exercise).
+In this course, you'll build a **student tracker for Riverside Academy** — starting here, adding features in every chapter. By the end, you'll have written a real Go program from scratch.
 
 ---
 
-## What is Go?
+## The Structure of Every Go Program
 
-Go (also known as Golang) is an open-source programming language created at Google in 2009 by Robert Griesemer, Rob Pike, and Ken Thompson. It was designed to be simple, fast, and reliable — perfect for building modern backend systems, CLI tools, and cloud infrastructure.
+Open any Go file and you'll see the same two things at the top:
 
-**Why learn Go?**
-- **Simple syntax** — only 25 keywords, easy to read and write
-- **Fast compilation** — compiles to native machine code in seconds
-- **Built-in concurrency** — goroutines and channels make concurrent programming easy
-- **Strong standard library** — HTTP servers, JSON, cryptography, testing, and more out of the box
-- **Single binary deployment** — compile once, copy anywhere, no dependencies needed
-- **Used by top companies** — Google, Docker, Kubernetes, Uber, Twitch, Cloudflare, and many more
-
----
-
-## Installing Go
-
-Visit [go.dev/dl](https://go.dev/dl/) and download the installer for your operating system:
-
-- **macOS:** Download the `.pkg` installer and run it
-- **Windows:** Download the `.msi` installer and run it
-- **Linux:** Download the tarball and extract to `/usr/local`:
-
-```bash
-# Linux only
-wget https://go.dev/dl/go1.22.0.linux-amd64.tar.gz
-sudo tar -C /usr/local -xzf go1.22.0.linux-amd64.tar.gz
-export PATH=$PATH:/usr/local/go/bin
-```
-
-After installation, open your terminal and verify Go is installed:
-
-```bash
-go version
-```
-
-You should see output like `go version go1.22.0 darwin/arm64`. If you see `command not found`, restart your terminal or check that Go's bin directory is in your `PATH`.
-
-Also check that the Go toolchain is working:
-
-```bash
-go env GOPATH
-```
-
-This shows where Go stores downloaded packages. By default it's `~/go` on macOS/Linux or `%USERPROFILE%\go` on Windows.
-
----
-
-## Setting Up VS Code
-
-Visual Studio Code is the most popular editor for Go. Here's how to set it up:
-
-**1. Install VS Code** from [code.visualstudio.com](https://code.visualstudio.com/) if you haven't already.
-
-**2. Install the Go extension:**
-- Open VS Code
-- Press `Ctrl+Shift+X` (or `Cmd+Shift+X` on Mac) to open Extensions
-- Search for **"Go"** by the Go team at Google
-- Click **Install**
-
-**3. Install Go tools:**
-- Press `Ctrl+Shift+P` (or `Cmd+Shift+P` on Mac) to open the Command Palette
-- Type **"Go: Install/Update Tools"**
-- Select **all tools** and click OK
-
-This installs `gopls` (the Go language server for autocomplete and navigation), `dlv` (the debugger), `staticcheck` (a linter), and other helpful tools.
-
-**4. Verify it works:**
-- Create any `.go` file in VS Code
-- You should see syntax highlighting, auto-imports, and error checking working immediately
-
-> **Tip:** Enable "Format on Save" in VS Code settings. The Go extension will automatically format your code using `gofmt` every time you save, keeping your code clean and consistent.
-
----
-
-## Setting Up Your First Project
-
-Every Go project starts with a **module**. A module is Go's way of managing a project and its dependencies. Create a project folder and initialize it:
-
-```bash
-mkdir my-first-go-app
-cd my-first-go-app
-go mod init my-first-go-app
-```
-
-This creates a `go.mod` file in your project directory. Think of it like `package.json` in JavaScript or `requirements.txt` in Python — it tracks your project name and any external dependencies.
-
-The `go.mod` file looks like this:
-
-```text
-module my-first-go-app
-
-go 1.22
-```
-
----
-
-## Understanding `package main` and `func main()`
-
-Before writing code, let's understand two fundamental concepts that every Go program needs.
-
-**`package main`** — Every Go file belongs to a package. The `main` package is special — it tells the Go compiler "this is an executable program, not a reusable library." Without `package main`, Go won't know where to start your program.
-
-**`func main()`** — This is the **entry point** of your program. When you run `go run main.go`, Go looks for a function called `main` inside `package main` and starts executing there. Every executable Go program must have exactly one `main` function.
-
-Think of it like the `main()` in C/Java, or like how a Python script runs from the top of the file — except Go explicitly requires this function.
-
----
-
-## Your First Go Program: Hello World
-
-Create a file called `main.go` in your project folder and add this code:
-
-```gorun
-// hello.go
+```go
 package main
 
 import "fmt"
 
 func main() {
-    fmt.Println("Hello, World!")
+    // your code goes here
 }
 ```
 
-Click **Run** above to see the output! Let's break down every line:
+- `package main` — tells Go this file is an executable program (not a library)
+- `import "fmt"` — loads the `fmt` package, which handles printing
+- `func main()` — the entry point; Go runs this function first when you start the program
 
-### Line 1: `package main`
-Declares this file as part of the `main` package — making it an executable program.
-
-### Line 3: `import "fmt"`
-Imports the `fmt` (format) package from Go's standard library. This package provides functions for formatted I/O — printing to the terminal, formatting strings, and reading input.
-
-### Line 5: `func main()`
-Defines the main function — Go starts executing your program here. The curly braces `{}` define the function body.
-
-### Line 6: `fmt.Println("Hello, World!")`
-`Println` means "print line" — it prints the text to the terminal and adds a newline character at the end. The `fmt.` prefix tells Go this function comes from the `fmt` package.
+Every single Go program you write in this course will have this structure. Think of it as the envelope that holds your code.
 
 ---
 
-## Printing and Formatting Output
+## Printing Output
 
-Go's `fmt` package gives you several ways to output text:
+The `fmt` package gives you three tools for output:
+
+### Println — simple, automatic newline
 
 ```gorun
-// printing.go
 package main
 
 import "fmt"
 
 func main() {
-    // Println adds a newline at the end
-    fmt.Println("Hello, Gopher!")
-    fmt.Println("This is on a new line")
-
-    // Print does NOT add a newline
-    fmt.Print("Hello ")
-    fmt.Print("World")
-    fmt.Print("\n") // manually add newline
-
-    // Printf lets you format with placeholders ("verbs")
-    name := "Go"
-    version := 1.22
-    fmt.Printf("Learning %s version %.2f\n", name, version)
-
-    // Sprintf returns a formatted string (doesn't print it)
-    message := fmt.Sprintf("I love %s!", name)
-    fmt.Println(message)
+    fmt.Println("Hello, Riverside Academy!")
+    fmt.Println("Welcome to the student tracker.")
 }
 ```
 
-**Quick summary:**
-- `fmt.Println()` — prints with a newline at the end
-- `fmt.Print()` — prints without a newline
-- `fmt.Printf()` — prints with format placeholders (we'll cover format verbs in detail in the next tutorial)
-- `fmt.Sprintf()` — like Printf but returns a string instead of printing
+Each `Println` call prints one line and automatically moves to the next. Run it and see.
 
----
+### Printf — templates with placeholders
 
-## Comments in Go
+`fmt.Printf` lets you build a message by filling in placeholders called **format verbs**:
 
-Comments explain your code to other developers (and your future self). The compiler ignores them completely:
+| Verb | Meaning |
+|------|---------|
+| `%s` | a string |
+| `%d` | a whole number (integer) |
+| `%f` | a decimal number (float) |
+| `\n` | move to the next line |
 
 ```gorun
-// comments.go
 package main
 
 import "fmt"
 
-// This is a single-line comment — starts with //
-
-/*
-   This is a multi-line comment.
-   It starts with /* and ends with */
-   Great for longer explanations or temporarily
-   disabling blocks of code.
-*/
-
 func main() {
-    fmt.Println("Comments are ignored by the compiler")
-    fmt.Println("They only exist to help humans") // inline comment
+    school := "Riverside Academy"
+    year := 2025
+    fmt.Printf("Welcome to %s, %d\n", school, year)
 }
 ```
 
-> **Go convention:** Use `//` comments above functions to document what they do. Tools like `go doc` and VS Code will pick these up and show them as documentation.
+### Sprintf — build a string instead of printing it
 
----
+`fmt.Sprintf` works exactly like Printf but **returns** the formatted string so you can store and reuse it:
 
-## Running Go Programs
-
-There are two ways to run Go code from the terminal:
-
-### `go run` — compile and run in one step
-
-Best for development — compiles your code to a temporary location and runs it immediately:
-
-```bash
-go run main.go
-```
-
-You can also run all `.go` files in the current directory:
-
-```bash
-go run .
-```
-
-### `go build` — compile to a binary
-
-Creates a standalone executable file you can distribute and deploy:
-
-```bash
-go build -o myapp main.go
-./myapp
-```
-
-The resulting binary includes **everything** needed to run — no Go installation, no dependencies, no runtime required on the target machine. This is one of Go's biggest advantages for deployment.
-
-> **Tip:** During development, use `go run`. When you're ready to deploy or share your program, use `go build`.
-
----
-
-## Common Beginner Mistakes
-
-Here are some things that will trip you up early on:
-
-**1. Unused imports cause compile errors:**
-```go
-import "fmt" // ERROR if you don't use fmt anywhere
-```
-Go refuses to compile if you import a package but don't use it. This keeps your code clean.
-
-**2. Unused variables cause compile errors:**
-```go
-x := 5 // ERROR if you never use x
-```
-Same rule — Go won't compile if you declare a variable and never use it.
-
-**3. Braces must be on the same line:**
-```go
-// ✅ Correct
-func main() {
-}
-
-// ❌ Wrong — won't compile!
-func main()
-{
-}
-```
-Go's automatic semicolon insertion requires the opening brace on the same line as the function declaration.
-
----
-
-<ChallengeBlock
-  title="Hello, You!"
-  description="Modify the program below to print your name and the current year on separate lines. For example: 'My name is Gopher' and 'The year is 2024'."
-  hint="Use fmt.Println twice — once for your name and once for the year. You can hard-code the year as a number."
-  starter={`package main
+```gorun
+package main
 
 import "fmt"
 
 func main() {
-\t// TODO: print your name on one line
-\t// TODO: print the current year on the next line
-}`}
-/>
+    id := 1042
+    name := "Alice"
+    badge := fmt.Sprintf("Student ID: %d — %s", id, name)
+    fmt.Println(badge)
+}
+```
 
-## What's Next?
+---
 
-You've installed Go, set up your editor, and written your first program! Next, let's learn about **variables and data types** — the building blocks for storing and working with data in Go.
+## Comments — Notes for Humans
+
+Comments start with `//` and are completely ignored by Go. They exist only for the people reading your code:
+
+```go
+// This is a comment — Go ignores it completely
+fmt.Println("This runs fine")
+```
+
+Use comments to explain *why* you made a decision, not just what the code does. In this course, every step will remind you when a comment is helpful.
+
+---
+
+## What's Next
+
+In **Chapter 2: Variables & Types**, you'll start storing real student data — names, ages, GPAs, and enrollment status. The building you just laid here is the foundation everything else is built on.

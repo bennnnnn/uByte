@@ -1,407 +1,128 @@
 ---
 title: "The fmt Package"
-description: "Master Go's fmt package — printing, formatting, format verbs, and reading input."
+description: "Display student data beautifully — control every detail of how your output looks."
 order: 3
 difficulty: "beginner"
-estimatedMinutes: 10
+estimatedMinutes: 12
+concepts: ["Println", "Printf", "Sprintf", "format verbs", "padding", "Fprintf"]
 ---
 
-## Concepts in this chapter
+## Your Data Looks Messy — Let's Fix That
 
-You will learn and practice: **Println** (multiple lines); **Printf** with **%s and %d**; **float formatting** (%.2f); **Sprintf** to build strings; **%v and %T** for any type.
+In Chapter 2, you stored Alice's information in variables. But if you just `Println` everything, it looks rough:
 
-Each section below has a short explanation; then you'll code the same ideas in the exercises (one concept per exercise).
-
----
-
-## What is the fmt Package?
-
-The `fmt` package (short for "format") is one of Go's most-used standard library packages. It handles:
-- **Printing** output to the terminal
-- **Formatting** strings with placeholders
-- **Scanning** (reading) input from the user
-
-You've already seen `fmt.Println` — now let's understand the whole package.
-
----
-
-## Printing Functions
-
-Go's `fmt` package gives you three main ways to print:
-
-```gorun
-// printing-functions.go
-package main
-
-import "fmt"
-
-func main() {
-    // fmt.Println — adds a newline at the end, spaces between arguments
-    fmt.Println("Hello, Gopher!")
-    fmt.Println("Name:", "Alice", "Age:", 30) // spaces added automatically
-
-    // fmt.Print — no newline, no spaces between arguments
-    fmt.Print("Hello ")
-    fmt.Print("World")
-    fmt.Print("\n") // manually add a newline
-
-    // fmt.Printf — format with placeholders (verbs)
-    name := "Go"
-    version := 1.22
-    fmt.Printf("Learning %s version %.2f\n", name, version)
-}
+```
+Alice
+17
+3.8
+true
 ```
 
-**Quick reference:**
-- `fmt.Println(a, b)` → prints `a b\n` (space between args, newline at end)
-- `fmt.Print(a, b)` → prints `ab` (no spaces, no newline)
-- `fmt.Printf(format, args...)` → prints using format verbs
+The `fmt` package is your formatting toolkit. With it, you control exactly how data is presented — like a word processor for your output.
 
 ---
 
-## fmt.Sprintf — Build Formatted Strings
+## Format Verbs — Placeholders for Values
 
-`Sprintf` works like `Printf` but **returns** a string instead of printing it. Use it when you need a formatted string for other purposes:
+`fmt.Printf` takes a **template string** with placeholders called format verbs, then fills them in with values:
 
 ```gorun
-// sprintf.go
 package main
 
 import "fmt"
 
 func main() {
     name := "Alice"
-    score := 98.5
+    age  := 17
+    gpa  := 3.8
 
-    // Build a formatted string
-    message := fmt.Sprintf("Player %s scored %.1f points!", name, score)
-    fmt.Println(message)
+    fmt.Printf("Name: %s\n", name)      // %s for strings
+    fmt.Printf("Age:  %d\n", age)       // %d for integers
+    fmt.Printf("GPA:  %.2f\n", gpa)     // %.2f = float, 2 decimal places
+}
+```
 
-    // Build a URL
-    host := "localhost"
-    port := 8080
-    url := fmt.Sprintf("http://%s:%d/api", host, port)
-    fmt.Println("URL:", url)
+The most useful verbs:
 
-    // Pad numbers for table formatting
-    for i := 1; i <= 5; i++ {
-        row := fmt.Sprintf("Item %02d: $%6.2f", i, float64(i)*9.99)
-        fmt.Println(row)
-    }
+| Verb | Used for | Example output |
+|------|----------|----------------|
+| `%s` | string | `Alice` |
+| `%d` | integer | `17` |
+| `%f` | float (default 6 decimals) | `3.800000` |
+| `%.2f` | float with 2 decimals | `3.80` |
+| `%t` | bool | `true` |
+| `%v` | any value, default format | works on everything |
+| `%T` | the type of a value | `int`, `string`, etc. |
+| `\n` | newline | moves to the next line |
+
+---
+
+## Sprintf — Build a String Without Printing It
+
+`fmt.Printf` prints immediately. `fmt.Sprintf` does the same formatting but **returns a string** instead — perfect for building messages you'll use later:
+
+```gorun
+package main
+
+import "fmt"
+
+func main() {
+    id    := 1042
+    name  := "Alice"
+    grade := 11
+
+    // Build the badge string, then use it
+    badge := fmt.Sprintf("[%d] %s — Grade %d", id, name, grade)
+    fmt.Println(badge)
+    fmt.Println("Badge length:", len(badge))
 }
 ```
 
 ---
 
-## fmt.Fprintf — Print to Any Writer
-
-`Fprintf` writes formatted output to any `io.Writer` — not just the terminal. The most common use is writing to `os.Stderr`:
+## Controlling Float Precision
 
 ```gorun
-// fprintf.go
 package main
 
-import (
-    "fmt"
-    "os"
-    "strings"
-)
+import "fmt"
 
 func main() {
-    // Write to stderr (standard error stream)
-    fmt.Fprintf(os.Stderr, "Warning: %s\n", "low memory")
+    gpa := 3.8
 
-    // Write to a strings.Builder (building strings efficiently)
-    var sb strings.Builder
-    for i := 1; i <= 3; i++ {
-        fmt.Fprintf(&sb, "Line %d\n", i)
-    }
-    fmt.Print(sb.String())
+    fmt.Printf("%.0f\n", gpa)  // 4   (0 decimal places, rounded)
+    fmt.Printf("%.1f\n", gpa)  // 3.8 (1 decimal place)
+    fmt.Printf("%.2f\n", gpa)  // 3.80 (2 decimal places — standard for GPAs)
+    fmt.Printf("%.4f\n", gpa)  // 3.8000 (4 decimal places)
+}
+```
+
+The `.2` between `%` and `f` controls the precision — how many digits appear after the decimal point.
+
+---
+
+## Printing Types for Debugging
+
+When something looks wrong, `%T` tells you what type Go thinks a variable is:
+
+```gorun
+package main
+
+import "fmt"
+
+func main() {
+    score := 83
+    gpa   := 3.8
+    name  := "Alice"
+
+    fmt.Printf("score: %v (type: %T)\n", score, score)
+    fmt.Printf("gpa:   %v (type: %T)\n", gpa, gpa)
+    fmt.Printf("name:  %v (type: %T)\n", name, name)
 }
 ```
 
 ---
 
-## Format Verbs — The Complete Guide
+## What's Next
 
-Format verbs are placeholders inside `Printf`/`Sprintf` format strings. Each verb controls how a value is displayed.
-
-### String and Rune Verbs
-
-```gorun
-// verbs-strings.go
-package main
-
-import "fmt"
-
-func main() {
-    s := "hello"
-
-    fmt.Printf("%s\n", s)      // hello        — plain string
-    fmt.Printf("%q\n", s)      // "hello"      — double-quoted string
-    fmt.Printf("%v\n", s)      // hello        — default format
-    fmt.Printf("%T\n", s)      // string       — type name
-
-    // Width and alignment
-    fmt.Printf("[%10s]\n", s)  // [     hello] — right-aligned in 10 chars
-    fmt.Printf("[%-10s]\n", s) // [hello     ] — left-aligned in 10 chars
-}
-```
-
-### Integer Verbs
-
-```gorun
-// verbs-integers.go
-package main
-
-import "fmt"
-
-func main() {
-    n := 42
-
-    fmt.Printf("%d\n", n)    // 42       — decimal (base 10)
-    fmt.Printf("%b\n", n)    // 101010   — binary (base 2)
-    fmt.Printf("%o\n", n)    // 52       — octal (base 8)
-    fmt.Printf("%x\n", n)    // 2a       — hex lowercase (base 16)
-    fmt.Printf("%X\n", n)    // 2A       — hex uppercase
-    fmt.Printf("%c\n", 65)   // A        — character (Unicode code point)
-
-    // Padding
-    fmt.Printf("%05d\n", n)  // 00042    — zero-padded to 5 digits
-    fmt.Printf("%8d\n", n)   //       42 — right-aligned in 8 spaces
-    fmt.Printf("%-8d|\n", n) // 42      | — left-aligned in 8 spaces
-}
-```
-
-### Float Verbs
-
-```gorun
-// verbs-floats.go
-package main
-
-import "fmt"
-
-func main() {
-    f := 3.14159265
-
-    fmt.Printf("%f\n", f)      // 3.141593    — default (6 decimal places)
-    fmt.Printf("%.2f\n", f)    // 3.14        — 2 decimal places
-    fmt.Printf("%.0f\n", f)    // 3           — 0 decimal places (rounded)
-    fmt.Printf("%e\n", f)      // 3.141593e+00 — scientific notation
-    fmt.Printf("%g\n", f)      // 3.14159265  — shortest representation
-
-    // Width + precision
-    fmt.Printf("%8.2f\n", f)   //     3.14   — width 8, 2 decimal places
-    fmt.Printf("%-8.2f|\n", f) // 3.14     | — left-aligned
-}
-```
-
-### The Universal Verbs
-
-```gorun
-// verbs-universal.go
-package main
-
-import "fmt"
-
-func main() {
-    // %v works for ANY type — great for debugging
-    fmt.Printf("%v\n", 42)              // 42
-    fmt.Printf("%v\n", 3.14)           // 3.14
-    fmt.Printf("%v\n", true)           // true
-    fmt.Printf("%v\n", "hello")        // hello
-    fmt.Printf("%v\n", []int{1, 2, 3}) // [1 2 3]
-
-    // %+v — for structs, includes field names
-    type Point struct{ X, Y int }
-    p := Point{1, 2}
-    fmt.Printf("%v\n", p)   // {1 2}
-    fmt.Printf("%+v\n", p)  // {X:1 Y:2}
-    fmt.Printf("%#v\n", p)  // main.Point{X:1, Y:2}
-
-    // %T — prints the type name
-    fmt.Printf("%T\n", 42)        // int
-    fmt.Printf("%T\n", 3.14)      // float64
-    fmt.Printf("%T\n", "hello")   // string
-    fmt.Printf("%T\n", []int{})   // []int
-}
-```
-
-### Boolean Verb
-
-```gorun
-// verbs-bool.go
-package main
-
-import "fmt"
-
-func main() {
-    ready := true
-    done := false
-
-    fmt.Printf("%t\n", ready) // true
-    fmt.Printf("%t\n", done)  // false
-    fmt.Printf("%v\n", ready) // true (%v also works)
-}
-```
-
----
-
-## fmt.Errorf — Formatting Errors
-
-`fmt.Errorf` creates a new error with a formatted message. You'll use this constantly in Go:
-
-```gorun
-// errorf.go
-package main
-
-import (
-    "fmt"
-)
-
-func divide(a, b float64) (float64, error) {
-    if b == 0 {
-        return 0, fmt.Errorf("cannot divide %.1f by zero", a)
-    }
-    return a / b, nil
-}
-
-func findUser(id int) (string, error) {
-    users := map[int]string{1: "Alice", 2: "Bob"}
-    user, ok := users[id]
-    if !ok {
-        return "", fmt.Errorf("user with id %d not found", id)
-    }
-    return user, nil
-}
-
-func main() {
-    result, err := divide(10, 2)
-    if err != nil {
-        fmt.Println("Error:", err)
-    } else {
-        fmt.Printf("10 / 2 = %.1f\n", result)
-    }
-
-    _, err = divide(5, 0)
-    fmt.Println("Error:", err)
-
-    user, err := findUser(1)
-    if err == nil {
-        fmt.Println("Found:", user)
-    }
-
-    _, err = findUser(99)
-    fmt.Println("Error:", err)
-}
-```
-
-> We'll cover error handling in depth in the **Error Handling** tutorial. `fmt.Errorf` with `%w` lets you wrap errors too.
-
----
-
-## Reading Input with fmt.Scan
-
-The `fmt` package can also read input. `fmt.Scan` reads whitespace-separated values:
-
-```gorun
-// scan.go
-package main
-
-import "fmt"
-
-func main() {
-    // fmt.Sscan reads from a string (useful for testing without real input)
-    var name string
-    var age int
-
-    // Sscan parses from a string — same API as Scan but from a string
-    input := "Alice 30"
-    n, err := fmt.Sscan(input, &name, &age)
-    if err != nil {
-        fmt.Println("Error:", err)
-        return
-    }
-    fmt.Printf("Parsed %d values: name=%s, age=%d\n", n, name, age)
-
-    // Sscanf with format string
-    var x, y float64
-    fmt.Sscanf("3.14 2.71", "%f %f", &x, &y)
-    fmt.Printf("x=%.2f, y=%.2f\n", x, y)
-}
-```
-
-> **In real programs:** Use `fmt.Scan(&variable)` or `fmt.Scanln(&variable)` to read from the terminal. `fmt.Sscan` is shown here because the playground doesn't support interactive input.
-
----
-
-## Putting It All Together
-
-```gorun
-// fmt-summary.go
-package main
-
-import (
-    "fmt"
-    "strings"
-)
-
-func formatTable(headers []string, rows [][]string) string {
-    var sb strings.Builder
-
-    // Header
-    for _, h := range headers {
-        fmt.Fprintf(&sb, "%-12s", h)
-    }
-    fmt.Fprintln(&sb)
-    fmt.Fprintf(&sb, "%s\n", strings.Repeat("-", 12*len(headers)))
-
-    // Rows
-    for _, row := range rows {
-        for _, cell := range row {
-            fmt.Fprintf(&sb, "%-12s", cell)
-        }
-        fmt.Fprintln(&sb)
-    }
-
-    return sb.String()
-}
-
-func main() {
-    headers := []string{"Name", "Score", "Grade"}
-    rows := [][]string{
-        {"Alice", fmt.Sprintf("%.1f", 95.5), "A"},
-        {"Bob", fmt.Sprintf("%.1f", 82.3), "B"},
-        {"Charlie", fmt.Sprintf("%.1f", 74.0), "C"},
-    }
-
-    fmt.Print(formatTable(headers, rows))
-
-    // Quick verb summary
-    fmt.Printf("\n%s → %-8s | %s → %-8s\n", "%s", "string", "%d", "integer")
-    fmt.Printf("%s → %-8s | %s → %-8s\n", "%f", "float", "%t", "boolean")
-    fmt.Printf("%s → %-8s | %s → %-8s\n", "%v", "any type", "%T", "type name")
-    fmt.Printf("%s → %-8s | %s → %-8s\n", "%q", "quoted", "%b", "binary")
-}
-```
-
----
-
-<ChallengeBlock
-  title="Table of Squares"
-  description="Print a formatted table of numbers 1 through 10 and their squares. Each row should be right-aligned so columns line up neatly, like: '  1 |   1' and ' 10 | 100'."
-  hint="Use fmt.Printf with width specifiers like %3d to right-align numbers. Use a for loop from 1 to 10."
-  starter={`package main
-
-import "fmt"
-
-func main() {
-\tfmt.Println("  N | N^2")
-\tfmt.Println("----|----")
-\t// TODO: loop from 1 to 10 and print each number and its square
-}`}
-/>
-
-## What's Next?
-
-Now you know how to print and format anything in Go! Next, let's learn about **control flow** — making decisions with `if`, `else`, and `switch`.
+You can now store data (Chapter 2) and display it beautifully (Chapter 3). In **Chapter 4: Control Flow**, you'll make *decisions* with that data — like determining whether Alice passed her exam or earned a spot on the honor roll.

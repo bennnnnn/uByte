@@ -1,44 +1,72 @@
 [
   {
-    "title": "Declare a Slice",
-    "instruction": "Declare a slice of strings named `langs` containing `\"go\"`, `\"python\"`, and `\"rust\"`. Print the whole slice.",
-    "hint": "Use `langs := []string{\"go\", \"python\", \"rust\"}`.",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\t// TODO: declare langs as a slice of strings\n\t// TODO: print langs\n}",
-    "expectedOutput": ["[go python rust]"]
+    "title": "The Problem with Arrays",
+    "instruction": "In Chapter 6, you stored students in a fixed 5-seat array. But what happens when a new student enrolls mid-semester? You can't add an 6th element to `[5]string` — the size is locked forever.\n\nThis is why **slices** exist. A slice is like an array, but it can **grow and shrink**. Compare the syntax:\n\n```go\n// Array — fixed size, never changes\nvar seats [5]string\n\n// Slice — flexible, can grow\nvar students []string\n```\n\nDeclare a slice named `students` and print it. You'll see `[]` — an empty slice.",
+    "hint": "var students []string — then fmt.Println(students). An empty slice prints as [].",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\t// TODO: declare students as an empty slice of strings\n\t// TODO: print students\n}",
+    "expectedOutput": ["[]"]
   },
   {
-    "title": "Update a Slice Value",
-    "instruction": "Start with `scores := []int{80, 85, 90}`. Change the second value to `95`, then print the whole slice.",
-    "hint": "The second value is at index 1, so use `scores[1] = 95`.",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tscores := []int{80, 85, 90}\n\t// TODO: change the second value to 95\n\tfmt.Println(scores)\n}",
-    "expectedOutput": ["[80 95 90]"]
+    "title": "Start Enrollment — Create a Slice with Values",
+    "instruction": "Three students enrolled on the first day: Alice, Bob, and Carol. Create a slice with their names already inside:\n\n```go\nstudents := []string{\"Alice\", \"Bob\", \"Carol\"}\n```\n\nDeclare this slice and print it.",
+    "hint": "students := []string{\"Alice\", \"Bob\", \"Carol\"} — then fmt.Println(students).",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\t// TODO: declare students with Alice, Bob, Carol\n\t// TODO: print students\n}",
+    "expectedOutput": ["[Alice Bob Carol]"]
   },
   {
-    "title": "First and Last Slice Value",
-    "instruction": "From `nums := []int{10, 20, 30, 40, 50}`, print the first value and then the last value.",
-    "hint": "Use `nums[0]` for the first value and `nums[len(nums)-1]` for the last value.",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tnums := []int{10, 20, 30, 40, 50}\n\t// TODO: print the first value\n\t// TODO: print the last value\n}",
-    "expectedOutput": ["10", "50"]
+    "title": "New Student Joins — append",
+    "instruction": "A fourth student, David, just enrolled. Use `append()` to add him to the slice:\n\n```go\nstudents = append(students, \"David\")\n```\n\n`append` creates a new, larger slice and returns it — that's why you assign the result back to `students`.\n\nAdd David to the slice and print it.",
+    "hint": "students = append(students, \"David\") — then fmt.Println(students). Don't forget to re-assign!",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tstudents := []string{\"Alice\", \"Bob\", \"Carol\"}\n\t// TODO: append \"David\" to students\n\tfmt.Println(students)\n}",
+    "expectedOutput": ["[Alice Bob Carol David]"]
   },
   {
-    "title": "Print Every Value",
-    "instruction": "Loop through `[]int{3, 6, 9}` and print each value on its own line.",
-    "hint": "Use a `for` loop with `i < len(nums)` and print `nums[i]`.",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tnums := []int{3, 6, 9}\n\t// TODO: loop through nums and print each value\n}",
-    "expectedOutput": ["3", "6", "9"]
+    "title": "How Many Are Enrolled? — len",
+    "instruction": "`len()` returns the number of elements in a slice. After David joins, there are 4 students. Print the count.\n\nThis is different from an array where you always know the size — with slices, you check at runtime.",
+    "hint": "fmt.Println(len(students)) — len works the same way as on arrays.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tstudents := []string{\"Alice\", \"Bob\", \"Carol\", \"David\"}\n\t// TODO: print the number of students using len\n}",
+    "expectedOutput": ["4"]
   },
   {
-    "title": "Find Min and Max",
-    "instruction": "For `nums := []int{8, 3, 15, 2, 10}`, find the minimum and maximum values and print them on separate lines.",
-    "hint": "Start with `min := nums[0]` and `max := nums[0]`, then compare the rest in a loop.",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tnums := []int{8, 3, 15, 2, 10}\n\tmin := nums[0]\n\tmax := nums[0]\n\t// TODO: update min and max while looping through nums\n\tfmt.Println(min)\n\tfmt.Println(max)\n}",
-    "expectedOutput": ["2", "15"]
+    "title": "First and Last Student",
+    "instruction": "Just like arrays (Chapter 6), slice elements are accessed by index starting at 0. The first element is `students[0]` and the last is `students[len(students)-1]`.\n\nPrint the **first** and **last** student on separate lines.",
+    "hint": "fmt.Println(students[0]) and fmt.Println(students[len(students)-1])",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tstudents := []string{\"Alice\", \"Bob\", \"Carol\", \"David\"}\n\t// TODO: print the first student\n\t// TODO: print the last student\n}",
+    "expectedOutput": ["Alice", "David"]
   },
   {
-    "title": "Sum Slice Elements",
-    "instruction": "Sum the values in `[]int{1, 2, 3, 4, 5}` and print the total.",
-    "hint": "Use `sum := 0` and add each value inside a loop.",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tnums := []int{1, 2, 3, 4, 5}\n\tsum := 0\n\t// TODO: add every value in nums to sum\n\tfmt.Println(sum)\n}",
-    "expectedOutput": ["15"]
+    "title": "Print Everyone — Loop a Slice",
+    "instruction": "Use `for range` to loop through a slice — it's cleaner than managing an index manually. The `range` keyword gives you both the index and the value:\n\n```go\nfor i, name := range students {\n    fmt.Println(i, name)\n}\n```\n\nLoop through `students` and print each name (without the index — use `_` to discard it).",
+    "hint": "for _, name := range students { fmt.Println(name) } — the _ means \"I don't need the index\".",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tstudents := []string{\"Alice\", \"Bob\", \"Carol\", \"David\"}\n\t// TODO: loop with range and print each student name\n}",
+    "expectedOutput": ["Alice", "Bob", "Carol", "David"]
+  },
+  {
+    "title": "Class Average — Slice of Scores",
+    "instruction": "Exam results are in. Use a `for range` loop to sum the scores and calculate the average.\n\nThis combines your loop skills (Chapter 5), division logic, and slices — three chapters working together!",
+    "hint": "for _, s := range scores { sum += s } — then average := sum / len(scores). Print average.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tscores := []int{72, 88, 65, 91, 54}\n\tsum := 0\n\t// TODO: range loop to sum scores\n\taverage := sum / len(scores)\n\tfmt.Println(average)\n}",
+    "expectedOutput": ["74"]
+  },
+  {
+    "title": "A Student Withdrew — Remove from Slice",
+    "instruction": "Bob (index 1) withdrew from the academy. To remove an element from a slice, you join the elements *before* it and *after* it together:\n\n```go\nstudents = append(students[:1], students[2:]...)\n```\n\n- `students[:1]` → everything before Bob\n- `students[2:]` → everything after Bob\n- `...` → spreads the second slice into individual arguments\n\nRemove Bob and print the updated slice.",
+    "hint": "students = append(students[:1], students[2:]...) — then fmt.Println(students).",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tstudents := []string{\"Alice\", \"Bob\", \"Carol\", \"David\"}\n\t// TODO: remove Bob (index 1) from the slice\n\tfmt.Println(students)\n}",
+    "expectedOutput": ["[Alice Carol David]"]
+  },
+  {
+    "title": "Top and Bottom Scores",
+    "instruction": "Find the highest and lowest scores in the class. Loop through `scores` and track both simultaneously — the same pattern from Chapter 6, but now on a slice with `range`.\n\nPrint the lowest score first, then the highest.",
+    "hint": "lowest := scores[0]; highest := scores[0]. Then for _, s := range scores: update both if needed. Print lowest, then highest.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tscores := []int{72, 88, 65, 91, 54}\n\tlowest := scores[0]\n\thighest := scores[0]\n\t// TODO: loop with range and update lowest and highest\n\tfmt.Println(lowest)\n\tfmt.Println(highest)\n}",
+    "expectedOutput": ["54", "91"]
+  },
+  {
+    "title": "Multiple Classes — Slice of Slices",
+    "instruction": "Riverside Academy has two classes. Each class has its own slice of scores. You can store slices *inside* a slice:\n\n```go\nclasses := [][]int{\n    {72, 88, 65},  // Class A\n    {91, 54, 77},  // Class B\n}\n```\n\nThe total across both classes is already declared as `total := 0`. Use a **nested** `range` loop to sum all scores across both classes and print the total.",
+    "hint": "for _, class := range classes { for _, score := range class { total += score } } — nested range loops.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tclasses := [][]int{\n\t\t{72, 88, 65},\n\t\t{91, 54, 77},\n\t}\n\ttotal := 0\n\t// TODO: nested range loop to sum all scores\n\tfmt.Println(total)\n}",
+    "expectedOutput": ["447"]
   }
 ]

@@ -1,37 +1,47 @@
 [
   {
-    "title": "Hello, World!",
-    "instruction": "Every Go program needs `package main` (executable) and `func main()` (entry point). Use `fmt.Println()` to print a line of text. Click Run to see your first Go program.",
-    "hint": "The program is already complete — just click Run.",
+    "title": "Your First Go Program",
+    "instruction": "Welcome to Go! Every Go program has two required pieces: `package main` tells Go this is a runnable program, and `func main()` is where execution begins. The program below is already complete — just click **Run** to see it work.",
+    "hint": "No changes needed — just press Run and see \"Hello, World!\" appear in the output.",
     "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tfmt.Println(\"Hello, World!\")\n}",
     "expectedOutput": ["Hello, World!"]
   },
   {
-    "title": "Print Multiple Lines",
-    "instruction": "You can call `fmt.Println()` multiple times — each call prints one line. Update the program to print two lines: one containing \"Go\" and one containing \"Gopher\".",
-    "hint": "Add a second fmt.Println() below the first.",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\t// TODO: print \"Go\" on first line, \"Gopher\" on second line\n}",
-    "expectedOutput": ["Go", "Gopher"]
+    "title": "Say Your Name",
+    "instruction": "Great — Go is running! Now make it personal. Change the message so it prints **your** name. For example, if your name is Alex, print `Hello, Alex!`.",
+    "hint": "Change the text inside Println to \"Hello, Alex!\" — replace Alex with your own name.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\t// TODO: print \"Hello, <your name>!\"\n\tfmt.Println(\"Hello, World!\")\n}",
+    "expectedOutput": ["Hello,"]
   },
   {
-    "title": "Use Printf",
-    "instruction": "`fmt.Printf()` formats output using verbs: `%s` (string), `%d` (integer), `\\n` (newline). Use Printf to print \"Learning Go version 1\" where the language and version come from variables.",
-    "hint": "fmt.Printf(\"%s version %d\\n\", language, version)",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tlanguage := \"Go\"\n\tversion := 1\n\t// TODO: use fmt.Printf to print \"Learning Go version 1\"\n\t_ = language\n\t_ = version\n}",
-    "expectedOutput": ["Learning Go"]
+    "title": "Print Two Lines",
+    "instruction": "Each call to `fmt.Println()` prints one line and then moves to the next line automatically. Print two lines: your name on the first line, and your hometown on the second line.\n\nYou're starting to build a student profile — we'll use this idea a lot throughout the course.",
+    "hint": "Call fmt.Println() twice — once for your name, once for your hometown.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\t// TODO: print your name on line 1\n\t// TODO: print your hometown on line 2\n}",
+    "expectedOutput": []
   },
   {
-    "title": "Use Sprintf",
-    "instruction": "`fmt.Sprintf()` works like Printf but returns a formatted string instead of printing it. Build the greeting \"Hello, Gopher!\" using Sprintf with the variable `name`, then print it.",
-    "hint": "greeting := fmt.Sprintf(\"Hello, %s!\", name)",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tname := \"Gopher\"\n\t// TODO: use fmt.Sprintf to build \"Hello, Gopher!\" and store in greeting\n\tgreeting := \"\"\n\t_ = name\n\tfmt.Println(greeting)\n}",
-    "expectedOutput": ["Hello, Gopher!"]
+    "title": "Fill in the Blanks with Printf",
+    "instruction": "`fmt.Printf()` lets you insert values into a template using **format verbs**. `%s` is a placeholder for a string, `%d` for a whole number, and `\\n` moves to the next line.\n\nThe variables `name` and `year` are already set. Use `fmt.Printf` to print:\n```\nWelcome to Riverside Academy, 2025\n```",
+    "hint": "fmt.Printf(\"Welcome to %s, %d\\n\", name, year) — %s inserts the string, %d inserts the number.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tname := \"Riverside Academy\"\n\tyear := 2025\n\t// TODO: use fmt.Printf to print \"Welcome to Riverside Academy, 2025\"\n\t_ = name\n\t_ = year\n}",
+    "expectedOutput": ["Welcome to Riverside Academy, 2025"]
   },
   {
-    "title": "Add Comments",
-    "instruction": "Comments start with `//` and are ignored by the compiler. Add a `//` comment above the Println describing what it does, then ensure the program prints \"Comments done!\".",
-    "hint": "A comment looks like: // This prints a confirmation message.",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\t// TODO: add a comment here describing the next line\n\tfmt.Println(\"Comments done!\")\n}",
-    "expectedOutput": ["Comments done!"]
+    "title": "Build a String with Sprintf",
+    "instruction": "`fmt.Sprintf()` works exactly like Printf but **returns a string** instead of printing it — perfect when you need to build a message and use it later.\n\nBuild the string `\"Student ID: 1042\"` using Sprintf with the variable `id`, store it in `badge`, then print it.",
+    "hint": "badge := fmt.Sprintf(\"Student ID: %d\", id) — then fmt.Println(badge).",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tid := 1042\n\t// TODO: use fmt.Sprintf to build \"Student ID: 1042\" and store in badge\n\tbadge := \"\"\n\t_ = id\n\tfmt.Println(badge)\n}",
+    "expectedOutput": ["Student ID: 1042"]
+  },
+  {
+    "title": "Document Your Code with Comments",
+    "instruction": "Comments start with `//` and are completely ignored by Go — they exist only for humans reading the code. Good comments explain *why* something is done, not just *what*.\n\nAdd a comment above the Println explaining what the program is for, then make sure the program still prints `\"Riverside Academy — Student Tracker\"`.",
+    "hint": "// This program is the entry point for Riverside Academy's student tracker",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\t// TODO: add a comment explaining what this program does\n\tfmt.Println(\"Riverside Academy — Student Tracker\")\n}",
+    "expectedOutput": ["Riverside Academy"],
+    "codeChecks": [
+      { "pattern": "^\\s*//", "message": "Add a // comment above the Println." }
+    ]
   }
 ]

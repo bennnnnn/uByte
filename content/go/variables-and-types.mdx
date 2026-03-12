@@ -1,431 +1,174 @@
 ---
-title: "Variables & Data Types"
-description: "Learn how to declare variables, understand Go's type system, and work with strings, numbers, booleans, and constants."
+title: "Variables & Types"
+description: "Store student information with variables — the labeled boxes that hold your data."
 order: 2
 difficulty: "beginner"
-estimatedMinutes: 12
+estimatedMinutes: 14
+concepts: ["var", ":=", "string", "int", "float64", "bool", "zero values", "type conversion", "const"]
 ---
 
-## Concepts in this chapter
+## Variables Are Labeled Boxes
 
-You will learn and practice:
+Imagine a row of boxes on a shelf. Each box has a label (the variable name) and contains something (the value). Before you can use a box, you have to create it and tell Go what kind of thing it will hold — that's the **type**.
 
-- **Variables** — named containers with a fixed type (`var`, short declaration `:=`)
-- **Zero values** — what uninitialized variables hold (0, `""`, `false`)
-- **Strings** — text, `len()`, concatenation, `strings` package
-- **Integers** — `int`, `int8`, `int16`, `int32`, `int64`, `uint8` (byte), arithmetic
-- **Floats** — `float32`, `float64`, `math` package
-- **Booleans** — `true`/`false`, comparisons, logical operators
-- **Type conversion** — explicit conversion (e.g. `float64(i)`), no implicit conversion
-- **Constants** — `const`, `iota` for enumerations
-- **Multiple declarations** — `x, y := 1, 2`, swap, `var` blocks
-
-Each section below has a short explanation; then you'll code the same ideas in the exercises (one concept per exercise) so you learn by doing.
-
----
-
-## What Are Variables?
-
-Variables are named containers that store data. In Go, every variable has a **type** that determines what kind of data it can hold. Unlike dynamically typed languages (Python, JavaScript), Go requires every variable to have a fixed type at compile time.
-
----
-
-## Declaring Variables with `var`
-
-The `var` keyword is the most explicit way to declare a variable. You can specify the type, let Go infer it, or declare without an initial value:
-
-```gorun
-// var-declaration.go
-package main
-
-import "fmt"
-
-func main() {
-    // Form 1: explicit type and value
-    var name string = "Gopher"
-    var age int = 10
-    var isActive bool = true
-
-    fmt.Println(name)     // Gopher
-    fmt.Println(age)      // 10
-    fmt.Println(isActive) // true
-
-    // Form 2: type inferred from value
-    var city = "San Francisco" // Go knows this is a string
-    var score = 95.5           // Go knows this is a float64
-    fmt.Println(city, score)
-
-    // Form 3: declare without value (gets zero value)
-    var count int   // count is 0
-    var label string // label is ""
-    fmt.Println(count, label)
-}
+```
+┌─────────┐   ┌─────────┐   ┌─────────┐
+│  Alice  │   │   17    │   │   3.8   │
+│  name   │   │   age   │   │   gpa   │
+└─────────┘   └─────────┘   └─────────┘
+  string          int          float64
 ```
 
-> **When to use `var`:** Use `var` when you want to declare a variable without an initial value, or when you need to be explicit about the type (e.g., `var x int64 = 5` when you need `int64` instead of the default `int`).
-
 ---
 
-## Short Variable Declaration (`:=`)
+## Declaring Variables
 
-Inside functions, the `:=` operator is the most common way to declare variables in Go. It declares **and** assigns in one step, and Go infers the type automatically:
+### The explicit way: `var`
+
+```go
+var name string = "Alice"
+var age int = 17
+```
+
+This is crystal clear: the variable is named `name`, it holds a `string`, and the value is `"Alice"`.
+
+### The short way: `:=`
+
+Inside a function, `:=` does the same thing in one step — Go figures out the type from the value:
 
 ```gorun
-// short-declaration.go
 package main
 
 import "fmt"
 
 func main() {
-    // Short declaration — Go figures out the type
-    name := "Gopher"     // string
-    age := 10            // int
-    isHappy := true      // bool
-    score := 98.5        // float64
+    name := "Alice"   // Go infers: string
+    age  := 17        // Go infers: int
+    gpa  := 3.8       // Go infers: float64
 
-    fmt.Println(name, age, isHappy, score)
-
-    // You can also declare multiple variables at once
-    x, y := 10, 20
-    fmt.Println(x, y)
-
-    // Reassign with = (no colon — variable already exists)
-    name = "Go Gopher"
     fmt.Println(name)
+    fmt.Println(age)
+    fmt.Println(gpa)
 }
 ```
 
-> **Important rules:**
-> - `:=` can only be used **inside functions**. For package-level (global) variables, you must use `var`.
-> - `:=` is for **new** variables. To reassign an existing variable, use `=` without the colon.
-> - You can use `:=` if **at least one** variable on the left is new: `x, y := 1, 2` then `x, z := 3, 4` is valid because `z` is new.
+`:=` is by far the most common form — you'll use it constantly throughout this course.
 
 ---
 
-## Zero Values
+## The Four Basic Types
 
-In Go, if you declare a variable without assigning a value, it automatically gets a **zero value**. There is no `undefined`, `null`, or `None` for basic types:
+| Type | What it holds | Example |
+|------|--------------|---------|
+| `string` | text | `"Alice"` |
+| `int` | whole numbers | `17`, `0`, `-5` |
+| `float64` | decimal numbers | `3.8`, `9.99` |
+| `bool` | true or false | `true`, `false` |
 
 ```gorun
-// zero-values.go
 package main
 
 import "fmt"
 
 func main() {
-    var s string   // zero value: "" (empty string)
-    var n int      // zero value: 0
-    var f float64  // zero value: 0.0
-    var b bool     // zero value: false
+    name     := "Alice"   // string
+    age      := 17        // int
+    gpa      := 3.8       // float64
+    enrolled := true      // bool
 
-    fmt.Printf("string:  %q\n", s)   // ""
-    fmt.Printf("int:     %d\n", n)   // 0
-    fmt.Printf("float64: %.1f\n", f) // 0.0
-    fmt.Printf("bool:    %t\n", b)   // false
-}
-```
-
-This is a deliberate design choice. Every variable in Go is always initialized — you'll never get a "variable used before initialization" error like in some other languages.
-
-**Zero value reference:**
-- `string` → `""` (empty string)
-- `int`, `float64`, etc. → `0`
-- `bool` → `false`
-- Pointers, slices, maps, channels, interfaces → `nil`
-
----
-
-## Basic Data Types
-
-### Strings
-
-Strings in Go are immutable sequences of bytes, typically UTF-8 encoded text. You create them with double quotes:
-
-```gorun
-// strings.go
-package main
-
-import (
-    "fmt"
-    "strings"
-)
-
-func main() {
-    greeting := "Hello, Go!"
-
-    // String length (number of bytes)
-    fmt.Println("Length:", len(greeting))
-
-    // Concatenation with +
-    first := "Hello"
-    last := "World"
-    combined := first + ", " + last + "!"
-    fmt.Println(combined)
-
-    // Access individual bytes (not recommended for Unicode)
-    fmt.Printf("First byte: %c\n", greeting[0]) // H
-
-    // Common string functions from the strings package
-    fmt.Println(strings.ToUpper("hello"))              // HELLO
-    fmt.Println(strings.ToLower("HELLO"))              // hello
-    fmt.Println(strings.Contains("hello", "ell"))      // true
-    fmt.Println(strings.HasPrefix("hello", "he"))      // true
-    fmt.Println(strings.HasSuffix("hello", "lo"))      // true
-    fmt.Println(strings.Replace("hello", "l", "L", -1)) // heLLo
-    fmt.Println(strings.Split("a,b,c", ","))           // [a b c]
-    fmt.Println(strings.TrimSpace("  hello  "))        // hello
-    fmt.Println(strings.Count("hello", "l"))           // 2
-}
-```
-
-> **Raw strings:** Use backticks for raw strings that can span multiple lines and don't process escape sequences: `` `Hello\nWorld` `` prints literally `Hello\nWorld`, not a newline.
-
-### Integers
-
-Go has several integer types with different sizes. In the exercises you'll use **int8**, **int16**, and **int** (and see type conversion):
-
-```gorun
-// integers.go
-package main
-
-import "fmt"
-
-func main() {
-    // Default int — platform-dependent (32 or 64 bit)
-    count := 42
-
-    // Sized integers
-    var tiny int8 = 127      // -128 to 127
-    var small int16 = 32767  // -32768 to 32767
-    var medium int32 = 2147483647
-    var big int64 = 9223372036854775807
-
-    // Unsigned integers (no negatives)
-    var positive uint8 = 255  // 0 to 255 (also called "byte")
-    var large uint64 = 18446744073709551615
-
-    // Arithmetic operations
-    a, b := 10, 3
-    fmt.Println("Add:", a+b)       // 13
-    fmt.Println("Subtract:", a-b)  // 7
-    fmt.Println("Multiply:", a*b)  // 30
-    fmt.Println("Divide:", a/b)    // 3 (integer division — truncates!)
-    fmt.Println("Remainder:", a%b) // 1
-
-    fmt.Println(count, tiny, small, medium, big, positive, large)
-}
-```
-
-> **Watch out:** Dividing two integers gives an integer result. `10 / 3` equals `3`, not `3.333`. If you need decimal precision, use floats.
-
-### Floats (Decimal Numbers)
-
-```gorun
-// floats.go
-package main
-
-import (
-    "fmt"
-    "math"
-)
-
-func main() {
-    // float64 is the default (and recommended) float type
-    pi := 3.14159
-    e := 2.71828
-
-    // float32 has less precision (use only when memory matters)
-    var f32 float32 = 3.14
-
-    // Float arithmetic
-    fmt.Printf("pi + e = %.4f\n", pi+e)
-    fmt.Printf("pi * 2 = %.4f\n", pi*2)
-
-    // Useful math functions
-    fmt.Printf("Square root of 16: %.0f\n", math.Sqrt(16))
-    fmt.Printf("Power 2^10: %.0f\n", math.Pow(2, 10))
-    fmt.Printf("Round 3.7: %.0f\n", math.Round(3.7))
-    fmt.Printf("Floor 3.7: %.0f\n", math.Floor(3.7))
-    fmt.Printf("Ceil 3.2: %.0f\n", math.Ceil(3.2))
-
-    _ = f32 // suppress unused warning
-}
-```
-
-### Booleans
-
-Booleans hold `true` or `false`. They're the result of comparisons and the building blocks of conditions:
-
-```gorun
-// booleans.go
-package main
-
-import "fmt"
-
-func main() {
-    isReady := true
-    isDone := false
-
-    // Logical operators
-    fmt.Println("AND:", isReady && isDone)  // false (both must be true)
-    fmt.Println("OR:", isReady || isDone)   // true  (at least one true)
-    fmt.Println("NOT:", !isReady)           // false (inverts the value)
-
-    // Comparison operators — all return booleans
-    x := 10
-    fmt.Println("x > 5:", x > 5)     // true
-    fmt.Println("x < 5:", x < 5)     // false
-    fmt.Println("x >= 10:", x >= 10) // true
-    fmt.Println("x <= 9:", x <= 9)   // false
-    fmt.Println("x == 10:", x == 10) // true  (equality check)
-    fmt.Println("x != 3:", x != 3)   // true  (not equal)
+    fmt.Println(name, age, gpa, enrolled)
 }
 ```
 
 ---
 
-## Type Conversion
+## Zero Values — Go Never Leaves a Box Empty
 
-Go has **no implicit type conversion** — you must convert explicitly. This prevents subtle bugs that happen in other languages where types are silently converted:
+What happens if you create a variable but don't put anything in it? Go fills it with a safe **zero value** automatically:
 
-```gorun
-// type-conversion.go
-package main
-
-import (
-    "fmt"
-    "strconv"
-)
-
-func main() {
-    // Number-to-number conversions: TypeName(value)
-    var i int = 42
-    var f float64 = float64(i)  // int → float64
-    var u uint = uint(f)        // float64 → uint
-    fmt.Println(i, f, u)        // 42 42 42
-
-    // Be careful — converting float to int truncates!
-    pi := 3.99
-    fmt.Println(int(pi)) // 3 (not 4 — it truncates, doesn't round)
-
-    // String → number: use the strconv package
-    num, err := strconv.Atoi("123") // Atoi = "ASCII to integer"
-    if err != nil {
-        fmt.Println("Error:", err)
-    } else {
-        fmt.Println("Parsed:", num) // 123
-    }
-
-    // Number → string
-    s := strconv.Itoa(42) // Itoa = "integer to ASCII"
-    fmt.Println("String:", s) // "42"
-
-    // Float → string: use Sprintf
-    fs := fmt.Sprintf("%.2f", 3.14159)
-    fmt.Println("Float string:", fs) // "3.14"
-}
-```
-
----
-
-## Constants
-
-Constants are values that are fixed at compile time and never change. They're declared with `const`:
+| Type | Zero value |
+|------|-----------|
+| `int` | `0` |
+| `float64` | `0` |
+| `string` | `""` (empty string) |
+| `bool` | `false` |
 
 ```gorun
-// constants.go
-package main
-
-import "fmt"
-
-const Pi = 3.14159
-const AppName = "GoTutorial"
-
-// Group related constants in a block
-const (
-    StatusOK       = 200
-    StatusNotFound = 404
-    StatusError    = 500
-)
-
-// iota: auto-incrementing constant generator (starts at 0)
-const (
-    Sunday = iota // 0
-    Monday        // 1
-    Tuesday       // 2
-    Wednesday     // 3
-    Thursday      // 4
-    Friday        // 5
-    Saturday      // 6
-)
-
-func main() {
-    fmt.Println("Pi:", Pi)
-    fmt.Println("App:", AppName)
-    fmt.Println("OK status:", StatusOK)
-    fmt.Println("Not Found:", StatusNotFound)
-    fmt.Println("Sunday:", Sunday, "Friday:", Friday)
-
-    // Constants can be used in expressions
-    circumference := 2 * Pi * 5
-    fmt.Printf("Circle circumference: %.2f\n", circumference)
-}
-```
-
-> **`iota` trick:** `iota` resets to 0 in each new `const` block and auto-increments. It's commonly used for enumerations.
-
----
-
-## Multiple Variable Declarations
-
-You can declare multiple variables at once for cleaner code:
-
-```gorun
-// multiple-vars.go
 package main
 
 import "fmt"
 
 func main() {
-    // Declare multiple variables on one line
-    x, y, z := 1, 2, 3
-    fmt.Println(x, y, z)
+    var score int
+    var comment string
+    var active bool
 
-    // Different types on one line
-    name, age, active := "Gopher", 10, true
-    fmt.Println(name, age, active)
+    fmt.Println(score)    // 0
+    fmt.Println(comment)  // (blank line)
+    fmt.Println(active)   // false
+}
+```
 
-    // Swap values — no temp variable needed!
-    a, b := "hello", "world"
-    a, b = b, a
-    fmt.Println(a, b) // world hello
+This matters — if you forget to set a value, you get a predictable result, not a crash.
 
-    // var block for package-level style
-    var (
-        host = "localhost"
-        port = 8080
-    )
-    fmt.Printf("Server: %s:%d\n", host, port)
+---
+
+## Updating Variables
+
+Variables can change. That's the whole point of a *variable*:
+
+```gorun
+package main
+
+import "fmt"
+
+func main() {
+    score := 78
+    fmt.Println(score)  // 78
+
+    score = score + 5   // bonus points
+    fmt.Println(score)  // 83
+
+    score += 2          // shorthand for score = score + 2
+    fmt.Println(score)  // 85
+}
+```
+
+Note: updating uses `=` (single equals), not `:=`. The `:=` is only for the *first time* a variable is created.
+
+---
+
+## Type Conversion — Explicit, Always
+
+Go **never converts types automatically**. If you need a `float64` as an `int`, you must say so explicitly:
+
+```gorun
+package main
+
+import "fmt"
+
+func main() {
+    gpa := 3.8
+    intGpa := int(gpa)  // decimal part is truncated, not rounded
+    fmt.Println(intGpa) // 3
 }
 ```
 
 ---
 
-<ChallengeBlock
-  title="Four Types"
-  description="Declare one variable of each of these four types: string, int, float64, and bool. Give each a meaningful value, then print each variable along with its type name using %T."
-  hint="Use fmt.Printf with %v and %T: fmt.Printf('value: %v, type: %T\n', x, x)"
-  starter={`package main
+## Constants — Values That Must Never Change
 
-import "fmt"
+Some values should be fixed for the lifetime of the program: the minimum passing score, the school name, the maximum GPA. Use `const` for these:
 
-func main() {
-\t// TODO: declare one variable of each type: string, int, float64, bool
-\t// TODO: print each with its value and type name
-\t_ = fmt.Sprintf // remove this line when you add your variables
-}`}
-/>
+```go
+const minPassScore = 60
+const schoolName = "Riverside Academy"
+```
 
-## What's Next?
+If you try to change a `const` later, Go will refuse to compile. That's a feature — it protects you from accidents.
 
-Now that you understand variables and data types, let's learn about the **fmt package** — Go's toolkit for printing, formatting, and reading input.
+---
+
+## What's Next
+
+You now have all the data for a student — name, age, GPA, score, enrollment status. In **Chapter 3: fmt Package**, you'll learn how to display all of that information in a clean, professional format.
