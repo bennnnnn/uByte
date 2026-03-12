@@ -1,49 +1,152 @@
 [
   {
-    "title": "Define an Interface",
-    "instruction": "Define a Speaker interface with Speak() string. Implement it on a Dog struct and print the result of calling Speak().",
-    "hint": "type Speaker interface { Speak() string }; type Dog struct{}; func (d Dog) Speak() string { return \"Woof\" }",
-    "starter": "package main\n\nimport \"fmt\"\n\n// TODO: define Speaker interface with Speak() string\n// TODO: define Dog struct and implement Speak() returning \"Woof\"\n\nfunc main() {\n\tvar s Speaker = Dog{}\n\tfmt.Println(s.Speak())\n}",
-    "expectedOutput": [
-      "Woof"
-    ]
+    "title": "What is an interface",
+    "instruction": "An interface defines a set of method signatures. Any type that has those methods satisfies the interface automatically — no declaration, no `implements` keyword.\n\nThink of a USB port. It does not care if you plug in a mouse, a keyboard, or a flash drive. As long as the plug fits the shape (the interface), it works.\n\nRun this. `Animal` is an interface with one method: `Speak() string`. Both `Dog` and `Cat` have that method, so both satisfy `Animal`.",
+    "starter": "package main\n\nimport \"fmt\"\n\ntype Animal interface {\n\tSpeak() string\n}\n\ntype Dog struct{ Name string }\ntype Cat struct{ Name string }\n\nfunc (d Dog) Speak() string { return \"Woof!\" }\nfunc (c Cat) Speak() string { return \"Meow!\" }\n\nfunc makeNoise(a Animal) {\n\tfmt.Println(a.Speak())\n}\n\nfunc main() {\n\tmakeNoise(Dog{Name: \"Rex\"})\n\tmakeNoise(Cat{Name: \"Whiskers\"})\n}",
+    "expectedOutput": ["Woof!", "Meow!"],
+    "successMessage": "makeNoise accepts any Animal — it does not care if it is a Dog or a Cat. Same function, different types, different results. That is polymorphism."
   },
   {
-    "title": "Implicit Implementation",
-    "instruction": "Create a slice of Speakers containing a Dog and a Cat, loop over it, and print what each one says.",
-    "hint": "animals := []Speaker{Dog{}, Cat{}}; for _, a := range animals { fmt.Println(a.Speak()) }",
-    "starter": "package main\n\nimport \"fmt\"\n\ntype Speaker interface { Speak() string }\ntype Dog struct{}\ntype Cat struct{}\n\nfunc (d Dog) Speak() string { return \"Woof\" }\nfunc (c Cat) Speak() string { return \"Meow\" }\n\nfunc main() {\n\t// TODO: create []Speaker with Dog{} and Cat{}, range and print Speak()\n}",
-    "expectedOutput": [
-      "Woof",
-      "Meow"
-    ]
+    "title": "Define and satisfy an interface",
+    "instruction": "Define a `Shape` interface with one method: `Area() float64`.\n\nThen add `Area()` methods to both `Rectangle` and `Triangle`. The compiler will tell you if you missed anything.\n\nFinally, write a `printArea(s Shape)` function and call it with both shapes.",
+    "hint": "type Shape interface { Area() float64 }  func (r Rectangle) Area() float64 { return r.Width * r.Height }  func (t Triangle) Area() float64 { return 0.5 * t.Base * t.Height }",
+    "starter": "package main\n\nimport \"fmt\"\n\n// TODO: define Shape interface with Area() float64\n\ntype Rectangle struct{ Width, Height float64 }\ntype Triangle struct{ Base, Height float64 }\n\n// TODO: add Area() to Rectangle\n// TODO: add Area() to Triangle\n\nfunc printArea(s Shape) {\n\tfmt.Printf(\"Area: %.2f\\n\", s.Area())\n}\n\nfunc main() {\n\tprintArea(Rectangle{Width: 5, Height: 3})\n\tprintArea(Triangle{Base: 6, Height: 4})\n}",
+    "expectedOutput": ["Area: 15.00", "Area: 12.00"],
+    "codeChecks": [
+      { "pattern": "type\\s+Shape\\s+interface\\s*\\{", "required": true, "message": "Define the Shape interface: type Shape interface { ... }" },
+      { "pattern": "Area\\s*\\(\\s*\\)\\s*float64", "required": true, "message": "The interface must require Area() float64." },
+      { "pattern": "func\\s*\\(\\s*\\w+\\s+Rectangle\\s*\\)\\s*Area", "required": true, "message": "Add Area() method to Rectangle." },
+      { "pattern": "func\\s*\\(\\s*\\w+\\s+Triangle\\s*\\)\\s*Area", "required": true, "message": "Add Area() method to Triangle." },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comments with your code." }
+    ],
+    "successMessage": "Rectangle and Triangle are completely different types — but both satisfy Shape. printArea works with both without knowing which one it has."
   },
   {
-    "title": "Interface as Parameter",
-    "instruction": "Define makeNoise(s Speaker) that calls fmt.Println(s.Speak()). Create a Lion with Speak() returning \"Roar\" and pass it to makeNoise.",
-    "hint": "func makeNoise(s Speaker) { fmt.Println(s.Speak()) }; type Lion struct{}; func (l Lion) Speak() string { return \"Roar\" }",
-    "starter": "package main\n\nimport \"fmt\"\n\ntype Speaker interface { Speak() string }\n\n// TODO: define makeNoise(s Speaker)\n// TODO: define Lion struct and Speak() returning \"Roar\"\n\nfunc main() {\n\tmakeNoise(Lion{})\n}",
-    "expectedOutput": [
-      "Roar"
-    ]
+    "title": "Interfaces with multiple methods",
+    "instruction": "An interface can require any number of methods. A type must implement all of them to satisfy the interface.\n\nAdd `Perimeter() float64` to the `Shape` interface. Then add `Perimeter()` methods to both `Rectangle` and `Circle`. Update `describe` to print both.",
+    "hint": "func (r Rectangle) Perimeter() float64 { return 2 * (r.Width + r.Height) }  func (c Circle) Perimeter() float64 { return 2 * 3.14159 * c.Radius }",
+    "starter": "package main\n\nimport \"fmt\"\n\ntype Shape interface {\n\tArea() float64\n\t// TODO: add Perimeter() float64\n}\n\ntype Rectangle struct{ Width, Height float64 }\ntype Circle struct{ Radius float64 }\n\nfunc (r Rectangle) Area() float64 { return r.Width * r.Height }\nfunc (c Circle) Area() float64    { return 3.14159 * c.Radius * c.Radius }\n\n// TODO: add Perimeter() to Rectangle\n// TODO: add Perimeter() to Circle\n\nfunc describe(s Shape) {\n\tfmt.Printf(\"Area: %.2f, Perimeter: %.2f\\n\", s.Area(), s.Perimeter())\n}\n\nfunc main() {\n\tdescribe(Rectangle{Width: 4, Height: 3})\n\tdescribe(Circle{Radius: 5})\n}",
+    "expectedOutput": ["Area: 12.00, Perimeter: 14.00", "Area: 78.54, Perimeter: 31.42"],
+    "codeChecks": [
+      { "pattern": "Perimeter\\s*\\(\\s*\\)\\s*float64", "required": true, "message": "Add Perimeter() float64 to the Shape interface." },
+      { "pattern": "func\\s*\\(\\s*\\w+\\s+Rectangle\\s*\\)\\s*Perimeter", "required": true, "message": "Add Perimeter() to Rectangle." },
+      { "pattern": "func\\s*\\(\\s*\\w+\\s+Circle\\s*\\)\\s*Perimeter", "required": true, "message": "Add Perimeter() to Circle." },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comments with your code." }
+    ],
+    "successMessage": "Both methods, both types. If you add a method to the interface but forget to add it to a type, the compiler tells you immediately — no runtime surprises."
   },
   {
-    "title": "Type Assertion",
-    "instruction": "Given a Speaker holding a Dog with Breed field, assert it to Dog and print the Breed.",
-    "hint": "d, ok := s.(Dog); if ok { fmt.Println(d.Breed) }",
-    "starter": "package main\n\nimport \"fmt\"\n\ntype Speaker interface { Speak() string }\ntype Dog struct { Breed string }\n\nfunc (d Dog) Speak() string { return \"Woof\" }\n\nfunc main() {\n\tvar s Speaker = Dog{Breed: \"Labrador\"}\n\t// TODO: assert s to Dog and print Breed\n}",
-    "expectedOutput": [
-      "Labrador"
-    ]
+    "title": "A slice of interfaces",
+    "instruction": "Because all three shapes satisfy `Shape`, you can store them in a `[]Shape` and treat them uniformly.\n\nAdd a `Circle{Radius: 3}` to the shapes slice, then loop through and call `describe` on each.",
+    "hint": "shapes := []Shape{Rectangle{...}, Triangle{...}, Circle{Radius: 3}}",
+    "starter": "package main\n\nimport \"fmt\"\n\ntype Shape interface {\n\tArea() float64\n\tName() string\n}\n\ntype Rectangle struct{ Width, Height float64 }\ntype Triangle struct{ Base, Height float64 }\ntype Circle struct{ Radius float64 }\n\nfunc (r Rectangle) Area() float64 { return r.Width * r.Height }\nfunc (t Triangle) Area() float64  { return 0.5 * t.Base * t.Height }\nfunc (c Circle) Area() float64    { return 3.14159 * c.Radius * c.Radius }\n\nfunc (r Rectangle) Name() string { return \"Rectangle\" }\nfunc (t Triangle) Name() string  { return \"Triangle\" }\nfunc (c Circle) Name() string    { return \"Circle\" }\n\nfunc describe(s Shape) {\n\tfmt.Printf(\"%s: area = %.2f\\n\", s.Name(), s.Area())\n}\n\nfunc main() {\n\tshapes := []Shape{\n\t\tRectangle{Width: 5, Height: 3},\n\t\tTriangle{Base: 6, Height: 4},\n\t\t// TODO: add Circle{Radius: 3}\n\t}\n\tfor _, s := range shapes {\n\t\tdescribe(s)\n\t}\n}",
+    "expectedOutput": ["Rectangle: area = 15.00", "Triangle: area = 12.00", "Circle: area = 28.27"],
+    "codeChecks": [
+      { "pattern": "Circle\\{Radius:\\s*3\\}", "required": true, "message": "Add Circle{Radius: 3} to the shapes slice." },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
+    ],
+    "successMessage": "Three different types in one slice, one loop, one function. This is the power of interfaces — write the loop once, it works for every type that satisfies Shape."
   },
   {
-    "title": "Empty Interface (any)",
-    "instruction": "Define printAny(v any) that prints the value. Call it with 42 and \"hello\".",
-    "hint": "func printAny(v any) { fmt.Println(v) }",
-    "starter": "package main\n\nimport \"fmt\"\n\n// TODO: define printAny(v any)\n\nfunc main() {\n\tprintAny(42)\n\tprintAny(\"hello\")\n}",
-    "expectedOutput": [
-      "42",
-      "hello"
-    ]
+    "title": "The Stringer interface",
+    "instruction": "You already used this in the Methods chapter without knowing what it was.\n\n`fmt.Stringer` is a standard library interface:\n```\ntype Stringer interface {\n    String() string\n}\n```\n\nIf your type has a `String() string` method, `fmt.Println` calls it automatically.\n\nAdd a `String() string` method to `Point` that returns `\"(3, 7)\"` format. Then just `fmt.Println(p)` and watch it use your method.",
+    "hint": "func (p Point) String() string { return fmt.Sprintf(\"(%d, %d)\", p.X, p.Y) }",
+    "starter": "package main\n\nimport \"fmt\"\n\ntype Point struct {\n\tX, Y int\n}\n\n// TODO: add String() string method to Point\n\nfunc main() {\n\tp := Point{X: 3, Y: 7}\n\tfmt.Println(p)\n}",
+    "expectedOutput": ["(3, 7)"],
+    "codeChecks": [
+      { "pattern": "func\\s*\\(\\s*\\w+\\s+Point\\s*\\)\\s*String\\s*\\(\\s*\\)\\s*string", "required": true, "message": "Add String() string method to Point." },
+      { "pattern": "Sprintf", "required": true, "message": "Use fmt.Sprintf inside String() to format the output." },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your method." }
+    ],
+    "successMessage": "fmt.Println saw that Point implements Stringer and called your String() method automatically. This is implicit interface satisfaction — no registration, no declaration."
+  },
+  {
+    "title": "Interface as function parameter",
+    "instruction": "Interfaces shine when used as function parameters. The function does not care about the concrete type — only that it has the right methods.\n\n`io.Writer` is the most famous example. `fmt.Fprintf` takes any `io.Writer` — a file, a network connection, a buffer, anything.\n\nRun this. `logMessage` accepts any `io.Writer`. We pass `os.Stdout` — the terminal. The function works the same regardless of where the output goes.",
+    "starter": "package main\n\nimport (\n\t\"fmt\"\n\t\"io\"\n\t\"os\"\n)\n\nfunc logMessage(w io.Writer, msg string) {\n\tfmt.Fprintf(w, \"[LOG] %s\\n\", msg)\n}\n\nfunc main() {\n\tlogMessage(os.Stdout, \"Server started\")\n\tlogMessage(os.Stdout, \"Request received\")\n\tlogMessage(os.Stdout, \"Response sent\")\n}",
+    "expectedOutput": ["[LOG] Server started", "[LOG] Request received", "[LOG] Response sent"],
+    "successMessage": "logMessage does not know it is writing to a terminal. It just knows it has a Writer. Swap os.Stdout for a file or a network socket and the function does not change at all."
+  },
+  {
+    "title": "Type assertion",
+    "instruction": "Sometimes you have an interface value and you need to access the concrete type underneath.\n\n`concrete, ok := interfaceVal.(ConcreteType)`\n\nIf the underlying type is `ConcreteType`, `ok` is `true` and `concrete` has the concrete value. If not, `ok` is `false` and `concrete` is the zero value.\n\nRun this. Then add a type assertion to check if `s` is a `Circle` and print its radius if it is.",
+    "hint": "if c, ok := s.(Circle); ok { fmt.Println(\"Circle radius:\", c.Radius) }",
+    "starter": "package main\n\nimport \"fmt\"\n\ntype Shape interface{ Area() float64 }\n\ntype Rectangle struct{ Width, Height float64 }\ntype Circle struct{ Radius float64 }\n\nfunc (r Rectangle) Area() float64 { return r.Width * r.Height }\nfunc (c Circle) Area() float64    { return 3.14159 * c.Radius * c.Radius }\n\nfunc inspect(s Shape) {\n\tif r, ok := s.(Rectangle); ok {\n\t\tfmt.Printf(\"Rectangle: %.0f x %.0f\\n\", r.Width, r.Height)\n\t}\n\t// TODO: add type assertion for Circle and print its Radius\n}\n\nfunc main() {\n\tinspect(Rectangle{Width: 4, Height: 3})\n\tinspect(Circle{Radius: 5})\n}",
+    "expectedOutput": ["Rectangle: 4 x 3", "Circle radius: 5"],
+    "codeChecks": [
+      { "pattern": "s\\.\\(Circle\\)", "required": true, "message": "Add a type assertion: if c, ok := s.(Circle); ok { ... }" },
+      { "pattern": "c\\.Radius|Radius:", "required": true, "message": "Print the Circle's Radius." },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your assertion." }
+    ],
+    "successMessage": "The two-value assertion (value, ok) is the safe version. Never use the one-value version s.(Circle) without ok — it panics if the type is wrong."
+  },
+  {
+    "title": "Type switch",
+    "instruction": "When you need to handle multiple concrete types from an interface, a type switch is cleaner than chaining type assertions.\n\n```\nswitch v := i.(type) {\ncase int:\n    fmt.Println(\"int:\", v)\ncase string:\n    fmt.Println(\"string:\", v)\ndefault:\n    fmt.Println(\"unknown\")\n}\n```\n\nAdd a `case Triangle` to the type switch that prints the base and height.",
+    "hint": "case Triangle: fmt.Printf(\"Triangle: base=%.0f height=%.0f\\n\", v.Base, v.Height)",
+    "starter": "package main\n\nimport \"fmt\"\n\ntype Shape interface{ Area() float64 }\n\ntype Rectangle struct{ Width, Height float64 }\ntype Triangle struct{ Base, Height float64 }\ntype Circle struct{ Radius float64 }\n\nfunc (r Rectangle) Area() float64 { return r.Width * r.Height }\nfunc (t Triangle) Area() float64  { return 0.5 * t.Base * t.Height }\nfunc (c Circle) Area() float64    { return 3.14159 * c.Radius * c.Radius }\n\nfunc whatShape(s Shape) {\n\tswitch v := s.(type) {\n\tcase Rectangle:\n\t\tfmt.Printf(\"Rectangle: %.0f x %.0f\\n\", v.Width, v.Height)\n\t// TODO: add case Triangle\n\tcase Circle:\n\t\tfmt.Printf(\"Circle: radius=%.0f\\n\", v.Radius)\n\tdefault:\n\t\tfmt.Println(\"Unknown shape\")\n\t}\n}\n\nfunc main() {\n\twhatShape(Rectangle{Width: 4, Height: 3})\n\twhatShape(Triangle{Base: 6, Height: 4})\n\twhatShape(Circle{Radius: 5})\n}",
+    "expectedOutput": ["Rectangle: 4 x 3", "Triangle: base=6 height=4", "Circle: radius=5"],
+    "codeChecks": [
+      { "pattern": "case\\s+Triangle:", "required": true, "message": "Add case Triangle: to the type switch." },
+      { "pattern": "v\\.Base|v\\.Height", "required": true, "message": "Print the Triangle's Base and Height using v." },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your case." }
+    ],
+    "successMessage": "Type switch: one construct, multiple types, zero repetition. Much cleaner than three consecutive if-else type assertions."
+  },
+  {
+    "title": "The empty interface",
+    "instruction": "An interface with no methods — `interface{}` — is satisfied by every type in Go. It is the \"accept anything\" type.\n\nIn modern Go (1.18+) it has an alias: `any`.\n\nUsed in `fmt.Println`, maps of mixed values, and anywhere you genuinely need to accept any type.\n\nRun this. Then add a call to `printAnything` with a `[]int{1, 2, 3}`.",
+    "hint": "printAnything([]int{1, 2, 3})",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc printAnything(v any) {\n\tfmt.Printf(\"Type: %T | Value: %v\\n\", v, v)\n}\n\nfunc main() {\n\tprintAnything(42)\n\tprintAnything(\"hello\")\n\tprintAnything(true)\n\tprintAnything(3.14)\n\t// TODO: call printAnything with []int{1, 2, 3}\n}",
+    "expectedOutput": ["Type: int | Value: 42", "Type: string | Value: hello", "Type: bool | Value: true", "Type: float64 | Value: 3.14", "Type: []int | Value: [1 2 3]"],
+    "codeChecks": [
+      { "pattern": "printAnything\\(\\[\\]int\\{1,\\s*2,\\s*3\\}\\)", "required": true, "message": "Call printAnything([]int{1, 2, 3})." },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your call." }
+    ],
+    "successMessage": "any accepts everything. The %T verb reveals the real type at runtime. Use any sparingly — specific interfaces are always better — but it is essential for generic utility functions like Println."
+  },
+  {
+    "title": "Composing interfaces",
+    "instruction": "Interfaces can embed other interfaces. The composed interface requires all methods from all embedded interfaces.\n\n```\ntype ReadWriter interface {\n    Reader  // embeds Reader (requires Read)\n    Writer  // embeds Writer (requires Write)\n}\n```\n\nThis is how Go's standard library is built. `io.ReadWriter` is just `io.Reader` + `io.Writer`.\n\nRun this. `Saver` embeds both `Storer` and `Retriever`. `MemoryStore` must implement all three methods.",
+    "starter": "package main\n\nimport \"fmt\"\n\ntype Storer interface {\n\tStore(key, value string)\n}\n\ntype Retriever interface {\n\tRetrieve(key string) string\n}\n\ntype Saver interface {\n\tStorer\n\tRetriever\n}\n\ntype MemoryStore struct {\n\tdata map[string]string\n}\n\nfunc (m *MemoryStore) Store(key, value string) {\n\tif m.data == nil {\n\t\tm.data = make(map[string]string)\n\t}\n\tm.data[key] = value\n}\n\nfunc (m *MemoryStore) Retrieve(key string) string {\n\treturn m.data[key]\n}\n\nfunc saveAndGet(s Saver, key, value string) {\n\ts.Store(key, value)\n\tfmt.Println(s.Retrieve(key))\n}\n\nfunc main() {\n\tstore := &MemoryStore{}\n\tsaveAndGet(store, \"name\", \"Alex\")\n\tsaveAndGet(store, \"city\", \"London\")\n}",
+    "expectedOutput": ["Alex", "London"],
+    "successMessage": "MemoryStore satisfies Saver by implementing both Store and Retrieve. Interface composition lets you build precise, minimal contracts — the Go standard library uses this pattern throughout."
+  },
+  {
+    "title": "Implicit satisfaction — no implements keyword",
+    "instruction": "This is the most important thing about Go interfaces.\n\nIn Java or C#, you write `class Dog implements Animal`. In Go — nothing. If `Dog` has the right methods, it satisfies `Animal` automatically.\n\nThis means you can satisfy an interface defined in someone else's package without importing it — and you can retrofit existing types to satisfy new interfaces.\n\nRun this. `LoudDog` is defined here. `fmt.Stringer` is defined in the standard library. `LoudDog` satisfies it just by having the right method — no import of `fmt` in the type definition needed.",
+    "starter": "package main\n\nimport \"fmt\"\n\ntype LoudDog struct{ Name string }\n\nfunc (d LoudDog) String() string {\n\treturn fmt.Sprintf(\"WOOF! I AM %s AND I AM VERY LOUD!\", d.Name)\n}\n\nfunc main() {\n\tdog := LoudDog{Name: \"Rex\"}\n\tfmt.Println(dog)\n\tfmt.Printf(\"The dog says: %v\\n\", dog)\n}",
+    "expectedOutput": ["WOOF! I AM Rex AND I AM VERY LOUD!", "The dog says: WOOF! I AM Rex AND I AM VERY LOUD!"],
+    "successMessage": "LoudDog never said it implements fmt.Stringer. It just has the method. Go connected them automatically. This is duck typing with compile-time safety — the best of both worlds."
+  },
+  {
+    "title": "Fix the broken interface",
+    "instruction": "The code below tries to use `Speaker` interface with `Robot`. But it does not compile — `Robot` is missing something.\n\nFix it so the program prints correctly.",
+    "hint": "Robot needs a Speak() string method. Add: func (r Robot) Speak() string { return \"Beep boop, I am \" + r.Model }",
+    "starter": "package main\n\nimport \"fmt\"\n\ntype Speaker interface {\n\tSpeak() string\n}\n\ntype Human struct{ Name string }\ntype Robot struct{ Model string }\n\nfunc (h Human) Speak() string { return \"Hello, I am \" + h.Name }\n\n// BUG: Robot does not implement Speaker — add the missing method\n\nfunc introduce(s Speaker) {\n\tfmt.Println(s.Speak())\n}\n\nfunc main() {\n\tintroduce(Human{Name: \"Alex\"})\n\tintroduce(Robot{Model: \"R2D2\"})\n}",
+    "expectedOutput": ["Hello, I am Alex", "Beep boop, I am R2D2"],
+    "codeChecks": [
+      { "pattern": "func\\s*\\(\\s*\\w+\\s+Robot\\s*\\)\\s*Speak\\s*\\(\\s*\\)\\s*string", "required": true, "message": "Add Speak() string method to Robot." },
+      { "pattern": "Beep boop", "required": true, "message": "Robot's Speak() should return a string starting with \"Beep boop\"." }
+    ],
+    "successMessage": "One method added, the interface satisfied, the compiler happy. This is the error you will see most often when working with interfaces: missing method on concrete type."
+  },
+  {
+    "title": "Build a notification system",
+    "instruction": "No starter code.\n\nBuild a notification system:\n\n1. Define a `Notifier` interface with one method: `Send(message string) string`\n2. Create three types: `EmailNotifier` (has `To` field), `SMSNotifier` (has `Phone` field), `PushNotifier` (has `DeviceID` field)\n3. Each `Send` returns a formatted confirmation string:\n   - Email: `\"Email sent to alex@email.com: Hello\"`\n   - SMS: `\"SMS sent to +1234567890: Hello\"`\n   - Push: `\"Push sent to device-abc123: Hello\"`\n4. Create a `[]Notifier` slice with all three, loop through and print the result of each `Send(\"Hello\")`",
+    "hint": "func (e EmailNotifier) Send(msg string) string { return fmt.Sprintf(\"Email sent to %s: %s\", e.To, msg) }",
+    "starter": "package main\n\nimport \"fmt\"\n\n// Build your notification system here\n\nfunc main() {\n}",
+    "expectedOutput": ["Email sent to alex@email.com: Hello", "SMS sent to +1234567890: Hello", "Push sent to device-abc123: Hello"],
+    "codeChecks": [
+      { "pattern": "type\\s+Notifier\\s+interface", "required": true, "message": "Define a Notifier interface." },
+      { "pattern": "Send\\s*\\(\\s*\\w+\\s+string\\s*\\)\\s*string", "required": true, "message": "The Notifier interface must have Send(message string) string." },
+      { "pattern": "type\\s+EmailNotifier\\s+struct", "required": true, "message": "Define an EmailNotifier struct." },
+      { "pattern": "type\\s+SMSNotifier\\s+struct", "required": true, "message": "Define an SMSNotifier struct." },
+      { "pattern": "type\\s+PushNotifier\\s+struct", "required": true, "message": "Define a PushNotifier struct." },
+      { "pattern": "\\[\\]Notifier", "required": true, "message": "Create a []Notifier slice." },
+      { "pattern": "range\\s+\\w+", "required": true, "message": "Loop through the notifiers with range." },
+      { "pattern": "\\.Send\\(\"Hello\"\\)", "required": true, "message": "Call .Send(\"Hello\") on each notifier." }
+    ],
+    "successMessage": "Three types, one interface, one loop. Email, SMS, and Push — completely different implementations, completely interchangeable. Add a fourth notifier type tomorrow and the loop does not change. That is the power of interfaces."
   }
 ]
