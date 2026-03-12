@@ -1,11 +1,14 @@
 ---
-title: "References"
-description: "How Python passes references and mutability."
-order: 9
+title: "Scope & References"
+description: "Where variables live and how Python passes data. The stuff that trips up every intermediate programmer."
+order: 12
 difficulty: "intermediate"
-estimatedMinutes: 15
+estimatedMinutes: 18
+concepts: ["scope", "local", "global", "nonlocal", "LEGB rule", "pass by reference", "mutable vs immutable", "id()"]
 ---
 
-## References
+## Where does your variable live?
 
-Python passes by object reference. Understanding mutability helps avoid bugs. More content coming soon.
+Why can't a function see variables from outside? Why does modifying a list inside a function change it everywhere? Why does this work but that doesn't?
+
+Scope and references explain all of it. Ten steps.

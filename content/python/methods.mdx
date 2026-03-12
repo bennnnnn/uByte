@@ -1,11 +1,14 @@
 ---
-title: "Methods"
-description: "Instance methods and self in Python."
-order: 11
+title: "Dunder Methods"
+description: "Make your classes feel like built-ins. __str__, __repr__, __len__, __eq__, and operator overloading."
+order: 16
 difficulty: "intermediate"
-estimatedMinutes: 12
+estimatedMinutes: 20
+concepts: ["__str__", "__repr__", "__len__", "__eq__", "__lt__", "__add__", "__contains__", "__getitem__", "operator overloading"]
 ---
 
-## Methods
+## Make your class behave like Python
 
-Methods are functions defined on a class; the first parameter is `self`. More content coming soon.
+Why does `print(myList)` work nicely? Why can you use `len(myList)`? Why can you compare two strings with `==`?
+
+Dunder methods (double underscore methods) are the hooks Python uses internally. Add them to your class and it starts feeling like a first-class Python citizen. Twelve steps.

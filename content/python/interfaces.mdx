@@ -1,11 +1,14 @@
 ---
 title: "Protocols & ABCs"
-description: "Duck typing, protocols, and abstract base classes in Python."
-order: 12
+description: "Write code that works with anything. Duck typing, Protocol, and ABC — Python's approach to interfaces."
+order: 18
 difficulty: "intermediate"
 estimatedMinutes: 20
+concepts: ["Protocol", "ABC", "abstractmethod", "duck typing", "structural subtyping", "runtime_checkable"]
 ---
 
-## Protocols
+## Write code that works with anything
 
-Python uses duck typing; `typing.Protocol` and `abc` formalize interfaces. More content coming soon.
+What if you want a function that accepts any object with a `.save()` method — regardless of its class?
+
+Python has two approaches: ABCs (formal contracts) and Protocols (structural, check-by-shape). Both let you write flexible code that works with any compatible type. Ten steps.

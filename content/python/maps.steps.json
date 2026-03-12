@@ -1,0 +1,125 @@
+[
+  {
+    "title": "The problem dictionaries solve",
+    "instruction": "You have a list of users. How do you find user #4521?\n\nWith a list: loop through every item until you find it. Slow.\n\nWith a dictionary: look it up instantly by ID.\n\nA dictionary maps **keys** to **values**:\n\n```python\nuser = {\"name\": \"Alex\", \"age\": 25, \"city\": \"London\"}\n```\n\nRun this.",
+    "starter": "user = {\"name\": \"Alex\", \"age\": 25, \"city\": \"London\"}\nprint(user)\nprint(user[\"name\"])\nprint(user[\"age\"])",
+    "expectedOutput": ["{\"name\": \"Alex\", \"age\": 25, \"city\": \"London\"}", "Alex", "25"],
+    "successMessage": "user[\"name\"] gives \"Alex\" instantly — no looping, no searching. Dictionary lookup is O(1) — fast regardless of size."
+  },
+  {
+    "title": "Create your own dictionary",
+    "instruction": "Create a dictionary called `product` with these keys:\n- `\"name\"` — a product name\n- `\"price\"` — a float\n- `\"in_stock\"` — a boolean\n- `\"category\"` — a string\n\nThen print each value by key.",
+    "hint": "product = {\"name\": \"Laptop\", \"price\": 999.99, \"in_stock\": True, \"category\": \"Electronics\"}",
+    "starter": "# TODO: create the product dictionary and print each value",
+    "expectedOutput": [],
+    "codeChecks": [
+      { "pattern": "product\\s*=\\s*\\{", "required": true, "message": "Create a product dictionary: product = {...}" },
+      { "pattern": "\"name\"", "required": true, "message": "Include a 'name' key." },
+      { "pattern": "\"price\"", "required": true, "message": "Include a 'price' key." },
+      { "pattern": "product\\[\"name\"\\]|product\\[\"price\"\\]", "required": true, "message": "Access values by key." },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
+    ],
+    "successMessage": "Your dictionary with four keys. Each key is a string label, each value can be any type. This is the structure of almost every API response you will ever work with."
+  },
+  {
+    "title": "Adding and updating keys",
+    "instruction": "Add a new key: `dict[\"key\"] = value` — works whether the key exists or not.\n\nIf the key exists: updates the value.\nIf the key is new: adds it.\n\nAdd an `\"email\"` key and update the `\"age\"` to 26.",
+    "hint": "user[\"email\"] = \"alex@example.com\"\nuser[\"age\"] = 26",
+    "starter": "user = {\"name\": \"Alex\", \"age\": 25, \"city\": \"London\"}\nprint(\"Before:\", user)\n# TODO: add email and update age\nprint(\"After:\", user)",
+    "expectedOutput": [],
+    "codeChecks": [
+      { "pattern": "user\\[\"email\"\\]\\s*=", "required": true, "message": "Add email: user[\"email\"] = \"...\"" },
+      { "pattern": "user\\[\"age\"\\]\\s*=\\s*26", "required": true, "message": "Update age: user[\"age\"] = 26" },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
+    ],
+    "successMessage": "Same syntax for adding and updating. Python just checks: does this key exist? Update it. Does it not exist? Create it."
+  },
+  {
+    "title": "get() — safe access",
+    "instruction": "`dict[\"key\"]` crashes with a `KeyError` if the key does not exist.\n\n`dict.get(\"key\")` returns `None` instead of crashing.\n`dict.get(\"key\", default)` returns `default` if key is missing.\n\nFix the broken code to use `get()` instead of direct access.",
+    "hint": "user.get(\"phone\", \"Not provided\")",
+    "starter": "user = {\"name\": \"Alex\", \"age\": 25}\n\n# This crashes:\nprint(user[\"phone\"])\n\n# Fix it to use get() with a default of \"Not provided\"",
+    "expectedOutput": ["Not provided"],
+    "codeChecks": [
+      { "pattern": "\\.get\\(\"phone\"", "required": true, "message": "Use get(): user.get(\"phone\", \"Not provided\")" }
+    ],
+    "successMessage": "get() is the safe way to access keys that might not exist. Always use get() when you are not 100% sure the key is there."
+  },
+  {
+    "title": "pop() and del",
+    "instruction": "Remove keys from a dictionary:\n\n- `dict.pop(\"key\")` — removes and **returns** the value\n- `del dict[\"key\"]` — removes the key\n\nRemove `\"phone\"` using `pop()` and `\"address\"` using `del`.",
+    "hint": "phone = user.pop(\"phone\")\ndel user[\"address\"]",
+    "starter": "user = {\"name\": \"Alex\", \"age\": 25, \"phone\": \"555-1234\", \"address\": \"London\"}\nprint(\"Before:\", user)\n# TODO: remove phone with pop() and address with del\nprint(\"After:\", user)",
+    "expectedOutput": [],
+    "codeChecks": [
+      { "pattern": "\\.pop\\(\"phone\"\\)", "required": true, "message": "Use pop(): user.pop(\"phone\")" },
+      { "pattern": "del user\\[\"address\"\\]", "required": true, "message": "Use del: del user[\"address\"]" },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
+    ],
+    "successMessage": "pop returns the value (useful if you need it elsewhere), del just removes. Both clean up keys you no longer need."
+  },
+  {
+    "title": "keys(), values(), items()",
+    "instruction": "Three methods for iterating dictionaries:\n\n- `dict.keys()` — all keys\n- `dict.values()` — all values\n- `dict.items()` — (key, value) pairs\n\nPrint all keys, all values, then loop over items to print `key: value`.",
+    "hint": "for key, value in user.items():\n    print(f\"{key}: {value}\")",
+    "starter": "user = {\"name\": \"Alex\", \"age\": 25, \"city\": \"London\"}\n\n# TODO: print all keys, all values, then all key-value pairs",
+    "expectedOutput": [],
+    "codeChecks": [
+      { "pattern": "\\.keys\\(\\)", "required": true, "message": "Use .keys() to get all keys." },
+      { "pattern": "\\.values\\(\\)", "required": true, "message": "Use .values() to get all values." },
+      { "pattern": "\\.items\\(\\)", "required": true, "message": "Use .items() to get key-value pairs." },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
+    ],
+    "successMessage": "items() is the most useful — it gives you both key and value in one loop. Essential for any dictionary processing."
+  },
+  {
+    "title": "in — check if key exists",
+    "instruction": "`in` on a dictionary checks keys (not values):\n\n`\"name\" in user` → True if 'name' is a key\n\nProcess the order only if all required keys are present.",
+    "hint": "if \"product\" in order and \"quantity\" in order:",
+    "starter": "order = {\"product\": \"Laptop\", \"quantity\": 2}\nrequired = [\"product\", \"quantity\", \"address\"]\n\n# TODO: check if all required keys are in order\n# print \"Order complete\" or \"Missing: {missing_keys}\"",
+    "expectedOutput": [],
+    "codeChecks": [
+      { "pattern": "in order", "required": true, "message": "Check if keys are in the order dict." },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
+    ],
+    "successMessage": "Key presence check before processing — a standard pattern in real Python code. APIs, form validation, config loading — all use this."
+  },
+  {
+    "title": "Nested dictionaries",
+    "instruction": "Dictionary values can be anything — including other dictionaries.\n\nAccess nested values by chaining key lookups:\n\n`user[\"address\"][\"city\"]`\n\nAccess and print the city and country from the nested address.",
+    "hint": "user[\"address\"][\"city\"]\nuser[\"address\"][\"country\"]",
+    "starter": "user = {\n    \"name\": \"Alex\",\n    \"age\": 25,\n    \"address\": {\n        \"city\": \"London\",\n        \"country\": \"UK\",\n        \"postcode\": \"SW1A 1AA\"\n    }\n}\n\n# TODO: print the city and country",
+    "expectedOutput": [],
+    "codeChecks": [
+      { "pattern": "user\\[\"address\"\\]\\[\"city\"\\]", "required": true, "message": "Access nested: user[\"address\"][\"city\"]" },
+      { "pattern": "user\\[\"address\"\\]\\[\"country\"\\]", "required": true, "message": "Access nested: user[\"address\"][\"country\"]" },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
+    ],
+    "successMessage": "Nested dicts are everywhere in real data — API responses, config files, JSON. Chain the keys like user[\"address\"][\"city\"] to navigate deeper."
+  },
+  {
+    "title": "Dictionary comprehension",
+    "instruction": "Just like list comprehensions, dict comprehensions build dictionaries in one line:\n\n`{key: value for item in collection}`\n\nBuild a dictionary mapping student names to their squared scores.",
+    "hint": "{name: score**2 for name, score in zip(names, scores)}",
+    "starter": "names = [\"Alice\", \"Bob\", \"Carol\"]\nscores = [9, 7, 8]\n\n# TODO: create {name: score**2} using dict comprehension\nsquared = {}\nprint(squared)",
+    "expectedOutput": ["{\"Alice\": 81, \"Bob\": 49, \"Carol\": 64}"],
+    "codeChecks": [
+      { "pattern": "\\{.*for.*in", "required": true, "message": "Use dict comprehension: {name: score**2 for ...}" },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
+    ],
+    "successMessage": "Dict comprehensions build key-value mappings in a single readable expression. One of Python's best tools for data transformation."
+  },
+  {
+    "title": "Build a word counter",
+    "instruction": "No starter code.\n\nBuild a word frequency counter:\n1. Start with a sentence string\n2. Split it into words using `.split()`\n3. Count how many times each word appears using a dictionary\n4. Print the word counts sorted by frequency\n\nExample: `\"the cat sat on the mat\"` → `{\"the\": 2, \"cat\": 1, ...}`",
+    "hint": "counts = {}\nfor word in words:\n    counts[word] = counts.get(word, 0) + 1",
+    "starter": "",
+    "expectedOutput": [],
+    "codeChecks": [
+      { "pattern": "\\.split\\(\\)", "required": true, "message": "Split the sentence: sentence.split()" },
+      { "pattern": "\\.get\\(\\w+,\\s*0\\)\\s*\\+\\s*1", "required": true, "message": "Count words: counts.get(word, 0) + 1" },
+      { "pattern": "for\\s+\\w+\\s+in", "required": true, "message": "Loop over the words." }
+    ],
+    "successMessage": "A real word frequency counter — exactly how search engines, text analysers, and spam detectors work at their core. Chapter 10 done."
+  }
+]

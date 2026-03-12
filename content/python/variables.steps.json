@@ -1,0 +1,124 @@
+[
+  {
+    "title": "What is a variable",
+    "instruction": "A variable is a labeled box. You put a value in it, stick a label on it, and use that label whenever you need the value.\n\nIn Python, creating a variable is one line:\n\n`name = \"Alex\"`\n\nThe `=` sign means *store this value in this variable*. It is not asking if they are equal — it is an instruction.\n\nRun this.",
+    "starter": "name = \"Alex\"\nprint(name)",
+    "expectedOutput": ["Alex"],
+    "successMessage": "name contains \"Alex\". print(name) printed the value inside the box — not the word 'name', but what name holds."
+  },
+  {
+    "title": "Create your own variable",
+    "instruction": "Create a variable called `name` and store your own name in it. Then print it.\n\nRemember: text values need quotes. `name = Alex` will crash. `name = \"Alex\"` works.",
+    "hint": "name = \"Your Name\"\nprint(name)",
+    "starter": "# TODO: create a variable called name with your name, then print it",
+    "expectedOutput": [],
+    "codeChecks": [
+      { "pattern": "name\\s*=\\s*\"[^\"]+\"", "required": true, "message": "Create the variable: name = \"Your Name\"" },
+      { "pattern": "print\\(name\\)", "required": true, "message": "Print the variable: print(name)" },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
+    ],
+    "successMessage": "Your own variable with your own name. Every program you ever write will be full of variables exactly like this."
+  },
+  {
+    "title": "Variables hold numbers too",
+    "instruction": "Variables can hold any type of value — not just text.\n\nNumbers do not need quotes: `age = 25` (not `age = \"25\"`).\n\nCreate a variable `age` with your age and a variable `year` with the current year. Print both.",
+    "hint": "age = 25\nyear = 2025\nprint(age)\nprint(year)",
+    "starter": "# TODO: create age and year variables, then print them",
+    "expectedOutput": [],
+    "codeChecks": [
+      { "pattern": "age\\s*=\\s*\\d+", "required": true, "message": "Create a variable: age = 25 (use your actual age)" },
+      { "pattern": "year\\s*=\\s*\\d{4}", "required": true, "message": "Create a variable: year = 2025 (or current year)" },
+      { "pattern": "print\\(age\\)", "required": true, "message": "Print the age variable." },
+      { "pattern": "print\\(year\\)", "required": true, "message": "Print the year variable." },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
+    ],
+    "successMessage": "Numbers need no quotes. age = 25 stores the number 25. age = \"25\" would store text — and you cannot do math with text."
+  },
+  {
+    "title": "Reassigning a variable",
+    "instruction": "Variables are not fixed. You can change the value inside at any time.\n\nRun this. Notice that `score` prints as 60 first, then 95 after reassignment. The old value is simply replaced.",
+    "starter": "score = 60\nprint(score)\n\nscore = 95\nprint(score)",
+    "expectedOutput": ["60", "95"],
+    "successMessage": "60 then 95. The variable updated. This is why they are called variables — the value varies. You will reassign variables constantly in real programs."
+  },
+  {
+    "title": "Update using the current value",
+    "instruction": "You can use a variable's current value to compute its next value:\n\n`count = count + 1` — add 1 to whatever count currently holds.\n\nRun this. Then add two more lines that increase `score` by 10 each time and print it.",
+    "hint": "score = score + 10\nprint(score)\nscore = score + 10\nprint(score)",
+    "starter": "score = 50\nprint(score)\n# TODO: add 10 to score twice, printing after each addition",
+    "expectedOutput": ["50", "60", "70"],
+    "codeChecks": [
+      { "pattern": "score\\s*=\\s*score\\s*\\+\\s*10", "required": true, "message": "Update score: score = score + 10" },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
+    ],
+    "successMessage": "50 → 60 → 70. The variable holds the running value each time. This pattern — update a variable using itself — is everywhere in programming."
+  },
+  {
+    "title": "Multiple variables on one line",
+    "instruction": "Python lets you assign multiple variables at once:\n\n`first, last = \"Alex\", \"Rivera\"`\n\nThis is called tuple unpacking. The values on the right are matched in order to the names on the left.\n\nCreate `city` and `country` in one line, then print both.",
+    "hint": "city, country = \"London\", \"UK\"\nprint(city)\nprint(country)",
+    "starter": "# TODO: assign city and country in one line, then print them",
+    "expectedOutput": [],
+    "codeChecks": [
+      { "pattern": "city\\s*,\\s*country\\s*=", "required": true, "message": "Assign both on one line: city, country = \"City\", \"Country\"" },
+      { "pattern": "print\\(city\\)", "required": true, "message": "Print city." },
+      { "pattern": "print\\(country\\)", "required": true, "message": "Print country." },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
+    ],
+    "successMessage": "Two variables, one line. Python unpacks from left to right — city gets the first value, country gets the second."
+  },
+  {
+    "title": "Swap two variables",
+    "instruction": "In most languages, swapping two variables requires a temporary third variable:\n\n```\ntemp = a\na = b\nb = temp\n```\n\nPython can do it in one line:\n\n`a, b = b, a`\n\nRun this. Then swap `first` and `last` the Python way.",
+    "hint": "first, last = last, first",
+    "starter": "first = \"Alex\"\nlast = \"Rivera\"\nprint(first, last)\n# TODO: swap first and last in one line\nprint(first, last)",
+    "expectedOutput": ["Alex Rivera", "Rivera Alex"],
+    "codeChecks": [
+      { "pattern": "first\\s*,\\s*last\\s*=\\s*last\\s*,\\s*first", "required": true, "message": "Swap them: first, last = last, first" },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your swap." }
+    ],
+    "successMessage": "Alex Rivera → Rivera Alex. One line swap. Python evaluates the right side completely before assigning — no temporary variable needed."
+  },
+  {
+    "title": "Naming rules",
+    "instruction": "Variable names have rules:\n- Only letters, numbers, and underscores (`_`)\n- Cannot start with a number\n- Case-sensitive: `score` and `Score` are different\n- Convention: use `snake_case` (words separated by underscores)\n\nThe code below has three broken variable names. Fix all three.",
+    "hint": "1stPlace → first_place, full name → full_name, user-score → user_score",
+    "starter": "# BUG: these variable names are invalid — fix them\n1stPlace = \"Gold\"\nfull name = \"Alex Rivera\"\nuser-score = 99\n\nprint(first_place)\nprint(full_name)\nprint(user_score)",
+    "expectedOutput": ["Gold", "Alex Rivera", "99"],
+    "codeChecks": [
+      { "pattern": "first_place\\s*=", "required": true, "message": "Fix: 1stPlace → first_place" },
+      { "pattern": "full_name\\s*=", "required": true, "message": "Fix: full name → full_name" },
+      { "pattern": "user_score\\s*=", "required": true, "message": "Fix: user-score → user_score" }
+    ],
+    "successMessage": "Three valid names. snake_case is Python's convention — lowercase words joined by underscores. You will write thousands of variable names in your career."
+  },
+  {
+    "title": "del — remove a variable",
+    "instruction": "`del` removes a variable. After deletion, trying to use it causes a `NameError`.\n\nRun this. Then add a line that deletes `temp` and prints a message confirming it's gone.",
+    "hint": "del temp\nprint(\"temp deleted\")",
+    "starter": "temp = \"I am temporary\"\nprint(temp)\n# TODO: delete temp and print \"temp deleted\"",
+    "expectedOutput": ["I am temporary", "temp deleted"],
+    "codeChecks": [
+      { "pattern": "del\\s+temp", "required": true, "message": "Delete the variable: del temp" },
+      { "pattern": "temp deleted", "required": true, "message": "Print \"temp deleted\" after deleting it." },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
+    ],
+    "successMessage": "del removes the variable entirely from memory. Not commonly needed day-to-day, but useful for cleaning up large objects or making code intent clear."
+  },
+  {
+    "title": "Build a profile",
+    "instruction": "No starter code.\n\nCreate four variables:\n- `name` — your name\n- `age` — your age\n- `city` — your city\n- `language` — `\"Python\"`\n\nThen print all four, each on its own line.",
+    "hint": "name = \"Alex\"\nage = 25\ncity = \"London\"\nlanguage = \"Python\"",
+    "starter": "",
+    "expectedOutput": [],
+    "codeChecks": [
+      { "pattern": "name\\s*=\\s*\"[^\"]+\"", "required": true, "message": "Create a name variable with your name." },
+      { "pattern": "age\\s*=\\s*\\d+", "required": true, "message": "Create an age variable with your age." },
+      { "pattern": "city\\s*=\\s*\"[^\"]+\"", "required": true, "message": "Create a city variable." },
+      { "pattern": "language\\s*=\\s*\"Python\"", "required": true, "message": "Create: language = \"Python\"" },
+      { "pattern": "print\\(name\\)", "required": true, "message": "Print name." },
+      { "pattern": "print\\(age\\)", "required": true, "message": "Print age." }
+    ],
+    "successMessage": "Four variables, four print calls, a complete mini-profile. Variables are the foundation of every program. Chapter 2 done."
+  }
+]

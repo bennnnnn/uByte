@@ -1,0 +1,101 @@
+[
+  {
+    "title": "What is a tuple",
+    "instruction": "A tuple is like a list — but **immutable** (locked). Once created, you cannot add, remove, or change items.\n\nUse parentheses instead of square brackets:\n\n```python\npoint = (10, 20)      # a tuple\ncolors = (\"red\", \"green\", \"blue\")\n```\n\nRun this. Notice tuples print with parentheses.",
+    "starter": "coordinates = (40.7128, -74.0060)  # New York City lat/lng\nprint(coordinates)\nprint(type(coordinates))\nprint(f\"Latitude: {coordinates[0]}\")\nprint(f\"Longitude: {coordinates[1]}\")",
+    "expectedOutput": ["(40.7128, -74.006)", "<class 'tuple'>", "Latitude: 40.7128", "Longitude: -74.006"],
+    "successMessage": "Coordinates are a perfect tuple — they should never change. A tuple is just a list that Python promises will never be modified."
+  },
+  {
+    "title": "Tuples are immutable",
+    "instruction": "Trying to change a tuple causes a `TypeError`. This is the point — tuples protect data from accidental changes.\n\nRun this and see the error. Then comment out the line that causes the error.",
+    "hint": "Comment out the point[0] = 999 line.",
+    "starter": "point = (10, 20)\nprint(point)\n# This will crash:\npoint[0] = 999  # BUG: tuples are immutable\nprint(point)",
+    "expectedOutput": ["(10, 20)"],
+    "codeChecks": [
+      { "pattern": "#.*point\\[0\\]|#.*BUG", "required": true, "message": "Comment out the line that modifies the tuple." }
+    ],
+    "successMessage": "TypeError: 'tuple' object does not support item assignment. This is not a bug — this is the feature. Immutability = safety."
+  },
+  {
+    "title": "Tuple unpacking",
+    "instruction": "In Chapter 2 you saw variable swapping with tuple unpacking. Tuples support unpacking naturally:\n\n```python\npoint = (10, 20)\nx, y = point\n```\n\nUnpack the RGB tuple into three separate variables and print each.",
+    "hint": "r, g, b = color",
+    "starter": "color = (255, 128, 0)\n# TODO: unpack into r, g, b variables\nprint(f\"Red: {r}, Green: {g}, Blue: {b}\")",
+    "expectedOutput": ["Red: 255, Green: 128, Blue: 0"],
+    "codeChecks": [
+      { "pattern": "r\\s*,\\s*g\\s*,\\s*b\\s*=\\s*color", "required": true, "message": "Unpack: r, g, b = color" },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
+    ],
+    "successMessage": "Unpacking assigns each value to a variable in order. This is cleaner than color[0], color[1], color[2] — and instantly readable."
+  },
+  {
+    "title": "Single-element tuple — the comma trick",
+    "instruction": "A one-element tuple requires a trailing comma:\n\n`(5)` is just the number 5 in parentheses.\n`(5,)` is a tuple containing 5.\n\nRun this to see the difference.",
+    "starter": "not_a_tuple = (5)\nactual_tuple = (5,)\n\nprint(type(not_a_tuple))\nprint(type(actual_tuple))\nprint(not_a_tuple)\nprint(actual_tuple)",
+    "expectedOutput": ["<class 'int'>", "<class 'tuple'>", "5", "(5,)"],
+    "successMessage": "The trailing comma makes it a tuple. Without it, Python treats the parentheses as grouping — not a tuple. Easy to miss, good to know."
+  },
+  {
+    "title": "When to use tuples vs lists",
+    "instruction": "Use a **list** when:\n- Data might change (add, remove, update)\n- Order may change (sorting)\n- You are building up a collection\n\nUse a **tuple** when:\n- Data is fixed (coordinates, dates, RGB)\n- You want to prevent accidental modification\n- Using as a dictionary key (lists cannot be dict keys)\n\nChange the data structures below: coordinates should be a tuple, names should be a list.",
+    "hint": "coordinates = (40.7128, -74.0060)\nnames = [\"Alice\", \"Bob\", \"Carol\"]",
+    "starter": "# BUG: coordinates should be a tuple (fixed data)\ncoordinates = [40.7128, -74.0060]\n\n# BUG: names should be a list (may change)\nnames = (\"Alice\", \"Bob\", \"Carol\")\n\nprint(type(coordinates))\nprint(type(names))",
+    "expectedOutput": ["<class 'tuple'>", "<class 'list'>"],
+    "codeChecks": [
+      { "pattern": "coordinates\\s*=\\s*\\(", "required": true, "message": "Make coordinates a tuple: coordinates = (40.7128, -74.0060)" },
+      { "pattern": "names\\s*=\\s*\\[", "required": true, "message": "Make names a list: names = [\"Alice\", \"Bob\", \"Carol\"]" }
+    ],
+    "successMessage": "Right tool for the job. Tuples and lists are both sequences — but one is locked, one is flexible. Match the container to the data."
+  },
+  {
+    "title": "Tuples as dictionary keys",
+    "instruction": "Lists cannot be dictionary keys (they are mutable). Tuples can.\n\nThis lets you use coordinate pairs, date ranges, or any fixed compound value as a key.\n\nCreate a dictionary that maps coordinate tuples to city names.",
+    "hint": "cities = {(40.7, -74.0): \"New York\", (51.5, -0.1): \"London\"}",
+    "starter": "# TODO: create a dict with tuple keys mapping coordinates to city names\n# Include at least 2 cities, then look up one by its coordinates",
+    "expectedOutput": [],
+    "codeChecks": [
+      { "pattern": "\\(\\d+\\.\\d+,\\s*-?\\d+\\.\\d+\\)\\s*:", "required": true, "message": "Use tuple keys: (lat, lng): \"City Name\"" },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
+    ],
+    "successMessage": "Tuples as dictionary keys. This unlocks map-like lookups using multi-dimensional coordinates, date pairs, or any compound identifier."
+  },
+  {
+    "title": "Named tuples — readable tuple fields",
+    "instruction": "`collections.namedtuple` creates a tuple where fields have names:\n\n```python\nfrom collections import namedtuple\nPoint = namedtuple('Point', ['x', 'y'])\np = Point(10, 20)\nprint(p.x)  # 10\n```\n\nMore readable than `p[0]`. Create a `Person` namedtuple with `name`, `age`, and `city` fields.",
+    "hint": "Person = namedtuple('Person', ['name', 'age', 'city'])\nperson = Person(\"Alex\", 25, \"London\")",
+    "starter": "from collections import namedtuple\n# TODO: create Person namedtuple with name, age, city fields\n# Then create a Person and print name, age, and city using dot notation",
+    "expectedOutput": [],
+    "codeChecks": [
+      { "pattern": "namedtuple\\('Person'", "required": true, "message": "Define: Person = namedtuple('Person', [...])" },
+      { "pattern": "\\.name", "required": true, "message": "Access the name field with dot notation." },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
+    ],
+    "successMessage": "Named tuples: the readability of a class, the immutability of a tuple, the performance of a tuple. Perfect for lightweight data containers."
+  },
+  {
+    "title": "Iterating and searching tuples",
+    "instruction": "You can use for loops, `in`, and `len()` on tuples just like lists.\n\nComplete the code below to find the day number of a given day name in the week.",
+    "hint": "for i, day in enumerate(days):\n    if day == target:",
+    "starter": "days = (\"Monday\", \"Tuesday\", \"Wednesday\", \"Thursday\", \"Friday\", \"Saturday\", \"Sunday\")\ntarget = \"Thursday\"\n\n# TODO: find and print the day number of target (1-based)\n# Expected: Thursday is day 4",
+    "expectedOutput": ["Thursday is day 4"],
+    "codeChecks": [
+      { "pattern": "for\\s+\\w+.*in.*enumerate\\(days\\)|days.index\\(", "required": true, "message": "Use enumerate(days) or days.index() to find the position." },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
+    ],
+    "successMessage": "Tuples support all read operations: indexing, slicing, len, enumerate, in. Only write operations are blocked. Perfect for read-only sequences."
+  },
+  {
+    "title": "Build a coordinate mapper",
+    "instruction": "No starter code.\n\nBuild a simple coordinate mapper:\n1. Create a list of 3 city tuples: `(name, latitude, longitude)`\n2. Print each city with its coordinates in a formatted line\n3. Find and print the city closest to the equator (lowest absolute latitude)\n\nExample output:\n```\nNew York: 40.71°N, 74.01°W\n```",
+    "hint": "cities = [(\"New York\", 40.71, -74.01), ...]\nmin(cities, key=lambda c: abs(c[1]))",
+    "starter": "",
+    "expectedOutput": [],
+    "codeChecks": [
+      { "pattern": "\\(\"[^\"]+\",\\s*-?\\d+\\.\\d+,\\s*-?\\d+\\.\\d+\\)", "required": true, "message": "Create city tuples: (\"City\", lat, lng)" },
+      { "pattern": "for\\s+\\w+\\s+in\\s+cities", "required": true, "message": "Loop over your cities." },
+      { "pattern": "abs\\(", "required": true, "message": "Use abs() to find the closest to equator." }
+    ],
+    "successMessage": "A real coordinate mapper using tuples. Data is protected, readable, and used correctly. Chapter 9 done."
+  }
+]

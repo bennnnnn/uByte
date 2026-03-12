@@ -1,0 +1,111 @@
+[
+  {
+    "title": "What is an exception",
+    "instruction": "When Python encounters an error, it **raises an exception**. Without handling it, your program crashes.\n\nRun this. The `ZeroDivisionError` crashes everything — including the second print that should still run.",
+    "starter": "print(\"Starting...\")\nresult = 10 / 0  # raises ZeroDivisionError\nprint(\"This never runs.\")  # skipped because of crash",
+    "expectedOutput": ["Starting..."],
+    "successMessage": "The exception propagated up and crashed the program. The second print never ran. Exception handling lets you catch these crashes and respond gracefully."
+  },
+  {
+    "title": "try/except — catch the crash",
+    "instruction": "`try/except` catches exceptions before they crash your program:\n\n```python\ntry:\n    # code that might fail\nexcept ExceptionType:\n    # what to do when it fails\n```\n\nWrap the division in a try/except so the program continues.",
+    "hint": "try:\n    result = 10 / 0\nexcept ZeroDivisionError:\n    print(\"Cannot divide by zero!\")",
+    "starter": "print(\"Starting...\")\n# TODO: wrap the division in try/except\nresult = 10 / 0\nprint(\"Program continues.\")",
+    "expectedOutput": ["Starting...", "Cannot divide by zero!", "Program continues."],
+    "codeChecks": [
+      { "pattern": "try:", "required": true, "message": "Add a try: block." },
+      { "pattern": "except ZeroDivisionError|except Exception|except:", "required": true, "message": "Add an except block." },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
+    ],
+    "successMessage": "The exception is caught, a helpful message is printed, and the program continues. That is the entire point of exception handling."
+  },
+  {
+    "title": "Multiple except blocks",
+    "instruction": "You can have multiple `except` blocks to handle different exceptions differently:\n\n```python\ntry:\n    ...\nexcept TypeError:\n    ...\nexcept ValueError:\n    ...\nexcept Exception as e:\n    # catch-all\n```\n\nAdd exception handling for `ValueError` (bad input) and `TypeError` (wrong type).",
+    "hint": "except ValueError:\n    print(\"Invalid value\")\nexcept TypeError:\n    print(\"Wrong type\")",
+    "starter": "def parse_age(value):\n    # TODO: wrap in try/except for ValueError, TypeError, and a general Exception\n    result = int(value)\n    return result\n\nprint(parse_age(\"25\"))   # works\nprint(parse_age(\"abc\"))  # ValueError\nprint(parse_age(None))   # TypeError",
+    "expectedOutput": [],
+    "codeChecks": [
+      { "pattern": "except ValueError", "required": true, "message": "Handle ValueError." },
+      { "pattern": "except TypeError", "required": true, "message": "Handle TypeError." },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
+    ],
+    "successMessage": "Different exceptions, different responses. Specific handlers come first, general ones last. Never catch bare Exception as your only handler in production code."
+  },
+  {
+    "title": "else — runs when no exception",
+    "instruction": "`else` on a try/except runs only if no exception was raised:\n\n```python\ntry:\n    result = parse(data)\nexcept ValueError:\n    print(\"Bad data\")\nelse:\n    print(\"Parsed successfully:\", result)\n```\n\nAdd an `else` block to print the result on success.",
+    "hint": "else:\n    print(f\"Parsed: {number}\")",
+    "starter": "def safe_int(text):\n    try:\n        number = int(text)\n    except ValueError:\n        print(f\"Could not convert '{text}' to int.\")\n    # TODO: add else that prints the number on success\n\nsafe_int(\"42\")\nsafe_int(\"oops\")\nsafe_int(\"100\")",
+    "expectedOutput": ["Parsed: 42", "Could not convert 'oops' to int.", "Parsed: 100"],
+    "codeChecks": [
+      { "pattern": "else:", "required": true, "message": "Add an else: block." },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
+    ],
+    "successMessage": "else runs only on success. Cleaner than putting success code inside try — it clearly separates 'what might fail' from 'what to do when it works'."
+  },
+  {
+    "title": "finally — always runs",
+    "instruction": "`finally` runs whether an exception happened or not — perfect for cleanup:\n\n```python\ntry:\n    open_connection()\nexcept Exception:\n    handle_error()\nfinally:\n    close_connection()  # always runs\n```\n\nAdd a `finally` block that always prints `\"Cleanup done.\"`",
+    "hint": "finally:\n    print(\"Cleanup done.\")",
+    "starter": "def process_file(filename):\n    try:\n        print(f\"Opening {filename}...\")\n        if filename == \"missing.txt\":\n            raise FileNotFoundError(\"File not found!\")\n        print(\"Processing...\")\n    except FileNotFoundError as e:\n        print(f\"Error: {e}\")\n    # TODO: add finally that prints \"Cleanup done.\"\n\nprocess_file(\"data.txt\")\nprint(\"---\")\nprocess_file(\"missing.txt\")",
+    "expectedOutput": ["Opening data.txt...", "Processing...", "Cleanup done.", "---", "Opening missing.txt...", "Error: File not found!", "Cleanup done."],
+    "codeChecks": [
+      { "pattern": "finally:", "required": true, "message": "Add a finally: block." },
+      { "pattern": "Cleanup done", "required": true, "message": "Print 'Cleanup done.' in finally." },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
+    ],
+    "successMessage": "finally always runs — success, failure, doesn't matter. Use it for closing files, releasing locks, logging, or any cleanup that must happen unconditionally."
+  },
+  {
+    "title": "raise — throw your own exception",
+    "instruction": "`raise` lets you throw an exception deliberately:\n\n```python\nif age < 0:\n    raise ValueError(\"Age cannot be negative\")\n```\n\nAdd validation to the `set_age` function using `raise`.",
+    "hint": "if age < 0 or age > 150:\n    raise ValueError(f\"Invalid age: {age}\")",
+    "starter": "def set_age(age):\n    # TODO: raise ValueError if age < 0 or > 150\n    return age\n\ntry:\n    print(set_age(25))\n    print(set_age(-5))\nexcept ValueError as e:\n    print(f\"Error: {e}\")",
+    "expectedOutput": ["25", "Error: Invalid age: -5"],
+    "codeChecks": [
+      { "pattern": "raise ValueError", "required": true, "message": "Use raise ValueError(...) for invalid ages." },
+      { "pattern": "age < 0", "required": true, "message": "Check: if age < 0" },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
+    ],
+    "successMessage": "raise gives you control over what counts as an error. Your function enforces its contract — invalid inputs are rejected with a clear error message."
+  },
+  {
+    "title": "Custom exceptions",
+    "instruction": "You can create your own exception types by inheriting from `Exception`:\n\n```python\nclass InsufficientFundsError(Exception):\n    pass\n```\n\nCustom exceptions make your error handling expressive and specific.\n\nCreate `InsufficientFundsError` and use it in the `withdraw` function.",
+    "hint": "class InsufficientFundsError(Exception):\n    pass\n\nraise InsufficientFundsError(f\"Need {amount}, have {self.balance}\")",
+    "starter": "# TODO: create InsufficientFundsError(Exception)\n\nclass BankAccount:\n    def __init__(self, balance):\n        self.balance = balance\n    \n    def withdraw(self, amount):\n        if amount > self.balance:\n            # TODO: raise InsufficientFundsError\n            pass\n        self.balance -= amount\n\naccount = BankAccount(100)\ntry:\n    account.withdraw(200)\nexcept InsufficientFundsError as e:\n    print(f\"Failed: {e}\")",
+    "expectedOutput": ["Failed: Need 200, have 100"],
+    "codeChecks": [
+      { "pattern": "class InsufficientFundsError\\(Exception\\)", "required": true, "message": "Define: class InsufficientFundsError(Exception):" },
+      { "pattern": "raise InsufficientFundsError", "required": true, "message": "Raise InsufficientFundsError in withdraw." },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comments with your code." }
+    ],
+    "successMessage": "Custom exceptions make your API self-documenting. catch InsufficientFundsError is clearer than catch Exception. Real libraries use custom exceptions everywhere."
+  },
+  {
+    "title": "Exception chaining with raise from",
+    "instruction": "`raise X from Y` chains exceptions — preserves the original error as context:\n\n```python\ntry:\n    int(\"abc\")\nexcept ValueError as e:\n    raise RuntimeError(\"Config parsing failed\") from e\n```\n\nFix the function to chain the low-level exception into a higher-level one.",
+    "hint": "raise ConfigError(\"Failed to load config\") from e",
+    "starter": "class ConfigError(Exception):\n    pass\n\ndef load_config(text):\n    try:\n        # Simulate parsing\n        value = int(text)\n        return {\"timeout\": value}\n    except ValueError as e:\n        # TODO: raise ConfigError with chaining: 'from e'\n        raise ConfigError(\"Failed to load config\")\n\ntry:\n    load_config(\"bad\")\nexcept ConfigError as e:\n    print(f\"Config error: {e}\")\n    print(f\"Caused by: {e.__cause__}\")",
+    "expectedOutput": [],
+    "codeChecks": [
+      { "pattern": "raise ConfigError.*from e", "required": true, "message": "Use 'raise ConfigError(...) from e' for chaining." },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
+    ],
+    "successMessage": "Exception chaining preserves the original cause. High-level error for the caller, low-level details for debugging. e.__cause__ gives you the original exception."
+  },
+  {
+    "title": "Build a data validator",
+    "instruction": "No starter code.\n\nBuild a `validate_user` function that:\n- Takes a dictionary with `name`, `email`, `age`\n- Raises `ValueError` if name is empty\n- Raises `ValueError` if email doesn't contain '@'\n- Raises `ValueError` if age is not between 0 and 120\n- Returns `\"Valid user\"` on success\n\nTest it with valid and invalid data.",
+    "hint": "def validate_user(data):\n    if not data.get(\"name\"):\n        raise ValueError(\"Name is required\")",
+    "starter": "",
+    "expectedOutput": [],
+    "codeChecks": [
+      { "pattern": "def validate_user\\(", "required": true, "message": "Define validate_user function." },
+      { "pattern": "raise ValueError", "required": true, "message": "Raise ValueError for invalid data." },
+      { "pattern": "try:", "required": true, "message": "Use try/except to test your function." }
+    ],
+    "successMessage": "A data validator with clear error messages. This is the foundation of every API input validation system. Chapter 19 done."
+  }
+]

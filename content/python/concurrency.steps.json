@@ -1,0 +1,85 @@
+[
+  {
+    "title": "Why async matters",
+    "instruction": "Your program spends most of its time **waiting**:\n- Waiting for a network response: 200ms\n- Waiting for a database query: 50ms\n- Waiting for a file to load: 10ms\n\nSynchronous code waits idle. Async code does other work while waiting.\n\nRun this simulation to see the difference.",
+    "starter": "import time\n\ndef sync_fetch(url):\n    time.sleep(0.1)  # simulate network wait\n    return f\"Data from {url}\"\n\nstart = time.time()\nresult1 = sync_fetch(\"api1\")\nresult2 = sync_fetch(\"api2\")\nresult3 = sync_fetch(\"api3\")\nelapsed = time.time() - start\nprint(f\"Sync: {elapsed:.2f}s for 3 requests\")  # ~0.3s",
+    "expectedOutput": [],
+    "successMessage": "0.3 seconds total — fetching one at a time. With async, all three requests run simultaneously — total time: 0.1s. That is the benefit of async."
+  },
+  {
+    "title": "async/await — the basics",
+    "instruction": "`async def` defines a coroutine — a function that can be paused and resumed.\n`await` pauses the coroutine until the awaited thing completes.\n\n```python\nasync def fetch(url):\n    await asyncio.sleep(1)  # pause here, do other things\n    return f\"Data from {url}\"\n```\n\nRun this basic async example.",
+    "starter": "import asyncio\n\nasync def greet(name, delay):\n    await asyncio.sleep(delay)\n    print(f\"Hello, {name}!\")\n\nasync def main():\n    await greet(\"Alice\", 0.1)\n    await greet(\"Bob\", 0.1)\n\nasyncio.run(main())",
+    "expectedOutput": ["Hello, Alice!", "Hello, Bob!"],
+    "successMessage": "Two sequential awaits — same total time as sync. Next step: run them concurrently with asyncio.gather()."
+  },
+  {
+    "title": "asyncio.gather() — run concurrently",
+    "instruction": "`asyncio.gather()` runs multiple coroutines **concurrently** — all start together, all run in parallel.\n\nRewrite main() to use `gather()` instead of awaiting sequentially.",
+    "hint": "await asyncio.gather(greet(\"Alice\", 0.1), greet(\"Bob\", 0.1))",
+    "starter": "import asyncio\nimport time\n\nasync def greet(name, delay):\n    await asyncio.sleep(delay)\n    print(f\"Hello, {name}!\")\n\nasync def main():\n    start = time.time()\n    # TODO: use asyncio.gather to run both greets concurrently\n    await greet(\"Alice\", 0.2)\n    await greet(\"Bob\", 0.2)\n    elapsed = time.time() - start\n    print(f\"Elapsed: {elapsed:.1f}s\")\n\nasyncio.run(main())",
+    "expectedOutput": [],
+    "codeChecks": [
+      { "pattern": "asyncio\\.gather\\(", "required": true, "message": "Use asyncio.gather() to run concurrently." },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
+    ],
+    "successMessage": "Both greetings ran simultaneously — total time ~0.2s instead of ~0.4s. gather() is async's superpower: start everything, wait for all, collect results."
+  },
+  {
+    "title": "async with tasks",
+    "instruction": "`asyncio.create_task()` schedules a coroutine to run independently — it starts immediately without being awaited right away.\n\nRun this to see how tasks overlap.",
+    "starter": "import asyncio\n\nasync def fetch_data(name, delay):\n    print(f\"Starting: {name}\")\n    await asyncio.sleep(delay)\n    print(f\"Done: {name}\")\n    return f\"{name} result\"\n\nasync def main():\n    task1 = asyncio.create_task(fetch_data(\"Users\", 0.3))\n    task2 = asyncio.create_task(fetch_data(\"Products\", 0.1))\n    task3 = asyncio.create_task(fetch_data(\"Orders\", 0.2))\n    \n    results = await asyncio.gather(task1, task2, task3)\n    print(results)\n\nasyncio.run(main())",
+    "expectedOutput": [],
+    "successMessage": "Products finishes first (0.1s), then Orders (0.2s), then Users (0.3s) — even though Users was created first. Tasks run concurrently by their delay, not their creation order."
+  },
+  {
+    "title": "asyncio.sleep vs time.sleep",
+    "instruction": "`time.sleep(1)` blocks the entire thread — nothing else can run.\n`asyncio.sleep(1)` yields control back to the event loop — other coroutines run.\n\nFix the code to use `asyncio.sleep` so the tasks can overlap.",
+    "hint": "await asyncio.sleep(delay)",
+    "starter": "import asyncio\nimport time\n\nasync def task(name, delay):\n    # BUG: time.sleep blocks the event loop — use asyncio.sleep\n    time.sleep(delay)\n    print(f\"{name} done\")\n\nasync def main():\n    await asyncio.gather(\n        task(\"A\", 0.2),\n        task(\"B\", 0.1),\n    )\n\nasyncio.run(main())",
+    "expectedOutput": ["B done", "A done"],
+    "codeChecks": [
+      { "pattern": "await asyncio\\.sleep\\(", "required": true, "message": "Change to: await asyncio.sleep(delay)" }
+    ],
+    "successMessage": "B finishes first because it sleeps less. asyncio.sleep yields — the event loop runs B while A is waiting. time.sleep blocks everything."
+  },
+  {
+    "title": "Exception handling in async",
+    "instruction": "Exceptions in async functions work the same way — they propagate through `await`.\n\nAdd try/except inside the async function to handle the error gracefully.",
+    "hint": "try:\n    await asyncio.sleep(0.1)\n    raise ConnectionError(\"Server unreachable\")\nexcept ConnectionError as e:\n    return f\"Failed: {e}\"",
+    "starter": "import asyncio\n\nasync def fetch(url):\n    await asyncio.sleep(0.1)\n    if \"bad\" in url:\n        raise ConnectionError(f\"Cannot connect to {url}\")\n    return f\"Data from {url}\"\n\nasync def safe_fetch(url):\n    # TODO: wrap fetch(url) in try/except, return error string on failure\n    return await fetch(url)\n\nasync def main():\n    r1 = await safe_fetch(\"good-api.com\")\n    r2 = await safe_fetch(\"bad-api.com\")\n    print(r1)\n    print(r2)\n\nasyncio.run(main())",
+    "expectedOutput": ["Data from good-api.com", "Failed: Cannot connect to bad-api.com"],
+    "codeChecks": [
+      { "pattern": "try:", "required": true, "message": "Add try/except around the await." },
+      { "pattern": "except ConnectionError", "required": true, "message": "Catch ConnectionError." },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
+    ],
+    "successMessage": "Async exception handling reads just like sync. try/except works across awaits. Real programs should always handle errors in network calls."
+  },
+  {
+    "title": "asyncio.timeout — stop waiting after too long",
+    "instruction": "`asyncio.timeout(seconds)` cancels an operation if it takes too long:\n\n```python\ntry:\n    async with asyncio.timeout(1.0):\n        result = await slow_operation()\nexcept TimeoutError:\n    print(\"Too slow!\")\n```\n\nAdd a 0.15 second timeout to the fetch call.",
+    "hint": "async with asyncio.timeout(0.15):\n    result = await fetch(url, delay)",
+    "starter": "import asyncio\n\nasync def fetch(url, delay):\n    await asyncio.sleep(delay)\n    return f\"Data from {url}\"\n\nasync def main():\n    # TODO: add 0.15s timeout\n    try:\n        result = await fetch(\"api.example.com\", 0.3)  # too slow\n        print(result)\n    except TimeoutError:\n        print(\"Request timed out.\")\n\nasyncio.run(main())",
+    "expectedOutput": ["Request timed out."],
+    "codeChecks": [
+      { "pattern": "asyncio\\.timeout\\(", "required": true, "message": "Use: async with asyncio.timeout(0.15):" },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
+    ],
+    "successMessage": "The fetch was supposed to take 0.3s but the timeout was 0.15s — timed out. Always set timeouts on network calls. Without them, a slow server hangs your entire program."
+  },
+  {
+    "title": "Build an async data fetcher",
+    "instruction": "No starter code.\n\nBuild an async program that:\n1. Defines `fetch_user(id)` — simulates 0.1s delay, returns `{\"id\": id, \"name\": f\"User {id}\"}`\n2. Uses `asyncio.gather()` to fetch users 1 through 5 concurrently\n3. Prints all results\n4. Prints total elapsed time (should be ~0.1s, not 0.5s)\n\nMeasure with `time.time()`.",
+    "hint": "results = await asyncio.gather(*[fetch_user(i) for i in range(1, 6)])",
+    "starter": "",
+    "expectedOutput": [],
+    "codeChecks": [
+      { "pattern": "async def fetch_user\\(", "required": true, "message": "Define async def fetch_user(id):" },
+      { "pattern": "asyncio\\.gather\\(", "required": true, "message": "Use asyncio.gather() to fetch concurrently." },
+      { "pattern": "asyncio\\.run\\(", "required": true, "message": "Run with asyncio.run()." },
+      { "pattern": "time\\.time\\(\\)", "required": true, "message": "Measure elapsed time." }
+    ],
+    "successMessage": "Five requests, ~0.1s total. gather() is the difference between 0.5s and 0.1s at scale. Chapter 22 done."
+  }
+]

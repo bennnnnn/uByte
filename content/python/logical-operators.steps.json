@@ -1,0 +1,114 @@
+[
+  {
+    "title": "and — both must be True",
+    "instruction": "In Chapter 5 you made decisions based on one condition. But real decisions usually involve multiple things:\n\n\"Log the user in if they provided the right email **and** the right password.\"\n\n`and` returns `True` only when **both** sides are `True`:\n\n```\nTrue and True  → True\nTrue and False → False\nFalse and anything → False\n```\n\nRun this. Then change `password_correct` to `False` and see what happens.",
+    "starter": "email_correct = True\npassword_correct = True\n\nif email_correct and password_correct:\n    print(\"Logged in!\")\nelse:\n    print(\"Login failed.\")",
+    "expectedOutput": ["Logged in!"],
+    "successMessage": "Both True → logged in. Either False → denied. and requires every condition to pass."
+  },
+  {
+    "title": "or — at least one must be True",
+    "instruction": "`or` returns `True` when **at least one** side is `True`:\n\n```\nTrue or True   → True\nTrue or False  → True\nFalse or False → False\n```\n\n\"Apply discount if the user is a student **or** has a coupon code.\"\n\nAdd an `or` condition: give the discount if `is_student` is True OR `has_coupon` is True.",
+    "hint": "if is_student or has_coupon:",
+    "starter": "is_student = False\nhas_coupon = True\n\n# TODO: give discount if student OR has coupon\nprint(\"No discount.\")",
+    "expectedOutput": ["10% discount applied!"],
+    "codeChecks": [
+      { "pattern": "is_student\\s+or\\s+has_coupon|has_coupon\\s+or\\s+is_student", "required": true, "message": "Use or: if is_student or has_coupon:" },
+      { "pattern": "discount", "required": true, "message": "Print a discount message." },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
+    ],
+    "successMessage": "has_coupon is True so the discount applies — even though is_student is False. or only needs one side to be True."
+  },
+  {
+    "title": "not — flip the result",
+    "instruction": "`not` reverses a boolean:\n\n```\nnot True  → False\nnot False → True\n```\n\n\"Show the upgrade prompt if the user is **not** a premium member.\"\n\nAdd a check using `not` that prints `\"Upgrade to premium!\"` when `is_premium` is `False`.",
+    "hint": "if not is_premium:",
+    "starter": "is_premium = False\n\n# TODO: if NOT premium, print \"Upgrade to premium!\"",
+    "expectedOutput": ["Upgrade to premium!"],
+    "codeChecks": [
+      { "pattern": "not is_premium", "required": true, "message": "Use: if not is_premium:" },
+      { "pattern": "Upgrade to premium!", "required": true, "message": "Print: Upgrade to premium!" },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
+    ],
+    "successMessage": "not flips True to False and False to True. Often reads more naturally than the alternative: 'if not logged in' beats 'if logged_in == False'."
+  },
+  {
+    "title": "Combining and, or, not",
+    "instruction": "You can chain multiple logical operators in one condition.\n\nParentheses control order of evaluation:\n\n`(a and b) or c` — check a AND b first, then OR with c\n\nComplete the access check: grant access if the user is an admin, OR if they are a verified adult member.",
+    "hint": "if is_admin or (is_verified and age >= 18):",
+    "starter": "is_admin = False\nis_verified = True\nage = 20\n\n# TODO: grant access if admin OR (verified AND age 18+)\nprint(\"Access denied.\")",
+    "expectedOutput": ["Access granted."],
+    "codeChecks": [
+      { "pattern": "is_admin\\s+or", "required": true, "message": "Use: if is_admin or ..." },
+      { "pattern": "is_verified\\s+and|and\\s+is_verified", "required": true, "message": "Combine with: is_verified and age >= 18" },
+      { "pattern": "Access granted", "required": true, "message": "Print 'Access granted.' when conditions pass." },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
+    ],
+    "successMessage": "is_admin is False but (is_verified and age >= 18) is True so access is granted. Parentheses make the logic explicit and readable."
+  },
+  {
+    "title": "in — check membership",
+    "instruction": "`in` checks if a value exists inside a sequence (list, string, tuple):\n\n```\n\"a\" in \"cat\"         → True\n5 in [1, 2, 3, 4, 5] → True\n\"x\" in \"cat\"         → False\n```\n\nAdd a check using `in` to see if the `username` is in the banned list.",
+    "hint": "if username in banned_users:",
+    "starter": "banned_users = [\"spammer\", \"bot123\", \"hacker\"]\nusername = \"spammer\"\n\n# TODO: if username is in banned_users, print \"User is banned.\"\n# otherwise print \"Welcome!\"",
+    "expectedOutput": ["User is banned."],
+    "codeChecks": [
+      { "pattern": "username\\s+in\\s+banned_users", "required": true, "message": "Use: if username in banned_users:" },
+      { "pattern": "banned", "required": true, "message": "Print a banned message." },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
+    ],
+    "successMessage": "in is incredibly readable: 'if username in banned_users' — it reads almost like English. Works on strings, lists, tuples, dicts (checks keys)."
+  },
+  {
+    "title": "not in — check absence",
+    "instruction": "`not in` is the opposite of `in`:\n\n`5 not in [1, 2, 3]` → `True`\n\n\"Send welcome email if the email address is **not in** our existing users list.\"\n\nAdd a check using `not in`.",
+    "hint": "if new_email not in existing_emails:",
+    "starter": "existing_emails = [\"alice@example.com\", \"bob@example.com\"]\nnew_email = \"carol@example.com\"\n\n# TODO: if new_email NOT in existing_emails, print \"Sending welcome email to {new_email}\"",
+    "expectedOutput": [],
+    "codeChecks": [
+      { "pattern": "not in existing_emails", "required": true, "message": "Use: if new_email not in existing_emails:" },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
+    ],
+    "successMessage": "not in is the cleanest way to check absence. Much cleaner than not (x in y) — same result, easier to read."
+  },
+  {
+    "title": "is — identity check",
+    "instruction": "`is` checks if two variables point to the **same object in memory** — not just equal value.\n\nMostly used to check for `None`:\n\n```python\nif result is None:\n    ...\n```\n\nDo NOT use `==` for None checks. Use `is`.\n\nFix the two None checks below to use `is` and `is not`.",
+    "hint": "if result is None:\nif result is not None:",
+    "starter": "result = None\n\n# BUG: use 'is' for None checks, not ==\nif result == None:\n    print(\"No result yet.\")\n\nresult = 42\nif result != None:\n    print(f\"Got result: {result}\")",
+    "expectedOutput": ["No result yet.", "Got result: 42"],
+    "codeChecks": [
+      { "pattern": "is None", "required": true, "message": "Use: if result is None:" },
+      { "pattern": "is not None", "required": true, "message": "Use: if result is not None:" }
+    ],
+    "successMessage": "is None not == None. This is a Python convention — PEP8 requires it. is checks identity (same object), == checks equality (same value)."
+  },
+  {
+    "title": "Truthy and falsy",
+    "instruction": "Python treats certain values as `False` even without comparing them explicitly:\n\n| Falsy | Truthy |\n|-------|--------|\n| `False` | `True` |\n| `0` | any non-zero number |\n| `\"\"` | any non-empty string |\n| `[]`, `{}`, `()` | any non-empty collection |\n| `None` | anything else |\n\nRun this. Notice you do not need `== \"\"` or `== 0` — Python checks truthiness directly.",
+    "starter": "name = \"\"\nif name:\n    print(f\"Hello, {name}!\")\nelse:\n    print(\"No name provided.\")\n\ncount = 0\nif count:\n    print(f\"Found {count} items.\")\nelse:\n    print(\"Nothing found.\")\n\nitems = []\nif items:\n    print(\"Has items.\")\nelse:\n    print(\"List is empty.\")",
+    "expectedOutput": ["No name provided.", "Nothing found.", "List is empty."],
+    "successMessage": "Empty string, zero, empty list — all falsy. if name: is the clean Pythonic check for 'if name is not empty'. You will use this pattern constantly."
+  },
+  {
+    "title": "Short-circuit evaluation",
+    "instruction": "Python is lazy with `and` and `or`:\n\n- `and` stops at the first `False` — no need to check further\n- `or` stops at the first `True` — no need to check further\n\nThis is called short-circuit evaluation.\n\nRun this. Notice that `risky_check()` is never called when the first condition is `False`.",
+    "starter": "def risky_check():\n    print(\"(risky_check was called)\")\n    return True\n\nis_safe = False\n\n# Python stops at is_safe — risky_check never runs\nif is_safe and risky_check():\n    print(\"All good.\")\nelse:\n    print(\"Short-circuited — risky_check skipped.\")",
+    "expectedOutput": ["Short-circuited — risky_check skipped."],
+    "successMessage": "is_safe is False so Python does not bother calling risky_check(). This is useful for safety: check if a value exists before using it — if x is not None and x > 0."
+  },
+  {
+    "title": "Build an access control system",
+    "instruction": "No starter code.\n\nBuild an access checker with these rules:\n- Must be logged in (`is_logged_in = True`)\n- Must be either an admin OR have both verified status AND be 18+\n- Must not be in the banned list (`banned = [\"baduser\"]`)\n\nCreate the variables and write the conditions. Print `\"Access granted.\"` or `\"Access denied.\"`",
+    "hint": "Combine and, or, not in with parentheses.",
+    "starter": "",
+    "expectedOutput": [],
+    "codeChecks": [
+      { "pattern": "is_logged_in", "required": true, "message": "Create and check is_logged_in." },
+      { "pattern": "and", "required": true, "message": "Use 'and' to combine conditions." },
+      { "pattern": "or", "required": true, "message": "Use 'or' for the admin/verified check." },
+      { "pattern": "not in", "required": true, "message": "Check 'not in banned' to exclude banned users." }
+    ],
+    "successMessage": "A real access control system using and, or, not, in — all in one condition. Chapter 6 done. You can now express any real-world rule in Python."
+  }
+]

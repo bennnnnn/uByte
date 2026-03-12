@@ -1,0 +1,123 @@
+[
+  {
+    "title": "Your first if statement",
+    "instruction": "All the code you have written so far runs exactly the same way every time. But real programs need to behave differently depending on the situation.\n\n`if` runs a block of code only when a condition is `True`.\n\n```python\nif condition:\n    # this only runs if condition is True\n```\n\nNotice the colon `:` and the **indentation** — Python uses indentation (4 spaces) instead of curly braces.\n\nRun this. Then change `score` to 40 and run again.",
+    "starter": "score = 85\n\nif score >= 60:\n    print(\"You passed!\")",
+    "expectedOutput": [],
+    "successMessage": "When score is 85, the print runs. When it's 40, nothing runs. The condition controls everything."
+  },
+  {
+    "title": "else — the backup plan",
+    "instruction": "`else` runs when the `if` condition is `False`.\n\n```python\nif condition:\n    # runs when True\nelse:\n    # runs when False\n```\n\nOnly one of the two blocks ever runs — never both.\n\nRun this with `score = 85` (passes), then change to `score = 40` (fails).",
+    "starter": "score = 85\n\nif score >= 60:\n    print(\"You passed! Great work.\")\nelse:\n    print(\"Not quite. You need 60 or more.\")",
+    "expectedOutput": [],
+    "successMessage": "if/else — one path or the other. The condition decides which. Every decision in programming comes down to this."
+  },
+  {
+    "title": "elif — multiple options",
+    "instruction": "`elif` is short for *else if*. Use it to check multiple conditions in order.\n\nPython checks top to bottom and runs the first block whose condition is `True`. The rest are skipped.\n\nAdd two more `elif` conditions: one for 70–79 (`grade = \"C\"`), one for 60–69 (`grade = \"D\"`).",
+    "hint": "elif score >= 70:\n    grade = \"C\"\nelif score >= 60:\n    grade = \"D\"",
+    "starter": "score = 78\n\nif score >= 90:\n    grade = \"A\"\nelif score >= 80:\n    grade = \"B\"\n# TODO: add elif for C (70-79) and D (60-69)\nelse:\n    grade = \"F\"\n\nprint(f\"Score: {score} → Grade: {grade}\")",
+    "expectedOutput": ["Score: 78 → Grade: C"],
+    "codeChecks": [
+      { "pattern": "elif score >= 70", "required": true, "message": "Add: elif score >= 70:" },
+      { "pattern": "elif score >= 60", "required": true, "message": "Add: elif score >= 60:" },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
+    ],
+    "successMessage": "Four grades, one chain. elif checks conditions in order — the first True one wins. 78 correctly gives C. Clean and readable."
+  },
+  {
+    "title": "Comparison operators",
+    "instruction": "Comparisons produce `True` or `False`:\n\n| Operator | Meaning |\n|----------|----------|\n| `==` | equal to |\n| `!=` | not equal to |\n| `>` | greater than |\n| `<` | less than |\n| `>=` | greater than or equal |\n| `<=` | less than or equal |\n\nCommon mistake: `=` is assignment. `==` is comparison.\n\nRun this and check all the outputs.",
+    "starter": "age = 18\nprint(age == 18)\nprint(age != 20)\nprint(age > 17)\nprint(age < 21)\nprint(age >= 18)\nprint(age <= 17)",
+    "expectedOutput": ["True", "True", "True", "True", "True", "False"],
+    "successMessage": "All comparisons return True or False. Note the last one: 18 <= 17 is False. The = sign in >= and <= does not mean assignment — it means 'or equal to'."
+  },
+  {
+    "title": "Nested if — decisions inside decisions",
+    "instruction": "An `if` block can contain another `if` inside it.\n\nThe inner `if` only runs if the outer condition is already `True`.\n\nThe indentation tells Python which block belongs where.\n\nAdd a nested check inside the `if is_logged_in:` block that also checks `is_premium`.",
+    "hint": "if is_logged_in:\n    if is_premium:\n        print(\"Welcome back, premium user!\")\n    else:\n        print(\"Welcome back!\")",
+    "starter": "is_logged_in = True\nis_premium = True\n\n# TODO: if logged in, check if premium and print different messages\nif is_logged_in:\n    print(\"Welcome!\")",
+    "expectedOutput": ["Welcome back, premium user!"],
+    "codeChecks": [
+      { "pattern": "if is_premium", "required": true, "message": "Add a nested check: if is_premium:" },
+      { "pattern": "premium", "required": true, "message": "Print a message that mentions premium." }
+    ],
+    "successMessage": "Nested if statements. The outer condition acts as a gate — the inner check only runs when you are already past the outer one."
+  },
+  {
+    "title": "Indentation is everything",
+    "instruction": "Python uses indentation to define blocks. Not curly braces — spaces.\n\nThe standard is **4 spaces** per level. Mixing tabs and spaces causes errors.\n\nThis code is broken — the `print` inside `else` has wrong indentation. Fix it.",
+    "hint": "The print inside else needs to be indented 4 spaces.",
+    "starter": "temperature = 35\n\nif temperature > 30:\n    print(\"It's hot outside!\")\nelse:\nprint(\"Nice weather today.\")  # BUG: this should be indented",
+    "expectedOutput": ["It's hot outside!"],
+    "codeChecks": [
+      { "pattern": "else:\\n    print", "required": true, "message": "Indent the print under else by 4 spaces." }
+    ],
+    "successMessage": "Indentation fixed. This is the single most common error for new Python programmers. Your editor helps — but watch for mixed tabs and spaces."
+  },
+  {
+    "title": "if on one line — ternary",
+    "instruction": "For simple if/else you can write everything on one line:\n\n`value = \"yes\" if condition else \"no\"`\n\nThis is called a ternary expression. Use it when the logic is simple and fits clearly on one line.\n\nRewrite the four-line if/else below as a single ternary line.",
+    "hint": "status = \"adult\" if age >= 18 else \"minor\"",
+    "starter": "age = 20\n\n# Rewrite this as a ternary:\n# if age >= 18:\n#     status = \"adult\"\n# else:\n#     status = \"minor\"\n\n# TODO: write the ternary here\nprint(status)",
+    "expectedOutput": ["adult"],
+    "codeChecks": [
+      { "pattern": "status\\s*=.*if.*else", "required": true, "message": "Use a ternary: status = \"adult\" if age >= 18 else \"minor\"" },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
+    ],
+    "successMessage": "One line, same result. Ternary expressions are great for simple conditions — but don't nest them. Readability matters more than brevity."
+  },
+  {
+    "title": "pass — a placeholder block",
+    "instruction": "Python requires at least one statement inside every block. If you want an empty block (as a placeholder while building), use `pass`.\n\n`pass` does nothing — it just satisfies Python's block requirement.\n\nAdd a `pass` to the empty `else` block below so it runs without error.",
+    "hint": "else:\n    pass",
+    "starter": "is_admin = False\n\nif is_admin:\n    print(\"Admin panel\")\nelse:\n    # TODO: just use pass here — nothing to do for non-admins yet",
+    "expectedOutput": [],
+    "codeChecks": [
+      { "pattern": "pass", "required": true, "message": "Add pass to the empty else block." },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with pass." }
+    ],
+    "successMessage": "pass is the intentional no-op. Use it as a placeholder when you know a block will do something later but is not ready yet."
+  },
+  {
+    "title": "match — Python's switch statement",
+    "instruction": "Python 3.10 added `match` — like a switch statement in other languages. Cleaner than long if/elif chains when matching exact values.\n\n```python\nmatch command:\n    case \"quit\":\n        ...\n    case \"help\":\n        ...\n    case _:\n        # default (like else)\n```\n\nAdd two more cases to the match below: `\"pause\"` and `\"resume\"`.",
+    "hint": "case \"pause\":\n    print(\"Paused.\")\ncase \"resume\":\n    print(\"Resumed.\")",
+    "starter": "command = \"pause\"\n\nmatch command:\n    case \"start\":\n        print(\"Starting...\")\n    case \"stop\":\n        print(\"Stopping...\")\n    # TODO: add pause and resume cases\n    case _:\n        print(f\"Unknown command: {command}\")",
+    "expectedOutput": ["Paused."],
+    "codeChecks": [
+      { "pattern": "case \"pause\"", "required": true, "message": "Add: case \"pause\":" },
+      { "pattern": "case \"resume\"", "required": true, "message": "Add: case \"resume\":" },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your cases." }
+    ],
+    "successMessage": "match is Python 3.10+. It is cleaner than a long if/elif chain when matching specific values. _ is the catch-all case (like else)."
+  },
+  {
+    "title": "Fix all the bugs",
+    "instruction": "This program has four bugs:\n1. Uses `=` instead of `==` in the comparison\n2. Missing colon after `else`\n3. Wrong indentation on the print inside else\n4. Using lowercase `true` instead of `True`\n\nFix all four.",
+    "hint": "==, colon after else, 4-space indent, capital True",
+    "starter": "is_member = true\n\nif is_member = True:\n    print(\"Member discount applied.\")\nelse\n    print(\"No discount.\")",
+    "expectedOutput": ["Member discount applied."],
+    "codeChecks": [
+      { "pattern": "is_member\\s*=\\s*True", "required": true, "message": "Use capital True: is_member = True" },
+      { "pattern": "if is_member\\s*==\\s*True|if is_member:", "required": true, "message": "Use == for comparison, not =" },
+      { "pattern": "else:\\n", "required": true, "message": "Add colon after else: else:" }
+    ],
+    "successMessage": "Four bugs, all fixed. Memorise these: True not true, == not =, colon after every block header, 4-space indentation."
+  },
+  {
+    "title": "Build an age checker",
+    "instruction": "No starter code.\n\nCreate a variable `age`. Then write an if/elif/else chain that prints:\n- `\"Child\"` if age < 13\n- `\"Teenager\"` if age is 13–17\n- `\"Adult\"` if age is 18–64\n- `\"Senior\"` if age 65 or above",
+    "hint": "Four cases — use elif for the middle ones.",
+    "starter": "",
+    "expectedOutput": [],
+    "codeChecks": [
+      { "pattern": "age\\s*=\\s*\\d+", "required": true, "message": "Create an age variable." },
+      { "pattern": "elif", "required": true, "message": "Use elif for the middle cases." },
+      { "pattern": "Child|child", "required": true, "message": "Handle the Child case." },
+      { "pattern": "Senior|senior", "required": true, "message": "Handle the Senior case." }
+    ],
+    "successMessage": "Four categories, one clean if/elif/else chain. You now know how to make your programs smart. Chapter 5 done."
+  }
+]

@@ -1,11 +1,14 @@
 ---
-title: "Async & Threading"
-description: "asyncio and threading in Python."
-order: 15
+title: "Async & Concurrency"
+description: "Do multiple things at once without threads. async/await and asyncio make concurrent code readable."
+order: 22
 difficulty: "advanced"
-estimatedMinutes: 25
+estimatedMinutes: 22
+concepts: ["async", "await", "asyncio", "coroutine", "event loop", "gather", "asyncio.sleep", "threading basics"]
 ---
 
-## Concurrency
+## Don't wait around
 
-Use `asyncio` for async I/O and `threading` or `multiprocessing` for parallelism. More content coming soon.
+Fetching a URL takes 200ms. Querying a database takes 100ms. Waiting for user input could take forever.
+
+`async/await` lets your program do other work while waiting — without threads, without complexity. Twelve steps.
