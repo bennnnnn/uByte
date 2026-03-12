@@ -1,9 +1,9 @@
 [
   {
     "title": "Your first variable",
-    "instruction": "In Chapter 1 you printed your name by typing it directly. Now let's store it in a variable instead.\n\nHere is how you create a variable in Go:\n\n    name := \"Alex\"\n\nThe := means create this variable and put this value in it. Think of it as an arrow pointing right: name gets \"Alex\".\n\nCreate a variable called name with your actual name in it. Then print it using fmt.Println(name).",
-    "hint": "Write name := \"YourName\" on one line. On the next line write fmt.Println(name). Your name goes inside double quotes.",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\t// TODO: create a variable called name with your name in it\n\t// TODO: print name using fmt.Println\n}",
+    "instruction": "Imagine you have a box. You write \"name\" on the outside of the box, then you put \"Alex\" inside it. Whenever you need your name, you just look at the box labeled \"name\" instead of writing \"Alex\" over and over again.\n\nThat box is a variable. A variable is a labeled box that holds a piece of information.\n\nIn Go, you create that box like this:\n\n    name := \"Alex\"\n\nname is the label you put on the box. := means \"create this box and put this value inside\". \"Alex\" is what goes in.\n\nNow whenever you write name, Go opens that box and gives you whatever is inside.\n\nYour turn: create a variable called name with your actual name in it. Then print it with fmt.Println(name).",
+    "hint": "First line: name := \"YourName\"  (your name goes inside the quotes). Second line: fmt.Println(name)  (no quotes around name this time — you are reading the box, not typing text).",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\t// TODO: create a variable called name and put your name inside it\n\t// TODO: print name using fmt.Println(name)\n}",
     "expectedOutput": [],
     "codeChecks": [
       { "pattern": "name\\s*:=\\s*\"\\S+\"", "required": true, "message": "Create a name variable like this: name := \"YourName\"" },
@@ -12,10 +12,10 @@
     ]
   },
   {
-    "title": "Add a second variable",
-    "instruction": "You're off to a great start! Let's add another variable.\n\nThe name variable is already created. Now create a city variable with the name of your city, then print both — name first, then city.\n\nTwo variables, two Println calls, two lines of output.",
-    "hint": "city := \"Chicago\" goes on a new line after name. Then add fmt.Println(city) after fmt.Println(name).",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tname := \"Alex\"\n\t// TODO: create a variable called city with your city name\n\tfmt.Println(name)\n\t// TODO: print city\n}",
+    "title": "One box is not enough",
+    "instruction": "Your contacts app does not just store one phone number. It stores your mom, your best friend, your pizza place, your dentist — each one in their own labeled contact.\n\nVariables work the same way. You can have as many as you want. Each one gets its own label and holds its own value.\n\nThe name box already exists. Now let's add a city box:\n\n    city := \"Chicago\"\n\nThen print both, name first, then city. Two boxes, two Println calls, two lines of output.\n\nPut your actual city in there — nobody's judging!",
+    "hint": "Add city := \"YourCity\" below the name line. Then add fmt.Println(city) below fmt.Println(name). Each variable gets its own Println.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tname := \"Alex\"\n\t// TODO: create a variable called city with the name of your city\n\tfmt.Println(name)\n\t// TODO: print city\n}",
     "expectedOutput": ["Alex"],
     "codeChecks": [
       { "pattern": "city\\s*:=\\s*\"\\S+\"", "required": true, "message": "Create a city variable like this: city := \"Chicago\"" },
@@ -24,31 +24,31 @@
     ]
   },
   {
-    "title": "Use a variable three times",
-    "instruction": "Here is the power of variables. The program already creates a greeting variable. Your job is to print it three times in a row — three separate Println calls, all using the same variable.\n\nNo copying the text. Just use greeting three times.",
-    "hint": "Write fmt.Println(greeting) three times. Each call reads from the same variable.",
+    "title": "Write once, use anywhere",
+    "instruction": "Here is the real reason variables exist. Imagine you are sending the same greeting to 100 people. Without variables you would type the whole message 100 times. If you made a typo, you would fix it 100 times.\n\nWith a variable, you write it once. Use it everywhere. Fix it once if something changes.\n\nThe greeting box is already created below. Your job is to print it three times — three separate Println calls, all using the same variable name.\n\nDo NOT copy-paste the text. Use the variable each time. That is the whole point.",
+    "hint": "Write fmt.Println(greeting) three times, each on its own line. Go will open the box and read the value each time.",
     "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tgreeting := \"Hello from Go!\"\n\t// TODO: print greeting three times using three separate Println calls\n}",
     "expectedOutput": ["Hello from Go!", "Hello from Go!", "Hello from Go!"],
     "codeChecks": [
-      { "pattern": "Println\\(greeting\\)(?:.*\\n.*){0,4}Println\\(greeting\\)(?:.*\\n.*){0,4}Println\\(greeting\\)", "required": true, "flags": "s", "message": "Call fmt.Println(greeting) three separate times." },
+      { "pattern": "Println\\(greeting\\)(?:.*\\n.*){0,4}Println\\(greeting\\)(?:.*\\n.*){0,4}Println\\(greeting\\)", "required": true, "flags": "s", "message": "Call fmt.Println(greeting) three separate times, each on its own line." },
       { "pattern": "TODO", "required": false, "message": "Replace the TODO line with your actual code." }
     ]
   },
   {
-    "title": "Update a variable",
-    "instruction": "Variables can change. That is literally what the word variable means.\n\nWhen you first create it, you use :=\nWhen you update it, you use just =\n\nThe program creates a mood variable set to \"tired\". Your job is to update it to \"energized\" after the first print, then print it again. You should see tired first, then energized.",
-    "hint": "After the first fmt.Println(mood), write: mood = \"energized\"  — single = not :=  Then add another fmt.Println(mood) below that.",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tmood := \"tired\"\n\tfmt.Println(mood)\n\t// TODO: update mood to \"energized\" using =\n\t// TODO: print mood again\n}",
+    "title": "Boxes can be refilled",
+    "instruction": "What happens when your friend gets a new phone number? You do not throw away your contacts app and start fresh. You just tap Edit and type the new number. The label stays the same, the value inside changes.\n\nVariables work exactly like that. You can change what is inside the box at any time.\n\nBut here is the important rule:\n\n- := creates a new box  (use this only once, the first time)\n- = refills an existing box  (use this when you want to change the value)\n\nThe mood box below starts as \"tired\". Your job is to change it to \"energized\" after the first print, then print it again. You should see tired first, then energized.",
+    "hint": "After fmt.Println(mood), write: mood = \"energized\"  (single = only, not :=). Then write fmt.Println(mood) one more time below that.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tmood := \"tired\"\n\tfmt.Println(mood)\n\t// TODO: change mood to \"energized\" using =\n\t// TODO: print mood again\n}",
     "expectedOutput": ["tired", "energized"],
     "codeChecks": [
-      { "pattern": "mood\\s*=\\s*\"energized\"", "required": true, "message": "Update mood using a single = like this: mood = \"energized\"  — not :=" },
+      { "pattern": "mood\\s*=\\s*\"energized\"", "required": true, "message": "Change the value using a single = like this: mood = \"energized\"  — not := which would try to create a new box" },
       { "pattern": "TODO", "required": false, "message": "Replace the TODO lines with your actual code." }
     ]
   },
   {
-    "title": "Three variables, all yours",
-    "instruction": "You are killing it! Let's go from scratch.\n\nCreate three variables:\n- firstName with your first name\n- lastName with your last name\n- hometown with the city you are from\n\nThen print all three, one per line.",
-    "hint": "Three := lines, three Println lines. That is all you need.",
+    "title": "Build your own contact card",
+    "instruction": "Think of this as creating your own contact entry — the kind you would find in someone's phone.\n\nA contact has a first name, a last name, and a hometown. Three separate pieces of information. Three separate boxes.\n\nFrom scratch, create these three variables:\n- firstName — your first name\n- lastName — your last name\n- hometown — the city you are from\n\nThen print all three, one per line.\n\nYou are putting real information in here. firstName holds \"Alex\", not the word \"firstName\". Remember the difference!",
+    "hint": "Three lines with :=, then three lines with Println. Make sure the names match exactly: firstName, lastName, hometown.",
     "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\t// TODO: create firstName, lastName, and hometown\n\t// TODO: print all three\n}",
     "expectedOutput": [],
     "codeChecks": [
