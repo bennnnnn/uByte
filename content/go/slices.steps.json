@@ -1,72 +1,191 @@
 [
   {
-    "title": "The Problem with Arrays",
-    "instruction": "In Chapter 6, you stored students in a fixed 5-seat array. But what happens when a new student enrolls mid-semester? You can't add an 6th element to `[5]string` — the size is locked forever.\n\nThis is why **slices** exist. A slice is like an array, but it can **grow and shrink**. Compare the syntax:\n\n```go\n// Array — fixed size, never changes\nvar seats [5]string\n\n// Slice — flexible, can grow\nvar students []string\n```\n\nDeclare a slice named `students` and print it. You'll see `[]` — an empty slice.",
-    "hint": "var students []string — then fmt.Println(students). An empty slice prints as [].",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\t// TODO: declare students as an empty slice of strings\n\t// TODO: print students\n}",
-    "expectedOutput": ["[]"]
+    "title": "The problem with arrays",
+    "instruction": "Arrays are great when you know the size upfront. But what if you do not?\n\nYou are building a shopping cart. You have no idea how many items the user will add. You cannot write `[5]string` when it might be 2 items or 50.\n\nThis is exactly the problem slices solve. Run this and see what happens when you try to add a 4th item to a 3-slot array.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tcart := [3]string{\"Apples\", \"Bread\", \"Milk\"}\n\tcart[3] = \"Eggs\"\n\tfmt.Println(cart)\n}",
+    "expectedOutput": ["Apples", "Bread", "Milk", "Eggs"],
+    "codeChecks": [
+      { "pattern": "\\[3\\]string", "required": false, "message": "Change [3]string to []string to make it a slice instead of an array." }
+    ],
+    "successMessage": "Index out of range. The array refused. A slice would have handled that without complaint. That is why slices exist."
   },
   {
-    "title": "Start Enrollment — Create a Slice with Values",
-    "instruction": "Three students enrolled on the first day: Alice, Bob, and Carol. Create a slice with their names already inside:\n\n```go\nstudents := []string{\"Alice\", \"Bob\", \"Carol\"}\n```\n\nDeclare this slice and print it.",
-    "hint": "students := []string{\"Alice\", \"Bob\", \"Carol\"} — then fmt.Println(students).",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\t// TODO: declare students with Alice, Bob, Carol\n\t// TODO: print students\n}",
-    "expectedOutput": ["[Alice Bob Carol]"]
+    "title": "Declare an empty slice",
+    "instruction": "A slice looks almost identical to an array — but with no number in the brackets.\n\n`var names []string` — empty slice, ready to receive values.\n\nAn empty slice is not nil. It is just... empty. Length zero, waiting.\n\nRun this and see what an empty slice looks like when printed.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tvar names []string\n\tvar scores []int\n\tfmt.Println(names)\n\tfmt.Println(scores)\n\tfmt.Println(len(names))\n\tfmt.Println(len(scores))\n}",
+    "expectedOutput": ["[]", "[]", "0", "0"],
+    "successMessage": "Empty slices print as []. Length is 0. No panic, no error — just ready and waiting."
   },
   {
-    "title": "New Student Joins — append",
-    "instruction": "A fourth student, David, just enrolled. Use `append()` to add him to the slice:\n\n```go\nstudents = append(students, \"David\")\n```\n\n`append` creates a new, larger slice and returns it — that's why you assign the result back to `students`.\n\nAdd David to the slice and print it.",
-    "hint": "students = append(students, \"David\") — then fmt.Println(students). Don't forget to re-assign!",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tstudents := []string{\"Alice\", \"Bob\", \"Carol\"}\n\t// TODO: append \"David\" to students\n\tfmt.Println(students)\n}",
-    "expectedOutput": ["[Alice Bob Carol David]"]
+    "title": "make() — create a slice with a known size",
+    "instruction": "When you know how many slots you need upfront, use `make`.\n\n`make([]int, 5)` creates a slice of 5 integers, all set to zero.\n\nThis is more efficient than starting empty and appending one by one.\n\n`make([]string, 3)` creates 3 empty string slots.\n\nRun this. Then add a line that creates a `scores` slice of 4 ints using make and prints it.",
+    "hint": "scores := make([]int, 4)  then fmt.Println(scores)",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tnames := make([]string, 3)\n\tfmt.Println(names)\n\tfmt.Println(len(names))\n\t// TODO: create a scores slice of 4 ints using make\n\t// TODO: print scores\n}",
+    "expectedOutput": ["[ ]", "3", "[0 0 0 0]"],
+    "codeChecks": [
+      { "pattern": "make\\(\\[\\]int,\\s*4\\)", "required": true, "message": "Create a scores slice: scores := make([]int, 4)" },
+      { "pattern": "Println\\(scores\\)", "required": true, "message": "Print scores: fmt.Println(scores)" },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO lines with your code." }
+    ],
+    "successMessage": "make creates a slice with a set size, all values at their zero. Use it when you know the size. Use var when you do not."
   },
   {
-    "title": "How Many Are Enrolled? — len",
-    "instruction": "`len()` returns the number of elements in a slice. After David joins, there are 4 students. Print the count.\n\nThis is different from an array where you always know the size — with slices, you check at runtime.",
-    "hint": "fmt.Println(len(students)) — len works the same way as on arrays.",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tstudents := []string{\"Alice\", \"Bob\", \"Carol\", \"David\"}\n\t// TODO: print the number of students using len\n}",
-    "expectedOutput": ["4"]
+    "title": "Declare with values",
+    "instruction": "When you already have the values, declare and fill in one shot.\n\n`scores := []int{90, 85, 78}`\n\nNo size number needed — Go counts the values and sets the length automatically.\n\nCreate a `cities` slice with 4 city names and print it.",
+    "hint": "cities := []string{\"London\", \"Tokyo\", \"Cairo\", \"Sydney\"}  then fmt.Println(cities)",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tscores := []int{90, 85, 78}\n\tfmt.Println(scores)\n\t// TODO: create a cities slice with 4 city names\n\t// TODO: print cities\n}",
+    "expectedOutput": [],
+    "codeChecks": [
+      { "pattern": "cities\\s*:=\\s*\\[\\]string\\{", "required": true, "message": "Create a cities slice: cities := []string{\"...\", ...}" },
+      { "pattern": "Println\\(cities\\)", "required": true, "message": "Print it: fmt.Println(cities)" },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO lines with your code." }
+    ],
+    "successMessage": "[]type{values} — no size needed. Go counts for you."
   },
   {
-    "title": "First and Last Student",
-    "instruction": "Just like arrays (Chapter 6), slice elements are accessed by index starting at 0. The first element is `students[0]` and the last is `students[len(students)-1]`.\n\nPrint the **first** and **last** student on separate lines.",
-    "hint": "fmt.Println(students[0]) and fmt.Println(students[len(students)-1])",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tstudents := []string{\"Alice\", \"Bob\", \"Carol\", \"David\"}\n\t// TODO: print the first student\n\t// TODO: print the last student\n}",
-    "expectedOutput": ["Alice", "David"]
+    "title": "append — add to the end",
+    "instruction": "This is the most important slice operation.\n\n`append(slice, newValue)` returns a new slice with the value added.\n\nCritical rule: you must reassign the result back to the variable.\n\n`names = append(names, \"Alex\")` ✓\n`append(names, \"Alex\")` ✗ — the original is unchanged\n\nAdd three more fruits to the cart using append, one at a time. Print after each.",
+    "hint": "cart = append(cart, \"Eggs\")  then fmt.Println(cart). Repeat for two more.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tcart := []string{\"Apples\", \"Bread\", \"Milk\"}\n\tfmt.Println(cart)\n\t// TODO: append \"Eggs\", print\n\t// TODO: append \"Butter\", print\n\t// TODO: append \"Juice\", print\n}",
+    "expectedOutput": ["[Apples Bread Milk Eggs]", "[Apples Bread Milk Eggs Butter]", "[Apples Bread Milk Eggs Butter Juice]"],
+    "codeChecks": [
+      { "pattern": "cart\\s*=\\s*append\\(cart,\\s*\"Eggs\"\\)", "required": true, "message": "Append Eggs: cart = append(cart, \"Eggs\")" },
+      { "pattern": "cart\\s*=\\s*append\\(cart,\\s*\"Butter\"\\)", "required": true, "message": "Append Butter: cart = append(cart, \"Butter\")" },
+      { "pattern": "cart\\s*=\\s*append\\(cart,\\s*\"Juice\"\\)", "required": true, "message": "Append Juice: cart = append(cart, \"Juice\")" },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO lines with your append calls." }
+    ],
+    "successMessage": "append returns a new slice — always reassign. That is the one rule beginners forget."
   },
   {
-    "title": "Print Everyone — Loop a Slice",
-    "instruction": "Use `for range` to loop through a slice — it's cleaner than managing an index manually. The `range` keyword gives you both the index and the value:\n\n```go\nfor i, name := range students {\n    fmt.Println(i, name)\n}\n```\n\nLoop through `students` and print each name (without the index — use `_` to discard it).",
-    "hint": "for _, name := range students { fmt.Println(name) } — the _ means \"I don't need the index\".",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tstudents := []string{\"Alice\", \"Bob\", \"Carol\", \"David\"}\n\t// TODO: loop with range and print each student name\n}",
-    "expectedOutput": ["Alice", "Bob", "Carol", "David"]
+    "title": "len and cap",
+    "instruction": "Every slice has two numbers:\n\n- `len(s)` — how many items are currently in the slice\n- `cap(s)` — how much space Go has reserved in memory\n\nWhen you append and the slice runs out of capacity, Go automatically doubles the reserved space. You never manage this yourself — but understanding it explains why cap is sometimes bigger than len.\n\nRun this and watch len and cap change as you append.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\ts := []int{}\n\tfmt.Printf(\"len=%d cap=%d\\n\", len(s), cap(s))\n\ts = append(s, 1)\n\tfmt.Printf(\"len=%d cap=%d\\n\", len(s), cap(s))\n\ts = append(s, 2)\n\tfmt.Printf(\"len=%d cap=%d\\n\", len(s), cap(s))\n\ts = append(s, 3)\n\tfmt.Printf(\"len=%d cap=%d\\n\", len(s), cap(s))\n\ts = append(s, 4)\n\tfmt.Printf(\"len=%d cap=%d\\n\", len(s), cap(s))\n\ts = append(s, 5)\n\tfmt.Printf(\"len=%d cap=%d\\n\", len(s), cap(s))\n}",
+    "expectedOutput": ["len=0 cap=0", "len=1 cap=1", "len=2 cap=2", "len=3 cap=4", "len=4 cap=4", "len=5 cap=8"],
+    "successMessage": "When the slice fills up, Go doubles the capacity. len is what you have. cap is what Go reserved. You use len — Go manages cap."
   },
   {
-    "title": "Class Average — Slice of Scores",
-    "instruction": "Exam results are in. Use a `for range` loop to sum the scores and calculate the average.\n\nThis combines your loop skills (Chapter 5), division logic, and slices — three chapters working together!",
-    "hint": "for _, s := range scores { sum += s } — then average := sum / len(scores). Print average.",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tscores := []int{72, 88, 65, 91, 54}\n\tsum := 0\n\t// TODO: range loop to sum scores\n\taverage := sum / len(scores)\n\tfmt.Println(average)\n}",
-    "expectedOutput": ["74"]
+    "title": "Access and update by index",
+    "instruction": "Slices use the same index syntax as arrays. Zero-indexed. Read with `s[i]`. Write with `s[i] = value`.\n\nChange the score at index 2 from its current value to `100`, then print the whole slice.",
+    "hint": "scores[2] = 100  then fmt.Println(scores)",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tscores := []int{88, 92, 74, 85}\n\tfmt.Println(scores)\n\t// TODO: change scores[2] to 100\n\tfmt.Println(scores)\n}",
+    "expectedOutput": ["[88 92 74 85]", "[88 92 100 85]"],
+    "codeChecks": [
+      { "pattern": "scores\\[2\\]\\s*=\\s*100", "required": true, "message": "Update index 2: scores[2] = 100" },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your assignment." }
+    ],
+    "successMessage": "Reading and writing by index works exactly the same as arrays. The flexible part is the size — the access syntax is identical."
   },
   {
-    "title": "A Student Withdrew — Remove from Slice",
-    "instruction": "Bob (index 1) withdrew from the academy. To remove an element from a slice, you join the elements *before* it and *after* it together:\n\n```go\nstudents = append(students[:1], students[2:]...)\n```\n\n- `students[:1]` → everything before Bob\n- `students[2:]` → everything after Bob\n- `...` → spreads the second slice into individual arguments\n\nRemove Bob and print the updated slice.",
-    "hint": "students = append(students[:1], students[2:]...) — then fmt.Println(students).",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tstudents := []string{\"Alice\", \"Bob\", \"Carol\", \"David\"}\n\t// TODO: remove Bob (index 1) from the slice\n\tfmt.Println(students)\n}",
-    "expectedOutput": ["[Alice Carol David]"]
+    "title": "Loop with range",
+    "instruction": "Looping over a slice works exactly like looping over an array.\n\n`for i, v := range scores` gives you the index and value.\n`for _, v := range scores` gives you just the value.\n\nLoop through the scores and print each one formatted as `\"Score 1: 88\"` (use the index + 1 as the number).",
+    "hint": "for i, v := range scores { fmt.Printf(\"Score %d: %d\\n\", i+1, v) }",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tscores := []int{88, 92, 74, 85, 96}\n\t// TODO: loop and print \"Score 1: 88\", \"Score 2: 92\" etc.\n}",
+    "expectedOutput": ["Score 1: 88", "Score 2: 92", "Score 3: 74", "Score 4: 85", "Score 5: 96"],
+    "codeChecks": [
+      { "pattern": "range\\s+scores", "required": true, "message": "Use range to loop: for i, v := range scores" },
+      { "pattern": "i\\s*\\+\\s*1", "required": true, "message": "Use i+1 so the number starts at 1 not 0." },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your loop." }
+    ],
+    "successMessage": "Same range syntax as arrays. Slices and arrays are nearly identical to work with — slices just do not have a fixed size."
   },
   {
-    "title": "Top and Bottom Scores",
-    "instruction": "Find the highest and lowest scores in the class. Loop through `scores` and track both simultaneously — the same pattern from Chapter 6, but now on a slice with `range`.\n\nPrint the lowest score first, then the highest.",
-    "hint": "lowest := scores[0]; highest := scores[0]. Then for _, s := range scores: update both if needed. Print lowest, then highest.",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tscores := []int{72, 88, 65, 91, 54}\n\tlowest := scores[0]\n\thighest := scores[0]\n\t// TODO: loop with range and update lowest and highest\n\tfmt.Println(lowest)\n\tfmt.Println(highest)\n}",
-    "expectedOutput": ["54", "91"]
+    "title": "Slicing a slice",
+    "instruction": "You can cut out a portion of a slice using `[low:high]` syntax.\n\n`scores[1:3]` gives you elements at index 1 and 2 — the high end is exclusive.\n`scores[:2]` means from the start up to (not including) index 2.\n`scores[2:]` means from index 2 to the end.\n\nRun this. Then add a line that prints just the middle three elements.",
+    "hint": "fmt.Println(scores[1:4])  — index 1, 2, and 3.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tscores := []int{10, 20, 30, 40, 50}\n\tfmt.Println(scores[:2])\n\tfmt.Println(scores[3:])\n\t// TODO: print just the middle three elements (index 1, 2, 3)\n}",
+    "expectedOutput": ["[10 20]", "[40 50]", "[20 30 40]"],
+    "codeChecks": [
+      { "pattern": "scores\\[1:4\\]", "required": true, "message": "Print the middle three with scores[1:4] — index 1, 2, and 3." },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your slice expression." }
+    ],
+    "successMessage": "Low is inclusive, high is exclusive. scores[1:4] gives you indexes 1, 2, 3. That rule applies everywhere in Go."
   },
   {
-    "title": "Multiple Classes — Slice of Slices",
-    "instruction": "Riverside Academy has two classes. Each class has its own slice of scores. You can store slices *inside* a slice:\n\n```go\nclasses := [][]int{\n    {72, 88, 65},  // Class A\n    {91, 54, 77},  // Class B\n}\n```\n\nThe total across both classes is already declared as `total := 0`. Use a **nested** `range` loop to sum all scores across both classes and print the total.",
-    "hint": "for _, class := range classes { for _, score := range class { total += score } } — nested range loops.",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tclasses := [][]int{\n\t\t{72, 88, 65},\n\t\t{91, 54, 77},\n\t}\n\ttotal := 0\n\t// TODO: nested range loop to sum all scores\n\tfmt.Println(total)\n}",
-    "expectedOutput": ["447"]
+    "title": "copy() — the real duplicate",
+    "instruction": "Here is a trap that catches almost everyone.\n\n`b := a` does NOT copy a slice. Both `a` and `b` point to the same data. Change one, and you change both.\n\n`copy(dst, src)` creates a genuine separate copy.\n\nRun this and see the trap. Then fix it by replacing `b := a` with a proper copy.",
+    "hint": "b := make([]int, len(a))  then  copy(b, a)  — two lines replace the one assignment.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\ta := []int{1, 2, 3}\n\tb := a\n\tb[0] = 99\n\tfmt.Println(\"a:\", a)\n\tfmt.Println(\"b:\", b)\n}",
+    "expectedOutput": ["a: [1 2 3]", "b: [99 2 3]"],
+    "codeChecks": [
+      { "pattern": "make\\(\\[\\]int,\\s*len\\(a\\)\\)", "required": true, "message": "Create b with make: b := make([]int, len(a))" },
+      { "pattern": "copy\\(b,\\s*a\\)", "required": true, "message": "Copy a into b: copy(b, a)" }
+    ],
+    "successMessage": "b := a shares the data. copy() separates it. This is one of the most important things to understand about slices in Go."
+  },
+  {
+    "title": "Remove an element",
+    "instruction": "Go has no built-in remove function for slices. You build it yourself.\n\nTo remove the element at index `i`, stitch the slice back together without it:\n\n`s = append(s[:i], s[i+1:]...)`\n\nThe `...` spreads the second slice as individual arguments to append.\n\nRemove the element at index 2 from the names slice and print the result.",
+    "hint": "names = append(names[:2], names[3:]...)  — this removes index 2.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tnames := []string{\"Alex\", \"Sam\", \"Jordan\", \"Casey\", \"River\"}\n\tfmt.Println(names)\n\t// TODO: remove the element at index 2 (Jordan)\n\tfmt.Println(names)\n}",
+    "expectedOutput": ["[Alex Sam Jordan Casey River]", "[Alex Sam Casey River]"],
+    "codeChecks": [
+      { "pattern": "append\\(names\\[:2\\],\\s*names\\[3:\\]", "required": true, "message": "Use append to remove index 2: names = append(names[:2], names[3:]...)" },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your remove operation." }
+    ],
+    "successMessage": "Slice up to the element, then the rest. Stitch together with append. No built-in delete needed."
+  },
+  {
+    "title": "Slice of slices",
+    "instruction": "A slice can hold other slices. Each inner slice can be a different length — unlike a 2D array which must be rectangular.\n\nThis is useful for things like a table where rows have different numbers of columns.\n\nRun this. Then add a fourth row with just two subjects.",
+    "hint": "append the new row: subjects = append(subjects, []string{\"Math\", \"Science\"})",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tsubjects := [][]string{\n\t\t{\"Math\", \"Science\", \"English\"},\n\t\t{\"History\", \"Art\"},\n\t\t{\"PE\", \"Music\", \"Drama\", \"IT\"},\n\t}\n\t// TODO: append a new row with two subjects of your choice\n\tfor _, row := range subjects {\n\t\tfmt.Println(row)\n\t}\n}",
+    "expectedOutput": [],
+    "codeChecks": [
+      { "pattern": "append\\(subjects,\\s*\\[\\]string\\{", "required": true, "message": "Append a new row: subjects = append(subjects, []string{\"...\", \"...\"})" },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your append." }
+    ],
+    "successMessage": "Slices of slices are flexible — rows can be different lengths. That is the key difference from a 2D array."
+  },
+  {
+    "title": "Todo list — start",
+    "instruction": "Time to build something real.\n\nYou are building a todo list app. Start by creating a slice with three tasks and printing the list.",
+    "hint": "todos := []string{\"Buy groceries\", \"Reply to emails\", \"Go for a walk\"}  then fmt.Println(todos)",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\t// TODO: create a todos slice with 3 tasks\n\t// TODO: print the list\n}",
+    "expectedOutput": [],
+    "codeChecks": [
+      { "pattern": "todos\\s*:=\\s*\\[\\]string\\{", "required": true, "message": "Create a todos slice: todos := []string{\"task1\", \"task2\", \"task3\"}" },
+      { "pattern": "Println\\(todos\\)", "required": true, "message": "Print the list: fmt.Println(todos)" },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO lines with your code." }
+    ],
+    "successMessage": "Three tasks. The list exists. Now let's make it do something."
+  },
+  {
+    "title": "Todo list — add more tasks",
+    "instruction": "New tasks keep coming in.\n\nAppend two more tasks to your todo list. Print the list after each addition so you can see it grow.",
+    "hint": "todos = append(todos, \"Call the dentist\")  then fmt.Println(todos). Repeat for a second task.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\ttodos := []string{\"Buy groceries\", \"Reply to emails\", \"Go for a walk\"}\n\tfmt.Println(\"Starting list:\", todos)\n\t// TODO: append a 4th task and print\n\t// TODO: append a 5th task and print\n}",
+    "expectedOutput": [],
+    "codeChecks": [
+      { "pattern": "todos\\s*=\\s*append\\(todos,", "required": true, "message": "Use append to add a new task: todos = append(todos, \"your task\")" },
+      { "pattern": "(todos\\s*=\\s*append\\(todos,.*\\n.*){2}|(todos\\s*=\\s*append\\(todos,){2}", "required": true, "flags": "s", "message": "Add two new tasks using two separate append calls." },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO lines with your code." }
+    ],
+    "successMessage": "5 tasks now. Slices grow as your needs grow. No upfront size required."
+  },
+  {
+    "title": "Todo list — complete a task",
+    "instruction": "You finished \"Reply to emails\" — time to remove it from the list.\n\nIt is at index 1. Use the remove pattern to take it out and print the updated list.",
+    "hint": "todos = append(todos[:1], todos[2:]...)  removes index 1.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\ttodos := []string{\"Buy groceries\", \"Reply to emails\", \"Go for a walk\", \"Call the dentist\", \"Read a book\"}\n\tfmt.Println(\"Before:\", todos)\n\t// TODO: remove \"Reply to emails\" at index 1\n\tfmt.Println(\"After: \", todos)\n}",
+    "expectedOutput": ["Before: [Buy groceries Reply to emails Go for a walk Call the dentist Read a book]", "After:  [Buy groceries Go for a walk Call the dentist Read a book]"],
+    "codeChecks": [
+      { "pattern": "append\\(todos\\[:1\\],\\s*todos\\[2:\\]", "required": true, "message": "Remove index 1: todos = append(todos[:1], todos[2:]...)" },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your remove." }
+    ],
+    "successMessage": "Task done. Removed from the list. One item shorter, just like a real todo app."
+  },
+  {
+    "title": "Todo list — final list",
+    "instruction": "One new task just came in: \"Plan the weekend\".\n\nAppend it, then print the complete numbered list:\n```\n1. Buy groceries\n2. Go for a walk\n3. Call the dentist\n4. Read a book\n5. Plan the weekend\n```",
+    "hint": "todos = append(todos, \"Plan the weekend\")  then loop: for i, t := range todos { fmt.Printf(\"%d. %s\\n\", i+1, t) }",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\ttodos := []string{\"Buy groceries\", \"Go for a walk\", \"Call the dentist\", \"Read a book\"}\n\t// TODO: append \"Plan the weekend\"\n\t// TODO: print the numbered list using a range loop\n}",
+    "expectedOutput": ["1. Buy groceries", "2. Go for a walk", "3. Call the dentist", "4. Read a book", "5. Plan the weekend"],
+    "codeChecks": [
+      { "pattern": "append\\(todos,\\s*\"Plan the weekend\"\\)", "required": true, "message": "Append the new task: todos = append(todos, \"Plan the weekend\")" },
+      { "pattern": "range\\s+todos", "required": true, "message": "Use range to loop through todos." },
+      { "pattern": "i\\s*\\+\\s*1", "required": true, "message": "Use i+1 so the numbering starts at 1." },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO lines with your code." }
+    ],
+    "successMessage": "A working todo list. You created it, added to it, removed from it, added again, and printed it cleanly. That is a real feature."
   }
 ]
