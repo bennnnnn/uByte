@@ -7,41 +7,47 @@
     "expectedOutput": ["Hello, World!"]
   },
   {
-    "title": "Make it say your name",
-    "instruction": "Now let's make it personal. Change the message so the program says hello to you.\n\nIf your name is Jordan, it should print: Hello, Jordan!\n\nEverything between the quote marks is what gets printed. That's the only thing you need to change.",
-    "hint": "Find the part that says \"Hello, World!\" and replace World with your own name. Keep the quote marks on both sides.",
+    "title": "Make it personal",
+    "instruction": "\"Hello, World!\" is the traditional first program every programmer writes. But let's make it yours.\n\nChange the message so it says hello to you specifically. If your name is Jordan, make it print: Hello, Jordan!\n\nThe only thing you need to touch is the text between the quote marks.",
+    "hint": "Find the text that says Hello, World! — replace World with your own name. Keep the exclamation mark and keep the quotes on both sides.",
     "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tfmt.Println(\"Hello, World!\")\n}",
-    "expectedOutput": ["Hello,"]
+    "expectedOutput": ["Hello,"],
+    "codeChecks": [
+      { "pattern": "Println\\(\"Hello,(?!.*World)", "message": "Replace 'World' with your own name — the output should say Hello, [your name]!" }
+    ]
   },
   {
     "title": "Print two lines",
-    "instruction": "Each time you write fmt.Println, it prints one line and then moves to the next line automatically. Like pressing Enter after you type something.\n\nAdd a second fmt.Println below the first one. Make the first line say your name, and the second line say your hometown. They should print one after the other.",
-    "hint": "Copy the fmt.Println line and paste it right below. Then change the text inside the quotes for each one. Two lines of code, two lines of output.",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tfmt.Println(\"Your name here\")\n\t// Add a second Println below this line\n}",
-    "expectedOutput": []
+    "instruction": "Every fmt.Println call prints one line. Two calls means two lines of output.\n\nThe program below already prints the first line. Add a second fmt.Println below it that prints exactly this: Go is awesome!\n\nRun it and watch both lines appear in order.",
+    "hint": "Copy the existing fmt.Println line, paste it right below, and change the text inside the quotes to: Go is awesome!",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tfmt.Println(\"Hello, Go!\")\n\t// Add your second Println right here\n}",
+    "expectedOutput": ["Hello, Go!", "Go is awesome!"]
   },
   {
-    "title": "Introduce yourself",
-    "instruction": "Let's print a proper 3-line introduction. Print these three things, each on its own line:\n\nYour name\nYour age\nOne fun fact about yourself\n\nYou'll need three separate fmt.Println calls — one for each line.",
-    "hint": "You need three lines of code, each starting with fmt.Println. Put a different piece of information in each one. Something like: fmt.Println(\"My name is Sam\"), fmt.Println(\"I am 24\"), fmt.Println(\"I can juggle\").",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\t// Print your name, age, and a fun fact\n\t// Each on its own line\n}",
-    "expectedOutput": []
+    "title": "Three lines — a short intro",
+    "instruction": "Now write a 3-line program that introduces you. Print these three things exactly:\n\nLine 1: My name is [your name]\nLine 2: I am learning Go\nLine 3: Watch out, world!\n\nThree separate fmt.Println calls. Three separate lines of output.",
+    "hint": "You need three fmt.Println lines. The second and third lines must say exactly: I am learning Go and Watch out, world! — the first line can say anything with 'My name is' in it.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\t// Print your 3-line intro here\n}",
+    "expectedOutput": ["I am learning Go", "Watch out, world!"],
+    "codeChecks": [
+      { "pattern": "My name is", "message": "The first line should say My name is [your name]" }
+    ]
   },
   {
     "title": "Leave a comment",
-    "instruction": "Comments are notes you leave in your code for yourself or other people. The computer ignores them completely — they're just for humans.\n\nA comment starts with two forward slashes: //\n\nAdd a comment above each fmt.Println explaining what it prints. The program should still produce the same output — comments don't affect what runs.",
-    "hint": "A comment looks like this: // This line prints my name. Place it on the line directly above the Println it describes. You should end up with three comments and three Println calls.",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tfmt.Println(\"My name is Alex\")\n\tfmt.Println(\"I am 22 years old\")\n\tfmt.Println(\"I enjoy hiking\")\n}",
-    "expectedOutput": ["My name is Alex", "I am 22 years old", "I enjoy hiking"],
+    "instruction": "A comment is a note you leave in your code. It starts with // and the computer ignores it completely — it's purely for humans reading the code.\n\nThis program has three Println calls. Add a comment above each one explaining what it prints. The output should stay exactly the same — comments don't change what runs.",
+    "hint": "A comment looks like this: // This prints a greeting. Put it on the line directly above the Println it describes. You'll add three comments total.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tfmt.Println(\"Riverside Academy\")\n\tfmt.Println(\"Student Tracker\")\n\tfmt.Println(\"Version 1.0\")\n}",
+    "expectedOutput": ["Riverside Academy", "Student Tracker", "Version 1.0"],
     "codeChecks": [
       { "pattern": "^\\s*//", "message": "Add at least one comment — a line that starts with //" }
     ]
   },
   {
-    "title": "Fix the broken program",
-    "instruction": "Something is wrong with this program. It won't run. Your job is to figure out what's broken and fix it.\n\nThis is an important skill — reading error messages and finding bugs. Every programmer does this constantly. Don't panic when you see an error. Read it, look at your code, and find the mismatch.\n\nHint: Go is very picky about quote marks and capitalization.",
-    "hint": "Look carefully at the Println calls. One of them has a problem with the quote marks, and one has a capitalization issue. Fix both and the program will run.",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tfmt.Println(\"This line is fine\")\n\tfmt.println(\"this line has a capital letter problem\")\n\tfmt.Println(\"this line has a missing quote)\n}",
-    "expectedOutput": ["This line is fine", "this line has a capital letter problem", "this line has a missing quote"]
+    "title": "Find and fix the bugs",
+    "instruction": "This program has two bugs. It won't run until you fix both of them.\n\nThis is what programmers call debugging — finding and fixing mistakes. Every programmer does this every single day. Don't be discouraged when you see errors, they're just the computer telling you where to look.\n\nHint: Go is very picky about capital letters. And every opening quote mark needs a closing one.",
+    "hint": "Bug 1: fmt.println should be fmt.Println — the P must be uppercase. Bug 2: the last Println is missing a closing quote mark before the closing parenthesis.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tfmt.Println(\"The first line is fine\")\n\tfmt.println(\"This line has a capital letter problem\")\n\tfmt.Println(\"This line is missing a closing quote)\n}",
+    "expectedOutput": ["The first line is fine", "This line has a capital letter problem", "This line is missing a closing quote"]
   }
 ]
