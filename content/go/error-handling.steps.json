@@ -1,48 +1,151 @@
 [
   {
-    "title": "Return an Error",
-    "instruction": "Define divide(a, b float64) (float64, error). When b is zero return 0 and fmt.Errorf(\"cannot divide by zero\"). Otherwise return result and nil.",
-    "hint": "if b == 0 { return 0, fmt.Errorf(\"cannot divide by zero\") }; return a / b, nil",
-    "starter": "package main\n\nimport \"fmt\"\n\n// TODO: define divide(a, b float64) (float64, error)\n\nfunc main() {\n\t_, err := divide(10, 0)\n\tfmt.Println(err)\n}",
-    "expectedOutput": [
-      "cannot divide by zero"
-    ]
+    "title": "What is an error in Go",
+    "instruction": "In Go, `error` is a built-in type. It is actually an interface with one method: `Error() string`.\n\nWhen a function can fail, it returns an error as its last return value. If everything went fine, it returns `nil` — Go's way of saying \"no error here\".\n\nRun this. `strconv.Atoi` converts a string to an integer. It returns both a result and an error.",
+    "starter": "package main\n\nimport (\n\t\"fmt\"\n\t\"strconv\"\n)\n\nfunc main() {\n\tn, err := strconv.Atoi(\"42\")\n\tfmt.Println(n, err)\n\n\tm, err := strconv.Atoi(\"hello\")\n\tfmt.Println(m, err)\n}",
+    "expectedOutput": ["42 <nil>", "0 strconv.Atoi: parsing \"hello\": invalid syntax"],
+    "successMessage": "nil means no error. A non-nil error means something went wrong. Two return values, always. That is Go's error contract."
   },
   {
-    "title": "Check an Error",
-    "instruction": "Call divide(10, 0) and divide(10, 2). For zero case print the error; for success print \"success:\" and result.",
-    "hint": "if err != nil { fmt.Println(\"Error:\", err) }; fmt.Println(\"success:\", result)",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc divide(a, b float64) (float64, error) {\n\tif b == 0 { return 0, fmt.Errorf(\"cannot divide by zero\") }\n\treturn a / b, nil\n}\n\nfunc main() {\n\t// TODO: call divide(10, 0), check err, print error\n\t// TODO: call divide(10, 2), print \"success:\" and result\n}",
-    "expectedOutput": [
-      "Error:",
-      "success: 5"
-    ]
+    "title": "Checking an error — if err != nil",
+    "instruction": "The most common pattern in all of Go:\n\n```\nresult, err := someFunction()\nif err != nil {\n    fmt.Println(\"Error:\", err)\n    return\n}\n// safe to use result here\n```\n\nAdd a check: if `strconv.Atoi` returns an error, print `\"Could not convert:\"` and the error. Otherwise print `\"Result:\"` and the number. Test with both `\"100\"` and `\"abc\"`.",
+    "hint": "if err != nil { fmt.Println(\"Could not convert:\", err); return }  fmt.Println(\"Result:\", n)",
+    "starter": "package main\n\nimport (\n\t\"fmt\"\n\t\"strconv\"\n)\n\nfunc convert(s string) {\n\tn, err := strconv.Atoi(s)\n\t// TODO: if err != nil, print \"Could not convert:\" and err, then return\n\t// TODO: otherwise print \"Result:\" and n\n}\n\nfunc main() {\n\tconvert(\"100\")\n\tconvert(\"abc\")\n}",
+    "expectedOutput": ["Result: 100", "Could not convert: strconv.Atoi: parsing \"abc\": invalid syntax"],
+    "codeChecks": [
+      { "pattern": "err\\s*!=\\s*nil", "required": true, "message": "Check the error: if err != nil { ... }" },
+      { "pattern": "Could not convert", "required": true, "message": "Print \"Could not convert:\" when err != nil." },
+      { "pattern": "Result:", "required": true, "message": "Print \"Result:\" and n when there is no error." },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comments with your code." }
+    ],
+    "successMessage": "if err != nil — you will type this hundreds of times in your Go career. It becomes muscle memory. And it means you never accidentally ignore a failure."
   },
   {
-    "title": "Custom Error Type",
-    "instruction": "Define ValidationError struct with Field string and Error() string returning \"ValidationError: \" + e.Field. Return one from validate(\"\") and print it.",
-    "hint": "func (e ValidationError) Error() string { return \"ValidationError: \" + e.Field }",
-    "starter": "package main\n\nimport \"fmt\"\n\n// TODO: define ValidationError with Field and Error() method\n\nfunc validate(name string) error {\n\tif name == \"\" { return ValidationError{Field: \"name\"} }\n\treturn nil\n}\n\nfunc main() {\n\terr := validate(\"\")\n\tfmt.Println(err)\n}",
-    "expectedOutput": [
-      "ValidationError"
-    ]
+    "title": "errors.New() — create your own error",
+    "instruction": "You can create your own error values using `errors.New()`:\n\n`return 0, errors.New(\"cannot divide by zero\")`\n\nThe `errors` package is part of the standard library.\n\nAdd an error case to `divide`: if `b == 0`, return `0` and a new error `\"cannot divide by zero\"`. Otherwise return the result and `nil`.",
+    "hint": "import \"errors\"  then: if b == 0 { return 0, errors.New(\"cannot divide by zero\") }  return a / b, nil",
+    "starter": "package main\n\nimport (\n\t\"errors\"\n\t\"fmt\"\n)\n\nfunc divide(a, b float64) (float64, error) {\n\t// TODO: if b == 0, return 0 and errors.New(\"cannot divide by zero\")\n\t// TODO: otherwise return a/b and nil\n}\n\nfunc main() {\n\tresult, err := divide(10, 2)\n\tif err != nil {\n\t\tfmt.Println(\"Error:\", err)\n\t} else {\n\t\tfmt.Println(result)\n\t}\n\n\t_, err = divide(10, 0)\n\tif err != nil {\n\t\tfmt.Println(\"Error:\", err)\n\t}\n}",
+    "expectedOutput": ["5", "Error: cannot divide by zero"],
+    "codeChecks": [
+      { "pattern": "errors\\.New\\(", "required": true, "message": "Use errors.New() to create the error." },
+      { "pattern": "cannot divide by zero", "required": true, "message": "The error message should be \"cannot divide by zero\"." },
+      { "pattern": "return a / b,\\s*nil", "required": true, "message": "Return a/b and nil when b is not zero." },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comments with your code." }
+    ],
+    "successMessage": "Your own error, your own message. errors.New is the simplest way to create an error. Clean, readable, no setup required."
   },
   {
-    "title": "Wrap Errors with %w",
-    "instruction": "Create base error, wrap with fmt.Errorf(\"wrapped: %w\", base), then print the wrapped error.",
-    "hint": "wrapped := fmt.Errorf(\"wrapped: %w\", base); fmt.Println(wrapped)",
-    "starter": "package main\n\nimport ( \"errors\"; \"fmt\" )\n\nfunc main() {\n\tbase := errors.New(\"connection refused\")\n\t// TODO: wrap base with fmt.Errorf and print\n\t_ = base\n}",
-    "expectedOutput": [
-      "wrapped:"
-    ]
+    "title": "fmt.Errorf() — errors with context",
+    "instruction": "`fmt.Errorf` creates an error with a formatted message — like `fmt.Sprintf` but returns an `error`.\n\n`return fmt.Errorf(\"age %d is invalid: must be between 0 and 120\", age)`\n\nThis lets you include the actual bad value in the error message, which makes debugging much easier.\n\nAdd the error case: if `age < 0` or `age > 120`, return a formatted error. Otherwise return `nil`.",
+    "hint": "if age < 0 || age > 120 { return fmt.Errorf(\"invalid age %d: must be between 0 and 120\", age) }  return nil",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc validateAge(age int) error {\n\t// TODO: if age < 0 or age > 120, return fmt.Errorf with the age in the message\n\t// TODO: otherwise return nil\n}\n\nfunc main() {\n\tif err := validateAge(25); err != nil {\n\t\tfmt.Println(err)\n\t} else {\n\t\tfmt.Println(\"Age is valid\")\n\t}\n\n\tif err := validateAge(200); err != nil {\n\t\tfmt.Println(err)\n\t}\n}",
+    "expectedOutput": ["Age is valid", "invalid age 200: must be between 0 and 120"],
+    "codeChecks": [
+      { "pattern": "fmt\\.Errorf\\(", "required": true, "message": "Use fmt.Errorf() to create the error with the age value." },
+      { "pattern": "%d", "required": true, "message": "Include the age value in the error message using %d." },
+      { "pattern": "return nil", "required": true, "message": "Return nil when the age is valid." },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comments with your code." }
+    ],
+    "successMessage": "\"invalid age 200\" — the bad value is right there in the error. This is how professional Go code reports errors. Always include context."
   },
   {
-    "title": "errors.Is",
-    "instruction": "Create ErrNotFound, wrap with fmt.Errorf, use errors.Is to check wrapped contains ErrNotFound and print true.",
-    "hint": "fmt.Println(errors.Is(wrapped, ErrNotFound))",
-    "starter": "package main\n\nimport ( \"errors\"; \"fmt\" )\n\nvar ErrNotFound = errors.New(\"not found\")\n\nfunc main() {\n\twrapped := fmt.Errorf(\"db: %w\", ErrNotFound)\n\t// TODO: use errors.Is and print true/false\n\t_ = wrapped\n}",
-    "expectedOutput": [
-      "true"
-    ]
+    "title": "Ignoring errors — the dangerous shortcut",
+    "instruction": "You can ignore the error return value with `_`. Go will not stop you.\n\n```\nn, _ := strconv.Atoi(input)  // silently ignores any error\n```\n\nThis is the most common source of subtle bugs in Go. If the conversion fails, `n` will be `0` — and you will never know why.\n\nRun this. Both inputs are processed — but the broken one silently produces 0. Then fix it by printing a message when the error is not nil.",
+    "hint": "Change n, _ := to n, err :=  then add: if err != nil { fmt.Println(\"skipping invalid input:\", s); continue }",
+    "starter": "package main\n\nimport (\n\t\"fmt\"\n\t\"strconv\"\n)\n\nfunc main() {\n\tinputs := []string{\"10\", \"twenty\", \"30\"}\n\ttotal := 0\n\n\tfor _, s := range inputs {\n\t\t// BUG: error is ignored — fix it\n\t\tn, _ := strconv.Atoi(s)\n\t\ttotal += n\n\t}\n\n\tfmt.Println(\"Total:\", total)\n}",
+    "expectedOutput": ["skipping invalid input: twenty", "Total: 40"],
+    "codeChecks": [
+      { "pattern": "err\\s*!=\\s*nil", "required": true, "message": "Check the error instead of ignoring it with _." },
+      { "pattern": "skipping invalid input", "required": true, "message": "Print a message when an invalid input is found." }
+    ],
+    "successMessage": "Total is 40 — 10 + 30, correctly skipping \"twenty\" with a visible message. Never ignore errors silently. Always handle or at least log them."
+  },
+  {
+    "title": "Multiple error checks in one function",
+    "instruction": "A function can have multiple failure points. Check each one and return the first error you find.\n\n`validateUser` below checks three things: name, age, email. Fill in the missing checks.",
+    "hint": "if name == \"\" { return errors.New(\"name cannot be empty\") }  if age < 18 { return fmt.Errorf(\"age %d is too young: must be 18+\", age) }",
+    "starter": "package main\n\nimport (\n\t\"errors\"\n\t\"fmt\"\n)\n\nfunc validateUser(name string, age int, email string) error {\n\t// TODO: if name is empty, return errors.New(\"name cannot be empty\")\n\t// TODO: if age < 18, return fmt.Errorf with the age in the message\n\tif email == \"\" {\n\t\treturn errors.New(\"email cannot be empty\")\n\t}\n\treturn nil\n}\n\nfunc main() {\n\tcheck := func(err error) {\n\t\tif err != nil {\n\t\t\tfmt.Println(\"Invalid:\", err)\n\t\t} else {\n\t\t\tfmt.Println(\"Valid\")\n\t\t}\n\t}\n\n\tcheck(validateUser(\"\", 25, \"a@b.com\"))\n\tcheck(validateUser(\"Alex\", 15, \"a@b.com\"))\n\tcheck(validateUser(\"Alex\", 25, \"\"))\n\tcheck(validateUser(\"Alex\", 25, \"a@b.com\"))\n}",
+    "expectedOutput": ["Invalid: name cannot be empty", "Invalid: age 15 is too young: must be 18+", "Invalid: email cannot be empty", "Valid"],
+    "codeChecks": [
+      { "pattern": "name\\s*==\\s*\"\"", "required": true, "message": "Check if name is empty." },
+      { "pattern": "age\\s*<\\s*18", "required": true, "message": "Check if age is under 18." },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comments with your checks." }
+    ],
+    "successMessage": "Four tests, four different outcomes. Each check returns early on the first failure. This is the standard Go validation pattern — return the first error found."
+  },
+  {
+    "title": "Custom error types",
+    "instruction": "Sometimes you need more than a message. You want a structured error you can inspect programmatically.\n\nCreate a custom error type by defining a struct with an `Error() string` method:\n\n```\ntype ValidationError struct {\n    Field   string\n    Message string\n}\n\nfunc (e ValidationError) Error() string {\n    return fmt.Sprintf(\"%s: %s\", e.Field, e.Message)\n}\n```\n\nRun this and see the custom error printed. Then add a second return that returns a `ValidationError` for the `\"email\"` field.",
+    "hint": "return ValidationError{Field: \"email\", Message: \"cannot be empty\"}",
+    "starter": "package main\n\nimport \"fmt\"\n\ntype ValidationError struct {\n\tField   string\n\tMessage string\n}\n\nfunc (e ValidationError) Error() string {\n\treturn fmt.Sprintf(\"%s: %s\", e.Field, e.Message)\n}\n\nfunc validate(name, email string) error {\n\tif name == \"\" {\n\t\treturn ValidationError{Field: \"name\", Message: \"cannot be empty\"}\n\t}\n\t// TODO: return a ValidationError for email if it is empty\n\treturn nil\n}\n\nfunc main() {\n\tfmt.Println(validate(\"\", \"a@b.com\"))\n\tfmt.Println(validate(\"Alex\", \"\"))\n\tfmt.Println(validate(\"Alex\", \"a@b.com\"))\n}",
+    "expectedOutput": ["name: cannot be empty", "email: cannot be empty", "<nil>"],
+    "codeChecks": [
+      { "pattern": "ValidationError\\{Field:\\s*\"email\"", "required": true, "message": "Return a ValidationError with Field: \"email\"." },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
+    ],
+    "successMessage": "Structured errors with fields you can read programmatically. Not just a message — a type. Next step: check which type of error you got."
+  },
+  {
+    "title": "errors.Is() — identify a specific error",
+    "instruction": "When a function can return different errors, you sometimes need to know which one you got.\n\n`errors.Is(err, ErrNotFound)` checks if `err` matches a specific sentinel error.\n\nA sentinel error is a package-level variable: `var ErrNotFound = errors.New(\"not found\")`\n\nRun this. Then add a check for `ErrUnauthorized` and print a different message for it.",
+    "hint": "} else if errors.Is(err, ErrUnauthorized) { fmt.Println(\"Access denied — please log in\") }",
+    "starter": "package main\n\nimport (\n\t\"errors\"\n\t\"fmt\"\n)\n\nvar ErrNotFound = errors.New(\"not found\")\nvar ErrUnauthorized = errors.New(\"unauthorized\")\n\nfunc getUser(id int) (string, error) {\n\tif id == 0 {\n\t\treturn \"\", ErrNotFound\n\t}\n\tif id < 0 {\n\t\treturn \"\", ErrUnauthorized\n\t}\n\treturn \"Alex\", nil\n}\n\nfunc main() {\n\tids := []int{1, 0, -1}\n\tfor _, id := range ids {\n\t\tname, err := getUser(id)\n\t\tif err == nil {\n\t\t\tfmt.Println(\"Found:\", name)\n\t\t} else if errors.Is(err, ErrNotFound) {\n\t\t\tfmt.Println(\"User not found\")\n\t\t\t// TODO: add check for ErrUnauthorized\n\t\t} else {\n\t\t\tfmt.Println(\"Unknown error:\", err)\n\t\t}\n\t}\n}",
+    "expectedOutput": ["Found: Alex", "User not found", "Access denied — please log in"],
+    "codeChecks": [
+      { "pattern": "errors\\.Is\\(err,\\s*ErrUnauthorized\\)", "required": true, "message": "Use errors.Is(err, ErrUnauthorized) to check for the unauthorized error." },
+      { "pattern": "Access denied", "required": true, "message": "Print \"Access denied — please log in\" for the unauthorized case." },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your check." }
+    ],
+    "successMessage": "Three IDs, three outcomes, zero crashes. errors.Is lets you handle each failure case differently without string comparison. This is the right way to check for specific errors."
+  },
+  {
+    "title": "errors.As() — extract the error type",
+    "instruction": "`errors.As` checks if an error is a specific type and extracts it so you can read its fields.\n\n```\nvar ve ValidationError\nif errors.As(err, &ve) {\n    fmt.Println(\"Field with problem:\", ve.Field)\n}\n```\n\nRun this. The error message alone tells you something went wrong. `errors.As` tells you exactly which field failed.",
+    "starter": "package main\n\nimport (\n\t\"errors\"\n\t\"fmt\"\n)\n\ntype ValidationError struct {\n\tField   string\n\tMessage string\n}\n\nfunc (e ValidationError) Error() string {\n\treturn fmt.Sprintf(\"%s: %s\", e.Field, e.Message)\n}\n\nfunc validateAge(age int) error {\n\tif age < 0 || age > 120 {\n\t\treturn ValidationError{Field: \"age\", Message: fmt.Sprintf(\"%d is out of range\", age)}\n\t}\n\treturn nil\n}\n\nfunc main() {\n\terr := validateAge(200)\n\tif err != nil {\n\t\tfmt.Println(\"Error:\", err)\n\n\t\tvar ve ValidationError\n\t\tif errors.As(err, &ve) {\n\t\t\tfmt.Println(\"Problem field:\", ve.Field)\n\t\t\tfmt.Println(\"Details:\", ve.Message)\n\t\t}\n\t}\n}",
+    "expectedOutput": ["Error: age: 200 is out of range", "Problem field: age", "Details: 200 is out of range"],
+    "successMessage": "errors.As extracted the full ValidationError — field name, message, everything. This is how you build rich error handling that does more than just print a string."
+  },
+  {
+    "title": "Wrapping errors — add context without losing the original",
+    "instruction": "When your function calls another function that fails, wrap the error to add context:\n\n`return fmt.Errorf(\"createUser: %w\", err)`\n\nThe `%w` verb wraps the original error. The caller gets the full context. `errors.Is` and `errors.As` still work through the wrap.\n\nRun this and see how the error grows as it travels up the call stack.",
+    "starter": "package main\n\nimport (\n\t\"errors\"\n\t\"fmt\"\n)\n\nvar ErrDatabase = errors.New(\"database connection failed\")\n\nfunc queryDB() error {\n\treturn ErrDatabase\n}\n\nfunc getUser(id int) error {\n\tif err := queryDB(); err != nil {\n\t\treturn fmt.Errorf(\"getUser(%d): %w\", id, err)\n\t}\n\treturn nil\n}\n\nfunc handleRequest() error {\n\tif err := getUser(42); err != nil {\n\t\treturn fmt.Errorf(\"handleRequest: %w\", err)\n\t}\n\treturn nil\n}\n\nfunc main() {\n\terr := handleRequest()\n\tfmt.Println(err)\n\tfmt.Println(\"Is ErrDatabase?\", errors.Is(err, ErrDatabase))\n}",
+    "expectedOutput": ["handleRequest: getUser(42): database connection failed", "Is ErrDatabase? true"],
+    "successMessage": "The error message shows the full journey: handleRequest → getUser(42) → database connection failed. errors.Is still finds ErrDatabase through all the wrapping. Context without losing the original."
+  },
+  {
+    "title": "panic and recover",
+    "instruction": "`panic` stops normal execution immediately. Use it only for truly unrecoverable situations — programming bugs, impossible states.\n\n`recover` catches a panic inside a deferred function. It is Go's equivalent of a last-chance safety net.\n\nRun this. The `safeDiv` function uses `defer` + `recover` to catch the panic and return 0 instead of crashing.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc safeDiv(a, b int) (result int) {\n\tdefer func() {\n\t\tif r := recover(); r != nil {\n\t\t\tfmt.Println(\"Recovered from panic:\", r)\n\t\t\tresult = 0\n\t\t}\n\t}()\n\treturn a / b\n}\n\nfunc main() {\n\tfmt.Println(safeDiv(10, 2))\n\tfmt.Println(safeDiv(10, 0))\n\tfmt.Println(safeDiv(20, 4))\n}",
+    "expectedOutput": ["5", "Recovered from panic: runtime error: integer divide by zero", "0", "5"],
+    "successMessage": "The program did not crash. recover caught the panic, printed the message, and returned 0. Use panic+recover sparingly — for most errors, return an error value instead."
+  },
+  {
+    "title": "Fix the broken error check",
+    "instruction": "This program is supposed to read a number and double it. But it ignores the error — so when the input is invalid it silently doubles 0 and nobody knows why.\n\nFix it: check the error from `strconv.Atoi`. If there is an error, print `\"Invalid input:\"` and the error, then return. Otherwise print `\"Double:\"` and the result.",
+    "hint": "Change n, _ := strconv.Atoi(input) to n, err := strconv.Atoi(input) then add if err != nil { ... }",
+    "starter": "package main\n\nimport (\n\t\"fmt\"\n\t\"strconv\"\n)\n\nfunc doubleInput(input string) {\n\t// BUG: error is ignored\n\tn, _ := strconv.Atoi(input)\n\tfmt.Println(\"Double:\", n*2)\n}\n\nfunc main() {\n\tdoubleInput(\"21\")\n\tdoubleInput(\"abc\")\n}",
+    "expectedOutput": ["Double: 42", "Invalid input: strconv.Atoi: parsing \"abc\": invalid syntax"],
+    "codeChecks": [
+      { "pattern": "n,\\s*err\\s*:=\\s*strconv\\.Atoi", "required": true, "message": "Capture the error: n, err := strconv.Atoi(input)" },
+      { "pattern": "err\\s*!=\\s*nil", "required": true, "message": "Check the error: if err != nil { ... }" },
+      { "pattern": "Invalid input", "required": true, "message": "Print \"Invalid input:\" when the error is not nil." }
+    ],
+    "successMessage": "42 for valid input, a clear error message for invalid. No silent failures. This is the difference between code that is easy to debug and code that drives you crazy at 2am."
+  },
+  {
+    "title": "Build a user validator",
+    "instruction": "No starter code.\n\nBuild a user validator with a custom error type:\n\n1. Define `ValidationError` with `Field` and `Message` string fields and an `Error() string` method\n2. Write `validateUser(name, email string, age int) error` that checks:\n   - `name` is not empty → `ValidationError{Field: \"name\", Message: \"cannot be empty\"}`\n   - `age` is between 18 and 120 → `ValidationError{Field: \"age\", Message: \"must be between 18 and 120\"}`\n   - `email` contains `@` → `ValidationError{Field: \"email\", Message: \"must contain @\"}`\n3. Test with four users — one valid, three each with a different broken field\n\nExpected output:\n```\nname: cannot be empty\nage: must be between 18 and 120\nemail: must contain @\nAlex is valid\n```",
+    "hint": "Use strings.Contains(email, \"@\") to check the email. Import \"strings\".",
+    "starter": "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n)\n\n// Build your validator here\n\nfunc main() {\n}",
+    "expectedOutput": ["name: cannot be empty", "age: must be between 18 and 120", "email: must contain @", "Alex is valid"],
+    "codeChecks": [
+      { "pattern": "type\\s+ValidationError\\s+struct", "required": true, "message": "Define a ValidationError struct." },
+      { "pattern": "func\\s*\\(\\s*\\w+\\s+ValidationError\\s*\\)\\s*Error\\s*\\(\\s*\\)\\s*string", "required": true, "message": "Add Error() string method to ValidationError." },
+      { "pattern": "func\\s+validateUser\\s*\\(", "required": true, "message": "Define the validateUser function." },
+      { "pattern": "name\\s*==\\s*\"\"", "required": true, "message": "Check that name is not empty." },
+      { "pattern": "age\\s*<\\s*18|age\\s*>\\s*120", "required": true, "message": "Check that age is between 18 and 120." },
+      { "pattern": "strings\\.Contains\\s*\\(.*email.*\"@\"\\)|strings\\.Contains\\s*\\(.*\"@\".*email\\)", "required": true, "message": "Check that email contains @ using strings.Contains." }
+    ],
+    "successMessage": "A real validator with structured errors. You built it from scratch — custom type, method, three checks, four tests. This exact pattern runs inside production APIs every day."
   }
 ]
