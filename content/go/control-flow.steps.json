@@ -1,51 +1,116 @@
 [
   {
-    "title": "Did Alice Pass? — if Statement",
-    "instruction": "In Chapter 2, you stored Alice's score (`83`). In Chapter 3, you formatted it nicely. Now let's **decide** something with it.\n\nAn `if` block runs only when a condition is true. The minimum passing score at Riverside Academy is `60`.\n\nWrite an `if` that prints `\"Pass\"` if `score` is 60 or higher.",
-    "hint": "if score >= 60 { fmt.Println(\"Pass\") }",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tscore := 83\n\t// TODO: if score >= 60, print \"Pass\"\n\t_ = score\n}",
-    "expectedOutput": ["Pass"]
+    "title": "Your first decision",
+    "instruction": "Imagine a bouncer at a club. They check your age. If you are old enough — you get in. If not — you don't.\n\nThat is an `if` statement. It runs a block of code only when a condition is true.\n\n```\nif age >= 18 {\n    fmt.Println(\"Welcome in\")\n}\n```\n\nRun this. Then change the age to 15 and run it again. Notice what changes.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tage := 20\n\tif age >= 18 {\n\t\tfmt.Println(\"Welcome in\")\n\t}\n\tfmt.Println(\"Done\")\n}",
+    "expectedOutput": ["Welcome in", "Done"],
+    "successMessage": "When the condition is true, the code inside runs. When it's false, Go skips it completely. That is all an if statement does."
   },
   {
-    "title": "Pass or Fail — if-else",
-    "instruction": "What if a student *didn't* pass? An `if-else` handles both cases — one block runs when the condition is true, the other when it's false.\n\nBob scored `54`. Print `\"Pass\"` if his score is 60 or higher, otherwise print `\"Fail\"`.",
-    "hint": "if score >= 60 { fmt.Println(\"Pass\") } else { fmt.Println(\"Fail\") }",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tscore := 54\n\t// TODO: print \"Pass\" if score >= 60, else \"Fail\"\n\t_ = score\n}",
-    "expectedOutput": ["Fail"]
+    "title": "Comparison operators",
+    "instruction": "The condition inside an `if` uses comparison operators to check relationships between values.\n\n- `==` equal to\n- `!=` not equal to\n- `<`  less than\n- `>`  greater than\n- `<=` less than or equal to\n- `>=` greater than or equal to\n\nRun this. Then change `score` to different values and see which lines print.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tscore := 75\n\tif score == 100 {\n\t\tfmt.Println(\"Perfect score\")\n\t}\n\tif score != 0 {\n\t\tfmt.Println(\"At least you tried\")\n\t}\n\tif score >= 50 {\n\t\tfmt.Println(\"You passed\")\n\t}\n\tif score < 30 {\n\t\tfmt.Println(\"Need more practice\")\n\t}\n}",
+    "expectedOutput": ["At least you tried", "You passed"],
+    "successMessage": "Six operators. Every condition you will ever write uses at least one of them."
   },
   {
-    "title": "Letter Grade — else if Chain",
-    "instruction": "The academy awards letter grades based on score:\n- 90–100 → `\"A\"`\n- 80–89 → `\"B\"`\n- 70–79 → `\"C\"`\n- 60–69 → `\"D\"`\n- below 60 → `\"F\"`\n\nAlice scored `83`. Use an `if / else if / else` chain to print her letter grade.",
-    "hint": "Start with if score >= 90 { \"A\" } else if score >= 80 { \"B\" } ... else { \"F\" }",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tscore := 83\n\t// TODO: use if/else if/else to print the letter grade\n\t_ = score\n}",
-    "expectedOutput": ["B"]
+    "title": "if-else — two paths",
+    "instruction": "An `if` runs code when the condition is true. But what about when it is false?\n\nThat is what `else` is for. One or the other will always run — never both, never neither.\n\n```\nif score >= 50 {\n    fmt.Println(\"Pass\")\n} else {\n    fmt.Println(\"Fail\")\n}\n```\n\nChange `score` to 40 and run it. Then change it to 60 and run it again.",
+    "hint": "Try score := 40 first, then score := 60. See which branch runs each time.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tscore := 40\n\tif score >= 50 {\n\t\tfmt.Println(\"Pass\")\n\t} else {\n\t\tfmt.Println(\"Fail\")\n\t}\n}",
+    "expectedOutput": ["Fail"],
+    "successMessage": "Two paths. One condition. Go picks the right one every time."
   },
   {
-    "title": "Department Lookup — switch Statement",
-    "instruction": "A `switch` is cleaner than a long `if-else` chain when you're comparing the same variable against many values. It also handles multiple values per case.\n\nPrint the department name for a student's subject code:\n- `\"MAT\"` or `\"SCI\"` → `\"STEM\"`\n- `\"ENG\"` or `\"HIS\"` → `\"Humanities\"`\n- anything else → `\"General\"`\n\n`subject` is `\"SCI\"`. Print the department.",
-    "hint": "switch subject { case \"MAT\", \"SCI\": fmt.Println(\"STEM\") case \"ENG\", \"HIS\": fmt.Println(\"Humanities\") default: fmt.Println(\"General\") }",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tsubject := \"SCI\"\n\t// TODO: switch on subject, print the department\n\t_ = subject\n}",
-    "expectedOutput": ["STEM"]
+    "title": "else if — more than two paths",
+    "instruction": "Sometimes two options are not enough. What if you need A, B, C, D, or F?\n\n`else if` adds more branches. Go checks each condition from top to bottom and runs the first one that is true. The rest are skipped.\n\nChange `score` to different values — try 95, 75, 55, 35 — and run each time.",
+    "hint": "Change the score value and hit Run. Each score should land in a different branch.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tscore := 95\n\tif score >= 90 {\n\t\tfmt.Println(\"Grade: A\")\n\t} else if score >= 80 {\n\t\tfmt.Println(\"Grade: B\")\n\t} else if score >= 70 {\n\t\tfmt.Println(\"Grade: C\")\n\t} else if score >= 60 {\n\t\tfmt.Println(\"Grade: D\")\n\t} else {\n\t\tfmt.Println(\"Grade: F\")\n\t}\n}",
+    "expectedOutput": ["Grade: A"],
+    "successMessage": "Go checks conditions in order and stops at the first true one. Order matters — always put the strictest condition first."
   },
   {
-    "title": "Compare Two Students",
-    "instruction": "Alice scored `83` and Bob scored `54`. Use an `if-else` to print who scored higher:\n- `\"Alice scored higher\"` if Alice's score is greater\n- `\"Bob scored higher\"` if Bob's score is greater\n- `\"It's a tie\"` if they're equal",
-    "hint": "if aliceScore > bobScore { ... } else if bobScore > aliceScore { ... } else { ... }",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\taliceScore := 83\n\tbobScore := 54\n\t// TODO: print who scored higher\n\t_ = aliceScore\n\t_ = bobScore\n}",
-    "expectedOutput": ["Alice scored higher"]
+    "title": "Logical operators — combine conditions",
+    "instruction": "Sometimes one condition is not enough. What if you need two things to be true at the same time?\n\n- `&&` AND — both must be true\n- `||` OR — at least one must be true\n- `!`  NOT — flips true to false and false to true\n\n```\nif age >= 18 && hasTicket {\n    fmt.Println(\"Enjoy the show\")\n}\n```\n\nRun this. Then try changing `hasTicket` to `false` and running again.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tage := 20\n\thasTicket := true\n\tisMember := false\n\n\tif age >= 18 && hasTicket {\n\t\tfmt.Println(\"Enjoy the show\")\n\t}\n\tif age >= 18 || hasTicket {\n\t\tfmt.Println(\"One condition is enough\")\n\t}\n\tif !isMember {\n\t\tfmt.Println(\"Sign up for membership\")\n\t}\n}",
+    "expectedOutput": ["Enjoy the show", "One condition is enough", "Sign up for membership"],
+    "successMessage": "&& needs both. || needs one. ! flips it. Three operators that make your conditions as precise as you need."
   },
   {
-    "title": "Honor Roll Check",
-    "instruction": "A student makes the honor roll if their score is 90 or above **AND** their GPA is 3.5 or above. Use `&&` (AND) to combine two conditions.\n\nAlice has score `92` and GPA `3.8`. Print `\"Honor Roll\"` if both conditions are met, otherwise print `\"Not on Honor Roll\"`.",
-    "hint": "if score >= 90 && gpa >= 3.5 { fmt.Println(\"Honor Roll\") } else { ... }",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tscore := 92\n\tgpa := 3.8\n\t// TODO: print \"Honor Roll\" if score >= 90 AND gpa >= 3.5\n\t_ = score\n\t_ = gpa\n}",
-    "expectedOutput": ["Honor Roll"]
+    "title": "switch — cleaner decisions",
+    "instruction": "When you have one variable and many possible values, a long `else if` chain gets messy fast.\n\n`switch` is the cleaner version. It checks the variable against each `case` and runs the matching one.\n\n```\nswitch day {\ncase \"Monday\":\n    fmt.Println(\"Start of the week\")\ncase \"Friday\":\n    fmt.Println(\"Finally\")\n}\n```\n\nChange `day` to different values — Monday, Wednesday, Saturday — and run each time.",
+    "hint": "Change the day := value to see different cases run.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tday := \"Monday\"\n\tswitch day {\n\tcase \"Monday\":\n\t\tfmt.Println(\"Start of the week. Coffee required.\")\n\tcase \"Wednesday\":\n\t\tfmt.Println(\"Halfway there.\")\n\tcase \"Friday\":\n\t\tfmt.Println(\"Best day of the week.\")\n\tdefault:\n\t\tfmt.Println(\"Just another day.\")\n\t}\n}",
+    "expectedOutput": ["Start of the week. Coffee required."],
+    "successMessage": "switch is if-else but readable. The default case catches anything that didn't match — like else at the end."
   },
   {
-    "title": "Scholarship Eligibility",
-    "instruction": "A student is eligible for a scholarship if their score is 85 or above **OR** they are on the honor roll (GPA 3.5+).\n\nUse `||` (OR) to check the eligibility. Carol has score `72` and GPA `3.7`. Print `\"Eligible\"` or `\"Not Eligible\"`.",
-    "hint": "if score >= 85 || gpa >= 3.5 { fmt.Println(\"Eligible\") } else { ... }",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tscore := 72\n\tgpa := 3.7\n\t// TODO: print \"Eligible\" if score >= 85 OR gpa >= 3.5\n\t_ = score\n\t_ = gpa\n}",
-    "expectedOutput": ["Eligible"]
+    "title": "Multiple values in one case",
+    "instruction": "Sometimes several different values should do the same thing.\n\nInstead of writing the same code in three separate cases, you can combine them:\n\n`case \"Sat\", \"Sun\":`\n\nAdd a new case to the switch that matches both `\"Sat\"` and `\"Sun\"` and prints `\"It's the weekend!\"`",
+    "hint": "case \"Sat\", \"Sun\":  — comma-separated values in one case line. Add it before the default case.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tday := \"Sat\"\n\tswitch day {\n\tcase \"Mon\", \"Tue\", \"Wed\", \"Thu\", \"Fri\":\n\t\tfmt.Println(\"Weekday\")\n\t// TODO: add a case for Sat and Sun\n\tdefault:\n\t\tfmt.Println(\"Unknown day\")\n\t}\n}",
+    "expectedOutput": ["It's the weekend!"],
+    "codeChecks": [
+      { "pattern": "case\\s+\"Sat\",\\s*\"Sun\"", "required": true, "message": "Add a case that matches both \"Sat\" and \"Sun\" using a comma: case \"Sat\", \"Sun\":" },
+      { "pattern": "weekend", "required": true, "message": "Print something about the weekend in your new case." },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your case." }
+    ],
+    "successMessage": "One case, multiple values. No repetition. Go is sensible like that."
+  },
+  {
+    "title": "switch with no condition",
+    "instruction": "A `switch` does not need a variable to compare. Without one, each case acts like an `if` condition.\n\nThis is cleaner than a long `else if` chain when each condition is different.\n\n```\nswitch {\ncase score >= 90:\n    fmt.Println(\"A\")\ncase score >= 80:\n    fmt.Println(\"B\")\n}\n```\n\nRun this. Change `score` to 65 and run again.",
+    "hint": "Change score to 65 and see which case matches.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tscore := 92\n\tswitch {\n\tcase score >= 90:\n\t\tfmt.Println(\"Excellent\")\n\tcase score >= 70:\n\t\tfmt.Println(\"Good\")\n\tcase score >= 50:\n\t\tfmt.Println(\"Passed\")\n\tdefault:\n\t\tfmt.Println(\"Failed\")\n\t}\n}",
+    "expectedOutput": ["Excellent"],
+    "successMessage": "switch without a variable is just a cleaner if-else. Same logic, easier to read."
+  },
+  {
+    "title": "Short variable declaration in if",
+    "instruction": "Go lets you declare a variable right inside the `if` statement.\n\n```\nif remainder := number % 2; remainder == 0 {\n    fmt.Println(\"Even\")\n}\n```\n\nThe variable is declared, then the condition checks it. It only exists inside the `if` block — nowhere else.\n\nAdd an `else` branch that prints `\"Odd\"` when remainder is not zero.",
+    "hint": "} else { fmt.Println(\"Odd\") }  — add this right after the closing brace of the if block.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tnumber := 7\n\tif remainder := number % 2; remainder == 0 {\n\t\tfmt.Println(\"Even\")\n\t\t// TODO: add an else that prints \"Odd\"\n\t}\n}",
+    "expectedOutput": ["Odd"],
+    "codeChecks": [
+      { "pattern": "else\\s*\\{", "required": true, "message": "Add an else block after the if block." },
+      { "pattern": "Odd", "required": true, "message": "Print \"Odd\" inside the else block." },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with an else block." }
+    ],
+    "successMessage": "Declare, check, use — all in one line. The variable stays scoped to the if block and does not pollute the rest of your function."
+  },
+  {
+    "title": "Nested if — a decision inside a decision",
+    "instruction": "Sometimes you need to check one thing, and only if that passes, check something else.\n\nYou can put an `if` inside another `if`. Just be careful — too many levels and the code becomes hard to read.\n\nRun this. Try different combinations of `isLoggedIn` and `isPremium`.",
+    "hint": "Try isLoggedIn = false, then isLoggedIn = true and isPremium = false, then both true.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tisLoggedIn := true\n\tisPremium := true\n\n\tif isLoggedIn {\n\t\tfmt.Println(\"Welcome back\")\n\t\tif isPremium {\n\t\t\tfmt.Println(\"Enjoy your premium content\")\n\t\t} else {\n\t\t\tfmt.Println(\"Upgrade for more features\")\n\t\t}\n\t} else {\n\t\tfmt.Println(\"Please log in\")\n\t}\n}",
+    "expectedOutput": ["Welcome back", "Enjoy your premium content"],
+    "successMessage": "Nested ifs work fine for 2 levels. Past that, consider combining conditions with && to keep it flat."
+  },
+  {
+    "title": "Fix the broken logic",
+    "instruction": "This program is supposed to check if someone can drive.\n\nRules: must be at least 16 AND have a licence.\n\nBut the logic is wrong and the program gives incorrect results. Find the bug and fix it.",
+    "hint": "Check the operator. Should it be && or ||? And check the age threshold.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tage := 14\n\thasLicence := false\n\n\tif age >= 16 || hasLicence {\n\t\tfmt.Println(\"Can drive\")\n\t} else {\n\t\tfmt.Println(\"Cannot drive\")\n\t}\n}",
+    "expectedOutput": ["Cannot drive"],
+    "codeChecks": [
+      { "pattern": "age\\s*>=\\s*16\\s*&&\\s*hasLicence", "required": true, "message": "Both conditions must be true. Use && not ||." }
+    ],
+    "successMessage": "|| means either condition makes it true. && means both must be true. Mixing them up is one of the most common logic bugs — now you know to look for it."
+  },
+  {
+    "title": "Build a decision machine",
+    "instruction": "No starter code.\n\nWrite a program that has three variables:\n- `score` (int) — set it to any value\n- `age` (int) — set it to any value\n- `isMember` (bool)\n\nThen print:\n- `\"Elite\"` if score >= 90 AND isMember is true\n- `\"Senior\"` if age >= 65\n- `\"Pass\"` if score >= 50\n- `\"Fail\"` otherwise\n\nUse if, else if, and at least one &&.",
+    "hint": "Start with the strictest condition first (Elite requires both score AND membership). Then work down.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\t// Create your variables and decision logic here\n}",
+    "expectedOutput": [],
+    "codeChecks": [
+      { "pattern": "score\\s*:=", "required": true, "message": "Create a score variable." },
+      { "pattern": "age\\s*:=", "required": true, "message": "Create an age variable." },
+      { "pattern": "isMember\\s*:=", "required": true, "message": "Create an isMember bool variable." },
+      { "pattern": "&&", "required": true, "message": "Use && to combine two conditions." },
+      { "pattern": "else if", "required": true, "message": "Use at least one else if." },
+      { "pattern": "Elite|Senior|Pass|Fail", "required": true, "message": "Print at least one of: Elite, Senior, Pass, or Fail." }
+    ],
+    "successMessage": "You built a program that thinks. Every app you have ever used is full of logic exactly like this."
   }
 ]
