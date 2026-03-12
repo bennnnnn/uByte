@@ -10,6 +10,7 @@ import { parseErrorLines } from "./useCodeEditor";
 import { apiFetch } from "@/lib/api-client";
 import { tutorialUrl } from "@/lib/urls";
 import { trackConversion } from "@/lib/analytics";
+import { celebrate } from "@/lib/celebrate";
 
 export type Status = "idle" | "running" | "passed" | "failed";
 
@@ -431,6 +432,7 @@ export function useStepProgress(
           return;
         }
         setStatus("passed");
+        celebrate(); // Small confetti burst — fires on every correct step.
         setFailCount(0);
         setAiFeedback(null);          // Step done — clear hint so the next step starts fresh.
         setAiFeedbackUpgrade(false);

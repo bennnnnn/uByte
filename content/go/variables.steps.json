@@ -1,64 +1,111 @@
 [
   {
-    "title": "Your first variable",
-    "instruction": "Imagine you have a box. You write \"name\" on the outside of the box, then you put \"Alex\" inside it. Whenever you need your name, you just look at the box labeled \"name\" instead of writing \"Alex\" over and over again.\n\nThat box is a variable. A variable is a labeled box that holds a piece of information.\n\nIn Go, you create that box like this:\n\n    name := \"Alex\"\n\nname is the label you put on the box. := means \"create this box and put this value inside\". \"Alex\" is what goes in.\n\nNow whenever you write name, Go opens that box and gives you whatever is inside.\n\nYour turn: create a variable called name with your actual name in it. Then print it with fmt.Println(name).",
-    "hint": "First line: name := \"YourName\"  (your name goes inside the quotes). Second line: fmt.Println(name)  (no quotes around name this time — you are reading the box, not typing text).",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\t// TODO: create a variable called name and put your name inside it\n\t// TODO: print name using fmt.Println(name)\n}",
-    "expectedOutput": [],
-    "codeChecks": [
-      { "pattern": "name\\s*:=\\s*\"\\S+\"", "required": true, "message": "Create a name variable like this: name := \"YourName\"" },
-      { "pattern": "Println\\(name\\)", "required": true, "message": "Print the variable by writing: fmt.Println(name)" },
-      { "pattern": "TODO", "required": false, "message": "Replace the TODO lines with your actual code." }
-    ]
-  },
-  {
-    "title": "One box is not enough",
-    "instruction": "Your contacts app does not just store one phone number. It stores your mom, your best friend, your pizza place, your dentist — each one in their own labeled contact.\n\nVariables work the same way. You can have as many as you want. Each one gets its own label and holds its own value.\n\nThe name box already exists. Now let's add a city box:\n\n    city := \"Chicago\"\n\nThen print both, name first, then city. Two boxes, two Println calls, two lines of output.\n\nPut your actual city in there — nobody's judging!",
-    "hint": "Add city := \"YourCity\" below the name line. Then add fmt.Println(city) below fmt.Println(name). Each variable gets its own Println.",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tname := \"Alex\"\n\t// TODO: create a variable called city with the name of your city\n\tfmt.Println(name)\n\t// TODO: print city\n}",
+    "title": "What is a variable",
+    "instruction": "Imagine a box with a label on it.\n\nYou write \"name\" on the outside. You put \"Alex\" inside. Whenever you need that name, you just say the label — and Go hands you what's inside.\n\nThat is a variable. A labeled box that holds a value.\n\nRun this program and see it in action.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tname := \"Alex\"\n\tfmt.Println(name)\n}",
     "expectedOutput": ["Alex"],
-    "codeChecks": [
-      { "pattern": "city\\s*:=\\s*\"\\S+\"", "required": true, "message": "Create a city variable like this: city := \"Chicago\"" },
-      { "pattern": "Println\\(city\\)", "required": true, "message": "Print city using fmt.Println(city)" },
-      { "pattern": "TODO", "required": false, "message": "Replace the TODO lines with your actual code." }
-    ]
+    "successMessage": "You stored a value and retrieved it. That is what every variable in every program ever written does."
   },
   {
-    "title": "Write once, use anywhere",
-    "instruction": "Here is the real reason variables exist. Imagine you are sending the same greeting to 100 people. Without variables you would type the whole message 100 times. If you made a typo, you would fix it 100 times.\n\nWith a variable, you write it once. Use it everywhere. Fix it once if something changes.\n\nThe greeting box is already created below. Your job is to print it three times — three separate Println calls, all using the same variable name.\n\nDo NOT copy-paste the text. Use the variable each time. That is the whole point.",
-    "hint": "Write fmt.Println(greeting) three times, each on its own line. Go will open the box and read the value each time.",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tgreeting := \"Hello from Go!\"\n\t// TODO: print greeting three times using three separate Println calls\n}",
-    "expectedOutput": ["Hello from Go!", "Hello from Go!", "Hello from Go!"],
-    "codeChecks": [
-      { "pattern": "Println\\(greeting\\)(?:.*\\n.*){0,4}Println\\(greeting\\)(?:.*\\n.*){0,4}Println\\(greeting\\)", "required": true, "flags": "s", "message": "Call fmt.Println(greeting) three separate times, each on its own line." },
-      { "pattern": "TODO", "required": false, "message": "Replace the TODO line with your actual code." }
-    ]
-  },
-  {
-    "title": "Boxes can be refilled",
-    "instruction": "What happens when your friend gets a new phone number? You do not throw away your contacts app and start fresh. You just tap Edit and type the new number. The label stays the same, the value inside changes.\n\nVariables work exactly like that. You can change what is inside the box at any time.\n\nBut here is the important rule:\n\n- := creates a new box  (use this only once, the first time)\n- = refills an existing box  (use this when you want to change the value)\n\nThe mood box below starts as \"tired\". Your job is to change it to \"energized\" after the first print, then print it again. You should see tired first, then energized.",
-    "hint": "After fmt.Println(mood), write: mood = \"energized\"  (single = only, not :=). Then write fmt.Println(mood) one more time below that.",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tmood := \"tired\"\n\tfmt.Println(mood)\n\t// TODO: change mood to \"energized\" using =\n\t// TODO: print mood again\n}",
-    "expectedOutput": ["tired", "energized"],
-    "codeChecks": [
-      { "pattern": "mood\\s*=\\s*\"energized\"", "required": true, "message": "Change the value using a single = like this: mood = \"energized\"  — not := which would try to create a new box" },
-      { "pattern": "TODO", "required": false, "message": "Replace the TODO lines with your actual code." }
-    ]
-  },
-  {
-    "title": "Build your own contact card",
-    "instruction": "Think of this as creating your own contact entry — the kind you would find in someone's phone.\n\nA contact has a first name, a last name, and a hometown. Three separate pieces of information. Three separate boxes.\n\nFrom scratch, create these three variables:\n- firstName — your first name\n- lastName — your last name\n- hometown — the city you are from\n\nThen print all three, one per line.\n\nYou are putting real information in here. firstName holds \"Alex\", not the word \"firstName\". Remember the difference!",
-    "hint": "Three lines with :=, then three lines with Println. Make sure the names match exactly: firstName, lastName, hometown.",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\t// TODO: create firstName, lastName, and hometown\n\t// TODO: print all three\n}",
+    "title": "Create your own variable with :=",
+    "instruction": "`:=` is how you create a variable and give it a value at the same time.\n\nLeft side: the label. Right side: what goes inside the box.\n\nChange the name to yours and run it.",
+    "hint": "Replace \"Alex\" with your actual name. Keep the quotes.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tname := \"Alex\"\n\tfmt.Println(name)\n}",
     "expectedOutput": [],
     "codeChecks": [
-      { "pattern": "firstName\\s*:=", "required": true, "message": "Create a variable called firstName" },
-      { "pattern": "lastName\\s*:=", "required": true, "message": "Create a variable called lastName" },
-      { "pattern": "hometown\\s*:=", "required": true, "message": "Create a variable called hometown" },
-      { "pattern": "Println\\(firstName\\)", "required": true, "message": "Print firstName using fmt.Println(firstName)" },
-      { "pattern": "Println\\(lastName\\)", "required": true, "message": "Print lastName using fmt.Println(lastName)" },
-      { "pattern": "Println\\(hometown\\)", "required": true, "message": "Print hometown using fmt.Println(hometown)" },
-      { "pattern": "TODO", "required": false, "message": "Replace the TODO lines with your actual code." }
-    ]
+      { "pattern": "name\\s*:=\\s*\"Alex\"", "required": false, "message": "Change the value from \"Alex\" to your own name." }
+    ],
+    "successMessage": "Your first original variable. := creates it and fills it in one shot."
+  },
+  {
+    "title": "Declare first, assign later",
+    "instruction": "Sometimes you want to create the box first and fill it later.\n\n`var name string` creates an empty box labeled name.\n`name = \"Alex\"` puts something inside.\n\nNotice: filling later uses `=` not `:=`\n\nRun this.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tvar name string\n\tname = \"Alex\"\n\tfmt.Println(name)\n}",
+    "expectedOutput": ["Alex"],
+    "successMessage": "Two separate steps: create the box, then fill it. This comes in handy when you do not have the value yet."
+  },
+  {
+    "title": "The var keyword with a value",
+    "instruction": "`var` can also declare and assign in one line — just like `:=` but more explicit.\n\n`var age int = 25`\n\nThis says: create a variable called age, it holds whole numbers, and it starts at 25.\n\nChange the age to your real age and run it.",
+    "hint": "Change the number 25 to your actual age. Keep everything else the same.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tvar age int = 25\n\tfmt.Println(age)\n}",
+    "expectedOutput": [],
+    "codeChecks": [
+      { "pattern": "var\\s+age\\s+int\\s*=\\s*\\d+", "required": true, "message": "Keep the var keyword and int type. Just change the number." }
+    ],
+    "successMessage": "var is the longer form. := is the shortcut. Both work — use whichever feels clearer."
+  },
+  {
+    "title": "Update a variable",
+    "instruction": "Variables can change. That is literally what the word means.\n\nBut there is one rule:\n- `:=` creates a new variable. Use it once.\n- `=` updates an existing one. Use it after.\n\nThe score starts at 60. Update it to 95 and print both values.",
+    "hint": "After fmt.Println(score), write: score = 95  then fmt.Println(score) again.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tscore := 60\n\tfmt.Println(score)\n\t// TODO: update score to 95 using =\n\t// TODO: print score again\n}",
+    "expectedOutput": ["60", "95"],
+    "codeChecks": [
+      { "pattern": "score\\s*=\\s*95", "required": true, "message": "Update score using a single =  like this: score = 95" },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO lines with actual code." }
+    ],
+    "successMessage": "Same box, new value. = refills. := creates. Never mix them up."
+  },
+  {
+    "title": "Two variables in one line",
+    "instruction": "Go lets you declare and assign multiple variables at once.\n\n`first, last := \"Alex\", \"Rivera\"`\n\nLeft side: the labels. Right side: the values. Order matches.\n\nChange the names to yours and run it.",
+    "hint": "Replace \"Alex\" with your first name and \"Rivera\" with your last name.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tfirst, last := \"Alex\", \"Rivera\"\n\tfmt.Println(first)\n\tfmt.Println(last)\n}",
+    "expectedOutput": [],
+    "codeChecks": [
+      { "pattern": "first,\\s*last\\s*:=", "required": true, "message": "Keep the multi-assignment format: first, last := ..." },
+      { "pattern": "first,\\s*last\\s*:=\\s*\"Alex\",", "required": false, "message": "Change the names from \"Alex\" and \"Rivera\" to your own." }
+    ],
+    "successMessage": "One line, two variables. Go matches left to right: first gets the first value, last gets the second."
+  },
+  {
+    "title": "Declare a group with var ()",
+    "instruction": "When you have several variables, you can declare them as a group.\n\n```\nvar (\n    name string = \"Alex\"\n    age  int    = 25\n    city string = \"London\"\n)\n```\n\nClean, organized, easy to read.\n\nAdd a fourth variable called `country` with your country, then print all four.",
+    "hint": "Add country string = \"YourCountry\" inside the var block. Then add fmt.Println(country) at the bottom.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tvar (\n\t\tname string = \"Alex\"\n\t\tage  int    = 25\n\t\tcity string = \"London\"\n\t\t// TODO: add country here\n\t)\n\tfmt.Println(name)\n\tfmt.Println(age)\n\tfmt.Println(city)\n\t// TODO: print country\n}",
+    "expectedOutput": [],
+    "codeChecks": [
+      { "pattern": "country\\s+string\\s*=\\s*\"\\S+\"", "required": true, "message": "Add country inside the var block: country string = \"YourCountry\"" },
+      { "pattern": "Println\\(country\\)", "required": true, "message": "Print country using fmt.Println(country)" },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO lines with actual code." }
+    ],
+    "successMessage": "The var block keeps all your declarations together. Much easier to scan than a pile of := lines."
+  },
+  {
+    "title": "Zero values",
+    "instruction": "What happens if you create a variable but never put anything in it?\n\nGo does not leave it empty. It gives it a default value called a zero value.\n\n- `string` gets `\"\"`  (empty text)\n- `int` gets `0`\n- `bool` gets `false`\n\nRun this and see the zero values printed.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tvar name string\n\tvar score int\n\tvar active bool\n\tfmt.Println(name)\n\tfmt.Println(score)\n\tfmt.Println(active)\n}",
+    "expectedOutput": ["", "0", "false"],
+    "successMessage": "No surprises in Go. Every variable always has a value, even before you assign one."
+  },
+  {
+    "title": "Fix the broken names",
+    "instruction": "Variable names have rules:\n\n- Start with a letter, not a number\n- No spaces — use camelCase instead\n- Case matters: `score` and `Score` are different variables\n\nThis code has three broken names. Fix them so the program runs.",
+    "hint": "1st name starts with a number. 2nd name has a space. 3rd is the wrong case when printed.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\t1stPlace := \"Gold\"\n\tfull name := \"Alex Rivera\"\n\tUserScore := 99\n\tfmt.Println(1stPlace)\n\tfmt.Println(full name)\n\tfmt.Println(userScore)\n}",
+    "expectedOutput": ["Gold", "Alex Rivera", "99"],
+    "codeChecks": [
+      { "pattern": "1stPlace|full name", "required": false, "message": "Fix the invalid variable names. No numbers at the start, no spaces — use camelCase." }
+    ],
+    "successMessage": "Good eye. Valid names keep your code readable and error-free."
+  },
+  {
+    "title": "Build a profile from scratch",
+    "instruction": "Everything you just learned — now use it all.\n\nBuild a short profile using these rules:\n- Use `:=` for name and age\n- Use `var` with a type for city\n- Declare score with var and assign it separately\n- Print all four\n\nNo starter code. Just you.",
+    "hint": "name := \"...\", age := 25, var city string then city = \"...\", var score int then score = 100. Then four Println calls.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\t// Build your profile here\n}",
+    "expectedOutput": [],
+    "codeChecks": [
+      { "pattern": "name\\s*:=", "required": true, "message": "Declare name using :=" },
+      { "pattern": "age\\s*:=", "required": true, "message": "Declare age using :=" },
+      { "pattern": "var\\s+city", "required": true, "message": "Declare city using the var keyword" },
+      { "pattern": "var\\s+score", "required": true, "message": "Declare score using the var keyword" },
+      { "pattern": "Println\\(name\\)", "required": true, "message": "Print name" },
+      { "pattern": "Println\\(age\\)", "required": true, "message": "Print age" },
+      { "pattern": "Println\\(city\\)", "required": true, "message": "Print city" },
+      { "pattern": "Println\\(score\\)", "required": true, "message": "Print score" }
+    ],
+    "successMessage": "You used every form of variable declaration in Go. Next up: the different kinds of data variables can hold."
   }
 ]
