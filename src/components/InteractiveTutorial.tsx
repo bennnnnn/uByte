@@ -180,9 +180,15 @@ export default function InteractiveTutorial({
 
   /** Reset to starter and delete the saved draft for the current step. */
   function handleReset() {
+    // Ask for confirmation — user may have written code they didn't mean to lose.
+    const confirmed = window.confirm(
+      "This will restore the original starter code and delete your current changes for this step.\n\nAre you sure?"
+    );
+    if (!confirmed) return;
+
     // Cancel any in-flight save so it doesn't undo the delete
     if (saveDraftTimerRef.current) clearTimeout(saveDraftTimerRef.current);
-    // Delete from DB (fire-and-forget)
+    // Delete the user's saved draft from DB (starter code never lives in the DB)
     if (user) {
       const safeIndex = Math.min(stepProgress.stepIndex, currentSteps.length - 1);
       apiFetch("/api/code-drafts", {
@@ -321,9 +327,10 @@ export default function InteractiveTutorial({
             <button
               type="button"
               onClick={handleReset}
-              className="rounded-md border border-zinc-300 px-3 py-1.5 text-sm text-zinc-500 transition-colors hover:border-zinc-400 hover:text-zinc-800 dark:border-zinc-700 dark:text-zinc-400 dark:hover:border-zinc-600 dark:hover:text-zinc-200"
+              title="Restore the original starter code — your changes will be deleted"
+              className="rounded-md border border-zinc-300 px-3 py-1.5 text-sm text-zinc-500 transition-colors hover:border-red-300 hover:text-red-600 dark:border-zinc-700 dark:text-zinc-400 dark:hover:border-red-700 dark:hover:text-red-400"
             >
-              Reset
+              ↺ Reset starter
             </button>
           </EditorToolbar>
 
@@ -381,10 +388,10 @@ export default function InteractiveTutorial({
           <button
             type="button"
             onClick={handleReset}
-            aria-label="Reset"
+            aria-label="Reset to original starter code"
             className="flex shrink-0 items-center justify-center rounded-md border border-zinc-300 px-3 py-2 text-sm text-zinc-500 dark:border-zinc-700 dark:text-zinc-400"
           >
-            Reset
+            ↺
           </button>
         </EditorToolbar>
       )}
