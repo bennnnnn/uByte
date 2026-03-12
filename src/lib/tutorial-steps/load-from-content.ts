@@ -38,6 +38,7 @@ export function loadStepsFromContent(
     const steps: TutorialStep[] = data.map((item: Record<string, unknown>) => ({
       title: typeof item.title === "string" ? item.title : "",
       instruction: typeof item.instruction === "string" ? item.instruction : "",
+      successMessage: typeof item.successMessage === "string" ? item.successMessage : undefined,
       hint: typeof item.hint === "string" ? item.hint : undefined,
       starter: typeof item.starter === "string" ? item.starter : "",
       expectedOutput: Array.isArray(item.expectedOutput)

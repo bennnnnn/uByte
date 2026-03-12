@@ -17,6 +17,8 @@ export interface CodeCheck {
 export interface TutorialStep {
   title: string;
   instruction: string;
+  /** Shown in the green success banner when the step passes. Falls back to the generic message. */
+  successMessage?: string;
   hint?: string;
   starter: string;
   expectedOutput: string[];

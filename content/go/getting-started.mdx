@@ -1,136 +1,18 @@
 ---
-title: "Getting Started with Go"
-description: "Write your very first Go program. No experience needed — we start from zero."
+title: "Getting Started"
+description: "Write your first Go program. No setup required — just you and the editor."
 order: 1
 difficulty: "beginner"
-estimatedMinutes: 12
-concepts: ["package main", "func main", "fmt.Println", "comments"]
----
-
-## Let's talk about what a program actually is
-
-You've used programs your whole life. Every app on your phone, every website you've visited, every video game you've played — those are all programs. But what actually is one?
-
-Here's the simplest way to think about it: a program is a list of instructions you write for a computer to follow. Like a recipe. A recipe says "add two eggs, mix for 3 minutes, bake at 350°" and a cook follows it step by step. Your program says "do this, then do that, then do this other thing" and the computer follows it step by step.
-
-The difference is that computers are incredibly fast and incredibly literal. Fast: your computer can follow millions of instructions per second. Literal: if you make a typo, the computer has no idea what you meant. It just stops and tells you something went wrong. It won't guess. It won't try to fix it. It waits for you to fix it.
-
-That might sound annoying, but it's actually a good thing. It means the computer does exactly what you tell it — no surprises.
-
----
-
-## So what is Go?
-
-Go is a programming language. Think of it as the language you use to write those instructions. Just like you can write a recipe in English or French or Spanish, you can write a program in Go, Python, JavaScript, or many others.
-
-Go was created by Google in 2009. Three engineers who were tired of slow, messy programming tools sat down and designed something cleaner. Today it powers some of the biggest systems on the internet — Docker, Cloudflare, Dropbox, and Uber all run large parts of their infrastructure in Go.
-
-Go is also known for being easier to read than most languages. Once you know the basics, Go code tends to say what it means in a straightforward way. That's exactly what we want when we're learning.
-
+estimatedMinutes: 10
+concepts: ["fmt.Println", "func main", "package main", "comments"]
 ---
 
 ## Your first Go program
 
-Here it is. Every Go program you ever write will start with this same basic shape:
+In ten steps you will go from zero to writing real code.
 
-```gorun
-package main
+No theory upfront. No vocabulary tests. Just you, a text editor, and a computer that listens.
 
-import "fmt"
+Each step takes about 30 seconds. Do them in order.
 
-func main() {
-    fmt.Println("Hello, World!")
-}
-```
-
-Hit Run. You should see "Hello, World!" appear in the output panel. Congratulations — you just ran your first Go program.
-
-Now let's go through it line by line, because every single line matters.
-
----
-
-## What does each line do?
-
-Line 1: `package main`
-
-Go organizes code into packages. Think of a package like a folder — it groups related code together. When you write `package main`, you're telling Go: "this is a program that can be run, not just a helper file." Every runnable Go program starts with this exact line. You don't need to understand packages deeply yet — just know this line is always first.
-
-Line 3: `import "fmt"`
-
-The word "fmt" is short for "format." This line tells Go: "I want to use the fmt toolbox in my program." The fmt toolbox contains tools for printing text, formatting numbers, and more. Without this line, your program wouldn't know how to print anything.
-
-Import is like going to a hardware store before you start a project. You pick up the tools you need before you start working.
-
-Lines 5–7: `func main() { ... }`
-
-This is where your actual instructions go. The word "func" is short for "function" — it's how you name a group of instructions in Go. The function named "main" is special: it's the starting point. When you run your program, Go looks for the main function and starts there.
-
-The curly braces `{` and `}` mark the beginning and end of the function's body — like parentheses in a sentence, but for code blocks.
-
-Line 6: `fmt.Println("Hello, World!")`
-
-This is the actual instruction. You're asking the fmt toolbox to use its Println tool to print the text "Hello, World!" to the screen.
-
-Println stands for "print line." It prints whatever you give it and then moves to a new line automatically — like pressing Enter after typing.
-
----
-
-## Println prints one line at a time
-
-You can call Println as many times as you want. Each call prints one line:
-
-```gorun
-package main
-
-import "fmt"
-
-func main() {
-    fmt.Println("Monday")
-    fmt.Println("Tuesday")
-    fmt.Println("Wednesday")
-}
-```
-
-Run that. Three lines print, in order, top to bottom. That's the fundamental rule of programs: instructions run one after another, from top to bottom, unless you tell Go to do something different (which you'll learn in later chapters).
-
----
-
-## Leaving notes for yourself — comments
-
-As your programs get longer, you'll want to leave notes explaining what different parts do. Not for the computer — for yourself, or for someone else reading your code later.
-
-In Go, a comment starts with two forward slashes. Everything after those slashes on that line is ignored completely by Go:
-
-```gorun
-package main
-
-import "fmt"
-
-func main() {
-    // This prints a greeting to the screen
-    fmt.Println("Hello, World!")
-
-    // This prints a farewell
-    fmt.Println("See you tomorrow!")
-}
-```
-
-The computer doesn't read the comments. It doesn't care about them at all. They're purely for humans. Write them like you're leaving a sticky note for the next person who reads your code — even if that person is you, six months from now, wondering what on earth you were thinking.
-
----
-
-## Two things to watch out for
-
-Capitalization matters. Go is case-sensitive. `fmt.Println` and `fmt.println` are completely different things. The first one works. The second one causes an error. This trips people up constantly at the start.
-
-Quotation marks matter. The text you want to print must be wrapped in double quotes. Single quotes won't work. Missing a quote will cause an error.
-
-Don't worry — you'll make these mistakes and Go will tell you about them. That's normal. Every programmer does it.
-
----
-
-## What's next
-
-In Chapter 2, you'll learn how to store information — like a student's name, age, and grade — in something called a variable. Right now your program can only print fixed text. After Chapter 2, it'll be able to work with data that can change.
-
-The exercises on the right side of the screen are your practice ground. Work through them one by one. Each one builds on the last.
+Let's go.

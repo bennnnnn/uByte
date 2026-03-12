@@ -166,14 +166,25 @@ export default function InstructionsSidebar({
 
         {status === "passed" && (
           <div className="mt-6 rounded-lg border border-emerald-300 bg-emerald-50 p-4 dark:border-emerald-800 dark:bg-emerald-950/40">
-            <p className="text-sm font-semibold text-emerald-700 dark:text-emerald-400">
-              🎉 Excellent work!
-            </p>
-            <p className="mt-1 text-xs text-emerald-600 dark:text-emerald-500">
-              {stepIndex < steps.length - 1
-                ? "Perfect! Moving to the next step…"
-                : "You nailed it! Tutorial complete!"}
-            </p>
+            {step.successMessage ? (
+              // Custom per-step success message from steps.json
+              step.successMessage.split("\n").map((line, i) => (
+                <p key={i} className={`text-sm text-emerald-700 dark:text-emerald-400 ${i === 0 ? "font-semibold" : "mt-1"}`}>
+                  {line}
+                </p>
+              ))
+            ) : (
+              <>
+                <p className="text-sm font-semibold text-emerald-700 dark:text-emerald-400">
+                  🎉 Excellent work!
+                </p>
+                <p className="mt-1 text-xs text-emerald-600 dark:text-emerald-500">
+                  {stepIndex < steps.length - 1
+                    ? "Moving to the next step…"
+                    : "You nailed it! Tutorial complete!"}
+                </p>
+              </>
+            )}
           </div>
         )}
 
