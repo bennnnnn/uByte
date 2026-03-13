@@ -18,7 +18,8 @@ const securityHeaders = [
       "default-src 'self'",
       // 'unsafe-inline' required by Next.js runtime styles and inline event handlers.
       "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://cdn.paddle.com https://sandbox-cdn.paddle.com https://accounts.google.com",
-      "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.paddle.com https://sandbox-cdn.paddle.com",
+      // accounts.google.com required for Google One Tap / GSI stylesheet (gsi/style).
+      "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.paddle.com https://sandbox-cdn.paddle.com https://accounts.google.com",
       "font-src 'self' https://fonts.gstatic.com",
       // Go Playground, Sentry, Vercel Analytics/Vitals, Paddle API, Google OAuth.
       // Fixed: vitals.vercel-insights.com was missing the https:// scheme.
@@ -36,6 +37,9 @@ const securityHeaders = [
       "frame-ancestors 'none'",
     ].join("; "),
   },
+  // Allow same-origin popups (required for Google OAuth flow) while still
+  // isolating the top-level window from cross-origin documents.
+  { key: "Cross-Origin-Opener-Policy", value: "same-origin-allow-popups" },
   // HSTS: tell browsers to always use HTTPS for this domain for 2 years.
   // Only set in production — setting it locally would permanently break the HTTP dev server.
   // includeSubDomains covers api.ubyte.dev etc; preload allows browser preload-list inclusion.
