@@ -56,7 +56,8 @@ export default function InteractiveTutorial({
   const [ideLang, setIdeLang] = useState<SupportedLanguage>(lang as SupportedLanguage);
   const [stepsForLang, setStepsForLang] = useState<TutorialStep[] | null>(null);
   const [stepsLoading, setStepsLoading] = useState(false);
-  const currentSteps = ideLang === lang ? steps : (stepsForLang ?? steps);
+  // Fall back to original steps if the other language has no content yet
+  const currentSteps = ideLang === lang ? steps : (stepsForLang?.length ? stepsForLang : steps);
 
   const editor = useCodeEditor(currentSteps[0]?.starter ?? "", ideLang);
   const stepProgress = useStepProgress(currentSteps, ideLang, tutorialSlug, next, editor.setCode, user?.id);
