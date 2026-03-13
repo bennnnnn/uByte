@@ -63,9 +63,6 @@ export default function PopularInterviewPrepSection({ problems }: Props) {
           const difficulty = meta?.difficulty ?? "easy";
           const badgeCls = DIFFICULTY_BADGE[difficulty];
           const category = meta?.category ? (CATEGORY_LABEL[meta.category] ?? meta.category) : null;
-          const description = meta?.description
-            ? meta.description.replace(/\*\*|__|\`/g, "").slice(0, 110).trimEnd() + (meta.description.length > 110 ? "…" : "")
-            : null;
 
           return (
             <Link
@@ -96,12 +93,8 @@ export default function PopularInterviewPrepSection({ problems }: Props) {
                 {p.title}
               </p>
 
-              {/* Description snippet */}
-              {description && (
-                <p className="text-xs leading-relaxed text-zinc-500 dark:text-zinc-400">
-                  {description}
-                </p>
-              )}
+              {/* Spacer keeps card height consistent */}
+              <div className="flex-1" />
 
               {/* Footer: language support + CTA */}
               <div className="mt-auto flex items-center justify-between border-t border-zinc-100 pt-3 dark:border-zinc-800">

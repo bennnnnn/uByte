@@ -4,7 +4,6 @@ import { MONTHLY_PRICE_CENTS } from "@/lib/plans";
 const PILLARS = [
   {
     title: "Interactive Tutorials",
-    metric: "130+ chapters",
     desc: "Write and run real code in your browser. Step-by-step lessons with instant AI-powered feedback — no installs, no setup.",
     icon: (
       <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.75}>
@@ -14,7 +13,6 @@ const PILLARS = [
   },
   {
     title: "Interview Prep",
-    metric: "50+ problems",
     desc: "LeetCode-style challenges covering arrays, strings, dynamic programming, trees, and graphs. AI hints when you're stuck.",
     icon: (
       <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.75}>
@@ -24,7 +22,6 @@ const PILLARS = [
   },
   {
     title: "Verifiable Certifications",
-    metric: "Go · Python · JS · Java · C++ · Rust · C#",
     desc: "Pass a timed exam, download a PDF certificate, and share it directly on LinkedIn. Recruiters actually look at these.",
     icon: (
       <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.75}>
@@ -76,13 +73,10 @@ export default function ValuePropBanner({ isPro = false }: ValuePropBannerProps)
               key={p.title}
               className="rounded-xl border border-violet-200/60 bg-white/70 p-5 shadow-sm backdrop-blur-sm transition-all hover:-translate-y-0.5 hover:border-violet-300 hover:shadow-md dark:border-violet-800/30 dark:bg-white/[0.04]"
             >
-              <div className="mb-4 flex items-center justify-between">
+              <div className="mb-4">
                 <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-violet-100 text-violet-600 dark:bg-violet-900/40 dark:text-violet-400">
                   {p.icon}
                 </div>
-                <span className="rounded-full bg-violet-100 px-2.5 py-0.5 text-[10px] font-bold text-violet-700 dark:bg-violet-900/40 dark:text-violet-300">
-                  {p.metric}
-                </span>
               </div>
               <p className="mb-1.5 text-sm font-bold text-zinc-900 dark:text-zinc-100">{p.title}</p>
               <p className="text-xs leading-relaxed text-zinc-500 dark:text-zinc-400">{p.desc}</p>
