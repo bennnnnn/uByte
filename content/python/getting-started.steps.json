@@ -1,109 +1,109 @@
 [
   {
-    "title": "Run your first program",
-    "instruction": "This is a Python program. It has exactly one line.\n\n`print()` tells Python to display something on the screen. Whatever you put inside the quotes gets printed.\n\nJust run it.",
-    "starter": "print(\"Hello, World!\")",
-    "expectedOutput": ["Hello, World!"],
-    "successMessage": "Hello, World! — the first program every programmer ever writes. You are officially a programmer now."
+    "title": "Welcome to Python 🐍",
+    "instruction": "Welcome! You just picked one of the best programming languages on the planet.\n\nPython powers Instagram, Netflix, NASA, and pretty much every AI system you have ever heard of. And the best part? It is shockingly easy to learn.\n\nHere is your very first Python program. One line. That is it.\n\nHit **Run** and watch what happens.",
+    "starter": "print(\"I love Python!\")",
+    "expectedOutput": ["I love Python!"],
+    "successMessage": "Did you see that?! One line of code and you just made a computer say what you told it to. That is programming. Welcome to the club."
   },
   {
     "title": "Make it say your name",
-    "instruction": "Change `\"Hello, World!\"` to `\"Hello, \"` followed by your own name.\n\nExample: `print(\"Hello, Alex!\")`",
-    "hint": "Change the text inside the quotes. Keep the quotes — they tell Python this is text.",
+    "instruction": "Now let's make it personal.\n\n`print()` will say whatever you put inside the quotes. It does not care if it's your name, your dog's name, or the lyrics to your favourite song.\n\nChange `\"Hello, World!\"` to say hello to YOU. Put your own name in there.\n\nSomething like: `print(\"Hello, Alex!\")`",
+    "hint": "Just change the text inside the quotes. Keep the quotes — Python needs them to know it's text.",
     "starter": "print(\"Hello, World!\")",
     "expectedOutput": [],
     "codeChecks": [
-      { "pattern": "print\\(\"Hello, World!\"\\)", "required": false, "message": "Change the message — replace World with your own name." }
+      { "pattern": "print\\(\"Hello, World!\"\\)", "required": false, "message": "Change the message — make it say hello to you, not the world!" }
     ],
-    "successMessage": "Your name on screen. The program is already yours."
+    "successMessage": "Your name on a screen! The program belongs to you now. That warm fuzzy feeling? That is what programmers call 'it works'. Get used to it."
   },
   {
-    "title": "Print two lines",
-    "instruction": "Add a second `print()` below the first one.\n\nEach `print()` starts a new line automatically.\n\nMake the second line say something about what you do — like `\"I am learning Python.\"`",
-    "hint": "Add print(\"I am learning Python.\") on the next line.",
+    "title": "Say more things",
+    "instruction": "Here is something cool — you can print as many lines as you want. Each `print()` creates a new line of output.\n\nLook at the starter code. There is a comment on line 2 starting with `#`. Comments are notes to yourself — Python completely ignores them.\n\nAdd a second `print()` below it. Tell Python something about what you are learning — like `print(\"I am learning Python and it is awesome.\")`",
+    "hint": "Add print(\"I am learning Python and it is awesome.\") on the line below the comment.",
     "starter": "print(\"Hello, Alex!\")\n# Add a second print() below this line",
     "expectedOutput": [],
     "codeChecks": [
-      { "pattern": "print\\(", "required": true, "message": "Add a second print() call." },
+      { "pattern": "print\\(", "required": true, "message": "Add a second print() call below the comment." },
       { "pattern": "print\\([^)]+\\)[\\s\\S]+print\\([^)]+\\)", "required": true, "message": "You need two print() calls — one per line." },
       { "pattern": "# Add a second", "required": false, "message": "Replace the comment with your second print() call." }
     ],
-    "successMessage": "Two lines of output, two lines of code. Python runs top to bottom — each print() adds one line."
+    "successMessage": "Two lines! Python ran your code top to bottom, line by line. That is literally how all programs work — top to bottom, one instruction at a time."
   },
   {
-    "title": "Print three lines",
-    "instruction": "Add a third `print()` below the other two.\n\nMake it say where you are from — like `\"From London.\"`",
+    "title": "Three things at once",
+    "instruction": "Alright, let's go bigger. Three lines.\n\nThink of it like sending a text with three messages back to back. Python sends them in order.\n\nAdd a third `print()` below the other two. Tell Python where you are from — like `print(\"From London.\")` or wherever you actually are.",
     "hint": "Add a third print() below the second one.",
     "starter": "print(\"Hello, Alex!\")\nprint(\"I am learning Python.\")\n# Add a third print() below",
     "expectedOutput": [],
     "codeChecks": [
-      { "pattern": "(print\\([^)]+\\)[\\s\\S]*){3}", "required": true, "message": "Add a third print() call." },
+      { "pattern": "(print\\([^)]+\\)[\\s\\S]*){3}", "required": true, "message": "Add a third print() call — you need three total." },
       { "pattern": "# Add a third", "required": false, "message": "Replace the comment with your third print() call." }
     ],
-    "successMessage": "Three lines. You now know the most-used function in Python. Seriously — you will call print() thousands of times."
+    "successMessage": "Three lines of output. You are officially doing more than most people who 'want to learn to code someday'. You are actually doing it."
   },
   {
-    "title": "Comments",
-    "instruction": "A comment starts with `#`. Python ignores everything after `#` on that line.\n\nComments are notes for humans — not instructions for Python.\n\nRun this. The comment does nothing. Then change the comment to describe what the program does.",
-    "hint": "Change the comment text to anything you like. It won't affect the output.",
+    "title": "Comments — your secret notes",
+    "instruction": "A line starting with `#` is a **comment**. Python skips it completely — it is just a note for humans.\n\nGood programmers write comments to explain their thinking. Not what the code does (the code shows that), but *why* they did it.\n\nRun the code below. You will notice the comment does not show up in the output. Then change the comment to describe what this program does.",
+    "hint": "Change the # comment text to something descriptive. The output will not change.",
     "starter": "# This is a comment — Python ignores this line\nprint(\"Hello, Python!\")\nprint(\"Comments are just notes for humans.\")",
     "expectedOutput": ["Hello, Python!", "Comments are just notes for humans."],
-    "successMessage": "Comments never run. They exist for you — and anyone else reading your code. Good programmers comment the 'why', not the 'what'."
+    "successMessage": "The comment vanished! Because it was never meant for Python — it was for you. Future you will love comments when you come back to old code and think 'wait, what does this do?'"
   },
   {
-    "title": "No main, no semicolons",
-    "instruction": "In Java or C++, every program needs a `main` function and semicolons at the end of every line.\n\nPython needs neither. Code at the top level just runs, top to bottom.\n\nRun this program — no `main`, no `;`. Then add two more `print()` lines about Python.",
-    "hint": "Add two print() lines below the existing ones. No semicolons needed.",
-    "starter": "print(\"Python runs top to bottom.\")\nprint(\"No main function needed.\")\n# Add two more lines below",
+    "title": "No main, no semicolons, no drama",
+    "instruction": "Quick comparison to show you how chill Python is.\n\nIn Java, this takes about 5 lines and some curly braces just to say hello. In C++, you need a `main()` function and a semicolon.\n\nPython? Just write and run. No ceremony.\n\nRun this. Then add two more `print()` lines about why Python is great. You are preaching to the choir here.",
+    "hint": "Add two more print() lines below the existing ones. No semicolons, no curly braces, just vibes.",
+    "starter": "print(\"Python runs top to bottom.\")\nprint(\"No main function needed.\")\n# Add two more reasons why Python is great",
     "expectedOutput": [],
     "codeChecks": [
       { "pattern": "(print\\([^)]+\\)[\\s\\S]*){4}", "required": true, "message": "Add two more print() calls — four total." },
       { "pattern": "# Add two more", "required": false, "message": "Replace the comment with your two print() calls." }
     ],
-    "successMessage": "Four lines, zero semicolons, zero curly braces. Python gets out of your way and lets you focus on what you want to say."
+    "successMessage": "Four lines, zero semicolons, zero curly braces. This is why millions of people fall in love with Python. It gets out of your way."
   },
   {
-    "title": "Spot the mistake",
-    "instruction": "This program has a bug. The string is not closed properly — there is a missing quote.\n\nFind it and fix it.",
-    "hint": "The closing quote is missing from the first print. It should be print(\"Python is great!\")",
+    "title": "Spot the bug",
+    "instruction": "Time to play detective. This program has a bug. It will crash if you run it.\n\nThe string is not closed properly — a quote is missing.\n\nSee if you can find it and fix it before running. (Hint: look at line 1 very carefully.)",
+    "hint": "The closing quote is missing on line 1. It should be: print(\"Python is great!\")",
     "starter": "print(\"Python is great!)\nprint(\"Let's fix this bug.\")",
     "expectedOutput": ["Python is great!", "Let's fix this bug."],
     "codeChecks": [
-      { "pattern": "print\\(\"Python is great!\"\\)", "required": true, "message": "Fix the missing closing quote: print(\"Python is great!\")" }
+      { "pattern": "print\\(\"Python is great!\"\\)", "required": true, "message": "Fix the missing closing quote on line 1: print(\"Python is great!\")" }
     ],
-    "successMessage": "Syntax errors are the most common bugs for beginners. The fix was one character — a closing quote. Your eye for bugs is already sharpening."
+    "successMessage": "Bug squashed! That was a syntax error — one of the most common mistakes beginners make. And now you know what it looks like, you will spot it instantly next time."
   },
   {
-    "title": "Another bug to fix",
-    "instruction": "Python is case-sensitive. `Print` is not the same as `print`.\n\n`Print(\"Hello\")` will crash. `print(\"Hello\")` works.\n\nFix both lines.",
+    "title": "Another sneaky bug",
+    "instruction": "Python is case-sensitive. `Print` and `print` are completely different things to Python.\n\n`Print(\"Hello\")` will crash. `print(\"Hello\")` works.\n\nThis catches everyone once. Both lines below are broken. Fix them.",
     "hint": "Change Print to print (lowercase p) on both lines.",
     "starter": "Print(\"Hello from Python!\")\nPrint(\"Case matters here.\")",
     "expectedOutput": ["Hello from Python!", "Case matters here."],
     "codeChecks": [
-      { "pattern": "Print\\(", "required": false, "message": "Change Print to print — Python is case-sensitive." }
+      { "pattern": "Print\\(", "required": false, "message": "Change Print to print — lowercase p. Python is case-sensitive!" }
     ],
-    "successMessage": "print not Print. Lowercase always. Python's built-in functions are all lowercase — this will become automatic very quickly."
+    "successMessage": "print not Print. Always lowercase. After writing a few hundred print() calls, your fingers will do this automatically. Promise."
   },
   {
-    "title": "Write a program from scratch",
-    "instruction": "The editor is empty. Write a program yourself.\n\nPrint exactly these three lines:\n```\nPython is fun.\nI wrote this myself.\nChapter 1 almost done.\n```",
-    "hint": "Three print() calls, one per line.",
+    "title": "Write it from scratch",
+    "instruction": "No starter code this time. The editor is empty. You are writing the whole thing.\n\nPrint exactly these three lines:\n```\nPython is fun.\nI wrote this myself.\nChapter 1 almost done.\n```\n\nThree `print()` calls, three lines of output. You have got this.",
+    "hint": "Three print() calls, one per line. Match the text exactly.",
     "starter": "",
     "expectedOutput": ["Python is fun.", "I wrote this myself.", "Chapter 1 almost done."],
     "codeChecks": [
       { "pattern": "print\\(", "required": true, "message": "Use print() to output each line." }
     ],
-    "successMessage": "You built that from nothing. Three print() calls, three lines of output, exactly right. That is programming."
+    "successMessage": "You wrote that from nothing. Blank screen to working program. That is the whole skill — that is what programmers do every day."
   },
   {
-    "title": "Chapter 1 complete",
-    "instruction": "One last change.\n\nThe program below prints `\"Learning Python\"`. Change it to print `\"Chapter 1 complete!\"`",
+    "title": "Chapter 1 complete!",
+    "instruction": "Last one. Let's end this chapter with a bang.\n\nChange the message below to say `\"Chapter 1 complete!\"` — because it is.",
     "hint": "Change the text inside the quotes.",
     "starter": "print(\"Learning Python\")",
     "expectedOutput": ["Chapter 1 complete!"],
     "codeChecks": [
       { "pattern": "print\\(\"Chapter 1 complete!\"\\)", "required": true, "message": "Change the message to: Chapter 1 complete!" }
     ],
-    "successMessage": "Chapter 1 complete!\n\nYou know print(), comments, basic syntax, and how to find bugs. Everything else in Python builds from here."
+    "successMessage": "Chapter 1 complete!\n\nYou know print(), comments, syntax, and how to hunt bugs. In Chapter 2, we are going to start *storing* information — and that is when things get really interesting."
   }
 ]

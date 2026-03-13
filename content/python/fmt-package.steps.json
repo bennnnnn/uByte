@@ -1,14 +1,14 @@
 [
   {
-    "title": "f-strings — the modern way",
-    "instruction": "In Chapter 2, you printed variables separately. But real programs need to embed variables inside sentences.\n\nf-strings do that. Put `f` before the opening quote, then use `{variable}` anywhere inside:\n\n`f\"Hello, {name}!\"` — Python replaces `{name}` with the variable's value.\n\nRun this.",
+    "title": "There's a better way to print",
+    "instruction": "In Chapter 2, when you wanted to print a variable alongside text, you had to do something clunky like `\"Hello, \" + name + \"!\"`.\n\nThere is a much better way. **f-strings.**\n\nPut an `f` before the opening quote. Then wrap any variable in `{}`. Python replaces it with the actual value.\n\n`f\"Hello, {name}!\"` — Python replaces `{name}` with whatever name holds.\n\nRun this and see how clean it looks.",
     "starter": "name = \"Alex\"\nage = 25\nprint(f\"Hello, {name}!\")\nprint(f\"You are {age} years old.\")",
     "expectedOutput": ["Hello, Alex!", "You are 25 years old."],
-    "successMessage": "f-strings embed variables directly in text. No str() conversion, no + concatenation — just put the variable in curly braces. This is the modern Python way."
+    "successMessage": "Did you see that? No + signs, no str() calls, no quotation juggling. Just put the variable in curly braces. f-strings are one of Python's most-loved features."
   },
   {
     "title": "Expressions inside f-strings",
-    "instruction": "The `{}` in an f-string can hold any Python expression — not just variable names.\n\n`f\"{2 + 2}\"` → `\"4\"`\n`f\"{name.upper()}\"` → the name in uppercase\n\nCreate an f-string that shows the tax-included price (multiply price by 1.2 inside the `{}`).",
+    "instruction": "Here is where f-strings get really powerful. You can put any Python expression inside the `{}`  — not just variable names.\n\n`{2 + 2}` → 4\n`{name.upper()}` → name in uppercase\n`{price * 1.2}` → price with 20% added\n\nPrint the price with 20% tax by putting `price * 1.2` directly inside the curly braces.",
     "hint": "print(f\"Price with tax: {price * 1.2}\")",
     "starter": "price = 100\nproduct = \"Laptop\"\nprint(f\"Product: {product}\")\n# TODO: print price with 20% tax using an expression inside {}",
     "expectedOutput": [],
@@ -16,11 +16,11 @@
       { "pattern": "price\\s*\\*\\s*1\\.2|price\\s*\\*\\s*1\\.20", "required": true, "message": "Multiply price by 1.2 inside the f-string: {price * 1.2}" },
       { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
     ],
-    "successMessage": "Any valid Python expression goes inside {}. Math, method calls, comparisons — they all work inline."
+    "successMessage": "Math inside curly braces. Method calls inside curly braces. Comparisons inside curly braces. The {} in f-strings accepts any valid Python expression — that is incredibly powerful."
   },
   {
-    "title": "Format numbers — decimal places",
-    "instruction": "Floats sometimes print with too many decimal places: `3.141592653589793`.\n\nControl it with format specifiers: `{value:.2f}` means 2 decimal places.\n\nFix the output below to show prices with exactly 2 decimal places.",
+    "title": "Fix messy decimal places",
+    "instruction": "Floats can be unpredictable: `99.9` prints as `99.9`, but after some math you might get `99.99999999` or `100.00000001`.\n\nf-strings let you control exactly how many decimal places to show:\n\n`{price:.2f}` means 'show this float with 2 decimal places'.\n\nFix the three prices to show exactly 2 decimal places.",
     "hint": "Use {price:.2f} in each f-string.",
     "starter": "price1 = 9.9\nprice2 = 14.99999\nprice3 = 100.0\n\n# TODO: print each price with exactly 2 decimal places\nprint(f\"Item 1: {price1}\")\nprint(f\"Item 2: {price2}\")\nprint(f\"Item 3: {price3}\")",
     "expectedOutput": ["Item 1: 9.90", "Item 2: 15.00", "Item 3: 100.00"],
@@ -29,11 +29,11 @@
       { "pattern": "price2:.2f", "required": true, "message": "Format price2: {price2:.2f}" },
       { "pattern": "price3:.2f", "required": true, "message": "Format price3: {price3:.2f}" }
     ],
-    "successMessage": ":.2f = float with 2 decimal places. Always use this for prices and currency. 15.00 looks much better than 14.99999."
+    "successMessage": "9.90, 15.00, 100.00 — clean, consistent prices. :.2f means 'float, 2 decimal places'. Always use this for money. You cannot ship a price that says $14.99999."
   },
   {
-    "title": "Format numbers — thousands separator",
-    "instruction": "`1000000` is hard to read. `1,000,000` is clear.\n\nUse `{value:,}` for thousands separators.\n\nAdd separators to the three big numbers below.",
+    "title": "Thousands separators",
+    "instruction": "Reading `8000000000` makes your brain work too hard. `8,000,000,000` is instant.\n\nAdd `:,` to format numbers with thousands separators:\n\n`{population:,}` → 8,000,000,000\n\nAdd separators to all three big numbers below.",
     "hint": "Use {population:,}, {salary:,}, {distance:,}",
     "starter": "population = 8000000000\nsalary = 120000\ndistance = 384400\n\n# TODO: print each with thousands separators\nprint(f\"World population: {population}\")\nprint(f\"Annual salary: {salary}\")\nprint(f\"Distance to Moon: {distance} km\")",
     "expectedOutput": ["World population: 8,000,000,000", "Annual salary: 120,000", "Distance to Moon: 384,400 km"],
@@ -42,18 +42,18 @@
       { "pattern": "salary:,", "required": true, "message": "Add comma format: {salary:,}" },
       { "pattern": "distance:,", "required": true, "message": "Add comma format: {distance:,}" }
     ],
-    "successMessage": ":, adds thousands separators automatically. Much clearer than 8000000000. You can combine them: {salary:,.2f} for currency."
+    "successMessage": "Much more readable! You can even combine them: {salary:,.2f} gives you $120,000.00 — number with separators AND two decimal places."
   },
   {
-    "title": "String width and alignment",
-    "instruction": "For neatly aligned columns, you can set a minimum width:\n\n`{value:<10}` — left-align in 10 characters\n`{value:>10}` — right-align in 10 characters\n`{value:^10}` — center in 10 characters\n\nRun this to see the alignment in action.",
+    "title": "Column alignment",
+    "instruction": "For neatly aligned columns, you can set a minimum width and alignment direction:\n\n`{value:<10}` — left-align in 10 characters\n`{value:>10}` — right-align in 10 characters\n\nRun the receipt below. Notice how < and > push the text and numbers to opposite sides. This is how reports, tables, and receipts are formatted.",
     "starter": "items = [(\"Apple\", 0.99), (\"Banana\", 0.49), (\"Mango\", 2.50)]\n\nprint(f\"{'Item':<10} {'Price':>8}\")\nprint(\"-\" * 20)\nfor name, price in items:\n    print(f\"{name:<10} {price:>8.2f}\")",
     "expectedOutput": [],
-    "successMessage": "Column-aligned output. < for left, > for right, ^ for center. The number is the minimum width. Use this for tables, reports, or any structured output."
+    "successMessage": "Perfect alignment — items on the left, prices on the right. < for left-align, > for right-align, the number is the minimum width. Real receipts, real reports, real data tables — this is how they are built."
   },
   {
-    "title": "print() — sep and end",
-    "instruction": "`print()` has two optional parameters:\n\n- `sep` — what goes between multiple values (default: space)\n- `end` — what goes at the end of the line (default: newline `\\n`)\n\nRun this. Then add two print calls that use `sep=\"-\"` and `end=\" | \"`.",
+    "title": "print() has hidden powers",
+    "instruction": "`print()` has two optional superpowers that most beginners don't know about:\n\n- `sep` — what to put **between** multiple values (default: a space)\n- `end` — what to put at the **end** of the line (default: a newline)\n\nAdd two more print calls: one using `sep=\"-\"`, one using `end=\" | \"`.",
     "hint": "print(\"A\", \"B\", \"C\", sep=\"-\")\nprint(\"one\", \"two\", end=\" | \")",
     "starter": "print(\"A\", \"B\", \"C\")\nprint(\"A\", \"B\", \"C\", sep=\", \")\n# TODO: print with sep=\"-\" and then with end=\" | \"",
     "expectedOutput": [],
@@ -62,11 +62,11 @@
       { "pattern": "end=", "required": true, "message": "Add a print with a custom end parameter." },
       { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
     ],
-    "successMessage": "sep and end give you control over exactly how print formats output. Print CSV-ready lines, inline sequences, or progress indicators."
+    "successMessage": "sep and end give you fine control over output. print(\"A\", \"B\", \"C\", sep=\"-\") gives A-B-C. Use end=\" \" to keep everything on one line."
   },
   {
-    "title": "Escape sequences",
-    "instruction": "Some characters cannot go directly in a string. Use escape sequences:\n\n- `\\n` — newline\n- `\\t` — tab\n- `\\\\` — literal backslash\n- `\\\"` — quote inside a double-quoted string\n\nRun this. Then add a line that prints a Windows-style file path using `\\\\`.",
+    "title": "Escape sequences — special characters",
+    "instruction": "Some characters need special treatment inside strings:\n\n- `\\n` — start a new line\n- `\\t` — add a tab\n- `\\\\` — a literal backslash (important for Windows file paths!)\n- `\\\"` — a quote inside a double-quoted string\n\nRun the first three lines to see \\n and \\t in action. Then add a line that prints a Windows-style file path using `\\\\`.",
     "hint": "print(\"C:\\\\Users\\\\Alex\\\\Documents\")",
     "starter": "print(\"Line 1\\nLine 2\\nLine 3\")\nprint(\"Name:\\tAlex\")\nprint(\"She said \\\"hello\\\"\")\n# TODO: print a Windows file path like C:\\Users\\Alex",
     "expectedOutput": [],
@@ -74,30 +74,30 @@
       { "pattern": "\\\\\\\\", "required": true, "message": "Use \\\\\\\\ for a literal backslash in a file path." },
       { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
     ],
-    "successMessage": "Escape sequences are Python's way of putting special characters in strings. \\n and \\t are the most common — you will use them constantly."
+    "successMessage": "\\n for newlines, \\t for tabs, \\\\\\\\ for backslashes. These are called escape sequences and you will use \\n constantly — it is how you add blank lines programmatically."
   },
   {
-    "title": "Raw strings — r\"\"",
-    "instruction": "If you have a string with many backslashes (like file paths or regex patterns), raw strings save you:\n\n`r\"C:\\Users\\Alex\"` — backslashes are treated literally. No escape needed.\n\nFix the broken file path below using a raw string.",
+    "title": "Raw strings — when backslashes get annoying",
+    "instruction": "File paths on Windows are a nightmare: `C:\\Users\\Alex` — all those backslashes need to be doubled.\n\nRaw strings fix this. Put an `r` before the opening quote and every backslash is treated literally:\n\n`r\"C:\\Users\\Alex\"` — no doubling needed!\n\nFix the broken file path by making it a raw string.",
     "hint": "path = r\"C:\\Users\\Alex\\Documents\"",
     "starter": "# BUG: \\U and \\A are not valid escape sequences — use a raw string\npath = \"C:\\Users\\Alex\\Documents\"\nprint(path)",
     "expectedOutput": ["C:\\Users\\Alex\\Documents"],
     "codeChecks": [
       { "pattern": "r\"[^\"]+\"", "required": true, "message": "Use a raw string: r\"C:\\Users\\Alex\\Documents\"" }
     ],
-    "successMessage": "r\"\" raw strings treat every backslash literally. Essential for Windows paths, file patterns, and regex — anywhere you have lots of backslashes."
+    "successMessage": "r\"\" raw strings — no escaping needed. Also essential for regular expressions, which are full of backslashes. Whenever you have lots of backslashes, reach for r\"\"."
   },
   {
-    "title": "Multi-line strings — triple quotes",
-    "instruction": "Triple quotes `\"\"\"` or `'''` let you write strings that span multiple lines without `\\n`.\n\nPerfect for long messages, SQL queries, HTML templates, or docstrings.\n\nRun this. Then write your own multi-line message.",
+    "title": "Multi-line strings",
+    "instruction": "Triple quotes `\"\"\"` let you write text that spans multiple lines without `\\n` everywhere.\n\nPerfect for long messages, email templates, SQL queries, or any block of text.\n\nRun this letter. Then write your own multi-line message below it.",
     "hint": "message = \"\"\"Line 1\nLine 2\nLine 3\"\"\"",
     "starter": "message = \"\"\"Dear Alex,\n\nWelcome to Python.\nThings are about to get interesting.\n\nCheers,\nThe Python Team\"\"\"\n\nprint(message)",
     "expectedOutput": [],
-    "successMessage": "Triple-quoted strings preserve all whitespace and newlines exactly as written. Great for long text — and they double as docstrings for documenting functions."
+    "successMessage": "Triple-quoted strings preserve everything — blank lines, indentation, all of it. They also double as docstrings for documenting functions. You will see them everywhere in production code."
   },
   {
-    "title": ".format() — the older way",
-    "instruction": "Before f-strings (Python 3.6+), `.format()` was the standard:\n\n`\"Hello, {}!\".format(name)`\n\nYou will see this in old code. It works the same way as f-strings.\n\nRewrite the two f-string lines below using `.format()` instead.",
+    "title": ".format() — the older style",
+    "instruction": "Before f-strings existed (they were added in Python 3.6), the standard was `.format()`:\n\n`\"Hello, {}!\".format(name)`\n\nSame result, more typing. You will see this in older code, so it's worth knowing.\n\nRewrite the two f-string lines below using `.format()` instead.",
     "hint": "\"Hello, {}!\".format(name)\n\"You are {} years old.\".format(age)",
     "starter": "name = \"Alex\"\nage = 25\n\n# TODO: rewrite these as .format() calls\nprint(f\"Hello, {name}!\")\nprint(f\"You are {age} years old.\")",
     "expectedOutput": ["Hello, Alex!", "You are 25 years old."],
@@ -105,11 +105,11 @@
       { "pattern": "\\.format\\(", "required": true, "message": "Use .format() instead of f-strings." },
       { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
     ],
-    "successMessage": ".format() still works perfectly. f-strings are cleaner and faster — use f-strings in new code, but recognise .format() in old code."
+    "successMessage": ".format() still works perfectly. f-strings are faster and cleaner for new code — but when you see .format() in someone else's code, you'll know exactly what it does."
   },
   {
-    "title": "% formatting — the oldest way",
-    "instruction": "Even older than `.format()` is `%` formatting:\n\n`\"Hello, %s!\" % name` — `%s` is replaced by the string value.\n`\"Age: %d\" % age` — `%d` is replaced by an integer.\n\nRun this. Then write a line that formats a price using `%` formatting with `%.2f`.",
+    "title": "% formatting — the ancient style",
+    "instruction": "Before `.format()` there was `%` formatting — Python's original approach:\n\n`\"Hello, %s!\" % name` — `%s` is a string placeholder\n`\"Age: %d\" % age` — `%d` is an integer placeholder\n`\"Price: %.2f\" % price` — `%.2f` is a float with 2 decimal places\n\nAdd a `%` formatted line for price using `%.2f`.",
     "hint": "print(\"Price: $%.2f\" % price)",
     "starter": "name = \"Alex\"\nage = 25\nprice = 19.9\n\nprint(\"Hello, %s!\" % name)\nprint(\"Age: %d\" % age)\n# TODO: print price using %.2f format",
     "expectedOutput": [],
@@ -117,12 +117,12 @@
       { "pattern": "%\\.2f", "required": true, "message": "Use %.2f to format the price." },
       { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
     ],
-    "successMessage": "% formatting is Python's oldest string formatting. Still works, rarely used in new code. You will see it in legacy codebases — and now you understand it."
+    "successMessage": "% formatting — still works, rarely written in new code. You will see it in legacy codebases. Now you can read it fluently. Use f-strings for everything you write yourself."
   },
   {
     "title": "Build a receipt",
-    "instruction": "No starter code.\n\nBuild a formatted receipt that prints:\n```\nReceipt\n---------\nCoffee         $3.50\nSandwich      $7.25\nTotal         $10.75\n---------\nThank you!\n```\n\nUse f-strings with `:.2f` for prices and `:<` or `:>` for alignment.",
-    "hint": "Use f\"{item:<12} ${price:.2f}\" for each line.",
+    "instruction": "Final challenge — let's build something real.\n\nBuild a formatted receipt that looks like this:\n```\nReceipt\n---------\nCoffee         $3.50\nSandwich       $7.25\nTotal         $10.75\n---------\nThank you!\n```\n\nUse f-strings with `:.2f` for prices and `:<` or `:>` for alignment. Make it look sharp.",
+    "hint": "Use f\"{item:<12} ${price:.2f}\" for each item line.",
     "starter": "",
     "expectedOutput": [],
     "codeChecks": [
@@ -130,6 +130,6 @@
       { "pattern": "f\"", "required": true, "message": "Use f-strings for the output." },
       { "pattern": "Receipt", "required": true, "message": "Print 'Receipt' as the header." }
     ],
-    "successMessage": "A real formatted receipt. Decimal-aligned prices, padded columns — this is exactly how real programs format financial output. Chapter 4 done."
+    "successMessage": "A real receipt with aligned columns and formatted prices. This is exactly how every POS system, invoice generator, and e-commerce confirmation email formats output. Chapter 4 done — you are absolutely flying."
   }
 ]

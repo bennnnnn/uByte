@@ -1,28 +1,28 @@
 [
   {
-    "title": "The problem lists solve",
-    "instruction": "Imagine you want to store five student names. Without lists, you would do this:\n\n```python\nstudent1 = \"Alice\"\nstudent2 = \"Bob\"\nstudent3 = \"Carol\"\nstudent4 = \"David\"\nstudent5 = \"Eve\"\n```\n\nThat is painful. And what if you have 1000 students?\n\nA list holds all of them in one variable:\n\n`students = [\"Alice\", \"Bob\", \"Carol\", \"David\", \"Eve\"]`\n\nRun this.",
+    "title": "One variable, many values",
+    "instruction": "Imagine you want to store five student names. Without lists, you'd do this:\n\n```python\nstudent1 = \"Alice\"\nstudent2 = \"Bob\"\nstudent3 = \"Carol\"\nstudent4 = \"David\"\nstudent5 = \"Eve\"\n```\n\nAnd if you want to loop over them? Nope, you can't. What if you add more students? More variables.\n\nLists solve this completely: **one variable, as many values as you want.**\n\n`students = [\"Alice\", \"Bob\", \"Carol\", \"David\", \"Eve\"]`\n\nRun this.",
     "starter": "students = [\"Alice\", \"Bob\", \"Carol\", \"David\", \"Eve\"]\nprint(students)\nprint(f\"Total students: {len(students)}\")",
     "expectedOutput": ["[\"Alice\", \"Bob\", \"Carol\", \"David\", \"Eve\"]", "Total students: 5"],
-    "successMessage": "One variable, five values. len() gives you the count. This is why lists exist — one container for many related values."
+    "successMessage": "One variable holds all five. len() counts them. Try adding more names to the list — the code doesn't change at all. That's the whole point."
   },
   {
-    "title": "Accessing items by index",
-    "instruction": "Each item in a list has a position called an **index**, starting at `0`:\n\n```\n[\"Alice\", \"Bob\", \"Carol\"]\n   [0]     [1]    [2]\n```\n\n`students[0]` → `\"Alice\"` (first item)\n`students[-1]` → last item (Python counts from the back with negatives)\n\nPrint the first, third, and last student.",
+    "title": "Getting items by position",
+    "instruction": "Every item in a list has a position called an **index**. Python starts counting at 0:\n\n```\n[\"Alice\", \"Bob\", \"Carol\"]\n   [0]     [1]    [2]\n```\n\nAnd Python's best trick: **negative indexes count from the back**.\n\n`students[-1]` is always the last item — no matter how long the list is.\n\nPrint the first, third, and last student.",
     "hint": "print(students[0])\nprint(students[2])\nprint(students[-1])",
     "starter": "students = [\"Alice\", \"Bob\", \"Carol\", \"David\", \"Eve\"]\n# TODO: print first, third, and last student",
     "expectedOutput": ["Alice", "Carol", "Eve"],
     "codeChecks": [
       { "pattern": "students\\[0\\]", "required": true, "message": "Access first item: students[0]" },
-      { "pattern": "students\\[2\\]", "required": true, "message": "Access third item: students[2]" },
+      { "pattern": "students\\[2\\]", "required": true, "message": "Access third item: students[2] (remember: 0 is first, 2 is third)" },
       { "pattern": "students\\[-1\\]", "required": true, "message": "Access last item: students[-1]" },
       { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
     ],
-    "successMessage": "Index 0 is the first item. Index -1 is always the last, regardless of list size. This is one of Python's most convenient features."
+    "successMessage": "Index 0 = first, -1 = always last. These two are used constantly. Especially students[-1] — it works on any list regardless of size."
   },
   {
-    "title": "Modifying items",
-    "instruction": "Lists are **mutable** — you can change items after creation.\n\n`students[1] = \"Robert\"` — replaces item at index 1.\n\nChange `\"Bob\"` to `\"Robert\"` and `\"Eve\"` to `\"Emma\"`.",
+    "title": "Changing items",
+    "instruction": "Lists are **mutable** — you can change items after creating the list. Just assign to the index:\n\n`students[1] = \"Robert\"` — replaces whatever was at position 1.\n\nChange 'Bob' to 'Robert' and change 'Eve' (the last one) to 'Emma'.",
     "hint": "students[1] = \"Robert\"\nstudents[-1] = \"Emma\"",
     "starter": "students = [\"Alice\", \"Bob\", \"Carol\", \"David\", \"Eve\"]\nprint(\"Before:\", students)\n# TODO: change Bob to Robert and Eve to Emma\nprint(\"After:\", students)",
     "expectedOutput": [],
@@ -31,11 +31,11 @@
       { "pattern": "students\\[-1\\]\\s*=\\s*\"Emma\"|students\\[4\\]\\s*=\\s*\"Emma\"", "required": true, "message": "Change the last item to \"Emma\"" },
       { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
     ],
-    "successMessage": "Bob is now Robert, Eve is now Emma. Lists remember your changes. Unlike strings and tuples, lists are fully editable after creation."
+    "successMessage": "Bob is Robert, Eve is Emma. Lists remember every change you make. This mutability is what makes lists so powerful for building up and adjusting collections of data."
   },
   {
     "title": "append() and insert()",
-    "instruction": "Add items to a list:\n\n- `list.append(item)` — adds to the **end**\n- `list.insert(index, item)` — adds at a **specific position**\n\nAdd `\"Frank\"` to the end with `append()`. Then insert `\"Zara\"` at position 0 (first).",
+    "instruction": "Two ways to add items:\n\n- `list.append(item)` — adds to the **end** (fast)\n- `list.insert(index, item)` — adds at a specific **position** (pushes everything else right)\n\nAppend 'Frank' to the end. Then insert 'Zara' at position 0 (making her first).",
     "hint": "students.append(\"Frank\")\nstudents.insert(0, \"Zara\")",
     "starter": "students = [\"Alice\", \"Bob\", \"Carol\"]\nprint(\"Before:\", students)\n# TODO: append Frank and insert Zara at position 0\nprint(\"After:\", students)",
     "expectedOutput": [],
@@ -44,12 +44,12 @@
       { "pattern": "insert\\(0,\\s*\"Zara\"\\)", "required": true, "message": "Insert Zara at position 0: students.insert(0, \"Zara\")" },
       { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
     ],
-    "successMessage": "append adds at the end, insert puts it wherever you want. append is O(1) — instant. insert is O(n) — slower on large lists."
+    "successMessage": "append adds to the end instantly (O(1) — constant time). insert pushes everything to make room (O(n) — slower on big lists). For building up lists, always prefer append."
   },
   {
     "title": "remove() and pop()",
-    "instruction": "Remove items from a list:\n\n- `list.remove(value)` — removes the **first occurrence** of a value\n- `list.pop(index)` — removes by **index** and **returns** the removed item\n- `list.pop()` — removes the **last** item\n\nRemove `\"Bob\"` by value, then pop the last item.",
-    "hint": "students.remove(\"Bob\")\nlast = students.pop()",
+    "instruction": "Two ways to remove items:\n\n- `list.remove(value)` — finds and removes the **first occurrence** of that value\n- `list.pop(index)` — removes by **position** and **gives you back** the removed item\n- `list.pop()` — removes the last item\n\nRemove 'Bob' by value. Then pop the last item (and you can store it if you want it).",
+    "hint": "students.remove(\"Bob\")\nstudents.pop()",
     "starter": "students = [\"Alice\", \"Bob\", \"Carol\", \"David\", \"Eve\"]\nprint(\"Before:\", students)\n# TODO: remove Bob, then pop the last item\nprint(\"After:\", students)",
     "expectedOutput": [],
     "codeChecks": [
@@ -57,11 +57,11 @@
       { "pattern": "pop\\(\\)", "required": true, "message": "Pop the last item: students.pop()" },
       { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
     ],
-    "successMessage": "remove deletes by value (first match only), pop deletes by index and returns the item. Both modify the list in-place."
+    "successMessage": "remove by value, pop by index. Both modify the list in-place. pop returns the removed item — so if you want to know what you removed, save it: last = students.pop()"
   },
   {
-    "title": "Slicing — extract a portion",
-    "instruction": "Slicing extracts a portion of a list:\n\n`list[start:stop]` — items from start up to (not including) stop\n`list[:3]` — first 3 items\n`list[2:]` — from index 2 to the end\n`list[::2]` — every 2nd item\n\nExtract the first three students, the last two, and every other student.",
+    "title": "Slicing — grab a portion",
+    "instruction": "Slicing extracts a portion of a list without changing the original:\n\n- `list[start:stop]` — from start up to (not including) stop\n- `list[:3]` — first 3 items\n- `list[-2:]` — last 2 items\n- `list[::2]` — every other item\n\nExtract the first three students, the last two, and every other student.",
     "hint": "students[:3], students[-2:], students[::2]",
     "starter": "students = [\"Alice\", \"Bob\", \"Carol\", \"David\", \"Eve\"]\n# TODO: print first 3, last 2, and every other student",
     "expectedOutput": ["['Alice', 'Bob', 'Carol']", "['David', 'Eve']", "['Alice', 'Carol', 'Eve']"],
@@ -71,11 +71,11 @@
       { "pattern": "students\\[::2\\]", "required": true, "message": "Every other item: students[::2]" },
       { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
     ],
-    "successMessage": "Slicing is one of Python's most powerful features. It creates a new list — it does not modify the original. Use it to extract any sub-sequence."
+    "successMessage": "Slicing creates a NEW list — the original is untouched. This is one of Python's most distinctive features. Slicing works on strings too: \"hello\"[:3] gives \"hel\"."
   },
   {
     "title": "Useful list methods",
-    "instruction": "Lists have many built-in methods:\n\n- `sort()` — sorts in place\n- `sorted()` — returns a new sorted list\n- `reverse()` — reverses in place\n- `count(x)` — counts occurrences of x\n- `index(x)` — finds position of x\n\nRun this. Then add: print how many times `3` appears, and find the index of `7`.",
+    "instruction": "Lists come with a toolbox of built-in methods:\n\n- `sorted(list)` — returns a new sorted list (original unchanged)\n- `list.sort()` — sorts the list in-place (original changed)\n- `list.count(x)` — how many times does x appear?\n- `list.index(x)` — what position is x at?\n\nRun the starter to see sort vs sorted. Then add: count how many 3s there are, and find the index of 7.",
     "hint": "print(numbers.count(3))\nprint(numbers.index(7))",
     "starter": "numbers = [5, 2, 8, 3, 1, 7, 3, 9]\nprint(sorted(numbers))\nprint(numbers)  # original unchanged\nnumbers.sort()\nprint(numbers)  # now sorted in-place\n# TODO: count 3s and find index of 7",
     "expectedOutput": [],
@@ -84,11 +84,11 @@
       { "pattern": "index\\(7\\)", "required": true, "message": "Find index of 7: numbers.index(7)" },
       { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
     ],
-    "successMessage": "sort() changes the original, sorted() creates a new one. count and index are for searching. All built in — no extra imports needed."
+    "successMessage": "sorted() creates a copy, sort() changes the original. Know which you want before you use it — getting them mixed up causes subtle bugs. Ask yourself: 'do I want to keep the original?'"
   },
   {
-    "title": "in — check if item exists",
-    "instruction": "`in` works on lists just like it works on strings:\n\n`\"Alice\" in students` → `True` if Alice is in the list.\n\nFrom the last chapter you know `not in` works too.\n\nCheck if each subject is available before enrolling.",
+    "title": "in — is it there?",
+    "instruction": "From Chapter 6 you know `in` works on strings. It works on lists too:\n\n`\"Alice\" in students` → True if Alice is in the list.\n\nCheck which subjects from a wishlist are actually available.",
     "hint": "if subject in available_subjects:",
     "starter": "available_subjects = [\"Math\", \"Science\", \"History\", \"English\"]\nwanted = [\"Math\", \"Art\", \"Science\"]\n\n# TODO: for each subject in wanted, print whether it is available\n# \"Math: available\" or \"Art: not available\"",
     "expectedOutput": ["Math: available", "Art: not available", "Science: available"],
@@ -97,33 +97,33 @@
       { "pattern": "for\\s+\\w+\\s+in\\s+wanted", "required": true, "message": "Loop over wanted: for subject in wanted:" },
       { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
     ],
-    "successMessage": "in on a list checks all elements — O(n). For fast lookups, you would use a set. But for small lists, in is perfectly fine."
+    "successMessage": "Membership check on a list. Note: for small lists this is fine. For thousands of items, a set gives you the same in but much faster. You'll learn sets later."
   },
   {
-    "title": "List comprehension with conditions",
-    "instruction": "You can add a filter condition to a list comprehension:\n\n`[x for x in numbers if x > 0]` — only positive numbers\n\nCreate two lists using comprehension:\n1. All even numbers from 1–20\n2. All students with names longer than 4 characters",
+    "title": "List comprehension with a filter",
+    "instruction": "Remember list comprehensions from Chapter 7? You can add a condition to filter the results:\n\n`[x for x in numbers if x > 0]` — only keeps positive numbers\n\nCreate two filtered lists:\n1. All even numbers from 1–20\n2. Students with names longer than 4 characters",
     "hint": "[x for x in range(1, 21) if x % 2 == 0]\n[s for s in students if len(s) > 4]",
-    "starter": "students = [\"Alice\", \"Bob\", \"Carol\", \"David\", \"Eve\", \"Isabella\"]\n\n# TODO: list of evens 1-20\nevens = []\nprint(evens)\n\n# TODO: list of students with names > 4 chars\nlong_names = []\nprint(long_names)",
+    "starter": "students = [\"Alice\", \"Bob\", \"Carol\", \"David\", \"Eve\", \"Isabella\"]\n\n# TODO: list of even numbers 1-20\nevens = []\nprint(evens)\n\n# TODO: list of students with names longer than 4 characters\nlong_names = []\nprint(long_names)",
     "expectedOutput": [],
     "codeChecks": [
-      { "pattern": "\\[.*for.*in.*range.*if.*%.*2.*==.*0\\]", "required": true, "message": "Use comprehension with condition: [x for x in range(1,21) if x % 2 == 0]" },
+      { "pattern": "\\[.*for.*in.*range.*if.*%.*2.*==.*0\\]", "required": true, "message": "Use comprehension with filter: [x for x in range(1,21) if x % 2 == 0]" },
       { "pattern": "\\[.*for.*in.*students.*if.*len", "required": true, "message": "Filter by name length: [s for s in students if len(s) > 4]" },
       { "pattern": "TODO", "required": false, "message": "Replace the TODO comments with your code." }
     ],
-    "successMessage": "Filtered comprehensions in one line. This is the idiomatic Python way to create filtered lists. Clear, fast, and readable."
+    "successMessage": "Filtered comprehensions. This pattern — create a new list by transforming and filtering another — is Python's most idiomatic way to process data."
   },
   {
     "title": "Build a grade tracker",
-    "instruction": "No starter code.\n\nBuild a grade tracker:\n1. Create a list of 5 scores (e.g. `[85, 92, 78, 96, 88]`)\n2. Print the highest score using `max()`\n3. Print the lowest using `min()`\n4. Print the average (sum divided by count)\n5. Print all scores above 85 using list comprehension",
+    "instruction": "Final challenge — let's build something real.\n\nCreate a list of 5 scores (make them up). Then:\n1. Print the highest score with `max()`\n2. Print the lowest score with `min()`\n3. Calculate and print the average (use `sum()` and `len()`)\n4. Print all scores above 85 using list comprehension\n\nNo starter code. You have all the pieces.",
     "hint": "avg = sum(scores) / len(scores)\nhigh_scores = [s for s in scores if s > 85]",
     "starter": "",
     "expectedOutput": [],
     "codeChecks": [
       { "pattern": "max\\(", "required": true, "message": "Use max() for the highest score." },
       { "pattern": "min\\(", "required": true, "message": "Use min() for the lowest score." },
-      { "pattern": "sum\\(", "required": true, "message": "Use sum() for calculating the average." },
-      { "pattern": "\\[.*for.*in.*if", "required": true, "message": "Use list comprehension with a condition." }
+      { "pattern": "sum\\(", "required": true, "message": "Use sum() for the total (needed for average)." },
+      { "pattern": "\\[.*for.*in.*if", "required": true, "message": "Use list comprehension with a condition for the high scores." }
     ],
-    "successMessage": "A real grade tracker — max, min, average, filtered list. You just used Python's most important data structure in a real scenario. Chapter 8 done."
+    "successMessage": "A real grade tracker! max, min, average, filtered list — all in less than 10 lines. Lists are Python's most used data structure. You now know them inside and out. Chapter 8 done!"
   }
 ]

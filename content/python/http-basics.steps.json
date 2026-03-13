@@ -1,93 +1,101 @@
 [
   {
-    "title": "HTTP basics",
-    "instruction": "HTTP is the language of the web. Every browser request, every API call uses it.\n\nKey concepts:\n- **GET** — retrieve data\n- **POST** — send data\n- **Status codes** — 200 OK, 404 Not Found, 500 Server Error\n- **Headers** — metadata (Content-Type, Authorization, etc.)\n\nPython's `urllib.request` is built-in. `requests` (third-party) is much cleaner.\n\nRun this basic GET request using urllib.",
-    "starter": "import urllib.request\nimport json\n\n# A public test API\nwith urllib.request.urlopen(\"https://httpbin.org/json\") as response:\n    data = json.loads(response.read().decode())\n    print(data[\"slideshow\"][\"title\"])\n    print(f\"Status: {response.status}\")",
+    "title": "The internet is just HTTP",
+    "instruction": "Every time your browser loads a page, every time your app fetches data from an API — it's using HTTP (HyperText Transfer Protocol).\n\nHTTP is a conversation:\n- Your program sends a **request** (`GET /users`)\n- The server sends back a **response** (status code + data)\n\nPython's standard library has `urllib` for HTTP — no install needed. Let's try it.",
+    "starter": "import urllib.request\nimport json\n\nwith urllib.request.urlopen(\"https://httpbin.org/json\") as response:\n    data = json.loads(response.read())\n    print(data[\"slideshow\"][\"title\"])\n    print(f\"Status: {response.status}\")",
     "expectedOutput": [],
-    "successMessage": "A real HTTP request to a real server. urllib is built-in — no installation needed. But requests makes everything much simpler."
+    "successMessage": "You just made an HTTP request from Python! urllib fetched a JSON response, you parsed it, and pulled out a value. That's the foundation of every API call."
   },
   {
-    "title": "requests.get() — the clean way",
-    "instruction": "The `requests` library is the standard for HTTP in Python:\n\n```python\nimport requests\nresponse = requests.get(\"https://api.example.com/data\")\nprint(response.status_code)  # 200\nprint(response.json())       # parsed JSON\n```\n\nRun this GET request to a public API.",
-    "starter": "import requests\n\nresponse = requests.get(\"https://httpbin.org/get\")\nprint(f\"Status: {response.status_code}\")\nprint(f\"URL: {response.json()['url']}\")\nprint(f\"Content-Type: {response.headers['Content-Type']}\")",
+    "title": "requests — urllib but human",
+    "instruction": "urllib works but is verbose. The `requests` library makes HTTP in Python actually enjoyable:\n\n```python\nimport requests\nresponse = requests.get(url)\ndata = response.json()\n```\n\nThree lines instead of ten.\n\nFetch a random user from a public API. The `.json()` method parses the JSON automatically.",
+    "hint": "response = requests.get(\"https://randomuser.me/api/\")\ndata = response.json()",
+    "starter": "import requests\n\n# TODO: GET https://randomuser.me/api/ and print the first user's name\n# data[\"results\"][0][\"name\"][\"first\"] + \" \" + data[\"results\"][0][\"name\"][\"last\"]",
     "expectedOutput": [],
-    "successMessage": "requests.get() is clean and readable. response.json() parses the JSON automatically. response.headers is a dictionary of response headers."
+    "codeChecks": [
+      { "pattern": "requests\\.get\\(", "required": true, "message": "Use requests.get(url) to make the request." },
+      { "pattern": "\\.json\\(\\)", "required": true, "message": "Parse the response: response.json()" },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
+    ],
+    "successMessage": "requests.get() + .json() — that's the whole API call. Requests is consistently one of the most downloaded Python packages in the world for good reason."
   },
   {
     "title": "Query parameters",
-    "instruction": "Query parameters add filters and options to URLs: `?key=value&other=value`\n\nWith requests, pass a `params` dict — it builds the URL for you:\n\n```python\nparams = {\"q\": \"python\", \"limit\": 10}\nresponse = requests.get(url, params=params)\n# becomes: url?q=python&limit=10\n```\n\nSearch for \"python\" using the provided API.",
-    "hint": "params = {\"q\": \"python\", \"format\": \"json\"}",
-    "starter": "import requests\n\n# TODO: make a GET request with params q=\"python tutorial\" and limit=5\nresponse = requests.get(\n    \"https://httpbin.org/get\",\n    params={}\n)\nprint(response.json()[\"args\"])",
+    "instruction": "APIs let you filter results with query parameters — the `?key=value` part of a URL.\n\nDon't build the URL string manually — use the `params` dict:\n\n```python\nrequests.get(url, params={\"q\": \"python\", \"limit\": 5})\n```\n\nRequests automatically URL-encodes them. Manual string building is messy and error-prone.\n\nSearch for posts by userId.",
+    "hint": "response = requests.get(url, params={\"userId\": 1})",
+    "starter": "import requests\n\nurl = \"https://jsonplaceholder.typicode.com/posts\"\n# TODO: add params={\"userId\": 1} to filter posts by user\nresponse = requests.get(url)\nposts = response.json()\nprint(f\"Found {len(posts)} posts\")\nif posts:\n    print(f\"First: {posts[0]['title'][:40]}\")",
     "expectedOutput": [],
     "codeChecks": [
-      { "pattern": "params\\s*=\\s*\\{[^}]+\\}", "required": true, "message": "Add params to the request." },
+      { "pattern": "params\\s*=\\s*\\{", "required": true, "message": "Add params dict: params={\"userId\": 1}" },
       { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
     ],
-    "successMessage": "params builds the URL safely — special characters are encoded, you don't need to worry about & vs ? or URL encoding. Always use params, never build URLs manually."
+    "successMessage": "Filtered to only user 1's posts. Requests built the URL for you: .../posts?userId=1. Always use params= — it handles encoding, escaping, and multiple values automatically."
   },
   {
-    "title": "requests.post() — send data",
-    "instruction": "POST sends data to the server. Most API endpoints that create or update data use POST.\n\n```python\nresponse = requests.post(url, json={\"key\": \"value\"})\n```\n\nThe `json=` parameter serializes the dict to JSON and sets the Content-Type header automatically.",
-    "hint": "requests.post(url, json={\"name\": \"Alex\", \"email\": \"alex@example.com\"})",
-    "starter": "import requests\n\nuser_data = {\n    \"name\": \"Alex Rivera\",\n    \"job\": \"Python Developer\"\n}\n\n# TODO: POST to https://httpbin.org/post with user_data as JSON\nresponse = None\nif response:\n    result = response.json()\n    print(f\"Status: {response.status_code}\")\n    print(f\"Sent: {result['json']}\")",
+    "title": "POST — sending data",
+    "instruction": "GET retrieves data. POST sends data — creating a new resource:\n\n```python\nrequests.post(url, json={\"key\": \"value\"})\n```\n\nUse `json=` and requests automatically serialises to JSON and sets the Content-Type header.\n\nCreate a new post.",
+    "hint": "response = requests.post(url, json={\"title\": \"Hello\", \"body\": \"World\", \"userId\": 1})",
+    "starter": "import requests\n\nurl = \"https://jsonplaceholder.typicode.com/posts\"\nnew_post = {\n    \"title\": \"My First API Post\",\n    \"body\": \"Learning Python HTTP the right way.\",\n    \"userId\": 1\n}\n\n# TODO: POST new_post to the URL and print the response status code and id\nresponse = requests.get(url)  # BUG: should be POST",
     "expectedOutput": [],
     "codeChecks": [
-      { "pattern": "requests\\.post\\(", "required": true, "message": "Use requests.post() to send data." },
-      { "pattern": "json\\s*=\\s*user_data|json=user_data", "required": true, "message": "Pass json=user_data to the POST request." },
+      { "pattern": "requests\\.post\\(", "required": true, "message": "Use requests.post() not requests.get()." },
+      { "pattern": "json=new_post|json=\\{", "required": true, "message": "Send data with json= parameter." },
       { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
     ],
-    "successMessage": "POST with JSON body. json= does the serialization and sets Content-Type: application/json automatically. The server echoes back exactly what you sent."
+    "successMessage": "Status 201 (Created) — the server acknowledged your new post. json= auto-serialises and sets Content-Type: application/json. Always use json= not data= when sending JSON."
   },
   {
-    "title": "Headers — authentication",
-    "instruction": "Many APIs require authentication via headers:\n\n```python\nheaders = {\n    \"Authorization\": \"Bearer your-token-here\",\n    \"Accept\": \"application/json\"\n}\nresponse = requests.get(url, headers=headers)\n```\n\nAdd custom headers to the request.",
-    "hint": "headers = {\"X-Custom-Header\": \"hello\", \"Accept\": \"application/json\"}",
-    "starter": "import requests\n\n# TODO: add headers with X-Custom-Header: \"hello\" and Accept: \"application/json\"\nresponse = requests.get(\n    \"https://httpbin.org/headers\",\n    headers={}\n)\nprint(response.json()[\"headers\"])",
+    "title": "Headers — send metadata",
+    "instruction": "HTTP headers carry metadata — authentication tokens, content type, user agent, language preferences.\n\nThe most important: `Authorization`:\n\n```python\nheaders = {\"Authorization\": \"Bearer your-token-here\"}\nrequests.get(url, headers=headers)\n```\n\nAdd an Authorization header to the request.",
+    "hint": "headers = {\"Authorization\": \"Bearer fake-token\", \"Accept\": \"application/json\"}",
+    "starter": "import requests\n\nurl = \"https://httpbin.org/headers\"\n# TODO: add headers with Authorization and Accept fields\nresponse = requests.get(url)\ndata = response.json()\nprint(data[\"headers\"])",
     "expectedOutput": [],
     "codeChecks": [
-      { "pattern": "headers\\s*=\\s*\\{[^}]+\\}", "required": true, "message": "Pass a headers dict with at least one header." },
+      { "pattern": "headers\\s*=\\s*\\{", "required": true, "message": "Create a headers dictionary." },
+      { "pattern": "Authorization", "required": true, "message": "Include an Authorization header." },
+      { "pattern": "headers=headers", "required": true, "message": "Pass headers to requests.get(url, headers=headers)." },
       { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
     ],
-    "successMessage": "Headers carry metadata — who you are (Authorization), what you accept (Accept), what format you're sending (Content-Type). Every production API uses them."
+    "successMessage": "Your headers arrived at the server. httpbin echoes back what it received. Authorization headers carry your API key or JWT token — the API uses them to identify you."
   },
   {
-    "title": "Error handling — response.raise_for_status()",
-    "instruction": "`response.raise_for_status()` raises an exception if the status code indicates an error (4xx or 5xx):\n\n```python\ntry:\n    response.raise_for_status()\nexcept requests.exceptions.HTTPError as e:\n    print(f\"HTTP error: {e}\")\n```\n\nAdd error handling to the request below.",
-    "hint": "try:\n    response.raise_for_status()\nexcept requests.exceptions.HTTPError as e:\n    print(f\"Error: {e}\")",
-    "starter": "import requests\n\n# TODO: add try/except and raise_for_status() to handle errors\nresponse = requests.get(\"https://httpbin.org/status/404\")\nprint(f\"Status: {response.status_code}\")\n# Without raise_for_status, a 404 looks like success!",
-    "expectedOutput": [],
+    "title": "raise_for_status() — check for errors",
+    "instruction": "`requests.get()` does NOT raise an exception for HTTP error codes (404, 500, etc.) — it succeeds and returns the error response.\n\n`response.raise_for_status()` converts HTTP errors to Python exceptions:\n- 4xx → `HTTPError` (client errors: not found, unauthorised)\n- 5xx → `HTTPError` (server errors)\n\nAlways call this after a request.",
+    "hint": "response.raise_for_status()\nexcept requests.HTTPError as e:",
+    "starter": "import requests\n\ntry:\n    response = requests.get(\"https://httpbin.org/status/404\")\n    # TODO: add raise_for_status() here\n    print(\"This should not print for a 404\")\nexcept requests.HTTPError as e:\n    print(f\"HTTP Error: {e.response.status_code}\")",
+    "expectedOutput": ["HTTP Error: 404"],
     "codeChecks": [
-      { "pattern": "raise_for_status\\(\\)", "required": true, "message": "Call response.raise_for_status()." },
-      { "pattern": "except requests\\.exceptions", "required": true, "message": "Catch requests.exceptions.HTTPError." },
+      { "pattern": "\\.raise_for_status\\(\\)", "required": true, "message": "Call: response.raise_for_status()" },
       { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
     ],
-    "successMessage": "raise_for_status turns a silent 404 into an exception you must handle. Always check the status code — HTTP requests can fail silently without it."
+    "successMessage": "404 became a Python exception. Without raise_for_status(), your code would silently process error responses. Add it after every request — it's the safety net."
   },
   {
     "title": "Sessions — reuse connections",
-    "instruction": "`requests.Session()` reuses connections and lets you set headers/auth once:\n\n```python\nsession = requests.Session()\nsession.headers.update({\"Authorization\": \"Bearer token\"})\n\n# All requests from this session carry the header\nresponse1 = session.get(url1)\nresponse2 = session.get(url2)\n```\n\nRewrite the two requests to use a session with a shared header.",
-    "hint": "session = requests.Session()\nsession.headers.update({\"X-App-Version\": \"1.0\"})",
-    "starter": "import requests\n\n# TODO: use requests.Session() and set X-App-Version: \"1.0\" once\n# then make two GET requests reusing the session\nr1 = requests.get(\"https://httpbin.org/headers\")\nr2 = requests.get(\"https://httpbin.org/headers\")\n\nprint(r1.json()[\"headers\"].get(\"X-App-Version\", \"not set\"))\nprint(r2.json()[\"headers\"].get(\"X-App-Version\", \"not set\"))",
+    "instruction": "Every `requests.get()` opens a new TCP connection. For many requests to the same server, that's slow.\n\n`requests.Session` reuses connections, sends headers automatically, and maintains cookies:\n\n```python\nwith requests.Session() as session:\n    session.headers[\"Authorization\"] = \"Bearer token\"\n    session.get(url1)  # uses shared headers and connection\n    session.get(url2)  # reuses everything\n```\n\nRewrite the three requests to use a Session with a shared User-Agent header.",
+    "hint": "with requests.Session() as session:\n    session.headers[\"User-Agent\"] = \"MyApp/1.0\"\n    r1 = session.get(url1)",
+    "starter": "import requests\n\nbase_url = \"https://jsonplaceholder.typicode.com\"\n\n# TODO: use a Session for these three requests\nr1 = requests.get(f\"{base_url}/posts/1\", headers={\"User-Agent\": \"MyApp/1.0\"})\nr2 = requests.get(f\"{base_url}/posts/2\", headers={\"User-Agent\": \"MyApp/1.0\"})\nr3 = requests.get(f\"{base_url}/posts/3\", headers={\"User-Agent\": \"MyApp/1.0\"})\n\nfor r in [r1, r2, r3]:\n    print(r.json()[\"title\"][:30])",
     "expectedOutput": [],
     "codeChecks": [
-      { "pattern": "Session\\(\\)", "required": true, "message": "Create a requests.Session()." },
-      { "pattern": "headers\\.update\\(", "required": true, "message": "Set headers on the session." },
+      { "pattern": "requests\\.Session\\(\\)", "required": true, "message": "Create a Session: with requests.Session() as session:" },
+      { "pattern": "session\\.get\\(", "required": true, "message": "Use session.get() for the requests." },
+      { "pattern": "session\\.headers\\[", "required": true, "message": "Set shared headers on the session: session.headers[\"User-Agent\"]" },
       { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
     ],
-    "successMessage": "One session, headers set once, applied to every request. More efficient than creating new connections, and cleaner code for authenticated APIs."
+    "successMessage": "Session reuses the TCP connection and sends User-Agent automatically. For any code that makes multiple requests to the same API, always use a Session — faster and cleaner."
   },
   {
-    "title": "Build a GitHub profile fetcher",
-    "instruction": "No starter code.\n\nBuild a function `get_github_user(username)` that:\n1. Makes a GET request to `https://api.github.com/users/{username}`\n2. Returns a dict with `name`, `public_repos`, `followers`\n3. Handles 404 (user not found) gracefully\n4. Uses a timeout of 5 seconds\n\nTest it with a real username like `\"python\"` or `\"torvalds\"`.",
-    "hint": "requests.get(url, timeout=5)\nresponse.raise_for_status()",
+    "title": "Build an API client",
+    "instruction": "Final challenge — no starter code.\n\nBuild a `JSONPlaceholderClient` class that:\n- Has `base_url = \"https://jsonplaceholder.typicode.com\"`\n- Uses a `requests.Session` internally\n- `get_post(id)` — returns a post dictionary\n- `get_user_posts(user_id)` — returns list of posts for a user\n- `create_post(title, body, user_id)` — creates a post and returns the created post\n\nAll methods should call raise_for_status().",
+    "hint": "class JSONPlaceholderClient:\n    def __init__(self):\n        self.session = requests.Session()\n        self.base_url = \"https://jsonplaceholder.typicode.com\"",
     "starter": "",
     "expectedOutput": [],
     "codeChecks": [
-      { "pattern": "def get_github_user\\(", "required": true, "message": "Define get_github_user(username)." },
-      { "pattern": "api\\.github\\.com/users", "required": true, "message": "Use the GitHub API URL." },
-      { "pattern": "timeout\\s*=\\s*5|timeout=5", "required": true, "message": "Add timeout=5 to the request." },
-      { "pattern": "raise_for_status\\(\\)|404", "required": true, "message": "Handle errors (raise_for_status or 404 check)." }
+      { "pattern": "class JSONPlaceholderClient:", "required": true, "message": "Define the client class." },
+      { "pattern": "requests\\.Session\\(\\)", "required": true, "message": "Use a Session inside the class." },
+      { "pattern": "def get_post\\(", "required": true, "message": "Define get_post method." },
+      { "pattern": "raise_for_status\\(\\)", "required": true, "message": "Call raise_for_status() after each request." }
     ],
-    "successMessage": "A real API client hitting a real server. This is the foundation of every data pipeline, bot, integration, or tool that touches external services. Chapter 23 done."
+    "successMessage": "A clean, reusable API client class. This is exactly how real Python SDKs are built — a class wrapping a Session, methods hiding the HTTP details. Chapter 23 done!"
   }
 ]

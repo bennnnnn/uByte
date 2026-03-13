@@ -1,95 +1,102 @@
 [
   {
-    "title": "What is JSON",
-    "instruction": "JSON (JavaScript Object Notation) is the universal language for exchanging data over the web.\n\nEvery REST API sends and receives JSON. Config files are JSON. Databases store JSON.\n\nJSON looks like Python dicts and lists — but there are differences:\n- JSON uses `true`/`false` (lowercase). Python uses `True`/`False`.\n- JSON uses `null`. Python uses `None`.\n- JSON strings require double quotes only.\n\nRun this to see a JSON string.",
-    "starter": "import json\n\ndata = {\n    \"name\": \"Alex\",\n    \"age\": 25,\n    \"active\": True,\n    \"score\": None,\n    \"tags\": [\"python\", \"developer\"]\n}\n\njson_string = json.dumps(data)\nprint(json_string)\nprint(type(json_string))",
-    "expectedOutput": [],
-    "successMessage": "json.dumps() converts a Python dict to a JSON string. Notice True → true, None → null. This is the string you send over a network."
+    "title": "JSON — the language APIs speak",
+    "instruction": "APIs respond in JSON. Configuration files are often JSON. Even your browser's local storage uses JSON.\n\nJSON (JavaScript Object Notation) looks just like Python dicts and lists — but it's text. When you send data over a network, it must become text first.\n\nPython's `json` module converts between JSON text and Python objects. No install needed.\n\nRun this.",
+    "starter": "import json\n\n# This is JSON — a Python string that contains structured data\njson_text = '{\"name\": \"Alex\", \"age\": 25, \"skills\": [\"Python\", \"JavaScript\"]}'\n\n# Parse it into a Python dict:\ndata = json.loads(json_text)\nprint(data[\"name\"])\nprint(data[\"skills\"])\nprint(type(data))  # a real dict!",
+    "expectedOutput": ["Alex", "['Python', 'JavaScript']", "<class 'dict'>"],
+    "successMessage": "json.loads() turned text into a real Python dict. 'loads' = load from string. Now you can access data['name'] just like any dict. That's the whole deal."
   },
   {
-    "title": "json.loads() — parse JSON",
-    "instruction": "`json.loads(string)` parses a JSON string back into Python data:\n\n```python\ndata = json.loads(json_string)\nprint(data[\"name\"])  # access like a dict\n```\n\nParse the JSON string and access the values.",
-    "hint": "data = json.loads(json_str)\nprint(data[\"city\"])",
-    "starter": "import json\n\njson_str = '{\"name\": \"Alice\", \"age\": 30, \"city\": \"London\", \"active\": true}'\n\n# TODO: parse json_str and print name, age, city\n# Also check the type of the 'active' field — it should be bool, not string",
-    "expectedOutput": [],
+    "title": "json.loads — parse any API response",
+    "instruction": "When an API responds, you get a string of JSON. `json.loads()` parses it into Python objects:\n\n- JSON object `{}` → Python `dict`\n- JSON array `[]` → Python `list`\n- JSON string `\"text\"` → Python `str`\n- JSON number → Python `int` or `float`\n- JSON `true`/`false` → Python `True`/`False`\n- JSON `null` → Python `None`\n\nParse the API response and print the user's name and account status.",
+    "hint": "data = json.loads(response)\nprint(data['user']['name'])",
+    "starter": "import json\n\napi_response = '''\n{\n    \"status\": \"success\",\n    \"user\": {\n        \"id\": 42,\n        \"name\": \"Alex Rivera\",\n        \"premium\": true,\n        \"last_login\": null\n    },\n    \"permissions\": [\"read\", \"write\", \"admin\"]\n}\n'''\n\n# TODO: parse the response and print:\n# - user name\n# - is premium (True or False)\n# - number of permissions",
+    "expectedOutput": ["Alex Rivera", "True", "3"],
     "codeChecks": [
-      { "pattern": "json\\.loads\\(", "required": true, "message": "Use: json.loads(json_str)" },
-      { "pattern": "\\[\"name\"\\]|\\[\"age\"\\]|\\[\"city\"\\]", "required": true, "message": "Access values by key." },
+      { "pattern": "json\\.loads\\(", "required": true, "message": "Parse with: json.loads(api_response)" },
+      { "pattern": "\\[\"user\"\\]\\[\"name\"\\]|\\['user'\\]\\['name'\\]", "required": true, "message": "Access nested: data['user']['name']" },
       { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
     ],
-    "successMessage": "loads parses back to Python. true → True, null → None. The type conversion is automatic — json.loads knows the JSON type system."
+    "successMessage": "Nested JSON parsed in one call. json.loads handles any depth automatically. true became True, null became None. Python's json module is opinionated in a good way."
   },
   {
-    "title": "json.dumps() options — indent and sort",
-    "instruction": "`json.dumps()` has useful options:\n\n- `indent=2` — pretty-print with indentation\n- `sort_keys=True` — alphabetical key order\n\nRun this to see pretty-printed JSON.",
-    "starter": "import json\n\nuser = {\n    \"name\": \"Alex\",\n    \"email\": \"alex@example.com\",\n    \"address\": {\n        \"city\": \"London\",\n        \"country\": \"UK\"\n    },\n    \"tags\": [\"python\", \"developer\"]\n}\n\ncompact = json.dumps(user)\npretty = json.dumps(user, indent=2, sort_keys=True)\n\nprint(\"Compact:\")\nprint(compact)\nprint(\"\\nPretty:\")\nprint(pretty)",
+    "title": "json.dumps — turn Python into JSON",
+    "instruction": "`json.dumps()` does the reverse — converts Python objects to JSON text.\n\n- `indent=2` makes it readable (pretty-printed)\n- `sort_keys=True` sorts keys alphabetically\n\nConvert the user dict to JSON and print it pretty.",
+    "hint": "json.dumps(user, indent=2)",
+    "starter": "import json\n\nuser = {\n    \"name\": \"Alex\",\n    \"age\": 25,\n    \"premium\": True,\n    \"last_login\": None,\n    \"skills\": [\"Python\", \"SQL\", \"Docker\"]\n}\n\n# TODO: convert user to JSON with indent=2\n# also try with sort_keys=True",
     "expectedOutput": [],
-    "successMessage": "Compact for transmission (fewer bytes), pretty for debugging and config files. indent=2 is the Python standard — you will see it everywhere."
+    "codeChecks": [
+      { "pattern": "json\\.dumps\\(", "required": true, "message": "Use json.dumps(user, indent=2)" },
+      { "pattern": "indent=2|indent=4", "required": true, "message": "Add indent for pretty-printing: indent=2" },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
+    ],
+    "successMessage": "Pretty-printed JSON with proper indentation. Notice: Python's True became true, None became null — json.dumps handles the translation automatically."
   },
   {
-    "title": "Write and read JSON files",
-    "instruction": "`json.dump()` (no 's') writes to a file. `json.load()` reads from a file.\n\nWrite the config to a file, then read it back.",
-    "hint": "with open(\"config.json\", \"w\") as f:\n    json.dump(config, f, indent=2)\n\nwith open(\"config.json\", \"r\") as f:\n    loaded = json.load(f)",
-    "starter": "import json\n\nconfig = {\n    \"version\": \"1.0\",\n    \"database\": {\"host\": \"localhost\", \"port\": 5432},\n    \"debug\": False\n}\n\n# TODO: write config to config.json (indent=2)\n# then read it back and print the database host\n",
+    "title": "Write JSON to a file",
+    "instruction": "To save data to a file, use `json.dump()` (no 's') — dumps directly to a file object:\n\n```python\nwith open(\"data.json\", \"w\") as f:\n    json.dump(data, f, indent=2)\n```\n\nSave the config to a file, then immediately read it back.",
+    "hint": "with open(\"config.json\", \"w\") as f:\n    json.dump(config, f, indent=2)",
+    "starter": "import json\n\nconfig = {\n    \"database\": {\"host\": \"localhost\", \"port\": 5432},\n    \"api\": {\"key\": \"abc123\", \"timeout\": 30},\n    \"debug\": True\n}\n\n# TODO: write config to \"config.json\" with indent=2\n# then read it back and print database host",
     "expectedOutput": ["localhost"],
     "codeChecks": [
-      { "pattern": "json\\.dump\\(config", "required": true, "message": "Write: json.dump(config, f, indent=2)" },
-      { "pattern": "json\\.load\\(f\\)", "required": true, "message": "Read: json.load(f)" },
+      { "pattern": "json\\.dump\\(", "required": true, "message": "Write with: json.dump(config, f, indent=2)" },
+      { "pattern": "json\\.load\\(", "required": true, "message": "Read back with: json.load(f)" },
       { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
     ],
-    "successMessage": "json.dump to file, json.load from file. Configuration, caching, data persistence — JSON files are everywhere in real applications."
+    "successMessage": "Written to disk and read back! json.dump for writing, json.load for reading. Configuration files, saved state, cached data — this is the pattern."
   },
   {
-    "title": "Nested JSON",
-    "instruction": "JSON structures nest arbitrarily deep. Access nested values by chaining keys:\n\n`data[\"address\"][\"city\"]`\n\nParse this API response and extract specific nested values.",
-    "hint": "user[\"address\"][\"city\"]\nuser[\"skills\"][0]",
-    "starter": "import json\n\napi_response = '''\n{\n    \"user\": {\n        \"id\": 1,\n        \"name\": \"Alex Rivera\",\n        \"address\": {\n            \"city\": \"London\",\n            \"country\": \"UK\"\n        },\n        \"skills\": [\"Python\", \"Django\", \"PostgreSQL\"]\n    }\n}\n'''\n\ndata = json.loads(api_response)\nuser = data[\"user\"]\n\n# TODO: print user's city, country, and first skill",
-    "expectedOutput": ["London", "UK", "Python"],
+    "title": "Nested JSON — go as deep as you need",
+    "instruction": "Real API responses are often deeply nested. You can chain key access as deep as needed.\n\nNavigate through the nested response to print the user's city and their first skill.",
+    "hint": "data['user']['address']['city']\ndata['user']['skills'][0]['name']",
+    "starter": "import json\n\nresponse = json.loads('''\n{\n    \"user\": {\n        \"id\": 1,\n        \"name\": \"Alex\",\n        \"address\": {\n            \"city\": \"London\",\n            \"country\": \"UK\"\n        },\n        \"skills\": [\n            {\"name\": \"Python\", \"level\": \"expert\"},\n            {\"name\": \"SQL\", \"level\": \"intermediate\"}\n        ]\n    }\n}\n''')\n\n# TODO: print city and first skill name",
+    "expectedOutput": ["London", "Python"],
     "codeChecks": [
-      { "pattern": "\\[\"address\"\\]\\[\"city\"\\]", "required": true, "message": "Access nested: user[\"address\"][\"city\"]" },
-      { "pattern": "\\[\"skills\"\\]\\[0\\]", "required": true, "message": "Access first skill: user[\"skills\"][0]" },
+      { "pattern": "\\[\"address\"\\]\\[\"city\"\\]|\\['address'\\]\\['city'\\]", "required": true, "message": "Access: data['user']['address']['city']" },
+      { "pattern": "\\[\"skills\"\\]\\[0\\]|\\['skills'\\]\\[0\\]", "required": true, "message": "Access: data['user']['skills'][0]['name']" },
       { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
     ],
-    "successMessage": "Chained key access for nested structures. Real API responses are often 5-10 levels deep. Chain keys, check for None, use .get() for optional fields."
+    "successMessage": "Nested JSON access — chain as many keys as you need. Real APIs have responses 6-10 levels deep. The pattern is always the same: data['key1']['key2'][0]['key3']"
   },
   {
-    "title": "json.JSONDecodeError — bad JSON",
-    "instruction": "`json.loads()` raises `json.JSONDecodeError` if the string is not valid JSON.\n\nHandle it gracefully instead of crashing.",
-    "hint": "except json.JSONDecodeError as e:\n    return None",
-    "starter": "import json\n\ndef safe_parse(text):\n    # TODO: parse text, return None on JSONDecodeError\n    return json.loads(text)\n\nprint(safe_parse('{\"valid\": true}'))    # works\nprint(safe_parse('not valid json'))      # should return None\nprint(safe_parse('{broken}'))            # should return None",
-    "expectedOutput": ["{\"valid\": True}", "None", "None"],
+    "title": "JSONDecodeError — handle bad JSON",
+    "instruction": "What if the server sends you malformed JSON? Maybe it's an HTML error page instead of JSON. `json.loads()` raises `json.JSONDecodeError`.\n\nAlways handle this when dealing with external data.",
+    "hint": "except json.JSONDecodeError as e:\n    print(f\"Invalid JSON: {e}\")",
+    "starter": "import json\n\nbad_responses = [\n    '{\"valid\": true}',\n    'Not JSON at all!',\n    '{broken json',\n    '{\"also\": \"valid\"}',\n]\n\n# TODO: loop over responses, parse each, catch JSONDecodeError\n# print the value for valid ones, or an error message for invalid ones",
+    "expectedOutput": ["Parsed: True", "Error: invalid JSON", "Error: invalid JSON", "Parsed: also"],
     "codeChecks": [
-      { "pattern": "except json\\.JSONDecodeError|except ValueError", "required": true, "message": "Catch json.JSONDecodeError." },
-      { "pattern": "return None", "required": true, "message": "Return None on parse failure." },
+      { "pattern": "json\\.JSONDecodeError", "required": true, "message": "Catch: except json.JSONDecodeError:" },
+      { "pattern": "try:", "required": true, "message": "Wrap json.loads in try/except." },
       { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
     ],
-    "successMessage": "Graceful JSON parsing. APIs sometimes return malformed JSON. safe_parse handles it without crashing — always wrap untrusted input in error handling."
+    "successMessage": "Two valid, two broken — all handled gracefully. External data is always suspect. Never trust that an API always returns valid JSON — always have the error handler ready."
   },
   {
-    "title": "Custom serialization",
-    "instruction": "By default, `json.dumps()` cannot serialize custom objects:\n\n```python\nclass User:\n    ...\n\njson.dumps(User())  # TypeError!\n```\n\nFix this by adding a `default` function that converts unknown objects to JSON-compatible dicts.",
-    "hint": "def user_to_json(obj):\n    if isinstance(obj, User):\n        return {\"name\": obj.name, \"age\": obj.age}",
-    "starter": "import json\nfrom datetime import date\n\nclass User:\n    def __init__(self, name, age, joined):\n        self.name = name\n        self.age = age\n        self.joined = joined  # datetime.date object\n\n# TODO: write a default() function and pass it to json.dumps\ndef default(obj):\n    pass  # handle User and date\n\nuser = User(\"Alex\", 25, date(2024, 1, 15))\nprint(json.dumps(user, default=default, indent=2))",
+    "title": "Custom serialisation — handle non-JSON types",
+    "instruction": "Python's `datetime` and custom objects can't be serialised to JSON by default:\n\n```python\njson.dumps(datetime.now())  # TypeError!\n```\n\nFix it with a custom default encoder:\n\n```python\ndef custom_encoder(obj):\n    if isinstance(obj, datetime):\n        return obj.isoformat()  # convert to ISO string\n    raise TypeError(f\"Not serialisable: {type(obj)}\")\n\njson.dumps(data, default=custom_encoder)\n```\n\nAdd datetime handling to the encoder.",
+    "hint": "def encoder(obj):\n    if isinstance(obj, datetime):\n        return obj.isoformat()",
+    "starter": "import json\nfrom datetime import datetime\n\nevent = {\n    \"name\": \"Python Conference\",\n    \"date\": datetime(2025, 9, 15, 9, 0, 0),  # can't be serialised!\n    \"attendees\": 500\n}\n\n# TODO: write encoder function that converts datetime to ISO string\n# then use json.dumps(event, default=encoder, indent=2)\n\nprint(json.dumps(event, indent=2))  # BUG: crashes without encoder",
     "expectedOutput": [],
     "codeChecks": [
-      { "pattern": "isinstance\\(obj, User\\)", "required": true, "message": "Check: isinstance(obj, User)" },
-      { "pattern": "isinstance\\(obj, date\\)|isoformat\\(\\)", "required": true, "message": "Handle date objects (use .isoformat())." },
-      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
+      { "pattern": "def encoder\\(|def.*default.*encoder", "required": true, "message": "Write a custom encoder function." },
+      { "pattern": "isinstance.*datetime|isinstance.*\\bdatetime\\b", "required": true, "message": "Check: if isinstance(obj, datetime):" },
+      { "pattern": "\\.isoformat\\(\\)", "required": true, "message": "Convert: return obj.isoformat()" },
+      { "pattern": "default=encoder|default=\\w+", "required": true, "message": "Pass: json.dumps(event, default=encoder)" }
     ],
-    "successMessage": "Custom serialization with default(). Dates, UUIDs, custom classes — pass default= and handle any type. The function receives any object json doesn't know how to handle."
+    "successMessage": "datetime serialised as ISO 8601 string. Custom encoders solve the 'not serialisable' problem for any type — dates, UUIDs, Decimal, custom classes."
   },
   {
-    "title": "Build an API response builder",
-    "instruction": "No starter code.\n\nBuild a function `build_response(data, success=True, message=\"\")` that:\n1. Returns a JSON string with structure:\n```json\n{\n  \"success\": true,\n  \"message\": \"\",\n  \"data\": ...,\n  \"timestamp\": \"2024-01-15\"\n}\n```\n2. Uses `json.dumps` with `indent=2`\n3. Includes today's date as timestamp (use `date.today().isoformat()`)\n\nTest with a user dict and an error response.",
-    "hint": "import json\nfrom datetime import date\n\ndef build_response(data, success=True, message=\"\"):",
+    "title": "Build a settings manager",
+    "instruction": "Final challenge — no starter code.\n\nBuild a `SettingsManager` class:\n- `__init__(filename)` — stores the filename, creates an empty settings dict\n- `load()` — reads settings from the JSON file, handles missing file gracefully\n- `save()` — writes current settings to the file\n- `get(key, default=None)` — returns setting value or default\n- `set(key, value)` — updates a setting and saves automatically\n\nTest with at least 3 settings.",
+    "hint": "class SettingsManager:\n    def __init__(self, filename):\n        self.filename = filename\n        self.settings = {}",
     "starter": "",
     "expectedOutput": [],
     "codeChecks": [
-      { "pattern": "def build_response\\(", "required": true, "message": "Define build_response()." },
-      { "pattern": "json\\.dumps\\(", "required": true, "message": "Use json.dumps() to build the JSON string." },
-      { "pattern": "isoformat\\(\\)", "required": true, "message": "Use date.today().isoformat() for timestamp." },
-      { "pattern": "\"success\":", "required": true, "message": "Include a 'success' field." }
+      { "pattern": "class SettingsManager:", "required": true, "message": "Define the SettingsManager class." },
+      { "pattern": "json\\.load\\(", "required": true, "message": "Use json.load() to read settings from file." },
+      { "pattern": "json\\.dump\\(", "required": true, "message": "Use json.dump() to write settings to file." },
+      { "pattern": "FileNotFoundError|except.*Error", "required": true, "message": "Handle missing file gracefully." }
     ],
-    "successMessage": "A standard API response builder — every REST API returns exactly this structure. You just built the foundation of every Python web service. Chapter 24 done — all 24 Python chapters written!"
+    "successMessage": "A complete settings manager — persists between runs, handles missing files, auto-saves on change. This pattern powers config systems in every real application. Chapter 24 done — Python curriculum complete! You absolute legend."
   }
 ]

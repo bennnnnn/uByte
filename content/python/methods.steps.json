@@ -1,27 +1,27 @@
 [
   {
-    "title": "What are dunder methods",
-    "instruction": "Dunder methods (double underscore) are Python's special hooks. When you write `print(obj)`, Python calls `obj.__str__()`. When you write `len(obj)`, Python calls `obj.__len__()`.\n\nThey let your objects behave like Python built-ins.\n\nRun this. Then add `__str__` to make print(book) show the title and author.",
-    "starter": "class Book:\n    def __init__(self, title, author, pages):\n        self.title = title\n        self.author = author\n        self.pages = pages\n\nbook = Book(\"Python Crash Course\", \"Eric Matthes\", 544)\nprint(book)  # right now: <__main__.Book object at ...>",
+    "title": "Python's secret hooks",
+    "instruction": "Have you ever wondered how `print(myList)` knows to show `[1, 2, 3]`? Or how `len(myList)` knows the count?\n\nPython has hooks — special methods with double underscores — that you can implement on your own classes to make them behave like built-ins.\n\n`print(obj)` calls `obj.__str__()`.\n`len(obj)` calls `obj.__len__()`.\n`obj1 + obj2` calls `obj1.__add__(obj2)`.\n\nRun this. Notice print(book) shows the memory address — useless. Your job is to fix that.",
+    "starter": "class Book:\n    def __init__(self, title, author, pages):\n        self.title = title\n        self.author = author\n        self.pages = pages\n\nbook = Book(\"Python Crash Course\", \"Eric Matthes\", 544)\nprint(book)  # right now: <__main__.Book object at 0x...>",
     "expectedOutput": [],
-    "successMessage": "Right now it shows memory address gibberish. Add __str__ and Python will call it whenever it needs to display your object as text."
+    "successMessage": "Gibberish output. Now you know WHY — no __str__ defined. Let's fix that next."
   },
   {
     "title": "__str__ vs __repr__",
-    "instruction": "`__str__` — human-readable output, used by `print()` and `str()`\n`__repr__` — developer-friendly output, used in the Python shell, `repr()`, and debugging\n\nConvention: `__repr__` should return something you could paste back into Python to recreate the object.\n\nAdd both to the `Book` class.",
+    "instruction": "Two methods, two purposes:\n\n- `__str__` — human-friendly output for `print()`\n- `__repr__` — developer-friendly, for debugging. Convention: should look like Python code that recreates the object\n\nAdd both to `Book`.",
     "hint": "def __str__(self):\n    return f\"{self.title} by {self.author}\"\n\ndef __repr__(self):\n    return f\"Book('{self.title}', '{self.author}', {self.pages})\"",
-    "starter": "class Book:\n    def __init__(self, title, author, pages):\n        self.title = title\n        self.author = author\n        self.pages = pages\n    \n    # TODO: add __str__ and __repr__\n\nbook = Book(\"Python Crash Course\", \"Eric Matthes\", 544)\nprint(book)    # uses __str__\nprint(repr(book))  # uses __repr__",
+    "starter": "class Book:\n    def __init__(self, title, author, pages):\n        self.title = title\n        self.author = author\n        self.pages = pages\n    \n    # TODO: add __str__ and __repr__\n\nbook = Book(\"Python Crash Course\", \"Eric Matthes\", 544)\nprint(book)        # uses __str__\nprint(repr(book))  # uses __repr__",
     "expectedOutput": ["Python Crash Course by Eric Matthes", "Book('Python Crash Course', 'Eric Matthes', 544)"],
     "codeChecks": [
-      { "pattern": "def __str__\\(self\\)", "required": true, "message": "Add __str__(self)." },
-      { "pattern": "def __repr__\\(self\\)", "required": true, "message": "Add __repr__(self)." },
+      { "pattern": "def __str__\\(self\\)", "required": true, "message": "Add __str__(self) for human-readable output." },
+      { "pattern": "def __repr__\\(self\\)", "required": true, "message": "Add __repr__(self) for developer-readable output." },
       { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
     ],
-    "successMessage": "__str__ for humans, __repr__ for developers. Always implement both. If you only implement one, implement __repr__ — Python falls back to it for __str__ if needed."
+    "successMessage": "__str__ for humans, __repr__ for developers. If you only implement one, implement __repr__ — Python falls back to it for __str__ if __str__ isn't defined."
   },
   {
     "title": "__len__ — make len() work",
-    "instruction": "`len(obj)` calls `obj.__len__()`.\n\nAdd `__len__` to the `Playlist` class so `len(playlist)` returns the number of songs.",
+    "instruction": "`len(obj)` calls `obj.__len__()`. Add it to your class and len() just works.\n\nAdd `__len__` to `Playlist` so `len(playlist)` returns the song count.",
     "hint": "def __len__(self):\n    return len(self.songs)",
     "starter": "class Playlist:\n    def __init__(self, name):\n        self.name = name\n        self.songs = []\n    \n    def add_song(self, song):\n        self.songs.append(song)\n    \n    # TODO: add __len__ so len(playlist) works\n\nplaylist = Playlist(\"Favourites\")\nplaylist.add_song(\"Song A\")\nplaylist.add_song(\"Song B\")\nplaylist.add_song(\"Song C\")\nprint(len(playlist))  # 3",
     "expectedOutput": ["3"],
@@ -30,11 +30,11 @@
       { "pattern": "return len\\(self\\.songs\\)", "required": true, "message": "Return len(self.songs)." },
       { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
     ],
-    "successMessage": "len(playlist) now works just like len([1,2,3]). Your class is starting to feel like a built-in Python type."
+    "successMessage": "len(playlist) works just like len([1,2,3]). Your Playlist now behaves like a Python built-in. That's the magic of dunder methods."
   },
   {
-    "title": "__eq__ — make == work",
-    "instruction": "By default, `==` on objects checks if they are the **same object** (same memory address). \n\nTo compare by **value**, implement `__eq__`:\n\n```python\ndef __eq__(self, other):\n    return self.value == other.value\n```\n\nAdd `__eq__` to `Point` so two points with same x and y are considered equal.",
+    "title": "__eq__ — make == work properly",
+    "instruction": "By default, `==` on objects checks memory address — two different objects are never equal, even with identical data.\n\nImplement `__eq__` to compare by *value* instead:\n\n```python\ndef __eq__(self, other):\n    return self.x == other.x and self.y == other.y\n```\n\nAdd `__eq__` to `Point` so two points with the same coordinates are equal.",
     "hint": "def __eq__(self, other):\n    return self.x == other.x and self.y == other.y",
     "starter": "class Point:\n    def __init__(self, x, y):\n        self.x = x\n        self.y = y\n    \n    # TODO: add __eq__ to compare by x and y values\n\np1 = Point(3, 4)\np2 = Point(3, 4)\np3 = Point(1, 2)\n\nprint(p1 == p2)  # should be True\nprint(p1 == p3)  # should be False",
     "expectedOutput": ["True", "False"],
@@ -43,24 +43,24 @@
       { "pattern": "self\\.x == other\\.x", "required": true, "message": "Compare x values: self.x == other.x" },
       { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
     ],
-    "successMessage": "Two different objects, same values, equal. Without __eq__ they would never be equal — they are different objects in memory. Value equality vs identity."
+    "successMessage": "p1 == p2 is now True! Two different objects but same values — equal. Without __eq__ they would never be equal (different memory addresses). Value equality vs identity."
   },
   {
     "title": "__lt__ — make sorting work",
-    "instruction": "To sort a list of custom objects with `sorted()`, you need `__lt__` (less than).\n\nAdd `__lt__` to `Student` so you can sort by score.",
+    "instruction": "Want to use `sorted()` on a list of your custom objects? You need `__lt__` (less than).\n\nAdd `__lt__` to `Student` so you can sort by score.",
     "hint": "def __lt__(self, other):\n    return self.score < other.score",
     "starter": "class Student:\n    def __init__(self, name, score):\n        self.name = name\n        self.score = score\n    \n    def __repr__(self):\n        return f\"{self.name}({self.score})\"\n    \n    # TODO: add __lt__ to compare by score\n\nstudents = [Student(\"Alice\", 85), Student(\"Bob\", 92), Student(\"Carol\", 78)]\nsorted_students = sorted(students)\nprint(sorted_students)",
     "expectedOutput": ["[Carol(78), Alice(85), Bob(92)]"],
     "codeChecks": [
       { "pattern": "def __lt__\\(self,\\s*other\\)", "required": true, "message": "Add __lt__(self, other)." },
-      { "pattern": "self\\.score < other\\.score", "required": true, "message": "Compare scores: self.score < other.score" },
+      { "pattern": "self\\.score < other\\.score", "required": true, "message": "Compare: self.score < other.score" },
       { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
     ],
-    "successMessage": "sorted() now works because Python can compare students by score. Add __gt__, __le__, __ge__ for full comparison support — or use @functools.total_ordering."
+    "successMessage": "Sorted by score! Once __lt__ is defined, sorted() knows how to order your students. You can also use @functools.total_ordering to generate all comparison methods from just __eq__ and __lt__."
   },
   {
-    "title": "__add__ — operator overloading",
-    "instruction": "`__add__` makes the `+` operator work on your class:\n\n`v1 + v2` calls `v1.__add__(v2)`\n\nAdd `__add__` to `Vector` so you can add two vectors together.",
+    "title": "__add__ — overload the + operator",
+    "instruction": "`v1 + v2` calls `v1.__add__(v2)`. Implement it and the + operator works on your class.\n\nAdd `__add__` to `Vector` so you can add two vectors.",
     "hint": "def __add__(self, other):\n    return Vector(self.x + other.x, self.y + other.y)",
     "starter": "class Vector:\n    def __init__(self, x, y):\n        self.x = x\n        self.y = y\n    \n    def __repr__(self):\n        return f\"Vector({self.x}, {self.y})\"\n    \n    # TODO: add __add__ so v1 + v2 works\n\nv1 = Vector(1, 2)\nv2 = Vector(3, 4)\nprint(v1 + v2)  # Vector(4, 6)",
     "expectedOutput": ["Vector(4, 6)"],
@@ -69,32 +69,32 @@
       { "pattern": "self\\.x \\+ other\\.x", "required": true, "message": "Add x components: self.x + other.x" },
       { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
     ],
-    "successMessage": "v1 + v2 creates a new Vector(4, 6). Operator overloading makes your class feel native. You can also add __sub__, __mul__, __truediv__ for full math support."
+    "successMessage": "v1 + v2 gives Vector(4, 6) — a brand new vector. Operator overloading makes your class feel native. You can also add __sub__, __mul__, __truediv__ for full math support."
   },
   {
     "title": "__contains__ — make 'in' work",
-    "instruction": "`x in obj` calls `obj.__contains__(x)`.\n\nAdd `__contains__` to `Playlist` so you can use `\"Song A\" in playlist`.",
+    "instruction": "`x in obj` calls `obj.__contains__(x)`. Add it to your class and the `in` keyword just works.\n\nAdd `__contains__` to `Playlist` so `\"Song\" in playlist` works.",
     "hint": "def __contains__(self, song):\n    return song in self.songs",
-    "starter": "class Playlist:\n    def __init__(self):\n        self.songs = []\n    \n    def add(self, song):\n        self.songs.append(song)\n    \n    # TODO: add __contains__ so 'song in playlist' works\n\nplaylist = Playlist()\nplaylist.add(\"Bohemian Rhapsody\")\nplaylist.add(\"Hotel California\")\n\nprint(\"Hotel California\" in playlist)  # True\nprint(\"Stairway to Heaven\" in playlist)  # False",
+    "starter": "class Playlist:\n    def __init__(self):\n        self.songs = []\n    \n    def add(self, song):\n        self.songs.append(song)\n    \n    # TODO: add __contains__ so 'song in playlist' works\n\nplaylist = Playlist()\nplaylist.add(\"Bohemian Rhapsody\")\nplaylist.add(\"Hotel California\")\n\nprint(\"Hotel California\" in playlist)    # True\nprint(\"Stairway to Heaven\" in playlist)  # False",
     "expectedOutput": ["True", "False"],
     "codeChecks": [
       { "pattern": "def __contains__\\(self,\\s*\\w+\\)", "required": true, "message": "Add __contains__(self, song)." },
       { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
     ],
-    "successMessage": "in now works on your Playlist. __contains__ is what makes custom collections feel like Python built-ins."
+    "successMessage": "'Hotel California' in playlist just works! __contains__ is what makes custom collections feel native. Your class now supports Python's most readable way to check membership."
   },
   {
-    "title": "Build a money class",
-    "instruction": "No starter code.\n\nBuild a `Money` class with:\n- `__init__(amount, currency)` — store amount and currency\n- `__str__` — returns e.g. `\"$10.00\"`\n- `__repr__` — returns e.g. `\"Money(10.0, 'USD')\"`\n- `__add__` — add two Money objects (same currency only)\n- `__eq__` — equal if same amount and currency\n\nTest all operations.",
+    "title": "Build a Money class",
+    "instruction": "Final challenge — no starter code.\n\nBuild a `Money` class:\n- `__init__(amount, currency)` — store both\n- `__str__` — returns e.g. `\"$10.00\"`\n- `__repr__` — returns e.g. `\"Money(10.0, 'USD')\"`\n- `__add__` — add two Money objects of the same currency\n- `__eq__` — equal if same amount AND same currency\n\nTest all four operations.",
     "hint": "class Money:\n    def __init__(self, amount, currency):\n        self.amount = amount\n        self.currency = currency",
     "starter": "",
     "expectedOutput": [],
     "codeChecks": [
       { "pattern": "class Money:", "required": true, "message": "Define: class Money:" },
-      { "pattern": "def __str__", "required": true, "message": "Add __str__." },
-      { "pattern": "def __add__", "required": true, "message": "Add __add__ for + operator." },
+      { "pattern": "def __str__", "required": true, "message": "Add __str__ for readable output." },
+      { "pattern": "def __add__", "required": true, "message": "Add __add__ for the + operator." },
       { "pattern": "def __eq__", "required": true, "message": "Add __eq__ for == comparison." }
     ],
-    "successMessage": "A Money class that behaves like a first-class Python type. You can print it, add it, compare it. Dunder methods transform plain classes into powerful objects. Chapter 16 done."
+    "successMessage": "A Money class that feels like a Python built-in. You can print it, add it, compare it. Dunder methods transform plain classes into professional types. Chapter 16 done!"
   }
 ]

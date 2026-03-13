@@ -1,28 +1,28 @@
 [
   {
-    "title": "The problem — direct access",
-    "instruction": "Right now, anyone can set `account.balance = -9999`.\n\nThat is dangerous. Real bank accounts don't let you set the balance directly.\n\nRun this. Notice how easy it is to corrupt an account by direct access.",
-    "starter": "class BankAccount:\n    def __init__(self, owner, balance):\n        self.owner = owner\n        self.balance = balance  # fully public\n\naccount = BankAccount(\"Alex\", 1000)\nprint(account.balance)  # 1000\naccount.balance = -9999  # no error! completely broken\nprint(account.balance)  # -9999",
+    "title": "The problem with public everything",
+    "instruction": "Right now, anyone can set `account.balance = -9999`. No error, no warning — just broken data.\n\nReal bank accounts don't let you set the balance directly. There is a deposit() method, a withdraw() method — but no 'set the balance to anything you want' method.\n\nThat protection is **encapsulation** — controlling what can be accessed and changed.\n\nRun this. See how easily the account breaks.",
+    "starter": "class BankAccount:\n    def __init__(self, owner, balance):\n        self.owner = owner\n        self.balance = balance  # fully public — anyone can set this\n\naccount = BankAccount(\"Alex\", 1000)\nprint(account.balance)  # 1000\naccount.balance = -9999  # no error! completely broken\nprint(account.balance)  # -9999",
     "expectedOutput": ["1000", "-9999"],
-    "successMessage": "Anyone can set balance to anything. This is the problem encapsulation solves — control access so invalid states are impossible."
+    "successMessage": "See the problem? One line and the account is destroyed. This is why we need encapsulation — to make invalid states impossible."
   },
   {
-    "title": "_ convention — signal private",
-    "instruction": "Python's convention: prefix with `_` to signal \"this is internal, don't touch it from outside\".\n\nIt is not enforced by Python — it is a social contract with other developers.\n\nRename `balance` to `_balance` to signal it is internal.",
+    "title": "_ convention — 'please don't touch this'",
+    "instruction": "Python's first line of encapsulation: prefix an attribute with `_` to signal it's private.\n\nPython won't enforce it — it's a convention, a social contract. Other developers see `_balance` and know: 'that's internal, I'll use the provided methods'.\n\nRename `balance` to `_balance` throughout the class.",
     "hint": "self._balance = balance",
     "starter": "class BankAccount:\n    def __init__(self, owner, balance):\n        self.owner = owner\n        # TODO: store as _balance to signal it's private\n        self.balance = balance\n    \n    def deposit(self, amount):\n        self.balance += amount\n    \n    def get_balance(self):\n        return self.balance\n\naccount = BankAccount(\"Alex\", 1000)\naccount.deposit(500)\nprint(account.get_balance())",
     "expectedOutput": ["1500"],
     "codeChecks": [
-      { "pattern": "self\\._balance", "required": true, "message": "Rename to _balance: self._balance = balance" },
+      { "pattern": "self\\._balance", "required": true, "message": "Rename to _balance: self._balance = balance (and update deposit and get_balance too!)" },
       { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
     ],
-    "successMessage": "_balance says: 'this is internal — access through the provided methods'. Convention, not enforcement. But respected by all Python developers."
+    "successMessage": "_balance says: 'internal implementation detail'. The underscore is respected by every Python developer. It doesn't lock the door — it puts a sign on it."
   },
   {
-    "title": "@property — controlled read access",
-    "instruction": "`@property` turns a method into an attribute-style getter:\n\n```python\n@property\ndef balance(self):\n    return self._balance\n```\n\nNow `account.balance` calls the method without `()`. Clean, readable, controlled.\n\nAdd a `@property` for `balance`.",
+    "title": "@property — read access without ()",
+    "instruction": "`@property` turns a method into an attribute that you access *without calling it*:\n\n```python\n@property\ndef balance(self):\n    return self._balance\n```\n\nNow `account.balance` calls the method behind the scenes — but looks like attribute access. Clean.\n\nAdd the `@property` for balance.",
     "hint": "@property\ndef balance(self):\n    return self._balance",
-    "starter": "class BankAccount:\n    def __init__(self, owner, balance):\n        self.owner = owner\n        self._balance = balance\n    \n    # TODO: add @property for balance\n    \n    def deposit(self, amount):\n        self._balance += amount\n\naccount = BankAccount(\"Alex\", 1000)\naccount.deposit(200)\nprint(account.balance)  # reads like an attribute, runs the property",
+    "starter": "class BankAccount:\n    def __init__(self, owner, balance):\n        self.owner = owner\n        self._balance = balance\n    \n    # TODO: add @property for balance\n    \n    def deposit(self, amount):\n        self._balance += amount\n\naccount = BankAccount(\"Alex\", 1000)\naccount.deposit(200)\nprint(account.balance)  # reads like an attribute, actually calls a method",
     "expectedOutput": ["1200"],
     "codeChecks": [
       { "pattern": "@property", "required": true, "message": "Add @property decorator." },
@@ -30,47 +30,47 @@
       { "pattern": "return self\\._balance", "required": true, "message": "Return self._balance." },
       { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
     ],
-    "successMessage": "account.balance reads like a simple attribute but runs your method. Users of the class don't even know there's a _balance internally. Clean API."
+    "successMessage": "account.balance reads like a plain attribute but runs your method. The users of this class don't see _balance — they just see balance. Clean API, protected internals."
   },
   {
-    "title": "@property setter — controlled write access",
-    "instruction": "Add a `@balance.setter` to control what values are allowed:\n\n```python\n@balance.setter\ndef balance(self, value):\n    if value < 0:\n        raise ValueError(\"Balance cannot be negative\")\n    self._balance = value\n```\n\nAdd the setter. Then try setting balance to a negative value.",
+    "title": "@setter — controlled write access",
+    "instruction": "Now add a setter — a method that runs when someone assigns to `balance`. The setter validates before storing.\n\nTrying `account.balance = -500` will now trigger your validation rule.",
     "hint": "@balance.setter\ndef balance(self, value):\n    if value < 0:\n        raise ValueError(\"Balance cannot be negative\")\n    self._balance = value",
     "starter": "class BankAccount:\n    def __init__(self, owner, balance):\n        self.owner = owner\n        self._balance = balance\n    \n    @property\n    def balance(self):\n        return self._balance\n    \n    # TODO: add @balance.setter with negative value check\n\naccount = BankAccount(\"Alex\", 1000)\nprint(account.balance)  # 1000\ntry:\n    account.balance = -500  # should raise ValueError\nexcept ValueError as e:\n    print(f\"Error: {e}\")",
     "expectedOutput": ["1000", "Error: Balance cannot be negative"],
     "codeChecks": [
       { "pattern": "@balance\\.setter", "required": true, "message": "Add @balance.setter" },
-      { "pattern": "raise ValueError", "required": true, "message": "Raise ValueError for invalid values." },
+      { "pattern": "raise ValueError", "required": true, "message": "Raise ValueError for negative values." },
       { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
     ],
-    "successMessage": "The setter validates before storing. account.balance = -500 triggers your rule. Invalid state is now impossible — the class enforces its own integrity."
+    "successMessage": "Now account.balance = -500 is impossible. The setter rejected it. Invalid state is gone — the class enforces its own rules at assignment time."
   },
   {
     "title": "Read-only property",
-    "instruction": "A property with no setter is read-only.\n\nTrying to set it raises `AttributeError: can't set attribute`.\n\nAdd a read-only `id` property that returns a formatted ID string.",
+    "instruction": "A property without a setter is read-only. Trying to assign to it raises `AttributeError`.\n\nPerfect for values that are set once and should never change — like an account ID.\n\nAdd a read-only `id` property.",
     "hint": "@property\ndef id(self):\n    return f\"ACC-{self._id:04d}\"",
     "starter": "class BankAccount:\n    def __init__(self, owner, account_id):\n        self.owner = owner\n        self._id = account_id\n        self._balance = 0\n    \n    # TODO: add read-only 'id' property that returns f\"ACC-{self._id:04d}\"\n\naccount = BankAccount(\"Alex\", 42)\nprint(account.id)  # ACC-0042\n\ntry:\n    account.id = 99  # should fail\nexcept AttributeError as e:\n    print(f\"Error: {e}\")",
     "expectedOutput": ["ACC-0042", "Error: can't set attribute"],
     "codeChecks": [
       { "pattern": "@property", "required": true, "message": "Add @property for id." },
-      { "pattern": "def id\\(self\\):", "required": true, "message": "Define id property." },
+      { "pattern": "def id\\(self\\):", "required": true, "message": "Define the id property." },
       { "pattern": ":04d", "required": true, "message": "Format as zero-padded: f\"ACC-{self._id:04d}\"" },
       { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
     ],
-    "successMessage": "No setter = read-only. The account ID should never change after creation. Properties give you precise control — read-only, write-only, or read-write."
+    "successMessage": "Read-only. No setter = no assignment allowed. ACC-0042 and it can never change. Properties give you precise control: read-only, write-once, validated, or fully flexible."
   },
   {
-    "title": "Build a validated user class",
-    "instruction": "No starter code.\n\nBuild a `User` class with validation:\n- `name` (property + setter): must be a non-empty string\n- `email` (property + setter): must contain '@'\n- `age` (property + setter): must be between 0 and 120\n\nTest it by trying to set invalid values.",
-    "hint": "Use @property and @x.setter with validation in each setter.",
+    "title": "Build a validated User",
+    "instruction": "Final challenge — no starter code.\n\nBuild a `User` class with full validation:\n- `name` — must be a non-empty string\n- `email` — must contain '@'\n- `age` — must be between 0 and 120\n\nUse `@property` and `@x.setter` for each field. Raise `ValueError` for invalid values.\n\nTest it by trying to set bad values.",
+    "hint": "@name.setter\ndef name(self, value):\n    if not value or not isinstance(value, str):\n        raise ValueError(\"Name must be a non-empty string\")\n    self._name = value",
     "starter": "",
     "expectedOutput": [],
     "codeChecks": [
       { "pattern": "class User:", "required": true, "message": "Define: class User:" },
-      { "pattern": "@property", "required": true, "message": "Use @property for controlled access." },
+      { "pattern": "@property", "required": true, "message": "Use @property for controlled read access." },
       { "pattern": "\\.setter", "required": true, "message": "Add setters with validation." },
       { "pattern": "raise ValueError", "required": true, "message": "Raise ValueError for invalid inputs." }
     ],
-    "successMessage": "A fully validated User class. Invalid data is impossible — the setters enforce the rules at assignment time. This is encapsulation at its finest. Chapter 15 done."
+    "successMessage": "A fully validated User class. Invalid data is impossible — the setters catch it at assignment time. This is what production-grade Python code looks like. Chapter 15 done!"
   }
 ]

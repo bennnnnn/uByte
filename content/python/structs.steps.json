@@ -1,30 +1,30 @@
 [
   {
-    "title": "What is a class",
-    "instruction": "So far you have stored a user as a dictionary:\n\n```python\nuser = {\"name\": \"Alex\", \"age\": 25, \"email\": \"alex@example.com\"}\n```\n\nBut a dictionary is just data — no built-in behaviour. A class bundles **data and behaviour** together:\n\n```python\nclass User:\n    def __init__(self, name, age):\n        self.name = name\n        self.age = age\n    \n    def greet(self):\n        print(f\"Hi, I'm {self.name}!\")\n```\n\nRun this.",
+    "title": "Build your own type",
+    "instruction": "So far you have used Python's built-in types: strings, ints, lists, dicts.\n\nBut what if you need a `User`? A `BankAccount`? A `Product`? These don't exist in Python — you build them.\n\nA **class** is a blueprint for a custom type. It bundles data and the functions that work on that data in one place.\n\nRun this. Then read it — `class User:` defines the blueprint, `User(\"Alex\", 25)` creates an actual user from it.",
     "starter": "class User:\n    def __init__(self, name, age):\n        self.name = name\n        self.age = age\n    \n    def greet(self):\n        print(f\"Hi, I'm {self.name}!\")\n\nuser = User(\"Alex\", 25)\nuser.greet()\nprint(user.name)\nprint(user.age)",
     "expectedOutput": ["Hi, I'm Alex!", "Alex", "25"],
-    "successMessage": "A class is a blueprint. User() creates an instance — an actual user object. The class defines what all users look like and what they can do."
+    "successMessage": "User is your custom type. user is an instance of it — an actual object made from the blueprint. The class defines what all users look like; instances hold specific data."
   },
   {
     "title": "__init__ and self",
-    "instruction": "`__init__` is the constructor — it runs automatically when you create an instance.\n\n`self` refers to the instance being created. `self.name = name` stores `name` on the instance.\n\nCreate a `Product` class with `name`, `price`, and `in_stock` attributes. Create two products.",
+    "instruction": "`__init__` is the constructor — it runs automatically the moment you create an instance.\n\n`self` is the instance itself. `self.name = name` stores the name *on that specific instance* (not on the class).\n\nCreate a `Product` class with `name`, `price`, and `in_stock` attributes. Then create two products.",
     "hint": "class Product:\n    def __init__(self, name, price, in_stock=True):\n        self.name = name\n        self.price = price\n        self.in_stock = in_stock",
     "starter": "# TODO: define Product class with name, price, in_stock attributes\n# Create two Product instances and print their details",
     "expectedOutput": [],
     "codeChecks": [
       { "pattern": "class Product:", "required": true, "message": "Define: class Product:" },
       { "pattern": "def __init__\\(self", "required": true, "message": "Add __init__(self, ...):" },
-      { "pattern": "self\\.name", "required": true, "message": "Store name: self.name = name" },
-      { "pattern": "self\\.price", "required": true, "message": "Store price: self.price = price" },
+      { "pattern": "self\\.name", "required": true, "message": "Store name on self: self.name = name" },
+      { "pattern": "self\\.price", "required": true, "message": "Store price on self: self.price = price" },
       { "pattern": "Product\\(", "required": true, "message": "Create at least one Product instance." },
       { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
     ],
-    "successMessage": "Products are now objects — structured data with consistent attributes. Two instances, same class, different data. That is the point of classes."
+    "successMessage": "Two products from one class. Each instance has its own independent name, price, and in_stock. The class is the template — instances are the actual things."
   },
   {
-    "title": "Instance methods",
-    "instruction": "Methods are functions that belong to a class. They always receive `self` as the first parameter — Python passes it automatically.\n\nAdd two methods to the `BankAccount` class: `deposit(amount)` and `get_balance()`.",
+    "title": "Methods — things the object can do",
+    "instruction": "Methods are functions that belong to a class. They always receive `self` first — Python passes it automatically when you call them.\n\nAdd `deposit(amount)` and `get_balance()` to the `BankAccount` class.",
     "hint": "def deposit(self, amount):\n    self.balance += amount\n\ndef get_balance(self):\n    return self.balance",
     "starter": "class BankAccount:\n    def __init__(self, owner, balance=0):\n        self.owner = owner\n        self.balance = balance\n    \n    # TODO: add deposit(self, amount) method\n    # TODO: add get_balance(self) method\n\naccount = BankAccount(\"Alex\", 1000)\naccount.deposit(500)\naccount.deposit(250)\nprint(account.get_balance())  # 1750",
     "expectedOutput": ["1750"],
@@ -34,18 +34,18 @@
       { "pattern": "self\\.balance\\s*\\+=", "required": true, "message": "Update balance: self.balance += amount" },
       { "pattern": "TODO", "required": false, "message": "Replace the TODO comments with your code." }
     ],
-    "successMessage": "Methods give your objects behaviour. account.deposit(500) reads naturally — the object does the action itself. This is the essence of OOP."
+    "successMessage": "account.deposit(500) reads naturally — the account does the action itself. That is the beauty of methods. The object owns its behaviour."
   },
   {
-    "title": "Class variables vs instance variables",
-    "instruction": "**Instance variables** belong to each object (`self.name` — different per object).\n**Class variables** belong to the class itself — shared across all instances.\n\nRun this. Notice `species` is shared — change it once and all instances see the change.",
-    "starter": "class Animal:\n    species_count = 0  # class variable\n    \n    def __init__(self, name, species):\n        self.name = name           # instance variable\n        self.species = species     # instance variable\n        Animal.species_count += 1  # update class variable\n\ndog = Animal(\"Rex\", \"Dog\")\ncat = Animal(\"Whiskers\", \"Cat\")\nbird = Animal(\"Tweety\", \"Bird\")\n\nprint(f\"Total animals: {Animal.species_count}\")\nprint(f\"Dog's name: {dog.name}\")",
+    "title": "Class variables — shared across all instances",
+    "instruction": "**Instance variables** (`self.name`) are unique per object.\n**Class variables** are shared across ALL instances — defined directly on the class.\n\nRun this. Notice `species_count` is shared — every new `Animal` increments the same counter.",
+    "starter": "class Animal:\n    species_count = 0  # class variable — shared\n    \n    def __init__(self, name, species):\n        self.name = name           # instance variable — unique\n        self.species = species     # instance variable — unique\n        Animal.species_count += 1  # update shared class variable\n\ndog = Animal(\"Rex\", \"Dog\")\ncat = Animal(\"Whiskers\", \"Cat\")\nbird = Animal(\"Tweety\", \"Bird\")\n\nprint(f\"Total animals: {Animal.species_count}\")\nprint(f\"Dog's name: {dog.name}\")",
     "expectedOutput": ["Total animals: 3", "Dog's name: Rex"],
-    "successMessage": "species_count is shared — every Animal tracks it. instance variables like name are unique per object. Class variables work like global state scoped to the class."
+    "successMessage": "species_count is shared — three animals, counter hit 3. instance variables like name are unique per object. Class variables work like global state scoped to the class."
   },
   {
     "title": "__str__ — make print() useful",
-    "instruction": "When you `print(object)`, Python calls the object's `__str__` method.\n\nWithout it: `<__main__.Person object at 0x...>` (useless).\nWith it: whatever you return from `__str__`.\n\nAdd a `__str__` method to the `Person` class.",
+    "instruction": "When you `print(object)` without a `__str__` method, you get something like:\n\n`<__main__.Person object at 0x104a5b0>`\n\nCompletely useless for debugging. `__str__` tells Python what to show instead.\n\nAdd `__str__` to the `Person` class.",
     "hint": "def __str__(self):\n    return f\"Person({self.name}, {self.age})\"",
     "starter": "class Person:\n    def __init__(self, name, age):\n        self.name = name\n        self.age = age\n    \n    # TODO: add __str__ that returns \"Person(name, age)\"\n\nalice = Person(\"Alice\", 30)\nprint(alice)  # should show Person(Alice, 30)",
     "expectedOutput": ["Person(Alice, 30)"],
@@ -54,25 +54,25 @@
       { "pattern": "return", "required": true, "message": "Return a string from __str__." },
       { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
     ],
-    "successMessage": "Now print(alice) gives you something readable. __str__ is the first dunder method every class should have — and you will cover more of them in Chapter 16."
+    "successMessage": "Now print(alice) gives you something actually useful. Every class should have __str__. You'll learn more dunder methods in Chapter 16."
   },
   {
-    "title": "Multiple methods",
-    "instruction": "Classes can have as many methods as they need. Each method represents something the object can **do**.\n\nAdd `withdraw(amount)` to the bank account. It should:\n- Only allow withdrawal if there are sufficient funds\n- Print an error if not enough balance",
+    "title": "Add validation to methods",
+    "instruction": "One of the biggest benefits of OOP: the object can protect its own data.\n\nAdd a `withdraw(amount)` method to the bank account. If there aren't enough funds, print an error and don't withdraw.",
     "hint": "def withdraw(self, amount):\n    if amount > self.balance:\n        print(\"Insufficient funds.\")\n        return\n    self.balance -= amount",
-    "starter": "class BankAccount:\n    def __init__(self, owner, balance=0):\n        self.owner = owner\n        self.balance = balance\n    \n    def deposit(self, amount):\n        self.balance += amount\n    \n    # TODO: add withdraw(self, amount) with balance check\n    \n    def __str__(self):\n        return f\"{self.owner}: ${self.balance:.2f}\"\n\naccount = BankAccount(\"Alex\", 100)\naccount.deposit(50)\naccount.withdraw(30)\nprint(account)       # Alex: $120.00\naccount.withdraw(200)  # should print error",
+    "starter": "class BankAccount:\n    def __init__(self, owner, balance=0):\n        self.owner = owner\n        self.balance = balance\n    \n    def deposit(self, amount):\n        self.balance += amount\n    \n    # TODO: add withdraw(self, amount) with balance check\n    \n    def __str__(self):\n        return f\"{self.owner}: ${self.balance:.2f}\"\n\naccount = BankAccount(\"Alex\", 100)\naccount.deposit(50)\naccount.withdraw(30)\nprint(account)         # Alex: $120.00\naccount.withdraw(200)  # should print error",
     "expectedOutput": ["Alex: $120.00", "Insufficient funds."],
     "codeChecks": [
       { "pattern": "def withdraw\\(self,\\s*amount\\)", "required": true, "message": "Add: def withdraw(self, amount):" },
-      { "pattern": "amount > self\\.balance|self\\.balance < amount", "required": true, "message": "Check for insufficient funds." },
-      { "pattern": "self\\.balance\\s*-=", "required": true, "message": "Deduct amount: self.balance -= amount" },
+      { "pattern": "amount > self\\.balance|self\\.balance < amount", "required": true, "message": "Check for insufficient funds before withdrawing." },
+      { "pattern": "self\\.balance\\s*-=", "required": true, "message": "Deduct: self.balance -= amount" },
       { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
     ],
-    "successMessage": "Business logic inside the class. The account protects itself — no external code can accidentally overdraw it. This is encapsulation at its most natural."
+    "successMessage": "The account protects itself. No external code can accidentally overdraw it — the validation is baked into the object. This is encapsulation at its most natural."
   },
   {
     "title": "Multiple instances are independent",
-    "instruction": "Every instance is a separate object with its own data.\n\nCreate two different bank accounts and verify that deposits to one do not affect the other.",
+    "instruction": "Every instance is a completely separate object with its own data. Changing one doesn't affect another.\n\nCreate two bank accounts and verify that deposits to Alice's account have zero effect on Bob's.",
     "hint": "account1 = BankAccount(\"Alice\", 1000)\naccount2 = BankAccount(\"Bob\", 500)",
     "starter": "class BankAccount:\n    def __init__(self, owner, balance=0):\n        self.owner = owner\n        self.balance = balance\n    \n    def deposit(self, amount):\n        self.balance += amount\n    \n    def __str__(self):\n        return f\"{self.owner}: ${self.balance}\"\n\n# TODO: create two accounts, deposit to one, verify the other is unchanged\nprint(account1)\nprint(account2)",
     "expectedOutput": [],
@@ -82,11 +82,11 @@
       { "pattern": "\\.deposit\\(", "required": true, "message": "Deposit to one account." },
       { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
     ],
-    "successMessage": "Two independent objects. Depositing to Alice's account has zero effect on Bob's. This isolation is the core benefit of OOP — each object manages its own state."
+    "successMessage": "Two independent objects. Alice's deposit didn't touch Bob's balance. This isolation is a core benefit of OOP — each object manages its own state, no accidental interference."
   },
   {
     "title": "Build a shopping cart",
-    "instruction": "No starter code.\n\nBuild a `ShoppingCart` class:\n- `__init__`: start with an empty list of items and a total of 0\n- `add_item(name, price)`: add item and update total\n- `remove_item(name, price)`: remove item and update total\n- `get_total()`: return total\n- `__str__`: return a readable summary\n\nCreate a cart, add 3 items, remove 1, print the total.",
+    "instruction": "Final challenge — no starter code.\n\nBuild a `ShoppingCart` class:\n- `__init__`: empty items list, total of 0\n- `add_item(name, price)`: add to items, update total\n- `remove_item(name, price)`: remove from items, update total\n- `get_total()`: return total\n- `__str__`: return a readable summary\n\nCreate a cart, add 3 items, remove 1, print the total.",
     "hint": "class ShoppingCart:\n    def __init__(self):\n        self.items = []\n        self.total = 0",
     "starter": "",
     "expectedOutput": [],
@@ -96,6 +96,6 @@
       { "pattern": "def remove_item\\(self", "required": true, "message": "Add: def remove_item(self, name, price):" },
       { "pattern": "def __str__\\(self\\)", "required": true, "message": "Add __str__ for readable output." }
     ],
-    "successMessage": "A real shopping cart class — state, methods, and a clean string representation. This is the foundation of every e-commerce backend. Chapter 13 done."
+    "successMessage": "A real shopping cart class! This is the foundation of every e-commerce backend on the planet. Chapter 13 done — you can now create your own custom types in Python."
   }
 ]

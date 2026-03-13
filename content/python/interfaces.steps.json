@@ -1,16 +1,16 @@
 [
   {
-    "title": "Duck typing — if it walks like a duck",
-    "instruction": "Python does not require formal interface declarations. If an object has the right methods, it works.\n\n\"If it walks like a duck and quacks like a duck, it is a duck.\"\n\nRun this. Both `Dog` and `Cat` work with `make_speak()` — no shared parent, no interface declaration. They just both have a `speak()` method.",
-    "starter": "class Dog:\n    def speak(self):\n        return \"Woof!\"\n\nclass Cat:\n    def speak(self):\n        return \"Meow!\"\n\ndef make_speak(animal):\n    # works with any object that has .speak()\n    print(animal.speak())\n\nmake_speak(Dog())\nmake_speak(Cat())",
+    "title": "If it has a .speak() method, it works",
+    "instruction": "Python's philosophy: 'if it walks like a duck and quacks like a duck, it's a duck.'\n\nYou do not need to declare that your class implements an interface. If it has the right methods, it works with any function that expects those methods.\n\nRun this. `make_speak()` works with both Dog and Cat — no shared parent, no interface declaration. They just both have a `speak()` method.",
+    "starter": "class Dog:\n    def speak(self):\n        return \"Woof!\"\n\nclass Cat:\n    def speak(self):\n        return \"Meow!\"\n\ndef make_speak(animal):\n    # works with any object that has a .speak() method\n    print(animal.speak())\n\nmake_speak(Dog())\nmake_speak(Cat())",
     "expectedOutput": ["Woof!", "Meow!"],
-    "successMessage": "No interface required. Python calls .speak() — if the object has it, it works. This is duck typing: behaviour defined by what an object can do, not what it is."
+    "successMessage": "No shared parent, no interface declaration — it just works. This is duck typing: behaviour defined by what an object can do, not what class it comes from."
   },
   {
-    "title": "ABC — Abstract Base Class",
-    "instruction": "ABCs let you define a formal contract: any subclass **must** implement these methods.\n\nIf a subclass does not implement all abstract methods, creating an instance raises `TypeError`.\n\n```python\nfrom abc import ABC, abstractmethod\n\nclass Shape(ABC):\n    @abstractmethod\n    def area(self) -> float:\n        ...\n```\n\nRun this. Then add a `Circle` class that implements `area`.",
-    "hint": "class Circle(Shape):\n    def __init__(self, radius):\n        self.radius = radius\n    def area(self):\n        return 3.14159 * self.radius ** 2",
-    "starter": "from abc import ABC, abstractmethod\n\nclass Shape(ABC):\n    @abstractmethod\n    def area(self) -> float:\n        ...\n    \n    @abstractmethod\n    def perimeter(self) -> float:\n        ...\n\nclass Rectangle(Shape):\n    def __init__(self, width, height):\n        self.width = width\n        self.height = height\n    def area(self):\n        return self.width * self.height\n    def perimeter(self):\n        return 2 * (self.width + self.height)\n\n# TODO: add Circle class that implements area() and perimeter()\n\nrect = Rectangle(4, 5)\nprint(f\"Rectangle area: {rect.area()}\")\n# circle = Circle(3)\n# print(f\"Circle area: {circle.area():.2f}\")",
+    "title": "ABC — enforce the contract",
+    "instruction": "Duck typing is flexible but informal. What if you want to **enforce** that every subclass must implement certain methods?\n\nThat's what ABCs (Abstract Base Classes) are for. If a subclass doesn't implement every `@abstractmethod`, creating an instance raises a `TypeError`.\n\nAdd a `Circle` class that implements `area()` and `perimeter()`.",
+    "hint": "class Circle(Shape):\n    def __init__(self, radius):\n        self.radius = radius\n    def area(self):\n        return 3.14159 * self.radius ** 2\n    def perimeter(self):\n        return 2 * 3.14159 * self.radius",
+    "starter": "from abc import ABC, abstractmethod\n\nclass Shape(ABC):\n    @abstractmethod\n    def area(self) -> float:\n        ...\n    \n    @abstractmethod\n    def perimeter(self) -> float:\n        ...\n\nclass Rectangle(Shape):\n    def __init__(self, width, height):\n        self.width = width\n        self.height = height\n    def area(self):\n        return self.width * self.height\n    def perimeter(self):\n        return 2 * (self.width + self.height)\n\n# TODO: add Circle class implementing both area() and perimeter()\n\nrect = Rectangle(4, 5)\nprint(f\"Rectangle area: {rect.area()}\")\n# circle = Circle(3)\n# print(f\"Circle area: {circle.area():.2f}\")",
     "expectedOutput": ["Rectangle area: 20"],
     "codeChecks": [
       { "pattern": "class Circle\\(Shape\\)", "required": true, "message": "Define: class Circle(Shape):" },
@@ -18,49 +18,49 @@
       { "pattern": "def perimeter\\(self\\)", "required": true, "message": "Implement perimeter() in Circle." },
       { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
     ],
-    "successMessage": "Rectangle and Circle both inherit from Shape ABC — both forced to implement area() and perimeter(). If you forget, Python will tell you at instantiation time."
+    "successMessage": "Both Rectangle and Circle implement the Shape contract. Forget to implement area() or perimeter() and Python will tell you the moment you try to instantiate the class."
   },
   {
-    "title": "ABC prevents instantiation",
-    "instruction": "You cannot create an instance of an abstract class — it is only a blueprint.\n\nRun this to see the error.",
+    "title": "ABCs prevent instantiation",
+    "instruction": "Abstract classes are blueprints only — you cannot create an instance of one.\n\nRun this to see the error. It's a clear signal: implement the abstract methods first.",
     "starter": "from abc import ABC, abstractmethod\n\nclass Vehicle(ABC):\n    @abstractmethod\n    def fuel_type(self):\n        ...\n\ntry:\n    v = Vehicle()  # should fail\nexcept TypeError as e:\n    print(f\"Error: {e}\")",
     "expectedOutput": [],
-    "successMessage": "Can't instantiate abstract class Vehicle with abstract method fuel_type. ABCs are templates — define the shape, not the content. Subclasses fill in the blanks."
+    "successMessage": "Can't instantiate abstract class Vehicle with abstract method fuel_type. The blueprint can't become a thing on its own — you must subclass it and implement the required methods."
   },
   {
-    "title": "Protocol — structural subtyping",
-    "instruction": "`Protocol` is a lighter alternative to ABC. You do not inherit from it — you just need to have the right methods.\n\n```python\nfrom typing import Protocol\n\nclass Drawable(Protocol):\n    def draw(self) -> str: ...\n```\n\nAny class with a `draw()` method satisfies `Drawable` — no inheritance required.\n\nRun this.",
+    "title": "Protocol — the modern approach",
+    "instruction": "`Protocol` (from `typing`) is Python 3.8+'s answer to interfaces. Unlike ABCs, you do NOT inherit from it.\n\nAny class that has the right methods satisfies the Protocol — no relationship needed.\n\nRun this.",
     "starter": "from typing import Protocol\n\nclass Drawable(Protocol):\n    def draw(self) -> str: ...\n\nclass Circle:\n    def draw(self) -> str:\n        return \"Drawing circle\"\n\nclass Square:\n    def draw(self) -> str:\n        return \"Drawing square\"\n\ndef render(shape: Drawable) -> None:\n    print(shape.draw())\n\nrender(Circle())\nrender(Square())",
     "expectedOutput": ["Drawing circle", "Drawing square"],
-    "successMessage": "Neither Circle nor Square inherits from Drawable. They just happen to have draw(). Protocol checks the shape of the object — not its ancestry."
+    "successMessage": "Neither Circle nor Square inherits from Drawable. They just happen to have a draw() method. Protocol checks the shape of the object — structural typing."
   },
   {
-    "title": "@runtime_checkable Protocol",
-    "instruction": "By default, Protocols are only checked by type checkers (like mypy), not at runtime.\n\nAdd `@runtime_checkable` to make `isinstance()` work at runtime:\n\n```python\n@runtime_checkable\nclass Saveable(Protocol):\n    def save(self) -> None: ...\n```\n\nAdd `@runtime_checkable` and use `isinstance` to check.",
+    "title": "@runtime_checkable — use isinstance with Protocols",
+    "instruction": "By default, Protocols are only checked by type-checkers (like mypy), not at runtime.\n\nAdd `@runtime_checkable` and `isinstance()` starts working:\n\n```python\n@runtime_checkable\nclass Saveable(Protocol):\n    def save(self) -> None: ...\n```\n\nAdd `@runtime_checkable` to make the isinstance checks work.",
     "hint": "from typing import Protocol, runtime_checkable",
     "starter": "from typing import Protocol, runtime_checkable\n\n# TODO: add @runtime_checkable to this Protocol\nclass Serializable(Protocol):\n    def to_json(self) -> str: ...\n\nclass User:\n    def to_json(self) -> str:\n        return '{\"type\": \"user\"}'\n\nclass Product:  # no to_json\n    pass\n\nu = User()\np = Product()\nprint(isinstance(u, Serializable))  # should be True\nprint(isinstance(p, Serializable))  # should be False",
     "expectedOutput": ["True", "False"],
     "codeChecks": [
-      { "pattern": "@runtime_checkable", "required": true, "message": "Add @runtime_checkable decorator." },
+      { "pattern": "@runtime_checkable", "required": true, "message": "Add @runtime_checkable above the Protocol." },
       { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
     ],
-    "successMessage": "@runtime_checkable makes isinstance() work with Protocols. Check at runtime whether an object matches the interface without any inheritance."
+    "successMessage": "isinstance works with the Protocol now. User has to_json so it passes. Product doesn't so it fails. No inheritance needed — just the right methods."
   },
   {
-    "title": "ABC vs Protocol — when to use which",
-    "instruction": "Use **ABC** when:\n- You want to enforce implementation\n- Subclasses need shared base behaviour (`super()` calls)\n- You control all the classes\n\nUse **Protocol** when:\n- You want flexible duck typing with type safety\n- You don't control the classes (third-party, standard library)\n- You want structural checking, not inheritance\n\nFix the code: the `Storable` check should use Protocol (not ABC) because `dict` is a built-in we cannot subclass.",
-    "hint": "Use Protocol instead of ABC so dict can match it.",
-    "starter": "from abc import ABC, abstractmethod\nfrom typing import Protocol\n\n# BUG: change this to use Protocol so built-in types can match it\nclass Storable(ABC):\n    @abstractmethod\n    def keys(self): ...\n    @abstractmethod\n    def __getitem__(self, key): ...\n\nd = {\"a\": 1}\nprint(isinstance(d, Storable))  # should be True",
+    "title": "ABC vs Protocol — know when to use which",
+    "instruction": "Use **ABC** when:\n- You control all the classes\n- You want to share code in the base class\n- You want Python to enforce implementation\n\nUse **Protocol** when:\n- You don't control all the classes (third-party code, built-ins)\n- You want structural/duck-typing behaviour with type safety\n\nFix the code: `Storable` checks for dict-like behaviour, but `dict` can't inherit from our ABC. Use Protocol instead.",
+    "hint": "class Storable(Protocol): ... (with @runtime_checkable)",
+    "starter": "from abc import ABC, abstractmethod\nfrom typing import Protocol, runtime_checkable\n\n# BUG: change to Protocol so built-in dict can satisfy it\nclass Storable(ABC):\n    @abstractmethod\n    def keys(self): ...\n    @abstractmethod\n    def __getitem__(self, key): ...\n\nd = {\"a\": 1}\nprint(isinstance(d, Storable))  # should be True",
     "expectedOutput": ["True"],
     "codeChecks": [
       { "pattern": "class Storable\\(Protocol\\)", "required": true, "message": "Change to: class Storable(Protocol):" },
-      { "pattern": "@runtime_checkable", "required": true, "message": "Add @runtime_checkable so isinstance works." }
+      { "pattern": "@runtime_checkable", "required": true, "message": "Add @runtime_checkable so isinstance works at runtime." }
     ],
-    "successMessage": "dict matches Storable without inheriting from it — structural subtyping. ABCs require inheritance; Protocols just require the right methods."
+    "successMessage": "dict satisfies Storable because it has keys() and __getitem__ — structural subtyping. ABCs need inheritance. Protocols just need the right methods."
   },
   {
     "title": "Build a plugin system",
-    "instruction": "No starter code.\n\nBuild a plugin system using Protocol:\n- Define `Plugin(Protocol)` with methods `load()` and `process(data: str) -> str`\n- Create two plugins: `UpperPlugin` and `ReversePlugin`\n- Write a `run_pipeline(plugins, data)` function that applies all plugins in sequence\n\nTest with: `run_pipeline([UpperPlugin(), ReversePlugin()], \"hello\")`",
+    "instruction": "Final challenge — no starter code.\n\nBuild a plugin system using Protocol:\n- `Plugin(Protocol)` with methods `load()` and `process(data: str) -> str`\n- `UpperPlugin` — converts text to uppercase\n- `ReversePlugin` — reverses the text\n- `run_pipeline(plugins, data)` — applies all plugins in sequence\n\nTest: `run_pipeline([UpperPlugin(), ReversePlugin()], \"hello\")` → `\"OLLEH\"`",
     "hint": "def run_pipeline(plugins, data):\n    for plugin in plugins:\n        data = plugin.process(data)\n    return data",
     "starter": "",
     "expectedOutput": [],
@@ -71,6 +71,6 @@
       { "pattern": "UpperPlugin\\(\\)", "required": true, "message": "Create and use UpperPlugin." },
       { "pattern": "ReversePlugin\\(\\)", "required": true, "message": "Create and use ReversePlugin." }
     ],
-    "successMessage": "A Protocol-based plugin pipeline. Add any new plugin without touching run_pipeline — it works with anything that has a process() method. Chapter 18 done."
+    "successMessage": "A Protocol-based plugin pipeline! Add any new plugin — it works without touching run_pipeline. This is how every extensible framework is built. Chapter 18 done!"
   }
 ]

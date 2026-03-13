@@ -1,27 +1,27 @@
 [
   {
-    "title": "What is inheritance",
-    "instruction": "You have a `User` class. Now you need `AdminUser` — just like `User` but with admin powers.\n\nCopying the whole class would be a disaster to maintain. Inheritance lets a child class **inherit** everything from a parent and only add what is new.\n\n```python\nclass AdminUser(User):  # AdminUser inherits from User\n```\n\nRun this. `AdminUser` gets all of `User`'s attributes for free.",
-    "starter": "class User:\n    def __init__(self, name, email):\n        self.name = name\n        self.email = email\n    \n    def greet(self):\n        print(f\"Hi, I'm {self.name}.\")\n\nclass AdminUser(User):\n    def delete_user(self, username):\n        print(f\"{self.name} deleted user: {username}\")\n\nadmin = AdminUser(\"Alex\", \"alex@example.com\")\nadmin.greet()               # inherited from User\nadmin.delete_user(\"spammer\")  # only AdminUser has this",
+    "title": "Don't copy the class — extend it",
+    "instruction": "You have a `User` class. Now you need `AdminUser` — exactly like `User`, but with extra powers.\n\nCopying the whole class is a maintenance nightmare. Change `User` and you have to remember to change the copy too.\n\n**Inheritance** lets `AdminUser` inherit everything from `User` for free, then only add what's new.\n\n```python\nclass AdminUser(User):  # AdminUser gets all of User's stuff\n```\n\nRun this.",
+    "starter": "class User:\n    def __init__(self, name, email):\n        self.name = name\n        self.email = email\n    \n    def greet(self):\n        print(f\"Hi, I'm {self.name}.\")\n\nclass AdminUser(User):\n    def delete_user(self, username):\n        print(f\"{self.name} deleted user: {username}\")\n\nadmin = AdminUser(\"Alex\", \"alex@example.com\")\nadmin.greet()                # inherited from User\nadmin.delete_user(\"spammer\")  # only AdminUser has this",
     "expectedOutput": ["Hi, I'm Alex.", "Alex deleted user: spammer"],
-    "successMessage": "AdminUser inherited greet() and the __init__ from User without copying a single line. Only delete_user() is new. Change User and AdminUser gets the update automatically."
+    "successMessage": "AdminUser got greet() and __init__ from User without copying a line. Add a new method to User tomorrow and AdminUser gets it automatically. That's inheritance."
   },
   {
-    "title": "super() — extend the parent",
-    "instruction": "`super()` calls the parent class's method.\n\nUse it in `__init__` to run the parent's setup code, then add your own:\n\n```python\nclass AdminUser(User):\n    def __init__(self, name, email, permissions):\n        super().__init__(name, email)  # run User's __init__\n        self.permissions = permissions  # then add ours\n```\n\nAdd a proper `__init__` to `AdminUser` using `super()`.",
+    "title": "super() — extend the parent's setup",
+    "instruction": "When `AdminUser` needs its own `__init__` (for extra attributes), use `super()` to run the parent's setup first:\n\n```python\nclass AdminUser(User):\n    def __init__(self, name, email, permissions):\n        super().__init__(name, email)  # run User's __init__\n        self.permissions = permissions  # then add ours\n```\n\nAdd a proper `__init__` to `AdminUser` using `super()`.",
     "hint": "def __init__(self, name, email, permissions):\n    super().__init__(name, email)\n    self.permissions = permissions",
-    "starter": "class User:\n    def __init__(self, name, email):\n        self.name = name\n        self.email = email\n\nclass AdminUser(User):\n    # TODO: add __init__ that calls super() and adds permissions attribute\n    pass\n\nadmin = AdminUser(\"Alex\", \"alex@example.com\", [\"delete\", \"ban\", \"edit\"])\nprint(admin.name)\nprint(admin.permissions)",
+    "starter": "class User:\n    def __init__(self, name, email):\n        self.name = name\n        self.email = email\n\nclass AdminUser(User):\n    # TODO: add __init__ that calls super() and adds a permissions list\n    pass\n\nadmin = AdminUser(\"Alex\", \"alex@example.com\", [\"delete\", \"ban\", \"edit\"])\nprint(admin.name)\nprint(admin.permissions)",
     "expectedOutput": ["Alex", "['delete', 'ban', 'edit']"],
     "codeChecks": [
-      { "pattern": "super\\(\\).__init__\\(", "required": true, "message": "Call super().__init__() to run User's setup." },
-      { "pattern": "self\\.permissions", "required": true, "message": "Store permissions: self.permissions = permissions" },
+      { "pattern": "super\\(\\).__init__\\(", "required": true, "message": "Call super().__init__() to run User's setup first." },
+      { "pattern": "self\\.permissions", "required": true, "message": "Store permissions on self: self.permissions = permissions" },
       { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
     ],
-    "successMessage": "super().__init__() delegates to the parent. AdminUser gets all of User's setup plus its own extra field. This is the clean way to extend classes."
+    "successMessage": "super().__init__() does User's setup. Then self.permissions adds the admin-specific part. AdminUser gets everything User sets up PLUS its own additions."
   },
   {
-    "title": "Method overriding",
-    "instruction": "A child class can override a parent method by defining a method with the same name.\n\nPython uses the child's version instead of the parent's.\n\nOverride the `greet()` method in `AdminUser` to include their role.",
+    "title": "Override — replace the parent's method",
+    "instruction": "A child class can replace a parent's method by defining a method with the same name.\n\nPython always uses the child's version. The parent's is still there if you need it via `super()`.\n\nOverride `greet()` in `AdminUser` to include their role.",
     "hint": "def greet(self):\n    print(f\"Hi, I'm {self.name} — Admin.\")",
     "starter": "class User:\n    def __init__(self, name):\n        self.name = name\n    \n    def greet(self):\n        print(f\"Hi, I'm {self.name}.\")\n\nclass AdminUser(User):\n    # TODO: override greet() to add \" — Admin\" at the end\n    pass\n\nuser = User(\"Alice\")\nadmin = AdminUser(\"Bob\")\nuser.greet()   # Hi, I'm Alice.\nadmin.greet()  # Hi, I'm Bob — Admin.",
     "expectedOutput": ["Hi, I'm Alice.", "Hi, I'm Bob — Admin."],
@@ -30,25 +30,25 @@
       { "pattern": "Admin", "required": true, "message": "Include '— Admin' in the greeting." },
       { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
     ],
-    "successMessage": "Python finds greet() in AdminUser first — the parent's version is shadowed. Override only the methods that need different behaviour; inherit the rest."
+    "successMessage": "Python found greet() in AdminUser first — the parent's version is shadowed. Override only what needs to be different; everything else is inherited unchanged."
   },
   {
-    "title": "isinstance() and issubclass()",
-    "instruction": "`isinstance(obj, Class)` checks if an object is an instance of a class — or a subclass of it.\n\n`issubclass(Child, Parent)` checks class relationships.\n\nRun this and understand the results.",
-    "starter": "class Vehicle:\n    pass\n\nclass Car(Vehicle):\n    pass\n\nclass Truck(Vehicle):\n    pass\n\nmy_car = Car()\n\nprint(isinstance(my_car, Car))      # True\nprint(isinstance(my_car, Vehicle))  # True — Car is a Vehicle\nprint(isinstance(my_car, Truck))    # False\nprint(issubclass(Car, Vehicle))     # True\nprint(issubclass(Truck, Car))       # False",
-    "expectedOutput": ["True", "True", "False", "True", "False"],
-    "successMessage": "isinstance(my_car, Vehicle) is True because Car inherits from Vehicle. This is how you write code that works for any Vehicle — cars, trucks, bikes — all at once."
+    "title": "isinstance() — 'is this one of those?'",
+    "instruction": "`isinstance(obj, Class)` is True if the object is an instance of that class — or any subclass.\n\nThis is how you write flexible code that works with any compatible type:\n\n```python\ndef process(vehicle):\n    if isinstance(vehicle, Vehicle):\n        vehicle.start()  # works for Car, Truck, Bus — all vehicles\n```\n\nRun this and understand why my_car is a Car, a Vehicle, but not a Truck.",
+    "starter": "class Vehicle:\n    pass\n\nclass Car(Vehicle):\n    pass\n\nclass Truck(Vehicle):\n    pass\n\nmy_car = Car()\n\nprint(isinstance(my_car, Car))      # True — it is a Car\nprint(isinstance(my_car, Vehicle))  # True — Car IS a Vehicle\nprint(isinstance(my_car, Truck))    # False — not a Truck\nprint(issubclass(Car, Vehicle))     # True — Car is a subclass of Vehicle",
+    "expectedOutput": ["True", "True", "False", "True"],
+    "successMessage": "isinstance(my_car, Vehicle) is True because Car inherits from Vehicle. This is how you write 'accepts any vehicle' functions — check isinstance(Vehicle) and all subclasses work."
   },
   {
     "title": "Multiple inheritance",
-    "instruction": "Python allows a class to inherit from multiple parents:\n\n```python\nclass FlyingCar(Car, Airplane):\n    pass\n```\n\nThe MRO (Method Resolution Order) determines which parent's method to use when both have the same name. Check it with `ClassName.__mro__`.\n\nRun this.",
-    "starter": "class Flyable:\n    def move(self):\n        print(\"Flying\")\n\nclass Drivable:\n    def move(self):\n        print(\"Driving\")\n\nclass FlyingCar(Flyable, Drivable):\n    pass\n\nfc = FlyingCar()\nfc.move()  # Which move() wins?\nprint(FlyingCar.__mro__)",
+    "instruction": "Python lets a class inherit from multiple parents at once:\n\n```python\nclass FlyingCar(Car, Airplane):\n    pass\n```\n\nWhen both parents have the same method, Python picks based on MRO (Method Resolution Order) — left to right.\n\nRun this. Which `move()` wins?",
+    "starter": "class Flyable:\n    def move(self):\n        print(\"Flying\")\n\nclass Drivable:\n    def move(self):\n        print(\"Driving\")\n\nclass FlyingCar(Flyable, Drivable):\n    pass\n\nfc = FlyingCar()\nfc.move()  # Which one?\nprint(FlyingCar.__mro__)",
     "expectedOutput": [],
-    "successMessage": "Flyable's move() wins — Python follows MRO left to right. Multiple inheritance is powerful but use it carefully. Prefer composition over deep inheritance hierarchies."
+    "successMessage": "Flyable's move() wins — Python goes left to right through the parents. __mro__ shows the lookup order. Multiple inheritance is powerful — use it carefully."
   },
   {
     "title": "Build an animal hierarchy",
-    "instruction": "No starter code.\n\nBuild a class hierarchy:\n- `Animal(name, sound)` — base class with a `speak()` method that prints `f\"{name} says {sound}\"`\n- `Dog(name)` — inherits from Animal, always has sound \"Woof\"\n- `Cat(name)` — inherits from Animal, always has sound \"Meow\"\n\nCreate one Dog and one Cat, call speak() on both.",
+    "instruction": "Final challenge — no starter code.\n\nBuild a class hierarchy:\n- `Animal(name, sound)` — base class with a `speak()` method: `f\"{name} says {sound}\"`\n- `Dog(name)` — inherits from Animal, always sound \"Woof\"\n- `Cat(name)` — inherits from Animal, always sound \"Meow\"\n\nCreate a dog and a cat, call `speak()` on both.",
     "hint": "class Dog(Animal):\n    def __init__(self, name):\n        super().__init__(name, \"Woof\")",
     "starter": "",
     "expectedOutput": [],
@@ -56,9 +56,9 @@
       { "pattern": "class Animal:", "required": true, "message": "Define: class Animal:" },
       { "pattern": "class Dog\\(Animal\\)", "required": true, "message": "Define: class Dog(Animal):" },
       { "pattern": "class Cat\\(Animal\\)", "required": true, "message": "Define: class Cat(Animal):" },
-      { "pattern": "super\\(\\).__init__\\(", "required": true, "message": "Call super().__init__() in Dog and Cat." },
+      { "pattern": "super\\(\\).__init__\\(", "required": true, "message": "Call super().__init__() in both Dog and Cat." },
       { "pattern": "\\.speak\\(\\)", "required": true, "message": "Call .speak() on your instances." }
     ],
-    "successMessage": "Dog and Cat inherit speak() from Animal — no code duplication. Both handle their specific sound in __init__ via super(). Chapter 14 done."
+    "successMessage": "Dog and Cat both inherit speak() — no code duplication. Change Animal's speak() and both update automatically. That's the power of inheritance. Chapter 14 done!"
   }
 ]

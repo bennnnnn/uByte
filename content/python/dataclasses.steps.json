@@ -1,19 +1,19 @@
 [
   {
-    "title": "The boilerplate problem",
-    "instruction": "Every class you have written so far has a lot of repetitive setup:\n- `__init__` to store fields\n- `__repr__` for debugging\n- `__eq__` for comparison\n\nFor a class with 5 fields, that is 20+ lines just for setup. `@dataclass` generates all of it.\n\nRun this. Compare: same result, half the code.",
+    "title": "All that boilerplate... gone",
+    "instruction": "Every class you have written needed:\n- `__init__` to store the fields\n- `__repr__` to make it printable\n- `__eq__` to make == work properly\n\nFor a class with 5 fields, that is 20+ lines of setup code. Every. Single. Time.\n\n`@dataclass` generates all of it automatically from your field declarations.\n\nRun this. Compare: same result, half the code.",
     "starter": "from dataclasses import dataclass\n\n# Without @dataclass — 12 lines of boilerplate:\nclass ProductManual:\n    def __init__(self, name, price, in_stock):\n        self.name = name\n        self.price = price\n        self.in_stock = in_stock\n    def __repr__(self):\n        return f\"Product(name={self.name!r}, price={self.price!r}, in_stock={self.in_stock!r})\"\n\n# With @dataclass — 4 lines:\n@dataclass\nclass Product:\n    name: str\n    price: float\n    in_stock: bool\n\np = Product(\"Laptop\", 999.99, True)\nprint(p)\nprint(p.name)",
     "expectedOutput": [],
-    "successMessage": "@dataclass generates __init__, __repr__, and __eq__ automatically from the field declarations. Same result, dramatically less code."
+    "successMessage": "@dataclass generated __init__, __repr__, and __eq__ automatically. Same result, dramatically less code. This is Python 3.7+ and it's one of the best additions to the language."
   },
   {
     "title": "Create a dataclass",
-    "instruction": "A dataclass uses type annotations to declare fields:\n\n```python\n@dataclass\nclass Point:\n    x: float\n    y: float\n```\n\nCreate a `User` dataclass with `name`, `email`, and `age` fields. Create two instances and print them.",
+    "instruction": "Fields are declared with type annotations:\n\n```python\n@dataclass\nclass Point:\n    x: float\n    y: float\n```\n\nThe type annotation (`: float`) tells @dataclass what the field is called and what type to show in repr. Python doesn't enforce the type at runtime — but it makes your code clear and tools like mypy can check it.\n\nCreate a `User` dataclass with `name`, `email`, and `age` fields. Create two instances.",
     "hint": "@dataclass\nclass User:\n    name: str\n    email: str\n    age: int",
     "starter": "from dataclasses import dataclass\n\n# TODO: define User dataclass with name, email, age\n# Create two instances and print them",
     "expectedOutput": [],
     "codeChecks": [
-      { "pattern": "@dataclass", "required": true, "message": "Add @dataclass decorator." },
+      { "pattern": "@dataclass", "required": true, "message": "Add @dataclass decorator above the class." },
       { "pattern": "class User:", "required": true, "message": "Define: class User:" },
       { "pattern": "name:\\s*str", "required": true, "message": "Declare: name: str" },
       { "pattern": "email:\\s*str", "required": true, "message": "Declare: email: str" },
@@ -21,11 +21,11 @@
       { "pattern": "User\\(", "required": true, "message": "Create at least one User instance." },
       { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
     ],
-    "successMessage": "Three fields, no __init__ written, no __repr__ written. @dataclass handled it. The type annotations (: str, : int) are declarations — Python uses them to build __init__."
+    "successMessage": "Three fields, no __init__ written, no __repr__ written. @dataclass handled everything. Look at the print output — it shows User(name='...', email='...', age=...) automatically."
   },
   {
     "title": "Default values",
-    "instruction": "Fields can have default values:\n\n```python\n@dataclass\nclass Config:\n    host: str = \"localhost\"\n    port: int = 8080\n    debug: bool = False\n```\n\nFields with defaults must come after fields without.\n\nAdd defaults to `is_active` (True) and `role` (\"user\") in the dataclass.",
+    "instruction": "Fields can have defaults — used when the argument is not passed:\n\n```python\n@dataclass\nclass Config:\n    host: str = \"localhost\"\n    port: int = 8080\n    debug: bool = False\n```\n\nOne rule: fields WITH defaults must come AFTER fields WITHOUT.\n\nAdd `is_active` (defaults to `True`) and `role` (defaults to `\"user\"`).",
     "hint": "is_active: bool = True\nrole: str = \"user\"",
     "starter": "from dataclasses import dataclass\n\n@dataclass\nclass User:\n    name: str\n    email: str\n    # TODO: add is_active with default True and role with default \"user\"\n\nuser1 = User(\"Alice\", \"alice@example.com\")\nuser2 = User(\"Bob\", \"bob@example.com\", is_active=False, role=\"admin\")\nprint(user1)\nprint(user2)",
     "expectedOutput": [],
@@ -34,47 +34,47 @@
       { "pattern": "role:\\s*str\\s*=\\s*\"user\"", "required": true, "message": "Add: role: str = \"user\"" },
       { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
     ],
-    "successMessage": "user1 uses all defaults, user2 overrides two. Dataclass defaults work just like function defaults. Fields with defaults must always come last."
+    "successMessage": "user1 uses all defaults. user2 overrides two fields. Defaults in dataclasses work exactly like default parameters in functions — optional after required."
   },
   {
     "title": "__eq__ is automatic",
-    "instruction": "Dataclasses automatically generate `__eq__` — two instances with the same field values are equal.\n\nRun this to confirm.",
-    "starter": "from dataclasses import dataclass\n\n@dataclass\nclass Point:\n    x: float\n    y: float\n\np1 = Point(3.0, 4.0)\np2 = Point(3.0, 4.0)\np3 = Point(1.0, 2.0)\n\nprint(p1 == p2)  # True — same values\nprint(p1 == p3)  # False — different values\nprint(p1 is p2)  # False — different objects",
+    "instruction": "One of @dataclass's best tricks: it generates `__eq__` for you. Two instances with identical field values are equal.\n\nRun this to confirm.",
+    "starter": "from dataclasses import dataclass\n\n@dataclass\nclass Point:\n    x: float\n    y: float\n\np1 = Point(3.0, 4.0)\np2 = Point(3.0, 4.0)\np3 = Point(1.0, 2.0)\n\nprint(p1 == p2)  # True — same values\nprint(p1 == p3)  # False — different values\nprint(p1 is p2)  # False — different objects in memory",
     "expectedOutput": ["True", "False", "False"],
-    "successMessage": "Same values = equal, even though they are different objects. @dataclass generates __eq__ automatically. With plain classes you would have written this yourself."
+    "successMessage": "p1 and p2 are equal (same values) but not identical (different objects). @dataclass gave you value-based equality for free — something you had to write manually in Chapter 16."
   },
   {
-    "title": "frozen=True — immutable dataclasses",
-    "instruction": "`@dataclass(frozen=True)` makes the dataclass immutable — like a tuple, but with named fields.\n\nTrying to modify a frozen dataclass raises `FrozenInstanceError`.\n\nRun this. Frozen is perfect for constants, config, and anything that should not change.",
-    "starter": "from dataclasses import dataclass\n\n@dataclass(frozen=True)\nclass Color:\n    r: int\n    g: int\n    b: int\n\nred = Color(255, 0, 0)\nprint(red)\nprint(red.r)\n\ntry:\n    red.r = 100  # should fail\nexcept Exception as e:\n    print(f\"Error: {type(e).__name__}\")",
+    "title": "frozen=True — immutable dataclass",
+    "instruction": "`@dataclass(frozen=True)` makes the class immutable — like a namedtuple, but with the readability of @dataclass.\n\nPerfect for configuration, coordinate pairs, colours — anything that should never change after creation.\n\nRun this.",
+    "starter": "from dataclasses import dataclass\n\n@dataclass(frozen=True)\nclass Color:\n    r: int\n    g: int\n    b: int\n\nred = Color(255, 0, 0)\nprint(red)\nprint(red.r)\n\ntry:\n    red.r = 100  # should fail!\nexcept Exception as e:\n    print(f\"Error: {type(e).__name__}\")",
     "expectedOutput": [],
-    "successMessage": "Frozen dataclasses are immutable. They can also be used as dictionary keys (unlike regular dataclasses). Perfect for value objects like colours, coordinates, config."
+    "successMessage": "FrozenInstanceError — you cannot modify a frozen dataclass. Frozen dataclasses can also be used as dictionary keys (regular ones can't). Perfect for immutable value objects."
   },
   {
     "title": "__post_init__ — validate after init",
-    "instruction": "`__post_init__` runs automatically after `__init__`. Use it for validation:\n\n```python\ndef __post_init__(self):\n    if self.age < 0:\n        raise ValueError(\"Age cannot be negative\")\n```\n\nAdd `__post_init__` to validate that price is positive and stock is non-negative.",
-    "hint": "def __post_init__(self):\n    if self.price <= 0:\n        raise ValueError(\"Price must be positive\")\n    if self.stock < 0:\n        raise ValueError(\"Stock cannot be negative\")",
-    "starter": "from dataclasses import dataclass\n\n@dataclass\nclass Product:\n    name: str\n    price: float\n    stock: int\n    \n    # TODO: add __post_init__ that validates price > 0 and stock >= 0\n\ntry:\n    bad = Product(\"Widget\", -5.0, 10)\nexcept ValueError as e:\n    print(f\"Error: {e}\")\n\ngood = Product(\"Gadget\", 29.99, 100)\nprint(good)",
+    "instruction": "`__post_init__` runs automatically right after `__init__` — perfect for validation:\n\n```python\ndef __post_init__(self):\n    if self.age < 0:\n        raise ValueError(\"Age cannot be negative\")\n```\n\nAdd `__post_init__` to validate that price is positive and stock is non-negative.",
+    "hint": "def __post_init__(self):\n    if self.price <= 0:\n        raise ValueError(\"Price must be positive\")",
+    "starter": "from dataclasses import dataclass\n\n@dataclass\nclass Product:\n    name: str\n    price: float\n    stock: int\n    \n    # TODO: add __post_init__ to validate price > 0 and stock >= 0\n\ntry:\n    bad = Product(\"Widget\", -5.0, 10)\nexcept ValueError as e:\n    print(f\"Error: {e}\")\n\ngood = Product(\"Gadget\", 29.99, 100)\nprint(good)",
     "expectedOutput": ["Error: Price must be positive", "Product(name='Gadget', price=29.99, stock=100)"],
     "codeChecks": [
       { "pattern": "def __post_init__\\(self\\)", "required": true, "message": "Add __post_init__(self)." },
       { "pattern": "raise ValueError", "required": true, "message": "Raise ValueError for invalid values." },
       { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
     ],
-    "successMessage": "__post_init__ gives you the best of both worlds: @dataclass generates the boilerplate, and you add custom validation. Clean and powerful."
+    "successMessage": "__post_init__ is the sweet spot — @dataclass handles the boilerplate, you add the custom validation. Best of both worlds."
   },
   {
     "title": "Build an order system",
-    "instruction": "No starter code.\n\nCreate two dataclasses:\n- `Item(name, price, quantity)` — frozen, with a `total` property (price × quantity)\n- `Order(items, customer_name)` — mutable, with a `total()` method that sums all item totals\n\nCreate an order with 3 items and print the total.",
+    "instruction": "Final challenge — no starter code.\n\nBuild two dataclasses:\n- `Item(name, price, quantity)` — **frozen** (items don't change once ordered). Add a `total` property using `__post_init__` or `field(default_factory=...)`\n- `Order(items, customer_name)` — mutable, with a `total()` method that sums item totals\n\nCreate an order with 3 items and print the total.",
     "hint": "@dataclass(frozen=True)\nclass Item:\n    name: str\n    price: float\n    quantity: int",
     "starter": "",
     "expectedOutput": [],
     "codeChecks": [
       { "pattern": "@dataclass", "required": true, "message": "Use @dataclass for both classes." },
-      { "pattern": "frozen=True", "required": true, "message": "Make Item frozen." },
+      { "pattern": "frozen=True", "required": true, "message": "Make Item frozen — order items should not change." },
       { "pattern": "class Order:", "required": true, "message": "Define: class Order:" },
-      { "pattern": "def total", "required": true, "message": "Add a total() method." }
+      { "pattern": "def total", "required": true, "message": "Add a total() method to Order." }
     ],
-    "successMessage": "Immutable items, mutable order. A clean separation of concerns using dataclasses. Chapter 17 done."
+    "successMessage": "Immutable items inside a mutable order — clean design. @dataclass handling all the boilerplate, you writing only the important logic. Chapter 17 done!"
   }
 ]

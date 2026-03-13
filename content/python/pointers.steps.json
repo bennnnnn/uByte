@@ -1,14 +1,14 @@
 [
   {
-    "title": "Local scope — variables inside functions",
-    "instruction": "A variable created inside a function is **local** — it only exists within that function.\n\nOnce the function returns, the variable is gone.\n\nRun this. Notice that `message` inside the function and `message` outside are completely separate.",
-    "starter": "message = \"Global message\"\n\ndef show_message():\n    message = \"Local message\"  # different variable\n    print(message)\n\nshow_message()\nprint(message)  # still \"Global message\"",
+    "title": "Variables inside functions stay inside",
+    "instruction": "Have you ever created a variable inside a function and then tried to use it outside — only to get a NameError?\n\nThat is **scope** at work. Variables created inside a function are **local** — they only exist while the function runs. Once the function returns, they vanish.\n\nRun this. Notice that `message` inside the function is completely separate from `message` outside it.",
+    "starter": "message = \"Global message\"\n\ndef show_message():\n    message = \"Local message\"  # different variable!\n    print(message)\n\nshow_message()\nprint(message)  # still \"Global message\"",
     "expectedOutput": ["Local message", "Global message"],
-    "successMessage": "Two separate variables both named 'message'. The function's local version shadows the global one inside the function, but the global stays untouched."
+    "successMessage": "Two variables, same name, completely separate. The function's local 'message' shadowed the global one inside the function — but the global survived untouched. Scope keeps variables contained."
   },
   {
-    "title": "Global scope",
-    "instruction": "A variable defined at the top level of a module has **global** scope — visible everywhere.\n\nFunctions can **read** global variables. But to **modify** them, you must use the `global` keyword.\n\nAdd `global count` to the function so it modifies the global counter.",
+    "title": "global — reach outside the function",
+    "instruction": "Functions can *read* global variables freely. But to *change* them, you must declare `global`:\n\n```python\ncount = 0\n\ndef increment():\n    global count  # tell Python: use the outer count\n    count += 1\n```\n\nWithout `global count`, Python would try to create a new local variable — and crash on `count += 1` because the local doesn't exist yet.\n\nAdd `global count` to fix the function.",
     "hint": "def increment():\n    global count\n    count += 1",
     "starter": "count = 0\n\ndef increment():\n    # TODO: declare count as global so we can modify it\n    count += 1\n\nincrement()\nincrement()\nincrement()\nprint(count)  # should be 3",
     "expectedOutput": ["3"],
@@ -16,18 +16,18 @@
       { "pattern": "global count", "required": true, "message": "Add: global count inside the function." },
       { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
     ],
-    "successMessage": "global count tells Python: use the outer count, don't create a new local one. Use global sparingly — it makes code harder to understand. Prefer returning values."
+    "successMessage": "3. global count told Python 'use the outer count, not a local one'. Use global sparingly — it makes code harder to follow. Usually better to return values and reassign."
   },
   {
     "title": "The LEGB rule",
-    "instruction": "Python looks up variable names in this order:\n\n1. **L**ocal — inside the current function\n2. **E**nclosing — any outer function scopes\n3. **G**lobal — module-level\n4. **B**uilt-in — Python's built-ins (print, len, etc.)\n\nRun this. Follow which `x` each print finds.",
+    "instruction": "When Python looks up a variable name, it searches in this order:\n\n1. **L**ocal — inside the current function\n2. **E**nclosing — any surrounding function scopes\n3. **G**lobal — module level\n4. **B**uilt-in — Python's built-in names (print, len, etc.)\n\nFirst match wins. Python stops searching as soon as it finds the name.\n\nRun this and trace which `x` each print finds.",
     "starter": "x = \"global\"\n\ndef outer():\n    x = \"enclosing\"\n    \n    def inner():\n        x = \"local\"\n        print(x)  # finds local first\n    \n    inner()\n    print(x)  # finds enclosing\n\nouter()\nprint(x)  # finds global",
     "expectedOutput": ["local", "enclosing", "global"],
-    "successMessage": "local → enclosing → global → built-in. Python finds the nearest matching name and stops searching. Understanding LEGB fixes most confusing scope bugs."
+    "successMessage": "local → enclosing → global. Each scope found its own x. Understanding LEGB explains 90% of confusing 'why is this variable wrong?' bugs."
   },
   {
-    "title": "nonlocal — modify enclosing scope",
-    "instruction": "`nonlocal` is like `global` but for enclosing function scopes:\n\n```python\ndef outer():\n    count = 0\n    def inner():\n        nonlocal count\n        count += 1\n```\n\nAdd `nonlocal count` to fix the counter.",
+    "title": "nonlocal — reach into the enclosing function",
+    "instruction": "`nonlocal` is like `global` but for the enclosing function (not the module):\n\n```python\ndef outer():\n    count = 0\n    def inner():\n        nonlocal count  # use outer's count\n        count += 1\n```\n\nAdd `nonlocal count` to fix the counter.",
     "hint": "nonlocal count",
     "starter": "def make_counter():\n    count = 0\n    \n    def increment():\n        # TODO: use nonlocal to modify outer count\n        count += 1\n        return count\n    \n    return increment\n\ncounter = make_counter()\nprint(counter())  # 1\nprint(counter())  # 2\nprint(counter())  # 3",
     "expectedOutput": ["1", "2", "3"],
@@ -35,45 +35,45 @@
       { "pattern": "nonlocal count", "required": true, "message": "Add: nonlocal count inside increment." },
       { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
     ],
-    "successMessage": "nonlocal modifies the enclosing function's variable. This pattern — a counter that remembers its state — is a closure. You built one in Chapter 11."
+    "successMessage": "The counter remembers its value between calls — that's nonlocal at work. This is a closure (remember Chapter 11?) with nonlocal making the state writable."
   },
   {
-    "title": "Mutable vs immutable — the big difference",
-    "instruction": "In Python, variables hold **references** (pointers to objects), not the objects themselves.\n\n**Immutable** types (int, str, tuple, float): cannot be changed in-place. Reassignment creates a new object.\n**Mutable** types (list, dict, set): can be changed in-place.\n\nRun this. Notice why the number does not change but the list does.",
-    "starter": "def modify_number(n):\n    n = n * 2  # creates a new int object\n\ndef modify_list(lst):\n    lst.append(99)  # modifies the same list object\n\nnum = 10\nmodify_number(num)\nprint(num)  # 10 — unchanged\n\nnumbers = [1, 2, 3]\nmodify_list(numbers)\nprint(numbers)  # [1, 2, 3, 99] — changed!",
+    "title": "Mutable vs immutable — the big 'aha'",
+    "instruction": "Here's something that confuses almost every beginner at least once.\n\n**Immutable** types (int, str, float, tuple, bool): cannot be modified. When you 'change' them, Python creates a new object.\n\n**Mutable** types (list, dict, set): can be modified in-place.\n\nThis matters a lot when you pass values to functions. Run this and observe the difference.",
+    "starter": "def modify_number(n):\n    n = n * 2  # creates a new int, doesn't touch the original\n\ndef modify_list(lst):\n    lst.append(99)  # modifies the SAME list object\n\nnum = 10\nmodify_number(num)\nprint(num)  # 10 — unchanged\n\nnumbers = [1, 2, 3]\nmodify_list(numbers)\nprint(numbers)  # [1, 2, 3, 99] — changed!",
     "expectedOutput": ["10", "[1, 2, 3, 99]"],
-    "successMessage": "Ints are immutable — n = n * 2 inside the function creates a new int but does not touch the original. Lists are mutable — lst.append modifies the same object both variables point to."
+    "successMessage": "The number didn't change but the list did. Ints are immutable — n = n * 2 creates a new int elsewhere in memory. Lists are mutable — lst.append modifies the exact same list both variables point to."
   },
   {
     "title": "Copying lists — the gotcha",
-    "instruction": "If you do `b = a` for a list, `b` and `a` point to the **same** list. Changing one changes both.\n\nTo get an independent copy:\n- `b = a.copy()` — shallow copy\n- `b = a[:]` — slice copy\n- `import copy; b = copy.deepcopy(a)` — deep copy (for nested structures)\n\nFix the code to make an independent copy.",
+    "instruction": "This trips up almost everyone their first time:\n\n`b = a` does NOT copy a list. It creates a second name for the **same** list.\n\n```python\nb = a          # b and a point to the same list\nb = a.copy()   # b is a NEW independent list\nb = a[:]       # also a new independent copy\n```\n\nFix the code to make a real independent backup.",
     "hint": "backup = original.copy()",
     "starter": "original = [1, 2, 3, 4, 5]\n\n# BUG: this creates a reference, not a copy!\nbackup = original\n\noriginal.append(999)\nprint(\"Original:\", original)\nprint(\"Backup:\", backup)  # should still be [1, 2, 3, 4, 5]",
     "expectedOutput": ["Original: [1, 2, 3, 4, 5, 999]", "Backup: [1, 2, 3, 4, 5]"],
     "codeChecks": [
       { "pattern": "backup\\s*=\\s*original\\.copy\\(\\)|backup\\s*=\\s*original\\[:\\]", "required": true, "message": "Make a real copy: backup = original.copy()" }
     ],
-    "successMessage": "backup = original was just an alias — two names for the same list. .copy() creates a new independent list. This is one of the most common Python bugs for beginners."
+    "successMessage": "backup = original was just an alias — two names, one list. .copy() creates a genuinely independent list. This is probably the most common Python bug among beginners. You're now immune."
   },
   {
-    "title": "id() — check if two variables share an object",
-    "instruction": "`id()` returns the memory address of an object. Same `id` = same object.\n\nThis confirms whether two variables share data or have independent copies.\n\nRun this.",
+    "title": "id() — are these the same object?",
+    "instruction": "`id()` returns the memory address of an object. If two variables have the same `id`, they are literally the same object — not just equal values.\n\nThis is your debugging tool for 'wait, are these the same thing or just equal?'\n\nRun this.",
     "starter": "a = [1, 2, 3]\nb = a          # same object\nc = a.copy()   # new object\n\nprint(f\"a id: {id(a)}\")\nprint(f\"b id: {id(b)} — same as a? {id(a) == id(b)}\")\nprint(f\"c id: {id(c)} — same as a? {id(a) == id(c)}\")",
     "expectedOutput": [],
-    "successMessage": "b has the same id as a — they share the object. c has a different id — it is independent. id() is your debugging tool for reference vs copy questions."
+    "successMessage": "b has the same id as a — they are the exact same object. c has a different id — it's independent. id() confirms what's really happening in memory. Use it when debugging mysterious mutation bugs."
   },
   {
     "title": "Build a safe list modifier",
-    "instruction": "No starter code.\n\nWrite a function `add_score(scores, new_score)` that:\n1. Makes a copy of `scores` (does not modify the original)\n2. Adds `new_score` to the copy\n3. Sorts the copy\n4. Returns the sorted copy\n\nVerify the original is unchanged after the call.",
+    "instruction": "Final challenge — no starter code.\n\nWrite a function `add_score(scores, new_score)` that:\n1. Makes a copy of `scores` (never touches the original)\n2. Appends `new_score` to the copy\n3. Sorts the copy\n4. Returns the sorted copy\n\nThen call it and verify the original list is completely unchanged.",
     "hint": "def add_score(scores, new_score):\n    result = scores.copy()\n    result.append(new_score)\n    result.sort()\n    return result",
     "starter": "",
     "expectedOutput": [],
     "codeChecks": [
-      { "pattern": "\\.copy\\(\\)", "required": true, "message": "Copy the list first: scores.copy()" },
-      { "pattern": "\\.append\\(", "required": true, "message": "Append the new score." },
-      { "pattern": "\\.sort\\(\\)|sorted\\(", "required": true, "message": "Sort the result." },
+      { "pattern": "\\.copy\\(\\)", "required": true, "message": "Copy the list first to protect the original: scores.copy()" },
+      { "pattern": "\\.append\\(", "required": true, "message": "Append the new score to the copy." },
+      { "pattern": "\\.sort\\(\\)|sorted\\(", "required": true, "message": "Sort the copy." },
       { "pattern": "return", "required": true, "message": "Return the new sorted list." }
     ],
-    "successMessage": "A function that is safe — it never touches the original data. This principle (not mutating inputs) makes code predictable and easier to debug. Chapter 12 done."
+    "successMessage": "A non-destructive function — it never touches the original data. This principle makes code predictable and safe. Chapter 12 done — you now understand how Python actually manages memory."
   }
 ]

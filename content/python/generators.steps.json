@@ -1,74 +1,75 @@
 [
   {
-    "title": "The memory problem",
-    "instruction": "A list loads all values into memory at once.\n\nIf you have 1 million records: all 1 million sit in RAM simultaneously.\nIf you have an infinite sequence: you cannot store it in a list at all.\n\nRun this. Notice the difference in memory usage.",
-    "starter": "# List: holds all 1,000,000 numbers in memory\nnumbers_list = list(range(1_000_000))\nprint(f\"List: {len(numbers_list)} items in memory\")\n\n# Generator: computes each value one at a time\nnumbers_gen = range(1_000_000)\nprint(f\"Generator: {type(numbers_gen).__name__} — no values yet\")",
+    "title": "A million numbers — without the memory",
+    "instruction": "What if you need to work with a million numbers? If you put them all in a list, you're using megabytes of RAM upfront — even for items you might never reach.\n\nGenerators are the solution. They produce values **one at a time, on demand**. The next value only gets computed when you ask for it.\n\nRun both versions. Notice: `range()` itself is a generator — that's why range(1_000_000) doesn't use any memory.",
+    "starter": "# This holds ALL numbers in memory at once:\nnumbers_list = list(range(1_000_000))\nprint(f\"List: {len(numbers_list)} items in memory\")\n\n# This generates them one at a time:\nnumbers_gen = range(1_000_000)\nprint(f\"Generator: no items in memory yet, just a recipe\")\n\n# Only processes as many as it needs:\nfor n in numbers_gen:\n    if n > 4:\n        break\n    print(n)",
     "expectedOutput": [],
-    "successMessage": "range() is actually a generator — it does not create all 1 million numbers at once. It generates them on demand. This is lazy evaluation."
+    "successMessage": "range() is a generator — it produces each number only when the loop asks for it. No million-element list, no wasted memory. This is the key idea behind generators."
   },
   {
     "title": "yield — your first generator",
-    "instruction": "`yield` turns a function into a generator. Instead of returning a single value, it produces values one at a time.\n\nEvery time the caller calls `next()`, the function runs until the next `yield`.\n\nRun this.",
-    "starter": "def count_up(n):\n    i = 1\n    while i <= n:\n        yield i\n        i += 1\n\ngen = count_up(5)\nprint(next(gen))  # 1\nprint(next(gen))  # 2\nprint(next(gen))  # 3\n\n# Or loop over it:\nfor num in count_up(5):\n    print(num, end=\" \")",
-    "expectedOutput": ["1", "2", "3", "1 2 3 4 5 "],
-    "successMessage": "yield pauses the function and sends a value out. next() resumes it from where it stopped. Generators remember their state between calls."
+    "instruction": "`yield` turns a regular function into a generator. When Python hits `yield`, it:\n1. Produces the value\n2. **Pauses** the function — preserving all local variables\n3. Waits until the next value is requested\n\n`return` in a regular function exits permanently. `yield` in a generator pauses and can resume.\n\nRun this.",
+    "starter": "def count_up(start, stop):\n    n = start\n    while n <= stop:\n        yield n  # pause here, send n, wait for next call\n        n += 1\n\ngen = count_up(1, 5)\nfor number in gen:\n    print(number)",
+    "expectedOutput": ["1", "2", "3", "4", "5"],
+    "successMessage": "count_up runs, yields 1, pauses. The loop asks for the next — count_up resumes from where it stopped, yields 2, pauses again. Each number materialises exactly when needed."
   },
   {
-    "title": "Write a generator function",
-    "instruction": "Write a generator `fibonacci()` that yields Fibonacci numbers indefinitely:\n\n0, 1, 1, 2, 3, 5, 8, 13, 21...\n\nUse `itertools.islice` to get the first 10.",
-    "hint": "def fibonacci():\n    a, b = 0, 1\n    while True:\n        yield a\n        a, b = b, a + b",
-    "starter": "from itertools import islice\n\n# TODO: write fibonacci() generator\ndef fibonacci():\n    pass\n\nprint(list(islice(fibonacci(), 10)))",
+    "title": "Write the Fibonacci generator",
+    "instruction": "Here's where generators shine. The Fibonacci sequence is infinite — you can't put it in a list. But with a generator, you can compute it forever:\n\n```\n0, 1, 1, 2, 3, 5, 8, 13, 21...\n```\n\nEach number is the sum of the previous two.\n\nWrite `fibonacci()` — an infinite generator. Take only the first 10 using `islice`.",
+    "hint": "def fibonacci():\n    a, b = 0, 1\n    while True:  # infinite loop is fine — we control how many we take\n        yield a\n        a, b = b, a + b",
+    "starter": "from itertools import islice\n\n# TODO: write infinite fibonacci() generator\n# yield a, then update a, b = b, a + b, repeat forever\n\nfirst_10 = list(islice(fibonacci(), 10))\nprint(first_10)",
     "expectedOutput": ["[0, 1, 1, 2, 3, 5, 8, 13, 21, 34]"],
     "codeChecks": [
-      { "pattern": "yield", "required": true, "message": "Use yield to produce values." },
-      { "pattern": "while True", "required": true, "message": "Use an infinite while loop." },
+      { "pattern": "def fibonacci\\(\\):", "required": true, "message": "Define: def fibonacci():" },
+      { "pattern": "yield a|yield \\w+", "required": true, "message": "Use yield to produce each Fibonacci number." },
+      { "pattern": "while True", "required": true, "message": "Use while True for the infinite loop." },
       { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
     ],
-    "successMessage": "An infinite generator — it never stops. islice takes only the first 10. You could ask for a billion Fibonacci numbers and only the ones you request get computed."
+    "successMessage": "[0, 1, 1, 2, 3, 5, 8, 13, 21, 34] — the first ten Fibonacci numbers. The generator kept computing forever, but islice took only what we needed and stopped. Infinite sequence, finite memory."
   },
   {
-    "title": "Generator expressions",
-    "instruction": "Like list comprehensions, but lazy:\n\n```python\n# List comprehension — all in memory\nnums = [x**2 for x in range(1000000)]\n\n# Generator expression — computed on demand\nnums = (x**2 for x in range(1000000))\n```\n\nParentheses instead of square brackets.\n\nRewrite the list comprehension as a generator expression and compute the sum.",
-    "hint": "gen = (x**2 for x in range(1, 11))\nprint(sum(gen))",
-    "starter": "# List comprehension (all in memory):\nlist_comp = [x**2 for x in range(1, 11)]\nprint(sum(list_comp))\n\n# TODO: rewrite as generator expression\ngen_exp = []  # change this\nprint(sum(gen_exp))",
-    "expectedOutput": ["385", "385"],
+    "title": "Generator expressions — one-line generators",
+    "instruction": "Just like list comprehensions (`[x for x in ...]`) create lists, **generator expressions** (`(x for x in ...)`) create generators.\n\nSquare brackets → list (all in memory at once).\nParentheses → generator (one at a time, on demand).\n\nAdd up the squares of numbers 1–1000 without ever building a list.",
+    "hint": "total = sum(x**2 for x in range(1, 1001))",
+    "starter": "# List comprehension — builds entire list in memory:\nlist_version = sum([x**2 for x in range(1_000_000)])\n\n# TODO: same sum but as a generator expression (no square brackets)\ngen_version = 0  # replace with generator expression\n\nprint(gen_version)",
+    "expectedOutput": [],
     "codeChecks": [
-      { "pattern": "\\(x\\*\\*2 for x in|\\(\\w+\\*\\*2 for", "required": true, "message": "Use generator expression: (x**2 for x in range(1,11))" },
+      { "pattern": "sum\\(\\w+\\s*\\*\\*\\s*2\\s*for\\s+\\w+\\s+in\\s+range", "required": true, "message": "Use generator expression: sum(x**2 for x in range(...))" },
       { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
     ],
-    "successMessage": "Same sum, different memory footprint. Generator expressions are perfect for sum(), max(), min(), or any aggregation — you process values one by one without loading all."
+    "successMessage": "sum(x**2 for x in range(...)) — no list, just a stream. Python's built-in functions (sum, min, max, any, all) all accept generators directly. This pattern is beautifully memory-efficient."
   },
   {
-    "title": "StopIteration — when generators end",
-    "instruction": "When a generator is exhausted, calling `next()` raises `StopIteration`.\n\nFor loops handle this automatically — they stop when `StopIteration` is raised.\n\nRun this.",
-    "starter": "def three_items():\n    yield \"first\"\n    yield \"second\"\n    yield \"third\"\n\ngen = three_items()\nprint(next(gen))  # first\nprint(next(gen))  # second\nprint(next(gen))  # third\n\ntry:\n    print(next(gen))  # StopIteration!\nexcept StopIteration:\n    print(\"Generator exhausted.\")",
+    "title": "StopIteration — generator exhaustion",
+    "instruction": "When a generator runs out of values, it raises `StopIteration`. The `for` loop handles this automatically — it's how the loop knows when to stop.\n\nYou can also use `next()` to manually pull values — but you need to handle StopIteration yourself.",
+    "starter": "def small_gen():\n    yield \"first\"\n    yield \"second\"\n    yield \"third\"\n\ngen = small_gen()\nprint(next(gen))  # first\nprint(next(gen))  # second\nprint(next(gen))  # third\n\ntry:\n    print(next(gen))  # StopIteration!\nexcept StopIteration:\n    print(\"Generator exhausted.\")",
     "expectedOutput": ["first", "second", "third", "Generator exhausted."],
-    "successMessage": "Three yields, then done. for loops catch StopIteration silently. If you use next() manually, always be ready for it — or use next(gen, default) with a default value."
+    "successMessage": "After the third value, StopIteration signals the end. for loops handle this silently — that's all that's happening under the hood every time a for loop ends."
   },
   {
     "title": "yield from — delegate to another generator",
-    "instruction": "`yield from` delegates to another generator. It yields all values from the nested generator without a manual loop:\n\n```python\ndef combined():\n    yield from gen1()\n    yield from gen2()\n```\n\nFix the `all_numbers` generator to use `yield from`.",
-    "hint": "yield from evens(n)\nyield from odds(n)",
-    "starter": "def evens(n):\n    for i in range(0, n, 2):\n        yield i\n\ndef odds(n):\n    for i in range(1, n, 2):\n        yield i\n\ndef all_numbers(n):\n    # TODO: yield from evens then odds\n    for x in evens(n):\n        yield x\n    for x in odds(n):\n        yield x\n\nprint(list(all_numbers(6)))",
-    "expectedOutput": ["[0, 2, 4, 1, 3, 5]"],
+    "instruction": "`yield from` delegates to another iterable — it yields every value from that sub-generator before continuing.\n\nUse it to flatten nested structures, combine generators, or simplify recursive generators.\n\nFix `flat_list` using `yield from` to flatten one level.",
+    "hint": "yield from items",
+    "starter": "def flat_list(nested):\n    for items in nested:\n        # TODO: instead of looping again, use 'yield from items'\n        for item in items:\n            yield item\n\ndata = [[1, 2, 3], [4, 5], [6, 7, 8, 9]]\nprint(list(flat_list(data)))",
+    "expectedOutput": ["[1, 2, 3, 4, 5, 6, 7, 8, 9]"],
     "codeChecks": [
-      { "pattern": "yield from evens\\(n\\)", "required": true, "message": "Use: yield from evens(n)" },
-      { "pattern": "yield from odds\\(n\\)", "required": true, "message": "Use: yield from odds(n)" },
+      { "pattern": "yield from items|yield from \\w+", "required": true, "message": "Use: yield from items" },
       { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
     ],
-    "successMessage": "yield from is cleaner than a manual loop when delegating to another generator. It also properly handles StopIteration and return values from nested generators."
+    "successMessage": "yield from items replaces the inner for loop and yield. It's cleaner, and it also correctly forwards send() and throw() if you're doing advanced generator work."
   },
   {
-    "title": "Build a pipeline with generators",
-    "instruction": "Generators chain together naturally — the output of one becomes the input of the next. This is a processing pipeline.\n\nComplete the pipeline: `read_numbers` → `filter_evens` → `square_them` → collect first 5.",
-    "hint": "def filter_evens(nums):\n    for n in nums:\n        if n % 2 == 0:\n            yield n",
-    "starter": "from itertools import islice\n\ndef read_numbers():\n    \"\"\"Produces numbers 1 to 100\"\"\"\n    for i in range(1, 101):\n        yield i\n\ndef filter_evens(nums):\n    \"\"\"Yields only even numbers\"\"\"\n    # TODO: filter and yield even numbers\n    pass\n\ndef square_them(nums):\n    \"\"\"Yields each number squared\"\"\"\n    # TODO: yield each number squared\n    pass\n\npipeline = square_them(filter_evens(read_numbers()))\nprint(list(islice(pipeline, 5)))",
-    "expectedOutput": ["[4, 16, 36, 64, 100]"],
+    "title": "Build a generator pipeline",
+    "instruction": "Generators compose beautifully — chain them to process data through stages, each stage lazy:\n\n```\nread_lines → filter → transform → output\n```\n\nNo full dataset in memory at any stage.\n\nBuild a pipeline that reads log lines, filters for errors, and extracts the message.",
+    "hint": "def read_lines(logs):\n    yield from logs\n\ndef filter_errors(lines):\n    for line in lines:\n        if 'ERROR' in line:\n            yield line",
+    "starter": "logs = [\n    \"INFO: Server started\",\n    \"ERROR: Connection refused\",\n    \"INFO: Request received\",\n    \"ERROR: Disk full\",\n    \"INFO: Request processed\",\n]\n\n# TODO: build a pipeline:\n# 1. read_lines(logs) — yields each log line\n# 2. filter_errors(lines) — yields only ERROR lines\n# 3. extract_message(lines) — yields just the message part after 'ERROR: '\n# Then print all error messages",
+    "expectedOutput": ["Connection refused", "Disk full"],
     "codeChecks": [
-      { "pattern": "def filter_evens.*:[\\s\\S]*yield", "required": true, "message": "Implement filter_evens with yield." },
-      { "pattern": "def square_them.*:[\\s\\S]*yield", "required": true, "message": "Implement square_them with yield." },
-      { "pattern": "TODO", "required": false, "message": "Replace the TODO comments with your code." }
+      { "pattern": "def read_lines\\(|yield from logs|yield from", "required": true, "message": "Create a read_lines generator." },
+      { "pattern": "def filter_errors\\(", "required": true, "message": "Create a filter_errors generator." },
+      { "pattern": "ERROR", "required": true, "message": "Filter for lines containing 'ERROR'." },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
     ],
-    "successMessage": "A three-stage pipeline: read → filter → transform. Each stage is lazy — only the values you request get processed. Generators compose beautifully. Chapter 21 done."
+    "successMessage": "A three-stage lazy pipeline! Each stage processes one item at a time. No intermediate lists. This is exactly how data processing pipelines work in production — memory-efficient and composable. Chapter 21 done!"
   }
 ]

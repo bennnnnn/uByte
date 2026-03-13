@@ -1,14 +1,14 @@
 [
   {
-    "title": "Why functions exist",
-    "instruction": "Imagine you need to validate an email address in ten different places in your program. Without functions, you copy the same code ten times. When you find a bug, you fix it ten times.\n\nA function wraps code under a name. Write it once, call it anywhere.\n\nRun this. The `greet()` function is defined once but called twice with different inputs.",
+    "title": "Stop copying code",
+    "instruction": "Imagine you need to validate an email address in 10 different places in your program. Without functions, you copy the same 5 lines 10 times. When you find a bug in the validation, you fix it 10 times. You probably miss one.\n\nFunctions solve this: **write it once, call it anywhere**.\n\n`def greet(name):` defines a function called `greet` that takes a `name`.\nThen `greet(\"Alice\")` runs it.\n\nRun this. The function is defined once but called twice.",
     "starter": "def greet(name):\n    print(f\"Hello, {name}! Welcome to Python.\")\n\ngreet(\"Alice\")\ngreet(\"Bob\")",
     "expectedOutput": ["Hello, Alice! Welcome to Python.", "Hello, Bob! Welcome to Python."],
-    "successMessage": "One function, called twice with different names. Change the greeting once and both calls update automatically. That is the power of functions."
+    "successMessage": "One function, two calls, two different results. Change the greeting once and both calls update automatically. This is the DRY principle: Don't Repeat Yourself."
   },
   {
-    "title": "Define your own function",
-    "instruction": "A function definition:\n\n```python\ndef function_name(parameters):\n    # body — indented\n```\n\n- `def` — starts the definition\n- `function_name` — what you call it\n- `parameters` — input values (optional)\n- The body runs only when you call the function\n\nWrite a function `say_hello` that prints `\"Hello, World!\"`. Then call it.",
+    "title": "Define your first function",
+    "instruction": "A function definition:\n\n```python\ndef function_name(parameters):\n    # body — must be indented\n    # runs only when you call the function\n```\n\n- `def` starts it\n- The body is indented (just like if/for)\n- Defining does NOT run the function — you have to call it\n\nWrite a function `say_hello` that prints `\"Hello, World!\"`. Then call it.",
     "hint": "def say_hello():\n    print(\"Hello, World!\")\n\nsay_hello()",
     "starter": "# TODO: define say_hello() and call it",
     "expectedOutput": ["Hello, World!"],
@@ -17,11 +17,11 @@
       { "pattern": "say_hello\\(\\)", "required": true, "message": "Call the function: say_hello()" },
       { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
     ],
-    "successMessage": "Your first function. Defined with def, called with say_hello(). The body only runs when you call it — defining does not execute anything."
+    "successMessage": "Defined AND called. Remember: def just creates the function — it doesn't run it. The call say_hello() is what makes it actually execute."
   },
   {
-    "title": "Parameters — give functions input",
-    "instruction": "Functions become powerful when they can accept input:\n\n```python\ndef greet(name):\n    print(f\"Hello, {name}!\")\n```\n\n`name` is a **parameter** — the placeholder inside the function.\n`\"Alice\"` is an **argument** — the actual value passed when calling.\n\nWrite a function `square(n)` that prints the square of any number. Call it with 4 and 7.",
+    "title": "Parameters — give it input",
+    "instruction": "A function without input can only do one thing. With **parameters**, it can do that thing with different data each time.\n\n`name` is a **parameter** — the placeholder in the definition.\n`\"Alice\"` is an **argument** — the actual value passed when calling.\n\nWrite a function `square(n)` that prints the square of any number. Call it with 4 and 7.",
     "hint": "def square(n):\n    print(n ** 2)\n\nsquare(4)\nsquare(7)",
     "starter": "# TODO: define square(n) and call it with 4 and 7",
     "expectedOutput": ["16", "49"],
@@ -31,11 +31,11 @@
       { "pattern": "square\\(7\\)", "required": true, "message": "Call: square(7)" },
       { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
     ],
-    "successMessage": "Parameters make functions reusable — same logic, different data. square(4) gives 16, square(7) gives 49. One function, infinite inputs."
+    "successMessage": "Parameters make functions reusable. square(4) gives 16, square(7) gives 49. One function handles infinitely many inputs. That's the power."
   },
   {
-    "title": "return — give back a value",
-    "instruction": "Functions can return a value for the caller to use:\n\n```python\ndef add(a, b):\n    return a + b\n\nresult = add(3, 4)  # result = 7\n```\n\nWithout `return`, a function returns `None`. With `return`, it gives back a value.\n\nWrite a function `celsius_to_fahrenheit(c)` that returns `(c * 9/5) + 32`. Call it and print the result.",
+    "title": "return — give something back",
+    "instruction": "So far your functions print things. But printing inside a function isn't always useful — sometimes you want the **result** so you can use it elsewhere.\n\n`return` sends a value back to whoever called the function:\n\n```python\ndef add(a, b):\n    return a + b\n\nresult = add(3, 4)  # result is now 7\n```\n\nWithout `return`, functions give back `None`.\n\nWrite `celsius_to_fahrenheit(c)` that returns `(c * 9/5) + 32`. Call it with 100.",
     "hint": "def celsius_to_fahrenheit(c):\n    return (c * 9/5) + 32",
     "starter": "# TODO: define celsius_to_fahrenheit and print the result for 100 degrees",
     "expectedOutput": ["212.0"],
@@ -45,84 +45,84 @@
       { "pattern": "celsius_to_fahrenheit\\(100\\)", "required": true, "message": "Call with 100: celsius_to_fahrenheit(100)" },
       { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
     ],
-    "successMessage": "return sends the value back. Now you can use the result in expressions, store it, pass it to other functions. Functions become building blocks."
+    "successMessage": "100°C → 212°F. return unlocks the result for use anywhere — store it in a variable, pass it to another function, print it, check it in an if-statement."
   },
   {
-    "title": "Default parameter values",
-    "instruction": "Parameters can have default values — used when the caller does not provide one:\n\n```python\ndef greet(name, greeting=\"Hello\"):\n    print(f\"{greeting}, {name}!\")\n\ngreet(\"Alice\")           # Hello, Alice!\ngreet(\"Bob\", \"Hi\")      # Hi, Bob!\n```\n\nAdd a default value of `2` to the `power` parameter in the function below.",
+    "title": "Default values — optional parameters",
+    "instruction": "Parameters can have default values. If the caller doesn't provide one, the default is used:\n\n```python\ndef greet(name, greeting=\"Hello\"):\n    print(f\"{greeting}, {name}!\")\n\ngreet(\"Alice\")           # Hello, Alice!\ngreet(\"Bob\", \"Hi\")      # Hi, Bob!\n```\n\nAdd a default value of `2` to the `power` parameter so `raise_to(3)` returns 9.",
     "hint": "def raise_to(base, power=2):",
-    "starter": "# TODO: add default value of 2 to power parameter\ndef raise_to(base, power):\n    return base ** power\n\nprint(raise_to(3))     # should use default: 9\nprint(raise_to(2, 10)) # explicit: 1024",
+    "starter": "# TODO: add default value of 2 to power parameter\ndef raise_to(base, power):\n    return base ** power\n\nprint(raise_to(3))     # should use default power of 2: outputs 9\nprint(raise_to(2, 10)) # explicit power: outputs 1024",
     "expectedOutput": ["9", "1024"],
     "codeChecks": [
       { "pattern": "def raise_to\\(base,\\s*power\\s*=\\s*2\\)", "required": true, "message": "Add default: def raise_to(base, power=2):" },
       { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
     ],
-    "successMessage": "Default parameters make functions flexible without requiring every argument every time. Defaults must come after required parameters — Python enforces this."
+    "successMessage": "raise_to(3) uses the default power of 2 (giving 9). raise_to(2, 10) overrides it (giving 1024). One rule: defaults must come AFTER required parameters."
   },
   {
-    "title": "*args — accept any number of arguments",
-    "instruction": "`*args` lets a function accept any number of positional arguments. They arrive as a tuple.\n\n```python\ndef sum_all(*nums):\n    return sum(nums)\n\nsum_all(1, 2, 3)     # 6\nsum_all(1, 2, 3, 4, 5)  # 15\n```\n\nWrite a function `average(*nums)` that returns the average of any number of arguments.",
+    "title": "*args — any number of arguments",
+    "instruction": "What if you don't know in advance how many arguments someone will pass?\n\n`*args` captures any number of extra positional arguments as a tuple:\n\n```python\ndef sum_all(*nums):\n    return sum(nums)  # nums is a tuple of all passed values\n\nsum_all(1, 2, 3)        # 6\nsum_all(1, 2, 3, 4, 5)  # 15\n```\n\nWrite an `average(*nums)` function that returns the mean of any number of arguments.",
     "hint": "def average(*nums):\n    return sum(nums) / len(nums)",
     "starter": "# TODO: define average(*nums) that returns the mean\nprint(average(10, 20, 30))    # 20.0\nprint(average(5, 15, 25, 35)) # 20.0",
     "expectedOutput": ["20.0", "20.0"],
     "codeChecks": [
       { "pattern": "def average\\(\\*\\w+\\)", "required": true, "message": "Define: def average(*nums):" },
-      { "pattern": "sum\\(", "required": true, "message": "Use sum() in your function." },
-      { "pattern": "len\\(", "required": true, "message": "Divide by len() for the average." },
+      { "pattern": "sum\\(", "required": true, "message": "Use sum() inside the function." },
+      { "pattern": "len\\(", "required": true, "message": "Divide by len() to get the average." },
       { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
     ],
-    "successMessage": "*args collects all extra positional arguments into a tuple. The name 'args' is convention — the * is what matters. Call with any number of arguments."
+    "successMessage": "average(10, 20, 30) and average(5, 15, 25, 35) both give 20.0 — same function, different number of arguments. *args makes functions ultra-flexible."
   },
   {
     "title": "**kwargs — named arguments",
-    "instruction": "`**kwargs` accepts any number of keyword arguments. They arrive as a dictionary.\n\n```python\ndef describe(**info):\n    for key, value in info.items():\n        print(f\"{key}: {value}\")\n\ndescribe(name=\"Alex\", city=\"London\", age=25)\n```\n\nWrite a function `build_url(**params)` that builds a query string from keyword arguments.",
+    "instruction": "`**kwargs` captures any number of keyword arguments as a dictionary:\n\n```python\ndef describe(**info):\n    for key, value in info.items():\n        print(f\"{key}: {value}\")\n\ndescribe(name=\"Alex\", city=\"London\", age=25)\n```\n\nWrite `build_url(**params)` that builds a query string from keyword arguments.\n\n`build_url(q=\"python\", page=1, limit=10)` → `?q=python&page=1&limit=10`",
     "hint": "def build_url(**params):\n    query = \"&\".join(f\"{k}={v}\" for k, v in params.items())\n    return f\"?{query}\"",
     "starter": "# TODO: define build_url(**params) that returns a query string\nprint(build_url(q=\"python\", page=1, limit=10))\n# Expected: ?q=python&page=1&limit=10",
     "expectedOutput": ["?q=python&page=1&limit=10"],
     "codeChecks": [
       { "pattern": "def build_url\\(\\*\\*\\w+\\)", "required": true, "message": "Define: def build_url(**params):" },
-      { "pattern": "\\.items\\(\\)", "required": true, "message": "Loop over params.items()." },
+      { "pattern": "\\.items\\(\\)", "required": true, "message": "Loop over params.items() to build the string." },
       { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
     ],
-    "successMessage": "**kwargs collects all keyword arguments into a dictionary. Combine *args and **kwargs for maximum flexibility: def func(*args, **kwargs)."
+    "successMessage": "**kwargs becomes a dictionary inside the function. This is how frameworks like Flask and Django handle flexible function signatures — functions that accept any keyword arguments."
   },
   {
-    "title": "lambda — anonymous one-liner functions",
-    "instruction": "A `lambda` is an anonymous function — defined in one line, no name needed:\n\n```python\nsquare = lambda x: x ** 2\ndouble = lambda x: x * 2\nadd = lambda a, b: a + b\n```\n\nUse `lambda` with `sorted()` to sort the users list by age.",
+    "title": "lambda — a function in one line",
+    "instruction": "Sometimes a function is so simple it feels wasteful to write a full `def`.\n\nA `lambda` is an anonymous one-liner:\n\n```python\nsquare = lambda x: x ** 2\nadd = lambda a, b: a + b\n```\n\nLambdas shine when passed as arguments to other functions — like `sorted()`:\n\nSort the users list by age using a lambda.",
     "hint": "sorted(users, key=lambda u: u[\"age\"])",
-    "starter": "users = [\n    {\"name\": \"Carol\", \"age\": 28},\n    {\"name\": \"Alice\", \"age\": 32},\n    {\"name\": \"Bob\", \"age\": 25},\n]\n\n# TODO: sort users by age using lambda\nsorted_users = []\nfor u in sorted_users:\n    print(f\"{u['name']}: {u['age']}\")",
+    "starter": "users = [\n    {\"name\": \"Carol\", \"age\": 28},\n    {\"name\": \"Alice\", \"age\": 32},\n    {\"name\": \"Bob\", \"age\": 25},\n]\n\n# TODO: sort users by age using a lambda as the key\nsorted_users = []\nfor u in sorted_users:\n    print(f\"{u['name']}: {u['age']}\")",
     "expectedOutput": ["Bob: 25", "Carol: 28", "Alice: 32"],
     "codeChecks": [
       { "pattern": "lambda\\s+\\w+:", "required": true, "message": "Use a lambda: lambda u: u[\"age\"]" },
       { "pattern": "sorted\\(", "required": true, "message": "Use sorted() with your lambda as key." },
       { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
     ],
-    "successMessage": "lambda + sorted is a perfect combination. Lambdas shine in situations like this: a quick throwaway function for sorting, filtering, or mapping."
+    "successMessage": "Sorted by age in one line. lambda + sorted is a classic Python pattern. Keep lambdas simple — if the logic gets complex, use a proper def instead."
   },
   {
     "title": "Closures — functions that remember",
-    "instruction": "A closure is a function that remembers variables from its enclosing scope — even after that scope has finished.\n\nRun this. `make_multiplier(3)` returns a new function that remembers `n=3`.",
-    "starter": "def make_multiplier(n):\n    def multiply(x):\n        return x * n  # n is remembered from the outer scope\n    return multiply\n\ntriple = make_multiplier(3)\ndouble = make_multiplier(2)\n\nprint(triple(5))   # 15\nprint(double(5))   # 10\nprint(triple(10))  # 30",
+    "instruction": "A closure is a function that **remembers** variables from the scope where it was created — even after that scope is gone.\n\nRun this. `make_multiplier(3)` returns a *new function* that permanently remembers `n=3`.",
+    "starter": "def make_multiplier(n):\n    def multiply(x):\n        return x * n  # n is remembered forever\n    return multiply\n\ntriple = make_multiplier(3)\ndouble = make_multiplier(2)\n\nprint(triple(5))   # 15\nprint(double(5))   # 10\nprint(triple(10))  # 30",
     "expectedOutput": ["15", "10", "30"],
-    "successMessage": "triple remembers n=3, double remembers n=2 — permanently. Closures create specialised functions from general ones. Powerful pattern for configuration and factories."
+    "successMessage": "triple remembers n=3. double remembers n=2. Each call to make_multiplier creates a new function with its own permanent copy of n. This is a closure — functions with memory."
   },
   {
-    "title": "Recursion — functions calling themselves",
-    "instruction": "A recursive function calls itself. It needs:\n1. A **base case** — when to stop\n2. A **recursive case** — calls itself with a smaller problem\n\nWrite a recursive `factorial(n)` function:\n- `factorial(0) = 1` (base case)\n- `factorial(n) = n * factorial(n-1)` (recursive case)",
+    "title": "Recursion — a function calling itself",
+    "instruction": "A recursive function calls *itself*. It sounds circular — and it is, but in a controlled way.\n\nYou always need:\n1. A **base case** — when to stop\n2. A **recursive case** — call yourself with a smaller problem\n\n`factorial(5)` = 5 × factorial(4) = 5 × 4 × factorial(3) = ... = 5 × 4 × 3 × 2 × 1 = 120\n\nWrite it.",
     "hint": "def factorial(n):\n    if n == 0:\n        return 1\n    return n * factorial(n - 1)",
     "starter": "# TODO: write recursive factorial(n)\nprint(factorial(5))  # 120\nprint(factorial(0))  # 1\nprint(factorial(10)) # 3628800",
     "expectedOutput": ["120", "1", "3628800"],
     "codeChecks": [
       { "pattern": "def factorial\\(n\\):", "required": true, "message": "Define: def factorial(n):" },
       { "pattern": "factorial\\(n\\s*-\\s*1\\)", "required": true, "message": "Recursive call: factorial(n - 1)" },
-      { "pattern": "if n == 0|if n <= 0|if n < 1", "required": true, "message": "Add a base case for n == 0." },
+      { "pattern": "if n == 0|if n <= 0|if n < 1", "required": true, "message": "Add the base case: if n == 0: return 1" },
       { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
     ],
-    "successMessage": "5 * 4 * 3 * 2 * 1 = 120. Recursion breaks a problem down until it hits the base case, then builds the answer back up. Elegant — and easy to get wrong without a base case."
+    "successMessage": "factorial(5) worked backwards: 5×4×3×2×1 = 120. Recursion is elegant when a problem naturally breaks into smaller versions of itself — trees, file systems, nested data."
   },
   {
     "title": "Build a calculator",
-    "instruction": "No starter code.\n\nBuild a four-function calculator:\n- `add(a, b)` → returns sum\n- `subtract(a, b)` → returns difference\n- `multiply(a, b)` → returns product\n- `divide(a, b)` → returns quotient; return `\"Cannot divide by zero\"` if b is 0\n\nCall each function and print the results.",
+    "instruction": "Final challenge — no starter code.\n\nBuild a four-function calculator:\n- `add(a, b)` → sum\n- `subtract(a, b)` → difference\n- `multiply(a, b)` → product\n- `divide(a, b)` → quotient, but return `\"Cannot divide by zero\"` if b is 0\n\nCall each function and print the results. Four functions, one real project.",
     "hint": "def divide(a, b):\n    if b == 0:\n        return \"Cannot divide by zero\"\n    return a / b",
     "starter": "",
     "expectedOutput": [],
@@ -131,8 +131,8 @@
       { "pattern": "def subtract\\(", "required": true, "message": "Define subtract(a, b)." },
       { "pattern": "def multiply\\(", "required": true, "message": "Define multiply(a, b)." },
       { "pattern": "def divide\\(", "required": true, "message": "Define divide(a, b)." },
-      { "pattern": "b == 0|b\\s*==\\s*0", "required": true, "message": "Handle division by zero in divide()." }
+      { "pattern": "b == 0", "required": true, "message": "Handle division by zero in divide()." }
     ],
-    "successMessage": "A working calculator with four functions and error handling. Functions make this clean — each operation is isolated, testable, and reusable. Chapter 11 done."
+    "successMessage": "A working calculator with error handling — all from scratch. Functions make the code clean, testable, and reusable. This is exactly the structure of every real program. Chapter 11 done!"
   }
 ]

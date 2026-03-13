@@ -1,88 +1,88 @@
 [
   {
-    "title": "What is a module",
-    "instruction": "A module is just a Python file. Every `.py` file you write is a module.\n\nYou import it with `import` to use its functions and variables in another file.\n\nPython comes with hundreds of built-in modules — the standard library. No installation needed.\n\nRun this to explore a few.",
+    "title": "The standard library — free tools, no install",
+    "instruction": "Python ships with hundreds of built-in modules — the standard library. Math, file system, dates, random numbers, networking, compression, encryption — it's all there.\n\nNo installation. No setup. Just `import` and go.\n\nRun this to explore three of them.",
     "starter": "import math\nimport random\nimport datetime\n\nprint(math.pi)\nprint(math.sqrt(16))\nprint(random.randint(1, 10))\nprint(datetime.date.today())",
     "expectedOutput": [],
-    "successMessage": "Three modules, zero installation. math, random, datetime — all built into Python. The standard library has a module for almost everything you will ever need."
+    "successMessage": "Three imports, four capabilities. The standard library is one of Python's greatest strengths — before reaching for a third-party package, check if the standard library already does it."
   },
   {
-    "title": "from import — import specific names",
-    "instruction": "`from module import name` imports only what you need — no module prefix required:\n\n```python\nfrom math import sqrt, pi\nprint(sqrt(16))  # no math. prefix\n```\n\nRewrite the imports below using `from ... import`.",
+    "title": "from import — no prefix needed",
+    "instruction": "`from module import name` imports just what you need — no module prefix required:\n\n```python\nfrom math import sqrt, pi\nprint(sqrt(16))  # no 'math.' needed\n```\n\nRewrite the imports to use `from ... import`.",
     "hint": "from math import sqrt, pi\nfrom random import choice",
-    "starter": "import math\nimport random\n\nresult = math.sqrt(25)\npi_value = math.pi\nwinner = random.choice([\"Alice\", \"Bob\", \"Carol\"])\n\n# TODO: rewrite the imports above using 'from ... import'\n# Then remove the math. and random. prefixes below",
+    "starter": "import math\nimport random\n\nresult = math.sqrt(25)\npi_value = math.pi\nwinner = random.choice([\"Alice\", \"Bob\", \"Carol\"])\n\n# TODO: rewrite the imports above using 'from ... import'\n# Then remove the math. and random. prefixes from the code below",
     "expectedOutput": [],
     "codeChecks": [
       { "pattern": "from math import", "required": true, "message": "Use: from math import sqrt, pi" },
       { "pattern": "from random import", "required": true, "message": "Use: from random import choice" },
       { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
     ],
-    "successMessage": "from import gives you the function directly. Cleaner for frequently used names. But if two modules have the same name, you need the prefix — that is when import module is better."
+    "successMessage": "from import is cleaner for frequently used names. One caveat: if two modules export the same name, you need the prefix version to avoid conflicts."
   },
   {
-    "title": "import as — aliases",
-    "instruction": "`import numpy as np` creates an alias — you type `np.array()` instead of `numpy.array()`.\n\nUseful for long module names and for avoiding conflicts.\n\n`import datetime as dt` → `dt.date.today()`",
-    "hint": "import datetime as dt\nprint(dt.date.today())",
-    "starter": "# TODO: import datetime with alias 'dt' and os with alias 'os_module'\n# Then use them\nimport datetime\nimport os\n\nprint(datetime.date.today())\nprint(os.getcwd())",
+    "title": "import as — shorter names",
+    "instruction": "`import module as alias` gives the module a shorter nickname:\n\n```python\nimport datetime as dt\ndt.date.today()  # shorter than datetime.date.today()\n```\n\nYou will see this everywhere in data science: `import numpy as np`, `import pandas as pd`, `import matplotlib.pyplot as plt`.\n\nAdd aliases to both imports.",
+    "hint": "import datetime as dt\nimport os as operating_system",
+    "starter": "# TODO: import datetime with alias 'dt' and os with any alias you like\nimport datetime\nimport os\n\nprint(datetime.date.today())\nprint(os.getcwd())",
     "expectedOutput": [],
     "codeChecks": [
       { "pattern": "import datetime as dt", "required": true, "message": "Alias: import datetime as dt" },
       { "pattern": "import os as", "required": true, "message": "Alias: import os as something" },
       { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
     ],
-    "successMessage": "Aliases are a Python convention. import numpy as np, import pandas as pd, import matplotlib.pyplot as plt — you will see these in almost every data science file."
+    "successMessage": "Aliases are Python convention. import numpy as np is so standard that using the full name looks strange. Pick short, memorable aliases."
   },
   {
-    "title": "os — working with the file system",
-    "instruction": "The `os` module gives you access to the operating system:\n\n```python\nos.getcwd()          # current directory\nos.listdir(path)     # list files\nos.path.exists(path) # check if file exists\nos.path.join(a, b)   # build paths safely\n```\n\nRun this to explore os capabilities.",
+    "title": "os — your file system, your rules",
+    "instruction": "The `os` module gives you access to the operating system — file paths, environment variables, directory listing, file existence checks.\n\nRun this. Then notice `os.path.join` — it builds paths correctly on Windows AND Mac/Linux automatically.",
     "starter": "import os\n\nprint(os.getcwd())\nprint(os.path.exists(\"/tmp\"))\nprint(os.path.join(\"folder\", \"subfolder\", \"file.txt\"))\nprint(os.environ.get(\"HOME\", \"Not found\"))",
     "expectedOutput": [],
-    "successMessage": "os.path.join builds paths the right way — handles / vs \\ differences between Linux and Windows automatically. Essential for any code that touches the file system."
+    "successMessage": "os.path.join handles / vs \\ differences between operating systems automatically. Always use it instead of manually building paths with string concatenation."
   },
   {
-    "title": "sys — interpreter information",
-    "instruction": "`sys` gives you information about the Python interpreter itself:\n\n```python\nsys.argv       # command-line arguments\nsys.version    # Python version\nsys.path       # module search paths\nsys.exit(0)    # exit the program\n```\n\nRun this.",
+    "title": "sys — talking to the interpreter",
+    "instruction": "`sys` gives you information about Python itself:\n\n- `sys.version` — what version is running?\n- `sys.platform` — what OS?\n- `sys.argv` — command-line arguments\n- `sys.exit()` — exit the program\n\nRun this.",
     "starter": "import sys\n\nprint(sys.version)\nprint(sys.platform)\nprint(f\"Python {sys.version_info.major}.{sys.version_info.minor}\")",
     "expectedOutput": [],
-    "successMessage": "sys.version_info.major gives you 3 (for Python 3). Use sys.platform to write cross-platform code. sys.argv lets you read command-line arguments."
+    "successMessage": "sys.version_info.major is 3 (for Python 3). Use sys.platform to write code that behaves differently on Windows vs Mac. sys.argv is how command-line scripts read their arguments."
   },
   {
-    "title": "collections — useful data structures",
-    "instruction": "`collections` extends Python's built-in types:\n\n- `Counter` — count occurrences\n- `defaultdict` — dict with automatic defaults\n- `deque` — fast double-ended queue\n- `OrderedDict` — dict that remembers insertion order\n\nUse `Counter` to count word frequencies.",
+    "title": "collections — data structure superpowers",
+    "instruction": "`collections` extends Python's built-in containers:\n\n- `Counter` — count occurrences instantly\n- `defaultdict` — dict that creates default values automatically\n- `deque` — fast queue (O(1) pop from both ends)\n\nUse `Counter` to count word frequencies — it is so much cleaner than the manual approach from Chapter 10.",
     "hint": "from collections import Counter\ncounts = Counter(words)",
-    "starter": "from collections import Counter, defaultdict\n\nwords = \"the cat sat on the mat and the cat sat\".split()\n# TODO: use Counter to count word frequencies, print top 3\n\n# defaultdict example\ngroups = defaultdict(list)\nfor word in words:\n    groups[len(word)].append(word)\nprint(dict(groups))",
+    "starter": "from collections import Counter, defaultdict\n\nwords = \"the cat sat on the mat and the cat sat\".split()\n# TODO: use Counter to count word frequencies and print the 3 most common\n\n# defaultdict example — no KeyError when key doesn't exist\ngroups = defaultdict(list)\nfor word in words:\n    groups[len(word)].append(word)\nprint(dict(groups))",
     "expectedOutput": [],
     "codeChecks": [
-      { "pattern": "Counter\\(words\\)|Counter\\(", "required": true, "message": "Use Counter() to count words." },
+      { "pattern": "Counter\\(words\\)|Counter\\(", "required": true, "message": "Use Counter() to count words: Counter(words)" },
       { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
     ],
-    "successMessage": "Counter is perfect for frequency analysis. defaultdict(list) auto-creates empty lists — no need to check if the key exists first. Both save significant boilerplate."
+    "successMessage": "Counter is magical — Counter(words) does in one call what took you an entire Chapter 10 solution. defaultdict means you never have to check if a key exists first."
   },
   {
-    "title": "__name__ == \"__main__\"",
-    "instruction": "When Python runs a file directly, `__name__` is `\"__main__\"`.\nWhen it is imported as a module, `__name__` is the module's filename.\n\nThis guard lets you write code that runs only when the file is executed directly — not when imported:\n\n```python\nif __name__ == \"__main__\":\n    main()\n```\n\nAdd the guard to this script.",
-    "hint": "if __name__ == \"__main__\":\n    print(\"Running directly\")",
-    "starter": "def calculate(a, b):\n    return a + b\n\ndef main():\n    result = calculate(10, 20)\n    print(f\"Result: {result}\")\n\n# TODO: add the __name__ guard so main() only runs when this file is executed directly",
+    "title": "__name__ == \"__main__\" — the essential guard",
+    "instruction": "When Python runs a file directly, `__name__` is `\"__main__\"`.\nWhen it's imported as a module, `__name__` is the file's name.\n\nThis guard is how you write code that runs only when executed directly — not when imported:\n\n```python\nif __name__ == \"__main__\":\n    main()  # only runs when you run this file directly\n```\n\nEvery Python script should have this. Add it.",
+    "hint": "if __name__ == \"__main__\":\n    main()",
+    "starter": "def calculate(a, b):\n    return a + b\n\ndef main():\n    result = calculate(10, 20)\n    print(f\"Result: {result}\")\n\n# TODO: add the __name__ guard so main() only runs when executed directly",
     "expectedOutput": ["Result: 30"],
     "codeChecks": [
       { "pattern": "if __name__ == \"__main__\"", "required": true, "message": "Add: if __name__ == \"__main__\":" },
       { "pattern": "main\\(\\)", "required": true, "message": "Call main() inside the guard." },
       { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
     ],
-    "successMessage": "Every Python script should have this guard. It separates code meant to run directly from code meant to be imported. Standard practice in every Python project."
+    "successMessage": "The __name__ guard is standard Python. Without it, importing your file would run all your code as a side effect — usually not what you want."
   },
   {
-    "title": "Build a file utilities module",
-    "instruction": "No starter code.\n\nBuild a small file utility using the standard library:\n1. Import `os`, `pathlib.Path`\n2. Write `list_python_files(directory)` that returns all `.py` files in a directory\n3. Write `file_size(path)` that returns file size in KB\n4. Test both with the current directory\n\nUse `Path(\".\")` for the current directory.",
+    "title": "Build a file utility",
+    "instruction": "Final challenge — no starter code.\n\nBuild two utilities using the standard library:\n1. `list_python_files(directory)` — returns all `.py` files in a directory\n2. `file_size_kb(path)` — returns the file size in KB\n\nUse `pathlib.Path` (modern Python file handling). Test with the current directory (`.`).",
     "hint": "from pathlib import Path\n\ndef list_python_files(directory):\n    return list(Path(directory).glob(\"*.py\"))",
     "starter": "",
     "expectedOutput": [],
     "codeChecks": [
-      { "pattern": "import os|from pathlib", "required": true, "message": "Import os or pathlib." },
-      { "pattern": "def list_python_files\\(", "required": true, "message": "Define list_python_files()." },
-      { "pattern": "def file_size\\(", "required": true, "message": "Define file_size()." },
+      { "pattern": "import os|from pathlib", "required": true, "message": "Import os or pathlib for file operations." },
+      { "pattern": "def list_python_files\\(", "required": true, "message": "Define list_python_files(directory)." },
+      { "pattern": "def file_size", "required": true, "message": "Define file_size_kb(path)." },
       { "pattern": "\\.py", "required": true, "message": "Filter for .py files." }
     ],
-    "successMessage": "File utilities using only the standard library. pathlib is modern Python — cleaner than os.path for most file operations. Chapter 20 done."
+    "successMessage": "File utilities from scratch, zero third-party packages. pathlib is modern Python — cleaner than os.path for most file work. Chapter 20 done!"
   }
 ]

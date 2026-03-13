@@ -1,51 +1,51 @@
 [
   {
-    "title": "Your first for loop",
-    "instruction": "Imagine printing the names of 100 students. Writing 100 `print()` calls is insane.\n\nA `for` loop does repetition for you:\n\n```python\nfor item in collection:\n    # runs once per item\n```\n\nRun this. Python loops through the list and runs the block once per name.",
+    "title": "Computers love repetition",
+    "instruction": "Imagine you need to print the names of 100 students. Without loops, you would write 100 `print()` calls. By hand. And then want to quit programming forever.\n\nLoops do the repetition for you. One `for` loop handles 100 names, or 1000 names, or 10 million names — same four lines of code.\n\n```python\nfor item in collection:\n    # runs once per item\n```\n\nRun this. Python visits each student and runs the block once per name.",
     "starter": "students = [\"Alice\", \"Bob\", \"Carol\", \"David\", \"Eve\"]\n\nfor student in students:\n    print(student)",
     "expectedOutput": ["Alice", "Bob", "Carol", "David", "Eve"],
-    "successMessage": "Five names, five iterations. The loop handled all five with four lines of code. Scale that to a million students — still four lines."
+    "successMessage": "Five names, five prints, four lines of code. Change the list to 1000 names and it's still four lines. Loops are one of the most powerful ideas in programming."
   },
   {
-    "title": "range() — loop a number of times",
-    "instruction": "`range(n)` produces the numbers 0, 1, 2, ... n-1.\n\n`range(3)` → 0, 1, 2\n`range(1, 6)` → 1, 2, 3, 4, 5\n`range(0, 10, 2)` → 0, 2, 4, 6, 8 (step of 2)\n\nPrint the numbers 1 to 10 using `range()`.",
+    "title": "range() — count for me",
+    "instruction": "`range(n)` generates numbers from 0 to n-1. You don't see them all at once — Python creates them one at a time.\n\n- `range(5)` → 0, 1, 2, 3, 4\n- `range(1, 6)` → 1, 2, 3, 4, 5\n- `range(0, 10, 2)` → 0, 2, 4, 6, 8 (step of 2)\n\nThe starter prints 0–4. Change it to print 1 through 10.",
     "hint": "for i in range(1, 11):",
     "starter": "# TODO: use range() to print numbers 1 through 10\nfor i in range(5):\n    print(i)",
     "expectedOutput": ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"],
     "codeChecks": [
-      { "pattern": "range\\(1,\\s*11\\)", "required": true, "message": "Use range(1, 11) to get 1 through 10." },
+      { "pattern": "range\\(1,\\s*11\\)", "required": true, "message": "Use range(1, 11) to get 1 through 10. (The stop value is not included!)" },
       { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
     ],
-    "successMessage": "range(1, 11) gives you 1 to 10. The stop value is always exclusive — range(1, 11) stops before 11. Use this whenever you need a counter."
+    "successMessage": "range(1, 11) gives you 1 to 10. The stop is always excluded — range(1, 11) stops BEFORE 11. This surprises everyone once. Now you know."
   },
   {
-    "title": "Loop over a string",
-    "instruction": "Strings are sequences too — you can loop over each character:\n\n`for char in \"hello\":` → visits `h`, `e`, `l`, `l`, `o`\n\nWrite a loop that prints each letter of your name on its own line. Then count how many characters it has by incrementing a counter.",
+    "title": "Strings are sequences too",
+    "instruction": "Here is something that surprises beginners: strings are sequences of characters. You can loop over them just like lists.\n\n`for char in \"hello\":` visits `h`, then `e`, then `l`, `l`, `o`.\n\nLoop over the name below, print each character, and count how many characters there are.",
     "hint": "count = 0\nfor char in name:\n    print(char)\n    count += 1\nprint(f\"Total: {count}\")",
     "starter": "name = \"Python\"\n# TODO: loop over name and print each character\n# also count and print total characters at the end",
     "expectedOutput": [],
     "codeChecks": [
       { "pattern": "for\\s+\\w+\\s+in\\s+name", "required": true, "message": "Loop over name: for char in name:" },
-      { "pattern": "print\\(char\\)|print\\(\\w+\\)", "required": true, "message": "Print each character." },
+      { "pattern": "print\\(char\\)|print\\(\\w+\\)", "required": true, "message": "Print each character inside the loop." },
       { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
     ],
-    "successMessage": "Strings are just sequences of characters. Every for loop that works on a list also works on a string."
+    "successMessage": "Every for loop that works on a list also works on a string. Strings are just sequences of characters — Python treats them the same way."
   },
   {
-    "title": "enumerate() — index and value together",
-    "instruction": "Sometimes you need the position (index) as well as the value while looping.\n\n`enumerate()` gives you both:\n\n```python\nfor index, value in enumerate(collection):\n```\n\nRewrite the loop below using `enumerate()` to print the index alongside each student's name.",
-    "hint": "for i, student in enumerate(students):",
+    "title": "enumerate() — index AND value",
+    "instruction": "Sometimes you need to know the position (index) of each item while looping. You could track it manually with a counter, but Python has something cleaner:\n\n`enumerate()` gives you both the index AND the value:\n\n```python\nfor index, value in enumerate(collection):\n```\n\nRewrite the loop to use `enumerate()` and number each student 1, 2, 3...",
+    "hint": "for i, student in enumerate(students, 1):",
     "starter": "students = [\"Alice\", \"Bob\", \"Carol\"]\n\n# TODO: use enumerate() to print:\n# 1. Alice\n# 2. Bob\n# 3. Carol\nfor student in students:\n    print(student)",
     "expectedOutput": ["1. Alice", "2. Bob", "3. Carol"],
     "codeChecks": [
-      { "pattern": "enumerate\\(students\\)", "required": true, "message": "Use: for i, student in enumerate(students):" },
+      { "pattern": "enumerate\\(students", "required": true, "message": "Use: for i, student in enumerate(students):" },
       { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
     ],
-    "successMessage": "enumerate returns (index, value) pairs. Note: by default it starts at 0 — use enumerate(students, 1) to start numbering at 1."
+    "successMessage": "enumerate returns (index, value) pairs. By default it starts at 0 — use enumerate(students, 1) to start numbering at 1. Bye bye manual counter variables."
   },
   {
-    "title": "while — loop until a condition is False",
-    "instruction": "`while` loops run as long as a condition is `True`:\n\n```python\nwhile condition:\n    # runs as long as condition is True\n```\n\nUse `while` when you do not know in advance how many times to loop.\n\nAdd the missing update (`count += 1`) so the loop does not run forever.",
+    "title": "while — loop until something changes",
+    "instruction": "`for` loops are great when you know what you're looping over. `while` is for when you don't know how many times you'll loop — you keep going until a condition changes.\n\n```python\nwhile condition:\n    # keeps running as long as condition is True\n```\n\nThe code below loops forever because `count` never changes. Add `count += 1` to fix it.",
     "hint": "count += 1",
     "starter": "count = 1\n\nwhile count <= 5:\n    print(f\"Count: {count}\")\n    # TODO: increment count or this loops forever!",
     "expectedOutput": ["Count: 1", "Count: 2", "Count: 3", "Count: 4", "Count: 5"],
@@ -53,11 +53,11 @@
       { "pattern": "count\\s*\\+=\\s*1|count\\s*=\\s*count\\s*\\+\\s*1", "required": true, "message": "Increment count: count += 1" },
       { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
     ],
-    "successMessage": "Without count += 1, while True loops forever — an infinite loop. Always make sure your while loop condition will eventually become False."
+    "successMessage": "Without count += 1 that's an infinite loop — your program would run forever (until you force-quit it). Always make sure your while loop condition will eventually become False."
   },
   {
-    "title": "break — exit the loop early",
-    "instruction": "`break` immediately exits the loop — even if there are items left to process.\n\nThis is perfect for searches: once you find what you are looking for, stop.\n\nAdd a `break` so the search stops as soon as it finds `\"Carol\"`.",
+    "title": "break — exit early",
+    "instruction": "`break` immediately exits the loop — even if there are items left.\n\nPerfect for searches: once you find what you're looking for, stop. No point checking the rest.\n\nAdd a `break` so the search stops as soon as it finds Carol.",
     "hint": "if student == \"Carol\":\n    print(f\"Found Carol!\")\n    break",
     "starter": "students = [\"Alice\", \"Bob\", \"Carol\", \"David\", \"Eve\"]\n\nfor student in students:\n    print(f\"Checking: {student}\")\n    # TODO: if student is Carol, print found message and break",
     "expectedOutput": ["Checking: Alice", "Checking: Bob", "Checking: Carol", "Found Carol!"],
@@ -66,11 +66,11 @@
       { "pattern": "Carol", "required": true, "message": "Check for Carol and break." },
       { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
     ],
-    "successMessage": "David and Eve were never checked. break saved unnecessary work. In a list of a million users, finding at position 3 and breaking saves 999,997 iterations."
+    "successMessage": "David and Eve never got checked! break saved the work. In a real user database with a million records, finding on record 3 and breaking saves 999,997 iterations."
   },
   {
-    "title": "continue — skip to the next iteration",
-    "instruction": "`continue` skips the rest of the current iteration and jumps to the next one.\n\nUse it to skip items that do not meet a condition — without breaking out of the loop.\n\nAdd a `continue` to skip negative numbers and only sum the positive ones.",
+    "title": "continue — skip and keep going",
+    "instruction": "`continue` skips the rest of the current iteration and jumps straight to the next one. The loop keeps going — you're just skipping this particular item.\n\n`break` = exit the whole loop.\n`continue` = skip this one, keep looping.\n\nAdd a `continue` to skip negative numbers and only add up the positive ones.",
     "hint": "if num < 0:\n    continue\ntotal += num",
     "starter": "numbers = [5, -3, 8, -1, 4, -7, 2]\ntotal = 0\n\nfor num in numbers:\n    # TODO: skip negatives using continue\n    total += num\n\nprint(f\"Sum of positives: {total}\")",
     "expectedOutput": ["Sum of positives: 19"],
@@ -78,11 +78,11 @@
       { "pattern": "continue", "required": true, "message": "Use continue to skip negative numbers." },
       { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
     ],
-    "successMessage": "5 + 8 + 4 + 2 = 19. The negatives were skipped. continue says 'done with this one, move on' — break says 'done with the whole loop'."
+    "successMessage": "5 + 8 + 4 + 2 = 19. The negatives were skipped and the loop kept going. continue says 'done with this item, next please' — break says 'done with the whole thing'."
   },
   {
-    "title": "zip() — loop two lists in parallel",
-    "instruction": "`zip()` lets you loop over two (or more) lists simultaneously:\n\n```python\nfor a, b in zip(list1, list2):\n```\n\nUse zip to pair names with scores and print each pairing.",
+    "title": "zip() — two lists at once",
+    "instruction": "What if you have two related lists — names and scores — and you want to loop over both at the same time?\n\n`zip()` pairs them up:\n\n```python\nfor name, score in zip(names, scores):\n```\n\nPython matches them position by position: name[0] with score[0], name[1] with score[1], etc.\n\nPrint each student with their score.",
     "hint": "for name, score in zip(names, scores):",
     "starter": "names = [\"Alice\", \"Bob\", \"Carol\"]\nscores = [92, 78, 95]\n\n# TODO: use zip to print each name with their score\n# Expected:\n# Alice: 92\n# Bob: 78\n# Carol: 95",
     "expectedOutput": ["Alice: 92", "Bob: 78", "Carol: 95"],
@@ -90,45 +90,45 @@
       { "pattern": "zip\\(names,\\s*scores\\)", "required": true, "message": "Use: for name, score in zip(names, scores):" },
       { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
     ],
-    "successMessage": "zip walks both lists in lockstep. When one list runs out, zip stops. Super clean — no indexing, no enumerate, just natural pairing."
+    "successMessage": "zip walks both lists in lockstep. No index tracking, no manual pairing — it just works. When one list runs out, zip stops automatically."
   },
   {
     "title": "Nested loops",
-    "instruction": "A loop inside a loop — the inner loop runs fully for every iteration of the outer.\n\nBe careful: 10 × 10 = 100 iterations. 1000 × 1000 = 1,000,000.\n\nComplete the multiplication table using nested loops.",
+    "instruction": "A loop inside a loop. The inner loop runs completely for every single iteration of the outer loop.\n\nBe careful: 10 outer × 10 inner = 100 total iterations. 100 × 100 = 10,000. Nested loops scale fast.\n\nComplete the 3×3 multiplication table using nested for loops.",
     "hint": "for i in range(1, 4):\n    for j in range(1, 4):\n        print(f\"{i} x {j} = {i*j}\")",
     "starter": "# TODO: print a 3x3 multiplication table using nested for loops\n# 1 x 1 = 1\n# 1 x 2 = 2\n# ...\n# 3 x 3 = 9",
     "expectedOutput": ["1 x 1 = 1", "1 x 2 = 2", "1 x 3 = 3", "2 x 1 = 2", "2 x 2 = 4", "2 x 3 = 6", "3 x 1 = 3", "3 x 2 = 6", "3 x 3 = 9"],
     "codeChecks": [
-      { "pattern": "for\\s+\\w+\\s+in\\s+range.*:[\\s\\S]+for\\s+\\w+\\s+in\\s+range", "required": true, "message": "Use nested for loops." },
+      { "pattern": "for\\s+\\w+\\s+in\\s+range.*:[\\s\\S]+for\\s+\\w+\\s+in\\s+range", "required": true, "message": "Use nested for loops — a loop inside a loop." },
       { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
     ],
-    "successMessage": "Nested loops. 9 lines of output from 5 lines of code. Outer loop runs 3 times, inner loop runs 3 times per outer iteration: 3 × 3 = 9 total."
+    "successMessage": "9 lines of output from 5 lines of code. Outer runs 3×, inner runs 3× per outer iteration: 3 × 3 = 9 total. Nested loops are powerful — use them carefully."
   },
   {
-    "title": "List comprehension — loop in one line",
-    "instruction": "List comprehension creates a new list by looping in a single expression:\n\n```python\n[expression for item in collection]\n```\n\n`[x * 2 for x in numbers]` — doubles every number in the list.\n\nRewrite the four-line loop as a list comprehension.",
+    "title": "List comprehension — a loop in one line",
+    "instruction": "Python has a beautiful shortcut for creating lists from loops:\n\n```python\n# The long way:\nnums = []\nfor x in range(5):\n    nums.append(x * 2)\n\n# The Python way:\nnums = [x * 2 for x in range(5)]\n```\n\nSame result, one line. This is called a **list comprehension** and Python devs use it constantly.\n\nRewrite the loop as a list comprehension.",
     "hint": "squares = [x ** 2 for x in range(1, 6)]",
-    "starter": "# Standard loop:\nresult = []\nfor x in range(1, 6):\n    result.append(x ** 2)\nprint(result)\n\n# TODO: rewrite as a list comprehension\nsquares = []  # replace this\nprint(squares)",
+    "starter": "# Standard loop:\nresult = []\nfor x in range(1, 6):\n    result.append(x ** 2)\nprint(result)\n\n# TODO: rewrite as a list comprehension on ONE line\nsquares = []  # replace this\nprint(squares)",
     "expectedOutput": ["[1, 4, 9, 16, 25]", "[1, 4, 9, 16, 25]"],
     "codeChecks": [
       { "pattern": "\\[.*for.*in.*\\]", "required": true, "message": "Use list comprehension: [x**2 for x in range(1, 6)]" },
       { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
     ],
-    "successMessage": "One line does what four lines did. List comprehensions are one of Python's best features — fast, readable, and Pythonic."
+    "successMessage": "One line does what four lines did. List comprehensions are one of Python's signature features — fast to write, fast to run, and actually quite readable once you're used to them."
   },
   {
-    "title": "Build a FizzBuzz",
-    "instruction": "Classic programming challenge:\n\n- Print numbers 1 to 20\n- If divisible by 3: print `Fizz`\n- If divisible by 5: print `Buzz`\n- If divisible by both: print `FizzBuzz`\n- Otherwise: print the number\n\nUse `%` (modulo) — `n % 3 == 0` means n is divisible by 3.",
-    "hint": "Check FizzBuzz first (both), then Fizz, then Buzz, then the number.",
+    "title": "FizzBuzz — the classic challenge",
+    "instruction": "Almost every programming interview has this question. Now you have everything you need to ace it.\n\nRules:\n- Print numbers 1 to 20\n- If divisible by 3: print `Fizz` instead\n- If divisible by 5: print `Buzz` instead\n- If divisible by **both** 3 and 5: print `FizzBuzz`\n\n`n % 3 == 0` means n is divisible by 3 (% is modulo — the remainder after division).\n\nCheck FizzBuzz first (both conditions), then Fizz, then Buzz, then the number.",
+    "hint": "Check divisible by both first, otherwise FizzBuzz can never win.",
     "starter": "# TODO: FizzBuzz 1-20",
     "expectedOutput": ["1", "2", "Fizz", "4", "Buzz", "Fizz", "7", "8", "Fizz", "Buzz", "11", "Fizz", "13", "14", "FizzBuzz", "16", "17", "Fizz", "19", "Buzz"],
     "codeChecks": [
       { "pattern": "for\\s+\\w+\\s+in\\s+range", "required": true, "message": "Use a for loop with range." },
       { "pattern": "%\\s*3\\s*==\\s*0", "required": true, "message": "Check divisibility by 3: n % 3 == 0" },
       { "pattern": "%\\s*5\\s*==\\s*0", "required": true, "message": "Check divisibility by 5: n % 5 == 0" },
-      { "pattern": "FizzBuzz", "required": true, "message": "Handle the FizzBuzz case (divisible by both)." },
+      { "pattern": "FizzBuzz", "required": true, "message": "Handle the FizzBuzz case (divisible by both 3 and 5)." },
       { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
     ],
-    "successMessage": "FizzBuzz is done. You have passed the first question of almost every programming interview. Chapter 7 complete."
+    "successMessage": "FizzBuzz complete! You just nailed the question that filters out a huge chunk of interview candidates. Chapter 7 done — and you're absolutely killing it."
   }
 ]

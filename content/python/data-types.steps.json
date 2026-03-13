@@ -1,43 +1,43 @@
 [
   {
-    "title": "type() — see what type a value is",
-    "instruction": "Every value in Python has a type. `type()` tells you what it is.\n\nRun this. Notice each value has a different type — `str`, `int`, `float`, `bool`.",
+    "title": "Not all data is the same",
+    "instruction": "In Chapter 2, you stored your name and your age in variables. But did you notice? Your name had quotes around it and your age did not.\n\nThat is not random. Python treats different kinds of data differently — and it calls those kinds **types**.\n\n`type()` tells you what type a value is. Run this and see what comes back.",
     "starter": "print(type(\"Hello\"))\nprint(type(42))\nprint(type(3.14))\nprint(type(True))",
     "expectedOutput": ["<class 'str'>", "<class 'int'>", "<class 'float'>", "<class 'bool'>"],
-    "successMessage": "Four values, four types. The class names tell you exactly what kind of data each one is. You will use type() constantly when debugging."
+    "successMessage": "Four values, four types: str (text), int (whole number), float (decimal), bool (yes/no). Python figured all of that out automatically from what you wrote. No declarations, no setup."
   },
   {
-    "title": "str — text",
-    "instruction": "A `str` (string) holds text. It can be any characters — letters, numbers, symbols, emoji.\n\nStrings need quotes — either single `'` or double `\"`. Both work.\n\nCreate a variable `email` with your email address and a variable `greeting` with a welcome message. Print both.",
+    "title": "str — anything you can read",
+    "instruction": "A `str` (short for 'string') holds text. Your name is a string. An email is a string. A tweet is a string.\n\nStrings need quotes. Single `'hello'` or double `\"hello\"` — both work the same way in Python. Your call.\n\nCreate a variable `email` with your email and a variable `greeting` with a welcome message. Then print both.",
     "hint": "email = \"alex@example.com\"\ngreeting = \"Welcome to Python!\"\nprint(email)\nprint(greeting)",
     "starter": "# TODO: create email and greeting variables, then print them",
     "expectedOutput": [],
     "codeChecks": [
-      { "pattern": "email\\s*=\\s*[\"'][^\"']+[\"']", "required": true, "message": "Create an email variable with a string value." },
-      { "pattern": "greeting\\s*=\\s*[\"'][^\"']+[\"']", "required": true, "message": "Create a greeting variable with a string value." },
+      { "pattern": "email\\s*=\\s*[\"'][^\"']+[\"']", "required": true, "message": "Create an email variable with quotes around the value." },
+      { "pattern": "greeting\\s*=\\s*[\"'][^\"']+[\"']", "required": true, "message": "Create a greeting variable." },
       { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
     ],
-    "successMessage": "Strings are everywhere. Names, emails, messages, URLs — if it is text, it is a string."
+    "successMessage": "Strings all around us. Names, emails, messages, addresses, URLs — if it's readable text, it's a string."
   },
   {
     "title": "int — whole numbers",
-    "instruction": "An `int` (integer) holds whole numbers — no decimal point.\n\nPositive, negative, or zero: `42`, `-7`, `0`, `1_000_000` (underscores for readability).\n\nCreate `year`, `population`, and `temperature` (a negative int for a cold day). Print all three.",
+    "instruction": "An `int` is a whole number. No decimal point. Positive, negative, or zero.\n\n`42`, `-7`, `0`, `1_000_000` — that last one uses underscores for readability. Python just ignores them. Try it!\n\nCreate `year`, `population`, and `temperature` (make temperature negative — brrr). Print all three.",
     "hint": "year = 2025\npopulation = 8_000_000_000\ntemperature = -15",
-    "starter": "# TODO: create year, population, and temperature (negative) variables",
+    "starter": "# TODO: create year, population, and temperature (make it negative!) variables",
     "expectedOutput": [],
     "codeChecks": [
-      { "pattern": "year\\s*=\\s*\\d{4}", "required": true, "message": "Create year as a 4-digit integer." },
+      { "pattern": "year\\s*=\\s*\\d{4}", "required": true, "message": "Create year as a 4-digit integer (no quotes)." },
       { "pattern": "population\\s*=\\s*[\\d_]+", "required": true, "message": "Create population as an integer." },
-      { "pattern": "temperature\\s*=\\s*-\\d+", "required": true, "message": "Create temperature as a negative integer." },
+      { "pattern": "temperature\\s*=\\s*-\\d+", "required": true, "message": "Create temperature as a negative integer (start with -)." },
       { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
     ],
-    "successMessage": "Ints are for counting — ages, years, quantities, scores. When in doubt about whole numbers, int is the right choice."
+    "successMessage": "Ints are for counting. Ages, years, quantities, scores, rankings. When a value is always a whole number, int is the right choice."
   },
   {
-    "title": "float — decimal numbers",
-    "instruction": "A `float` holds numbers with a decimal point: `3.14`, `99.99`, `-0.5`.\n\nUse float for prices, measurements, percentages — anything that needs precision beyond a whole number.\n\nCreate `price` (99.99), `pi` (3.14159), and `percentage` (87.5). Print all three.",
+    "title": "float — when you need more precision",
+    "instruction": "A `float` is a number with a decimal point: `3.14`, `99.99`, `-0.5`.\n\nUse floats for prices, temperatures, percentages, distances — anything that needs precision beyond a whole number.\n\nCreate `price` as 99.99, `pi` as 3.14159, and `percentage` as 87.5. Print all three.",
     "hint": "price = 99.99\npi = 3.14159\npercentage = 87.5",
-    "starter": "# TODO: create price, pi, and percentage as floats",
+    "starter": "# TODO: create price, pi, and percentage as floats (with decimal points)",
     "expectedOutput": ["99.99", "3.14159", "87.5"],
     "codeChecks": [
       { "pattern": "price\\s*=\\s*99\\.99", "required": true, "message": "Create: price = 99.99" },
@@ -45,25 +45,25 @@
       { "pattern": "percentage\\s*=\\s*87\\.5", "required": true, "message": "Create: percentage = 87.5" },
       { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
     ],
-    "successMessage": "Floats for decimals, ints for whole numbers. Python chooses automatically — 10 / 3 gives 3.333..., 10 // 3 gives 3."
+    "successMessage": "Floats for decimals, ints for whole numbers. One rule: 10 / 3 gives you a float (3.333...), 10 // 3 gives you an int (3). Python has different operators for each!"
   },
   {
-    "title": "bool — True or False",
-    "instruction": "A `bool` (boolean) is the simplest type — it can only be `True` or `False`.\n\nNotice: capital T and F. `true` and `false` (lowercase) are not Python booleans.\n\nCreate `is_logged_in = True`, `is_premium = False`, `has_errors = False`. Print all three.",
+    "title": "bool — the yes/no type",
+    "instruction": "A `bool` can only be one of two values: `True` or `False`.\n\nThat's it. Two options. And yet booleans control pretty much everything — is the user logged in? Did the payment succeed? Is the list empty?\n\nNotice: capital T and F. `true` (lowercase) is not a Python boolean — it will crash.\n\nCreate `is_logged_in = True`, `is_premium = False`, `has_errors = False`. Print all three.",
     "hint": "is_logged_in = True\nis_premium = False\nhas_errors = False",
     "starter": "# TODO: create three boolean variables and print them",
     "expectedOutput": ["True", "False", "False"],
     "codeChecks": [
-      { "pattern": "is_logged_in\\s*=\\s*True", "required": true, "message": "Create: is_logged_in = True" },
-      { "pattern": "is_premium\\s*=\\s*False", "required": true, "message": "Create: is_premium = False" },
+      { "pattern": "is_logged_in\\s*=\\s*True", "required": true, "message": "Create: is_logged_in = True (capital T)" },
+      { "pattern": "is_premium\\s*=\\s*False", "required": true, "message": "Create: is_premium = False (capital F)" },
       { "pattern": "has_errors\\s*=\\s*False", "required": true, "message": "Create: has_errors = False" },
       { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
     ],
-    "successMessage": "Booleans are the foundation of every decision in programming. Every if-statement, every loop condition — they all come down to True or False."
+    "successMessage": "Every if-statement, every decision, every loop condition — they all come down to True or False. Booleans are the bedrock of all program logic."
   },
   {
-    "title": "None — the absence of a value",
-    "instruction": "`None` is Python's way of saying \"nothing here\" or \"no value yet\".\n\nIt is not zero. It is not an empty string. It is the deliberate absence of a value — a placeholder.\n\nRun this. Then add a variable `result = None` and print it.",
+    "title": "None — the 'nothing here yet' type",
+    "instruction": "Sometimes you need to say 'this variable exists, but has no value yet'. That is what `None` is for.\n\nNone is not zero. It is not an empty string. It is the deliberate absence of a value.\n\nThink of it like an empty box with a label on it — the box exists, but there is nothing inside.\n\nRun this, then add `result = None` and print it.",
     "hint": "result = None\nprint(result)",
     "starter": "user = None\nprint(user)\nprint(type(user))\n# TODO: add result = None and print it",
     "expectedOutput": ["None", "<class 'NoneType'>", "None"],
@@ -72,49 +72,49 @@
       { "pattern": "print\\(result\\)", "required": true, "message": "Print result." },
       { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
     ],
-    "successMessage": "None is not nothing — it is a specific value meaning 'no value'. Functions that do not return anything actually return None. You will see it everywhere."
+    "successMessage": "None is everywhere. Functions that don't return anything return None. Missing API fields are None. Uninitialised values are None. You will see it constantly."
   },
   {
-    "title": "Type inference — Python figures it out",
-    "instruction": "Python automatically assigns a type based on the value you give a variable. You never have to declare the type.\n\n`x = 42` → Python makes it an int.\n`x = \"hello\"` → Python makes it a string.\n\nRun this and see the types Python assigned.",
+    "title": "Python figures out the type for you",
+    "instruction": "Here is something wild: you never have to tell Python what type a variable is. Python infers it from the value.\n\n`x = 42` — Python makes it an int automatically.\n`x = \"hello\"` — Python makes it a string automatically.\n\nThis is called **dynamic typing** and it's one of the reasons Python is so fast to write.\n\nRun this and see all five types Python inferred.",
     "starter": "a = 100\nb = 3.14\nc = \"Python\"\nd = True\ne = None\n\nprint(type(a).__name__)\nprint(type(b).__name__)\nprint(type(c).__name__)\nprint(type(d).__name__)\nprint(type(e).__name__)",
     "expectedOutput": ["int", "float", "str", "bool", "NoneType"],
-    "successMessage": "Python inferred all five types from the values — no declarations needed. This is dynamic typing. Fast to write, but it means you must track types mentally."
+    "successMessage": "Python inferred all five types without you saying a word. int, float, str, bool, NoneType — all from the values alone. No declarations, no type keywords. Pure Python magic."
   },
   {
-    "title": "\"42\" is not 42",
-    "instruction": "This is the most common type mistake beginners make.\n\n`\"42\"` is a string — text that happens to look like a number.\n`42` is an integer — an actual number you can do math with.\n\nRun this. The + on strings concatenates (joins). The + on ints adds. They look the same but behave completely differently.",
+    "title": "The sneaky \"42\" vs 42 trap",
+    "instruction": "This is the most common type mistake beginners make. Seriously, everyone does this at least once.\n\n`\"42\"` is text that looks like a number. `42` is an actual number.\n\nThey look similar but behave completely differently. Watch what the `+` operator does to each one.",
     "starter": "a = \"42\"\nb = \"8\"\nprint(a + b)\n\nc = 42\nd = 8\nprint(c + d)",
     "expectedOutput": ["428", "50"],
-    "successMessage": "\"42\" + \"8\" = \"428\" (joined text). 42 + 8 = 50 (math). Same operator, completely different behaviour. This trips up every beginner — and now you understand why."
+    "successMessage": "\"42\" + \"8\" = \"428\" (they got glued together as text). 42 + 8 = 50 (actual math). Same operator, totally different result. This trips up every beginner. And now you understand exactly why."
   },
   {
-    "title": "Type conversion — int(), float(), str()",
-    "instruction": "You can convert between types using `int()`, `float()`, and `str()`.\n\nFix the broken code below. `age` is a string `\"25\"` but we need to add 1 to it — which requires converting it to an int first.",
+    "title": "int(), float(), str() — convert between types",
+    "instruction": "You can convert between types:\n- `int(\"25\")` → turns the string \"25\" into the number 25\n- `float(25)` → turns 25 into 25.0\n- `str(25)` → turns 25 into the string \"25\"\n\nThe code below is broken — it tries to add 1 to the string `\"25\"`. Convert `age` to int first, then add 1.\n\nRemember: when you read input from a user, it always comes in as a string. Converting to int is something you will do constantly.",
     "hint": "age = int(age)\nthen age = age + 1",
     "starter": "age = \"25\"\n# BUG: can't add 1 to a string — convert age to int first\nage = age + 1\nprint(age)",
     "expectedOutput": ["26"],
     "codeChecks": [
-      { "pattern": "int\\(age\\)|int\\(\"25\"\\)", "required": true, "message": "Convert age to int: age = int(age)" }
+      { "pattern": "int\\(age\\)|int\\(\"25\"\\)", "required": true, "message": "Convert age to int first: age = int(age)" }
     ],
-    "successMessage": "int() converted the string \"25\" to the number 25. Then + 1 worked. Type conversion is a daily Python task — input() always returns strings, so you convert constantly."
+    "successMessage": "int() converted the text \"25\" to the number 25, then + 1 worked perfectly. You will do this conversion constantly — user input is always a string."
   },
   {
-    "title": "str() — turn anything into a string",
-    "instruction": "You cannot concatenate a string and a number directly:\n\n`\"Age: \" + 25` crashes with a TypeError.\n\nConvert with `str()` first: `\"Age: \" + str(25)`.\n\nFix the three broken lines below.",
-    "hint": "\"Score: \" + str(score), \"Year: \" + str(year), \"Pi: \" + str(pi)",
-    "starter": "score = 99\nyear = 2025\npi = 3.14\n\n# BUG: these will crash — fix them\nprint(\"Score: \" + score)\nprint(\"Year: \" + year)\nprint(\"Pi: \" + pi)",
+    "title": "str() — join text with numbers",
+    "instruction": "You cannot glue a string and a number together directly:\n\n`\"Score: \" + 99` → crashes with a TypeError\n\nYou need to convert the number to text first: `\"Score: \" + str(99)`\n\nFix the three broken lines below. (Heads up: in the next chapter you will learn f-strings, which make this way cleaner — but str() is good to know.)",
+    "hint": "\"Score: \" + str(score)\n\"Year: \" + str(year)\n\"Pi: \" + str(pi)",
+    "starter": "score = 99\nyear = 2025\npi = 3.14\n\n# BUG: these crash because you can't add strings and numbers — wrap the numbers in str()\nprint(\"Score: \" + score)\nprint(\"Year: \" + year)\nprint(\"Pi: \" + pi)",
     "expectedOutput": ["Score: 99", "Year: 2025", "Pi: 3.14"],
     "codeChecks": [
       { "pattern": "str\\(score\\)", "required": true, "message": "Convert score: str(score)" },
       { "pattern": "str\\(year\\)", "required": true, "message": "Convert year: str(year)" },
       { "pattern": "str\\(pi\\)", "required": true, "message": "Convert pi: str(pi)" }
     ],
-    "successMessage": "str() wraps any value in quotes, making it safe to join with other strings. Though honestly — f-strings (next chapter) are cleaner for this."
+    "successMessage": "str() wraps any value in quotes, making it safe to join with text. Though honestly — Chapter 4 has f-strings, which make this SO much cleaner. Sneak preview: f\"Score: {score}\" just works."
   },
   {
-    "title": "isinstance() — check the type safely",
-    "instruction": "`isinstance(value, type)` returns `True` if a value is of that type.\n\nBetter than `type(x) == int` because it also handles subclasses.\n\nRun this. Then add two more `isinstance` checks: one for `score` being an int, one for `name` being a str.",
+    "title": "isinstance() — double-check a type",
+    "instruction": "`isinstance(value, type)` returns `True` if the value is of that type — `False` otherwise.\n\nGreat for validation: before doing math on a value, make sure it's actually a number.\n\nRun the first two checks, then add two more: check if `score` is an int, and if `name` is a str.",
     "hint": "print(isinstance(score, int))\nprint(isinstance(name, str))",
     "starter": "price = 9.99\nname = \"Alex\"\nscore = 100\n\nprint(isinstance(price, float))\nprint(isinstance(price, int))\n# TODO: check if score is int and if name is str",
     "expectedOutput": ["True", "False", "True", "True"],
@@ -123,20 +123,20 @@
       { "pattern": "isinstance\\(name,\\s*str\\)", "required": true, "message": "Check: isinstance(name, str)" },
       { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
     ],
-    "successMessage": "isinstance gives you a clean True/False answer about any value's type. Use it in if-statements to validate data before processing it."
+    "successMessage": "isinstance gives you a clean True or False. Use it in if-statements to validate before processing — 'if isinstance(value, int): do math, else: tell the user it's wrong'."
   },
   {
-    "title": "Use all five types",
-    "instruction": "No starter code.\n\nCreate one variable of each type:\n- `str` — your name\n- `int` — your age\n- `float` — a price (e.g. 12.99)\n- `bool` — whether you like Python (`True`)\n- `None` — a pending result\n\nPrint each variable on its own line.",
-    "hint": "Five variables, five print() calls.",
+    "title": "All five types — your turn",
+    "instruction": "Final challenge! No starter code.\n\nCreate one variable of each type:\n- A string (your name)\n- An int (your age)\n- A float (a price, like 12.99)\n- A bool (whether you're enjoying Python so far — `True` hopefully)\n- A None (a result that isn't ready yet)\n\nThen print each one.",
+    "hint": "Five variables, five print() calls. Mix them up!",
     "starter": "",
     "expectedOutput": [],
     "codeChecks": [
-      { "pattern": "[a-z_]+\\s*=\\s*\"[^\"]+\"", "required": true, "message": "Create a string variable." },
-      { "pattern": "[a-z_]+\\s*=\\s*\\d+\\.\\d+", "required": true, "message": "Create a float variable." },
+      { "pattern": "[a-z_]+\\s*=\\s*\"[^\"]+\"", "required": true, "message": "Create a string variable (text in quotes)." },
+      { "pattern": "[a-z_]+\\s*=\\s*\\d+\\.\\d+", "required": true, "message": "Create a float variable (number with decimal)." },
       { "pattern": "[a-z_]+\\s*=\\s*True|[a-z_]+\\s*=\\s*False", "required": true, "message": "Create a boolean variable." },
       { "pattern": "[a-z_]+\\s*=\\s*None", "required": true, "message": "Create a None variable." }
     ],
-    "successMessage": "Five types, five variables — the complete foundation. Every Python program you ever write will use combinations of these. Chapter 3 done."
+    "successMessage": "All five types — you have covered the complete foundation of Python data. Every program you will ever write uses combinations of these. Chapter 3 done, and you are flying."
   }
 ]
