@@ -34,6 +34,10 @@ export async function getApprovedExperiences(opts: {
   const sql = getSql();
   const { company, difficulty, outcome, limit = 30, offset = 0 } = opts;
 
+  const companyVal    = company    ?? null;
+  const difficultyVal = difficulty ?? null;
+  const outcomeVal    = outcome    ?? null;
+
   const rows = await sql`
     SELECT
       e.id, e.user_id, e.company, e.role, e.difficulty, e.outcome,
@@ -44,9 +48,9 @@ export async function getApprovedExperiences(opts: {
     LEFT JOIN users u ON u.id = e.user_id
     LEFT JOIN interview_votes v ON v.experience_id = e.id
     WHERE e.approved = true
-      AND (${company ?? null}::text IS NULL OR lower(e.company) = lower(${company ?? ""}))
-      AND (${difficulty ?? null}::text IS NULL OR e.difficulty = ${difficulty ?? ""})
-      AND (${outcome ?? null}::text IS NULL OR e.outcome = ${outcome ?? ""})
+      AND (${companyVal}    IS NULL OR lower(e.company)   = lower(${companyVal}))
+      AND (${difficultyVal} IS NULL OR e.difficulty       = ${difficultyVal})
+      AND (${outcomeVal}    IS NULL OR e.outcome          = ${outcomeVal})
     GROUP BY e.id, u.name
     ORDER BY vote_score DESC, e.created_at DESC
     LIMIT ${limit} OFFSET ${offset}
@@ -62,13 +66,17 @@ export async function countApprovedExperiences(opts: {
 }): Promise<number> {
   const sql = getSql();
   const { company, difficulty, outcome } = opts;
+  const companyVal    = company    ?? null;
+  const difficultyVal = difficulty ?? null;
+  const outcomeVal    = outcome    ?? null;
+
   const rows = await sql`
     SELECT COUNT(*)::int AS n
     FROM interview_experiences e
     WHERE e.approved = true
-      AND (${company ?? null}::text IS NULL OR lower(e.company) = lower(${company ?? ""}))
-      AND (${difficulty ?? null}::text IS NULL OR e.difficulty = ${difficulty ?? ""})
-      AND (${outcome ?? null}::text IS NULL OR e.outcome = ${outcome ?? ""})
+      AND (${companyVal}    IS NULL OR lower(e.company) = lower(${companyVal}))
+      AND (${difficultyVal} IS NULL OR e.difficulty     = ${difficultyVal})
+      AND (${outcomeVal}    IS NULL OR e.outcome        = ${outcomeVal})
   `;
   return (rows[0] as { n: number }).n;
 }
