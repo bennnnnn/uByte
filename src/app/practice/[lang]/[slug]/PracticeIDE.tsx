@@ -23,6 +23,7 @@ import { EditorToolbar } from "@/components/editor/EditorToolbar";
 import { OutputPanel, type VerdictState } from "./OutputPanel";
 import { useShareCode } from "@/hooks/useShareCode";
 import { useEditorKeyDown } from "@/hooks/useEditorKeyDown";
+import DiscussionThread from "./DiscussionThread";
 
 const LANG_ORDER = ALL_LANGUAGE_KEYS;
 
@@ -73,7 +74,7 @@ export function PracticeIDE({ problem, initialLang, initialCode, categoryFilter 
   const bookmarked = bookmarkId !== null;
 
   // Notes (per-problem, persisted in localStorage)
-  const [descTab, setDescTab] = useState<"desc" | "notes">("desc");
+  const [descTab, setDescTab] = useState<"desc" | "notes" | "discuss">("desc");
   const [notes, setNotes] = useState<string>("");
   const notesKey = `practice-notes-${problem.slug}`;
   const [noteSaved, setNoteSaved] = useState(false);
@@ -704,9 +705,9 @@ export function PracticeIDE({ problem, initialLang, initialCode, categoryFilter 
           style={isMobile ? undefined : { width: leftWidth }}
           suppressHydrationWarning
         >
-          {/* Tab strip: Description | Notes */}
+          {/* Tab strip: Description | Notes | Discuss */}
           <div className="flex shrink-0 border-b border-zinc-200 dark:border-zinc-800">
-            {(["desc", "notes"] as const).map((tab) => (
+            {(["desc", "notes", "discuss"] as const).map((tab) => (
               <button
                 key={tab}
                 type="button"
@@ -717,7 +718,7 @@ export function PracticeIDE({ problem, initialLang, initialCode, categoryFilter 
                     : "text-zinc-400 hover:text-zinc-700 dark:text-zinc-500 dark:hover:text-zinc-300"
                 }`}
               >
-                {tab === "desc" ? "Description" : "Notes"}
+                {tab === "desc" ? "Description" : tab === "notes" ? "Notes" : "Discuss"}
               </button>
             ))}
           </div>
@@ -832,6 +833,15 @@ export function PracticeIDE({ problem, initialLang, initialCode, categoryFilter 
                 </>
               )}
             </div>
+          )}
+
+          {/* Discuss tab */}
+          {descTab === "discuss" && (
+            <DiscussionThread
+              slug={problem.slug}
+              currentUserId={user?.id ?? null}
+              isSignedIn={!!user}
+            />
           )}
         </aside>
 

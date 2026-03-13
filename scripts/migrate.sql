@@ -193,3 +193,16 @@ CREATE TABLE IF NOT EXISTS interview_votes (
   CONSTRAINT interview_votes_user_uniq    UNIQUE (experience_id, user_id),
   CONSTRAINT interview_votes_visitor_uniq UNIQUE (experience_id, visitor_id)
 );
+
+-- Discussion threads per practice problem
+CREATE TABLE IF NOT EXISTS discussion_posts (
+  id         SERIAL PRIMARY KEY,
+  slug       TEXT NOT NULL,
+  user_id    INTEGER REFERENCES users(id) ON DELETE SET NULL,
+  parent_id  INTEGER REFERENCES discussion_posts(id) ON DELETE CASCADE,
+  body       TEXT NOT NULL CHECK (char_length(body) <= 2000),
+  deleted    BOOLEAN NOT NULL DEFAULT false,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+CREATE INDEX IF NOT EXISTS idx_discussion_slug   ON discussion_posts(slug, created_at ASC)  WHERE deleted = false;
+CREATE INDEX IF NOT EXISTS idx_discussion_parent ON discussion_posts(parent_id, created_at ASC) WHERE deleted = false;
