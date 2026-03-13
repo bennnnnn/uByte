@@ -45,7 +45,7 @@ export default function HeroSection({
         <div className="grid flex-1 items-center gap-8 py-10 sm:gap-10 sm:py-16 lg:grid-cols-[1fr_1.1fr] lg:gap-14 lg:py-14">
 
           {/* LEFT: server-rendered copy — LCP elements land in initial HTML */}
-          <div className="animate-in fade-in slide-in-from-bottom-4 duration-700 ease-out">
+          <div>
             {/* Badge */}
             <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-indigo-200 bg-indigo-50 px-4 py-1.5 text-[11px] font-bold uppercase tracking-[0.12em] text-indigo-600 dark:border-indigo-800 dark:bg-indigo-950/50 dark:text-indigo-400">
               <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-indigo-500" />

@@ -8,21 +8,19 @@ export default function HeroCTAButtons() {
   const { user, loading, profile } = useAuth();
   const isPro = hasPaidAccess(profile?.plan);
 
+  // All three states (guest / free / pro) render 2 buttons + 1 trust line — identical layout.
+  // During `loading`, user=null/isPro=false → guest state renders immediately with no height
+  // change once auth resolves. No placeholder needed, no CLS.
   const trustLine = isPro
     ? "You have full access — tutorials, interview prep, and certifications, all unlocked."
     : user
     ? "Upgrade to unlock all tutorials, certifications, and interview prep."
     : "Free forever for the basics. Upgrade to unlock everything.";
 
-  // Reserve layout space while auth state loads — prevents CLS
-  if (loading) {
-    return <div className="mb-10 h-[52px]" aria-hidden />;
-  }
-
   return (
     <>
       <div className="mb-10 flex flex-wrap gap-3">
-        {isPro ? (
+        {!loading && isPro ? (
           <>
             <Link
               href="/tutorial/go"
@@ -40,7 +38,7 @@ export default function HeroCTAButtons() {
               My certifications
             </Link>
           </>
-        ) : user ? (
+        ) : !loading && user ? (
           <>
             <Link
               href="/tutorial/go"
@@ -59,6 +57,7 @@ export default function HeroCTAButtons() {
             </Link>
           </>
         ) : (
+          // Guest state — also shown during loading (same layout = zero CLS on auth resolve)
           <>
             <Link
               href="/tutorial/go"

@@ -73,7 +73,7 @@ export default function SiteFooter() {
 
   return (
     <footer className="relative shrink-0 overflow-hidden border-t border-zinc-100 bg-white dark:border-zinc-800 dark:bg-zinc-950">
-      <div className="pointer-events-none absolute inset-0 overflow-hidden">
+      <div className="pointer-events-none absolute inset-0 overflow-hidden [transform:translateZ(0)]">
         <div className="absolute -left-16 top-0 h-44 w-44 rounded-full bg-indigo-100/70 blur-3xl dark:bg-indigo-900/20" />
         <div className="absolute right-0 top-0 h-36 w-36 rounded-full bg-cyan-100/60 blur-3xl dark:bg-cyan-900/20" />
       </div>
