@@ -81,7 +81,7 @@ export default function TestimonialsStrip() {
                 <p className="text-xs font-semibold text-zinc-800 dark:text-zinc-200">{t.name}</p>
                 <p className="text-xs text-zinc-500 dark:text-zinc-400">{t.role}</p>
               </div>
-              <span className="shrink-0 rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-bold text-emerald-600 dark:bg-emerald-950/40 dark:text-emerald-400">
+              <span className="shrink-0 rounded-full bg-emerald-50 px-2 py-0.5 text-[10px] font-bold text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300">
                 Verified ✓
               </span>
             </figcaption>

@@ -51,6 +51,7 @@ export default function PopularInterviewPrepSection({ problems }: Props) {
         />
         <Link
           href="/practice"
+          aria-label="Browse all practice problems"
           className="shrink-0 text-sm font-semibold text-indigo-600 hover:text-indigo-500 dark:text-indigo-400"
         >
           Browse all →
@@ -82,7 +83,7 @@ export default function PopularInterviewPrepSection({ problems }: Props) {
                   </span>
                 )}
                 {p.viewCount > 0 && (
-                  <span className="ml-auto text-[10px] text-zinc-400 dark:text-zinc-500">
+                  <span className="ml-auto text-[10px] text-zinc-500 dark:text-zinc-400">
                     {p.viewCount.toLocaleString()} attempts
                   </span>
                 )}
@@ -98,7 +99,7 @@ export default function PopularInterviewPrepSection({ problems }: Props) {
 
               {/* Footer: language support + CTA */}
               <div className="mt-auto flex items-center justify-between border-t border-zinc-100 pt-3 dark:border-zinc-800">
-                <span className="text-[10px] font-medium text-zinc-400 dark:text-zinc-500">
+                <span className="text-[10px] font-medium text-zinc-500 dark:text-zinc-400">
                   Go · Python · JS · Java · C++ · Rust · C#
                 </span>
                 <span className="flex items-center gap-1 text-xs font-semibold text-indigo-600 transition-[gap] group-hover:gap-1.5 dark:text-indigo-400">

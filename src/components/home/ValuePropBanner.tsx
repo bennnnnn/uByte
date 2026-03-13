@@ -78,7 +78,7 @@ export default function ValuePropBanner({ isPro = false }: ValuePropBannerProps)
               </div>
             </div>
             <p className="mb-1.5 text-sm font-bold text-white">{p.title}</p>
-            <p className="text-xs leading-relaxed text-indigo-200/60">{p.desc}</p>
+            <p className="text-xs leading-relaxed text-indigo-200">{p.desc}</p>
           </div>
         ))}
       </div>

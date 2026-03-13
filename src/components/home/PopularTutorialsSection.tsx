@@ -24,6 +24,7 @@ export default function PopularTutorialsSection({ languages }: Props) {
         />
         <Link
           href="/tutorial/go"
+          aria-label="Browse all tutorials"
           className="shrink-0 text-sm font-semibold text-indigo-600 hover:text-indigo-500 dark:text-indigo-400"
         >
           Browse all →
@@ -56,7 +57,7 @@ export default function PopularTutorialsSection({ languages }: Props) {
                 <p className="text-base font-bold text-zinc-900 group-hover:text-indigo-600 dark:text-zinc-100 dark:group-hover:text-indigo-400">
                   {lang.name}
                 </p>
-                <p className="mt-0.5 text-xs text-zinc-400 dark:text-zinc-500">
+                <p className="mt-0.5 text-xs text-zinc-500 dark:text-zinc-400">
                   {lessonCount} lessons
                 </p>
               </div>

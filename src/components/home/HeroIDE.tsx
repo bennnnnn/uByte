@@ -117,7 +117,7 @@ export default function HeroIDE() {
       </div>
 
       {/* Floating streak badge */}
-      <div className="absolute bottom-0 left-2 z-10 flex translate-y-1/2 items-center gap-2 rounded-xl border border-amber-200 bg-surface-card px-3.5 py-2 text-xs font-semibold text-amber-600 shadow-lg shadow-zinc-200/60 dark:border-amber-800 dark:text-amber-400 dark:shadow-zinc-900/80 sm:-bottom-4 sm:-left-3 sm:translate-y-0">
+      <div className="absolute bottom-0 left-2 z-10 flex translate-y-1/2 items-center gap-2 rounded-xl border border-amber-200 bg-surface-card px-3.5 py-2 text-xs font-semibold text-amber-700 shadow-lg shadow-zinc-200/60 dark:border-amber-800 dark:text-amber-400 dark:shadow-zinc-900/80 sm:-bottom-4 sm:-left-3 sm:translate-y-0">
         <span className="text-base">🔥</span>
         3-day streak
       </div>

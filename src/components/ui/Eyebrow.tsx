@@ -11,7 +11,7 @@ export default function Eyebrow({ children, className = "", as: Tag = "h2", id }
   return (
     <Tag
       id={id}
-      className={`mb-1 text-xs font-bold uppercase tracking-[0.15em] text-zinc-400 dark:text-zinc-500 ${className}`}
+      className={`mb-1 text-xs font-bold uppercase tracking-[0.15em] text-zinc-500 dark:text-zinc-400 ${className}`}
     >
       {children}
     </Tag>
