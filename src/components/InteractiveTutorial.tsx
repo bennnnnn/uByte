@@ -28,6 +28,7 @@ import { EditorToolbar } from "@/components/editor/EditorToolbar";
 import { useShareCode } from "@/hooks/useShareCode";
 import { useEditorKeyDown } from "@/hooks/useEditorKeyDown";
 import { tryDecodeShareCode } from "@/lib/share-code";
+import DiscussionThread from "@/app/practice/[lang]/[slug]/DiscussionThread";
 import { apiFetch } from "@/lib/api-client";
 
 interface Props {
@@ -71,6 +72,7 @@ export default function InteractiveTutorial({
     return 14;
   });
   const [mobileTab, setMobileTab] = useState<"instructions" | "code">("instructions");
+  const [leftTab, setLeftTab] = useState<"instructions" | "discuss">("instructions");
   const isMobile = useIsMobile();
 
   const currentStep = currentSteps[stepProgress.stepIndex];
@@ -277,14 +279,44 @@ export default function InteractiveTutorial({
       <div className="flex flex-1 overflow-hidden">
         {/* Left panel */}
         <aside className={`flex min-w-0 flex-col overflow-hidden bg-surface-card ${mobileTab === "instructions" ? "flex shrink" : "hidden"} md:flex md:shrink-0`} style={isMobile ? undefined : { width: leftWidth }} suppressHydrationWarning>
-          <InstructionsSidebar
-            lang={lang}
-            step={currentStep}
-            steps={currentSteps}
-            progress={stepProgress}
-            tutorialSlug={tutorialSlug}
-            nextTutorial={next ? { slug: next.slug, steps: allTutorialSteps[next.slug] ?? [] } : null}
-          />
+          {/* Tab strip: Instructions | Discuss */}
+          <div className="flex shrink-0 border-b border-zinc-200 dark:border-zinc-800">
+            {(["instructions", "discuss"] as const).map((tab) => (
+              <button
+                key={tab}
+                type="button"
+                onClick={() => setLeftTab(tab)}
+                className={`flex-1 py-2 text-xs font-semibold uppercase tracking-wider transition-colors ${
+                  leftTab === tab
+                    ? "border-b-2 border-indigo-500 text-indigo-600 dark:text-indigo-400"
+                    : "text-zinc-400 hover:text-zinc-700 dark:text-zinc-500 dark:hover:text-zinc-300"
+                }`}
+              >
+                {tab === "instructions" ? "Instructions" : "Discuss"}
+              </button>
+            ))}
+          </div>
+
+          {leftTab === "instructions" && (
+            <InstructionsSidebar
+              lang={lang}
+              step={currentStep}
+              steps={currentSteps}
+              progress={stepProgress}
+              tutorialSlug={tutorialSlug}
+              nextTutorial={next ? { slug: next.slug, steps: allTutorialSteps[next.slug] ?? [] } : null}
+            />
+          )}
+
+          {leftTab === "discuss" && (
+            <div className="min-w-0 flex-1 overflow-hidden">
+              <DiscussionThread
+                slug={`tutorial:${lang}:${tutorialSlug}`}
+                currentUserId={user?.id ?? null}
+                isSignedIn={!!user}
+              />
+            </div>
+          )}
         </aside>
 
         {/* Horizontal resize handle */}
