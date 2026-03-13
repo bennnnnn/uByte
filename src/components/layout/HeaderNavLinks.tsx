@@ -222,6 +222,19 @@ export default function HeaderNavLinks({ side = "left" }: { side?: "left" }) {
                 <span className="block text-xs text-zinc-400 dark:text-zinc-500">Timed mock interview + AI debrief</span>
               </span>
             </Link>
+
+            <Link
+              href="/interviews"
+              role="menuitem"
+              onClick={handleClose}
+              className="flex items-center gap-3 rounded-xl px-3 py-2.5 transition-colors hover:bg-zinc-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-indigo-500 dark:hover:bg-zinc-800"
+            >
+              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-emerald-100 text-base dark:bg-emerald-950/60">💬</span>
+              <span>
+                <span className="block text-sm font-semibold text-zinc-800 dark:text-zinc-100">Interview experiences</span>
+                <span className="block text-xs text-zinc-400 dark:text-zinc-500">Real stories shared anonymously</span>
+              </span>
+            </Link>
           </div>
         </NavDropdown>
 
