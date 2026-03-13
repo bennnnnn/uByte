@@ -68,7 +68,7 @@ export default function PopularInterviewPrepSection({ problems }: Props) {
             <Link
               key={p.slug}
               href={`/practice/go/${p.slug}`}
-              className="group flex flex-col gap-3 rounded-xl border border-zinc-200 bg-white p-5 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-indigo-200 hover:shadow-md dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-indigo-900/70"
+              className="group flex flex-col gap-3 rounded-xl bg-[#f7f8fd] p-5 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md dark:bg-zinc-800/80"
             >
               {/* Top: difficulty dot + badge + category */}
               <div className="flex flex-wrap items-center gap-2">
@@ -77,7 +77,7 @@ export default function PopularInterviewPrepSection({ problems }: Props) {
                   {difficulty}
                 </span>
                 {category && (
-                  <span className="rounded-full bg-zinc-100 px-2 py-0.5 text-[10px] font-semibold text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400">
+                  <span className="rounded-full bg-white px-2 py-0.5 text-[10px] font-semibold text-zinc-500 dark:bg-zinc-700 dark:text-zinc-400">
                     {category}
                   </span>
                 )}

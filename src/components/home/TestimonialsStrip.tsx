@@ -50,7 +50,7 @@ export default function TestimonialsStrip() {
         {TESTIMONIALS.map((t) => (
           <figure
             key={t.name}
-            className="relative flex flex-col overflow-hidden rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md dark:border-zinc-800 dark:bg-zinc-900"
+            className="relative flex flex-col overflow-hidden rounded-2xl bg-[#f7f8fd] p-6 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md dark:bg-zinc-800/80"
           >
             {/* Large decorative quote mark */}
             <span
