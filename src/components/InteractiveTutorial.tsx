@@ -274,9 +274,33 @@ export default function InteractiveTutorial({
       <div className="flex flex-1 overflow-hidden">
         {/* Left panel */}
         <aside className={`flex min-w-0 flex-col overflow-hidden bg-surface-card ${mobileTab === "instructions" ? "flex shrink" : "hidden"} md:flex md:shrink-0`} style={isMobile ? undefined : { width: leftWidth }} suppressHydrationWarning>
-          {/* Tab strip: Outline | Instructions | Discuss */}
-          <div className="flex shrink-0 border-b border-zinc-200 dark:border-zinc-800">
-            {(["outline", "instructions", "discuss"] as const).map((tab) => (
+          {/* Tab strip: ☰ hamburger | Steps | Discuss */}
+          <div className="flex shrink-0 items-stretch border-b border-zinc-200 dark:border-zinc-800">
+            {/* Hamburger toggle — expands/collapses the outline */}
+            <button
+              type="button"
+              onClick={() => setLeftTab(leftTab === "outline" ? "instructions" : "outline")}
+              aria-label={leftTab === "outline" ? "Close outline" : "Open course outline"}
+              className={`flex w-10 shrink-0 items-center justify-center border-r transition-colors ${
+                leftTab === "outline"
+                  ? "border-indigo-200 bg-indigo-50 text-indigo-600 dark:border-indigo-900 dark:bg-indigo-950/40 dark:text-indigo-400"
+                  : "border-zinc-200 text-zinc-400 hover:bg-zinc-100 hover:text-zinc-700 dark:border-zinc-800 dark:text-zinc-500 dark:hover:bg-zinc-800 dark:hover:text-zinc-300"
+              }`}
+            >
+              {leftTab === "outline" ? (
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">
+                  <line x1="2" y1="4" x2="14" y2="4" /><line x1="2" y1="8" x2="14" y2="8" /><line x1="2" y1="12" x2="14" y2="12" />
+                  <line x1="11" y1="5.5" x2="14" y2="8" /><line x1="14" y1="8" x2="11" y2="10.5" />
+                </svg>
+              ) : (
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">
+                  <line x1="2" y1="4" x2="14" y2="4" /><line x1="2" y1="8" x2="14" y2="8" /><line x1="2" y1="12" x2="14" y2="12" />
+                </svg>
+              )}
+            </button>
+
+            {/* Steps / Discuss tabs */}
+            {(["instructions", "discuss"] as const).map((tab) => (
               <button
                 key={tab}
                 type="button"
@@ -287,7 +311,7 @@ export default function InteractiveTutorial({
                     : "text-zinc-400 hover:text-zinc-700 dark:text-zinc-500 dark:hover:text-zinc-300"
                 }`}
               >
-                {tab === "outline" ? "Outline" : tab === "instructions" ? "Steps" : "Discuss"}
+                {tab === "instructions" ? "Steps" : "Discuss"}
               </button>
             ))}
           </div>
