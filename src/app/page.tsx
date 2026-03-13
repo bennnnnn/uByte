@@ -54,38 +54,25 @@ export default async function Home() {
   const goTutorials = getAllTutorials("go");
   const topicCount = goTutorials.length;
   const problemCount = getAllPracticeProblems().length;
-  const examConfigByLang = await getExamConfigForAllLangs();
+  // Kick off all independent async work in parallel
+  const [examConfigByLang, user, popularTutorials, popularProblems] = await Promise.all([
+    getExamConfigForAllLangs(),
+    getCurrentUser(),
+    getPopularTutorials(),
+    getPopularPracticeProblems(),
+  ]);
 
-  const websiteJsonLd = buildSiteSearchJsonLd();
-  const orgJsonLd = {
-    "@context": "https://schema.org",
-    "@type": "Organization",
-    name: APP_NAME,
-    url: BASE_URL,
-    sameAs: [BASE_URL],
-  };
-  const itemListJsonLd = {
-    "@context": "https://schema.org",
-    "@type": "ItemList",
-    name: "Programming language tutorial tracks on uByte",
-    itemListElement: getAllLanguageSlugs().map((slug, index) => ({
-      "@type": "ListItem",
-      position: index + 1,
-      name: LANGUAGES[slug as SupportedLanguage]?.name ?? slug,
-      url: absoluteUrl(tutorialLangUrl(slug)),
-    })),
-  };
-
-  const languageEntries = getAllLanguageSlugs()
-    .map((slug) => ({ slug, config: LANGUAGES[slug as keyof typeof LANGUAGES] }))
-    .filter((e): e is { slug: string; config: (typeof LANGUAGES)["go"] } => !!e.config);
-
-  // Resolve "You left off at..." and "Continue" language from last activity (logged-in only)
+  // Resolve "You left off at..." + user plan — both need user but are independent of each other
   let leftOff: { href: string; label: string } | null = null;
   let continueLang: SupportedLanguage = "go";
-  const user = await getCurrentUser();
+  let userPlan = "free";
+
   if (user) {
-    const last = await getLastActivity(user.userId);
+    const [last, fetchedPlan] = await Promise.all([
+      getLastActivity(user.userId),
+      getUserPlan(user.userId),
+    ]);
+    userPlan = fetchedPlan;
     if (last) {
       if (last.activity_type === "tutorial" && last.slug) {
         continueLang = last.lang as SupportedLanguage;
@@ -110,6 +97,7 @@ export default async function Home() {
       }
     }
   }
+
   const continueTutorialList = getAllTutorials(continueLang).map(({ slug, title }) => ({ slug, title }));
 
   // Total lessons summed across ALL languages — updates automatically when new tutorials are added
@@ -121,14 +109,7 @@ export default async function Home() {
   // Number of languages with a published exam config (dynamic — add a new lang and it counts itself)
   const certificationCount = Object.values(examConfigByLang).filter(Boolean).length;
 
-  const userPlan = user ? await getUserPlan(user.userId) : "free";
   const isPro = userPlan === "pro" || userPlan === "yearly";
-
-  // Popular data — same logic used in /certifications (sort by real usage, no fallback shown)
-  const [popularTutorials, popularProblems] = await Promise.all([
-    getPopularTutorials(),
-    getPopularPracticeProblems(),
-  ]);
   const popularPracticeProblems =
     popularProblems.length > 0 ? popularProblems : getFallbackPopularPracticeProblems();
 

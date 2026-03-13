@@ -228,13 +228,21 @@ export const POST = withErrorHandling("POST /api/judge-code", async (request: Ne
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 20_000);
 
+  const langId = JUDGE0_LANG_IDS[lang];
+  if (!langId) {
+    return NextResponse.json(
+      { verdict: "error" as const, message: "Unsupported language for code execution" },
+      { status: 400 }
+    );
+  }
+
   try {
     const res = await fetch(`${JUDGE0_URL}/submissions?base64_encoded=true&wait=true`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         source_code:     b64(judgeCode),
-        language_id:     JUDGE0_LANG_IDS[lang],
+        language_id:     langId,
         stdin:           b64(stdin),
         cpu_time_limit:  10,
         memory_limit:    131072,

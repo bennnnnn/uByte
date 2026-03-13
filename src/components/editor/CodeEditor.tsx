@@ -72,3 +72,4 @@ export function CodeEditor({ editor, onKeyDown, fontSize }: CodeEditorProps) {
     </div>
   );
 }
+

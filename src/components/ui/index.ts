@@ -5,7 +5,6 @@ export { default as Eyebrow } from "./Eyebrow";
 export { default as FormError } from "./FormError";
 export { default as GradientText } from "./GradientText";
 export { default as Input } from "./Input";
-export { default as SectionDivider } from "./SectionDivider";
 export { default as Textarea } from "./Textarea";
 export { default as TextLink } from "./TextLink";
 

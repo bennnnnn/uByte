@@ -66,6 +66,9 @@ export const POST = withErrorHandling("POST /api/run-code", async (request: Next
     }
 
     const langId = JUDGE0_LANG_IDS[lang];
+    if (!langId) {
+      return NextResponse.json({ Errors: "Unsupported language for code execution" }, { status: 400 });
+    }
     const res = await fetch(
       `${JUDGE0_URL}/submissions?base64_encoded=true&wait=true`,
       {

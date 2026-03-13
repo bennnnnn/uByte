@@ -40,18 +40,21 @@ export async function getAllSiteSettings(): Promise<Record<string, string>> {
   return loadAll();
 }
 
-/** Set one or more site settings. */
+/** Set one or more site settings in a single batched upsert. */
 export async function setSiteSettings(
   updates: Record<string, string>
 ): Promise<void> {
+  const entries = Object.entries(updates);
+  if (entries.length === 0) return;
+
   const sql = getSql();
-  for (const [key, value] of Object.entries(updates)) {
-    await sql`
-      INSERT INTO site_settings (key, value, updated_at)
-      VALUES (${key}, ${value}, NOW())
-      ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value, updated_at = NOW()
-    `;
-  }
+  const keys   = entries.map(([k]) => k);
+  const values = entries.map(([, v]) => v);
+  await sql`
+    INSERT INTO site_settings (key, value, updated_at)
+    SELECT unnest(${keys}::text[]), unnest(${values}::text[]), NOW()
+    ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value, updated_at = NOW()
+  `;
   invalidateSiteSettingsCache();
 }
 

@@ -96,7 +96,4 @@ export function getTotalLessonCount(lang: SupportedLanguage): number {
   return total;
 }
 
-/** @deprecated Use getSteps(lang, slug) or getAllStepsForLanguage(lang). Kept for gradual migration. */
-export const allSteps: Record<string, TutorialStep[]> = goSteps;
-
 export type { TutorialStep };
