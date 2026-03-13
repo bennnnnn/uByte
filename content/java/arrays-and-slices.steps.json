@@ -1,0 +1,71 @@
+[
+  {
+    "title": "Declare and initialise arrays",
+    "instruction": "Two ways to create an array:\n\n```java\n// Method 1: declare with size (all zeros/null)\nint[] scores = new int[5];\n\n// Method 2: declare with values\nint[] scores = {95, 87, 73, 91, 68};\n```\n\nAccess with index (0-based). `.length` gives the count.\n\nRun this.",
+    "starter": "public class Main {\n    public static void main(String[] args) {\n        int[] scores = {95, 87, 73, 91, 68};\n\n        System.out.println(\"Length: \" + scores.length);\n        System.out.println(\"First: \" + scores[0]);\n        System.out.println(\"Last: \" + scores[scores.length - 1]);\n\n        // Modify an element:\n        scores[2] = 80;\n        System.out.println(\"Updated index 2: \" + scores[2]);\n    }\n}",
+    "expectedOutput": ["Length: 5", "First: 95", "Last: 68", "Updated index 2: 80"],
+    "successMessage": "scores.length is 5 but the last index is 4 — arrays are 0-indexed. Off-by-one errors (using .length instead of .length-1) cause ArrayIndexOutOfBoundsException — a very common Java bug."
+  },
+  {
+    "title": "Loop over arrays",
+    "instruction": "Two ways to iterate:\n\n1. Classic `for` with index — when you need the position\n2. For-each — when you just need each value\n\nPrint each score with its index.",
+    "hint": "for (int i = 0; i < scores.length; i++) { System.out.println(i + \": \" + scores[i]); }",
+    "starter": "public class Main {\n    public static void main(String[] args) {\n        int[] scores = {95, 87, 73, 91, 68};\n\n        // TODO: print each score with its index: \"0: 95\"\n        for (int i = 0; i < scores.length; i++) {\n            System.out.println(i + \": \" + scores[i]);\n        }\n    }\n}",
+    "expectedOutput": ["0: 95", "1: 87", "2: 73", "3: 91", "4: 68"],
+    "codeChecks": [
+      { "pattern": "for\\s*\\(\\s*int\\s+i\\s*=\\s*0", "required": true, "message": "Use a classic for loop with index i." },
+      { "pattern": "scores\\[i\\]", "required": true, "message": "Access elements: scores[i]" }
+    ],
+    "successMessage": "Classic for with index — the most common array traversal pattern in Java. You'll write this hundreds of times."
+  },
+  {
+    "title": "Find min, max, sum",
+    "instruction": "Calculate statistics by looping through the array manually.\n\nWrite code to find the sum, min, and max of the scores array.",
+    "hint": "Start sum at 0, min at scores[0], max at scores[0]. Loop through and update.",
+    "starter": "public class Main {\n    public static void main(String[] args) {\n        int[] scores = {95, 87, 73, 91, 68, 82};\n\n        // TODO: calculate sum, min, max\n        int sum = 0;\n        int min = scores[0];\n        int max = scores[0];\n\n        for (int s : scores) {\n            sum += s;\n            if (s < min) min = s;\n            if (s > max) max = s;\n        }\n\n        System.out.println(\"Sum: \" + sum);\n        System.out.println(\"Min: \" + min);\n        System.out.println(\"Max: \" + max);\n        System.out.println(\"Avg: \" + (double) sum / scores.length);\n    }\n}",
+    "expectedOutput": ["Sum: 496", "Min: 68", "Max: 95", "Avg: 82.66666666666667"],
+    "codeChecks": [
+      { "pattern": "sum\\s*\\+=|sum\\s*=\\s*sum\\s*\\+", "required": true, "message": "Accumulate sum: sum += s" },
+      { "pattern": "if\\s*\\(s\\s*<\\s*min\\)|if\\s*\\(s<min\\)", "required": true, "message": "Track minimum: if (s < min) min = s;" },
+      { "pattern": "if\\s*\\(s\\s*>\\s*max\\)|if\\s*\\(s>max\\)", "required": true, "message": "Track maximum: if (s > max) max = s;" }
+    ],
+    "successMessage": "Sum, min, max, average — the four statistics every data processing program needs. Notice (double) sum / scores.length — the cast prevents integer division."
+  },
+  {
+    "title": "Arrays utility class",
+    "instruction": "`java.util.Arrays` provides ready-made operations:\n\n- `Arrays.sort(arr)` — sort in place\n- `Arrays.toString(arr)` — print as string\n- `Arrays.copyOf(arr, newLength)` — copy with different size\n- `Arrays.fill(arr, value)` — fill with a value\n- `Arrays.binarySearch(arr, value)` — fast search (requires sorted array)\n\nRun this.",
+    "starter": "import java.util.Arrays;\n\npublic class Main {\n    public static void main(String[] args) {\n        int[] scores = {95, 87, 73, 91, 68, 82};\n\n        System.out.println(Arrays.toString(scores));\n\n        Arrays.sort(scores);\n        System.out.println(Arrays.toString(scores));\n\n        int idx = Arrays.binarySearch(scores, 87);\n        System.out.println(\"87 is at index: \" + idx);\n\n        int[] copy = Arrays.copyOf(scores, 3); // first 3 elements\n        System.out.println(Arrays.toString(copy));\n    }\n}",
+    "expectedOutput": ["[95, 87, 73, 91, 68, 82]", "[68, 73, 82, 87, 91, 95]", "87 is at index: 3", "[68, 73, 82]"],
+    "successMessage": "Arrays.toString() for printing, Arrays.sort() for sorting, binarySearch() for fast lookup. These are the workhorses of array operations in Java."
+  },
+  {
+    "title": "ArrayIndexOutOfBoundsException",
+    "instruction": "Access an index that doesn't exist and Java throws `ArrayIndexOutOfBoundsException`. It's one of the most common Java runtime errors.\n\nFix the three out-of-bounds accesses.",
+    "hint": "Array has indices 0, 1, 2, 3, 4 for length 5. scores.length-1 is the last valid index.",
+    "starter": "public class Main {\n    public static void main(String[] args) {\n        int[] scores = {10, 20, 30, 40, 50};\n\n        // BUG 1: accessing index 5 (length is 5, max index is 4)\n        // System.out.println(scores[5]); // fix: scores[4] or scores[scores.length-1]\n\n        System.out.println(scores[scores.length - 1]); // last element safely\n        System.out.println(scores[0]);                  // first element\n        System.out.println(scores.length);              // count\n    }\n}",
+    "expectedOutput": ["50", "10", "5"],
+    "successMessage": "scores.length - 1 is always the safe last index. Forgetting this -1 causes AIOOBE — one of Java's most common bugs. Always double-check loop conditions and index access."
+  },
+  {
+    "title": "2D arrays — matrices",
+    "instruction": "2D arrays are arrays of arrays — perfect for grids, tables, and matrices:\n\n```java\nint[][] grid = new int[3][3];\nint[][] matrix = {{1,2,3}, {4,5,6}, {7,8,9}};\n```\n\nAccess with `matrix[row][col]`. Iterate with nested loops.\n\nBuild and print a 3×3 identity matrix.",
+    "hint": "int[][] id = new int[3][3]; for (int i = 0; i < 3; i++) id[i][i] = 1;",
+    "starter": "public class Main {\n    public static void main(String[] args) {\n        // Identity matrix: 1s on the diagonal, 0s elsewhere\n        int[][] identity = new int[3][3];\n        for (int i = 0; i < 3; i++) {\n            identity[i][i] = 1;\n        }\n\n        // Print it:\n        for (int[] row : identity) {\n            for (int val : row) {\n                System.out.print(val + \" \");\n            }\n            System.out.println();\n        }\n    }\n}",
+    "expectedOutput": ["1 0 0 ", "0 1 0 ", "0 0 1 "],
+    "successMessage": "A 3×3 identity matrix. int[][] is an array of int arrays. The nested for-each loops over rows, then columns. 2D arrays power image processing, game boards, and mathematical computations."
+  },
+  {
+    "title": "Build a grade analyser",
+    "instruction": "Final challenge — no starter code.\n\nGiven `int[] grades = {72, 88, 95, 64, 81, 77, 90, 55, 83, 69}`:\n\n1. Print the sorted grades\n2. Print min and max\n3. Print the average to 1 decimal place\n4. Count how many are passing (>= 60)\n5. Print `\"PASS: X/10 students\"`",
+    "hint": "Use Arrays.sort(), a loop for stats, count++ for passing grades.",
+    "starter": "",
+    "expectedOutput": [],
+    "codeChecks": [
+      { "pattern": "Arrays\\.sort", "required": true, "message": "Use Arrays.sort() to sort the grades." },
+      { "pattern": "int.*min|int.*max|Arrays\\.toString", "required": true, "message": "Calculate and print min/max." },
+      { "pattern": "count|passing|pass", "required": true, "message": "Count passing grades (>= 60)." },
+      { "pattern": "import java\\.util\\.Arrays|java\\.util\\.Arrays", "required": true, "message": "Import java.util.Arrays." }
+    ],
+    "successMessage": "A complete grade analyser — sort, stats, count. This is the foundation of every reporting system. Chapter 7 done!"
+  }
+]

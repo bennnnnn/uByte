@@ -1,95 +1,14 @@
 ---
-title: "Output and Formatting in Java"
-description: "Master System.out.printf, String.format, StringBuilder, and text blocks in Java."
-order: 3
+title: "Strings & StringBuilder"
+description: "Master Java String methods, String.format, StringBuilder for efficient building, and the String pool."
+order: 4
 difficulty: "beginner"
-estimatedMinutes: 15
+estimatedMinutes: 20
+concepts: ["String methods", "String.format", "StringBuilder", "charAt", "substring", "indexOf", "split", "String pool", "equals vs =="]
 ---
 
-## Printing in Java
+## Strings are immutable — and that changes everything
 
-Java has three main print methods:
+In Java, `String` objects cannot be changed. Every time you concatenate or modify, Java creates a new String object. For a few operations, that's fine. For building strings in a loop — use `StringBuilder`.
 
-| Method | Newline | Use case |
-|--------|---------|----------|
-| `System.out.println(x)` | Yes | Most common — print + newline |
-| `System.out.print(x)` | No | Print without newline |
-| `System.out.printf(fmt, args)` | With `%n` | C-style formatted output |
-
----
-
-## printf Format Specifiers
-
-| Specifier | Type | Example |
-|-----------|------|---------|
-| `%s` | String | `"Alice"` |
-| `%d` | Integer | `42` |
-| `%f` | Float | `3.14159...` |
-| `%.2f` | Float (2 dp) | `3.14` |
-| `%n` | Newline | platform-safe |
-| `%10s` | Right-pad 10 | `"     Alice"` |
-| `%-10s` | Left-pad 10 | `"Alice     "` |
-
-```java
-String name = "Alice";
-int age = 30;
-System.out.printf("Name: %s, Age: %d%n", name, age);
-// Name: Alice, Age: 30
-```
-
----
-
-## String.format
-
-`String.format()` uses the same specifiers but returns a `String` instead of printing:
-
-```java
-double result = 22.0 / 7.0;
-String formatted = String.format("Pi ≈ %.4f", result);
-System.out.println(formatted); // Pi ≈ 3.1429
-```
-
----
-
-## StringBuilder
-
-String concatenation with `+` creates a new `String` each time. For building strings in a loop, use `StringBuilder`:
-
-```java
-StringBuilder sb = new StringBuilder();
-sb.append("Hello").append(", ").append("World!");
-System.out.println(sb.toString()); // Hello, World!
-```
-
----
-
-## Text Blocks (Java 15+)
-
-Triple-quoted text blocks preserve indentation and are great for multi-line strings:
-
-```java
-String json = """
-        {
-            "name": "Alice",
-            "age": 30
-        }
-        """;
-System.out.print(json);
-```
-
----
-
-## Padding and Alignment
-
-```java
-System.out.printf("%-10s | %10s%n", "Left", "Right");
-// Left       |      Right
-System.out.printf("%-10s | %10s%n", "Alice", "Bob");
-// Alice      |        Bob
-```
-
----
-
-## What's Next?
-
-You can now format output in Java. Next: **control flow** — if/else, switch expressions, and conditional logic.
+This chapter covers everything from basic methods to efficient string building patterns you'll use in every real Java program.

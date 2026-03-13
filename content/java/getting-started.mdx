@@ -1,92 +1,14 @@
 ---
-title: "Getting Started with Java"
-description: "Write your first Java program, understand the class structure, and learn how Java compiles and runs."
+title: "Getting Started"
+description: "Write your first Java program — understand the boilerplate, System.out.println, comments, and how Java compiles and runs."
 order: 1
 difficulty: "beginner"
-estimatedMinutes: 10
+estimatedMinutes: 15
+concepts: ["main method", "System.out.println", "comments", "class structure", "compilation", "data types intro"]
 ---
 
-## What is Java?
+## The language that runs everywhere
 
-Java is a class-based, object-oriented language created by Sun Microsystems in 1995. It runs on the **Java Virtual Machine (JVM)**, making it platform-independent — "write once, run anywhere."
+Java is the backbone of Android apps, enterprise banking systems, and millions of backend services. It was designed with one goal: write once, run anywhere — and it still delivers on that promise 30 years later.
 
-**Why learn Java?**
-- **Widespread** — used in Android, enterprise backends, big data, and more
-- **Strongly typed** — catch bugs at compile time
-- **Rich standard library** — batteries included
-- **Long-term support** — Java 21 (LTS) is widely deployed
-
----
-
-## Running Java
-
-```bash
-java --version       # check installed JVM
-javac Hello.java     # compile to bytecode
-java Hello           # run the bytecode
-```
-
-With modern tooling you can also use `java Hello.java` to run directly (Java 11+).
-
----
-
-## Hello, World!
-
-```java
-public class Main {
-    public static void main(String[] args) {
-        System.out.println("Hello, World!");
-    }
-}
-```
-
-Every Java program needs at least one **class** whose name matches the file name. Execution begins in `public static void main(String[] args)`.
-
-`System.out.println()` prints a line followed by a newline.
-
-Click **Run** above to see the output.
-
----
-
-## Variables
-
-```java
-String language = "Java";
-int version = 21;
-System.out.println("Learning " + language + " version " + version);
-```
-
-Java is **statically typed** — every variable has a fixed type declared at compile time. Since Java 10 you can use `var` for local type inference:
-
-```java
-var city = "London";   // inferred as String
-var count = 42;        // inferred as int
-```
-
----
-
-## String Formatting
-
-```java
-String name = "Learner";
-System.out.printf("Hello, %s!%n", name);         // printf style
-String msg = String.format("Hello, %s!", name);   // build string
-System.out.println(msg);
-```
-
----
-
-## Comments
-
-```java
-// This is a single-line comment
-/* This is a
-   multi-line comment */
-System.out.println("Comments are ignored"); // inline comment
-```
-
----
-
-## What's Next?
-
-You've run your first Java program. Next: **variables and types** — integers, doubles, booleans, Strings, and type casting.
+Unlike JavaScript or Python, Java requires a bit of structure upfront. But that structure is what makes large Java codebases maintainable — and what makes Java one of the most hireable skills in the world.

@@ -1,0 +1,58 @@
+[
+  {
+    "title": "The problem with public fields",
+    "instruction": "Public fields can be set to anything — including impossible values:\n\n```java\nperson.age = -500;  // valid Java, invalid data!\n```\n\nEncapsulation fixes this by hiding fields and controlling access.",
+    "starter": "class PersonBad {\n    public String name;\n    public int age;  // dangerous — anyone can set age = -99\n}\n\nclass PersonGood {\n    private String name;    // hidden — only accessible via methods\n    private int age;\n\n    PersonGood(String name, int age) {\n        this.name = name;\n        setAge(age);  // validate even in constructor\n    }\n\n    void setAge(int age) {\n        if (age < 0 || age > 150) throw new IllegalArgumentException(\"Invalid age: \" + age);\n        this.age = age;\n    }\n\n    int getAge()    { return age; }\n    String getName(){ return name; }\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        PersonBad bad = new PersonBad();\n        bad.age = -99;  // Java allows this — very wrong!\n        System.out.println(\"Bad age: \" + bad.age);\n\n        PersonGood good = new PersonGood(\"Alex\", 25);\n        System.out.println(\"Good age: \" + good.getAge());\n\n        try {\n            good.setAge(-1);  // throws!\n        } catch (IllegalArgumentException e) {\n            System.out.println(\"Caught: \" + e.getMessage());\n        }\n    }\n}",
+    "expectedOutput": ["Bad age: -99", "Good age: 25", "Caught: Invalid age: -1"],
+    "successMessage": "bad.age = -99 compiled and ran — no protection at all. PersonGood throws an exception for invalid data. Validation in setters is the heart of encapsulation."
+  },
+  {
+    "title": "Access modifiers",
+    "instruction": "Java has four access levels:\n\n| Modifier | Access |\n|----------|--------|\n| `private` | Same class only |\n| `(none)` | Same package |\n| `protected` | Same package + subclasses |\n| `public` | Everywhere |\n\nConvention: fields are `private`, methods are `public`.",
+    "starter": "class Counter {\n    private int count;        // private field\n    private int maxCount;     // private field\n\n    public Counter(int maxCount) {  // public constructor\n        this.count = 0;\n        this.maxCount = maxCount;\n    }\n\n    public void increment() {       // public method\n        if (count < maxCount) count++;\n    }\n\n    public void decrement() {       // public method\n        if (count > 0) count--;\n    }\n\n    public int getCount() {         // public getter\n        return count;\n    }\n\n    public boolean isFull() {       // public derived value\n        return count == maxCount;\n    }\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        Counter c = new Counter(3);\n        c.increment();\n        c.increment();\n        c.increment();\n        c.increment();  // no effect — at max\n        System.out.println(c.getCount());\n        System.out.println(c.isFull());\n    }\n}",
+    "expectedOutput": ["3", "true"],
+    "successMessage": "count is private — you can't access c.count from outside. The fourth increment did nothing because increment() checked against maxCount. The constraint is enforced."
+  },
+  {
+    "title": "Getters and setters",
+    "instruction": "Convention for private fields:\n\n- **Getter**: `getFieldName()` — returns the value\n- **Setter**: `setFieldName(value)` — validates then sets\n- **Boolean getter**: `isFieldName()` — for boolean fields\n\nAdd a setter for `email` that validates it contains '@'.",
+    "hint": "public void setEmail(String email) { if (!email.contains(\"@\")) throw ...; this.email = email; }",
+    "starter": "class User {\n    private String name;\n    private String email;\n\n    public User(String name, String email) {\n        this.name = name;\n        setEmail(email);  // validate on construction\n    }\n\n    public String getName()  { return name; }\n    public String getEmail() { return email; }\n\n    // TODO: add setEmail(String email) that validates '@' is present\n    public void setEmail(String email) {\n        if (!email.contains(\"@\")) {\n            throw new IllegalArgumentException(\"Invalid email: \" + email);\n        }\n        this.email = email;\n    }\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        User u = new User(\"Alex\", \"alex@example.com\");\n        System.out.println(u.getName() + \" — \" + u.getEmail());\n\n        try {\n            u.setEmail(\"not-an-email\");\n        } catch (IllegalArgumentException e) {\n            System.out.println(\"Error: \" + e.getMessage());\n        }\n    }\n}",
+    "expectedOutput": ["Alex — alex@example.com", "Error: Invalid email: not-an-email"],
+    "codeChecks": [
+      { "pattern": "public void setEmail\\(String", "required": true, "message": "Add: public void setEmail(String email)" },
+      { "pattern": "contains\\(\"@\"\\)|indexOf\\('@'\\) >= 0|indexOf\\(\"@\"\\) >= 0", "required": true, "message": "Validate email contains '@'." },
+      { "pattern": "throw new IllegalArgumentException", "required": true, "message": "Throw IllegalArgumentException for invalid email." }
+    ],
+    "successMessage": "The setter validates before assigning. The object never holds an invalid email. This is why setters are more than just assignment — they're the enforcement point."
+  },
+  {
+    "title": "Immutable objects with final fields",
+    "instruction": "An **immutable** object's state cannot change after construction. Make fields `final` and provide only getters — no setters.\n\nImmutable objects are thread-safe, cacheable, and predictable. Java's `String` is immutable.",
+    "starter": "final class Money {\n    private final double amount;\n    private final String currency;\n\n    public Money(double amount, String currency) {\n        if (amount < 0) throw new IllegalArgumentException(\"Amount cannot be negative\");\n        this.amount = amount;\n        this.currency = currency;\n    }\n\n    public double getAmount()   { return amount; }\n    public String getCurrency() { return currency; }\n\n    // Returns a NEW Money object — doesn't modify this one!\n    public Money add(Money other) {\n        if (!currency.equals(other.currency)) throw new IllegalArgumentException(\"Currency mismatch\");\n        return new Money(this.amount + other.amount, currency);\n    }\n\n    @Override\n    public String toString() {\n        return String.format(\"%.2f %s\", amount, currency);\n    }\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        Money price = new Money(19.99, \"USD\");\n        Money tax   = new Money(2.00, \"USD\");\n        Money total = price.add(tax);\n\n        System.out.println(price);\n        System.out.println(tax);\n        System.out.println(total);\n        System.out.println(price); // unchanged!\n    }\n}",
+    "expectedOutput": ["19.99 USD", "2.00 USD", "21.99 USD", "19.99 USD"],
+    "successMessage": "price is unchanged after add() — add() creates a new Money object instead of modifying. This is immutability: safe to share, safe to cache, impossible to corrupt."
+  },
+  {
+    "title": "Builder pattern for complex objects",
+    "instruction": "When a class has many optional fields, a constructor with 10 parameters is unreadable.\n\nThe **Builder pattern** solves this with a fluent API:\n\n```java\nUser user = new User.Builder(\"Alex\")\n    .email(\"alex@example.com\")\n    .age(25)\n    .build();\n```",
+    "starter": "class Config {\n    private final String host;\n    private final int port;\n    private final boolean ssl;\n    private final int timeout;\n\n    private Config(Builder builder) {\n        this.host    = builder.host;\n        this.port    = builder.port;\n        this.ssl     = builder.ssl;\n        this.timeout = builder.timeout;\n    }\n\n    @Override\n    public String toString() {\n        return String.format(\"Config{host=%s, port=%d, ssl=%b, timeout=%ds}\", host, port, ssl, timeout);\n    }\n\n    static class Builder {\n        private String host;\n        private int port    = 80;\n        private boolean ssl = false;\n        private int timeout = 30;\n\n        Builder(String host) { this.host = host; }\n\n        Builder port(int port)       { this.port = port;    return this; }\n        Builder ssl(boolean ssl)     { this.ssl  = ssl;     return this; }\n        Builder timeout(int timeout) { this.timeout = timeout; return this; }\n\n        Config build() { return new Config(this); }\n    }\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        Config dev  = new Config.Builder(\"localhost\").port(8080).build();\n        Config prod = new Config.Builder(\"api.example.com\").port(443).ssl(true).timeout(60).build();\n\n        System.out.println(dev);\n        System.out.println(prod);\n    }\n}",
+    "expectedOutput": ["Config{host=localhost, port=8080, ssl=false, timeout=30s}", "Config{host=api.example.com, port=443, ssl=true, timeout=60s}"],
+    "successMessage": "The builder lets you set only what you need and defaults the rest. Return this from each setter enables chaining. This is used in Lombok's @Builder, OkHttp, Retrofit — everywhere."
+  },
+  {
+    "title": "Build a validated bank account",
+    "instruction": "Final challenge — no starter code.\n\nBuild a fully encapsulated `BankAccount` class:\n- `private` fields: `String owner`, `double balance`, `int transactionCount`\n- Constructor validates: owner not empty, initial balance >= 0\n- `deposit(double amount)` — validates amount > 0, updates balance\n- `withdraw(double amount)` — validates amount > 0, balance sufficient\n- `getBalance()`, `getOwner()`, `getTransactionCount()`\n- `toString()` shows owner, balance, transaction count\n\nTest with valid and invalid operations.",
+    "hint": "Each method should validate its inputs and throw IllegalArgumentException for bad data.",
+    "starter": "",
+    "expectedOutput": [],
+    "codeChecks": [
+      { "pattern": "class BankAccount", "required": true, "message": "Define class BankAccount." },
+      { "pattern": "private.*balance|private double balance", "required": true, "message": "Make balance private." },
+      { "pattern": "void deposit\\(double|deposit\\(double", "required": true, "message": "Add deposit(double amount)." },
+      { "pattern": "void withdraw\\(double|withdraw\\(double", "required": true, "message": "Add withdraw(double amount)." },
+      { "pattern": "throw new IllegalArgumentException|throw new RuntimeException", "required": true, "message": "Throw exceptions for invalid operations." }
+    ],
+    "successMessage": "A fully protected BankAccount — no invalid state is possible. This is what real banking software does. Chapter 10 done!"
+  }
+]

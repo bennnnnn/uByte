@@ -1,0 +1,70 @@
+[
+  {
+    "title": "The 8 primitive types",
+    "instruction": "Java has exactly 8 primitive data types:\n\n| Type | Size | Range / Use |\n|------|------|-------------|\n| `byte` | 8-bit | -128 to 127 |\n| `short` | 16-bit | -32,768 to 32,767 |\n| `int` | 32-bit | -2 billion to 2 billion |\n| `long` | 64-bit | Huge integers |\n| `float` | 32-bit | Decimal (less precise) |\n| `double` | 64-bit | Decimal (precise — use this) |\n| `char` | 16-bit | Single character |\n| `boolean` | 1-bit | true / false |\n\nRun this — all eight in one program.",
+    "starter": "public class Main {\n    public static void main(String[] args) {\n        byte  b = 100;\n        short s = 30000;\n        int   i = 2_000_000;  // underscores for readability!\n        long  l = 9_000_000_000L; // L suffix required for long literals\n        float  f = 3.14f;     // f suffix required for float\n        double d = 3.14159265;\n        char   c = 'A';       // single quotes for char\n        boolean flag = true;\n\n        System.out.println(b + \" \" + s + \" \" + i + \" \" + l);\n        System.out.println(f + \" \" + d);\n        System.out.println(c + \" \" + flag);\n    }\n}",
+    "expectedOutput": ["100 30000 2000000 9000000000", "3.14 3.14159265", "A true"],
+    "successMessage": "All 8 primitives! Notice: long needs L suffix, float needs f suffix, char uses single quotes. The underscore in 2_000_000 is purely for readability — Java ignores it."
+  },
+  {
+    "title": "int vs long — don't overflow",
+    "instruction": "An `int` can hold up to about 2.1 billion. Go bigger and it overflows — silently wrapping to a negative number.\n\nRun this to see integer overflow in action — then fix it with `long`.",
+    "hint": "Change int to long and add L to the literal: 3_000_000_000L",
+    "starter": "public class Main {\n    public static void main(String[] args) {\n        // BUG: 3 billion overflows int!\n        int population = 3_000_000_000; // this line won't compile\n        System.out.println(population);\n\n        // Fix: use long\n        long safePopulation = 3_000_000_000L;\n        System.out.println(safePopulation);\n    }\n}",
+    "expectedOutput": ["3000000000"],
+    "codeChecks": [
+      { "pattern": "long safePopulation\\s*=\\s*3_000_000_000L|long safePopulation\\s*=\\s*3000000000L", "required": true, "message": "Use long with L suffix: long safePopulation = 3_000_000_000L;" },
+      { "pattern": "int population", "required": false, "message": "Remove the int population line — it won't compile." }
+    ],
+    "successMessage": "int max is ~2.1 billion. For anything bigger (population, distances in metres, timestamps) use long. The L suffix tells Java the literal is a long, not an int."
+  },
+  {
+    "title": "double vs float — precision matters",
+    "instruction": "`double` is the standard choice for decimals — 15-16 significant digits.\n`float` is smaller (7 digits) and less precise — only use it when memory is critical (like large arrays of sensor readings).\n\nSee the precision difference.",
+    "starter": "public class Main {\n    public static void main(String[] args) {\n        float  f = 1.23456789f;\n        double d = 1.23456789;\n\n        System.out.println(f);  // loses precision!\n        System.out.println(d);  // full precision\n\n        // Classic floating-point trap:\n        System.out.println(0.1 + 0.2);\n        System.out.println(0.1 + 0.2 == 0.3); // false!\n    }\n}",
+    "expectedOutput": ["1.2345679", "1.23456789", "0.30000000000000004", "false"],
+    "successMessage": "float loses precision at digit 7. double keeps 15-16. And 0.1 + 0.2 ≠ 0.3 — the same floating-point issue as every language. For money: use BigDecimal. For physics: double is fine."
+  },
+  {
+    "title": "char — single characters",
+    "instruction": "`char` holds exactly one character using single quotes. Under the hood, it's a 16-bit Unicode code point.\n\n```java\nchar c = 'A';     // a character literal\nchar d = 65;      // same! 65 is ASCII for 'A'\n```\n\nYou can do arithmetic on chars — they're numbers.",
+    "starter": "public class Main {\n    public static void main(String[] args) {\n        char letter = 'A';\n        System.out.println(letter);\n        System.out.println((int) letter);  // print as number\n\n        // Arithmetic on chars:\n        char next = (char) (letter + 1);\n        System.out.println(next); // B\n\n        // Loop through alphabet:\n        for (char ch = 'A'; ch <= 'E'; ch++) {\n            System.out.print(ch + \" \");\n        }\n        System.out.println();\n    }\n}",
+    "expectedOutput": ["A", "65", "B", "A B C D E "],
+    "successMessage": "'A' is 65 in ASCII — add 1 and you get 'B' (66). Casting (char)(letter + 1) converts the int 66 back to a char. This is used in encryption, sorting, and text processing."
+  },
+  {
+    "title": "Type casting",
+    "instruction": "**Widening** (safe — automatic): `int → long → double` — bigger type, no data loss.\n**Narrowing** (explicit cast needed): `double → int` — risk of losing the decimal part.\n\n```java\nint x = 5;\ndouble d = x;       // widening — automatic\nint y = (int) d;    // narrowing — explicit (int) cast required\n```",
+    "starter": "public class Main {\n    public static void main(String[] args) {\n        int i = 42;\n        double d = i;       // widening: int → double (automatic)\n        System.out.println(d);\n\n        double pi = 3.99;\n        int truncated = (int) pi;  // narrowing: drops decimal (no rounding!)\n        System.out.println(truncated);\n\n        // String to int:\n        String s = \"123\";\n        int parsed = Integer.parseInt(s);\n        System.out.println(parsed + 1);\n    }\n}",
+    "expectedOutput": ["42.0", "3", "124"],
+    "successMessage": "(int) 3.99 gives 3 — it truncates, doesn't round. Integer.parseInt() converts String to int. These are the two most common conversions you'll ever do."
+  },
+  {
+    "title": "String — the special type",
+    "instruction": "`String` starts with a capital S — it's a class, not a primitive. But it's used so often Java treats it almost like a primitive.\n\nKey difference: use `.equals()` to compare strings, not `==`:\n\n```java\nString a = \"hello\";\nString b = \"hello\";\na == b     // might be false! (compares references)\na.equals(b) // always correct (compares content)\n```",
+    "starter": "public class Main {\n    public static void main(String[] args) {\n        String greeting = \"Hello, Java!\";\n        System.out.println(greeting.length());\n        System.out.println(greeting.toUpperCase());\n        System.out.println(greeting.contains(\"Java\"));\n        System.out.println(greeting.replace(\"Java\", \"World\"));\n\n        // Comparing strings:\n        String a = \"hello\";\n        String b = \"hello\";\n        System.out.println(a.equals(b));  // true — content comparison\n    }\n}",
+    "expectedOutput": ["12", "HELLO, JAVA!", "true", "Hello, World!", "true"],
+    "successMessage": "String is a class — it has methods! .equals() for comparison (never ==), .length(), .toUpperCase(), .contains(), .replace(). There are dozens more — you'll use these every day."
+  },
+  {
+    "title": "Wrapper classes and autoboxing",
+    "instruction": "Each primitive has a **wrapper class**: `int → Integer`, `double → Double`, `boolean → Boolean`.\n\nWrapper classes let primitives go into collections (which require objects) and provide utility methods.\n\n**Autoboxing**: Java automatically converts between them:\n```java\nInteger x = 5;  // autoboxes int → Integer\nint y = x;       // unboxes Integer → int\n```",
+    "starter": "public class Main {\n    public static void main(String[] args) {\n        // Wrapper class utility methods:\n        System.out.println(Integer.MAX_VALUE);\n        System.out.println(Integer.MIN_VALUE);\n        System.out.println(Integer.parseInt(\"42\"));\n        System.out.println(Double.parseDouble(\"3.14\"));\n\n        // Autoboxing:\n        Integer boxed = 100;   // autobox: int → Integer\n        int unboxed = boxed;   // unbox: Integer → int\n        System.out.println(boxed + unboxed);\n\n        // Converting to String:\n        System.out.println(String.valueOf(42));\n        System.out.println(Integer.toString(255, 16)); // 255 in hex\n    }\n}",
+    "expectedOutput": ["2147483647", "-2147483648", "42", "3.14", "200", "42", "ff"],
+    "successMessage": "Integer.MAX_VALUE is 2,147,483,647. Autoboxing is transparent — Java handles the boxing/unboxing automatically. Integer.toString(255, 16) gives 'ff' — base conversions built in."
+  },
+  {
+    "title": "Build a unit converter",
+    "instruction": "No starter code. Build a temperature converter:\n\n- Store a temperature as `double celsius = 100.0`\n- Convert to Fahrenheit: `(celsius * 9/5.0) + 32`\n- Convert to Kelvin: `celsius + 273.15`\n- Print all three with labels\n\nAlso show that `int / int` truncates but `int / 5.0` does not.",
+    "hint": "double fahrenheit = (celsius * 9 / 5.0) + 32;",
+    "starter": "",
+    "expectedOutput": [],
+    "codeChecks": [
+      { "pattern": "double celsius\\s*=|var celsius\\s*=", "required": true, "message": "Declare celsius as a double." },
+      { "pattern": "9\\s*/\\s*5\\.0|9\\.0\\s*/\\s*5", "required": true, "message": "Use 9/5.0 (not 9/5) to avoid integer division." },
+      { "pattern": "celsius\\s*\\+\\s*273\\.15|273\\.15", "required": true, "message": "Calculate Kelvin: celsius + 273.15" },
+      { "pattern": "System\\.out\\.println", "required": true, "message": "Print the results." }
+    ],
+    "successMessage": "Temperature converter using casting and double arithmetic. The 9/5.0 vs 9/5 distinction saved you from wrong results. This is why Java's strict typing prevents silent bugs. Chapter 3 done!"
+  }
+]

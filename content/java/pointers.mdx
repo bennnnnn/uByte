@@ -1,66 +1,14 @@
 ---
-title: "References and Memory in Java"
-description: "Understand references, object identity, and how Java passes objects by reference value."
-order: 9
+title: "Encapsulation"
+description: "Access modifiers, private fields, getters and setters, data validation, and why hiding implementation details matters."
+order: 10
 difficulty: "intermediate"
-estimatedMinutes: 10
+estimatedMinutes: 18
+concepts: ["private", "public", "protected", "getters", "setters", "encapsulation", "data validation", "access modifiers", "package-private"]
 ---
 
-## Concepts in this chapter
+## Protect your data
 
-You will learn and practice:
+Encapsulation is one of the four pillars of OOP. By hiding internal state and controlling access through methods, you prevent invalid data from ever entering an object.
 
-- **References vs primitives** — objects are referenced; primitives are copied
-- **Pass by value** — reference value is copied, so the same object is shared
-- **null** — no object; check before use to avoid NullPointerException
-- **Equality** — == for reference equality, equals() for value equality
-
----
-
-## Primitives vs Objects
-
-- **Primitives** (int, double, boolean, etc.) are stored by value. Assigning copies the value.
-- **Objects** (String, arrays, any class instance) are stored by **reference**. Assigning copies the reference, not the object.
-
-```java
-int a = 10;
-int b = a;   // b is a copy
-b = 20;      // a is still 10
-
-String s1 = "hello";
-String s2 = s1;  // s2 refers to the same String
-```
-
----
-
-## null and Null Checks
-
-A reference can be `null` (no object). Calling a method on null throws NullPointerException:
-
-```java
-String name = null;
-if (name != null) {
-    System.out.println(name.length());
-}
-// or: Objects.requireNonNull(name);
-```
-
----
-
-## == vs equals()
-
-- **==** for references compares whether they point to the same object.
-- **equals()** compares content (overridden by String, Integer, etc.).
-
-```java
-String a = "hi";
-String b = new String("hi");
-System.out.println(a == b);        // false (different objects)
-System.out.println(a.equals(b));  // true (same content)
-```
-
----
-
-## What's Next?
-
-Next: **Classes and Objects** — define your own types.
+A `BankAccount` with a `public balance` field is dangerous — anyone can set it to anything. Make it `private` and only allow changes through `deposit()` and `withdraw()` — which can validate and log.

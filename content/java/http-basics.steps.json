@@ -1,0 +1,53 @@
+[
+  {
+    "title": "HttpClient basics",
+    "instruction": "Java 11+ includes `java.net.http.HttpClient`. The three main classes:\n\n- `HttpClient` — the client (reuse across requests)\n- `HttpRequest` — the request to send\n- `HttpResponse` — the response received\n\nRun this to see the structure — even without a network call.",
+    "starter": "import java.net.http.*;\nimport java.net.URI;\n\npublic class Main {\n    public static void main(String[] args) {\n        // Create a reusable client:\n        HttpClient client = HttpClient.newBuilder()\n            .version(HttpClient.Version.HTTP_2)\n            .followRedirects(HttpClient.Redirect.NORMAL)\n            .build();\n\n        // Build a request:\n        HttpRequest request = HttpRequest.newBuilder()\n            .uri(URI.create(\"https://jsonplaceholder.typicode.com/posts/1\"))\n            .header(\"Accept\", \"application/json\")\n            .GET()\n            .build();\n\n        System.out.println(\"Client created: \" + (client != null));\n        System.out.println(\"Request URI: \" + request.uri());\n        System.out.println(\"Method: \" + request.method());\n    }\n}",
+    "expectedOutput": ["Client created: true", "Request URI: https://jsonplaceholder.typicode.com/posts/1", "Method: GET"],
+    "successMessage": "HttpClient is the client, HttpRequest is the request. The builder pattern sets options clearly. Version.HTTP_2 uses HTTP/2 if the server supports it, falls back to HTTP/1.1."
+  },
+  {
+    "title": "Making a GET request",
+    "instruction": "`client.send(request, BodyHandlers.ofString())` makes the HTTP call:\n\n```java\nHttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());\nresponse.statusCode();  // 200, 404, etc.\nresponse.body();        // response body as String\n```\n\nThis is a synchronous (blocking) call — the thread waits for the response.",
+    "hint": "Wrap in try-catch for IOException and InterruptedException",
+    "starter": "import java.net.http.*;\nimport java.net.URI;\nimport java.io.IOException;\n\npublic class Main {\n    public static void main(String[] args) throws IOException, InterruptedException {\n        HttpClient client = HttpClient.newHttpClient();\n\n        HttpRequest request = HttpRequest.newBuilder()\n            .uri(URI.create(\"https://jsonplaceholder.typicode.com/posts/1\"))\n            .build();\n\n        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());\n\n        System.out.println(\"Status: \" + response.statusCode());\n        System.out.println(\"Body length: \" + response.body().length());\n        System.out.println(\"Has userId: \" + response.body().contains(\"userId\"));\n    }\n}",
+    "expectedOutput": ["Status: 200", "Has userId: true"],
+    "successMessage": "Status 200 = success. The JSON body contains userId, id, title, body fields. response.body() is just a String — parse it with a JSON library or simple string manipulation."
+  },
+  {
+    "title": "Simple JSON parsing",
+    "instruction": "Without an external library, parse simple JSON using String operations or `org.json`.\n\nFor production, you'd use Jackson or Gson. Here we'll extract fields manually from the JSON string:\n\n```java\n// Extract value between: \"key\":\\s*\"value\" or \"key\":\\s*number\n```",
+    "hint": "Use split or substring with indexOf to extract values from JSON string.",
+    "starter": "public class Main {\n    // Simple JSON value extractor (no library needed for simple cases):\n    static String extractString(String json, String key) {\n        String search = \"\\\"\" + key + \"\\\":\\\"\";\n        int start = json.indexOf(search);\n        if (start == -1) return null;\n        start += search.length();\n        int end = json.indexOf('\"', start);\n        return json.substring(start, end);\n    }\n\n    static int extractInt(String json, String key) {\n        String search = \"\\\"\" + key + \\\"\\\":\";\n        int start = json.indexOf(search);\n        if (start == -1) return -1;\n        start += search.length();\n        int end = start;\n        while (end < json.length() && (Character.isDigit(json.charAt(end)))) end++;\n        return Integer.parseInt(json.substring(start, end));\n    }\n\n    public static void main(String[] args) {\n        String json = \"{\\\"userId\\\":1,\\\"id\\\":1,\\\"title\\\":\\\"sample post\\\",\\\"body\\\":\\\"hello world\\\"}\";\n\n        System.out.println(\"id: \"     + extractInt(json, \"id\"));\n        System.out.println(\"userId: \" + extractInt(json, \"userId\"));\n        System.out.println(\"title: \"  + extractString(json, \"title\"));\n        System.out.println(\"body: \"   + extractString(json, \"body\"));\n    }\n}",
+    "expectedOutput": ["id: 1", "userId: 1", "title: sample post", "body: hello world"],
+    "successMessage": "Manual JSON parsing works for simple cases. In production, use Jackson: objectMapper.readValue(json, Post.class) — it handles complex structures, nested objects, arrays, null values, and type safety."
+  },
+  {
+    "title": "POST request with JSON body",
+    "instruction": "Send data with a POST request:\n\n```java\nHttpRequest request = HttpRequest.newBuilder()\n    .uri(URI.create(url))\n    .header(\"Content-Type\", \"application/json\")\n    .POST(HttpRequest.BodyPublishers.ofString(jsonBody))\n    .build();\n```",
+    "starter": "import java.net.http.*;\nimport java.net.URI;\nimport java.io.IOException;\n\npublic class Main {\n    public static void main(String[] args) throws IOException, InterruptedException {\n        HttpClient client = HttpClient.newHttpClient();\n\n        String jsonBody = \"{\\\"title\\\":\\\"Java is awesome\\\",\\\"body\\\":\\\"Learning HTTP in Java!\\\",\\\"userId\\\":1}\";\n\n        HttpRequest request = HttpRequest.newBuilder()\n            .uri(URI.create(\"https://jsonplaceholder.typicode.com/posts\"))\n            .header(\"Content-Type\", \"application/json\")\n            .POST(HttpRequest.BodyPublishers.ofString(jsonBody))\n            .build();\n\n        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());\n\n        System.out.println(\"Status: \" + response.statusCode());\n        System.out.println(\"Created: \" + response.body().contains(\"id\"));\n    }\n}",
+    "expectedOutput": ["Status: 201", "Created: true"],
+    "successMessage": "201 = Created. The server responded with the created resource including an assigned id. POST with JSON body is the standard pattern for REST API calls."
+  },
+  {
+    "title": "Async HTTP with sendAsync",
+    "instruction": "`sendAsync()` returns a `CompletableFuture` — doesn't block the thread:\n\n```java\nclient.sendAsync(request, BodyHandlers.ofString())\n    .thenApply(HttpResponse::body)\n    .thenAccept(body -> process(body));\n```\n\nMake 3 requests concurrently — see how they complete faster than sequentially.",
+    "starter": "import java.net.http.*;\nimport java.net.URI;\nimport java.util.concurrent.CompletableFuture;\n\npublic class Main {\n    public static void main(String[] args) throws Exception {\n        HttpClient client = HttpClient.newHttpClient();\n\n        long start = System.currentTimeMillis();\n\n        CompletableFuture<String>[] futures = new CompletableFuture[3];\n        for (int i = 1; i <= 3; i++) {\n            final int id = i;\n            futures[i-1] = client.sendAsync(\n                HttpRequest.newBuilder()\n                    .uri(URI.create(\"https://jsonplaceholder.typicode.com/posts/\" + id))\n                    .build(),\n                HttpResponse.BodyHandlers.ofString())\n                .thenApply(r -> \"Post \" + id + \": status=\" + r.statusCode());\n        }\n\n        CompletableFuture.allOf(futures).join();\n        for (var f : futures) System.out.println(f.get());\n\n        System.out.println(\"Time: <2000ms concurrent\");\n    }\n}",
+    "expectedOutput": ["Post 1: status=200", "Post 2: status=200", "Post 3: status=200", "Time: <2000ms concurrent"],
+    "successMessage": "Three requests fired simultaneously — faster than sequential. CompletableFuture.allOf waits for all to complete. This is how Java web services handle multiple downstream API calls."
+  },
+  {
+    "title": "Build a REST client",
+    "instruction": "Final challenge — no starter code.\n\nBuild a `JsonPlaceholderClient` class:\n- `getPost(int id)` — GET /posts/{id}, returns the body String\n- `createPost(String title, String body)` — POST /posts, returns status code\n- `deletePost(int id)` — DELETE /posts/{id}, returns status code\n\nTest all three methods and print results.\n\nBase URL: `https://jsonplaceholder.typicode.com`",
+    "hint": "Store HttpClient as a field. For DELETE: .method(\"DELETE\", HttpRequest.BodyPublishers.noBody())",
+    "starter": "",
+    "expectedOutput": [],
+    "codeChecks": [
+      { "pattern": "class JsonPlaceholderClient|HttpClient client", "required": true, "message": "Create a REST client class with an HttpClient field." },
+      { "pattern": "getPost|GET", "required": true, "message": "Implement getPost(int id) for GET requests." },
+      { "pattern": "createPost|POST.*BodyPublishers", "required": true, "message": "Implement createPost with a POST request." },
+      { "pattern": "deletePost|DELETE", "required": true, "message": "Implement deletePost with a DELETE request." }
+    ],
+    "successMessage": "A complete REST client class. Reusable, well-structured, handles all three HTTP methods. Add authentication headers? One line in the HttpRequest builder. Chapter 21 done!"
+  }
+]

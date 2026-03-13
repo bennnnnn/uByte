@@ -1,0 +1,45 @@
+[
+  {
+    "title": "Generic classes",
+    "instruction": "`<T>` is a type parameter — a placeholder replaced when you create the class.\n\n```java\nclass Box<T> {             // T = any type\n    T value;\n    Box(T val) { value = val; }\n    T get() { return value; }\n}\n\nBox<String> strBox = new Box<>(\"hello\");\nBox<Integer> intBox = new Box<>(42);\n```\n\nRun this — one class, different types.",
+    "starter": "class Box<T> {\n    private T value;\n\n    Box(T value) { this.value = value; }\n    T get()       { return value; }\n    void set(T v) { value = v; }\n\n    @Override\n    public String toString() { return \"Box[\" + value + \"]\"; }\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        Box<String>  strBox = new Box<>(\"Hello\");\n        Box<Integer> intBox = new Box<>(42);\n        Box<Double>  dblBox = new Box<>(3.14);\n\n        System.out.println(strBox);\n        System.out.println(intBox);\n        System.out.println(dblBox);\n\n        strBox.set(\"Updated\");\n        System.out.println(strBox);\n    }\n}",
+    "expectedOutput": ["Box[Hello]", "Box[42]", "Box[3.14]", "Box[Updated]"],
+    "successMessage": "One Box class, three different types. The compiler tracks the type — strBox.get() returns a String, intBox.get() returns an Integer. No casting, no runtime errors."
+  },
+  {
+    "title": "Generic methods",
+    "instruction": "Methods can be generic independently of their class:\n\n```java\nstatic <T> void swap(T[] arr, int i, int j) {\n    T temp = arr[i];\n    arr[i] = arr[j];\n    arr[j] = temp;\n}\n```\n\nWrite a generic `printArray` and `reverse` method.",
+    "hint": "static <T> void printArray(T[] arr) { for (T item : arr) System.out.print(item + \" \"); System.out.println(); }",
+    "starter": "import java.util.Arrays;\n\npublic class Main {\n    static <T> void printArray(T[] arr) {\n        for (T item : arr) System.out.print(item + \" \");\n        System.out.println();\n    }\n\n    static <T> T[] reverse(T[] arr) {\n        T[] copy = Arrays.copyOf(arr, arr.length);\n        for (int i = 0, j = copy.length-1; i < j; i++, j--) {\n            T tmp = copy[i]; copy[i] = copy[j]; copy[j] = tmp;\n        }\n        return copy;\n    }\n\n    public static void main(String[] args) {\n        String[]  words  = {\"Java\", \"is\", \"awesome\"};\n        Integer[] numbers = {1, 2, 3, 4, 5};\n\n        printArray(words);\n        printArray(numbers);\n        printArray(reverse(numbers));\n    }\n}",
+    "expectedOutput": ["Java is awesome ", "1 2 3 4 5 ", "5 4 3 2 1 "],
+    "successMessage": "The same printArray and reverse work on String[], Integer[], or any array. The compiler infers T from the argument — you don't need to specify <String> explicitly."
+  },
+  {
+    "title": "Bounded type parameters",
+    "instruction": "Restrict `T` to specific types using `extends`:\n\n```java\n// T must be a Number (or subclass):\nstatic <T extends Number> double sum(List<T> list) {...}\n```\n\nThis lets you call `.doubleValue()` on T because you know it's a Number.",
+    "starter": "import java.util.List;\n\npublic class Main {\n    // T must be a Number — lets us call .doubleValue()\n    static <T extends Number> double sum(List<T> list) {\n        double total = 0;\n        for (T item : list) total += item.doubleValue();\n        return total;\n    }\n\n    static <T extends Comparable<T>> T max(T a, T b) {\n        return a.compareTo(b) >= 0 ? a : b;\n    }\n\n    public static void main(String[] args) {\n        System.out.println(sum(List.of(1, 2, 3, 4, 5)));\n        System.out.println(sum(List.of(1.5, 2.5, 3.0)));\n\n        System.out.println(max(10, 20));\n        System.out.println(max(\"apple\", \"zebra\"));\n    }\n}",
+    "expectedOutput": ["15.0", "7.0", "20", "zebra"],
+    "successMessage": "<T extends Number> restricts T to Number and subclasses — Integer, Double, Long all qualify. <T extends Comparable<T>> ensures compareTo() is available. Bounded types unlock powerful reusable algorithms."
+  },
+  {
+    "title": "Wildcards — ? for flexible methods",
+    "instruction": "Wildcards handle situations where you don't know or don't care about the exact type:\n\n- `List<?>` — any type (read-only)\n- `List<? extends Number>` — Number or subclass (producer)\n- `List<? super Integer>` — Integer or parent (consumer)\n\nThe PECS rule: Producer Extends, Consumer Super.",
+    "starter": "import java.util.List;\n\npublic class Main {\n    // ? — accepts List<String>, List<Integer>, etc.\n    static void printList(List<?> list) {\n        for (Object item : list) System.out.print(item + \" \");\n        System.out.println();\n    }\n\n    // ? extends Number — accepts List<Integer>, List<Double>, etc.\n    static double sumNumbers(List<? extends Number> list) {\n        double sum = 0;\n        for (Number n : list) sum += n.doubleValue();\n        return sum;\n    }\n\n    public static void main(String[] args) {\n        printList(List.of(\"a\", \"b\", \"c\"));\n        printList(List.of(1, 2, 3));\n        System.out.println(sumNumbers(List.of(1, 2, 3, 4)));\n        System.out.println(sumNumbers(List.of(1.5, 2.5)));\n    }\n}",
+    "expectedOutput": ["a b c ", "1 2 3 ", "10.0", "4.0"],
+    "successMessage": "List<?> accepts any List. List<? extends Number> accepts Integer, Double, etc. The ? extends version gives you read access to elements as Number."
+  },
+  {
+    "title": "Build a generic stack",
+    "instruction": "Final challenge — no starter code.\n\nBuild `class Stack<T>`:\n- `private` storage using an array (hint: use `Object[]` internally since Java can't create generic arrays directly)\n- `push(T item)` — add to top, grow if full\n- `pop()` — remove and return top, throw `EmptyStackException` if empty\n- `peek()` — view top without removing\n- `isEmpty()` / `size()`\n\nTest with both `Stack<String>` and `Stack<Integer>`.",
+    "hint": "Use ArrayList<T> internally instead if arrays with generics feel tricky. It's the same idea.",
+    "starter": "",
+    "expectedOutput": [],
+    "codeChecks": [
+      { "pattern": "class Stack<T>|class Stack <T>", "required": true, "message": "Define class Stack<T>." },
+      { "pattern": "void push\\(T|push\\(T item\\)", "required": true, "message": "Add push(T item) method." },
+      { "pattern": "T pop\\(\\)|pop\\(\\)", "required": true, "message": "Add T pop() method." },
+      { "pattern": "Stack<String>|Stack<Integer>", "required": true, "message": "Test with Stack<String> and Stack<Integer>." }
+    ],
+    "successMessage": "A type-safe generic stack. Stack<String> only holds Strings, Stack<Integer> only integers. The compiler enforces this — no ClassCastException possible. Chapter 14 done!"
+  }
+]

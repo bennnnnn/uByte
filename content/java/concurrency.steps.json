@@ -1,0 +1,51 @@
+[
+  {
+    "title": "Creating threads",
+    "instruction": "Two ways to create a thread:\n\n1. Extend `Thread` and override `run()`\n2. Pass a `Runnable` to `Thread` — preferred\n\nCall `.start()` (not `.run()` — start() creates a new thread; run() executes in the current thread).",
+    "starter": "public class Main {\n    public static void main(String[] args) throws InterruptedException {\n        // Method 1: Runnable lambda\n        Thread t1 = new Thread(() -> {\n            for (int i = 1; i <= 3; i++) {\n                System.out.println(\"Thread 1: step \" + i);\n                try { Thread.sleep(10); } catch (InterruptedException e) { Thread.currentThread().interrupt(); }\n            }\n        });\n\n        // Method 2: extend Thread\n        Thread t2 = new Thread(() -> {\n            for (int i = 1; i <= 3; i++) {\n                System.out.println(\"Thread 2: step \" + i);\n                try { Thread.sleep(10); } catch (InterruptedException e) { Thread.currentThread().interrupt(); }\n            }\n        });\n\n        t1.start();\n        t2.start();\n        t1.join(); // wait for t1 to finish\n        t2.join(); // wait for t2 to finish\n        System.out.println(\"Both done.\");\n    }\n}",
+    "expectedOutput": ["Both done."],
+    "successMessage": "Threads run concurrently — output order varies. .join() waits for a thread to finish. Thread.sleep(ms) pauses the thread. Always interrupt-handle sleep: catch (InterruptedException e) { Thread.currentThread().interrupt(); }"
+  },
+  {
+    "title": "Race conditions — the silent enemy",
+    "instruction": "When multiple threads modify shared data without synchronisation, you get incorrect results:\n\n```java\ncounter++;  // NOT atomic! Three operations: read, add, write\n```\n\nThis is a race condition. Fix it with `synchronized` or `AtomicInteger`.",
+    "starter": "import java.util.concurrent.atomic.AtomicInteger;\n\npublic class Main {\n    static int unsafeCounter = 0;\n    static AtomicInteger safeCounter = new AtomicInteger(0);\n\n    public static void main(String[] args) throws InterruptedException {\n        Thread[] threads = new Thread[10];\n\n        for (int i = 0; i < 10; i++) {\n            threads[i] = new Thread(() -> {\n                for (int j = 0; j < 1000; j++) {\n                    unsafeCounter++;       // RACE CONDITION!\n                    safeCounter.incrementAndGet(); // thread-safe\n                }\n            });\n            threads[i].start();\n        }\n\n        for (Thread t : threads) t.join();\n\n        System.out.println(\"Expected: 10000\");\n        System.out.println(\"Unsafe:   \" + unsafeCounter + \" (probably wrong!)\");\n        System.out.println(\"Safe:     \" + safeCounter.get());\n    }\n}",
+    "expectedOutput": ["Expected: 10000", "Safe:     10000"],
+    "successMessage": "unsafeCounter is almost never 10000 — threads overwrite each other's work. AtomicInteger.incrementAndGet() is a single atomic operation. For counters and flags: use AtomicInteger, AtomicBoolean."
+  },
+  {
+    "title": "synchronized — mutex lock",
+    "instruction": "`synchronized` ensures only one thread enters a block at a time:\n\n```java\nsynchronized (this) {\n    // only one thread here at a time\n}\n\n// or on a method:\nsynchronized void increment() { count++; }\n```\n\nSynchronize the bank transfer method.",
+    "starter": "public class Main {\n    static class BankAccount {\n        private double balance;\n        BankAccount(double b) { balance = b; }\n\n        // synchronized ensures atomicity:\n        synchronized void transfer(BankAccount to, double amount) {\n            if (balance >= amount) {\n                balance -= amount;\n                to.balance += amount;\n            }\n        }\n\n        synchronized double getBalance() { return balance; }\n    }\n\n    public static void main(String[] args) throws InterruptedException {\n        BankAccount a = new BankAccount(1000);\n        BankAccount b = new BankAccount(1000);\n\n        Thread[] threads = new Thread[10];\n        for (int i = 0; i < 10; i++) {\n            threads[i] = new Thread(() -> a.transfer(b, 10));\n            threads[i].start();\n        }\n        for (Thread t : threads) t.join();\n\n        System.out.println(\"A: \" + a.getBalance());\n        System.out.println(\"B: \" + b.getBalance());\n        System.out.println(\"Total: \" + (a.getBalance() + b.getBalance()));\n    }\n}",
+    "expectedOutput": ["A: 900.0", "B: 1100.0", "Total: 2000.0"],
+    "successMessage": "Total is always 2000 — money is conserved. Without synchronized, threads could read the same balance simultaneously and both subtract, losing money. Synchronized prevents this."
+  },
+  {
+    "title": "ExecutorService — thread pools",
+    "instruction": "Creating threads is expensive. A **thread pool** reuses threads:\n\n```java\nExecutorService pool = Executors.newFixedThreadPool(4);\npool.submit(() -> { /* task */ });\npool.shutdown();\n```\n\nAlways `shutdown()` when done — otherwise the program won't exit.",
+    "starter": "import java.util.concurrent.*;\nimport java.util.*;\n\npublic class Main {\n    static int computeFactorial(int n) {\n        int result = 1;\n        for (int i = 2; i <= n; i++) result *= i;\n        return result;\n    }\n\n    public static void main(String[] args) throws Exception {\n        ExecutorService pool = Executors.newFixedThreadPool(4);\n\n        List<Future<Integer>> futures = new ArrayList<>();\n\n        for (int i = 1; i <= 8; i++) {\n            final int n = i;\n            futures.add(pool.submit(() -> computeFactorial(n)));\n        }\n\n        for (int i = 0; i < futures.size(); i++) {\n            System.out.println((i+1) + \"! = \" + futures.get(i).get());\n        }\n\n        pool.shutdown();\n    }\n}",
+    "expectedOutput": ["1! = 1", "2! = 2", "3! = 6", "4! = 24", "5! = 120", "6! = 720", "7! = 5040", "8! = 40320"],
+    "successMessage": "Pool of 4 threads processes 8 tasks. Future.get() blocks until the result is ready. Results come back in submission order — even though execution was concurrent."
+  },
+  {
+    "title": "CompletableFuture — async pipelines",
+    "instruction": "`CompletableFuture` is the modern async API — chain operations without blocking:\n\n```java\nCompletableFuture.supplyAsync(() -> fetchData())\n    .thenApply(data -> processData(data))\n    .thenAccept(result -> saveResult(result));\n```\n\nEach step runs when the previous one completes.",
+    "starter": "import java.util.concurrent.*;\n\npublic class Main {\n    static String fetchUser(int id) {\n        // Simulate network call\n        return \"User\" + id;\n    }\n\n    static String fetchProfile(String user) {\n        return user + \"_profile\";\n    }\n\n    public static void main(String[] args) throws Exception {\n        // Chain async operations:\n        CompletableFuture<String> pipeline = CompletableFuture\n            .supplyAsync(() -> fetchUser(42))\n            .thenApply(user -> fetchProfile(user))\n            .thenApply(profile -> profile.toUpperCase());\n\n        System.out.println(pipeline.get());\n\n        // Combine two futures:\n        CompletableFuture<String> f1 = CompletableFuture.supplyAsync(() -> \"Hello\");\n        CompletableFuture<String> f2 = CompletableFuture.supplyAsync(() -> \"World\");\n\n        String combined = f1.thenCombine(f2, (a, b) -> a + \", \" + b).get();\n        System.out.println(combined);\n    }\n}",
+    "expectedOutput": ["USER42_PROFILE", "Hello, World"],
+    "successMessage": "supplyAsync → thenApply → thenApply is a pipeline. thenCombine merges two independent futures. This is how modern Java web frameworks handle concurrent requests."
+  },
+  {
+    "title": "Build a parallel word counter",
+    "instruction": "Final challenge — no starter code.\n\nWrite a parallel word frequency counter:\n1. Create a list of 10 text strings\n2. Use `ExecutorService` with 4 threads to process each string\n3. Each thread counts words in its string and returns a `Map<String, Integer>`\n4. Merge all maps in the main thread\n5. Print the top 5 most frequent words\n\nHint: use `Callable<Map<String, Integer>>` and `Future`.",
+    "hint": "pool.submit(new Callable<Map<String,Integer>>() { public Map<String,Integer> call() { ... } }) or lambda with explicit type.",
+    "starter": "",
+    "expectedOutput": [],
+    "codeChecks": [
+      { "pattern": "ExecutorService|newFixedThreadPool", "required": true, "message": "Use ExecutorService with a thread pool." },
+      { "pattern": "Callable|Future|submit\\(", "required": true, "message": "Use Callable/Future for tasks that return results." },
+      { "pattern": "pool\\.shutdown\\(\\)", "required": true, "message": "Shut down the pool when done." },
+      { "pattern": "Map<String|HashMap|TreeMap", "required": true, "message": "Use a Map for word frequencies." }
+    ],
+    "successMessage": "Parallel word counting with thread pooling. Real search engines use exactly this pattern — divide the corpus, count in parallel, merge results. Chapter 20 done!"
+  }
+]

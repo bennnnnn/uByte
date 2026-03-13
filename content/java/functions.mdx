@@ -1,61 +1,14 @@
 ---
-title: "Methods and Functions in Java"
-description: "Define and call methods; pass arguments and return values."
-order: 8
-difficulty: "beginner"
-estimatedMinutes: 12
+title: "Lambdas & Streams"
+description: "Lambda expressions, method references, and the Stream API — filter, map, reduce, collect, sorted, and parallel streams."
+order: 17
+difficulty: "intermediate"
+estimatedMinutes: 22
+concepts: ["lambda", "method reference", "Stream", "filter", "map", "reduce", "collect", "sorted", "Optional", "Collectors", "flatMap", "peek"]
 ---
 
-## Concepts in this chapter
+## Data pipelines without the boilerplate
 
-You will learn and practice:
+Streams let you process collections with a declarative pipeline — tell Java WHAT to do, not HOW to loop.
 
-- **Defining methods** — return type, name, parameters, body
-- **Calling methods** — same class (static) and from main
-- **Return values** — return statement; void for no return
-- **Overloading** — same name, different parameter lists
-- **Pass by value** — primitives and references
-
----
-
-## Method Syntax
-
-```java
-public static int add(int a, int b) {
-    return a + b;
-}
-
-public static void greet(String name) {
-    System.out.println("Hello, " + name + "!");
-}
-
-public static void main(String[] args) {
-    System.out.println(add(3, 5));   // 8
-    greet("Alice");
-}
-```
-
----
-
-## Return and Void
-
-- Methods with a return type must return a value of that type (or throw).
-- `void` methods do not return a value.
-
----
-
-## Overloading
-
-Java allows multiple methods with the same name but different parameter types or count:
-
-```java
-public static int sum(int a, int b) { return a + b; }
-public static int sum(int a, int b, int c) { return a + b + c; }
-public static double sum(double a, double b) { return a + b; }
-```
-
----
-
-## What's Next?
-
-Next: **References and Memory** — how objects and references work.
+Before Streams: 20 lines of for-loops and conditionals. After Streams: 3 lines of filter/map/collect. Not just shorter — easier to read and reason about.

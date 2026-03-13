@@ -1,59 +1,17 @@
 ---
-title: "HashMap and Maps in Java"
-description: "Store and look up key-value pairs with HashMap and the Map interface."
-order: 7
-difficulty: "beginner"
-estimatedMinutes: 12
+title: "Collections"
+description: "ArrayList, LinkedList, HashMap, HashSet, TreeMap, Queue, Stack, and the Collections utility class."
+order: 16
+difficulty: "intermediate"
+estimatedMinutes: 22
+concepts: ["ArrayList", "LinkedList", "HashMap", "HashSet", "TreeMap", "Queue", "Collections.sort", "Iterator", "List", "Map", "Set"]
 ---
 
-## Concepts in this chapter
+## The Collections Framework
 
-You will learn and practice:
+Java's collections framework provides ready-made data structures for almost every use case. Every professional Java program uses these daily.
 
-- **HashMap** — create, put, get, containsKey
-- **Map interface** — Map&lt;K, V&gt; and implementations
-- **Iteration** — keySet, values, entrySet
-- **getOrDefault** — safe lookup with default value
-
----
-
-## HashMap Basics
-
-```java
-import java.util.HashMap;
-import java.util.Map;
-
-Map<String, Integer> ages = new HashMap<>();
-ages.put("Alice", 30);
-ages.put("Bob", 25);
-System.out.println(ages.get("Alice"));   // 30
-System.out.println(ages.containsKey("Bob"));  // true
-```
-
----
-
-## getOrDefault and putIfAbsent
-
-```java
-int age = ages.getOrDefault("Charlie", 0);  // 0 if missing
-ages.putIfAbsent("Diana", 28);  // put only if key absent
-```
-
----
-
-## Iterating
-
-```java
-for (String name : ages.keySet()) {
-    System.out.println(name + ": " + ages.get(name));
-}
-for (Map.Entry<String, Integer> e : ages.entrySet()) {
-    System.out.println(e.getKey() + " -> " + e.getValue());
-}
-```
-
----
-
-## What's Next?
-
-Next: **Methods and Functions** — defining and calling methods.
+- `ArrayList` — dynamic array, fast random access
+- `HashMap` — key-value pairs, O(1) lookup
+- `HashSet` — unique items, O(1) contains
+- `TreeMap` / `TreeSet` — sorted collections

@@ -1,0 +1,44 @@
+[
+  {
+    "title": "Writing to a file",
+    "instruction": "`Files.write()` is the simplest way to write a file:\n\n```java\nPath path = Path.of(\"output.txt\");\nFiles.write(path, List.of(\"line 1\", \"line 2\"));\n```\n\n`Files.writeString()` writes a single string. Both create the file if it doesn't exist, overwrite if it does.\n\nRun this — then read the file with Files.readString.",
+    "starter": "import java.io.IOException;\nimport java.nio.file.*;\nimport java.util.List;\n\npublic class Main {\n    public static void main(String[] args) throws IOException {\n        Path path = Path.of(\"students.txt\");\n\n        // Write multiple lines:\n        List<String> lines = List.of(\"Alice,90\", \"Bob,85\", \"Carol,92\", \"David,78\");\n        Files.write(path, lines);\n        System.out.println(\"Written \" + lines.size() + \" lines.\");\n\n        // Append to existing file:\n        Files.write(path, List.of(\"Eve,88\"), StandardOpenOption.APPEND);\n        System.out.println(\"Appended 1 line.\");\n\n        // Verify total:\n        long count = Files.lines(path).count();\n        System.out.println(\"Total lines: \" + count);\n    }\n}",
+    "expectedOutput": ["Written 4 lines.", "Appended 1 line.", "Total lines: 5"],
+    "successMessage": "Files.write with StandardOpenOption.APPEND adds to existing content instead of overwriting. Files.lines returns a Stream<String> — .count() is a stream terminal operation."
+  },
+  {
+    "title": "Reading from a file",
+    "instruction": "Several ways to read:\n\n- `Files.readAllLines(path)` — all lines as `List<String>` (small files)\n- `Files.readString(path)` — entire file as one String (small files)\n- `Files.lines(path)` — stream of lines (large files — lazy!)\n\nFor large files, always use `Files.lines()` — it doesn't load everything into memory.",
+    "starter": "import java.io.IOException;\nimport java.nio.file.*;\nimport java.util.List;\n\npublic class Main {\n    public static void main(String[] args) throws IOException {\n        Path path = Path.of(\"students.txt\");\n\n        // Write test data first:\n        Files.write(path, List.of(\"Alice,90\", \"Bob,85\", \"Carol,92\", \"David,78\", \"Eve,88\"));\n\n        // Read all lines:\n        List<String> lines = Files.readAllLines(path);\n        System.out.println(\"Lines: \" + lines.size());\n\n        // Parse CSV and find highest score:\n        int maxScore = Files.lines(path)\n            .mapToInt(line -> Integer.parseInt(line.split(\",\")[1]))\n            .max()\n            .orElse(0);\n        System.out.println(\"Highest score: \" + maxScore);\n\n        // Read as string:\n        String content = Files.readString(path);\n        System.out.println(content.contains(\"Carol\"));\n    }\n}",
+    "expectedOutput": ["Lines: 5", "Highest score: 92", "true"],
+    "successMessage": "Files.lines returns a Stream — pipe it directly into stream operations. mapToInt + max + orElse finds the highest score without a single for-loop. Clean and memory-efficient."
+  },
+  {
+    "title": "BufferedReader for large files",
+    "instruction": "`BufferedReader` reads line by line, efficiently, for large files:\n\n```java\ntry (BufferedReader reader = Files.newBufferedReader(path)) {\n    String line;\n    while ((line = reader.readLine()) != null) {\n        // process line\n    }\n}\n```\n\nThe try-with-resources ensures the reader is always closed.",
+    "starter": "import java.io.*;\nimport java.nio.file.*;\nimport java.util.List;\n\npublic class Main {\n    public static void main(String[] args) throws IOException {\n        Path path = Path.of(\"log.txt\");\n        Files.write(path, List.of(\"INFO: Server started\", \"ERROR: Connection failed\", \"INFO: Request received\", \"ERROR: Timeout\", \"WARN: High memory\"));\n\n        int errors = 0;\n        int total  = 0;\n\n        try (BufferedReader reader = Files.newBufferedReader(path)) {\n            String line;\n            while ((line = reader.readLine()) != null) {\n                total++;\n                if (line.startsWith(\"ERROR\")) errors++;\n            }\n        }  // reader auto-closed here\n\n        System.out.println(\"Total lines: \" + total);\n        System.out.println(\"Errors: \" + errors);\n    }\n}",
+    "expectedOutput": ["Total lines: 5", "Errors: 2"],
+    "successMessage": "try-with-resources closes the BufferedReader automatically. This pattern handles files of any size — it reads one line at a time, never loading the whole file into memory."
+  },
+  {
+    "title": "Path operations",
+    "instruction": "`Path` and `Files` have methods for working with file system structure:\n\n- `Files.exists(path)`\n- `Files.isDirectory(path)`\n- `Files.createDirectories(path)` — create nested dirs\n- `Files.delete(path)` / `Files.deleteIfExists(path)`\n- `Files.copy(source, target)` / `Files.move()`\n- `path.getFileName()`, `path.getParent()`",
+    "starter": "import java.io.IOException;\nimport java.nio.file.*;\nimport java.util.List;\n\npublic class Main {\n    public static void main(String[] args) throws IOException {\n        Path dir  = Path.of(\"myapp\", \"data\");\n        Path file = dir.resolve(\"config.txt\");\n\n        // Create directory structure:\n        Files.createDirectories(dir);\n        System.out.println(\"Dir exists: \" + Files.isDirectory(dir));\n\n        // Write a file in the directory:\n        Files.write(file, List.of(\"host=localhost\", \"port=8080\"));\n        System.out.println(\"File name: \" + file.getFileName());\n        System.out.println(\"Parent: \" + file.getParent());\n\n        // Cleanup:\n        Files.delete(file);\n        Files.delete(dir);\n        Files.delete(dir.getParent());\n        System.out.println(\"Cleaned up.\");\n    }\n}",
+    "expectedOutput": ["Dir exists: true", "File name: config.txt", "Parent: myapp/data", "Cleaned up."],
+    "successMessage": "Path.resolve appends a filename to a directory path. getFileName/getParent navigate the path structure. Files.createDirectories creates all missing parent directories in one call."
+  },
+  {
+    "title": "CSV file processor",
+    "instruction": "Final challenge — no starter code.\n\nWrite a program that:\n1. Creates a file `grades.csv` with 6+ student records: `name,subject,score`\n2. Reads it back using `Files.lines()`\n3. Calculates and prints:\n   - Average score overall\n   - Highest scorer's name and score\n   - Count of students per subject\n4. Writes a summary to `summary.txt`",
+    "hint": "Use Files.write() to create, Files.lines() + stream ops to process. group by subject with Collectors.groupingBy.",
+    "starter": "",
+    "expectedOutput": [],
+    "codeChecks": [
+      { "pattern": "Files\\.write|Files\\.writeString", "required": true, "message": "Write the CSV file with Files.write()." },
+      { "pattern": "Files\\.lines|Files\\.readAllLines|BufferedReader", "required": true, "message": "Read the file back." },
+      { "pattern": "split\\(\",\"\\)", "required": true, "message": "Parse CSV by splitting on comma." },
+      { "pattern": "mapToDouble|mapToInt|average\\(\\)|sum\\(\\)|max\\(\\)", "required": true, "message": "Calculate statistics using stream operations." }
+    ],
+    "successMessage": "A complete CSV file processor — write, read, parse, analyse, summarise. This is foundation-level data processing. Chapter 19 done!"
+  }
+]

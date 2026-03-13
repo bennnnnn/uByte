@@ -1,70 +1,14 @@
 ---
-title: "Arrays and ArrayList in Java"
-description: "Work with fixed-size arrays and dynamic ArrayList collections in Java."
-order: 6
+title: "Arrays"
+description: "Java arrays — declaration, initialisation, traversal, multi-dimensional arrays, and the Arrays utility class."
+order: 7
 difficulty: "beginner"
-estimatedMinutes: 15
+estimatedMinutes: 18
+concepts: ["array declaration", "array initialisation", "length", "for-each", "Arrays.sort", "Arrays.copyOf", "2D arrays", "ArrayIndexOutOfBoundsException"]
 ---
 
-## Concepts in this chapter
+## One variable, many values
 
-You will learn and practice:
+Arrays store multiple values of the same type under one name. In Java, arrays are fixed-size — you decide the length upfront. For dynamic sizing, you'll use `ArrayList` (Chapter 16).
 
-- **Arrays** — fixed-size, same-type elements; `int[]`, `String[]`
-- **ArrayList** — dynamic size; add, get, size
-- **Access by index** — zero-based; length vs size
-- **Iteration** — for loop with index and for-each
-- **Copying and sorting** — Arrays.copyOf, Collections.sort
-
----
-
-## Arrays
-
-Arrays have a fixed length set at creation:
-
-```java
-int[] numbers = {10, 20, 30};
-String[] names = new String[3];
-names[0] = "Alice";
-names[1] = "Bob";
-
-System.out.println(numbers.length);  // 3
-System.out.println(numbers[1]);      // 20
-```
-
----
-
-## ArrayList
-
-`ArrayList` grows as you add elements. Import `java.util.ArrayList`:
-
-```java
-import java.util.ArrayList;
-
-ArrayList<String> list = new ArrayList<>();
-list.add("apple");
-list.add("banana");
-list.add("cherry");
-System.out.println(list.size());   // 3
-System.out.println(list.get(1));   // banana
-```
-
----
-
-## For-Each and Index Loop
-
-```java
-for (int n : numbers) {
-    System.out.println(n);
-}
-
-for (int i = 0; i < list.size(); i++) {
-    System.out.println(i + ": " + list.get(i));
-}
-```
-
----
-
-## What's Next?
-
-Next: **HashMap and Maps** — key-value storage.
+Arrays are the foundation of almost all data processing — sorting, searching, statistics, matrix math.

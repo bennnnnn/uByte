@@ -1,0 +1,63 @@
+[
+  {
+    "title": "Your first class",
+    "instruction": "A class defines fields (data) and methods (behaviour).\n\nThe `constructor` runs when you do `new ClassName()`. `this` refers to the current object being created.\n\nRun this — notice how each object has its own data.",
+    "starter": "class Dog {\n    String name;\n    String breed;\n    int age;\n\n    Dog(String name, String breed, int age) {\n        this.name = name;\n        this.breed = breed;\n        this.age = age;\n    }\n\n    void bark() {\n        System.out.println(name + \" says: Woof!\");\n    }\n\n    String describe() {\n        return name + \" is a \" + age + \"-year-old \" + breed;\n    }\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        Dog rex = new Dog(\"Rex\", \"Labrador\", 3);\n        Dog bella = new Dog(\"Bella\", \"Poodle\", 5);\n\n        rex.bark();\n        bella.bark();\n        System.out.println(rex.describe());\n    }\n}",
+    "expectedOutput": ["Rex says: Woof!", "Bella says: Woof!", "Rex is a 3-year-old Labrador"],
+    "successMessage": "Two Dog objects, each with their own name/breed/age. The class is the blueprint; new Dog(...) creates an instance. This.name = name assigns the constructor parameter to the field."
+  },
+  {
+    "title": "Add a method to your class",
+    "instruction": "Add `deposit(double amount)` and `getBalance()` methods to `BankAccount`.\n\nMethods that work on the object's own fields don't need parameters for the fields — they access them directly via `this` (or just the field name).",
+    "hint": "void deposit(double amount) { this.balance += amount; }",
+    "starter": "class BankAccount {\n    String owner;\n    double balance;\n\n    BankAccount(String owner, double initialBalance) {\n        this.owner = owner;\n        this.balance = initialBalance;\n    }\n\n    // TODO: add deposit(double amount) and getBalance() methods\n    void deposit(double amount) {\n        balance += amount;\n    }\n\n    double getBalance() {\n        return balance;\n    }\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        BankAccount acc = new BankAccount(\"Alex\", 100.0);\n        acc.deposit(250.0);\n        acc.deposit(75.0);\n        System.out.printf(\"Balance: $%.2f%n\", acc.getBalance());\n    }\n}",
+    "expectedOutput": ["Balance: $425.00"],
+    "codeChecks": [
+      { "pattern": "void deposit\\(double", "required": true, "message": "Add: void deposit(double amount)" },
+      { "pattern": "double getBalance\\(\\)", "required": true, "message": "Add: double getBalance()" },
+      { "pattern": "balance\\s*\\+=\\s*amount|this\\.balance\\s*\\+=", "required": true, "message": "Update balance: balance += amount;" }
+    ],
+    "successMessage": "$425.00 — 100 + 250 + 75. Instance methods access fields directly. The object carries its state — balance persists between calls."
+  },
+  {
+    "title": "toString — readable objects",
+    "instruction": "By default, printing an object gives something like `Dog@5f4da5c3` — the memory address. Useless.\n\nOverride `toString()` to return a human-readable description:\n\n```java\n@Override\npublic String toString() {\n    return \"Dog{name='\" + name + \"', age=\" + age + \"}\";\n}\n```\n\nAdd `toString()` to the `Student` class.",
+    "hint": "@Override public String toString() { return \"Student{name='\" + name + \"', grade=\" + grade + \"}\"; }",
+    "starter": "class Student {\n    String name;\n    int grade;\n\n    Student(String name, int grade) {\n        this.name = name;\n        this.grade = grade;\n    }\n\n    // TODO: add toString() method\n    @Override\n    public String toString() {\n        return \"Student{name='\" + name + \"', grade=\" + grade + \"}\";\n    }\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        Student s1 = new Student(\"Alice\", 90);\n        Student s2 = new Student(\"Bob\", 85);\n\n        System.out.println(s1);\n        System.out.println(s2);\n    }\n}",
+    "expectedOutput": ["Student{name='Alice', grade=90}", "Student{name='Bob', grade=85}"],
+    "codeChecks": [
+      { "pattern": "@Override", "required": true, "message": "Add @Override annotation before toString()." },
+      { "pattern": "public String toString\\(\\)", "required": true, "message": "Define: public String toString()" }
+    ],
+    "successMessage": "@Override tells Java and your IDE that you're replacing a method from the parent class (Object). Without toString(), you'd see the memory address. Every class you create should have one."
+  },
+  {
+    "title": "Multiple constructors",
+    "instruction": "Like methods, constructors can be overloaded — multiple constructors with different parameters.\n\nA common pattern: one full constructor and one that provides defaults.",
+    "starter": "class Point {\n    double x;\n    double y;\n\n    Point(double x, double y) {\n        this.x = x;\n        this.y = y;\n    }\n\n    // Default: origin (0, 0)\n    Point() {\n        this(0, 0);  // calls the two-arg constructor!\n    }\n\n    double distanceTo(Point other) {\n        double dx = this.x - other.x;\n        double dy = this.y - other.y;\n        return Math.sqrt(dx*dx + dy*dy);\n    }\n\n    @Override\n    public String toString() {\n        return String.format(\"(%.1f, %.1f)\", x, y);\n    }\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        Point origin = new Point();\n        Point p = new Point(3, 4);\n\n        System.out.println(origin);\n        System.out.println(p);\n        System.out.printf(\"Distance: %.1f%n\", origin.distanceTo(p));\n    }\n}",
+    "expectedOutput": ["(0.0, 0.0)", "(3.0, 4.0)", "Distance: 5.0"],
+    "successMessage": "this(0, 0) calls the other constructor — constructor chaining. Distance from (0,0) to (3,4) is 5.0 — the 3-4-5 right triangle. Math.sqrt is in java.lang, no import needed."
+  },
+  {
+    "title": "Object references and null",
+    "instruction": "Variables hold **references** to objects, not the objects themselves.\n\n`null` means the variable holds no reference — accessing its methods throws `NullPointerException` — Java's most infamous error.\n\nAlways check for null before using an object.",
+    "starter": "class User {\n    String name;\n    User(String name) { this.name = name; }\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        User u1 = new User(\"Alex\");\n        User u2 = u1;  // u2 points to the SAME object\n\n        u2.name = \"Jordan\";\n        System.out.println(u1.name); // Jordan! Same object.\n\n        // NullPointerException if not checked:\n        User u3 = null;\n        if (u3 != null) {\n            System.out.println(u3.name);\n        } else {\n            System.out.println(\"u3 is null\");\n        }\n    }\n}",
+    "expectedOutput": ["Jordan", "u3 is null"],
+    "successMessage": "u1 and u2 point to the same object — modifying via u2 changes u1. This reference semantics is critical: Java objects are always accessed via references. Always null-check before use."
+  },
+  {
+    "title": "Build a Product class",
+    "instruction": "Final challenge — no starter code.\n\nBuild a `Product` class:\n- Fields: `String name`, `double price`, `int stock`\n- Constructor for all three fields\n- `sell(int quantity)` — reduces stock, throws `IllegalStateException` if insufficient stock\n- `restock(int quantity)` — adds to stock\n- `isAvailable()` — returns true if stock > 0\n- `toString()` — `\"Product{name='...', price=$..., stock=...}\"`\n\nCreate 2 products, sell some, restock one, print each.",
+    "hint": "if (quantity > stock) throw new IllegalStateException(\"Insufficient stock\");",
+    "starter": "",
+    "expectedOutput": [],
+    "codeChecks": [
+      { "pattern": "class Product", "required": true, "message": "Define class Product." },
+      { "pattern": "void sell\\(int|sell\\(int quantity\\)", "required": true, "message": "Add sell(int quantity) method." },
+      { "pattern": "void restock\\(int|restock\\(int", "required": true, "message": "Add restock(int quantity) method." },
+      { "pattern": "throw new IllegalStateException|throw new RuntimeException", "required": true, "message": "Throw an exception when stock is insufficient." },
+      { "pattern": "@Override[\\s\\S]*toString|toString\\(\\)", "required": true, "message": "Override toString()." }
+    ],
+    "successMessage": "A complete Product class with validation. Real e-commerce systems use exactly this pattern — sell() checks stock before committing. Chapter 9 done!"
+  }
+]

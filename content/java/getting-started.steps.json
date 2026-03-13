@@ -1,0 +1,79 @@
+[
+  {
+    "title": "Welcome to Java",
+    "instruction": "Java runs on over 3 billion devices. Android phones, ATMs, airline booking systems — Java is everywhere.\n\nEvery Java program has the same skeleton:\n```java\npublic class Main {\n    public static void main(String[] args) {\n        // your code here\n    }\n}\n```\n\n`System.out.println()` prints a line. Hit **Run** and see your first Java program execute.",
+    "starter": "public class Main {\n    public static void main(String[] args) {\n        System.out.println(\"Hello, Java!\");\n    }\n}",
+    "expectedOutput": ["Hello, Java!"],
+    "successMessage": "Your first Java program! That boilerplate — public class Main, public static void main — will become second nature. For now, just know: it's the entry point every Java program needs."
+  },
+  {
+    "title": "Print multiple lines",
+    "instruction": "Each `System.out.println()` prints on its own line and adds a newline at the end.\n\n`System.out.print()` prints without the newline — useful for building output piece by piece.\n\nAdd two more `println` calls inside `main`.",
+    "hint": "System.out.println(\"second line\");\nSystem.out.println(\"third line\");",
+    "starter": "public class Main {\n    public static void main(String[] args) {\n        System.out.println(\"Java is powerful.\");\n        // TODO: add two more println calls\n    }\n}",
+    "expectedOutput": ["Java is powerful.", "It runs everywhere.", "Let's learn it!"],
+    "codeChecks": [
+      { "pattern": "System\\.out\\.println\\([^)]+\\)[\\s\\S]*System\\.out\\.println\\([^)]+\\)[\\s\\S]*System\\.out\\.println", "required": true, "message": "Add two more System.out.println() calls — three total." },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
+    ],
+    "successMessage": "Three lines, three outputs. Java runs them top to bottom. Every program you ever write follows this rule: instructions execute in sequence, inside main."
+  },
+  {
+    "title": "Comments — document your code",
+    "instruction": "Java has three comment styles:\n\n- `// single-line` — everything after `//` on that line\n- `/* multi-line */` — spans multiple lines\n- `/** Javadoc */` — generates documentation (you'll use this with classes)\n\nComments are ignored by the compiler. Run this — notice none of the comments appear in output.",
+    "starter": "public class Main {\n    public static void main(String[] args) {\n        // This is a single-line comment\n        System.out.println(\"Comments are invisible to Java.\");\n\n        /*\n         * This is a multi-line comment.\n         * Very useful for longer explanations.\n         */\n        System.out.println(\"But your code runs fine.\");\n    }\n}",
+    "expectedOutput": ["Comments are invisible to Java.", "But your code runs fine."],
+    "successMessage": "Comments document WHY — not what. Good comments are rare and valuable. Bad comments repeat the code in English. Write code that explains itself, and comments that explain the reasoning."
+  },
+  {
+    "title": "String concatenation with +",
+    "instruction": "In Java, `+` between strings joins them together:\n\n```java\nSystem.out.println(\"Hello, \" + \"World\");\n// Hello, World\n```\n\nIf one side is a number, Java converts it to a String automatically when combined with `+`.\n\nPrint your name and age using concatenation.",
+    "hint": "System.out.println(\"My name is \" + \"Alex\" + \" and I am \" + 25 + \" years old.\");",
+    "starter": "public class Main {\n    public static void main(String[] args) {\n        // TODO: print your name and age using + concatenation\n        System.out.println(\"Name: \" + \"Alex\");\n        System.out.println(\"Age: \" + 25);\n        System.out.println(\"Combined: \" + \"Alex\" + \" is \" + 25);\n    }\n}",
+    "expectedOutput": ["Name: Alex", "Age: 25", "Combined: Alex is 25"],
+    "codeChecks": [
+      { "pattern": "\"[^\"]+\"\\s*\\+\\s*", "required": true, "message": "Use + to concatenate strings." },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
+    ],
+    "successMessage": "String concatenation with +. Note: \"1\" + 2 gives \"12\" — Java converts the number to a string when mixed with string concatenation. You'll see this behaviour a lot."
+  },
+  {
+    "title": "Arithmetic output",
+    "instruction": "Java handles arithmetic directly inside `System.out.println`:\n\n```java\nSystem.out.println(10 + 3);   // 13\nSystem.out.println(10 - 3);   // 7\nSystem.out.println(10 * 3);   // 30\nSystem.out.println(10 / 3);   // 3 — integer division!\nSystem.out.println(10 % 3);   // 1 — remainder\n```\n\n⚠️ `10 / 3` gives `3` not `3.33` — because both are integers. Use `10.0 / 3` for decimal division.\n\nRun all six operations.",
+    "starter": "public class Main {\n    public static void main(String[] args) {\n        System.out.println(10 + 3);\n        System.out.println(10 - 3);\n        System.out.println(10 * 3);\n        System.out.println(10 / 3);   // integer division!\n        System.out.println(10.0 / 3); // decimal division\n        System.out.println(10 % 3);   // remainder\n    }\n}",
+    "expectedOutput": ["13", "7", "30", "3", "3.3333333333333335", "1"],
+    "successMessage": "Integer division truncates — 10/3 is 3, not 3.33. This catches everyone at least once. Whenever you need decimal precision, make at least one operand a double: 10.0/3."
+  },
+  {
+    "title": "Spot and fix the error",
+    "instruction": "Java is compiled — syntax errors are caught before the program ever runs. This one has a missing semicolon and a wrong method name.\n\nJava requires semicolons at the end of every statement. Find and fix both bugs.",
+    "hint": "All statements end with ; and the method is System.out.println (lowercase p)",
+    "starter": "public class Main {\n    public static void main(String[] args) {\n        System.out.println(\"First line\")\n        System.out.PrintLn(\"Second line\");\n    }\n}",
+    "expectedOutput": ["First line", "Second line"],
+    "codeChecks": [
+      { "pattern": "System\\.out\\.println\\(\"First line\"\\);", "required": true, "message": "Add the missing semicolon after the first println." },
+      { "pattern": "System\\.out\\.println\\(\"Second line\"\\);", "required": true, "message": "Fix the method name: PrintLn → println (lowercase p)" }
+    ],
+    "successMessage": "Two bugs: missing semicolon and wrong capitalisation. Java is case-sensitive — println, not PrintLn. The compiler error messages tell you exactly what line to fix."
+  },
+  {
+    "title": "What is a class?",
+    "instruction": "In Java, **everything lives inside a class**. The class named `Main` matches the filename `Main.java`.\n\n`public` — accessible from anywhere\n`static` — belongs to the class, not an instance\n`void` — returns nothing\n`main` — the entry point Java looks for\n`String[] args` — command-line arguments (mostly ignored for now)\n\nYou don't need to understand all of this yet — but you'll know exactly what it means by Chapter 9. For now, just recognise the structure.",
+    "starter": "public class Main {\n    /*\n     * Every Java program starts here.\n     * Java looks for a class named Main with this exact method signature.\n     */\n    public static void main(String[] args) {\n        System.out.println(\"Class: \" + Main.class.getSimpleName());\n        System.out.println(\"Method: main\");\n        System.out.println(\"Ready to learn Java!\");\n    }\n}",
+    "expectedOutput": ["Class: Main", "Method: main", "Ready to learn Java!"],
+    "successMessage": "Main.class.getSimpleName() reads the class name at runtime. Every Java file has exactly one public class matching the filename. This structure will make complete sense by Chapter 9."
+  },
+  {
+    "title": "Write it from scratch",
+    "instruction": "No starter code. Write everything yourself.\n\nPrint exactly:\n```\nJava is compiled.\nJava is typed.\nJava is everywhere.\nChapter 1 complete!\n```\n\nFour `System.out.println` calls. Match the text exactly.",
+    "hint": "public class Main { public static void main(String[] args) { System.out.println(...); } }",
+    "starter": "",
+    "expectedOutput": ["Java is compiled.", "Java is typed.", "Java is everywhere.", "Chapter 1 complete!"],
+    "codeChecks": [
+      { "pattern": "public class Main", "required": true, "message": "Start with: public class Main {" },
+      { "pattern": "public static void main", "required": true, "message": "Include the main method signature." },
+      { "pattern": "System\\.out\\.println", "required": true, "message": "Use System.out.println() to print." }
+    ],
+    "successMessage": "Built from nothing! Class, main method, four print statements — you typed it all. That structure becomes invisible muscle memory within a few chapters. Chapter 1 done!"
+  }
+]

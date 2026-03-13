@@ -1,0 +1,51 @@
+[
+  {
+    "title": "Using the standard library",
+    "instruction": "Java ships with thousands of ready-made classes in packages like `java.util`, `java.io`, `java.net`. Import them to use them:\n\n```java\nimport java.util.ArrayList;  // specific class\nimport java.util.*;          // all of java.util\n```\n\n`java.lang` is auto-imported — String, Math, System are always available.",
+    "starter": "import java.util.*;\nimport java.util.stream.Collectors;\n\npublic class Main {\n    public static void main(String[] args) {\n        // java.util:\n        List<Integer> nums = Arrays.asList(5, 2, 8, 1, 9, 3);\n        Collections.sort(nums);\n        System.out.println(nums);\n\n        // java.lang (auto-imported):\n        System.out.println(Math.sqrt(144));\n        System.out.println(Math.PI);\n        System.out.println(String.format(\"%.3f\", Math.E));\n\n        // String joining:\n        String result = nums.stream().map(String::valueOf).collect(Collectors.joining(\", \"));\n        System.out.println(result);\n    }\n}",
+    "expectedOutput": ["[1, 2, 3, 5, 8, 9]", "12.0", "3.141592653589793", "2.718", "1, 2, 3, 5, 8, 9"],
+    "successMessage": "java.lang is free — Math, String, System, Integer, etc. are always available. Everything else needs import. java.util.* is common in quick programs; explicit imports are preferred in production code."
+  },
+  {
+    "title": "Static imports",
+    "instruction": "`import static` lets you use a class's static members without the class name:\n\n```java\nimport static java.lang.Math.*;  // now you can write sqrt(4) instead of Math.sqrt(4)\nimport static java.util.Collections.sort;\n```\n\nUseful for Math operations and constants in calculation-heavy code.",
+    "starter": "import static java.lang.Math.*;\nimport static java.util.Arrays.asList;\n\npublic class Main {\n    public static void main(String[] args) {\n        // No 'Math.' prefix needed:\n        double hypotenuse = sqrt(pow(3, 2) + pow(4, 2));\n        System.out.println(hypotenuse);\n\n        double circumference = 2 * PI * 5;\n        System.out.printf(\"%.4f%n\", circumference);\n\n        // Static import of Arrays.asList:\n        var numbers = asList(1, 2, 3, 4, 5);\n        System.out.println(numbers);\n    }\n}",
+    "expectedOutput": ["5.0", "31.4159", "[1, 2, 3, 4, 5]"],
+    "successMessage": "sqrt and pow instead of Math.sqrt and Math.pow — cleaner for math-heavy code. Use static imports sparingly — they hide where methods come from."
+  },
+  {
+    "title": "java.util.Random",
+    "instruction": "`Random` and `Math.random()` generate random numbers. `Random` is more flexible.",
+    "starter": "import java.util.Random;\n\npublic class Main {\n    public static void main(String[] args) {\n        Random rng = new Random(42);  // seed for reproducibility\n\n        // nextInt(bound) — 0 to bound-1:\n        for (int i = 0; i < 5; i++) {\n            System.out.print(rng.nextInt(10) + \" \");\n        }\n        System.out.println();\n\n        // Simulate dice rolls:\n        int[] counts = new int[7];\n        Random dice = new Random();\n        for (int i = 0; i < 6000; i++) {\n            counts[dice.nextInt(6) + 1]++;\n        }\n\n        for (int face = 1; face <= 6; face++) {\n            System.out.printf(\"Face %d: ~%d%n\", face, counts[face] / 100 * 100);\n        }\n    }\n}",
+    "expectedOutput": ["0 7 3 2 3 ", "Face 1: ~1000", "Face 2: ~1000", "Face 3: ~1000", "Face 4: ~1000", "Face 5: ~1000", "Face 6: ~1000"],
+    "successMessage": "Seeded Random gives reproducible results — great for tests. nextInt(6) gives 0-5, +1 shifts to 1-6. After 6000 rolls, each face appears approximately 1000 times — fair dice."
+  },
+  {
+    "title": "java.time — modern date/time",
+    "instruction": "Java 8 introduced `java.time` — the correct way to handle dates.\n\n- `LocalDate` — date only\n- `LocalTime` — time only  \n- `LocalDateTime` — date + time\n- `Duration` — time between two instants\n\nOld `Date` and `Calendar` classes are deprecated and confusing — never use them.",
+    "starter": "import java.time.*;\nimport java.time.format.DateTimeFormatter;\n\npublic class Main {\n    public static void main(String[] args) {\n        LocalDate today = LocalDate.now();\n        System.out.println(today);\n\n        LocalDate birthday = LocalDate.of(1990, 6, 15);\n        long years = ChronoUnit.YEARS.between(birthday, today);\n        System.out.println(\"Age: \" + years);\n\n        LocalDateTime now = LocalDateTime.now();\n        DateTimeFormatter fmt = DateTimeFormatter.ofPattern(\"yyyy-MM-dd HH:mm\");\n        System.out.println(now.format(fmt));\n\n        // Date arithmetic:\n        LocalDate nextWeek = today.plusDays(7);\n        System.out.println(\"Next week: \" + nextWeek);\n    }\n}",
+    "expectedOutput": [],
+    "successMessage": "java.time is immutable, thread-safe, and intuitive. plusDays/minusDays for arithmetic. ChronoUnit.YEARS.between for age calculations. DateTimeFormatter for custom formats."
+  },
+  {
+    "title": "Useful java.util classes",
+    "instruction": "Quick tour of commonly used utilities:\n\n- `Objects.requireNonNull()` — clean null checks\n- `Objects.toString(obj, default)` — null-safe toString\n- `UUID.randomUUID()` — unique IDs\n- `Optional.of()` / `Optional.empty()` — null safety",
+    "starter": "import java.util.*;\n\npublic class Main {\n    static String describe(String name) {\n        Objects.requireNonNull(name, \"name cannot be null\");\n        return \"Hello, \" + name;\n    }\n\n    public static void main(String[] args) {\n        // null-safe toString:\n        String val = null;\n        System.out.println(Objects.toString(val, \"(empty)\"));\n\n        // UUID for unique IDs:\n        String id1 = UUID.randomUUID().toString();\n        String id2 = UUID.randomUUID().toString();\n        System.out.println(id1.length());\n        System.out.println(id1.equals(id2));\n\n        // requireNonNull for clean parameter checks:\n        System.out.println(describe(\"Alex\"));\n        try {\n            describe(null);\n        } catch (NullPointerException e) {\n            System.out.println(\"Error: \" + e.getMessage());\n        }\n    }\n}",
+    "expectedOutput": ["(empty)", "36", "false", "Hello, Alex", "Error: name cannot be null"],
+    "successMessage": "UUID is always 36 characters. Objects.requireNonNull is cleaner than if (x == null) throw. Objects.toString with default handles null safely. These are daily-use utilities."
+  },
+  {
+    "title": "Build a simple logger",
+    "instruction": "Final challenge — no starter code.\n\nBuild a `Logger` class using `java.time` and `java.util.ArrayList`:\n- Levels: `INFO`, `WARN`, `ERROR`\n- `log(String level, String message)` — stores and prints `\"[yyyy-MM-dd HH:mm:ss] [LEVEL] message\"`\n- `getLogs(String level)` — returns all logs matching that level\n- `getErrorCount()` — returns count of ERROR logs\n\nLog at least 5 messages across different levels.",
+    "hint": "Use LocalDateTime.now().format(formatter) for timestamps. Store logs as List<String>.",
+    "starter": "",
+    "expectedOutput": [],
+    "codeChecks": [
+      { "pattern": "class Logger", "required": true, "message": "Define class Logger." },
+      { "pattern": "LocalDateTime|LocalDate|java\\.time", "required": true, "message": "Use java.time for timestamps." },
+      { "pattern": "void log\\(String|log\\(String level", "required": true, "message": "Add log(String level, String message)." },
+      { "pattern": "getLogs|getErrorCount", "required": true, "message": "Add getLogs() and getErrorCount()." }
+    ],
+    "successMessage": "A real logger with timestamped, leveled messages. This is exactly how SLF4J and Log4j work under the hood. Chapter 18 done!"
+  }
+]

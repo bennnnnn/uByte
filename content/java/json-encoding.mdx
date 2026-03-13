@@ -1,47 +1,12 @@
 ---
-title: "JSON in Java"
-description: "Parse and generate JSON using simple string handling or libraries like Gson."
-order: 18
+title: "File I/O"
+description: "Read and write files using java.nio.file.Files, Path, BufferedReader/Writer, and try-with-resources."
+order: 19
 difficulty: "intermediate"
-estimatedMinutes: 12
+estimatedMinutes: 18
+concepts: ["Files", "Path", "Paths", "BufferedReader", "BufferedWriter", "Files.readAllLines", "Files.write", "try-with-resources", "FileNotFoundException", "IOException"]
 ---
 
-## Concepts in this chapter
+## Files: persistence beyond the program
 
-You will learn and practice:
-
-- **JSON format** — objects {}, arrays [], strings, numbers
-- **Manual parsing** — for simple cases; use libraries in production
-- **Gson / Jackson** — fromJson, toJson; ObjectMapper
-- **POJOs** — plain Java objects with getters/setters for mapping
-- **JSON in HTTP** — send and receive JSON in request/response body
-
----
-
-## Simple JSON String
-
-```java
-// Without a library, build JSON manually for simple cases:
-String name = "Alice";
-int age = 30;
-String json = "{\"name\":\"" + name + "\",\"age\":" + age + "}";
-System.out.println(json);
-```
-
----
-
-## With Gson (if available)
-
-```java
-// Gson gson = new Gson();
-// String json = gson.toJson(person);
-// Person p = gson.fromJson(json, Person.class);
-```
-
-In the exercise we use simple string building so it runs without external deps.
-
----
-
-## What's Next?
-
-Next: **Streams and Lambdas** — functional-style operations on collections.
+Everything in memory disappears when your program ends. Files persist. Java's `java.nio.file` package (NIO.2, Java 7+) is the modern way to work with files — it's simpler, more powerful, and safer than the old `java.io.File`.

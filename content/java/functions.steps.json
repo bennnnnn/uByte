@@ -1,0 +1,59 @@
+[
+  {
+    "title": "Lambda expressions",
+    "instruction": "Lambdas are inline function implementations. They implement functional interfaces:\n\n```java\n// Old way:\nComparator<String> c = new Comparator<String>() {\n    public int compare(String a, String b) { return a.compareTo(b); }\n};\n\n// Lambda way:\nComparator<String> c = (a, b) -> a.compareTo(b);\n```\n\nRun this — lambdas replacing anonymous classes.",
+    "starter": "import java.util.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        List<String> names = new ArrayList<>(Arrays.asList(\"Charlie\", \"Alice\", \"Bob\", \"David\"));\n\n        // Lambda as Comparator:\n        names.sort((a, b) -> a.compareTo(b));\n        System.out.println(names);\n\n        // Lambda in forEach:\n        names.forEach(name -> System.out.println(\"Hello, \" + name));\n\n        // Lambda as Predicate:\n        names.removeIf(name -> name.startsWith(\"D\"));\n        System.out.println(names);\n    }\n}",
+    "expectedOutput": ["[Alice, Bob, Charlie, David]", "Hello, Alice", "Hello, Bob", "Hello, Charlie", "Hello, David", "[Alice, Bob, Charlie]"],
+    "successMessage": "Three lambdas: a Comparator for sort, a Consumer for forEach, a Predicate for removeIf. Lambdas are implementations of functional interfaces — one abstract method."
+  },
+  {
+    "title": "Method references",
+    "instruction": "Method references are shorter lambdas when you just call an existing method:\n\n```java\nnames.forEach(name -> System.out.println(name));  // lambda\nnames.forEach(System.out::println);               // method reference\n```\n\nFour types: `ClassName::staticMethod`, `object::instanceMethod`, `ClassName::instanceMethod`, `ClassName::new`",
+    "starter": "import java.util.*;\nimport java.util.stream.*;\n\npublic class Main {\n    static String addExclamation(String s) { return s + \"!\"; }\n\n    public static void main(String[] args) {\n        List<String> words = Arrays.asList(\"hello\", \"world\", \"java\");\n\n        // Method reference instead of lambda:\n        words.forEach(System.out::println);   // ClassName::staticMethod from instance\n\n        // Static method reference:\n        List<String> excited = words.stream()\n            .map(Main::addExclamation)   // static method reference\n            .collect(Collectors.toList());\n        System.out.println(excited);\n\n        // Instance method reference:\n        List<String> upper = words.stream()\n            .map(String::toUpperCase)    // instance method of String\n            .collect(Collectors.toList());\n        System.out.println(upper);\n    }\n}",
+    "expectedOutput": ["hello", "world", "java", "[hello!, world!, java!]", "[HELLO, WORLD, JAVA]"],
+    "successMessage": "System.out::println, Main::addExclamation, String::toUpperCase — all method references. They're just syntactic sugar for lambdas but read more naturally."
+  },
+  {
+    "title": "Stream basics — filter and map",
+    "instruction": "A Stream pipeline: source → intermediate operations → terminal operation.\n\n- `filter(predicate)` — keep matching elements\n- `map(function)` — transform each element\n- `collect(Collectors.toList())` — produce a List result\n\nStreams are lazy — nothing runs until the terminal operation.",
+    "hint": ".filter(s -> s.length() > 4).map(String::toUpperCase).collect(Collectors.toList())",
+    "starter": "import java.util.*;\nimport java.util.stream.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        List<String> names = Arrays.asList(\"Alice\", \"Bob\", \"Carol\", \"David\", \"Eve\", \"Frank\");\n\n        // Names longer than 4 chars, uppercased:\n        List<String> result = names.stream()\n            .filter(n -> n.length() > 4)\n            .map(String::toUpperCase)\n            .collect(Collectors.toList());\n        System.out.println(result);\n\n        // Count names starting with vowels:\n        long count = names.stream()\n            .filter(n -> \"AEIOU\".indexOf(n.charAt(0)) >= 0)\n            .count();\n        System.out.println(\"Vowel names: \" + count);\n    }\n}",
+    "expectedOutput": ["[ALICE, CAROL, DAVID, FRANK]", "Vowel names: 2"],
+    "successMessage": "filter keeps Alice/Carol/David/Frank (length > 4). map uppercases. count() is a terminal op that returns the count without collecting. Each intermediate op returns a new Stream."
+  },
+  {
+    "title": "reduce, sorted, distinct",
+    "instruction": "More stream operations:\n\n- `sorted()` — sort elements\n- `distinct()` — remove duplicates\n- `reduce(identity, accumulator)` — combine all elements to one value\n- `mapToInt()` → `.sum()` / `.average()` / `.max()`",
+    "starter": "import java.util.*;\nimport java.util.stream.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        List<Integer> numbers = Arrays.asList(5, 3, 8, 1, 5, 9, 3, 7, 2, 8);\n\n        // Sum using reduce:\n        int sum = numbers.stream()\n            .reduce(0, Integer::sum);\n        System.out.println(\"Sum: \" + sum);\n\n        // Sorted and distinct:\n        List<Integer> sorted = numbers.stream()\n            .distinct()\n            .sorted()\n            .collect(Collectors.toList());\n        System.out.println(sorted);\n\n        // Statistics using IntStream:\n        IntSummaryStatistics stats = numbers.stream()\n            .mapToInt(Integer::intValue)\n            .summaryStatistics();\n        System.out.println(\"Max: \" + stats.getMax());\n        System.out.println(\"Avg: \" + stats.getAverage());\n    }\n}",
+    "expectedOutput": ["Sum: 51", "[1, 2, 3, 5, 7, 8, 9]", "Max: 9", "Avg: 5.1"],
+    "successMessage": "reduce(0, Integer::sum) starts at 0 and adds each element. distinct() removes 5, 3, 8 duplicates. summaryStatistics() gives count, sum, min, max, average in one call."
+  },
+  {
+    "title": "Collectors — grouping and joining",
+    "instruction": "`Collectors` provides powerful terminal operations:\n\n- `Collectors.toList()` — collect to List\n- `Collectors.joining(\", \")` — join strings\n- `Collectors.groupingBy(f)` — group into Map\n- `Collectors.counting()` — count per group",
+    "starter": "import java.util.*;\nimport java.util.stream.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        List<String> words = Arrays.asList(\"apple\", \"ant\", \"banana\", \"avocado\", \"berry\", \"apricot\");\n\n        // Join to comma-separated string:\n        String joined = words.stream()\n            .filter(w -> w.startsWith(\"a\"))\n            .collect(Collectors.joining(\", \"));\n        System.out.println(joined);\n\n        // Group by first letter:\n        Map<Character, List<String>> grouped = words.stream()\n            .collect(Collectors.groupingBy(w -> w.charAt(0)));\n        grouped.forEach((k, v) -> System.out.println(k + \": \" + v));\n\n        // Count per letter:\n        Map<Character, Long> counts = words.stream()\n            .collect(Collectors.groupingBy(w -> w.charAt(0), Collectors.counting()));\n        System.out.println(\"Counts: \" + counts);\n    }\n}",
+    "expectedOutput": ["apple, ant, avocado, apricot", "a: [apple, ant, avocado, apricot]", "b: [banana, berry]", "Counts: {a=4, b=2}"],
+    "successMessage": "groupingBy builds a Map automatically. Collectors.counting() downstream counts per group. This groupingBy + counting combo is a one-liner word frequency counter."
+  },
+  {
+    "title": "Optional — null safety",
+    "instruction": "`Optional<T>` wraps a value that might not exist — it forces you to handle the missing case.\n\n```java\nOptional<String> found = list.stream().filter(...).findFirst();\nfound.ifPresent(s -> System.out.println(s));\nfound.orElse(\"default\");\n```",
+    "starter": "import java.util.*;\nimport java.util.stream.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        List<String> names = Arrays.asList(\"Alice\", \"Bob\", \"Carol\");\n\n        // findFirst returns Optional — might be empty:\n        Optional<String> firstB = names.stream()\n            .filter(n -> n.startsWith(\"B\"))\n            .findFirst();\n\n        firstB.ifPresent(n -> System.out.println(\"Found: \" + n));\n\n        Optional<String> firstZ = names.stream()\n            .filter(n -> n.startsWith(\"Z\"))\n            .findFirst();\n\n        System.out.println(firstZ.orElse(\"None found\"));\n        System.out.println(firstZ.isPresent());\n\n        // Transform if present:\n        String result = firstB\n            .map(String::toUpperCase)\n            .orElse(\"NO RESULT\");\n        System.out.println(result);\n    }\n}",
+    "expectedOutput": ["Found: Bob", "None found", "false", "BOB"],
+    "successMessage": "Optional forces you to handle the 'not found' case. orElse provides a default. map transforms if present. This eliminates NullPointerException in stream operations."
+  },
+  {
+    "title": "Build a report generator",
+    "instruction": "Final challenge — no starter code.\n\nGiven a list of `Employee` objects (name, department, salary):\n1. Find the highest earner in each department (groupingBy + Collectors.maxBy)\n2. Average salary per department (groupingBy + Collectors.averagingDouble)\n3. All employees earning > 80000, sorted by salary desc, collected to List\n4. Print a formatted report\n\nCreate at least 8 employees in 3 departments.",
+    "hint": "record Employee(String name, String dept, double salary) {} — use record for brevity (Chapter 22), or a normal class.",
+    "starter": "",
+    "expectedOutput": [],
+    "codeChecks": [
+      { "pattern": "groupingBy", "required": true, "message": "Use Collectors.groupingBy for department grouping." },
+      { "pattern": "sorted\\(|Comparator", "required": true, "message": "Sort employees by salary." },
+      { "pattern": "averagingDouble|averagingInt|average\\(\\)", "required": true, "message": "Calculate average salary per department." },
+      { "pattern": "System\\.out\\.println|System\\.out\\.printf", "required": true, "message": "Print the report." }
+    ],
+    "successMessage": "A full report generator using Streams. groupingBy with maxBy or averagingDouble is the pattern for report systems everywhere. Chapter 17 done!"
+  }
+]

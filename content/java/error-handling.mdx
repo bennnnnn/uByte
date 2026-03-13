@@ -1,51 +1,14 @@
 ---
-title: "Exceptions and Error Handling in Java"
-description: "Handle errors with try-catch, throw exceptions, and use finally."
-order: 13
-difficulty: "beginner"
-estimatedMinutes: 12
+title: "Error Handling"
+description: "try/catch/finally, checked vs unchecked exceptions, custom exception classes, multi-catch, and best practices."
+order: 15
+difficulty: "intermediate"
+estimatedMinutes: 18
+concepts: ["try/catch/finally", "checked exceptions", "unchecked exceptions", "custom exceptions", "multi-catch", "throws", "try-with-resources", "Exception hierarchy"]
 ---
 
-## Concepts in this chapter
+## When things go wrong
 
-You will learn and practice:
+Exceptions are Java's way of saying "something unexpected happened — here's exactly what and where." A `NullPointerException` tells you more than a silent crash.
 
-- **try-catch** — catch exceptions; prevent program crash
-- **throw** — throw checked or unchecked exceptions
-- **finally** — run cleanup code whether or not an exception occurred
-- **Checked vs unchecked** — IOException is checked; RuntimeException is not
-- **Exception hierarchy** — Exception, RuntimeException, Error
-
----
-
-## try and catch
-
-```java
-try {
-    int n = Integer.parseInt("abc");  // throws NumberFormatException
-} catch (NumberFormatException e) {
-    System.out.println("Invalid number: " + e.getMessage());
-}
-```
-
----
-
-## throw and finally
-
-```java
-if (age < 0) {
-    throw new IllegalArgumentException("Age cannot be negative");
-}
-
-try {
-    // ...
-} finally {
-    System.out.println("Cleanup");
-}
-```
-
----
-
-## What's Next?
-
-Next: **Packages and Imports** — organize code into packages.
+Understanding the difference between checked and unchecked exceptions is critical — it determines whether you MUST handle an error or CAN choose to handle it.

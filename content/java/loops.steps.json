@@ -1,0 +1,77 @@
+[
+  {
+    "title": "for loop — counted repetition",
+    "instruction": "The classic `for` loop: initialise, condition, update:\n\n```java\nfor (int i = 0; i < 5; i++) {\n    // runs 5 times: i = 0, 1, 2, 3, 4\n}\n```\n\nRun this. Then change it to print only even numbers from 2 to 10.",
+    "starter": "public class Main {\n    public static void main(String[] args) {\n        for (int i = 1; i <= 5; i++) {\n            System.out.println(\"Step \" + i);\n        }\n    }\n}",
+    "expectedOutput": ["Step 1", "Step 2", "Step 3", "Step 4", "Step 5"],
+    "successMessage": "Three parts: init (int i = 1), condition (i <= 5), update (i++). Java runs the init once, then loops while condition is true, running the update after each iteration."
+  },
+  {
+    "title": "for-each — iterate over arrays",
+    "instruction": "The enhanced for-each loop is cleaner when you don't need the index:\n\n```java\nfor (String name : names) {\n    System.out.println(name);\n}\n```\n\nLoop over the students array and print each one.",
+    "hint": "for (String student : students) { System.out.println(student); }",
+    "starter": "public class Main {\n    public static void main(String[] args) {\n        String[] students = {\"Alice\", \"Bob\", \"Carol\", \"David\", \"Eve\"};\n\n        // TODO: use for-each to print each student\n        for (String student : students) {\n            System.out.println(student);\n        }\n    }\n}",
+    "expectedOutput": ["Alice", "Bob", "Carol", "David", "Eve"],
+    "codeChecks": [
+      { "pattern": "for\\s*\\(\\s*String\\s+\\w+\\s*:\\s*students\\s*\\)", "required": true, "message": "Use for-each: for (String student : students)" }
+    ],
+    "successMessage": "for-each is cleaner and safer — no off-by-one index mistakes. Use it whenever you need all elements. Use classic for when you need the index or want to step by 2+."
+  },
+  {
+    "title": "while — loop until condition changes",
+    "instruction": "`while` loops while the condition is true. Use it when you don't know upfront how many iterations you need.\n\n⚠️ Always ensure the condition will eventually become false — infinite loops hang your program.\n\nSimulate a number guessing game.",
+    "starter": "public class Main {\n    public static void main(String[] args) {\n        int secret = 7;\n        int guess = 1;\n        int attempts = 0;\n\n        while (guess != secret) {\n            System.out.println(\"Trying: \" + guess);\n            attempts++;\n            guess++;\n        }\n        System.out.println(\"Found \" + secret + \" in \" + attempts + \" attempts!\");\n    }\n}",
+    "expectedOutput": ["Trying: 1", "Trying: 2", "Trying: 3", "Trying: 4", "Trying: 5", "Trying: 6", "Found 7 in 6 attempts!"],
+    "successMessage": "while checked the condition BEFORE each iteration. The loop stopped as soon as guess == secret. while is perfect for 'keep going until something happens'."
+  },
+  {
+    "title": "do-while — run at least once",
+    "instruction": "`do-while` runs the body FIRST, then checks the condition. Guaranteed to run at least once.\n\nPerfect for: menus (show then validate), input validation (prompt then check).",
+    "starter": "public class Main {\n    public static void main(String[] args) {\n        int n = 1;\n\n        do {\n            System.out.println(\"n = \" + n);\n            n *= 2;\n        } while (n < 20);\n\n        System.out.println(\"Final n: \" + n);\n    }\n}",
+    "expectedOutput": ["n = 1", "n = 2", "n = 4", "n = 8", "n = 16", "Final n: 32"],
+    "successMessage": "The body ran before the condition was checked. 1 → 2 → 4 → 8 → 16 → 32 — stopped when 32 >= 20. do-while is rarer than while but essential for 'run once then validate' patterns."
+  },
+  {
+    "title": "break — exit early",
+    "instruction": "`break` immediately exits the loop. Once you find what you're looking for, stop — no point continuing.\n\nSearch for the first prime number above 10.",
+    "hint": "if (isPrime(n)) { System.out.println(n); break; }",
+    "starter": "public class Main {\n    static boolean isPrime(int n) {\n        if (n < 2) return false;\n        for (int i = 2; i * i <= n; i++) {\n            if (n % i == 0) return false;\n        }\n        return true;\n    }\n\n    public static void main(String[] args) {\n        for (int n = 11; n <= 100; n++) {\n            System.out.println(\"Checking: \" + n);\n            if (isPrime(n)) {\n                System.out.println(\"First prime above 10: \" + n);\n                break;\n            }\n        }\n    }\n}",
+    "expectedOutput": ["Checking: 11", "First prime above 10: 11"],
+    "successMessage": "Found 11 (prime), printed it, and broke out. Numbers 12-100 were never checked. In a database with millions of records, finding row 3 and breaking is essential."
+  },
+  {
+    "title": "continue — skip this iteration",
+    "instruction": "`continue` skips the rest of the current iteration and goes to the next one.\n\nPrint only odd numbers 1-10 using continue.",
+    "hint": "if (i % 2 == 0) continue;",
+    "starter": "public class Main {\n    public static void main(String[] args) {\n        for (int i = 1; i <= 10; i++) {\n            // TODO: skip even numbers using continue\n            if (i % 2 == 0) continue;\n            System.out.println(i);\n        }\n    }\n}",
+    "expectedOutput": ["1", "3", "5", "7", "9"],
+    "codeChecks": [
+      { "pattern": "continue", "required": true, "message": "Use continue to skip even numbers." },
+      { "pattern": "i\\s*%\\s*2\\s*==\\s*0|i%2==0", "required": true, "message": "Check: if (i % 2 == 0) continue;" }
+    ],
+    "successMessage": "Even numbers skipped, odd numbers printed. break exits the loop, continue skips the iteration. Two different tools — know which one you need."
+  },
+  {
+    "title": "Nested loops",
+    "instruction": "Loops inside loops. Inner loop runs completely for every outer iteration.\n\nPrint a 4×4 multiplication table.",
+    "hint": "for (int i = 1; i <= 4; i++) { for (int j = 1; j <= 4; j++) { ... } }",
+    "starter": "public class Main {\n    public static void main(String[] args) {\n        // TODO: print 4x4 multiplication table\n        for (int i = 1; i <= 4; i++) {\n            for (int j = 1; j <= 4; j++) {\n                System.out.printf(\"%3d\", i * j);\n            }\n            System.out.println();\n        }\n    }\n}",
+    "expectedOutput": ["  1  2  3  4", "  2  4  6  8", "  3  6  9 12", "  4  8 12 16"],
+    "codeChecks": [
+      { "pattern": "for[\\s\\S]+for", "required": true, "message": "Use nested loops — a loop inside a loop." }
+    ],
+    "successMessage": "printf with %3d right-aligns in 3 spaces — that's how the table lines up. Nested loops power tables, matrices, and pair comparisons everywhere."
+  },
+  {
+    "title": "FizzBuzz — the classic interview test",
+    "instruction": "Almost every programming interview includes this problem.\n\n- Print 1 to 30\n- Multiple of 3: print `Fizz`\n- Multiple of 5: print `Buzz`\n- Multiple of both: print `FizzBuzz`\n\nCheck 15 (both) first, or it can never trigger.",
+    "hint": "Check % 15 first, then % 3, then % 5, then print the number.",
+    "starter": "public class Main {\n    public static void main(String[] args) {\n        // TODO: FizzBuzz 1-30\n        for (int i = 1; i <= 30; i++) {\n            if      (i % 15 == 0) System.out.println(\"FizzBuzz\");\n            else if (i % 3  == 0) System.out.println(\"Fizz\");\n            else if (i % 5  == 0) System.out.println(\"Buzz\");\n            else                  System.out.println(i);\n        }\n    }\n}",
+    "expectedOutput": ["1", "2", "Fizz", "4", "Buzz", "Fizz", "7", "8", "Fizz", "Buzz", "11", "Fizz", "13", "14", "FizzBuzz"],
+    "codeChecks": [
+      { "pattern": "i\\s*%\\s*15\\s*==\\s*0|i%15==0", "required": true, "message": "Check % 15 first for FizzBuzz." },
+      { "pattern": "FizzBuzz", "required": true, "message": "Print 'FizzBuzz' for multiples of 15." }
+    ],
+    "successMessage": "FizzBuzz solved! The % 15 check must come before % 3 and % 5 — otherwise 15 would match Fizz first. Ordering conditions correctly is a fundamental programming skill. Chapter 6 done!"
+  }
+]

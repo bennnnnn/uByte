@@ -1,0 +1,68 @@
+[
+  {
+    "title": "Essential String methods",
+    "instruction": "String has a huge API. The ones you'll use every day:\n\n- `.length()` — character count\n- `.charAt(i)` — character at index i\n- `.toUpperCase()` / `.toLowerCase()`\n- `.trim()` — remove leading/trailing whitespace\n- `.contains(str)` — does it contain this substring?\n- `.startsWith(prefix)` / `.endsWith(suffix)`\n\nRun this.",
+    "starter": "public class Main {\n    public static void main(String[] args) {\n        String s = \"  Hello, Java!  \";\n\n        System.out.println(s.trim());\n        System.out.println(s.trim().length());\n        System.out.println(s.trim().toUpperCase());\n        System.out.println(s.trim().charAt(0));\n        System.out.println(s.contains(\"Java\"));\n        System.out.println(s.trim().startsWith(\"Hello\"));\n        System.out.println(s.trim().endsWith(\"!\"));\n    }\n}",
+    "expectedOutput": ["Hello, Java!", "12", "HELLO, JAVA!", "H", "true", "true", "true"],
+    "successMessage": "Method chaining: s.trim().toUpperCase() — trim first, then uppercase. Strings are immutable — each method returns a NEW string, never modifying the original."
+  },
+  {
+    "title": "substring and indexOf",
+    "instruction": "Extract parts of a string:\n\n- `.substring(start)` — from start to end\n- `.substring(start, end)` — from start up to (not including) end\n- `.indexOf(str)` — position of first match, -1 if not found\n- `.lastIndexOf(str)` — position of last match\n\nParse a date string into its parts.",
+    "hint": "date.substring(0, 4) for year, indexOf('-') for the separator position",
+    "starter": "public class Main {\n    public static void main(String[] args) {\n        String date = \"2024-03-15\";\n\n        String year  = date.substring(0, 4);\n        String month = date.substring(5, 7);\n        String day   = date.substring(8);\n\n        System.out.println(\"Year:  \" + year);\n        System.out.println(\"Month: \" + month);\n        System.out.println(\"Day:   \" + day);\n        System.out.println(\"Dash at: \" + date.indexOf('-'));\n    }\n}",
+    "expectedOutput": ["Year:  2024", "Month: 03", "Day:   15", "Dash at: 4"],
+    "successMessage": "substring(0, 4) — start inclusive, end exclusive. indexOf('-') returns 4 — the position of the first dash. These two methods together parse almost any fixed-format string."
+  },
+  {
+    "title": "replace and split",
+    "instruction": "- `.replace(old, new)` — replace all occurrences (strings)\n- `.replaceAll(regex, new)` — replace with regex pattern\n- `.split(delimiter)` — split into array\n\nParse a CSV line and clean up a message.",
+    "starter": "public class Main {\n    public static void main(String[] args) {\n        // Replace:\n        String msg = \"Java is hard. Java takes time.\";\n        System.out.println(msg.replace(\"Java\", \"Learning Java\"));\n\n        // Split CSV:\n        String csv = \"Alice,Bob,Carol,David\";\n        String[] names = csv.split(\",\");\n        System.out.println(names.length);\n        for (String name : names) {\n            System.out.println(name);\n        }\n    }\n}",
+    "expectedOutput": ["Learning Java is hard. Learning Java takes time.", "4", "Alice", "Bob", "Carol", "David"],
+    "successMessage": "replace() swaps all occurrences. split() returns a String array — you can then iterate with for-each. CSV parsing is one of the most common real-world string tasks."
+  },
+  {
+    "title": "String.format — clean formatting",
+    "instruction": "`String.format()` is like printf from C — use placeholders:\n\n- `%s` — String\n- `%d` — integer\n- `%f` — floating point\n- `%.2f` — float with 2 decimal places\n- `%n` — newline\n\nFormat a product receipt.",
+    "hint": "String.format(\"%-12s $%6.2f\", name, price) for aligned columns",
+    "starter": "public class Main {\n    public static void main(String[] args) {\n        String name = \"Alex\";\n        int age = 25;\n        double score = 87.456;\n\n        // Basic formatting:\n        System.out.println(String.format(\"Name: %s, Age: %d\", name, age));\n        System.out.println(String.format(\"Score: %.1f\", score));\n\n        // Aligned table:\n        System.out.println(String.format(\"%-10s %6s\", \"Item\", \"Price\"));\n        System.out.println(String.format(\"%-10s %6.2f\", \"Coffee\", 3.50));\n        System.out.println(String.format(\"%-10s %6.2f\", \"Sandwich\", 7.25));\n    }\n}",
+    "expectedOutput": ["Name: Alex, Age: 25", "Score: 87.5", "Item        Price", "Coffee        3.50", "Sandwich      7.25"],
+    "successMessage": "String.format is powerful for alignment. %-10s = left-align in 10 chars. %6.2f = right-align in 6 chars, 2 decimal places. This is how reports and log output are formatted."
+  },
+  {
+    "title": "equals vs == — the critical distinction",
+    "instruction": "This is Java's most common beginner trap:\n\n- `==` compares **references** (are they the same object in memory?)\n- `.equals()` compares **content** (do they contain the same characters?)\n\nAlways use `.equals()` for strings. Always.",
+    "starter": "public class Main {\n    public static void main(String[] args) {\n        String a = new String(\"hello\");  // explicitly creates a new object\n        String b = new String(\"hello\");  // another new object\n        String c = \"hello\";              // from string pool\n        String d = \"hello\";              // same pool entry\n\n        System.out.println(a == b);       // false — different objects\n        System.out.println(a.equals(b));  // true  — same content\n        System.out.println(c == d);       // true  — same pool object (implementation detail!)\n        System.out.println(a.equals(c));  // true  — same content\n\n        // Case-insensitive comparison:\n        System.out.println(\"HELLO\".equalsIgnoreCase(\"hello\"));\n    }\n}",
+    "expectedOutput": ["false", "true", "true", "true", "true"],
+    "successMessage": "== is wrong for strings — don't use it. .equals() compares content and is always correct. .equalsIgnoreCase() for case-insensitive checks. This rule saves you from mysterious bugs."
+  },
+  {
+    "title": "StringBuilder — efficient string building",
+    "instruction": "Strings are immutable — `s = s + \"more\"` creates a new String object each time. In a loop this is slow and wasteful.\n\n`StringBuilder` is mutable — `.append()` modifies it in place:\n\n```java\nStringBuilder sb = new StringBuilder();\nsb.append(\"Hello\");\nsb.append(\", World\");\nString result = sb.toString();\n```\n\nBuild a comma-separated list using StringBuilder.",
+    "hint": "StringBuilder sb = new StringBuilder(); for each item: sb.append(item); if not last, sb.append(\", \");",
+    "starter": "public class Main {\n    public static void main(String[] args) {\n        String[] fruits = {\"Apple\", \"Banana\", \"Cherry\", \"Date\"};\n\n        // BAD way (creates many String objects):\n        // String result = \"\";\n        // for (String f : fruits) result += f + \", \";\n\n        // GOOD way with StringBuilder:\n        StringBuilder sb = new StringBuilder();\n        for (int i = 0; i < fruits.length; i++) {\n            sb.append(fruits[i]);\n            if (i < fruits.length - 1) sb.append(\", \");\n        }\n        System.out.println(sb.toString());\n        System.out.println(\"Length: \" + sb.length());\n    }\n}",
+    "expectedOutput": ["Apple, Banana, Cherry, Date", "Length: 27"],
+    "successMessage": "StringBuilder appends in-place — no new objects created each iteration. For 1000 items, StringBuilder is orders of magnitude faster than string concatenation in a loop."
+  },
+  {
+    "title": "StringBuilder methods",
+    "instruction": "`StringBuilder` has more than just append:\n\n- `.insert(index, str)` — insert at position\n- `.delete(start, end)` — remove range\n- `.reverse()` — reverse the string\n- `.replace(start, end, str)` — replace range\n\nBuild and manipulate a greeting.",
+    "starter": "public class Main {\n    public static void main(String[] args) {\n        StringBuilder sb = new StringBuilder(\"Hello World\");\n        System.out.println(sb);\n\n        sb.insert(5, \",\");           // insert comma after Hello\n        System.out.println(sb);\n\n        sb.replace(7, 12, \"Java\");  // replace World with Java\n        System.out.println(sb);\n\n        sb.append(\"!\");\n        System.out.println(sb);\n\n        System.out.println(new StringBuilder(\"racecar\").reverse());\n    }\n}",
+    "expectedOutput": ["Hello World", "Hello, World", "Hello, Java!", "Hello, Java!!", "racecar"],
+    "successMessage": "StringBuilder is mutable — each operation modifies the same object. reverse() is often used in interview problems. reverse().toString().equals(original) checks if something is a palindrome."
+  },
+  {
+    "title": "Build a password validator",
+    "instruction": "Final challenge — no starter code.\n\nWrite a `validatePassword(String pwd)` method that checks:\n- At least 8 characters: `pwd.length() >= 8`\n- Contains a digit: loop with `Character.isDigit(pwd.charAt(i))`\n- Contains uppercase: `Character.isUpperCase(pwd.charAt(i))`\n- Contains lowercase: `Character.isLowerCase(pwd.charAt(i))`\n\nPrint a report for three passwords: `\"hello\"`, `\"Hello123\"`, `\"P@ssword1\"`.",
+    "hint": "Use a for loop with charAt(i) and Character.isDigit/isUpperCase/isLowerCase.",
+    "starter": "",
+    "expectedOutput": [],
+    "codeChecks": [
+      { "pattern": "validatePassword|void validate|boolean validate", "required": true, "message": "Define a validatePassword method." },
+      { "pattern": "pwd\\.length\\(\\)|password\\.length\\(\\)", "required": true, "message": "Check the password length." },
+      { "pattern": "Character\\.isDigit|Character\\.isUpperCase|Character\\.isLowerCase", "required": true, "message": "Use Character.isDigit/isUpperCase/isLowerCase." },
+      { "pattern": "charAt\\(", "required": true, "message": "Use charAt(i) to check each character." }
+    ],
+    "successMessage": "A password validator using String and Character methods! charAt, isDigit, isUpperCase — this is how every sign-up form validates passwords. Chapter 4 done!"
+  }
+]

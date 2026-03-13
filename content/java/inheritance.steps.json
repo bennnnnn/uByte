@@ -1,0 +1,61 @@
+[
+  {
+    "title": "extends — inherit everything",
+    "instruction": "`class Child extends Parent` gives Child all of Parent's fields and methods for free.\n\nRun this — `AdminUser` gets `greet()` from `User` without writing it.",
+    "starter": "class User {\n    protected String name;\n    protected String email;\n\n    User(String name, String email) {\n        this.name = name;\n        this.email = email;\n    }\n\n    String greet() {\n        return \"Hi, I'm \" + name;\n    }\n}\n\nclass AdminUser extends User {\n    private String department;\n\n    AdminUser(String name, String email, String department) {\n        super(name, email);  // MUST call parent constructor first\n        this.department = department;\n    }\n\n    String deletePost(int postId) {\n        return name + \" deleted post \" + postId;\n    }\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        AdminUser admin = new AdminUser(\"Alex\", \"alex@example.com\", \"Engineering\");\n        System.out.println(admin.greet());          // inherited!\n        System.out.println(admin.deletePost(42));   // own method\n        System.out.println(admin.name);             // inherited field\n    }\n}",
+    "expectedOutput": ["Hi, I'm Alex", "Alex deleted post 42", "Alex"],
+    "successMessage": "admin.greet() works even though AdminUser never defined it — inherited from User. super(name, email) calls User's constructor to set up the inherited fields."
+  },
+  {
+    "title": "super() — parent constructor",
+    "instruction": "When a child class defines its own constructor, it **must** call `super(...)` as the first statement.\n\nThis ensures the parent class gets to initialise its own fields.",
+    "hint": "AdminUser constructor: super(name, email); this.permissions = permissions;",
+    "starter": "class User {\n    private String name;\n    private String email;\n\n    User(String name, String email) {\n        this.name = name;\n        this.email = email;\n    }\n\n    String getName()  { return name; }\n    String getEmail() { return email; }\n}\n\nclass AdminUser extends User {\n    private String[] permissions;\n\n    // TODO: add constructor that calls super(name, email) and sets permissions\n    AdminUser(String name, String email, String[] permissions) {\n        super(name, email);\n        this.permissions = permissions;\n    }\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        AdminUser admin = new AdminUser(\"Alex\", \"alex@example.com\",\n            new String[]{\"delete\", \"ban\", \"edit\"});\n        System.out.println(admin.getName());\n        System.out.println(admin.getEmail());\n        System.out.println(admin.permissions.length);\n    }\n}",
+    "expectedOutput": ["Alex", "alex@example.com", "3"],
+    "codeChecks": [
+      { "pattern": "super\\(name,\\s*email\\)", "required": true, "message": "Call super(name, email) first in the constructor." },
+      { "pattern": "this\\.permissions\\s*=\\s*permissions", "required": true, "message": "Set this.permissions = permissions;" }
+    ],
+    "successMessage": "super(name, email) initialises User's name and email fields. Then this.permissions = permissions adds what AdminUser needs. If you forget super(), Java complains immediately."
+  },
+  {
+    "title": "@Override — replace the parent method",
+    "instruction": "`@Override` replaces a parent method with a new implementation.\n\nUse `super.method()` to call the parent's version alongside your override.\n\n`@Override` is optional but critical — it tells Java and your IDE that you mean to override.",
+    "hint": "@Override\nString greet() { return super.greet() + \" (Admin)\"; }",
+    "starter": "class User {\n    protected String name;\n    User(String name) { this.name = name; }\n    String greet()    { return \"Hi, I'm \" + name; }\n    String describe() { return \"User: \" + name; }\n}\n\nclass AdminUser extends User {\n    AdminUser(String name) { super(name); }\n\n    // TODO: override greet() to append \" (Admin)\" using super.greet()\n    @Override\n    String greet() {\n        return super.greet() + \" (Admin)\";\n    }\n\n    @Override\n    String describe() {\n        return \"Admin User: \" + name;\n    }\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        User    user  = new User(\"Alice\");\n        AdminUser admin = new AdminUser(\"Bob\");\n\n        System.out.println(user.greet());\n        System.out.println(admin.greet());\n        System.out.println(admin.describe());\n    }\n}",
+    "expectedOutput": ["Hi, I'm Alice", "Hi, I'm Bob (Admin)", "Admin User: Bob"],
+    "codeChecks": [
+      { "pattern": "@Override", "required": true, "message": "Add @Override annotation before the overridden method." },
+      { "pattern": "super\\.greet\\(\\)", "required": true, "message": "Call super.greet() in the override." }
+    ],
+    "successMessage": "super.greet() calls User's version, then ' (Admin)' is appended. @Override is technically optional — but without it, a typo (grret vs greet) creates a new method instead of overriding."
+  },
+  {
+    "title": "instanceof and casting",
+    "instruction": "`instanceof` checks if an object is of a given type — including parent types.\n\nWith pattern matching (Java 16+): `if (obj instanceof AdminUser admin)` — check AND cast in one step.",
+    "starter": "class Animal { String name; Animal(String n){ name=n; } }\nclass Dog extends Animal { void bark(){ System.out.println(name+\" barks!\"); } Dog(String n){ super(n); } }\nclass Cat extends Animal { void meow(){ System.out.println(name+\" meows!\"); } Cat(String n){ super(n); } }\n\npublic class Main {\n    public static void main(String[] args) {\n        Animal[] animals = {\n            new Dog(\"Rex\"),\n            new Cat(\"Whiskers\"),\n            new Dog(\"Buddy\")\n        };\n\n        for (Animal a : animals) {\n            if (a instanceof Dog d) {\n                d.bark();  // d is already a Dog — no cast needed!\n            } else if (a instanceof Cat c) {\n                c.meow();\n            }\n\n            System.out.println(a.name + \" instanceof Animal: \" + (a instanceof Animal));\n        }\n    }\n}",
+    "expectedOutput": ["Rex barks!", "Rex instanceof Animal: true", "Whiskers meows!", "Whiskers instanceof Animal: true", "Buddy barks!", "Buddy instanceof Animal: true"],
+    "successMessage": "instanceof Animal is true for both Dog and Cat — they extend Animal. Pattern matching (instanceof Dog d) checks and casts in one step — Java 16+. No explicit (Dog) cast needed."
+  },
+  {
+    "title": "final and abstract classes",
+    "instruction": "- `final class` — cannot be extended (String is final!)\n- `abstract class` — cannot be instantiated directly; must be extended\n\n`abstract` methods have no body — subclasses MUST implement them.",
+    "starter": "abstract class Shape {\n    abstract double area();   // subclasses MUST implement\n    abstract double perimeter();\n\n    // Non-abstract method — shared by all shapes:\n    String describe() {\n        return String.format(\"%s: area=%.2f, perimeter=%.2f\",\n            getClass().getSimpleName(), area(), perimeter());\n    }\n}\n\nclass Circle extends Shape {\n    private double radius;\n    Circle(double r) { radius = r; }\n    @Override double area()      { return Math.PI * radius * radius; }\n    @Override double perimeter() { return 2 * Math.PI * radius; }\n}\n\nclass Rectangle extends Shape {\n    private double w, h;\n    Rectangle(double w, double h) { this.w=w; this.h=h; }\n    @Override double area()      { return w * h; }\n    @Override double perimeter() { return 2 * (w + h); }\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        Shape[] shapes = {new Circle(5), new Rectangle(4, 6)};\n        for (Shape s : shapes) System.out.println(s.describe());\n    }\n}",
+    "expectedOutput": ["Circle: area=78.54, perimeter=31.42", "Rectangle: area=24.00, perimeter=20.00"],
+    "successMessage": "Abstract class + abstract methods = guaranteed implementation in subclasses. You cannot do new Shape() — it forces you to create a concrete subclass. Shape.describe() is shared without rewriting."
+  },
+  {
+    "title": "Build a vehicle hierarchy",
+    "instruction": "Final challenge — no starter code.\n\nBuild this hierarchy:\n- `abstract class Vehicle(String make, String model, int year)` — abstract `fuelType()` and `describe()` methods\n- `class Car extends Vehicle` — fuelType() = \"gasoline\"\n- `class ElectricCar extends Car` — fuelType() = \"electric\", adds `batteryRange` field\n- `class Truck extends Vehicle` — fuelType() = \"diesel\", adds `payload` field\n\nCreate one of each. Use instanceof to identify each type. Print all their descriptions.",
+    "hint": "abstract class Vehicle { abstract String fuelType(); String describe() { return make + \" \" + model + \" (\" + year + \") — \" + fuelType(); } }",
+    "starter": "",
+    "expectedOutput": [],
+    "codeChecks": [
+      { "pattern": "abstract class Vehicle", "required": true, "message": "Define abstract class Vehicle." },
+      { "pattern": "class Car\\s+extends\\s+Vehicle|class Car extends Vehicle", "required": true, "message": "class Car extends Vehicle" },
+      { "pattern": "class ElectricCar\\s+extends\\s+Car|class ElectricCar extends Car", "required": true, "message": "class ElectricCar extends Car" },
+      { "pattern": "instanceof", "required": true, "message": "Use instanceof to identify types." }
+    ],
+    "successMessage": "A complete vehicle hierarchy — abstract base, concrete subclasses, instanceof checks. This is how real domain models are structured in enterprise Java. Chapter 11 done!"
+  }
+]

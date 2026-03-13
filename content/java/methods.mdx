@@ -1,56 +1,14 @@
 ---
-title: "Instance Methods and Overloading in Java"
-description: "Add behavior to classes with instance methods and overload methods by signature."
-order: 11
+title: "Methods"
+description: "Define and call methods, parameters, return types, method overloading, varargs, recursion, and static vs instance methods."
+order: 8
 difficulty: "beginner"
-estimatedMinutes: 12
+estimatedMinutes: 20
+concepts: ["method declaration", "parameters", "return type", "void", "overloading", "varargs", "static", "recursion", "scope"]
 ---
 
-## Concepts in this chapter
+## Don't repeat yourself
 
-You will learn and practice:
+Methods let you name a piece of logic and reuse it anywhere. Write once, call everywhere. Change it in one place and it updates everywhere it's used.
 
-- **Instance methods** — non-static; called on an object; can use this
-- **Static methods** — belong to the class; no this
-- **Overloading** — same method name, different parameter list
-- **Method calls** — object.method() and Class.staticMethod()
-
----
-
-## Instance vs Static
-
-```java
-public class Counter {
-    private int count = 0;
-
-    public void increment() {
-        count++;
-    }
-    public int getCount() {
-        return count;
-    }
-}
-
-Counter c = new Counter();
-c.increment();
-c.increment();
-System.out.println(c.getCount());  // 2
-```
-
----
-
-## Overloading
-
-Same name, different parameters (count or types):
-
-```java
-public void print(int x) { System.out.println(x); }
-public void print(String s) { System.out.println(s); }
-public void print(int a, int b) { System.out.println(a + ", " + b); }
-```
-
----
-
-## What's Next?
-
-Next: **Interfaces and Abstract Classes** — contracts and polymorphism.
+Java methods are inside classes — always. The `static` keyword means they belong to the class itself, not to an instance. You'll understand the non-static case deeply in Chapter 9.

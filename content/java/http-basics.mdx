@@ -1,43 +1,14 @@
 ---
-title: "HTTP and HttpClient in Java"
-description: "Make HTTP GET and POST requests using java.net.http.HttpClient (Java 11+)."
-order: 17
-difficulty: "intermediate"
-estimatedMinutes: 12
+title: "HTTP & JSON"
+description: "Make HTTP requests with Java's built-in HttpClient, parse JSON responses, build REST clients, and handle async HTTP."
+order: 21
+difficulty: "advanced"
+estimatedMinutes: 22
+concepts: ["HttpClient", "HttpRequest", "HttpResponse", "GET", "POST", "headers", "JSON parsing", "ObjectMapper concept", "async requests", "CompletableFuture"]
 ---
 
-## Concepts in this chapter
+## Connect to the world
 
-You will learn and practice:
+Java 11+ ships with `java.net.http.HttpClient` — a modern, async-capable HTTP client with no external dependencies.
 
-- **HttpClient** — create with HttpClient.newHttpClient()
-- **HttpRequest** — GET, URI, build()
-- **HttpResponse** — body(), statusCode()
-- **Async** — sendAsync for non-blocking requests
-- **Headers** — add headers to requests
-
----
-
-## Simple GET
-
-```java
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-
-HttpClient client = HttpClient.newHttpClient();
-HttpRequest request = HttpRequest.newBuilder()
-    .uri(URI.create("https://example.com"))
-    .GET()
-    .build();
-HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-System.out.println(response.statusCode());
-System.out.println(response.body().substring(0, 50));
-```
-
----
-
-## What's Next?
-
-Next: **JSON with Gson/Jackson** — parse and generate JSON.
+Combined with JSON parsing, you can build REST clients, call APIs, and integrate with any web service — all in standard Java.

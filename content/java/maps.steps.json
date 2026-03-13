@@ -1,0 +1,60 @@
+[
+  {
+    "title": "ArrayList — dynamic arrays",
+    "instruction": "Unlike arrays, `ArrayList` grows automatically. It implements the `List` interface.\n\n```java\nList<String> names = new ArrayList<>();\nnames.add(\"Alice\");\nnames.get(0);       // \"Alice\"\nnames.size();       // 1\n```\n\nRun this — build a list and manipulate it.",
+    "starter": "import java.util.ArrayList;\nimport java.util.Collections;\nimport java.util.List;\n\npublic class Main {\n    public static void main(String[] args) {\n        List<String> fruits = new ArrayList<>();\n        fruits.add(\"Banana\");\n        fruits.add(\"Apple\");\n        fruits.add(\"Cherry\");\n        fruits.add(\"Date\");\n\n        System.out.println(fruits);\n        System.out.println(\"Size: \" + fruits.size());\n        System.out.println(\"Index 1: \" + fruits.get(1));\n\n        fruits.remove(\"Banana\");\n        Collections.sort(fruits);\n        System.out.println(fruits);\n\n        System.out.println(\"Contains Cherry: \" + fruits.contains(\"Cherry\"));\n    }\n}",
+    "expectedOutput": ["[Banana, Apple, Cherry, Date]", "Size: 4", "Index 1: Apple", "[Apple, Cherry, Date]", "Contains Cherry: true"],
+    "successMessage": "ArrayList prints like [a, b, c]. Collections.sort() sorts in place. .contains() is O(n) — linear search. For fast contains checks, use HashSet instead."
+  },
+  {
+    "title": "HashMap — key-value pairs",
+    "instruction": "`HashMap<K, V>` maps keys to values with O(1) average lookup:\n\n```java\nMap<String, Integer> ages = new HashMap<>();\nages.put(\"Alice\", 25);\nages.get(\"Alice\");           // 25\nages.getOrDefault(\"Bob\", 0); // 0 if key not found\n```",
+    "hint": "Iterate entries with: for (Map.Entry<String, Integer> entry : map.entrySet())",
+    "starter": "import java.util.HashMap;\nimport java.util.Map;\n\npublic class Main {\n    public static void main(String[] args) {\n        Map<String, Integer> scores = new HashMap<>();\n        scores.put(\"Alice\", 88);\n        scores.put(\"Bob\",   72);\n        scores.put(\"Carol\", 95);\n        scores.put(\"David\", 80);\n\n        System.out.println(scores.get(\"Carol\"));\n        System.out.println(scores.getOrDefault(\"Eve\", 0));\n        System.out.println(scores.containsKey(\"Bob\"));\n\n        // Update — put with same key replaces:\n        scores.put(\"Bob\", 85);\n        System.out.println(\"Bob updated: \" + scores.get(\"Bob\"));\n\n        // Iterate all entries:\n        for (Map.Entry<String, Integer> e : scores.entrySet()) {\n            System.out.println(e.getKey() + \": \" + e.getValue());\n        }\n    }\n}",
+    "expectedOutput": ["95", "0", "true", "Bob updated: 85"],
+    "successMessage": "getOrDefault prevents NullPointerException when a key is missing. entrySet() gives you both key and value per entry. HashMap order is not guaranteed — use LinkedHashMap for insertion order, TreeMap for sorted order."
+  },
+  {
+    "title": "HashSet — unique items only",
+    "instruction": "`HashSet<T>` stores unique items with O(1) average `contains()`.\n\nPerfect for: deduplication, membership testing, set operations.\n\nRemove duplicates from a list using a HashSet.",
+    "hint": "new HashSet<>(list) deduplicates the list in one step.",
+    "starter": "import java.util.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        List<Integer> numbers = new ArrayList<>(Arrays.asList(3, 1, 4, 1, 5, 9, 2, 6, 5, 3, 5));\n        System.out.println(\"With duplicates: \" + numbers);\n        System.out.println(\"Size: \" + numbers.size());\n\n        // Deduplicate using HashSet:\n        Set<Integer> unique = new HashSet<>(numbers);\n        System.out.println(\"Unique count: \" + unique.size());\n\n        // Set operations:\n        Set<String> a = new HashSet<>(Arrays.asList(\"Java\", \"Python\", \"Go\"));\n        Set<String> b = new HashSet<>(Arrays.asList(\"Python\", \"Rust\",   \"Go\"));\n\n        Set<String> intersection = new HashSet<>(a);\n        intersection.retainAll(b);\n        System.out.println(\"Both know: \" + intersection);\n    }\n}",
+    "expectedOutput": ["With duplicates: [3, 1, 4, 1, 5, 9, 2, 6, 5, 3, 5]", "Size: 11", "Unique count: 7", "Both know: [Python, Go]"],
+    "successMessage": "new HashSet<>(list) deduplicates in one step. retainAll = intersection. removeAll = difference. addAll = union. These set operations are used in data analysis and permission systems."
+  },
+  {
+    "title": "TreeMap — sorted keys",
+    "instruction": "`TreeMap` keeps keys sorted (ascending by default). Use it when iteration order matters.\n\nUnlike HashMap (O(1)), TreeMap is O(log n) — worth it when you need sorted output.",
+    "starter": "import java.util.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        // Word frequency counter — TreeMap sorts words alphabetically:\n        String text = \"the quick brown fox jumps over the lazy dog the fox\";\n        Map<String, Integer> freq = new TreeMap<>();\n\n        for (String word : text.split(\" \")) {\n            freq.put(word, freq.getOrDefault(word, 0) + 1);\n        }\n\n        for (Map.Entry<String, Integer> e : freq.entrySet()) {\n            System.out.printf(\"%-10s: %d%n\", e.getKey(), e.getValue());\n        }\n    }\n}",
+    "expectedOutput": ["brown     : 1", "dog       : 1", "fox       : 2", "jumps     : 1", "lazy      : 1", "over      : 1", "quick     : 1", "the       : 3"],
+    "successMessage": "TreeMap output is alphabetically sorted — 'brown' before 'dog' before 'fox'. The frequency counter pattern (getOrDefault + put) is one of the most common interview and real-world patterns."
+  },
+  {
+    "title": "Queue and Deque",
+    "instruction": "`Queue` = FIFO (first in, first out). `Deque` = double-ended queue.\n\n- `offer(item)` — add to tail\n- `poll()` — remove from head (null if empty)\n- `peek()` — view head without removing\n\nUse `ArrayDeque` as the implementation — faster than LinkedList.",
+    "starter": "import java.util.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        // Queue: first in, first out (ticket queue!)\n        Queue<String> ticketQueue = new ArrayDeque<>();\n        ticketQueue.offer(\"Alice\");\n        ticketQueue.offer(\"Bob\");\n        ticketQueue.offer(\"Carol\");\n\n        System.out.println(\"Queue: \" + ticketQueue);\n        System.out.println(\"Serving: \" + ticketQueue.poll());\n        System.out.println(\"Serving: \" + ticketQueue.poll());\n        System.out.println(\"Next: \" + ticketQueue.peek());\n        System.out.println(\"Queue: \" + ticketQueue);\n\n        // Stack: last in, first out (using Deque as stack)\n        Deque<Integer> stack = new ArrayDeque<>();\n        stack.push(1); stack.push(2); stack.push(3);\n        System.out.println(\"Stack top: \" + stack.peek());\n        System.out.println(\"Pop: \" + stack.pop());\n    }\n}",
+    "expectedOutput": ["Queue: [Alice, Bob, Carol]", "Serving: Alice", "Serving: Bob", "Next: Carol", "Queue: [Carol]", "Stack top: 3", "Pop: 3"],
+    "successMessage": "Queue serves Alice first (FIFO). Stack pops 3 first (LIFO). Use ArrayDeque for both — it's faster than LinkedList and the recommended choice for Java stacks and queues."
+  },
+  {
+    "title": "Collections utility methods",
+    "instruction": "`java.util.Collections` has powerful utilities:\n\n- `Collections.sort(list)` — sort\n- `Collections.reverse(list)` — reverse in place\n- `Collections.shuffle(list)` — randomise\n- `Collections.min(list)` / `max(list)`\n- `Collections.frequency(list, value)` — count occurrences\n- `Collections.unmodifiableList(list)` — read-only view",
+    "starter": "import java.util.*;\n\npublic class Main {\n    public static void main(String[] args) {\n        List<Integer> numbers = new ArrayList<>(Arrays.asList(5, 2, 8, 1, 9, 3, 7, 4, 6));\n\n        System.out.println(Collections.min(numbers));\n        System.out.println(Collections.max(numbers));\n\n        Collections.sort(numbers);\n        System.out.println(numbers);\n\n        Collections.reverse(numbers);\n        System.out.println(numbers);\n\n        List<Integer> items = Arrays.asList(1, 2, 2, 3, 2, 4);\n        System.out.println(\"Freq of 2: \" + Collections.frequency(items, 2));\n    }\n}",
+    "expectedOutput": ["1", "9", "[1, 2, 3, 4, 5, 6, 7, 8, 9]", "[9, 8, 7, 6, 5, 4, 3, 2, 1]", "Freq of 2: 3"],
+    "successMessage": "Collections has 30+ utility methods. These are the foundation — you'll use sort, min, max, and frequency constantly. All work with any Collection (List, Queue, etc.)."
+  },
+  {
+    "title": "Build an inventory manager",
+    "instruction": "Final challenge — no starter code.\n\nBuild an `InventoryManager` using collections:\n- `Map<String, Integer> stock` — product name to quantity\n- `addProduct(String name, int qty)` — adds or increases stock\n- `sellProduct(String name, int qty)` — reduces stock, throws if insufficient\n- `getLowStock(int threshold)` — returns `List<String>` of products with stock <= threshold\n- `printAll()` — sorted alphabetically by product name\n\nTest with at least 5 products.",
+    "hint": "Use TreeMap for automatic alphabetical order. getLowStock uses entrySet() and returns a filtered list.",
+    "starter": "",
+    "expectedOutput": [],
+    "codeChecks": [
+      { "pattern": "class InventoryManager|Map<String, Integer>|TreeMap|HashMap", "required": true, "message": "Use a Map<String, Integer> for stock." },
+      { "pattern": "addProduct|put\\(|merge\\(", "required": true, "message": "Implement addProduct." },
+      { "pattern": "sellProduct|getOrDefault", "required": true, "message": "Implement sellProduct." },
+      { "pattern": "getLowStock|threshold", "required": true, "message": "Implement getLowStock with threshold." }
+    ],
+    "successMessage": "A real inventory system built entirely with Java collections. TreeMap keeps it sorted for free. getLowStock is O(n) — checking every product. Chapter 16 done!"
+  }
+]

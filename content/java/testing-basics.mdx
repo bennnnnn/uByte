@@ -1,46 +1,14 @@
 ---
-title: "Testing in Java with JUnit"
-description: "Write and run unit tests with JUnit 5 (Jupiter)."
-order: 16
+title: "Generics"
+description: "Write type-safe reusable code with generics — generic classes, methods, bounded types, wildcards, and the Collections API."
+order: 14
 difficulty: "intermediate"
-estimatedMinutes: 12
+estimatedMinutes: 20
+concepts: ["generics", "<T>", "type parameters", "bounded types", "wildcards", "? extends", "? super", "generic methods", "type erasure"]
 ---
 
-## Concepts in this chapter
+## One class, any type
 
-You will learn and practice:
+Before generics, Java collections held `Object` — you'd put a `String` in, take an `Object` out, and cast it manually. Casting failed at runtime with cryptic errors.
 
-- **JUnit 5** — @Test, assertions (assertEquals, assertTrue)
-- **Test class** — public class with public void test methods
-- **Assertions** — assertEquals(expected, actual), assertTrue(condition)
-- **Running tests** — IDE or mvn test / gradle test
-
----
-
-## Simple Test
-
-```java
-import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
-public class CalculatorTest {
-    @Test
-    void add() {
-        assertEquals(5, 2 + 3);
-    }
-}
-```
-
----
-
-## Assertions
-
-- **assertEquals(expected, actual)** — must be equal
-- **assertTrue(boolean)** — condition is true
-- **assertThrows** — expect an exception
-
----
-
-## What's Next?
-
-Next: **HTTP and HttpClient** — make HTTP requests in Java.
+Generics move those errors to compile time. `List<String>` can only hold Strings — the compiler rejects anything else.

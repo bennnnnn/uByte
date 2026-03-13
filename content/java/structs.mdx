@@ -1,53 +1,14 @@
 ---
-title: "Classes and Objects in Java"
-description: "Define classes, create objects, and use constructors and fields."
-order: 10
+title: "Classes & Objects"
+description: "Create classes, constructors, instance fields, methods, this keyword, and the difference between classes and objects."
+order: 9
 difficulty: "beginner"
-estimatedMinutes: 15
+estimatedMinutes: 22
+concepts: ["class", "object", "constructor", "instance variables", "instance methods", "this", "new", "toString", "getters", "setters"]
 ---
 
-## Concepts in this chapter
+## Build your own types
 
-You will learn and practice:
+So far you've used Java's built-in types: `int`, `String`, `double`. Classes let you create YOUR OWN types — `BankAccount`, `Student`, `Product`.
 
-- **Class definition** — fields and methods
-- **Constructors** — same name as class; no return type
-- **new** — create an object; reference type
-- **Encapsulation** — private fields, public getters/setters
-- **this** — refer to the current object
-
----
-
-## Simple Class
-
-```java
-public class Person {
-    private String name;
-    private int age;
-
-    public Person(String name, int age) {
-        this.name = name;
-        this.age = age;
-    }
-
-    public String getName() { return name; }
-    public int getAge() { return age; }
-}
-
-// usage:
-Person p = new Person("Alice", 30);
-System.out.println(p.getName());
-```
-
----
-
-## Constructor and Fields
-
-- The constructor runs when you call `new Person(...)`.
-- `this.name` refers to the instance field (not the parameter).
-
----
-
-## What's Next?
-
-Next: **Methods and Overloading** — instance methods and method overloading.
+A class is a blueprint. An object is the thing you build from that blueprint. Every `String` you've used is an object built from Java's `String` class.

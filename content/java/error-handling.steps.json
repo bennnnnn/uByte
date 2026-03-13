@@ -1,0 +1,51 @@
+[
+  {
+    "title": "try / catch / finally",
+    "instruction": "When code might fail, wrap it in `try`. Catch specific exceptions in `catch`. `finally` runs ALWAYS — whether an exception happened or not.\n\nRun this — see what happens with a bad index and a good index.",
+    "starter": "public class Main {\n    public static void main(String[] args) {\n        String[] names = {\"Alice\", \"Bob\", \"Carol\"};\n\n        for (int i = 0; i <= 3; i++) {  // i=3 is out of bounds!\n            try {\n                System.out.println(\"Accessing index \" + i + \": \" + names[i]);\n            } catch (ArrayIndexOutOfBoundsException e) {\n                System.out.println(\"Error at \" + i + \": \" + e.getMessage());\n            } finally {\n                System.out.println(\"--- finally ran ---\");\n            }\n        }\n    }\n}",
+    "expectedOutput": ["Accessing index 0: Alice", "--- finally ran ---", "Accessing index 1: Bob", "--- finally ran ---", "Accessing index 2: Carol", "--- finally ran ---", "Error at 3: Index 3 out of bounds for length 3", "--- finally ran ---"],
+    "successMessage": "finally ran every single time — success or exception. Use finally for cleanup: closing files, database connections, network sockets. The new try-with-resources (coming in step 6) does this automatically."
+  },
+  {
+    "title": "Checked vs unchecked exceptions",
+    "instruction": "**Checked exceptions** (e.g. `IOException`, `SQLException`) — must be caught or declared with `throws`.\n**Unchecked exceptions** (e.g. `NullPointerException`, `IllegalArgumentException`) — no requirement to handle.\n\nThe hierarchy: `Throwable → Exception → RuntimeException (unchecked)`, `Exception (non-Runtime) = checked`.",
+    "starter": "import java.io.IOException;\n\npublic class Main {\n    // Declares it MIGHT throw IOException (checked) — caller must handle\n    static void readFile(String path) throws IOException {\n        if (!path.endsWith(\".txt\")) {\n            throw new IOException(\"Not a text file: \" + path);\n        }\n        System.out.println(\"Reading: \" + path);\n    }\n\n    // Unchecked — no 'throws' needed\n    static void process(String data) {\n        if (data == null) throw new IllegalArgumentException(\"Data cannot be null\");\n        System.out.println(\"Processing: \" + data);\n    }\n\n    public static void main(String[] args) {\n        try {\n            readFile(\"report.txt\");    // OK\n            readFile(\"config.xml\");   // throws\n        } catch (IOException e) {\n            System.out.println(\"IOException: \" + e.getMessage());\n        }\n\n        process(\"hello\");  // OK\n        try {\n            process(null);\n        } catch (IllegalArgumentException e) {\n            System.out.println(\"IllegalArgument: \" + e.getMessage());\n        }\n    }\n}",
+    "expectedOutput": ["Reading: report.txt", "IOException: Not a text file: config.xml", "Processing: hello", "IllegalArgument: Data cannot be null"],
+    "successMessage": "readFile declares 'throws IOException' — callers are forced to handle it at compile time. process throws IllegalArgumentException (unchecked) — callers can handle it or let it propagate."
+  },
+  {
+    "title": "Multi-catch",
+    "instruction": "Catch multiple exception types in one catch block with `|`:\n\n```java\ncatch (IOException | SQLException e) {\n    // handles both\n}\n```\n\nOr use multiple catch blocks for different handling. Catch from most specific to most general.",
+    "starter": "public class Main {\n    static int safeDivide(int a, int b) {\n        return a / b;  // throws ArithmeticException if b=0\n    }\n\n    static int parseAndDouble(String s) {\n        return Integer.parseInt(s) * 2;  // throws NumberFormatException\n    }\n\n    public static void main(String[] args) {\n        String[] inputs = {\"10\", \"abc\", \"5\", null};\n        int[] divisors  = {2, 0, 0, 3};\n\n        for (int i = 0; i < inputs.length; i++) {\n            try {\n                int parsed = parseAndDouble(inputs[i]);\n                int result = safeDivide(parsed, divisors[i]);\n                System.out.println(\"Result: \" + result);\n            } catch (NumberFormatException e) {\n                System.out.println(\"Bad number: \" + inputs[i]);\n            } catch (ArithmeticException e) {\n                System.out.println(\"Division by zero!\");\n            } catch (NullPointerException e) {\n                System.out.println(\"Null input!\");\n            }\n        }\n    }\n}",
+    "expectedOutput": ["Result: 10", "Bad number: abc", "Division by zero!", "Null input!"],
+    "successMessage": "Each exception type caught and handled differently. Order matters — put more specific exceptions first. Catching Exception at the end is a last resort catch-all."
+  },
+  {
+    "title": "Custom exception classes",
+    "instruction": "Create your own exception classes for domain-specific errors:\n\n```java\nclass InsufficientFundsException extends RuntimeException {\n    double shortfall;\n    InsufficientFundsException(double shortfall) {\n        super(\"Insufficient funds. Shortfall: $\" + shortfall);\n        this.shortfall = shortfall;\n    }\n}\n```",
+    "starter": "class InsufficientFundsException extends RuntimeException {\n    private final double shortfall;\n\n    InsufficientFundsException(double shortfall) {\n        super(String.format(\"Insufficient funds. Shortfall: $%.2f\", shortfall));\n        this.shortfall = shortfall;\n    }\n\n    double getShortfall() { return shortfall; }\n}\n\nclass BankAccount {\n    private double balance;\n    BankAccount(double bal) { balance = bal; }\n\n    void withdraw(double amount) {\n        if (amount > balance) throw new InsufficientFundsException(amount - balance);\n        balance -= amount;\n    }\n\n    double getBalance() { return balance; }\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        BankAccount acc = new BankAccount(100.0);\n\n        try {\n            acc.withdraw(50);\n            System.out.printf(\"Balance: $%.2f%n\", acc.getBalance());\n            acc.withdraw(200);  // throws\n        } catch (InsufficientFundsException e) {\n            System.out.println(e.getMessage());\n            System.out.printf(\"Shortfall: $%.2f%n\", e.getShortfall());\n        }\n    }\n}",
+    "expectedOutput": ["Balance: $50.00", "Insufficient funds. Shortfall: $150.00", "Shortfall: $150.00"],
+    "successMessage": "A custom exception with extra data (shortfall). The catch block can access e.getShortfall() — more information than a generic exception. Custom exceptions make error handling meaningful."
+  },
+  {
+    "title": "try-with-resources",
+    "instruction": "Resources like file handles and database connections MUST be closed — even if an exception occurs.\n\n`try-with-resources` automatically closes anything that implements `AutoCloseable`:\n\n```java\ntry (Connection conn = getConnection()) {\n    // conn is auto-closed when the block exits\n}\n```\n\nNo explicit finally needed.",
+    "starter": "class DatabaseConnection implements AutoCloseable {\n    private boolean open = true;\n\n    DatabaseConnection(String url) {\n        System.out.println(\"Connecting to: \" + url);\n    }\n\n    void query(String sql) {\n        if (!open) throw new IllegalStateException(\"Connection is closed\");\n        System.out.println(\"Executing: \" + sql);\n    }\n\n    @Override\n    public void close() {\n        open = false;\n        System.out.println(\"Connection closed.\");\n    }\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        // try-with-resources: close() is called automatically!\n        try (DatabaseConnection conn = new DatabaseConnection(\"jdbc:postgresql://localhost/db\")) {\n            conn.query(\"SELECT * FROM users\");\n            conn.query(\"SELECT * FROM orders\");\n        }  // conn.close() called here automatically\n\n        System.out.println(\"After try block.\");\n    }\n}",
+    "expectedOutput": ["Connecting to: jdbc:postgresql://localhost/db", "Executing: SELECT * FROM users", "Executing: SELECT * FROM orders", "Connection closed.", "After try block."],
+    "successMessage": "close() was called automatically — even without a finally block. This is AutoCloseable / try-with-resources. It's the correct way to handle files, database connections, and HTTP clients."
+  },
+  {
+    "title": "Build a robust input parser",
+    "instruction": "Final challenge — no starter code.\n\nWrite `parseAge(String input)` that:\n- Throws `NullPointerException` (with message \"Input cannot be null\") if input is null\n- Throws `NumberFormatException` if input isn't a number (Integer.parseInt does this automatically)\n- Throws `IllegalArgumentException` (with message \"Age must be 0-150\") if outside valid range\n- Returns the parsed age otherwise\n\nTest it with: `null`, `\"abc\"`, `\"-5\"`, `\"200\"`, `\"25\"`.",
+    "hint": "if (input == null) throw new NullPointerException(\"...\"); int age = Integer.parseInt(input); if (age < 0 || age > 150) throw new IllegalArgumentException(\"...\");",
+    "starter": "",
+    "expectedOutput": [],
+    "codeChecks": [
+      { "pattern": "parseAge\\(String|int parseAge|static.*parseAge", "required": true, "message": "Define parseAge(String input) method." },
+      { "pattern": "throw new NullPointerException|input == null|input != null", "required": true, "message": "Handle null input." },
+      { "pattern": "Integer\\.parseInt\\(input\\)", "required": true, "message": "Use Integer.parseInt(input)." },
+      { "pattern": "IllegalArgumentException|age < 0|age > 150", "required": true, "message": "Validate age range 0-150." }
+    ],
+    "successMessage": "A validated input parser with meaningful error messages. Each failure mode is distinguishable. This is how production APIs validate user input. Chapter 15 done!"
+  }
+]

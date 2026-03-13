@@ -1,50 +1,14 @@
 ---
-title: "Streams and Lambdas in Java"
-description: "Use the Stream API and lambda expressions for functional-style operations on collections."
-order: 19
+title: "Polymorphism"
+description: "Method overriding, dynamic dispatch, upcasting and downcasting, and how polymorphism makes code flexible and extensible."
+order: 13
 difficulty: "intermediate"
-estimatedMinutes: 15
+estimatedMinutes: 18
+concepts: ["polymorphism", "dynamic dispatch", "method overriding", "upcasting", "downcasting", "ClassCastException", "abstract classes", "Open/Closed principle"]
 ---
 
-## Concepts in this chapter
+## One interface, many forms
 
-You will learn and practice:
+Polymorphism means "many forms". A `Shape` reference can point to a `Circle`, `Rectangle`, or `Triangle` — and calling `.area()` on any of them does the right thing automatically.
 
-- **Lambda** — (x) -> x * 2, (a, b) -> a + b
-- **Stream** — list.stream(), filter, map, collect
-- **filter** — keep elements matching a predicate
-- **map** — transform each element
-- **collect** — toList(), joining(), toMap()
-- **Method references** — String::valueOf, Integer::parseInt
-
----
-
-## Lambda and Stream
-
-```java
-import java.util.List;
-import java.util.stream.Collectors;
-
-List<Integer> nums = List.of(1, 2, 3, 4, 5);
-List<Integer> doubled = nums.stream()
-    .map(n -> n * 2)
-    .collect(Collectors.toList());
-
-List<Integer> evens = nums.stream()
-    .filter(n -> n % 2 == 0)
-    .collect(Collectors.toList());
-```
-
----
-
-## Method Reference
-
-```java
-list.stream().map(String::toUpperCase).collect(Collectors.toList());
-```
-
----
-
-## What's Next?
-
-You've completed the Java tutorial track. Try interview prep problems or another language!
+This is what makes large Java systems extensible — add a new `Shape` subclass and all existing code that works with `Shape` works with it too.

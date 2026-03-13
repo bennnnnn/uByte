@@ -1,55 +1,14 @@
 ---
-title: "Packages and Imports in Java"
-description: "Organize code into packages and import classes from other packages."
-order: 14
-difficulty: "beginner"
-estimatedMinutes: 10
+title: "Packages & Imports"
+description: "Organise code with packages, import statements, access modifiers in the context of packages, and Java module system basics."
+order: 18
+difficulty: "intermediate"
+estimatedMinutes: 15
+concepts: ["package", "import", "static import", "classpath", "access modifiers", "module-info", "java.util", "java.io", "java.net"]
 ---
 
-## Concepts in this chapter
+## Organisation at scale
 
-You will learn and practice:
+A `package` is a namespace — `com.company.project.model`. Without packages, every class name in the world would have to be unique. With packages, `User` in `com.myapp.model` doesn't conflict with `User` in `org.otherapp.model`.
 
-- **package** — declare at top of file; matches directory structure
-- **import** — use classes from java.util, java.io, or your own packages
-- **Static import** — import static for constants and static methods
-- **Fully qualified name** — use full name without import (e.g. java.util.ArrayList)
-
----
-
-## Package Declaration
-
-```java
-package com.example.app;
-
-public class Main {
-    public static void main(String[] args) {
-        System.out.println("Hello");
-    }
-}
-```
-
-File must live in `com/example/app/Main.java`.
-
----
-
-## Imports
-
-```java
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-
-// or single type
-import java.util.Scanner;
-
-// static import
-import static java.lang.Math.PI;
-import static java.lang.Math.sqrt;
-```
-
----
-
-## What's Next?
-
-Next: **Threads and Concurrency** — run code in parallel.
+Every real Java project has a package structure. Every IDE generates it automatically — but you should understand what it means.

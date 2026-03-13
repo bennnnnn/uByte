@@ -1,0 +1,74 @@
+[
+  {
+    "title": "Your first method",
+    "instruction": "A method has a return type, a name, parameters, and a body:\n\n```java\nstatic returnType methodName(paramType param) {\n    return value;\n}\n```\n\n`void` means it returns nothing. `static` means you can call it from `main` without creating an object.\n\nRun this — then notice how `greet` is called twice with different names.",
+    "starter": "public class Main {\n    static String greet(String name) {\n        return \"Hello, \" + name + \"!\";\n    }\n\n    static void printSeparator() {\n        System.out.println(\"----------\");\n    }\n\n    public static void main(String[] args) {\n        System.out.println(greet(\"Alice\"));\n        System.out.println(greet(\"Bob\"));\n        printSeparator();\n        System.out.println(greet(\"Carol\"));\n    }\n}",
+    "expectedOutput": ["Hello, Alice!", "Hello, Bob!", "----------", "Hello, Carol!"],
+    "successMessage": "One method, three calls. Change the format in greet() once and all three outputs update. This is why methods exist — eliminate duplication, centralise logic."
+  },
+  {
+    "title": "Parameters and return values",
+    "instruction": "Methods can take multiple parameters and return any type.\n\nWrite a `bmi(double weight, double height)` method that returns weight / (height * height).",
+    "hint": "static double bmi(double weight, double height) { return weight / (height * height); }",
+    "starter": "public class Main {\n    // TODO: write bmi(double weight, double height) that returns weight / (height * height)\n    static double bmi(double weight, double height) {\n        return weight / (height * height);\n    }\n\n    public static void main(String[] args) {\n        System.out.printf(\"BMI: %.1f%n\", bmi(70, 1.75));\n        System.out.printf(\"BMI: %.1f%n\", bmi(90, 1.80));\n    }\n}",
+    "expectedOutput": ["BMI: 22.9", "BMI: 27.8"],
+    "codeChecks": [
+      { "pattern": "static double bmi\\(", "required": true, "message": "Define: static double bmi(double weight, double height)" },
+      { "pattern": "weight\\s*/\\s*\\(height\\s*\\*\\s*height\\)|weight\\s*/\\s*height\\s*\\*\\s*height", "required": true, "message": "Return weight / (height * height)" }
+    ],
+    "successMessage": "22.9 and 27.8 — correct BMI values. The method takes two doubles, does the math, and returns a double. printf with %.1f formats to one decimal place."
+  },
+  {
+    "title": "Method overloading",
+    "instruction": "Overloading: multiple methods with the **same name** but different parameters.\n\nJava picks the right one based on the arguments you pass:\n\n```java\nstatic int add(int a, int b) { ... }\nstatic double add(double a, double b) { ... }\nstatic int add(int a, int b, int c) { ... }\n```\n\nRun this — Java chooses automatically.",
+    "starter": "public class Main {\n    static int add(int a, int b) {\n        return a + b;\n    }\n\n    static double add(double a, double b) {\n        return a + b;\n    }\n\n    static int add(int a, int b, int c) {\n        return a + b + c;\n    }\n\n    public static void main(String[] args) {\n        System.out.println(add(3, 4));          // int version\n        System.out.println(add(3.5, 4.5));      // double version\n        System.out.println(add(1, 2, 3));       // three-arg version\n    }\n}",
+    "expectedOutput": ["7", "8.0", "6"],
+    "successMessage": "Same name, three different implementations. Java picks based on argument types and count. Overloading is how print() in many libraries works — it accepts any type."
+  },
+  {
+    "title": "Varargs — variable argument count",
+    "instruction": "With `...` (varargs), a method accepts any number of arguments as an array:\n\n```java\nstatic int sum(int... numbers) {\n    // numbers is treated as int[]\n}\n```\n\nWrite a `sum` method that accepts any number of ints.",
+    "hint": "static int sum(int... nums) { int total = 0; for (int n : nums) total += n; return total; }",
+    "starter": "public class Main {\n    // TODO: write sum(int... numbers) — accepts any number of ints\n    static int sum(int... numbers) {\n        int total = 0;\n        for (int n : numbers) total += n;\n        return total;\n    }\n\n    public static void main(String[] args) {\n        System.out.println(sum(1, 2));\n        System.out.println(sum(1, 2, 3, 4));\n        System.out.println(sum(10, 20, 30, 40, 50));\n    }\n}",
+    "expectedOutput": ["3", "10", "150"],
+    "codeChecks": [
+      { "pattern": "int\\.\\.\\.\\s*\\w+|int\\s+\\.\\.\\.\\s*\\w+|int\\.\\.\\.", "required": true, "message": "Use varargs: int... numbers" }
+    ],
+    "successMessage": "Varargs turns the arguments into an array — iterate with for-each. Java's own System.out.printf uses varargs: printf(format, arg1, arg2, ...) — any number of args."
+  },
+  {
+    "title": "Early return",
+    "instruction": "Return as soon as you have the answer — no need to reach the end:\n\n```java\nstatic boolean isEven(int n) {\n    if (n % 2 == 0) return true;\n    return false; // or just: return n % 2 == 0;\n}\n```\n\nWrite `isPrime(int n)` that returns early when it finds a factor.",
+    "hint": "for (int i = 2; i * i <= n; i++) { if (n % i == 0) return false; } return true;",
+    "starter": "public class Main {\n    // TODO: write isPrime(int n) — return true if n is prime\n    static boolean isPrime(int n) {\n        if (n < 2) return false;\n        for (int i = 2; i * i <= n; i++) {\n            if (n % i == 0) return false;\n        }\n        return true;\n    }\n\n    public static void main(String[] args) {\n        int[] test = {1, 2, 7, 10, 13, 15, 17};\n        for (int n : test) {\n            System.out.println(n + \": \" + isPrime(n));\n        }\n    }\n}",
+    "expectedOutput": ["1: false", "2: true", "7: true", "10: false", "13: true", "15: false", "17: true"],
+    "codeChecks": [
+      { "pattern": "static boolean isPrime\\(int", "required": true, "message": "Define: static boolean isPrime(int n)" },
+      { "pattern": "return false", "required": true, "message": "Return false when a factor is found." },
+      { "pattern": "return true", "required": true, "message": "Return true at the end (no factors found)." }
+    ],
+    "successMessage": "i * i <= n is the key optimisation — you only need to check up to the square root. If no factor found up to √n, n is prime. Multiple returns make the logic clean."
+  },
+  {
+    "title": "Recursion — methods calling themselves",
+    "instruction": "A method that calls itself is recursive. Every recursive method needs:\n1. **Base case** — stops the recursion\n2. **Recursive case** — calls itself with a smaller problem\n\n`factorial(5) = 5 × 4 × 3 × 2 × 1 = 120`",
+    "hint": "if (n <= 1) return 1; return n * factorial(n - 1);",
+    "starter": "public class Main {\n    static long factorial(int n) {\n        if (n <= 1) return 1;            // base case\n        return n * factorial(n - 1);     // recursive case\n    }\n\n    static int fibonacci(int n) {\n        if (n <= 1) return n;            // base cases: fib(0)=0, fib(1)=1\n        return fibonacci(n-1) + fibonacci(n-2);\n    }\n\n    public static void main(String[] args) {\n        System.out.println(factorial(5));\n        System.out.println(factorial(10));\n\n        for (int i = 0; i <= 8; i++) {\n            System.out.print(fibonacci(i) + \" \");\n        }\n        System.out.println();\n    }\n}",
+    "expectedOutput": ["120", "3628800", "0 1 1 2 3 5 8 13 21 "],
+    "successMessage": "Factorial: 10! = 3,628,800. Fibonacci: each number is the sum of the two before it. Recursion is elegant — but for large n, iteration is usually faster and safer (no stack overflow)."
+  },
+  {
+    "title": "Build a string utilities class",
+    "instruction": "Final challenge — no starter code.\n\nWrite three static utility methods:\n- `static boolean isPalindrome(String s)` — returns true if s is the same forwards and backwards (case-insensitive)\n- `static int countVowels(String s)` — count a, e, i, o, u\n- `static String titleCase(String sentence)` — first letter of each word capitalised\n\nTest each method.",
+    "hint": "For isPalindrome: reverse with StringBuilder and compare. For titleCase: split on spaces, capitalize each word.",
+    "starter": "",
+    "expectedOutput": [],
+    "codeChecks": [
+      { "pattern": "static boolean isPalindrome|static.*isPalindrome", "required": true, "message": "Define isPalindrome(String s)." },
+      { "pattern": "static int countVowels|static.*countVowels", "required": true, "message": "Define countVowels(String s)." },
+      { "pattern": "static String titleCase|static.*titleCase", "required": true, "message": "Define titleCase(String s)." },
+      { "pattern": "System\\.out\\.println", "required": true, "message": "Test and print results." }
+    ],
+    "successMessage": "Three utility methods — reusable, testable, and clean. This is how Java utility classes are built in practice. Chapter 8 done!"
+  }
+]

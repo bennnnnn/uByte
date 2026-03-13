@@ -1,44 +1,14 @@
 ---
-title: "Threads and Concurrency in Java"
-description: "Run code in parallel with Thread and Runnable; basics of synchronization."
-order: 15
-difficulty: "intermediate"
-estimatedMinutes: 15
+title: "Concurrency"
+description: "Threads, Runnable, ExecutorService, synchronized, volatile, Future, and CompletableFuture for concurrent Java programs."
+order: 20
+difficulty: "advanced"
+estimatedMinutes: 25
+concepts: ["Thread", "Runnable", "ExecutorService", "synchronized", "volatile", "Future", "CompletableFuture", "race condition", "deadlock", "thread pool"]
 ---
 
-## Concepts in this chapter
+## Do multiple things at once
 
-You will learn and practice:
+Concurrency lets your program do multiple things simultaneously — handle 1000 web requests, download files while processing existing ones, compute in parallel.
 
-- **Thread** — create a thread with Runnable or extending Thread
-- **start()** — begin execution; run() is called by the JVM
-- **join()** — wait for a thread to finish
-- **Runnable** — functional interface; can use lambda
-- **Concurrency** — multiple threads; shared state needs care
-
----
-
-## Creating a Thread
-
-```java
-Thread t = new Thread(() -> {
-    System.out.println("Hello from thread");
-});
-t.start();
-t.join();  // wait for thread to finish
-```
-
----
-
-## Runnable Lambda
-
-```java
-Runnable task = () -> System.out.println("Running");
-new Thread(task).start();
-```
-
----
-
-## What's Next?
-
-Next: **Testing with JUnit** — write and run unit tests.
+Java has excellent concurrency support — but with power comes complexity. Race conditions and deadlocks are the hardest bugs to debug. This chapter teaches you how to avoid them.

@@ -1,0 +1,82 @@
+[
+  {
+    "title": "Declare your first variable",
+    "instruction": "In Java, you declare a variable by specifying its **type** then its **name**:\n\n```java\nint age = 25;      // integer\nString name = \"Alex\"; // text\n```\n\nUnlike JavaScript or Python, you can't just write `age = 25`. Java needs to know upfront: what kind of data goes here?\n\nRun this — notice how each variable holds its own type.",
+    "starter": "public class Main {\n    public static void main(String[] args) {\n        int age = 25;\n        String name = \"Alex\";\n        double height = 1.75;\n        boolean isStudent = true;\n\n        System.out.println(name);\n        System.out.println(age);\n        System.out.println(height);\n        System.out.println(isStudent);\n    }\n}",
+    "expectedOutput": ["Alex", "25", "1.75", "true"],
+    "successMessage": "Four types, four variables. Java knows exactly what each box holds — int is integers only, String is text only. This prevents accidental type mixups that silently break programs in dynamic languages."
+  },
+  {
+    "title": "Create your own variables",
+    "instruction": "Create four variables:\n- `int score` with value `95`\n- `String city` with your city name\n- `double price` with value `19.99`\n- `boolean isActive` with value `true`\n\nThen print each one.",
+    "hint": "int score = 95;\nString city = \"London\";\ndouble price = 19.99;\nboolean isActive = true;",
+    "starter": "public class Main {\n    public static void main(String[] args) {\n        // TODO: declare and print all four variables\n    }\n}",
+    "expectedOutput": [],
+    "codeChecks": [
+      { "pattern": "int score\\s*=\\s*95", "required": true, "message": "Declare: int score = 95;" },
+      { "pattern": "String city\\s*=", "required": true, "message": "Declare: String city = \"...\";" },
+      { "pattern": "double price\\s*=\\s*19\\.99", "required": true, "message": "Declare: double price = 19.99;" },
+      { "pattern": "boolean isActive\\s*=\\s*true", "required": true, "message": "Declare: boolean isActive = true;" },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO with your code." }
+    ],
+    "successMessage": "Four typed variables declared and printed. Notice String starts with a capital S — it's not a primitive like int or double. You'll understand exactly why in Chapter 3."
+  },
+  {
+    "title": "Reassigning variables",
+    "instruction": "Declare a variable once with its type. After that, just use the name — no type keyword needed:\n\n```java\nint score = 0;\nscore = 10;     // no 'int' needed — already declared\nscore = score + 5;\n```\n\nUpdate a counter three times and print after each change.",
+    "hint": "score = score + 10; or score += 10;",
+    "starter": "public class Main {\n    public static void main(String[] args) {\n        int score = 0;\n        System.out.println(score);\n\n        score = 10;\n        System.out.println(score);\n\n        score = score + 25;\n        System.out.println(score);\n\n        score -= 5;\n        System.out.println(score);\n    }\n}",
+    "expectedOutput": ["0", "10", "35", "30"],
+    "successMessage": "Declare once with the type, update without it. score += 10 is shorthand for score = score + 10. These compound operators (+=, -=, *=, /=) are used constantly."
+  },
+  {
+    "title": "final — Java's constant",
+    "instruction": "`final` variables cannot be reassigned once set — they are constants:\n\n```java\nfinal double PI = 3.14159;\nPI = 3.0; // ERROR — cannot assign to final variable\n```\n\nConvention: `final` constants use ALL_CAPS with underscores.\n\nFix the code — move the assignment so it only happens once.",
+    "hint": "Declare final MAX_SPEED = 120; and never reassign it.",
+    "starter": "public class Main {\n    public static void main(String[] args) {\n        final int MAX_SPEED = 120;\n        System.out.println(\"Speed limit: \" + MAX_SPEED);\n        // This would crash — final cannot be reassigned:\n        // MAX_SPEED = 130;\n        System.out.println(\"Still: \" + MAX_SPEED);\n    }\n}",
+    "expectedOutput": ["Speed limit: 120", "Still: 120"],
+    "successMessage": "final is Java's version of const. Use it for values that should never change — tax rates, physical constants, configuration. ALL_CAPS_WITH_UNDERSCORES is the naming convention."
+  },
+  {
+    "title": "Increment and decrement",
+    "instruction": "Adding or subtracting 1 is so common Java has shortcuts:\n\n- `i++` — increment by 1 (post-increment)\n- `i--` — decrement by 1\n- `++i` — pre-increment (adds before using the value)\n\nFor simple counting, `i++` and `i--` are what you'll use.",
+    "hint": "count++; count--;",
+    "starter": "public class Main {\n    public static void main(String[] args) {\n        int count = 0;\n        System.out.println(count);\n\n        count++;\n        System.out.println(count);\n\n        count++;\n        count++;\n        System.out.println(count);\n\n        count--;\n        System.out.println(count);\n    }\n}",
+    "expectedOutput": ["0", "1", "3", "2"],
+    "successMessage": "count++ increments, count-- decrements. These are used thousands of times in every Java program — for loop counters, indexes, pagination. They become reflex."
+  },
+  {
+    "title": "var — type inference (Java 10+)",
+    "instruction": "Since Java 10, you can use `var` to let Java infer the type from the value:\n\n```java\nvar name = \"Alex\";   // Java infers: String\nvar age  = 25;       // Java infers: int\nvar pi   = 3.14;     // Java infers: double\n```\n\nThe type is still fixed — `var` just saves you typing it. It's NOT like JavaScript's `var`.\n\nRewrite the four declarations using `var`.",
+    "hint": "var score = 95; var city = \"London\";",
+    "starter": "public class Main {\n    public static void main(String[] args) {\n        // TODO: rewrite using var\n        var score = 95;\n        var city = \"London\";\n        var price = 19.99;\n        var isActive = true;\n\n        System.out.println(score + \" \" + city + \" \" + price + \" \" + isActive);\n    }\n}",
+    "expectedOutput": ["95 London 19.99 true"],
+    "codeChecks": [
+      { "pattern": "var score\\s*=", "required": true, "message": "Use var for score." },
+      { "pattern": "var city\\s*=", "required": true, "message": "Use var for city." }
+    ],
+    "successMessage": "var infers the type — but the type is still fixed at compile time. Try var x = 5; x = \"hello\"; and Java will refuse. var reduces verbosity without removing safety."
+  },
+  {
+    "title": "Naming rules and conventions",
+    "instruction": "Java variable naming rules:\n- Letters, digits, `_`, `$` only\n- Cannot start with a digit\n- Case-sensitive: `score` ≠ `Score`\n- Convention: `camelCase` for variables and methods\n- Convention: `PascalCase` for class names\n- Convention: `ALL_CAPS` for constants\n\nFix the three illegal variable names.",
+    "hint": "1stPlace → firstPlace, user-score → userScore, user name → userName",
+    "starter": "public class Main {\n    public static void main(String[] args) {\n        // BUG: all three names are invalid — fix them\n        // int 1stPlace = 1;\n        // int user-score = 95;\n        // String user name = \"Alex\";\n\n        int firstPlace = 1;\n        int userScore = 95;\n        String userName = \"Alex\";\n\n        System.out.println(firstPlace + \" \" + userScore + \" \" + userName);\n    }\n}",
+    "expectedOutput": ["1 95 Alex"],
+    "successMessage": "camelCase for variables (userScore), PascalCase for classes (BankAccount), ALL_CAPS for constants (MAX_SIZE). These conventions make Java code universally readable."
+  },
+  {
+    "title": "Build a profile",
+    "instruction": "No starter code. Write everything from scratch.\n\nDeclare these variables about yourself:\n- `final String LANGUAGE = \"Java\"`\n- `String name` — your name\n- `int year` — current year\n- `var chaptersCompleted = 1`\n\nPrint a profile: `\"Alex is learning Java in 2024. Chapter 1 of many done!\"`",
+    "hint": "Use final for LANGUAGE, var for chaptersCompleted, regular types for the rest.",
+    "starter": "",
+    "expectedOutput": [],
+    "codeChecks": [
+      { "pattern": "final String LANGUAGE\\s*=\\s*\"Java\"", "required": true, "message": "Declare: final String LANGUAGE = \"Java\";" },
+      { "pattern": "String name\\s*=|var name\\s*=", "required": true, "message": "Declare a name variable." },
+      { "pattern": "var chaptersCompleted\\s*=", "required": true, "message": "Use var for chaptersCompleted." },
+      { "pattern": "System\\.out\\.println", "required": true, "message": "Print the profile." }
+    ],
+    "successMessage": "final for constants, var for inference, typed declarations for everything else. That mix of tools is real Java code. Chapter 2 done!"
+  }
+]

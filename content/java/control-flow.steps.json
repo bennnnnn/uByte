@@ -1,0 +1,68 @@
+[
+  {
+    "title": "if / else if / else",
+    "instruction": "Java's `if/else` should feel familiar. One rule: use braces `{}` always — missing braces are a historic source of critical bugs (Apple's 'goto fail' SSL vulnerability was exactly this).\n\nRun this. Try changing the score.",
+    "starter": "public class Main {\n    public static void main(String[] args) {\n        int score = 78;\n\n        if (score >= 90) {\n            System.out.println(\"A — Excellent!\");\n        } else if (score >= 80) {\n            System.out.println(\"B — Great work!\");\n        } else if (score >= 70) {\n            System.out.println(\"C — Solid effort.\");\n        } else if (score >= 60) {\n            System.out.println(\"D — Keep pushing.\");\n        } else {\n            System.out.println(\"F — Let's try again.\");\n        }\n    }\n}",
+    "expectedOutput": ["C — Solid effort."],
+    "successMessage": "78 → C. Conditions checked top to bottom; the first true one wins. Always use braces — even for single-line bodies. Consistency prevents bugs."
+  },
+  {
+    "title": "Logical operators: &&, ||, !",
+    "instruction": "Combine boolean conditions:\n\n- `&&` (AND) — both must be true\n- `||` (OR) — at least one must be true  \n- `!` (NOT) — flip true/false\n\nWrite an access check: grant access if admin, or (verified AND 18 or older).",
+    "hint": "if (isAdmin || (isVerified && age >= 18))",
+    "starter": "public class Main {\n    public static void main(String[] args) {\n        boolean isAdmin = false;\n        boolean isVerified = true;\n        int age = 20;\n\n        // TODO: grant access if admin OR (verified AND 18+)\n        if (isAdmin || (isVerified && age >= 18)) {\n            System.out.println(\"Access granted.\");\n        } else {\n            System.out.println(\"Access denied.\");\n        }\n    }\n}",
+    "expectedOutput": ["Access granted."],
+    "codeChecks": [
+      { "pattern": "isAdmin\\s*\\|\\|", "required": true, "message": "Use || for the admin check." },
+      { "pattern": "isVerified\\s*&&|&&\\s*isVerified", "required": true, "message": "Use && for verified + age." }
+    ],
+    "successMessage": "isAdmin was false but (isVerified && age >= 18) was true — access granted. Parentheses make the logic explicit. Always use them when mixing && and ||."
+  },
+  {
+    "title": "Ternary — one-line if/else",
+    "instruction": "The ternary operator returns a value based on a condition:\n\n```java\ntype result = condition ? valueIfTrue : valueIfFalse;\n```\n\nPerfect for simple assignments. Don't nest them — it kills readability.",
+    "hint": "String status = age >= 18 ? \"adult\" : \"minor\";",
+    "starter": "public class Main {\n    public static void main(String[] args) {\n        int age = 20;\n        int score = 55;\n\n        // TODO: use ternary for status (adult/minor) and grade (pass/fail)\n        String status = age >= 18 ? \"adult\" : \"minor\";\n        String grade  = score >= 60 ? \"PASS\" : \"FAIL\";\n\n        System.out.println(status);\n        System.out.println(grade);\n    }\n}",
+    "expectedOutput": ["adult", "FAIL"],
+    "codeChecks": [
+      { "pattern": "age >= 18\\s*\\?\\s*\"adult\"\\s*:\\s*\"minor\"", "required": true, "message": "Ternary: age >= 18 ? \"adult\" : \"minor\"" },
+      { "pattern": "score >= 60\\s*\\?\\s*\"PASS\"\\s*:\\s*\"FAIL\"", "required": true, "message": "Ternary: score >= 60 ? \"PASS\" : \"FAIL\"" }
+    ],
+    "successMessage": "Two decisions in two lines. Ternary is perfect for conditional assignments — just keep them simple. A ternary inside a ternary is a warning sign."
+  },
+  {
+    "title": "switch — classic and modern",
+    "instruction": "Classic switch matches exact values. Modern `switch` expression (Java 14+) uses `->` arrows and returns values — no `break` needed:\n\n```java\nString result = switch (day) {\n    case \"MON\", \"TUE\" -> \"Weekday\";\n    case \"SAT\", \"SUN\" -> \"Weekend\";\n    default -> \"Unknown\";\n};\n```\n\nRun both versions and see the difference.",
+    "starter": "public class Main {\n    public static void main(String[] args) {\n        String day = \"SAT\";\n\n        // Modern switch expression (Java 14+):\n        String type = switch (day) {\n            case \"MON\", \"TUE\", \"WED\", \"THU\", \"FRI\" -> \"Weekday\";\n            case \"SAT\", \"SUN\" -> \"Weekend\";\n            default -> \"Unknown\";\n        };\n        System.out.println(day + \" is a \" + type);\n\n        // Also works with integers:\n        int month = 7;\n        int daysInMonth = switch (month) {\n            case 1, 3, 5, 7, 8, 10, 12 -> 31;\n            case 4, 6, 9, 11            -> 30;\n            case 2                      -> 28;\n            default -> throw new IllegalArgumentException(\"Invalid month: \" + month);\n        };\n        System.out.println(\"Days in month \" + month + \": \" + daysInMonth);\n    }\n}",
+    "expectedOutput": ["SAT is a Weekend", "Days in month 7: 31"],
+    "successMessage": "Modern switch expressions: multiple cases with a comma, arrow -> for the result, no break needed. Throwing in a default is good practice — it catches impossible values immediately."
+  },
+  {
+    "title": "switch with yield",
+    "instruction": "For multi-statement switch cases, use `yield` to return a value:\n\n```java\nString result = switch (x) {\n    case 1 -> \"one\";\n    case 2 -> {\n        System.out.println(\"Processing...\");\n        yield \"two\";  // yield returns from a block\n    }\n};\n```\n\nAdd a logging case to the role switch.",
+    "hint": "case \"admin\" -> { System.out.println(\"Audit: admin login\"); yield \"Full access\"; }",
+    "starter": "public class Main {\n    public static void main(String[] args) {\n        String role = \"admin\";\n\n        String access = switch (role) {\n            case \"admin\" -> {\n                System.out.println(\"Audit: admin access logged.\");\n                yield \"Full access\";\n            }\n            case \"editor\" -> \"Read + write\";\n            case \"viewer\" -> \"Read only\";\n            default -> \"No access\";\n        };\n        System.out.println(access);\n    }\n}",
+    "expectedOutput": ["Audit: admin access logged.", "Full access"],
+    "successMessage": "yield returns a value from a switch block — like return but for switch expressions. Use -> for simple one-liners, yield for multi-statement cases."
+  },
+  {
+    "title": "instanceof and pattern matching",
+    "instruction": "Classic `instanceof` checks type. Java 16+ adds pattern matching — it assigns AND checks in one step:\n\n```java\n// Old:\nif (obj instanceof String) {\n    String s = (String) obj;\n}\n\n// New (pattern matching):\nif (obj instanceof String s) {\n    // s is already a String here!\n}\n```",
+    "starter": "public class Main {\n    public static void main(String[] args) {\n        Object[] items = {\"hello\", 42, 3.14, true, null};\n\n        for (Object item : items) {\n            if (item instanceof String s) {\n                System.out.println(\"String of length \" + s.length() + \": \" + s);\n            } else if (item instanceof Integer i) {\n                System.out.println(\"Integer: \" + (i * 2) + \" (doubled)\");\n            } else if (item instanceof Double d) {\n                System.out.println(\"Double: \" + d);\n            } else if (item == null) {\n                System.out.println(\"null\");\n            } else {\n                System.out.println(\"Other: \" + item);\n            }\n        }\n    }\n}",
+    "expectedOutput": ["String of length 5: hello", "Integer: 84 (doubled)", "Double: 3.14", "Other: true", "null"],
+    "successMessage": "Pattern matching instanceof — check and cast in one operation. s is already a String inside the block, no cast needed. This is a Java 16+ feature used heavily with sealed classes."
+  },
+  {
+    "title": "Build a calculator",
+    "instruction": "Final challenge — no starter code.\n\nWrite a `calculate(double a, String op, double b)` method using a switch expression that:\n- `\"+\"` — adds\n- `\"-\"` — subtracts\n- `\"*\"` — multiplies\n- `\"/\"` — divides (throw `ArithmeticException` if b == 0)\n- `\"%\"` — modulo\n\nTest with 5 different operations.",
+    "hint": "double result = switch (op) { case \"+\" -> a + b; case \"/\" -> { if (b == 0) throw new ArithmeticException(); yield a / b; } ... };",
+    "starter": "",
+    "expectedOutput": [],
+    "codeChecks": [
+      { "pattern": "calculate|double.*String.*double|switch.*op|switch \\(op\\)", "required": true, "message": "Define calculate method with switch on op." },
+      { "pattern": "throw new ArithmeticException|throw new IllegalArgumentException", "required": true, "message": "Throw an exception when dividing by zero." },
+      { "pattern": "System\\.out\\.println", "required": true, "message": "Print results for at least 5 operations." }
+    ],
+    "successMessage": "A full calculator with error handling — switch expression, arithmetic, and exception throwing. Chapter 5 done!"
+  }
+]

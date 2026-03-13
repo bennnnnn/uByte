@@ -1,0 +1,51 @@
+[
+  {
+    "title": "Records — immutable data classes",
+    "instruction": "A `record` is an immutable data carrier. One line replaces: constructor, getters, equals, hashCode, toString:\n\n```java\nrecord Point(int x, int y) {}\n// Creates: Point(int x, int y) constructor, .x(), .y(), toString, equals, hashCode\n```\n\nRun this — see how little code it takes.",
+    "starter": "public class Main {\n    record Point(double x, double y) {\n        // Compact constructor for validation:\n        Point {\n            if (Double.isNaN(x) || Double.isNaN(y)) throw new IllegalArgumentException(\"NaN not allowed\");\n        }\n\n        double distanceTo(Point other) {\n            return Math.sqrt(Math.pow(x - other.x, 2) + Math.pow(y - other.y, 2));\n        }\n    }\n\n    record Person(String name, int age) {}\n\n    public static void main(String[] args) {\n        Point p1 = new Point(0, 0);\n        Point p2 = new Point(3, 4);\n\n        System.out.println(p1);          // auto toString!\n        System.out.println(p2.x());      // auto getter!\n        System.out.printf(\"Distance: %.1f%n\", p1.distanceTo(p2));\n\n        Person alice = new Person(\"Alice\", 30);\n        Person twin  = new Person(\"Alice\", 30);\n        System.out.println(alice);          // auto toString\n        System.out.println(alice.equals(twin)); // auto equals!\n    }\n}",
+    "expectedOutput": ["Point[x=0.0, y=0.0]", "3.0", "Distance: 5.0", "Person[name=Alice, age=30]", "true"],
+    "successMessage": "One line defines a complete data class. Records are immutable — no setters, all fields final. equals() and hashCode() compare by content automatically. Records are perfect for DTOs and value objects."
+  },
+  {
+    "title": "Text blocks — multi-line strings",
+    "instruction": "Text blocks (Java 15+) make multi-line strings readable:\n\n```java\nString json = \"\"\"\n    {\n        \"name\": \"Alice\",\n        \"age\": 30\n    }\n    \"\"\";\n```\n\nNo more escape characters for quotes. Indentation is relative to the closing `\"\"\"`.",
+    "starter": "public class Main {\n    public static void main(String[] args) {\n        // Before text blocks:\n        String oldWay = \"{\\n    \\\"name\\\": \\\"Alice\\\",\\n    \\\"age\\\": 30\\n}\";\n\n        // With text blocks:\n        String jsonBody = \"\"\"\n            {\n                \"name\": \"Alice\",\n                \"age\": 30,\n                \"roles\": [\"admin\", \"editor\"]\n            }\n            \"\"\";\n\n        String html = \"\"\"\n            <html>\n                <body>\n                    <h1>Hello, Java!</h1>\n                </body>\n            </html>\n            \"\"\";\n\n        System.out.println(jsonBody.trim());\n        System.out.println(\"---\");\n        System.out.println(html.trim());\n    }\n}",
+    "expectedOutput": ["{", "    \"name\": \"Alice\",", "    \"age\": 30,", "    \"roles\": [\"admin\", \"editor\"]", "}", "---", "<html>", "    <body>", "        <h1>Hello, Java!</h1>", "    </body>", "</html>"],
+    "successMessage": "Text blocks preserve formatting and don't need escape characters for quotes. The closing \"\"\" controls indentation — content is trimmed relative to it. Essential for JSON, HTML, and SQL strings."
+  },
+  {
+    "title": "Sealed classes — controlled hierarchies",
+    "instruction": "A `sealed` class restricts which classes can extend it:\n\n```java\nsealed interface Shape permits Circle, Rectangle, Triangle {}\n```\n\nThe compiler knows ALL possible subclasses — enabling exhaustive pattern matching.",
+    "starter": "public class Main {\n    sealed interface Shape permits Circle, Rectangle, Triangle {}\n    record Circle   (double radius)          implements Shape {}\n    record Rectangle(double width, double height) implements Shape {}\n    record Triangle (double base,  double height) implements Shape {}\n\n    static double area(Shape shape) {\n        return switch (shape) {\n            case Circle    c -> Math.PI * c.radius() * c.radius();\n            case Rectangle r -> r.width() * r.height();\n            case Triangle  t -> 0.5 * t.base() * t.height();\n            // No default needed — sealed class: compiler knows all cases!\n        };\n    }\n\n    public static void main(String[] args) {\n        Shape[] shapes = {new Circle(5), new Rectangle(4, 6), new Triangle(3, 8)};\n        for (Shape s : shapes) {\n            System.out.printf(\"%s: %.2f%n\", s.getClass().getSimpleName(), area(s));\n        }\n    }\n}",
+    "expectedOutput": ["Circle: 78.54", "Rectangle: 24.00", "Triangle: 12.00"],
+    "successMessage": "No default case needed — sealed class guarantees all cases covered. Add a Hexagon? The compiler forces you to update every switch. This is how you get exhaustive, safe hierarchies."
+  },
+  {
+    "title": "Pattern matching switch",
+    "instruction": "Java 21 brings full pattern matching in switch:\n\n```java\nswitch (obj) {\n    case Integer i -> \"int: \" + i;\n    case String s  -> \"string: \" + s;\n    case null      -> \"null\";\n    default        -> \"other\";\n}\n```\n\nCombine with `when` for guards.",
+    "starter": "public class Main {\n    sealed interface Payment permits CreditCard, Cash, Crypto {}\n    record CreditCard(String holder, double limit) implements Payment {}\n    record Cash(double amount)                     implements Payment {}\n    record Crypto(String coin, double amount)      implements Payment {}\n\n    static String processPayment(Payment p, double total) {\n        return switch (p) {\n            case CreditCard c when c.limit() >= total ->\n                \"Charging $\" + total + \" to \" + c.holder() + \"'s card\";\n            case CreditCard c ->\n                \"Declined: limit $\" + c.limit() + \" < $\" + total;\n            case Cash cash when cash.amount() >= total ->\n                \"Cash payment: $\" + total + \", change: $\" + (cash.amount() - total);\n            case Cash cash ->\n                \"Insufficient cash: $\" + cash.amount();\n            case Crypto(var coin, var amount) ->\n                \"Crypto: \" + amount + \" \" + coin;\n        };\n    }\n\n    public static void main(String[] args) {\n        System.out.println(processPayment(new CreditCard(\"Alex\", 500), 200));\n        System.out.println(processPayment(new CreditCard(\"Bob\",   50), 200));\n        System.out.println(processPayment(new Cash(100), 80));\n        System.out.println(processPayment(new Crypto(\"BTC\", 0.005), 300));\n    }\n}",
+    "expectedOutput": ["Charging $200.0 to Alex's card", "Declined: limit $50.0 < $200.0", "Cash payment: $80.0, change: $20.0", "Crypto: 0.005 BTC"],
+    "successMessage": "when guards add conditions to patterns. Deconstruction (Crypto(var coin, var amount)) extracts fields inline. This is Java 21's most powerful feature — exhaustive, readable dispatch."
+  },
+  {
+    "title": "Virtual threads (Java 21)",
+    "instruction": "Virtual threads (Java 21) are lightweight — you can have MILLIONS:\n\n```java\ntry (var executor = Executors.newVirtualThreadPerTaskExecutor()) {\n    executor.submit(() -> { /* task */ });\n}\n```\n\nEach task gets its own virtual thread — no thread pool needed. Perfect for I/O-heavy work.",
+    "starter": "import java.util.concurrent.*;\nimport java.util.*;\n\npublic class Main {\n    public static void main(String[] args) throws Exception {\n        int taskCount = 10_000;\n        List<Future<Integer>> futures = new ArrayList<>();\n\n        long start = System.currentTimeMillis();\n\n        try (ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor()) {\n            for (int i = 0; i < taskCount; i++) {\n                final int taskId = i;\n                futures.add(executor.submit(() -> {\n                    Thread.sleep(10);  // simulate I/O\n                    return taskId * 2;\n                }));\n            }\n        }\n\n        long sum = 0;\n        for (var f : futures) sum += f.get();\n\n        long elapsed = System.currentTimeMillis() - start;\n        System.out.println(\"Tasks: \" + taskCount);\n        System.out.println(\"Sum correct: \" + (sum == (long)(taskCount-1)*taskCount));\n        System.out.println(\"Fast (virtual threads!): \" + (elapsed < 3000));\n    }\n}",
+    "expectedOutput": ["Tasks: 10000", "Sum correct: true", "Fast (virtual threads!): true"],
+    "successMessage": "10,000 tasks with 10ms sleep each = 100 seconds sequentially. With virtual threads: they run concurrently and finish in ~10ms total. This is Project Loom — Java's answer to Go's goroutines."
+  },
+  {
+    "title": "Build a modern API response model",
+    "instruction": "Final challenge — no starter code.\n\nUsing modern Java features, build an API response model:\n\n1. `sealed interface ApiResponse<T> permits Success, Failure`\n2. `record Success<T>(T data, int statusCode)` implements ApiResponse<T>\n3. `record Failure(String error, int statusCode)` implements ApiResponse\n4. A `processResponse(ApiResponse<?> resp)` method using pattern matching switch\n5. Text blocks for JSON-like output formatting\n\nTest with 3 Success and 2 Failure responses.",
+    "hint": "record Success<T>(T data, int statusCode) implements ApiResponse<T> {} requires the sealed interface to be generic too: sealed interface ApiResponse<T> permits Success, Failure {}",
+    "starter": "",
+    "expectedOutput": [],
+    "codeChecks": [
+      { "pattern": "sealed interface ApiResponse|sealed class ApiResponse", "required": true, "message": "Define sealed interface/class ApiResponse." },
+      { "pattern": "record Success|class Success", "required": true, "message": "Define Success record/class." },
+      { "pattern": "record Failure|class Failure", "required": true, "message": "Define Failure record/class." },
+      { "pattern": "switch\\s*\\(|case Success|case Failure", "required": true, "message": "Use pattern matching switch for processResponse." }
+    ],
+    "successMessage": "A fully modern Java API response model: sealed interface, records, pattern matching, text blocks. This is what Java looks like in 2024 — expressive, safe, and concise. Chapter 22 done — Java complete!"
+  }
+]

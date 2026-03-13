@@ -1,0 +1,44 @@
+[
+  {
+    "title": "Dynamic dispatch in action",
+    "instruction": "When you call a method through a parent-type reference, Java automatically runs the child's overridden version at runtime. This is **dynamic dispatch** — the most powerful feature of OOP.\n\nRun this — even though the variable type is `Animal`, the right sound plays.",
+    "starter": "abstract class Animal {\n    String name;\n    Animal(String name) { this.name = name; }\n    abstract void makeSound();\n    void describe() { System.out.println(name + \" says: \"); makeSound(); }\n}\n\nclass Dog  extends Animal { Dog(String n){super(n);}  @Override void makeSound(){System.out.println(\"Woof!\");} }\nclass Cat  extends Animal { Cat(String n){super(n);}  @Override void makeSound(){System.out.println(\"Meow!\");} }\nclass Duck extends Animal { Duck(String n){super(n);} @Override void makeSound(){System.out.println(\"Quack!\");} }\n\npublic class Main {\n    public static void main(String[] args) {\n        Animal[] animals = {new Dog(\"Rex\"), new Cat(\"Whiskers\"), new Duck(\"Donald\")};\n\n        for (Animal a : animals) {\n            a.describe();   // Java picks the right makeSound() at runtime!\n        }\n    }\n}",
+    "expectedOutput": ["Rex says: ", "Woof!", "Whiskers says: ", "Meow!", "Donald says: ", "Quack!"],
+    "successMessage": "The array holds Animal references — but at runtime Java knows each object's real type and calls the right makeSound(). This is dynamic dispatch — it's what makes polymorphism work."
+  },
+  {
+    "title": "Upcasting and downcasting",
+    "instruction": "**Upcasting**: assigning a child type to a parent reference — always safe.\n**Downcasting**: assigning a parent reference back to a child — requires explicit cast, can fail.\n\nAlways use `instanceof` before downcasting.",
+    "starter": "class Vehicle { String type = \"vehicle\"; void describe() { System.out.println(\"I am a \" + type); } }\nclass Car extends Vehicle { int doors; Car(int d){type=\"car\"; doors=d;} void honk(){ System.out.println(\"Beep!\"); } }\nclass Truck extends Vehicle { int payload; Truck(int p){type=\"truck\"; payload=p;} void haul(){ System.out.println(\"Hauling \" + payload + \"kg\"); } }\n\npublic class Main {\n    public static void main(String[] args) {\n        Vehicle v = new Car(4);   // upcast — safe\n        v.describe();\n\n        // Downcast:\n        if (v instanceof Car car) {   // pattern matching instanceof\n            car.honk();\n            System.out.println(\"Doors: \" + car.doors);\n        }\n\n        // Wrong downcast:\n        Vehicle truck = new Truck(5000);\n        if (truck instanceof Car) {\n            System.out.println(\"This never prints\");\n        } else {\n            System.out.println(\"Not a car — safe!\");\n        }\n    }\n}",
+    "expectedOutput": ["I am a car", "Beep!", "Doors: 4", "Not a car — safe!"],
+    "successMessage": "Upcasting is automatic. Downcasting needs instanceof check — without it, you get ClassCastException at runtime. Pattern matching (instanceof Car car) checks and casts in one shot."
+  },
+  {
+    "title": "Polymorphic collections",
+    "instruction": "Store different types in a single collection using the parent type. Process all of them uniformly — each handles itself.\n\nThis is the Open/Closed Principle: open for extension (add new shape types), closed for modification (existing code unchanged).",
+    "starter": "import java.util.ArrayList;\nimport java.util.List;\n\nabstract class Shape {\n    abstract double area();\n    abstract String name();\n}\n\nclass Circle    extends Shape { double r;   Circle(double r){this.r=r;}    @Override double area(){return Math.PI*r*r;} @Override String name(){return \"Circle\";} }\nclass Rectangle extends Shape { double w,h; Rectangle(double w,double h){this.w=w;this.h=h;} @Override double area(){return w*h;} @Override String name(){return \"Rectangle\";} }\nclass Triangle  extends Shape { double b,h; Triangle(double b,double h){this.b=b;this.h=h;} @Override double area(){return 0.5*b*h;} @Override String name(){return \"Triangle\";} }\n\npublic class Main {\n    public static void main(String[] args) {\n        List<Shape> shapes = new ArrayList<>();\n        shapes.add(new Circle(5));\n        shapes.add(new Rectangle(4, 6));\n        shapes.add(new Triangle(3, 8));\n\n        double total = 0;\n        for (Shape s : shapes) {\n            double area = s.area();\n            System.out.printf(\"%s: %.2f%n\", s.name(), area);\n            total += area;\n        }\n        System.out.printf(\"Total: %.2f%n\", total);\n    }\n}",
+    "expectedOutput": ["Circle: 78.54", "Rectangle: 24.00", "Triangle: 12.00", "Total: 114.54"],
+    "successMessage": "One loop processes three different types. Add a Hexagon class later? Just extend Shape and add to the list — zero changes to existing code. That's the Open/Closed principle."
+  },
+  {
+    "title": "Overriding equals and hashCode",
+    "instruction": "By default, `equals()` compares references (same memory). Override it to compare content.\n\n**Rule**: if you override `equals()`, you MUST override `hashCode()` too — they're used together in `HashMap` and `HashSet`.",
+    "starter": "import java.util.HashSet;\n\nclass Point {\n    int x, y;\n    Point(int x, int y) { this.x=x; this.y=y; }\n\n    @Override\n    public boolean equals(Object o) {\n        if (this == o) return true;\n        if (!(o instanceof Point p)) return false;\n        return x == p.x && y == p.y;\n    }\n\n    @Override\n    public int hashCode() {\n        return 31 * x + y;  // consistent with equals\n    }\n\n    @Override\n    public String toString() { return \"(\" + x + \",\" + y + \")\"; }\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        Point a = new Point(1, 2);\n        Point b = new Point(1, 2);\n        Point c = new Point(3, 4);\n\n        System.out.println(a.equals(b));  // true — same content\n        System.out.println(a.equals(c));  // false\n\n        HashSet<Point> set = new HashSet<>();\n        set.add(a); set.add(b); set.add(c);  // b is duplicate of a\n        System.out.println(set.size());       // 2, not 3!\n    }\n}",
+    "expectedOutput": ["true", "false", "2"],
+    "successMessage": "Overriding both equals AND hashCode: a and b are 'equal' so the HashSet treats them as duplicates — size is 2, not 3. Always override both together — IDEs can generate them automatically."
+  },
+  {
+    "title": "Design a notification system",
+    "instruction": "Final challenge — no starter code.\n\nDesign:\n- `abstract class Notification` with fields `String title`, `String message` and abstract `send()` method\n- `class EmailNotification` — send() prints `\"Email to [email]: [title] — [message]\"`\n- `class SMSNotification` — send() prints `\"SMS to [phone]: [message]\"`\n- `class PushNotification` — send() prints `\"Push: [title]\"`\n\nWrite `sendAll(List<Notification> notifications)` and test it with all three types.",
+    "hint": "import java.util.List; abstract class Notification { ... } class EmailNotification extends Notification { ... }",
+    "starter": "",
+    "expectedOutput": [],
+    "codeChecks": [
+      { "pattern": "abstract class Notification", "required": true, "message": "Define abstract class Notification." },
+      { "pattern": "class EmailNotification\\s+extends|EmailNotification extends", "required": true, "message": "class EmailNotification extends Notification" },
+      { "pattern": "class SMSNotification\\s+extends|SMSNotification extends", "required": true, "message": "class SMSNotification extends Notification" },
+      { "pattern": "sendAll|List<Notification>|for.*Notification", "required": true, "message": "Write sendAll with a List<Notification> parameter." }
+    ],
+    "successMessage": "A polymorphic notification system — sendAll doesn't care which notification type it receives. Add SlackNotification later? Zero changes to sendAll. Chapter 13 done!"
+  }
+]

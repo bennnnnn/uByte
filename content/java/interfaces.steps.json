@@ -1,0 +1,51 @@
+[
+  {
+    "title": "Define and implement an interface",
+    "instruction": "An interface defines method signatures — no body (unless using `default`). Classes `implement` the interface and provide the bodies.\n\nRun this — both `Dog` and `Robot` implement `Speakable` differently.",
+    "starter": "interface Speakable {\n    void speak();          // must be implemented\n    String getVoice();     // must be implemented\n}\n\nclass Dog implements Speakable {\n    private String name;\n    Dog(String name) { this.name = name; }\n\n    @Override\n    public void speak() { System.out.println(name + \" says: \" + getVoice()); }\n\n    @Override\n    public String getVoice() { return \"Woof!\"; }\n}\n\nclass Robot implements Speakable {\n    @Override\n    public void speak() { System.out.println(\"Robot says: \" + getVoice()); }\n\n    @Override\n    public String getVoice() { return \"BEEP BOOP\"; }\n}\n\npublic class Main {\n    static void makeSpeak(Speakable s) {  // accepts ANY Speakable\n        s.speak();\n    }\n\n    public static void main(String[] args) {\n        makeSpeak(new Dog(\"Rex\"));\n        makeSpeak(new Robot());\n    }\n}",
+    "expectedOutput": ["Rex says: Woof!", "Robot says: BEEP BOOP"],
+    "successMessage": "makeSpeak accepts ANY Speakable — Dog, Robot, or anything else that implements the interface. The interface is the contract; classes decide the implementation."
+  },
+  {
+    "title": "Multiple interfaces",
+    "instruction": "A class can implement multiple interfaces — separated by commas:\n\n```java\nclass Duck implements Swimmable, Flyable, Speakable { ... }\n```\n\nThis is how Java gets around single inheritance limitation.",
+    "starter": "interface Swimmable { void swim(); }\ninterface Flyable   { void fly();  }\n\nclass Duck implements Swimmable, Flyable {\n    private String name;\n    Duck(String name) { this.name = name; }\n\n    @Override public void swim() { System.out.println(name + \" is swimming.\"); }\n    @Override public void fly()  { System.out.println(name + \" is flying.\");  }\n}\n\nclass Boat implements Swimmable {\n    @Override public void swim() { System.out.println(\"Boat is sailing.\"); }\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        Duck duck = new Duck(\"Donald\");\n        duck.swim();\n        duck.fly();\n\n        // Duck IS-A Swimmable AND IS-A Flyable:\n        Swimmable s = duck;\n        Flyable   f = duck;\n        s.swim();\n        f.fly();\n    }\n}",
+    "expectedOutput": ["Donald is swimming.", "Donald is flying.", "Donald is swimming.", "Donald is flying."],
+    "successMessage": "Duck implements both interfaces. A Swimmable variable can hold a Duck, a Flyable variable can also hold a Duck — same object, different 'views' via different interface types."
+  },
+  {
+    "title": "default methods — add to interfaces without breaking",
+    "instruction": "`default` methods in interfaces have a body — they're optional to override.\n\nThis lets you add new methods to an interface without breaking all existing implementations.",
+    "starter": "interface Printable {\n    String format();  // abstract — must implement\n\n    default void print() {   // default — optional to override\n        System.out.println(\"[PRINT] \" + format());\n    }\n\n    default void printLoud() {\n        System.out.println(\"[PRINT] \" + format().toUpperCase());\n    }\n}\n\nclass Invoice implements Printable {\n    private int id;\n    private double amount;\n    Invoice(int id, double amount) { this.id=id; this.amount=amount; }\n\n    @Override\n    public String format() {\n        return String.format(\"Invoice #%d: $%.2f\", id, amount);\n    }\n    // Uses default print() and printLoud()\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        Invoice inv = new Invoice(1001, 89.99);\n        inv.print();\n        inv.printLoud();\n    }\n}",
+    "expectedOutput": ["[PRINT] Invoice #1001: $89.99", "[PRINT] INVOICE #1001: $89.99"],
+    "successMessage": "Invoice only implemented format() — it got print() and printLoud() for free. This is how Java's collections were updated (Iterable.forEach, etc.) without breaking all existing code."
+  },
+  {
+    "title": "Comparable — natural ordering",
+    "instruction": "`Comparable<T>` is a built-in interface for natural ordering. Implement `compareTo()` and `Arrays.sort()` / `Collections.sort()` work automatically:\n\n```java\n@Override\npublic int compareTo(Student other) {\n    return this.grade - other.grade;  // ascending order\n}\n```\n\nReturn negative: this comes first. Return positive: other comes first. Return 0: equal.",
+    "starter": "import java.util.Arrays;\n\nclass Student implements Comparable<Student> {\n    String name;\n    int grade;\n\n    Student(String name, int grade) {\n        this.name = name;\n        this.grade = grade;\n    }\n\n    @Override\n    public int compareTo(Student other) {\n        return this.grade - other.grade;  // ascending by grade\n    }\n\n    @Override\n    public String toString() { return name + \"(\" + grade + \")\"; }\n}\n\npublic class Main {\n    public static void main(String[] args) {\n        Student[] students = {\n            new Student(\"Alice\", 88),\n            new Student(\"Bob\",   72),\n            new Student(\"Carol\", 95),\n            new Student(\"David\", 80),\n        };\n        Arrays.sort(students);\n        for (Student s : students) System.out.println(s);\n    }\n}",
+    "expectedOutput": ["Bob(72)", "David(80)", "Alice(88)", "Carol(95)"],
+    "successMessage": "Sorted by grade ascending — Bob first (72), Carol last (95). Comparable makes your class work with all of Java's sorting infrastructure for free."
+  },
+  {
+    "title": "Functional interfaces and lambdas",
+    "instruction": "A **functional interface** has exactly one abstract method. You can use a lambda instead of an anonymous class:\n\n```java\n@FunctionalInterface\ninterface Transformer {\n    int transform(int n);\n}\n\n// Lambda:\nTransformer double = n -> n * 2;\n```\n\nRun this and see lambdas replacing verbose anonymous classes.",
+    "starter": "@FunctionalInterface\ninterface MathOp {\n    double apply(double a, double b);\n}\n\npublic class Main {\n    static double calculate(double a, double b, MathOp op) {\n        return op.apply(a, b);\n    }\n\n    public static void main(String[] args) {\n        MathOp add      = (a, b) -> a + b;\n        MathOp subtract = (a, b) -> a - b;\n        MathOp multiply = (a, b) -> a * b;\n        MathOp power    = (a, b) -> Math.pow(a, b);\n\n        System.out.println(calculate(10, 3, add));\n        System.out.println(calculate(10, 3, subtract));\n        System.out.println(calculate(10, 3, multiply));\n        System.out.println(calculate(2, 10, power));\n    }\n}",
+    "expectedOutput": ["13.0", "7.0", "30.0", "1024.0"],
+    "successMessage": "Lambdas implement functional interfaces. MathOp is the interface; (a, b) -> a + b is the implementation. You'll use this pattern constantly with Java's streams in Chapter 17."
+  },
+  {
+    "title": "Build a payment system",
+    "instruction": "Final challenge — no starter code.\n\nDefine:\n- `interface PaymentMethod` with `boolean processPayment(double amount)` and `String getType()`\n- `class CreditCard implements PaymentMethod` — always succeeds if amount <= 5000\n- `class PayPal implements PaymentMethod` — always succeeds if amount <= 2000  \n- `class Bitcoin implements PaymentMethod` — always succeeds (no limit)\n\nWrite `checkout(double amount, PaymentMethod... methods)` that tries each method in order and prints which one succeeded.",
+    "hint": "For each method, if processPayment(amount) returns true, print the type and return.",
+    "starter": "",
+    "expectedOutput": [],
+    "codeChecks": [
+      { "pattern": "interface PaymentMethod", "required": true, "message": "Define interface PaymentMethod." },
+      { "pattern": "implements PaymentMethod", "required": true, "message": "At least one class implements PaymentMethod." },
+      { "pattern": "checkout|PaymentMethod\\.\\.\\.", "required": true, "message": "Define checkout method with PaymentMethod... params." },
+      { "pattern": "processPayment", "required": true, "message": "Call processPayment(amount) in checkout." }
+    ],
+    "successMessage": "A polymorphic payment system — checkout doesn't care which payment method it gets. Add a new payment type? Just implement PaymentMethod. No existing code changes. Chapter 12 done!"
+  }
+]
