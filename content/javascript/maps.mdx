@@ -1,27 +1,14 @@
 ---
 title: "Objects & Maps"
-description: "Plain objects, Map, and Set in JavaScript."
-order: 7
-difficulty: "intermediate"
-estimatedMinutes: 12
+description: "JavaScript objects, property access, spread, Object methods, and the Map/Set data structures."
+order: 8
+difficulty: "beginner"
+estimatedMinutes: 20
+concepts: ["objects", "property access", "computed properties", "Object.keys/values/entries", "spread", "Map", "Set"]
 ---
 
-## Plain Object
+## Key-value data
 
-```javascript
-const person = { name: "Alice", age: 30 };
-console.log(person.name);        // Alice
-console.log(person["age"]);      // 30
-person.city = "London";          // add property
-```
+Objects are JavaScript's most versatile data structure. Almost everything you work with — API responses, configuration, user data, events — is an object.
 
-## Map (key-value, any key type)
-
-```javascript
-const map = new Map();
-map.set("key", 42);
-console.log(map.get("key")); // 42
-console.log(map.size);       // 1
-```
-
-More content coming soon. Try the interactive steps above!
+And unlike Python's dict, JavaScript objects have a prototype chain which gives them superpowers (and occasional surprises). Plus JavaScript has a dedicated `Map` data structure for when plain objects aren't quite right.

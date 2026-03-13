@@ -1,0 +1,100 @@
+[
+  {
+    "title": "Welcome to JavaScript",
+    "instruction": "You just picked the most widely used programming language in the world.\n\nJavaScript runs in every browser, every web app, every Node.js server. Instagram, Netflix, Airbnb — all JavaScript. And it is shockingly quick to pick up.\n\n`console.log()` is how JavaScript talks to you. Whatever you put inside the parentheses gets printed.\n\nHit **Run** and see what happens.",
+    "starter": "console.log(\"Hello, JavaScript!\");",
+    "expectedOutput": ["Hello, JavaScript!"],
+    "successMessage": "Did you see that? One line of code, instant output. That is JavaScript. Welcome to the most-used language on the planet."
+  },
+  {
+    "title": "Make it say your name",
+    "instruction": "Change the message to greet yourself.\n\nJavaScript strings can use double quotes `\"` or single quotes `'` — both work exactly the same. Pick a style and stick to it.\n\nChange the text to `Hello, [your name]!` — put your actual name in there.",
+    "hint": "Just change the text inside the quotes. Keep the quotes themselves.",
+    "starter": "console.log(\"Hello, World!\");",
+    "expectedOutput": [],
+    "codeChecks": [
+      { "pattern": "console\\.log\\(\"Hello, World!\"\\)", "required": false, "message": "Change the message — make it say hello to you!" }
+    ],
+    "successMessage": "Your name on the screen. This program belongs to you now. That warm feeling? Programmers call it 'it works'. Get very used to it."
+  },
+  {
+    "title": "Print multiple things",
+    "instruction": "Each `console.log()` prints on its own line. Run as many as you want — JavaScript goes top to bottom, one at a time.\n\nAdd a second and third `console.log()` below the first. Tell it something about you.",
+    "hint": "console.log(\"I am learning JavaScript.\");\nconsole.log(\"This is my third line.\");",
+    "starter": "console.log(\"Hello, Alex!\");\n// Add two more console.log() calls below",
+    "expectedOutput": [],
+    "codeChecks": [
+      { "pattern": "(console\\.log\\([^)]+\\)[\\s\\S]*){3}", "required": true, "message": "Add two more console.log() calls — three total." }
+    ],
+    "successMessage": "Three lines! JavaScript ran them in order, top to bottom. Every program you will ever write follows this same rule — instructions execute in sequence."
+  },
+  {
+    "title": "The semicolon situation",
+    "instruction": "JavaScript semicolons are optional — the language has Automatic Semicolon Insertion (ASI) that adds them for you.\n\nBut most style guides (and your future teammates) expect them. In this course we use semicolons consistently.\n\nRun this — both versions work. Then add one more line without a semicolon to confirm it still runs.",
+    "starter": "console.log(\"With semicolon\");\nconsole.log(\"Without semicolon\")\nconsole.log(\"Also fine\");",
+    "expectedOutput": ["With semicolon", "Without semicolon", "Also fine"],
+    "successMessage": "Both work. JavaScript is forgiving about semicolons. We use them anyway — they make intent clear and prevent edge-case bugs where ASI guesses wrong."
+  },
+  {
+    "title": "Comments — notes for humans",
+    "instruction": "Comments are completely ignored by JavaScript. They are notes for the humans reading the code.\n\n- `//` — single-line comment (everything after it on that line)\n- `/* ... */` — multi-line comment block\n\nRun this. Notice neither comment appears in the output. Then change the `//` comment to describe what the program does.",
+    "hint": "Change the // comment text. The output won't change.",
+    "starter": "// This is a single-line comment\nconsole.log(\"JavaScript is fun!\");\n\n/* This is a\n   multi-line comment */\nconsole.log(\"Comments are invisible to JS.\");",
+    "expectedOutput": ["JavaScript is fun!", "Comments are invisible to JS."],
+    "successMessage": "Comments never appear in output. Good comments explain WHY the code does something — not what (the code shows that). Future you will be very grateful for them."
+  },
+  {
+    "title": "typeof — what kind of thing is this?",
+    "instruction": "`typeof` tells you the data type of any value:\n\n```js\ntypeof \"hello\"  // 'string'\ntypeof 42       // 'number'\ntypeof true     // 'boolean'\ntypeof undefined // 'undefined'\n```\n\nRun this. You will see all five types. Later you will understand why `typeof null === 'object'` is one of JavaScript's most famous quirks.",
+    "starter": "console.log(typeof \"hello\");\nconsole.log(typeof 42);\nconsole.log(typeof true);\nconsole.log(typeof undefined);\nconsole.log(typeof null);      // spoiler: it says 'object'!",
+    "expectedOutput": ["string", "number", "boolean", "undefined", "object"],
+    "successMessage": "typeof null === 'object' is a 25-year-old bug in JavaScript that can never be fixed because too much code depends on it. Knowing this saves you from future confusion."
+  },
+  {
+    "title": "Spot the bug — missing quote",
+    "instruction": "This program crashes. A string is not closed properly — a quote is missing.\n\nFind it and fix it before running.",
+    "hint": "Look at line 1. The closing quote is missing.",
+    "starter": "console.log(\"JavaScript is awesome!);\nconsole.log(\"Bug squashed.\");",
+    "expectedOutput": ["JavaScript is awesome!", "Bug squashed."],
+    "codeChecks": [
+      { "pattern": "console\\.log\\(\"JavaScript is awesome!\"\\)", "required": true, "message": "Fix the missing closing quote on line 1." }
+    ],
+    "successMessage": "Syntax error fixed! Unclosed strings are the most common crash for beginners. Your editor will usually highlight them in red — learn to read those hints."
+  },
+  {
+    "title": "Case sensitivity",
+    "instruction": "JavaScript is case-sensitive. `Console.log` is not the same as `console.log`.\n\n`console.log` works. `Console.Log` crashes.\n\nFix both broken lines.",
+    "hint": "All lowercase: console.log",
+    "starter": "Console.log(\"Hello!\");\nconsole.Log(\"World!\");",
+    "expectedOutput": ["Hello!", "World!"],
+    "codeChecks": [
+      { "pattern": "Console\\.log|console\\.Log", "required": false, "message": "Use lowercase: console.log — JavaScript is case-sensitive!" }
+    ],
+    "successMessage": "console.log — always lowercase. After a few hundred calls your fingers type it automatically. Promise."
+  },
+  {
+    "title": "Numbers and arithmetic",
+    "instruction": "JavaScript handles math directly in `console.log` — no extra steps:\n\n```js\nconsole.log(5 + 3);   // 8\nconsole.log(10 - 4);  // 6\nconsole.log(3 * 7);   // 21\nconsole.log(15 / 4);  // 3.75\nconsole.log(15 % 4);  // 3  (remainder)\nconsole.log(2 ** 10); // 1024 (power)\n```\n\nPrint the result of all six operations.",
+    "hint": "Six console.log calls, one per operation.",
+    "starter": "// TODO: print results of all 6 arithmetic operations",
+    "expectedOutput": ["8", "6", "21", "3.75", "3", "1024"],
+    "codeChecks": [
+      { "pattern": "5 \\+ 3|5\\+3", "required": true, "message": "Add 5 + 3." },
+      { "pattern": "\\*\\*", "required": true, "message": "Use ** for exponentiation: 2 ** 10" },
+      { "pattern": "%", "required": true, "message": "Use % for remainder: 15 % 4" },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
+    ],
+    "successMessage": "All six operations! % (modulo/remainder) is used constantly in programming — it tells you if a number is even, creates wrap-around counters, and appears in FizzBuzz."
+  },
+  {
+    "title": "Write it from scratch",
+    "instruction": "No starter code. Blank page. You write the whole thing.\n\nPrint exactly:\n```\nJavaScript is awesome.\nI built this from scratch.\nChapter 1 complete!\n```\n\nThree `console.log()` calls. Each exact string on its own line.",
+    "hint": "Three console.log calls, one per line. Match the text exactly.",
+    "starter": "",
+    "expectedOutput": ["JavaScript is awesome.", "I built this from scratch.", "Chapter 1 complete!"],
+    "codeChecks": [
+      { "pattern": "console\\.log", "required": true, "message": "Use console.log() to print each line." }
+    ],
+    "successMessage": "Built from nothing. Three lines, three outputs, zero guidance. That is what programming is — blank screen to working code. Chapter 1 done!"
+  }
+]

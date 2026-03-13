@@ -1,0 +1,101 @@
+[
+  {
+    "title": "Three ways to write a function",
+    "instruction": "JavaScript has three function syntaxes. They are mostly interchangeable — but they differ in hoisting and `this` binding.\n\nRun this to see all three do the same thing.",
+    "starter": "// 1. Function declaration — hoisted (works before declaration in file)\nfunction greet1(name) {\n  return `Hello, ${name}!`;\n}\n\n// 2. Function expression — NOT hoisted\nconst greet2 = function(name) {\n  return `Hello, ${name}!`;\n};\n\n// 3. Arrow function — short, modern, no own 'this'\nconst greet3 = name => `Hello, ${name}!`;\n\nconsole.log(greet1(\"Alice\"));\nconsole.log(greet2(\"Bob\"));\nconsole.log(greet3(\"Carol\"));",
+    "expectedOutput": ["Hello, Alice!", "Hello, Bob!", "Hello, Carol!"],
+    "successMessage": "Three syntaxes, same result. Use arrow functions by default (modern, concise). Use function declarations when you need hoisting or a named function in stack traces."
+  },
+  {
+    "title": "Arrow functions — compact syntax",
+    "instruction": "Arrow functions have shortcuts based on how much they do:\n\n```js\n// Multiple statements:\nconst fn = (a, b) => { return a + b; };\n\n// Single expression (implicit return):\nconst fn = (a, b) => a + b;\n\n// Single parameter (no parens needed):\nconst fn = n => n * 2;\n\n// No parameters:\nconst fn = () => \"hello\";\n```\n\nRewrite the four functions using the most compact arrow syntax.",
+    "hint": "n => n * 2, (a, b) => a + b",
+    "starter": "// Rewrite each as a compact arrow function:\nconst double = function(n) { return n * 2; };\nconst add = function(a, b) { return a + b; };\nconst getName = function(user) { return user.name; };\nconst pi = function() { return 3.14159; };\n\nconsole.log(double(5));\nconsole.log(add(3, 4));\nconsole.log(getName({ name: \"Alex\" }));\nconsole.log(pi());",
+    "expectedOutput": ["10", "7", "Alex", "3.14159"],
+    "codeChecks": [
+      { "pattern": "const double\\s*=\\s*n\\s*=>|const double\\s*=\\s*\\(n\\)\\s*=>", "required": true, "message": "Rewrite double as arrow: n => n * 2" },
+      { "pattern": "const add\\s*=\\s*\\(a,\\s*b\\)\\s*=>\\s*a\\s*\\+\\s*b", "required": true, "message": "Rewrite add as arrow: (a, b) => a + b" }
+    ],
+    "successMessage": "Compact arrows everywhere. user => user.name is cleaner than function(user) { return user.name; } — and you'll see this in every map/filter/sort call."
+  },
+  {
+    "title": "Parameters and return",
+    "instruction": "Functions can take multiple parameters and return any value. A function with no `return` statement returns `undefined`.\n\nWrite `bmi(weight, height)` that returns the Body Mass Index: `weight / (height * height)`.",
+    "hint": "return weight / (height * height);",
+    "starter": "// TODO: write bmi(weight, height) that returns weight / (height ** 2)\n// Then call it and print the result formatted to 1 decimal\nconsole.log(bmi(70, 1.75).toFixed(1));  // should be 22.9",
+    "expectedOutput": ["22.9"],
+    "codeChecks": [
+      { "pattern": "function bmi\\(|const bmi\\s*=", "required": true, "message": "Define the bmi function." },
+      { "pattern": "return", "required": true, "message": "Use return to send back the result." },
+      { "pattern": "height\\s*\\*\\s*height|height\\s*\\*\\*\\s*2", "required": true, "message": "Divide by height squared." },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
+    ],
+    "successMessage": "22.9 — correct BMI. return sends the value back to the caller. Without return, the function would give undefined and toFixed would crash."
+  },
+  {
+    "title": "Default parameters",
+    "instruction": "Default values are used when an argument is not provided (or is `undefined`):\n\n```js\nfunction greet(name, greeting = \"Hello\") {\n  return `${greeting}, ${name}!`;\n}\n```\n\nAdd defaults so the function works with just a product name.",
+    "hint": "function createProduct(name, price = 0, inStock = true)",
+    "starter": "// TODO: add defaults: price = 0, inStock = true, category = 'General'\nfunction createProduct(name, price, inStock, category) {\n  return { name, price, inStock, category };\n}\n\nconsole.log(createProduct(\"Widget\"));\nconsole.log(createProduct(\"Gadget\", 29.99));",
+    "expectedOutput": [],
+    "codeChecks": [
+      { "pattern": "price\\s*=\\s*0", "required": true, "message": "Add default: price = 0" },
+      { "pattern": "inStock\\s*=\\s*true", "required": true, "message": "Add default: inStock = true" },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
+    ],
+    "successMessage": "Defaults fill in when arguments are omitted. Notice { name, price, inStock, category } in the return — that's shorthand property syntax. When key name = variable name, you don't need the colon."
+  },
+  {
+    "title": "Rest parameters — any number of args",
+    "instruction": "`...rest` collects remaining arguments into an array:\n\n```js\nfunction sum(...numbers) {\n  return numbers.reduce((acc, n) => acc + n, 0);\n}\nsum(1, 2, 3, 4, 5)  // 15\n```\n\nWrite `max(...nums)` that returns the largest number (without Math.max).",
+    "hint": "function max(...nums) { return nums.reduce((a, b) => a > b ? a : b); }",
+    "starter": "// TODO: write max(...nums) that returns the largest number\nconsole.log(max(3, 1, 4, 1, 5, 9, 2, 6));  // 9\nconsole.log(max(7, 2, 8, 5));               // 8",
+    "expectedOutput": ["9", "8"],
+    "codeChecks": [
+      { "pattern": "function max\\(\\.\\.\\.\\w+\\)|const max\\s*=\\s*\\(\\.\\.\\.\\w+\\)\\s*=>", "required": true, "message": "Use rest params: function max(...nums)" },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
+    ],
+    "successMessage": "Rest params make functions flexible — accept any number of arguments. The rest array is a regular array so all array methods work on it."
+  },
+  {
+    "title": "Callbacks — functions as arguments",
+    "instruction": "Functions are values in JavaScript — you can pass them as arguments to other functions.\n\nA function that takes another function as an argument is called a **higher-order function**. The passed function is a **callback**.\n\nYou've already used this: `array.map(fn)`, `array.filter(fn)` — both take callbacks.\n\nWrite a `processData` function that accepts data and a transformer callback.",
+    "hint": "function processData(data, transform) { return data.map(transform); }",
+    "starter": "function processData(data, transform) {\n  return data.map(transform);\n}\n\nconst numbers = [1, 2, 3, 4, 5];\n\n// Pass different callbacks:\nconsole.log(processData(numbers, n => n * 2));\nconsole.log(processData(numbers, n => n ** 2));\nconsole.log(processData(numbers, n => n % 2 === 0 ? \"even\" : \"odd\"));",
+    "expectedOutput": ["[ 2, 4, 6, 8, 10 ]", "[ 1, 4, 9, 16, 25 ]", "[ 'odd', 'even', 'odd', 'even', 'odd' ]"],
+    "successMessage": "Same processData, three different callbacks, three different results. Higher-order functions + callbacks = functional programming. map, filter, reduce are all higher-order functions."
+  },
+  {
+    "title": "Pure functions — same input, same output",
+    "instruction": "A **pure function** always returns the same result for the same inputs and has no side effects (doesn't modify anything outside itself).\n\nPure functions are predictable, testable, and safe to use anywhere.\n\nFix `addToCart` — it mutates the original cart (impure). Make it pure by returning a new cart.",
+    "hint": "return [...cart, item]; instead of cart.push(item)",
+    "starter": "// IMPURE — mutates the original!\nfunction addToCartImpure(cart, item) {\n  cart.push(item);  // side effect!\n  return cart;\n}\n\n// TODO: write pure addToCart that returns a NEW array\nfunction addToCart(cart, item) {\n  // return a new array with item added, don't mutate cart\n}\n\nconst cart = [\"apple\", \"banana\"];\nconst newCart = addToCart(cart, \"cherry\");\nconsole.log(\"Original:\", cart);    // unchanged\nconsole.log(\"New cart:\", newCart); // has cherry",
+    "expectedOutput": ["Original: [ 'apple', 'banana' ]", "New cart: [ 'apple', 'banana', 'cherry' ]"],
+    "codeChecks": [
+      { "pattern": "return\\s*\\[\\.\\.\\.(cart|\\w+),\\s*(item|\\w+)\\]", "required": true, "message": "Return a new array: return [...cart, item]" },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
+    ],
+    "successMessage": "The original cart is untouched — a pure function. React state management requires pure functions. Redux, Zustand, all state libraries depend on immutability."
+  },
+  {
+    "title": "IIFE — run once immediately",
+    "instruction": "An IIFE (Immediately Invoked Function Expression) runs the moment it's defined:\n\n```js\n(function() {\n  // runs immediately\n})();\n```\n\nUseful for: running setup code without polluting the global scope, creating private variables.\n\nRun this and see how IIFE creates a private scope.",
+    "starter": "const result = (function() {\n  const secret = \"hidden inside IIFE\";\n  const computed = 6 * 7;\n  return { computed, message: \"IIFE ran!\" };\n})();\n\nconsole.log(result.computed);\nconsole.log(result.message);\ntry {\n  console.log(secret); // can't access this\n} catch(e) {\n  console.log(\"secret is not accessible outside IIFE\");\n}",
+    "expectedOutput": ["42", "IIFE ran!", "secret is not accessible outside IIFE"],
+    "successMessage": "secret is completely hidden. IIFE was the pre-ES6 module pattern — bundle everything in an IIFE and expose only what you choose. Now we use proper ES modules (Chapter 16)."
+  },
+  {
+    "title": "Build a validation library",
+    "instruction": "Final challenge — no starter code.\n\nBuild a small validation library:\n- `isEmail(str)` — returns true if string contains '@' and a '.' after '@'\n- `isLength(str, min, max)` — returns true if length is within range\n- `isInRange(num, min, max)` — returns true if number is within range\n- `validate(value, ...rules)` — takes a value and any number of rule functions, returns true only if ALL pass\n\nTest validate with multiple rules at once.",
+    "hint": "const validate = (value, ...rules) => rules.every(rule => rule(value));",
+    "starter": "",
+    "expectedOutput": [],
+    "codeChecks": [
+      { "pattern": "function isEmail|const isEmail\\s*=", "required": true, "message": "Define isEmail." },
+      { "pattern": "function validate|const validate\\s*=", "required": true, "message": "Define validate." },
+      { "pattern": "\\.\\.\\.rules|\\.\\.\\.", "required": true, "message": "Use rest params for validate: (...rules)" },
+      { "pattern": "\\.every\\(", "required": true, "message": "Use .every() so all rules must pass." }
+    ],
+    "successMessage": "A composable validation library! validate(email, isEmail, v => isLength(v, 5, 100)) — chain any rules. This pattern is exactly how libraries like Zod and Joi work. Chapter 9 done!"
+  }
+]

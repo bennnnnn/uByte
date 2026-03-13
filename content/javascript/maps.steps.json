@@ -1,0 +1,95 @@
+[
+  {
+    "title": "Objects — look things up by name",
+    "instruction": "Arrays store values by position. Objects store them by **name** (key).\n\n`user[\"name\"]` or `user.name` — both work. Dot notation is cleaner when you know the key name. Bracket notation is needed when the key is dynamic.\n\nRun this.",
+    "starter": "const user = {\n  name: \"Alex\",\n  age: 25,\n  city: \"London\",\n  isPremium: true,\n};\n\nconsole.log(user.name);\nconsole.log(user[\"age\"]);\nconsole.log(user.isPremium);\n\n// Dynamic key access:\nconst field = \"city\";\nconsole.log(user[field]);  // can't use dot notation with variables",
+    "expectedOutput": ["Alex", "25", "true", "London"],
+    "successMessage": "Dot notation for known keys, bracket notation for dynamic keys. user[field] where field is a variable — you can't do that with dots."
+  },
+  {
+    "title": "Adding, updating, deleting",
+    "instruction": "Same syntax for adding and updating — JavaScript doesn't care which:\n\n```js\nobj.newKey = value;     // add\nobj.existingKey = val;  // update\ndelete obj.key;         // remove\n```\n\nAdd email, update city, delete isPremium.",
+    "hint": "user.email = \"...\"; user.city = \"...\"; delete user.isPremium;",
+    "starter": "const user = { name: \"Alex\", age: 25, city: \"London\", isPremium: true };\nconsole.log(\"Before:\", user);\n// TODO: add email, update city to 'Paris', delete isPremium\nconsole.log(\"After:\", user);",
+    "expectedOutput": [],
+    "codeChecks": [
+      { "pattern": "user\\.email\\s*=", "required": true, "message": "Add: user.email = \"...\"" },
+      { "pattern": "user\\.city\\s*=\\s*[\"']Paris[\"']", "required": true, "message": "Update: user.city = \"Paris\"" },
+      { "pattern": "delete user\\.isPremium", "required": true, "message": "Delete: delete user.isPremium" },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
+    ],
+    "successMessage": "Added, updated, deleted. delete removes the key entirely — unlike setting it to null, which keeps the key with an empty value."
+  },
+  {
+    "title": "Computed property names",
+    "instruction": "When the property key comes from a variable, use square brackets in the object literal:\n\n```js\nconst key = \"score\";\nconst obj = { [key]: 100 };  // { score: 100 }\n```\n\nBuild a dynamic config object where keys come from variables.",
+    "hint": "{ [fieldName]: fieldValue }",
+    "starter": "function createField(name, value) {\n  return { [name]: value };\n}\n\nconsole.log(createField(\"username\", \"alex\"));\nconsole.log(createField(\"score\", 95));\nconsole.log(createField(\"active\", true));\n\n// Build a settings object dynamically:\nconst settings = {};\nconst keys = [\"theme\", \"lang\", \"tz\"];\nconst vals = [\"dark\", \"en\", \"UTC\"];\nkeys.forEach((k, i) => { settings[k] = vals[i]; });\nconsole.log(settings);",
+    "expectedOutput": ["{ username: 'alex' }", "{ score: 95 }", "{ active: true }", "{ theme: 'dark', lang: 'en', tz: 'UTC' }"],
+    "successMessage": "Computed property names are essential when building objects dynamically — form state, query params, API payloads where field names come from variables."
+  },
+  {
+    "title": "Object.keys, values, entries",
+    "instruction": "Three essential methods for working with all an object's data:\n\n- `Object.keys(obj)` — array of key names\n- `Object.values(obj)` — array of values\n- `Object.entries(obj)` — array of `[key, value]` pairs\n\nPrint all keys, all values, and then loop over entries to print `key: value`.",
+    "hint": "for (const [key, value] of Object.entries(user)) { ... }",
+    "starter": "const user = { name: \"Alex\", age: 25, city: \"London\" };\n\nconsole.log(Object.keys(user));\nconsole.log(Object.values(user));\n\n// TODO: loop over Object.entries() and print \"key: value\" for each",
+    "expectedOutput": ["[ 'name', 'age', 'city' ]", "[ 'Alex', 25, 'London' ]", "name: Alex", "age: 25", "city: London"],
+    "codeChecks": [
+      { "pattern": "Object\\.entries\\(", "required": true, "message": "Use: for (const [key, value] of Object.entries(user))" },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
+    ],
+    "successMessage": "Object.entries() + destructuring is the modern way to loop over objects. It's the equivalent of Python's .items()."
+  },
+  {
+    "title": "Spread — copy and merge objects",
+    "instruction": "Object spread `{...obj}` creates a shallow copy. Merge objects by spreading both:\n\n```js\nconst merged = { ...defaults, ...overrides };\n```\n\nLater keys overwrite earlier ones — so put overrides last.\n\nMerge defaults with user settings.",
+    "hint": "const config = { ...defaults, ...userSettings };",
+    "starter": "const defaults = { theme: \"light\", lang: \"en\", fontSize: 14, notifications: true };\nconst userSettings = { theme: \"dark\", fontSize: 18 };\n\n// TODO: merge — user settings override defaults\nconst config = {};\nconsole.log(config);",
+    "expectedOutput": ["{ theme: 'dark', lang: 'en', fontSize: 18, notifications: true }"],
+    "codeChecks": [
+      { "pattern": "\\.\\.\\.(defaults|userSettings)", "required": true, "message": "Use spread: { ...defaults, ...userSettings }" },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
+    ],
+    "successMessage": "User's dark theme and font size 18 overrode the defaults, but lang and notifications came from defaults. This pattern is how every configuration system merges user preferences."
+  },
+  {
+    "title": "Optional chaining on objects",
+    "instruction": "From Chapter 5: `?.` prevents crashes when accessing properties on null/undefined.\n\nThis is essential for API responses where nested data might be missing.\n\nSafely access deeply nested data with `?.` and provide defaults with `??`.",
+    "starter": "const response1 = { user: { address: { city: \"London\", country: \"UK\" } } };\nconst response2 = { user: { name: \"Bob\" } };  // no address\nconst response3 = null;\n\nconst getCity = (resp) => resp?.user?.address?.city ?? \"Unknown city\";\n\nconsole.log(getCity(response1));\nconsole.log(getCity(response2));\nconsole.log(getCity(response3));",
+    "expectedOutput": ["London", "Unknown city", "Unknown city"],
+    "successMessage": "?. chains safely through every level. response3?.user?.address?.city returns undefined (not an error), then ?? gives the fallback. Three null-safe levels in one expression."
+  },
+  {
+    "title": "Map — when object keys aren't strings",
+    "instruction": "Plain objects only support string (and symbol) keys. `Map` supports ANY key type — objects, arrays, functions, numbers.\n\nMap also remembers insertion order and has a clean API:\n\n```js\nconst m = new Map();\nm.set(key, value);\nm.get(key);\nm.has(key);\nm.delete(key);\nm.size;\n```",
+    "starter": "const scores = new Map();\n\nconst alice = { name: \"Alice\" };\nconst bob   = { name: \"Bob\"   };\n\nscores.set(alice, 95);\nscores.set(bob, 87);\nscores.set(1, \"first\");  // number key!\n\nconsole.log(scores.get(alice));\nconsole.log(scores.get(bob));\nconsole.log(scores.has(alice));\nconsole.log(scores.size);\n\nfor (const [person, score] of scores) {\n  if (typeof person === 'object') console.log(`${person.name}: ${score}`);\n}",
+    "expectedOutput": ["95", "87", "true", "3", "Alice: 95", "Bob: 87"],
+    "successMessage": "Map with object keys — this is impossible with plain objects (objects are stringified to [object Object] as keys). Use Map when keys need to be non-strings."
+  },
+  {
+    "title": "Set — unique values only",
+    "instruction": "`Set` stores unique values — duplicates are silently ignored:\n\n```js\nconst set = new Set([1, 2, 2, 3, 3]);\n// → Set { 1, 2, 3 }\n```\n\nThe classic use: deduplicate an array. Convert array → Set → back to array.",
+    "hint": "[...new Set(array)] or Array.from(new Set(array))",
+    "starter": "const tags = [\"js\", \"react\", \"js\", \"node\", \"react\", \"python\", \"js\"];\nconsole.log(\"With duplicates:\", tags);\n\n// TODO: remove duplicates using Set\nconst unique = [];\nconsole.log(\"Unique:\", unique);\nconsole.log(`Removed ${tags.length - unique.length} duplicates`);",
+    "expectedOutput": ["With duplicates: [ 'js', 'react', 'js', 'node', 'react', 'python', 'js' ]", "Unique: [ 'js', 'react', 'node', 'python' ]", "Removed 3 duplicates"],
+    "codeChecks": [
+      { "pattern": "new Set\\(", "required": true, "message": "Use new Set(tags) to deduplicate." },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
+    ],
+    "successMessage": "[...new Set(array)] is the cleanest one-liner for deduplication in JavaScript. Set also has O(1) lookup — checking if a value exists is faster than array.includes() on large datasets."
+  },
+  {
+    "title": "Build a word frequency counter",
+    "instruction": "Final challenge — no starter code.\n\nBuild a `wordFrequency(text)` function that:\n1. Splits text into words (lowercase, remove punctuation)\n2. Counts each word using a `Map`\n3. Returns the top 5 most frequent words as `[word, count]` pairs\n\nTest with: `\"the cat sat on the mat and the cat sat on the hat\"`",
+    "hint": "Use text.toLowerCase().split(' ') and a Map to count. Sort entries by value descending, slice top 5.",
+    "starter": "",
+    "expectedOutput": [],
+    "codeChecks": [
+      { "pattern": "function wordFrequency|const wordFrequency\\s*=", "required": true, "message": "Define wordFrequency(text)." },
+      { "pattern": "new Map\\(\\)|Map\\(\\)", "required": true, "message": "Use a Map to count word frequencies." },
+      { "pattern": "\\.split\\(", "required": true, "message": "Split the text into words." },
+      { "pattern": "\\.toLowerCase\\(\\)", "required": true, "message": "Convert to lowercase for normalisation." }
+    ],
+    "successMessage": "A word frequency counter using Map — the foundation of search engines, spell checkers, and text analysers. Chapter 8 done — objects and Maps mastered!"
+  }
+]

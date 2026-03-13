@@ -1,0 +1,66 @@
+[
+  {
+    "title": "The iterator protocol",
+    "instruction": "Before generators, let's understand iterators. An **iterator** is any object with a `next()` method that returns `{ value, done }`.\n\n`for...of` works on any iterator — it calls `next()` repeatedly until `done: true`.\n\nRun this to see the protocol.",
+    "starter": "// Manual iterator:\nfunction counter(max) {\n  let i = 0;\n  return {\n    next() {\n      if (i < max) return { value: i++, done: false };\n      return { value: undefined, done: true };\n    }\n  };\n}\n\nconst iter = counter(3);\nconsole.log(iter.next()); // { value: 0, done: false }\nconsole.log(iter.next()); // { value: 1, done: false }\nconsole.log(iter.next()); // { value: 2, done: false }\nconsole.log(iter.next()); // { value: undefined, done: true }",
+    "expectedOutput": ["{ value: 0, done: false }", "{ value: 1, done: false }", "{ value: 2, done: false }", "{ value: undefined, done: true }"],
+    "successMessage": "The iterator protocol: next() returns {value, done}. done: true signals the end. for...of calls next() automatically until done is true. Generators automate this boilerplate."
+  },
+  {
+    "title": "Generator functions with yield",
+    "instruction": "`function*` (note the asterisk) creates a generator. `yield` pauses it and emits a value.\n\nCallers use `next()` to resume.\n\nRun this to see the generator pause and resume.",
+    "starter": "function* counter(max) {\n  for (let i = 0; i < max; i++) {\n    yield i;  // pause here, emit i\n  }\n}\n\nconst gen = counter(3);\nconsole.log(gen.next()); // { value: 0, done: false }\nconsole.log(gen.next()); // { value: 1, done: false }\nconsole.log(gen.next()); // { value: 2, done: false }\nconsole.log(gen.next()); // { value: undefined, done: true }",
+    "expectedOutput": ["{ value: 0, done: false }", "{ value: 1, done: false }", "{ value: 2, done: false }", "{ value: undefined, done: true }"],
+    "successMessage": "Same protocol, less code! The generator handles the {value, done} wrapping automatically. yield pauses execution and sends the value to the caller."
+  },
+  {
+    "title": "Generators work with for...of",
+    "instruction": "Generators implement the iterable protocol automatically — they work directly in `for...of`, spread, and destructuring.\n\nNo need to call `next()` manually.",
+    "starter": "function* range(start, end, step = 1) {\n  for (let i = start; i <= end; i += step) {\n    yield i;\n  }\n}\n\n// for...of:\nfor (const n of range(1, 5)) {\n  process.stdout.write(n + \" \");\n}\nconsole.log();\n\n// Spread:\nconsole.log([...range(0, 10, 2)]);\n\n// Destructuring:\nconst [a, b, c] = range(100, 300, 100);\nconsole.log(a, b, c);",
+    "expectedOutput": ["1 2 3 4 5 ", "[ 0, 2, 4, 6, 8, 10 ]", "100 200 300"],
+    "successMessage": "Generators are first-class iterables. Spread, for...of, destructuring — they all work. range(0, 1000000) is memory-efficient because values are produced one at a time."
+  },
+  {
+    "title": "Infinite generators",
+    "instruction": "Generators can be infinite — they never run out of values. You take as many as you need.\n\nThis is safe because values are produced lazily — the generator doesn't compute them all upfront.",
+    "hint": "function* naturals() { let n = 1; while (true) { yield n++; } }",
+    "starter": "function* naturals() {\n  let n = 1;\n  while (true) {   // infinite!\n    yield n++;\n  }\n}\n\nfunction take(gen, n) {\n  const result = [];\n  for (const val of gen) {\n    result.push(val);\n    if (result.length === n) break;\n  }\n  return result;\n}\n\nconsole.log(take(naturals(), 5));    // [1, 2, 3, 4, 5]\nconsole.log(take(naturals(), 10));   // first 10 naturals",
+    "expectedOutput": ["[ 1, 2, 3, 4, 5 ]", "[ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ]"],
+    "successMessage": "Infinite generator! It never ends, but take() breaks early. This is how database cursors work — they can scroll through billions of rows without loading them all."
+  },
+  {
+    "title": "yield* — delegate to another generator",
+    "instruction": "`yield*` delegates to another iterable — generator, array, string, anything iterable.\n\nIt's like spreading one generator inside another.",
+    "starter": "function* numbers() { yield 1; yield 2; yield 3; }\nfunction* letters() { yield 'a'; yield 'b'; yield 'c'; }\n\nfunction* combined() {\n  yield* numbers();\n  yield 99;         // regular yield\n  yield* letters();\n  yield* [10, 20]; // works with arrays too!\n}\n\nconsole.log([...combined()]);",
+    "expectedOutput": ["[ 1, 2, 3, 99, 'a', 'b', 'c', 10, 20 ]"],
+    "successMessage": "yield* delegates iteration. Combined flattened both generators and an array into one sequence. This is how you compose generators into pipelines."
+  },
+  {
+    "title": "Two-way communication with generators",
+    "instruction": "Generators can receive values through `next(value)`. The `yield` expression evaluates to that value:\n\n```js\nconst input = yield \"prompt\";  // receives value from next(value)\n```\n\nThis makes generators two-way communication channels.",
+    "starter": "function* calculator() {\n  let result = 0;\n  while (true) {\n    const op = yield result;\n    if (!op) break;\n    if (op.action === 'add')  result += op.value;\n    if (op.action === 'sub')  result -= op.value;\n    if (op.action === 'mul')  result *= op.value;\n  }\n}\n\nconst calc = calculator();\nconsole.log(calc.next().value);                          // 0\nconsole.log(calc.next({ action: 'add', value: 10 }).value); // 10\nconsole.log(calc.next({ action: 'mul', value: 3  }).value); // 30\nconsole.log(calc.next({ action: 'sub', value: 5  }).value); // 25",
+    "expectedOutput": ["0", "10", "30", "25"],
+    "successMessage": "Two-way communication through yield. Redux-Saga uses this to manage complex async flows — each yield is a point where saga middleware injects a result."
+  },
+  {
+    "title": "Custom iterable class",
+    "instruction": "Make any class iterable by implementing `[Symbol.iterator]()` — a method that returns an iterator.\n\nOnce you do this, `for...of`, spread, and destructuring all work on your class.",
+    "starter": "class NumberRange {\n  constructor(start, end) {\n    this.start = start;\n    this.end = end;\n  }\n  \n  [Symbol.iterator]() {\n    let current = this.start;\n    const end = this.end;\n    return {\n      next() {\n        if (current <= end) return { value: current++, done: false };\n        return { value: undefined, done: true };\n      }\n    };\n  }\n}\n\nconst r = new NumberRange(1, 5);\nfor (const n of r) process.stdout.write(n + \" \");\nconsole.log();\nconsole.log([...r]);\nconst [first, , third] = r;\nconsole.log(first, third);",
+    "expectedOutput": ["1 2 3 4 5 ", "[ 1, 2, 3, 4, 5 ]", "1 3"],
+    "successMessage": "[Symbol.iterator]() is the magic method. Any object that has it becomes iterable. Spread, for...of, destructuring — they all call it. This is how custom collections work."
+  },
+  {
+    "title": "Lazy pipeline with generators",
+    "instruction": "Final challenge — no starter code.\n\nBuild a lazy data pipeline using generators:\n- `function* map(iterable, fn)` — lazy map\n- `function* filter(iterable, fn)` — lazy filter\n- `function* take(iterable, n)` — take first n items\n\nThen chain them to process the naturals sequence (from step 4): take the first 5 even numbers and double them.\n\nDo this without creating any intermediate arrays.",
+    "hint": "function* map(iter, fn) { for (const x of iter) yield fn(x); }\nfunction* filter(iter, fn) { for (const x of iter) if (fn(x)) yield x; }\nfunction* take(iter, n) { let i = 0; for (const x of iter) { if (i++ >= n) break; yield x; } }",
+    "starter": "",
+    "expectedOutput": ["[ 4, 8, 12, 16, 20 ]"],
+    "codeChecks": [
+      { "pattern": "function\\*\\s+map|function\\*\\s+lazyMap", "required": true, "message": "Define function* map(iterable, fn)." },
+      { "pattern": "function\\*\\s+filter|function\\*\\s+lazyFilter", "required": true, "message": "Define function* filter(iterable, fn)." },
+      { "pattern": "function\\*\\s+take", "required": true, "message": "Define function* take(iterable, n)." },
+      { "pattern": "yield", "required": true, "message": "Use yield in each generator." }
+    ],
+    "successMessage": "A lazy functional pipeline! No intermediate arrays — values flow from naturals through filter and map one at a time, then take stops after 5. Chapter 19 done!"
+  }
+]

@@ -1,38 +1,14 @@
 ---
-title: "Interfaces & Protocols"
-description: "Duck typing, mixins, and TypeScript interfaces in JavaScript."
-order: 12
+title: "Inheritance"
+description: "Extend classes with extends and super, override methods, use instanceof, and know when NOT to use inheritance."
+order: 13
 difficulty: "intermediate"
-estimatedMinutes: 20
+estimatedMinutes: 18
+concepts: ["extends", "super()", "method overriding", "instanceof", "abstract-like patterns", "composition vs inheritance"]
 ---
 
-## Duck Typing
+## Build on what exists
 
-JavaScript has no `interface` keyword — any object that has the right methods works:
+Inheritance lets you create specialised versions of existing classes without copying code. `AdminUser` gets everything `User` has, then adds its own capabilities.
 
-```javascript
-function makeSound(animal) {
-  animal.speak(); // works if animal has speak()
-}
-```
-
-## Symbols for Protocols
-
-```javascript
-const Serializable = Symbol("Serializable");
-class User {
-  [Serializable]() { return JSON.stringify(this); }
-}
-```
-
-## TypeScript Interfaces
-
-If using TypeScript, `interface` provides compile-time checking:
-
-```typescript
-interface Shape {
-  area(): number;
-}
-```
-
-More content coming soon. Try the interactive steps above!
+JavaScript's class inheritance is prototype-based under the hood — the `extends` keyword sets up the prototype chain. Chapter 14 goes deeper on that.

@@ -1,0 +1,65 @@
+[
+  {
+    "title": "async/await basics",
+    "instruction": "`async` makes a function return a Promise.\n`await` pauses execution until a Promise resolves — but only inside an `async` function.\n\nCompare the Promise chain from Chapter 17 with the async/await version:\n\n```js\n// Promise chain:  fetchUser().then(u => u.name).then(console.log)\n// async/await:    const user = await fetchUser(); console.log(user.name);\n```\n\nRun both versions — they do the same thing.",
+    "starter": "function delay(ms, value) {\n  return new Promise(resolve => setTimeout(() => resolve(value), ms));\n}\n\n// Promise chain version:\ndelay(50, { name: \"alex\", score: 78 })\n  .then(u => u.name)\n  .then(n => n.toUpperCase())\n  .then(console.log);\n\n// async/await version — same logic:\nasync function main() {\n  const user  = await delay(50, { name: \"alex\", score: 78 });\n  const name  = user.name;\n  const upper = name.toUpperCase();\n  console.log(upper);\n}\nmain();",
+    "expectedOutput": ["ALEX", "ALEX"],
+    "successMessage": "Same result, different style. async/await wins on readability — you can add variables, conditions, loops. Promise chains get unwieldy with branching logic."
+  },
+  {
+    "title": "await is just waiting",
+    "instruction": "`await` pauses the async function — the rest of the program keeps running.\n\nThis is the key insight: `await` doesn't block the whole program, just the async function it's in.\n\nRun this and note the order.",
+    "starter": "async function fetchData() {\n  console.log(\"2: fetchData started\");\n  await new Promise(r => setTimeout(r, 100));\n  console.log(\"4: fetchData done\");\n  return \"result!\";\n}\n\nconsole.log(\"1: Before calling fetchData\");\nconst promise = fetchData();  // starts the async function\nconsole.log(\"3: After calling fetchData (still waiting)\");\n\npromise.then(r => console.log(\"5: Got:\", r));",
+    "expectedOutput": ["1: Before calling fetchData", "2: fetchData started", "3: After calling fetchData (still waiting)", "4: fetchData done", "5: Got: result!"],
+    "successMessage": "1, 2, 3, 4, 5 — in that order. Step 3 runs BEFORE step 4 even though it comes after the await. The event loop kept going while the 100ms timer was running."
+  },
+  {
+    "title": "Error handling with try/catch",
+    "instruction": "With async/await, you use regular `try/catch` for errors — much cleaner than `.catch()` chains.\n\nAwait wraps the rejected promise rejection into a thrown error.",
+    "starter": "function fakeRequest(name, shouldFail = false) {\n  return new Promise((res, rej) =>\n    setTimeout(() => shouldFail ? rej(new Error(`${name} failed!`)) : res(`${name} ok`), 50)\n  );\n}\n\nasync function loadPage() {\n  try {\n    const user    = await fakeRequest(\"user\");\n    const orders  = await fakeRequest(\"orders\", true); // fails!\n    const reviews = await fakeRequest(\"reviews\");      // never runs\n    return { user, orders, reviews };\n  } catch (error) {\n    console.log(\"Caught:\", error.message);\n    return null;\n  }\n}\n\nloadPage().then(r => console.log(\"Result:\", r));",
+    "expectedOutput": ["Caught: orders failed!", "Result: null"],
+    "successMessage": "try/catch with async/await — reviews never ran because orders threw. Errors jump to the nearest catch, exactly like synchronous code. This is why async/await is so readable."
+  },
+  {
+    "title": "Sequential vs parallel — critical difference!",
+    "instruction": "This is the most important async/await performance trap.\n\n**Sequential** (slow): each await finishes before the next starts\n**Parallel** (fast): start all at once, await all results together\n\nRun both and see the time difference.",
+    "starter": "function fetchItem(name, ms) {\n  return new Promise(r => setTimeout(() => r(`${name} loaded`), ms));\n}\n\nasync function sequential() {\n  const start = Date.now();\n  const a = await fetchItem(\"users\",    100);\n  const b = await fetchItem(\"products\", 100);\n  const c = await fetchItem(\"orders\",   100);\n  console.log(`Sequential: ${Date.now() - start}ms`);\n  return [a, b, c];\n}\n\nasync function parallel() {\n  const start = Date.now();\n  const [a, b, c] = await Promise.all([\n    fetchItem(\"users\",    100),\n    fetchItem(\"products\", 100),\n    fetchItem(\"orders\",   100),\n  ]);\n  console.log(`Parallel: ${Date.now() - start}ms`);\n  return [a, b, c];\n}\n\nsequential().then(() => parallel());",
+    "expectedOutput": ["Sequential: 300ms", "Parallel: 100ms"],
+    "successMessage": "Sequential: 300ms. Parallel: 100ms. NEVER chain awaits when the requests are independent — use Promise.all. This is the most impactful async optimisation."
+  },
+  {
+    "title": "Async functions always return Promises",
+    "instruction": "An `async` function ALWAYS returns a Promise — even if you return a plain value.\n\nThis means you can `.then()` on any async function call.",
+    "starter": "async function getScore() {\n  return 95; // wrapped in Promise.resolve(95) automatically\n}\n\nasync function getUser() {\n  return { name: \"Alex\", score: await getScore() };\n}\n\n// async functions always return Promises:\nconsole.log(getScore() instanceof Promise); // true\n\n// Use await or .then() to get the value:\ngetScore().then(s => console.log(\"Score:\", s));\n\nasync function main() {\n  const score = await getScore();\n  const user  = await getUser();\n  console.log(\"Direct:\", score);\n  console.log(\"User:\",  user.name, user.score);\n}\nmain();",
+    "expectedOutput": ["true", "Score: 95", "Direct: 95", "User: Alex 95"],
+    "successMessage": "async always wraps the return value in a Promise. This means async functions compose naturally — you can await any async function, nest them, pass them around."
+  },
+  {
+    "title": "Async iteration — for await...of",
+    "instruction": "`for await...of` loops over async iterables — like paginated API responses or file streams.\n\nSimulate processing a stream of data one chunk at a time.",
+    "starter": "async function* generateNumbers(max) {\n  for (let i = 1; i <= max; i++) {\n    await new Promise(r => setTimeout(r, 10)); // simulate delay\n    yield i;\n  }\n}\n\nasync function main() {\n  let sum = 0;\n  for await (const num of generateNumbers(5)) {\n    console.log(`Got: ${num}`);\n    sum += num;\n  }\n  console.log(`Sum: ${sum}`);\n}\n\nmain();",
+    "expectedOutput": ["Got: 1", "Got: 2", "Got: 3", "Got: 4", "Got: 5", "Sum: 15"],
+    "successMessage": "for await...of processes each value as it arrives. This is how you handle streams, paginated APIs, and large datasets without loading everything into memory first."
+  },
+  {
+    "title": "Async error propagation",
+    "instruction": "Errors in async functions propagate naturally through the await chain.\n\nA best practice: wrap the top-level async call in try/catch so errors don't go unhandled.",
+    "starter": "async function step1() { throw new Error(\"Step 1 failed\"); }\nasync function step2() { return await step1(); }\nasync function step3() { return await step2(); }\n\n// Without handling:\nstep3().catch(e => console.log(\"Unhandled:\", e.message));\n\n// With try/catch at the top level:\nasync function main() {\n  try {\n    await step3();\n  } catch (e) {\n    console.log(\"Caught at main:\", e.message);\n  }\n}\nmain();",
+    "expectedOutput": ["Unhandled: Step 1 failed", "Caught at main: Step 1 failed"],
+    "successMessage": "Errors propagate through the entire async chain. step3 awaited step2, which awaited step1 — the error bubbled all the way up. Catch it at the highest level."
+  },
+  {
+    "title": "Build an async data fetcher with retry",
+    "instruction": "Final challenge — no starter code.\n\nBuild `fetchWithRetry(fn, options)` where options is `{ maxRetries: 3, delayMs: 100, timeout: 1000 }`.\n\n- Wraps a Promise-returning function with retry logic\n- Uses exponential backoff: delay doubles each retry (100ms, 200ms, 400ms)\n- Times out the whole operation after `timeout` ms\n- Logs each attempt\n\nTest with a function that fails twice then succeeds.",
+    "hint": "Use Promise.race with a timeout promise. Double delay each attempt.",
+    "starter": "",
+    "expectedOutput": [],
+    "codeChecks": [
+      { "pattern": "async function fetchWithRetry|const fetchWithRetry\\s*=", "required": true, "message": "Define async fetchWithRetry." },
+      { "pattern": "for|while", "required": true, "message": "Use a loop for retries." },
+      { "pattern": "await new Promise|await.*setTimeout", "required": true, "message": "Use await for the delay between retries." },
+      { "pattern": "\\* 2|delay.*2|backoff", "required": true, "message": "Double the delay for exponential backoff." }
+    ],
+    "successMessage": "Retry + exponential backoff + timeout — the standard pattern for production API calls. Chapter 18 done — async/await is now in your toolbox!"
+  }
+]

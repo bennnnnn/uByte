@@ -1,0 +1,67 @@
+[
+  {
+    "title": "fetch — make your first HTTP request",
+    "instruction": "`fetch(url)` returns a Promise that resolves to a `Response` object. Call `.json()` on it to parse the body.\n\nTwo awaits:\n1. `await fetch(url)` — wait for the response headers\n2. `await response.json()` — wait for the body to be read\n\nFetch a user from the JSONPlaceholder test API.",
+    "starter": "async function main() {\n  const response = await fetch(\"https://jsonplaceholder.typicode.com/users/1\");\n  console.log(\"Status:\", response.status);\n  console.log(\"OK:\", response.ok);\n  \n  const user = await response.json();\n  console.log(\"Name:\", user.name);\n  console.log(\"Email:\", user.email);\n  console.log(\"City:\", user.address.city);\n}\n\nmain();",
+    "expectedOutput": [],
+    "successMessage": "Two awaits — response headers first, then body. response.ok is true for 2xx status codes. This is the basic fetch pattern you'll use hundreds of times."
+  },
+  {
+    "title": "Error handling — network vs HTTP errors",
+    "instruction": "`fetch` only rejects for **network failures** (no connection, DNS failure). HTTP errors (404, 500) still resolve — you get a Response with `ok: false`.\n\nYou must check `response.ok` manually:\n\n```js\nif (!response.ok) throw new Error(`HTTP ${response.status}`);\n```",
+    "starter": "async function safeFetch(url) {\n  const response = await fetch(url);\n  \n  if (!response.ok) {\n    throw new Error(`HTTP Error ${response.status}: ${response.statusText}`);\n  }\n  \n  return response.json();\n}\n\nasync function main() {\n  // Valid request:\n  try {\n    const user = await safeFetch(\"https://jsonplaceholder.typicode.com/users/1\");\n    console.log(\"Got user:\", user.name);\n  } catch (e) {\n    console.log(\"Error:\", e.message);\n  }\n  \n  // 404 request:\n  try {\n    const notFound = await safeFetch(\"https://jsonplaceholder.typicode.com/users/9999\");\n  } catch (e) {\n    console.log(\"Not found error:\", e.message);\n  }\n}\n\nmain();",
+    "expectedOutput": [],
+    "successMessage": "fetch doesn't throw for 404 — you must check response.ok. This is the most common fetch mistake. Always wrap fetch with a helper that checks ok and throws."
+  },
+  {
+    "title": "POST — send data",
+    "instruction": "POST requests send data in the body. You need to:\n1. Set `method: 'POST'`\n2. Set `Content-Type: application/json` header\n3. JSON.stringify the body\n\nCreate a new post on JSONPlaceholder.",
+    "hint": "headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data)",
+    "starter": "async function createPost(data) {\n  const response = await fetch(\"https://jsonplaceholder.typicode.com/posts\", {\n    method: \"POST\",\n    headers: {\n      \"Content-Type\": \"application/json\",\n    },\n    body: JSON.stringify(data),\n  });\n  \n  if (!response.ok) throw new Error(`HTTP ${response.status}`);\n  return response.json();\n}\n\nasync function main() {\n  const newPost = await createPost({\n    title: \"My First Post\",\n    body: \"Hello from JavaScript!\",\n    userId: 1,\n  });\n  console.log(\"Created:\", newPost.id);\n  console.log(\"Title:\", newPost.title);\n}\n\nmain();",
+    "expectedOutput": [],
+    "successMessage": "POST with JSON body — the pattern for every form submission, API call, and data creation. JSONPlaceholder returns a fake ID of 101 (it doesn't actually save anything)."
+  },
+  {
+    "title": "Query parameters with URLSearchParams",
+    "instruction": "Build query strings with `URLSearchParams` — it handles URL encoding automatically:\n\n```js\nconst params = new URLSearchParams({ q: 'hello world', page: 2 });\nfetch(`/api/search?${params}`);\n// → /api/search?q=hello+world&page=2\n```\n\nSearch for posts from user 1.",
+    "starter": "async function fetchPosts(filters) {\n  const params = new URLSearchParams(filters);\n  const url = `https://jsonplaceholder.typicode.com/posts?${params}`;\n  console.log(\"URL:\", url);\n  \n  const response = await fetch(url);\n  const posts = await response.json();\n  return posts;\n}\n\nasync function main() {\n  const posts = await fetchPosts({ userId: 1 });\n  console.log(\"Posts count:\", posts.length);\n  console.log(\"First post:\", posts[0].title);\n}\n\nmain();",
+    "expectedOutput": [],
+    "successMessage": "URLSearchParams handles encoding — spaces become +, special characters are percent-encoded. Never concatenate query strings manually — it's error-prone and a security risk."
+  },
+  {
+    "title": "Request headers and Authorization",
+    "instruction": "APIs often require authentication via headers:\n\n```js\nfetch(url, {\n  headers: {\n    'Authorization': 'Bearer your-token',\n    'Accept': 'application/json',\n  }\n})\n```\n\nBuild a reusable `apiClient` that always adds auth headers.",
+    "starter": "function createApiClient(baseUrl, token) {\n  const defaultHeaders = {\n    \"Content-Type\": \"application/json\",\n    \"Accept\": \"application/json\",\n    ...(token && { \"Authorization\": `Bearer ${token}` }),\n  };\n  \n  return {\n    async get(path) {\n      const r = await fetch(`${baseUrl}${path}`, { headers: defaultHeaders });\n      if (!r.ok) throw new Error(`HTTP ${r.status}`);\n      return r.json();\n    },\n    async post(path, data) {\n      const r = await fetch(`${baseUrl}${path}`, {\n        method: \"POST\",\n        headers: defaultHeaders,\n        body: JSON.stringify(data),\n      });\n      if (!r.ok) throw new Error(`HTTP ${r.status}`);\n      return r.json();\n    }\n  };\n}\n\nconst api = createApiClient(\"https://jsonplaceholder.typicode.com\", \"fake-token\");\n\nasync function main() {\n  const user = await api.get(\"/users/1\");\n  console.log(\"User:\", user.name);\n}\nmain();",
+    "expectedOutput": [],
+    "successMessage": "A reusable API client with auth headers baked in. This is the pattern real apps use — Axios, SWR, React Query all wrap fetch with helpers like this."
+  },
+  {
+    "title": "AbortController — cancel requests",
+    "instruction": "`AbortController` cancels in-flight requests — essential for:\n- Search-as-you-type (cancel old request when user types more)\n- Component unmount (cancel if user navigates away)\n- Timeout (cancel after N milliseconds)\n\nBuild a fetch with timeout using AbortController.",
+    "hint": "const controller = new AbortController(); fetch(url, { signal: controller.signal }); setTimeout(() => controller.abort(), ms);",
+    "starter": "function fetchWithTimeout(url, ms = 5000) {\n  const controller = new AbortController();\n  const timeoutId = setTimeout(() => controller.abort(), ms);\n  \n  return fetch(url, { signal: controller.signal })\n    .then(r => {\n      clearTimeout(timeoutId);\n      return r.json();\n    })\n    .catch(e => {\n      if (e.name === 'AbortError') throw new Error(`Timeout after ${ms}ms`);\n      throw e;\n    });\n}\n\nasync function main() {\n  try {\n    const data = await fetchWithTimeout(\"https://jsonplaceholder.typicode.com/users/1\", 5000);\n    console.log(\"Got:\", data.name);\n  } catch(e) {\n    console.log(\"Error:\", e.message);\n  }\n}\nmain();",
+    "expectedOutput": [],
+    "successMessage": "AbortController + clearTimeout — the proper fetch timeout pattern. React's useEffect hook returns a cleanup function that should call controller.abort() when the component unmounts."
+  },
+  {
+    "title": "Parallel requests with Promise.all",
+    "instruction": "From Chapter 17: `Promise.all` runs Promises in parallel. Applied to fetch: load multiple API resources simultaneously.\n\nFetch user data and their posts in parallel, then combine them.",
+    "starter": "async function loadUserWithPosts(userId) {\n  const [user, posts] = await Promise.all([\n    fetch(`https://jsonplaceholder.typicode.com/users/${userId}`).then(r => r.json()),\n    fetch(`https://jsonplaceholder.typicode.com/posts?userId=${userId}`).then(r => r.json()),\n  ]);\n  \n  return { ...user, posts };\n}\n\nasync function main() {\n  const user = await loadUserWithPosts(1);\n  console.log(\"User:\", user.name);\n  console.log(\"Posts:\", user.posts.length);\n  console.log(\"First post:\", user.posts[0].title);\n}\nmain();",
+    "expectedOutput": [],
+    "successMessage": "Two requests in parallel — takes as long as the slower one, not both combined. This is how dashboards load multiple data sources efficiently."
+  },
+  {
+    "title": "Build a mini HTTP client library",
+    "instruction": "Final challenge — no starter code.\n\nBuild a `createHttpClient(baseUrl, options)` factory that:\n- `get(path, params)` — GET request with optional query params\n- `post(path, data)` — POST with JSON body\n- `put(path, data)` — PUT with JSON body\n- `delete(path)` — DELETE\n- Auto-handles `response.ok` check and throws on errors\n- Supports `options.headers` for default headers (e.g. auth)\n- Supports `options.timeout` for request cancellation\n\nTest against JSONPlaceholder.",
+    "hint": "Return different fetch configurations based on method. Use AbortController for timeout.",
+    "starter": "",
+    "expectedOutput": [],
+    "codeChecks": [
+      { "pattern": "function createHttpClient|const createHttpClient\\s*=", "required": true, "message": "Define createHttpClient(baseUrl, options)." },
+      { "pattern": "\\.get\\s*\\(|\\.get:", "required": true, "message": "Add get() method." },
+      { "pattern": "\\.post\\s*\\(|\\.post:", "required": true, "message": "Add post() method." },
+      { "pattern": "AbortController|signal", "required": true, "message": "Implement timeout with AbortController." }
+    ],
+    "successMessage": "A complete HTTP client library — headers, timeout, all methods, error handling. This is what Axios does under the hood. Chapter 21 done!"
+  }
+]

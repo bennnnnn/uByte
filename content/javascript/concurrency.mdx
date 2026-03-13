@@ -1,34 +1,14 @@
 ---
-title: "Promises & Async/Await"
-description: "The event loop, Promises, async/await, and parallel execution in JavaScript."
-order: 15
-difficulty: "advanced"
-estimatedMinutes: 25
+title: "Async/Await"
+description: "Write asynchronous code that reads like synchronous — async/await on top of Promises, error handling, parallel vs sequential, and real patterns."
+order: 18
+difficulty: "intermediate"
+estimatedMinutes: 22
+concepts: ["async", "await", "try/catch with async", "sequential vs parallel", "Promise.all with await", "async iteration", "top-level await"]
 ---
 
-## Promises
+## The best thing that happened to JavaScript
 
-```javascript
-const p = new Promise((resolve, reject) => {
-  setTimeout(() => resolve("done"), 1000);
-});
-p.then(val => console.log(val)); // "done" after 1s
-```
+`async/await` was introduced in 2017 and immediately changed how JavaScript is written. Instead of `.then().then().then()` chains, you write code that looks synchronous but runs asynchronously.
 
-## async / await
-
-```javascript
-async function getData() {
-  const res = await fetch("https://api.example.com/data");
-  const data = await res.json();
-  return data;
-}
-```
-
-## Parallel Execution
-
-```javascript
-const [a, b] = await Promise.all([fetchA(), fetchB()]);
-```
-
-More content coming soon. Try the interactive steps above!
+Under the hood, `async/await` is still Promises — just with much better syntax. Everything in Chapter 17 still applies.

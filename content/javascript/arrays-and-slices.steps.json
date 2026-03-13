@@ -1,0 +1,107 @@
+[
+  {
+    "title": "Arrays — one variable, many values",
+    "instruction": "From Chapter 2: `const name = \"Alex\"` stores one value. But what if you have 100 names? 100 variables? No.\n\nArrays store multiple values under one name:\n\n```js\nconst names = [\"Alice\", \"Bob\", \"Carol\"];\n```\n\nRun this. Notice `.length` for count and `[index]` (0-based) for access.",
+    "starter": "const scores = [95, 87, 73, 91, 68, 82];\n\nconsole.log(scores);\nconsole.log(`Total students: ${scores.length}`);\nconsole.log(`First: ${scores[0]}`);\nconsole.log(`Last: ${scores[scores.length - 1]}`);\nconsole.log(`Last (modern): ${scores.at(-1)}`);",
+    "expectedOutput": ["[ 95, 87, 73, 91, 68, 82 ]", "Total students: 6", "First: 95", "Last: 82", "Last (modern): 82"],
+    "successMessage": ".at(-1) always gives the last element regardless of array length. scores[scores.length - 1] works too but .at() is cleaner. Remember it."
+  },
+  {
+    "title": "push, pop, shift, unshift",
+    "instruction": "Four mutation methods:\n\n- `push(x)` — add to **end** (fast)\n- `pop()` — remove from **end**, returns removed item\n- `unshift(x)` — add to **front** (slow — shifts everything)\n- `shift()` — remove from **front**, returns removed item\n\nBuild a queue (add to end, remove from front).",
+    "hint": "queue.push(\"new\"); const first = queue.shift();",
+    "starter": "const queue = [\"Alice\", \"Bob\", \"Carol\"];\nconsole.log(\"Queue:\", queue);\n\nqueue.push(\"David\");\nconsole.log(\"After push:\", queue);\n\nconst served = queue.shift();\nconsole.log(`Served: ${served}`);\nconsole.log(\"After shift:\", queue);\n\nconst last = queue.pop();\nconsole.log(`Removed last: ${last}`);\nconsole.log(\"After pop:\", queue);",
+    "expectedOutput": ["Queue: [ 'Alice', 'Bob', 'Carol' ]", "After push: [ 'Alice', 'Bob', 'Carol', 'David' ]", "Served: Alice", "After shift: [ 'Bob', 'Carol', 'David' ]", "Removed last: David", "After pop: [ 'Bob', 'Carol' ]"],
+    "successMessage": "A working queue. push/pop at end are O(1) — constant time. unshift/shift at front are O(n) — they move every element. For large arrays, prefer push/pop."
+  },
+  {
+    "title": "map — transform every item",
+    "instruction": "`.map()` runs a function on every element and returns a **new array** with the transformed values. The original is unchanged.\n\n```js\nconst doubled = numbers.map(n => n * 2);\n```\n\nTransform the prices array to add 20% tax.",
+    "hint": "prices.map(p => p * 1.2)",
+    "starter": "const prices = [10, 25, 50, 100];\n\n// TODO: create 'withTax' array using map — each price * 1.2\nconst withTax = prices.map(/* your function here */);\nconsole.log(withTax.map(p => p.toFixed(2)));",
+    "expectedOutput": ["[ '12.00', '30.00', '60.00', '120.00' ]"],
+    "codeChecks": [
+      { "pattern": "prices\\.map\\(", "required": true, "message": "Use: prices.map(p => p * 1.2)" },
+      { "pattern": "\\* 1\\.2|\\*1\\.2", "required": true, "message": "Multiply each price by 1.2 for tax." },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
+    ],
+    "successMessage": "map transforms every element. The original prices array is unchanged — map creates a NEW array. This immutability is a key feature — no side effects."
+  },
+  {
+    "title": "filter — keep what you want",
+    "instruction": "`.filter()` runs a test function on every element and returns a **new array** containing only the elements that pass.\n\n```js\nconst adults = users.filter(u => u.age >= 18);\n```\n\nFilter the products to only show those in stock with price under 50.",
+    "hint": "products.filter(p => p.inStock && p.price < 50)",
+    "starter": "const products = [\n  { name: \"Phone\",   price: 799, inStock: true  },\n  { name: \"Cable\",   price: 15,  inStock: true  },\n  { name: \"Laptop\",  price: 1299,inStock: false },\n  { name: \"Charger\", price: 35,  inStock: true  },\n  { name: \"Case\",    price: 20,  inStock: false },\n];\n\n// TODO: filter to inStock products under $50\nconst affordable = products.filter(/* your condition */);\naffordable.forEach(p => console.log(`${p.name}: $${p.price}`));",
+    "expectedOutput": ["Cable: $15", "Charger: $35"],
+    "codeChecks": [
+      { "pattern": "products\\.filter\\(", "required": true, "message": "Use: products.filter(p => ...)" },
+      { "pattern": "inStock", "required": true, "message": "Check p.inStock in the filter." },
+      { "pattern": "price < 50|price<=49|price <=49", "required": true, "message": "Filter price < 50." },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
+    ],
+    "successMessage": "Cable and Charger — the only two items that are inStock AND under $50. filter is declarative — you say what you WANT, not how to skip the rest. Clean."
+  },
+  {
+    "title": "reduce — collapse to one value",
+    "instruction": "`reduce` is the most powerful array method — it collapses the whole array into a single value (sum, object, another array, anything).\n\n```js\narray.reduce((accumulator, current) => { ... }, initialValue)\n```\n\n- `accumulator` — the running result\n- `current` — the current element\n- `initialValue` — what accumulator starts as\n\nCalculate the total and average score.",
+    "hint": "const total = scores.reduce((sum, s) => sum + s, 0);",
+    "starter": "const scores = [88, 92, 79, 95, 83, 71];\n\n// TODO: use reduce to calculate total and average\nconst total = scores.reduce(/* sum them up */);\nconst average = total / scores.length;\n\nconsole.log(`Total: ${total}`);\nconsole.log(`Average: ${average.toFixed(1)}`);",
+    "expectedOutput": ["Total: 508", "Average: 84.7"],
+    "codeChecks": [
+      { "pattern": "scores\\.reduce\\(", "required": true, "message": "Use: scores.reduce((sum, s) => sum + s, 0)" },
+      { "pattern": "sum\\s*\\+\\s*s|acc\\s*\\+\\s*cur|accumulator\\s*\\+\\s*current", "required": true, "message": "Add each score to the accumulator." },
+      { "pattern": ",\\s*0\\)", "required": true, "message": "Start with 0 as the initial value: reduce(..., 0)" },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
+    ],
+    "successMessage": "reduce accumulates: starts at 0, adds 88 = 88, adds 92 = 180, and so on until 508. Then 508 / 6 = 84.7. This powers totals in every e-commerce cart on the web."
+  },
+  {
+    "title": "find, findIndex, some, every",
+    "instruction": "Four search/test methods:\n\n- `find(fn)` — first element that passes, or `undefined`\n- `findIndex(fn)` — index of first match, or `-1`\n- `some(fn)` — does ANY element pass? `true`/`false`\n- `every(fn)` — do ALL elements pass? `true`/`false`\n\nRun this.",
+    "starter": "const users = [\n  { name: \"Alice\", age: 17, premium: false },\n  { name: \"Bob\",   age: 25, premium: true  },\n  { name: \"Carol\", age: 30, premium: true  },\n];\n\nconsole.log(users.find(u => u.premium)?.name);\nconsole.log(users.findIndex(u => u.name === \"Carol\"));\nconsole.log(users.some(u => u.age < 18));\nconsole.log(users.every(u => u.age >= 18));",
+    "expectedOutput": ["Bob", "2", "true", "false"],
+    "successMessage": "find returns the actual element (or undefined), findIndex returns the position. some/every are perfect for validation: every(u => u.isVerified) — are all users verified?"
+  },
+  {
+    "title": "slice — non-mutating extraction",
+    "instruction": "`slice(start, end)` extracts a portion WITHOUT modifying the original:\n\n- `arr.slice(0, 3)` — first 3 items\n- `arr.slice(-2)` — last 2 items\n- `arr.slice(2)` — from index 2 to end\n\nGet the first page (5 items) and last page from a list of 12.",
+    "hint": "items.slice(0, 5), items.slice(-5)",
+    "starter": "const items = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];\n\nconst firstPage = items.slice(0, 5);\nconst lastFive = items.slice(-5);\nconst middle = items.slice(3, 8);\n\nconsole.log(\"First 5:\", firstPage);\nconsole.log(\"Last 5:\", lastFive);\nconsole.log(\"Middle:\", middle);",
+    "expectedOutput": ["First 5: [ 1, 2, 3, 4, 5 ]", "Last 5: [ 8, 9, 10, 11, 12 ]", "Middle: [ 4, 5, 6, 7, 8 ]"],
+    "successMessage": "slice is non-destructive — the original items array is untouched. Use it for pagination (get page 2: slice(10, 20)), preview (show first 3), and copying."
+  },
+  {
+    "title": "spread — copy and merge arrays",
+    "instruction": "The spread operator `...` expands an array into individual elements:\n\n```js\nconst merged = [...arr1, ...arr2];  // merge\nconst copy = [...arr];               // copy\n```\n\nMerge two arrays and add a new element.",
+    "hint": "const all = [...frontend, ...backend, \"DevOps\"];",
+    "starter": "const frontend = [\"React\", \"CSS\", \"TypeScript\"];\nconst backend = [\"Node.js\", \"PostgreSQL\", \"Redis\"];\n\n// TODO: merge both arrays and add \"DevOps\" at the end\nconst allSkills = [];\nconsole.log(allSkills);",
+    "expectedOutput": ["[ 'React', 'CSS', 'TypeScript', 'Node.js', 'PostgreSQL', 'Redis', 'DevOps' ]"],
+    "codeChecks": [
+      { "pattern": "\\.\\.\\.(frontend|backend)", "required": true, "message": "Use spread: [...frontend, ...backend, \"DevOps\"]" },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
+    ],
+    "successMessage": "Spread creates a new merged array — no mutation. This is the immutable update pattern used everywhere in React state management."
+  },
+  {
+    "title": "flat and flatMap",
+    "instruction": "`.flat()` flattens nested arrays one level (or more with a depth argument).\n`.flatMap()` maps then flattens — saves a step.\n\nFlatten the nested skill categories and then add 'Senior ' prefix to all.",
+    "hint": "nested.flat()\nnested.flatMap(category => category.map(s => 'Senior ' + s))",
+    "starter": "const skills = [[\"React\", \"Vue\"], [\"Node.js\", \"Express\"], [\"SQL\", \"MongoDB\"]];\n\nconsole.log(skills.flat());\n\n// flatMap: flatten AND transform in one step\nconst seniorSkills = skills.flatMap(category => category.map(s => `Senior ${s}`));\nconsole.log(seniorSkills);",
+    "expectedOutput": ["[ 'React', 'Vue', 'Node.js', 'Express', 'SQL', 'MongoDB' ]", "[ 'Senior React', 'Senior Vue', 'Senior Node.js', 'Senior Express', 'Senior SQL', 'Senior MongoDB' ]"],
+    "successMessage": "flatMap = map + flat in one call. It's especially useful when each element should produce multiple output elements — like expanding each user into their list of permissions."
+  },
+  {
+    "title": "Build a data pipeline",
+    "instruction": "Final challenge — the real power of array methods is **chaining** them.\n\nStart with the products array and chain `.filter()`, `.map()`, and `.reduce()` to:\n1. Filter to only in-stock products\n2. Apply 10% discount to each price\n3. Calculate the total discounted price\n\nOne chain, three transformations.",
+    "hint": "products.filter(p => p.inStock).map(p => p.price * 0.9).reduce((sum, p) => sum + p, 0)",
+    "starter": "const products = [\n  { name: \"Laptop\",  price: 1200, inStock: true  },\n  { name: \"Phone\",   price: 800,  inStock: false },\n  { name: \"Tablet\",  price: 500,  inStock: true  },\n  { name: \"Watch\",   price: 300,  inStock: true  },\n  { name: \"Earbuds\", price: 150,  inStock: false },\n];\n\n// TODO: chain filter → map → reduce\nconst total = 0; // replace with chain\nconsole.log(`Total (with discount): $${total.toFixed(2)}`);",
+    "expectedOutput": ["Total (with discount): $1800.00"],
+    "codeChecks": [
+      { "pattern": "\\.filter\\(", "required": true, "message": "Chain .filter() first." },
+      { "pattern": "\\.map\\(", "required": true, "message": "Chain .map() to apply discount." },
+      { "pattern": "\\.reduce\\(", "required": true, "message": "Chain .reduce() to sum the prices." },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
+    ],
+    "successMessage": "Three transformations, one chain. This functional style — filter → map → reduce — is how data pipelines are built in React, Node.js, and every modern JavaScript application. Chapter 7 done!"
+  }
+]

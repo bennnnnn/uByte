@@ -1,0 +1,72 @@
+[
+  {
+    "title": "What is a Promise?",
+    "instruction": "A Promise represents a value that doesn't exist yet — but will in the future (or won't, if something goes wrong).\n\nA Promise has three states:\n- **Pending** — initial state, waiting\n- **Fulfilled** — succeeded, has a value\n- **Rejected** — failed, has a reason\n\nRun this to see a Promise resolve.",
+    "starter": "const promise = new Promise((resolve, reject) => {\n  // This function runs immediately\n  // Call resolve(value) to fulfil\n  // Call reject(error) to reject\n  resolve(\"I have a value!\");\n});\n\nconsole.log(typeof promise);         // object\nconsole.log(promise instanceof Promise); // true\n\npromise.then(value => {\n  console.log(\"Fulfilled with:\", value);\n});",
+    "expectedOutput": ["object", "true", "Fulfilled with: I have a value!"],
+    "successMessage": "A Promise is an object. resolve() puts it in the fulfilled state. .then() runs when the Promise fulfils — not immediately, but in the next microtask. More on this in Chapter 20."
+  },
+  {
+    "title": "Simulating async work",
+    "instruction": "In the real world, Promises wrap async operations (network calls, file reads). We'll simulate them with `setTimeout`.\n\nNotice how the code after `fetchUser()` runs BEFORE the result arrives — that's the whole point of async.",
+    "starter": "function fetchUser(id) {\n  return new Promise((resolve, reject) => {\n    setTimeout(() => {\n      if (id <= 0) {\n        reject(new Error(`Invalid ID: ${id}`));\n      } else {\n        resolve({ id, name: `User${id}`, role: 'user' });\n      }\n    }, 100); // simulates 100ms network delay\n  });\n}\n\nconsole.log(\"Fetching user...\");\nfetchUser(1).then(user => console.log(\"Got:\", user.name));\nconsole.log(\"This runs before the user arrives!\");",
+    "expectedOutput": ["Fetching user...", "This runs before the user arrives!", "Got: User1"],
+    "successMessage": "The last line printed SECOND — even though it appears after the .then. JavaScript scheduled the setTimeout and moved on. That's the async model."
+  },
+  {
+    "title": ".catch — handle rejection",
+    "instruction": "`.catch(fn)` handles a rejected Promise. Always add it — unhandled rejections crash Node.js.\n\n`.catch(fn)` is shorthand for `.then(undefined, fn)`.",
+    "starter": "function fetchUser(id) {\n  return new Promise((resolve, reject) => {\n    setTimeout(() => {\n      if (id > 0) resolve({ id, name: `User${id}` });\n      else reject(new Error(`Invalid ID: ${id}`));\n    }, 50);\n  });\n}\n\nfetchUser(5)\n  .then(user => console.log(\"User:\", user.name))\n  .catch(err => console.log(\"Error:\", err.message));\n\nfetchUser(-1)\n  .then(user => console.log(\"User:\", user.name))\n  .catch(err => console.log(\"Error:\", err.message));",
+    "expectedOutput": ["User: User5", "Error: Invalid ID: -1"],
+    "successMessage": ".catch is your safety net. Without it, a rejected Promise is 'unhandled' — Node.js throws an UnhandledPromiseRejection and may crash your server."
+  },
+  {
+    "title": ".then chaining",
+    "instruction": "Each `.then()` returns a new Promise — so you can chain them.\n\nThe value returned from one `.then` becomes the input to the next.\n\nTransform data through a chain: fetch → extract name → uppercase → log.",
+    "starter": "function delay(ms, value) {\n  return new Promise(resolve => setTimeout(() => resolve(value), ms));\n}\n\ndelay(50, { id: 1, name: \"alex\", score: 78 })\n  .then(user => {\n    console.log(\"Step 1 - Got user:\", user.name);\n    return user.name; // pass name to next then\n  })\n  .then(name => {\n    console.log(\"Step 2 - Name:\", name);\n    return name.toUpperCase();\n  })\n  .then(upper => {\n    console.log(\"Step 3 - Uppercased:\", upper);\n  })\n  .catch(err => console.log(\"Error:\", err.message));",
+    "expectedOutput": ["Step 1 - Got user: alex", "Step 2 - Name: alex", "Step 3 - Uppercased: ALEX"],
+    "successMessage": "Each .then receives the return value of the previous one. The chain flows top to bottom. An error at any step jumps straight to .catch — skipping remaining .thens."
+  },
+  {
+    "title": ".finally — always runs",
+    "instruction": "`.finally()` runs whether the Promise fulfilled or rejected — just like `finally` in try/catch.\n\nPerfect for hiding loading spinners, closing connections.",
+    "starter": "let isLoading = true;\nconsole.log(\"Loading:\", isLoading);\n\nfunction fetchData(shouldFail) {\n  return new Promise((resolve, reject) => {\n    setTimeout(() => shouldFail ? reject(new Error(\"Failed!\")) : resolve(\"Data!\"), 50);\n  });\n}\n\nfetchData(false)\n  .then(data => console.log(\"Success:\", data))\n  .catch(err => console.log(\"Error:\", err.message))\n  .finally(() => {\n    isLoading = false;\n    console.log(\"Loading:\", isLoading);\n  });\n\nfetchData(true)\n  .then(data => console.log(\"Success:\", data))\n  .catch(err => console.log(\"Error:\", err.message))\n  .finally(() => console.log(\"Done (either way).\"));",
+    "expectedOutput": ["Loading: true", "Success: Data!", "Loading: false", "Error: Failed!", "Done (either way)."],
+    "successMessage": ".finally always runs — success or failure. This is how loading spinners are hidden, how database connections are closed, how cleanup always happens."
+  },
+  {
+    "title": "Promise.all — run in parallel",
+    "instruction": "`Promise.all([p1, p2, p3])` runs all Promises in parallel and waits for ALL to complete.\n\nIf any one fails, the whole thing fails. One bad apple rejects the group.\n\nRun three 'requests' in parallel.",
+    "starter": "function fakeRequest(name, ms, shouldFail = false) {\n  return new Promise((resolve, reject) => {\n    setTimeout(() => {\n      shouldFail ? reject(new Error(`${name} failed`)) : resolve(`${name} data`);\n    }, ms);\n  });\n}\n\nconst start = Date.now();\nPromise.all([\n  fakeRequest(\"users\",    100),\n  fakeRequest(\"products\", 150),\n  fakeRequest(\"orders\",   80),\n])\n  .then(([users, products, orders]) => {\n    const elapsed = Date.now() - start;\n    console.log(users);\n    console.log(products);\n    console.log(orders);\n    console.log(`Took ~${Math.round(elapsed/100)*100}ms (parallel)`);  // ~150ms, not 330ms\n  });",
+    "expectedOutput": ["users data", "products data", "orders data", "Took ~200ms (parallel)"],
+    "successMessage": "Three requests in ~150-200ms, not 330ms (sequential). Promise.all runs them in parallel — complete when the SLOWEST finishes. This is how APIs fetch multiple resources efficiently."
+  },
+  {
+    "title": "Promise.allSettled — get all results",
+    "instruction": "`Promise.allSettled` waits for all Promises and gives you all results — even the failed ones.\n\nUnlike `Promise.all`, one failure doesn't cancel the rest.\n\nGet results from all requests, successful or not.",
+    "starter": "function fakeRequest(name, ms, fail = false) {\n  return new Promise((res, rej) => setTimeout(() => fail ? rej(new Error(`${name} error`)) : res(`${name} ok`), ms));\n}\n\nPromise.allSettled([\n  fakeRequest(\"users\",    50),\n  fakeRequest(\"orders\",   80, true), // this one fails\n  fakeRequest(\"products\", 60),\n])\n  .then(results => {\n    results.forEach(r => {\n      if (r.status === \"fulfilled\") console.log(\"✓\", r.value);\n      else                          console.log(\"✗\", r.reason.message);\n    });\n  });",
+    "expectedOutput": ["✓ users ok", "✗ orders error", "✓ products ok"],
+    "successMessage": "allSettled never rejects — it always resolves with an array of { status, value/reason } objects. Use it when you want results from all requests regardless of failures."
+  },
+  {
+    "title": "Promise.race — first one wins",
+    "instruction": "`Promise.race([p1, p2, p3])` resolves or rejects as soon as the FIRST Promise settles.\n\nPerfect for timeouts: race a real request against a timer that rejects after N milliseconds.",
+    "hint": "const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout!')), 500));",
+    "starter": "function withTimeout(promise, ms) {\n  const timer = new Promise((_, reject) =>\n    setTimeout(() => reject(new Error(`Timeout after ${ms}ms`)), ms)\n  );\n  return Promise.race([promise, timer]);\n}\n\nfunction slowRequest(ms) {\n  return new Promise(resolve => setTimeout(() => resolve(\"Data!\"), ms));\n}\n\nwithTimeout(slowRequest(100), 500)\n  .then(d => console.log(\"Fast enough:\", d))\n  .catch(e => console.log(e.message));\n\nwithTimeout(slowRequest(1000), 300)\n  .then(d => console.log(\"Fast enough:\", d))\n  .catch(e => console.log(e.message));",
+    "expectedOutput": ["Fast enough: Data!", "Timeout after 300ms"],
+    "successMessage": "withTimeout is a standard pattern. The real request races against a timer — whoever settles first wins. This is how you prevent requests from hanging forever."
+  },
+  {
+    "title": "Build a retry mechanism",
+    "instruction": "Final challenge — no starter code.\n\nWrite `retry(fn, maxAttempts, delayMs)` that:\n- Calls `fn()` (which returns a Promise)\n- If it rejects, waits `delayMs` ms then tries again\n- After `maxAttempts` failures, rejects with the last error\n- Logs attempt number before each try\n\nTest with a function that fails the first 2 times then succeeds.",
+    "hint": "async function retry(fn, attempts, delay) { for (let i = 1; i <= attempts; i++) { try { return await fn(); } catch(e) { if (i === attempts) throw e; await new Promise(r => setTimeout(r, delay)); } } }",
+    "starter": "",
+    "expectedOutput": [],
+    "codeChecks": [
+      { "pattern": "function retry|const retry\\s*=", "required": true, "message": "Define retry(fn, maxAttempts, delayMs)." },
+      { "pattern": "for|while", "required": true, "message": "Use a loop for multiple attempts." },
+      { "pattern": "setTimeout|Promise", "required": true, "message": "Use setTimeout or Promise for delay." }
+    ],
+    "successMessage": "A retry function — used in every production system for network requests, database calls, and external APIs. Chapter 17 done — Promises mastered!"
+  }
+]

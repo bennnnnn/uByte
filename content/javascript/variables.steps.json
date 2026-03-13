@@ -1,0 +1,111 @@
+[
+  {
+    "title": "const — your go-to variable",
+    "instruction": "In Chapter 1 you typed `\"JavaScript is awesome!\"` directly in console.log. What if you need that value in ten places?\n\n`const` creates a named container. Write it once, use it everywhere:\n\n```js\nconst language = \"JavaScript\";\nconsole.log(language);\n```\n\nRun this. Then look at the two console.log calls — they both use the same variable.",
+    "starter": "const language = \"JavaScript\";\nconst version = 2024;\n\nconsole.log(language);\nconsole.log(version);\nconsole.log(`Learning ${language} in ${version}`);",
+    "expectedOutput": ["JavaScript", "2024", "Learning JavaScript in 2024"],
+    "successMessage": "One variable, used three times. Change 'language' in one place and all three outputs update. That's the entire point of variables."
+  },
+  {
+    "title": "Create your own const",
+    "instruction": "Create two `const` variables — `name` with your name and `city` with your city. Then print them with a template literal.\n\nRemember: text needs quotes, numbers don't. `const age = 25` not `const age = \"25\"`.",
+    "hint": "const name = \"Alex\";\nconst city = \"London\";\nconsole.log(`${name} from ${city}`);",
+    "starter": "// TODO: create name and city constants, then print them",
+    "expectedOutput": [],
+    "codeChecks": [
+      { "pattern": "const name\\s*=\\s*[\"'][^\"']+[\"']", "required": true, "message": "Create: const name = \"Your Name\"" },
+      { "pattern": "const city\\s*=\\s*[\"'][^\"']+[\"']", "required": true, "message": "Create: const city = \"Your City\"" },
+      { "pattern": "console\\.log", "required": true, "message": "Print the variables with console.log." },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
+    ],
+    "successMessage": "const is the right default for variables that don't need to change. Use it for everything — then switch to let only if you actually need to reassign."
+  },
+  {
+    "title": "const cannot be reassigned",
+    "instruction": "The 'const' in `const` stands for constant. Once set, you cannot reassign it.\n\nRun this — it will crash with a `TypeError`. Then comment out the broken line so the rest runs.",
+    "hint": "Put // in front of the language = \"Python\" line.",
+    "starter": "const language = \"JavaScript\";\nconsole.log(language);\nlanguage = \"Python\"; // BUG: const cannot be reassigned!\nconsole.log(language);",
+    "expectedOutput": ["JavaScript"],
+    "codeChecks": [
+      { "pattern": "//.*language = \"Python\"|//.*language\\s*=", "required": true, "message": "Comment out the reassignment: // language = \"Python\"" }
+    ],
+    "successMessage": "TypeError: Assignment to constant variable. const protects you from accidental overwrites. When you see const, you know that value will never change — that's a guarantee."
+  },
+  {
+    "title": "let — when you need to change",
+    "instruction": "`let` works like `const` but allows reassignment. Use it when the value will genuinely change — like a score, a counter, or a status.\n\nThe score starts at 0 and increases. `const` would crash here — `let` is the right tool.",
+    "starter": "let score = 0;\nconsole.log(score);\n\nscore = score + 10;\nconsole.log(score);\n\nscore += 25;  // shorthand for score = score + 25\nconsole.log(score);\n\nscore -= 5;   // shorthand for score = score - 5\nconsole.log(score);",
+    "expectedOutput": ["0", "10", "35", "30"],
+    "successMessage": "let for things that change, const for things that don't. The rule: start with const. If JavaScript complains about reassignment, switch to let. Simple."
+  },
+  {
+    "title": "++ and -- shortcuts",
+    "instruction": "Adding or subtracting 1 is so common JavaScript has special shortcuts:\n\n- `count++` — increment by 1 (same as `count += 1`)\n- `count--` — decrement by 1\n\nAdd `count++` three times and print after each, then `count--` once.",
+    "hint": "count++;\nconsole.log(count);",
+    "starter": "let count = 0;\nconsole.log(count);\n// TODO: increment three times printing each time, then decrement once",
+    "expectedOutput": ["0", "1", "2", "3", "2"],
+    "codeChecks": [
+      { "pattern": "count\\+\\+|count\\s*\\+=\\s*1", "required": true, "message": "Increment: count++" },
+      { "pattern": "count--|count\\s*-=\\s*1", "required": true, "message": "Decrement: count--" },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
+    ],
+    "successMessage": "count++ is everywhere — loop counters, score trackers, pagination. Small shortcut, used thousands of times."
+  },
+  {
+    "title": "var — and why to avoid it",
+    "instruction": "`var` is the original JavaScript variable declaration from 1995. It has two problems:\n\n1. **Function-scoped, not block-scoped** — a `var` inside an `if` leaks outside it\n2. **Hoisted** — you can use a `var` before you declare it (it's just `undefined`)\n\nRun this to see both problems. Modern JavaScript uses `let` and `const` exclusively — `var` is legacy.",
+    "starter": "// Problem 1: var leaks out of blocks\nif (true) {\n  var leaked = \"I escaped the block!\";\n  let stayed = \"I stayed inside.\";\n}\nconsole.log(leaked);  // works — scary\ntry { console.log(stayed); } catch(e) { console.log(\"stayed is not defined\"); }\n\n// Problem 2: var is hoisted\nconsole.log(hoisted);  // undefined instead of crashing\nvar hoisted = \"declared later\";",
+    "expectedOutput": ["I escaped the block!", "stayed is not defined", "undefined"],
+    "successMessage": "var's block-scope leak is the source of countless JavaScript bugs. Modern JS developers never use var — const and let were specifically created to fix these problems."
+  },
+  {
+    "title": "Naming rules",
+    "instruction": "Variable names have rules:\n\n- Only letters, digits, `_`, and `$`\n- Cannot start with a digit\n- Case-sensitive: `score` ≠ `Score`\n- Convention: `camelCase` for variables (not `snake_case`)\n\nThree names below are illegal. Fix them all.",
+    "hint": "1stPlace → firstPlace, full-name → fullName, user score → userScore",
+    "starter": "// BUG: all three variable names are invalid — fix them\nconst 1stPlace = \"Gold\";\nconst full-name = \"Alex Rivera\";\nconst user score = 99;\n\nconsole.log(firstPlace);\nconsole.log(fullName);\nconsole.log(userScore);",
+    "expectedOutput": ["Gold", "Alex Rivera", "99"],
+    "codeChecks": [
+      { "pattern": "const firstPlace\\s*=", "required": true, "message": "Fix: 1stPlace → firstPlace" },
+      { "pattern": "const fullName\\s*=", "required": true, "message": "Fix: full-name → fullName (camelCase)" },
+      { "pattern": "const userScore\\s*=", "required": true, "message": "Fix: user score → userScore (no spaces)" }
+    ],
+    "successMessage": "camelCase is JavaScript's convention. firstNameLastName, getUserById, isLoggedIn — you'll write thousands of variable names. camelCase all of them."
+  },
+  {
+    "title": "Multiple assignments",
+    "instruction": "You can declare multiple variables on separate lines or use destructuring to unpack from an array (more on that in Chapter 11).\n\nFor now, declare three variables and then swap two of them.\n\nTo swap without a third variable use destructuring:\n```js\n[a, b] = [b, a];\n```",
+    "hint": "[first, last] = [last, first];",
+    "starter": "let first = \"Alex\";\nlet last = \"Rivera\";\nlet score = 95;\n\nconsole.log(first, last);\n// TODO: swap first and last using [first, last] = [last, first]\nconsole.log(first, last);",
+    "expectedOutput": ["Alex Rivera", "Rivera Alex"],
+    "codeChecks": [
+      { "pattern": "\\[first,\\s*last\\]\\s*=\\s*\\[last,\\s*first\\]", "required": true, "message": "Swap using: [first, last] = [last, first]" },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
+    ],
+    "successMessage": "[first, last] = [last, first] — one line, no temp variable. This is JavaScript destructuring and it's beautiful. Full chapter on it coming in Chapter 11."
+  },
+  {
+    "title": "undefined and the temporal dead zone",
+    "instruction": "An uninitialized `let` is `undefined`. Accessing a `let` before its declaration (the temporal dead zone) crashes.\n\nThis is `let` being stricter than `var` — on purpose:\n\n```js\nconsole.log(x);  // crashes — TDZ\nlet x = 5;\n```\n\nFix the code so the variable is declared before it's used.",
+    "hint": "Move the let declaration before the console.log.",
+    "starter": "// BUG: accessing let before declaration — temporal dead zone\nconsole.log(username);\nlet username = \"Alex\";",
+    "expectedOutput": ["Alex"],
+    "codeChecks": [
+      { "pattern": "let username\\s*=\\s*\"Alex\";[\\s\\S]*console\\.log\\(username\\)", "required": true, "message": "Declare let username before using it." }
+    ],
+    "successMessage": "Declare before use — always. The TDZ exists to catch exactly this mistake. var would silently print undefined here, hiding the bug. let protects you."
+  },
+  {
+    "title": "Build a profile",
+    "instruction": "No starter code. Write everything from scratch.\n\nCreate these variables:\n- `const name` — your name\n- `const language` — `\"JavaScript\"`\n- `let chaptersCompleted` — start at 0, then set it to 2\n- `const isLearning` — `true`\n\nPrint all four. Then print a summary using a template literal: `\"Alex is learning JavaScript — 2 chapters in!\"`",
+    "hint": "Mix const and let appropriately. Template literal: `${name} is learning ${language}...`",
+    "starter": "",
+    "expectedOutput": [],
+    "codeChecks": [
+      { "pattern": "const name\\s*=", "required": true, "message": "Declare: const name = \"...\"" },
+      { "pattern": "const language\\s*=\\s*\"JavaScript\"", "required": true, "message": "Declare: const language = \"JavaScript\"" },
+      { "pattern": "let chaptersCompleted", "required": true, "message": "Use let (not const) for chaptersCompleted — it changes." },
+      { "pattern": "chaptersCompleted\\s*=\\s*2", "required": true, "message": "Update chaptersCompleted to 2." }
+    ],
+    "successMessage": "const for stable data, let for changing data. That rule — applied consistently — prevents more bugs than almost anything else in JavaScript. Chapter 2 done!"
+  }
+]

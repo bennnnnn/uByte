@@ -1,0 +1,72 @@
+[
+  {
+    "title": "extends — inherit everything",
+    "instruction": "When class B extends class A, B gets all of A's methods for free. You only add what's different.\n\nRun this. AdminUser gets `greet()` from User without rewriting it.",
+    "starter": "class User {\n  constructor(name, email) {\n    this.name = name;\n    this.email = email;\n  }\n  greet() {\n    return `Hi, I'm ${this.name}.`;\n  }\n}\n\nclass AdminUser extends User {\n  deletePost(postId) {\n    return `${this.name} deleted post ${postId}.`;\n  }\n}\n\nconst admin = new AdminUser(\"Alex\", \"alex@example.com\");\nconsole.log(admin.greet());         // inherited!\nconsole.log(admin.deletePost(42));  // own method",
+    "expectedOutput": ["Hi, I'm Alex.", "Alex deleted post 42."],
+    "successMessage": "AdminUser got greet() for free — no copy needed. Add methods to User and AdminUser gets them automatically. That's the inheritance benefit."
+  },
+  {
+    "title": "super() — call the parent constructor",
+    "instruction": "When a child class has its own constructor, you **must** call `super()` first — before accessing `this`.\n\n`super()` runs the parent's constructor to set up the inherited properties.",
+    "hint": "constructor(name, email, permissions) { super(name, email); this.permissions = permissions; }",
+    "starter": "class User {\n  constructor(name, email) {\n    this.name = name;\n    this.email = email;\n  }\n}\n\nclass AdminUser extends User {\n  // TODO: add constructor that calls super(name, email) and sets this.permissions\n}\n\nconst admin = new AdminUser(\"Alex\", \"alex@example.com\", [\"delete\", \"ban\", \"edit\"]);\nconsole.log(admin.name);\nconsole.log(admin.email);\nconsole.log(admin.permissions);",
+    "expectedOutput": ["Alex", "alex@example.com", "[ 'delete', 'ban', 'edit' ]"],
+    "codeChecks": [
+      { "pattern": "super\\(name,\\s*email\\)|super\\(\\w+,\\s*\\w+\\)", "required": true, "message": "Call super(name, email) before setting this.permissions." },
+      { "pattern": "this\\.permissions", "required": true, "message": "Set: this.permissions = permissions" },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
+    ],
+    "successMessage": "super() sets up name and email (from User), then this.permissions adds what's new. If you forget super(), JavaScript throws: 'Must call super before accessing this'."
+  },
+  {
+    "title": "Override — replace the parent's method",
+    "instruction": "A child class replaces a parent method by defining it with the same name.\n\nCall `super.methodName()` to run the parent's version alongside your override.",
+    "hint": "greet() { return super.greet() + ' (Admin)'; }",
+    "starter": "class User {\n  constructor(name) { this.name = name; }\n  greet() { return `Hi, I'm ${this.name}.`; }\n  describe() { return `User: ${this.name}`; }\n}\n\nclass AdminUser extends User {\n  // TODO: override greet() to include '(Admin)' using super.greet()\n  // TODO: override describe() to include role\n}\n\nconst user  = new User(\"Alice\");\nconst admin = new AdminUser(\"Bob\");\nconsole.log(user.greet());\nconsole.log(admin.greet());\nconsole.log(admin.describe());",
+    "expectedOutput": ["Hi, I'm Alice.", "Hi, I'm Bob. (Admin)", "Admin User: Bob"],
+    "codeChecks": [
+      { "pattern": "super\\.greet\\(\\)", "required": true, "message": "Call super.greet() in the override." },
+      { "pattern": "Admin", "required": true, "message": "Include 'Admin' in the overridden messages." },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
+    ],
+    "successMessage": "super.greet() runs User's version, then you add the ' (Admin)' part. Override only what differs — call super for the common part."
+  },
+  {
+    "title": "instanceof — type checking",
+    "instruction": "`instanceof` checks if an object is an instance of a class — or any of its ancestors:\n\n```js\nadmin instanceof AdminUser  // true\nadmin instanceof User       // true — AdminUser extends User\nadmin instanceof Array      // false\n```\n\nRun this and explain the results.",
+    "starter": "class Animal { constructor(name) { this.name = name; } }\nclass Dog extends Animal { bark() { return \"Woof!\"; } }\nclass Cat extends Animal { meow() { return \"Meow!\"; } }\n\nconst dog = new Dog(\"Rex\");\n\nconsole.log(dog instanceof Dog);     // true\nconsole.log(dog instanceof Animal);  // true — Dog extends Animal\nconsole.log(dog instanceof Cat);     // false\nconsole.log(dog instanceof Object);  // true — everything extends Object!",
+    "expectedOutput": ["true", "true", "false", "true"],
+    "successMessage": "dog instanceof Animal is true because Dog extends Animal. Everything in JS instanceof Object — Object is the root. Use instanceof to write functions that accept any subclass."
+  },
+  {
+    "title": "Abstract-like patterns",
+    "instruction": "JavaScript doesn't have `abstract` classes, but you can simulate them by throwing in the base class method:\n\n```js\nspeak() {\n  throw new Error('speak() must be implemented by subclass');\n}\n```\n\nForget to implement it in a subclass and you'll get a clear error — not a silent undefined.",
+    "starter": "class Shape {\n  area() {\n    throw new Error(`${this.constructor.name} must implement area()`);\n  }\n  describe() {\n    return `${this.constructor.name} with area ${this.area().toFixed(2)}`;\n  }\n}\n\nclass Circle extends Shape {\n  constructor(radius) { super(); this.radius = radius; }\n  area() { return Math.PI * this.radius ** 2; }\n}\n\nclass Rectangle extends Shape {\n  constructor(w, h) { super(); this.width = w; this.height = h; }\n  area() { return this.width * this.height; }\n}\n\nconsole.log(new Circle(5).describe());\nconsole.log(new Rectangle(4, 6).describe());",
+    "expectedOutput": ["Circle with area 78.54", "Rectangle with area 24.00"],
+    "successMessage": "If a subclass forgets to implement area(), you get 'must implement area()' — a clear, helpful error. Much better than undefined behaviour."
+  },
+  {
+    "title": "Composition over inheritance",
+    "instruction": "Inheritance creates tight coupling. Deep inheritance hierarchies are notoriously hard to maintain.\n\nComposition is often better — build objects by combining behaviours rather than inheriting them:\n\n```js\nconst canSwim = { swim() { return 'swimming'; } };\nconst canFly  = { fly()  { return 'flying'; } };\nconst Duck = { ...canSwim, ...canFly };  // ducks can do both!\n```\n\nBuild a `Robot` with mixed abilities using composition.",
+    "hint": "const Robot = Object.assign({}, canWalk, canTalk, canCalculate);",
+    "starter": "const canWalk = {\n  walk() { return `${this.name} is walking.`; }\n};\nconst canTalk = {\n  talk(msg) { return `${this.name} says: ${msg}`; }\n};\nconst canCalculate = {\n  calculate(a, b) { return `${this.name} calculated: ${a + b}`; }\n};\n\n// TODO: build Robot combining all three abilities\nconst Robot = Object.assign({ name: \"R2D2\" }, canWalk, canTalk, canCalculate);\n\nconsole.log(Robot.walk());\nconsole.log(Robot.talk(\"Hello, humans.\"));\nconsole.log(Robot.calculate(5, 7));",
+    "expectedOutput": ["R2D2 is walking.", "R2D2 says: Hello, humans.", "R2D2 calculated: 12"],
+    "successMessage": "Three abilities mixed without any class hierarchy. This is composition — pick the behaviours you need and mix them. React hooks are composition in practice."
+  },
+  {
+    "title": "Build an animal hierarchy",
+    "instruction": "Final challenge — no starter code.\n\nBuild this hierarchy:\n- `Animal(name, sound)` — base class with `speak()` returning `'{name} says {sound}'`\n- `Dog(name)` — extends Animal, always sound 'Woof', adds `fetch(item)` method\n- `Cat(name)` — extends Animal, always sound 'Meow', adds `purr()` method\n- `ServiceDog(name, role)` — extends Dog, adds `performDuty()` returning their role\n\nCreate one of each and verify instanceof for the service dog (should be Dog, Animal, and ServiceDog all true).",
+    "hint": "class Dog extends Animal { constructor(name) { super(name, 'Woof'); } }",
+    "starter": "",
+    "expectedOutput": [],
+    "codeChecks": [
+      { "pattern": "class Animal", "required": true, "message": "Define base Animal class." },
+      { "pattern": "class Dog\\s+extends\\s+Animal", "required": true, "message": "class Dog extends Animal" },
+      { "pattern": "class Cat\\s+extends\\s+Animal", "required": true, "message": "class Cat extends Animal" },
+      { "pattern": "class ServiceDog\\s+extends\\s+Dog", "required": true, "message": "class ServiceDog extends Dog" },
+      { "pattern": "instanceof", "required": true, "message": "Test instanceof for the service dog." }
+    ],
+    "successMessage": "Four-level hierarchy, all working. ServiceDog instanceof Dog AND instanceof Animal — the chain goes all the way up. Chapter 13 done!"
+  }
+]

@@ -1,0 +1,73 @@
+[
+  {
+    "title": "try/catch — contain the crash",
+    "instruction": "Without try/catch, an error stops your program dead. With it, you handle the problem and keep going.\n\n```js\ntry {\n  // risky code\n} catch (error) {\n  // runs only if an error was thrown\n}\n```\n\nRun this. The crash is caught and the program continues.",
+    "starter": "console.log(\"Before the risky code.\");\n\ntry {\n  const parsed = JSON.parse(\"{ this is not valid JSON }\");\n  console.log(parsed);\n} catch (error) {\n  console.log(\"Caught:\", error.message);\n}\n\nconsole.log(\"Program continues after the catch.\");",
+    "expectedOutput": ["Before the risky code.", "Caught: Unexpected token 't', \"{ this is not\"... is not valid JSON", "Program continues after the catch."],
+    "successMessage": "Without try/catch, that JSON.parse crash would end your program. With it, you handle the error and carry on. Every JSON.parse should be wrapped in try/catch."
+  },
+  {
+    "title": "The Error object",
+    "instruction": "When an error is caught, you get an `Error` object with:\n- `error.message` — human-readable description\n- `error.name` — the error type ('TypeError', 'SyntaxError', etc.)\n- `error.stack` — full call stack (for debugging)\n\nInspect a real error.",
+    "starter": "try {\n  null.property;  // TypeError — can't access property of null\n} catch (error) {\n  console.log(error.name);\n  console.log(error.message);\n  // error.stack is too long — just check the first line\n  console.log(error instanceof TypeError);\n  console.log(error instanceof Error);\n}",
+    "expectedOutput": ["TypeError", "Cannot read properties of null (reading 'property')", "true", "true"],
+    "successMessage": "Every Error is also instanceof Error — they all extend the base Error class. error.name tells you the type. error.message tells you what went wrong."
+  },
+  {
+    "title": "Built-in error types",
+    "instruction": "JavaScript has 7 built-in error types — each for a different category:\n\n- `SyntaxError` — invalid code\n- `TypeError` — wrong type operation\n- `ReferenceError` — undefined variable\n- `RangeError` — value out of range\n- `URIError` — malformed URI\n- `EvalError` — eval problems (rare)\n- `Error` — generic base\n\nTrigger and catch three different types.",
+    "starter": "const errors = [\n  () => null.property,\n  () => undeclaredVariable,\n  () => new Array(-1),\n];\n\nerrors.forEach(fn => {\n  try {\n    fn();\n  } catch (e) {\n    console.log(`${e.name}: ${e.message}`);\n  }\n});",
+    "expectedOutput": ["TypeError: Cannot read properties of null (reading 'property')", "ReferenceError: undeclaredVariable is not defined", "RangeError: Invalid array length"],
+    "successMessage": "Three types, three different error names. Checking error.name (or instanceof) lets you handle each type differently — retry for network errors, show validation message for TypeError."
+  },
+  {
+    "title": "throw — trigger your own errors",
+    "instruction": "`throw` lets you trigger an error yourself — to signal invalid input or impossible state.\n\nYou can throw any value, but best practice is to throw an `Error` object so you get a stack trace.",
+    "hint": "if (amount < 0) throw new Error('Amount cannot be negative');",
+    "starter": "function withdraw(balance, amount) {\n  if (typeof amount !== 'number') {\n    throw new TypeError(`Amount must be a number, got ${typeof amount}`);\n  }\n  if (amount < 0) {\n    throw new RangeError(`Amount must be positive, got ${amount}`);\n  }\n  if (amount > balance) {\n    throw new Error(`Insufficient funds: need ${amount}, have ${balance}`);\n  }\n  return balance - amount;\n}\n\nconst tests = [\n  () => withdraw(100, 50),\n  () => withdraw(100, \"50\"),\n  () => withdraw(100, -10),\n  () => withdraw(100, 200),\n];\n\ntests.forEach(fn => {\n  try {\n    console.log(\"Result:\", fn());\n  } catch(e) {\n    console.log(`${e.name}: ${e.message}`);\n  }\n});",
+    "expectedOutput": ["Result: 50", "TypeError: Amount must be a number, got string", "RangeError: Amount must be positive, got -10", "Error: Insufficient funds: need 200, have 100"],
+    "successMessage": "Four cases — three throws, one success. Throwing specific error types (TypeError, RangeError) lets callers catch and handle them differently."
+  },
+  {
+    "title": "Custom error classes",
+    "instruction": "Extend `Error` to create your own error types — makes it easy to catch and handle your application's specific errors.\n\nAdd the missing `ValidationError` and `NetworkError` classes.",
+    "hint": "class ValidationError extends Error { constructor(field, message) { super(message); this.name = 'ValidationError'; this.field = field; } }",
+    "starter": "class AppError extends Error {\n  constructor(message, code) {\n    super(message);\n    this.name = \"AppError\";\n    this.code = code;\n  }\n}\n\n// TODO: add ValidationError(field, message) — extends AppError, sets field\nclass ValidationError extends AppError {\n  constructor(field, message) {\n    super(message, \"VALIDATION_ERROR\");\n    this.name = \"ValidationError\";\n    this.field = field;\n  }\n}\n\ntry {\n  throw new ValidationError(\"email\", \"Invalid email format\");\n} catch (e) {\n  console.log(e.name);\n  console.log(e.message);\n  console.log(e.field);\n  console.log(e instanceof ValidationError);\n  console.log(e instanceof AppError);\n  console.log(e instanceof Error);\n}",
+    "expectedOutput": ["ValidationError", "Invalid email format", "email", "true", "true", "true"],
+    "successMessage": "ValidationError extends AppError extends Error — the chain goes three levels. catch (e) { if (e instanceof ValidationError) ... } — catch specific types and handle them differently."
+  },
+  {
+    "title": "finally — always runs",
+    "instruction": "`finally` runs whether or not an error occurred — perfect for cleanup:\n\n```js\ntry {\n  // open file / DB connection\n} catch (e) {\n  // handle error\n} finally {\n  // ALWAYS close / clean up\n}\n```\n\nSimulate a database query with guaranteed cleanup.",
+    "starter": "function queryDatabase(query) {\n  console.log(\"Opening connection...\");\n  try {\n    if (!query) throw new Error(\"Query cannot be empty\");\n    console.log(`Running: ${query}`);\n    return { rows: 5 };\n  } catch (e) {\n    console.log(`Query failed: ${e.message}`);\n    return null;\n  } finally {\n    console.log(\"Closing connection.\");  // always runs!\n  }\n}\n\nqueryDatabase(\"SELECT * FROM users\");\nconsole.log(\"---\");\nqueryDatabase(\"\");",
+    "expectedOutput": ["Opening connection...", "Running: SELECT * FROM users", "Closing connection.", "---", "Opening connection...", "Query failed: Query cannot be empty", "Closing connection."],
+    "successMessage": "'Closing connection.' always prints — even when an error occurs. Database connections, file handles, loading spinners — all should be closed in finally."
+  },
+  {
+    "title": "Re-throw — only handle what you know",
+    "instruction": "A catch block should only handle errors it understands. Re-throw anything else:\n\n```js\ncatch (e) {\n  if (e instanceof ValidationError) {\n    // handle it\n  } else {\n    throw e;  // re-throw — not our problem\n  }\n}\n```\n\nFix the overly broad catch that swallows everything.",
+    "hint": "if (e instanceof ValidationError) { ... } else { throw e; }",
+    "starter": "class ValidationError extends Error {\n  constructor(msg) { super(msg); this.name = \"ValidationError\"; }\n}\n\nfunction processForm(data) {\n  try {\n    if (!data.email) throw new ValidationError(\"Email required\");\n    if (!data.name)  undefinedFunction(); // simulates an unexpected bug\n    return \"Success\";\n  } catch (e) {\n    // BUG: this catches ALL errors, even unexpected ones!\n    // TODO: only handle ValidationError, re-throw others\n    return \"Validation failed: \" + e.message;\n  }\n}\n\ntry {\n  processForm({ email: \"\", name: \"Alex\" });\n} catch(e) { console.log(\"Caught outer:\", e.message); }\n\ntry {\n  processForm({ name: \"\" });\n} catch(e) { console.log(\"Caught outer:\", e.message); }",
+    "expectedOutput": ["Caught outer: undefinedFunction is not defined", "Caught outer: Email required"],
+    "codeChecks": [
+      { "pattern": "instanceof ValidationError", "required": true, "message": "Check: if (e instanceof ValidationError)" },
+      { "pattern": "throw e", "required": true, "message": "Re-throw: else { throw e; }" },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
+    ],
+    "successMessage": "Re-throwing is responsible error handling. Only catch what you understand — let unexpected errors bubble up where they can be logged and investigated."
+  },
+  {
+    "title": "Build a safe API call wrapper",
+    "instruction": "Final challenge — no starter code.\n\nWrite `safeCall(fn, ...args)` — a wrapper that:\n1. Calls `fn(...args)` inside try/catch\n2. Returns `{ success: true, data: result }` on success\n3. Returns `{ success: false, error: err.message, type: err.name }` on failure\n\nTest it with functions that succeed and fail.",
+    "hint": "function safeCall(fn, ...args) { try { return { success: true, data: fn(...args) }; } catch(e) { return { success: false, error: e.message, type: e.name }; } }",
+    "starter": "",
+    "expectedOutput": [],
+    "codeChecks": [
+      { "pattern": "function safeCall|const safeCall\\s*=", "required": true, "message": "Define safeCall(fn, ...args)." },
+      { "pattern": "success:\\s*true", "required": true, "message": "Return { success: true, data: result } on success." },
+      { "pattern": "success:\\s*false", "required": true, "message": "Return { success: false, error: ... } on failure." },
+      { "pattern": "\\.\\.\\.args", "required": true, "message": "Use rest params: (...args)" }
+    ],
+    "successMessage": "safeCall wraps any function with error handling. This Result-type pattern (used heavily in Rust and functional JS) avoids exceptions in normal flow. Chapter 15 done!"
+  }
+]

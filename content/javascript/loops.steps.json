@@ -1,0 +1,114 @@
+[
+  {
+    "title": "for — the classic",
+    "instruction": "The classic `for` loop gives you full control: start, condition, increment.\n\n```js\nfor (let i = 0; i < 5; i++) {\n  // runs 5 times: i = 0, 1, 2, 3, 4\n}\n```\n\nRun this. Then modify it to print only even numbers from 0 to 10.",
+    "hint": "for (let i = 0; i <= 10; i += 2)",
+    "starter": "for (let i = 1; i <= 5; i++) {\n  console.log(`Step ${i}`);\n}",
+    "expectedOutput": ["Step 1", "Step 2", "Step 3", "Step 4", "Step 5"],
+    "successMessage": "Three parts: initialise (let i = 0), condition (i <= 5), update (i++). The loop runs while condition is true."
+  },
+  {
+    "title": "for...of — loop over any iterable",
+    "instruction": "`for...of` is the modern way to loop over arrays, strings, Maps, Sets — anything iterable.\n\nCleaner than classic `for` when you don't need the index:\n\n```js\nfor (const name of names) {\n  console.log(name);\n}\n```\n\nLoop over the students array and print each with a numbered prefix using the loop variable.",
+    "hint": "for (const student of students) { console.log(student); }",
+    "starter": "const students = [\"Alice\", \"Bob\", \"Carol\", \"David\", \"Eve\"];\n\n// TODO: use for...of to print each student\n// Expected: Alice, Bob, Carol, David, Eve (one per line)",
+    "expectedOutput": ["Alice", "Bob", "Carol", "David", "Eve"],
+    "codeChecks": [
+      { "pattern": "for\\s*\\(.*of\\s+students\\)", "required": true, "message": "Use: for (const student of students)" },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
+    ],
+    "successMessage": "for...of is clean, safe, and works on any iterable. Prefer it over classic for whenever you don't need the index."
+  },
+  {
+    "title": "entries() — index AND value",
+    "instruction": "Need both the index and the value while iterating? `.entries()` gives you both as `[index, value]` pairs.\n\nRun this to number the list starting from 1.",
+    "starter": "const languages = [\"JavaScript\", \"Python\", \"Go\", \"Rust\"];\n\nfor (const [index, lang] of languages.entries()) {\n  console.log(`${index + 1}. ${lang}`);\n}",
+    "expectedOutput": ["1. JavaScript", "2. Python", "3. Go", "4. Rust"],
+    "successMessage": "entries() destructures to [index, value]. Note index + 1 to start numbering at 1 instead of 0. This pattern replaces manual index tracking."
+  },
+  {
+    "title": "for...in — loop over object keys",
+    "instruction": "`for...in` iterates over the **keys** of an object:\n\n```js\nfor (const key in obj) {\n  console.log(key, obj[key]);\n}\n```\n\nNote: `for...in` on arrays gives string indexes ('0', '1', '2') — use `for...of` for arrays instead.\n\nPrint all user properties with their values.",
+    "hint": "for (const key in user) { console.log(`${key}: ${user[key]}`); }",
+    "starter": "const user = { name: \"Alex\", age: 25, city: \"London\", role: \"admin\" };\n\n// TODO: use for...in to print each key: value pair",
+    "expectedOutput": ["name: Alex", "age: 25", "city: London", "role: admin"],
+    "codeChecks": [
+      { "pattern": "for\\s*\\(.*in\\s+user\\)", "required": true, "message": "Use: for (const key in user)" },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
+    ],
+    "successMessage": "for...in for objects, for...of for arrays and iterables. Keep that rule in your head — using for...in on arrays gives you string indexes and includes inherited properties."
+  },
+  {
+    "title": "while — loop until something changes",
+    "instruction": "`while` keeps going as long as the condition is true. Use it when you don't know upfront how many iterations you need.\n\n⚠️ Always make sure the condition will eventually become false — or you get an infinite loop.\n\nSimulate a dice roll that keeps rolling until you get a 6.",
+    "hint": "while (roll !== 6) { roll = Math.ceil(Math.random() * 6); }",
+    "starter": "let attempts = 0;\nlet roll;\n\ndo {\n  roll = Math.ceil(Math.random() * 6);\n  attempts++;\n  console.log(`Roll ${attempts}: ${roll}`);\n} while (roll !== 6);\n\nconsole.log(`Got a 6 in ${attempts} attempt(s)!`);",
+    "expectedOutput": [],
+    "successMessage": "do...while always executes at least once — perfect for 'roll until success'. The number of iterations varies every run since it's random."
+  },
+  {
+    "title": "break — exit early",
+    "instruction": "`break` immediately exits the loop — even if there are items remaining.\n\nPerfect for search: once you find what you want, stop. No point checking the rest.\n\nSearch for the first premium user and break when found.",
+    "hint": "if (user.isPremium) { console.log('Found!'); break; }",
+    "starter": "const users = [\n  { name: \"Alice\", isPremium: false },\n  { name: \"Bob\",   isPremium: false },\n  { name: \"Carol\", isPremium: true },\n  { name: \"David\", isPremium: true },\n];\n\nfor (const user of users) {\n  console.log(`Checking ${user.name}...`);\n  // TODO: if user.isPremium, print 'Found first premium: {name}' and break\n}",
+    "expectedOutput": ["Checking Alice...", "Checking Bob...", "Checking Carol...", "Found first premium: Carol"],
+    "codeChecks": [
+      { "pattern": "break", "required": true, "message": "Use break to exit the loop early." },
+      { "pattern": "isPremium", "required": true, "message": "Check user.isPremium before breaking." },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
+    ],
+    "successMessage": "David was never checked. break saved the work. In a database with millions of users, finding on record 3 and breaking is essential for performance."
+  },
+  {
+    "title": "continue — skip this one",
+    "instruction": "`continue` skips the rest of the current iteration and jumps to the next one.\n\n`break` = stop the loop entirely.\n`continue` = skip this item, keep going.\n\nPrint only active users (skip inactive ones).",
+    "hint": "if (!user.isActive) continue;",
+    "starter": "const users = [\n  { name: \"Alice\", isActive: true  },\n  { name: \"Bob\",   isActive: false },\n  { name: \"Carol\", isActive: true  },\n  { name: \"David\", isActive: false },\n  { name: \"Eve\",   isActive: true  },\n];\n\nfor (const user of users) {\n  // TODO: skip inactive users with continue\n  console.log(`Active: ${user.name}`);\n}",
+    "expectedOutput": ["Active: Alice", "Active: Carol", "Active: Eve"],
+    "codeChecks": [
+      { "pattern": "continue", "required": true, "message": "Use continue to skip inactive users." },
+      { "pattern": "!user\\.isActive|user\\.isActive === false|user\\.isActive == false", "required": true, "message": "Check: if (!user.isActive) continue" },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
+    ],
+    "successMessage": "Bob and David skipped. Alice, Carol, Eve printed. continue says 'skip the rest of this iteration' — the loop keeps going."
+  },
+  {
+    "title": "forEach — simplest array loop",
+    "instruction": "Arrays have a `.forEach()` method — a cleaner version of a for loop for simple iteration:\n\n```js\narray.forEach((item, index) => {\n  // do something\n});\n```\n\nNote: `forEach` cannot break early. If you need break/continue, use for...of instead.\n\nRewrite the for...of loop as a forEach.",
+    "hint": "students.forEach((student, i) => { ... })",
+    "starter": "const students = [\"Alice\", \"Bob\", \"Carol\"];\n\n// for...of version:\nfor (const [i, student] of students.entries()) {\n  console.log(`${i + 1}. ${student}`);\n}\n\nconsole.log(\"--- forEach version ---\");\n// TODO: rewrite using .forEach()",
+    "expectedOutput": ["1. Alice", "2. Bob", "3. Carol", "--- forEach version ---", "1. Alice", "2. Bob", "3. Carol"],
+    "codeChecks": [
+      { "pattern": "\\.forEach\\(", "required": true, "message": "Use: students.forEach((student, i) => { ... })" },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
+    ],
+    "successMessage": "forEach is clean and readable for simple iteration. But remember: no break inside forEach. If you need to stop early, for...of is the right choice."
+  },
+  {
+    "title": "Nested loops — with care",
+    "instruction": "Loops inside loops. The inner loop runs completely for every outer iteration.\n\n⚠️ 10 outer × 10 inner = 100 iterations. 1000 × 1000 = 1,000,000. Nested loops scale quadratically — be careful with large data.\n\nPrint a 3×3 multiplication table.",
+    "hint": "for (let i = 1; i <= 3; i++) { for (let j = 1; j <= 3; j++) { ... } }",
+    "starter": "// TODO: print 3x3 multiplication table\n// 1x1=1  1x2=2  1x3=3\n// 2x1=2  2x2=4  2x3=6\n// 3x1=3  3x2=6  3x3=9",
+    "expectedOutput": ["1x1=1", "1x2=2", "1x3=3", "2x1=2", "2x2=4", "2x3=6", "3x1=3", "3x2=6", "3x3=9"],
+    "codeChecks": [
+      { "pattern": "for[\\s\\S]+for", "required": true, "message": "Use nested loops — a loop inside a loop." },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
+    ],
+    "successMessage": "9 outputs, 5 lines of code. Nested loops are powerful for tables, matrices, and pair comparisons — just keep an eye on the scale."
+  },
+  {
+    "title": "FizzBuzz — the classic interview question",
+    "instruction": "Almost every programming interview has this. You now have everything you need.\n\nRules:\n- Print 1 to 30\n- Divisible by 3: print `Fizz`\n- Divisible by 5: print `Buzz`  \n- Divisible by both: print `FizzBuzz`\n\n`n % 3 === 0` checks divisibility. Check FizzBuzz first or it can never win.",
+    "hint": "Check % 15 (both) first, then % 3, then % 5, then the number.",
+    "starter": "// TODO: FizzBuzz 1-30",
+    "expectedOutput": ["1", "2", "Fizz", "4", "Buzz", "Fizz", "7", "8", "Fizz", "Buzz", "11", "Fizz", "13", "14", "FizzBuzz"],
+    "codeChecks": [
+      { "pattern": "for\\s*\\(", "required": true, "message": "Use a for loop." },
+      { "pattern": "%\\s*3\\s*===\\s*0|%3===0", "required": true, "message": "Check divisibility by 3: n % 3 === 0" },
+      { "pattern": "%\\s*5\\s*===\\s*0|%5===0", "required": true, "message": "Check divisibility by 5: n % 5 === 0" },
+      { "pattern": "FizzBuzz", "required": true, "message": "Handle the FizzBuzz case (both 3 and 5)." },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
+    ],
+    "successMessage": "FizzBuzz done! This question filters out a huge percentage of interview candidates. You just nailed it. Chapter 6 complete — you can loop anything now."
+  }
+]

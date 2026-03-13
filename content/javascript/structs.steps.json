@@ -1,0 +1,82 @@
+[
+  {
+    "title": "Your first class",
+    "instruction": "A class is a blueprint for creating objects with the same structure.\n\n- `constructor` runs when you do `new ClassName()`\n- `this` inside a class refers to the instance being created\n- Methods are defined without the `function` keyword\n\nRun this.",
+    "starter": "class User {\n  constructor(name, email) {\n    this.name = name;\n    this.email = email;\n    this.createdAt = new Date().toISOString();\n  }\n  \n  greet() {\n    return `Hello, I'm ${this.name}!`;\n  }\n  \n  toString() {\n    return `User(${this.name}, ${this.email})`;\n  }\n}\n\nconst alice = new User(\"Alice\", \"alice@example.com\");\nconsole.log(alice.greet());\nconsole.log(alice.toString());\nconsole.log(alice.name);",
+    "expectedOutput": ["Hello, I'm Alice!", "User(Alice, alice@example.com)", "Alice"],
+    "successMessage": "Class → new User() creates an instance. constructor sets up the properties. Methods are shared by all instances (they live on the prototype — more on that in Chapter 14)."
+  },
+  {
+    "title": "Add methods to a class",
+    "instruction": "Add two methods to the `BankAccount` class:\n- `deposit(amount)` — add to balance\n- `getBalance()` — return balance formatted as `'$0.00'`",
+    "hint": "deposit(amount) { this.balance += amount; }\ngetBalance() { return `$${this.balance.toFixed(2)}`; }",
+    "starter": "class BankAccount {\n  constructor(owner, initialBalance = 0) {\n    this.owner = owner;\n    this.balance = initialBalance;\n  }\n  \n  // TODO: add deposit(amount) and getBalance() methods\n}\n\nconst account = new BankAccount(\"Alex\", 100);\naccount.deposit(250);\naccount.deposit(75);\nconsole.log(account.getBalance());  // $425.00",
+    "expectedOutput": ["$425.00"],
+    "codeChecks": [
+      { "pattern": "deposit\\(amount\\)", "required": true, "message": "Add: deposit(amount) { this.balance += amount; }" },
+      { "pattern": "getBalance\\(\\)", "required": true, "message": "Add: getBalance() { return `$${this.balance.toFixed(2)}`; }" },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
+    ],
+    "successMessage": "$425.00 — correct! Methods access instance data via this. The balance is private to each account instance."
+  },
+  {
+    "title": "Getters and setters",
+    "instruction": "Getters and setters look like properties but call functions:\n\n```js\nget fullName() { return `${this.first} ${this.last}`; }\nset fullName(name) { [this.first, this.last] = name.split(\" \"); }\n```\n\nAccess: `user.fullName` (no `()` — it's not called like a method).\n\nAdd a getter `fullName` and setter `fullName` to the Person class.",
+    "hint": "get fullName() { return `${this.firstName} ${this.lastName}`; }",
+    "starter": "class Person {\n  constructor(firstName, lastName) {\n    this.firstName = firstName;\n    this.lastName = lastName;\n  }\n  \n  // TODO: add get fullName() and set fullName(name)\n}\n\nconst person = new Person(\"Alex\", \"Rivera\");\nconsole.log(person.fullName);          // Alex Rivera\nperson.fullName = \"Jordan Smith\";      // setter\nconsole.log(person.firstName);         // Jordan\nconsole.log(person.lastName);          // Smith",
+    "expectedOutput": ["Alex Rivera", "Jordan", "Smith"],
+    "codeChecks": [
+      { "pattern": "get fullName\\(\\)", "required": true, "message": "Add: get fullName() { return ... }" },
+      { "pattern": "set fullName\\(", "required": true, "message": "Add: set fullName(name) { ... }" },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
+    ],
+    "successMessage": "Getters look like properties. Setters intercept assignment. React's controlled inputs, Vue's computed properties — all use this getter/setter pattern."
+  },
+  {
+    "title": "Static methods — no instance needed",
+    "instruction": "`static` methods belong to the class itself, not instances:\n\n```js\nUser.create(...)  // static — no new needed\nuser.greet()      // instance — needs an instance\n```\n\nUseful for utility functions and factory methods.\n\nAdd a static `validate(email)` and `fromJSON(json)` factory.",
+    "hint": "static validate(email) { return email.includes('@'); }\nstatic fromJSON(json) { return new User(json.name, json.email); }",
+    "starter": "class User {\n  constructor(name, email) {\n    this.name = name;\n    this.email = email;\n  }\n  \n  // TODO: add static validate(email) — returns true if email has '@'\n  // TODO: add static fromJSON(json) — creates a User from an object\n}\n\nconsole.log(User.validate(\"alex@example.com\")); // true\nconsole.log(User.validate(\"not-an-email\"));     // false\n\nconst u = User.fromJSON({ name: \"Alex\", email: \"alex@example.com\" });\nconsole.log(u.name);",
+    "expectedOutput": ["true", "false", "Alex"],
+    "codeChecks": [
+      { "pattern": "static validate\\(", "required": true, "message": "Add: static validate(email) { ... }" },
+      { "pattern": "static fromJSON\\(", "required": true, "message": "Add: static fromJSON(json) { return new User(...) }" },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
+    ],
+    "successMessage": "User.validate() and User.fromJSON() — called on the class, not an instance. Factory methods (fromJSON, fromString, create) are the most common use of static."
+  },
+  {
+    "title": "Private fields with #",
+    "instruction": "ES2022 added real private fields with `#`. Unlike the old `_name` convention, these actually enforce privacy:\n\n```js\nclass Counter {\n  #count = 0;  // truly private\n  increment() { this.#count++; }\n  get value()  { return this.#count; }\n}\n```\n\nPreviously private fields were just convention (`_count`). Now they're enforced.",
+    "starter": "class BankAccount {\n  #balance;  // private — can't be accessed from outside!\n  \n  constructor(initial) {\n    this.#balance = initial;\n  }\n  \n  deposit(amount)  { this.#balance += amount; }\n  withdraw(amount) { this.#balance -= amount; }\n  get balance()    { return this.#balance; }\n}\n\nconst account = new BankAccount(100);\naccount.deposit(50);\nconsole.log(account.balance);  // 150 — through getter\n\ntry {\n  console.log(account.#balance); // SyntaxError — truly private!\n} catch(e) {\n  console.log(\"Private field access blocked!\");\n}",
+    "expectedOutput": ["150", "Private field access blocked!"],
+    "successMessage": "#balance is truly private — not a convention, a language feature. You cannot access it from outside the class, even in tests. JavaScript finally caught up to Java and Python."
+  },
+  {
+    "title": "Method chaining",
+    "instruction": "Method chaining lets you call multiple methods in sequence:\n\n```js\nqueryBuilder.select('name').where('age > 18').limit(10).build()\n```\n\nMake methods chainable by returning `this`:\n\n```js\nwhere(condition) {\n  this.conditions.push(condition);\n  return this;  // enables chaining!\n}\n```\n\nAdd `select`, `where`, and `limit` to the QueryBuilder.",
+    "hint": "select(col) { this.columns.push(col); return this; }",
+    "starter": "class QueryBuilder {\n  constructor(table) {\n    this.table = table;\n    this.columns = [];\n    this.conditions = [];\n    this._limit = null;\n  }\n  \n  // TODO: add chainable select(col), where(cond), limit(n)\n  \n  build() {\n    const cols = this.columns.length ? this.columns.join(\", \") : \"*\";\n    let q = `SELECT ${cols} FROM ${this.table}`;\n    if (this.conditions.length) q += ` WHERE ${this.conditions.join(\" AND \")}`;\n    if (this._limit) q += ` LIMIT ${this._limit}`;\n    return q;\n  }\n}\n\nconst query = new QueryBuilder(\"users\")\n  .select(\"name\")\n  .select(\"email\")\n  .where(\"age > 18\")\n  .where(\"active = true\")\n  .limit(10)\n  .build();\n\nconsole.log(query);",
+    "expectedOutput": ["SELECT name, email FROM users WHERE age > 18 AND active = true LIMIT 10"],
+    "codeChecks": [
+      { "pattern": "select\\s*\\(col\\)|select\\s*\\(\\w+\\)", "required": true, "message": "Add select method that returns this." },
+      { "pattern": "return\\s+this;", "required": true, "message": "Return 'this' from each chainable method." },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
+    ],
+    "successMessage": "Method chaining — elegant and readable. jQuery, Mongoose, Knex, Prisma all use this pattern. The key: return this from every chainable method."
+  },
+  {
+    "title": "Build a shopping cart class",
+    "instruction": "Final challenge — no starter code.\n\nBuild a `ShoppingCart` class:\n- Private `#items` array\n- `add(product, quantity)` — add/update item\n- `remove(productId)` — remove item\n- `get total()` — returns sum of all item prices × quantities\n- `get count()` — total item count\n- `clear()` — empty the cart\n- `summary()` — returns formatted cart contents\n\nTest with at least 4 operations.",
+    "hint": "class ShoppingCart { #items = []; ... }",
+    "starter": "",
+    "expectedOutput": [],
+    "codeChecks": [
+      { "pattern": "class ShoppingCart", "required": true, "message": "Define class ShoppingCart." },
+      { "pattern": "#items", "required": true, "message": "Use private field #items." },
+      { "pattern": "get total\\(\\)", "required": true, "message": "Add a getter for total." },
+      { "pattern": "\\.reduce\\(|\\.forEach\\(|\\.map\\(", "required": true, "message": "Use array methods to calculate totals." }
+    ],
+    "successMessage": "A full shopping cart with private state, getters, and methods. This is the structure of real e-commerce cart implementations. Chapter 12 done!"
+  }
+]

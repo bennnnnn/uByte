@@ -1,0 +1,95 @@
+[
+  {
+    "title": "if / else — the basic decision",
+    "instruction": "You know what if/else does — but JavaScript's version has a few quirks worth knowing.\n\nThe braces `{}` are technically optional for single-line bodies, but always use them. Missing braces cause famous bugs (Apple's 'goto fail' SSL vulnerability was exactly this).\n\nRun this, then change the score to see each path.",
+    "starter": "const score = 78;\n\nif (score >= 90) {\n  console.log(\"A — Excellent!\");\n} else if (score >= 80) {\n  console.log(\"B — Great work!\");\n} else if (score >= 70) {\n  console.log(\"C — Solid effort.\");\n} else if (score >= 60) {\n  console.log(\"D — Keep pushing.\");\n} else {\n  console.log(\"F — Let's try again.\");\n}",
+    "expectedOutput": ["C — Solid effort."],
+    "successMessage": "78 → C. Each condition is checked top-to-bottom. The first one that's true wins — everything below is skipped."
+  },
+  {
+    "title": "Logical operators: &&, ||, !",
+    "instruction": "Combine conditions:\n\n- `&&` (AND) — both must be true\n- `||` (OR) — at least one must be true\n- `!` (NOT) — flip true/false\n\nWrite the access check: grant access if user is an admin OR (is verified AND is at least 18).",
+    "hint": "if (isAdmin || (isVerified && age >= 18))",
+    "starter": "const isAdmin = false;\nconst isVerified = true;\nconst age = 20;\n\n// TODO: grant access if admin OR (verified AND 18+)\nconsole.log(\"Access denied.\");",
+    "expectedOutput": ["Access granted."],
+    "codeChecks": [
+      { "pattern": "isAdmin\\s*\\|\\|", "required": true, "message": "Use || for the admin check." },
+      { "pattern": "isVerified\\s*&&|&&\\s*isVerified", "required": true, "message": "Use && to combine verified and age." },
+      { "pattern": "Access granted", "required": true, "message": "Print 'Access granted.' when conditions pass." },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
+    ],
+    "successMessage": "isAdmin was false but (isVerified && age >= 20) was true, so access granted. Parentheses make the logic explicit — always add them when mixing && and ||."
+  },
+  {
+    "title": "Short-circuit evaluation",
+    "instruction": "JavaScript evaluates `&&` and `||` lazily — it stops as soon as it knows the answer:\n\n- `false && anything` → stops at false, returns `false`\n- `true || anything` → stops at true, returns `true`\n\nThis is used constantly to write concise conditional code:\n\n```js\nuser && console.log(user.name)  // only runs if user exists\nname || \"Anonymous\"             // fallback if name is falsy\n```\n\nRun this.",
+    "starter": "const user = { name: \"Alex\", role: \"admin\" };\nconst noUser = null;\n\n// && short-circuit: right side only runs if left is truthy\nuser && console.log(\"User:\", user.name);\nnoUser && console.log(\"No user name\");  // won't run\n\n// || short-circuit: right side only runs if left is falsy\nconst displayName = user.name || \"Anonymous\";\nconst guestName = null || \"Guest\";\nconsole.log(displayName);\nconsole.log(guestName);",
+    "expectedOutput": ["User: Alex", "Alex", "Guest"],
+    "successMessage": "Short-circuit evaluation makes conditions concise. user && doSomething() is so common it has its own name: 'guard clause'. You'll write this pattern constantly."
+  },
+  {
+    "title": "?? — nullish coalescing",
+    "instruction": "`||` has a problem: it treats ALL falsy values as 'no value'. That means `0 || 100` gives 100 — even though 0 is a valid score.\n\n`??` (nullish coalescing) only falls back when the left side is `null` or `undefined`:\n\n```js\n0 ?? 100    → 0    (0 is not null/undefined)\n0 || 100   → 100  (0 is falsy)\n```\n\nFix the defaults to use `??` instead of `||`.",
+    "hint": "Replace || with ?? for the score and count",
+    "starter": "const score = 0;\nconst itemCount = 0;\nconst username = null;\n\n// BUG: || treats 0 as 'no value' — use ?? instead\nconsole.log(score || 100);       // wrong: gives 100\nconsole.log(score ?? 100);       // correct: gives 0\n\n// TODO: use ?? for itemCount (should give 0, not 99)\nconsole.log(itemCount || 99);    // fix this\n\n// For username (actually null), either works:\nconsole.log(username ?? \"Anonymous\");",
+    "expectedOutput": ["100", "0", "0", "Anonymous"],
+    "codeChecks": [
+      { "pattern": "itemCount\\s*\\?\\?", "required": true, "message": "Use ?? for itemCount: itemCount ?? 99" },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
+    ],
+    "successMessage": "?? vs || — this distinction matters enormously. Use ?? when 0 and \"\" are valid values. Use || only when you want ALL falsy values to trigger the fallback."
+  },
+  {
+    "title": "?. — optional chaining",
+    "instruction": "Accessing a property on `null` or `undefined` crashes with a TypeError. Optional chaining `?.` returns `undefined` instead:\n\n```js\nuser?.address?.city   // undefined if user or address is null\n```\n\nThis replaced dozens of lines of defensive null checks in modern JavaScript.",
+    "starter": "const user1 = { name: \"Alex\", address: { city: \"London\" } };\nconst user2 = { name: \"Bob\" };  // no address\nconst user3 = null;\n\n// Without optional chaining — crashes for user2 and user3:\n// console.log(user2.address.city); // TypeError!\n\n// With optional chaining:\nconsole.log(user1?.address?.city);  // London\nconsole.log(user2?.address?.city);  // undefined\nconsole.log(user3?.address?.city);  // undefined\n\n// Combine with ?? for a default:\nconsole.log(user2?.address?.city ?? \"No city\");",
+    "expectedOutput": ["London", "undefined", "undefined", "No city"],
+    "successMessage": "?. is a modern JavaScript superpower. Before it existed, you'd write: user && user.address && user.address.city. Now it's just user?.address?.city. Game changer."
+  },
+  {
+    "title": "Ternary — one-line if/else",
+    "instruction": "The ternary operator is a compact if/else that returns a value:\n\n```js\ncondition ? valueIfTrue : valueIfFalse\n```\n\nUse it for simple assignments. Don't nest ternaries — it becomes unreadable fast.\n\nRewrite the four-line if/else as a single ternary.",
+    "hint": "const status = age >= 18 ? \"adult\" : \"minor\";",
+    "starter": "const age = 20;\n\n// Rewrite this as a ternary:\n// if (age >= 18) {\n//   const status = \"adult\";\n// } else {\n//   const status = \"minor\";\n// }\n\n// TODO: write the ternary here\nconst status = null; // replace with ternary\nconsole.log(status);",
+    "expectedOutput": ["adult"],
+    "codeChecks": [
+      { "pattern": "age >= 18\\s*\\?\\s*\"adult\"\\s*:\\s*\"minor\"", "required": true, "message": "Use ternary: age >= 18 ? \"adult\" : \"minor\"" },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
+    ],
+    "successMessage": "One line, same result. Ternaries are everywhere in JSX/React: {isLoggedIn ? <UserMenu /> : <LoginButton />}. Keep them simple — one condition only."
+  },
+  {
+    "title": "switch — match exact values",
+    "instruction": "`switch` is cleaner than a long if/else chain when matching exact values.\n\nImportant: always `break` at the end of each case, or execution 'falls through' to the next case!\n\nAdd cases for `'pause'` and `'resume'`.",
+    "hint": "case 'pause':\n  console.log('Paused.');\n  break;",
+    "starter": "const command = \"pause\";\n\nswitch (command) {\n  case \"start\":\n    console.log(\"Starting...\");\n    break;\n  case \"stop\":\n    console.log(\"Stopping...\");\n    break;\n  // TODO: add pause and resume cases\n  default:\n    console.log(`Unknown command: ${command}`);\n}",
+    "expectedOutput": ["Paused."],
+    "codeChecks": [
+      { "pattern": "case \"pause\":|case 'pause':", "required": true, "message": "Add: case 'pause':" },
+      { "pattern": "case \"resume\":|case 'resume':", "required": true, "message": "Add: case 'resume':" },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
+    ],
+    "successMessage": "switch with break — never forget the break, or cases bleed into each other. Intentional fall-through (multiple cases, same action) is a valid pattern but should be commented."
+  },
+  {
+    "title": "Logical assignment operators",
+    "instruction": "Modern JavaScript has shorthand for common patterns:\n\n- `x ||= value` — set x to value only if x is falsy\n- `x &&= value` — set x to value only if x is truthy  \n- `x ??= value` — set x to value only if x is null/undefined\n\nThese replace verbose guard patterns:\n```js\n// Before: settings.theme = settings.theme || 'dark';\n// After:  settings.theme ||= 'dark';\n```",
+    "starter": "let config = { timeout: 0, retries: null, debug: true };\n\nconfig.timeout ||= 30;   // 0 is falsy, so this sets it to 30\nconfig.retries ??= 3;    // null, so this sets it to 3  \nconfig.debug &&= false;  // debug is truthy, so this sets it to false\n\nconsole.log(config.timeout);  // 30\nconsole.log(config.retries);  // 3\nconsole.log(config.debug);    // false",
+    "expectedOutput": ["30", "3", "false"],
+    "successMessage": "Logical assignment operators reduce boilerplate dramatically. ??= is especially useful for initialising optional config values — set it only when truly absent."
+  },
+  {
+    "title": "Build an access control system",
+    "instruction": "Final challenge — no starter code.\n\nBuild `checkAccess(user)` that returns a message based on these rules:\n- If user is null: `\"No user — please log in.\"`\n- If user.isBanned: `\"Account banned.\"`\n- If user.role === 'admin': `\"Admin access granted.\"`\n- If user.isVerified && user.age >= 18: `\"Access granted.\"`\n- Otherwise: `\"Access denied.\"`\n\nTest it with 5 different user objects covering each case.",
+    "hint": "Use ?. and ?? for safe access. Use if/else if chain for the rules.",
+    "starter": "",
+    "expectedOutput": [],
+    "codeChecks": [
+      { "pattern": "function checkAccess|const checkAccess\\s*=", "required": true, "message": "Define checkAccess(user)." },
+      { "pattern": "\\?\\?|\\?\\.", "required": true, "message": "Use ?? or ?. for null-safe access." },
+      { "pattern": "isBanned", "required": true, "message": "Handle the isBanned case." },
+      { "pattern": "isVerified", "required": true, "message": "Check isVerified in the conditions." }
+    ],
+    "successMessage": "A complete access control system using &&, ||, ??, ?., and if/else. All of Chapter 5 in one function. This is how real auth middleware works. Chapter 5 done!"
+  }
+]

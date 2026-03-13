@@ -1,34 +1,14 @@
 ---
-title: "JSON in JavaScript"
-description: "JSON.stringify, JSON.parse, and working with JSON data in JavaScript."
-order: 18
+title: "JSON"
+description: "JSON.parse, JSON.stringify, replacers, revivers, custom serialization, and handling every edge case."
+order: 22
 difficulty: "intermediate"
-estimatedMinutes: 15
+estimatedMinutes: 18
+concepts: ["JSON.parse", "JSON.stringify", "indent", "replacer", "reviver", "Date serialization", "circular references", "schema validation"]
 ---
 
-## JSON.stringify (object → string)
+## The language of APIs
 
-```javascript
-const user = { name: "Alice", age: 30, city: "London" };
-const json = JSON.stringify(user);
-console.log(json); // {"name":"Alice","age":30,"city":"London"}
+JSON is how JavaScript objects travel across the internet. Nearly every API request and response is JSON. It looks like JavaScript object literals — but it's stricter, and there are important differences.
 
-// Pretty-print
-console.log(JSON.stringify(user, null, 2));
-```
-
-## JSON.parse (string → object)
-
-```javascript
-const parsed = JSON.parse('{"name":"Alice","age":30}');
-console.log(parsed.name); // Alice
-```
-
-## Handling Dates and Special Values
-
-```javascript
-const obj = { date: new Date().toISOString(), score: null };
-const json = JSON.stringify(obj);
-```
-
-More content coming soon. Try the interactive steps above!
+After this chapter, you'll never be surprised by a JSON quirk again.

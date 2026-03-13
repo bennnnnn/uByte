@@ -1,34 +1,14 @@
 ---
-title: "References & Closures"
-description: "How JavaScript passes primitives by value and objects by reference."
-order: 9
+title: "Scope & Closures"
+description: "Block scope, function scope, the var hoisting trap, closures, and why functions remember their birth environment."
+order: 10
 difficulty: "intermediate"
-estimatedMinutes: 15
+estimatedMinutes: 22
+concepts: ["block scope", "function scope", "hoisting", "closure", "lexical environment", "module pattern", "the var loop bug"]
 ---
 
-## Primitives — Passed by Value
+## Where variables live
 
-```javascript
-let a = 10;
-let b = a;
-b = 20;
-console.log(a); // 10 — unchanged
-```
+Scope determines which variables are visible where. Get it wrong and you get mysterious `undefined` values and bugs that only appear sometimes.
 
-## Objects — Passed by Reference
-
-```javascript
-const obj = { x: 1 };
-const ref = obj;
-ref.x = 99;
-console.log(obj.x); // 99 — same object!
-```
-
-## Cloning Objects
-
-```javascript
-const copy = { ...obj };        // shallow clone
-const deep = structuredClone(obj); // deep clone (modern)
-```
-
-More content coming soon. Try the interactive steps above!
+Closures are one of JavaScript's most powerful features — and the source of many 'aha!' moments. Once you understand them, you'll see them everywhere: event handlers, callbacks, React hooks, setTimeout patterns.

@@ -1,40 +1,14 @@
 ---
-title: "Modules & Imports"
-description: "ES modules (import/export), CommonJS (require), and npm packages."
-order: 14
+title: "Modules"
+description: "ES Modules, CommonJS, named exports, default exports, dynamic imports, and organising real-world JavaScript projects."
+order: 16
 difficulty: "intermediate"
-estimatedMinutes: 12
+estimatedMinutes: 18
+concepts: ["ES modules", "import", "export", "default export", "named exports", "CommonJS", "require", "dynamic import", "circular deps"]
 ---
 
-## ES Modules (import/export)
+## Split code across files
 
-```javascript
-// math.js
-export function add(a, b) { return a + b; }
-export const PI = 3.14159;
+A 10,000-line single file is impossible to maintain. Modules let you split code into focused files, import what you need, and hide everything else.
 
-// main.js
-import { add, PI } from "./math.js";
-console.log(add(2, 3)); // 5
-```
-
-## Default Exports
-
-```javascript
-export default function greet(name) {
-  return `Hello, ${name}!`;
-}
-import greet from "./greet.js";
-```
-
-## npm Packages
-
-```bash
-npm install lodash
-```
-```javascript
-import _ from "lodash";
-console.log(_.chunk([1,2,3,4], 2)); // [[1,2],[3,4]]
-```
-
-More content coming soon. Try the interactive steps above!
+JavaScript has two module systems: **CommonJS** (the original Node.js way) and **ES Modules** (the modern standard). Understanding both is essential because you'll encounter both in the wild.

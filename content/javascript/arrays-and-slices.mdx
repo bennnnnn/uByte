@@ -1,27 +1,14 @@
 ---
 title: "Arrays"
-description: "Creating, slicing, mapping, and filtering arrays in JavaScript."
-order: 6
-difficulty: "intermediate"
-estimatedMinutes: 15
+description: "JavaScript arrays and their powerful built-in methods: map, filter, reduce, find, and more."
+order: 7
+difficulty: "beginner"
+estimatedMinutes: 22
+concepts: ["array methods", "map", "filter", "reduce", "find", "some", "every", "flat", "spread", "Array.from"]
 ---
 
-## Creating Arrays
+## The most-used data structure
 
-```javascript
-const nums = [1, 2, 3, 4, 5];
-console.log(nums.length); // 5
-console.log(nums[0]);     // 1
-```
+Arrays are everywhere in JavaScript — every API response is an array of objects, every list is an array, every data transformation touches arrays.
 
-## Common Methods
-
-```javascript
-nums.push(6);              // add to end
-nums.slice(1, 3);          // [2, 3] — non-mutating
-nums.map(n => n * 2);      // [2, 4, 6, ...]
-nums.filter(n => n > 2);   // [3, 4, 5, ...]
-nums.reduce((a, b) => a + b, 0); // 15
-```
-
-More content coming soon. Try the interactive steps above!
+The modern array methods (`map`, `filter`, `reduce`) are what separate JavaScript developers from JavaScript masters. They let you transform data declaratively — saying WHAT you want, not HOW to do it step by step.

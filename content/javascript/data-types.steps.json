@@ -1,0 +1,84 @@
+[
+  {
+    "title": "The seven primitive types",
+    "instruction": "JavaScript has seven primitive types. You have already seen a few — now let's meet them all.\n\nRun this. Notice how `typeof` reports each one.",
+    "starter": "console.log(typeof \"hello\");      // string\nconsole.log(typeof 42);           // number\nconsole.log(typeof 3.14);         // number (same type!)\nconsole.log(typeof true);         // boolean\nconsole.log(typeof undefined);    // undefined\nconsole.log(typeof null);         // object (famous bug)\nconsole.log(typeof Symbol());     // symbol\nconsole.log(typeof 9007199254740993n); // bigint",
+    "expectedOutput": ["string", "number", "number", "boolean", "undefined", "object", "symbol", "bigint"],
+    "successMessage": "JavaScript has ONE number type for both integers and decimals — unlike Python. And typeof null === 'object' is a bug from 1995 that cannot be fixed. You now know the whole type system."
+  },
+  {
+    "title": "number — JavaScript does floats by default",
+    "instruction": "JavaScript uses a 64-bit float for ALL numbers — integers and decimals share one type.\n\nThis creates a famous quirk:\n\n```js\n0.1 + 0.2 === 0.3  // false!\n```\n\nRun this, then check why `0.1 + 0.2` doesn't equal `0.3` and how to work around it.",
+    "starter": "console.log(0.1 + 0.2);           // not 0.3!\nconsole.log(0.1 + 0.2 === 0.3);   // false\nconsole.log((0.1 + 0.2).toFixed(1) === \"0.3\"); // true\n\nconsole.log(Number.MAX_SAFE_INTEGER);\nconsole.log(Number.isInteger(42));\nconsole.log(Number.isInteger(42.5));",
+    "expectedOutput": ["0.30000000000000004", "false", "true", "9007199254740991", "true", "false"],
+    "successMessage": "0.1 + 0.2 = 0.30000000000000004 — floating-point math! Every language with 64-bit floats has this. For money: always use .toFixed(2) or store amounts in cents (integers)."
+  },
+  {
+    "title": "string — text in JavaScript",
+    "instruction": "Strings can use single quotes, double quotes, or backticks. Backtick strings (template literals) are the most powerful — they support multi-line and embedded expressions.\n\nCreate three strings using each quote style, then combine them.",
+    "hint": "const a = \"double\";\nconst b = 'single';\nconst c = `backtick ${a}`;",
+    "starter": "const name = \"Alex\";         // double quotes\nconst city = 'London';       // single quotes  \nconst greeting = `Hello, ${name} from ${city}!`;  // template literal\n\nconsole.log(greeting);\nconsole.log(greeting.length);\nconsole.log(greeting.toUpperCase());",
+    "expectedOutput": ["Hello, Alex from London!", "24", "HELLO, ALEX FROM LONDON!"],
+    "successMessage": "Template literals (backticks) are modern JS's preferred string style — they support interpolation, multi-line text, and expressions. Use them by default."
+  },
+  {
+    "title": "boolean — just two values",
+    "instruction": "`true` and `false`. That's it. They control every `if` statement, every loop condition, every decision.\n\nJavaScript also has comparison operators that PRODUCE booleans:\n\n- `===` strict equality (type + value)\n- `!==` strict not-equal\n- `>`, `<`, `>=`, `<=`\n\nRun these and confirm the outputs.",
+    "starter": "const isLoggedIn = true;\nconst isPremium = false;\n\nconsole.log(isLoggedIn);\nconsole.log(!isLoggedIn);  // NOT\n\nconsole.log(5 === 5);     // true\nconsole.log(5 === \"5\");   // false — different types!\nconsole.log(5 > 3);       // true\nconsole.log(\"a\" < \"b\");   // true — alphabetical",
+    "expectedOutput": ["true", "false", "true", "false", "true", "true"],
+    "successMessage": "5 === \"5\" is false because === checks type too. This is strict equality — the right default. Later you'll meet == (loose equality) and understand why most style guides ban it."
+  },
+  {
+    "title": "null vs undefined — two 'nothing' values",
+    "instruction": "JavaScript has two ways to say 'no value here', which confuses everyone:\n\n- `undefined` — the value was never set. JavaScript assigns this automatically.\n- `null` — the value was intentionally set to nothing. A deliberate empty.\n\nRule of thumb: JavaScript gives you `undefined`. You give things `null` when you want to clear them.",
+    "starter": "let notSet;  // JavaScript gives it undefined automatically\nconsole.log(notSet);\nconsole.log(typeof notSet);\n\nlet cleared = null;  // you deliberately set it to nothing\nconsole.log(cleared);\nconsole.log(typeof cleared);  // 'object' — the famous bug\n\nconsole.log(null === undefined);   // false — they are not equal\nconsole.log(null == undefined);    // true — loose equality agrees",
+    "expectedOutput": ["undefined", "undefined", "null", "object", "false", "true"],
+    "successMessage": "undefined = JS didn't set it. null = you cleared it. Use null intentionally — don't set things to undefined yourself. That's JavaScript's job."
+  },
+  {
+    "title": "The coercion trap — == vs ===",
+    "instruction": "This is one of JavaScript's most famous footguns. `==` (loose equality) converts types before comparing — `===` (strict equality) does not.\n\nRun this and study every result. Then remember: **always use `===`**.",
+    "starter": "// Loose == coerces types before comparing:\nconsole.log(0 == false);      // true\nconsole.log(1 == true);       // true\nconsole.log(\"\" == false);     // true\nconsole.log(null == undefined);// true\nconsole.log(\"5\" == 5);        // true\n\nconsole.log(\"--- strict ===\");\n\n// Strict === never coerces:\nconsole.log(0 === false);     // false\nconsole.log(\"5\" === 5);       // false\nconsole.log(null === undefined);// false",
+    "expectedOutput": ["true", "true", "true", "true", "true", "--- strict ===", "false", "false", "false"],
+    "successMessage": "== hides type mismatches behind silent conversions. Every major JavaScript style guide (Airbnb, Google, Standard) requires ===. Treat == as if it doesn't exist."
+  },
+  {
+    "title": "Type conversion — be explicit",
+    "instruction": "Rather than letting JS coerce types silently, convert explicitly:\n\n- `Number(\"42\")` → 42\n- `String(42)` → `\"42\"`\n- `Boolean(0)` → `false`\n- `parseInt(\"42px\")` → 42 (stops at non-number)\n\nFix the broken additions by converting explicitly.",
+    "hint": "Number(\"10\") to convert string to number.",
+    "starter": "// BUG: \"5\" + 3 gives \"53\" not 8!\nconst a = \"5\";\nconst b = 3;\nconsole.log(a + b);             // \"53\" — string concatenation!\nconsole.log(Number(a) + b);     // 8 — correct\n\n// TODO: convert \"100\" to a number and add 50\nconst price = \"100\";\nconsole.log(price + 50);        // BUG: prints \"10050\"\nconsole.log(/* fix this */ + 50); // should print 150",
+    "expectedOutput": ["53", "8", "10050", "150"],
+    "codeChecks": [
+      { "pattern": "Number\\(price\\)|parseInt\\(price\\)", "required": true, "message": "Convert price: Number(price) + 50" },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
+    ],
+    "successMessage": "\"5\" + 3 = \"53\" not 8 — that is the coercion trap! Number() is explicit and safe. Always convert intentionally instead of letting JavaScript guess."
+  },
+  {
+    "title": "Truthy and falsy",
+    "instruction": "JavaScript treats certain values as `false` in boolean contexts:\n\n| Falsy | Truthy |\n|-------|--------|\n| `false`, `0`, `\"\"`, `null`, `undefined`, `NaN` | Everything else |\n\nThis lets you write `if (name)` instead of `if (name !== \"\")` — but it also creates traps. `if (0)` won't run even though 0 is a valid number.\n\nRun and study each.",
+    "starter": "const values = [0, \"\", null, undefined, NaN, false, -1, \"0\", [], {}];\n\nvalues.forEach(v => {\n  console.log(`${String(v)}: ${v ? \"truthy\" : \"falsy\"}`);\n});",
+    "expectedOutput": ["0: falsy", ": falsy", "null: falsy", "undefined: falsy", "NaN: falsy", "false: falsy", "-1: truthy", "0: truthy", ": truthy", "[object Object]: truthy"],
+    "successMessage": "Six falsy values only — everything else is truthy. Note: empty array [] and empty object {} are both TRUTHY! That surprises many people."
+  },
+  {
+    "title": "NaN — the weird number",
+    "instruction": "`NaN` means 'Not a Number' — but `typeof NaN === 'number'`. It is JavaScript's way of saying 'I tried to do math but the result is nonsensical'.\n\n`NaN` is the only value in JavaScript that is not equal to itself:\n\n```js\nNaN === NaN  // false!\n```\n\nUse `Number.isNaN()` to check for it.",
+    "starter": "console.log(typeof NaN);           // 'number' — weird\nconsole.log(0 / 0);                // NaN\nconsole.log(parseInt(\"hello\"));    // NaN\n\n// NaN !== NaN is the only case of a value not equal to itself!\nconsole.log(NaN === NaN);          // false!\nconsole.log(NaN == NaN);           // false!\n\n// The right way to check:\nconsole.log(Number.isNaN(NaN));    // true\nconsole.log(Number.isNaN(42));     // false",
+    "expectedOutput": ["number", "NaN", "NaN", "false", "false", "true", "false"],
+    "successMessage": "NaN !== NaN — the only value in JavaScript not equal to itself. Always use Number.isNaN() to check for it. isNaN() (without Number.) has surprising coercion behaviour, so always use the Number. version."
+  },
+  {
+    "title": "All types in one program",
+    "instruction": "Final challenge — no starter code.\n\nCreate one variable of each type:\n- A string (your name)\n- A number (your age)\n- A boolean (are you enjoying this?)\n- `null` (a result not ready yet)\n- `undefined` (declare it without assigning)\n\nPrint each with its type using typeof. Then show the famous bugs: `typeof null` and `NaN === NaN`.",
+    "hint": "Use typeof to check each variable's type.",
+    "starter": "",
+    "expectedOutput": [],
+    "codeChecks": [
+      { "pattern": "typeof ", "required": true, "message": "Use typeof to check each type." },
+      { "pattern": "null", "required": true, "message": "Create a null variable." },
+      { "pattern": "NaN", "required": true, "message": "Demonstrate NaN behaviour." }
+    ],
+    "successMessage": "All seven primitive types covered — plus the two bugs (typeof null and NaN) that every JavaScript developer eventually discovers. Now you found them first. Chapter 3 done!"
+  }
+]

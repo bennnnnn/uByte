@@ -1,0 +1,64 @@
+[
+  {
+    "title": "Every object has a prototype",
+    "instruction": "Every JavaScript object has a hidden link to another object — its **prototype**. When you access a property that doesn't exist on the object, JavaScript looks up the prototype chain.\n\nThat's why `[].push()` works — arrays don't each have their own push method. They all share one from `Array.prototype`.\n\nRun this.",
+    "starter": "const arr = [1, 2, 3];\n\n// push lives on Array.prototype, not on arr directly\nconsole.log(arr.hasOwnProperty(\"push\"));           // false — not on arr\nconsole.log(Array.prototype.hasOwnProperty(\"push\"));// true — on prototype\n\n// The chain:\nconsole.log(Object.getPrototypeOf(arr) === Array.prototype); // true\nconsole.log(typeof Array.prototype.push); // function",
+    "expectedOutput": ["false", "true", "true", "function"],
+    "successMessage": "push lives on Array.prototype, not on each array. All arrays SHARE one push method through the prototype chain. This is why JavaScript is memory-efficient — methods aren't copied."
+  },
+  {
+    "title": "The prototype chain lookup",
+    "instruction": "When you access `obj.property`, JavaScript looks:\n1. On `obj` itself\n2. On `obj.__proto__` (obj's prototype)\n3. On `obj.__proto__.__proto__` (prototype's prototype)\n4. All the way to `null` — then returns `undefined`\n\nRun this to see the chain in action.",
+    "starter": "function Animal(name) {\n  this.name = name; // own property\n}\nAnimal.prototype.speak = function() {\n  return `${this.name} makes a sound.`;\n};\n\nconst dog = new Animal(\"Rex\");\n\nconsole.log(dog.hasOwnProperty(\"name\"));   // true — own\nconsole.log(dog.hasOwnProperty(\"speak\"));  // false — on prototype\nconsole.log(dog.speak());                  // found on prototype\nconsole.log(Object.getPrototypeOf(dog) === Animal.prototype);",
+    "expectedOutput": ["true", "false", "Rex makes a sound.", "true"],
+    "successMessage": "name is dog's own property. speak lives on Animal.prototype. When you call dog.speak(), JS looks on dog (not found), then on Animal.prototype (found!) and calls it."
+  },
+  {
+    "title": "Classes are prototype sugar",
+    "instruction": "ES6 class syntax compiles down to prototype-based code. The class version and the prototype version are identical under the hood.\n\nRun both and compare.",
+    "starter": "// Class syntax:\nclass PersonClass {\n  constructor(name) { this.name = name; }\n  greet() { return `Hello from ${this.name}`; }\n}\n\n// Equivalent prototype code:\nfunction PersonProto(name) { this.name = name; }\nPersonProto.prototype.greet = function() { return `Hello from ${this.name}`; };\n\nconst p1 = new PersonClass(\"Alice\");\nconst p2 = new PersonProto(\"Bob\");\n\nconsole.log(p1.greet());\nconsole.log(p2.greet());\nconsole.log(typeof PersonClass);  // function!\nconsole.log(typeof PersonProto);  // function",
+    "expectedOutput": ["Hello from Alice", "Hello from Bob", "function", "function"],
+    "successMessage": "typeof PersonClass === 'function' — classes are functions! The class keyword is syntactic sugar. Understanding this is key to debugging weird class-related bugs."
+  },
+  {
+    "title": "Object.create — manual prototype chain",
+    "instruction": "`Object.create(proto)` creates a new object with `proto` as its prototype — without a constructor function.\n\nThis is the purest form of prototypal inheritance in JavaScript.",
+    "starter": "const animal = {\n  speak() { return `${this.name} speaks.`; },\n  eat()   { return `${this.name} eats.`; }\n};\n\nconst dog = Object.create(animal);\ndog.name = \"Rex\";\ndog.bark = function() { return `${this.name} barks!`; };\n\nconsole.log(dog.speak());  // from prototype\nconsole.log(dog.eat());   // from prototype\nconsole.log(dog.bark());  // own method\nconsole.log(Object.getPrototypeOf(dog) === animal);",
+    "expectedOutput": ["Rex speaks.", "Rex eats.", "Rex barks!", "true"],
+    "successMessage": "dog was created with animal as its prototype directly. No classes, no constructors. Object.create is the foundational prototype tool — classes are built on top of it."
+  },
+  {
+    "title": "hasOwnProperty vs in",
+    "instruction": "Two ways to check if a property exists:\n\n- `hasOwnProperty('key')` — only on the object itself (not prototype)\n- `'key' in obj` — includes inherited properties from the prototype chain\n\nThis matters when looping — `for...in` includes prototype properties!",
+    "starter": "function Animal(name) {\n  this.name = name;\n}\nAnimal.prototype.speak = function() {};\nAnimal.prototype.type = \"animal\";\n\nconst dog = new Animal(\"Rex\");\ndog.breed = \"Labrador\";\n\n// hasOwnProperty — only own:\nconsole.log(dog.hasOwnProperty(\"name\"));  // true\nconsole.log(dog.hasOwnProperty(\"speak\")); // false — on prototype\n\n// in — includes prototype:\nconsole.log(\"speak\" in dog);  // true\nconsole.log(\"type\"  in dog);  // true\n\n// for...in includes inherited — filter with hasOwnProperty:\nfor (const key in dog) {\n  if (dog.hasOwnProperty(key)) console.log(`Own: ${key}`);\n}",
+    "expectedOutput": ["true", "false", "true", "true", "Own: name", "Own: breed"],
+    "successMessage": "for...in + hasOwnProperty is the safe pattern for looping over object keys. Modern code often uses Object.keys() (own only) instead to avoid this entirely."
+  },
+  {
+    "title": "Extending built-in prototypes — why NOT to",
+    "instruction": "You CAN add methods to built-in prototypes — but you almost never should:\n\n```js\nArray.prototype.first = function() { return this[0]; };\n[1, 2, 3].first(); // works — but bad!\n```\n\nWhy is it bad? If two libraries both add `Array.prototype.first`, the second overwrites the first. Chaos.\n\nRun the example. Then notice why prototype pollution is dangerous.",
+    "starter": "// DO NOT do this in real code — demo only!\nArray.prototype.sum = function() {\n  return this.reduce((a, b) => a + b, 0);\n};\n\nconsole.log([1, 2, 3, 4, 5].sum()); // works\n\n// The danger: for...in now leaks!\nconst arr = [1, 2, 3];\nfor (const key in arr) {\n  console.log(key); // 0, 1, 2, and 'sum'! — polluted\n}",
+    "expectedOutput": ["15", "0", "1", "2", "sum"],
+    "successMessage": "See 'sum' appearing in the for...in loop? That's prototype pollution. Stick to utility functions or wrapper classes instead of extending built-ins."
+  },
+  {
+    "title": "Object.assign vs spread",
+    "instruction": "`Object.assign(target, ...sources)` copies properties from sources to target.\n`{...obj}` spread does the same but creates a new object.\n\nBoth are **shallow copies** — nested objects are still shared references!\n\nSee the shallow copy gotcha.",
+    "starter": "const original = { name: \"Alex\", address: { city: \"London\" } };\n\n// Shallow copy:\nconst copy = { ...original };\ncopy.name = \"Bob\";  // safe — primitive\ncopy.address.city = \"Paris\";  // DANGER — mutates original!\n\nconsole.log(original.name);         // Alex — safe\nconsole.log(original.address.city); // Paris! — mutated!\n\n// Deep copy using structuredClone (modern):\nconst deepCopy = structuredClone(original);\ndeepCopy.address.city = \"Tokyo\";\nconsole.log(original.address.city); // still Paris — safe",
+    "expectedOutput": ["Alex", "Paris", "Paris"],
+    "successMessage": "Shallow copy: nested objects are shared. structuredClone() does a true deep copy — use it for nested data. JSON.parse(JSON.stringify(obj)) is the old workaround (but loses functions, dates)."
+  },
+  {
+    "title": "Build a prototype-based inheritance chain",
+    "instruction": "Final challenge — using the prototype approach (no classes).\n\nBuild a three-level chain: `Vehicle → Car → ElectricCar`.\n- Vehicle: `make`, `model`, `start()` method\n- Car: inherits Vehicle, adds `fuelType = 'gasoline'`, overrides `start()`\n- ElectricCar: inherits Car, adds `batteryRange`, overrides `start()` to mention silent operation\n\nUse `Object.create` for the prototype chain.",
+    "hint": "Car.prototype = Object.create(Vehicle.prototype); Car.prototype.constructor = Car;",
+    "starter": "",
+    "expectedOutput": [],
+    "codeChecks": [
+      { "pattern": "Object\\.create\\(Vehicle\\.prototype\\)|Object\\.create\\(\\w+\\.prototype\\)", "required": true, "message": "Set Car's prototype: Car.prototype = Object.create(Vehicle.prototype)" },
+      { "pattern": "Object\\.create\\(Car\\.prototype\\)", "required": true, "message": "Set ElectricCar's prototype: Object.create(Car.prototype)" },
+      { "pattern": "\\.prototype\\.start|ElectricCar\\.prototype\\.start", "required": true, "message": "Override start() on the prototypes." }
+    ],
+    "successMessage": "Three levels of prototype inheritance without a single class keyword. You just did what JavaScript has always done under the hood. Chapter 14 done — prototypes demystified!"
+  }
+]

@@ -1,69 +1,14 @@
 ---
-title: "Console & Formatting"
-description: "console.log, template literals, toFixed, and string building in JavaScript."
-order: 3
+title: "Strings & Template Literals"
+description: "Master JavaScript strings — methods, template literals, formatting, and all the tricks you'll use every day."
+order: 4
 difficulty: "beginner"
-estimatedMinutes: 10
+estimatedMinutes: 20
+concepts: ["string methods", "template literals", "slice", "includes", "split", "trim", "padStart", "repeat", "tagged templates"]
 ---
 
-## console.log
+## Strings are everywhere
 
-`console.log()` accepts any number of arguments, printing them space-separated:
+Names, emails, URLs, messages, code — everything is strings. JavaScript strings come with a large built-in toolbox of methods that you will reach for constantly.
 
-```javascript
-console.log("Name:", "Alice", "Age:", 30);
-// Name: Alice Age: 30
-```
-
----
-
-## Template Literals
-
-The JavaScript equivalent of `fmt.Sprintf` — embed expressions with `${...}`:
-
-```javascript
-const name = "Alice";
-const age = 30;
-console.log(`Name: ${name}, Age: ${age}`);
-```
-
----
-
-## Number Formatting
-
-```javascript
-const pi = 3.14159;
-console.log(pi.toFixed(2));       // "3.14"
-console.log(pi.toPrecision(4));   // "3.142"
-console.log((1234567).toLocaleString()); // "1,234,567"
-```
-
----
-
-## Building Strings
-
-Use template literals or string concatenation:
-
-```javascript
-const host = "localhost";
-const port = 8080;
-const url = `http://${host}:${port}/api`;
-console.log(url); // http://localhost:8080/api
-```
-
----
-
-## console Methods
-
-```javascript
-console.log("info");        // standard output
-console.error("error!");    // stderr (red in terminals)
-console.warn("warning");    // warning
-console.table([{a:1},{a:2}]); // formatted table
-```
-
----
-
-## What's Next?
-
-Next: **Control Flow** — `if/else`, ternary operators, and `switch` in JavaScript.
+Template literals (backtick strings) are the crown jewel — expressions inside `${}` make formatting effortless.

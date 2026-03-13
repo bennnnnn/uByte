@@ -1,37 +1,14 @@
 ---
-title: "Event Loop & Async"
-description: "The JavaScript event loop, microtasks, and concurrent patterns."
-order: 19
+title: "The Event Loop"
+description: "How JavaScript actually runs — the call stack, event loop, microtask queue, macrotask queue, and why setTimeout(fn, 0) isn't instant."
+order: 20
 difficulty: "advanced"
-estimatedMinutes: 20
+estimatedMinutes: 22
+concepts: ["call stack", "event loop", "microtask queue", "macrotask queue", "setTimeout", "Promise microtasks", "queueMicrotask", "task scheduling"]
 ---
 
-## The Event Loop
+## The engine behind async
 
-JavaScript is single-threaded. Async work is queued as callbacks/microtasks:
+Understanding the event loop is what separates developers who can reason about async JavaScript from those who are constantly confused by ordering surprises.
 
-```javascript
-console.log("1 - sync");
-setTimeout(() => console.log("3 - macro task"), 0);
-Promise.resolve().then(() => console.log("2 - microtask"));
-// Output: 1, 2, 3
-```
-
-## Promise.race (first to resolve)
-
-```javascript
-const result = await Promise.race([
-  fetch("/api/fast"),
-  new Promise((_, reject) => setTimeout(() => reject("timeout"), 5000))
-]);
-```
-
-## AbortController (cancellation)
-
-```javascript
-const controller = new AbortController();
-fetch("/api/data", { signal: controller.signal });
-controller.abort(); // cancel the request
-```
-
-More content coming soon. Try the interactive steps above!
+It explains why `setTimeout(fn, 0)` doesn't run immediately, why Promise callbacks run before setTimeout callbacks, and why `await` pauses the function but not the whole program.

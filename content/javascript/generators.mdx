@@ -1,0 +1,14 @@
+---
+title: "Generators & Iterators"
+description: "Iterators, generator functions with yield, lazy sequences, infinite generators, and custom iterables."
+order: 19
+difficulty: "advanced"
+estimatedMinutes: 20
+concepts: ["Symbol.iterator", "iterator protocol", "generator function", "yield", "yield*", "infinite generators", "lazy evaluation"]
+---
+
+## Pausable functions
+
+Generators are functions that can pause and resume. Instead of computing all values upfront, they produce one value at a time — on demand.
+
+This is called **lazy evaluation**: values are computed only when needed. It's how Python's `range(1000000)` doesn't use gigabytes of memory, and how JavaScript streams work.

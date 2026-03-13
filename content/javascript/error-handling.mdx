@@ -1,46 +1,14 @@
 ---
 title: "Error Handling"
-description: "try/catch/finally, Error types, and async error handling in JavaScript."
-order: 13
+description: "try/catch/finally, throw, custom error types, and building resilient code that fails gracefully."
+order: 15
 difficulty: "intermediate"
-estimatedMinutes: 15
+estimatedMinutes: 18
+concepts: ["try/catch/finally", "throw", "Error types", "custom errors", "error chaining", "global handlers"]
 ---
 
-## try / catch / finally
+## Things go wrong — handle it
 
-```javascript
-try {
-  JSON.parse("invalid json");
-} catch (err) {
-  console.log("Error:", err.message);
-} finally {
-  console.log("Always runs");
-}
-```
+Every real-world program encounters unexpected situations: network timeouts, invalid input, missing data, API errors. Without error handling, your program just crashes.
 
-## Custom Errors
-
-```javascript
-class ValidationError extends Error {
-  constructor(msg) {
-    super(msg);
-    this.name = "ValidationError";
-  }
-}
-throw new ValidationError("Invalid input");
-```
-
-## Async Error Handling
-
-```javascript
-async function fetchData() {
-  try {
-    const res = await fetch("https://api.example.com");
-    return await res.json();
-  } catch (err) {
-    console.error("Fetch failed:", err.message);
-  }
-}
-```
-
-More content coming soon. Try the interactive steps above!
+JavaScript gives you `try/catch/finally` and a hierarchy of built-in error types. Learning to throw and catch the right error makes debugging 10× faster.

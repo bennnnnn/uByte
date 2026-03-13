@@ -1,45 +1,12 @@
 ---
 title: "Functions"
-description: "Function declarations, arrow functions, default params, and closures in JavaScript."
-order: 8
-difficulty: "intermediate"
-estimatedMinutes: 15
+description: "Function declarations, expressions, arrow functions, callbacks, default parameters, rest, and pure functions."
+order: 9
+difficulty: "beginner"
+estimatedMinutes: 22
+concepts: ["function declaration", "expression", "arrow function", "parameters", "default values", "rest params", "callbacks", "pure functions", "IIFE"]
 ---
 
-## Function Declaration
+## The building blocks of everything
 
-```javascript
-function add(a, b) {
-  return a + b;
-}
-console.log(add(3, 4)); // 7
-```
-
-## Arrow Functions
-
-```javascript
-const multiply = (a, b) => a * b;
-const square = n => n * n;
-```
-
-## Default Parameters
-
-```javascript
-function greet(name = "World") {
-  console.log(`Hello, ${name}!`);
-}
-```
-
-## Closures
-
-```javascript
-function counter() {
-  let count = 0;
-  return () => ++count;
-}
-const inc = counter();
-console.log(inc()); // 1
-console.log(inc()); // 2
-```
-
-More content coming soon. Try the interactive steps above!
+Functions are how you name a piece of logic, reuse it anywhere, and keep code DRY (Don't Repeat Yourself). JavaScript has three ways to write them — and they have meaningful differences around `this`, hoisting, and when to use each.

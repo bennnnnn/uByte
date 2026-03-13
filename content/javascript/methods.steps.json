@@ -1,0 +1,101 @@
+[
+  {
+    "title": "Array destructuring",
+    "instruction": "Instead of accessing array elements by index one by one, destructure them into named variables in one line:\n\n```js\nconst [first, second, third] = [10, 20, 30];\n```\n\nRun this. See how much cleaner it is than `arr[0]`, `arr[1]`, `arr[2]`.",
+    "starter": "const rgb = [255, 128, 0];\n\n// Old way:\nconst r1 = rgb[0];\nconst g1 = rgb[1];\nconst b1 = rgb[2];\n\n// Destructuring:\nconst [r, g, b] = rgb;\nconsole.log(`R:${r} G:${g} B:${b}`);\n\n// Works with any iterable:\nconst [first, ...rest] = [1, 2, 3, 4, 5];\nconsole.log(first);  // 1\nconsole.log(rest);   // [2, 3, 4, 5]",
+    "expectedOutput": ["R:255 G:128 B:0", "1", "[ 2, 3, 4, 5 ]"],
+    "successMessage": "[r, g, b] = rgb — cleaner than rgb[0], rgb[1], rgb[2]. The ...rest captures everything that wasn't explicitly named."
+  },
+  {
+    "title": "Skip elements",
+    "instruction": "Use commas to skip elements you don't need:\n\n```js\nconst [, second, , fourth] = [1, 2, 3, 4];\n```\n\nExtract only the first and last items from the array.",
+    "hint": "const [first, , , , last] = numbers;",
+    "starter": "const numbers = [10, 20, 30, 40, 50];\n\n// TODO: destructure to get only first and last (skip the middle)\nconst [first] = numbers; // fix this\nconsole.log(`First: ${first}, Last: ???`);",
+    "expectedOutput": ["First: 10, Last: 50"],
+    "codeChecks": [
+      { "pattern": "\\[\\s*\\w+\\s*,\\s*,", "required": true, "message": "Skip elements using commas: [first, , , , last]" },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
+    ],
+    "successMessage": "Commas skip elements. [first, , , , last] — four commas to skip three elements. Especially useful when a function returns an array and you only need specific positions."
+  },
+  {
+    "title": "Object destructuring",
+    "instruction": "Object destructuring extracts properties into variables by name:\n\n```js\nconst { name, age, city } = user;\n// same as: const name = user.name; const age = user.age; ...\n```\n\nDestructure the user object into separate variables.",
+    "hint": "const { name, age, city, email } = user;",
+    "starter": "const user = { name: \"Alex\", age: 25, city: \"London\", email: \"alex@example.com\" };\n\n// TODO: destructure name, age, and city from user\nconst {} = user; // fix this\nconsole.log(`${name}, ${age}, ${city}`);",
+    "expectedOutput": ["Alex, 25, London"],
+    "codeChecks": [
+      { "pattern": "const\\s*\\{\\s*name,", "required": true, "message": "Destructure: const { name, age, city } = user;" },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
+    ],
+    "successMessage": "name, age, city — three variables in one line. This is how React components receive props: function Component({ name, age, onClick }) — all destructured from the props object."
+  },
+  {
+    "title": "Rename while destructuring",
+    "instruction": "If the property name conflicts with an existing variable, rename it:\n\n```js\nconst { name: userName, id: userId } = user;\n// userName = user.name, userId = user.id\n```\n\nDestructure both responses — they both have 'name' so you need to rename.",
+    "hint": "const { name: userA } = user1; const { name: userB } = user2;",
+    "starter": "const user1 = { name: \"Alice\", score: 95 };\nconst user2 = { name: \"Bob\",   score: 87 };\n\n// TODO: destructure both users, renaming 'name' to avoid conflict\nconst { name: nameA, score: scoreA } = user1;\n// add user2 destructuring here\nconsole.log(`${nameA} vs ${nameB}: ${scoreA} vs ${scoreB}`);",
+    "expectedOutput": ["Alice vs Bob: 95 vs 87"],
+    "codeChecks": [
+      { "pattern": "name:\\s*nameB|name: nameB", "required": true, "message": "Rename user2's name: { name: nameB, score: scoreB } = user2" },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
+    ],
+    "successMessage": "Renaming during destructuring is clean and explicit. { originalName: newVariable } — the property name on the left, your variable name on the right."
+  },
+  {
+    "title": "Default values in destructuring",
+    "instruction": "Set defaults for missing properties — they kick in when the property is undefined:\n\n```js\nconst { name, role = 'user', theme = 'dark' } = preferences;\n```\n\nDestructure the config with sensible defaults.",
+    "hint": "const { host = 'localhost', port = 3000, debug = false } = config;",
+    "starter": "const config = { host: \"api.example.com\", timeout: 30 };\n// port and debug are missing — use defaults\n\nconst { host, port = 3000, timeout, debug = false } = config;\nconsole.log(`${host}:${port}`);\nconsole.log(`timeout: ${timeout}, debug: ${debug}`);",
+    "expectedOutput": ["api.example.com:3000", "timeout: 30, debug: false"],
+    "successMessage": "port defaulted to 3000, debug to false — because they weren't in config. Defaults + destructuring is the cleanest way to handle optional function parameters."
+  },
+  {
+    "title": "Nested destructuring",
+    "instruction": "Destructure nested objects and arrays inline:\n\n```js\nconst { address: { city, country } } = user;\n```\n\nExtract the nested address data.",
+    "hint": "const { name, address: { city, country } } = user;",
+    "starter": "const user = {\n  name: \"Alex\",\n  address: {\n    city: \"London\",\n    country: \"UK\",\n    postcode: \"SW1A 1AA\"\n  }\n};\n\n// TODO: destructure name, city, and country in one line\nconst { name } = user; // add nested destructuring\nconsole.log(`${name} lives in ${city}, ${country}`);",
+    "expectedOutput": ["Alex lives in London, UK"],
+    "codeChecks": [
+      { "pattern": "address:\\s*\\{", "required": true, "message": "Use nested destructuring: { address: { city, country } }" },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
+    ],
+    "successMessage": "Nested destructuring in one line. API responses are often 5-10 levels deep — nested destructuring handles them elegantly."
+  },
+  {
+    "title": "Destructuring in function params",
+    "instruction": "The most common use of destructuring: directly in function parameters.\n\nInstead of receiving a `user` object and then doing `user.name`, destructure right in the signature:\n\n```js\nfunction greet({ name, age }) {\n  return `Hello ${name}, you're ${age}`;\n}\n```\n\nRewrite the formatOrder function to destructure its parameter.",
+    "hint": "function formatOrder({ id, customer: { name }, total, items }) { ... }",
+    "starter": "// Rewrite to destructure the order object in the params:\nfunction formatOrder(order) {\n  return `Order #${order.id} | ${order.customer.name} | $${order.total.toFixed(2)} | ${order.items.length} items`;\n}\n\nconst order = { id: 1234, customer: { name: \"Alex\" }, total: 89.99, items: [\"Laptop\", \"Cable\"] };\nconsole.log(formatOrder(order));",
+    "expectedOutput": ["Order #1234 | Alex | $89.99 | 2 items"],
+    "codeChecks": [
+      { "pattern": "function formatOrder\\s*\\(\\s*\\{", "required": true, "message": "Destructure in the params: function formatOrder({ id, ... })" }
+    ],
+    "successMessage": "Params destructuring is everywhere in modern JavaScript. React components: function Button({ label, onClick, disabled = false }) — clean and self-documenting."
+  },
+  {
+    "title": "Spread in function calls",
+    "instruction": "Spread `...` works in function calls to expand an array into individual arguments:\n\n```js\nMath.max(...numbers);  // instead of Math.max(a, b, c, d)\n```\n\nUse spread to find the max, min, and call a multi-arg function.",
+    "hint": "Math.max(...scores), Math.min(...scores)",
+    "starter": "const scores = [85, 92, 67, 98, 73, 88];\n\n// TODO: use spread to find max and min WITHOUT hard-coding args\nconsole.log(\"Max:\", Math.max(...scores));\nconsole.log(\"Min:\", Math.min(...scores));\n\nfunction describe(a, b, c) {\n  return `${a}, ${b}, ${c}`;\n}\nconst first3 = [\"Alice\", \"Bob\", \"Carol\"];\nconsole.log(describe(...first3));",
+    "expectedOutput": ["Max: 98", "Min: 67", "Alice, Bob, Carol"],
+    "codeChecks": [
+      { "pattern": "Math\\.max\\(\\.\\.\\.", "required": true, "message": "Use spread: Math.max(...scores)" },
+      { "pattern": "Math\\.min\\(\\.\\.\\.", "required": true, "message": "Use spread: Math.min(...scores)" }
+    ],
+    "successMessage": "Spread in calls expands the array into arguments. Math.max(85, 92, 67, 98...) written as Math.max(...scores). Works with any function that takes multiple args."
+  },
+  {
+    "title": "Build an API response handler",
+    "instruction": "Final challenge — no starter code.\n\nWrite `handleResponse({ data, error, meta: { total, page } = {} })` that:\n- If error is present: prints `Error: {error.message}`\n- If data is empty: prints `No results on page {page}`\n- Otherwise: prints a summary like `Page {page} of {total}: {data.length} results`\n\nTest with 3 different response shapes.",
+    "hint": "function handleResponse({ data = [], error, meta: { total = '?', page = 1 } = {} }) { ... }",
+    "starter": "",
+    "expectedOutput": [],
+    "codeChecks": [
+      { "pattern": "function handleResponse\\s*\\(\\s*\\{|const handleResponse\\s*=\\s*\\(\\s*\\{", "required": true, "message": "Destructure in the function params." },
+      { "pattern": "meta:", "required": true, "message": "Destructure the nested meta object." },
+      { "pattern": "error", "required": true, "message": "Handle the error case." }
+    ],
+    "successMessage": "Destructuring with nested objects, defaults, and renaming all in the function signature. This is how real API response handlers look in production. Chapter 11 done!"
+  }
+]

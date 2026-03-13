@@ -1,36 +1,14 @@
 ---
 title: "HTTP & fetch"
-description: "Making HTTP requests with the fetch API and handling responses in JavaScript."
-order: 17
+description: "Make HTTP requests with fetch, handle GET/POST/PUT/DELETE, work with headers, authentication, and graceful error handling."
+order: 21
 difficulty: "intermediate"
-estimatedMinutes: 20
+estimatedMinutes: 22
+concepts: ["fetch", "Response", "json()", "GET", "POST", "headers", "Authorization", "AbortController", "error handling", "URLSearchParams"]
 ---
 
-## fetch API (browser & Node.js 18+)
+## Connect to the world
 
-```javascript
-const res = await fetch("https://jsonplaceholder.typicode.com/posts/1");
-const data = await res.json();
-console.log(data.title);
-```
+Every modern app talks to APIs. `fetch` is the browser and Node.js native HTTP client — clean, Promise-based, and powerful.
 
-## POST Request
-
-```javascript
-const res = await fetch("https://api.example.com/users", {
-  method: "POST",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify({ name: "Alice" }),
-});
-const user = await res.json();
-```
-
-## Error Handling
-
-```javascript
-if (!res.ok) {
-  throw new Error(`HTTP error: ${res.status}`);
-}
-```
-
-More content coming soon. Try the interactive steps above!
+After this chapter, you'll be able to talk to any REST API — GitHub, Stripe, Twitter, your own backend.

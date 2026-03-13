@@ -1,0 +1,64 @@
+[
+  {
+    "title": "Synchronous code — the call stack",
+    "instruction": "JavaScript executes code on a **call stack** — last in, first out (LIFO).\n\nWhen a function is called, it's pushed onto the stack. When it returns, it's popped off.\n\nRun this and understand the order.",
+    "starter": "function c() { console.log(\"c running\"); }\nfunction b() { console.log(\"b before c\"); c(); console.log(\"b after c\"); }\nfunction a() { console.log(\"a before b\"); b(); console.log(\"a after b\"); }\n\na();\nconsole.log(\"all done\");",
+    "expectedOutput": ["a before b", "b before c", "c running", "b after c", "a after b", "all done"],
+    "successMessage": "The stack: a is called, b is called inside a, c is called inside b. c returns, b continues, b returns, a continues. Always completes in the order functions were entered."
+  },
+  {
+    "title": "setTimeout — the macrotask queue",
+    "instruction": "When `setTimeout(fn, 0)` is called:\n1. The timer is registered with the browser/Node.js\n2. JS moves on immediately (doesn't wait!)\n3. When the current synchronous code finishes, the event loop checks the **macrotask queue**\n4. The callback runs\n\nSo even `setTimeout(fn, 0)` runs AFTER all synchronous code.\n\nPreddict the output before running.",
+    "starter": "console.log(\"1 - sync\");\n\nsetTimeout(() => console.log(\"2 - setTimeout 0ms\"), 0);\nsetTimeout(() => console.log(\"3 - setTimeout 100ms\"), 100);\n\nconsole.log(\"4 - sync\");\nconsole.log(\"5 - sync\");",
+    "expectedOutput": ["1 - sync", "4 - sync", "5 - sync", "2 - setTimeout 0ms", "3 - setTimeout 100ms"],
+    "successMessage": "Sync first (1, 4, 5), then macrotasks (2, then 3). setTimeout(fn, 0) doesn't mean immediate — it means 'run after current sync code finishes, minimum 0ms wait'."
+  },
+  {
+    "title": "Promises — the microtask queue",
+    "instruction": "Promise callbacks run in the **microtask queue** — which is checked BEFORE the macrotask queue.\n\nMicrotask queue processing:\n1. Run all synchronous code\n2. Drain the ENTIRE microtask queue\n3. Run ONE macrotask (setTimeout callback)\n4. Drain microtasks again\n5. Repeat\n\nPredict the order.",
+    "starter": "console.log(\"1 - sync\");\n\nsetTimeout(() => console.log(\"2 - setTimeout\"), 0);  // macrotask\n\nPromise.resolve().then(() => console.log(\"3 - promise .then\"));  // microtask\nPromise.resolve().then(() => console.log(\"4 - promise .then\"));  // microtask\n\nconsole.log(\"5 - sync\");",
+    "expectedOutput": ["1 - sync", "5 - sync", "3 - promise .then", "4 - promise .then", "2 - setTimeout"],
+    "successMessage": "Sync (1, 5) → microtasks (3, 4) → macrotask (2). Promise callbacks ALWAYS run before setTimeout callbacks — this is why async/await code runs predictably."
+  },
+  {
+    "title": "Microtasks run before next macrotask",
+    "instruction": "The microtask queue is completely drained between every macrotask.\n\nIf a microtask adds another microtask, THAT runs before any macrotask.\n\nThis can starve macrotasks if you're not careful.",
+    "starter": "setTimeout(() => console.log(\"timeout 1\"), 0);\nsetTimeout(() => console.log(\"timeout 2\"), 0);\n\n// Microtasks created after the above:\nPromise.resolve()\n  .then(() => {\n    console.log(\"microtask 1\");\n    return Promise.resolve(); // adds ANOTHER microtask!\n  })\n  .then(() => console.log(\"microtask 2\"));\n\nconsole.log(\"sync\");",
+    "expectedOutput": ["sync", "microtask 1", "microtask 2", "timeout 1", "timeout 2"],
+    "successMessage": "microtask 2 ran before timeout 1 — even though it was created after the timeouts were registered. Microtasks always drain completely before the next macrotask runs."
+  },
+  {
+    "title": "The event loop and await",
+    "instruction": "`await` is syntactic sugar for `.then()`. Under the hood:\n\n```js\nconst x = await somePromise;\n// equivalent to:\nsomePromise.then(x => { /* rest of function */ });\n```\n\nSo `await` suspends the async function, puts the continuation in the microtask queue, and the event loop moves on.",
+    "starter": "async function step(name) {\n  console.log(`${name}: before await`);\n  await Promise.resolve();\n  console.log(`${name}: after await`);\n}\n\nconsole.log(\"sync 1\");\nstep(\"A\");\nstep(\"B\");\nconsole.log(\"sync 2\");",
+    "expectedOutput": ["sync 1", "A: before await", "B: before await", "sync 2", "A: after await", "B: after await"],
+    "successMessage": "Both A and B ran up to their awaits before sync 2. Then sync 2 ran. Then both continuations ran. await suspends the function, not the thread."
+  },
+  {
+    "title": "queueMicrotask — low-level scheduling",
+    "instruction": "`queueMicrotask(fn)` adds a function directly to the microtask queue — without a Promise wrapper.\n\nFaster than `Promise.resolve().then(fn)` — used in performance-critical libraries.",
+    "starter": "console.log(\"sync start\");\n\nsetTimeout(() => console.log(\"macrotask\"), 0);\n\nqueueMicrotask(() => console.log(\"microtask via queueMicrotask\"));\n\nPromise.resolve().then(() => console.log(\"microtask via Promise\"));\n\nconsole.log(\"sync end\");",
+    "expectedOutput": ["sync start", "sync end", "microtask via queueMicrotask", "microtask via Promise", "macrotask"],
+    "successMessage": "queueMicrotask and Promise both queue microtasks — they run in order before the macrotask. queueMicrotask is the low-level API; Promise.then is higher-level."
+  },
+  {
+    "title": "Blocking the event loop",
+    "instruction": "Since JavaScript is single-threaded, CPU-intensive synchronous code blocks everything — including timers, incoming HTTP requests, and Promise callbacks.\n\nThis is why you should never do heavy computation on the main thread.",
+    "starter": "const start = Date.now();\n\nsetTimeout(() => {\n  const delay = Date.now() - start;\n  console.log(`setTimeout fired after ${delay}ms (requested 100ms)`);\n}, 100);\n\n// Block the event loop with sync work:\nconsole.log(\"Starting sync work...\");\nconst end = start + 300; // block for 300ms\nwhile (Date.now() < end) {} // busy wait\nconsole.log(\"Sync work done.\");",
+    "expectedOutput": ["Starting sync work...", "Sync work done.", "setTimeout fired after 300ms (requested 100ms)"],
+    "successMessage": "The timer asked for 100ms but got 300ms — because synchronous code was blocking the event loop. This is why Node.js server performance tanks if you do CPU work on the main thread."
+  },
+  {
+    "title": "Build a task scheduler",
+    "instruction": "Final challenge — no starter code.\n\nBuild `createScheduler()` that returns:\n- `schedule(task, priority)` — schedules a task with priority ('high' = microtask, 'low' = macrotask)\n- `flush()` — returns a Promise that resolves when all scheduled tasks run\n\nHigh priority tasks should always run before low priority ones.\n\nTest with a mix of high and low priority tasks.",
+    "hint": "High priority: queueMicrotask() or Promise.resolve().then(). Low priority: setTimeout().",
+    "starter": "",
+    "expectedOutput": [],
+    "codeChecks": [
+      { "pattern": "function createScheduler|const createScheduler\\s*=", "required": true, "message": "Define createScheduler()." },
+      { "pattern": "queueMicrotask|Promise\\.resolve\\(\\)\\.then", "required": true, "message": "Use queueMicrotask or Promise.resolve().then for high priority." },
+      { "pattern": "setTimeout", "required": true, "message": "Use setTimeout for low priority tasks." }
+    ],
+    "successMessage": "A priority task scheduler using microtasks and macrotasks! React's Scheduler package does something similar to split work into high/low priority lanes. Chapter 20 done!"
+  }
+]

@@ -1,0 +1,99 @@
+[
+  {
+    "title": "Template literals — the modern way",
+    "instruction": "Backtick strings are the gold standard for building strings in modern JavaScript. They support:\n\n1. **Interpolation** — `${expression}` embeds any expression\n2. **Multi-line** — no `\\n` needed\n3. **Expressions** — math, method calls, ternaries — all valid\n\nRun this. Notice that expressions inside `${}` can be anything.",
+    "starter": "const name = \"Alex\";\nconst score = 87;\nconst passed = score >= 60;\n\nconsole.log(`Hello, ${name}!`);\nconsole.log(`Score: ${score}/100 — ${passed ? \"PASS\" : \"FAIL\"}`);\nconsole.log(`5 × 7 = ${5 * 7}`);\nconsole.log(`Name length: ${name.length} characters`);",
+    "expectedOutput": ["Hello, Alex!", "Score: 87/100 — PASS", "5 × 7 = 35", "Name length: 4 characters"],
+    "successMessage": "Ternary inside a template literal — ${passed ? \"PASS\" : \"FAIL\"} — clean and readable. Template literals replace ugly string concatenation with clarity."
+  },
+  {
+    "title": "length and indexing",
+    "instruction": "Strings have a `length` property and you can access characters by index (0-based):\n\n- `str[0]` — first character\n- `str[str.length - 1]` — last character\n- `str.at(-1)` — last character (modern, cleaner)\n\nPrint the first character, last character, and length of each word.",
+    "hint": "word[0], word.at(-1), word.length",
+    "starter": "const words = [\"JavaScript\", \"amazing\", \"fun\"];\n\n// TODO: for each word, print: first char, last char, and length\nwords.forEach(word => {\n  console.log(`${word}: first='${word[0]}' last='${word.at(-1)}' length=${word.length}`);\n});",
+    "expectedOutput": ["JavaScript: first='J' last='t' length=10", "amazing: first='a' last='g' length=7", "fun: first='f' last='n' length=3"],
+    "codeChecks": [
+      { "pattern": "word\\[0\\]", "required": true, "message": "Access first char: word[0]" },
+      { "pattern": "\\.at\\(-1\\)|\\.length - 1\\]|\\[word\\.length-1\\]", "required": true, "message": "Access last char: word.at(-1)" },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
+    ],
+    "successMessage": ".at(-1) is the modern way — cleaner than [length-1]. Negative indexes count from the end. .at() works on arrays too."
+  },
+  {
+    "title": "toUpperCase, toLowerCase, trim",
+    "instruction": "Three methods you will use constantly:\n\n- `.toUpperCase()` / `.toLowerCase()` — case conversion\n- `.trim()` — remove whitespace from both ends\n- `.trimStart()` / `.trimEnd()` — one side only\n\nFix the messy user input by normalising it.",
+    "hint": "input.trim().toLowerCase()",
+    "starter": "// User typed with wrong case and extra spaces:\nconst rawInput = \"   ALEX RIVERA   \";\n\n// TODO: clean it up:\n// 1. trim whitespace\n// 2. convert to lowercase\n// 3. print the cleaned version\nconsole.log(rawInput.trim().toLowerCase());",
+    "expectedOutput": ["alex rivera"],
+    "codeChecks": [
+      { "pattern": "\\.trim\\(\\)", "required": true, "message": "Use .trim() to remove whitespace." },
+      { "pattern": "\\.toLowerCase\\(\\)", "required": true, "message": "Use .toLowerCase() to normalise case." }
+    ],
+    "successMessage": "trim + toLowerCase is the standard input normalisation pattern. Before comparing usernames, emails, or search queries, always normalise them — otherwise 'Alex' and 'alex' look different."
+  },
+  {
+    "title": "includes, startsWith, endsWith",
+    "instruction": "Search inside strings:\n\n- `.includes(substr)` — is this substring anywhere?\n- `.startsWith(prefix)` — does it begin with this?\n- `.endsWith(suffix)` — does it end with this?\n\nAll return `true` or `false`. Use them to validate URLs and emails.",
+    "hint": "url.startsWith('https'), email.includes('@')",
+    "starter": "const url = \"https://example.com/path\";\nconst email = \"alex@example.com\";\nconst filename = \"report.pdf\";\n\nconsole.log(url.startsWith(\"https\"));\nconsole.log(url.includes(\"/path\"));\nconsole.log(email.includes(\"@\"));\nconsole.log(filename.endsWith(\".pdf\"));\nconsole.log(filename.endsWith(\".jpg\"));",
+    "expectedOutput": ["true", "true", "true", "true", "false"],
+    "successMessage": "Three clean boolean methods — no regex needed for common checks. includes, startsWith, endsWith read almost like English. That's intentional."
+  },
+  {
+    "title": "slice — extract a portion",
+    "instruction": "`.slice(start, end)` extracts a substring:\n\n- `str.slice(0, 5)` — first 5 characters\n- `str.slice(-3)` — last 3 characters\n- `str.slice(7)` — from position 7 to the end\n\nExtract the protocol, domain, and file extension from the URL.",
+    "hint": "url.slice(0, 8) for 'https://'",
+    "starter": "const url = \"https://example.com\";\nconst filename = \"document.pdf\";\n\n// TODO:\n// 1. Extract the protocol: \"https://\"\n// 2. Extract the domain: \"example.com\"\n// 3. Extract the extension: \".pdf\" (last 4 chars)\nconsole.log(url.slice(0, 8));\nconsole.log(url.slice(8));\nconsole.log(filename.slice(-4));",
+    "expectedOutput": ["https://", "example.com", ".pdf"],
+    "codeChecks": [
+      { "pattern": "\\.slice\\(", "required": true, "message": "Use .slice() to extract substrings." }
+    ],
+    "successMessage": "slice with negative indexes counts from the end — filename.slice(-4) always gets the last 4 characters regardless of filename length. This is how file extension detection works."
+  },
+  {
+    "title": "split and join",
+    "instruction": "`.split(separator)` breaks a string into an array.\n`.join(separator)` joins an array back into a string.\n\nThey are inverses — split apart, join together. Perfect for CSV parsing, URL building, and formatting.",
+    "hint": "csv.split(\",\") then array.join(\", \")",
+    "starter": "const csv = \"Alice,Bob,Carol,David\";\nconst names = csv.split(\",\");\nconsole.log(names);\nconsole.log(names.length);\n\n// Rejoin with different separator:\nconsole.log(names.join(\" | \"));\nconsole.log(names.join(\" and \"));\n\n// Split a sentence into words:\nconst sentence = \"JavaScript is amazing\";\nconsole.log(sentence.split(\" \"));",
+    "expectedOutput": ["[ 'Alice', 'Bob', 'Carol', 'David' ]", "4", "Alice | Bob | Carol | David", "Alice and Bob and Carol and David", "[ 'JavaScript', 'is', 'amazing' ]"],
+    "successMessage": "split/join are data transformation workhorses. CSV parsing, URL building, sentence processing, name formatting — all use this pair constantly."
+  },
+  {
+    "title": "replace and replaceAll",
+    "instruction": "`.replace(search, replacement)` replaces the **first** match.\n`.replaceAll(search, replacement)` replaces **all** matches.\n\nBoth accept strings or regular expressions.",
+    "hint": "str.replaceAll(\"old\", \"new\")",
+    "starter": "const text = \"JavaScript is hard. JavaScript takes time. JavaScript is worth it.\";\n\n// Replace only the first occurrence:\nconsole.log(text.replace(\"JavaScript\", \"JS\"));\n\n// Replace all:\nconsole.log(text.replaceAll(\"JavaScript\", \"JS\"));\n\n// Common use: sanitise input\nconst userInput = \"  hello   world  \";\nconsole.log(userInput.trim().replaceAll(\"   \", \" \"));",
+    "expectedOutput": ["JS is hard. JavaScript takes time. JavaScript is worth it.", "JS is hard. JS takes time. JS is worth it.", "hello world"],
+    "successMessage": "replaceAll is what you almost always want — replace just looks for the first one. The trim + replaceAll pattern cleans up messy user input effectively."
+  },
+  {
+    "title": "padStart, padEnd, repeat",
+    "instruction": "String padding and repetition — used for formatting aligned output:\n\n- `str.padStart(width, char)` — pad on the left to reach width\n- `str.padEnd(width, char)` — pad on the right\n- `str.repeat(n)` — repeat the string n times\n\nBuild an aligned receipt using padStart.",
+    "hint": "item.padEnd(12) + price.padStart(8)",
+    "starter": "const items = [[\"Coffee\", 3.50], [\"Sandwich\", 7.25], [\"Cookie\", 1.99]];\n\nconsole.log(\"Item         Price\");\nconsole.log(\"-\".repeat(20));\nfor (const [item, price] of items) {\n  console.log(`${item.padEnd(12)} $${price.toFixed(2).padStart(6)}`);\n}\nconsole.log(\"-\".repeat(20));",
+    "expectedOutput": [],
+    "successMessage": "Aligned columns with padStart and padEnd. Receipts, reports, tables, CLI output — this is how they are formatted. toFixed(2) for prices, padStart for right-alignment."
+  },
+  {
+    "title": "indexOf and search",
+    "instruction": "Find the position of something in a string:\n\n- `.indexOf(substr)` — position of first match (-1 if not found)\n- `.lastIndexOf(substr)` — position of last match\n\nBuild a function that checks if an email is valid — it must contain exactly one '@' and a '.' after the '@'.",
+    "hint": "email.indexOf('@') must not be -1, email.lastIndexOf('.') must be after the @",
+    "starter": "function isValidEmail(email) {\n  const atIndex = email.indexOf(\"@\");\n  const dotIndex = email.lastIndexOf(\".\");\n  return atIndex > 0 && dotIndex > atIndex;\n}\n\nconsole.log(isValidEmail(\"user@example.com\"));   // true\nconsole.log(isValidEmail(\"@example.com\"));        // false\nconsole.log(isValidEmail(\"userexample.com\"));     // false\nconsole.log(isValidEmail(\"user@example\"));        // false",
+    "expectedOutput": ["true", "false", "false", "false"],
+    "successMessage": "indexOf returns -1 when nothing is found — checking for > 0 (not just >= 0) ensures the @ isn't the first character. Real email validation uses regex, but this covers the basics."
+  },
+  {
+    "title": "Build a string formatter",
+    "instruction": "Final challenge — no starter code.\n\nWrite a `formatUser(user)` function that takes `{ name, email, score }` and returns a formatted string like:\n```\nName:  Alex Rivera\nEmail: alex@example.com\nScore: 87/100 ★★★★\n```\n\nRequirements:\n- Left-align labels, right-align values\n- Score shows star rating: 5 stars for 100, round to nearest star\n- Email should be lowercased",
+    "hint": "Use padEnd for labels, toFixed for score, '★'.repeat(Math.round(score/20)) for stars.",
+    "starter": "",
+    "expectedOutput": [],
+    "codeChecks": [
+      { "pattern": "function formatUser|const formatUser\\s*=", "required": true, "message": "Define a formatUser function." },
+      { "pattern": "padEnd|padStart", "required": true, "message": "Use padEnd or padStart for alignment." },
+      { "pattern": "toLowerCase\\(\\)", "required": true, "message": "Lowercase the email." },
+      { "pattern": "repeat\\(", "required": true, "message": "Use repeat() for the star rating." }
+    ],
+    "successMessage": "A formatted user card — padEnd, toLowerCase, repeat, toFixed, all working together. String formatting is everywhere: emails, invoices, CLI tools, logs. Chapter 4 done!"
+  }
+]

@@ -1,44 +1,14 @@
 ---
-title: "Control Flow"
-description: "if/else, ternary, nullish coalescing, and switch in JavaScript."
-order: 4
+title: "Operators & Control Flow"
+description: "Make decisions with if/else, switch, ternary, and JavaScript's powerful nullish coalescing and optional chaining operators."
+order: 5
 difficulty: "beginner"
-estimatedMinutes: 15
+estimatedMinutes: 20
+concepts: ["if/else", "switch", "ternary", "&&", "||", "??", "?.","logical assignment"]
 ---
 
-## if / else if / else
+## Give your program a brain
 
-```javascript
-const x = 10;
-if (x > 0) {
-  console.log("positive");
-} else if (x < 0) {
-  console.log("negative");
-} else {
-  console.log("zero");
-}
-```
+So far your programs run the same code every time. Control flow lets you make decisions — run this code *only if* the user is logged in, *switch* behaviour based on a role, *skip* a step if the value is null.
 
-## Ternary Operator
-
-```javascript
-const label = x > 0 ? "positive" : "non-positive";
-```
-
-## Nullish Coalescing (??)
-
-```javascript
-const name = null ?? "Guest"; // "Guest"
-```
-
-## switch
-
-```javascript
-switch (day) {
-  case 1: console.log("Monday"); break;
-  case 2: console.log("Tuesday"); break;
-  default: console.log("Other");
-}
-```
-
-More content coming soon. Try the interactive steps above!
+JavaScript has some powerful modern operators you won't find in older languages: nullish coalescing `??` and optional chaining `?.` are game-changers for handling missing data.

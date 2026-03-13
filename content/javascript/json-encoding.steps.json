@@ -1,0 +1,68 @@
+[
+  {
+    "title": "JSON.stringify — object to string",
+    "instruction": "`JSON.stringify(value)` converts a JavaScript value to a JSON string.\n\nNotice what gets LOST:\n- `undefined` values are omitted\n- Functions are omitted\n- `Date` objects become strings\n- `Symbol` keys are omitted\n\nRun this.",
+    "starter": "const data = {\n  name: \"Alex\",\n  age: 25,\n  score: null,\n  active: true,\n  address: { city: \"London\" },\n  tags: [\"js\", \"python\"],\n  secret: undefined,    // omitted!\n  fn: () => {},         // omitted!\n  created: new Date(\"2024-01-15\"),  // becomes string\n};\n\nconsole.log(JSON.stringify(data));",
+    "expectedOutput": ["{\"name\":\"Alex\",\"age\":25,\"score\":null,\"active\":true,\"address\":{\"city\":\"London\"},\"tags\":[\"js\",\"python\"],\"created\":\"2024-01-15T00:00:00.000Z\"}"],
+    "successMessage": "undefined, functions, and Symbols are silently dropped. Date becomes an ISO string. null stays as null. These are the JSON gotchas that bite everyone at least once."
+  },
+  {
+    "title": "JSON.stringify with indent",
+    "instruction": "The second and third arguments to `JSON.stringify`:\n- `replacer` — filter/transform what gets serialized (null = keep all)\n- `indent` — number of spaces for pretty-printing\n\n`JSON.stringify(data, null, 2)` — pretty print with 2-space indent.",
+    "starter": "const user = {\n  name: \"Alex\",\n  age: 25,\n  address: { city: \"London\", country: \"UK\" },\n  skills: [\"JavaScript\", \"Python\"],\n};\n\n// Compact (default):\nconsole.log(JSON.stringify(user));\nconsole.log(\"---\");\n// Pretty-printed:\nconsole.log(JSON.stringify(user, null, 2));",
+    "expectedOutput": [],
+    "successMessage": "null, 2 — keep all fields, indent 2 spaces. Use compact for APIs (save bandwidth), pretty-print for logs and config files."
+  },
+  {
+    "title": "JSON.parse — string to object",
+    "instruction": "`JSON.parse(str)` converts a JSON string back to a JavaScript value.\n\nAlways wrap in `try/catch` — malformed JSON throws a `SyntaxError`.\n\nParse valid and invalid JSON and handle both cases.",
+    "starter": "function safeJsonParse(str) {\n  try {\n    return { data: JSON.parse(str), error: null };\n  } catch (e) {\n    return { data: null, error: e.message };\n  }\n}\n\nconst valid   = '{\"name\":\"Alex\",\"score\":95}';\nconst invalid = '{name: \"Alex\"}';  // keys must have quotes in JSON\n\nconst r1 = safeJsonParse(valid);\nconst r2 = safeJsonParse(invalid);\n\nconsole.log(r1.data.name, r1.data.score);\nconsole.log(r2.error.includes(\"JSON\") ? \"Invalid JSON\" : r2.error);",
+    "expectedOutput": ["Alex 95", "Invalid JSON"],
+    "successMessage": "Always try/catch around JSON.parse. User-supplied JSON, API responses, localStorage values — all can be malformed. safeJsonParse is a pattern worth keeping."
+  },
+  {
+    "title": "Replacer — filter and transform",
+    "instruction": "The `replacer` argument controls what gets serialized:\n\n- Array of keys: only include those keys\n- Function `(key, value) => newValue`: transform each value\n\nRemove passwords and transform dates.",
+    "hint": "replacer function: if key === 'password' return undefined",
+    "starter": "const user = {\n  id: 1,\n  name: \"Alex\",\n  password: \"secret123\",    // should be excluded!\n  email: \"alex@example.com\",\n  createdAt: \"2024-01-15\",\n};\n\n// Array replacer — whitelist only these keys:\nconsole.log(JSON.stringify(user, [\"id\", \"name\", \"email\"]));\n\n// Function replacer — exclude password:\nconst sanitized = JSON.stringify(user, (key, value) => {\n  if (key === \"password\") return undefined;  // omit\n  return value;  // keep everything else\n});\nconsole.log(sanitized);",
+    "expectedOutput": ["{\"id\":1,\"name\":\"Alex\",\"email\":\"alex@example.com\"}", "{\"id\":1,\"name\":\"Alex\",\"email\":\"alex@example.com\",\"createdAt\":\"2024-01-15\"}"],
+    "successMessage": "Array replacer: whitelist. Function replacer: control each field. Return undefined to omit. Return a new value to transform. Never send passwords to the client — use replacer to strip them."
+  },
+  {
+    "title": "Reviver — transform on parse",
+    "instruction": "`JSON.parse(str, reviver)` lets you transform values while parsing.\n\nMost common use: convert ISO date strings back to `Date` objects (since JSON has no native Date type).",
+    "starter": "const json = '{\"name\":\"Alex\",\"createdAt\":\"2024-01-15T00:00:00.000Z\",\"updatedAt\":\"2024-03-10T12:00:00.000Z\"}';\n\n// Without reviver — dates are strings:\nconst withoutReviver = JSON.parse(json);\nconsole.log(typeof withoutReviver.createdAt);  // string\n\n// With reviver — convert date strings to Date objects:\nconst withReviver = JSON.parse(json, (key, value) => {\n  if (typeof value === 'string' && /^\\d{4}-\\d{2}-\\d{2}T/.test(value)) {\n    return new Date(value);\n  }\n  return value;\n});\nconsole.log(withReviver.createdAt instanceof Date); // true\nconsole.log(withReviver.createdAt.getFullYear());   // 2024",
+    "expectedOutput": ["string", "true", "2024"],
+    "successMessage": "Reviver restores Date objects from ISO strings. Without it, every date field is a string and you have to convert manually. JSON serialization libraries like superjson do this automatically."
+  },
+  {
+    "title": "Custom toJSON method",
+    "instruction": "When a class has a `toJSON()` method, `JSON.stringify` uses its return value instead of the raw object.\n\nThis controls exactly how your class serializes.",
+    "starter": "class User {\n  #password;  // private — should NOT be in JSON\n  \n  constructor(name, email, password) {\n    this.name = name;\n    this.email = email;\n    this.#password = password;\n    this.createdAt = new Date();\n  }\n  \n  toJSON() {\n    return {\n      name: this.name,\n      email: this.email,\n      createdAt: this.createdAt.toISOString(),\n      // password is never included\n    };\n  }\n}\n\nconst user = new User(\"Alex\", \"alex@example.com\", \"secret!\");\nconsole.log(JSON.stringify(user));\nconsole.log(JSON.stringify({ users: [user] }, null, 2).includes(\"password\")); // false",
+    "expectedOutput": [],
+    "successMessage": "toJSON() is called automatically by JSON.stringify. Private fields stay private. Dates are formatted. This is the clean way to control serialization of your classes."
+  },
+  {
+    "title": "Handling circular references",
+    "instruction": "Objects that reference themselves crash `JSON.stringify` with `TypeError: circular structure`.\n\nDetect and handle circular references with a custom replacer.",
+    "starter": "// Normal stringify crashes on circular refs:\nconst obj = { name: \"node\" };\nobj.self = obj; // circular!\n\ntry {\n  JSON.stringify(obj);\n} catch (e) {\n  console.log(\"Error:\", e.message.includes(\"circular\") ? \"Circular structure detected\" : e.message);\n}\n\n// Safe stringify with circular detection:\nfunction safeStringify(obj) {\n  const seen = new Set();\n  return JSON.stringify(obj, (key, value) => {\n    if (typeof value === 'object' && value !== null) {\n      if (seen.has(value)) return '[Circular]';\n      seen.add(value);\n    }\n    return value;\n  });\n}\n\nconsole.log(safeStringify(obj));",
+    "expectedOutput": ["Error: Circular structure detected", "{\"name\":\"node\",\"self\":\"[Circular]\"}"],
+    "successMessage": "Circular references — common in tree structures, linked lists, and object graphs. safeStringify handles them gracefully. Libraries like json-stringify-safe do this in production."
+  },
+  {
+    "title": "Build a data serialiser",
+    "instruction": "Final challenge — no starter code.\n\nBuild a `Serialiser` class with:\n- `serialise(data)` — converts to JSON string, handles Dates as ISO strings, strips undefined\n- `deserialise(str)` — parses JSON, converts ISO date strings back to Date objects\n- `serialiseFile(data, indent)` — pretty-printed (for config files)\n\nTest with an object containing nested objects, arrays, Dates, and undefined values.",
+    "hint": "Use replacer in stringify and reviver in parse. DATE_PATTERN = /^\\d{4}-\\d{2}-\\d{2}T/",
+    "starter": "",
+    "expectedOutput": [],
+    "codeChecks": [
+      { "pattern": "class Serialiser|class Serializer", "required": true, "message": "Define Serialiser class." },
+      { "pattern": "serialise\\(|serialize\\(", "required": true, "message": "Add serialise() method." },
+      { "pattern": "deserialise\\(|deserialize\\(", "required": true, "message": "Add deserialise() method." },
+      { "pattern": "JSON\\.stringify", "required": true, "message": "Use JSON.stringify in serialise." },
+      { "pattern": "JSON\\.parse", "required": true, "message": "Use JSON.parse in deserialise." },
+      { "pattern": "new Date\\(|instanceof Date", "required": true, "message": "Handle Date conversion." }
+    ],
+    "successMessage": "A complete serialisation library with Date handling, custom replacer, and reviver. You have now covered everything in JavaScript from console.log to async generators to JSON. Chapter 22 done — JavaScript complete!"
+  }
+]

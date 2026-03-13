@@ -1,41 +1,14 @@
 ---
 title: "Loops"
-description: "for, while, for...of, and forEach in JavaScript."
-order: 5
+description: "for, while, for...of, for...in, forEach — loop over everything JavaScript throws at you."
+order: 6
 difficulty: "beginner"
-estimatedMinutes: 12
+estimatedMinutes: 20
+concepts: ["for", "while", "for...of", "for...in", "forEach", "break", "continue", "labeled loops"]
 ---
 
-## for Loop
+## Repetition without repetition
 
-```javascript
-for (let i = 0; i < 5; i++) {
-  console.log(i);
-}
-```
+Writing the same code 100 times is why loops were invented. JavaScript has five different loop constructs — each with its ideal use case.
 
-## for...of (arrays)
-
-```javascript
-const nums = [1, 2, 3];
-for (const n of nums) {
-  console.log(n);
-}
-```
-
-## while Loop
-
-```javascript
-let i = 0;
-while (i < 5) {
-  console.log(i++);
-}
-```
-
-## Array forEach
-
-```javascript
-[1, 2, 3].forEach(n => console.log(n));
-```
-
-More content coming soon. Try the interactive steps above!
+The rule of thumb: `for...of` for arrays and iterables, `for...in` for object keys, `forEach` for simple array iteration, classic `for` when you need index control.

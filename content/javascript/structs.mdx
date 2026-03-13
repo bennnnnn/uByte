@@ -1,44 +1,14 @@
 ---
 title: "Classes & Objects"
-description: "ES6 classes, constructors, inheritance, and private fields in JavaScript."
-order: 10
+description: "ES6 classes, constructor, methods, getters/setters, static methods, and private fields."
+order: 12
 difficulty: "intermediate"
-estimatedMinutes: 15
+estimatedMinutes: 22
+concepts: ["class", "constructor", "this", "instance methods", "getters/setters", "static", "private fields", "method chaining"]
 ---
 
-## Class
+## Build your own types
 
-```javascript
-class Animal {
-  constructor(name) {
-    this.name = name;
-  }
-  speak() {
-    console.log(`${this.name} makes a sound.`);
-  }
-}
-const a = new Animal("Dog");
-a.speak(); // Dog makes a sound.
-```
+Classes are blueprints for custom objects. Before ES6 classes (2015), JavaScript used function constructors — messy and error-prone. Classes give us clean syntax for the same prototype-based system underneath.
 
-## Inheritance
-
-```javascript
-class Dog extends Animal {
-  speak() {
-    console.log(`${this.name} barks.`);
-  }
-}
-```
-
-## Private Fields (ES2022)
-
-```javascript
-class Counter {
-  #count = 0;
-  increment() { this.#count++; }
-  get() { return this.#count; }
-}
-```
-
-More content coming soon. Try the interactive steps above!
+One important difference from Python/Java: JavaScript classes are syntactic sugar over prototypes — the mechanics are different even if the syntax looks similar.

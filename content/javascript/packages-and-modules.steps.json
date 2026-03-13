@@ -1,0 +1,58 @@
+[
+  {
+    "title": "Named exports",
+    "instruction": "Named exports let you export multiple things from one file. The importer picks what they need.\n\nSince we're in a single-file environment, we'll simulate modules by demonstrating the patterns inline. Run this to see the structure.",
+    "starter": "// Simulating: export const add = (a, b) => a + b;\nconst mathModule = {\n  add: (a, b) => a + b,\n  subtract: (a, b) => a - b,\n  multiply: (a, b) => a * b,\n  divide: (a, b) => {\n    if (b === 0) throw new Error(\"Division by zero\");\n    return a / b;\n  }\n};\n\n// Simulating: import { add, subtract } from './math';\nconst { add, subtract } = mathModule;\n\nconsole.log(add(10, 5));\nconsole.log(subtract(10, 5));\nconsole.log(mathModule.multiply(4, 7));\nconsole.log(mathModule.divide(20, 4));",
+    "expectedOutput": ["15", "5", "28", "5"],
+    "successMessage": "Named exports export multiple things by name. Importers choose exactly what they need: import { add, multiply } — clean and explicit."
+  },
+  {
+    "title": "ES Modules syntax",
+    "instruction": "The modern (ES Module) syntax:\n\n```js\n// math.js\nexport const PI = 3.14159;\nexport function add(a, b) { return a + b; }\nexport default function main() { ... }  // default export\n\n// app.js\nimport main, { PI, add } from './math.js';\n//     ^       ^^^^^^^\n//     default   named\n```\n\nRules to remember:\n- One `export default` per file\n- Unlimited named exports\n- Named imports use `{ curly braces }`\n- Default imports use any name you choose",
+    "starter": "// Demonstrate the import/export patterns:\nconst utils = {\n  // Named exports:\n  formatDate: (date) => date.toLocaleDateString(),\n  formatCurrency: (amount, currency = 'USD') => \n    new Intl.NumberFormat('en-US', { style: 'currency', currency }).format(amount),\n  \n  // Default export equivalent:\n  default: function createUtils() { return utils; }\n};\n\n// import { formatDate, formatCurrency } from './utils.js'\nconst { formatDate, formatCurrency } = utils;\n\nconsole.log(formatCurrency(1234.56));\nconsole.log(formatDate(new Date('2024-01-15')));",
+    "expectedOutput": ["$1,234.56", "1/15/2024"],
+    "successMessage": "Intl.NumberFormat for currency — built into JavaScript! formatDate and formatCurrency are named exports. The default export would be the createUtils factory."
+  },
+  {
+    "title": "CommonJS — require/module.exports",
+    "instruction": "Node.js was originally built on CommonJS (before ES Modules existed):\n\n```js\n// math.js (CommonJS)\nconst add = (a, b) => a + b;\nmodule.exports = { add };\n// OR: module.exports = add; (for single export)\n\n// app.js\nconst { add } = require('./math');\nconst add2 = require('./math').add;\n```\n\nYou'll still see CommonJS everywhere — npm packages, old codebases, config files.",
+    "starter": "// Simulating require/module.exports:\nfunction createModule(exports) {\n  return { require: () => exports };\n}\n\n// math.js equivalent:\nconst mathExports = { add: (a, b) => a + b, PI: 3.14159 };\nconst mathModule = createModule(mathExports);\n\n// app.js equivalent:\nconst { add, PI } = mathModule.require();\nconsole.log(add(5, 3));\nconsole.log(PI);\n\n// CommonJS also supports single-value exports:\nconst singleModule = createModule((a, b) => a * b);\nconst multiply = singleModule.require();\nconsole.log(multiply(4, 7));",
+    "expectedOutput": ["8", "3.14159", "28"],
+    "successMessage": "CommonJS is synchronous and uses require(). ES Modules are asynchronous and use import. New projects: use ES Modules (.mjs or \"type\": \"module\" in package.json)."
+  },
+  {
+    "title": "Re-exporting — barrel files",
+    "instruction": "A 'barrel' file (`index.js`) re-exports from multiple modules, creating a single import point:\n\n```js\n// utils/index.js\nexport { formatDate }  from './date.js';\nexport { formatCurrency } from './currency.js';\nexport { validateEmail } from './validation.js';\n\n// app.js — import everything from one place:\nimport { formatDate, formatCurrency } from './utils';\n```\n\nBuild a mini standard library using this pattern.",
+    "starter": "// Simulating a barrel module:\nconst stringUtils = {\n  capitalize: str => str.charAt(0).toUpperCase() + str.slice(1),\n  truncate: (str, max) => str.length > max ? str.slice(0, max) + '...' : str,\n};\nconst numberUtils = {\n  clamp: (num, min, max) => Math.min(Math.max(num, min), max),\n  random: (min, max) => Math.floor(Math.random() * (max - min + 1)) + min,\n};\n\n// Barrel — re-export everything:\nconst utils = { ...stringUtils, ...numberUtils };\n\n// Consumer imports from one place:\nconst { capitalize, truncate, clamp } = utils;\nconsole.log(capitalize(\"javascript\"));\nconsole.log(truncate(\"This is a very long sentence.\", 15));\nconsole.log(clamp(150, 0, 100));",
+    "expectedOutput": ["Javascript", "This is a very ...", "100"],
+    "successMessage": "Barrel files centralise imports. Instead of import { x } from './utils/string' and import { y } from './utils/number', one import { x, y } from './utils' does it. Very common in React projects."
+  },
+  {
+    "title": "Dynamic imports",
+    "instruction": "Regular `import` is static — it runs at module load time. **Dynamic imports** load code on demand:\n\n```js\nconst module = await import('./heavy-module.js');\n```\n\nUseful for:\n- Code splitting (load only what's needed)\n- Conditional loading (load analytics only in production)\n- Lazy loading (load a feature only when the user opens it)\n\nSimulate lazy loading.",
+    "starter": "// Simulating dynamic import with a Promise:\nasync function loadChartModule() {\n  console.log(\"Loading chart module...\");\n  // In real code: const { Chart } = await import('./chart.js');\n  return new Promise(resolve => {\n    setTimeout(() => {\n      resolve({ renderChart: (data) => `Chart(${data.join(',')})` });\n    }, 100);\n  });\n}\n\nasync function main() {\n  const { renderChart } = await loadChartModule();\n  console.log(renderChart([10, 20, 30]));\n  console.log(\"Chart rendered!\");\n}\n\nmain();",
+    "expectedOutput": ["Loading chart module...", "Chart(10,20,30)", "Chart rendered!"],
+    "successMessage": "Dynamic imports are how Next.js, Vite, and webpack do code splitting. Your users download code only when they need it — not everything upfront."
+  },
+  {
+    "title": "import.meta",
+    "instruction": "`import.meta` provides metadata about the current module:\n\n- `import.meta.url` — the URL of the current module file\n- `import.meta.env` — environment variables (in Vite/build tools)\n\nIn Node.js, this replaces the old `__filename` and `__dirname` for ES Modules.",
+    "starter": "// import.meta is available in real ES modules\n// Here we'll demonstrate the concept with a simulation:\nconst moduleInfo = {\n  url: \"file:///project/src/utils.js\",\n  env: { NODE_ENV: \"production\", API_URL: \"https://api.example.com\" }\n};\n\n// Extract filename from URL:\nconst filename = moduleInfo.url.split(\"/\").at(-1);\nconst dirname = moduleInfo.url.split(\"/\").slice(0, -1).join(\"/\");\n\nconsole.log(\"File:\", filename);\nconsole.log(\"Dir:\",  dirname);\nconsole.log(\"Env:\",  moduleInfo.env.NODE_ENV);\nconsole.log(\"API:\",  moduleInfo.env.API_URL);",
+    "expectedOutput": ["File: utils.js", "Dir: file:///project/src", "Env: production", "API: https://api.example.com"],
+    "successMessage": "import.meta.url replaces __filename in ES Modules. import.meta.env is how Vite exposes .env variables to the browser. Modern tooling uses import.meta extensively."
+  },
+  {
+    "title": "Build a plugin system",
+    "instruction": "Final challenge — no starter code.\n\nBuild a plugin system using module patterns:\n\n```js\nconst app = createApp();\napp.use(loggerPlugin);\napp.use(authPlugin);\napp.run(request);\n```\n\nRequirements:\n- `createApp()` returns an app with `use(plugin)` and `run(context)` methods\n- Each plugin is a function that receives and transforms context\n- `run()` passes context through each plugin in order\n- Built-in plugin: `loggerPlugin` that logs the context\n- Built-in plugin: `authPlugin` that adds `user: 'guest'` if no user",
+    "hint": "function createApp() { const plugins = []; return { use(p) { plugins.push(p); return this; }, run(ctx) { return plugins.reduce((c, p) => p(c), ctx); } }; }",
+    "starter": "",
+    "expectedOutput": [],
+    "codeChecks": [
+      { "pattern": "function createApp|const createApp\\s*=", "required": true, "message": "Define createApp()." },
+      { "pattern": "\\.use\\(", "required": true, "message": "Add use() method." },
+      { "pattern": "\\.run\\(|run\\(", "required": true, "message": "Add run() method." },
+      { "pattern": "\\.reduce\\(|\\.forEach\\(", "required": true, "message": "Process plugins in sequence." }
+    ],
+    "successMessage": "A plugin/middleware system — this is exactly how Express.js middleware works, how Koa works, how Vite plugins work. Modules + patterns = architecture. Chapter 16 done!"
+  }
+]

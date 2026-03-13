@@ -1,0 +1,83 @@
+[
+  {
+    "title": "Block scope vs function scope",
+    "instruction": "`let` and `const` are **block-scoped** — they only exist inside the `{}` that declared them.\n\n`var` is **function-scoped** — it ignores blocks (if, for, while) and leaks into the whole function.\n\nRun this to see the difference in the loop.",
+    "starter": "// var leaks out of the for block:\nfor (var i = 0; i < 3; i++) { /* ... */ }\nconsole.log(\"var i after loop:\", i); // 3 — it escaped!\n\n// let stays inside the block:\nfor (let j = 0; j < 3; j++) { /* ... */ }\ntry {\n  console.log(j); // ReferenceError\n} catch(e) {\n  console.log(\"let j is not accessible outside the loop\");\n}",
+    "expectedOutput": ["var i after loop: 3", "let j is not accessible outside the loop"],
+    "successMessage": "var escaped the for loop — that's a feature of var that causes countless bugs. let stays exactly where it belongs. Use let and const always."
+  },
+  {
+    "title": "The classic var loop bug",
+    "instruction": "This is JavaScript's most infamous beginner trap. `var` loops with `setTimeout` give unexpected results:\n\n```js\nfor (var i = 0; i < 3; i++) {\n  setTimeout(() => console.log(i), 0);\n}\n// Prints: 3, 3, 3 — NOT 0, 1, 2!\n```\n\nBecause `var i` is shared — by the time the callbacks run, the loop has finished and `i` is 3.\n\n`let` fixes this by creating a new binding per iteration.\n\nFix the loop by changing `var` to `let`.",
+    "hint": "Change var to let",
+    "starter": "// BUG: prints 3, 3, 3 instead of 0, 1, 2\nfor (var i = 0; i < 3; i++) {\n  setTimeout(() => console.log(i), 0);\n}",
+    "expectedOutput": ["0", "1", "2"],
+    "codeChecks": [
+      { "pattern": "for\\s*\\(\\s*let\\s+i", "required": true, "message": "Change var to let in the for loop." }
+    ],
+    "successMessage": "let creates a new i for each iteration. var shares one i across all three callbacks. This is probably the most-Googled JavaScript bug in history — and you just fixed it."
+  },
+  {
+    "title": "Hoisting — var vs let vs function",
+    "instruction": "JavaScript 'hoists' declarations to the top of their scope:\n\n- **function declarations** — fully hoisted, work before their line\n- **var** — hoisted but `undefined` until assignment\n- **let/const** — hoisted but in the temporal dead zone (crash if accessed early)\n\nRun this to see each behaviour.",
+    "starter": "// Function declarations are fully hoisted:\nconsole.log(sayHi()); // works!\nfunction sayHi() { return \"Hi!\"; }\n\n// var is hoisted as undefined:\nconsole.log(x); // undefined, not an error\nvar x = 5;\nconsole.log(x); // 5\n\n// let is in the TDZ — accessing before declaration crashes:\ntry {\n  console.log(y); // TDZ — ReferenceError\n  let y = 10;\n} catch(e) {\n  console.log(\"TDZ error:\", e.message);\n}",
+    "expectedOutput": ["Hi!", "undefined", "5", "TDZ error: Cannot access 'y' before initialization"],
+    "successMessage": "Function declarations: fully hoisted. var: hoisted as undefined. let/const: TDZ — crash on early access. The TDZ is stricter, but that's good — it catches mistakes."
+  },
+  {
+    "title": "Closures — functions that remember",
+    "instruction": "A **closure** is a function that remembers the variables from its birth scope — even after that scope is gone.\n\nRun this. `makeCounter()` returns a function that permanently remembers `count`.",
+    "starter": "function makeCounter(start = 0) {\n  let count = start;\n  \n  return function() {\n    count++;\n    return count;\n  };\n}\n\nconst counter1 = makeCounter();\nconst counter2 = makeCounter(10);\n\nconsole.log(counter1()); // 1\nconsole.log(counter1()); // 2\nconsole.log(counter1()); // 3\nconsole.log(counter2()); // 11 — separate from counter1!",
+    "expectedOutput": ["1", "2", "3", "11"],
+    "successMessage": "counter1 and counter2 each have their own independent count — even though they came from the same function. Closures capture the ENVIRONMENT, not the value."
+  },
+  {
+    "title": "Closures with parameters",
+    "instruction": "Closures can capture parameters too — making powerful factory functions:\n\n```js\nconst multiply = factor => n => n * factor;\nconst triple = multiply(3);\ntriple(5);  // 15\n```\n\nWrite `makeMultiplier(factor)` that returns a function to multiply any number by that factor.",
+    "hint": "const makeMultiplier = factor => n => n * factor;",
+    "starter": "// TODO: write makeMultiplier(factor) using closures\n// Then create double, triple, and quadruple functions\n\nconst double = null;    // replace\nconst triple = null;    // replace\nconst quadruple = null; // replace\n\nconsole.log(double(5));    // 10\nconsole.log(triple(5));    // 15\nconsole.log(quadruple(5)); // 20",
+    "expectedOutput": ["10", "15", "20"],
+    "codeChecks": [
+      { "pattern": "function makeMultiplier|const makeMultiplier\\s*=", "required": true, "message": "Define makeMultiplier." },
+      { "pattern": "makeMultiplier\\(2\\)|makeMultiplier\\(3\\)|makeMultiplier\\(4\\)", "required": true, "message": "Create double, triple, quadruple using makeMultiplier." },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
+    ],
+    "successMessage": "double, triple, quadruple — all created from one makeMultiplier factory. Closures capturing parameters create specialised functions. This is partial application."
+  },
+  {
+    "title": "Private state with closures",
+    "instruction": "Closures are the classic way to create **private state** — variables that can only be accessed through provided methods:\n\n```js\nconst counter = (function() {\n  let _count = 0;  // private!\n  return {\n    increment() { _count++; },\n    get() { return _count; }\n  };\n})();\n```\n\nThe `_count` is completely hidden — no one can set it directly.\n\nRun this.",
+    "starter": "function createBankAccount(initialBalance) {\n  let balance = initialBalance;  // private!\n  \n  return {\n    deposit(amount)  { balance += amount; },\n    withdraw(amount) {\n      if (amount > balance) throw new Error(\"Insufficient funds\");\n      balance -= amount;\n    },\n    getBalance()     { return balance; }\n  };\n}\n\nconst account = createBankAccount(100);\naccount.deposit(50);\naccount.withdraw(30);\nconsole.log(account.getBalance()); // 120\n\ntry {\n  console.log(account.balance); // undefined — private!\n} catch(e) { console.log(\"private\"); }\nconsole.log(account.balance); // undefined",
+    "expectedOutput": ["120", "undefined"],
+    "successMessage": "account.balance is undefined — the variable balance lives in the closure, completely hidden. This is the module pattern — closures for encapsulation before ES6 classes."
+  },
+  {
+    "title": "Closures in callbacks",
+    "instruction": "Closures appear everywhere callbacks are used — in setTimeout, event handlers, array methods.\n\nEvery callback function 'closes over' the variables in its surrounding scope.",
+    "starter": "const messages = [\"Hello\", \"World\", \"JavaScript\"];\n\n// Each callback closes over 'i' and 'msg':\nmessages.forEach((msg, i) => {\n  // Arrow function creates a closure over 'i' and 'msg'\n  setTimeout(() => {\n    console.log(`${i + 1}: ${msg}`);\n  }, i * 100);  // delay increases so they print in order\n});",
+    "expectedOutput": ["1: Hello", "2: World", "3: JavaScript"],
+    "successMessage": "Each setTimeout callback captures its own i and msg from the forEach iteration. Closures in callbacks are the mechanism behind React's useEffect, event listeners, and async patterns."
+  },
+  {
+    "title": "Memoisation with closures",
+    "instruction": "Memoisation caches function results — if the same inputs are seen again, return the cached result instead of recalculating.\n\nWrite `memoize(fn)` — a function that wraps any function with caching.",
+    "hint": "function memoize(fn) { const cache = new Map(); return function(...args) { const key = JSON.stringify(args); if (cache.has(key)) return cache.get(key); const result = fn(...args); cache.set(key, result); return result; }; }",
+    "starter": "function memoize(fn) {\n  const cache = new Map(); // closure — cache persists between calls!\n  return function(...args) {\n    const key = JSON.stringify(args);\n    if (cache.has(key)) {\n      console.log(`(cached)`);\n      return cache.get(key);\n    }\n    const result = fn(...args);\n    cache.set(key, result);\n    return result;\n  };\n}\n\nconst slowSquare = memoize(n => {\n  // Simulate slow computation\n  return n * n;\n});\n\nconsole.log(slowSquare(5));  // computed\nconsole.log(slowSquare(5));  // cached!\nconsole.log(slowSquare(10)); // computed\nconsole.log(slowSquare(10)); // cached!",
+    "expectedOutput": ["25", "(cached)", "25", "100", "(cached)", "100"],
+    "successMessage": "The cache Map lives in the closure — it persists between calls. Memoisation is used everywhere: React's useMemo, expensive calculations, API call deduplication."
+  },
+  {
+    "title": "Build a state machine",
+    "instruction": "Final challenge — no starter code.\n\nBuild a `trafficLight()` factory using closures:\n- Starts at `'red'`\n- Has a `next()` method that cycles: red → green → yellow → red\n- Has a `state()` method that returns the current state\n- Has a `canGo()` method that returns true only when green\n\nCreate two independent traffic lights to prove they don't share state.",
+    "hint": "function trafficLight() { const states = ['red', 'green', 'yellow']; let current = 0; return { next() { current = (current + 1) % states.length; }, state() { return states[current]; } }; }",
+    "starter": "",
+    "expectedOutput": [],
+    "codeChecks": [
+      { "pattern": "function trafficLight|const trafficLight\\s*=", "required": true, "message": "Define trafficLight factory." },
+      { "pattern": "let current|let state|let index", "required": true, "message": "Use a private let variable for state." },
+      { "pattern": "next\\(\\)", "required": true, "message": "Return a next() method." },
+      { "pattern": "canGo\\(\\)|state\\(\\)", "required": true, "message": "Return state() and canGo() methods." }
+    ],
+    "successMessage": "Two traffic lights, completely independent state. Closures for privacy, factory function for reuse. This is the module pattern in action. Chapter 10 done!"
+  }
+]
