@@ -8,7 +8,7 @@ import { LANGUAGES, getAllLanguageSlugs } from "@/lib/languages/registry";
 import { getLangIcon } from "@/lib/languages/icons";
 import { APP_NAME, BASE_URL } from "@/lib/constants";
 import { getExamConfigForAllLangs, getLastActivity, getUserPlan } from "@/lib/db";
-import { getPopularTutorials, getPopularPracticeProblems, getFallbackPopularPracticeProblems } from "@/lib/db/home-popular";
+import { getPopularLanguages, getPopularPracticeProblems, getFallbackPopularLanguages, getFallbackPopularPracticeProblems } from "@/lib/db/home-popular";
 import { tutorialLangUrl, tutorialUrl } from "@/lib/urls";
 import { absoluteUrl, SITE_KEYWORDS, buildSiteSearchJsonLd } from "@/lib/seo";
 import { getCurrentUser } from "@/lib/auth";
@@ -55,10 +55,10 @@ export default async function Home() {
   const topicCount = goTutorials.length;
   const problemCount = getAllPracticeProblems().length;
   // Kick off all independent async work in parallel
-  const [examConfigByLang, user, popularTutorials, popularProblems] = await Promise.all([
+  const [examConfigByLang, user, popularLanguages, popularProblems] = await Promise.all([
     getExamConfigForAllLangs(),
     getCurrentUser(),
-    getPopularTutorials(),
+    getPopularLanguages(),
     getPopularPracticeProblems(),
   ]);
 
@@ -112,6 +112,8 @@ export default async function Home() {
   const isPro = userPlan === "pro" || userPlan === "yearly";
   const popularPracticeProblems =
     popularProblems.length > 0 ? popularProblems : getFallbackPopularPracticeProblems();
+  const popularLangs =
+    popularLanguages.length > 0 ? popularLanguages : getFallbackPopularLanguages();
 
   const websiteJsonLd = buildSiteSearchJsonLd();
   const orgJsonLd = {
@@ -184,8 +186,8 @@ export default async function Home() {
           <SectionHeading
             id="languages-heading"
             eyebrow="Languages"
-            title="Seven languages. One subscription."
-            subtitle="Go, Python, JavaScript, Java, Rust, C++, and C# — all in the same interactive IDE. Start one, continue all."
+            title="The languages that get you hired."
+            subtitle="Pick one and build real skills — guided tutorials, interview prep, and a verifiable certificate, every step of the way."
           />
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {languageEntries.map(({ slug, config }) => (
@@ -202,8 +204,8 @@ export default async function Home() {
           </div>
         </section>
 
-        {/* Popular tutorials — sorted by real completion count */}
-        <PopularTutorialsSection tutorials={popularTutorials} />
+        {/* Popular languages — sorted by real learner count */}
+        <PopularTutorialsSection languages={popularLangs} />
 
         {/* Popular interview prep — sorted by real view count */}
         <PopularInterviewPrepSection problems={popularPracticeProblems} />
