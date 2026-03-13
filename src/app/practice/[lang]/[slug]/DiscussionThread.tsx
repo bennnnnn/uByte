@@ -78,20 +78,35 @@ function ComposeBox({
   onSubmit,
   onCancel,
   autoFocus = false,
+  prefill = "",
 }: {
   placeholder: string;
   onSubmit: (text: string) => Promise<void>;
   onCancel?: () => void;
   autoFocus?: boolean;
+  prefill?: string;
 }) {
-  const [text, setText] = useState("");
+  const [text, setText] = useState(prefill);
   const [busy, setBusy] = useState(false);
   const [err,  setErr]  = useState("");
   const ref = useRef<HTMLTextAreaElement>(null);
 
+  // When prefill changes (e.g. user clicked reply on a different reply), update text and focus
   useEffect(() => {
-    if (autoFocus) ref.current?.focus();
-  }, [autoFocus]);
+    if (prefill) {
+      setText(prefill);
+      setTimeout(() => {
+        if (ref.current) {
+          ref.current.focus();
+          ref.current.selectionStart = ref.current.selectionEnd = prefill.length;
+        }
+      }, 0);
+    }
+  }, [prefill]);
+
+  useEffect(() => {
+    if (autoFocus && !prefill) ref.current?.focus();
+  }, [autoFocus, prefill]);
 
   const submit = async () => {
     if (!text.trim() || busy) return;
@@ -146,11 +161,94 @@ function ComposeBox({
   );
 }
 
+/* ── Report picker ──────────────────────────────────────────────────────── */
+const REPORT_REASONS = [
+  { value: "spam",          label: "Spam" },
+  { value: "harassment",    label: "Harassment" },
+  { value: "inappropriate", label: "Inappropriate content" },
+  { value: "other",         label: "Other" },
+];
+
+function ReportPicker({
+  postId,
+  onClose,
+}: {
+  postId: number;
+  onClose: () => void;
+}) {
+  const [selected, setSelected] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [done, setDone] = useState(false);
+
+  async function submit() {
+    if (!selected || busy) return;
+    setBusy(true);
+    try {
+      await apiFetch(`/api/discussion/post/${postId}/report`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ reason: selected }),
+      });
+      setDone(true);
+      setTimeout(onClose, 1500);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  if (done) {
+    return (
+      <span className="text-[11px] text-emerald-600 dark:text-emerald-400">
+        Thanks — reported.
+      </span>
+    );
+  }
+
+  return (
+    <span className="flex flex-wrap items-center gap-1.5">
+      <span className="text-[11px] text-zinc-500">Report as:</span>
+      {REPORT_REASONS.map((r) => (
+        <button
+          key={r.value}
+          type="button"
+          onClick={() => setSelected(r.value)}
+          className={`rounded px-1.5 py-0.5 text-[11px] transition-colors ${
+            selected === r.value
+              ? "bg-red-100 font-semibold text-red-700 dark:bg-red-950/50 dark:text-red-400"
+              : "text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-300"
+          }`}
+        >
+          {r.label}
+        </button>
+      ))}
+      {selected && (
+        <button
+          type="button"
+          onClick={() => void submit()}
+          disabled={busy}
+          className="rounded bg-red-500 px-2 py-0.5 text-[11px] font-semibold text-white hover:bg-red-600 disabled:opacity-50"
+        >
+          {busy ? "…" : "Send"}
+        </button>
+      )}
+      <button
+        type="button"
+        onClick={onClose}
+        className="text-[11px] text-zinc-300 hover:text-zinc-500 dark:text-zinc-600"
+      >
+        Cancel
+      </button>
+    </span>
+  );
+}
+
 /* ── Single post card ───────────────────────────────────────────────────── */
 function PostCard({
   post,
   currentUserId,
+  isSignedIn,
   isReply,
+  rootPostId,
   onReplySubmit,
   onDelete,
   onToggleReplies,
@@ -158,16 +256,23 @@ function PostCard({
 }: {
   post: Post;
   currentUserId: number | null;
+  isSignedIn: boolean;
   isReply: boolean;
-  onReplySubmit: (postId: number, text: string) => Promise<void>;
+  /** For replies: the id of the top-level parent post to attach new replies to */
+  rootPostId?: number;
+  onReplySubmit: (parentId: number, text: string) => Promise<void>;
   onDelete: (postId: number) => void;
   onToggleReplies: (postId: number) => void;
   onLoadReplies: (postId: number) => Promise<void>;
 }) {
   const [replying, setReplying] = useState(false);
+  const [replyPrefill, setReplyPrefill] = useState("");
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [reporting, setReporting] = useState(false);
 
   const canDelete = currentUserId && post.user_id === currentUserId;
+  // The effective parent for new replies
+  const replyParentId = isReply ? (rootPostId ?? post.id) : post.id;
 
   const handleToggle = async () => {
     onToggleReplies(post.id);
@@ -176,19 +281,40 @@ function PostCard({
     }
   };
 
+  // Called when "Reply" is clicked on a nested reply — opens parent compose with @name prefilled
+  const handleReplyToReply = (authorName: string) => {
+    const prefill = `@${authorName} `;
+    setReplyPrefill(prefill);
+    setReplying(true);
+  };
+
+  const authorHref = post.user_id ? `/u/${post.user_id}` : null;
+
   return (
     <div className={`flex gap-3 ${isReply ? "pl-2" : ""}`}>
-      {/* Avatar */}
-      <div className={`mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[11px] font-bold ${avatarColor(post.author_name)}`}>
-        {initials(post.author_name)}
-      </div>
+      {/* Avatar — links to public profile */}
+      {authorHref ? (
+        <Link href={authorHref} className={`mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[11px] font-bold transition-opacity hover:opacity-70 ${avatarColor(post.author_name)}`}>
+          {initials(post.author_name)}
+        </Link>
+      ) : (
+        <div className={`mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[11px] font-bold ${avatarColor(post.author_name)}`}>
+          {initials(post.author_name)}
+        </div>
+      )}
 
       <div className="min-w-0 flex-1">
         {/* Header */}
         <div className="mb-1 flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
-          <span className="text-xs font-semibold text-zinc-800 dark:text-zinc-200">
-            {post.author_name ?? "Anonymous"}
-          </span>
+          {authorHref ? (
+            <Link href={authorHref} className="text-xs font-semibold text-zinc-800 hover:underline dark:text-zinc-200">
+              {post.author_name ?? "Anonymous"}
+            </Link>
+          ) : (
+            <span className="text-xs font-semibold text-zinc-800 dark:text-zinc-200">
+              {post.author_name ?? "Anonymous"}
+            </span>
+          )}
           <span className="text-[10px] text-zinc-400">{timeAgo(post.created_at)}</span>
         </div>
 
@@ -198,11 +324,20 @@ function PostCard({
         </p>
 
         {/* Actions */}
-        <div className="mt-1.5 flex items-center gap-3">
-          {!isReply && currentUserId && (
+        <div className="mt-1.5 flex flex-wrap items-center gap-3">
+          {/* Reply button — available on all posts (including replies) */}
+          {isSignedIn && (
             <button
               type="button"
-              onClick={() => setReplying((r) => !r)}
+              onClick={() => {
+                if (isReply) {
+                  // Bubble up: tell parent PostCard to open its compose with @mention
+                  // (handled via onReplyToUser prop on reply cards — see below)
+                } else {
+                  setReplyPrefill("");
+                  setReplying((r) => !r);
+                }
+              }}
               className="text-[11px] font-medium text-zinc-400 transition-colors hover:text-indigo-600 dark:hover:text-indigo-400"
             >
               Reply
@@ -229,7 +364,26 @@ function PostCard({
             </button>
           )}
 
-          {canDelete && (
+          {/* Report button */}
+          {isSignedIn && !canDelete && !reporting && (
+            <button
+              type="button"
+              onClick={() => setReporting(true)}
+              aria-label="Report post"
+              className="text-[11px] text-zinc-300 transition-colors hover:text-orange-500 dark:text-zinc-600 dark:hover:text-orange-400"
+              title="Report"
+            >
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+                <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z" /><line x1="4" y1="22" x2="4" y2="15" />
+              </svg>
+            </button>
+          )}
+
+          {reporting && (
+            <ReportPicker postId={post.id} onClose={() => setReporting(false)} />
+          )}
+
+          {canDelete && !reporting && (
             confirmDelete ? (
               <span className="flex items-center gap-1.5 text-[11px]">
                 <span className="text-zinc-400">Delete?</span>
@@ -248,22 +402,24 @@ function PostCard({
           )}
         </div>
 
-        {/* Inline reply form */}
-        {replying && (
+        {/* Inline reply compose (top-level posts only) */}
+        {!isReply && replying && (
           <div className="mt-3">
             <ComposeBox
-              placeholder={`Reply to ${post.author_name ?? "this comment"}… (use @name to mention)`}
+              placeholder={replyPrefill ? `Replying… (use @name to mention)` : `Reply to ${post.author_name ?? "this comment"}… (use @name to mention)`}
+              prefill={replyPrefill}
               autoFocus
-              onCancel={() => setReplying(false)}
+              onCancel={() => { setReplying(false); setReplyPrefill(""); }}
               onSubmit={async (text) => {
-                await onReplySubmit(post.id, text);
+                await onReplySubmit(replyParentId, text);
                 setReplying(false);
+                setReplyPrefill("");
               }}
             />
           </div>
         )}
 
-        {/* Replies */}
+        {/* Replies list */}
         {!isReply && post.repliesOpen && (
           <div className="mt-3 space-y-3 border-l-2 border-zinc-100 pl-3 dark:border-zinc-800">
             {post.repliesLoading ? (
@@ -272,20 +428,125 @@ function PostCard({
               <p className="text-xs text-zinc-400">No replies yet.</p>
             ) : (
               (post.replies ?? []).map((reply) => (
-                <PostCard
+                <ReplyCard
                   key={reply.id}
                   post={reply}
                   currentUserId={currentUserId}
-                  isReply
-                  onReplySubmit={onReplySubmit}
+                  isSignedIn={isSignedIn}
+                  rootPostId={post.id}
+                  onReplyTo={handleReplyToReply}
                   onDelete={onDelete}
-                  onToggleReplies={onToggleReplies}
-                  onLoadReplies={onLoadReplies}
                 />
               ))
             )}
           </div>
         )}
+      </div>
+    </div>
+  );
+}
+
+/* ── Reply card (flat — no further nesting) ─────────────────────────────── */
+function ReplyCard({
+  post,
+  currentUserId,
+  isSignedIn,
+  rootPostId,
+  onReplyTo,
+  onDelete,
+}: {
+  post: Post;
+  currentUserId: number | null;
+  isSignedIn: boolean;
+  rootPostId: number;
+  /** Called when the user clicks "Reply" — parent PostCard handles the compose */
+  onReplyTo: (authorName: string) => void;
+  onDelete: (postId: number) => void;
+}) {
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const [reporting, setReporting] = useState(false);
+  const canDelete = currentUserId && post.user_id === currentUserId;
+  const authorHref = post.user_id ? `/u/${post.user_id}` : null;
+
+  void rootPostId; // used by parent for submit routing
+
+  return (
+    <div className="flex gap-3">
+      {authorHref ? (
+        <Link href={authorHref} className={`mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[10px] font-bold transition-opacity hover:opacity-70 ${avatarColor(post.author_name)}`}>
+          {initials(post.author_name)}
+        </Link>
+      ) : (
+        <div className={`mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[10px] font-bold ${avatarColor(post.author_name)}`}>
+          {initials(post.author_name)}
+        </div>
+      )}
+
+      <div className="min-w-0 flex-1">
+        <div className="mb-0.5 flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
+          {authorHref ? (
+            <Link href={authorHref} className="text-xs font-semibold text-zinc-800 hover:underline dark:text-zinc-200">
+              {post.author_name ?? "Anonymous"}
+            </Link>
+          ) : (
+            <span className="text-xs font-semibold text-zinc-800 dark:text-zinc-200">
+              {post.author_name ?? "Anonymous"}
+            </span>
+          )}
+          <span className="text-[10px] text-zinc-400">{timeAgo(post.created_at)}</span>
+        </div>
+
+        <p className="whitespace-pre-wrap break-words text-sm leading-relaxed text-zinc-700 dark:text-zinc-300">
+          <BodyText text={post.body} />
+        </p>
+
+        <div className="mt-1 flex flex-wrap items-center gap-3">
+          {isSignedIn && (
+            <button
+              type="button"
+              onClick={() => onReplyTo(post.author_name ?? "user")}
+              className="text-[11px] font-medium text-zinc-400 transition-colors hover:text-indigo-600 dark:hover:text-indigo-400"
+            >
+              Reply
+            </button>
+          )}
+
+          {isSignedIn && !canDelete && !reporting && (
+            <button
+              type="button"
+              onClick={() => setReporting(true)}
+              aria-label="Report post"
+              className="text-[11px] text-zinc-300 transition-colors hover:text-orange-500 dark:text-zinc-600 dark:hover:text-orange-400"
+              title="Report"
+            >
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+                <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z" /><line x1="4" y1="22" x2="4" y2="15" />
+              </svg>
+            </button>
+          )}
+
+          {reporting && (
+            <ReportPicker postId={post.id} onClose={() => setReporting(false)} />
+          )}
+
+          {canDelete && !reporting && (
+            confirmDelete ? (
+              <span className="flex items-center gap-1.5 text-[11px]">
+                <span className="text-zinc-400">Delete?</span>
+                <button type="button" onClick={() => onDelete(post.id)} className="font-medium text-red-500 hover:text-red-700">Yes</button>
+                <button type="button" onClick={() => setConfirmDelete(false)} className="text-zinc-400 hover:text-zinc-600">No</button>
+              </span>
+            ) : (
+              <button
+                type="button"
+                onClick={() => setConfirmDelete(true)}
+                className="text-[11px] text-zinc-300 transition-colors hover:text-red-500 dark:text-zinc-600"
+              >
+                Delete
+              </button>
+            )
+          )}
+        </div>
       </div>
     </div>
   );
@@ -352,7 +613,7 @@ export default function DiscussionThread({ slug, currentUserId, isSignedIn }: Pr
     setPosts((prev) => [...prev, { ...data.post, reply_count: 0 }]);
   }, [slug]);
 
-  /* ── Submit reply ───────────────────────────────────────────────────── */
+  /* ── Submit reply (or reply-to-reply, flat threading) ───────────────── */
   const submitReply = useCallback(async (parentId: number, text: string) => {
     const res  = await apiFetch(`/api/discussion/${slug}`, {
       method: "POST",
@@ -380,7 +641,6 @@ export default function DiscussionThread({ slug, currentUserId, isSignedIn }: Pr
   /* ── Delete post ────────────────────────────────────────────────────── */
   const deletePost = useCallback(async (id: number) => {
     await apiFetch(`/api/discussion/post/${id}`, { method: "DELETE" });
-    // Remove from top-level or from replies
     setPosts((prev) =>
       prev
         .filter((p) => p.id !== id)
@@ -450,6 +710,7 @@ export default function DiscussionThread({ slug, currentUserId, isSignedIn }: Pr
                 key={post.id}
                 post={post}
                 currentUserId={currentUserId}
+                isSignedIn={isSignedIn}
                 isReply={false}
                 onReplySubmit={submitReply}
                 onDelete={(id) => void deletePost(id)}
