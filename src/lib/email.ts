@@ -642,3 +642,66 @@ export async function sendContactEmail(opts: {
     `,
   });
 }
+
+/** Sent daily to users who have unread discussion reply/mention notifications. */
+export async function sendNotificationDigestEmail(opts: {
+  to: string;
+  name: string;
+  notifications: { title: string; message: string }[];
+}): Promise<void> {
+  const resend = getResend();
+  if (!resend) return;
+
+  const { to, name, notifications } = opts;
+  const firstName = name.split(" ")[0];
+  const count = notifications.length;
+  const subject =
+    count === 1
+      ? `You have 1 new notification on uByte`
+      : `You have ${count} new notifications on uByte`;
+
+  const notifRows = notifications
+    .map(
+      (n) => `
+        <tr>
+          <td style="padding:12px 0;border-bottom:1px solid #f3f4f6">
+            <p style="margin:0 0 2px;font-size:14px;font-weight:600;color:#18181b">${n.title}</p>
+            <p style="margin:0;font-size:13px;color:#6b7280">${n.message}</p>
+          </td>
+        </tr>`,
+    )
+    .join("");
+
+  await resend.emails.send({
+    from: FROM,
+    to,
+    subject,
+    html: `
+      <div style="font-family:sans-serif;max-width:520px;margin:auto;color:#18181b">
+        <div style="background:#4f46e5;padding:28px 32px;border-radius:12px 12px 0 0;text-align:center">
+          <span style="color:#fff;font-size:26px;font-weight:800;letter-spacing:-1px">uByte</span>
+          <p style="color:#c7d2fe;margin:4px 0 0;font-size:13px">Notification digest</p>
+        </div>
+        <div style="background:#f9fafb;padding:28px 32px;border-radius:0 0 12px 12px;border:1px solid #e5e7eb;border-top:none">
+          <h2 style="margin:0 0 4px;font-size:18px">Hey ${firstName} 👋</h2>
+          <p style="color:#6b7280;margin:0 0 20px;font-size:14px">
+            You have ${count} unread ${count === 1 ? "notification" : "notifications"} since your last visit:
+          </p>
+
+          <table style="width:100%;border-collapse:collapse">
+            ${notifRows}
+          </table>
+
+          <div style="text-align:center;margin:24px 0 0">
+            <a href="${BASE_URL}/profile?tab=notifications"
+               style="display:inline-block;padding:12px 28px;background:#4f46e5;color:#fff;border-radius:8px;text-decoration:none;font-weight:700;font-size:14px">
+              View all notifications →
+            </a>
+          </div>
+
+          ${unsubFooter(to)}
+        </div>
+      </div>
+    `,
+  });
+}

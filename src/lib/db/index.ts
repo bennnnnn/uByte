@@ -29,6 +29,7 @@ export * from "./onboarding-drip";
 export * from "./referrals";
 export * from "./push-subscriptions";
 export * from "./weekly-digest";
+export * from "./notification-digest";
 export * from "./blog-posts";
 export * from "./exam-questions";
 export * from "./exam-attempts";
