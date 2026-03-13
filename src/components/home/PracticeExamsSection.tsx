@@ -50,7 +50,7 @@ export default function PracticeExamsSection({ examConfigByLang }: Props) {
           <div className="shrink-0">
             <Link
               href="/certifications"
-              className="inline-flex items-center gap-2 rounded-xl bg-amber-500 px-6 py-3 text-sm font-bold text-white shadow-md shadow-amber-500/20 transition-all hover:-translate-y-0.5 hover:bg-amber-400"
+              className="inline-flex items-center gap-2 rounded-xl bg-violet-100 px-6 py-3 text-sm font-bold text-violet-700 shadow-sm transition-all hover:-translate-y-0.5 hover:bg-violet-200 dark:bg-violet-900/40 dark:text-violet-300 dark:hover:bg-violet-900/60"
             >
               View certifications
               <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
