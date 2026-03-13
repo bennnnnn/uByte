@@ -1,29 +1,12 @@
 ---
 title: "Functions"
-description: "Defining and calling functions, overloading, and default arguments in C++."
-order: 8
-difficulty: "intermediate"
-estimatedMinutes: 15
+description: "Declare and call functions, pass by value vs reference, default arguments, overloading, inline, and recursion."
+order: 7
+difficulty: "beginner"
+estimatedMinutes: 20
+concepts: ["function declaration", "parameters", "return type", "pass by value", "pass by reference", "const reference", "overloading", "default arguments", "inline", "recursion"]
 ---
 
-## Defining Functions
+## Don't repeat yourself
 
-```cpp
-int add(int a, int b) {
-    return a + b;
-}
-
-int main() {
-    std::cout << add(3, 4) << std::endl; // 7
-}
-```
-
-## Default Arguments
-
-```cpp
-void greet(std::string name = "World") {
-    std::cout << "Hello, " << name << "!" << std::endl;
-}
-```
-
-More content coming soon. Try the interactive steps above!
+Functions are named, reusable blocks of logic. In C++, function parameters are **copied by default** — unlike Python and Java where objects are references. Understanding pass-by-value vs pass-by-reference is one of the most important C++ concepts.

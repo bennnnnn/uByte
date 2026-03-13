@@ -1,0 +1,45 @@
+[
+  {
+    "title": "Lambda basics",
+    "instruction": "Lambda syntax:\n\n```cpp\n[capture](params) -> returnType { body }\n```\n\n- `[]` — capture nothing\n- `[=]` — capture all by value\n- `[&]` — capture all by reference\n- Return type is optional (deduced)\n\nRun this.",
+    "starter": "#include <iostream>\n#include <vector>\n#include <algorithm>\nusing namespace std;\n\nint main() {\n    // Basic lambda:\n    auto greet = [](string name) { cout << \"Hello, \" << name << \"!\" << endl; };\n    greet(\"Alice\");\n    greet(\"Bob\");\n\n    // Lambda as comparator:\n    vector<int> nums = {5, 2, 8, 1, 9};\n    sort(nums.begin(), nums.end(), [](int a, int b){ return a > b; });\n    for (int n : nums) cout << n << \" \";\n    cout << endl;\n\n    // Lambda with return type deduction:\n    auto square = [](int n) { return n * n; };\n    cout << square(7) << endl;\n\n    return 0;\n}",
+    "expectedOutput": ["Hello, Alice!", "Hello, Bob!", "9 8 5 2 1 ", "49"],
+    "successMessage": "Lambdas are anonymous functions. The compiler deduces the return type automatically. Lambdas are how we passed the sort comparator in Chapter 17 without naming a function."
+  },
+  {
+    "title": "Captures — access outer variables",
+    "instruction": "Lambdas can capture outer variables:\n\n```cpp\nint threshold = 60;\nauto isPassing = [threshold](int score) {\n    return score >= threshold;\n};\n```\n\n- `[threshold]` — capture by value (copy)\n- `[&threshold]` — capture by reference\n- `[=]` — capture all used variables by value\n- `[&]` — capture all by reference",
+    "starter": "#include <iostream>\n#include <vector>\n#include <algorithm>\nusing namespace std;\n\nint main() {\n    int threshold = 60;\n\n    auto isPassing = [threshold](int score) {\n        return score >= threshold;  // uses captured threshold\n    };\n\n    vector<int> scores = {45, 72, 88, 55, 90, 38};\n    int passing = count_if(scores.begin(), scores.end(), isPassing);\n    cout << \"Passing: \" << passing << endl;\n\n    // Capture by reference — lambda can modify outer variable:\n    int sum = 0;\n    for_each(scores.begin(), scores.end(), [&sum](int s){ sum += s; });\n    cout << \"Sum: \" << sum << endl;\n\n    return 0;\n}",
+    "expectedOutput": ["Passing: 3", "Sum: 388"],
+    "successMessage": "Threshold captured by value — a copy. Changing threshold later doesn't affect the lambda. sum captured by reference — the lambda modifies the outer sum directly."
+  },
+  {
+    "title": "std::function — store any callable",
+    "instruction": "`std::function<returnType(params)>` can hold ANY callable — lambda, function pointer, or functor:\n\n```cpp\nfunction<int(int)> doubler = [](int n){ return n * 2; };\ndoubler = someNamedFunction;  // can swap to a named function\n```\n\nThis is how callbacks, event handlers, and strategy patterns work in C++.",
+    "starter": "#include <iostream>\n#include <functional>\n#include <vector>\n#include <string>\nusing namespace std;\n\nvoid applyToAll(vector<int>& v, function<int(int)> transform) {\n    for (auto& x : v) x = transform(x);\n}\n\nint main() {\n    vector<int> nums = {1, 2, 3, 4, 5};\n\n    applyToAll(nums, [](int n){ return n * 2; });\n    for (int n : nums) cout << n << \" \";\n    cout << endl;\n\n    applyToAll(nums, [](int n){ return n + 10; });\n    for (int n : nums) cout << n << \" \";\n    cout << endl;\n\n    // Store different callbacks:\n    function<void(string)> onLogin;\n    onLogin = [](string user){ cout << user << \" logged in.\" << endl; };\n    onLogin(\"Alice\");\n\n    return 0;\n}",
+    "expectedOutput": ["2 4 6 8 10 ", "12 14 16 18 20 ", "Alice logged in."],
+    "successMessage": "std::function stores any callable with the matching signature. applyToAll works with any transformation lambda. This is the callback/event handler pattern used in GUIs, async systems, and game engines."
+  },
+  {
+    "title": "Returning lambdas",
+    "instruction": "Functions can return lambdas — this creates closures, encapsulating state:\n\n```cpp\nauto makeCounter() {\n    int count = 0;\n    return [count]() mutable { return ++count; };\n}\n```\n\n`mutable` allows the lambda to modify captured-by-value variables.",
+    "starter": "#include <iostream>\n#include <functional>\nusing namespace std;\n\nauto makeMultiplier(int factor) {\n    return [factor](int n){ return n * factor; };  // factor captured\n}\n\nauto makeCounter() {\n    int count = 0;\n    return [count]() mutable { return ++count; };  // mutable to modify copy\n}\n\nint main() {\n    auto triple = makeMultiplier(3);\n    auto double_ = makeMultiplier(2);\n\n    cout << triple(5)  << endl;   // 15\n    cout << double_(7) << endl;   // 14\n\n    auto counter1 = makeCounter();\n    auto counter2 = makeCounter();\n    cout << counter1() << endl;   // 1\n    cout << counter1() << endl;   // 2\n    cout << counter2() << endl;   // 1 (own counter)\n\n    return 0;\n}",
+    "expectedOutput": ["15", "14", "1", "2", "1"],
+    "successMessage": "makeMultiplier captures factor in the returned lambda. counter1 and counter2 have independent counts. Closures capture state — this is how currying, event handlers, and callbacks maintain context."
+  },
+  {
+    "title": "Build a function pipeline",
+    "instruction": "No starter code.\n\nBuild a `Pipeline<T>` class that chains transformations:\n\n```cpp\nPipeline<int>(numbers)\n    .filter([](int n){ return n > 5; })\n    .transform([](int n){ return n * 2; })\n    .forEach([](int n){ cout << n << endl; });\n```\n\nUse `vector<function<...>>` to store the steps, or apply each in chain methods.",
+    "hint": "Store vector<T> as data. filter returns a new Pipeline with filtered data. transform returns a new Pipeline with transformed data. forEach calls the function on each element.",
+    "starter": "",
+    "expectedOutput": [],
+    "codeChecks": [
+      { "pattern": "template.*T.*class Pipeline|class Pipeline", "required": true, "message": "Define a Pipeline class (possibly templated)." },
+      { "pattern": "filter\\(|filter \\(", "required": true, "message": "Add filter() method taking a lambda predicate." },
+      { "pattern": "transform\\(|transform \\(", "required": true, "message": "Add transform() method taking a lambda function." },
+      { "pattern": "forEach\\(|for_each\\(", "required": true, "message": "Add forEach() method." },
+      { "pattern": "function<|auto.*lambda|\\[\\]", "required": true, "message": "Use lambdas or std::function for the pipeline steps." }
+    ],
+    "successMessage": "A fluent pipeline using lambdas. filter+transform+forEach is map/filter/reduce. This pattern is used in LINQ (C#), Java Streams, and Rust iterators — all inspired by functional programming. Chapter 20 done!"
+  }
+]

@@ -1,0 +1,58 @@
+[
+  {
+    "title": "Integer types",
+    "instruction": "C++ has multiple integer types — choose by size needed:\n\n| Type | Size | Range |\n|------|------|-------|\n| `short` | 16-bit | -32,768 to 32,767 |\n| `int` | 32-bit | ~-2 billion to 2 billion |\n| `long` | 32 or 64-bit | platform dependent |\n| `long long` | 64-bit | ~-9 quintillion |\n| `unsigned int` | 32-bit | 0 to ~4 billion |\n\n`sizeof()` tells you the actual size in bytes.",
+    "starter": "#include <iostream>\nusing namespace std;\n\nint main() {\n    short  s  = 30000;\n    int    i  = 2'000'000;     // digit separator (C++14)\n    long long ll = 9'000'000'000LL;\n    unsigned int u = 4'000'000'000u;\n\n    cout << s  << endl;\n    cout << i  << endl;\n    cout << ll << endl;\n    cout << u  << endl;\n\n    cout << \"sizeof int: \"       << sizeof(int)       << \" bytes\" << endl;\n    cout << \"sizeof long long: \" << sizeof(long long) << \" bytes\" << endl;\n\n    return 0;\n}",
+    "expectedOutput": ["30000", "2000000", "9000000000", "4000000000", "sizeof int: 4 bytes", "sizeof long long: 8 bytes"],
+    "successMessage": "digit separators (2'000'000) are legal C++14 — they just help readability. LL suffix marks a long long literal, u marks unsigned. sizeof tells you memory usage in bytes."
+  },
+  {
+    "title": "Floating-point types",
+    "instruction": "Three floating-point types:\n\n- `float` — 32-bit, ~7 decimal digits precision\n- `double` — 64-bit, ~15 digits — **default choice**\n- `long double` — 80 or 128-bit\n\nFloating-point is inexact by design — `0.1 + 0.2` is not exactly `0.3`.",
+    "starter": "#include <iostream>\n#include <iomanip>\nusing namespace std;\n\nint main() {\n    float  f = 1.23456789f;   // f suffix required for float\n    double d = 1.23456789;\n\n    cout << setprecision(9);\n    cout << f << endl;  // loses precision\n    cout << d << endl;  // full precision\n\n    // The famous floating-point trap:\n    cout << (0.1 + 0.2) << endl;\n    cout << boolalpha << (0.1 + 0.2 == 0.3) << endl;\n\n    return 0;\n}",
+    "expectedOutput": ["1.23456788", "1.23456789", "0.3", "false"],
+    "successMessage": "float loses precision at digit 7-8. double keeps ~15. 0.1+0.2 ≠ 0.3 — floating-point arithmetic is approximate. For money: use integer cents. For exact decimals: use a BigDecimal library."
+  },
+  {
+    "title": "char and bool",
+    "instruction": "`char` holds a single character (single quotes!). Under the hood it's just an 8-bit integer.\n`bool` holds `true` or `false` (prints as 1/0 by default; use `boolalpha` for true/false).\n\n`char` arithmetic: 'A' is 65 in ASCII — add 1 to get 'B'.",
+    "starter": "#include <iostream>\nusing namespace std;\n\nint main() {\n    char c = 'A';\n    cout << c << endl;            // A\n    cout << (int)c << endl;       // 65\n    cout << (char)(c + 1) << endl; // B\n\n    bool flag = true;\n    cout << flag << endl;           // 1\n    cout << boolalpha << flag << endl; // true\n\n    // Loop through part of the alphabet:\n    for (char ch = 'A'; ch <= 'E'; ch++) {\n        cout << ch << \" \";\n    }\n    cout << endl;\n\n    return 0;\n}",
+    "expectedOutput": ["A", "65", "B", "1", "true", "A B C D E "],
+    "successMessage": "(char)('A' + 1) = 'B'. Casting back to char interprets the number as a character. This is used in encryption (Caesar cipher), parsing, and competitive programming."
+  },
+  {
+    "title": "Type casting",
+    "instruction": "C++ casting:\n\n- **Implicit (widening)**: `int → double` — automatic, safe\n- **C-style cast**: `(int)value` — works but unchecked\n- **`static_cast<T>(value)`** — preferred in modern C++, checked at compile time\n\nAlways use `static_cast` — it makes casts explicit and safe.",
+    "starter": "#include <iostream>\nusing namespace std;\n\nint main() {\n    int i = 42;\n    double d = i;           // implicit widening — safe\n    cout << d << endl;       // 42.0\n\n    double pi = 3.99;\n    int truncated = static_cast<int>(pi);  // drops decimal (no rounding!)\n    cout << truncated << endl;             // 3\n\n    // Integer division problem and fix:\n    int a = 7, b = 2;\n    cout << a / b << endl;                   // 3 (integer!)\n    cout << static_cast<double>(a) / b << endl; // 3.5\n\n    return 0;\n}",
+    "expectedOutput": ["42", "3", "3", "3.5"],
+    "successMessage": "static_cast<int>(3.99) = 3 — truncates, doesn't round. static_cast<double>(a)/b forces decimal division. Always use static_cast in C++ — it's explicit and the compiler can check it."
+  },
+  {
+    "title": "Numeric limits",
+    "instruction": "`<limits>` provides the min and max for each type:\n\n```cpp\n#include <limits>\nnumeric_limits<int>::max()    // 2147483647\nnumeric_limits<int>::min()    // -2147483648\n```\n\nOverflowing an integer is undefined behaviour in C++ — it can do anything, including crash silently.",
+    "starter": "#include <iostream>\n#include <limits>\nusing namespace std;\n\nint main() {\n    cout << \"int max: \"       << numeric_limits<int>::max()    << endl;\n    cout << \"int min: \"       << numeric_limits<int>::min()    << endl;\n    cout << \"double max: \"    << numeric_limits<double>::max() << endl;\n    cout << \"double epsilon: \"<< numeric_limits<double>::epsilon() << endl;\n\n    // Overflow: undefined behaviour!\n    int overflow = numeric_limits<int>::max();\n    overflow++;  // wraps around on most platforms\n    cout << \"Overflowed: \" << overflow << endl;\n\n    return 0;\n}",
+    "expectedOutput": ["int max: 2147483647", "int min: -2147483648", "Overflowed: -2147483648"],
+    "successMessage": "2147483647 + 1 = -2147483648 on most platforms — signed integer overflow wraps around. This is technically undefined behaviour in C++ — use long long or unsigned for larger numbers."
+  },
+  {
+    "title": "Bitwise operators",
+    "instruction": "Bitwise operators work on individual bits — essential for embedded systems, graphics, and network programming:\n\n- `&` AND — 1 only if both are 1\n- `|` OR — 1 if either is 1\n- `^` XOR — 1 if exactly one is 1\n- `~` NOT — flip all bits\n- `<<` shift left, `>>` shift right",
+    "starter": "#include <iostream>\nusing namespace std;\n\nint main() {\n    int a = 0b1010;  // 10 in binary\n    int b = 0b1100;  // 12 in binary\n\n    cout << (a & b)  << endl;  // AND:  1000 = 8\n    cout << (a | b)  << endl;  // OR:   1110 = 14\n    cout << (a ^ b)  << endl;  // XOR:  0110 = 6\n    cout << (1 << 4) << endl;  // left shift: 2^4 = 16\n    cout << (16 >> 2) << endl; // right shift: 16/4 = 4\n\n    // Check if a bit is set (common in games/flags):\n    int flags = 0b0101;  // bits 0 and 2 are set\n    cout << boolalpha << ((flags & (1 << 2)) != 0) << endl;  // bit 2 set?\n\n    return 0;\n}",
+    "expectedOutput": ["8", "14", "6", "16", "4", "true"],
+    "successMessage": "Left shift by n = multiply by 2^n. Right shift by n = divide by 2^n. Bit flags are how game engines store 32 boolean options in a single int. Essential for systems programming."
+  },
+  {
+    "title": "Build a unit converter",
+    "instruction": "No starter code. Build a temperature converter:\n\n- `const double CELSIUS = 100.0`\n- Calculate Fahrenheit: `(celsius * 9.0 / 5.0) + 32`\n- Calculate Kelvin: `celsius + 273.15`\n- Use `static_cast<int>()` to also show truncated integer versions\n- Print all results with labels",
+    "hint": "double fahrenheit = (CELSIUS * 9.0 / 5.0) + 32; double kelvin = CELSIUS + 273.15;",
+    "starter": "",
+    "expectedOutput": [],
+    "codeChecks": [
+      { "pattern": "const double CELSIUS|const auto CELSIUS|const float CELSIUS", "required": true, "message": "Declare: const double CELSIUS = 100.0;" },
+      { "pattern": "9\\.0\\s*/\\s*5\\.0|9\\.0\\s*/\\s*5|9\\s*/\\s*5\\.0", "required": true, "message": "Use 9.0/5.0 (not 9/5) to avoid integer division." },
+      { "pattern": "273\\.15", "required": true, "message": "Calculate Kelvin: celsius + 273.15" },
+      { "pattern": "static_cast<int>", "required": true, "message": "Use static_cast<int>() for integer versions." }
+    ],
+    "successMessage": "Temperature converter with proper casting. 9.0/5.0 prevents integer division. static_cast<int> is the C++ way to truncate. Chapter 3 done!"
+  }
+]

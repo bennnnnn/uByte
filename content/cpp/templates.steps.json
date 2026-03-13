@@ -1,0 +1,44 @@
+[
+  {
+    "title": "Function templates",
+    "instruction": "A function template works with any type. `T` is a placeholder replaced at compile time:\n\n```cpp\ntemplate <typename T>\nT max(T a, T b) {\n    return (a > b) ? a : b;\n}\n```\n\nThe compiler generates a separate `max<int>`, `max<double>`, etc.",
+    "starter": "#include <iostream>\n#include <string>\nusing namespace std;\n\ntemplate <typename T>\nT myMax(T a, T b) {\n    return (a > b) ? a : b;\n}\n\ntemplate <typename T>\nvoid swap(T& a, T& b) {\n    T temp = a;\n    a = b;\n    b = temp;\n}\n\ntemplate <typename T>\nvoid printArray(const T arr[], int size) {\n    for (int i = 0; i < size; i++)\n        cout << arr[i] << \" \";\n    cout << endl;\n}\n\nint main() {\n    cout << myMax(10, 20)      << endl;  // int\n    cout << myMax(3.14, 2.71)  << endl;  // double\n    cout << myMax(string(\"z\"), string(\"a\")) << endl;  // string!\n\n    int a = 5, b = 10;\n    swap(a, b);\n    cout << a << \" \" << b << endl;\n\n    double arr[] = {3.0, 1.0, 4.0, 1.0, 5.0};\n    printArray(arr, 5);\n\n    return 0;\n}",
+    "expectedOutput": ["20", "3.14", "z", "10 5", "3 1 4 1 5 "],
+    "successMessage": "One template, three types — the compiler generated three separate functions. myMax(\"z\", \"a\") works because string has operator>. This is zero-cost generics — no boxing, no virtual dispatch."
+  },
+  {
+    "title": "Class templates",
+    "instruction": "Template classes work with any type:\n\n```cpp\ntemplate <typename T>\nclass Box {\n    T value;\npublic:\n    Box(T v) : value(v) {}\n    T get() { return value; }\n};\n\nBox<int>    intBox(42);\nBox<string> strBox(\"hello\");\n```",
+    "starter": "#include <iostream>\n#include <string>\nusing namespace std;\n\ntemplate <typename T>\nclass Stack {\n    vector<T> data;\n\npublic:\n    void push(const T& val) { data.push_back(val); }\n\n    T pop() {\n        T top = data.back();\n        data.pop_back();\n        return top;\n    }\n\n    T peek() const { return data.back(); }\n    bool empty() const { return data.empty(); }\n    size_t size() const { return data.size(); }\n};\n\n#include <vector>\n\nint main() {\n    Stack<int> intStack;\n    intStack.push(10);\n    intStack.push(20);\n    intStack.push(30);\n    cout << intStack.pop() << endl;  // 30\n    cout << intStack.peek() << endl; // 20\n\n    Stack<string> strStack;\n    strStack.push(\"C++\");\n    strStack.push(\"is\");\n    strStack.push(\"awesome\");\n    while (!strStack.empty())\n        cout << strStack.pop() << \" \";\n    cout << endl;\n\n    return 0;\n}",
+    "expectedOutput": ["30", "20", "awesome is C++ "],
+    "successMessage": "Stack<int> and Stack<string> — one template, two specialisations. The stack pops in LIFO order — awesome, is, C++. This is exactly how std::stack is implemented."
+  },
+  {
+    "title": "Multiple template parameters",
+    "instruction": "Templates can have multiple type parameters:\n\n```cpp\ntemplate <typename K, typename V>\nclass Pair {\n    K first;\n    V second;\n};\n```\n\nThis is how `std::pair<K,V>` and `std::map<K,V>` work.",
+    "starter": "#include <iostream>\n#include <string>\nusing namespace std;\n\ntemplate <typename T1, typename T2>\nstruct Pair {\n    T1 first;\n    T2 second;\n\n    Pair(T1 a, T2 b) : first(a), second(b) {}\n\n    void print() const {\n        cout << \"(\" << first << \", \" << second << \")\" << endl;\n    }\n};\n\ntemplate <typename K, typename V>\nPair<K,V> makePair(K k, V v) {\n    return Pair<K,V>(k, v);\n}\n\nint main() {\n    Pair<string, int> nameAge(\"Alice\", 30);\n    Pair<int, double> idScore(1001, 95.5);\n\n    nameAge.print();\n    idScore.print();\n\n    auto p = makePair(\"Bob\", 3.14);\n    p.print();\n\n    return 0;\n}",
+    "expectedOutput": ["(Alice, 30)", "(1001, 95.5)", "(Bob, 3.14)"],
+    "successMessage": "Two type parameters — K and V. makePair uses auto to deduce the return type. This is exactly std::pair from <utility>, and std::map uses pairs for its key-value storage."
+  },
+  {
+    "title": "Template specialization",
+    "instruction": "Provide a specific implementation for a particular type:\n\n```cpp\ntemplate <>         // full specialization for char*\nbool isNull<char*>(char* p) {\n    return p == nullptr || *p == '\\0';\n}\n```\n\nUseful when the general template doesn't work correctly for a specific type.",
+    "starter": "#include <iostream>\n#include <string>\nusing namespace std;\n\ntemplate <typename T>\nstring describe(T val) {\n    return \"Value: \" + to_string(val);\n}\n\n// Specialization for bool:\ntemplate <>\nstring describe<bool>(bool val) {\n    return string(\"Bool: \") + (val ? \"true\" : \"false\");\n}\n\n// Specialization for string:\ntemplate <>\nstring describe<string>(string val) {\n    return \"String: '\" + val + \"' (len=\" + to_string(val.length()) + \")\";\n}\n\nint main() {\n    cout << describe(42)         << endl;\n    cout << describe(3.14)       << endl;\n    cout << describe(true)       << endl;  // uses specialization\n    cout << describe(string(\"hi\")) << endl;  // uses specialization\n\n    return 0;\n}",
+    "expectedOutput": ["Value: 42", "Value: 3.140000", "Bool: true", "String: 'hi' (len=2)"],
+    "successMessage": "Specializations override the general template for specific types. The general template uses to_string; the bool specialization uses true/false text. This is how type-specific behaviour is injected."
+  },
+  {
+    "title": "Build a generic container",
+    "instruction": "No starter code.\n\nWrite `template <typename T> class BoundedQueue`:\n- Fixed max capacity (constructor parameter)\n- `enqueue(T val)` — add to back, throw `overflow_error` if full\n- `dequeue()` — remove and return front, throw `underflow_error` if empty\n- `peek() const` — view front\n- `size() const` / `isEmpty() const` / `isFull() const`\n\nTest with `BoundedQueue<int>` and `BoundedQueue<string>`.",
+    "hint": "Use vector<T> internally. Keep a deque-like structure or use front index + back index.",
+    "starter": "",
+    "expectedOutput": [],
+    "codeChecks": [
+      { "pattern": "template\\s*<\\s*typename T\\s*>\\s*class BoundedQueue", "required": true, "message": "Define template <typename T> class BoundedQueue." },
+      { "pattern": "void enqueue|enqueue\\(const T", "required": true, "message": "Add enqueue() method." },
+      { "pattern": "T dequeue\\(\\)|dequeue\\(\\)", "required": true, "message": "Add T dequeue() method." },
+      { "pattern": "BoundedQueue<int>|BoundedQueue<string>", "required": true, "message": "Test with both BoundedQueue<int> and BoundedQueue<string>." }
+    ],
+    "successMessage": "A generic bounded queue — works with any type. Templates with zero runtime overhead. This pattern is used in thread-safe work queues, message buffers, and event systems. Chapter 15 done!"
+  }
+]

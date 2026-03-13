@@ -1,27 +1,14 @@
 ---
-title: "Async I/O & Select"
-description: "select(), poll(), and async I/O in C++."
-order: 19
-difficulty: "advanced"
-estimatedMinutes: 20
+title: "Encapsulation"
+description: "Access specifiers, getters/setters, data validation, private implementation, and friend functions."
+order: 13
+difficulty: "intermediate"
+estimatedMinutes: 16
+concepts: ["private", "public", "protected", "getters", "setters", "validation", "friend", "encapsulation", "header files concept"]
 ---
 
-## select() (POSIX)
+## Hide what doesn't need to be visible
 
-`select()` monitors multiple file descriptors for readability/writability:
+Encapsulation means hiding implementation details — exposing only what users need. A `BankAccount` with a `public balance` is dangerous. Make it `private` and only allow changes through validated methods.
 
-```cpp
-#include <sys/select.h>
-fd_set readfds;
-FD_ZERO(&readfds);
-FD_SET(STDIN_FILENO, &readfds);
-
-struct timeval tv = {5, 0}; // 5 second timeout
-int result = select(STDIN_FILENO + 1, &readfds, nullptr, nullptr, &tv);
-```
-
-## Asio (modern async I/O)
-
-Boost.Asio or standalone Asio provides async networking similar to Go channels.
-
-More content coming soon. Try the interactive steps above!
+In C++, access control is enforced at compile time — the compiler refuses to compile code that violates it.

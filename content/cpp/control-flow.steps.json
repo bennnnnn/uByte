@@ -1,0 +1,52 @@
+[
+  {
+    "title": "if / else if / else",
+    "instruction": "The classic conditional. Always use braces `{}`:\n\n```cpp\nif (score >= 90) {\n    cout << \"A\" << endl;\n} else if (score >= 80) {\n    cout << \"B\" << endl;\n} else {\n    cout << \"Below B\" << endl;\n}\n```\n\nConditions checked top to bottom — first match wins.",
+    "starter": "#include <iostream>\nusing namespace std;\n\nint main() {\n    int score = 78;\n\n    if (score >= 90) {\n        cout << \"A — Excellent!\" << endl;\n    } else if (score >= 80) {\n        cout << \"B — Great!\" << endl;\n    } else if (score >= 70) {\n        cout << \"C — Solid.\" << endl;\n    } else if (score >= 60) {\n        cout << \"D — Keep going.\" << endl;\n    } else {\n        cout << \"F — Try again.\" << endl;\n    }\n\n    return 0;\n}",
+    "expectedOutput": ["C — Solid."],
+    "successMessage": "78 → C. Conditions execute top to bottom; the first true branch runs. Change score to 91 and it prints A. Always use braces — missing braces caused Apple's famous 'goto fail' SSL bug."
+  },
+  {
+    "title": "Logical operators: &&, ||, !",
+    "instruction": "Combine boolean conditions:\n\n- `&&` — both must be true (AND)\n- `||` — at least one must be true (OR)\n- `!` — invert (NOT)\n\n**Short-circuit**: `&&` stops at first `false`, `||` stops at first `true`.",
+    "hint": "if (isAdmin || (isVerified && age >= 18))",
+    "starter": "#include <iostream>\nusing namespace std;\n\nint main() {\n    bool isAdmin = false;\n    bool isVerified = true;\n    int age = 20;\n\n    // Access if admin OR (verified AND 18+)\n    if (isAdmin || (isVerified && age >= 18)) {\n        cout << \"Access granted.\" << endl;\n    } else {\n        cout << \"Access denied.\" << endl;\n    }\n\n    // Short-circuit demo:\n    int x = 0;\n    if (x != 0 && 10/x > 1) {  // safe — second part never evaluates\n        cout << \"true\" << endl;\n    } else {\n        cout << \"Short-circuited safely.\" << endl;\n    }\n\n    return 0;\n}",
+    "expectedOutput": ["Access granted.", "Short-circuited safely."],
+    "successMessage": "Short-circuit evaluation: if x=0, the second part of && never runs — no division by zero. This is why checking for null/zero FIRST is important in compound conditions."
+  },
+  {
+    "title": "Ternary operator",
+    "instruction": "One-line conditional expression:\n\n```cpp\ntype result = condition ? valueIfTrue : valueIfFalse;\n```\n\nPerfect for simple assignments. Don't nest — it kills readability.",
+    "starter": "#include <iostream>\nusing namespace std;\n\nint main() {\n    int age = 20;\n    int score = 55;\n    int a = 10, b = 7;\n\n    string status = (age >= 18) ? \"adult\" : \"minor\";\n    string grade  = (score >= 60) ? \"PASS\" : \"FAIL\";\n    int    maxVal = (a > b) ? a : b;\n\n    cout << status << endl;\n    cout << grade  << endl;\n    cout << maxVal << endl;\n\n    return 0;\n}",
+    "expectedOutput": ["adult", "FAIL", "10"],
+    "successMessage": "Ternary for simple decisions in one line. Nesting ternaries is legal but cruel to readers — use if/else for anything complex."
+  },
+  {
+    "title": "switch — match exact values",
+    "instruction": "C++ `switch` works on `int`, `char`, and `enum` (not strings).\n\n⚠️ **Always use `break`** — otherwise execution falls through to the next case.",
+    "starter": "#include <iostream>\nusing namespace std;\n\nint main() {\n    int day = 3;\n\n    switch (day) {\n        case 1: cout << \"Monday\" << endl;    break;\n        case 2: cout << \"Tuesday\" << endl;   break;\n        case 3: cout << \"Wednesday\" << endl; break;\n        case 4: cout << \"Thursday\" << endl;  break;\n        case 5: cout << \"Friday\" << endl;    break;\n        case 6:\n        case 7: cout << \"Weekend!\" << endl;  break;  // fallthrough: 6 and 7\n        default: cout << \"Invalid\" << endl;  break;\n    }\n\n    // Switch on char:\n    char grade = 'B';\n    switch (grade) {\n        case 'A': cout << \"Excellent\" << endl; break;\n        case 'B': cout << \"Good\" << endl;      break;\n        case 'C': cout << \"Average\" << endl;   break;\n        default:  cout << \"Below average\" << endl;\n    }\n\n    return 0;\n}",
+    "expectedOutput": ["Wednesday", "Good"],
+    "successMessage": "case 6 falls through to case 7 intentionally — both produce 'Weekend!'. Intentional fallthrough is the one time you omit break. Otherwise: never forget break or you get silent bugs."
+  },
+  {
+    "title": "Comparison operators",
+    "instruction": "C++ comparison operators:\n\n- `==` equal, `!=` not equal\n- `<`, `>`, `<=`, `>=`\n- `<=>` (spaceship, C++20) — three-way comparison\n\n⚠️ `if (x = 5)` is assignment, not comparison! The compiler often warns about this — enable warnings (`-Wall`).",
+    "starter": "#include <iostream>\nusing namespace std;\n\nint main() {\n    int a = 10, b = 20;\n\n    cout << boolalpha;\n    cout << (a == b)  << endl;  // false\n    cout << (a != b)  << endl;  // true\n    cout << (a < b)   << endl;  // true\n    cout << (a >= 10) << endl;  // true\n\n    // Common pitfall:\n    int x = 5;\n    if (x == 5) {  // correct comparison\n        cout << \"x is 5\" << endl;\n    }\n    // if (x = 0) would ASSIGN 0 to x and the condition would be false!\n\n    return 0;\n}",
+    "expectedOutput": ["false", "true", "true", "true", "x is 5"],
+    "successMessage": "== for comparison, = for assignment. Accidentally writing = instead of == in a condition is one of the oldest C++ bugs — compilers warn about it with -Wall."
+  },
+  {
+    "title": "Build a grade calculator",
+    "instruction": "No starter code.\n\nGiven scores: `85, 92, 78, 96, 70`\n\n1. Calculate the average\n2. Assign a letter grade:\n   - 90+ = A, 80+ = B, 70+ = C, 60+ = D, else F\n3. Use the ternary operator for a pass/fail status (pass >= 70)\n4. Print all three results",
+    "hint": "double avg = (85 + 92 + 78 + 96 + 70) / 5.0; then if/else or nested ternary for grade.",
+    "starter": "",
+    "expectedOutput": [],
+    "codeChecks": [
+      { "pattern": "85.*92.*78.*96.*70|scores|sum", "required": true, "message": "Include the five scores in your calculation." },
+      { "pattern": "5\\.0|static_cast<double>|\\(double\\)", "required": true, "message": "Use 5.0 (not 5) to avoid integer division in average." },
+      { "pattern": "if.*90|>= 90|>=90", "required": true, "message": "Check for A grade (>= 90)." },
+      { "pattern": "\\?.*:|ternary|pass.*fail|PASS.*FAIL", "required": true, "message": "Use ternary operator for pass/fail." }
+    ],
+    "successMessage": "Average with letter grade and pass/fail. Division by 5.0 — not 5 — is critical. Chapter 5 done!"
+  }
+]

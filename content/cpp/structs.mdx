@@ -1,31 +1,14 @@
 ---
-title: "Structs & Classes"
-description: "Structs, classes, constructors, and access modifiers in C++."
-order: 10
-difficulty: "intermediate"
-estimatedMinutes: 15
+title: "Structs & Enums"
+description: "struct for grouping data, enum and enum class for named constants, unions, and the difference from classes."
+order: 11
+difficulty: "beginner"
+estimatedMinutes: 16
+concepts: ["struct", "member initialization", "struct methods", "enum", "enum class", "union", "designated initializers", "struct vs class"]
 ---
 
-## struct
+## Group related data together
 
-```cpp
-struct Point {
-    double x;
-    double y;
-};
-Point p = {3.0, 4.0};
-std::cout << p.x << std::endl;
-```
+A `struct` bundles related data under one name. Before OOP, structs were how all complex data was organised in C. In modern C++, structs with methods are nearly identical to classes — the only difference is default access: `struct` defaults to public, `class` to private.
 
-## class with Constructor
-
-```cpp
-class Circle {
-public:
-    double radius;
-    Circle(double r) : radius(r) {}
-    double area() { return 3.14159 * radius * radius; }
-};
-```
-
-More content coming soon. Try the interactive steps above!
+`enum class` (C++11) replaces old-style enums with type-safe, scoped named constants.

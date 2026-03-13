@@ -1,26 +1,14 @@
 ---
-title: "Member Functions"
-description: "Instance methods, const methods, and operator overloading in C++."
-order: 11
+title: "Memory Management"
+description: "Stack vs heap, new and delete, memory leaks, smart pointers — unique_ptr and shared_ptr — and RAII."
+order: 10
 difficulty: "intermediate"
-estimatedMinutes: 12
+estimatedMinutes: 22
+concepts: ["stack", "heap", "new", "delete", "memory leak", "unique_ptr", "shared_ptr", "RAII", "make_unique", "make_shared", "weak_ptr"]
 ---
 
-## Member Functions
+## You control the memory
 
-```cpp
-class Rectangle {
-public:
-    int width, height;
-    Rectangle(int w, int h) : width(w), height(h) {}
-    int area() const { return width * height; }
-};
-Rectangle r(4, 5);
-std::cout << r.area() << std::endl; // 20
-```
+In Python, Java, and JavaScript, a garbage collector frees memory for you. In C++, **you are the garbage collector** — unless you use smart pointers.
 
-## const Methods
-
-A `const` method promises not to modify the object — good practice for getters.
-
-More content coming soon. Try the interactive steps above!
+Manual memory management (`new`/`delete`) gives ultimate control but is error-prone. Smart pointers (`unique_ptr`, `shared_ptr`) give you the same control automatically — this is the modern C++ way.

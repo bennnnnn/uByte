@@ -1,0 +1,46 @@
+[
+  {
+    "title": "Access specifiers",
+    "instruction": "Three access levels in C++:\n\n- `private` — only the class itself can access\n- `protected` — class and derived classes\n- `public` — everyone\n\n`class` defaults to `private`, `struct` defaults to `public`. Same thing, different default.",
+    "starter": "#include <iostream>\n#include <string>\nusing namespace std;\n\nclass Counter {\nprivate:\n    int count;      // hidden\n    int maxCount;   // hidden\n\npublic:\n    Counter(int max) : count(0), maxCount(max) {}\n\n    void increment() {\n        if (count < maxCount) count++;\n    }\n\n    void decrement() {\n        if (count > 0) count--;\n    }\n\n    int getCount()  const { return count; }\n    bool isFull()   const { return count == maxCount; }\n};\n\nint main() {\n    Counter c(5);\n    c.increment(); c.increment(); c.increment();\n    c.increment(); c.increment();\n    c.increment();  // no effect — at max\n\n    cout << c.getCount() << endl;\n    cout << boolalpha << c.isFull() << endl;\n    // c.count = 99;  // compile error!\n\n    return 0;\n}",
+    "expectedOutput": ["5", "true"],
+    "successMessage": "Count is 5 — the 6th increment did nothing (enforced by the method). c.count = 99 would be a compile error — private is enforced at compile time, not runtime."
+  },
+  {
+    "title": "Getters and setters with validation",
+    "instruction": "Getters return private values. Setters validate before setting.\n\nPattern: getters are `const` (they don't modify the object). Setters validate and throw or clamp.",
+    "hint": "void setAge(int age) { if (age < 0 || age > 150) throw invalid_argument(\"...\"); this->age = age; }",
+    "starter": "#include <iostream>\n#include <string>\n#include <stdexcept>\nusing namespace std;\n\nclass Person {\n    string name;\n    int age;\n\npublic:\n    Person(string name, int age) : name(name) {\n        setAge(age);  // validate even in constructor\n    }\n\n    string getName() const { return name; }\n    int    getAge()  const { return age; }\n\n    void setAge(int age) {\n        if (age < 0 || age > 150)\n            throw invalid_argument(\"Invalid age: \" + to_string(age));\n        this->age = age;\n    }\n};\n\nint main() {\n    Person p(\"Alice\", 25);\n    cout << p.getName() << \" is \" << p.getAge() << endl;\n\n    p.setAge(26);\n    cout << p.getAge() << endl;\n\n    try {\n        p.setAge(-5);\n    } catch (const invalid_argument& e) {\n        cout << \"Error: \" << e.what() << endl;\n    }\n\n    return 0;\n}",
+    "expectedOutput": ["Alice is 25", "26", "Error: Invalid age: -5"],
+    "successMessage": "Setters are the enforcement point. The Person can never have a negative age — it's structurally impossible. const on getters signals they won't modify the object and can be called on const Person references."
+  },
+  {
+    "title": "const member functions",
+    "instruction": "`const` at the end of a function signature means it won't modify the object:\n\n```cpp\nint getValue() const { return value; }  // const function\n```\n\n- Call on `const` objects: only `const` methods are accessible\n- Good practice: mark all read-only methods `const`",
+    "starter": "#include <iostream>\n#include <string>\nusing namespace std;\n\nclass Rectangle {\n    double width, height;\n\npublic:\n    Rectangle(double w, double h) : width(w), height(h) {}\n\n    double area()      const { return width * height; }\n    double perimeter() const { return 2 * (width + height); }\n\n    void scale(double factor) {   // non-const: modifies object\n        width  *= factor;\n        height *= factor;\n    }\n\n    void print() const {          // const: just reads\n        cout << width << \" x \" << height << endl;\n    }\n};\n\nint main() {\n    const Rectangle r(4, 6);  // const object!\n    r.print();\n    cout << r.area() << endl;\n    // r.scale(2);  // compile error — can't call non-const on const object\n\n    Rectangle r2(3, 5);\n    r2.scale(2);  // OK — r2 is not const\n    r2.print();\n\n    return 0;\n}",
+    "expectedOutput": ["4 x 6", "24", "6 x 10"],
+    "successMessage": "r is const — only const methods can be called on it. r.scale(2) would be a compile error. Mark every method that doesn't modify state as const — it enables const correctness throughout your codebase."
+  },
+  {
+    "title": "friend functions",
+    "instruction": "`friend` gives a non-member function access to private members.\n\nMost common use: overloading `<<` for cout output, since the left operand is `ostream`, not your class.",
+    "starter": "#include <iostream>\n#include <string>\nusing namespace std;\n\nclass Temperature {\n    double celsius;\n\npublic:\n    Temperature(double c) : celsius(c) {}\n\n    double toCelsius()    const { return celsius; }\n    double toFahrenheit() const { return celsius * 9.0/5.0 + 32; }\n    double toKelvin()     const { return celsius + 273.15; }\n\n    // friend: operator<< needs access to private celsius\n    friend ostream& operator<<(ostream& os, const Temperature& t) {\n        return os << t.celsius << \"°C\";\n    }\n\n    bool operator<(const Temperature& other) const {\n        return celsius < other.celsius;\n    }\n};\n\nint main() {\n    Temperature boiling(100), freezing(0), body(37);\n\n    cout << boiling << \" = \" << boiling.toFahrenheit() << \"°F\" << endl;\n    cout << body    << \" = \" << body.toKelvin() << \"K\" << endl;\n    cout << boolalpha << (freezing < body) << endl;\n\n    return 0;\n}",
+    "expectedOutput": ["100°C = 212°F", "37°C = 310.15K", "true"],
+    "successMessage": "friend operator<< enables cout << temperature directly. The friend function sees private celsius. Use friend sparingly — it breaks encapsulation, but for operator<< it's the idiomatic C++ pattern."
+  },
+  {
+    "title": "Build a validated stack",
+    "instruction": "No starter code.\n\nBuild a `Stack` class (private array or vector internally):\n- `private`: data storage, current size\n- `push(int value)` — add if not full (max 10 items), throw `overflow_error` if full\n- `pop()` — remove and return top, throw `underflow_error` if empty\n- `peek() const` — view top without removing\n- `isEmpty() const` / `isFull() const` / `size() const`\n- `print() const` — print all items",
+    "hint": "Use vector<int> or int data[10] internally. Keep private int topIndex or vector.size().",
+    "starter": "",
+    "expectedOutput": [],
+    "codeChecks": [
+      { "pattern": "class Stack", "required": true, "message": "Define class Stack." },
+      { "pattern": "private:", "required": true, "message": "Use private: for data members." },
+      { "pattern": "void push\\(|push\\(int", "required": true, "message": "Add push() method." },
+      { "pattern": "int pop\\(\\)|pop\\(\\)", "required": true, "message": "Add pop() method." },
+      { "pattern": "overflow_error|underflow_error|runtime_error|out_of_range", "required": true, "message": "Throw exceptions for overflow/underflow." }
+    ],
+    "successMessage": "An encapsulated stack — users can't corrupt it by accessing data directly. Private internals, public interface, validated operations. Chapter 13 done!"
+  }
+]

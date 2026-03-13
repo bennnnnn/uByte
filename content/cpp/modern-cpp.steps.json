@@ -1,0 +1,51 @@
+[
+  {
+    "title": "Move semantics — steal instead of copy",
+    "instruction": "Copying a vector copies all its elements. **Moving** it transfers ownership — O(1) instead of O(n).\n\n`std::move()` casts to an rvalue reference, enabling the move constructor:\n\n```cpp\nvector<int> v2 = move(v1);  // v1 is now empty, v2 has everything\n```",
+    "starter": "#include <iostream>\n#include <vector>\n#include <string>\nusing namespace std;\n\nstring buildLargeString() {\n    string s = \"Hello, C++ World! \";\n    for (int i = 0; i < 3; i++) s += s;  // grow it\n    return s;  // Return Value Optimization (RVO) kicks in\n}\n\nint main() {\n    vector<int> original = {1, 2, 3, 4, 5};\n    cout << \"Original size: \" << original.size() << endl;\n\n    vector<int> moved = move(original);  // O(1) move!\n    cout << \"Moved size: \"    << moved.size()    << endl;\n    cout << \"Original after move: \" << original.size() << endl;  // 0!\n\n    // String move:\n    string s1 = buildLargeString();\n    cout << \"s1 length: \" << s1.length() << endl;\n    string s2 = move(s1);  // s2 takes ownership, s1 becomes empty\n    cout << \"s1 after move: '\" << s1 << \"'\" << endl;\n\n    return 0;\n}",
+    "expectedOutput": ["Original size: 5", "Moved size: 5", "Original after move: 0"],
+    "successMessage": "Move transfers ownership — original is empty after move. No copying of all elements. This is why pushing large objects into vectors with push_back(move(obj)) is critical for performance."
+  },
+  {
+    "title": "auto and type deduction",
+    "instruction": "`auto` deduces the type from the initialiser. Especially useful for iterators and complex types.\n\n`auto&` — deduced reference. `const auto&` — const deduced reference.",
+    "starter": "#include <iostream>\n#include <vector>\n#include <map>\n#include <string>\nusing namespace std;\n\nint main() {\n    // Saves typing:\n    auto pi = 3.14159;\n    auto msg = string(\"Hello\");\n\n    // Essential for iterators:\n    map<string, vector<int>> data;\n    data[\"scores\"] = {90, 85, 92};\n\n    // Without auto: map<string, vector<int>>::iterator it = data.begin();\n    auto it = data.begin();  // much cleaner!\n    cout << it->first << \": \" << it->second.size() << \" scores\" << endl;\n\n    // auto in range-based for:\n    for (const auto& [key, values] : data) {\n        cout << key << \": \";\n        for (auto v : values) cout << v << \" \";\n        cout << endl;\n    }\n\n    return 0;\n}",
+    "expectedOutput": ["scores: 3 scores", "scores: 90 85 92 "],
+    "successMessage": "auto shines for complex iterator and template types. The structured binding auto& [key, values] unpacks the map entry — much cleaner than .first and .second. Use auto for iterators; explicit types for simple local variables."
+  },
+  {
+    "title": "Structured bindings",
+    "instruction": "C++17 structured bindings decompose tuples, pairs, and structs:\n\n```cpp\nauto [x, y] = getPoint();           // pair\nfor (auto& [key, val] : myMap) {}   // map entries\nstruct Point{int x, y};\nauto [px, py] = point;               // struct!\n```",
+    "starter": "#include <iostream>\n#include <map>\n#include <tuple>\n#include <string>\nusing namespace std;\n\nstruct RGB { int r, g, b; };\n\ntuple<string, int, double> getUser() {\n    return {\"Alice\", 30, 9.5};\n}\n\nint main() {\n    // Unpack tuple:\n    auto [name, age, rating] = getUser();\n    cout << name << \", \" << age << \", \" << rating << endl;\n\n    // Unpack map entries:\n    map<string, int> scores = {{\"Alice\", 90}, {\"Bob\", 85}};\n    for (const auto& [student, score] : scores) {\n        cout << student << \": \" << score << endl;\n    }\n\n    // Unpack struct:\n    RGB color = {255, 128, 0};\n    auto [r, g, b] = color;\n    cout << \"R=\" << r << \" G=\" << g << \" B=\" << b << endl;\n\n    return 0;\n}",
+    "expectedOutput": ["Alice, 30, 9.5", "Alice: 90", "Bob: 85", "R=255 G=128 B=0"],
+    "successMessage": "Structured bindings eliminate .first/.second and get<0>(). Unpacking maps, tuples, and structs inline makes code dramatically more readable."
+  },
+  {
+    "title": "std::optional — null safety without nullptr",
+    "instruction": "`std::optional<T>` represents a value that may or may not exist — safer than null pointers:\n\n```cpp\noptional<int> findFirst(vector<int>& v, int target);\nauto result = findFirst(v, 42);\nif (result) cout << *result << endl;\nresult.value_or(-1);  // default if empty\n```",
+    "starter": "#include <iostream>\n#include <optional>\n#include <vector>\n#include <string>\nusing namespace std;\n\noptional<int> findValue(const vector<int>& v, int target) {\n    for (int i = 0; i < (int)v.size(); i++) {\n        if (v[i] == target) return i;  // return the index\n    }\n    return nullopt;  // not found\n}\n\noptional<string> getUser(int id) {\n    if (id == 1) return \"Alice\";\n    if (id == 2) return \"Bob\";\n    return nullopt;\n}\n\nint main() {\n    vector<int> nums = {5, 3, 9, 1, 7};\n\n    auto idx = findValue(nums, 9);\n    if (idx) cout << \"Found at index: \" << *idx << endl;\n\n    auto notFound = findValue(nums, 42);\n    cout << \"Value or -1: \" << notFound.value_or(-1) << endl;\n\n    for (int id : {1, 2, 3}) {\n        auto user = getUser(id);\n        cout << id << \": \" << user.value_or(\"(not found)\") << endl;\n    }\n\n    return 0;\n}",
+    "expectedOutput": ["Found at index: 2", "Value or -1: -1", "1: Alice", "2: Bob", "3: (not found)"],
+    "successMessage": "optional communicates 'might not exist' in the return type itself. value_or() provides a default. No null checks scattered everywhere — the type tells you when to check."
+  },
+  {
+    "title": "Initializer lists and uniform initialization",
+    "instruction": "C++11 uniform initialization with `{}` works everywhere:\n\n```cpp\nint x{5};          // same as int x = 5\nvector<int> v{1, 2, 3};\nstruct Point p{3, 4};\n```\n\nNarrowing conversions are a compile error with `{}` — safer than `()`.",
+    "starter": "#include <iostream>\n#include <vector>\n#include <map>\nusing namespace std;\n\nstruct Config {\n    string host;\n    int port;\n    bool ssl;\n};\n\nvoid printVec(initializer_list<int> items) {\n    for (int item : items) cout << item << \" \";\n    cout << endl;\n}\n\nint main() {\n    // Uniform initialization:\n    int x{42};\n    double d{3.14};\n    Config cfg{\"localhost\", 8080, false};\n\n    cout << cfg.host << \":\" << cfg.port << endl;\n\n    // Initializer list:\n    printVec({1, 2, 3, 4, 5});\n    printVec({10, 20, 30});\n\n    // vector with initializer list:\n    vector<int> v{5, 3, 1, 4, 2};\n    for (int n : v) cout << n << \" \";\n    cout << endl;\n\n    return 0;\n}",
+    "expectedOutput": ["localhost:8080", "1 2 3 4 5 ", "10 20 30 ", "5 3 1 4 2 "],
+    "successMessage": "Uniform {} initialization works for everything. initializer_list lets functions accept {1, 2, 3} directly. {} prevents narrowing: int x{3.14} is a compile error — int x = 3.14 silently truncates to 3."
+  },
+  {
+    "title": "Build a modern utility library",
+    "instruction": "No starter code.\n\nUsing modern C++ features, build:\n1. A `Chain<T>` class with `filter`, `transform`, `first` using `optional<T>`, and `toVector`\n2. Use lambdas, auto, structured bindings\n3. `first(predicate)` returns `optional<T>` — the first matching element\n\nTest with a vector of integers:\n- filter even numbers\n- transform: multiply by 3\n- find the first > 20\n- collect to vector and print",
+    "hint": "Chain<int> c(data); c.filter([](int n){ return n%2==0; }).transform(...).toVector();",
+    "starter": "",
+    "expectedOutput": [],
+    "codeChecks": [
+      { "pattern": "optional<|optional <", "required": true, "message": "Use std::optional for the first() method." },
+      { "pattern": "auto.*=.*\\[|auto \\w+\\s*=|function<", "required": true, "message": "Use auto and lambdas." },
+      { "pattern": "filter|transform", "required": true, "message": "Implement filter() and transform() methods." },
+      { "pattern": "toVector|collect|result", "required": true, "message": "Implement toVector() to collect results." }
+    ],
+    "successMessage": "A modern C++ utility chain using optional, auto, and lambdas. This is how ranges (C++20) work under the hood. Modern C++ is expressive, safe, and fast. Chapter 21 done!"
+  }
+]

@@ -1,30 +1,14 @@
 ---
-title: "Headers & Namespaces"
-description: "Header files, namespaces, and organizing C++ code."
-order: 14
+title: "STL Algorithms"
+description: "sort, find, transform, accumulate, count_if, for_each, and other powerful algorithms from <algorithm> and <numeric>."
+order: 17
 difficulty: "intermediate"
-estimatedMinutes: 12
+estimatedMinutes: 18
+concepts: ["sort", "find", "find_if", "count_if", "transform", "accumulate", "for_each", "any_of", "all_of", "none_of", "unique", "reverse", "rotate", "iterators"]
 ---
 
-## Header Files
+## Algorithms that work on anything
 
-```cpp
-// math_utils.h
-#pragma once
-int add(int a, int b);
+The STL algorithms in `<algorithm>` and `<numeric>` work on any range — vectors, arrays, sets, even your own containers. They're the building blocks of every data processing pipeline.
 
-// math_utils.cpp
-#include "math_utils.h"
-int add(int a, int b) { return a + b; }
-```
-
-## Namespaces
-
-```cpp
-namespace myapp {
-    void hello() { std::cout << "Hello from myapp!" << std::endl; }
-}
-myapp::hello();
-```
-
-More content coming soon. Try the interactive steps above!
+Combined with lambdas, they're remarkably expressive: `sort(v.begin(), v.end(), [](auto& a, auto& b){ return a.score > b.score; })` — sort by score descending in one line.

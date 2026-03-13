@@ -1,0 +1,51 @@
+[
+  {
+    "title": "Your first class",
+    "instruction": "Classes default to `private` — the opposite of `struct`.\n\n`public:` section is accessible from outside. `private:` is hidden.\n\nRun this — notice how the class controls access.",
+    "starter": "#include <iostream>\n#include <string>\nusing namespace std;\n\nclass Dog {\npublic:\n    string name;\n    string breed;\n\n    Dog(string n, string b) : name(n), breed(b) {\n        cout << name << \" created!\" << endl;\n    }\n\n    void bark() {\n        cout << name << \" says: Woof!\" << endl;\n    }\n\n    string describe() {\n        return name + \" is a \" + breed;\n    }\n};\n\nint main() {\n    Dog rex(\"Rex\", \"Labrador\");\n    Dog bella(\"Bella\", \"Poodle\");\n\n    rex.bark();\n    bella.bark();\n    cout << rex.describe() << endl;\n\n    return 0;\n}",
+    "expectedOutput": ["Rex created!", "Bella created!", "Rex says: Woof!", "Bella says: Woof!", "Rex is a Labrador"],
+    "successMessage": "The constructor printed 'created!' when each Dog was made. : name(n), breed(b) is a member initialiser list — the most efficient way to initialise members in C++."
+  },
+  {
+    "title": "Destructor — automatic cleanup",
+    "instruction": "The destructor (`~ClassName()`) runs automatically when the object is destroyed.\n\nThis is the heart of RAII — the destructor releases resources:\n\n```cpp\n~Dog() {\n    cout << name << \" destroyed!\" << endl;\n}\n```\n\nNo need to call it — C++ calls it for you.",
+    "starter": "#include <iostream>\n#include <string>\nusing namespace std;\n\nclass Resource {\npublic:\n    string name;\n\n    Resource(string n) : name(n) {\n        cout << \"Acquired: \" << name << endl;\n    }\n\n    ~Resource() {\n        cout << \"Released: \" << name << endl;\n    }\n\n    void use() {\n        cout << \"Using: \" << name << endl;\n    }\n};\n\nint main() {\n    cout << \"--- main start ---\" << endl;\n    {\n        Resource r1(\"Database Connection\");\n        Resource r2(\"File Handle\");\n        r1.use();\n        r2.use();\n    }  // r2 destroyed first (LIFO!), then r1\n    cout << \"--- main end ---\" << endl;\n\n    return 0;\n}",
+    "expectedOutput": ["--- main start ---", "Acquired: Database Connection", "Acquired: File Handle", "Using: Database Connection", "Using: File Handle", "Released: File Handle", "Released: Database Connection", "--- main end ---"],
+    "successMessage": "Destroyed in reverse order (LIFO — last in, first out). This is why RAII is powerful: database connections, file handles, mutexes — all released automatically, even if an exception occurs."
+  },
+  {
+    "title": "Member initializer list",
+    "instruction": "Always use member initialiser lists instead of assignment in the constructor body:\n\n```cpp\n// Prefer this:\nPerson(string n, int a) : name(n), age(a) {}\n\n// Over this:\nPerson(string n, int a) { name = n; age = a; }  // assigns AFTER default construction\n```\n\nFor `const` members and references, initialisers are **required** — assignment won't work.",
+    "starter": "#include <iostream>\n#include <string>\nusing namespace std;\n\nclass BankAccount {\n    const string owner;   // const — MUST use initializer list\n    double balance;\n    const int id;\n\npublic:\n    BankAccount(string owner, double balance, int id)\n        : owner(owner), balance(balance), id(id) {}\n\n    void deposit(double amount) { balance += amount; }\n\n    void print() {\n        cout << \"Account #\" << id << \" (\" << owner << \"): $\" << balance << endl;\n    }\n};\n\nint main() {\n    BankAccount acc(\"Alice\", 1000.0, 42);\n    acc.deposit(500.0);\n    acc.deposit(250.0);\n    acc.print();\n\n    return 0;\n}",
+    "expectedOutput": ["Account #42 (Alice): $1750"],
+    "successMessage": "const members MUST be set in the initializer list — they can't be assigned after construction. The member initializer list also avoids default-constructing then assigning — more efficient for non-trivial types."
+  },
+  {
+    "title": "Operator overloading",
+    "instruction": "Define operators for your types using `operator` keyword:\n\n```cpp\nVector2D operator+(const Vector2D& other) const {\n    return {x + other.x, y + other.y};\n}\n```\n\nOverload `<<` for easy printing with cout.",
+    "starter": "#include <iostream>\n#include <cmath>\nusing namespace std;\n\nclass Vector2D {\npublic:\n    double x, y;\n    Vector2D(double x=0, double y=0) : x(x), y(y) {}\n\n    Vector2D operator+(const Vector2D& o) const { return {x+o.x, y+o.y}; }\n    Vector2D operator*(double scalar)    const { return {x*scalar, y*scalar}; }\n    double   dot(const Vector2D& o)      const { return x*o.x + y*o.y; }\n    double   length()                    const { return sqrt(x*x + y*y); }\n    bool     operator==(const Vector2D& o) const { return x==o.x && y==o.y; }\n\n    friend ostream& operator<<(ostream& os, const Vector2D& v) {\n        return os << \"(\" << v.x << \", \" << v.y << \")\";\n    }\n};\n\nint main() {\n    Vector2D a(3, 4), b(1, 2);\n    cout << a + b      << endl;  // uses operator+\n    cout << a * 2      << endl;  // uses operator*\n    cout << a.length() << endl;  // 5.0\n    cout << a.dot(b)   << endl;  // 11\n    cout << boolalpha << (a == b) << endl;\n\n    return 0;\n}",
+    "expectedOutput": ["(4, 6)", "(6, 8)", "5", "11", "false"],
+    "successMessage": "Operator overloading makes your types feel native. friend ostream& operator<< enables cout << a. Vector2D is how game engines represent positions, velocities, and directions."
+  },
+  {
+    "title": "this pointer",
+    "instruction": "`this` is a pointer to the current object inside member functions. Use it when parameter names shadow member names:\n\n```cpp\nclass Dog {\n    string name;\npublic:\n    Dog(string name) { this->name = name; }  // this->name = member\n}\n```\n\nOr return `*this` for method chaining (fluent interface).",
+    "starter": "#include <iostream>\n#include <string>\nusing namespace std;\n\nclass Builder {\n    string result = \"\";\n\npublic:\n    Builder& add(const string& text) {\n        result += text;\n        return *this;  // return reference to self for chaining\n    }\n\n    Builder& addLine(const string& text) {\n        result += text + \"\\n\";\n        return *this;\n    }\n\n    string build() { return result; }\n};\n\nint main() {\n    string text = Builder()\n        .addLine(\"Line 1\")\n        .addLine(\"Line 2\")\n        .add(\"Line 3\")\n        .build();\n\n    cout << text << endl;\n\n    return 0;\n}",
+    "expectedOutput": ["Line 1", "Line 2", "Line 3"],
+    "successMessage": "Method chaining via return *this — each method returns the same object. This is the fluent interface pattern used by string builders, query builders, and configuration APIs everywhere."
+  },
+  {
+    "title": "Build a Matrix class",
+    "instruction": "No starter code.\n\nBuild a `Matrix2x2` class:\n- Fields: `double a, b, c, d` (row 0: a,b; row 1: c,d)\n- Constructor with all four values\n- `operator+` for matrix addition\n- `operator*` for scalar multiplication\n- `determinant()` returns `a*d - b*c`\n- `friend ostream& operator<<` for printing as `[[a,b],[c,d]]`\n\nTest with two matrices.",
+    "hint": "Matrix2x2 operator+(const Matrix2x2& o) const { return {a+o.a, b+o.b, c+o.c, d+o.d}; }",
+    "starter": "",
+    "expectedOutput": [],
+    "codeChecks": [
+      { "pattern": "class Matrix2x2|struct Matrix2x2", "required": true, "message": "Define class/struct Matrix2x2." },
+      { "pattern": "operator\\+", "required": true, "message": "Overload operator+." },
+      { "pattern": "determinant", "required": true, "message": "Add determinant() method." },
+      { "pattern": "operator<<", "required": true, "message": "Overload operator<< for printing." }
+    ],
+    "successMessage": "A 2×2 matrix class with operator overloading. Linear algebra is the foundation of 3D graphics, machine learning, and physics simulations — all built on classes like this. Chapter 12 done!"
+  }
+]

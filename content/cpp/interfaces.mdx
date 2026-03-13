@@ -1,28 +1,14 @@
 ---
-title: "Virtual Functions & Polymorphism"
-description: "Abstract classes, virtual functions, and runtime polymorphism in C++."
+title: "Classes & OOP"
+description: "C++ classes — constructors, destructors, member functions, this pointer, operator overloading, and the Rule of Three/Five."
 order: 12
 difficulty: "intermediate"
-estimatedMinutes: 20
+estimatedMinutes: 22
+concepts: ["class", "constructor", "destructor", "this", "member initializer list", "operator overloading", "Rule of Three", "copy constructor", "assignment operator"]
 ---
 
-## Abstract Class (Interface)
+## Build your own types with full control
 
-```cpp
-class Shape {
-public:
-    virtual double area() const = 0; // pure virtual
-    virtual ~Shape() {}
-};
+C++ classes add encapsulation, constructors, destructors, and operator overloading to structs. The destructor is unique to C++ — it runs automatically when an object goes out of scope, enabling RAII.
 
-class Circle : public Shape {
-    double r;
-public:
-    Circle(double r) : r(r) {}
-    double area() const override { return 3.14159 * r * r; }
-};
-```
-
-Use `= 0` to make a function pure virtual (must be overridden). A class with any pure virtual is abstract.
-
-More content coming soon. Try the interactive steps above!
+Operator overloading lets your types behave like built-ins: `point1 + point2`, `cout << myObject`.

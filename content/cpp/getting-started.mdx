@@ -1,85 +1,14 @@
 ---
-title: "Getting Started with C++"
-description: "Install a compiler, write your first Hello World program, and learn C++ fundamentals."
+title: "Getting Started"
+description: "Write your first C++ program — understand #include, main(), cout, cin, compilation, and why C++ is the language of speed."
 order: 1
 difficulty: "beginner"
-estimatedMinutes: 10
+estimatedMinutes: 15
+concepts: ["main function", "cout", "cin", "endl", "#include", "compilation", "namespace std", "comments", "return 0"]
 ---
 
-## What is C++?
+## The language that powers everything fast
 
-C++ is a high-performance, compiled programming language created by Bjarne Stroustrup in 1985 as an extension of C. It supports object-oriented, generic, and procedural programming styles.
+C++ runs inside every AAA game, every browser's JavaScript engine, every trading system, and NASA's space software. When performance is the priority — not just now, but forever — C++ is the answer.
 
-**Why learn C++?**
-- **Speed** — compiles to native machine code; among the fastest languages available
-- **Control** — direct memory management via pointers and RAII
-- **Versatility** — used in games, OS kernels, compilers, embedded systems, and HPC
-- **Modern features** — C++11/14/17/20 added lambdas, smart pointers, ranges, and more
-
----
-
-## Installing a Compiler
-
-**macOS:** Install Xcode Command Line Tools:
-```bash
-xcode-select --install
-```
-Then verify: `g++ --version` or `clang++ --version`.
-
-**Linux (Ubuntu/Debian):**
-```bash
-sudo apt update && sudo apt install build-essential
-```
-
-**Windows:** Install [MinGW-w64](https://www.mingw-w64.org/) or use [MSVC](https://visualstudio.microsoft.com/). Or use WSL (Windows Subsystem for Linux).
-
----
-
-## Your First Program
-
-Every C++ program needs:
-- `#include <iostream>` — brings in the input/output library
-- `int main()` — the entry point the OS calls
-- `std::cout << ... << std::endl;` — writes to standard output
-
-```cpp
-#include <iostream>
-
-int main() {
-    std::cout << "Hello, World!" << std::endl;
-    return 0;
-}
-```
-
-Click **Run** above to see the output.
-
----
-
-## Printing Output
-
-`std::cout` (character output) uses the `<<` (insertion) operator to chain values:
-
-```cpp
-std::string name = "C++";
-int year = 2024;
-std::cout << "Learning " << name << " in " << year << std::endl;
-```
-
-Use `"\n"` or `std::endl` to end a line. `std::endl` also flushes the buffer; `"\n"` is faster for most cases.
-
----
-
-## Comments
-
-```cpp
-// Single-line comment — ignored by the compiler
-/* Multi-line
-   comment */
-std::cout << "Comments are ignored" << std::endl; // inline comment
-```
-
----
-
-## What's Next?
-
-You've run your first C++ program. Next, learn **variables and types** — how to store and work with data using C++'s strong type system.
+It's not easy. But nothing worth knowing is. By the end of this track you'll understand why C++ remains irreplaceable — and you'll be able to write it.

@@ -1,31 +1,14 @@
 ---
-title: "HTTP in C++"
-description: "Making HTTP requests with libcurl and cpp-httplib."
-order: 17
+title: "File I/O"
+description: "Read and write files with fstream, ifstream, ofstream — text mode, binary mode, and stream state checking."
+order: 19
 difficulty: "intermediate"
-estimatedMinutes: 20
+estimatedMinutes: 16
+concepts: ["fstream", "ifstream", "ofstream", "open", "close", "getline", "read/write binary", "stream flags", "filesystem", "RAII file handling"]
 ---
 
-## libcurl (most common)
+## Files: data that outlives your program
 
-```cpp
-#include <curl/curl.h>
+C++ file I/O uses streams — the same interface as `cin` and `cout`. `ifstream` reads, `ofstream` writes, `fstream` does both.
 
-CURL* curl = curl_easy_init();
-if (curl) {
-    curl_easy_setopt(curl, CURLOPT_URL, "https://api.example.com/data");
-    curl_easy_perform(curl);
-    curl_easy_cleanup(curl);
-}
-```
-
-## cpp-httplib (header-only, simpler)
-
-```cpp
-#include "httplib.h"
-httplib::Client cli("httpbin.org");
-auto res = cli.Get("/get");
-if (res) std::cout << res->body << std::endl;
-```
-
-More content coming soon. Try the interactive steps above!
+RAII applies here too: the destructor closes the file automatically when the stream goes out of scope.

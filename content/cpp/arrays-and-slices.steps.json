@@ -1,0 +1,59 @@
+[
+  {
+    "title": "std::vector — the dynamic array",
+    "instruction": "`vector` grows automatically. It's the C++ equivalent of Python's list or Java's ArrayList.\n\n```cpp\n#include <vector>\nvector<int> nums = {1, 2, 3};\nnums.push_back(4);  // adds to the end\nnums.size();        // 4\n```\n\nRun this.",
+    "starter": "#include <iostream>\n#include <vector>\nusing namespace std;\n\nint main() {\n    vector<int> scores = {95, 87, 73, 91, 68};\n\n    cout << \"Size: \" << scores.size() << endl;\n    cout << \"First: \" << scores[0] << endl;\n    cout << \"Last: \"  << scores.back() << endl;\n\n    scores.push_back(82);\n    cout << \"After push: \" << scores.size() << endl;\n\n    scores.pop_back();\n    cout << \"After pop: \"  << scores.size() << endl;\n\n    return 0;\n}",
+    "expectedOutput": ["Size: 5", "First: 95", "Last: 68", "After push: 6", "After pop: 5"],
+    "successMessage": ".back() returns the last element. push_back adds to the end, pop_back removes it. Unlike Java's ArrayList, vector doesn't box values — int stays int, no overhead."
+  },
+  {
+    "title": "Iterate a vector",
+    "instruction": "Three ways to iterate a vector:\n1. Classic index for loop — when you need the index\n2. Range-based for — cleaner, when you just need values\n3. Iterator — the traditional C++ way\n\nAll produce the same result — range-based for is the modern choice.",
+    "starter": "#include <iostream>\n#include <vector>\nusing namespace std;\n\nint main() {\n    vector<string> fruits = {\"Apple\", \"Banana\", \"Cherry\"};\n\n    // 1. Index loop:\n    for (size_t i = 0; i < fruits.size(); i++) {\n        cout << i << \": \" << fruits[i] << endl;\n    }\n\n    // 2. Range-based for (preferred):\n    cout << \"--- range for ---\" << endl;\n    for (const auto& fruit : fruits) {\n        cout << fruit << endl;\n    }\n\n    return 0;\n}",
+    "expectedOutput": ["0: Apple", "1: Banana", "2: Cherry", "--- range for ---", "Apple", "Banana", "Cherry"],
+    "successMessage": "size_t for the index — it's the unsigned type returned by .size(). Comparing int i < fruits.size() causes a signed/unsigned warning. Use size_t or just use range-based for."
+  },
+  {
+    "title": "Vector methods",
+    "instruction": "Key vector operations:\n\n- `.push_back(val)` — add to end\n- `.pop_back()` — remove from end\n- `.insert(pos, val)` — insert at position\n- `.erase(pos)` — remove at position\n- `.clear()` — empty the vector\n- `.empty()` — check if empty\n- `.front()` / `.back()` — first/last element",
+    "starter": "#include <iostream>\n#include <vector>\nusing namespace std;\n\nint main() {\n    vector<int> v = {10, 20, 30, 40, 50};\n\n    // Insert at position 2:\n    v.insert(v.begin() + 2, 25);\n    for (int x : v) cout << x << \" \";\n    cout << endl;\n\n    // Erase position 0:\n    v.erase(v.begin());\n    for (int x : v) cout << x << \" \";\n    cout << endl;\n\n    cout << \"Front: \" << v.front() << endl;\n    cout << \"Back: \"  << v.back()  << endl;\n    cout << \"Empty: \" << boolalpha << v.empty() << endl;\n\n    return 0;\n}",
+    "expectedOutput": ["10 20 25 30 40 50 ", "20 25 30 40 50 ", "Front: 20", "Back: 50", "Empty: false"],
+    "successMessage": "v.begin() is an iterator to the first element. v.begin() + 2 points to the third. insert and erase use iterators — you'll see this pattern constantly in C++ algorithms."
+  },
+  {
+    "title": "C arrays and std::array",
+    "instruction": "C arrays are the original — fixed size, no bounds checking, legacy.\n`std::array<T, N>` is C++11's fixed-size array with safety and STL compatibility.\n\nPrefer `std::array` over C arrays for fixed-size needs.",
+    "starter": "#include <iostream>\n#include <array>\nusing namespace std;\n\nint main() {\n    // C array — legacy, avoid in new code:\n    int cArr[5] = {1, 2, 3, 4, 5};\n    cout << cArr[0] << endl;\n    // cArr[10] = 99; — undefined behaviour, no error!\n\n    // std::array — safe, STL-compatible:\n    array<int, 5> arr = {10, 20, 30, 40, 50};\n    cout << arr.size() << endl;\n    cout << arr.at(2)  << endl;    // bounds checked\n    cout << arr.front() << endl;\n    cout << arr.back()  << endl;\n\n    // Range-based for works too:\n    for (int x : arr) cout << x << \" \";\n    cout << endl;\n\n    return 0;\n}",
+    "expectedOutput": ["1", "5", "30", "10", "50", "10 20 30 40 50 "],
+    "successMessage": ".at(2) throws out_of_range on bad index; [2] doesn't. std::array has .size(), works with range-for, and is just as fast as C arrays. Use it whenever you know the size at compile time."
+  },
+  {
+    "title": "Find min, max, sum in a vector",
+    "instruction": "Calculate statistics by iterating. The `<algorithm>` header has `min_element`, `max_element`, and `accumulate` from `<numeric>`.",
+    "hint": "*min_element(v.begin(), v.end()) gives the minimum value (dereference the iterator).",
+    "starter": "#include <iostream>\n#include <vector>\n#include <algorithm>\n#include <numeric>\nusing namespace std;\n\nint main() {\n    vector<int> scores = {95, 87, 73, 91, 68, 82};\n\n    int sum = accumulate(scores.begin(), scores.end(), 0);\n    int mn  = *min_element(scores.begin(), scores.end());\n    int mx  = *max_element(scores.begin(), scores.end());\n    double avg = static_cast<double>(sum) / scores.size();\n\n    cout << \"Sum: \" << sum << endl;\n    cout << \"Min: \" << mn  << endl;\n    cout << \"Max: \" << mx  << endl;\n    cout << \"Avg: \" << avg << endl;\n\n    return 0;\n}",
+    "expectedOutput": ["Sum: 496", "Min: 68", "Max: 95", "Avg: 82.6667"],
+    "successMessage": "The * before min_element dereferences the iterator to get the value. accumulate sums from 0. These STL algorithms work on any range — vectors, arrays, any container."
+  },
+  {
+    "title": "2D vector — matrix",
+    "instruction": "A `vector<vector<T>>` creates a 2D structure — like a matrix or grid:",
+    "starter": "#include <iostream>\n#include <vector>\nusing namespace std;\n\nint main() {\n    // 3x3 identity matrix:\n    vector<vector<int>> matrix(3, vector<int>(3, 0));\n    for (int i = 0; i < 3; i++) matrix[i][i] = 1;\n\n    for (const auto& row : matrix) {\n        for (int val : row) {\n            cout << val << \" \";\n        }\n        cout << endl;\n    }\n\n    // Initializer list 2D vector:\n    vector<vector<string>> grid = {\n        {\"X\", \"O\", \"X\"},\n        {\"O\", \"X\", \"O\"},\n        {\"X\", \"O\", \"X\"}\n    };\n    cout << grid[1][1] << endl;  // center\n\n    return 0;\n}",
+    "expectedOutput": ["1 0 0 ", "0 1 0 ", "0 0 1 ", "X"],
+    "successMessage": "vector<vector<int>>(3, vector<int>(3, 0)) creates a 3x3 grid initialized to 0. 2D vectors power game boards, image processing, and mathematical matrices."
+  },
+  {
+    "title": "Build a grade analyser",
+    "instruction": "No starter code.\n\nGiven `vector<int> grades = {72, 88, 95, 64, 81, 77, 90, 55, 83, 69}`:\n\n1. Print sorted grades (use `sort` from `<algorithm>`)\n2. Print min and max\n3. Print average to 1 decimal\n4. Count passing (>= 60) and print `\"PASS: X/10\"`",
+    "hint": "sort(grades.begin(), grades.end()); for sorting. Use accumulate for sum.",
+    "starter": "",
+    "expectedOutput": [],
+    "codeChecks": [
+      { "pattern": "sort\\(", "required": true, "message": "Use sort() from <algorithm> to sort grades." },
+      { "pattern": "min_element|mn|min.*grades", "required": true, "message": "Find and print the minimum grade." },
+      { "pattern": "accumulate|sum", "required": true, "message": "Calculate sum with accumulate." },
+      { "pattern": "count|passing|>= 60|>=60", "required": true, "message": "Count passing grades (>= 60)." }
+    ],
+    "successMessage": "A complete grade analyser with sorting, statistics, and counting. These patterns — sort, min/max, accumulate — are the building blocks of every data-crunching program. Chapter 8 done!"
+  }
+]

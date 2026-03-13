@@ -1,0 +1,56 @@
+[
+  {
+    "title": "for loop",
+    "instruction": "Classic for loop: init, condition, update:\n\n```cpp\nfor (int i = 0; i < 5; i++) {\n    // runs 5 times\n}\n```\n\nRun this, then try changing the step to `i += 2` for odd numbers.",
+    "starter": "#include <iostream>\nusing namespace std;\n\nint main() {\n    for (int i = 1; i <= 5; i++) {\n        cout << \"Step \" << i << endl;\n    }\n    return 0;\n}",
+    "expectedOutput": ["Step 1", "Step 2", "Step 3", "Step 4", "Step 5"],
+    "successMessage": "Three parts: init (int i=1), condition (i<=5), update (i++). i++ increments after each body execution. For step 2: use i += 2 in the update slot."
+  },
+  {
+    "title": "Range-based for — iterate containers",
+    "instruction": "C++11 range-based for is cleaner when you don't need the index:\n\n```cpp\nfor (auto& item : container) {\n    // item is each element\n}\n```\n\nUse `auto&` to avoid copying. Use `const auto&` for read-only.",
+    "starter": "#include <iostream>\n#include <vector>\nusing namespace std;\n\nint main() {\n    vector<string> fruits = {\"Apple\", \"Banana\", \"Cherry\", \"Date\"};\n\n    // Range-based for:\n    for (const auto& fruit : fruits) {\n        cout << fruit << endl;\n    }\n\n    return 0;\n}",
+    "expectedOutput": ["Apple", "Banana", "Cherry", "Date"],
+    "successMessage": "const auto& — const means read-only, & means reference (no copy). Without &, each element is copied on every iteration. For large objects, always use references."
+  },
+  {
+    "title": "while loop",
+    "instruction": "`while` loops while the condition is true. Use when you don't know the iteration count upfront.\n\n⚠️ Always ensure the condition eventually becomes false — infinite loops freeze programs.",
+    "starter": "#include <iostream>\nusing namespace std;\n\nint main() {\n    int n = 1;\n    while (n <= 100) {\n        if (n * n > 100) {\n            cout << \"First square > 100: \" << n * n << \" (n=\" << n << \")\" << endl;\n            break;\n        }\n        n++;\n    }\n\n    // Count down:\n    int count = 5;\n    while (count > 0) {\n        cout << count << \" \";\n        count--;\n    }\n    cout << \"GO!\" << endl;\n\n    return 0;\n}",
+    "expectedOutput": ["First square > 100: 121 (n=11)", "5 4 3 2 1 GO!"],
+    "successMessage": "11² = 121 > 100. The break exits the loop immediately. while + break is the pattern for 'search until found'. The countdown demonstrates while for decreasing sequences."
+  },
+  {
+    "title": "do-while — run at least once",
+    "instruction": "`do-while` executes the body first, then checks the condition — guaranteed one run.\n\nIdeal for: menus (show options then check choice), input validation (prompt then validate).",
+    "starter": "#include <iostream>\nusing namespace std;\n\nint main() {\n    int n = 1;\n    do {\n        cout << n << \" \";\n        n *= 2;\n    } while (n <= 64);\n    cout << endl;\n\n    // Sum using do-while:\n    int sum = 0, i = 1;\n    do {\n        sum += i;\n        i++;\n    } while (i <= 10);\n    cout << \"1+2+...+10 = \" << sum << endl;\n\n    return 0;\n}",
+    "expectedOutput": ["1 2 4 8 16 32 64 ", "1+2+...+10 = 55"],
+    "successMessage": "Powers of 2: 1 2 4 8 16 32 64 — stops when n*2 would exceed 64. 1+2+...+10 = 55 (the famous Gauss sum). do-while runs at least once; the sum of 1-10 needs all 10 iterations."
+  },
+  {
+    "title": "break and continue",
+    "instruction": "- `break` — exit the loop immediately\n- `continue` — skip the rest of this iteration, go to the next\n\nFind the first number divisible by both 7 and 11, then skip multiples of 3 in a range.",
+    "starter": "#include <iostream>\nusing namespace std;\n\nint main() {\n    // Find first number divisible by 7 AND 11:\n    for (int n = 1; n <= 1000; n++) {\n        if (n % 7 == 0 && n % 11 == 0) {\n            cout << \"First: \" << n << endl;\n            break;\n        }\n    }\n\n    // Print 1-20, skip multiples of 3:\n    for (int i = 1; i <= 20; i++) {\n        if (i % 3 == 0) continue;\n        cout << i << \" \";\n    }\n    cout << endl;\n\n    return 0;\n}",
+    "expectedOutput": ["First: 77", "1 2 4 5 7 8 10 11 13 14 16 17 19 20 "],
+    "successMessage": "77 = 7 × 11. break exits as soon as it's found. continue skips 3, 6, 9... without an else branch. Clean and readable."
+  },
+  {
+    "title": "Nested loops",
+    "instruction": "Loops inside loops. The inner loop runs completely for every outer iteration.\n\nPrint a 5×5 multiplication table.",
+    "hint": "for (int i=1; i<=5; i++) { for (int j=1; j<=5; j++) { cout << setw(4) << i*j; } cout << endl; }",
+    "starter": "#include <iostream>\n#include <iomanip>\nusing namespace std;\n\nint main() {\n    for (int i = 1; i <= 5; i++) {\n        for (int j = 1; j <= 5; j++) {\n            cout << setw(4) << i * j;\n        }\n        cout << endl;\n    }\n    return 0;\n}",
+    "expectedOutput": ["   1   2   3   4   5", "   2   4   6   8  10", "   3   6   9  12  15", "   4   8  12  16  20", "   5  10  15  20  25"],
+    "successMessage": "setw(4) right-aligns in 4 characters. Nested loops power matrices, 2D grids, and pair comparisons. Row i, Column j — that's every 2D data structure."
+  },
+  {
+    "title": "FizzBuzz",
+    "instruction": "The classic programming interview test — print 1 to 30:\n- Multiple of 3: `Fizz`\n- Multiple of 5: `Buzz`\n- Multiple of both: `FizzBuzz`\n\nCheck for 15 first, or it never triggers.",
+    "starter": "#include <iostream>\nusing namespace std;\n\nint main() {\n    for (int i = 1; i <= 30; i++) {\n        if      (i % 15 == 0) cout << \"FizzBuzz\" << endl;\n        else if (i % 3  == 0) cout << \"Fizz\"     << endl;\n        else if (i % 5  == 0) cout << \"Buzz\"     << endl;\n        else                  cout << i           << endl;\n    }\n    return 0;\n}",
+    "expectedOutput": ["1", "2", "Fizz", "4", "Buzz", "Fizz", "7", "8", "Fizz", "Buzz", "11", "Fizz", "13", "14", "FizzBuzz"],
+    "codeChecks": [
+      { "pattern": "i\\s*%\\s*15\\s*==\\s*0|i%15==0", "required": true, "message": "Check % 15 FIRST for FizzBuzz." },
+      { "pattern": "FizzBuzz", "required": true, "message": "Print 'FizzBuzz' for multiples of 15." }
+    ],
+    "successMessage": "% 15 before % 3 and % 5 — if you check % 3 first, 15 prints 'Fizz' instead of 'FizzBuzz'. Ordering conditions correctly is a core programming skill. Chapter 6 done!"
+  }
+]

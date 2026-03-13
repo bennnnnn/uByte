@@ -1,0 +1,62 @@
+[
+  {
+    "title": "Hello, C++",
+    "instruction": "Every C++ program starts at `main()`. `cout` (console out) prints output. `endl` ends the line.\n\n```cpp\n#include <iostream>\nusing namespace std;\n\nint main() {\n    cout << \"Hello!\" << endl;\n    return 0;\n}\n```\n\n`<<` is the stream insertion operator — it pushes data into `cout`. Hit **Run**.",
+    "starter": "#include <iostream>\nusing namespace std;\n\nint main() {\n    cout << \"Hello, C++!\" << endl;\n    return 0;\n}",
+    "expectedOutput": ["Hello, C++!"],
+    "successMessage": "Welcome to C++. That #include pulls in the input/output library. 'using namespace std' lets you write cout instead of std::cout. return 0 signals the program succeeded."
+  },
+  {
+    "title": "Print multiple lines",
+    "instruction": "Chain multiple `<<` operators or use separate `cout` statements:\n\n```cpp\ncout << \"Line 1\" << endl;\ncout << \"Line 2\" << endl;\n// or chain: cout << \"a\" << \" \" << \"b\" << endl;\n```\n\nAdd two more `cout` lines.",
+    "hint": "cout << \"second line\" << endl;",
+    "starter": "#include <iostream>\nusing namespace std;\n\nint main() {\n    cout << \"C++ is fast.\" << endl;\n    // TODO: add two more cout lines\n    return 0;\n}",
+    "expectedOutput": ["C++ is fast.", "C++ is powerful.", "C++ is everywhere."],
+    "codeChecks": [
+      { "pattern": "cout[\\s\\S]*cout[\\s\\S]*cout", "required": true, "message": "Add two more cout statements — three total." },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO with your code." }
+    ],
+    "successMessage": "Three outputs — C++ runs them top to bottom. Every cout ends with endl (or '\\n' for speed — endl flushes the buffer, '\\n' doesn't)."
+  },
+  {
+    "title": "\\n vs endl",
+    "instruction": "`endl` flushes the output buffer — safe but slightly slower.\n`'\\n'` just adds a newline — faster, preferred in performance-critical code.\n\nFor learning they're the same. In game engines and servers, `'\\n'` is the choice.",
+    "starter": "#include <iostream>\nusing namespace std;\n\nint main() {\n    // endl flushes the buffer:\n    cout << \"Using endl\" << endl;\n\n    // \\n is faster (no flush):\n    cout << \"Using backslash-n\" << '\\n';\n\n    // Chain multiple outputs:\n    cout << \"Name: \" << \"Alex\" << \", Age: \" << 25 << '\\n';\n\n    return 0;\n}",
+    "expectedOutput": ["Using endl", "Using backslash-n", "Name: Alex, Age: 25"],
+    "successMessage": "Both work for learning. For production: '\\n' in tight loops, endl when you need output to appear immediately (like progress reporting). Now you know the difference."
+  },
+  {
+    "title": "Comments",
+    "instruction": "C++ has two comment styles:\n\n- `// single line` — everything after `//`\n- `/* multi-line */` — spans lines\n\nThe preprocessor ignores them. Comments explain WHY — not what.",
+    "starter": "#include <iostream>\nusing namespace std;\n\nint main() {\n    // Single-line comment — C++ ignores this\n    cout << \"Comments are invisible.\" << endl;\n\n    /*\n     * Multi-line comment.\n     * Use for longer explanations.\n     */\n    cout << \"Code runs fine.\" << endl;\n\n    return 0; // Successful exit\n}",
+    "expectedOutput": ["Comments are invisible.", "Code runs fine."],
+    "successMessage": "Two comment styles. // for quick notes, /* */ for longer explanations. Great code is self-documenting — comments should explain reasoning, not repeat the code."
+  },
+  {
+    "title": "cin — read user input",
+    "instruction": "`cin` (console in) reads from the keyboard. `>>` is the stream extraction operator:\n\n```cpp\nint age;\ncin >> age;  // reads an integer\n```\n\nIn our sandbox, `cin` is pre-filled. Run this to see how input/output works together.",
+    "starter": "#include <iostream>\nusing namespace std;\n\nint main() {\n    int x = 10;\n    int y = 25;\n\n    // Simulating arithmetic (cin not needed here):\n    cout << \"Sum: \" << x + y << endl;\n    cout << \"Product: \" << x * y << endl;\n    cout << \"Average: \" << (x + y) / 2.0 << endl;\n\n    return 0;\n}",
+    "expectedOutput": ["Sum: 35", "Product: 250", "Average: 17.5"],
+    "successMessage": "(x + y) / 2.0 — the .0 makes it a double division. Without it, 35/2 = 17 (integer division). This is one of C++'s classic beginner traps."
+  },
+  {
+    "title": "Arithmetic operators",
+    "instruction": "C++ arithmetic:\n\n- `+`, `-`, `*`, `/` — standard math\n- `%` — modulo (remainder)\n- `5 / 2 = 2` — **integer division** — drops the decimal!\n- `5.0 / 2 = 2.5` — make one a double for decimal result\n- `int(3.9) = 3` — cast truncates, doesn't round",
+    "starter": "#include <iostream>\nusing namespace std;\n\nint main() {\n    cout << 10 + 3 << endl;   // 13\n    cout << 10 - 3 << endl;   // 7\n    cout << 10 * 3 << endl;   // 30\n    cout << 10 / 3 << endl;   // 3 (integer!)\n    cout << 10.0 / 3 << endl; // 3.333...\n    cout << 10 % 3 << endl;   // 1 (remainder)\n    cout << (int)3.99 << endl; // 3 (truncate)\n\n    return 0;\n}",
+    "expectedOutput": ["13", "7", "30", "3", "3.33333", "1", "3"],
+    "successMessage": "10/3 = 3 — integer division truncates. 10.0/3 = 3.333... — one double operand forces decimal division. (int)3.99 = 3 — C-style cast truncates. These rules trip up beginners constantly."
+  },
+  {
+    "title": "Write it from scratch",
+    "instruction": "No starter code. Write everything yourself.\n\nPrint exactly:\n```\nC++ is compiled.\nC++ is fast.\nC++ is powerful.\nChapter 1 complete!\n```\n\nFour `cout` lines, all with `endl`.",
+    "hint": "#include <iostream>\\nusing namespace std;\\nint main() { cout << \"...\" << endl; return 0; }",
+    "starter": "",
+    "expectedOutput": ["C++ is compiled.", "C++ is fast.", "C++ is powerful.", "Chapter 1 complete!"],
+    "codeChecks": [
+      { "pattern": "#include\\s*<iostream>", "required": true, "message": "Include the iostream library: #include <iostream>" },
+      { "pattern": "int main\\s*\\(\\s*\\)", "required": true, "message": "Define the main function: int main()" },
+      { "pattern": "cout", "required": true, "message": "Use cout to print." }
+    ],
+    "successMessage": "Written from memory — #include, namespace, main, four couts, return 0. That skeleton becomes second nature within a few chapters. Chapter 1 done!"
+  }
+]

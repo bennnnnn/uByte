@@ -1,28 +1,14 @@
 ---
-title: "Exceptions"
-description: "try/catch, throwing exceptions, and std::exception in C++."
-order: 13
+title: "Error Handling"
+description: "try/catch/throw, exception hierarchy, custom exceptions, noexcept, RAII for error safety, and error codes."
+order: 18
 difficulty: "intermediate"
-estimatedMinutes: 15
+estimatedMinutes: 18
+concepts: ["try", "catch", "throw", "exception", "runtime_error", "logic_error", "custom exceptions", "noexcept", "exception hierarchy", "RAII safety"]
 ---
 
-## try / catch / throw
+## Handling the unexpected
 
-```cpp
-#include <stdexcept>
+C++ exceptions let you separate error handling from normal code flow. When something goes wrong deep inside a function, throw an exception — it automatically unwinds the stack until a handler catches it.
 
-void divide(int a, int b) {
-    if (b == 0) throw std::invalid_argument("division by zero");
-    std::cout << a / b << std::endl;
-}
-
-int main() {
-    try {
-        divide(10, 0);
-    } catch (const std::exception& e) {
-        std::cout << "Error: " << e.what() << std::endl;
-    }
-}
-```
-
-More content coming soon. Try the interactive steps above!
+RAII makes C++ exception safety elegant: destructors run during stack unwinding, so resources are released automatically even when exceptions are thrown.

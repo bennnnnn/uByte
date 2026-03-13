@@ -1,0 +1,66 @@
+[
+  {
+    "title": "Declare your first variable",
+    "instruction": "Declare a variable: `type name = value;`\n\n```cpp\nint score = 95;       // integer\ndouble pi = 3.14;    // decimal\nbool active = true;  // true/false\nchar grade = 'A';    // single character (single quotes!)\n```\n\nRun this — four types, four variables.",
+    "starter": "#include <iostream>\nusing namespace std;\n\nint main() {\n    int score = 95;\n    double pi = 3.14159;\n    bool active = true;\n    char grade = 'A';\n\n    cout << score << endl;\n    cout << pi << endl;\n    cout << active << endl;  // prints 1 (true) or 0 (false)\n    cout << grade << endl;\n\n    return 0;\n}",
+    "expectedOutput": ["95", "3.14159", "1", "A"],
+    "successMessage": "true prints as 1 and false as 0 — that's how C++ booleans work. Use boolalpha to print 'true'/'false': cout << boolalpha << active. One of C++'s quirks."
+  },
+  {
+    "title": "Create your own variables",
+    "instruction": "Declare four variables:\n- `int age` — your age\n- `double height` — in metres (e.g. 1.75)\n- `char initial` — first letter of your name\n- `bool isLearning` — set to `true`\n\nThen print each one.",
+    "hint": "int age = 25; double height = 1.75; char initial = 'A'; bool isLearning = true;",
+    "starter": "#include <iostream>\nusing namespace std;\n\nint main() {\n    // TODO: declare age, height, initial, isLearning\n    return 0;\n}",
+    "expectedOutput": [],
+    "codeChecks": [
+      { "pattern": "int age\\s*=", "required": true, "message": "Declare: int age = your_age;" },
+      { "pattern": "double height\\s*=", "required": true, "message": "Declare: double height = 1.75;" },
+      { "pattern": "char initial\\s*=", "required": true, "message": "Declare: char initial = 'X';" },
+      { "pattern": "bool isLearning\\s*=\\s*true", "required": true, "message": "Declare: bool isLearning = true;" },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO with your declarations." }
+    ],
+    "successMessage": "Four typed variables — each holds exactly its type. Try assigning a string to an int and watch the compiler refuse. That protection is C++'s greatest strength."
+  },
+  {
+    "title": "Reassigning variables",
+    "instruction": "Declare once with the type, then reassign without the type keyword:\n\n```cpp\nint count = 0;\ncount = 10;     // reassign — no 'int' needed\ncount += 5;     // shorthand: count = count + 5\ncount++;        // increment by 1\n```",
+    "starter": "#include <iostream>\nusing namespace std;\n\nint main() {\n    int count = 0;\n    cout << count << endl;\n\n    count = 10;\n    cout << count << endl;\n\n    count += 25;\n    cout << count << endl;\n\n    count--;\n    cout << count << endl;\n\n    return 0;\n}",
+    "expectedOutput": ["0", "10", "35", "34"],
+    "successMessage": "count-- decrements by 1. +=, -=, *=, /= are compound operators. count++ is post-increment — used so often it gave its name to the language: 'C with one increment'."
+  },
+  {
+    "title": "const — values that don't change",
+    "instruction": "`const` variables cannot be reassigned. They MUST be initialized at declaration:\n\n```cpp\nconst double PI = 3.14159265;\nconst int MAX_PLAYERS = 100;\n```\n\nConvention: `UPPER_SNAKE_CASE` for constants.",
+    "starter": "#include <iostream>\nusing namespace std;\n\nint main() {\n    const double PI = 3.14159265;\n    const int MAX_SCORE = 100;\n    const char GRADE_PASS = 'C';\n\n    double radius = 5.0;\n    double area = PI * radius * radius;\n\n    cout << \"PI: \" << PI << endl;\n    cout << \"Area: \" << area << endl;\n    cout << \"Max score: \" << MAX_SCORE << endl;\n\n    // PI = 3.0; // This would be a compile error!\n\n    return 0;\n}",
+    "expectedOutput": ["PI: 3.14159", "Area: 78.5398", "Max score: 100"],
+    "successMessage": "const = read-only forever after initialization. Game engines store constants for gravity, speed of light, max players. The compiler prevents accidental modification."
+  },
+  {
+    "title": "auto — type inference",
+    "instruction": "`auto` lets the compiler infer the type from the initialiser:\n\n```cpp\nauto x = 42;      // int\nauto y = 3.14;    // double\nauto s = \"hello\"; // const char*\n```\n\nThe type is still fixed — `auto` just saves typing it. Prefer explicit types in learning; use `auto` for complex iterator types in real code.",
+    "starter": "#include <iostream>\nusing namespace std;\n\nint main() {\n    auto score = 95;       // int\n    auto pi    = 3.14159;  // double\n    auto flag  = true;     // bool\n    auto ch    = 'Z';      // char\n\n    cout << score << endl;\n    cout << pi << endl;\n    cout << flag << endl;\n    cout << ch << endl;\n\n    return 0;\n}",
+    "expectedOutput": ["95", "3.14159", "1", "Z"],
+    "successMessage": "auto infers the type at compile time — the type is still fixed, just written for you. Use it for iterators (auto it = vec.begin()), lambdas, and complex template types in real C++ code."
+  },
+  {
+    "title": "Variable scope",
+    "instruction": "Variables exist only within their `{...}` block — this is **scope**.\n\nA variable in an inner block shadows an outer one with the same name (usually a bad idea).",
+    "starter": "#include <iostream>\nusing namespace std;\n\nint main() {\n    int x = 10;        // outer x\n    cout << x << endl;\n\n    {\n        int y = 20;    // y only lives here\n        int x = 99;    // inner x — shadows outer x\n        cout << x << endl;  // prints inner x\n        cout << y << endl;\n    }\n    // y is gone here\n    cout << x << endl;  // back to outer x\n\n    return 0;\n}",
+    "expectedOutput": ["10", "99", "20", "10"],
+    "successMessage": "Outer x=10, inner x=99 — the inner one shadowed the outer. After the block closes, the outer x=10 is visible again. Shadowing is valid but confusing — avoid in real code."
+  },
+  {
+    "title": "Build a profile",
+    "instruction": "No starter code. Write everything from scratch.\n\nDeclare:\n- `const string LANGUAGE = \"C++\"` (you'll need `#include <string>`)\n- `string name` — your name\n- `int year` — current year\n- `auto chaptersCompleted = 1`\n\nPrint: `\"Alex is learning C++ in 2024. Chapter 1 done!\"`",
+    "hint": "#include <iostream>\\n#include <string>\\nusing namespace std;\\nint main() { const string LANGUAGE = \"C++\"; ... }",
+    "starter": "",
+    "expectedOutput": [],
+    "codeChecks": [
+      { "pattern": "#include\\s*<string>", "required": true, "message": "Include the string library: #include <string>" },
+      { "pattern": "const string LANGUAGE\\s*=\\s*\"C\\+\\+\"", "required": true, "message": "Declare: const string LANGUAGE = \"C++\";" },
+      { "pattern": "auto chaptersCompleted\\s*=", "required": true, "message": "Use auto: auto chaptersCompleted = 1;" },
+      { "pattern": "cout", "required": true, "message": "Print the profile with cout." }
+    ],
+    "successMessage": "const for constants, auto for inference, explicit types for clarity. That mix of tools is real C++ code. Chapter 2 done!"
+  }
+]

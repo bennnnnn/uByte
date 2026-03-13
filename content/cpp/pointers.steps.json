@@ -1,0 +1,57 @@
+[
+  {
+    "title": "What is a pointer?",
+    "instruction": "A pointer holds a **memory address** — the location of another variable.\n\n- `int* p` — pointer to int\n- `&x` — address of x (address-of operator)\n- `*p` — value at the address (dereference operator)\n\n```cpp\nint x = 42;\nint* p = &x;   // p holds the address of x\n*p = 99;       // change x through the pointer\n```\n\nRun this.",
+    "starter": "#include <iostream>\nusing namespace std;\n\nint main() {\n    int x = 42;\n    int* p = &x;  // p points to x\n\n    cout << x    << endl;  // value of x\n    cout << &x   << endl;  // address of x (hex)\n    cout << p    << endl;  // same address\n    cout << *p   << endl;  // value AT that address: 42\n\n    *p = 99;               // change x through pointer\n    cout << x    << endl;  // x is now 99!\n\n    return 0;\n}",
+    "expectedOutput": ["42", "99"],
+    "successMessage": "p and &x print the same memory address. *p = 99 changed x through the pointer. The address will be different every run — the OS puts variables wherever it wants. Pointer manipulation is how memory works."
+  },
+  {
+    "title": "nullptr — the safe null pointer",
+    "instruction": "A pointer that points to nothing should be set to `nullptr` (C++11).\n\nDereferencing a null pointer is **undefined behaviour** — your program might crash, corrupt data, or worse.\n\nAlways check for nullptr before dereferencing.",
+    "starter": "#include <iostream>\nusing namespace std;\n\nvoid printIfValid(int* p) {\n    if (p != nullptr) {\n        cout << \"Value: \" << *p << endl;\n    } else {\n        cout << \"Null pointer!\" << endl;\n    }\n}\n\nint main() {\n    int x = 42;\n    int* p = &x;\n    int* q = nullptr;\n\n    printIfValid(p);\n    printIfValid(q);\n\n    // Never do this:\n    // cout << *q << endl;  // undefined behaviour — likely crash!\n\n    return 0;\n}",
+    "expectedOutput": ["Value: 42", "Null pointer!"],
+    "successMessage": "Always null-check before dereferencing. nullptr is safer than the old NULL or 0 — it's type-safe and the compiler can catch misuse. Most segmentation faults are null pointer dereferences."
+  },
+  {
+    "title": "Pointer arithmetic",
+    "instruction": "You can do arithmetic on pointers — adding 1 moves to the NEXT element of that type:\n\n```cpp\nint arr[] = {10, 20, 30};\nint* p = arr;  // points to arr[0]\np++;           // now points to arr[1]\n```\n\nThis is how C arrays and low-level memory access work.",
+    "starter": "#include <iostream>\nusing namespace std;\n\nint main() {\n    int arr[] = {10, 20, 30, 40, 50};\n    int* p = arr;  // points to first element\n\n    cout << *p       << endl;  // 10\n    cout << *(p + 1) << endl;  // 20\n    cout << *(p + 4) << endl;  // 50\n\n    // Iterate using pointer arithmetic:\n    int* end = arr + 5;  // past the last element\n    for (int* it = arr; it != end; ++it) {\n        cout << *it << \" \";\n    }\n    cout << endl;\n\n    return 0;\n}",
+    "expectedOutput": ["10", "20", "50", "10 20 30 40 50 "],
+    "successMessage": "p+1 moves to the next int (4 bytes forward). This is how vector iterators are implemented internally. Raw pointer iteration is how the original STL algorithms worked before range-based for."
+  },
+  {
+    "title": "const with pointers",
+    "instruction": "Two kinds of const with pointers:\n\n```cpp\nconst int* p = &x;  // pointer to const int — can't change *p\nint* const p = &x;  // const pointer — can't change p (where it points)\nconst int* const p; // both are const\n```\n\nRead from right to left: `const int* p` = \"p is a pointer to const int\".",
+    "starter": "#include <iostream>\nusing namespace std;\n\nint main() {\n    int a = 10, b = 20;\n\n    // Pointer to const: can't modify value through pointer\n    const int* p = &a;\n    cout << *p << endl;\n    p = &b;        // OK: can change where it points\n    cout << *p << endl;\n    // *p = 99;    // ERROR: can't modify through const pointer\n\n    // Const pointer: can't change where it points\n    int* const q = &a;\n    *q = 99;       // OK: can modify value\n    cout << a << endl;\n    // q = &b;    // ERROR: can't reassign const pointer\n\n    return 0;\n}",
+    "expectedOutput": ["10", "20", "99"],
+    "successMessage": "const int* p — the value is const, the pointer can move. int* const p — the pointer is const, the value can change. Function parameters almost always use const T* or const T& — read-only access without copying."
+  },
+  {
+    "title": "References vs pointers",
+    "instruction": "References are safer, simpler aliases:\n\n| Feature | Pointer | Reference |\n|---------|---------|----------|\n| Null? | Yes (nullptr) | Never null |\n| Reassign? | Yes | No — always same object |\n| Syntax | `*p`, `p->` | `r`, `.` |\n| Use for | Optional/arrays | Parameters |\n\nRule: use references when you can, pointers when you must.",
+    "starter": "#include <iostream>\nusing namespace std;\n\nvoid withPointer(int* p) {\n    if (p) *p *= 2;\n}\n\nvoid withReference(int& r) {\n    r *= 2;  // no null check needed — references can't be null\n}\n\nint main() {\n    int x = 10;\n    withPointer(&x);\n    cout << x << endl;   // 20\n\n    withReference(x);\n    cout << x << endl;   // 40\n\n    // Reference as alias:\n    int& ref = x;\n    ref = 100;\n    cout << x << endl;   // 100 — same variable!\n\n    return 0;\n}",
+    "expectedOutput": ["20", "40", "100"],
+    "successMessage": "References never need null checks — they're always valid. ref = 100 changes x because ref IS x. Use references for parameters; use pointers for optional values, arrays, and raw memory access."
+  },
+  {
+    "title": "Pointers to strings and arrays",
+    "instruction": "Array names are pointers to their first element. C-strings are `const char*` — a pointer to the first character.",
+    "starter": "#include <iostream>\n#include <string>\nusing namespace std;\n\nvoid printReverse(const int* arr, int size) {\n    for (int i = size - 1; i >= 0; i--) {\n        cout << arr[i] << \" \";\n    }\n    cout << endl;\n}\n\nint main() {\n    int numbers[] = {1, 2, 3, 4, 5};\n    printReverse(numbers, 5);  // array decays to pointer\n\n    // Pointer to string:\n    const char* cstr = \"Hello, C++!\";  // C-string literal\n    cout << cstr << endl;              // cout prints until '\\0'\n    cout << *cstr << endl;             // first char: 'H'\n    cout << cstr + 7 << endl;          // pointer + 7 = 'C++!'\n\n    return 0;\n}",
+    "expectedOutput": ["5 4 3 2 1 ", "Hello, C++!", "H", "C++!"],
+    "successMessage": "Arrays decay to pointers when passed to functions. C-strings are null-terminated char arrays. cstr + 7 moves 7 characters forward. This is how C worked before C++ — understanding it makes you a better programmer."
+  },
+  {
+    "title": "Build a pointer toolkit",
+    "instruction": "No starter code.\n\nWrite three functions using pointers:\n1. `void swapValues(int* a, int* b)` — swap two integers via pointers\n2. `int* findMax(int* arr, int size)` — return pointer to the largest element\n3. `void fillArray(int* arr, int size, int value)` — fill array with a value\n\nTest each.",
+    "hint": "swapValues: int temp = *a; *a = *b; *b = temp;\\nfindMax: int* maxPtr = arr; for loop comparing *ptr > *maxPtr",
+    "starter": "",
+    "expectedOutput": [],
+    "codeChecks": [
+      { "pattern": "void swapValues\\(int\\*\\s*a,\\s*int\\*\\s*b\\)|swapValues\\(int \\*", "required": true, "message": "Define void swapValues(int* a, int* b)." },
+      { "pattern": "int\\* findMax|int \\*findMax", "required": true, "message": "Define int* findMax(int* arr, int size)." },
+      { "pattern": "void fillArray|fillArray\\(int\\*", "required": true, "message": "Define void fillArray(int* arr, int size, int value)." }
+    ],
+    "successMessage": "Pointer-based utilities — the foundation of every C++ data structure. Swap via pointers is the simplest pointer exercise; findMax returning a pointer lets the caller modify the max value. Chapter 9 done!"
+  }
+]

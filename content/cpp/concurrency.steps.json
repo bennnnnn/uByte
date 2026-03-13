@@ -1,0 +1,51 @@
+[
+  {
+    "title": "std::thread — create threads",
+    "instruction": "`#include <thread>` to use `std::thread`.\n\n- `thread t(function, args...)` — starts a thread\n- `.join()` — wait for thread to finish\n- `.detach()` — let it run independently\n\nAlways join or detach before the thread object is destroyed.",
+    "starter": "#include <iostream>\n#include <thread>\n#include <chrono>\nusing namespace std;\n\nvoid worker(int id) {\n    for (int i = 0; i < 3; i++) {\n        cout << \"Thread \" << id << \": step \" << i << endl;\n        this_thread::sleep_for(chrono::milliseconds(10));\n    }\n}\n\nint main() {\n    thread t1(worker, 1);\n    thread t2(worker, 2);\n\n    t1.join();  // wait for t1\n    t2.join();  // wait for t2\n\n    cout << \"Both done.\" << endl;\n    return 0;\n}",
+    "expectedOutput": ["Both done."],
+    "successMessage": "Two threads running concurrently — output order varies. join() blocks main until the thread finishes. Never let a thread object be destroyed without join() or detach() — that calls std::terminate()."
+  },
+  {
+    "title": "mutex — prevent race conditions",
+    "instruction": "Multiple threads accessing shared data simultaneously causes race conditions.\n\n`mutex::lock()`/`unlock()` — manual (error-prone).\n`lock_guard<mutex>` — RAII: locks on construction, unlocks on destruction.",
+    "starter": "#include <iostream>\n#include <thread>\n#include <mutex>\n#include <vector>\nusing namespace std;\n\nmutex mtx;\nint sharedCounter = 0;\n\nvoid increment(int times) {\n    for (int i = 0; i < times; i++) {\n        lock_guard<mutex> lock(mtx);  // locks here, unlocks when lock goes out of scope\n        sharedCounter++;\n    }\n}\n\nint main() {\n    const int numThreads = 10;\n    const int times = 1000;\n\n    vector<thread> threads;\n    for (int i = 0; i < numThreads; i++)\n        threads.emplace_back(increment, times);\n\n    for (auto& t : threads) t.join();\n\n    cout << \"Expected: \" << numThreads * times << endl;\n    cout << \"Got: \" << sharedCounter << endl;\n    cout << (sharedCounter == numThreads * times ? \"Correct!\" : \"RACE CONDITION!\") << endl;\n\n    return 0;\n}",
+    "expectedOutput": ["Expected: 10000", "Got: 10000", "Correct!"],
+    "successMessage": "lock_guard acquires the mutex in the constructor, releases it in the destructor — RAII lock management. Without it, sharedCounter would almost never be 10000. lock_guard is safe even if an exception is thrown."
+  },
+  {
+    "title": "atomic — lock-free operations",
+    "instruction": "`atomic<T>` provides thread-safe operations without mutex overhead for simple types:\n\n```cpp\natomic<int> counter{0};\ncounter++;              // thread-safe increment\ncounter.fetch_add(5);   // thread-safe add\n```\n\nFaster than mutex for single-variable access.",
+    "starter": "#include <iostream>\n#include <thread>\n#include <atomic>\n#include <vector>\nusing namespace std;\n\natomic<int> atomicCounter{0};\nint unsafeCounter = 0;\n\nvoid work(int times) {\n    for (int i = 0; i < times; i++) {\n        atomicCounter.fetch_add(1);  // atomic — thread safe\n        unsafeCounter++;             // NOT atomic — race condition\n    }\n}\n\nint main() {\n    vector<thread> threads;\n    for (int i = 0; i < 10; i++)\n        threads.emplace_back(work, 1000);\n    for (auto& t : threads) t.join();\n\n    cout << \"Expected: 10000\" << endl;\n    cout << \"Atomic: \" << atomicCounter << endl;\n    cout << \"Unsafe: \" << unsafeCounter << \" (probably wrong!)\" << endl;\n\n    return 0;\n}",
+    "expectedOutput": ["Expected: 10000", "Atomic: 10000"],
+    "successMessage": "atomic<int> is always correct — hardware-level atomic operations. unsafeCounter is almost never 10000. Use atomic for simple counters, flags, and pointers. Use mutex for more complex shared state."
+  },
+  {
+    "title": "async and future — task parallelism",
+    "instruction": "`std::async` runs a function asynchronously and returns a `future<T>`.\n`future::get()` blocks until the result is ready:\n\n```cpp\nauto f = async(launch::async, []{ return expensiveCalc(); });\nint result = f.get();  // waits if not done\n```",
+    "starter": "#include <iostream>\n#include <future>\n#include <chrono>\n#include <vector>\nusing namespace std;\n\nlong long fibonacci(int n) {\n    if (n <= 1) return n;\n    return fibonacci(n-1) + fibonacci(n-2);\n}\n\nint main() {\n    // Run two computations in parallel:\n    auto f1 = async(launch::async, fibonacci, 38);\n    auto f2 = async(launch::async, fibonacci, 36);\n\n    cout << \"Waiting for results...\" << endl;\n\n    // Both run concurrently — get() waits for each:\n    long long r1 = f1.get();\n    long long r2 = f2.get();\n\n    cout << \"fib(38) = \" << r1 << endl;\n    cout << \"fib(36) = \" << r2 << endl;\n\n    return 0;\n}",
+    "expectedOutput": ["Waiting for results...", "fib(38) = 39088169", "fib(36) = 14930352"],
+    "successMessage": "Both Fibonacci calculations ran concurrently — f1.get() blocked until 38 was done. On a multi-core CPU, this is roughly twice as fast as sequential. async is the high-level tool for easy parallelism."
+  },
+  {
+    "title": "condition_variable — coordinate threads",
+    "instruction": "`condition_variable` lets threads wait for a condition and notify others:\n\n```cpp\ncondition_variable cv;\ncv.wait(lock, []{ return dataReady; });  // wait until dataReady\ncv.notify_one();  // wake one waiter\ncv.notify_all();  // wake all waiters\n```\n\nThis is how producer-consumer patterns work.",
+    "starter": "#include <iostream>\n#include <thread>\n#include <mutex>\n#include <condition_variable>\n#include <queue>\nusing namespace std;\n\nmutex mtx;\ncondition_variable cv;\nqueue<int> workQueue;\nbool done = false;\n\nvoid producer() {\n    for (int i = 1; i <= 5; i++) {\n        {\n            lock_guard<mutex> lock(mtx);\n            workQueue.push(i);\n            cout << \"Produced: \" << i << endl;\n        }\n        cv.notify_one();  // wake the consumer\n    }\n    { lock_guard<mutex> lock(mtx); done = true; }\n    cv.notify_one();\n}\n\nvoid consumer() {\n    while (true) {\n        unique_lock<mutex> lock(mtx);\n        cv.wait(lock, []{ return !workQueue.empty() || done; });\n        while (!workQueue.empty()) {\n            cout << \"Consumed: \" << workQueue.front() << endl;\n            workQueue.pop();\n        }\n        if (done) break;\n    }\n}\n\nint main() {\n    thread p(producer);\n    thread c(consumer);\n    p.join(); c.join();\n    return 0;\n}",
+    "expectedOutput": ["Produced: 1", "Consumed: 1"],
+    "successMessage": "Producer-consumer pattern with condition_variable. cv.wait() releases the lock while waiting, reacquires it when woken. This is the foundation of thread pools, message queues, and event systems."
+  },
+  {
+    "title": "Build a parallel sum",
+    "instruction": "No starter code.\n\nWrite a parallel sum function:\n1. Split a large vector into N chunks (N = thread count)\n2. Each thread sums its chunk and stores to a `vector<long long> partialSums`\n3. After all threads join, sum the partial sums\n4. Verify it equals the sequential sum\n\nTest with a vector of 1,000,000 integers (1 to 1,000,000).",
+    "hint": "Create threads[i] = thread([&, i]{ partialSums[i] = accumulate(start, end, 0LL); }); where start/end are iterators to the chunk.",
+    "starter": "",
+    "expectedOutput": [],
+    "codeChecks": [
+      { "pattern": "thread|async", "required": true, "message": "Use std::thread or async for parallel execution." },
+      { "pattern": "join\\(\\)", "required": true, "message": "Call join() on each thread." },
+      { "pattern": "accumulate|sum|+=", "required": true, "message": "Sum each chunk." },
+      { "pattern": "1000000|1'000'000|vector<.*long|vector<int>", "required": true, "message": "Use a vector of 1 million elements." }
+    ],
+    "successMessage": "Parallel summation — N threads work simultaneously, then results are combined. On a quad-core CPU this is ~4x faster than sequential. Parallel algorithms like this are in <execution> in C++17. Chapter 22 done — C++ complete!"
+  }
+]

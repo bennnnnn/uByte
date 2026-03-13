@@ -1,0 +1,51 @@
+[
+  {
+    "title": "try / catch / throw",
+    "instruction": "```cpp\ntry {\n    // code that might throw\n} catch (const ExceptionType& e) {\n    // handle it\n}\n```\n\nCatch by `const reference` — always. Never catch by value (it slices derived types).",
+    "starter": "#include <iostream>\n#include <stdexcept>\nusing namespace std;\n\ndouble divide(double a, double b) {\n    if (b == 0) throw runtime_error(\"Division by zero!\");\n    return a / b;\n}\n\nint main() {\n    try {\n        cout << divide(10, 2)  << endl;\n        cout << divide(10, 0)  << endl;  // throws!\n        cout << \"Never reached\" << endl;\n    } catch (const runtime_error& e) {\n        cout << \"Error: \" << e.what() << endl;\n    }\n\n    cout << \"Program continues.\" << endl;\n    return 0;\n}",
+    "expectedOutput": ["5", "Error: Division by zero!", "Program continues."],
+    "successMessage": "The second divide threw — execution jumped to catch, skipping 'Never reached'. After catch, the program continues normally. e.what() returns the error message string."
+  },
+  {
+    "title": "Multiple catch blocks",
+    "instruction": "Catch different exception types differently. Catch from most specific to most general.\n\nCatch `...` (three dots) catches anything:",
+    "starter": "#include <iostream>\n#include <stdexcept>\n#include <vector>\nusing namespace std;\n\nvoid riskyOperation(int choice) {\n    switch (choice) {\n        case 1: throw runtime_error(\"Runtime problem\");\n        case 2: throw invalid_argument(\"Bad argument\");\n        case 3: throw out_of_range(\"Index too large\");\n        default: break;\n    }\n}\n\nint main() {\n    for (int i = 0; i <= 3; i++) {\n        try {\n            riskyOperation(i);\n            cout << \"Success for \" << i << endl;\n        } catch (const invalid_argument& e) {\n            cout << \"Invalid arg: \" << e.what() << endl;\n        } catch (const out_of_range& e) {\n            cout << \"Out of range: \" << e.what() << endl;\n        } catch (const runtime_error& e) {\n            cout << \"Runtime error: \" << e.what() << endl;\n        } catch (...) {\n            cout << \"Unknown error\" << endl;\n        }\n    }\n    return 0;\n}",
+    "expectedOutput": ["Success for 0", "Runtime error: Runtime problem", "Invalid arg: Bad argument", "Out of range: Index too large"],
+    "successMessage": "Catch from most specific to most general — invalid_argument and out_of_range before runtime_error (they both inherit from it). Catch (...) is the safety net for anything else."
+  },
+  {
+    "title": "Custom exception classes",
+    "instruction": "Inherit from `std::exception` or its subclasses to create domain-specific exceptions:\n\n```cpp\nclass DatabaseError : public runtime_error {\n    int errorCode;\npublic:\n    DatabaseError(string msg, int code)\n        : runtime_error(msg), errorCode(code) {}\n    int getCode() const { return errorCode; }\n};\n```",
+    "starter": "#include <iostream>\n#include <stdexcept>\nusing namespace std;\n\nclass InsufficientFundsException : public runtime_error {\n    double shortfall;\npublic:\n    InsufficientFundsException(double shortfall)\n        : runtime_error(\"Insufficient funds. Shortfall: $\" + to_string(shortfall)),\n          shortfall(shortfall) {}\n\n    double getShortfall() const { return shortfall; }\n};\n\nclass BankAccount {\n    double balance;\npublic:\n    BankAccount(double b) : balance(b) {}\n    void withdraw(double amount) {\n        if (amount > balance)\n            throw InsufficientFundsException(amount - balance);\n        balance -= amount;\n    }\n    double getBalance() const { return balance; }\n};\n\nint main() {\n    BankAccount acc(100.0);\n    try {\n        acc.withdraw(60);\n        cout << \"Balance: $\" << acc.getBalance() << endl;\n        acc.withdraw(80);  // throws!\n    } catch (const InsufficientFundsException& e) {\n        cout << e.what() << endl;\n        cout << \"Shortfall: $\" << e.getShortfall() << endl;\n    }\n    return 0;\n}",
+    "expectedOutput": ["Balance: $40", "Insufficient funds. Shortfall: $40.000000", "Shortfall: $40"],
+    "successMessage": "Custom exception with extra data (shortfall). The catch block accesses e.getShortfall() — more information than a generic error. Custom exceptions make error handling meaningful."
+  },
+  {
+    "title": "noexcept — promise to never throw",
+    "instruction": "`noexcept` is a function specifier promising it never throws.\n\nThe compiler can optimise `noexcept` functions more aggressively. If a `noexcept` function does throw, `std::terminate()` is called.",
+    "starter": "#include <iostream>\n#include <stdexcept>\nusing namespace std;\n\nint safeAdd(int a, int b) noexcept {\n    return a + b;  // never throws\n}\n\nconditional noexcept — only noexcept if T's move is noexcept:\ntemplate <typename T>\nvoid swap(T& a, T& b) noexcept {\n    T temp = move(a);\n    a = move(b);\n    b = move(temp);\n}\n\nint main() {\n    cout << safeAdd(3, 4) << endl;\n\n    int x = 10, y = 20;\n    swap(x, y);\n    cout << x << \" \" << y << endl;\n\n    // Check if noexcept:\n    cout << boolalpha << noexcept(safeAdd(1, 2)) << endl;\n\n    return 0;\n}",
+    "expectedOutput": ["7", "20 10", "true"],
+    "successMessage": "noexcept enables move semantics optimisations — vectors use move instead of copy when they know the element's move constructor is noexcept. Mark destructors and swap as noexcept — always."
+  },
+  {
+    "title": "Exception safety and RAII",
+    "instruction": "RAII makes exception safety automatic — destructors run during stack unwinding, releasing resources.\n\nNo `try/catch` needed for resource cleanup when using RAII types.",
+    "starter": "#include <iostream>\n#include <memory>\n#include <stdexcept>\nusing namespace std;\n\nclass Lock {\npublic:\n    Lock()  { cout << \"Lock acquired\" << endl; }\n    ~Lock() { cout << \"Lock released\" << endl; }  // ALWAYS runs!\n};\n\nvoid riskyWork() {\n    Lock l;  // acquired here\n    cout << \"Working...\" << endl;\n    throw runtime_error(\"Something went wrong!\");\n    cout << \"Never reached\" << endl;\n}  // Lock destructor runs here — even during exception!\n\nint main() {\n    try {\n        riskyWork();\n    } catch (const runtime_error& e) {\n        cout << \"Caught: \" << e.what() << endl;\n    }\n    cout << \"Done.\" << endl;\n    return 0;\n}",
+    "expectedOutput": ["Lock acquired", "Working...", "Lock released", "Caught: Something went wrong!", "Done."],
+    "successMessage": "Lock released even though an exception was thrown! RAII makes this automatic. mutex locks, file handles, database connections — all released safely during exception unwinding. No try/catch needed for cleanup."
+  },
+  {
+    "title": "Build a safe calculator",
+    "instruction": "No starter code.\n\nCreate:\n- `class MathError : public runtime_error` with an error code\n- `class DivisionByZeroError : public MathError`\n- `class OverflowError : public MathError`\n\nWrite `int safeCalculate(int a, string op, int b)` that:\n- Throws `DivisionByZeroError` for `/` or `%` with b==0\n- Throws `OverflowError` if the result would overflow int\n- Handles `+`, `-`, `*`, `/`, `%`\n\nTest with 5 operations including error cases.",
+    "hint": "For overflow check: if (op == \"+\" && (long long)a + b > INT_MAX) throw OverflowError(...);",
+    "starter": "",
+    "expectedOutput": [],
+    "codeChecks": [
+      { "pattern": "class MathError.*runtime_error|MathError.*public.*runtime_error", "required": true, "message": "Define MathError extending runtime_error." },
+      { "pattern": "class DivisionByZeroError.*MathError|DivisionByZeroError.*public.*MathError", "required": true, "message": "Define DivisionByZeroError extending MathError." },
+      { "pattern": "safeCalculate", "required": true, "message": "Define safeCalculate function." },
+      { "pattern": "catch.*MathError|catch.*DivisionByZero", "required": true, "message": "Catch the custom exceptions." }
+    ],
+    "successMessage": "A hierarchical exception system. Catching MathError catches both DivisionByZeroError and OverflowError. This is how production error handling works — catch at the right level of specificity. Chapter 18 done!"
+  }
+]

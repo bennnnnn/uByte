@@ -1,0 +1,52 @@
+[
+  {
+    "title": "map — sorted key-value pairs",
+    "instruction": "`map<K, V>` stores key-value pairs sorted by key. O(log n) access.\n\n```cpp\nmap<string, int> scores;\nscores[\"Alice\"] = 90;\nscores.find(\"Bob\");   // returns iterator\n```\n\nUse `[]` to access/insert, `.at()` for bounds-checked access.",
+    "starter": "#include <iostream>\n#include <map>\n#include <string>\nusing namespace std;\n\nint main() {\n    map<string, int> scores;\n    scores[\"Alice\"] = 88;\n    scores[\"Bob\"]   = 72;\n    scores[\"Carol\"] = 95;\n    scores[\"David\"] = 80;\n\n    // Access:\n    cout << scores[\"Carol\"] << endl;\n    cout << scores.at(\"Bob\") << endl;\n\n    // Iterate (sorted by key!):\n    for (const auto& [name, score] : scores) {\n        cout << name << \": \" << score << endl;\n    }\n\n    // Check if key exists:\n    cout << boolalpha << (scores.count(\"Eve\") > 0) << endl;\n\n    return 0;\n}",
+    "expectedOutput": ["95", "72", "Alice: 88", "Bob: 72", "Carol: 95", "David: 80", "false"],
+    "successMessage": "map iterates in alphabetical order by key. auto& [name, score] is structured binding — C++17, unpacks each pair. count() returns 1 if key exists, 0 otherwise."
+  },
+  {
+    "title": "unordered_map — O(1) hash map",
+    "instruction": "`unordered_map<K, V>` uses hashing — O(1) average access, faster than `map` for large datasets, but no ordering.\n\nUse `unordered_map` when you don't need sorted keys.",
+    "hint": "Same interface as map — just faster, unordered.",
+    "starter": "#include <iostream>\n#include <unordered_map>\n#include <string>\nusing namespace std;\n\nint main() {\n    unordered_map<string, int> wordCount;\n    string words[] = {\"the\", \"quick\", \"brown\", \"fox\", \"the\", \"fox\", \"the\"};\n\n    for (const auto& word : words) {\n        wordCount[word]++;  // creates with 0 if not exists, then increments\n    }\n\n    for (const auto& [word, count] : wordCount) {\n        cout << word << \": \" << count << endl;\n    }\n\n    cout << \"'the' appears: \" << wordCount[\"the\"] << \" times\" << endl;\n\n    return 0;\n}",
+    "expectedOutput": ["'the' appears: 3 times"],
+    "successMessage": "wordCount[word]++ — if 'the' doesn't exist yet, [] creates it with 0, then ++ makes it 1. Second time it finds 1, increments to 2. Unordered: output order varies. Perfect for word frequency counting."
+  },
+  {
+    "title": "set and unordered_set — unique items",
+    "instruction": "`set<T>` stores unique sorted items. `unordered_set<T>` stores unique items with O(1) contains.\n\n```cpp\nset<int> s = {3, 1, 4, 1, 5};  // duplicate 1 is removed\n// s = {1, 3, 4, 5} — sorted!\n```",
+    "starter": "#include <iostream>\n#include <set>\n#include <unordered_set>\n#include <vector>\nusing namespace std;\n\nint main() {\n    // set — unique, sorted:\n    set<int> nums = {5, 2, 8, 1, 5, 9, 3, 2};\n    for (int n : nums) cout << n << \" \";  // sorted, no duplicates\n    cout << endl;\n\n    // Membership test:\n    cout << boolalpha << (nums.count(5) > 0) << endl;\n    cout << (nums.count(7) > 0) << endl;\n\n    // Deduplicate a vector:\n    vector<string> langs = {\"C++\", \"Python\", \"C++\", \"Java\", \"Python\"};\n    set<string> unique(langs.begin(), langs.end());\n    for (const auto& l : unique) cout << l << \" \";\n    cout << endl;\n\n    return 0;\n}",
+    "expectedOutput": ["1 2 3 5 8 9 ", "true", "false", "C++ Java Python "],
+    "successMessage": "set deduplicates and sorts automatically. set<string> from a vector removes duplicates in one line. Use set when you need both uniqueness and sorted order; unordered_set for faster membership testing."
+  },
+  {
+    "title": "stack, queue, and priority_queue",
+    "instruction": "Adaptor containers wrap other containers:\n\n- `stack<T>` — LIFO (last in, first out)\n- `queue<T>` — FIFO (first in, first out)\n- `priority_queue<T>` — always access the largest element first",
+    "starter": "#include <iostream>\n#include <stack>\n#include <queue>\n#include <priority_queue>\nusing namespace std;\n\nint main() {\n    // Stack:\n    stack<int> st;\n    st.push(1); st.push(2); st.push(3);\n    while (!st.empty()) { cout << st.top() << \" \"; st.pop(); }\n    cout << endl;\n\n    // Queue:\n    queue<string> q;\n    q.push(\"Alice\"); q.push(\"Bob\"); q.push(\"Carol\");\n    while (!q.empty()) { cout << q.front() << \" \"; q.pop(); }\n    cout << endl;\n\n    // Priority queue (max-heap by default):\n    priority_queue<int> pq;\n    pq.push(5); pq.push(2); pq.push(8); pq.push(1); pq.push(9);\n    while (!pq.empty()) { cout << pq.top() << \" \"; pq.pop(); }\n    cout << endl;\n\n    return 0;\n}",
+    "expectedOutput": ["3 2 1 ", "Alice Bob Carol ", "9 8 5 2 1 "],
+    "successMessage": "Stack: 3 2 1 (LIFO). Queue: Alice Bob Carol (FIFO). Priority queue: 9 8 5 2 1 (largest first). priority_queue is a max-heap — used in Dijkstra's shortest path, event scheduling, and task priority systems."
+  },
+  {
+    "title": "pair and tuple",
+    "instruction": "`pair<T1, T2>` holds two values. `tuple<T1,T2,...>` holds any number.\n\n```cpp\npair<string, int> p = {\"Alice\", 30};\np.first;   // \"Alice\"\np.second;  // 30\n```\n\n`make_pair` / `make_tuple` for construction.",
+    "starter": "#include <iostream>\n#include <map>\n#include <vector>\n#include <string>\nusing namespace std;\n\nint main() {\n    // pair:\n    pair<string, int> p1 = {\"Alice\", 90};\n    auto p2 = make_pair(\"Bob\", 85);\n    cout << p1.first << \": \" << p1.second << endl;\n    cout << p2.first << \": \" << p2.second << endl;\n\n    // map uses pairs internally:\n    map<string, int> scores;\n    scores.insert({\"Carol\", 95});\n    scores.insert(make_pair(\"David\", 78));\n\n    for (auto& [name, score] : scores)\n        cout << name << \": \" << score << endl;\n\n    // Sort vector of pairs by second element:\n    vector<pair<string, int>> v = {{\"C\",3},{\"A\",1},{\"B\",2}};\n    sort(v.begin(), v.end(),\n         [](const auto& x, const auto& y){ return x.second < y.second; });\n    for (auto& [c, n] : v) cout << c << \":\" << n << \" \";\n    cout << endl;\n\n    return 0;\n}",
+    "expectedOutput": ["Alice: 90", "Bob: 85", "Carol: 95", "David: 78", "A:1 B:2 C:3 "],
+    "successMessage": "pairs are how map stores entries. Sorting a vector of pairs by second element with a lambda comparator — a very common pattern for leaderboards and rankings."
+  },
+  {
+    "title": "Build a frequency analyser",
+    "instruction": "No starter code.\n\nGiven this text: `\"to be or not to be that is the question\"`\n\n1. Count word frequencies using `unordered_map<string, int>`\n2. Find the top 3 most frequent words\n3. Store all unique words in a `set<string>` and print them sorted\n4. Print total word count and unique word count",
+    "hint": "For top 3: copy to vector<pair<string,int>>, sort by .second descending, take first 3.",
+    "starter": "",
+    "expectedOutput": [],
+    "codeChecks": [
+      { "pattern": "unordered_map<string.*int>|map<string.*int>", "required": true, "message": "Use unordered_map<string, int> for word frequencies." },
+      { "pattern": "set<string>", "required": true, "message": "Use set<string> for unique sorted words." },
+      { "pattern": "sort\\(|sort \\(", "required": true, "message": "Sort word frequencies to find top 3." },
+      { "pattern": "split|ss >>|istringstream|stringstream", "required": true, "message": "Parse the text into words (use stringstream or split on space)." }
+    ],
+    "successMessage": "Frequency analysis using unordered_map + vector sort + set. Word frequency counting is the foundation of search engines, spam filters, and NLP. Chapter 16 done!"
+  }
+]

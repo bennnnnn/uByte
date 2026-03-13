@@ -1,35 +1,12 @@
 ---
 title: "Loops"
-description: "for, while, and range-based for loops in C++."
-order: 5
+description: "for, while, do-while, range-based for, break, continue — all of C++'s looping constructs."
+order: 6
 difficulty: "beginner"
-estimatedMinutes: 12
+estimatedMinutes: 16
+concepts: ["for loop", "while", "do-while", "range-based for", "break", "continue", "nested loops", "FizzBuzz"]
 ---
 
-## for Loop
+## Repetition is computation
 
-```cpp
-for (int i = 0; i < 5; i++) {
-    std::cout << i << std::endl;
-}
-```
-
-## Range-based for (C++11)
-
-```cpp
-std::vector<int> nums = {1, 2, 3};
-for (auto n : nums) {
-    std::cout << n << std::endl;
-}
-```
-
-## while Loop
-
-```cpp
-int i = 0;
-while (i < 5) {
-    std::cout << i++ << std::endl;
-}
-```
-
-More content coming soon. Try the interactive steps above!
+Loops are the engine of every algorithm. C++ loops are identical to Java and C — but C++11 added the elegant range-based for loop that eliminates index management entirely.

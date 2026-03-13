@@ -1,0 +1,52 @@
+[
+  {
+    "title": "Write to a file",
+    "instruction": "`ofstream` opens a file for writing. Use `<<` just like `cout`:\n\n```cpp\nofstream file(\"output.txt\");\nfile << \"Hello\" << endl;\n// file closed automatically when it goes out of scope\n```\n\n`ios::app` appends instead of overwriting.",
+    "starter": "#include <iostream>\n#include <fstream>\n#include <string>\nusing namespace std;\n\nint main() {\n    // Write to file:\n    {\n        ofstream out(\"students.txt\");\n        if (!out) { cerr << \"Cannot create file!\" << endl; return 1; }\n\n        out << \"Alice,90\" << endl;\n        out << \"Bob,85\" << endl;\n        out << \"Carol,92\" << endl;\n        cout << \"Written 3 records.\" << endl;\n    }  // file closed here\n\n    // Append to file:\n    {\n        ofstream out(\"students.txt\", ios::app);\n        out << \"David,78\" << endl;\n        cout << \"Appended 1 record.\" << endl;\n    }\n\n    return 0;\n}",
+    "expectedOutput": ["Written 3 records.", "Appended 1 record."],
+    "successMessage": "ofstream creates the file if it doesn't exist, overwrites if it does. ios::app appends. The block-scoped ofstream is RAII — the file is closed when the block ends."
+  },
+  {
+    "title": "Read from a file — line by line",
+    "instruction": "`ifstream` reads from a file. `getline(file, line)` reads one line.\n\n`while (getline(file, line))` loops until end of file.",
+    "starter": "#include <iostream>\n#include <fstream>\n#include <string>\n#include <sstream>\nusing namespace std;\n\nint main() {\n    // First create the file:\n    {\n        ofstream out(\"data.txt\");\n        out << \"Alice,90\" << endl << \"Bob,85\" << endl << \"Carol,92\" << endl;\n    }\n\n    // Read it back:\n    ifstream in(\"data.txt\");\n    if (!in) { cerr << \"File not found!\" << endl; return 1; }\n\n    string line;\n    int count = 0;\n    double total = 0;\n\n    while (getline(in, line)) {\n        count++;\n        stringstream ss(line);\n        string name;\n        int score;\n        getline(ss, name, ',');\n        ss >> score;\n        cout << name << \" scored \" << score << endl;\n        total += score;\n    }\n\n    cout << \"Average: \" << total / count << endl;\n\n    return 0;\n}",
+    "expectedOutput": ["Alice scored 90", "Bob scored 85", "Carol scored 92", "Average: 89"],
+    "successMessage": "getline(ss, name, ',') reads up to the comma delimiter — perfect for CSV parsing. The stringstream splits each line. This is the pattern for every CSV reader."
+  },
+  {
+    "title": "Read word by word with >>",
+    "instruction": "`>>` on ifstream reads one whitespace-separated token at a time — like `cin`.\n\nPerfect for structured data where items are separated by spaces.",
+    "starter": "#include <iostream>\n#include <fstream>\n#include <string>\n#include <map>\nusing namespace std;\n\nint main() {\n    // Write test data:\n    {\n        ofstream out(\"words.txt\");\n        out << \"the quick brown fox the fox the\" << endl;\n    }\n\n    // Count word frequency:\n    ifstream in(\"words.txt\");\n    map<string, int> freq;\n    string word;\n\n    while (in >> word) {\n        freq[word]++;\n    }\n\n    for (const auto& [w, c] : freq) {\n        cout << w << \": \" << c << endl;\n    }\n\n    return 0;\n}",
+    "expectedOutput": ["brown: 1", "fox: 2", "quick: 1", "the: 3"],
+    "successMessage": "while (in >> word) reads until EOF. The map counts frequencies and iterates alphabetically. Word frequency counting from a file — every search engine starts here."
+  },
+  {
+    "title": "Check stream state",
+    "instruction": "Always check if a file opened successfully:\n\n```cpp\nif (!file) { cerr << \"Error!\"; return 1; }\n```\n\nStream state flags:\n- `good()` — all OK\n- `eof()` — reached end of file\n- `fail()` — formatting or logic error\n- `bad()` — severe error",
+    "starter": "#include <iostream>\n#include <fstream>\nusing namespace std;\n\nint main() {\n    ifstream file(\"nonexistent_file.txt\");\n\n    if (!file.is_open()) {\n        cerr << \"Error: could not open file\" << endl;\n    }\n\n    cout << \"good(): \" << boolalpha << file.good() << endl;\n    cout << \"fail(): \" << file.fail() << endl;\n\n    // Reset and try a real file:\n    ofstream out(\"test.txt\");\n    out << \"Hello\" << endl;\n    out.close();\n\n    ifstream in(\"test.txt\");\n    cout << \"File opened: \" << in.is_open() << endl;\n    string line;\n    getline(in, line);\n    cout << line << endl;\n\n    return 0;\n}",
+    "expectedOutput": ["Error: error: could not open file", "good(): false", "fail(): true", "File opened: true", "Hello"],
+    "successMessage": "is_open() and the stream bool conversion both check if the file opened. fail() is true when the open failed. Always check before reading — an unchecked failed open produces silent garbage data."
+  },
+  {
+    "title": "filesystem — modern path handling",
+    "instruction": "`<filesystem>` (C++17) provides cross-platform file system operations:\n\n```cpp\n#include <filesystem>\nnamespace fs = filesystem;\n\nfs::exists(\"file.txt\")\nfs::create_directories(\"path/to/dir\")\nfs::file_size(\"file.txt\")\n```",
+    "starter": "#include <iostream>\n#include <fstream>\n#include <filesystem>\nusing namespace std;\nnamespace fs = filesystem;\n\nint main() {\n    // Create a directory and file:\n    fs::create_directories(\"myapp/data\");\n    ofstream out(\"myapp/data/config.txt\");\n    out << \"port=8080\" << endl << \"host=localhost\" << endl;\n    out.close();\n\n    fs::path p(\"myapp/data/config.txt\");\n    cout << \"Exists: \" << boolalpha << fs::exists(p) << endl;\n    cout << \"Size: \"   << fs::file_size(p) << \" bytes\" << endl;\n    cout << \"Name: \"   << p.filename() << endl;\n    cout << \"Parent: \" << p.parent_path() << endl;\n\n    // Cleanup:\n    fs::remove_all(\"myapp\");\n    cout << \"Cleaned up.\" << endl;\n\n    return 0;\n}",
+    "expectedOutput": ["Exists: true", "Name: \"config.txt\"", "Cleaned up."],
+    "successMessage": "filesystem provides cross-platform path operations — no more Windows vs Linux path separator issues. p.filename(), p.parent_path(), p.stem(), p.extension() decompose paths cleanly."
+  },
+  {
+    "title": "Build a log file system",
+    "instruction": "No starter code.\n\nBuild a `Logger` class:\n- Constructor takes a filename, opens the file in append mode\n- `log(string level, string message)` — writes `\"[YYYY-MM-DD HH:MM:SS] [LEVEL] message\"`\n- Use `<chrono>` or just write a fixed timestamp for simplicity\n- `getLineCount()` — read the file and count lines\n- Destructor closes the file\n\nLog 5+ messages, then print the line count.",
+    "hint": "Use ctime and localtime to format the timestamp, or write a fixed-format string.",
+    "starter": "",
+    "expectedOutput": [],
+    "codeChecks": [
+      { "pattern": "class Logger", "required": true, "message": "Define class Logger." },
+      { "pattern": "ofstream|fstream", "required": true, "message": "Use ofstream or fstream for the log file." },
+      { "pattern": "ios::app", "required": true, "message": "Open in append mode: ios::app." },
+      { "pattern": "void log\\(|log\\(string", "required": true, "message": "Add log(string level, string message) method." },
+      { "pattern": "~Logger", "required": true, "message": "Add a destructor that closes the file." }
+    ],
+    "successMessage": "A RAII-based logger — destructor closes the file automatically. Append mode means logs accumulate across runs. This is how real logging libraries work. Chapter 19 done!"
+  }
+]

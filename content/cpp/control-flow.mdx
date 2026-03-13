@@ -1,33 +1,14 @@
 ---
 title: "Control Flow"
-description: "if/else, switch, and boolean logic in C++."
-order: 4
+description: "if/else, switch, ternary operator, logical operators, and short-circuit evaluation in C++."
+order: 5
 difficulty: "beginner"
 estimatedMinutes: 15
+concepts: ["if/else", "switch", "ternary", "&&", "||", "!", "short-circuit", "comparison operators", "nested if"]
 ---
 
-## if / else if / else
+## Make decisions
 
-```cpp
-int x = 10;
-if (x > 0) {
-    std::cout << "positive" << std::endl;
-} else if (x < 0) {
-    std::cout << "negative" << std::endl;
-} else {
-    std::cout << "zero" << std::endl;
-}
-```
+Control flow is how programs choose. C++'s control structures should feel familiar — they're the template that Java, JavaScript, and C# all copied.
 
-## switch
-
-```cpp
-int day = 2;
-switch (day) {
-    case 1: std::cout << "Monday"; break;
-    case 2: std::cout << "Tuesday"; break;
-    default: std::cout << "Other"; break;
-}
-```
-
-More content coming soon. Try the interactive steps above!
+One C++-specific detail: `switch` works on integers and chars (and enums), not strings.

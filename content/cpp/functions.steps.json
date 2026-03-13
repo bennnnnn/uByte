@@ -1,0 +1,62 @@
+[
+  {
+    "title": "Your first function",
+    "instruction": "Declare functions BEFORE `main()` or provide a **forward declaration**:\n\n```cpp\nreturnType functionName(paramType param) {\n    return value;\n}\n```\n\n`void` = returns nothing. Run this.",
+    "starter": "#include <iostream>\nusing namespace std;\n\nstring greet(string name) {\n    return \"Hello, \" + name + \"!\";\n}\n\nvoid printSeparator() {\n    cout << \"----------\" << endl;\n}\n\nint main() {\n    cout << greet(\"Alice\") << endl;\n    cout << greet(\"Bob\")   << endl;\n    printSeparator();\n    cout << greet(\"Carol\") << endl;\n    return 0;\n}",
+    "expectedOutput": ["Hello, Alice!", "Hello, Bob!", "----------", "Hello, Carol!"],
+    "successMessage": "One function, three calls. Change the format in greet() and all three outputs update. Functions defined before main() are visible throughout. Functions after main() need a forward declaration."
+  },
+  {
+    "title": "Pass by value — copies are made",
+    "instruction": "In C++, function parameters are **copied** by default. Changing them inside the function doesn't affect the caller:\n\n```cpp\nvoid addFive(int x) {   // x is a COPY\n    x += 5;             // doesn't change caller's variable\n}\n```\n\nThis is safe but slow for large objects.",
+    "starter": "#include <iostream>\nusing namespace std;\n\nvoid tryToDouble(int n) {\n    n = n * 2;  // only changes the LOCAL copy\n    cout << \"Inside: \" << n << endl;\n}\n\nint main() {\n    int x = 10;\n    cout << \"Before: \" << x << endl;\n    tryToDouble(x);\n    cout << \"After: \"  << x << endl;  // still 10!\n    return 0;\n}",
+    "expectedOutput": ["Before: 10", "Inside: 20", "After: 10"],
+    "successMessage": "x is unchanged! The function received a copy of 10, doubled the copy to 20, and discarded it when it returned. Pass-by-value is the default in C++ — safe, no side effects."
+  },
+  {
+    "title": "Pass by reference — modify the original",
+    "instruction": "Add `&` to make a parameter a **reference** — the function operates on the original variable:\n\n```cpp\nvoid doubleIt(int& n) {  // & = reference, not a copy\n    n = n * 2;           // modifies the caller's variable!\n}\n```\n\nAlso use `const string&` to pass large objects efficiently without allowing modification.",
+    "hint": "void doubleIt(int& n) { n *= 2; }",
+    "starter": "#include <iostream>\n#include <string>\nusing namespace std;\n\nvoid doubleIt(int& n) {\n    n *= 2;  // modifies the original\n}\n\nvoid swap(int& a, int& b) {\n    int temp = a;\n    a = b;\n    b = temp;\n}\n\n// const& for efficiency without modification:\nvoid printName(const string& name) {\n    cout << \"Name: \" << name << endl;\n}\n\nint main() {\n    int x = 10;\n    doubleIt(x);\n    cout << x << endl;  // 20!\n\n    int a = 3, b = 7;\n    swap(a, b);\n    cout << a << \" \" << b << endl;  // 7 3\n\n    printName(\"Alice\");\n    return 0;\n}",
+    "expectedOutput": ["20", "7 3", "Name: Alice"],
+    "codeChecks": [
+      { "pattern": "void doubleIt\\(int&", "required": true, "message": "Use int& reference parameter: void doubleIt(int& n)" },
+      { "pattern": "void swap\\(int&.*int&|void swap\\(int &.*int &", "required": true, "message": "Use int& for both swap parameters." }
+    ],
+    "successMessage": "x went from 10 to 20 — the reference let the function modify the original. swap uses two references to exchange values. const string& avoids copying without the function being able to modify it."
+  },
+  {
+    "title": "Default arguments",
+    "instruction": "Parameters can have default values — used when the caller doesn't provide them:\n\n```cpp\nvoid greet(string name, string title = \"Mr.\") {\n    cout << title << \" \" << name << endl;\n}\ngreet(\"Smith\");         // Mr. Smith\ngreet(\"Smith\", \"Dr.\"); // Dr. Smith\n```\n\nDefaults must come at the END of the parameter list.",
+    "starter": "#include <iostream>\n#include <string>\nusing namespace std;\n\ndouble power(double base, int exp = 2) {\n    double result = 1;\n    for (int i = 0; i < exp; i++) result *= base;\n    return result;\n}\n\nvoid log(string message, string level = \"INFO\") {\n    cout << \"[\" << level << \"] \" << message << endl;\n}\n\nint main() {\n    cout << power(5)    << endl;  // 5^2\n    cout << power(2, 8) << endl;  // 2^8\n    cout << power(3, 3) << endl;  // 3^3\n\n    log(\"Server started\");\n    log(\"Connection failed\", \"ERROR\");\n    log(\"Low memory\", \"WARN\");\n\n    return 0;\n}",
+    "expectedOutput": ["25", "256", "27", "[INFO] Server started", "[ERROR] Connection failed", "[WARN] Low memory"],
+    "successMessage": "Default arguments make functions flexible without overloading. Defaults at the end — that rule is enforced by the compiler. Log functions with default INFO level are a classic use case."
+  },
+  {
+    "title": "Function overloading",
+    "instruction": "Multiple functions with the same name but different parameter types or counts.\n\nThe compiler picks the right one based on the arguments.",
+    "starter": "#include <iostream>\n#include <string>\nusing namespace std;\n\nint add(int a, int b) {\n    return a + b;\n}\n\ndouble add(double a, double b) {\n    return a + b;\n}\n\nstring add(string a, string b) {\n    return a + b;\n}\n\nint add(int a, int b, int c) {\n    return a + b + c;\n}\n\nint main() {\n    cout << add(3, 4)          << endl;  // int version\n    cout << add(3.5, 4.5)      << endl;  // double version\n    cout << add(\"Hello, \", \"World\") << endl; // string version\n    cout << add(1, 2, 3)       << endl;  // three-arg version\n    return 0;\n}",
+    "expectedOutput": ["7", "8", "Hello, World", "6"],
+    "successMessage": "Four functions named add — the compiler picks by argument types. Overloading is how C++ standard library functions like abs(), min(), max() work on any numeric type."
+  },
+  {
+    "title": "Recursion",
+    "instruction": "A function that calls itself. Every recursive function needs:\n1. **Base case** — stops the recursion\n2. **Recursive case** — calls itself with a smaller problem\n\n`factorial(5) = 5 × factorial(4) = ... = 120`",
+    "starter": "#include <iostream>\nusing namespace std;\n\nlong long factorial(int n) {\n    if (n <= 1) return 1;           // base case\n    return n * factorial(n - 1);    // recursive case\n}\n\nint fibonacci(int n) {\n    if (n <= 1) return n;\n    return fibonacci(n-1) + fibonacci(n-2);\n}\n\nint main() {\n    cout << factorial(5) << endl;\n    cout << factorial(10) << endl;\n\n    for (int i = 0; i <= 8; i++) {\n        cout << fibonacci(i) << \" \";\n    }\n    cout << endl;\n\n    return 0;\n}",
+    "expectedOutput": ["120", "3628800", "0 1 1 2 3 5 8 13 21 "],
+    "successMessage": "10! = 3,628,800. Fibonacci: 0,1,1,2,3,5... Each number is the sum of the previous two. Recursion is elegant — but the fibonacci implementation here is O(2^n). In practice, use memoization or iteration."
+  },
+  {
+    "title": "Build string utilities",
+    "instruction": "No starter code. Write three functions:\n\n- `bool isPalindrome(const string& s)` — true if s reads the same backwards (case-insensitive hint: compare lowercase copies)\n- `int countOccurrences(const string& s, char target)` — count how many times char appears\n- `string reverse(const string& s)` — return reversed string\n\nTest each with two inputs.",
+    "hint": "For isPalindrome: use string reversed(s.rbegin(), s.rend()); and compare. For countOccurrences: loop and count.",
+    "starter": "",
+    "expectedOutput": [],
+    "codeChecks": [
+      { "pattern": "bool isPalindrome|isPalindrome\\(const string", "required": true, "message": "Define bool isPalindrome(const string& s)." },
+      { "pattern": "int countOccurrences|countOccurrences\\(", "required": true, "message": "Define int countOccurrences(const string& s, char target)." },
+      { "pattern": "string reverse|reverse\\(const string", "required": true, "message": "Define string reverse(const string& s)." }
+    ],
+    "successMessage": "Three string utilities using const string& — efficient, no unnecessary copies. string(s.rbegin(), s.rend()) reverses using reverse iterators. Chapter 7 done!"
+  }
+]

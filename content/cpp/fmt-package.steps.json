@@ -1,0 +1,58 @@
+[
+  {
+    "title": "std::string basics",
+    "instruction": "`#include <string>` gives you `std::string`.\n\nKey methods:\n- `.length()` or `.size()` — character count\n- `.at(i)` — character at index (bounds-checked)\n- `[i]` — character at index (no bounds check)\n- `.empty()` — true if empty\n- `.clear()` — erase content\n\nRun this.",
+    "starter": "#include <iostream>\n#include <string>\nusing namespace std;\n\nint main() {\n    string s = \"Hello, C++!\";\n\n    cout << s.length() << endl;\n    cout << s[0] << endl;      // H\n    cout << s.at(7) << endl;   // C\n    cout << s.empty() << endl; // 0 (false)\n\n    s += \" Welcome.\";\n    cout << s << endl;\n    cout << s.length() << endl;\n\n    return 0;\n}",
+    "expectedOutput": ["11", "H", "C", "0", "Hello, C++! Welcome.", "20"],
+    "successMessage": "Strings are dynamic — += appends and the string grows automatically. .at(i) throws out_of_range if i is too large; [i] doesn't check — use .at() when you're not sure."
+  },
+  {
+    "title": "substr, find, replace",
+    "instruction": "String operations:\n\n- `.substr(start, length)` — extract a portion\n- `.find(str)` — returns the index (or `string::npos` if not found)\n- `.replace(start, length, str)` — replace a range\n- `.erase(start, length)` — remove a range",
+    "starter": "#include <iostream>\n#include <string>\nusing namespace std;\n\nint main() {\n    string date = \"2024-03-15\";\n\n    cout << date.substr(0, 4) << endl;  // year\n    cout << date.substr(5, 2) << endl;  // month\n    cout << date.substr(8)    << endl;  // day\n\n    string text = \"I love Java programming\";\n    size_t pos = text.find(\"Java\");\n    if (pos != string::npos) {\n        text.replace(pos, 4, \"C++\");\n    }\n    cout << text << endl;\n\n    return 0;\n}",
+    "expectedOutput": ["2024", "03", "15", "I love C++ programming"],
+    "successMessage": "string::npos is the 'not found' sentinel — always check before using the position. substr(start, length) — note: second argument is LENGTH not end index (different from Java's substring!)."
+  },
+  {
+    "title": "String comparison and case",
+    "instruction": "C++ strings compare lexicographically with `==`, `<`, `>`, `<=`, `>=`.\n\nUnlike Java, `s1 == s2` correctly compares CONTENT (not addresses).\n\nFor case conversion, use `<algorithm>` with `transform`.",
+    "starter": "#include <iostream>\n#include <string>\n#include <algorithm>\nusing namespace std;\n\nint main() {\n    string a = \"hello\";\n    string b = \"world\";\n    string c = \"hello\";\n\n    cout << boolalpha;\n    cout << (a == c) << endl;   // true — content comparison\n    cout << (a == b) << endl;   // false\n    cout << (a < b)  << endl;   // true — 'h' < 'w' lexicographically\n\n    // Convert to uppercase:\n    string upper = a;\n    transform(upper.begin(), upper.end(), upper.begin(), ::toupper);\n    cout << upper << endl;\n\n    return 0;\n}",
+    "expectedOutput": ["true", "false", "true", "HELLO"],
+    "successMessage": "C++ string == compares content — no need for .equals() like in Java. transform with ::toupper converts case. ::toupper takes a char and returns the uppercase version."
+  },
+  {
+    "title": "to_string and stoi — convert between types",
+    "instruction": "Convert between strings and numbers:\n\n- `to_string(number)` — number → string\n- `stoi(str)` — string → int (stod for double, stol for long)\n\nThese are your main tools for parsing input and building output.",
+    "starter": "#include <iostream>\n#include <string>\nusing namespace std;\n\nint main() {\n    // Number to string:\n    int age = 25;\n    double price = 9.99;\n    string msg = \"Age: \" + to_string(age) + \", Price: \" + to_string(price);\n    cout << msg << endl;\n\n    // String to number:\n    string num = \"42\";\n    string dbl = \"3.14\";\n    int parsed = stoi(num);\n    double parsedD = stod(dbl);\n    cout << parsed + 1 << endl;\n    cout << parsedD + 1.0 << endl;\n\n    return 0;\n}",
+    "expectedOutput": ["Age: 25, Price: 9.990000", "43", "4.14"],
+    "successMessage": "to_string() converts numbers to strings. stoi/stod convert back. stoi throws invalid_argument for non-numeric strings — wrap in try/catch for user input parsing."
+  },
+  {
+    "title": "stringstream — build and parse",
+    "instruction": "`stringstream` from `<sstream>` builds strings like cout, and parses like cin:\n\n```cpp\nstringstream ss;\nss << \"Name: \" << name << \", Age: \" << age;\nstring result = ss.str();\n```\n\nAlso great for parsing space-separated data.",
+    "starter": "#include <iostream>\n#include <string>\n#include <sstream>\nusing namespace std;\n\nint main() {\n    // Build a string with stream:\n    stringstream builder;\n    builder << \"Product: \" << \"Widget\" << \", Price: $\" << 29.99 << \", Stock: \" << 42;\n    cout << builder.str() << endl;\n\n    // Parse space-separated values:\n    string data = \"Alice 25 87.5\";\n    stringstream parser(data);\n    string name;\n    int age;\n    double score;\n    parser >> name >> age >> score;\n    cout << name << \" aged \" << age << \" scored \" << score << endl;\n\n    return 0;\n}",
+    "expectedOutput": ["Product: Widget, Price: $29.99, Stock: 42", "Alice aged 25 scored 87.5"],
+    "successMessage": "stringstream builds strings with mixed types cleanly. Parsing with >> extracts whitespace-separated tokens. This is the C++ equivalent of Python's str.split() for simple cases."
+  },
+  {
+    "title": "string_view — efficient read-only strings",
+    "instruction": "`string_view` (C++17) is a lightweight, non-owning reference to string data — no copy, no allocation:\n\n```cpp\nvoid process(string_view sv) {  // accepts string, literal, or char*\n    // read-only access, no copy made\n}\n```\n\nUse it for function parameters that only read the string.",
+    "starter": "#include <iostream>\n#include <string>\n#include <string_view>\nusing namespace std;\n\n// Takes any string-like thing without copying:\nbool startsWith(string_view str, string_view prefix) {\n    return str.substr(0, prefix.size()) == prefix;\n}\n\nbool contains(string_view haystack, string_view needle) {\n    return haystack.find(needle) != string_view::npos;\n}\n\nint main() {\n    string s = \"Hello, C++ World!\";\n\n    cout << boolalpha;\n    cout << startsWith(s, \"Hello\") << endl;  // works with string\n    cout << startsWith(\"Goodbye\", \"Good\") << endl;  // works with literal\n    cout << contains(s, \"C++\") << endl;\n    cout << contains(s, \"Java\") << endl;\n\n    return 0;\n}",
+    "expectedOutput": ["true", "true", "true", "false"],
+    "successMessage": "string_view accepts a string, string literal, or char* without copying. Zero-cost abstraction. Use it for any function parameter that only needs to read a string — a major C++ best practice."
+  },
+  {
+    "title": "Build a word analyser",
+    "instruction": "No starter code.\n\nGiven `string sentence = \"the quick brown fox jumps over the lazy dog\"`:\n\n1. Count words (count spaces + 1)\n2. Count occurrences of the word \"the\"\n3. Reverse the entire string\n4. Replace every 'o' with '0' (zero)\n5. Print all results",
+    "hint": "Use find() in a loop for counting occurrences. Use std::reverse from <algorithm> for reversing. Use transform or a loop for replacing.",
+    "starter": "",
+    "expectedOutput": [],
+    "codeChecks": [
+      { "pattern": "string sentence\\s*=|string s\\s*=", "required": true, "message": "Declare the sentence string." },
+      { "pattern": "find\\(|count\\(", "required": true, "message": "Use find() to count word occurrences." },
+      { "pattern": "reverse|transform", "required": true, "message": "Use reverse() to reverse the string." },
+      { "pattern": "replace|'o'|\"o\"", "required": true, "message": "Replace 'o' with '0'." }
+    ],
+    "successMessage": "String manipulation using find, replace, and reverse. These are the bread and butter of text processing. Chapter 4 done!"
+  }
+]

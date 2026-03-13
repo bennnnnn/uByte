@@ -1,32 +1,14 @@
 ---
-title: "Testing in C++"
-description: "Unit testing with assertions and Catch2 in C++."
-order: 16
+title: "Inheritance & Polymorphism"
+description: "Extend classes with inheritance, virtual functions, pure virtual functions, abstract classes, and polymorphic dispatch."
+order: 14
 difficulty: "intermediate"
-estimatedMinutes: 18
+estimatedMinutes: 22
+concepts: ["inheritance", "public inheritance", "virtual", "override", "pure virtual", "abstract class", "polymorphism", "virtual destructor", "vtable", "dynamic_cast"]
 ---
 
-## Assertions
+## Build on what exists
 
-```cpp
-#include <cassert>
-int add(int a, int b) { return a + b; }
-int main() {
-    assert(add(2, 3) == 5);
-    std::cout << "All tests passed!" << std::endl;
-}
-```
+Inheritance creates specialised versions of existing classes. `virtual` functions enable polymorphism — the ability to call the right function based on the actual object type at runtime, not the variable type.
 
-## Catch2 (popular test framework)
-
-```cpp
-#define CATCH_CONFIG_MAIN
-#include <catch2/catch.hpp>
-
-TEST_CASE("add works correctly") {
-    REQUIRE(add(2, 3) == 5);
-    REQUIRE(add(-1, 1) == 0);
-}
-```
-
-More content coming soon. Try the interactive steps above!
+Virtual functions are what make game engines extensible: `Entity::update()` calls the right `Player::update()`, `Enemy::update()`, or `Bullet::update()` based on what the object actually is.

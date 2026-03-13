@@ -1,0 +1,52 @@
+[
+  {
+    "title": "Inheritance basics",
+    "instruction": "`class Child : public Parent` inherits all public members.\n\nThe derived class constructor must call the base class constructor:\n```cpp\nDog(string name) : Animal(name) {}  // : calls base constructor\n```\n\nRun this.",
+    "starter": "#include <iostream>\n#include <string>\nusing namespace std;\n\nclass Animal {\nprotected:\n    string name;\n\npublic:\n    Animal(string name) : name(name) {\n        cout << name << \" (animal) created\" << endl;\n    }\n\n    void eat() {\n        cout << name << \" is eating.\" << endl;\n    }\n};\n\nclass Dog : public Animal {\npublic:\n    Dog(string name) : Animal(name) {\n        cout << name << \" (dog) created\" << endl;\n    }\n\n    void bark() {\n        cout << name << \" says: Woof!\" << endl;\n    }\n};\n\nint main() {\n    Dog d(\"Rex\");\n    d.eat();   // inherited from Animal\n    d.bark();  // Dog's own method\n    return 0;\n}",
+    "expectedOutput": ["Rex (animal) created", "Rex (dog) created", "Rex is eating.", "Rex says: Woof!"],
+    "successMessage": "Animal constructor ran first, then Dog's. Rex inherited eat() from Animal without rewriting it. protected means derived classes can access the member; private would hide it even from derived classes."
+  },
+  {
+    "title": "virtual — enable polymorphism",
+    "instruction": "Without `virtual`, the BASE class version is always called even on derived objects.\nWith `virtual`, the DERIVED version is called based on the actual object type:\n\n```cpp\nvirtual void speak() { cout << \"...\" << endl; }  // base\nvoid speak() override { cout << \"Woof!\" << endl; }  // derived\n```\n\n`override` is optional but essential — it makes typos compile errors.",
+    "starter": "#include <iostream>\n#include <string>\nusing namespace std;\n\nclass Animal {\npublic:\n    string name;\n    Animal(string n) : name(n) {}\n\n    virtual void speak() {\n        cout << name << \": ...\" << endl;\n    }\n};\n\nclass Dog  : public Animal {\npublic:\n    Dog(string n) : Animal(n) {}\n    void speak() override { cout << name << \": Woof!\"  << endl; }\n};\n\nclass Cat  : public Animal {\npublic:\n    Cat(string n) : Animal(n) {}\n    void speak() override { cout << name << \": Meow!\"  << endl; }\n};\n\nvoid makeSpeak(Animal& a) {  // takes base reference\n    a.speak();               // calls the RIGHT version!\n}\n\nint main() {\n    Dog d(\"Rex\");\n    Cat c(\"Whiskers\");\n    Animal a(\"Generic\");\n\n    makeSpeak(d);\n    makeSpeak(c);\n    makeSpeak(a);\n    return 0;\n}",
+    "expectedOutput": ["Rex: Woof!", "Whiskers: Meow!", "Generic: ..."],
+    "successMessage": "makeSpeak takes Animal& but calls the right speak() — Dog's for Rex, Cat's for Whiskers. This is virtual dispatch. Without virtual, all three would print '...' — the base version."
+  },
+  {
+    "title": "Pure virtual — abstract classes",
+    "instruction": "A **pure virtual** function has no implementation in the base class:\n\n```cpp\nvirtual double area() = 0;  // = 0 makes it pure virtual\n```\n\nA class with any pure virtual function is **abstract** — you cannot instantiate it directly. Derived classes MUST implement all pure virtuals.",
+    "starter": "#include <iostream>\n#include <cmath>\nusing namespace std;\n\nclass Shape {\npublic:\n    virtual double area()      = 0;  // pure virtual\n    virtual double perimeter() = 0;  // pure virtual\n\n    // Regular virtual with implementation:\n    virtual void describe() {\n        cout << typeid(*this).name() << \": area=\" << area() << endl;\n    }\n};\n\nclass Circle : public Shape {\n    double r;\npublic:\n    Circle(double r) : r(r) {}\n    double area()      override { return M_PI * r * r; }\n    double perimeter() override { return 2 * M_PI * r; }\n};\n\nclass Square : public Shape {\n    double s;\npublic:\n    Square(double s) : s(s) {}\n    double area()      override { return s * s; }\n    double perimeter() override { return 4 * s; }\n};\n\nint main() {\n    // Shape s;  // compile error — abstract!\n    Circle c(5);\n    Square sq(4);\n\n    cout << \"Circle area: \" << c.area() << endl;\n    cout << \"Square area: \" << sq.area() << endl;\n\n    return 0;\n}",
+    "expectedOutput": ["Circle area: 78.5398", "Square area: 16"],
+    "successMessage": "Abstract classes enforce a contract — every Shape subclass MUST implement area() and perimeter(). Shape itself can't be instantiated — just a blueprint."
+  },
+  {
+    "title": "Virtual destructor — essential!",
+    "instruction": "If you delete a derived object through a base pointer without a virtual destructor, the derived destructor never runs — **memory leak!**\n\nRule: **If a class has virtual functions, give it a virtual destructor.**",
+    "starter": "#include <iostream>\n#include <string>\n#include <memory>\nusing namespace std;\n\nclass Base {\npublic:\n    virtual ~Base() { cout << \"Base destroyed\" << endl; }  // virtual!\n    virtual void greet() { cout << \"Hello from Base\" << endl; }\n};\n\nclass Derived : public Base {\n    string data = \"expensive resource\";\npublic:\n    ~Derived() { cout << \"Derived destroyed (\" << data << \" freed)\" << endl; }\n    void greet() override { cout << \"Hello from Derived\" << endl; }\n};\n\nint main() {\n    // Polymorphic deletion via base pointer:\n    Base* p = new Derived();\n    p->greet();\n    delete p;  // calls Derived::~Derived() then Base::~Base() — correct!\n    return 0;\n}",
+    "expectedOutput": ["Hello from Derived", "Derived destroyed (expensive resource freed)", "Base destroyed"],
+    "successMessage": "Both destructors ran — Derived first, then Base. Without virtual ~Base(), only Base::~Base() would run — the expensive resource would never be freed. Virtual destructor is non-optional for polymorphic base classes."
+  },
+  {
+    "title": "dynamic_cast — safe downcasting",
+    "instruction": "`dynamic_cast` safely converts a base pointer/reference to a derived type:\n\n- Returns `nullptr` if the cast fails (for pointers)\n- Throws `bad_cast` if it fails (for references)\n\nRequires virtual functions (vtable) to work.",
+    "starter": "#include <iostream>\n#include <string>\nusing namespace std;\n\nclass Animal {\npublic:\n    string name;\n    Animal(string n) : name(n) {}\n    virtual ~Animal() = default;\n    virtual void speak() = 0;\n};\n\nclass Dog : public Animal {\npublic:\n    Dog(string n) : Animal(n) {}\n    void speak() override { cout << name << \": Woof\" << endl; }\n    void fetch() { cout << name << \" fetches the ball!\" << endl; }\n};\n\nclass Cat : public Animal {\npublic:\n    Cat(string n) : Animal(n) {}\n    void speak() override { cout << name << \": Meow\" << endl; }\n    void purr() { cout << name << \" purrs...\" << endl; }\n};\n\nvoid interact(Animal* a) {\n    a->speak();\n    if (Dog* d = dynamic_cast<Dog*>(a)) {\n        d->fetch();  // only for dogs\n    } else if (Cat* c = dynamic_cast<Cat*>(a)) {\n        c->purr();   // only for cats\n    }\n}\n\nint main() {\n    Animal* animals[] = {new Dog(\"Rex\"), new Cat(\"Whiskers\")};\n    for (auto* a : animals) { interact(a); delete a; }\n    return 0;\n}",
+    "expectedOutput": ["Rex: Woof", "Rex fetches the ball!", "Whiskers: Meow", "Whiskers purrs..."],
+    "successMessage": "dynamic_cast returns nullptr for the wrong type — safe to check. This is how game engines handle entity-specific interactions: 'is this entity a Player? Let it interact with the upgrade.'"
+  },
+  {
+    "title": "Build a shapes calculator",
+    "instruction": "No starter code.\n\nBuild an abstract class hierarchy:\n- `abstract class Shape` — pure virtual `area()`, `perimeter()`, `name()` methods; virtual `describe()` that prints all three\n- `class Circle(radius)`, `class Rectangle(w, h)`, `class Triangle(a, b, c)` — all concrete\n- Triangle area: Heron's formula — `s=(a+b+c)/2; area=sqrt(s*(s-a)*(s-b)*(s-c))`\n\nCreate a vector of `Shape*`, call describe() on each, total the areas.",
+    "hint": "vector<unique_ptr<Shape>> shapes; shapes.push_back(make_unique<Circle>(5));",
+    "starter": "",
+    "expectedOutput": [],
+    "codeChecks": [
+      { "pattern": "class Shape", "required": true, "message": "Define abstract class Shape." },
+      { "pattern": "virtual.*area.*=\\s*0|area\\(\\)\\s*=\\s*0", "required": true, "message": "Make area() pure virtual." },
+      { "pattern": "class Circle.*Shape|Circle.*public.*Shape", "required": true, "message": "class Circle : public Shape" },
+      { "pattern": "class Triangle.*Shape|Triangle.*public.*Shape", "required": true, "message": "class Triangle : public Shape" },
+      { "pattern": "vector|unique_ptr|Shape\\*", "required": true, "message": "Store shapes in a collection." }
+    ],
+    "successMessage": "Abstract class, three concrete shapes, polymorphic dispatch. Virtual functions call the right area() for each shape. This is the foundation of every game engine, rendering system, and UI framework. Chapter 14 done!"
+  }
+]

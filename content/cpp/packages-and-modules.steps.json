@@ -1,0 +1,52 @@
+[
+  {
+    "title": "sort and reverse",
+    "instruction": "`sort` needs `<algorithm>`. Pass begin/end iterators and an optional comparator.\n\n`sort(v.begin(), v.end())` — ascending (default)\n`sort(v.begin(), v.end(), greater<int>())` — descending\n`reverse(v.begin(), v.end())` — reverse in place",
+    "starter": "#include <iostream>\n#include <vector>\n#include <algorithm>\n#include <string>\nusing namespace std;\n\nint main() {\n    vector<int> nums = {5, 2, 8, 1, 9, 3, 7};\n\n    sort(nums.begin(), nums.end());\n    for (int n : nums) cout << n << \" \";\n    cout << endl;\n\n    sort(nums.begin(), nums.end(), greater<int>());\n    for (int n : nums) cout << n << \" \";\n    cout << endl;\n\n    vector<string> words = {\"banana\", \"apple\", \"cherry\"};\n    sort(words.begin(), words.end());\n    for (const auto& w : words) cout << w << \" \";\n    cout << endl;\n\n    return 0;\n}",
+    "expectedOutput": ["1 2 3 5 7 8 9 ", "9 8 7 5 3 2 1 ", "apple banana cherry "],
+    "successMessage": "sort ascending, descending with greater<int>(), and strings alphabetically. sort is O(n log n) — introsort under the hood (quicksort + heapsort hybrid). The most-used algorithm in C++."
+  },
+  {
+    "title": "find, find_if, count_if",
+    "instruction": "Searching algorithms:\n\n- `find(begin, end, value)` — linear search, returns iterator\n- `find_if(begin, end, predicate)` — find first matching predicate\n- `count_if(begin, end, predicate)` — count matching elements\n- Check result: `if (it != v.end())` to know if found",
+    "starter": "#include <iostream>\n#include <vector>\n#include <algorithm>\nusing namespace std;\n\nint main() {\n    vector<int> nums = {3, 7, 2, 9, 4, 7, 6, 1, 8};\n\n    // find:\n    auto it = find(nums.begin(), nums.end(), 9);\n    if (it != nums.end())\n        cout << \"Found 9 at index: \" << (it - nums.begin()) << endl;\n\n    // find_if — first even number:\n    auto even = find_if(nums.begin(), nums.end(), [](int n){ return n % 2 == 0; });\n    if (even != nums.end())\n        cout << \"First even: \" << *even << endl;\n\n    // count_if:\n    int evenCount = count_if(nums.begin(), nums.end(), [](int n){ return n % 2 == 0; });\n    cout << \"Even numbers: \" << evenCount << endl;\n\n    return 0;\n}",
+    "expectedOutput": ["Found 9 at index: 3", "First even: 2", "Even numbers: 4"],
+    "successMessage": "find returns an iterator — dereference with * to get the value, subtract begin() for the index. Lambdas as predicates make find_if and count_if extremely flexible."
+  },
+  {
+    "title": "transform — apply a function to every element",
+    "instruction": "`transform` applies a function to each element and stores results:\n\n```cpp\ntransform(src.begin(), src.end(), dest.begin(), func);\n```\n\nCan also take two input ranges and combine them.",
+    "starter": "#include <iostream>\n#include <vector>\n#include <algorithm>\n#include <string>\n#include <cctype>\nusing namespace std;\n\nint main() {\n    vector<int> nums = {1, 2, 3, 4, 5};\n    vector<int> squares(nums.size());\n\n    // Square each element:\n    transform(nums.begin(), nums.end(), squares.begin(),\n              [](int n){ return n * n; });\n    for (int n : squares) cout << n << \" \";\n    cout << endl;\n\n    // Uppercase a string:\n    string s = \"hello world\";\n    transform(s.begin(), s.end(), s.begin(), ::toupper);\n    cout << s << endl;\n\n    // Add two vectors element-wise:\n    vector<int> a = {1, 2, 3};\n    vector<int> b = {10, 20, 30};\n    vector<int> c(3);\n    transform(a.begin(), a.end(), b.begin(), c.begin(),\n              [](int x, int y){ return x + y; });\n    for (int n : c) cout << n << \" \";\n    cout << endl;\n\n    return 0;\n}",
+    "expectedOutput": ["1 4 9 16 25 ", "HELLO WORLD", "11 22 33 "],
+    "successMessage": "transform is map from functional programming — apply a function to every element. Element-wise addition of two vectors in one call. This is the building block of every numerical library."
+  },
+  {
+    "title": "accumulate and reduce",
+    "instruction": "`accumulate` from `<numeric>` folds a range to a single value:\n\n```cpp\naccumulate(begin, end, initial_value);            // sum\naccumulate(begin, end, 1, multiplies<int>());    // product\naccumulate(begin, end, \"\", [](s, val){ ... });   // string join\n```",
+    "starter": "#include <iostream>\n#include <vector>\n#include <numeric>\n#include <string>\n#include <functional>\nusing namespace std;\n\nint main() {\n    vector<int> nums = {1, 2, 3, 4, 5};\n\n    int sum     = accumulate(nums.begin(), nums.end(), 0);\n    int product = accumulate(nums.begin(), nums.end(), 1, multiplies<int>());\n    cout << \"Sum: \" << sum << endl;\n    cout << \"Product: \" << product << endl;\n\n    // Join strings:\n    vector<string> words = {\"C++\", \"is\", \"amazing\"};\n    string joined = accumulate(words.begin() + 1, words.end(),\n                               words[0],\n                               [](string a, string b){ return a + \" \" + b; });\n    cout << joined << endl;\n\n    // Running average:\n    double avg = static_cast<double>(sum) / nums.size();\n    cout << \"Average: \" << avg << endl;\n\n    return 0;\n}",
+    "expectedOutput": ["Sum: 15", "Product: 120", "C++ is amazing", "Average: 3"],
+    "successMessage": "accumulate is fold/reduce from functional programming. Sum, product, string join — all the same function with different starting values and operations. multiplies<int>() is a function object from <functional>."
+  },
+  {
+    "title": "any_of, all_of, none_of",
+    "instruction": "Boolean checks on ranges:\n\n- `all_of(begin, end, pred)` — are ALL elements matching?\n- `any_of(begin, end, pred)` — is AT LEAST ONE matching?\n- `none_of(begin, end, pred)` — are NONE matching?",
+    "starter": "#include <iostream>\n#include <vector>\n#include <algorithm>\nusing namespace std;\n\nint main() {\n    vector<int> scores = {85, 92, 78, 95, 88};\n    vector<int> failing = {45, 72, 38, 55};\n\n    cout << boolalpha;\n\n    // All passing (>= 60)?\n    cout << all_of(scores.begin(), scores.end(),\n                   [](int s){ return s >= 60; }) << endl;  // true\n\n    // Any perfect score?\n    cout << any_of(scores.begin(), scores.end(),\n                   [](int s){ return s == 100; }) << endl;  // false\n\n    // None failing in scores?\n    cout << none_of(scores.begin(), scores.end(),\n                    [](int s){ return s < 60; }) << endl;   // true\n\n    // Any passing in failing?\n    cout << any_of(failing.begin(), failing.end(),\n                   [](int s){ return s >= 60; }) << endl;   // true\n\n    return 0;\n}",
+    "expectedOutput": ["true", "false", "true", "true"],
+    "successMessage": "all_of, any_of, none_of — boolean queries over ranges. 72 in failing[] is >= 60, so any_of returns true. These replace manual loops with readable one-liners."
+  },
+  {
+    "title": "Build a data pipeline",
+    "instruction": "No starter code.\n\nGiven employee records (struct Employee{string name; string dept; int salary;}):\n- Create 8 employees in 3 departments\n- Filter employees earning > 70000 (use remove_if or copy_if)\n- Sort by salary descending\n- Transform to a vector of strings `\"Name: $salary\"` using transform\n- Print each\n- Use accumulate to find total payroll",
+    "hint": "Use copy_if to filter into a new vector. sort with lambda comparator. transform to strings.",
+    "starter": "",
+    "expectedOutput": [],
+    "codeChecks": [
+      { "pattern": "struct Employee|class Employee", "required": true, "message": "Define an Employee struct/class." },
+      { "pattern": "copy_if|remove_if|filter", "required": true, "message": "Filter employees by salary." },
+      { "pattern": "sort\\(", "required": true, "message": "Sort employees by salary." },
+      { "pattern": "transform\\(", "required": true, "message": "Transform to string representations using transform." },
+      { "pattern": "accumulate", "required": true, "message": "Calculate total payroll with accumulate." }
+    ],
+    "successMessage": "A data pipeline using STL algorithms — filter, sort, transform, reduce. This is how every reporting and analytics system works at its core. Chapter 17 done!"
+  }
+]

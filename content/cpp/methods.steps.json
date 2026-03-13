@@ -1,0 +1,51 @@
+[
+  {
+    "title": "Stack vs heap",
+    "instruction": "Two places memory lives:\n\n**Stack**: local variables, function parameters — automatic allocation/deallocation, fast, limited size (~1MB default).\n**Heap**: dynamically allocated with `new` — manual, large, slower.\n\nMost variables go on the stack. Large data, dynamic-size data, and objects that outlive their function go on the heap.",
+    "starter": "#include <iostream>\nusing namespace std;\n\nvoid demonstrateStack() {\n    int local = 42;    // stack — freed when function returns\n    cout << \"Stack var: \" << local << endl;\n}  // local is freed here automatically\n\nint main() {\n    // Stack allocation (automatic):\n    int stack_var = 100;\n    double stack_arr[5] = {1.0, 2.0, 3.0, 4.0, 5.0};\n    cout << \"Stack int: \" << stack_var << endl;\n    cout << \"Stack arr: \" << stack_arr[2] << endl;\n\n    demonstrateStack();\n\n    // Stack size is limited:\n    // int huge[1000000];  // might overflow the stack!\n\n    return 0;\n}",
+    "expectedOutput": ["Stack int: 100", "Stack arr: 3", "Stack var: 42"],
+    "successMessage": "Stack variables are freed automatically when they go out of scope. Fast and safe — but limited to about 1MB on most systems. For large data: use the heap via new or vector (which manages heap internally)."
+  },
+  {
+    "title": "new and delete — manual heap allocation",
+    "instruction": "`new` allocates memory on the heap and returns a pointer.\n`delete` frees it.\n\n**Golden rule**: every `new` must have exactly one matching `delete`.",
+    "starter": "#include <iostream>\nusing namespace std;\n\nint main() {\n    // Allocate a single int on the heap:\n    int* p = new int(42);\n    cout << *p << endl;\n    delete p;   // free the memory\n    p = nullptr; // good practice — prevent use-after-free\n\n    // Allocate an array on the heap:\n    int* arr = new int[5]{10, 20, 30, 40, 50};\n    for (int i = 0; i < 5; i++) cout << arr[i] << \" \";\n    cout << endl;\n    delete[] arr;   // use delete[] for arrays, NOT delete!\n    arr = nullptr;\n\n    return 0;\n}",
+    "expectedOutput": ["42", "10 20 30 40 50 "],
+    "successMessage": "delete for single objects, delete[] for arrays. Never mix them. After deleting, set to nullptr — using a pointer after delete is 'use-after-free' — undefined behaviour that causes security vulnerabilities."
+  },
+  {
+    "title": "Memory leaks",
+    "instruction": "A **memory leak** happens when you `new` but forget to `delete`.\n\nLeaks slowly drain available memory — the program works fine at first, then crashes or slows after hours of running.\n\nThe fixed version shows how to avoid the leak.",
+    "starter": "#include <iostream>\nusing namespace std;\n\nvoid leakyFunction() {\n    int* data = new int[100];  // allocated\n    // ... do work ...\n    // FORGOT delete[] data;  — this memory is NEVER freed!\n}\n\nvoid safeFunction() {\n    int* data = new int[100];  // allocated\n    for (int i = 0; i < 5; i++) data[i] = i * 10;\n    cout << data[3] << endl;\n    delete[] data;  // freed!\n}\n\nint main() {\n    // leakyFunction();  // leaks 400 bytes each call\n    safeFunction();      // safe\n    safeFunction();      // safe again\n    cout << \"No leaks.\" << endl;\n    return 0;\n}",
+    "expectedOutput": ["30", "30", "No leaks."],
+    "successMessage": "Calling leakyFunction() 1000 times leaks 400KB. In a server running for months, that adds up to crashes. Manual delete works but smart pointers (next step) eliminate leaks entirely."
+  },
+  {
+    "title": "unique_ptr — exclusive ownership",
+    "instruction": "`unique_ptr` automatically deletes when it goes out of scope. Zero overhead vs raw pointer.\n\n```cpp\nauto p = make_unique<int>(42);  // allocated\n// p is automatically deleted when it leaves scope!\n```\n\n`unique_ptr` can't be copied — only one owner at a time. Transfer with `move()`.",
+    "starter": "#include <iostream>\n#include <memory>\nusing namespace std;\n\nint main() {\n    // unique_ptr — auto-deletes when scope ends\n    {\n        auto p = make_unique<int>(42);\n        cout << *p << endl;\n        *p = 99;\n        cout << *p << endl;\n    }  // p deleted here automatically!\n    cout << \"Block ended — memory freed.\" << endl;\n\n    // unique_ptr to array:\n    auto arr = make_unique<int[]>(5);\n    for (int i = 0; i < 5; i++) arr[i] = i * 10;\n    for (int i = 0; i < 5; i++) cout << arr[i] << \" \";\n    cout << endl;\n\n    return 0;\n}",
+    "expectedOutput": ["42", "99", "Block ended — memory freed.", "0 10 20 30 40 "],
+    "successMessage": "The memory was freed automatically when the block ended — no delete needed. make_unique is the modern way: no raw new, no raw delete, no leaks. This is RAII: Resource Acquisition Is Initialization."
+  },
+  {
+    "title": "shared_ptr — shared ownership",
+    "instruction": "`shared_ptr` allows multiple owners. It tracks the reference count — deletes when the last owner goes away.\n\nUse when multiple parts of the code need to own the same object.",
+    "starter": "#include <iostream>\n#include <memory>\nusing namespace std;\n\nstruct Resource {\n    string name;\n    Resource(string n) : name(n) { cout << \"Created: \" << name << endl; }\n    ~Resource()                  { cout << \"Destroyed: \" << name << endl; }\n};\n\nint main() {\n    shared_ptr<Resource> p1 = make_shared<Resource>(\"MyResource\");\n    cout << \"Count: \" << p1.use_count() << endl;  // 1\n\n    {\n        shared_ptr<Resource> p2 = p1;  // p2 is a co-owner\n        cout << \"Count: \" << p1.use_count() << endl;  // 2\n        cout << p2->name << endl;\n    }  // p2 destroyed — count drops to 1\n\n    cout << \"Count: \" << p1.use_count() << endl;  // 1\n    // Resource destroyed when p1 goes out of scope\n    return 0;\n}",
+    "expectedOutput": ["Created: MyResource", "Count: 1", "Count: 2", "MyResource", "Count: 1", "Destroyed: MyResource"],
+    "successMessage": "The Resource was created once and destroyed once — exactly right. use_count() tracks owners. shared_ptr is perfect for scene graphs, shared caches, and any object with multiple owners."
+  },
+  {
+    "title": "Build a safe resource manager",
+    "instruction": "No starter code.\n\nCreate a `Buffer` struct with:\n- A `unique_ptr<int[]>` for data\n- A `size` field\n- Constructor that allocates the buffer\n- `set(int index, int value)` and `get(int index)` with bounds checking\n- Destructor that prints \"Buffer freed.\"\n\nCreate two Buffers, set some values, print them. Verify the destructor message appears automatically.",
+    "hint": "struct Buffer { int size; unique_ptr<int[]> data; Buffer(int n) : size(n), data(make_unique<int[]>(n)) {} ... };",
+    "starter": "",
+    "expectedOutput": [],
+    "codeChecks": [
+      { "pattern": "unique_ptr<int\\[\\]>|unique_ptr<int\\s*\\[", "required": true, "message": "Use unique_ptr<int[]> for the buffer data." },
+      { "pattern": "make_unique<int\\[\\]>|make_unique<int\\s*\\[", "required": true, "message": "Use make_unique<int[]>(size) to allocate." },
+      { "pattern": "~Buffer|~Resource|~\\w+\\s*\\(\\s*\\)", "required": true, "message": "Define a destructor that prints 'Buffer freed.'" },
+      { "pattern": "bounds|index\\s*>=|index\\s*<|at\\s*\\(", "required": true, "message": "Add bounds checking in set() and get()." }
+    ],
+    "successMessage": "A safe buffer that never leaks — unique_ptr ensures automatic cleanup. The destructor print confirms when memory is released. RAII in action. Chapter 10 done!"
+  }
+]

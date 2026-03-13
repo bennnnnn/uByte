@@ -1,31 +1,14 @@
 ---
-title: "Threads & Concurrency"
-description: "std::thread, mutexes, and async in C++."
-order: 15
+title: "Concurrency"
+description: "std::thread, mutex, lock_guard, atomic, async, future, and promise — concurrent programming in C++."
+order: 22
 difficulty: "advanced"
-estimatedMinutes: 25
+estimatedMinutes: 22
+concepts: ["thread", "mutex", "lock_guard", "unique_lock", "atomic", "async", "future", "promise", "condition_variable", "thread_pool concept"]
 ---
 
-## std::thread (C++11)
+## Parallelism at the metal level
 
-```cpp
-#include <thread>
-#include <iostream>
+C++ concurrency gives you direct control over threads — the actual OS threads, not green threads or promises. With that power comes responsibility: data races, deadlocks, and memory ordering issues.
 
-void worker(int id) {
-    std::cout << "Thread " << id << " running" << std::endl;
-}
-
-int main() {
-    std::thread t1(worker, 1);
-    std::thread t2(worker, 2);
-    t1.join();
-    t2.join();
-}
-```
-
-## std::mutex
-
-Use `std::mutex` + `std::lock_guard` to protect shared data from data races.
-
-More content coming soon. Try the interactive steps above!
+Modern C++ provides the tools to avoid these: `mutex` for mutual exclusion, `atomic` for lock-free operations, `async`/`future` for task-based parallelism.

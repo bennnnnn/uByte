@@ -1,23 +1,14 @@
 ---
-title: "JSON in C++"
-description: "Parsing and generating JSON with nlohmann/json."
-order: 18
+title: "Lambdas & Functional"
+description: "Lambda expressions, captures, std::function, std::bind, and functional programming patterns in C++."
+order: 20
 difficulty: "intermediate"
-estimatedMinutes: 15
+estimatedMinutes: 20
+concepts: ["lambda", "capture by value", "capture by reference", "capture list", "std::function", "std::bind", "higher-order functions", "closures", "mutable lambda"]
 ---
 
-## nlohmann/json (most popular header-only library)
+## Inline functions, anywhere
 
-```cpp
-#include <nlohmann/json.hpp>
-using json = nlohmann::json;
+Lambdas (C++11) let you write functions inline — no need to name them. They're the key to making STL algorithms expressive and building functional-style data pipelines.
 
-json j = {{"name", "Alice"}, {"age", 30}};
-std::cout << j.dump(2) << std::endl;
-
-// Parsing
-auto parsed = json::parse("{\"city\": \"Berlin\"}");
-std::string city = parsed["city"];
-```
-
-More content coming soon. Try the interactive steps above!
+Every `sort`, `transform`, `find_if` you've written already used lambdas. Now let's understand them deeply.

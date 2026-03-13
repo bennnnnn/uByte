@@ -1,0 +1,56 @@
+[
+  {
+    "title": "Your first struct",
+    "instruction": "A `struct` groups related data:\n\n```cpp\nstruct Point {\n    double x;\n    double y;\n};\n\nPoint p = {1.0, 2.0};  // initialise\np.x;   // access member\n```\n\nRun this.",
+    "starter": "#include <iostream>\n#include <string>\nusing namespace std;\n\nstruct Person {\n    string name;\n    int age;\n    double height;\n};\n\nint main() {\n    Person alice = {\"Alice\", 30, 1.68};\n    Person bob   = {\"Bob\",   25, 1.80};\n\n    cout << alice.name << \" is \" << alice.age << \" years old.\" << endl;\n    cout << bob.name   << \" is \" << bob.height << \"m tall.\"    << endl;\n\n    // Modify a field:\n    alice.age++;\n    cout << alice.name << \" is now \" << alice.age << \"!\" << endl;\n\n    return 0;\n}",
+    "expectedOutput": ["Alice is 30 years old.", "Bob is 1.8m tall.", "Alice is now 31!"],
+    "successMessage": "Structs group related data. alice.name accesses the member. Default initialization with {\"Alice\", 30, 1.68} uses the order fields are declared. You can mix designated initializers in C++20: Person{.name=\"Alice\", .age=30}."
+  },
+  {
+    "title": "Structs with methods",
+    "instruction": "Structs can have methods — making them nearly identical to classes:\n\n```cpp\nstruct Rectangle {\n    double width, height;\n    double area()     { return width * height; }\n    double perimeter(){ return 2 * (width + height); }\n};\n```\n\nAdd a `greet()` method and a `isAdult()` method to Person.",
+    "hint": "string greet() { return \"Hi, I'm \" + name; } bool isAdult() { return age >= 18; }",
+    "starter": "#include <iostream>\n#include <string>\nusing namespace std;\n\nstruct Person {\n    string name;\n    int age;\n\n    // TODO: add greet() and isAdult() methods\n    string greet() { return \"Hi, I'm \" + name; }\n    bool isAdult()  { return age >= 18; }\n};\n\nint main() {\n    Person p1 = {\"Alice\", 25};\n    Person p2 = {\"Charlie\", 15};\n\n    cout << p1.greet() << endl;\n    cout << boolalpha << p1.isAdult() << endl;\n    cout << p2.greet() << endl;\n    cout << p2.isAdult() << endl;\n\n    return 0;\n}",
+    "expectedOutput": ["Hi, I'm Alice", "true", "Hi, I'm Charlie", "false"],
+    "codeChecks": [
+      { "pattern": "string greet|greet\\(\\)", "required": true, "message": "Add a greet() method." },
+      { "pattern": "bool isAdult|isAdult\\(\\)", "required": true, "message": "Add an isAdult() method." }
+    ],
+    "successMessage": "Structs with methods — this is where C++ structs and classes blur. The only difference: struct members are public by default. Use structs for simple data containers; classes for complex objects with invariants."
+  },
+  {
+    "title": "enum class — type-safe enumerations",
+    "instruction": "Old-style `enum` pollutes the namespace and converts to int implicitly — dangerous.\n`enum class` (C++11) is scoped and type-safe:\n\n```cpp\nenum class Direction { North, South, East, West };\nDirection d = Direction::North;  // must use scope\n```",
+    "starter": "#include <iostream>\nusing namespace std;\n\nenum class Status { Active, Inactive, Pending, Banned };\nenum class Priority { Low, Medium, High, Critical };\n\nstring statusName(Status s) {\n    switch (s) {\n        case Status::Active:   return \"Active\";\n        case Status::Inactive: return \"Inactive\";\n        case Status::Pending:  return \"Pending\";\n        case Status::Banned:   return \"Banned\";\n        default: return \"Unknown\";\n    }\n}\n\nint main() {\n    Status   myStatus   = Status::Active;\n    Priority myPriority = Priority::High;\n\n    cout << statusName(myStatus) << endl;\n\n    // Can't mix types:\n    // if (myStatus == myPriority)  // compile error!\n    // int x = Status::Active;       // compile error!\n\n    cout << \"Type-safe!\" << endl;\n\n    return 0;\n}",
+    "expectedOutput": ["Active", "Type-safe!"],
+    "successMessage": "enum class forces you to write Status::Active, not just Active — preventing name collisions. You can't accidentally compare Status to Priority. This is a huge improvement over C-style enums."
+  },
+  {
+    "title": "Structs as function parameters",
+    "instruction": "Pass structs by **const reference** to avoid copying:\n\n```cpp\nvoid printInfo(const Person& p) {  // no copy!\n    cout << p.name << endl;\n}\n```\n\nReturn structs by value — the compiler optimises this with RVO (Return Value Optimisation).",
+    "starter": "#include <iostream>\n#include <string>\n#include <cmath>\nusing namespace std;\n\nstruct Point {\n    double x, y;\n};\n\n// const& avoids copying:\ndouble distance(const Point& a, const Point& b) {\n    double dx = a.x - b.x;\n    double dy = a.y - b.y;\n    return sqrt(dx*dx + dy*dy);\n}\n\n// Return struct by value (RVO optimises this):\nPoint midpoint(const Point& a, const Point& b) {\n    return {(a.x + b.x) / 2, (a.y + b.y) / 2};\n}\n\nint main() {\n    Point p1 = {0, 0};\n    Point p2 = {6, 8};\n    Point mid = midpoint(p1, p2);\n\n    cout << distance(p1, p2) << endl;\n    cout << mid.x << \", \" << mid.y << endl;\n\n    return 0;\n}",
+    "expectedOutput": ["10", "3, 4"],
+    "successMessage": "6-8-10 right triangle — distance is 10. midpoint is (3, 4). Return by value is zero-cost thanks to Return Value Optimisation — the compiler builds the result directly in the caller's memory."
+  },
+  {
+    "title": "Nested structs",
+    "instruction": "Structs can contain other structs — building complex data models.",
+    "starter": "#include <iostream>\n#include <string>\n#include <vector>\nusing namespace std;\n\nstruct Address {\n    string street;\n    string city;\n    string country;\n};\n\nstruct Employee {\n    string name;\n    int id;\n    double salary;\n    Address address;  // nested struct!\n};\n\nvoid printEmployee(const Employee& e) {\n    cout << e.name << \" (#\" << e.id << \")\" << endl;\n    cout << \"  City: \" << e.address.city << endl;\n    cout << \"  Salary: $\" << e.salary << endl;\n}\n\nint main() {\n    Employee emp = {\n        \"Alice Smith\", 1001, 95000.0,\n        {\"123 Main St\", \"San Francisco\", \"USA\"}\n    };\n\n    printEmployee(emp);\n\n    return 0;\n}",
+    "expectedOutput": ["Alice Smith (#1001)", "  City: San Francisco", "  Salary: $95000"],
+    "successMessage": "Nested structs build hierarchical data models. emp.address.city accesses the nested field. This is how database rows, API responses, and game entities are represented."
+  },
+  {
+    "title": "Build a playing card system",
+    "instruction": "No starter code.\n\nBuild:\n- `enum class Suit { Clubs, Diamonds, Hearts, Spades }`\n- `enum class Rank { Two=2, Three, ..., Ten, Jack, Queen, King, Ace }`\n- `struct Card { Suit suit; Rank rank; string toString(); }`\n- `toString()` returns e.g. `\"King of Hearts\"`\n\nCreate 5 cards and print them.",
+    "hint": "Use switch in toString() to convert enum values to strings.",
+    "starter": "",
+    "expectedOutput": [],
+    "codeChecks": [
+      { "pattern": "enum class Suit", "required": true, "message": "Define enum class Suit." },
+      { "pattern": "enum class Rank", "required": true, "message": "Define enum class Rank." },
+      { "pattern": "struct Card", "required": true, "message": "Define struct Card." },
+      { "pattern": "toString|to_string|print", "required": true, "message": "Add a toString() method to Card." }
+    ],
+    "successMessage": "A type-safe playing card system. enum class Suit prevents Suit::Hearts == Rank::Ace comparisons. toString with switch converts enums to readable strings. Chapter 11 done!"
+  }
+]
