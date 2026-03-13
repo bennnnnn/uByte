@@ -64,6 +64,7 @@ export interface Notification {
   type: string;
   title: string;
   message: string;
+  link?: string | null;
   read: boolean;
   created_at: string;
 }

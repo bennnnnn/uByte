@@ -56,12 +56,13 @@ export const POST = withErrorHandling(
       return NextResponse.json({ error: "Slow down — too many posts." }, { status: 429 });
     }
 
-    const body = await req.json() as { body?: string; parentId?: number };
+    const body = await req.json() as { body?: string; parentId?: number; pageUrl?: string };
     const text = body.body?.trim() ?? "";
     if (!text) return NextResponse.json({ error: "Message cannot be empty." }, { status: 400 });
     if (text.length > 2000) return NextResponse.json({ error: "Message too long (max 2000 chars)." }, { status: 400 });
 
     const parentId = typeof body.parentId === "number" ? body.parentId : null;
+    const pageUrl  = typeof body.pageUrl === "string" ? body.pageUrl : null;
 
     const post = await createPost(user.userId, slug, text, parentId);
 
@@ -70,6 +71,8 @@ export const POST = withErrorHandling(
     const problemTitle = problem?.title ?? slug;
     const preview = text.length > 120 ? text.slice(0, 120) + "…" : text;
     const authorName = user.name || "Someone";
+    // Track who already got a reply notification so we don't double-notify via @mention
+    const alreadyNotified = new Set<number>();
 
     // 1. Reply notification — tell the parent post's author
     if (parentId) {
@@ -80,21 +83,25 @@ export const POST = withErrorHandling(
           "reply",
           `${authorName} replied to your comment`,
           `On "${problemTitle}": "${preview}"`,
+          pageUrl,
         );
+        alreadyNotified.add(parent.user_id);
       }
     }
 
-    // 2. @mention notifications — parse @Name tokens from the body
+    // 2. @mention notifications — skip anyone who already got a reply notification
     const mentionTokens = [...text.matchAll(/@([\w.-]+)/g)].map((m) => m[1]);
     if (mentionTokens.length > 0) {
       const mentioned = await findUsersByNames(mentionTokens);
       for (const m of mentioned) {
         if (m.id === user.userId) continue; // don't self-notify
+        if (alreadyNotified.has(m.id)) continue; // already notified via reply
         await createNotification(
           m.id,
           "mention",
           `${authorName} mentioned you`,
           `On "${problemTitle}": "${preview}"`,
+          pageUrl,
         );
       }
     }

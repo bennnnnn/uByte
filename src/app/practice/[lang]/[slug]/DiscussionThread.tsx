@@ -342,7 +342,7 @@ export default function DiscussionThread({ slug, currentUserId, isSignedIn }: Pr
     const res  = await apiFetch(`/api/discussion/${slug}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ body: text }),
+      body: JSON.stringify({ body: text, pageUrl: window.location.pathname }),
     });
     if (!res.ok) {
       const data = await res.json() as { error?: string };
@@ -357,7 +357,7 @@ export default function DiscussionThread({ slug, currentUserId, isSignedIn }: Pr
     const res  = await apiFetch(`/api/discussion/${slug}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ body: text, parentId }),
+      body: JSON.stringify({ body: text, parentId, pageUrl: window.location.pathname }),
     });
     if (!res.ok) {
       const data = await res.json() as { error?: string };
