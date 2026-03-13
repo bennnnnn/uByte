@@ -379,7 +379,7 @@ export default function DiscussionThread({ slug, currentUserId, isSignedIn }: Pr
 
   /* ── Delete post ────────────────────────────────────────────────────── */
   const deletePost = useCallback(async (id: number) => {
-    await apiFetch(`/api/discussion/${id}`, { method: "DELETE" });
+    await apiFetch(`/api/discussion/post/${id}`, { method: "DELETE" });
     // Remove from top-level or from replies
     setPosts((prev) =>
       prev
