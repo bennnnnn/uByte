@@ -8,7 +8,7 @@
   --background: #ffffff;
   --foreground: #171717;
   --surface-page: #ffffff;
-  --surface-card: #f3f4f6; /* gray-100 cards on white page */
+  --surface-card: #ffffff;
 }
 
 @theme {
@@ -40,7 +40,7 @@
   --background: #ffffff;
   --foreground: #171717;
   --surface-page: #ffffff;
-  --surface-card: #f3f4f6;
+  --surface-card: #ffffff;
 }
 
 html {

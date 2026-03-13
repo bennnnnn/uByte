@@ -41,47 +41,53 @@ export default function ValuePropBanner({ isPro = false }: ValuePropBannerProps)
   return (
     <section
       aria-labelledby="value-prop-heading"
-      className="rounded-2xl bg-gray-100 px-6 py-10 sm:px-10 sm:py-14 dark:bg-zinc-800/80"
+      className="relative overflow-hidden rounded-2xl bg-indigo-950 px-6 py-12 sm:px-10 sm:py-16"
     >
+      {/* Subtle glow orbs for depth */}
+      <div className="pointer-events-none absolute inset-0 overflow-hidden">
+        <div className="absolute -left-32 top-0 h-[400px] w-[400px] rounded-full bg-indigo-500/20 blur-[100px]" />
+        <div className="absolute -right-32 bottom-0 h-[400px] w-[400px] rounded-full bg-violet-500/20 blur-[100px]" />
+      </div>
+
       {/* Header */}
-      <div className="mb-10 text-center">
-        <div className="mb-3 inline-flex items-center gap-1.5 rounded-full border border-indigo-200 bg-indigo-50 px-3.5 py-1 text-[11px] font-bold uppercase tracking-widest text-indigo-600 dark:border-indigo-800 dark:bg-indigo-950/50 dark:text-indigo-400">
+      <div className="relative mb-10 text-center">
+        <div className="mb-3 inline-flex items-center gap-1.5 rounded-full border border-indigo-700 bg-indigo-900/60 px-3.5 py-1 text-[11px] font-bold uppercase tracking-widest text-indigo-300">
           Everything in one place
         </div>
         <h2
           id="value-prop-heading"
-          className="text-2xl font-black tracking-tight text-zinc-900 dark:text-zinc-100 sm:text-3xl"
+          className="text-2xl font-black tracking-tight text-white sm:text-3xl"
         >
           From beginner to hire-ready.
         </h2>
-        <p className="mt-2 text-sm text-zinc-500 dark:text-zinc-400 sm:text-base">
+        <p className="mt-2 text-sm text-indigo-200/70 sm:text-base">
           Three tools that work together. Zero context-switching, zero extra platforms.
         </p>
       </div>
 
       {/* Pillars */}
-      <div className="mb-10 grid gap-4 sm:grid-cols-3">
+      <div className="relative mb-10 grid gap-4 sm:grid-cols-3">
         {PILLARS.map((p) => (
           <div
             key={p.title}
-            className="rounded-xl bg-white p-5 transition-all hover:-translate-y-0.5 hover:shadow-md dark:bg-zinc-900"
+            className="rounded-xl border border-indigo-800/60 bg-indigo-900/50 p-5 transition-all hover:-translate-y-0.5 hover:border-indigo-600/60 hover:bg-indigo-900/80"
           >
             <div className="mb-4">
-              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-indigo-100 text-indigo-600 dark:bg-indigo-900/40 dark:text-indigo-400">
+              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-indigo-500/20 text-indigo-300">
                 {p.icon}
               </div>
             </div>
-            <p className="mb-1.5 text-sm font-bold text-zinc-900 dark:text-zinc-100">{p.title}</p>
-            <p className="text-xs leading-relaxed text-zinc-500 dark:text-zinc-400">{p.desc}</p>
+            <p className="mb-1.5 text-sm font-bold text-white">{p.title}</p>
+            <p className="text-xs leading-relaxed text-indigo-200/60">{p.desc}</p>
           </div>
         ))}
       </div>
 
       {/* CTA */}
-      <div className="flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
+      <div className="relative flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
         <Link
           href="/pricing"
-          className="inline-flex items-center justify-center gap-2 rounded-xl bg-indigo-600 px-7 py-3 text-sm font-bold text-white shadow-md shadow-indigo-500/20 transition-all hover:-translate-y-0.5 hover:bg-indigo-500"
+          className="inline-flex items-center justify-center gap-2 rounded-xl bg-white px-7 py-3 text-sm font-bold text-indigo-900 shadow-md transition-all hover:-translate-y-0.5 hover:bg-indigo-50"
         >
           See plans — from ${(MONTHLY_PRICE_CENTS / 100).toFixed(2)}/mo
           <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
@@ -90,7 +96,7 @@ export default function ValuePropBanner({ isPro = false }: ValuePropBannerProps)
         </Link>
         <Link
           href="/tutorial/go"
-          className="text-sm font-semibold text-zinc-500 underline-offset-2 transition-colors hover:text-zinc-800 hover:underline dark:text-zinc-400 dark:hover:text-zinc-200"
+          className="text-sm font-semibold text-indigo-300 underline-offset-2 transition-colors hover:text-white hover:underline"
         >
           Start free first →
         </Link>

@@ -68,7 +68,7 @@ export default function PopularInterviewPrepSection({ problems }: Props) {
             <Link
               key={p.slug}
               href={`/practice/go/${p.slug}`}
-              className="group flex flex-col gap-3 rounded-xl bg-gray-100 p-5 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md dark:bg-zinc-800/80"
+              className="group flex flex-col gap-3 rounded-xl border border-zinc-200 bg-gray-100 p-5 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md dark:border-zinc-700 dark:bg-zinc-800/80"
             >
               {/* Top: difficulty dot + badge + category */}
               <div className="flex flex-wrap items-center gap-2">
