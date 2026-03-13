@@ -1,33 +1,79 @@
 import SectionHeading from "./SectionHeading";
 
 const STEPS = [
-  { number: "01", icon: "📖", label: "Learn",     desc: "Short, focused tutorials with real code examples. Zero setup — write and run code right in your browser." },
-  { number: "02", icon: "🎯", label: "Practice",  desc: "Solve LeetCode-style problems to sharpen the skills interviewers actually test. Same IDE, all 7 languages." },
-  { number: "03", icon: "📋", label: "Certify",   desc: "Take a timed exam and earn a verifiable certificate you can share on LinkedIn or your résumé." },
-  { number: "04", icon: "🚀", label: "Get hired", desc: "Walk into any technical interview job-ready — with proof of your skills to back it up." },
+  {
+    number: "01",
+    label: "Learn",
+    desc: "Short, focused tutorials with real code examples. Zero setup — write and run code right in your browser.",
+    icon: (
+      <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.75}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+      </svg>
+    ),
+  },
+  {
+    number: "02",
+    label: "Practice",
+    desc: "Solve LeetCode-style problems to sharpen the skills interviewers actually test. Same IDE, all 7 languages.",
+    icon: (
+      <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.75}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+      </svg>
+    ),
+  },
+  {
+    number: "03",
+    label: "Certify",
+    desc: "Take a timed exam and earn a verifiable certificate you can share on LinkedIn or attach to your résumé.",
+    icon: (
+      <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.75}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
+      </svg>
+    ),
+  },
+  {
+    number: "04",
+    label: "Get hired",
+    desc: "Walk into any technical interview job-ready — with proof of your skills to back it up.",
+    icon: (
+      <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.75}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+      </svg>
+    ),
+  },
 ];
-
-const CARD_CLS = "border-indigo-200 bg-gradient-to-br from-white to-indigo-50/60 dark:border-indigo-900/40 dark:from-zinc-900 dark:to-indigo-950/20";
 
 export default function StepsSection() {
   return (
     <section aria-labelledby="how-heading">
-      <SectionHeading id="how-heading" title="One subscription. The complete path." subtitle="From your first line of code to a verifiable certificate — no other platform needed." className="mb-10" />
+      <SectionHeading
+        id="how-heading"
+        eyebrow="How it works"
+        title="One subscription. The complete path."
+        subtitle="From your first line of code to a verifiable certificate — no other platform needed."
+        className="mb-12"
+      />
 
-      <div className="relative grid grid-cols-2 gap-4 sm:grid-cols-4">
-        <div aria-hidden className="absolute left-0 right-0 top-12 hidden border-t-2 border-dashed border-zinc-200 dark:border-zinc-700 sm:block" />
+      <div className="relative grid grid-cols-2 gap-5 sm:grid-cols-4">
+        {/* Connecting line through the icon circles */}
+        <div aria-hidden className="absolute left-5 right-5 top-5 hidden h-px bg-gradient-to-r from-transparent via-zinc-200 to-transparent dark:via-zinc-700 sm:block" />
 
         {STEPS.map((s) => (
-          <div key={s.label} className={`relative z-10 overflow-hidden rounded-2xl border p-5 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg ${CARD_CLS}`}>
-            <span className="pointer-events-none absolute -right-2 -top-3 select-none text-7xl font-black leading-none text-indigo-100 dark:text-indigo-950">
-              {s.number}
-            </span>
-            <div className="relative">
-              <span className="mb-3 flex h-8 w-8 items-center justify-center rounded-full bg-indigo-500 text-base text-white shadow">
+          <div key={s.label} className="relative z-10 flex flex-col gap-4">
+            {/* Icon circle */}
+            <div className="flex justify-start">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-indigo-500 to-violet-600 text-white shadow-md shadow-indigo-500/25">
                 {s.icon}
-              </span>
-              <p className="text-sm font-bold text-zinc-900 dark:text-zinc-100">{s.label}</p>
-              <p className="mt-1.5 text-xs leading-relaxed text-zinc-500 dark:text-zinc-400">{s.desc}</p>
+              </div>
+            </div>
+
+            {/* Card */}
+            <div className="flex-1 rounded-xl border border-zinc-200 bg-white p-4 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-indigo-200 hover:shadow-md dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-indigo-900/70">
+              <div className="mb-2 flex items-center gap-2">
+                <span className="text-[10px] font-bold text-zinc-300 dark:text-zinc-600">{s.number}</span>
+                <p className="text-sm font-bold text-zinc-900 dark:text-zinc-100">{s.label}</p>
+              </div>
+              <p className="text-xs leading-relaxed text-zinc-500 dark:text-zinc-400">{s.desc}</p>
             </div>
           </div>
         ))}

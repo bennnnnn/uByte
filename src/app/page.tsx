@@ -183,6 +183,7 @@ export default async function Home() {
         <section aria-labelledby="languages-heading">
           <SectionHeading
             id="languages-heading"
+            eyebrow="Languages"
             title="Seven languages. One subscription."
             subtitle="Go, Python, JavaScript, Java, Rust, C++, and C# — all in the same interactive IDE. Start one, continue all."
           />

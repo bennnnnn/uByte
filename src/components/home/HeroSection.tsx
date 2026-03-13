@@ -277,13 +277,13 @@ export default function HeroSection({
             {/* Stats */}
             <div className="flex flex-wrap gap-6 border-t border-zinc-200 pt-8 dark:border-zinc-800">
               {[
-                { n: String(languageCount),    label: "Languages"        },
-                { n: lessonsLabel,             label: "Total Lessons"     },
-                { n: problemsLabel,            label: "Interview Qs"      },
-                { n: String(certificationCount), label: "Certifications" },
-              ].map(({ n, label }) => (
+                { n: String(languageCount),      label: "Languages",      color: "text-indigo-600 dark:text-indigo-400"  },
+                { n: lessonsLabel,               label: "Total Lessons",   color: "text-violet-600 dark:text-violet-400"  },
+                { n: problemsLabel,              label: "Interview Qs",    color: "text-cyan-600 dark:text-cyan-400"      },
+                { n: String(certificationCount), label: "Certifications",  color: "text-amber-600 dark:text-amber-400"    },
+              ].map(({ n, label, color }) => (
                 <div key={label}>
-                  <p className="text-2xl font-black text-zinc-900 dark:text-zinc-100">{n}</p>
+                  <p className={`text-2xl font-black ${color}`}>{n}</p>
                   <p className="text-xs text-zinc-400 dark:text-zinc-500">{label}</p>
                 </div>
               ))}
