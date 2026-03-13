@@ -113,6 +113,30 @@ export default async function Home() {
   const popularPracticeProblems =
     popularProblems.length > 0 ? popularProblems : getFallbackPopularPracticeProblems();
 
+  const websiteJsonLd = buildSiteSearchJsonLd();
+  const orgJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: APP_NAME,
+    url: BASE_URL,
+    sameAs: [BASE_URL],
+  };
+  const itemListJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    name: "Programming language tutorial tracks on uByte",
+    itemListElement: getAllLanguageSlugs().map((slug, index) => ({
+      "@type": "ListItem",
+      position: index + 1,
+      name: LANGUAGES[slug as SupportedLanguage]?.name ?? slug,
+      url: absoluteUrl(tutorialLangUrl(slug)),
+    })),
+  };
+
+  const languageEntries = getAllLanguageSlugs()
+    .map((slug) => ({ slug, config: LANGUAGES[slug as keyof typeof LANGUAGES] }))
+    .filter((e): e is { slug: string; config: (typeof LANGUAGES)["go"] } => !!e.config);
+
   return (
     <div className="min-h-0 flex-1 overflow-y-auto">
       <script
