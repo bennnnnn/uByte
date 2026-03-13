@@ -44,8 +44,10 @@ export default function GoogleOneTap() {
       return true;
     }
 
-    // GSI script may not be loaded yet — load it if missing, then init
-    if (!tryInit()) {
+    // Defer GSI injection by 4 s so it doesn't compete with LCP/FCP resources.
+    // After the delay, load the script if missing, then init.
+    const timer = setTimeout(() => {
+      if (tryInit()) return;
       const existing = document.querySelector(`script[src*="accounts.google.com/gsi/client"]`);
       if (!existing) {
         const script = document.createElement("script");
@@ -55,13 +57,12 @@ export default function GoogleOneTap() {
         script.onload = () => tryInit();
         document.head.appendChild(script);
       } else {
-        // Script is loading — poll until ready
         const interval = setInterval(() => {
           if (tryInit()) clearInterval(interval);
         }, 200);
-        return () => clearInterval(interval);
       }
-    }
+    }, 4000);
+    return () => clearTimeout(timer);
   }, [loading, user, pathname, loginWithGoogle]);
 
   // Cancel One Tap when the user logs in (avoids a stale prompt)
