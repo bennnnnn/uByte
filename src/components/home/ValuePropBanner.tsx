@@ -41,7 +41,7 @@ export default function ValuePropBanner({ isPro = false }: ValuePropBannerProps)
   return (
     <section
       aria-labelledby="value-prop-heading"
-      className="rounded-2xl bg-[#eef0ff] px-6 py-10 shadow-sm sm:px-10 sm:py-14 dark:bg-zinc-800/80"
+      className="rounded-2xl bg-white px-6 py-10 shadow-sm sm:px-10 sm:py-14 dark:bg-zinc-800/80"
     >
       {/* Header */}
       <div className="mb-10 text-center">

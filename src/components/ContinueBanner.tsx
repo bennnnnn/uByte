@@ -56,31 +56,31 @@ export default function ContinueBanner({ lang, tutorials }: { lang: string; tuto
   const progressPct = tutorials.length > 0 ? Math.round((completedCount / tutorials.length) * 100) : 0;
 
   return (
-    <div className="mb-8 overflow-hidden rounded-xl border border-indigo-200 bg-indigo-50 dark:border-indigo-900 dark:bg-indigo-950/30">
+    <div className="mb-8 overflow-hidden rounded-xl border border-violet-200 bg-violet-50 dark:border-violet-900 dark:bg-violet-950/30">
       <div className="flex flex-wrap items-center justify-between gap-3 px-5 py-4 sm:flex-nowrap">
         <div className="flex items-center gap-3">
           <span className="text-xl">📖</span>
           <div>
-            <p className="text-sm font-medium text-indigo-900 dark:text-indigo-200">
+            <p className="text-sm font-medium text-violet-900 dark:text-violet-200">
               Continue where you left off
             </p>
-            <p className="text-xs text-indigo-600 dark:text-indigo-400">
+            <p className="text-xs text-violet-600 dark:text-violet-400">
               {completedCount} of {tutorials.length} completed
             </p>
           </div>
         </div>
         <Link
           href={tutorialUrl(lang, nextTutorial.slug, lastStep ?? undefined)}
-          className="inline-flex items-center gap-1.5 rounded-lg bg-indigo-700 px-3 py-2 text-xs font-semibold text-white shadow-sm transition-all hover:bg-indigo-600 hover:shadow-md"
+          className="inline-flex items-center gap-1.5 rounded-lg bg-violet-700 px-3 py-2 text-xs font-semibold text-white shadow-sm transition-all hover:bg-violet-600 hover:shadow-md"
         >
           {nextTutorial.title}
           <span aria-hidden>→</span>
         </Link>
       </div>
       {/* Progress bar */}
-      <div className="h-1 w-full bg-indigo-200/80 dark:bg-indigo-900/50">
+      <div className="h-1 w-full bg-violet-200/80 dark:bg-violet-900/50">
         <div
-          className="h-full bg-indigo-500 transition-all duration-500 ease-out dark:bg-indigo-400"
+          className="h-full bg-violet-500 transition-all duration-500 ease-out dark:bg-violet-400"
           style={{ width: `${progressPct}%` }}
           role="progressbar"
           aria-valuenow={completedCount}

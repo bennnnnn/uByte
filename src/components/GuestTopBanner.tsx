@@ -46,8 +46,8 @@ export default function GuestTopBanner({ show }: Props) {
 
   return (
     <>
-      <div className="flex items-center justify-between gap-3 border-b border-indigo-200 bg-indigo-50 px-4 py-2 dark:border-indigo-800/60 dark:bg-indigo-950/40">
-        <p className="text-xs text-indigo-800 dark:text-indigo-200">
+      <div className="flex items-center justify-between gap-3 border-b border-violet-200 bg-violet-50 px-4 py-2 dark:border-violet-800/60 dark:bg-violet-950/40">
+        <p className="text-xs text-violet-800 dark:text-violet-200">
           <span className="font-semibold">Your progress isn&apos;t saved.</span>{" "}
           Create a free account to keep your streak, XP, and completed steps.
         </p>
@@ -55,7 +55,7 @@ export default function GuestTopBanner({ show }: Props) {
           <button
             type="button"
             onClick={() => setAuthOpen(true)}
-            className="rounded-lg bg-indigo-600 px-3 py-1 text-xs font-bold text-white transition hover:bg-indigo-500"
+            className="rounded-lg bg-violet-600 px-3 py-1 text-xs font-bold text-white transition hover:bg-violet-500"
           >
             Sign up free
           </button>
@@ -63,7 +63,7 @@ export default function GuestTopBanner({ show }: Props) {
             type="button"
             onClick={dismiss}
             aria-label="Dismiss"
-            className="rounded p-0.5 text-indigo-400 hover:text-indigo-600 dark:hover:text-indigo-200"
+            className="rounded p-0.5 text-violet-400 hover:text-violet-600 dark:hover:text-violet-200"
           >
             <svg viewBox="0 0 20 20" fill="currentColor" className="h-3.5 w-3.5">
               <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />

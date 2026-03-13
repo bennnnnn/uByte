@@ -66,7 +66,7 @@ export default function ReferralPromptBanner() {
 
   return (
     <div className="relative mx-auto mb-6 max-w-6xl px-4 sm:px-6 lg:px-8">
-      <div className="flex flex-col gap-3 rounded-2xl border border-indigo-200 bg-gradient-to-r from-indigo-50 to-violet-50 px-5 py-4 dark:border-indigo-800/50 dark:from-indigo-950/40 dark:to-violet-950/40 sm:flex-row sm:items-center sm:gap-4">
+      <div className="flex flex-col gap-3 rounded-2xl border border-violet-200 bg-violet-50 px-5 py-4 dark:border-violet-800/50 dark:bg-violet-950/30 sm:flex-row sm:items-center sm:gap-4">
         {/* Icon + text */}
         <div className="flex flex-1 items-start gap-3">
           <span className="mt-0.5 shrink-0 text-2xl">🎁</span>
