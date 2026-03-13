@@ -41,67 +41,59 @@ export default function ValuePropBanner({ isPro = false }: ValuePropBannerProps)
   return (
     <section
       aria-labelledby="value-prop-heading"
-      className="relative overflow-hidden rounded-2xl border border-violet-200/80 bg-gradient-to-br from-violet-50 via-indigo-50/70 to-purple-50 px-6 py-10 sm:px-10 sm:py-14 dark:border-violet-800/30 dark:from-violet-950/30 dark:via-indigo-950/20 dark:to-purple-950/20"
+      className="rounded-2xl border border-zinc-200 bg-white px-6 py-10 shadow-sm sm:px-10 sm:py-14 dark:border-zinc-800 dark:bg-zinc-900"
     >
-      {/* Subtle glow orbs */}
-      <div aria-hidden className="pointer-events-none absolute -left-16 -top-16 h-64 w-64 rounded-full bg-violet-300/20 blur-[100px] dark:bg-violet-500/10" />
-      <div aria-hidden className="pointer-events-none absolute -bottom-16 -right-16 h-64 w-64 rounded-full bg-indigo-300/20 blur-[100px] dark:bg-indigo-500/10" />
-      {/* Dot grid */}
-      <div aria-hidden className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle,rgba(109,40,217,0.07)_1px,transparent_1px)] bg-[size:28px_28px]" />
-
-      <div className="relative">
-        {/* Header */}
-        <div className="mb-10 text-center">
-          <div className="mb-3 inline-flex items-center gap-1.5 rounded-full border border-violet-300 bg-white/70 px-3.5 py-1 text-[11px] font-bold uppercase tracking-widest text-violet-700 dark:border-violet-700 dark:bg-violet-950/40 dark:text-violet-300">
-            Everything in one place
-          </div>
-          <h2
-            id="value-prop-heading"
-            className="text-2xl font-black tracking-tight text-zinc-900 dark:text-zinc-100 sm:text-3xl"
-          >
-            From beginner to hire-ready.
-          </h2>
-          <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400 sm:text-base">
-            Three tools that work together. Zero context-switching, zero extra platforms.
-          </p>
+      {/* Header */}
+      <div className="mb-10 text-center">
+        <div className="mb-3 inline-flex items-center gap-1.5 rounded-full border border-indigo-200 bg-indigo-50 px-3.5 py-1 text-[11px] font-bold uppercase tracking-widest text-indigo-600 dark:border-indigo-800 dark:bg-indigo-950/50 dark:text-indigo-400">
+          Everything in one place
         </div>
+        <h2
+          id="value-prop-heading"
+          className="text-2xl font-black tracking-tight text-zinc-900 dark:text-zinc-100 sm:text-3xl"
+        >
+          From beginner to hire-ready.
+        </h2>
+        <p className="mt-2 text-sm text-zinc-500 dark:text-zinc-400 sm:text-base">
+          Three tools that work together. Zero context-switching, zero extra platforms.
+        </p>
+      </div>
 
-        {/* Pillars */}
-        <div className="mb-10 grid gap-4 sm:grid-cols-3">
-          {PILLARS.map((p) => (
-            <div
-              key={p.title}
-              className="rounded-xl border border-violet-200/60 bg-white/70 p-5 shadow-sm backdrop-blur-sm transition-all hover:-translate-y-0.5 hover:border-violet-300 hover:shadow-md dark:border-violet-800/30 dark:bg-white/[0.04]"
-            >
-              <div className="mb-4">
-                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-violet-100 text-violet-600 dark:bg-violet-900/40 dark:text-violet-400">
-                  {p.icon}
-                </div>
+      {/* Pillars */}
+      <div className="mb-10 grid gap-4 sm:grid-cols-3">
+        {PILLARS.map((p) => (
+          <div
+            key={p.title}
+            className="rounded-xl border border-zinc-200 bg-zinc-50 p-5 transition-all hover:-translate-y-0.5 hover:border-indigo-200 hover:shadow-md dark:border-zinc-700 dark:bg-zinc-800/60 dark:hover:border-indigo-800"
+          >
+            <div className="mb-4">
+              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-indigo-100 text-indigo-600 dark:bg-indigo-900/40 dark:text-indigo-400">
+                {p.icon}
               </div>
-              <p className="mb-1.5 text-sm font-bold text-zinc-900 dark:text-zinc-100">{p.title}</p>
-              <p className="text-xs leading-relaxed text-zinc-500 dark:text-zinc-400">{p.desc}</p>
             </div>
-          ))}
-        </div>
+            <p className="mb-1.5 text-sm font-bold text-zinc-900 dark:text-zinc-100">{p.title}</p>
+            <p className="text-xs leading-relaxed text-zinc-500 dark:text-zinc-400">{p.desc}</p>
+          </div>
+        ))}
+      </div>
 
-        {/* CTA */}
-        <div className="flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
-          <Link
-            href="/pricing"
-            className="inline-flex items-center justify-center gap-2 rounded-xl bg-violet-600 px-7 py-3 text-sm font-bold text-white shadow-lg shadow-violet-500/25 transition-all hover:-translate-y-0.5 hover:bg-violet-500 hover:shadow-violet-500/40"
-          >
-            See plans — from ${(MONTHLY_PRICE_CENTS / 100).toFixed(2)}/mo
-            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
-            </svg>
-          </Link>
-          <Link
-            href="/tutorial/go"
-            className="text-sm font-semibold text-violet-700 underline-offset-2 transition-colors hover:text-violet-900 hover:underline dark:text-violet-400 dark:hover:text-violet-200"
-          >
-            Start free first →
-          </Link>
-        </div>
+      {/* CTA */}
+      <div className="flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
+        <Link
+          href="/pricing"
+          className="inline-flex items-center justify-center gap-2 rounded-xl bg-indigo-600 px-7 py-3 text-sm font-bold text-white shadow-md shadow-indigo-500/20 transition-all hover:-translate-y-0.5 hover:bg-indigo-500"
+        >
+          See plans — from ${(MONTHLY_PRICE_CENTS / 100).toFixed(2)}/mo
+          <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+          </svg>
+        </Link>
+        <Link
+          href="/tutorial/go"
+          className="text-sm font-semibold text-zinc-500 underline-offset-2 transition-colors hover:text-zinc-800 hover:underline dark:text-zinc-400 dark:hover:text-zinc-200"
+        >
+          Start free first →
+        </Link>
       </div>
     </section>
   );

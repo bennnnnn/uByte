@@ -16,19 +16,13 @@ const FEATURES = [
 
 export default function PracticeExamsSection({ examConfigByLang }: Props) {
   return (
-    <section aria-labelledby="certifications-heading" className="space-y-6">
-      {/* Hero card — light purple/amber */}
-      <div className="relative overflow-hidden rounded-2xl border border-amber-200/80 bg-gradient-to-br from-amber-50 via-violet-50/60 to-purple-50 px-6 py-8 shadow-sm sm:px-10 sm:py-10 dark:border-amber-800/30 dark:from-amber-950/20 dark:via-violet-950/20 dark:to-purple-950/20">
-        {/* Dot grid */}
-        <div aria-hidden className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle,rgba(217,119,6,0.06)_1px,transparent_1px)] bg-[size:28px_28px]" />
-        {/* Glow orbs */}
-        <div aria-hidden className="pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full bg-amber-300/20 blur-[80px]" />
-        <div aria-hidden className="pointer-events-none absolute -bottom-16 -left-16 h-48 w-48 rounded-full bg-violet-300/15 blur-[80px]" />
-
-        <div className="relative flex flex-col gap-8 sm:flex-row sm:items-center sm:justify-between">
+    <section aria-labelledby="certifications-heading" className="space-y-4">
+      {/* Hero card — clean white, amber accent only on CTA + dots */}
+      <div className="rounded-2xl border border-zinc-200 bg-white px-6 py-8 shadow-sm sm:px-10 sm:py-10 dark:border-zinc-800 dark:bg-zinc-900">
+        <div className="flex flex-col gap-8 sm:flex-row sm:items-center sm:justify-between">
           {/* Left: copy */}
           <div>
-            <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-amber-300 bg-white/70 px-3 py-1 text-[11px] font-bold uppercase tracking-widest text-amber-700 dark:border-amber-700 dark:bg-amber-950/40 dark:text-amber-400">
+            <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-[11px] font-bold uppercase tracking-widest text-amber-700 dark:border-amber-800 dark:bg-amber-950/40 dark:text-amber-400">
               <svg className="h-3 w-3" fill="currentColor" viewBox="0 0 20 20">
                 <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
               </svg>
@@ -38,7 +32,7 @@ export default function PracticeExamsSection({ examConfigByLang }: Props) {
             <h2 id="certifications-heading" className="text-xl font-black text-zinc-900 dark:text-zinc-100 sm:text-2xl">
               Prove what you know.
             </h2>
-            <p className="mt-1.5 max-w-md text-sm text-zinc-600 dark:text-zinc-400">
+            <p className="mt-1.5 max-w-md text-sm text-zinc-500 dark:text-zinc-400">
               Pass a timed exam and earn a certificate you can share on LinkedIn, attach to job applications, or link from your portfolio. Recruiters notice.
             </p>
 
@@ -56,7 +50,7 @@ export default function PracticeExamsSection({ examConfigByLang }: Props) {
           <div className="shrink-0">
             <Link
               href="/certifications"
-              className="inline-flex items-center gap-2 rounded-xl bg-amber-500 px-6 py-3 text-sm font-bold text-white shadow-lg shadow-amber-500/25 transition-all hover:-translate-y-0.5 hover:bg-amber-400 hover:shadow-amber-500/40"
+              className="inline-flex items-center gap-2 rounded-xl bg-amber-500 px-6 py-3 text-sm font-bold text-white shadow-md shadow-amber-500/20 transition-all hover:-translate-y-0.5 hover:bg-amber-400"
             >
               View certifications
               <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>

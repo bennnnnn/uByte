@@ -2,18 +2,18 @@ import Link from "next/link";
 
 type ColorScheme = "indigo" | "amber";
 
-const THEMES: Record<ColorScheme, { card: string; iconBg: string; badge: string; arrow: string }> = {
+const THEMES: Record<ColorScheme, { iconBg: string; badge: string; arrow: string; hover: string }> = {
   indigo: {
-    card: "border-indigo-200 bg-gradient-to-br from-white to-indigo-50/60 hover:border-indigo-400 hover:shadow-indigo-100 dark:border-indigo-900/50 dark:from-zinc-900 dark:to-indigo-950/20 dark:hover:border-indigo-700 dark:hover:shadow-indigo-950/50",
-    iconBg: "bg-indigo-100 dark:bg-indigo-950/50",
-    badge: "bg-indigo-100 text-indigo-700 dark:bg-indigo-950 dark:text-indigo-400",
-    arrow: "text-indigo-600 dark:text-indigo-400",
+    iconBg: "bg-indigo-50 text-indigo-600 dark:bg-indigo-950/50 dark:text-indigo-400",
+    badge:  "bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400",
+    arrow:  "text-indigo-600 dark:text-indigo-400",
+    hover:  "hover:border-indigo-300 hover:shadow-indigo-50 dark:hover:border-indigo-800",
   },
   amber: {
-    card: "border-amber-200 bg-gradient-to-br from-white to-amber-50/60 hover:border-amber-400 hover:shadow-amber-100 dark:border-amber-900/40 dark:from-zinc-900 dark:to-amber-950/20 dark:hover:border-amber-700 dark:hover:shadow-amber-950/50",
-    iconBg: "bg-amber-50 dark:bg-amber-950/50",
-    badge: "bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-400",
-    arrow: "text-amber-600 dark:text-amber-400",
+    iconBg: "bg-amber-50 text-amber-600 dark:bg-amber-950/50 dark:text-amber-400",
+    badge:  "bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400",
+    arrow:  "text-amber-600 dark:text-amber-400",
+    hover:  "hover:border-amber-300 hover:shadow-amber-50 dark:hover:border-amber-800",
   },
 };
 
@@ -32,7 +32,7 @@ export default function LangCard({ href, icon, name, badge, description, cta, co
   return (
     <Link
       href={href}
-      className={`group flex flex-col rounded-2xl border p-5 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md ${t.card}`}
+      className={`group flex flex-col rounded-xl border border-zinc-200 bg-white p-5 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md dark:border-zinc-800 dark:bg-zinc-900 ${t.hover}`}
     >
       <div className="mb-3 flex items-center justify-between gap-2">
         <div className="flex items-center gap-3">
