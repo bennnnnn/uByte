@@ -68,7 +68,7 @@ export default function StepsSection() {
             </div>
 
             {/* Card */}
-            <div className="flex-1 rounded-xl bg-white p-4 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md dark:bg-zinc-800/80">
+            <div className="flex-1 rounded-xl bg-zinc-50 p-4 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md dark:bg-zinc-800/80">
               <div className="mb-2 flex items-center gap-2">
                 <span className="text-[10px] font-bold text-zinc-300 dark:text-zinc-600">{s.number}</span>
                 <p className="text-sm font-bold text-zinc-900 dark:text-zinc-100">{s.label}</p>
