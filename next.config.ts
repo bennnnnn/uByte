@@ -57,10 +57,6 @@ const nextConfig: NextConfig = {
     inlineCss: true,
     optimizeCss: true,
     optimizePackageImports: ["@sentry/nextjs", "canvas-confetti"],
-    // Honour the browserslist in package.json so SWC doesn't emit polyfills
-    // for Array.at, flat, flatMap, Object.fromEntries, Object.hasOwn, trimStart/End
-    // — all natively supported by Chrome 93+, Safari 15.4+, Firefox 92+.
-    browsersListForSwc: true,
   },
   webpack(config, { isServer }) {
     if (!isServer) {
