@@ -5,10 +5,10 @@
 @variant dark (&:where(.dark, .dark *));
 
 :root {
-  --background: #f8f9fa;
+  --background: #ffffff;
   --foreground: #171717;
-  --surface-page: #f8f9fa; /* Google-standard page gray */
-  --surface-card: #ffffff; /* pure white cards float above */
+  --surface-page: #ffffff;
+  --surface-card: #f3f4f6; /* gray-100 cards on white page */
 }
 
 @theme {
@@ -37,10 +37,10 @@
 }
 
 .light {
-  --background: #f8f9fa;
+  --background: #ffffff;
   --foreground: #171717;
-  --surface-page: #f8f9fa;
-  --surface-card: #ffffff;
+  --surface-page: #ffffff;
+  --surface-card: #f3f4f6;
 }
 
 html {

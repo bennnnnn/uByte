@@ -41,7 +41,7 @@ export default function ValuePropBanner({ isPro = false }: ValuePropBannerProps)
   return (
     <section
       aria-labelledby="value-prop-heading"
-      className="rounded-2xl bg-white px-6 py-10 shadow-sm sm:px-10 sm:py-14 dark:bg-zinc-800/80"
+      className="rounded-2xl bg-gray-100 px-6 py-10 sm:px-10 sm:py-14 dark:bg-zinc-800/80"
     >
       {/* Header */}
       <div className="mb-10 text-center">
@@ -64,7 +64,7 @@ export default function ValuePropBanner({ isPro = false }: ValuePropBannerProps)
         {PILLARS.map((p) => (
           <div
             key={p.title}
-            className="rounded-xl bg-white p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md dark:bg-zinc-900"
+            className="rounded-xl bg-white p-5 transition-all hover:-translate-y-0.5 hover:shadow-md dark:bg-zinc-900"
           >
             <div className="mb-4">
               <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-indigo-100 text-indigo-600 dark:bg-indigo-900/40 dark:text-indigo-400">
