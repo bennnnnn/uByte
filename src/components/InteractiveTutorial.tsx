@@ -281,10 +281,10 @@ export default function InteractiveTutorial({
               type="button"
               onClick={() => setLeftTab(leftTab === "outline" ? "instructions" : "outline")}
               aria-label={leftTab === "outline" ? "Close outline" : "Open course outline"}
-              className={`flex w-10 shrink-0 items-center justify-center border-r transition-colors ${
+              className={`flex w-10 shrink-0 items-center justify-center transition-colors ${
                 leftTab === "outline"
-                  ? "border-indigo-200 bg-indigo-50 text-indigo-600 dark:border-indigo-900 dark:bg-indigo-950/40 dark:text-indigo-400"
-                  : "border-zinc-200 text-zinc-400 hover:bg-zinc-100 hover:text-zinc-700 dark:border-zinc-800 dark:text-zinc-500 dark:hover:bg-zinc-800 dark:hover:text-zinc-300"
+                  ? "text-indigo-600 dark:text-indigo-400"
+                  : "text-zinc-400 hover:bg-zinc-100 hover:text-zinc-700 dark:text-zinc-500 dark:hover:bg-zinc-800 dark:hover:text-zinc-300"
               }`}
             >
               {leftTab === "outline" ? (
@@ -311,7 +311,7 @@ export default function InteractiveTutorial({
                     : "text-zinc-400 hover:text-zinc-700 dark:text-zinc-500 dark:hover:text-zinc-300"
                 }`}
               >
-                {tab === "instructions" ? "Steps" : "Discuss"}
+                {tab === "instructions" ? "Instructions" : "Discuss"}
               </button>
             ))}
           </div>
