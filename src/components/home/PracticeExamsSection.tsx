@@ -18,7 +18,7 @@ export default function PracticeExamsSection({ examConfigByLang }: Props) {
   return (
     <section aria-labelledby="certifications-heading" className="space-y-4">
       {/* Hero card — clean white, amber accent only on CTA + dots */}
-      <div className="rounded-2xl border border-[#E7E1F3] bg-[#FAFCFF] px-6 py-8 shadow-sm sm:px-10 sm:py-10 dark:border-zinc-700 dark:bg-zinc-800/80">
+      <div className="rounded-2xl border border-[#E5E7EB] bg-[#F7F8FF] px-6 py-8 shadow-sm sm:px-10 sm:py-10 dark:border-zinc-700 dark:bg-zinc-800/80">
         <div className="flex flex-col gap-8 sm:flex-row sm:items-center sm:justify-between">
           {/* Left: copy */}
           <div>

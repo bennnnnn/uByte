@@ -5,11 +5,11 @@
 @variant dark (&:where(.dark, .dark *));
 
 :root {
-  --background: #F4F1FB;
+  --background: #ffffff;
   --foreground: #171717;
-  --surface-page: #F4F1FB;
-  --surface-card: #FAFCFF;
-  --border-card: #E7E1F3;
+  --surface-page: #ffffff;
+  --surface-card: #F7F8FF;
+  --border-card: #E5E7EB;
 }
 
 @theme {
@@ -38,11 +38,11 @@
 }
 
 .light {
-  --background: #F4F1FB;
+  --background: #ffffff;
   --foreground: #171717;
-  --surface-page: #F4F1FB;
-  --surface-card: #FAFCFF;
-  --border-card: #E7E1F3;
+  --surface-page: #ffffff;
+  --surface-card: #F7F8FF;
+  --border-card: #E5E7EB;
 }
 
 html {
