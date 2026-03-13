@@ -14,7 +14,6 @@ import { useStepProgress } from "@/hooks/useStepProgress";
 import { usePanelResize } from "@/hooks/usePanelResize";
 import OutputPanel from "@/components/tutorial/OutputPanel";
 import InstructionsSidebar from "@/components/tutorial/InstructionsSidebar";
-import CourseOutlineDrawer from "@/components/tutorial/CourseOutlineDrawer";
 import SnapshotDrawer from "@/components/tutorial/SnapshotDrawer";
 import { tutorialUrl } from "@/lib/urls";
 import { LANGUAGES } from "@/lib/languages/registry";
@@ -52,7 +51,7 @@ export default function InteractiveTutorial({
   next,
   isFree,
 }: Props) {
-  const { user, profile, loading } = useAuth();
+  const { user, profile, loading, progressByLang } = useAuth();
 
   const [ideLang, setIdeLang] = useState<SupportedLanguage>(lang as SupportedLanguage);
   const [stepsForLang, setStepsForLang] = useState<TutorialStep[] | null>(null);
@@ -63,7 +62,6 @@ export default function InteractiveTutorial({
   const stepProgress = useStepProgress(currentSteps, ideLang, tutorialSlug, next, editor.setCode, user?.id);
   const { leftWidth, outputHeight, isDragging, startDragH, startDragV, startDragVTouch } = usePanelResize();
 
-  const [showNav, setShowNav] = useState(false);
   const [expandedSlug, setExpandedSlug] = useState(tutorialSlug);
   const [showSnapshots, setShowSnapshots] = useState(false);
   const { shareCopied, handleShare } = useShareCode(() => editor.code);
@@ -72,7 +70,7 @@ export default function InteractiveTutorial({
     return 14;
   });
   const [mobileTab, setMobileTab] = useState<"instructions" | "code">("instructions");
-  const [leftTab, setLeftTab] = useState<"instructions" | "discuss">("instructions");
+  const [leftTab, setLeftTab] = useState<"instructions" | "discuss" | "outline">("instructions");
   const isMobile = useIsMobile();
 
   const currentStep = currentSteps[stepProgress.stepIndex];
@@ -237,12 +235,9 @@ export default function InteractiveTutorial({
       {/* ── Top Bar ── */}
       <header className="flex h-12 shrink-0 items-center justify-between border-b border-zinc-200 bg-zinc-50 px-4 dark:border-zinc-800 dark:bg-zinc-900">
         <div className="flex min-w-0 flex-1 items-center gap-2 md:flex-initial">
-          <button onClick={() => { setShowNav(true); setExpandedSlug(tutorialSlug); }} aria-label="Open course outline" className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md text-zinc-600 transition-colors hover:bg-zinc-200 hover:text-zinc-900 md:h-8 md:w-8 dark:text-zinc-400 dark:hover:bg-zinc-700 dark:hover:text-zinc-100">
-            <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><line x1="2" y1="4.5" x2="16" y2="4.5" /><line x1="2" y1="9" x2="16" y2="9" /><line x1="2" y1="13.5" x2="16" y2="13.5" /></svg>
-          </button>
-          <Link href="/" className="hidden items-center gap-2 rounded-md py-1 pr-2 transition-colors hover:bg-zinc-200 dark:hover:bg-zinc-800 md:flex" aria-label="Back to home">
+          <Link href="/" className="flex items-center gap-2 rounded-md py-1 pr-2 transition-colors hover:bg-zinc-200 dark:hover:bg-zinc-800" aria-label="Back to home">
             <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-indigo-600 text-xs font-bold text-white">U</span>
-            <span className="text-sm font-bold text-zinc-800 dark:text-zinc-100">uByte</span>
+            <span className="hidden text-sm font-bold text-zinc-800 dark:text-zinc-100 md:block">uByte</span>
           </Link>
         </div>
         <h1 className="min-w-0 max-w-[45%] flex-1 truncate text-center text-sm font-semibold text-zinc-800 dark:text-zinc-100 md:max-w-[40%] md:flex-initial" title={tutorialTitle}>{tutorialTitle}</h1>
@@ -279,9 +274,9 @@ export default function InteractiveTutorial({
       <div className="flex flex-1 overflow-hidden">
         {/* Left panel */}
         <aside className={`flex min-w-0 flex-col overflow-hidden bg-surface-card ${mobileTab === "instructions" ? "flex shrink" : "hidden"} md:flex md:shrink-0`} style={isMobile ? undefined : { width: leftWidth }} suppressHydrationWarning>
-          {/* Tab strip: Instructions | Discuss */}
+          {/* Tab strip: Outline | Instructions | Discuss */}
           <div className="flex shrink-0 border-b border-zinc-200 dark:border-zinc-800">
-            {(["instructions", "discuss"] as const).map((tab) => (
+            {(["outline", "instructions", "discuss"] as const).map((tab) => (
               <button
                 key={tab}
                 type="button"
@@ -292,10 +287,86 @@ export default function InteractiveTutorial({
                     : "text-zinc-400 hover:text-zinc-700 dark:text-zinc-500 dark:hover:text-zinc-300"
                 }`}
               >
-                {tab === "instructions" ? "Instructions" : "Discuss"}
+                {tab === "outline" ? "Outline" : tab === "instructions" ? "Steps" : "Discuss"}
               </button>
             ))}
           </div>
+
+          {leftTab === "outline" && (
+            <nav className="flex-1 overflow-y-auto px-3 py-3">
+              <ul className="space-y-0.5">
+                {allTutorials.map((t) => {
+                  const isCurrent = t.slug === tutorialSlug;
+                  const isDone = (progressByLang[lang] ?? []).includes(t.slug);
+                  const isExpanded = expandedSlug === t.slug;
+                  const subSteps = allTutorialSteps[t.slug] ?? [];
+                  return (
+                    <li key={t.slug}>
+                      <Link
+                        href={tutorialUrl(lang, t.slug)}
+                        onClick={() => { if (subSteps.length > 0) setExpandedSlug(isExpanded ? "" : t.slug); }}
+                        className={`flex items-center justify-between rounded-lg px-3 py-2 text-sm transition-all duration-150 ${
+                          isCurrent
+                            ? "bg-white font-semibold text-indigo-700 shadow-sm dark:bg-zinc-800 dark:text-indigo-400"
+                            : "font-medium text-zinc-800 hover:bg-zinc-200/70 hover:text-zinc-900 dark:text-zinc-200 dark:hover:bg-zinc-800 dark:hover:text-white"
+                        }`}
+                      >
+                        <span className="flex-1 leading-snug">{t.title}</span>
+                        {isDone && !isCurrent && (
+                          <svg className="mr-1 h-3.5 w-3.5 shrink-0 text-emerald-500 dark:text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+                          </svg>
+                        )}
+                        {subSteps.length > 0 && (
+                          <svg
+                            className={`h-3.5 w-3.5 shrink-0 transition-transform duration-200 ${isExpanded ? "rotate-90" : ""} ${isCurrent ? "text-indigo-500 dark:text-indigo-400" : "text-zinc-400 dark:text-zinc-500"}`}
+                            fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                          >
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
+                          </svg>
+                        )}
+                      </Link>
+
+                      {isExpanded && subSteps.length > 0 && (
+                        <ul className="ml-3 mt-0.5 space-y-0.5 border-l border-zinc-200 pl-3 dark:border-zinc-700">
+                          {subSteps.map((step) => {
+                            const isActiveStep = isCurrent && step.index === stepProgress.stepIndex;
+                            const isStepSkipped = isCurrent && stepProgress.skippedSteps.has(step.index);
+                            const isStepDone = isCurrent && stepProgress.completedSteps.has(step.index) && !isStepSkipped;
+                            return (
+                              <li key={step.index}>
+                                {isCurrent ? (
+                                  <button
+                                    onClick={() => { stepProgress.goToStep(step.index); setLeftTab("instructions"); }}
+                                    className={`flex w-full items-center justify-between rounded-md px-2 py-1.5 text-xs transition-all duration-150 ${
+                                      isActiveStep
+                                        ? "font-medium text-indigo-600 dark:text-indigo-400"
+                                        : "text-zinc-400 hover:bg-zinc-200/70 hover:text-zinc-700 dark:text-zinc-500 dark:hover:bg-zinc-800 dark:hover:text-zinc-300"
+                                    }`}
+                                  >
+                                    <span>{step.title}</span>
+                                    {isStepDone    && <span className="shrink-0 text-emerald-500 dark:text-emerald-400">✓</span>}
+                                    {isStepSkipped && <span className="shrink-0 text-zinc-400 dark:text-zinc-500" title="Skipped">›</span>}
+                                  </button>
+                                ) : (
+                                  <Link
+                                    href={tutorialUrl(lang, t.slug, step.index)}
+                                    className="block rounded-md px-2 py-1.5 text-xs text-zinc-400 transition-all duration-150 hover:bg-zinc-200/70 hover:text-zinc-700 dark:text-zinc-500 dark:hover:bg-zinc-800 dark:hover:text-zinc-300"
+                                  >
+                                    {step.title}
+                                  </Link>
+                                )}
+                              </li>
+                            );
+                          })}
+                        </ul>
+                      )}
+                    </li>
+                  );
+                })}
+              </ul>
+            </nav>
+          )}
 
           {leftTab === "instructions" && (
             <InstructionsSidebar
@@ -437,21 +508,6 @@ export default function InteractiveTutorial({
         />
       )}
 
-      {/* Course outline drawer */}
-      <CourseOutlineDrawer
-        lang={lang}
-        show={showNav}
-        onClose={() => setShowNav(false)}
-        allTutorials={allTutorials}
-        allTutorialSteps={allTutorialSteps}
-        tutorialSlug={tutorialSlug}
-        stepIndex={stepProgress.stepIndex}
-        completedSteps={stepProgress.completedSteps}
-        skippedSteps={stepProgress.skippedSteps}
-        expandedSlug={expandedSlug}
-        onExpandSlug={setExpandedSlug}
-        onGoToStep={stepProgress.goToStep}
-      />
 
       {/* Congratulations modal */}
       {stepProgress.tutorialDone && (
