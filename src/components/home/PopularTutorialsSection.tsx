@@ -38,7 +38,7 @@ export default function PopularTutorialsSection({ languages }: Props) {
             <Link
               key={lang.slug}
               href={tutorialLangUrl(lang.slug)}
-              className="group flex flex-col gap-3 rounded-xl border border-zinc-200 bg-[#f8f9fa] p-5 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md dark:border-zinc-700 dark:bg-zinc-800/80"
+              className="group flex flex-col gap-3 rounded-xl border border-[#E7E1F3] bg-[#FAFCFF] p-5 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md dark:border-zinc-700 dark:bg-zinc-800/80"
             >
               {/* Top row: icon + learner count */}
               <div className="flex items-center justify-between">

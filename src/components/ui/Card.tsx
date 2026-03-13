@@ -13,7 +13,7 @@ const Card = forwardRef<HTMLDivElement, CardProps>(function Card(
   return (
     <Tag
       ref={ref as React.Ref<HTMLDivElement>}
-      className={`rounded-2xl border border-zinc-200 bg-surface-card shadow-sm dark:border-zinc-700 ${className}`}
+      className={`rounded-2xl border border-[#E7E1F3] bg-surface-card shadow-sm dark:border-zinc-700 ${className}`}
     >
       {children}
     </Tag>

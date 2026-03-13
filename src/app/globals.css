@@ -5,10 +5,11 @@
 @variant dark (&:where(.dark, .dark *));
 
 :root {
-  --background: #ffffff;
+  --background: #F4F1FB;
   --foreground: #171717;
-  --surface-page: #ffffff;
-  --surface-card: #f8f9fa;
+  --surface-page: #F4F1FB;
+  --surface-card: #FAFCFF;
+  --border-card: #E7E1F3;
 }
 
 @theme {
@@ -37,10 +38,11 @@
 }
 
 .light {
-  --background: #ffffff;
+  --background: #F4F1FB;
   --foreground: #171717;
-  --surface-page: #ffffff;
-  --surface-card: #f8f9fa;
+  --surface-page: #F4F1FB;
+  --surface-card: #FAFCFF;
+  --border-card: #E7E1F3;
 }
 
 html {
