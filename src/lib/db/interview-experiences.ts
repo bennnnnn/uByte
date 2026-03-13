@@ -48,9 +48,9 @@ export async function getApprovedExperiences(opts: {
     LEFT JOIN users u ON u.id = e.user_id
     LEFT JOIN interview_votes v ON v.experience_id = e.id
     WHERE e.approved = true
-      AND (${companyVal}    IS NULL OR lower(e.company)   = lower(${companyVal}))
-      AND (${difficultyVal} IS NULL OR e.difficulty       = ${difficultyVal})
-      AND (${outcomeVal}    IS NULL OR e.outcome          = ${outcomeVal})
+      AND (${companyVal}::text    IS NULL OR lower(e.company) = lower(${companyVal}::text))
+      AND (${difficultyVal}::text IS NULL OR e.difficulty     = ${difficultyVal}::text)
+      AND (${outcomeVal}::text    IS NULL OR e.outcome        = ${outcomeVal}::text)
     GROUP BY e.id, u.name
     ORDER BY vote_score DESC, e.created_at DESC
     LIMIT ${limit} OFFSET ${offset}
@@ -74,9 +74,9 @@ export async function countApprovedExperiences(opts: {
     SELECT COUNT(*)::int AS n
     FROM interview_experiences e
     WHERE e.approved = true
-      AND (${companyVal}    IS NULL OR lower(e.company) = lower(${companyVal}))
-      AND (${difficultyVal} IS NULL OR e.difficulty     = ${difficultyVal})
-      AND (${outcomeVal}    IS NULL OR e.outcome        = ${outcomeVal})
+      AND (${companyVal}::text    IS NULL OR lower(e.company) = lower(${companyVal}::text))
+      AND (${difficultyVal}::text IS NULL OR e.difficulty     = ${difficultyVal}::text)
+      AND (${outcomeVal}::text    IS NULL OR e.outcome        = ${outcomeVal}::text)
   `;
   return (rows[0] as { n: number }).n;
 }
