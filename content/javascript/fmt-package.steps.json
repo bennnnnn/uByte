@@ -23,7 +23,7 @@
     "title": "toUpperCase, toLowerCase, trim",
     "instruction": "Three methods you will use constantly:\n\n- `.toUpperCase()` / `.toLowerCase()` — case conversion\n- `.trim()` — remove whitespace from both ends\n- `.trimStart()` / `.trimEnd()` — one side only\n\nFix the messy user input by normalising it.",
     "hint": "input.trim().toLowerCase()",
-    "starter": "// User typed with wrong case and extra spaces:\nconst rawInput = \"   ALEX RIVERA   \";\n\n// TODO: clean it up:\n// 1. trim whitespace\n// 2. convert to lowercase\n// 3. print the cleaned version\nconsole.log(rawInput.trim().toLowerCase());",
+    "starter": "// User typed with wrong case and extra spaces:\nconst rawInput = \"   ALEX RIVERA   \";\n\n// Clean it up — chain trim() and toLowerCase():\nconsole.log(rawInput.trim().toLowerCase());",
     "expectedOutput": ["alex rivera"],
     "codeChecks": [
       { "pattern": "\\.trim\\(\\)", "required": true, "message": "Use .trim() to remove whitespace." },
@@ -43,7 +43,7 @@
     "title": "slice — extract a portion",
     "instruction": "`.slice(start, end)` extracts a substring:\n\n- `str.slice(0, 5)` — first 5 characters\n- `str.slice(-3)` — last 3 characters\n- `str.slice(7)` — from position 7 to the end\n\nExtract the protocol, domain, and file extension from the URL.",
     "hint": "url.slice(0, 8) for 'https://'",
-    "starter": "const url = \"https://example.com\";\nconst filename = \"document.pdf\";\n\n// TODO:\n// 1. Extract the protocol: \"https://\"\n// 2. Extract the domain: \"example.com\"\n// 3. Extract the extension: \".pdf\" (last 4 chars)\nconsole.log(url.slice(0, 8));\nconsole.log(url.slice(8));\nconsole.log(filename.slice(-4));",
+    "starter": "const url = \"https://example.com\";\nconst filename = \"document.pdf\";\n\n// Extract parts using slice:\nconsole.log(url.slice(0, 8));   // protocol: \"https://\"\nconsole.log(url.slice(8));      // domain: \"example.com\"\nconsole.log(filename.slice(-4)); // extension: \".pdf\"",
     "expectedOutput": ["https://", "example.com", ".pdf"],
     "codeChecks": [
       { "pattern": "\\.slice\\(", "required": true, "message": "Use .slice() to extract substrings." }

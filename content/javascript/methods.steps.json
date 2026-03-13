@@ -77,7 +77,7 @@
     "title": "Spread in function calls",
     "instruction": "Spread `...` works in function calls to expand an array into individual arguments:\n\n```js\nMath.max(...numbers);  // instead of Math.max(a, b, c, d)\n```\n\nUse spread to find the max, min, and call a multi-arg function.",
     "hint": "Math.max(...scores), Math.min(...scores)",
-    "starter": "const scores = [85, 92, 67, 98, 73, 88];\n\n// TODO: use spread to find max and min WITHOUT hard-coding args\nconsole.log(\"Max:\", Math.max(...scores));\nconsole.log(\"Min:\", Math.min(...scores));\n\nfunction describe(a, b, c) {\n  return `${a}, ${b}, ${c}`;\n}\nconst first3 = [\"Alice\", \"Bob\", \"Carol\"];\nconsole.log(describe(...first3));",
+    "starter": "const scores = [85, 92, 67, 98, 73, 88];\n\n// Spread expands the array into individual arguments:\nconsole.log(\"Max:\", Math.max(...scores));\nconsole.log(\"Min:\", Math.min(...scores));\n\nfunction describe(a, b, c) {\n  return `${a}, ${b}, ${c}`;\n}\nconst first3 = [\"Alice\", \"Bob\", \"Carol\"];\nconsole.log(describe(...first3));",
     "expectedOutput": ["Max: 98", "Min: 67", "Alice, Bob, Carol"],
     "codeChecks": [
       { "pattern": "Math\\.max\\(\\.\\.\\.", "required": true, "message": "Use spread: Math.max(...scores)" },
