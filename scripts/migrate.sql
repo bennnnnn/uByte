@@ -153,3 +153,43 @@ VALUES
   ('cpp', 40, 45),
   ('csharp', 40, 45)
 ON CONFLICT (lang) DO NOTHING;
+
+-- Contact messages from the /contact form (stored for admin review)
+CREATE TABLE IF NOT EXISTS contact_messages (
+  id         SERIAL PRIMARY KEY,
+  name       TEXT NOT NULL,
+  email      TEXT NOT NULL,
+  subject    TEXT NOT NULL,
+  message    TEXT NOT NULL,
+  read       BOOLEAN NOT NULL DEFAULT false,
+  created_at TEXT DEFAULT (NOW()::text)
+);
+CREATE INDEX IF NOT EXISTS idx_contact_messages_created ON contact_messages(created_at DESC);
+
+-- User-submitted interview experiences
+CREATE TABLE IF NOT EXISTS interview_experiences (
+  id          SERIAL PRIMARY KEY,
+  user_id     INTEGER REFERENCES users(id) ON DELETE SET NULL,
+  company     TEXT NOT NULL,
+  role        TEXT NOT NULL,
+  difficulty  TEXT NOT NULL CHECK (difficulty IN ('easy', 'medium', 'hard')),
+  outcome     TEXT NOT NULL CHECK (outcome IN ('offer', 'rejection', 'ongoing', 'ghosted')),
+  rounds      TEXT NOT NULL,
+  tips        TEXT,
+  anonymous   BOOLEAN NOT NULL DEFAULT true,
+  approved    BOOLEAN NOT NULL DEFAULT false,
+  created_at  TEXT DEFAULT (NOW()::text)
+);
+CREATE INDEX IF NOT EXISTS idx_interview_exp_approved ON interview_experiences(approved, created_at DESC);
+
+-- Votes on interview experiences (helpful / not helpful)
+CREATE TABLE IF NOT EXISTS interview_votes (
+  id            SERIAL PRIMARY KEY,
+  experience_id INTEGER NOT NULL REFERENCES interview_experiences(id) ON DELETE CASCADE,
+  user_id       INTEGER REFERENCES users(id) ON DELETE SET NULL,
+  visitor_id    TEXT,
+  vote          SMALLINT NOT NULL CHECK (vote IN (1, -1)),
+  created_at    TEXT DEFAULT (NOW()::text),
+  CONSTRAINT interview_votes_user_uniq    UNIQUE (experience_id, user_id),
+  CONSTRAINT interview_votes_visitor_uniq UNIQUE (experience_id, visitor_id)
+);

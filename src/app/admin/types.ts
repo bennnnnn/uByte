@@ -70,18 +70,20 @@ export interface ExamStats {
   passRatePercent: number;
 }
 
-export type Tab = "users" | "analytics" | "revenue" | "growth" | "audit" | "exams" | "banner" | "blog";
+export type Tab = "users" | "analytics" | "revenue" | "growth" | "audit" | "exams" | "banner" | "blog" | "messages" | "interviews";
 export type RevenuePeriod = "7days" | "month" | "year";
 
 export const TAB_LABELS: Record<Tab, string> = {
-  users:     "Users",
-  analytics: "Analytics",
-  revenue:   "Revenue",
-  growth:    "Growth",
-  audit:     "Audit log",
-  exams:     "Certifications",
-  banner:    "Site banner",
-  blog:      "Blog editor",
+  users:      "Users",
+  analytics:  "Analytics",
+  revenue:    "Revenue",
+  growth:     "Growth",
+  audit:      "Audit log",
+  exams:      "Certifications",
+  banner:     "Site banner",
+  blog:       "Blog editor",
+  messages:   "Messages",
+  interviews: "Interviews",
 };
 
 export type { AdminRevenueStats };

@@ -6,6 +6,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { sendContactEmail } from "@/lib/email";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 import { withErrorHandling } from "@/lib/api-utils";
+import { saveContactMessage } from "@/lib/db/contact-messages";
 
 export const POST = withErrorHandling("POST /api/contact", async (req: NextRequest) => {
   const ip = getClientIp(req.headers);
@@ -33,6 +34,9 @@ export const POST = withErrorHandling("POST /api/contact", async (req: NextReque
     return NextResponse.json({ error: "Invalid email address." }, { status: 400 });
   }
 
-  await sendContactEmail({ fromName: name, fromEmail: email, subject, message });
+  await Promise.all([
+    sendContactEmail({ fromName: name, fromEmail: email, subject, message }),
+    saveContactMessage({ name, email, subject, message }),
+  ]);
   return NextResponse.json({ ok: true });
 });
