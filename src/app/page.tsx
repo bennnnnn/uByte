@@ -212,6 +212,9 @@ export default async function Home() {
 
         {/* Certifications */}
         <PracticeExamsSection examConfigByLang={examConfigByLang} />
+
+        {/* Spacer before footer */}
+        <div className="pb-8 sm:pb-12" />
       </div>
     </div>
   );
