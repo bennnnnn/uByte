@@ -5,7 +5,7 @@ const PILLARS = [
   {
     title: "Interactive Tutorials",
     metric: "130+ chapters",
-    desc: "Write and run real code in your browser. Step-by-step lessons with instant AI-powered feedback across all 7 languages.",
+    desc: "Write and run real code in your browser. Step-by-step lessons with instant AI-powered feedback — no installs, no setup.",
     icon: (
       <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.75}>
         <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
@@ -24,8 +24,8 @@ const PILLARS = [
   },
   {
     title: "Verifiable Certifications",
-    metric: "7 languages",
-    desc: "Pass a timed exam, download a PDF certificate, and share it on LinkedIn. Recruiters actually look at these.",
+    metric: "Go · Python · JS · Java · C++ · Rust · C#",
+    desc: "Pass a timed exam, download a PDF certificate, and share it directly on LinkedIn. Recruiters actually look at these.",
     icon: (
       <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.75}>
         <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
@@ -44,28 +44,28 @@ export default function ValuePropBanner({ isPro = false }: ValuePropBannerProps)
   return (
     <section
       aria-labelledby="value-prop-heading"
-      className="relative overflow-hidden rounded-2xl bg-zinc-900 px-6 py-10 shadow-xl sm:px-10 sm:py-14 dark:bg-zinc-950"
+      className="relative overflow-hidden rounded-2xl border border-violet-200/80 bg-gradient-to-br from-violet-50 via-indigo-50/70 to-purple-50 px-6 py-10 sm:px-10 sm:py-14 dark:border-violet-800/30 dark:from-violet-950/30 dark:via-indigo-950/20 dark:to-purple-950/20"
     >
-      {/* Background glow orbs */}
-      <div aria-hidden className="pointer-events-none absolute -left-20 -top-20 h-72 w-72 rounded-full bg-indigo-500/15 blur-[120px]" />
-      <div aria-hidden className="pointer-events-none absolute -bottom-20 -right-20 h-72 w-72 rounded-full bg-violet-500/15 blur-[120px]" />
-      {/* Subtle grid */}
-      <div aria-hidden className="pointer-events-none absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:48px_48px]" />
+      {/* Subtle glow orbs */}
+      <div aria-hidden className="pointer-events-none absolute -left-16 -top-16 h-64 w-64 rounded-full bg-violet-300/20 blur-[100px] dark:bg-violet-500/10" />
+      <div aria-hidden className="pointer-events-none absolute -bottom-16 -right-16 h-64 w-64 rounded-full bg-indigo-300/20 blur-[100px] dark:bg-indigo-500/10" />
+      {/* Dot grid */}
+      <div aria-hidden className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle,rgba(109,40,217,0.07)_1px,transparent_1px)] bg-[size:28px_28px]" />
 
       <div className="relative">
         {/* Header */}
         <div className="mb-10 text-center">
-          <div className="mb-3 inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-3.5 py-1 text-[11px] font-bold uppercase tracking-widest text-indigo-300">
+          <div className="mb-3 inline-flex items-center gap-1.5 rounded-full border border-violet-300 bg-white/70 px-3.5 py-1 text-[11px] font-bold uppercase tracking-widest text-violet-700 dark:border-violet-700 dark:bg-violet-950/40 dark:text-violet-300">
             Everything in one place
           </div>
           <h2
             id="value-prop-heading"
-            className="text-2xl font-black tracking-tight text-white sm:text-3xl"
+            className="text-2xl font-black tracking-tight text-zinc-900 dark:text-zinc-100 sm:text-3xl"
           >
             From beginner to hire-ready.
           </h2>
-          <p className="mt-2 text-sm text-zinc-400 sm:text-base">
-            One subscription. Three powerful tools. All 7 languages.
+          <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400 sm:text-base">
+            Three tools that work together. Zero context-switching, zero extra platforms.
           </p>
         </div>
 
@@ -74,18 +74,18 @@ export default function ValuePropBanner({ isPro = false }: ValuePropBannerProps)
           {PILLARS.map((p) => (
             <div
               key={p.title}
-              className="rounded-xl border border-white/[0.07] bg-white/[0.04] p-5 backdrop-blur-sm transition-colors hover:border-white/[0.12] hover:bg-white/[0.07]"
+              className="rounded-xl border border-violet-200/60 bg-white/70 p-5 shadow-sm backdrop-blur-sm transition-all hover:-translate-y-0.5 hover:border-violet-300 hover:shadow-md dark:border-violet-800/30 dark:bg-white/[0.04]"
             >
               <div className="mb-4 flex items-center justify-between">
-                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-indigo-500/20 text-indigo-400">
+                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-violet-100 text-violet-600 dark:bg-violet-900/40 dark:text-violet-400">
                   {p.icon}
                 </div>
-                <span className="rounded-full bg-indigo-500/15 px-2.5 py-0.5 text-[10px] font-bold text-indigo-300">
+                <span className="rounded-full bg-violet-100 px-2.5 py-0.5 text-[10px] font-bold text-violet-700 dark:bg-violet-900/40 dark:text-violet-300">
                   {p.metric}
                 </span>
               </div>
-              <p className="mb-1.5 text-sm font-bold text-white">{p.title}</p>
-              <p className="text-xs leading-relaxed text-zinc-400">{p.desc}</p>
+              <p className="mb-1.5 text-sm font-bold text-zinc-900 dark:text-zinc-100">{p.title}</p>
+              <p className="text-xs leading-relaxed text-zinc-500 dark:text-zinc-400">{p.desc}</p>
             </div>
           ))}
         </div>
@@ -94,7 +94,7 @@ export default function ValuePropBanner({ isPro = false }: ValuePropBannerProps)
         <div className="flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
           <Link
             href="/pricing"
-            className="inline-flex items-center justify-center gap-2 rounded-xl bg-indigo-600 px-7 py-3 text-sm font-bold text-white shadow-lg shadow-indigo-500/30 transition-all hover:-translate-y-0.5 hover:bg-indigo-500 hover:shadow-indigo-500/45"
+            className="inline-flex items-center justify-center gap-2 rounded-xl bg-violet-600 px-7 py-3 text-sm font-bold text-white shadow-lg shadow-violet-500/25 transition-all hover:-translate-y-0.5 hover:bg-violet-500 hover:shadow-violet-500/40"
           >
             See plans — from ${(MONTHLY_PRICE_CENTS / 100).toFixed(2)}/mo
             <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
@@ -103,7 +103,7 @@ export default function ValuePropBanner({ isPro = false }: ValuePropBannerProps)
           </Link>
           <Link
             href="/tutorial/go"
-            className="text-sm font-semibold text-zinc-400 underline-offset-2 transition-colors hover:text-white hover:underline"
+            className="text-sm font-semibold text-violet-700 underline-offset-2 transition-colors hover:text-violet-900 hover:underline dark:text-violet-400 dark:hover:text-violet-200"
           >
             Start free first →
           </Link>

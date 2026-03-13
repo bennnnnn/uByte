@@ -46,7 +46,7 @@ export default function PopularInterviewPrepSection({ problems }: Props) {
           id="popular-prep-heading"
           eyebrow="Interview Prep"
           title="Practice problems developers love"
-          subtitle="Real interview questions — solve them in any of 7 languages, get instant feedback."
+          subtitle="Real interview questions — solve in your language of choice, get instant feedback."
           className="mb-0 text-left"
         />
         <Link

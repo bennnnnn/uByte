@@ -111,12 +111,12 @@ const STEP_TEXT: Record<Lang, string> = {
 
 const LANG_ORDER = ALL_LANGUAGE_KEYS;
 
-function getFeatures(langCount: number) {
+function getFeatures(_langCount: number) {
   return [
     "Write real code in your browser — zero setup, zero installs",
     "Tutorials → Interview prep → Verifiable certification, all in one",
     "Instant feedback on every step — know if you're right immediately",
-    `One subscription unlocks all ${langCount} languages, all features`,
+    "Earn a certificate you can share on LinkedIn and your résumé",
   ];
 }
 
@@ -170,7 +170,7 @@ export default function HeroSection({
             {/* Badge */}
             <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-indigo-200 bg-indigo-50 px-4 py-1.5 text-[11px] font-bold uppercase tracking-[0.12em] text-indigo-600 dark:border-indigo-800 dark:bg-indigo-950/50 dark:text-indigo-400">
               <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-indigo-500" />
-              Free to start · No credit card · {languageCount} Languages
+              Free to start · No credit card · Zero setup
             </div>
 
             {/* Headline */}
@@ -184,7 +184,7 @@ export default function HeroSection({
             {/* Sub */}
             <p className="mb-8 max-w-[480px] text-base leading-relaxed text-zinc-500 dark:text-zinc-400 sm:text-lg">
               The complete path from beginner to job-ready — interactive tutorials,
-              LeetCode-style interview prep, and verifiable certificates. All in one place, for all {languageCount} languages.
+              LeetCode-style interview prep, and verifiable certificates. All in one place, no installs needed.
             </p>
 
             {/* Feature list */}
@@ -268,9 +268,9 @@ export default function HeroSection({
             {/* Trust line */}
             <p className="mb-6 text-xs font-medium text-zinc-500 dark:text-zinc-400">
               {isPro
-                ? `You have full access — all ${languageCount} languages, certifications, and interview prep.`
+                ? "You have full access — tutorials, interview prep, and certifications, all unlocked."
                 : user
-                ? `Upgrade once. Unlock all ${languageCount} languages, certifications, and interview prep.`
+                ? "Upgrade to unlock all tutorials, certifications, and interview prep."
                 : "Free forever for the basics. Upgrade to unlock everything."}
             </p>
 
