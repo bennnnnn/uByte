@@ -369,7 +369,7 @@ export function useStepProgress(
       const { output: out, hasError } = await runCodeRequest(code, lang);
       setOutputIsError(hasError);
       setOutput(out || (hasError ? "Compilation error (see above)" : "(no output)"));
-      if (hasError) setErrorLines(parseErrorLines(out));
+      if (hasError) setErrorLines(parseErrorLines(out, lang));
       setStatus("idle");
     } catch {
       setOutputIsError(true);
@@ -415,7 +415,7 @@ export function useStepProgress(
       setOutputIsError(hasError);
       setOutput(out || (hasError ? "Compilation error" : "(no output)"));
         if (hasError) {
-        setErrorLines(parseErrorLines(out));
+        setErrorLines(parseErrorLines(out, lang));
         setStatus("failed");
         setFailCount((n) => {
           const next = n + 1;

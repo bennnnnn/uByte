@@ -150,5 +150,6 @@ VALUES
   ('javascript', 40, 45),
   ('java', 40, 45),
   ('rust', 40, 45),
-  ('cpp', 40, 45)
+  ('cpp', 40, 45),
+  ('csharp', 40, 45)
 ON CONFLICT (lang) DO NOTHING;
