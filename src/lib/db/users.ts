@@ -77,28 +77,20 @@ export async function getUserById(id: number): Promise<User | undefined> {
   return row as User | undefined;
 }
 
-const ALLOWED_PROFILE_FIELDS = new Set(["name", "bio", "avatar", "theme"]);
-
 export async function updateUserProfile(
   userId: number,
   fields: { name?: string; bio?: string; avatar?: string; theme?: string }
 ): Promise<void> {
   const sql = getSql();
-  const sets: string[] = [];
-  const vals: unknown[] = [];
-  for (const [key, val] of Object.entries(fields)) {
-    if (!ALLOWED_PROFILE_FIELDS.has(key)) continue;
-    if (val !== undefined) {
-      vals.push(val);
-      sets.push(`${key} = $${vals.length}`);
-    }
-  }
-  if (sets.length === 0) return;
-  vals.push(userId);
-  await sql.query(
-    `UPDATE users SET ${sets.join(", ")} WHERE id = $${vals.length}`,
-    vals as string[]
-  );
+  // Issue individual updates for each provided field using tagged template
+  // literals so all values are properly parameterised by the Neon client.
+  const { name, bio, avatar, theme } = fields;
+  await Promise.all([
+    name    !== undefined ? sql`UPDATE users SET name   = ${name}   WHERE id = ${userId}` : null,
+    bio     !== undefined ? sql`UPDATE users SET bio    = ${bio}    WHERE id = ${userId}` : null,
+    avatar  !== undefined ? sql`UPDATE users SET avatar = ${avatar} WHERE id = ${userId}` : null,
+    theme   !== undefined ? sql`UPDATE users SET theme  = ${theme}  WHERE id = ${userId}` : null,
+  ].filter(Boolean));
 }
 
 export async function updateUserPassword(userId: number, passwordHash: string): Promise<void> {
