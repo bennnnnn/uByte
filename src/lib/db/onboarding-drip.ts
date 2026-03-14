@@ -126,7 +126,7 @@ export async function getUsersForTrialEndingWarning(
   const sql = getSql();
   const rows = await sql`
     SELECT u.id, u.name, u.email, u.plan,
-           EXTRACT(DAY FROM (u.subscription_expires_at::timestamptz - NOW()))::int AS days_left
+           EXTRACT(DAY FROM (u.subscription_expires_at::timestamptz - NOW()))::int AS "daysLeft"
     FROM users u
     WHERE
       u.email_verified = 1

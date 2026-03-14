@@ -276,7 +276,7 @@ export default async function PracticeExamsPage() {
               /* Not logged in */
               <div className="flex flex-wrap gap-3">
                 <Link
-                  href="/login?redirect=/certifications"
+                  href="/login?next=/certifications"
                   className="inline-flex items-center justify-center gap-2 rounded-xl bg-indigo-600 px-5 py-3 text-sm font-bold text-white shadow-md shadow-indigo-500/20 transition-all hover:-translate-y-0.5 hover:bg-indigo-500"
                 >
                   Get started free
@@ -581,7 +581,7 @@ export default async function PracticeExamsPage() {
             </p>
             <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
               <Link
-                href="/login?redirect=/certifications"
+                href="/login?next=/certifications"
                 className="inline-flex items-center justify-center gap-2 rounded-xl bg-indigo-600 px-5 py-3 text-sm font-bold text-white shadow-md shadow-indigo-500/20 transition-all hover:-translate-y-0.5 hover:bg-indigo-500"
               >
                 Sign up free

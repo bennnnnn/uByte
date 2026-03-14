@@ -21,9 +21,15 @@ async function ensureTable(): Promise<void> {
     CREATE TABLE IF NOT EXISTS weekly_digest_log (
       id         SERIAL PRIMARY KEY,
       user_id    INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-      sent_at    TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-      UNIQUE(user_id, DATE_TRUNC('week', sent_at))
+      sent_at    TIMESTAMPTZ NOT NULL DEFAULT NOW()
     )
+  `;
+  // Expression-based unique constraints cannot live inside CREATE TABLE in
+  // PostgreSQL. Use a unique index instead — ON CONFLICT DO NOTHING will
+  // still honour it.
+  await sql`
+    CREATE UNIQUE INDEX IF NOT EXISTS idx_weekly_digest_user_week
+    ON weekly_digest_log (user_id, (DATE_TRUNC('week', sent_at AT TIME ZONE 'UTC')))
   `;
   _ready = true;
 }
