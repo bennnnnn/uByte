@@ -4,9 +4,9 @@ import HeroIDE from "./HeroIDE";
 
 const FEATURES = [
   "Write real code in your browser — zero setup, zero installs",
-  "Tutorials → Interview prep → Verifiable certification, all in one",
+  "Tutorials → Interview prep → Certification, all in one",
   "Instant feedback on every step — know if you're right immediately",
-  "Earn a certificate you can share on LinkedIn and your résumé",
+  "Earn a certificate that proves your understanding",
 ];
 
 interface HeroSectionProps {
@@ -46,12 +46,6 @@ export default function HeroSection({
 
           {/* LEFT: server-rendered copy — LCP elements land in initial HTML */}
           <div>
-            {/* Badge */}
-            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-indigo-200 bg-indigo-50 px-4 py-1.5 text-[11px] font-bold uppercase tracking-[0.12em] text-indigo-600 dark:border-indigo-800 dark:bg-indigo-950/50 dark:text-indigo-400">
-              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-indigo-500" />
-              Free to start · No credit card · Zero setup
-            </div>
-
             {/* Headline */}
             <h1 className="mb-5 text-[2rem] font-black leading-[1.08] tracking-tight text-zinc-900 dark:text-zinc-50 sm:text-[2.75rem] sm:leading-[1.04] lg:text-[3.25rem] xl:text-[3.75rem]">
               Learn. Practice.
@@ -63,7 +57,7 @@ export default function HeroSection({
             {/* Subtitle — this is the LCP element; server-rendered for instant paint */}
             <p className="mb-8 max-w-[480px] text-base leading-relaxed text-zinc-500 dark:text-zinc-400 sm:text-lg">
               The complete path from beginner to job-ready — interactive tutorials,
-              LeetCode-style interview prep, and verifiable certificates. All in one place, no installs needed.
+              LeetCode-style interview prep, and certification exams. All in one place, no installs needed.
             </p>
 
             {/* Feature list */}

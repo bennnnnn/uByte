@@ -1,6 +1,6 @@
 const TESTIMONIALS = [
   {
-    quote: "I passed my Go certification on the first try. The timed exam format is exactly like a real assessment — and the certificate is on my LinkedIn profile the same day.",
+    quote: "I passed my Go certification on the first try. The timed exam format really tests whether you understand the concepts, not just the syntax.",
     name: "Amir K.",
     role: "Backend Engineer",
     initials: "AK",
@@ -14,7 +14,7 @@ const TESTIMONIALS = [
     gradient: "from-violet-500 to-fuchsia-600",
   },
   {
-    quote: "Added my Rust certificate to LinkedIn within an hour. Three recruiters reached out that same week. This platform is the real deal.",
+    quote: "Finished the Rust certification and finally feel confident I actually understand the language. The exam was tough — exactly how it should be.",
     name: "James T.",
     role: "Systems Programmer",
     initials: "JT",

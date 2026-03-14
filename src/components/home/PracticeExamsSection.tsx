@@ -8,10 +8,10 @@ interface Props {
 }
 
 const FEATURES = [
-  "Timed, proctored assessment",
+  "Timed assessment",
   "Instant PDF certificate",
-  "One-click LinkedIn sharing",
-  "Verifiable by employers",
+  "Test your real understanding",
+  "Covers all core language concepts",
 ];
 
 export default function PracticeExamsSection({ examConfigByLang }: Props) {
@@ -26,14 +26,14 @@ export default function PracticeExamsSection({ examConfigByLang }: Props) {
               <svg className="h-3 w-3" fill="currentColor" viewBox="0 0 20 20">
                 <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
               </svg>
-              Verifiable Certifications · Pro
+              Certifications · Pro
             </div>
 
             <h2 id="certifications-heading" className="text-xl font-black text-zinc-900 dark:text-zinc-100 sm:text-2xl">
               Prove what you know.
             </h2>
             <p className="mt-1.5 max-w-md text-sm text-zinc-500 dark:text-zinc-400">
-              Pass a timed exam and earn a certificate you can share on LinkedIn, attach to job applications, or link from your portfolio. Recruiters notice.
+              Pass a timed exam and earn a certificate that proves your understanding of the language — a real measure of how far you've come.
             </p>
 
             <ul className="mt-5 flex flex-wrap gap-x-6 gap-y-2">
