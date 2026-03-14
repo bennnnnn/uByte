@@ -1,0 +1,64 @@
+[
+  {
+    "title": "Your first variable",
+    "instruction": "`let` creates a variable. By default it is immutable — you cannot change it after creation.\n\n```rust\nlet x = 5;\n```\n\nRun this program.",
+    "starter": "fn main() {\n    let x = 5;\n    println!(\"x is {}\", x);\n}",
+    "expectedOutput": ["x is 5"],
+    "successMessage": "let binds a name to a value. Rust calls this a 'binding'. The value is locked in — immutable by default."
+  },
+  {
+    "title": "Immutable means immutable",
+    "instruction": "Try to change an immutable variable and see what Rust says.\n\nRun this program — it will fail to compile. Read the error carefully.",
+    "hint": "You cannot reassign an immutable variable. Rust will refuse to compile this. Read the error message.",
+    "starter": "fn main() {\n    let x = 5;\n    x = 10; // This won't compile!\n    println!(\"{}\", x);\n}",
+    "expectedOutput": [],
+    "codeChecks": [
+      { "pattern": "x\\s*=\\s*10", "required": false, "message": "Notice that Rust won't let you reassign x. Add 'mut' to the let binding to fix it." }
+    ],
+    "successMessage": "That error message is Rust protecting you. Unintended mutation is a huge source of bugs. Rust forces you to be explicit."
+  },
+  {
+    "title": "Making a variable mutable",
+    "instruction": "`let mut` creates a variable you can change:\n\n```rust\nlet mut score = 0;\nscore = 100;\n```\n\nChange the code to use `mut` so the reassignment works.",
+    "hint": "Change 'let x = 5;' to 'let mut x = 5;'",
+    "starter": "fn main() {\n    let mut x = 5;\n    println!(\"x starts as {}\", x);\n    x = 10;\n    println!(\"x is now {}\", x);\n}",
+    "expectedOutput": ["x starts as 5", "x is now 10"],
+    "successMessage": "mut signals intent: 'this value will change'. When you see mut, you know to pay extra attention to where and how it changes."
+  },
+  {
+    "title": "Shadowing",
+    "instruction": "Rust lets you declare a new variable with the same name — this is called *shadowing*.\n\n```rust\nlet x = 5;\nlet x = x + 1; // new x, shadows the old one\n```\n\nShadowing is different from mutation: you are creating a *new* variable, not changing the old one.\n\nRun this.",
+    "starter": "fn main() {\n    let x = 5;\n    let x = x + 1;\n    let x = x * 2;\n    println!(\"x is {}\", x);\n}",
+    "expectedOutput": ["x is 12"],
+    "successMessage": "Shadowing lets you transform a value while keeping the name. Unlike mut, you can even change the type when you shadow."
+  },
+  {
+    "title": "Shadowing changes type",
+    "instruction": "One power of shadowing: the new variable can be a different type.\n\nWith `mut` you cannot change the type — only the value. With shadowing you can change both.\n\nRun this.",
+    "starter": "fn main() {\n    let spaces = \"   \"; // a string\n    let spaces = spaces.len(); // now a number\n    println!(\"spaces: {}\", spaces);\n}",
+    "expectedOutput": ["spaces: 3"],
+    "successMessage": "spaces started as a string slice and became a usize. With mut you'd need two different names. Shadowing lets you reuse the same name across a transformation."
+  },
+  {
+    "title": "Constants",
+    "instruction": "Constants are like variables, but:\n- They are *always* immutable — no `mut` allowed\n- The type *must* be annotated\n- They live for the entire program duration\n- Named in SCREAMING_SNAKE_CASE by convention\n\n```rust\nconst MAX_SCORE: u32 = 100;\n```\n\nRun this.",
+    "starter": "fn main() {\n    const MAX_POINTS: u32 = 100_000;\n    const PI: f64 = 3.14159;\n    println!(\"Max: {}\", MAX_POINTS);\n    println!(\"Pi: {}\", PI);\n}",
+    "expectedOutput": ["Max: 100000", "Pi: 3.14159"],
+    "successMessage": "Notice the underscore in 100_000 — Rust lets you use _ as a visual separator in numbers. MAX_POINTS reads the same as 100000 but is far easier to scan."
+  },
+  {
+    "title": "Declare first, use later",
+    "instruction": "You can declare a variable and assign it later — useful when the value depends on a condition.\n\nBut Rust will refuse to compile if you use a variable before assigning it.",
+    "starter": "fn main() {\n    let y;\n    y = 42;\n    println!(\"y is {}\", y);\n}",
+    "expectedOutput": ["y is 42"],
+    "successMessage": "Rust tracks whether every variable is initialised before use. This prevents the 'use uninitialised variable' class of bugs that plague C and C++."
+  },
+  {
+    "title": "Type annotations",
+    "instruction": "Rust usually infers the type. But you can be explicit:\n\n```rust\nlet x: i32 = 5;\nlet name: &str = \"Alex\";\n```\n\nAdd type annotations to the variables below.",
+    "hint": "Change 'let age =' to 'let age: i32 =' and 'let name =' to 'let name: &str ='",
+    "starter": "fn main() {\n    let age: i32 = 30;\n    let name: &str = \"Jordan\";\n    println!(\"{} is {} years old\", name, age);\n}",
+    "expectedOutput": ["Jordan is 30 years old"],
+    "successMessage": "Explicit types make code self-documenting. You'll add annotations when inference gets ambiguous or when you want to be crystal clear about intent."
+  }
+]

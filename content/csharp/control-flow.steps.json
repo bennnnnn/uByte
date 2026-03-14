@@ -1,0 +1,81 @@
+[
+  {
+    "title": "if and else",
+    "instruction": "Standard if/else — no surprises.\n\nRun this.",
+    "starter": "using System;\n\nclass Program {\n    static void Main() {\n        int x = 10;\n        if (x > 5) {\n            Console.WriteLine(\"big\");\n        } else {\n            Console.WriteLine(\"small\");\n        }\n    }\n}",
+    "expectedOutput": [
+      "big"
+    ],
+    "successMessage": "C# requires parentheses around the condition (unlike Go or Rust). Braces are required for the body."
+  },
+  {
+    "title": "else if chains",
+    "instruction": "Chain multiple conditions.\n\nRun this, then change score to 75 and 55.",
+    "starter": "using System;\n\nclass Program {\n    static void Main() {\n        int score = 85;\n        if (score >= 90) Console.WriteLine(\"A\");\n        else if (score >= 80) Console.WriteLine(\"B\");\n        else if (score >= 70) Console.WriteLine(\"C\");\n        else Console.WriteLine(\"F\");\n    }\n}",
+    "expectedOutput": [
+      "B"
+    ],
+    "successMessage": "The first true condition wins. Braces are optional for single-statement bodies — but many teams require them for clarity."
+  },
+  {
+    "title": "Ternary operator",
+    "instruction": "The ternary `? :` is a compact if/else expression:\n\n```csharp\nstring result = x > 0 ? \"positive\" : \"non-positive\";\n```\n\nRun this.",
+    "starter": "using System;\n\nclass Program {\n    static void Main() {\n        int n = 7;\n        string kind = n % 2 == 0 ? \"even\" : \"odd\";\n        Console.WriteLine($\"{n} is {kind}\");\n    }\n}",
+    "expectedOutput": [
+      "7 is odd"
+    ],
+    "successMessage": "Ternary is clean for simple two-way choices. Avoid nesting ternaries — they become unreadable quickly."
+  },
+  {
+    "title": "switch statement",
+    "instruction": "Match a single value against multiple cases.\n\nRun this.",
+    "starter": "using System;\n\nclass Program {\n    static void Main() {\n        int day = 3;\n        switch (day) {\n            case 1: Console.WriteLine(\"Monday\");    break;\n            case 2: Console.WriteLine(\"Tuesday\");   break;\n            case 3: Console.WriteLine(\"Wednesday\"); break;\n            case 4: Console.WriteLine(\"Thursday\");  break;\n            case 5: Console.WriteLine(\"Friday\");    break;\n            default: Console.WriteLine(\"Weekend\");  break;\n        }\n    }\n}",
+    "expectedOutput": [
+      "Wednesday"
+    ],
+    "successMessage": "break is required after each case (no fall-through by default). default catches everything else."
+  },
+  {
+    "title": "switch expression (modern C#)",
+    "instruction": "C# 8+ switch expression is terser and returns a value.\n\nRun this.",
+    "starter": "using System;\n\nclass Program {\n    static void Main() {\n        for (int i = 1; i <= 5; i++) {\n            string label = i switch {\n                1 => \"one\",\n                2 => \"two\",\n                3 => \"three\",\n                _ => \"other\"\n            };\n            Console.WriteLine(label);\n        }\n    }\n}",
+    "expectedOutput": [
+      "one",
+      "two",
+      "three",
+      "other",
+      "other"
+    ],
+    "successMessage": "Switch expressions produce a value. _ is the discard/default. No break needed. Much cleaner than the classic switch statement."
+  },
+  {
+    "title": "Logical operators",
+    "instruction": "&&, ||, ! are short-circuit evaluated — right side is not evaluated if left side determines the result.\n\nRun this.",
+    "starter": "using System;\n\nclass Program {\n    static void Main() {\n        int age = 20;\n        bool hasId = true;\n        Console.WriteLine(age >= 18 && hasId);\n        Console.WriteLine(age < 18 || hasId);\n        Console.WriteLine(!hasId);\n    }\n}",
+    "expectedOutput": [
+      "True",
+      "True",
+      "False"
+    ],
+    "successMessage": "Short-circuit: if age >= 18 is false, hasId is never evaluated. Useful for null checks: obj != null && obj.Value > 0."
+  },
+  {
+    "title": "Null conditional and coalescing",
+    "instruction": "C# has operators for null safety:\n- `??` returns a default if null\n- `?.` calls a method only if not null\n\nRun this.",
+    "starter": "using System;\n\nclass Program {\n    static void Main() {\n        string maybeNull = null;\n        string result = maybeNull ?? \"default value\";\n        Console.WriteLine(result);\n\n        int? length = maybeNull?.Length;\n        Console.WriteLine(length ?? -1);\n    }\n}",
+    "expectedOutput": [
+      "default value",
+      "-1"
+    ],
+    "successMessage": "?? returns the right side when the left is null. ?. avoids NullReferenceException by returning null instead of throwing when the object is null."
+  },
+  {
+    "title": "Pattern matching in if",
+    "instruction": "C# 7+ `is` patterns match types and bind variables.\n\nRun this.",
+    "starter": "using System;\n\nclass Program {\n    static void Main() {\n        object obj = 42;\n        if (obj is int n) {\n            Console.WriteLine($\"integer: {n * 2}\");\n        } else if (obj is string s) {\n            Console.WriteLine($\"string: {s}\");\n        }\n    }\n}",
+    "expectedOutput": [
+      "integer: 84"
+    ],
+    "successMessage": "'is int n' both checks the type AND binds the value to n. It is type-safe pattern matching — no explicit cast needed."
+  }
+]

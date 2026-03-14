@@ -1,0 +1,84 @@
+[
+  {
+    "title": "Create a Vec",
+    "instruction": "Use `vec![]` macro or `Vec::new()` + `push`.\n\nRun this.",
+    "starter": "fn main() {\n    let v1 = vec![1, 2, 3, 4, 5];\n    let mut v2: Vec<i32> = Vec::new();\n    v2.push(10);\n    v2.push(20);\n    println!(\"{:?}\", v1);\n    println!(\"{:?}\", v2);\n}",
+    "expectedOutput": [
+      "[1, 2, 3, 4, 5]",
+      "[10, 20]"
+    ],
+    "successMessage": "vec! is the quick constructor. Vec::new() + push builds incrementally. Both produce the same type."
+  },
+  {
+    "title": "Access elements",
+    "instruction": "Index with `[]` (panics if out of bounds) or `.get()` (returns Option).\n\nRun this.",
+    "starter": "fn main() {\n    let v = vec![10, 20, 30, 40, 50];\n    println!(\"{}\", v[2]);\n    println!(\"{:?}\", v.get(2));\n    println!(\"{:?}\", v.get(99));\n}",
+    "expectedOutput": [
+      "30",
+      "Some(30)",
+      "None"
+    ],
+    "successMessage": "v[2] panics on out-of-bounds. v.get(2) returns Option — safe for user input or dynamic indices."
+  },
+  {
+    "title": "Iterate a Vec",
+    "instruction": "`for x in &v` iterates by reference. `for x in v` consumes the Vec.\n\nRun this.",
+    "starter": "fn main() {\n    let v = vec![1, 2, 3, 4, 5];\n    let mut sum = 0;\n    for &n in &v {\n        sum += n;\n    }\n    println!(\"sum: {}\", sum);\n    println!(\"v still exists: {:?}\", v);\n}",
+    "expectedOutput": [
+      "sum: 15",
+      "v still exists: [1, 2, 3, 4, 5]"
+    ],
+    "successMessage": "&v borrows — v is still usable after the loop. Without & the loop would consume v."
+  },
+  {
+    "title": "push and pop",
+    "instruction": "`push` adds to the end. `pop` removes the last element and returns Option.\n\nRun this.",
+    "starter": "fn main() {\n    let mut v = vec![1, 2, 3];\n    v.push(4);\n    v.push(5);\n    println!(\"{:?}\", v);\n    while let Some(x) = v.pop() {\n        print!(\"{} \", x);\n    }\n    println!();\n}",
+    "expectedOutput": [
+      "[1, 2, 3, 4, 5]",
+      "5 4 3 2 1 "
+    ],
+    "successMessage": "while let Some(x) = v.pop() drains the vec from the end. Pop returns None when empty, ending the loop."
+  },
+  {
+    "title": "filter and map",
+    "instruction": "`.iter().filter().map().collect()` transforms a Vec without a loop.\n\nRun this.",
+    "starter": "fn main() {\n    let nums = vec![1, 2, 3, 4, 5, 6, 7, 8];\n    let evens_doubled: Vec<i32> = nums.iter()\n        .filter(|&&x| x % 2 == 0)\n        .map(|&x| x * 2)\n        .collect();\n    println!(\"{:?}\", evens_doubled);\n}",
+    "expectedOutput": [
+      "[4, 8, 12, 16]"
+    ],
+    "successMessage": "filter keeps elements matching the predicate. map transforms each. collect turns the iterator back into a Vec."
+  },
+  {
+    "title": "sort and dedup",
+    "instruction": "`sort()` sorts in place. `dedup()` removes consecutive duplicates.\n\nRun this.",
+    "starter": "fn main() {\n    let mut v = vec![3, 1, 4, 1, 5, 9, 2, 6, 5, 3];\n    v.sort();\n    v.dedup();\n    println!(\"{:?}\", v);\n}",
+    "expectedOutput": [
+      "[1, 2, 3, 4, 5, 6, 9]"
+    ],
+    "successMessage": "Sort first, then dedup removes consecutive duplicates. Together they remove all duplicates from the vec."
+  },
+  {
+    "title": "len, is_empty, contains",
+    "instruction": "Common Vec predicates.\n\nRun this.",
+    "starter": "fn main() {\n    let v = vec![10, 20, 30];\n    println!(\"len: {}\", v.len());\n    println!(\"empty: {}\", v.is_empty());\n    println!(\"has 20: {}\", v.contains(&20));\n    println!(\"sum: {}\", v.iter().sum::<i32>());\n}",
+    "expectedOutput": [
+      "len: 3",
+      "empty: false",
+      "has 20: true",
+      "sum: 60"
+    ],
+    "successMessage": "iter().sum() uses a turbofish ::<i32> to tell Rust what type to sum into. Common pattern when type inference needs a hint."
+  },
+  {
+    "title": "Vec of structs",
+    "instruction": "Vecs can hold any type, including your custom structs.\n\nRun this.",
+    "starter": "#[derive(Debug)]\nstruct Student {\n    name: String,\n    grade: u32,\n}\n\nfn main() {\n    let mut class = Vec::new();\n    class.push(Student { name: String::from(\"Alice\"), grade: 92 });\n    class.push(Student { name: String::from(\"Bob\"),   grade: 85 });\n    class.push(Student { name: String::from(\"Carol\"), grade: 97 });\n    class.sort_by_key(|s| s.grade);\n    for s in &class {\n        println!(\"{}: {}\", s.name, s.grade);\n    }\n}",
+    "expectedOutput": [
+      "Bob: 85",
+      "Alice: 92",
+      "Carol: 97"
+    ],
+    "successMessage": "sort_by_key sorts by a field. The closure extracts the key. This is a clean, idiomatic pattern for sorting collections of structs."
+  }
+]

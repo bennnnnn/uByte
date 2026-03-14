@@ -1,49 +1,14 @@
 ---
-title: "Error Handling with Result in Rust"
-description: "Use Result and Option for fallible operations; the ? operator."
-order: 13
-difficulty: "beginner"
-estimatedMinutes: 12
+title: "Error Handling"
+description: "Result<T,E> for recoverable errors, the ? operator, and when to use panic vs Result."
+order: 15
+difficulty: "intermediate"
+estimatedMinutes: 20
+concepts: ["Result", "Ok", "Err", "?", "unwrap", "expect", "map_err", "panic"]
 ---
 
-## Concepts in this chapter
+## No exceptions
 
-You will learn and practice:
+Rust has no exceptions. Errors are values — either `panic!` for unrecoverable bugs, or `Result<T, E>` for expected failures.
 
-- **Result&lt;T, E&gt;** — Ok(value) or Err(error)
-- **Option&lt;T&gt;** — Some(value) or None
-- **unwrap** — panic on Err/None (use for quick tests)
-- **? operator** — propagate errors to caller (in functions returning Result)
-- **match** — handle Ok/Err or Some/None explicitly
-
----
-
-## Result
-
-```rust
-fn parse(s: &str) -> Result<i32, std::num::ParseIntError> {
-    s.parse()
-}
-
-fn main() {
-    match parse("42") {
-        Ok(n) => println!("{}", n),
-        Err(e) => println!("Invalid: {}", e),
-    }
-}
-```
-
----
-
-## unwrap and expect
-
-```rust
-let n: i32 = "42".parse().unwrap();
-let n = "x".parse().expect("not a number");  // panic with message
-```
-
----
-
-## What's Next?
-
-Next: **Crates and Modules** — organize code.
+This design forces you to think about errors at every step. The `?` operator makes it painless.

@@ -1,0 +1,88 @@
+[
+  {
+    "title": "Create an array",
+    "instruction": "Declare an array with `type[] name = new type[size]` or with an initialiser.\n\nRun this.",
+    "starter": "using System;\n\nclass Program {\n    static void Main() {\n        int[] nums = new int[5]; // default value 0\n        int[] primes = { 2, 3, 5, 7, 11 };\n        Console.WriteLine(primes.Length);\n        Console.WriteLine(primes[0]);\n        Console.WriteLine(primes[4]);\n    }\n}",
+    "expectedOutput": [
+      "5",
+      "2",
+      "11"
+    ],
+    "successMessage": "Arrays are zero-indexed. primes[0] is 2, primes[4] is 11. Length gives the count."
+  },
+  {
+    "title": "Modify elements",
+    "instruction": "Assign to an index to change an element.\n\nRun this.",
+    "starter": "using System;\n\nclass Program {\n    static void Main() {\n        int[] scores = { 85, 92, 78, 96, 88 };\n        scores[2] = 80;\n        foreach (int s in scores) {\n            Console.Write($\"{s} \");\n        }\n        Console.WriteLine();\n    }\n}",
+    "expectedOutput": [
+      "85 92 80 96 88 "
+    ],
+    "successMessage": "Element [2] changed from 78 to 80. Arrays are mutable — you can change elements but not the size."
+  },
+  {
+    "title": "Iterate with for and foreach",
+    "instruction": "Use `for` when you need the index, `foreach` when you don't.\n\nRun this.",
+    "starter": "using System;\n\nclass Program {\n    static void Main() {\n        string[] fruits = { \"apple\", \"banana\", \"cherry\" };\n        for (int i = 0; i < fruits.Length; i++) {\n            Console.WriteLine($\"{i}: {fruits[i]}\");\n        }\n    }\n}",
+    "expectedOutput": [
+      "0: apple",
+      "1: banana",
+      "2: cherry"
+    ],
+    "successMessage": "fruits.Length is the upper bound. Loop from 0 to Length-1. Using < Length (not <=) prevents IndexOutOfRangeException."
+  },
+  {
+    "title": "Array.Sort and Array.Reverse",
+    "instruction": "Static methods on the `Array` class sort and reverse in place.\n\nRun this.",
+    "starter": "using System;\n\nclass Program {\n    static void Main() {\n        int[] nums = { 5, 2, 8, 1, 9, 3 };\n        Array.Sort(nums);\n        Console.WriteLine(string.Join(\" \", nums));\n        Array.Reverse(nums);\n        Console.WriteLine(string.Join(\" \", nums));\n    }\n}",
+    "expectedOutput": [
+      "1 2 3 5 8 9",
+      "9 8 5 3 2 1"
+    ],
+    "successMessage": "Array.Sort uses IntroSort — O(n log n). Array.Reverse reverses in place. Both modify the original array."
+  },
+  {
+    "title": "Array methods: Min, Max, Sum",
+    "instruction": "LINQ adds useful array methods via the `using System.Linq` namespace.\n\nRun this.",
+    "starter": "using System;\nusing System.Linq;\n\nclass Program {\n    static void Main() {\n        int[] nums = { 3, 1, 4, 1, 5, 9, 2, 6 };\n        Console.WriteLine(nums.Min());\n        Console.WriteLine(nums.Max());\n        Console.WriteLine(nums.Sum());\n        Console.WriteLine($\"{nums.Average():F2}\");\n    }\n}",
+    "expectedOutput": [
+      "1",
+      "9",
+      "31",
+      "3.88"
+    ],
+    "successMessage": "Min, Max, Sum, Average come from LINQ. They work on any IEnumerable<T>. LINQ will be covered fully in its own chapter."
+  },
+  {
+    "title": "2D arrays",
+    "instruction": "C# supports rectangular 2D arrays with `[,]` syntax.\n\nRun this.",
+    "starter": "using System;\n\nclass Program {\n    static void Main() {\n        int[,] matrix = {\n            { 1, 2, 3 },\n            { 4, 5, 6 },\n            { 7, 8, 9 }\n        };\n        Console.WriteLine(matrix[1, 2]); // row 1, col 2\n        Console.WriteLine(matrix.GetLength(0)); // rows\n        Console.WriteLine(matrix.GetLength(1)); // cols\n    }\n}",
+    "expectedOutput": [
+      "6",
+      "3",
+      "3"
+    ],
+    "successMessage": "matrix[1,2] accesses row 1, column 2 (0-indexed) = 6. GetLength(0) = rows, GetLength(1) = columns."
+  },
+  {
+    "title": "Jagged arrays",
+    "instruction": "Jagged arrays are arrays of arrays, each row having different lengths.\n\nRun this.",
+    "starter": "using System;\n\nclass Program {\n    static void Main() {\n        int[][] triangle = new int[4][];\n        for (int i = 0; i < 4; i++) {\n            triangle[i] = new int[i + 1];\n            for (int j = 0; j <= i; j++) {\n                triangle[i][j] = i + j + 1;\n            }\n        }\n        foreach (var row in triangle) {\n            Console.WriteLine(string.Join(\" \", row));\n        }\n    }\n}",
+    "expectedOutput": [
+      "1",
+      "2 3",
+      "3 4 5",
+      "4 5 6 7"
+    ],
+    "successMessage": "Jagged arrays use [][] syntax. Each row is a separate array. More flexible than rectangular 2D arrays."
+  },
+  {
+    "title": "Array.Copy and spread",
+    "instruction": "`Array.Copy` copies elements between arrays.\n\nRun this.",
+    "starter": "using System;\n\nclass Program {\n    static void Main() {\n        int[] source = { 1, 2, 3, 4, 5 };\n        int[] dest = new int[5];\n        Array.Copy(source, dest, 5);\n        dest[0] = 99;\n        Console.WriteLine(string.Join(\" \", source)); // unchanged\n        Console.WriteLine(string.Join(\" \", dest));   // modified copy\n    }\n}",
+    "expectedOutput": [
+      "1 2 3 4 5",
+      "99 2 3 4 5"
+    ],
+    "successMessage": "Array.Copy makes a shallow copy. Modifying dest[0] does not affect source. For value types like int, this is a full independent copy."
+  }
+]

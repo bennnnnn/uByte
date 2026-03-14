@@ -1,0 +1,88 @@
+[
+  {
+    "title": "Define a trait",
+    "instruction": "A trait declares method signatures. Types implement them.\n\nRun this.",
+    "starter": "trait Greet {\n    fn hello(&self) -> String;\n}\n\nstruct Person { name: String }\nstruct Robot  { id: u32 }\n\nimpl Greet for Person {\n    fn hello(&self) -> String {\n        format!(\"Hi, I'm {}\", self.name)\n    }\n}\nimpl Greet for Robot {\n    fn hello(&self) -> String {\n        format!(\"BEEP. I AM ROBOT {}.\", self.id)\n    }\n}\n\nfn main() {\n    let p = Person { name: String::from(\"Alice\") };\n    let r = Robot { id: 42 };\n    println!(\"{}\", p.hello());\n    println!(\"{}\", r.hello());\n}",
+    "expectedOutput": [
+      "Hi, I'm Alice",
+      "BEEP. I AM ROBOT 42."
+    ],
+    "successMessage": "Both Person and Robot implement Greet. They each provide their own hello(). Same interface, different behaviour."
+  },
+  {
+    "title": "Default methods",
+    "instruction": "Trait methods can have default implementations that types can override.\n\nRun this.",
+    "starter": "trait Summary {\n    fn title(&self) -> String;\n    fn preview(&self) -> String {\n        format!(\"{}...\", &self.title()[..20.min(self.title().len())])\n    }\n}\n\nstruct Article { title: String }\n\nimpl Summary for Article {\n    fn title(&self) -> String { self.title.clone() }\n    // preview() uses the default\n}\n\nfn main() {\n    let a = Article { title: String::from(\"Rust is Amazing\") };\n    println!(\"{}\", a.title());\n    println!(\"{}\", a.preview());\n}",
+    "expectedOutput": [
+      "Rust is Amazing",
+      "Rust is Amazing..."
+    ],
+    "successMessage": "preview() has a default implementation using title(). Article gets it for free. Override only when the default is wrong for your type."
+  },
+  {
+    "title": "Trait bounds",
+    "instruction": "Use traits as constraints on generics: `fn foo<T: Trait>(x: T)`\n\nRun this.",
+    "starter": "use std::fmt::Display;\n\nfn print_twice<T: Display>(x: T) {\n    println!(\"{}\", x);\n    println!(\"{}\", x);\n}\n\nfn main() {\n    print_twice(42);\n    print_twice(\"hello\");\n    print_twice(3.14);\n}",
+    "expectedOutput": [
+      "42",
+      "42",
+      "hello",
+      "hello",
+      "3.14",
+      "3.14"
+    ],
+    "successMessage": "T: Display means 'T must implement the Display trait'. The function works for any type that can be printed."
+  },
+  {
+    "title": "Multiple trait bounds",
+    "instruction": "Require multiple traits with `+`:\n\n```rust\nfn foo<T: Display + Debug + Clone>(x: T)\n```\n\nRun this.",
+    "starter": "use std::fmt::{Display, Debug};\n\nfn describe<T: Display + Debug>(x: T) {\n    println!(\"Display: {}\", x);\n    println!(\"Debug:   {:?}\", x);\n}\n\nfn main() {\n    describe(42);\n    describe(\"hello\");\n}",
+    "expectedOutput": [
+      "Display: 42",
+      "Debug:   42",
+      "Display: hello",
+      "Debug:   \"hello\""
+    ],
+    "successMessage": "+ combines trait bounds. T must implement both Display and Debug. The integer 42 satisfies both; so does &str."
+  },
+  {
+    "title": "Implement Display",
+    "instruction": "Implement `std::fmt::Display` to control how your type prints with `{}`.\n\nRun this.",
+    "starter": "use std::fmt;\n\nstruct Point { x: f64, y: f64 }\n\nimpl fmt::Display for Point {\n    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {\n        write!(f, \"({:.1}, {:.1})\", self.x, self.y)\n    }\n}\n\nfn main() {\n    let p = Point { x: 3.0, y: 4.0 };\n    println!(\"{}\", p);\n    println!(\"{}\", format!(\"Point is {}\", p));\n}",
+    "expectedOutput": [
+      "(3.0, 4.0)",
+      "Point is (3.0, 4.0)"
+    ],
+    "successMessage": "Implementing Display unlocks println!(\"{}\", ...) and format!(\"{}\", ...) for your type."
+  },
+  {
+    "title": "where clause",
+    "instruction": "For complex bounds, use a `where` clause for readability:\n\nRun this.",
+    "starter": "use std::fmt::Display;\n\nfn largest_display<T>(list: &[T]) -> &T\nwhere\n    T: PartialOrd + Display,\n{\n    let mut largest = &list[0];\n    for item in list {\n        if item > largest {\n            largest = item;\n        }\n    }\n    largest\n}\n\nfn main() {\n    let numbers = vec![34, 50, 25, 100, 65];\n    println!(\"largest: {}\", largest_display(&numbers));\n}",
+    "expectedOutput": [
+      "largest: 100"
+    ],
+    "successMessage": "where clauses move complex bounds out of the function signature, making both more readable."
+  },
+  {
+    "title": "Trait objects with dyn",
+    "instruction": "`dyn Trait` is a runtime-dispatched trait object. Use when you need a collection of different types.\n\nRun this.",
+    "starter": "trait Animal {\n    fn sound(&self) -> &str;\n}\nstruct Dog;\nstruct Cat;\nimpl Animal for Dog { fn sound(&self) -> &str { \"Woof\" } }\nimpl Animal for Cat { fn sound(&self) -> &str { \"Meow\" } }\n\nfn main() {\n    let animals: Vec<Box<dyn Animal>> = vec![\n        Box::new(Dog),\n        Box::new(Cat),\n        Box::new(Dog),\n    ];\n    for a in &animals {\n        println!(\"{}\", a.sound());\n    }\n}",
+    "expectedOutput": [
+      "Woof",
+      "Meow",
+      "Woof"
+    ],
+    "successMessage": "dyn Animal is a trait object — runtime polymorphism. Box<dyn Animal> stores any Animal on the heap. The concrete type is erased, the trait interface remains."
+  },
+  {
+    "title": "Derive common traits",
+    "instruction": "Use `#[derive]` to auto-implement common traits.\n\nRun this.",
+    "starter": "#[derive(Debug, Clone, PartialEq)]\nstruct Point { x: f64, y: f64 }\n\nfn main() {\n    let p1 = Point { x: 1.0, y: 2.0 };\n    let p2 = p1.clone();\n    println!(\"{:?}\", p1);\n    println!(\"equal: {}\", p1 == p2);\n}",
+    "expectedOutput": [
+      "Point { x: 1.0, y: 2.0 }",
+      "equal: true"
+    ],
+    "successMessage": "#[derive] generates trait implementations for free. Debug for {:?}, Clone for .clone(), PartialEq for ==. Essential for most structs."
+  }
+]

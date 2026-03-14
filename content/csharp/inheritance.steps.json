@@ -1,0 +1,83 @@
+[
+  {
+    "title": "Basic inheritance",
+    "instruction": "Use `: BaseClass` to inherit.\n\nRun this.",
+    "starter": "using System;\n\nclass Animal {\n    public string Name { get; set; }\n    public void Breathe() => Console.WriteLine($\"{Name} breathes\");\n}\n\nclass Dog : Animal {\n    public void Bark() => Console.WriteLine($\"{Name} says: Woof!\");\n}\n\nclass Program {\n    static void Main() {\n        var dog = new Dog { Name = \"Rex\" };\n        dog.Breathe(); // inherited\n        dog.Bark();    // own method\n    }\n}",
+    "expectedOutput": [
+      "Rex breathes",
+      "Rex says: Woof!"
+    ],
+    "successMessage": "Dog inherits Name and Breathe() from Animal, then adds Bark(). Inheritance models 'is-a' relationships: a Dog IS an Animal."
+  },
+  {
+    "title": "virtual and override",
+    "instruction": "`virtual` marks a base method as overridable. `override` replaces it in the derived class.\n\nRun this.",
+    "starter": "using System;\n\nclass Shape {\n    public virtual double Area() => 0;\n    public virtual string Describe() => $\"Shape with area {Area():F2}\";\n}\n\nclass Circle : Shape {\n    public double Radius { get; }\n    public Circle(double r) { Radius = r; }\n    public override double Area() => Math.PI * Radius * Radius;\n}\n\nclass Program {\n    static void Main() {\n        Shape s = new Circle(5);\n        Console.WriteLine(s.Area());\n        Console.WriteLine(s.Describe());\n    }\n}",
+    "expectedOutput": [
+      "78.53981633974483",
+      "Shape with area 78.54"
+    ],
+    "successMessage": "Even though s is typed as Shape, s.Area() calls Circle.Area() — runtime polymorphism. Describe() uses the overridden Area() automatically."
+  },
+  {
+    "title": "base keyword",
+    "instruction": "`base` calls the base class constructor or method.\n\nRun this.",
+    "starter": "using System;\n\nclass Animal {\n    public string Name { get; }\n    public Animal(string name) { Name = name; }\n    public virtual string Speak() => $\"{Name} makes a sound\";\n}\n\nclass Cat : Animal {\n    public Cat(string name) : base(name) {} // call base constructor\n    public override string Speak() => base.Speak() + \" (meow)\";\n}\n\nclass Program {\n    static void Main() {\n        var c = new Cat(\"Whiskers\");\n        Console.WriteLine(c.Speak());\n    }\n}",
+    "expectedOutput": [
+      "Whiskers makes a sound (meow)"
+    ],
+    "successMessage": "base(name) passes the argument to Animal's constructor. base.Speak() calls the original method and Cat appends to it."
+  },
+  {
+    "title": "Abstract classes",
+    "instruction": "`abstract` methods have no implementation — subclasses must provide one.\n\nRun this.",
+    "starter": "using System;\n\nabstract class Shape {\n    public abstract double Area();\n    public void Print() => Console.WriteLine($\"Area: {Area():F2}\");\n}\n\nclass Square : Shape {\n    private double side;\n    public Square(double s) { side = s; }\n    public override double Area() => side * side;\n}\n\nclass Triangle : Shape {\n    private double b, h;\n    public Triangle(double b, double h) { this.b = b; this.h = h; }\n    public override double Area() => 0.5 * b * h;\n}\n\nclass Program {\n    static void Main() {\n        Shape[] shapes = { new Square(4), new Triangle(6, 3) };\n        foreach (var s in shapes) s.Print();\n    }\n}",
+    "expectedOutput": [
+      "Area: 16.00",
+      "Area: 9.00"
+    ],
+    "successMessage": "Abstract classes cannot be instantiated directly. They define a contract that concrete subclasses must fulfil. Print() uses the abstract Area() — polymorphism."
+  },
+  {
+    "title": "sealed keyword",
+    "instruction": "`sealed` prevents further inheritance. `sealed override` prevents further overriding.\n\nRun this.",
+    "starter": "using System;\n\nclass Base {\n    public virtual void Hello() => Console.WriteLine(\"Base\");\n}\n\nsealed class Derived : Base {\n    public override void Hello() => Console.WriteLine(\"Derived (sealed)\");\n}\n\nclass Program {\n    static void Main() {\n        var d = new Derived();\n        d.Hello();\n        // class Further : Derived {} // won't compile\n    }\n}",
+    "expectedOutput": [
+      "Derived (sealed)"
+    ],
+    "successMessage": "sealed prevents subclassing. Sealing a class can also be a performance hint to the JIT compiler for devirtualisation."
+  },
+  {
+    "title": "is and as operators",
+    "instruction": "`is` checks the type. `as` casts to a type (returns null on failure instead of throwing).\n\nRun this.",
+    "starter": "using System;\n\nclass Animal { public string Name { get; set; } }\nclass Dog : Animal { public void Bark() => Console.WriteLine(\"Woof\"); }\nclass Cat : Animal { public void Meow() => Console.WriteLine(\"Meow\"); }\n\nclass Program {\n    static void Main() {\n        Animal[] animals = { new Dog { Name = \"Rex\" }, new Cat { Name = \"Luna\" } };\n        foreach (var a in animals) {\n            if (a is Dog d) d.Bark();\n            else if (a is Cat c) c.Meow();\n        }\n    }\n}",
+    "expectedOutput": [
+      "Woof",
+      "Meow"
+    ],
+    "successMessage": "'a is Dog d' checks if a is a Dog AND binds it to d. This is pattern matching — clean and safe type casting."
+  },
+  {
+    "title": "Polymorphic collections",
+    "instruction": "A `List<Animal>` can hold any Animal subclass.\n\nRun this.",
+    "starter": "using System;\nusing System.Collections.Generic;\n\nclass Animal {\n    public string Name { get; set; }\n    public virtual string Sound() => \"...\";\n}\nclass Dog : Animal { public override string Sound() => \"Woof\"; }\nclass Cat : Animal { public override string Sound() => \"Meow\"; }\nclass Cow : Animal { public override string Sound() => \"Moo\"; }\n\nclass Program {\n    static void Main() {\n        var farm = new List<Animal> {\n            new Dog { Name = \"Rex\" },\n            new Cat { Name = \"Luna\" },\n            new Cow { Name = \"Bessie\" }\n        };\n        foreach (var a in farm) {\n            Console.WriteLine($\"{a.Name}: {a.Sound()}\");\n        }\n    }\n}",
+    "expectedOutput": [
+      "Rex: Woof",
+      "Luna: Meow",
+      "Bessie: Moo"
+    ],
+    "successMessage": "The list holds Animals but each Sound() call dispatches to the correct subclass at runtime. This is the power of polymorphism."
+  },
+  {
+    "title": "Object as universal base class",
+    "instruction": "Every C# class implicitly inherits from `object` (System.Object).\n\nRun this.",
+    "starter": "using System;\n\nclass Program {\n    static void Main() {\n        int n = 42;\n        string s = \"hello\";\n        object[] objs = { n, s, 3.14, true };\n        foreach (object o in objs) {\n            Console.WriteLine($\"{o.GetType().Name}: {o}\");\n        }\n    }\n}",
+    "expectedOutput": [
+      "Int32: 42",
+      "String: hello",
+      "Double: 3.14",
+      "Boolean: True"
+    ],
+    "successMessage": "object is the root of all C# types. Any value can be stored in an object variable (boxing for value types). GetType() returns the actual runtime type."
+  }
+]

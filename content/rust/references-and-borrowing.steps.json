@@ -1,0 +1,88 @@
+[
+  {
+    "title": "Immutable reference",
+    "instruction": "Pass `&value` to borrow without moving. The function uses a reference `&String`.\n\nRun this.",
+    "starter": "fn length(s: &String) -> usize {\n    s.len()\n}\n\nfn main() {\n    let s = String::from(\"hello\");\n    let len = length(&s);\n    println!(\"{} has {} bytes\", s, len);\n}",
+    "expectedOutput": [
+      "hello has 5 bytes"
+    ],
+    "successMessage": "&s borrows s. After length() returns, s is still valid because the function never owned it."
+  },
+  {
+    "title": "Many immutable borrows",
+    "instruction": "Any number of immutable references can coexist — they all promise not to mutate.\n\nRun this.",
+    "starter": "fn main() {\n    let s = String::from(\"hello\");\n    let r1 = &s;\n    let r2 = &s;\n    let r3 = &s;\n    println!(\"{} {} {}\", r1, r2, r3);\n}",
+    "expectedOutput": [
+      "hello hello hello"
+    ],
+    "successMessage": "Three simultaneous immutable borrows are safe. They all read the same memory; no conflicts possible."
+  },
+  {
+    "title": "Mutable reference",
+    "instruction": "`&mut` borrows mutably — you can modify through the reference.\n\nThe value must be declared `mut`. Create the reference with `&mut`.\n\nRun this.",
+    "starter": "fn append_world(s: &mut String) {\n    s.push_str(\" world\");\n}\n\nfn main() {\n    let mut s = String::from(\"hello\");\n    append_world(&mut s);\n    println!(\"{}\", s);\n}",
+    "expectedOutput": [
+      "hello world"
+    ],
+    "successMessage": "&mut s grants mutation rights. The function changes s through the reference. After the call, s reflects the change."
+  },
+  {
+    "title": "One mutable borrow at a time",
+    "instruction": "Only one mutable reference can exist at a time. This prevents data races.\n\nRun this — it will fail. Read the error.",
+    "hint": "Remove one of the mutable references.",
+    "starter": "fn main() {\n    let mut s = String::from(\"hello\");\n    let r1 = &mut s;\n    let r2 = &mut s; // error!\n    println!(\"{} {}\", r1, r2);\n}",
+    "expectedOutput": [],
+    "codeChecks": [
+      {
+        "pattern": "let r2 = &mut s",
+        "required": false,
+        "message": "You cannot have two mutable borrows at once. Remove r2 or restructure the code."
+      }
+    ],
+    "successMessage": "This rule eliminates data races at compile time. If two threads both held &mut, they could corrupt data simultaneously."
+  },
+  {
+    "title": "Cannot mix mutable and immutable",
+    "instruction": "Active immutable borrows prevent mutable borrows — they promise the data will not change.\n\nRun this — it will fail.",
+    "hint": "Use r1 and r2 before creating the mutable borrow r3.",
+    "starter": "fn main() {\n    let mut s = String::from(\"hello\");\n    let r1 = &s;\n    let r2 = &mut s; // error while r1 is active!\n    println!(\"{} {}\", r1, r2);\n}",
+    "expectedOutput": [],
+    "codeChecks": [
+      {
+        "pattern": "let r2 = &mut s",
+        "required": false,
+        "message": "r1 is still active when r2 is created. Use r1 first, then create the mutable borrow."
+      }
+    ],
+    "successMessage": "Immutable borrows guarantee no mutation. A mutable borrow would break that guarantee. Once r1 is no longer used, r2 is valid."
+  },
+  {
+    "title": "Non-Lexical Lifetimes (NLL)",
+    "instruction": "Borrows end at their last use, not at end of scope. This makes the rules more flexible.\n\nRun this — it works!",
+    "starter": "fn main() {\n    let mut s = String::from(\"hello\");\n    let r1 = &s;\n    println!(\"{}\", r1); // r1 last used here, borrow ends\n    let r2 = &mut s;    // now safe to mutate\n    r2.push_str(\" world\");\n    println!(\"{}\", r2);\n}",
+    "expectedOutput": [
+      "hello",
+      "hello world"
+    ],
+    "successMessage": "NLL: the immutable borrow r1 ends at its last use. After that, the mutable borrow r2 is safe. Modern Rust is much more ergonomic because of NLL."
+  },
+  {
+    "title": "No dangling references",
+    "instruction": "Rust guarantees references always point to valid data.\n\nThis code will fail — Rust prevents returning a reference to local data.\n\nRun it to see the error.",
+    "hint": "Return the String directly instead of a reference to it.",
+    "starter": "fn dangle() -> String {\n    let s = String::from(\"hello\");\n    s // Return the String itself, not a reference\n}\n\nfn main() {\n    let s = dangle();\n    println!(\"{}\", s);\n}",
+    "expectedOutput": [
+      "hello"
+    ],
+    "successMessage": "This works because we return the String (transferring ownership). If we returned &s, Rust would reject it — s would be dropped before the caller uses the reference."
+  },
+  {
+    "title": "Borrowing summary",
+    "instruction": "The rules:\n1. Any number of immutable borrows, OR exactly one mutable borrow\n2. References are always valid (no dangling references)\n\nRun this.",
+    "starter": "fn summarise(text: &str) -> usize {\n    text.split_whitespace().count()\n}\n\nfn main() {\n    let speech = String::from(\"to be or not to be\");\n    let words = summarise(&speech);\n    println!(\"{} words: '{}'\", words, speech);\n}",
+    "expectedOutput": [
+      "6 words: 'to be or not to be'"
+    ],
+    "successMessage": "speech is borrowed by summarise (as &str — string slice). After the call, speech is still valid. Borrowing is the everyday Rust pattern for working with data."
+  }
+]

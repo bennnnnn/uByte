@@ -1,0 +1,91 @@
+[
+  {
+    "title": "String basics",
+    "instruction": "Strings are immutable sequences of characters in double quotes.\n\nRun this.",
+    "starter": "using System;\n\nclass Program {\n    static void Main() {\n        string greeting = \"Hello, World!\";\n        Console.WriteLine(greeting);\n        Console.WriteLine(greeting.Length);\n        Console.WriteLine(greeting.ToUpper());\n    }\n}",
+    "expectedOutput": [
+      "Hello, World!",
+      "13",
+      "HELLO, WORLD!"
+    ],
+    "successMessage": "Length gives the character count. ToUpper() returns a new string — the original is unchanged."
+  },
+  {
+    "title": "String interpolation",
+    "instruction": "`$\"text {expression}\"` interpolates values directly into the string.\n\nRun this.",
+    "starter": "using System;\n\nclass Program {\n    static void Main() {\n        string name = \"Alice\";\n        int score = 95;\n        Console.WriteLine($\"{name} scored {score}/100\");\n        Console.WriteLine($\"Double: {score * 2}\");\n        Console.WriteLine($\"Upper: {name.ToUpper()}\");\n    }\n}",
+    "expectedOutput": [
+      "Alice scored 95/100",
+      "Double: 190",
+      "Upper: ALICE"
+    ],
+    "successMessage": "Any C# expression can go inside {}. Interpolated strings are evaluated at runtime."
+  },
+  {
+    "title": "String methods",
+    "instruction": "C# strings have many useful methods.\n\nRun this.",
+    "starter": "using System;\n\nclass Program {\n    static void Main() {\n        string s = \"  Hello, Rust!  \";\n        Console.WriteLine(s.Trim());\n        Console.WriteLine(s.Trim().Replace(\"Rust\", \"C#\"));\n        Console.WriteLine(s.Trim().Contains(\"Hello\"));\n        Console.WriteLine(s.Trim().StartsWith(\"Hello\"));\n        Console.WriteLine(s.Trim().IndexOf(\",\"));\n    }\n}",
+    "expectedOutput": [
+      "Hello, Rust!",
+      "Hello, C#!",
+      "True",
+      "True",
+      "5"
+    ],
+    "successMessage": "Trim removes whitespace. Replace swaps text. Contains and StartsWith return bool. IndexOf returns the position of a character."
+  },
+  {
+    "title": "Substring and slicing",
+    "instruction": "`Substring(start, length)` extracts part of a string.\n\nRun this.",
+    "starter": "using System;\n\nclass Program {\n    static void Main() {\n        string s = \"Hello, World!\";\n        Console.WriteLine(s.Substring(7, 5));\n        Console.WriteLine(s[0..5]);  // C# range syntax\n        Console.WriteLine(s[^6..]);  // from 6th from end\n    }\n}",
+    "expectedOutput": [
+      "World",
+      "Hello",
+      "World!"
+    ],
+    "successMessage": "Substring(start, length) is classic C#. s[0..5] and s[^6..] are modern C# 8 range syntax. ^ counts from the end."
+  },
+  {
+    "title": "Split and Join",
+    "instruction": "`Split` breaks a string into an array. `String.Join` combines an array.\n\nRun this.",
+    "starter": "using System;\n\nclass Program {\n    static void Main() {\n        string csv = \"one,two,three,four\";\n        string[] parts = csv.Split(',');\n        Console.WriteLine(parts.Length);\n        Console.WriteLine(parts[1]);\n        Console.WriteLine(String.Join(\" | \", parts));\n    }\n}",
+    "expectedOutput": [
+      "4",
+      "two",
+      "one | two | three | four"
+    ],
+    "successMessage": "Split returns an array of strings. String.Join glues them back together with a separator."
+  },
+  {
+    "title": "String comparison",
+    "instruction": "`==` compares string values. `string.Compare` gives ordering.\n\nRun this.",
+    "starter": "using System;\n\nclass Program {\n    static void Main() {\n        string a = \"Hello\";\n        string b = \"hello\";\n        Console.WriteLine(a == b);\n        Console.WriteLine(a.Equals(b, StringComparison.OrdinalIgnoreCase));\n        Console.WriteLine(string.Compare(a, b));\n    }\n}",
+    "expectedOutput": [
+      "False",
+      "True",
+      "-1"
+    ],
+    "successMessage": "== is case-sensitive. OrdinalIgnoreCase makes it case-insensitive. Compare returns -1 (less), 0 (equal), or 1 (greater)."
+  },
+  {
+    "title": "Format strings",
+    "instruction": "`string.Format` with format specifiers controls number formatting.\n\nRun this.",
+    "starter": "using System;\n\nclass Program {\n    static void Main() {\n        double price = 9.9;\n        Console.WriteLine($\"{price:F2}\");    // 2 decimal places\n        Console.WriteLine($\"{price:C}\");     // currency\n        Console.WriteLine($\"{1234567:N0}\");  // number with commas\n        Console.WriteLine($\"{0.75:P}\");      // percent\n    }\n}",
+    "expectedOutput": [
+      "9.90",
+      "$9.90",
+      "1,234,567",
+      "75.00 %"
+    ],
+    "successMessage": "Format specifiers after : control presentation. F2=fixed 2 decimals, C=currency, N0=number with commas, P=percent."
+  },
+  {
+    "title": "StringBuilder",
+    "instruction": "`StringBuilder` is efficient for building strings in loops.\n\nRun this.",
+    "starter": "using System;\nusing System.Text;\n\nclass Program {\n    static void Main() {\n        var sb = new StringBuilder();\n        for (int i = 1; i <= 5; i++) {\n            sb.Append(i);\n            if (i < 5) sb.Append(\", \");\n        }\n        Console.WriteLine(sb.ToString());\n    }\n}",
+    "expectedOutput": [
+      "1, 2, 3, 4, 5"
+    ],
+    "successMessage": "StringBuilder avoids creating a new string for every concatenation. For 5 items it barely matters; for 5,000 it is crucial."
+  }
+]

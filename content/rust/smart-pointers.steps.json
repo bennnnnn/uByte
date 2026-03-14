@@ -1,0 +1,83 @@
+[
+  {
+    "title": "Box<T> — heap allocation",
+    "instruction": "`Box<T>` stores a value on the heap. The Box itself lives on the stack.\n\nRun this.",
+    "starter": "fn main() {\n    let b = Box::new(5);\n    println!(\"b = {}\", b);\n    println!(\"b + 1 = {}\", *b + 1);\n    // Box is dropped here, heap memory freed\n}",
+    "expectedOutput": [
+      "b = 5",
+      "b + 1 = 6"
+    ],
+    "successMessage": "Box<T> owns the heap value. When Box is dropped, the heap memory is freed. *b dereferences to get the i32."
+  },
+  {
+    "title": "Recursive data with Box",
+    "instruction": "A recursive type needs Box to have a known size at compile time.\n\nRun this.",
+    "starter": "#[derive(Debug)]\nenum List {\n    Cons(i32, Box<List>),\n    Nil,\n}\n\nuse List::*;\n\nfn main() {\n    let list = Cons(1, Box::new(Cons(2, Box::new(Cons(3, Box::new(Nil))))));\n    println!(\"{:?}\", list);\n}",
+    "expectedOutput": [
+      "Cons(1, Cons(2, Cons(3, Nil)))"
+    ],
+    "successMessage": "Without Box, Cons would be infinitely large. Box breaks the cycle: the Box itself has a known size (one pointer), and it points to the rest on the heap."
+  },
+  {
+    "title": "Rc<T> — shared ownership",
+    "instruction": "`Rc<T>` (reference counted) allows multiple owners. The data is freed when the last Rc drops.\n\nRun this.",
+    "starter": "use std::rc::Rc;\n\nfn main() {\n    let a = Rc::new(5);\n    let b = Rc::clone(&a); // increments reference count\n    let c = Rc::clone(&a);\n    println!(\"count: {}\", Rc::strong_count(&a));\n    println!(\"{} {} {}\", a, b, c);\n    drop(b);\n    println!(\"after drop: {}\", Rc::strong_count(&a));\n}",
+    "expectedOutput": [
+      "count: 3",
+      "5 5 5",
+      "after drop: 2"
+    ],
+    "successMessage": "Rc::clone does not deep-copy — it increments the reference count. The data is freed when count reaches 0. Single-threaded only."
+  },
+  {
+    "title": "RefCell<T> — interior mutability",
+    "instruction": "`RefCell<T>` allows mutable borrows at runtime even through shared references.\n\nRun this.",
+    "starter": "use std::cell::RefCell;\n\nfn main() {\n    let data = RefCell::new(vec![1, 2, 3]);\n    \n    // Borrow immutably\n    println!(\"{:?}\", data.borrow());\n    \n    // Borrow mutably\n    data.borrow_mut().push(4);\n    println!(\"{:?}\", data.borrow());\n}",
+    "expectedOutput": [
+      "[1, 2, 3]",
+      "[1, 2, 3, 4]"
+    ],
+    "successMessage": "RefCell moves the borrow checks to runtime. If you violate the rules at runtime, it panics. Use when you know borrows are correct but the compiler can't verify it."
+  },
+  {
+    "title": "Rc<RefCell<T>> — shared mutable",
+    "instruction": "Combine `Rc` and `RefCell` for shared mutable data.\n\nRun this.",
+    "starter": "use std::rc::Rc;\nuse std::cell::RefCell;\n\nfn main() {\n    let shared = Rc::new(RefCell::new(0));\n    let a = Rc::clone(&shared);\n    let b = Rc::clone(&shared);\n    \n    *a.borrow_mut() += 10;\n    *b.borrow_mut() += 20;\n    \n    println!(\"{}\", shared.borrow());\n}",
+    "expectedOutput": [
+      "30"
+    ],
+    "successMessage": "Rc<RefCell<T>> is the Rust way to have multiple references that can mutate shared data. Both a and b modified the same value."
+  },
+  {
+    "title": "Box and Deref",
+    "instruction": "Smart pointers implement `Deref` so you can use them like regular references.\n\nRun this.",
+    "starter": "fn greet(name: &str) {\n    println!(\"Hello, {}!\", name);\n}\n\nfn main() {\n    let boxed = Box::new(String::from(\"Rustacean\"));\n    greet(&boxed); // Box<String> auto-derefs to &str\n}",
+    "expectedOutput": [
+      "Hello, Rustacean!"
+    ],
+    "successMessage": "Deref coercion: &Box<String> -> &String -> &str automatically. This chain makes Box<String> usable wherever &str is expected."
+  },
+  {
+    "title": "The Drop trait",
+    "instruction": "Implement `Drop` to run code when a value goes out of scope.\n\nRun this.",
+    "starter": "struct Resource {\n    name: String,\n}\n\nimpl Drop for Resource {\n    fn drop(&mut self) {\n        println!(\"Dropping: {}\", self.name);\n    }\n}\n\nfn main() {\n    let r1 = Resource { name: String::from(\"Database connection\") };\n    let r2 = Resource { name: String::from(\"File handle\") };\n    println!(\"Resources created\");\n} // r2 dropped first, then r1 (reverse order)",
+    "expectedOutput": [
+      "Resources created",
+      "Dropping: File handle",
+      "Dropping: Database connection"
+    ],
+    "successMessage": "Drop runs in reverse order of creation (LIFO). This is how Rust implements RAII — resource cleanup is automatic and deterministic."
+  },
+  {
+    "title": "Weak<T> — avoid reference cycles",
+    "instruction": "`Weak<T>` holds a non-owning reference — it does not prevent the data from being freed.\n\nRun this.",
+    "starter": "use std::rc::{Rc, Weak};\n\nfn main() {\n    let strong = Rc::new(42);\n    let weak = Rc::downgrade(&strong);\n    \n    println!(\"strong count: {}\", Rc::strong_count(&strong));\n    println!(\"weak count: {}\", Rc::weak_count(&strong));\n    \n    if let Some(val) = weak.upgrade() {\n        println!(\"still alive: {}\", val);\n    }\n    \n    drop(strong);\n    println!(\"upgraded after drop: {:?}\", weak.upgrade());\n}",
+    "expectedOutput": [
+      "strong count: 1",
+      "weak count: 1",
+      "still alive: 42",
+      "upgraded after drop: None"
+    ],
+    "successMessage": "Weak::upgrade() returns Option — Some if the data is still alive, None if it was freed. Use Weak to break reference cycles that would otherwise leak memory."
+  }
+]

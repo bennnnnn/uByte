@@ -1,0 +1,92 @@
+[
+  {
+    "title": "Basic enum",
+    "instruction": "Define an enum and use its values.\n\nRun this.",
+    "starter": "using System;\n\nenum Direction { North, South, East, West }\n\nclass Program {\n    static void Main() {\n        Direction d = Direction.North;\n        Console.WriteLine(d);\n        Console.WriteLine((int)d);\n    }\n}",
+    "expectedOutput": [
+      "North",
+      "0"
+    ],
+    "successMessage": "Enum values are auto-numbered starting at 0. Casting to int gives the underlying value."
+  },
+  {
+    "title": "Enum in switch",
+    "instruction": "Switch on enums for exhaustive case handling.\n\nRun this.",
+    "starter": "using System;\n\nenum Season { Spring, Summer, Autumn, Winter }\n\nclass Program {\n    static void Main() {\n        Season s = Season.Summer;\n        string desc = s switch {\n            Season.Spring => \"flowers bloom\",\n            Season.Summer => \"hot and sunny\",\n            Season.Autumn => \"leaves fall\",\n            Season.Winter => \"cold and dark\"\n        };\n        Console.WriteLine($\"{s}: {desc}\");\n    }\n}",
+    "expectedOutput": [
+      "Summer: hot and sunny"
+    ],
+    "successMessage": "Switch expressions on enums are exhaustive — all cases handled. The compiler warns if you miss a case."
+  },
+  {
+    "title": "Custom underlying values",
+    "instruction": "You can assign explicit integer values to enum members.\n\nRun this.",
+    "starter": "using System;\n\nenum HttpStatus {\n    OK = 200,\n    Created = 201,\n    BadRequest = 400,\n    Unauthorized = 401,\n    NotFound = 404\n}\n\nclass Program {\n    static void Main() {\n        HttpStatus code = HttpStatus.OK;\n        Console.WriteLine($\"{code} = {(int)code}\");\n        HttpStatus notFound = (HttpStatus)404;\n        Console.WriteLine(notFound);\n    }\n}",
+    "expectedOutput": [
+      "OK = 200",
+      "NotFound"
+    ],
+    "successMessage": "Custom values make enums map to real-world codes. Casting an int back to an enum gives you the named value."
+  },
+  {
+    "title": "Flags enum",
+    "instruction": "`[Flags]` enums use powers of 2 to combine values with bitwise OR.\n\nRun this.",
+    "starter": "using System;\n\n[Flags]\nenum Permissions {\n    None   = 0,\n    Read   = 1,\n    Write  = 2,\n    Delete = 4,\n    Admin  = Read | Write | Delete\n}\n\nclass Program {\n    static void Main() {\n        var perms = Permissions.Read | Permissions.Write;\n        Console.WriteLine(perms);\n        Console.WriteLine(perms.HasFlag(Permissions.Read));\n        Console.WriteLine(perms.HasFlag(Permissions.Delete));\n    }\n}",
+    "expectedOutput": [
+      "Read, Write",
+      "True",
+      "False"
+    ],
+    "successMessage": "Flags enums combine permissions with |. HasFlag checks if a permission is included. Admin = all three combined."
+  },
+  {
+    "title": "Enum.GetValues",
+    "instruction": "Iterate all values of an enum with `Enum.GetValues`.\n\nRun this.",
+    "starter": "using System;\n\nenum Planet { Mercury, Venus, Earth, Mars, Jupiter }\n\nclass Program {\n    static void Main() {\n        foreach (Planet p in Enum.GetValues<Planet>()) {\n            Console.WriteLine($\"{(int)p}: {p}\");\n        }\n    }\n}",
+    "expectedOutput": [
+      "0: Mercury",
+      "1: Venus",
+      "2: Earth",
+      "3: Mars",
+      "4: Jupiter"
+    ],
+    "successMessage": "Enum.GetValues<T>() returns all enum values. Useful for populating dropdowns or iterating over all options."
+  },
+  {
+    "title": "Enum.Parse and TryParse",
+    "instruction": "Convert strings to enum values at runtime.\n\nRun this.",
+    "starter": "using System;\n\nenum Color { Red, Green, Blue }\n\nclass Program {\n    static void Main() {\n        Color c = Enum.Parse<Color>(\"Green\");\n        Console.WriteLine(c);\n\n        if (Enum.TryParse<Color>(\"Purple\", out Color bad)) {\n            Console.WriteLine(bad);\n        } else {\n            Console.WriteLine(\"Purple is not a Color\");\n        }\n    }\n}",
+    "expectedOutput": [
+      "Green",
+      "Purple is not a Color"
+    ],
+    "successMessage": "Enum.Parse throws on invalid values. TryParse returns false safely. Use TryParse for user input."
+  },
+  {
+    "title": "Enum with methods via extension",
+    "instruction": "Enums cannot have methods, but extension methods add behaviour.\n\nRun this.",
+    "starter": "using System;\n\nenum DayOfWeek2 { Mon, Tue, Wed, Thu, Fri, Sat, Sun }\n\nstatic class DayExtensions {\n    public static bool IsWeekend(this DayOfWeek2 day) =>\n        day == DayOfWeek2.Sat || day == DayOfWeek2.Sun;\n}\n\nclass Program {\n    static void Main() {\n        foreach (DayOfWeek2 d in Enum.GetValues<DayOfWeek2>()) {\n            Console.WriteLine($\"{d}: {(d.IsWeekend() ? \"weekend\" : \"weekday\")}\");\n        }\n    }\n}",
+    "expectedOutput": [
+      "Mon: weekday",
+      "Tue: weekday",
+      "Wed: weekday",
+      "Thu: weekday",
+      "Fri: weekday",
+      "Sat: weekend",
+      "Sun: weekend"
+    ],
+    "successMessage": "Extension methods let you add behaviour to enums without modifying them. this DayOfWeek2 day makes it callable as d.IsWeekend()."
+  },
+  {
+    "title": "Enum as array index",
+    "instruction": "Enum values as array indices create type-safe lookup tables.\n\nRun this.",
+    "starter": "using System;\n\nenum Season { Spring, Summer, Autumn, Winter }\n\nclass Program {\n    static readonly string[] Descriptions = {\n        \"flowers bloom\",\n        \"hot and sunny\",\n        \"leaves fall\",\n        \"cold and dark\"\n    };\n\n    static void Main() {\n        foreach (Season s in Enum.GetValues<Season>()) {\n            Console.WriteLine($\"{s}: {Descriptions[(int)s]}\");\n        }\n    }\n}",
+    "expectedOutput": [
+      "Spring: flowers bloom",
+      "Summer: hot and sunny",
+      "Autumn: leaves fall",
+      "Winter: cold and dark"
+    ],
+    "successMessage": "Casting to int uses enum values as array indices. A clean way to associate data with each enum value."
+  }
+]

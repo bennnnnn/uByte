@@ -1,0 +1,86 @@
+[
+  {
+    "title": "Nullable value types",
+    "instruction": "`int?` is shorthand for `Nullable<int>`. It can be null.\n\nRun this.",
+    "starter": "using System;\n\nclass Program {\n    static void Main() {\n        int? age = null;\n        Console.WriteLine(age.HasValue);\n        age = 30;\n        Console.WriteLine(age.HasValue);\n        Console.WriteLine(age.Value);\n    }\n}",
+    "expectedOutput": [
+      "False",
+      "True",
+      "30"
+    ],
+    "successMessage": "int? wraps int in a Nullable<int>. HasValue checks if it has a value. Value throws if null — use ?? for safety."
+  },
+  {
+    "title": "Null coalescing ??",
+    "instruction": "`??` returns the left side if not null, else the right side.\n\nRun this.",
+    "starter": "using System;\n\nclass Program {\n    static void Main() {\n        int? a = null;\n        int? b = 42;\n        Console.WriteLine(a ?? 0);\n        Console.WriteLine(b ?? 0);\n        string s = null;\n        Console.WriteLine(s ?? \"default\");\n    }\n}",
+    "expectedOutput": [
+      "0",
+      "42",
+      "default"
+    ],
+    "successMessage": "?? is the null-coalescing operator. It is the safe way to provide a fallback without an if-null check."
+  },
+  {
+    "title": "Null conditional ?.",
+    "instruction": "`?.` calls a member only if the object is not null, otherwise returns null.\n\nRun this.",
+    "starter": "using System;\n\nclass Program {\n    static void Main() {\n        string s = null;\n        int? len = s?.Length;\n        Console.WriteLine(len);\n        Console.WriteLine(len ?? -1);\n\n        string hello = \"hello\";\n        Console.WriteLine(hello?.ToUpper());\n    }\n}",
+    "expectedOutput": [
+      "",
+      "- 1",
+      "HELLO"
+    ],
+    "successMessage": "?. short-circuits to null if the object is null. Combine with ?? for safe defaults."
+  },
+  {
+    "title": "??= null coalescing assignment",
+    "instruction": "`??=` assigns the right side only if the left is null.\n\nRun this.",
+    "starter": "using System;\n\nclass Program {\n    static void Main() {\n        string s = null;\n        s ??= \"default\";\n        Console.WriteLine(s);\n\n        string t = \"existing\";\n        t ??= \"not used\";\n        Console.WriteLine(t);\n    }\n}",
+    "expectedOutput": [
+      "default",
+      "existing"
+    ],
+    "successMessage": "??= is shorthand for: if (s == null) s = value. It initialises a variable only when needed."
+  },
+  {
+    "title": "Nullable reference types",
+    "instruction": "Enable nullable reference types with `#nullable enable` to get compile-time null safety.\n\nRun this.",
+    "starter": "using System;\n\n#nullable enable\n\nclass Program {\n    static string Greet(string? name) {\n        return $\"Hello, {name ?? \"stranger\"}!\";\n    }\n\n    static void Main() {\n        Console.WriteLine(Greet(\"Alice\"));\n        Console.WriteLine(Greet(null));\n    }\n}",
+    "expectedOutput": [
+      "Hello, Alice!",
+      "Hello, stranger!"
+    ],
+    "successMessage": "string? means 'this string can be null'. string means 'never null'. The compiler warns if you dereference a nullable without checking."
+  },
+  {
+    "title": "Null-forgiving operator !",
+    "instruction": "The `!` postfix operator tells the compiler 'I know this is not null'.\n\nUse sparingly — it disables the null check.\n\nRun this.",
+    "starter": "using System;\n\n#nullable enable\n\nclass Program {\n    static string? TryGetName() => \"Alice\";\n\n    static void Main() {\n        string name = TryGetName()!; // I know it won't be null\n        Console.WriteLine(name.Length);\n    }\n}",
+    "expectedOutput": [
+      "5"
+    ],
+    "successMessage": "! suppresses the nullable warning. Use it only when you are certain — if you're wrong, you get a NullReferenceException at runtime."
+  },
+  {
+    "title": "Pattern matching for null",
+    "instruction": "Use `is null` and `is not null` patterns for readable null checks.\n\nRun this.",
+    "starter": "using System;\n\nstatic string Describe(object obj) {\n    if (obj is null) return \"null\";\n    if (obj is string s) return $\"string: \\\"{s}\\\"\";\n    if (obj is int n) return $\"int: {n}\";\n    return $\"other: {obj.GetType().Name}\";\n}\n\nclass Program {\n    static void Main() {\n        Console.WriteLine(Describe(null));\n        Console.WriteLine(Describe(\"hello\"));\n        Console.WriteLine(Describe(42));\n        Console.WriteLine(Describe(3.14));\n    }\n}",
+    "expectedOutput": [
+      "null",
+      "string: \"hello\"",
+      "int: 42",
+      "other: Double"
+    ],
+    "successMessage": "is null is clearer than == null (avoids operator overloading surprises). Pattern matching unifies null check and type check."
+  },
+  {
+    "title": "Null in collections",
+    "instruction": "Collections can contain null values. Use LINQ to filter them.\n\nRun this.",
+    "starter": "using System;\nusing System.Linq;\nusing System.Collections.Generic;\n\nclass Program {\n    static void Main() {\n        var names = new List<string?> { \"Alice\", null, \"Bob\", null, \"Carol\" };\n        var nonNull = names.Where(n => n != null).ToList();\n        Console.WriteLine(nonNull.Count);\n        Console.WriteLine(string.Join(\", \", nonNull));\n    }\n}",
+    "expectedOutput": [
+      "3",
+      "Alice, Bob, Carol"
+    ],
+    "successMessage": "Filter nulls with Where(n => n != null). In C# 11 you can use Where(n => n is not null) for the same effect."
+  }
+]

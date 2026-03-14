@@ -1,0 +1,68 @@
+[
+  {
+    "title": "Run your first program",
+    "instruction": "Every Rust program starts at `fn main()`. The code inside the curly braces runs when you execute the program.\n\n`println!` is a macro that prints a line. The `!` tells you it is a macro, not a regular function.\n\nPress **Run** and see what happens.",
+    "starter": "fn main() {\n    println!(\"Hello, Rust!\");\n}",
+    "expectedOutput": ["Hello, Rust!"],
+    "successMessage": "You just ran a Rust program. That fn main() is the entry point — every Rust binary you ever write starts there."
+  },
+  {
+    "title": "Print something different",
+    "instruction": "Change the text inside the quotes to your name and run it.\n\nThe string is between the double quotes. Everything else must stay exactly as it is.",
+    "hint": "Only change the text between the quotes. Keep fn main(), the curly braces, and println! exactly as they are.",
+    "starter": "fn main() {\n    println!(\"Hello, Rust!\");\n}",
+    "expectedOutput": [],
+    "codeChecks": [
+      { "pattern": "println!\\(\"Hello, Rust!\"\\)", "required": false, "message": "Change the text inside the quotes to something personal." }
+    ],
+    "successMessage": "You told the computer to say something specific. That is programming — giving precise instructions."
+  },
+  {
+    "title": "Print two lines",
+    "instruction": "Each `println!` prints one line.\n\nAdd a second `println!` below the first one and run it. Print two different things.",
+    "hint": "Add println!(\"your text\"); on a new line inside the curly braces.",
+    "starter": "fn main() {\n    println!(\"Line one\");\n}",
+    "expectedOutput": [],
+    "codeChecks": [
+      { "pattern": "println![\\s\\S]*println!", "required": true, "message": "Add a second println! call below the first." }
+    ],
+    "successMessage": "Rust ran both lines, top to bottom. That sequential execution is the foundation of every program."
+  },
+  {
+    "title": "Print a number",
+    "instruction": "`println!` can print numbers too, using `{}` as a placeholder:\n\n```rust\nprintln!(\"{}\", 42);\n```\n\nThe `{}` gets replaced by the value after the comma.\n\nRun this and see the output.",
+    "starter": "fn main() {\n    println!(\"{}\", 42);\n    println!(\"{}\", 3.14);\n    println!(\"{}\", true);\n}",
+    "expectedOutput": ["42", "3.14", "true"],
+    "successMessage": "The {} placeholder works with numbers, decimals, and booleans. It is Rust's way of injecting values into strings."
+  },
+  {
+    "title": "Multiple placeholders",
+    "instruction": "You can use several `{}` in one `println!`:\n\n```rust\nprintln!(\"{} + {} = {}\", 1, 2, 3);\n```\n\nEach `{}` maps to the next argument in order.\n\nRun this program.",
+    "starter": "fn main() {\n    println!(\"{} + {} = {}\", 1, 2, 3);\n    println!(\"Name: {}, Age: {}\", \"Alex\", 25);\n}",
+    "expectedOutput": ["1 + 2 = 3", "Name: Alex, Age: 25"],
+    "successMessage": "Each {} slot is filled left to right. If you have three {}, you need exactly three values after the format string."
+  },
+  {
+    "title": "Comments in Rust",
+    "instruction": "Comments are notes for humans. Rust ignores them completely.\n\n`//` starts a single-line comment. Everything after `//` on that line is ignored.\n\nRun this — the comments do not appear in output.",
+    "starter": "fn main() {\n    // This is a comment — Rust ignores it\n    println!(\"Comments are invisible.\");\n\n    // Another comment\n    println!(\"Only println! output appears.\");\n}",
+    "expectedOutput": ["Comments are invisible.", "Only println! output appears."],
+    "successMessage": "Comments document WHY your code does something. Write code that explains itself, and comments that explain the reasoning behind decisions."
+  },
+  {
+    "title": "Fix the syntax error",
+    "instruction": "This program has a bug. Run it, read the error message, and fix it.\n\nRust's error messages are famous for being helpful — they tell you exactly what is wrong.",
+    "hint": "Look at the println! line. Check the quotes and the semicolon carefully.",
+    "starter": "fn main() {\n    println!(\"Rust is great)\n}",
+    "expectedOutput": ["Rust is great"],
+    "successMessage": "Rust's compiler is your friend. It catches mistakes before your program runs — unlike many other languages. Get comfortable reading its error messages."
+  },
+  {
+    "title": "Write from scratch",
+    "instruction": "The function body is empty. Write a complete Rust program that prints three lines:\n- `Rust is fast`\n- `Rust is safe`\n- `Rust is fun`",
+    "hint": "Add three println! calls inside fn main().",
+    "starter": "fn main() {\n    // Write your three println! calls here\n}",
+    "expectedOutput": ["Rust is fast", "Rust is safe", "Rust is fun"],
+    "successMessage": "You wrote a working Rust program from scratch. fn main is the container, println! is the tool. That is the whole skeleton."
+  }
+]

@@ -1,0 +1,98 @@
+[
+  {
+    "title": "Spawn a thread",
+    "instruction": "`thread::spawn` runs a closure in a new OS thread.\n\n`.join()` waits for it to finish.\n\nRun this.",
+    "starter": "use std::thread;\nuse std::time::Duration;\n\nfn main() {\n    let handle = thread::spawn(|| {\n        for i in 1..=3 {\n            println!(\"thread: {}\", i);\n            thread::sleep(Duration::from_millis(1));\n        }\n    });\n\n    for i in 1..=3 {\n        println!(\"main: {}\", i);\n    }\n\n    handle.join().unwrap();\n}",
+    "expectedOutput": [],
+    "codeChecks": [
+      {
+        "pattern": "thread::spawn",
+        "required": true,
+        "message": "Use thread::spawn to create a thread."
+      },
+      {
+        "pattern": "join",
+        "required": true,
+        "message": "Call join() to wait for the thread to complete."
+      }
+    ],
+    "successMessage": "Output order varies — that is concurrency. join() ensures we wait for the spawned thread before main exits."
+  },
+  {
+    "title": "move closure in thread",
+    "instruction": "Threads need `move` closures to take ownership of captured data.\n\nRun this.",
+    "starter": "use std::thread;\n\nfn main() {\n    let message = String::from(\"Hello from main thread\");\n    let handle = thread::spawn(move || {\n        println!(\"{}\", message);\n    });\n    handle.join().unwrap();\n}",
+    "expectedOutput": [
+      "Hello from main thread"
+    ],
+    "successMessage": "move transfers message into the thread closure. Without move, Rust cannot guarantee message outlives the thread."
+  },
+  {
+    "title": "Arc<T> — shared across threads",
+    "instruction": "`Arc<T>` (Atomic Reference Count) is `Rc<T>` for multiple threads — thread-safe.\n\nRun this.",
+    "starter": "use std::sync::Arc;\nuse std::thread;\n\nfn main() {\n    let data = Arc::new(vec![1, 2, 3, 4, 5]);\n    let mut handles = vec![];\n    for i in 0..3 {\n        let data = Arc::clone(&data);\n        let h = thread::spawn(move || {\n            println!(\"thread {}: sum = {}\", i, data.iter().sum::<i32>());\n        });\n        handles.push(h);\n    }\n    for h in handles { h.join().unwrap(); }\n}",
+    "expectedOutput": [],
+    "codeChecks": [
+      {
+        "pattern": "Arc::new",
+        "required": true,
+        "message": "Wrap the shared data in Arc::new."
+      },
+      {
+        "pattern": "Arc::clone",
+        "required": true,
+        "message": "Clone the Arc before passing to each thread."
+      }
+    ],
+    "successMessage": "Arc allows multiple threads to share ownership. The data is freed when the last Arc drops, regardless of thread order."
+  },
+  {
+    "title": "Mutex<T> — exclusive access",
+    "instruction": "`Mutex<T>` ensures only one thread accesses the data at a time.\n\nRun this.",
+    "starter": "use std::sync::{Arc, Mutex};\nuse std::thread;\n\nfn main() {\n    let counter = Arc::new(Mutex::new(0));\n    let mut handles = vec![];\n    for _ in 0..5 {\n        let counter = Arc::clone(&counter);\n        handles.push(thread::spawn(move || {\n            *counter.lock().unwrap() += 1;\n        }));\n    }\n    for h in handles { h.join().unwrap(); }\n    println!(\"result: {}\", *counter.lock().unwrap());\n}",
+    "expectedOutput": [
+      "result: 5"
+    ],
+    "successMessage": "Arc<Mutex<T>> is the standard pattern for shared mutable state across threads. lock() acquires the mutex, returning a MutexGuard that releases it when dropped."
+  },
+  {
+    "title": "Channels — message passing",
+    "instruction": "`std::sync::mpsc` provides a multi-producer, single-consumer channel.\n\nRun this.",
+    "starter": "use std::sync::mpsc;\nuse std::thread;\n\nfn main() {\n    let (tx, rx) = mpsc::channel();\n    thread::spawn(move || {\n        for i in 1..=3 {\n            tx.send(i).unwrap();\n        }\n    });\n    for received in rx {\n        println!(\"got: {}\", received);\n    }\n}",
+    "expectedOutput": [
+      "got: 1",
+      "got: 2",
+      "got: 3"
+    ],
+    "successMessage": "tx sends, rx receives. rx is an iterator — when all senders drop, it ends. Message passing avoids shared state entirely."
+  },
+  {
+    "title": "Multiple producers",
+    "instruction": "Clone the transmitter for multiple senders.\n\nRun this.",
+    "starter": "use std::sync::mpsc;\nuse std::thread;\n\nfn main() {\n    let (tx, rx) = mpsc::channel();\n    for i in 0..3 {\n        let tx = tx.clone();\n        thread::spawn(move || {\n            tx.send(format!(\"msg from {}\", i)).unwrap();\n        });\n    }\n    drop(tx); // drop original so rx iterator can end\n    let mut msgs: Vec<String> = rx.collect();\n    msgs.sort();\n    for m in &msgs { println!(\"{}\", m); }\n}",
+    "expectedOutput": [
+      "msg from 0",
+      "msg from 1",
+      "msg from 2"
+    ],
+    "successMessage": "mpsc = multi-producer single-consumer. Clone tx for each sender. Drop the original tx so the receiver knows when all senders are done."
+  },
+  {
+    "title": "Rayon-style data parallelism",
+    "instruction": "Use `std::thread::scope` (Rust 1.63+) for scoped threads that can borrow the parent's data.\n\nRun this.",
+    "starter": "use std::thread;\n\nfn main() {\n    let data = vec![1, 2, 3, 4, 5, 6, 7, 8];\n    let result = thread::scope(|s| {\n        let h1 = s.spawn(|| data[..4].iter().sum::<i32>());\n        let h2 = s.spawn(|| data[4..].iter().sum::<i32>());\n        h1.join().unwrap() + h2.join().unwrap()\n    });\n    println!(\"parallel sum: {}\", result);\n}",
+    "expectedOutput": [
+      "parallel sum: 36"
+    ],
+    "successMessage": "Scoped threads can borrow data from the enclosing scope — safe because scope() guarantees threads end before the scope exits."
+  },
+  {
+    "title": "Send and Sync",
+    "instruction": "`Send` means a type can be sent to another thread. `Sync` means it can be shared.\n\nRun this to see the rules in practice.",
+    "starter": "use std::sync::{Arc, Mutex};\n\n// Arc<Mutex<T>> is Send + Sync if T: Send\n// Rc<T> is neither — single-threaded only\n\nfn is_send<T: Send>(_: T) {}\nfn is_sync<T: Sync>(_: &T) {}\n\nfn main() {\n    let arc_mutex = Arc::new(Mutex::new(42));\n    is_send(arc_mutex.clone());\n    is_sync(&arc_mutex);\n    println!(\"Arc<Mutex<i32>> is Send and Sync\");\n}",
+    "expectedOutput": [
+      "Arc<Mutex<i32>> is Send and Sync"
+    ],
+    "successMessage": "Send and Sync are marker traits. Arc<Mutex<T>> is both. The compiler automatically verifies thread safety via these traits."
+  }
+]

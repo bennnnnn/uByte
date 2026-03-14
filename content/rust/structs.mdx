@@ -1,39 +1,12 @@
 ---
-title: "Structs in Rust"
-description: "Define structs, create instances, and use field access."
+title: "Structs"
+description: "Define custom data types, add methods with impl, and use associated functions as constructors."
 order: 10
-difficulty: "beginner"
-estimatedMinutes: 12
+difficulty: "intermediate"
+estimatedMinutes: 20
+concepts: ["struct", "impl", "self", "&self", "&mut self", "associated functions", "#[derive(Debug)]"]
 ---
 
-## Concepts in this chapter
+## Custom data types
 
-You will learn and practice:
-
-- **struct** — define with named fields
-- **Instantiation** — Point { x: 3, y: 4 }
-- **Field access** — p.x, p.y
-- **Update syntax** — Point { x: 1, ..other } to copy rest from other
-- **Tuple structs** — struct Color(i32, i32, i32);
-
----
-
-## Defining a Struct
-
-```rust
-struct Point {
-    x: i32,
-    y: i32,
-}
-
-fn main() {
-    let p = Point { x: 3, y: 4 };
-    println!("{} {}", p.x, p.y);
-}
-```
-
----
-
-## What's Next?
-
-Next: **Methods and impl** — add methods to structs.
+A struct groups related fields under one name. Methods are functions attached to that struct via `impl`.

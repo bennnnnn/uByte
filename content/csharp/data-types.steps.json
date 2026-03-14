@@ -1,0 +1,84 @@
+[
+  {
+    "title": "Integer types",
+    "instruction": "C# has several integer sizes. `int` (32-bit) is the default.\n\nRun this.",
+    "starter": "using System;\n\nclass Program {\n    static void Main() {\n        byte  b = 255;\n        short s = 32767;\n        int   i = 2_147_483_647;\n        long  l = 9_000_000_000L;\n        Console.WriteLine($\"{b} {s} {i} {l}\");\n    }\n}",
+    "expectedOutput": [
+      "255 32767 2147483647 9000000000"
+    ],
+    "successMessage": "Each integer type has a range. _ is a digit separator (ignored by compiler). L suffix marks a long literal."
+  },
+  {
+    "title": "Floating-point types",
+    "instruction": "`double` (64-bit) is the default. `float` (32-bit) needs an `f` suffix. `decimal` is for exact decimal arithmetic.\n\nRun this.",
+    "starter": "using System;\n\nclass Program {\n    static void Main() {\n        float  f = 3.14f;\n        double d = 3.14159265;\n        decimal m = 9.99m;\n        Console.WriteLine($\"{f} {d} {m}\");\n        Console.WriteLine($\"{0.1m + 0.2m}\");\n    }\n}",
+    "expectedOutput": [
+      "3.14 3.14159265 9.99",
+      "0.3"
+    ],
+    "successMessage": "0.1m + 0.2m = 0.3 exactly. 0.1 + 0.2 in double would give 0.30000000000000004. Use decimal for money!"
+  },
+  {
+    "title": "Boolean type",
+    "instruction": "`bool` is `true` or `false`. Comparison and logical operators produce booleans.\n\nRun this.",
+    "starter": "using System;\n\nclass Program {\n    static void Main() {\n        bool t = true;\n        bool f = false;\n        Console.WriteLine($\"{t} {f}\");\n        Console.WriteLine(5 > 3);\n        Console.WriteLine(5 == 5);\n        Console.WriteLine(!true);\n        Console.WriteLine(true && false);\n        Console.WriteLine(true || false);\n    }\n}",
+    "expectedOutput": [
+      "True False",
+      "True",
+      "True",
+      "False",
+      "False",
+      "True"
+    ],
+    "successMessage": "&&, ||, ! are the logical operators. C# booleans print as True/False (capitalised)."
+  },
+  {
+    "title": "char type",
+    "instruction": "`char` stores a single Unicode character in single quotes.\n\nRun this.",
+    "starter": "using System;\n\nclass Program {\n    static void Main() {\n        char letter = 'A';\n        char digit  = '9';\n        char newline = '\\n';\n        Console.WriteLine(letter);\n        Console.WriteLine(digit);\n        Console.WriteLine((int)letter);\n    }\n}",
+    "expectedOutput": [
+      "A",
+      "9",
+      "65"
+    ],
+    "successMessage": "(int)letter casts the char to its Unicode code point. 'A' is 65. Casting is explicit in C#."
+  },
+  {
+    "title": "Explicit casting",
+    "instruction": "C# requires explicit casts for narrowing conversions (e.g., double to int).\n\nRun this.",
+    "starter": "using System;\n\nclass Program {\n    static void Main() {\n        double d = 9.99;\n        int i = (int)d;  // truncates, not rounds\n        Console.WriteLine($\"{d} -> {i}\");\n\n        int x = 1000;\n        byte b = (byte)x;  // wraps\n        Console.WriteLine($\"{x} -> {b}\");\n    }\n}",
+    "expectedOutput": [
+      "9.99 -> 9",
+      "1000 -> 232"
+    ],
+    "successMessage": "(int) truncates (does not round). 1000 % 256 = 232 — byte wraps. Explicit casts make potential data loss visible."
+  },
+  {
+    "title": "Implicit conversions",
+    "instruction": "Widening conversions (small -> large) are automatic.\n\nRun this.",
+    "starter": "using System;\n\nclass Program {\n    static void Main() {\n        int i = 100;\n        long l = i;    // automatic: int -> long\n        double d = i;  // automatic: int -> double\n        Console.WriteLine($\"{i} {l} {d}\");\n    }\n}",
+    "expectedOutput": [
+      "100 100 100"
+    ],
+    "successMessage": "int fits in long and double — no data loss possible, so the conversion is automatic. Narrowing (double->int) requires an explicit cast."
+  },
+  {
+    "title": "Convert class",
+    "instruction": "`Convert` provides safe conversions with clear naming.\n\nRun this.",
+    "starter": "using System;\n\nclass Program {\n    static void Main() {\n        string s = \"42\";\n        int n = Convert.ToInt32(s);\n        double d = Convert.ToDouble(\"3.14\");\n        string back = Convert.ToString(n);\n        Console.WriteLine($\"{n} {d} {back}\");\n    }\n}",
+    "expectedOutput": [
+      "42 3.14 42"
+    ],
+    "successMessage": "Convert.ToInt32 is safer than a cast — it handles string -> int, bool -> int, etc. For string parsing, int.Parse and int.TryParse are also common."
+  },
+  {
+    "title": "TryParse for safe input",
+    "instruction": "`TryParse` returns false instead of throwing an exception on invalid input.\n\nRun this.",
+    "starter": "using System;\n\nclass Program {\n    static void Main() {\n        string input1 = \"42\";\n        string input2 = \"abc\";\n\n        if (int.TryParse(input1, out int n1)) {\n            Console.WriteLine($\"parsed: {n1}\");\n        }\n        if (!int.TryParse(input2, out int n2)) {\n            Console.WriteLine($\"'{input2}' is not a number\");\n        }\n    }\n}",
+    "expectedOutput": [
+      "parsed: 42",
+      "'abc' is not a number"
+    ],
+    "successMessage": "TryParse uses the 'out' parameter pattern to return both success/failure and the parsed value. No exception on failure."
+  }
+]

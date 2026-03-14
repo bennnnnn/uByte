@@ -1,0 +1,78 @@
+[
+  {
+    "title": "Inline modules",
+    "instruction": "Define a module with `mod`. Items inside are private by default.\n\nRun this.",
+    "starter": "mod greetings {\n    pub fn hello() {\n        println!(\"Hello from a module!\");\n    }\n    fn secret() {\n        println!(\"only inside module\");\n    }\n}\n\nfn main() {\n    greetings::hello();\n    // greetings::secret(); // won't compile — private\n}",
+    "expectedOutput": [
+      "Hello from a module!"
+    ],
+    "successMessage": "::  navigates module paths. hello is pub — accessible outside. secret is private — only code inside the module can call it."
+  },
+  {
+    "title": "Nested modules",
+    "instruction": "Modules can be nested. Paths use :: separators.\n\nRun this.",
+    "starter": "mod math {\n    pub mod basic {\n        pub fn add(a: i32, b: i32) -> i32 { a + b }\n    }\n    pub mod advanced {\n        pub fn square(n: i32) -> i32 { n * n }\n    }\n}\n\nfn main() {\n    println!(\"{}\", math::basic::add(3, 4));\n    println!(\"{}\", math::advanced::square(5));\n}",
+    "expectedOutput": [
+      "7",
+      "25"
+    ],
+    "successMessage": "Nested modules create a hierarchy. Each level needs pub to be accessible from outside."
+  },
+  {
+    "title": "use to shorten paths",
+    "instruction": "`use` brings a path into scope so you don't have to repeat it.\n\nRun this.",
+    "starter": "mod geometry {\n    pub fn circle_area(r: f64) -> f64 {\n        std::f64::consts::PI * r * r\n    }\n}\n\nuse geometry::circle_area;\nuse std::f64::consts::PI;\n\nfn main() {\n    println!(\"{:.4}\", circle_area(3.0));\n    println!(\"{:.4}\", PI);\n}",
+    "expectedOutput": [
+      "28.2743",
+      "3.1416"
+    ],
+    "successMessage": "use imports the name into the current scope. Now you can write circle_area instead of geometry::circle_area."
+  },
+  {
+    "title": "use with as",
+    "instruction": "`as` renames an import to avoid conflicts or shorten long names.\n\nRun this.",
+    "starter": "use std::collections::HashMap as Map;\nuse std::collections::HashSet as Set;\n\nfn main() {\n    let mut m: Map<&str, i32> = Map::new();\n    m.insert(\"a\", 1);\n    let mut s: Set<i32> = Set::new();\n    s.insert(42);\n    println!(\"map len: {} set len: {}\", m.len(), s.len());\n}",
+    "expectedOutput": [
+      "map len: 1 set len: 1"
+    ],
+    "successMessage": "as gives an alias. HashMap as Map and HashSet as Set are local renames. Useful when two crates export the same name."
+  },
+  {
+    "title": "super and self",
+    "instruction": "`super` refers to the parent module. `self` refers to the current module.\n\nRun this.",
+    "starter": "mod outer {\n    pub fn outer_fn() {\n        println!(\"outer\");\n    }\n    pub mod inner {\n        pub fn call_parent() {\n            super::outer_fn();\n        }\n    }\n}\n\nfn main() {\n    outer::inner::call_parent();\n}",
+    "expectedOutput": [
+      "outer"
+    ],
+    "successMessage": "super::outer_fn() reaches up to the parent module. This is how inner modules call sibling or parent functions."
+  },
+  {
+    "title": "pub struct fields",
+    "instruction": "Struct fields are private by default. Mark them `pub` individually.\n\nRun this.",
+    "starter": "mod data {\n    pub struct Config {\n        pub host: String,\n        pub port: u16,\n        secret_key: String, // private!\n    }\n    impl Config {\n        pub fn new(host: &str, port: u16) -> Config {\n            Config {\n                host: String::from(host),\n                port,\n                secret_key: String::from(\"s3cr3t\"),\n            }\n        }\n        pub fn is_secure(&self) -> bool {\n            !self.secret_key.is_empty()\n        }\n    }\n}\n\nuse data::Config;\n\nfn main() {\n    let c = Config::new(\"localhost\", 8080);\n    println!(\"{}:{} secure={}\", c.host, c.port, c.is_secure());\n}",
+    "expectedOutput": [
+      "localhost:8080 secure=true"
+    ],
+    "successMessage": "host and port are pub — readable outside. secret_key is private — only Config's methods can access it. Struct encapsulation in Rust."
+  },
+  {
+    "title": "use glob imports",
+    "instruction": "`use module::*` imports everything public from a module.\n\nUse sparingly — it can cause name conflicts.\n\nRun this.",
+    "starter": "mod shapes {\n    pub const PI: f64 = 3.14159;\n    pub fn circle_area(r: f64) -> f64 { PI * r * r }\n    pub fn square_area(s: f64) -> f64 { s * s }\n}\n\nuse shapes::*;\n\nfn main() {\n    println!(\"{:.2}\", circle_area(2.0));\n    println!(\"{:.2}\", square_area(3.0));\n    println!(\"{:.5}\", PI);\n}",
+    "expectedOutput": [
+      "12.57",
+      "9.00",
+      "3.14159"
+    ],
+    "successMessage": "Glob imports bring everything public into scope. Convenient in tests (use super::*) but risky in production code."
+  },
+  {
+    "title": "External crates",
+    "instruction": "External crates are listed in Cargo.toml. Use them with `use`.\n\nThe standard library (std) is always available.\n\nRun this.",
+    "starter": "use std::collections::{HashMap, HashSet, BTreeMap};\n\nfn main() {\n    let mut map: HashMap<&str, i32> = HashMap::new();\n    map.insert(\"x\", 1);\n    \n    let mut set: HashSet<i32> = HashSet::new();\n    set.insert(42);\n    \n    let mut btree: BTreeMap<&str, i32> = BTreeMap::new();\n    btree.insert(\"b\", 2);\n    btree.insert(\"a\", 1);\n    \n    println!(\"{:?}\", btree); // BTreeMap is sorted\n}",
+    "expectedOutput": [
+      "{\\'a\\': 1, \\'b\\': 2}"
+    ],
+    "successMessage": "Brace imports use a::b::{X, Y} to import multiple items from the same path. BTreeMap keeps keys sorted — HashMap does not."
+  }
+]

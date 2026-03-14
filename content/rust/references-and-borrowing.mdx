@@ -1,0 +1,12 @@
+---
+title: "References and Borrowing"
+description: "Borrow values with & references. Understand mutable borrows and the rules that prevent data races."
+order: 8
+difficulty: "intermediate"
+estimatedMinutes: 20
+concepts: ["&", "&mut", "borrow", "rules", "NLL", "dangling references"]
+---
+
+## Borrow without moving
+
+References let you use a value without taking ownership. The owner keeps the value; the borrower gets a guaranteed-valid pointer.

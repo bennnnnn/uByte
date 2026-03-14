@@ -1,0 +1,84 @@
+[
+  {
+    "title": "Func<T, TResult>",
+    "instruction": "`Func<TIn, TOut>` is a built-in delegate for a function that takes input and returns output.\n\nRun this.",
+    "starter": "using System;\n\nclass Program {\n    static void Main() {\n        Func<int, int> double_ = n => n * 2;\n        Func<string, string, string> concat = (a, b) => a + b;\n        Console.WriteLine(double_(5));\n        Console.WriteLine(concat(\"hello\", \" world\"));\n    }\n}",
+    "expectedOutput": [
+      "10",
+      "hello world"
+    ],
+    "successMessage": "Func<int,int> is a delegate for a function taking int and returning int. The last type parameter is always the return type."
+  },
+  {
+    "title": "Action<T>",
+    "instruction": "`Action<T>` is a delegate for a function that returns nothing (void).\n\nRun this.",
+    "starter": "using System;\n\nclass Program {\n    static void Main() {\n        Action<string> print = s => Console.WriteLine(s.ToUpper());\n        Action<int, int> add = (a, b) => Console.WriteLine($\"{a}+{b}={a+b}\");\n        print(\"hello\");\n        add(3, 4);\n    }\n}",
+    "expectedOutput": [
+      "HELLO",
+      "3+4=7"
+    ],
+    "successMessage": "Action has no return type. Action<string, int> takes a string and int. Use Action when you only want side effects."
+  },
+  {
+    "title": "Passing functions to methods",
+    "instruction": "Accept delegates as parameters for flexible, reusable code.\n\nRun this.",
+    "starter": "using System;\nusing System.Collections.Generic;\nusing System.Linq;\n\nstatic List<T> Filter<T>(List<T> items, Func<T, bool> predicate) =>\n    items.Where(predicate).ToList();\n\nclass Program {\n    static void Main() {\n        var nums = new List<int> { 1, 2, 3, 4, 5, 6, 7, 8 };\n        var evens = Filter(nums, n => n % 2 == 0);\n        var large = Filter(nums, n => n > 5);\n        Console.WriteLine(string.Join(\" \", evens));\n        Console.WriteLine(string.Join(\" \", large));\n    }\n}",
+    "expectedOutput": [
+      "2 4 6 8",
+      "6 7 8"
+    ],
+    "successMessage": "Filter accepts any predicate. Pass a lambda inline or a named method. This is the foundation of functional programming in C#."
+  },
+  {
+    "title": "Multicast delegates",
+    "instruction": "A delegate can hold multiple methods and invoke them all.\n\nRun this.",
+    "starter": "using System;\n\nclass Program {\n    static void Main() {\n        Action<string> loggers = s => Console.WriteLine($\"Console: {s}\");\n        loggers += s => Console.WriteLine($\"File: {s}\");\n        loggers += s => Console.WriteLine($\"Network: {s}\");\n        loggers(\"App started\");\n    }\n}",
+    "expectedOutput": [
+      "Console: App started",
+      "File: App started",
+      "Network: App started"
+    ],
+    "successMessage": "+= adds a method to the delegate. When invoked, all three run. -= removes a method. This multicast capability is the foundation of events."
+  },
+  {
+    "title": "Events",
+    "instruction": "Events use delegates but restrict callers to += and -= only.\n\nRun this.",
+    "starter": "using System;\n\nclass Button {\n    public event Action<string> Clicked;\n    public void Click(string label) {\n        Console.WriteLine($\"Button '{label}' clicked\");\n        Clicked?.Invoke(label);\n    }\n}\n\nclass Program {\n    static void Main() {\n        var btn = new Button();\n        btn.Clicked += label => Console.WriteLine($\"Handler 1: {label}\");\n        btn.Clicked += label => Console.WriteLine($\"Handler 2: {label}\");\n        btn.Click(\"OK\");\n    }\n}",
+    "expectedOutput": [
+      "Button 'OK' clicked",
+      "Handler 1: OK",
+      "Handler 2: OK"
+    ],
+    "successMessage": "event restricts callers to subscribe (+=) and unsubscribe (-=) only — they cannot invoke or replace the delegate. This is the observer pattern in C#."
+  },
+  {
+    "title": "EventHandler pattern",
+    "instruction": "The standard .NET event pattern uses EventHandler<TEventArgs>.\n\nRun this.",
+    "starter": "using System;\n\nclass OrderEventArgs : EventArgs {\n    public int OrderId { get; }\n    public decimal Total { get; }\n    public OrderEventArgs(int id, decimal total) { OrderId = id; Total = total; }\n}\n\nclass OrderService {\n    public event EventHandler<OrderEventArgs> OrderPlaced;\n    public void PlaceOrder(int id, decimal total) {\n        Console.WriteLine($\"Order {id} placed\");\n        OrderPlaced?.Invoke(this, new OrderEventArgs(id, total));\n    }\n}\n\nclass Program {\n    static void Main() {\n        var svc = new OrderService();\n        svc.OrderPlaced += (sender, e) =>\n            Console.WriteLine($\"Email: order {e.OrderId} for {e.Total:C}\");\n        svc.PlaceOrder(42, 99.99m);\n    }\n}",
+    "expectedOutput": [
+      "Order 42 placed",
+      "Email: order 42 for $99.99"
+    ],
+    "successMessage": "EventArgs carries event data. EventHandler<T> is the standard .NET event delegate. sender is the source object."
+  },
+  {
+    "title": "Closures in lambdas",
+    "instruction": "Lambdas capture variables from their enclosing scope.\n\nRun this.",
+    "starter": "using System;\nusing System.Collections.Generic;\n\nclass Program {\n    static void Main() {\n        int multiplier = 3;\n        Func<int, int> triple = n => n * multiplier;\n        Console.WriteLine(triple(5));\n\n        multiplier = 10;\n        Console.WriteLine(triple(5)); // captures the variable, not the value\n    }\n}",
+    "expectedOutput": [
+      "15",
+      "50"
+    ],
+    "successMessage": "The lambda captures multiplier by reference. When multiplier changes to 10, the lambda sees 10. Closures capture variables, not values."
+  },
+  {
+    "title": "Predicate<T>",
+    "instruction": "`Predicate<T>` is a built-in delegate for bool-returning functions.\n\nRun this.",
+    "starter": "using System;\nusing System.Collections.Generic;\n\nclass Program {\n    static void Main() {\n        var nums = new List<int> { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };\n        Predicate<int> isEven = n => n % 2 == 0;\n        var evens = nums.FindAll(isEven);\n        int first = nums.Find(n => n > 5);\n        Console.WriteLine(string.Join(\" \", evens));\n        Console.WriteLine(first);\n    }\n}",
+    "expectedOutput": [
+      "2 4 6 8 10",
+      "6"
+    ],
+    "successMessage": "Predicate<T> is equivalent to Func<T,bool>. FindAll and Find on List use Predicate. The LINQ equivalents Where and First are more commonly used today."
+  }
+]

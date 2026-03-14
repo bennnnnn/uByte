@@ -1,0 +1,91 @@
+[
+  {
+    "title": "Define and call a function",
+    "instruction": "Use `fn` to define a function. Call it with its name and `()`.\n\nRun this.",
+    "starter": "fn say_hello() {\n    println!(\"Hello from a function!\");\n}\n\nfn main() {\n    say_hello();\n    say_hello();\n}",
+    "expectedOutput": [
+      "Hello from a function!",
+      "Hello from a function!"
+    ],
+    "successMessage": "Functions package behaviour you can reuse. Calling say_hello() twice runs its body twice — without repeating the code."
+  },
+  {
+    "title": "Parameters",
+    "instruction": "Parameters use `name: type` syntax. Rust always requires type annotations on function parameters.\n\nRun this.",
+    "starter": "fn greet(name: &str, times: u32) {\n    for _ in 0..times {\n        println!(\"Hello, {}!\", name);\n    }\n}\n\nfn main() {\n    greet(\"Alice\", 2);\n    greet(\"Bob\", 1);\n}",
+    "expectedOutput": [
+      "Hello, Alice!",
+      "Hello, Alice!",
+      "Hello, Bob!"
+    ],
+    "successMessage": "Rust requires explicit types for parameters — no inference here. This makes function signatures self-documenting."
+  },
+  {
+    "title": "Return values",
+    "instruction": "Specify the return type with `->`. The last expression (without `;`) is returned.\n\nRun this.",
+    "starter": "fn square(x: i32) -> i32 {\n    x * x\n}\n\nfn main() {\n    println!(\"{}\", square(4));\n    println!(\"{}\", square(10));\n}",
+    "expectedOutput": [
+      "16",
+      "100"
+    ],
+    "successMessage": "x * x has no semicolon — it is an expression whose value is returned. Add a semicolon and it becomes a statement returning unit."
+  },
+  {
+    "title": "Explicit return",
+    "instruction": "Use `return` for early exits from a function.\n\nThe last expression still handles the normal case.\n\nRun this.",
+    "starter": "fn absolute(n: i32) -> i32 {\n    if n < 0 { return -n; }\n    n\n}\n\nfn main() {\n    println!(\"{}\", absolute(-5));\n    println!(\"{}\", absolute(3));\n    println!(\"{}\", absolute(0));\n}",
+    "expectedOutput": [
+      "5",
+      "3",
+      "0"
+    ],
+    "successMessage": "return exits immediately when n is negative. The final n at the bottom handles the positive/zero case without return."
+  },
+  {
+    "title": "Block expressions",
+    "instruction": "A block `{}` is an expression. Its value is the last expression inside it.\n\nRun this.",
+    "starter": "fn main() {\n    let y = {\n        let x = 3;\n        x * x + 1\n    };\n    println!(\"y = {}\", y);\n}",
+    "expectedOutput": [
+      "y = 10"
+    ],
+    "successMessage": "The block evaluates to 10 (3*3+1=10). This is why Rust functions implicitly return their last expression."
+  },
+  {
+    "title": "Multiple return values via tuple",
+    "instruction": "Rust functions return one value, but that value can be a tuple.\n\nRun this.",
+    "starter": "fn min_max(v: &[i32]) -> (i32, i32) {\n    let mut min = v[0];\n    let mut max = v[0];\n    for &n in v {\n        if n < min { min = n; }\n        if n > max { max = n; }\n    }\n    (min, max)\n}\n\nfn main() {\n    let (lo, hi) = min_max(&[3, 1, 4, 1, 5, 9, 2, 6]);\n    println!(\"min={} max={}\", lo, hi);\n}",
+    "expectedOutput": [
+      "min=1 max=9"
+    ],
+    "successMessage": "Tuples bundle multiple values. The caller destructures them with let (lo, hi) = .... Common pattern for functions that compute two related results."
+  },
+  {
+    "title": "Functions as arguments",
+    "instruction": "Functions can take other functions as parameters using `fn` types.\n\nRun this.",
+    "starter": "fn apply(f: fn(i32) -> i32, x: i32) -> i32 {\n    f(x)\n}\n\nfn double(n: i32) -> i32 { n * 2 }\nfn negate(n: i32) -> i32 { -n }\n\nfn main() {\n    println!(\"{}\", apply(double, 5));\n    println!(\"{}\", apply(negate, 5));\n}",
+    "expectedOutput": [
+      "10",
+      "-5"
+    ],
+    "successMessage": "fn(i32)->i32 is a function pointer type. apply accepts any function with that signature. This is the foundation of higher-order programming."
+  },
+  {
+    "title": "Recursive functions",
+    "instruction": "Functions can call themselves. Every recursive function needs a base case to stop.\n\nRun this.",
+    "starter": "fn factorial(n: u64) -> u64 {\n    if n <= 1 { return 1; }\n    n * factorial(n - 1)\n}\n\nfn main() {\n    for i in 0..=10 {\n        println!(\"{}! = {}\", i, factorial(i));\n    }\n}",
+    "expectedOutput": [
+      "0! = 1",
+      "1! = 1",
+      "2! = 2",
+      "3! = 6",
+      "4! = 24",
+      "5! = 120",
+      "6! = 720",
+      "7! = 5040",
+      "8! = 40320",
+      "9! = 362880",
+      "10! = 3628800"
+    ],
+    "successMessage": "Factorial is the classic recursion example. Each call reduces n by 1 until the base case (n<=1). Rust optimises tail recursion in release mode."
+  }
+]

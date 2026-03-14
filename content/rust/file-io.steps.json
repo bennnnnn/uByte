@@ -1,0 +1,89 @@
+[
+  {
+    "title": "Read a file",
+    "instruction": "`fs::read_to_string` reads an entire file into a String.\n\nRun this.",
+    "starter": "use std::fs;\n\nfn main() {\n    // Write a temp file then read it back\n    fs::write(\"/tmp/hello.txt\", \"Hello, file!\").unwrap();\n    let contents = fs::read_to_string(\"/tmp/hello.txt\").unwrap();\n    println!(\"{}\", contents);\n}",
+    "expectedOutput": [
+      "Hello, file!"
+    ],
+    "successMessage": "fs::read_to_string is the simplest way to read a file. It returns Result<String, io::Error> — we unwrap here but in production you'd handle the error."
+  },
+  {
+    "title": "Write a file",
+    "instruction": "`fs::write` creates or overwrites a file.\n\nRun this.",
+    "starter": "use std::fs;\n\nfn main() {\n    let data = \"line 1\\nline 2\\nline 3\\n\";\n    fs::write(\"/tmp/data.txt\", data).unwrap();\n    println!(\"written\");\n    let back = fs::read_to_string(\"/tmp/data.txt\").unwrap();\n    print!(\"{}\", back);\n}",
+    "expectedOutput": [
+      "written",
+      "line 1",
+      "line 2",
+      "line 3"
+    ],
+    "successMessage": "fs::write takes anything that can be converted to bytes. It creates the file if it doesn't exist and overwrites if it does."
+  },
+  {
+    "title": "Handle file errors",
+    "instruction": "Use match or ? to handle file not found and other errors.\n\nRun this.",
+    "starter": "use std::fs;\n\nfn read_or_default(path: &str, default: &str) -> String {\n    match fs::read_to_string(path) {\n        Ok(content) => content,\n        Err(_)      => String::from(default),\n    }\n}\n\nfn main() {\n    let content = read_or_default(\"/tmp/exists.txt\", \"(file not found)\");\n    println!(\"{}\", content.trim());\n}",
+    "expectedOutput": [
+      "(file not found)"
+    ],
+    "successMessage": "Pattern matching on Result handles both outcomes. The file might not exist — Rust forces you to decide what to do in that case."
+  },
+  {
+    "title": "Append to a file",
+    "instruction": "`OpenOptions` lets you open files with specific modes.\n\nRun this.",
+    "starter": "use std::fs::OpenOptions;\nuse std::io::Write;\n\nfn main() {\n    let mut f = OpenOptions::new()\n        .create(true)\n        .append(true)\n        .open(\"/tmp/log.txt\")\n        .unwrap();\n    writeln!(f, \"log entry 1\").unwrap();\n    writeln!(f, \"log entry 2\").unwrap();\n    let content = std::fs::read_to_string(\"/tmp/log.txt\").unwrap();\n    print!(\"{}\", content);\n}",
+    "expectedOutput": [],
+    "codeChecks": [
+      {
+        "pattern": "append\\(true\\)",
+        "required": true,
+        "message": "Use .append(true) to add to the end of the file without truncating."
+      }
+    ],
+    "successMessage": "OpenOptions is a builder for file modes. append(true) adds to the end. create(true) creates the file if it doesn't exist."
+  },
+  {
+    "title": "Read line by line",
+    "instruction": "`BufReader` reads efficiently line by line without loading the whole file.\n\nRun this.",
+    "starter": "use std::fs::File;\nuse std::io::{BufRead, BufReader};\n\nfn main() {\n    std::fs::write(\"/tmp/lines.txt\", \"apple\\nbanana\\ncherry\\n\").unwrap();\n    let file = File::open(\"/tmp/lines.txt\").unwrap();\n    let reader = BufReader::new(file);\n    for (i, line) in reader.lines().enumerate() {\n        println!(\"{}: {}\", i + 1, line.unwrap());\n    }\n}",
+    "expectedOutput": [
+      "1: apple",
+      "2: banana",
+      "3: cherry"
+    ],
+    "successMessage": "BufReader wraps a File with buffered reading. .lines() returns an iterator of Result<String> — each line is read lazily."
+  },
+  {
+    "title": "Paths",
+    "instruction": "`Path` and `PathBuf` handle file paths in a cross-platform way.\n\nRun this.",
+    "starter": "use std::path::{Path, PathBuf};\n\nfn main() {\n    let p = Path::new(\"/tmp/hello.txt\");\n    println!(\"exists: {}\", p.exists());\n    println!(\"extension: {:?}\", p.extension());\n    println!(\"file name: {:?}\", p.file_name());\n\n    let mut pb = PathBuf::from(\"/tmp\");\n    pb.push(\"subdir\");\n    pb.push(\"file.rs\");\n    println!(\"path: {}\", pb.display());\n}",
+    "expectedOutput": [
+      "exists: true",
+      "extension: Some(\"txt\")",
+      "file name: Some(\"hello.txt\")",
+      "path: /tmp/subdir/file.rs"
+    ],
+    "successMessage": "Path is borrowed (like &str). PathBuf is owned (like String). push() extends the path safely regardless of OS separator."
+  },
+  {
+    "title": "fs::read for binary",
+    "instruction": "`fs::read` returns `Vec<u8>` — useful for binary files.\n\nRun this.",
+    "starter": "use std::fs;\n\nfn main() {\n    fs::write(\"/tmp/bytes.bin\", &[72u8, 101, 108, 108, 111]).unwrap();\n    let bytes = fs::read(\"/tmp/bytes.bin\").unwrap();\n    println!(\"bytes: {:?}\", bytes);\n    println!(\"as string: {}\", String::from_utf8(bytes).unwrap());\n}",
+    "expectedOutput": [
+      "bytes: [72, 101, 108, 108, 111]",
+      "as string: Hello"
+    ],
+    "successMessage": "fs::read returns raw bytes. String::from_utf8 converts if valid UTF-8. For truly binary data (images, etc.) you work directly with Vec<u8>."
+  },
+  {
+    "title": "Walk a directory",
+    "instruction": "`fs::read_dir` lists directory contents.\n\nRun this.",
+    "starter": "use std::fs;\n\nfn main() {\n    fs::create_dir_all(\"/tmp/testdir\").unwrap();\n    fs::write(\"/tmp/testdir/a.txt\", \"a\").unwrap();\n    fs::write(\"/tmp/testdir/b.txt\", \"b\").unwrap();\n\n    let mut entries: Vec<String> = fs::read_dir(\"/tmp/testdir\")\n        .unwrap()\n        .map(|e| e.unwrap().file_name().into_string().unwrap())\n        .collect();\n    entries.sort();\n    for e in entries { println!(\"{}\", e); }\n}",
+    "expectedOutput": [
+      "a.txt",
+      "b.txt"
+    ],
+    "successMessage": "read_dir returns an iterator of Result<DirEntry>. We extract the file name, collect into a Vec, then sort for deterministic output."
+  }
+]

@@ -1,0 +1,88 @@
+[
+  {
+    "title": "Read and write text files",
+    "instruction": "`File.WriteAllText` and `File.ReadAllText` are the simplest file operations.\n\nRun this.",
+    "starter": "using System;\nusing System.IO;\n\nclass Program {\n    static void Main() {\n        File.WriteAllText(\"/tmp/demo.txt\", \"Hello, File I/O!\");\n        string content = File.ReadAllText(\"/tmp/demo.txt\");\n        Console.WriteLine(content);\n    }\n}",
+    "expectedOutput": [
+      "Hello, File I/O!"
+    ],
+    "successMessage": "WriteAllText creates or overwrites. ReadAllText reads the entire file. Simple and direct for small files."
+  },
+  {
+    "title": "Read lines",
+    "instruction": "`File.ReadAllLines` returns a string array.\n`File.ReadLines` is lazy — loads one line at a time.\n\nRun this.",
+    "starter": "using System;\nusing System.IO;\n\nclass Program {\n    static void Main() {\n        File.WriteAllLines(\"/tmp/list.txt\", new[] { \"alpha\", \"beta\", \"gamma\" });\n        string[] lines = File.ReadAllLines(\"/tmp/list.txt\");\n        for (int i = 0; i < lines.Length; i++)\n            Console.WriteLine($\"{i+1}: {lines[i]}\");\n    }\n}",
+    "expectedOutput": [
+      "1: alpha",
+      "2: beta",
+      "3: gamma"
+    ],
+    "successMessage": "WriteAllLines writes each element on its own line. ReadAllLines loads all lines into an array. Use ReadLines for very large files."
+  },
+  {
+    "title": "Append to a file",
+    "instruction": "`File.AppendAllText` adds text to an existing file.\n\nRun this.",
+    "starter": "using System;\nusing System.IO;\n\nclass Program {\n    static void Main() {\n        File.WriteAllText(\"/tmp/log.txt\", \"line 1\\n\");\n        File.AppendAllText(\"/tmp/log.txt\", \"line 2\\n\");\n        File.AppendAllText(\"/tmp/log.txt\", \"line 3\\n\");\n        Console.Write(File.ReadAllText(\"/tmp/log.txt\"));\n    }\n}",
+    "expectedOutput": [
+      "line 1",
+      "line 2",
+      "line 3"
+    ],
+    "successMessage": "AppendAllText preserves existing content. WriteAllText would overwrite it."
+  },
+  {
+    "title": "StreamWriter for large files",
+    "instruction": "Use `StreamWriter` when writing many lines or large data.\n\nRun this.",
+    "starter": "using System;\nusing System.IO;\n\nclass Program {\n    static void Main() {\n        using (var writer = new StreamWriter(\"/tmp/data.csv\")) {\n            writer.WriteLine(\"Name,Score\");\n            string[] names = { \"Alice\", \"Bob\", \"Carol\" };\n            int[] scores = { 92, 85, 97 };\n            for (int i = 0; i < names.Length; i++)\n                writer.WriteLine($\"{names[i]},{scores[i]}\");\n        }\n        Console.Write(File.ReadAllText(\"/tmp/data.csv\"));\n    }\n}",
+    "expectedOutput": [
+      "Name,Score",
+      "Alice,92",
+      "Bob,85",
+      "Carol,97"
+    ],
+    "successMessage": "using automatically closes (disposes) the StreamWriter. This flushes the buffer and releases the file handle."
+  },
+  {
+    "title": "StreamReader for large files",
+    "instruction": "Read large files line by line with `StreamReader`.\n\nRun this.",
+    "starter": "using System;\nusing System.IO;\n\nclass Program {\n    static void Main() {\n        File.WriteAllLines(\"/tmp/nums.txt\", new[] { \"1\", \"2\", \"3\", \"4\", \"5\" });\n        int sum = 0;\n        using (var reader = new StreamReader(\"/tmp/nums.txt\")) {\n            string line;\n            while ((line = reader.ReadLine()) != null) {\n                sum += int.Parse(line);\n            }\n        }\n        Console.WriteLine($\"sum: {sum}\");\n    }\n}",
+    "expectedOutput": [
+      "sum: 15"
+    ],
+    "successMessage": "StreamReader reads line by line — memory efficient for huge files. The using block ensures the file is closed even if an exception occurs."
+  },
+  {
+    "title": "Path class",
+    "instruction": "`Path` helps build and parse file paths in a cross-platform way.\n\nRun this.",
+    "starter": "using System;\nusing System.IO;\n\nclass Program {\n    static void Main() {\n        string dir = \"/tmp\";\n        string file = Path.Combine(dir, \"data\", \"output.txt\");\n        Console.WriteLine(file);\n        Console.WriteLine(Path.GetFileName(file));\n        Console.WriteLine(Path.GetExtension(file));\n        Console.WriteLine(Path.GetDirectoryName(file));\n    }\n}",
+    "expectedOutput": [
+      "/tmp/data/output.txt",
+      "output.txt",
+      ".txt",
+      "/tmp/data"
+    ],
+    "successMessage": "Path.Combine uses the OS separator. GetFileName, GetExtension, GetDirectoryName parse path components."
+  },
+  {
+    "title": "Directory operations",
+    "instruction": "`Directory` creates and lists directories.\n\nRun this.",
+    "starter": "using System;\nusing System.IO;\n\nclass Program {\n    static void Main() {\n        string dir = \"/tmp/testio\";\n        Directory.CreateDirectory(dir);\n        File.WriteAllText(Path.Combine(dir, \"a.txt\"), \"a\");\n        File.WriteAllText(Path.Combine(dir, \"b.txt\"), \"b\");\n        string[] files = Directory.GetFiles(dir, \"*.txt\");\n        Array.Sort(files);\n        foreach (var f in files)\n            Console.WriteLine(Path.GetFileName(f));\n        Directory.Delete(dir, recursive: true);\n        Console.WriteLine(Directory.Exists(dir));\n    }\n}",
+    "expectedOutput": [
+      "a.txt",
+      "b.txt",
+      "False"
+    ],
+    "successMessage": "CreateDirectory is idempotent — no error if it already exists. GetFiles matches a pattern. Delete with recursive=true removes the directory and all contents."
+  },
+  {
+    "title": "File.Exists and metadata",
+    "instruction": "Check if a file exists and read its metadata.\n\nRun this.",
+    "starter": "using System;\nusing System.IO;\n\nclass Program {\n    static void Main() {\n        string path = \"/tmp/meta.txt\";\n        File.WriteAllText(path, \"test content\");\n        Console.WriteLine(File.Exists(path));\n        var info = new FileInfo(path);\n        Console.WriteLine($\"size: {info.Length} bytes\");\n        Console.WriteLine($\"readonly: {info.IsReadOnly}\");\n    }\n}",
+    "expectedOutput": [
+      "True",
+      "size: 12 bytes",
+      "readonly: False"
+    ],
+    "successMessage": "FileInfo gives rich metadata. File.Exists for quick checks, FileInfo for detailed information like creation time, last modified, etc."
+  }
+]

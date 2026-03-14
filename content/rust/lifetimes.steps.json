@@ -1,0 +1,82 @@
+[
+  {
+    "title": "Why lifetimes exist",
+    "instruction": "This code would cause a dangling reference — a reference to freed data.\n\nRust refuses to compile it. Run it to see the error.",
+    "hint": "The reference r outlives the data it points to. The data is dropped inside the inner scope.",
+    "starter": "fn main() {\n    let r;\n    {\n        let x = 5;\n        r = &x; // r would dangle after x is dropped!\n    }\n    // x is dropped here\n    println!(\"{}\", r); // would use freed memory\n}",
+    "expectedOutput": [],
+    "codeChecks": [
+      {
+        "pattern": "r = &x",
+        "required": false,
+        "message": "x is dropped before r is used. Move x outside the inner scope to fix this."
+      }
+    ],
+    "successMessage": "The borrow checker rejected this. r would have outlived x. This kind of bug causes crashes in C/C++. Rust catches it at compile time."
+  },
+  {
+    "title": "Simple lifetime annotation",
+    "instruction": "When a function returns a reference derived from its inputs, Rust needs to know which input it comes from.\n\nRun this.",
+    "starter": "fn longest<'a>(x: &'a str, y: &'a str) -> &'a str {\n    if x.len() > y.len() { x } else { y }\n}\n\nfn main() {\n    let s1 = String::from(\"long string\");\n    let result;\n    {\n        let s2 = String::from(\"xyz\");\n        result = longest(s1.as_str(), s2.as_str());\n        println!(\"{}\", result);\n    }\n}",
+    "expectedOutput": [
+      "long string"
+    ],
+    "successMessage": "'a says 'the returned reference lives at least as long as the shorter of x and y'. The annotation constrains the lifetime."
+  },
+  {
+    "title": "Lifetime elision rules",
+    "instruction": "Rust has three lifetime elision rules to avoid annotation boilerplate.\n\nIf the compiler can apply them, no annotations needed.\n\nRun this.",
+    "starter": "// These all have lifetimes — elision handles them\nfn first_word(s: &str) -> &str {\n    match s.find(' ') {\n        Some(i) => &s[..i],\n        None    => s,\n    }\n}\n\nfn main() {\n    let s = String::from(\"hello world\");\n    println!(\"{}\", first_word(&s));\n}",
+    "expectedOutput": [
+      "hello"
+    ],
+    "successMessage": "No lifetime annotations needed here. The elision rules infer: the output reference has the same lifetime as the single input reference."
+  },
+  {
+    "title": "Structs with lifetime annotations",
+    "instruction": "If a struct holds a reference, it needs a lifetime parameter.\n\nRun this.",
+    "starter": "struct Important<'a> {\n    text: &'a str,\n}\n\nimpl<'a> Important<'a> {\n    fn display(&self) {\n        println!(\"Important: {}\", self.text);\n    }\n}\n\nfn main() {\n    let text = String::from(\"Don't forget this!\");\n    let excerpt = Important { text: &text };\n    excerpt.display();\n}",
+    "expectedOutput": [
+      "Important: Don't forget this!"
+    ],
+    "successMessage": "'a annotates the struct: 'an instance of Important cannot outlive the data in text'. The struct borrows the string — it doesn't own it."
+  },
+  {
+    "title": "Multiple lifetime parameters",
+    "instruction": "Sometimes inputs have different lifetimes.\n\nRun this.",
+    "starter": "fn announce<'a, 'b>(announcement: &'a str, name: &'b str) -> &'a str {\n    println!(\"Attention {}!\", name);\n    announcement\n}\n\nfn main() {\n    let ann = String::from(\"Sale today!\");\n    let result;\n    {\n        let name = String::from(\"Alice\");\n        result = announce(&ann, &name);\n    }\n    println!(\"{}\", result);\n}",
+    "expectedOutput": [
+      "Attention Alice!",
+      "Sale today!"
+    ],
+    "successMessage": "'a and 'b are separate lifetimes. result has lifetime 'a (tied to ann), not 'b (tied to name). So result is valid after name is dropped."
+  },
+  {
+    "title": "Static lifetime",
+    "instruction": "`'static` means the reference lives for the entire program duration.\n\nString literals are `'static` — they are baked into the binary.\n\nRun this.",
+    "starter": "fn static_str() -> &'static str {\n    \"I live forever in the binary\"\n}\n\nfn main() {\n    let s: &'static str = \"hello world\";\n    let r = static_str();\n    println!(\"{} | {}\", s, r);\n}",
+    "expectedOutput": [
+      "hello world | I live forever in the binary"
+    ],
+    "successMessage": "String literals have 'static lifetime because they're embedded in the binary. They are valid for the entire program run."
+  },
+  {
+    "title": "Lifetime bounds on generics",
+    "instruction": "Generic types can have lifetime constraints too.\n\nRun this.",
+    "starter": "fn print_ref<'a, T>(t: &'a T)\nwhere\n    T: std::fmt::Display + 'a,\n{\n    println!(\"{}\", t);\n}\n\nfn main() {\n    let n = 42;\n    let s = \"hello\";\n    print_ref(&n);\n    print_ref(&s);\n}",
+    "expectedOutput": [
+      "42",
+      "hello"
+    ],
+    "successMessage": "T: Display + 'a means T must implement Display AND must live at least as long as 'a. Lifetime bounds compose with trait bounds."
+  },
+  {
+    "title": "Lifetime summary",
+    "instruction": "Lifetimes ensure references never outlive the data they point to.\n\nRun this summary program.",
+    "starter": "fn summary<'a>(long: &'a str, short: &'a str) -> &'a str {\n    if long.len() > short.len() { long } else { short }\n}\n\nfn main() {\n    let a = String::from(\"I am the longer string\");\n    let b = String::from(\"short\");\n    let result = summary(&a, &b);\n    println!(\"longer: {}\", result);\n}",
+    "expectedOutput": [
+      "longer: I am the longer string"
+    ],
+    "successMessage": "Lifetime annotations are not changing anything about how long data lives — they are describing relationships. The borrow checker uses them to verify safety."
+  }
+]

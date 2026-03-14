@@ -1,0 +1,82 @@
+[
+  {
+    "title": "iter() basics",
+    "instruction": "`iter()` creates an iterator over references. `next()` advances it.\n\nRun this.",
+    "starter": "fn main() {\n    let v = vec![1, 2, 3];\n    let mut it = v.iter();\n    println!(\"{:?}\", it.next());\n    println!(\"{:?}\", it.next());\n    println!(\"{:?}\", it.next());\n    println!(\"{:?}\", it.next());\n}",
+    "expectedOutput": [
+      "Some(1)",
+      "Some(2)",
+      "Some(3)",
+      "None"
+    ],
+    "successMessage": "next() returns Option<&T>. Some(item) while items remain, None when exhausted. for loops call next() automatically."
+  },
+  {
+    "title": "map",
+    "instruction": "`map` transforms each element. It is lazy — nothing happens until consumed.\n\nRun this.",
+    "starter": "fn main() {\n    let v = vec![1, 2, 3, 4, 5];\n    let doubled: Vec<i32> = v.iter().map(|&x| x * 2).collect();\n    println!(\"{:?}\", doubled);\n}",
+    "expectedOutput": [
+      "[2, 4, 6, 8, 10]"
+    ],
+    "successMessage": "map returns a lazy iterator. collect() drives it to completion, allocating the Vec."
+  },
+  {
+    "title": "filter",
+    "instruction": "`filter` keeps elements matching a predicate.\n\nRun this.",
+    "starter": "fn main() {\n    let v = vec![1, 2, 3, 4, 5, 6, 7, 8];\n    let evens: Vec<&i32> = v.iter().filter(|&&x| x % 2 == 0).collect();\n    println!(\"{:?}\", evens);\n}",
+    "expectedOutput": [
+      "[2, 4, 6, 8]"
+    ],
+    "successMessage": "filter takes a predicate closure returning bool. Only elements for which it returns true are kept."
+  },
+  {
+    "title": "fold",
+    "instruction": "`fold` accumulates a value across all elements.\n\nRun this.",
+    "starter": "fn main() {\n    let v = vec![1, 2, 3, 4, 5];\n    let sum = v.iter().fold(0, |acc, &x| acc + x);\n    let product = v.iter().fold(1, |acc, &x| acc * x);\n    println!(\"sum: {} product: {}\", sum, product);\n}",
+    "expectedOutput": [
+      "sum: 15 product: 120"
+    ],
+    "successMessage": "fold starts with an accumulator, then applies the closure for each element. sum and product are common folds — Rust also provides .sum() and .product() directly."
+  },
+  {
+    "title": "enumerate",
+    "instruction": "`enumerate` pairs each element with its index.\n\nRun this.",
+    "starter": "fn main() {\n    let fruits = [\"apple\", \"banana\", \"cherry\"];\n    for (i, fruit) in fruits.iter().enumerate() {\n        println!(\"{}: {}\", i, fruit);\n    }\n}",
+    "expectedOutput": [
+      "0: apple",
+      "1: banana",
+      "2: cherry"
+    ],
+    "successMessage": "enumerate yields (index, &item) tuples. More idiomatic than maintaining a counter manually."
+  },
+  {
+    "title": "zip",
+    "instruction": "`zip` combines two iterators into pairs, stopping at the shorter.\n\nRun this.",
+    "starter": "fn main() {\n    let names = [\"Alice\", \"Bob\", \"Carol\"];\n    let scores = [92, 85, 97];\n    for (name, score) in names.iter().zip(scores.iter()) {\n        println!(\"{}: {}\", name, score);\n    }\n}",
+    "expectedOutput": [
+      "Alice: 92",
+      "Bob: 85",
+      "Carol: 97"
+    ],
+    "successMessage": "zip pairs elements positionally. If one iterator is shorter, the zip stops there."
+  },
+  {
+    "title": "chain",
+    "instruction": "`chain` concatenates two iterators.\n\nRun this.",
+    "starter": "fn main() {\n    let a = vec![1, 2, 3];\n    let b = vec![4, 5, 6];\n    let combined: Vec<i32> = a.iter().chain(b.iter()).copied().collect();\n    println!(\"{:?}\", combined);\n}",
+    "expectedOutput": [
+      "[1, 2, 3, 4, 5, 6]"
+    ],
+    "successMessage": "chain concatenates lazily. copied() turns &i32 into i32 (same as map(|&x| x) but more readable)."
+  },
+  {
+    "title": "Custom iterator",
+    "instruction": "Implement the `Iterator` trait for your own type by providing `next()`.\n\nRun this.",
+    "starter": "struct Counter { count: u32, max: u32 }\n\nimpl Counter {\n    fn new(max: u32) -> Self { Counter { count: 0, max } }\n}\n\nimpl Iterator for Counter {\n    type Item = u32;\n    fn next(&mut self) -> Option<u32> {\n        if self.count < self.max {\n            self.count += 1;\n            Some(self.count)\n        } else {\n            None\n        }\n    }\n}\n\nfn main() {\n    let sum: u32 = Counter::new(5).sum();\n    println!(\"sum 1..=5: {}\", sum);\n    \n    let doubled: Vec<u32> = Counter::new(4).map(|x| x * 2).collect();\n    println!(\"{:?}\", doubled);\n}",
+    "expectedOutput": [
+      "sum 1..=5: 15",
+      "[2, 4, 6, 8]"
+    ],
+    "successMessage": "Implement next() and you get all iterator methods for free — sum, map, filter, collect, etc. This is the power of Rust's trait system."
+  }
+]

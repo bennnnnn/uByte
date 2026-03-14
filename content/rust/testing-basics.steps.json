@@ -1,0 +1,74 @@
+[
+  {
+    "title": "Your first test",
+    "instruction": "Mark a function with `#[test]` to make it a test. The test passes if it does not panic.\n\nRun this.",
+    "starter": "fn add(a: i32, b: i32) -> i32 {\n    a + b\n}\n\n#[test]\nfn test_add() {\n    assert_eq!(add(2, 3), 5);\n    assert_eq!(add(-1, 1), 0);\n}\n\nfn main() {\n    println!(\"add(2, 3) = {}\", add(2, 3));\n}",
+    "expectedOutput": [
+      "add(2, 3) = 5"
+    ],
+    "successMessage": "assert_eq! panics if the two values are not equal. A panicking test is a failing test. Here both assertions pass."
+  },
+  {
+    "title": "assert! macro",
+    "instruction": "`assert!` checks that a condition is true.\n\nRun this.",
+    "starter": "fn is_even(n: i32) -> bool {\n    n % 2 == 0\n}\n\n#[test]\nfn test_even() {\n    assert!(is_even(4));\n    assert!(!is_even(3));\n    assert!(is_even(0));\n}\n\nfn main() {\n    println!(\"{} {}\", is_even(4), is_even(3));\n}",
+    "expectedOutput": [
+      "true false"
+    ],
+    "successMessage": "assert!(condition) panics when condition is false. assert!(!is_even(3)) verifies 3 is NOT even."
+  },
+  {
+    "title": "assert_ne!",
+    "instruction": "`assert_ne!` checks that two values are NOT equal.\n\nRun this.",
+    "starter": "fn triple(n: i32) -> i32 {\n    n * 3\n}\n\n#[test]\nfn test_triple() {\n    assert_ne!(triple(5), 5);  // 15 != 5\n    assert_eq!(triple(4), 12);\n}\n\nfn main() {\n    println!(\"{}\", triple(5));\n}",
+    "expectedOutput": [
+      "15"
+    ],
+    "successMessage": "assert_ne! is the 'not equal' version. It fails when the values ARE equal."
+  },
+  {
+    "title": "Custom failure messages",
+    "instruction": "All assert macros accept an optional format string for better error messages.\n\nRun this.",
+    "starter": "fn clamp(n: i32, lo: i32, hi: i32) -> i32 {\n    n.max(lo).min(hi)\n}\n\n#[test]\nfn test_clamp() {\n    let result = clamp(150, 0, 100);\n    assert_eq!(result, 100, \"clamp(150, 0, 100) should be 100, got {}\", result);\n    assert!(result >= 0 && result <= 100, \"result {} out of range\", result);\n}\n\nfn main() {\n    println!(\"{}\", clamp(150, 0, 100));\n}",
+    "expectedOutput": [
+      "100"
+    ],
+    "successMessage": "Custom messages make failures easier to debug. The format string appears in the test output when the assertion fails."
+  },
+  {
+    "title": "#[should_panic]",
+    "instruction": "Mark a test with `#[should_panic]` when it should panic to pass.\n\nRun this.",
+    "starter": "fn divide(a: i32, b: i32) -> i32 {\n    if b == 0 { panic!(\"division by zero!\"); }\n    a / b\n}\n\n#[test]\n#[should_panic(expected = \"division by zero\")]\nfn test_divide_by_zero() {\n    divide(10, 0); // should panic\n}\n\nfn main() {\n    println!(\"{}\", divide(10, 2));\n}",
+    "expectedOutput": [
+      "5"
+    ],
+    "successMessage": "expected = means the panic message must contain that string. Without expected, any panic passes. With it, only the matching panic passes."
+  },
+  {
+    "title": "Test organisation in mod tests",
+    "instruction": "Convention: put tests in a `mod tests` block with `#[cfg(test)]`.\n\nRun this.",
+    "starter": "fn multiply(a: i32, b: i32) -> i32 {\n    a * b\n}\n\n#[cfg(test)]\nmod tests {\n    use super::*;\n\n    #[test]\n    fn test_multiply() {\n        assert_eq!(multiply(3, 4), 12);\n        assert_eq!(multiply(-2, 5), -10);\n        assert_eq!(multiply(0, 100), 0);\n    }\n}\n\nfn main() {\n    println!(\"{}\", multiply(6, 7));\n}",
+    "expectedOutput": [
+      "42"
+    ],
+    "successMessage": "#[cfg(test)] means the module is compiled only during tests. use super::* imports everything from the parent module."
+  },
+  {
+    "title": "Result in tests",
+    "instruction": "Tests can return `Result<(), E>` — return Err to fail, Ok(()) to pass.\n\nRun this.",
+    "starter": "fn parse_port(s: &str) -> Result<u16, String> {\n    s.parse::<u16>().map_err(|e| e.to_string())\n}\n\n#[test]\nfn test_parse_port() -> Result<(), String> {\n    let port = parse_port(\"8080\")?;\n    assert_eq!(port, 8080);\n    Ok(())\n}\n\nfn main() {\n    println!(\"{:?}\", parse_port(\"8080\"));\n}",
+    "expectedOutput": [
+      "Ok(8080)"
+    ],
+    "successMessage": "Returning Result from a test lets you use ? to propagate errors cleanly. No need to unwrap everything in the test body."
+  },
+  {
+    "title": "Test-driven development",
+    "instruction": "Write the test first, watch it fail, then implement the function.\n\nRun this.",
+    "starter": "fn fibonacci(n: u64) -> u64 {\n    match n {\n        0 => 0,\n        1 => 1,\n        _ => fibonacci(n - 1) + fibonacci(n - 2),\n    }\n}\n\n#[cfg(test)]\nmod tests {\n    use super::*;\n    #[test]\n    fn test_fibonacci() {\n        assert_eq!(fibonacci(0), 0);\n        assert_eq!(fibonacci(1), 1);\n        assert_eq!(fibonacci(10), 55);\n        assert_eq!(fibonacci(15), 610);\n    }\n}\n\nfn main() {\n    for i in 0..=10 {\n        print!(\"{} \", fibonacci(i));\n    }\n    println!();\n}",
+    "expectedOutput": [
+      "0 1 1 2 3 5 8 13 21 34 55 "
+    ],
+    "successMessage": "TDD: tests first, then implementation. The tests document what fibonacci should do. The implementation satisfies them."
+  }
+]

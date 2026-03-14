@@ -1,0 +1,90 @@
+[
+  {
+    "title": "for loop",
+    "instruction": "Classic indexed for loop:\n\n```csharp\nfor (init; condition; update)\n```\n\nRun this.",
+    "starter": "using System;\n\nclass Program {\n    static void Main() {\n        for (int i = 1; i <= 5; i++) {\n            Console.WriteLine(i);\n        }\n    }\n}",
+    "expectedOutput": [
+      "1",
+      "2",
+      "3",
+      "4",
+      "5"
+    ],
+    "successMessage": "for loops have three parts: initialiser (int i=1), condition (i<=5), update (i++). All are optional."
+  },
+  {
+    "title": "Count down",
+    "instruction": "Loops can count backwards.\n\nRun this.",
+    "starter": "using System;\n\nclass Program {\n    static void Main() {\n        for (int i = 5; i >= 1; i--) {\n            Console.WriteLine(i);\n        }\n        Console.WriteLine(\"Go!\");\n    }\n}",
+    "expectedOutput": [
+      "5",
+      "4",
+      "3",
+      "2",
+      "1",
+      "Go!"
+    ],
+    "successMessage": "i-- decrements. The loop continues as long as i >= 1."
+  },
+  {
+    "title": "while loop",
+    "instruction": "`while` loops while a condition is true.\n\nRun this.",
+    "starter": "using System;\n\nclass Program {\n    static void Main() {\n        int n = 1;\n        while (n <= 100) {\n            n *= 2;\n        }\n        Console.WriteLine(n);\n    }\n}",
+    "expectedOutput": [
+      "128"
+    ],
+    "successMessage": "Doubling from 1: 2, 4, 8, 16, 32, 64, 128. The first power of 2 greater than 100 is 128."
+  },
+  {
+    "title": "do-while loop",
+    "instruction": "`do-while` always runs at least once — the condition is checked after.\n\nRun this.",
+    "starter": "using System;\n\nclass Program {\n    static void Main() {\n        int count = 0;\n        do {\n            Console.WriteLine($\"count: {count}\");\n            count++;\n        } while (count < 3);\n    }\n}",
+    "expectedOutput": [
+      "count: 0",
+      "count: 1",
+      "count: 2"
+    ],
+    "successMessage": "do-while is for situations where you need at least one execution — like 'show menu, then ask again if invalid input'."
+  },
+  {
+    "title": "foreach loop",
+    "instruction": "`foreach` iterates over any collection.\n\nRun this.",
+    "starter": "using System;\n\nclass Program {\n    static void Main() {\n        string[] langs = { \"Go\", \"Rust\", \"C#\", \"Python\" };\n        foreach (string lang in langs) {\n            Console.WriteLine(lang);\n        }\n    }\n}",
+    "expectedOutput": [
+      "Go",
+      "Rust",
+      "C#",
+      "Python"
+    ],
+    "successMessage": "foreach is the cleanest way to iterate — no index arithmetic, no off-by-one risk. Use it for collections whenever you do not need the index."
+  },
+  {
+    "title": "break and continue",
+    "instruction": "`break` exits the loop. `continue` skips to the next iteration.\n\nRun this.",
+    "starter": "using System;\n\nclass Program {\n    static void Main() {\n        for (int i = 1; i <= 10; i++) {\n            if (i % 3 == 0) continue;\n            if (i > 7) break;\n            Console.Write($\"{i} \");\n        }\n        Console.WriteLine();\n    }\n}",
+    "expectedOutput": [
+      "1 2 4 5 7 "
+    ],
+    "successMessage": "Multiples of 3 are skipped (continue). The loop stops after 7 (break). 3, 6, and 8+ are not printed."
+  },
+  {
+    "title": "Nested loops",
+    "instruction": "Loops can be nested. Use descriptive variable names.\n\nRun this.",
+    "starter": "using System;\n\nclass Program {\n    static void Main() {\n        for (int row = 1; row <= 3; row++) {\n            for (int col = 1; col <= 3; col++) {\n                Console.Write($\"{row*col} \");\n            }\n            Console.WriteLine();\n        }\n    }\n}",
+    "expectedOutput": [
+      "1 2 3 ",
+      "2 4 6 ",
+      "3 6 9 "
+    ],
+    "successMessage": "A 3x3 multiplication table. Inner loop runs completely for each outer loop iteration."
+  },
+  {
+    "title": "Loop over indices with LINQ range",
+    "instruction": "Use `Enumerable.Range` for index-based loops without a traditional for.\n\nRun this.",
+    "starter": "using System;\nusing System.Linq;\n\nclass Program {\n    static void Main() {\n        var squares = Enumerable.Range(1, 5).Select(i => i * i);\n        foreach (var s in squares) {\n            Console.Write($\"{s} \");\n        }\n        Console.WriteLine();\n    }\n}",
+    "expectedOutput": [
+      "1 4 9 16 25 "
+    ],
+    "successMessage": "Enumerable.Range(1,5) generates 1,2,3,4,5. Select transforms each. This is the LINQ way of a for loop — useful in method chains."
+  }
+]

@@ -1,0 +1,86 @@
+[
+  {
+    "title": "Basic async method",
+    "instruction": "An `async` method can use `await`. It returns `Task` (void) or `Task<T>` (value).\n\nRun this.",
+    "starter": "using System;\nusing System.Threading.Tasks;\n\nstatic async Task<string> GetGreetingAsync(string name) {\n    await Task.Delay(10); // simulate async work\n    return $\"Hello, {name}!\";\n}\n\nclass Program {\n    static async Task Main() {\n        string greeting = await GetGreetingAsync(\"C#\");\n        Console.WriteLine(greeting);\n    }\n}",
+    "expectedOutput": [
+      "Hello, C#!"
+    ],
+    "successMessage": "await suspends the method until the Task completes, then continues. The thread is not blocked — it can do other work while waiting."
+  },
+  {
+    "title": "Returning Task<T>",
+    "instruction": "Async methods returning a value use `Task<T>`.\n\nRun this.",
+    "starter": "using System;\nusing System.Threading.Tasks;\n\nstatic async Task<int> AddAsync(int a, int b) {\n    await Task.Delay(1);\n    return a + b;\n}\n\nclass Program {\n    static async Task Main() {\n        int result = await AddAsync(3, 4);\n        Console.WriteLine($\"3 + 4 = {result}\");\n    }\n}",
+    "expectedOutput": [
+      "3 + 4 = 7"
+    ],
+    "successMessage": "Task<int> wraps the return value. await unwraps it. The async/await pair converts callbacks into sequential-looking code."
+  },
+  {
+    "title": "async void",
+    "instruction": "`async void` is for event handlers. Avoid it in other code — exceptions cannot be caught.\n\nRun this.",
+    "starter": "using System;\nusing System.Threading.Tasks;\n\nstatic async void FireAndForget() {\n    await Task.Delay(10);\n    Console.WriteLine(\"Fire and forget completed\");\n}\n\nclass Program {\n    static async Task Main() {\n        FireAndForget();\n        await Task.Delay(50); // wait long enough for it\n        Console.WriteLine(\"Main done\");\n    }\n}",
+    "expectedOutput": [
+      "Fire and forget completed",
+      "Main done"
+    ],
+    "successMessage": "async void fires without waiting. Use it only for event handlers. In other code, return Task so callers can await and catch exceptions."
+  },
+  {
+    "title": "Task.WhenAll — parallel tasks",
+    "instruction": "Run multiple async operations in parallel with `Task.WhenAll`.\n\nRun this.",
+    "starter": "using System;\nusing System.Threading.Tasks;\n\nstatic async Task<int> FetchDataAsync(int id) {\n    await Task.Delay(10 * id);\n    return id * 10;\n}\n\nclass Program {\n    static async Task Main() {\n        var tasks = new[] {\n            FetchDataAsync(1),\n            FetchDataAsync(2),\n            FetchDataAsync(3)\n        };\n        int[] results = await Task.WhenAll(tasks);\n        Console.WriteLine(string.Join(\" \", results));\n    }\n}",
+    "expectedOutput": [
+      "10 20 30"
+    ],
+    "successMessage": "Task.WhenAll starts all tasks, then awaits all of them. Total time is the max of individual times, not the sum — real parallelism."
+  },
+  {
+    "title": "Task.WhenAny — first wins",
+    "instruction": "`Task.WhenAny` returns when the FIRST task completes.\n\nRun this.",
+    "starter": "using System;\nusing System.Threading.Tasks;\n\nstatic async Task<string> SlowAsync() {\n    await Task.Delay(100);\n    return \"slow\";\n}\n\nstatic async Task<string> FastAsync() {\n    await Task.Delay(10);\n    return \"fast\";\n}\n\nclass Program {\n    static async Task Main() {\n        Task<string> first = await Task.WhenAny(SlowAsync(), FastAsync());\n        Console.WriteLine(await first);\n    }\n}",
+    "expectedOutput": [
+      "fast"
+    ],
+    "successMessage": "WhenAny returns when the fastest task finishes. Useful for timeouts: race a real operation against Task.Delay."
+  },
+  {
+    "title": "CancellationToken",
+    "instruction": "Pass a `CancellationToken` to cancel long-running operations.\n\nRun this.",
+    "starter": "using System;\nusing System.Threading;\nusing System.Threading.Tasks;\n\nstatic async Task LongOperationAsync(CancellationToken ct) {\n    for (int i = 0; i < 10; i++) {\n        ct.ThrowIfCancellationRequested();\n        await Task.Delay(10, ct);\n        Console.Write($\"{i} \");\n    }\n}\n\nclass Program {\n    static async Task Main() {\n        using var cts = new CancellationTokenSource(TimeSpan.FromMilliseconds(35));\n        try {\n            await LongOperationAsync(cts.Token);\n        } catch (OperationCanceledException) {\n            Console.WriteLine();\n            Console.WriteLine(\"Cancelled!\");\n        }\n    }\n}",
+    "expectedOutput": [],
+    "codeChecks": [
+      {
+        "pattern": "CancellationToken",
+        "required": true,
+        "message": "Use CancellationToken to support cancellation."
+      },
+      {
+        "pattern": "ThrowIfCancellationRequested",
+        "required": true,
+        "message": "Check for cancellation inside the loop."
+      }
+    ],
+    "successMessage": "The operation is cancelled after ~35ms. OperationCanceledException signals cancellation. CancellationToken is the cooperative cancellation pattern in .NET."
+  },
+  {
+    "title": "ValueTask for hot paths",
+    "instruction": "`ValueTask<T>` avoids heap allocation when the result is often synchronously available.\n\nRun this.",
+    "starter": "using System;\nusing System.Threading.Tasks;\n\nstatic async ValueTask<int> GetCachedValueAsync(bool useCache) {\n    if (useCache) return 42; // synchronous fast path\n    await Task.Delay(1);\n    return 99;\n}\n\nclass Program {\n    static async Task Main() {\n        Console.WriteLine(await GetCachedValueAsync(true));\n        Console.WriteLine(await GetCachedValueAsync(false));\n    }\n}",
+    "expectedOutput": [
+      "42",
+      "99"
+    ],
+    "successMessage": "ValueTask avoids allocating a Task object on the heap when the result is already available. Use it for high-performance code where the sync path is common."
+  },
+  {
+    "title": "Async streams",
+    "instruction": "`IAsyncEnumerable<T>` is async foreach — items arrive over time.\n\nRun this.",
+    "starter": "using System;\nusing System.Collections.Generic;\nusing System.Threading.Tasks;\n\nstatic async IAsyncEnumerable<int> GenerateAsync() {\n    for (int i = 1; i <= 5; i++) {\n        await Task.Delay(5);\n        yield return i;\n    }\n}\n\nclass Program {\n    static async Task Main() {\n        await foreach (int n in GenerateAsync()) {\n            Console.Write($\"{n} \");\n        }\n        Console.WriteLine();\n    }\n}",
+    "expectedOutput": [
+      "1 2 3 4 5 "
+    ],
+    "successMessage": "IAsyncEnumerable combined with await foreach handles streaming data — useful for paginated APIs, live feeds, or large database result sets."
+  }
+]

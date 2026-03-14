@@ -1,98 +1,16 @@
 ---
 title: "Getting Started with Rust"
-description: "Write your first Rust program, understand the main function, and learn how Rust compiles and runs."
+description: "Write your first Rust program, understand the basic structure, and get comfortable with println!."
 order: 1
 difficulty: "beginner"
-estimatedMinutes: 10
+estimatedMinutes: 12
+concepts: ["fn main", "println!", "compile", "entry point"]
 ---
 
-## What is Rust?
+## Your first Rust program
 
-Rust is a systems programming language focused on three goals: **safety**, **speed**, and **concurrency**. It achieves memory safety without a garbage collector through its unique ownership system.
+Rust programs start at `fn main()` — the entry point every program needs.
 
-**Why learn Rust?**
-- **Memory safe** — no null pointers, no data races, no use-after-free
-- **Blazing fast** — performance comparable to C and C++
-- **Modern tooling** — `cargo` handles builds, tests, and dependencies
-- **Growing demand** — used in OS kernels, WebAssembly, game engines, and CLI tools
+`println!` is a macro (notice the `!`) that prints a line of text to the console.
 
----
-
-## Running Rust
-
-```bash
-rustc --version      # check installed compiler
-rustc hello.rs       # compile a single file
-./hello              # run the binary
-```
-
-For projects, use **Cargo** (Rust's build tool and package manager):
-
-```bash
-cargo new my_project   # create a new project
-cd my_project
-cargo run              # compile and run
-cargo build            # compile only
-```
-
----
-
-## Hello, World!
-
-```rust
-fn main() {
-    println!("Hello, World!");
-}
-```
-
-- `fn main()` is the entry point — every Rust binary starts here.
-- `println!` is a **macro** (note the `!`). It prints a line followed by a newline.
-
-Click **Run** above to see the output.
-
----
-
-## Variables
-
-```rust
-let language = "Rust";   // immutable by default
-let version: u32 = 1;
-println!("Learning {} version {}", language, version);
-```
-
-Variables are **immutable by default**. Add `mut` to make one mutable:
-
-```rust
-let mut count = 0;
-count += 1;
-println!("{}", count); // 1
-```
-
----
-
-## Format Strings
-
-Use `{}` as a placeholder in `println!` and `format!`:
-
-```rust
-let name = "Learner";
-let greeting = format!("Hello, {}!", name);
-println!("{}", greeting); // Hello, Learner!
-```
-
----
-
-## Comments
-
-```rust
-// Single-line comment
-/* Multi-line
-   comment */
-println!("Comments are ignored"); // inline comment
-```
-
----
-
-## What's Next?
-
-You've run your first Rust program. Next: **variables and types** — immutability, scalar types, String vs &str, shadowing, and tuples.
+By the end of this chapter you will understand the shape of every Rust program you will ever write.

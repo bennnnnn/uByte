@@ -1,0 +1,82 @@
+[
+  {
+    "title": "Generic function",
+    "instruction": "A function with `<T>` works for any type.\n\nRun this.",
+    "starter": "fn first<T>(list: &[T]) -> &T {\n    &list[0]\n}\n\nfn main() {\n    let nums = vec![1, 2, 3];\n    let strs = vec![\"a\", \"b\", \"c\"];\n    println!(\"{}\", first(&nums));\n    println!(\"{}\", first(&strs));\n}",
+    "expectedOutput": [
+      "1",
+      "a"
+    ],
+    "successMessage": "The same function works for &[i32] and &[&str]. T is a placeholder that the compiler fills in based on usage."
+  },
+  {
+    "title": "Bounded generics",
+    "instruction": "Add trait bounds to restrict which types are accepted:\n\nRun this.",
+    "starter": "fn largest<T: PartialOrd>(list: &[T]) -> &T {\n    let mut largest = &list[0];\n    for item in list {\n        if item > largest { largest = item; }\n    }\n    largest\n}\n\nfn main() {\n    println!(\"{}\", largest(&[34, 50, 25, 100, 65]));\n    println!(\"{}\", largest(&[1.5, 2.7, 0.3]));\n}",
+    "expectedOutput": [
+      "100",
+      "2.7"
+    ],
+    "successMessage": "T: PartialOrd means 'T must support >'. Without the bound, the compiler cannot use > on T."
+  },
+  {
+    "title": "Generic struct",
+    "instruction": "Structs can be generic over one or more types.\n\nRun this.",
+    "starter": "#[derive(Debug)]\nstruct Pair<T> {\n    first: T,\n    second: T,\n}\n\nimpl<T: std::fmt::Display + PartialOrd> Pair<T> {\n    fn larger(&self) -> &T {\n        if self.first > self.second { &self.first } else { &self.second }\n    }\n}\n\nfn main() {\n    let p = Pair { first: 5, second: 3 };\n    println!(\"{:?} larger: {}\", p, p.larger());\n}",
+    "expectedOutput": [
+      "Pair { first: 5, second: 3 } larger: 5"
+    ],
+    "successMessage": "impl<T: ...> Pair<T> adds methods only when T satisfies the bounds. Types that don't implement Display + PartialOrd cannot call larger()."
+  },
+  {
+    "title": "Multiple type parameters",
+    "instruction": "Use multiple type parameters: `<T, U>`\n\nRun this.",
+    "starter": "#[derive(Debug)]\nstruct KeyValue<K, V> {\n    key: K,\n    value: V,\n}\n\nfn main() {\n    let entry = KeyValue { key: \"age\", value: 30 };\n    let entry2 = KeyValue { key: 1, value: 3.14 };\n    println!(\"{:?}\", entry);\n    println!(\"{:?}\", entry2);\n}",
+    "expectedOutput": [
+      "KeyValue { key: \"age\", value: 30 }",
+      "KeyValue { key: 1, value: 3.14 }"
+    ],
+    "successMessage": "K and V are independent type parameters. The struct adapts to whatever types you use — no runtime overhead."
+  },
+  {
+    "title": "Generic enum",
+    "instruction": "Option<T> and Result<T,E> are generic enums from the standard library. Write your own.\n\nRun this.",
+    "starter": "#[derive(Debug)]\nenum Maybe<T> {\n    Just(T),\n    Nothing,\n}\n\nfn safe_head<T: Clone>(v: &[T]) -> Maybe<T> {\n    if v.is_empty() { Maybe::Nothing } else { Maybe::Just(v[0].clone()) }\n}\n\nfn main() {\n    println!(\"{:?}\", safe_head(&[1, 2, 3]));\n    println!(\"{:?}\", safe_head::<i32>(&[]));\n}",
+    "expectedOutput": [
+      "Just(1)",
+      "Nothing"
+    ],
+    "successMessage": "Maybe<T> is essentially Option<T> reimplemented. Writing it yourself makes clear why Option is designed the way it is."
+  },
+  {
+    "title": "Zero-cost abstraction",
+    "instruction": "Generic code compiles to the same machine code as hand-written type-specific code.\n\nRun this.",
+    "starter": "fn add<T: std::ops::Add<Output = T>>(a: T, b: T) -> T {\n    a + b\n}\n\nfn main() {\n    println!(\"{}\", add(1_i32, 2));\n    println!(\"{}\", add(1.5_f64, 2.5));\n    println!(\"{}\", add(10_u64, 20));\n}",
+    "expectedOutput": [
+      "3",
+      "4",
+      "30"
+    ],
+    "successMessage": "The compiler generates three separate add functions — one per type. No boxing, no vtable, no runtime cost. This is Rust's zero-cost abstraction promise."
+  },
+  {
+    "title": "impl Trait in function position",
+    "instruction": "`impl Trait` as a parameter type is shorthand for a generic bound.\n\nRun this.",
+    "starter": "fn print_all(items: impl Iterator<Item = i32>) {\n    for item in items {\n        print!(\"{} \", item);\n    }\n    println!();\n}\n\nfn main() {\n    print_all(vec![1, 2, 3].into_iter());\n    print_all(1..=5);\n}",
+    "expectedOutput": [
+      "1 2 3 ",
+      "1 2 3 4 5 "
+    ],
+    "successMessage": "impl Iterator<Item=i32> means 'some type that is an Iterator producing i32'. Both Vec::IntoIter and Range implement it."
+  },
+  {
+    "title": "Phantom types",
+    "instruction": "Sometimes you want a type parameter for type safety without storing the value.\n\nRun this.",
+    "starter": "use std::marker::PhantomData;\n\nstruct Id<T> {\n    value: u64,\n    _marker: PhantomData<T>,\n}\n\nstruct User;\nstruct Post;\n\nfn main() {\n    let user_id: Id<User> = Id { value: 1, _marker: PhantomData };\n    let post_id: Id<Post> = Id { value: 1, _marker: PhantomData };\n    println!(\"user id: {}\", user_id.value);\n    println!(\"post id: {}\", post_id.value);\n    // Cannot mix them: user_id and post_id are different types\n}",
+    "expectedOutput": [
+      "user id: 1",
+      "post id: 1"
+    ],
+    "successMessage": "PhantomData marks the type parameter without storing data. Id<User> and Id<Post> are different types even though the inner value is the same u64."
+  }
+]

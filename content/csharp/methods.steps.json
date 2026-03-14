@@ -1,0 +1,92 @@
+[
+  {
+    "title": "Define and call a method",
+    "instruction": "Static methods in C# are defined inside a class.\n\nRun this.",
+    "starter": "using System;\n\nclass Program {\n    static void SayHello() {\n        Console.WriteLine(\"Hello from a method!\");\n    }\n\n    static void Main() {\n        SayHello();\n        SayHello();\n    }\n}",
+    "expectedOutput": [
+      "Hello from a method!",
+      "Hello from a method!"
+    ],
+    "successMessage": "Methods package reusable behaviour. SayHello() called twice runs its body twice."
+  },
+  {
+    "title": "Parameters",
+    "instruction": "Parameters are declared with type and name.\n\nRun this.",
+    "starter": "using System;\n\nclass Program {\n    static void Greet(string name, int times) {\n        for (int i = 0; i < times; i++) {\n            Console.WriteLine($\"Hello, {name}!\");\n        }\n    }\n\n    static void Main() {\n        Greet(\"Alice\", 2);\n        Greet(\"Bob\", 1);\n    }\n}",
+    "expectedOutput": [
+      "Hello, Alice!",
+      "Hello, Alice!",
+      "Hello, Bob!"
+    ],
+    "successMessage": "Parameters make methods flexible. The caller controls which data gets processed."
+  },
+  {
+    "title": "Return values",
+    "instruction": "Methods can return a value with the `return` keyword. The return type is declared before the method name.\n\nRun this.",
+    "starter": "using System;\n\nclass Program {\n    static int Add(int a, int b) {\n        return a + b;\n    }\n\n    static double CircleArea(double r) {\n        return Math.PI * r * r;\n    }\n\n    static void Main() {\n        Console.WriteLine(Add(3, 4));\n        Console.WriteLine($\"{CircleArea(5):F2}\");\n    }\n}",
+    "expectedOutput": [
+      "7",
+      "78.54"
+    ],
+    "successMessage": "The return type (int, double) appears before the method name. void means 'returns nothing'."
+  },
+  {
+    "title": "Method overloading",
+    "instruction": "Multiple methods can share a name if they have different parameter types/counts.\n\nRun this.",
+    "starter": "using System;\n\nclass Program {\n    static int Add(int a, int b) { return a + b; }\n    static double Add(double a, double b) { return a + b; }\n    static int Add(int a, int b, int c) { return a + b + c; }\n\n    static void Main() {\n        Console.WriteLine(Add(1, 2));\n        Console.WriteLine(Add(1.5, 2.5));\n        Console.WriteLine(Add(1, 2, 3));\n    }\n}",
+    "expectedOutput": [
+      "3",
+      "4",
+      "6"
+    ],
+    "successMessage": "The compiler chooses the right overload based on argument types. This is compile-time polymorphism."
+  },
+  {
+    "title": "Optional parameters",
+    "instruction": "Parameters can have default values — callers can omit them.\n\nRun this.",
+    "starter": "using System;\n\nclass Program {\n    static void Log(string message, string level = \"INFO\", bool timestamp = false) {\n        string prefix = timestamp ? \"[12:00] \" : \"\";\n        Console.WriteLine($\"{prefix}[{level}] {message}\");\n    }\n\n    static void Main() {\n        Log(\"App started\");\n        Log(\"Connection failed\", \"ERROR\");\n        Log(\"Checkpoint\", \"DEBUG\", true);\n    }\n}",
+    "expectedOutput": [
+      "[INFO] App started",
+      "[ERROR] Connection failed",
+      "[12:00] [DEBUG] Checkpoint"
+    ],
+    "successMessage": "Optional parameters must come after required ones. Callers can supply them positionally or by name."
+  },
+  {
+    "title": "Named arguments",
+    "instruction": "Call with argument names to skip optionals or clarify code.\n\nRun this.",
+    "starter": "using System;\n\nclass Program {\n    static void CreateUser(string name, int age = 0, bool admin = false) {\n        Console.WriteLine($\"{name} age={age} admin={admin}\");\n    }\n\n    static void Main() {\n        CreateUser(\"Alice\", admin: true);\n        CreateUser(name: \"Bob\", age: 25);\n    }\n}",
+    "expectedOutput": [
+      "Alice age=0 admin=True",
+      "Bob age=25 admin=False"
+    ],
+    "successMessage": "Named arguments make calls self-documenting and allow skipping optional parameters."
+  },
+  {
+    "title": "out parameters",
+    "instruction": "`out` lets a method return multiple values.\n\nRun this.",
+    "starter": "using System;\n\nclass Program {\n    static bool Divide(int a, int b, out int result) {\n        if (b == 0) { result = 0; return false; }\n        result = a / b;\n        return true;\n    }\n\n    static void Main() {\n        if (Divide(10, 2, out int r)) {\n            Console.WriteLine($\"result: {r}\");\n        }\n        if (!Divide(10, 0, out int r2)) {\n            Console.WriteLine(\"division by zero\");\n        }\n    }\n}",
+    "expectedOutput": [
+      "result: 5",
+      "division by zero"
+    ],
+    "successMessage": "out parameters are declared at the call site with 'out'. TryParse uses this exact pattern."
+  },
+  {
+    "title": "Recursive methods",
+    "instruction": "Methods can call themselves. A base case prevents infinite recursion.\n\nRun this.",
+    "starter": "using System;\n\nclass Program {\n    static long Factorial(int n) {\n        if (n <= 1) return 1;\n        return n * Factorial(n - 1);\n    }\n\n    static void Main() {\n        for (int i = 0; i <= 8; i++) {\n            Console.WriteLine($\"{i}! = {Factorial(i)}\");\n        }\n    }\n}",
+    "expectedOutput": [
+      "0! = 1",
+      "1! = 1",
+      "2! = 2",
+      "3! = 6",
+      "4! = 24",
+      "5! = 120",
+      "6! = 720",
+      "7! = 5040",
+      "8! = 40320"
+    ],
+    "successMessage": "Each call reduces n by 1. When n reaches 1, recursion stops. Stack depth = n, so this is not suitable for very large n."
+  }
+]

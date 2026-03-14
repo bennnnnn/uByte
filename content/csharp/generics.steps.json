@@ -1,0 +1,83 @@
+[
+  {
+    "title": "Generic method",
+    "instruction": "A generic method uses `<T>` as a placeholder type.\n\nRun this.",
+    "starter": "using System;\n\nstatic T Max<T>(T a, T b) where T : IComparable<T> =>\n    a.CompareTo(b) >= 0 ? a : b;\n\nclass Program {\n    static void Main() {\n        Console.WriteLine(Max(3, 7));\n        Console.WriteLine(Max(\"apple\", \"banana\"));\n        Console.WriteLine(Max(3.14, 2.72));\n    }\n}",
+    "expectedOutput": [
+      "7",
+      "banana",
+      "3.14"
+    ],
+    "successMessage": "Max works for any type that implements IComparable<T>. The where clause constrains T."
+  },
+  {
+    "title": "Generic class",
+    "instruction": "A generic class holds data of any type while remaining type-safe.\n\nRun this.",
+    "starter": "using System;\n\nclass Box<T> {\n    public T Value { get; set; }\n    public Box(T value) { Value = value; }\n    public override string ToString() => $\"Box[{Value}]\";\n}\n\nclass Program {\n    static void Main() {\n        var intBox = new Box<int>(42);\n        var strBox = new Box<string>(\"hello\");\n        Console.WriteLine(intBox);\n        Console.WriteLine(strBox);\n        Console.WriteLine(intBox.Value + 1);\n    }\n}",
+    "expectedOutput": [
+      "Box[42]",
+      "Box[hello]",
+      "43"
+    ],
+    "successMessage": "Box<int> and Box<string> are two separate types generated from the same generic class. No casting needed."
+  },
+  {
+    "title": "Generic Stack",
+    "instruction": "Implement a stack that works for any element type.\n\nRun this.",
+    "starter": "using System;\nusing System.Collections.Generic;\n\nclass MyStack<T> {\n    private List<T> items = new();\n    public void Push(T item) => items.Add(item);\n    public T Pop() {\n        if (items.Count == 0) throw new InvalidOperationException(\"Stack is empty\");\n        T top = items[^1];\n        items.RemoveAt(items.Count - 1);\n        return top;\n    }\n    public int Count => items.Count;\n}\n\nclass Program {\n    static void Main() {\n        var stack = new MyStack<string>();\n        stack.Push(\"a\"); stack.Push(\"b\"); stack.Push(\"c\");\n        while (stack.Count > 0)\n            Console.Write(stack.Pop() + \" \");\n        Console.WriteLine();\n    }\n}",
+    "expectedOutput": [
+      "c b a "
+    ],
+    "successMessage": "MyStack<T> works for strings, ints, or any other type. [^1] is a C# 8 index-from-end — the last element."
+  },
+  {
+    "title": "Constraints (where)",
+    "instruction": "`where T : ...` constrains what types can be used.\n\nRun this.",
+    "starter": "using System;\n\nstatic T CreateAndInit<T>() where T : new() {\n    return new T();\n}\n\nclass Greeter {\n    public string Greet() => \"Hello from Greeter!\";\n}\n\nclass Program {\n    static void Main() {\n        var g = CreateAndInit<Greeter>();\n        Console.WriteLine(g.Greet());\n    }\n}",
+    "expectedOutput": [
+      "Hello from Greeter!"
+    ],
+    "successMessage": "where T : new() requires T to have a parameterless constructor. Other constraints: class (reference type), struct (value type), IComparable<T>, specific base class."
+  },
+  {
+    "title": "Multiple type parameters",
+    "instruction": "Generics can have multiple type parameters.\n\nRun this.",
+    "starter": "using System;\n\nclass Pair<TFirst, TSecond> {\n    public TFirst First { get; }\n    public TSecond Second { get; }\n    public Pair(TFirst f, TSecond s) { First = f; Second = s; }\n    public override string ToString() => $\"({First}, {Second})\";\n}\n\nclass Program {\n    static void Main() {\n        var p1 = new Pair<string, int>(\"age\", 30);\n        var p2 = new Pair<int, bool>(1, true);\n        Console.WriteLine(p1);\n        Console.WriteLine(p2);\n    }\n}",
+    "expectedOutput": [
+      "(age, 30)",
+      "(1, True)"
+    ],
+    "successMessage": "Multiple type parameters map to completely independent types. Pair<string,int> and Pair<int,bool> are different classes."
+  },
+  {
+    "title": "default(T)",
+    "instruction": "`default(T)` returns the default value for any type (null for reference types, 0 for numerics).\n\nRun this.",
+    "starter": "using System;\n\nstatic T GetOrDefault<T>(T[] arr, int index) {\n    if (index < 0 || index >= arr.Length)\n        return default(T);\n    return arr[index];\n}\n\nclass Program {\n    static void Main() {\n        int[] nums = { 10, 20, 30 };\n        Console.WriteLine(GetOrDefault(nums, 1));  // 20\n        Console.WriteLine(GetOrDefault(nums, 99)); // 0 (default int)\n        string[] strs = { \"hello\" };\n        Console.WriteLine(GetOrDefault(strs, 5) ?? \"null\"); // null -> \"null\"\n    }\n}",
+    "expectedOutput": [
+      "20",
+      "0",
+      "null"
+    ],
+    "successMessage": "default(T) is 0 for int, false for bool, null for reference types. Works for any T."
+  },
+  {
+    "title": "Generic repository pattern",
+    "instruction": "Generics are the foundation of most framework patterns, like the repository.\n\nRun this.",
+    "starter": "using System;\nusing System.Collections.Generic;\n\nclass Repository<T> {\n    private List<T> store = new();\n    public void Add(T item) => store.Add(item);\n    public int Count => store.Count;\n    public T Get(int index) => store[index];\n}\n\nclass Product { public string Name { get; set; } }\n\nclass Program {\n    static void Main() {\n        var repo = new Repository<Product>();\n        repo.Add(new Product { Name = \"Widget\" });\n        repo.Add(new Product { Name = \"Gadget\" });\n        Console.WriteLine($\"{repo.Count} products\");\n        Console.WriteLine(repo.Get(0).Name);\n    }\n}",
+    "expectedOutput": [
+      "2 products",
+      "Widget"
+    ],
+    "successMessage": "Repository<T> is completely generic — reuse it for Product, User, Order, anything. This is a simplified version of a very common enterprise pattern."
+  },
+  {
+    "title": "Covariance with out",
+    "instruction": "`IEnumerable<out T>` allows assigning a List<Dog> to IEnumerable<Animal>.\n\nRun this.",
+    "starter": "using System;\nusing System.Collections.Generic;\n\nclass Animal { public string Name { get; set; } }\nclass Dog : Animal {}\n\nclass Program {\n    static void Main() {\n        List<Dog> dogs = new() {\n            new Dog { Name = \"Rex\" },\n            new Dog { Name = \"Buddy\" }\n        };\n        IEnumerable<Animal> animals = dogs; // covariant!\n        foreach (var a in animals)\n            Console.WriteLine(a.Name);\n    }\n}",
+    "expectedOutput": [
+      "Rex",
+      "Buddy"
+    ],
+    "successMessage": "IEnumerable<out T> is covariant — a sequence of Dogs IS a sequence of Animals. This only works for interfaces declared with 'out'."
+  }
+]

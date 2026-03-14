@@ -1,0 +1,84 @@
+[
+  {
+    "title": "Define a record",
+    "instruction": "Records are concise immutable data containers.\n\nRun this.",
+    "starter": "using System;\n\nrecord Point(double X, double Y);\n\nclass Program {\n    static void Main() {\n        var p = new Point(3.0, 4.0);\n        Console.WriteLine(p);\n        Console.WriteLine(p.X);\n    }\n}",
+    "expectedOutput": [
+      "Point { X = 3, Y = 4 }",
+      "3"
+    ],
+    "successMessage": "The one-liner record Point(double X, double Y) generates everything: a constructor, X/Y properties, ToString, Equals, GetHashCode."
+  },
+  {
+    "title": "Value equality",
+    "instruction": "Records compare by value, not by reference.\n\nRun this.",
+    "starter": "using System;\n\nrecord Point(double X, double Y);\n\nclass Program {\n    static void Main() {\n        var p1 = new Point(1, 2);\n        var p2 = new Point(1, 2);\n        var p3 = new Point(3, 4);\n        Console.WriteLine(p1 == p2); // value equality\n        Console.WriteLine(p1 == p3);\n        Console.WriteLine(p1.Equals(p2));\n    }\n}",
+    "expectedOutput": [
+      "True",
+      "False",
+      "True"
+    ],
+    "successMessage": "Two separate Point instances with the same values are equal. Classes use reference equality by default. Records use value equality."
+  },
+  {
+    "title": "Non-destructive mutation with with",
+    "instruction": "`with` creates a copy with some properties changed.\n\nRun this.",
+    "starter": "using System;\n\nrecord Config(string Host, int Port, bool Debug);\n\nclass Program {\n    static void Main() {\n        var prod = new Config(\"example.com\", 443, false);\n        var dev = prod with { Host = \"localhost\", Debug = true };\n        Console.WriteLine(prod);\n        Console.WriteLine(dev);\n    }\n}",
+    "expectedOutput": [
+      "Config { Host = example.com, Port = 443, Debug = False }",
+      "Config { Host = localhost, Port = 443, Debug = True }"
+    ],
+    "successMessage": "with creates a new record, leaving the original unchanged. Immutable data structures and non-destructive mutation are functional programming patterns."
+  },
+  {
+    "title": "Record deconstruction",
+    "instruction": "Positional records support deconstruction.\n\nRun this.",
+    "starter": "using System;\n\nrecord Person(string Name, int Age);\n\nclass Program {\n    static void Main() {\n        var people = new[] {\n            new Person(\"Alice\", 30),\n            new Person(\"Bob\", 25),\n        };\n        foreach (var (name, age) in people) {\n            Console.WriteLine($\"{name}: {age}\");\n        }\n    }\n}",
+    "expectedOutput": [
+      "Alice: 30",
+      "Bob: 25"
+    ],
+    "successMessage": "Positional records generate a Deconstruct method. var (name, age) in people extracts each record's fields."
+  },
+  {
+    "title": "Record with custom members",
+    "instruction": "Add computed properties and methods to records.\n\nRun this.",
+    "starter": "using System;\n\nrecord Temperature(double Celsius) {\n    public double Fahrenheit => Celsius * 9 / 5 + 32;\n    public bool IsFreezing => Celsius <= 0;\n    public override string ToString() => $\"{Celsius}°C / {Fahrenheit:F1}°F\";\n}\n\nclass Program {\n    static void Main() {\n        var t = new Temperature(100);\n        Console.WriteLine(t);\n        Console.WriteLine(new Temperature(-5).IsFreezing);\n    }\n}",
+    "expectedOutput": [
+      "100°C / 212.0°F",
+      "True"
+    ],
+    "successMessage": "Records can have methods and computed properties like regular classes. ToString is overridden to format nicely."
+  },
+  {
+    "title": "Record struct",
+    "instruction": "`record struct` is a value type record (stack-allocated for small types).\n\nRun this.",
+    "starter": "using System;\n\nrecord struct Point2D(float X, float Y) {\n    public float Length => MathF.Sqrt(X * X + Y * Y);\n}\n\nclass Program {\n    static void Main() {\n        var p = new Point2D(3, 4);\n        Console.WriteLine(p);\n        Console.WriteLine(p.Length);\n        var q = p with { Y = 0 };\n        Console.WriteLine(q);\n    }\n}",
+    "expectedOutput": [
+      "Point2D { X = 3, Y = 4 }",
+      "5",
+      "Point2D { X = 3, Y = 0 }"
+    ],
+    "successMessage": "record struct is a value type — copied when assigned, no heap allocation for small structs. Still gets with and value equality."
+  },
+  {
+    "title": "Inheritance with records",
+    "instruction": "Records can inherit from other records.\n\nRun this.",
+    "starter": "using System;\n\nrecord Shape(string Color);\nrecord Circle(string Color, double Radius) : Shape(Color);\nrecord Square(string Color, double Side) : Shape(Color);\n\nclass Program {\n    static void Main() {\n        Shape[] shapes = {\n            new Circle(\"red\", 5),\n            new Square(\"blue\", 4)\n        };\n        foreach (var s in shapes)\n            Console.WriteLine(s);\n    }\n}",
+    "expectedOutput": [
+      "Circle { Color = red, Radius = 5 }",
+      "Square { Color = blue, Side = 4 }"
+    ],
+    "successMessage": "Records support inheritance. Each subtype adds its own properties. ToString shows all properties including inherited ones."
+  },
+  {
+    "title": "Records as DTOs",
+    "instruction": "Records excel as Data Transfer Objects (DTOs) in APIs.\n\nRun this.",
+    "starter": "using System;\nusing System.Text.Json;\n\nrecord UserDto(int Id, string Name, string Email);\n\nclass Program {\n    static void Main() {\n        var user = new UserDto(1, \"Alice\", \"alice@example.com\");\n        string json = JsonSerializer.Serialize(user);\n        Console.WriteLine(json);\n\n        var back = JsonSerializer.Deserialize<UserDto>(json);\n        Console.WriteLine(back == user);\n    }\n}",
+    "expectedOutput": [
+      "{\"Id\":1,\"Name\":\"Alice\",\"Email\":\"alice@example.com\"}",
+      "True"
+    ],
+    "successMessage": "Records serialise to JSON cleanly. Deserialised instance equals the original because records use value equality. Perfect for API request/response models."
+  }
+]

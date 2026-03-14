@@ -1,0 +1,86 @@
+[
+  {
+    "title": "Declare and assign",
+    "instruction": "Declare a variable with its type and name:\n\n```csharp\nint age = 25;\nstring name = \"Alice\";\n```\n\nRun this.",
+    "starter": "using System;\n\nclass Program {\n    static void Main() {\n        int age = 25;\n        string name = \"Alice\";\n        Console.WriteLine($\"{name} is {age}\");\n    }\n}",
+    "expectedOutput": [
+      "Alice is 25"
+    ],
+    "successMessage": "Explicit type declarations document intent. int means a 32-bit integer, string means text."
+  },
+  {
+    "title": "Type inference with var",
+    "instruction": "`var` lets the compiler infer the type from the initial value.\n\nThe type is still fixed at compile time — just not written out.\n\nRun this.",
+    "starter": "using System;\n\nclass Program {\n    static void Main() {\n        var x = 42;      // int\n        var pi = 3.14;   // double\n        var msg = \"hi\"; // string\n        Console.WriteLine($\"{x} {pi} {msg}\");\n    }\n}",
+    "expectedOutput": [
+      "42 3.14 hi"
+    ],
+    "successMessage": "var is not dynamic — it is static type inference. x is still an int, you just didn't write the word 'int'."
+  },
+  {
+    "title": "Reassigning variables",
+    "instruction": "Variables can change. Just use `=` (not `var` or type again).\n\nRun this.",
+    "starter": "using System;\n\nclass Program {\n    static void Main() {\n        int score = 0;\n        Console.WriteLine($\"start: {score}\");\n        score = 50;\n        Console.WriteLine($\"after: {score}\");\n        score += 25;\n        Console.WriteLine($\"final: {score}\");\n    }\n}",
+    "expectedOutput": [
+      "start: 0",
+      "after: 50",
+      "final: 75"
+    ],
+    "successMessage": "+= is shorthand for score = score + 25. C# also has -=, *=, /=, and %=."
+  },
+  {
+    "title": "Constants",
+    "instruction": "`const` creates a compile-time constant. The value can never change.\n\nNaming convention: ALL_CAPS or PascalCase.\n\nRun this.",
+    "starter": "using System;\n\nclass Program {\n    const double Pi = 3.14159;\n    const int MaxScore = 100;\n\n    static void Main() {\n        Console.WriteLine($\"Pi = {Pi}\");\n        Console.WriteLine($\"Max score = {MaxScore}\");\n    }\n}",
+    "expectedOutput": [
+      "Pi = 3.14159",
+      "Max score = 100"
+    ],
+    "successMessage": "const is evaluated at compile time. It cannot be changed anywhere in the program."
+  },
+  {
+    "title": "Multiple assignments",
+    "instruction": "Declare multiple variables on separate lines or assign several at once.\n\nRun this.",
+    "starter": "using System;\n\nclass Program {\n    static void Main() {\n        int a = 1, b = 2, c = 3;\n        Console.WriteLine($\"{a} {b} {c}\");\n\n        int x;\n        x = 10;\n        Console.WriteLine(x);\n    }\n}",
+    "expectedOutput": [
+      "1 2 3",
+      "10"
+    ],
+    "successMessage": "You can declare multiple variables of the same type in one line. You can also declare first and assign later (x must be assigned before use)."
+  },
+  {
+    "title": "Arithmetic operators",
+    "instruction": "Standard operators: `+`, `-`, `*`, `/`, `%`.\n\nNote: integer division truncates.\n\nRun this.",
+    "starter": "using System;\n\nclass Program {\n    static void Main() {\n        Console.WriteLine(10 + 3);\n        Console.WriteLine(10 - 3);\n        Console.WriteLine(10 * 3);\n        Console.WriteLine(10 / 3);\n        Console.WriteLine(10 % 3);\n    }\n}",
+    "expectedOutput": [
+      "13",
+      "7",
+      "30",
+      "3",
+      "1"
+    ],
+    "successMessage": "10 / 3 = 3 in integer division (truncated). Add a decimal: 10.0 / 3 = 3.333..."
+  },
+  {
+    "title": "Increment and decrement",
+    "instruction": "`++` and `--` increment and decrement by 1.\n\nRun this.",
+    "starter": "using System;\n\nclass Program {\n    static void Main() {\n        int count = 0;\n        count++;\n        count++;\n        count++;\n        Console.WriteLine(count);\n        count--;\n        Console.WriteLine(count);\n    }\n}",
+    "expectedOutput": [
+      "3",
+      "2"
+    ],
+    "successMessage": "++ and -- are shorthand for += 1 and -= 1. Very common in loops."
+  },
+  {
+    "title": "Checking types with GetType",
+    "instruction": "Every variable has a type. Use `.GetType()` to inspect it at runtime.\n\nRun this.",
+    "starter": "using System;\n\nclass Program {\n    static void Main() {\n        var n = 42;\n        var d = 3.14;\n        var s = \"hello\";\n        var b = true;\n        Console.WriteLine(n.GetType());\n        Console.WriteLine(d.GetType());\n        Console.WriteLine(s.GetType());\n        Console.WriteLine(b.GetType());\n    }\n}",
+    "expectedOutput": [
+      "System.Int32",
+      "System.Double",
+      "System.String",
+      "System.Boolean"
+    ],
+    "successMessage": "var inferred int, double, string, bool. C# types are System.Int32, System.Double, etc. The short names are aliases."
+  }
+]

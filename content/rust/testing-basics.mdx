@@ -1,39 +1,14 @@
 ---
-title: "Testing in Rust"
-description: "Write and run unit tests with #[test] and cargo test."
-order: 16
+title: "Testing"
+description: "Write unit tests with #[test], use assert macros, and organise tests in Rust."
+order: 24
 difficulty: "intermediate"
-estimatedMinutes: 12
+estimatedMinutes: 18
+concepts: ["#[test]", "assert_eq!", "assert!", "assert_ne!", "#[should_panic]", "test module", "Result in tests"]
 ---
 
-## Concepts in this chapter
+## Built-in testing
 
-You will learn and practice:
+Rust has first-class testing support built into the language. No external frameworks needed for unit tests.
 
-- **#[test]** — mark a function as a test
-- **assert!** — assert!(condition)
-- **assert_eq!** — assert_eq!(expected, actual)
-- **#[cfg(test)]** — compile tests only when testing
-- **cargo test** — run all tests
-
----
-
-## Simple Test
-
-```rust
-#[cfg(test)]
-mod tests {
-    #[test]
-    fn it_works() {
-        assert_eq!(2 + 2, 4);
-    }
-}
-```
-
-In the exercise we simulate the test by calling the function and printing pass/fail so the runner can check output.
-
----
-
-## What's Next?
-
-Next: **HTTP with reqwest** — make HTTP requests (or use std for basics).
+Run tests with `cargo test`.

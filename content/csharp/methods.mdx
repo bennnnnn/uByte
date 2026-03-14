@@ -1,105 +1,14 @@
 ---
-title: "Extension Methods and LINQ"
-description: "Extension methods, static utility classes, operator overloading, and an intro to LINQ in C#."
-order: 11
-difficulty: "intermediate"
-estimatedMinutes: 12
+title: "Methods"
+description: "Define and call static methods, use parameters and return values, and understand method overloading."
+order: 7
+difficulty: "beginner"
+estimatedMinutes: 18
+concepts: ["static", "void", "return", "parameters", "overloading", "ref", "out", "optional parameters"]
 ---
 
-## Extension Methods
+## Methods
 
-Add methods to existing types **without modifying them**:
+Methods are functions inside a class. In C#, `static` methods belong to the class, not an instance.
 
-```csharp
-public static class StringExtensions {
-    public static bool IsPalindrome(this string s) {
-        var rev = new string(s.Reverse().ToArray());
-        return s.Equals(rev, StringComparison.OrdinalIgnoreCase);
-    }
-}
-
-Console.WriteLine("racecar".IsPalindrome());  // true
-Console.WriteLine("hello".IsPalindrome());    // false
-```
-
-The `this` keyword on the first parameter designates the target type.
-
----
-
-## Static Utility Classes
-
-```csharp
-public static class MathHelper {
-    public static double Clamp(double value, double min, double max) =>
-        Math.Max(min, Math.Min(max, value));
-}
-
-Console.WriteLine(MathHelper.Clamp(150, 0, 100));  // 100
-```
-
----
-
-## Operator Overloading
-
-```csharp
-struct Vector2 {
-    public double X, Y;
-    public Vector2(double x, double y) { X = x; Y = y; }
-
-    public static Vector2 operator +(Vector2 a, Vector2 b) =>
-        new(a.X + b.X, a.Y + b.Y);
-
-    public override string ToString() => $"({X}, {Y})";
-}
-
-var v1 = new Vector2(1, 2);
-var v2 = new Vector2(3, 4);
-Console.WriteLine(v1 + v2);  // (4, 6)
-```
-
----
-
-## Introduction to LINQ
-
-Language Integrated Query — query collections with a SQL-like syntax:
-
-```csharp
-int[] nums = { 5, 2, 8, 1, 9, 3 };
-
-// Query syntax
-var evens = from n in nums
-            where n % 2 == 0
-            orderby n
-            select n;
-
-// Method syntax (more common)
-var evens2 = nums.Where(n => n % 2 == 0).OrderBy(n => n);
-
-foreach (var n in evens2) Console.Write(n + " ");  // 2 8
-```
-
----
-
-## Common LINQ Methods
-
-```csharp
-var nums = new[] { 1, 2, 3, 4, 5, 6 };
-
-nums.Where(x => x > 3)           // filter
-    .Select(x => x * x)          // transform
-    .Sum()                        // aggregate
-;
-
-nums.First(x => x > 3);          // 4
-nums.FirstOrDefault(x => x > 9); // 0 (default)
-nums.Any(x => x > 5);            // true
-nums.All(x => x > 0);            // true
-nums.Count(x => x % 2 == 0);     // 3
-nums.OrderByDescending(x => x).Take(3).ToList();  // [6,5,4]
-```
-
----
-
-## What's Next?
-
-You can query and transform data elegantly. Next: **interfaces** — contracts, polymorphism, and dependency injection patterns.
+Later you will see instance methods (on objects). For now, static methods work just like regular functions.

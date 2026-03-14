@@ -1,0 +1,88 @@
+[
+  {
+    "title": "Create and configure HttpClient",
+    "instruction": "Create an HttpClient and set headers.\n\nRun this.",
+    "starter": "using System;\nusing System.Net.Http;\nusing System.Threading.Tasks;\n\nclass Program {\n    static async Task Main() {\n        using var client = new HttpClient();\n        client.DefaultRequestHeaders.Add(\"User-Agent\", \"uByte-Tutorial\");\n        Console.WriteLine(\"HttpClient ready\");\n        Console.WriteLine(client.DefaultRequestHeaders.UserAgent.ToString());\n    }\n}",
+    "expectedOutput": [
+      "HttpClient ready",
+      "uByte-Tutorial"
+    ],
+    "successMessage": "HttpClient is reusable — create once, reuse across calls. using disposes it properly."
+  },
+  {
+    "title": "GET a string",
+    "instruction": "`GetStringAsync` fetches a URL and returns the body as a string.\n\nRun this.",
+    "starter": "using System;\nusing System.Net.Http;\nusing System.Threading.Tasks;\n\nclass Program {\n    static async Task Main() {\n        using var client = new HttpClient();\n        // Use a public echo API\n        var json = await client.GetStringAsync(\"https://httpbin.org/get\");\n        Console.WriteLine(json.Contains(\"uByte-Tutorial\") ? \"found header\" : \"header missing\");\n        Console.WriteLine(\"request complete\");\n    }\n}",
+    "expectedOutput": [],
+    "codeChecks": [
+      {
+        "pattern": "GetStringAsync",
+        "required": true,
+        "message": "Use GetStringAsync to fetch the URL."
+      },
+      {
+        "pattern": "await",
+        "required": true,
+        "message": "Use await before the async call."
+      }
+    ],
+    "successMessage": "GetStringAsync is the simplest way to fetch text content. It throws HttpRequestException on network errors or non-2xx responses."
+  },
+  {
+    "title": "Check status code",
+    "instruction": "`GetAsync` gives you the full response including status code.\n\nRun this.",
+    "starter": "using System;\nusing System.Net.Http;\nusing System.Threading.Tasks;\n\nclass Program {\n    static async Task Main() {\n        using var client = new HttpClient();\n        HttpResponseMessage response = await client.GetAsync(\"https://httpbin.org/status/200\");\n        Console.WriteLine((int)response.StatusCode);\n        Console.WriteLine(response.IsSuccessStatusCode);\n    }\n}",
+    "expectedOutput": [
+      "200",
+      "True"
+    ],
+    "successMessage": "GetAsync returns HttpResponseMessage. StatusCode is the HTTP status. IsSuccessStatusCode is true for 200-299."
+  },
+  {
+    "title": "Deserialise JSON",
+    "instruction": "Use `JsonSerializer.Deserialize<T>` to parse JSON into a C# object.\n\nRun this.",
+    "starter": "using System;\nusing System.Text.Json;\n\nrecord WeatherData(string City, double TempC, string Condition);\n\nclass Program {\n    static void Main() {\n        string json = \"\"\"{\"City\":\"London\",\"TempC\":15.5,\"Condition\":\"Cloudy\"}\"\"\";\n        var weather = JsonSerializer.Deserialize<WeatherData>(json,\n            new JsonSerializerOptions { PropertyNameCaseInsensitive = true });\n        Console.WriteLine($\"{weather.City}: {weather.TempC}C, {weather.Condition}\");\n    }\n}",
+    "expectedOutput": [
+      "London: 15.5C, Cloudy"
+    ],
+    "successMessage": "JsonSerializer.Deserialize maps JSON to a C# type. PropertyNameCaseInsensitive handles mixed-case JSON keys."
+  },
+  {
+    "title": "Serialise to JSON",
+    "instruction": "`JsonSerializer.Serialize<T>` converts an object to JSON.\n\nRun this.",
+    "starter": "using System;\nusing System.Text.Json;\n\nrecord User(int Id, string Name, string Email);\n\nclass Program {\n    static void Main() {\n        var user = new User(1, \"Alice\", \"alice@example.com\");\n        string json = JsonSerializer.Serialize(user,\n            new JsonSerializerOptions { WriteIndented = true });\n        Console.WriteLine(json);\n    }\n}",
+    "expectedOutput": [
+      "{\n  \"Id\": 1,\n  \"Name\": \"Alice\",\n  \"Email\": \"alice@example.com\"\n}"
+    ],
+    "successMessage": "WriteIndented=true produces formatted JSON. Use it for debug output. Leave it false for API responses to save bandwidth."
+  },
+  {
+    "title": "POST with JSON body",
+    "instruction": "Send a POST request with a JSON body.\n\nRun this.",
+    "starter": "using System;\nusing System.Net.Http;\nusing System.Net.Http.Json;\nusing System.Threading.Tasks;\n\nrecord Todo(string Title, bool Completed);\n\nclass Program {\n    static async Task Main() {\n        using var client = new HttpClient();\n        var todo = new Todo(\"Learn C#\", false);\n        var response = await client.PostAsJsonAsync(\n            \"https://jsonplaceholder.typicode.com/todos\", todo);\n        Console.WriteLine(response.StatusCode);\n    }\n}",
+    "expectedOutput": [
+      "Created"
+    ],
+    "successMessage": "PostAsJsonAsync serialises the object and sets Content-Type: application/json automatically. It is the clean way to POST JSON."
+  },
+  {
+    "title": "Error handling",
+    "instruction": "Handle HTTP errors gracefully.\n\nRun this.",
+    "starter": "using System;\nusing System.Net.Http;\nusing System.Threading.Tasks;\n\nstatic async Task FetchSafely(string url) {\n    using var client = new HttpClient();\n    try {\n        var response = await client.GetAsync(url);\n        response.EnsureSuccessStatusCode();\n        Console.WriteLine($\"{(int)response.StatusCode}: success\");\n    } catch (HttpRequestException ex) {\n        Console.WriteLine($\"HTTP error: {ex.StatusCode}\");\n    } catch (Exception ex) {\n        Console.WriteLine($\"Error: {ex.Message}\");\n    }\n}\n\nclass Program {\n    static async Task Main() {\n        await FetchSafely(\"https://httpbin.org/status/200\");\n        await FetchSafely(\"https://httpbin.org/status/404\");\n    }\n}",
+    "expectedOutput": [
+      "200: success",
+      "HTTP error: NotFound"
+    ],
+    "successMessage": "EnsureSuccessStatusCode throws HttpRequestException for non-2xx responses. Catch it to handle 404, 500, etc. gracefully."
+  },
+  {
+    "title": "Query parameters and headers",
+    "instruction": "Build URLs with query strings and add headers.\n\nRun this.",
+    "starter": "using System;\nusing System.Net.Http;\nusing System.Threading.Tasks;\nusing System.Web;\n\nclass Program {\n    static async Task Main() {\n        using var client = new HttpClient();\n        client.DefaultRequestHeaders.Add(\"Accept\", \"application/json\");\n\n        var query = HttpUtility.ParseQueryString(string.Empty);\n        query[\"userId\"] = \"1\";\n        string url = $\"https://jsonplaceholder.typicode.com/todos?{query}\";\n        Console.WriteLine(url);\n\n        var response = await client.GetAsync(url);\n        Console.WriteLine($\"status: {(int)response.StatusCode}\");\n    }\n}",
+    "expectedOutput": [
+      "https://jsonplaceholder.typicode.com/todos?userId=1",
+      "status: 200"
+    ],
+    "successMessage": "HttpUtility.ParseQueryString builds a properly encoded query string. DefaultRequestHeaders sets headers on all requests from this client."
+  }
+]

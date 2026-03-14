@@ -1,42 +1,14 @@
 ---
-title: "Functions in Rust"
-description: "Define and call functions; pass arguments and return values."
-order: 8
+title: "Functions"
+description: "Define and call functions, pass parameters, return values, and understand Rust's expression-based returns."
+order: 6
 difficulty: "beginner"
-estimatedMinutes: 12
+estimatedMinutes: 18
+concepts: ["fn", "parameters", "->", "return", "last expression", "unit", "blocks as expressions"]
 ---
 
-## Concepts in this chapter
+## Functions
 
-You will learn and practice:
+Functions are the primary unit of code organisation in Rust.
 
-- **Function syntax** — `fn name(x: i32) -> i32 { }`
-- **Return** — last expression without semicolon, or `return` keyword
-- **Parameters** — pass by value (ownership moves for non-Copy types)
-- **Multiple return** — use a tuple `(i32, bool)`
-- **Unit type** — `()` for functions that don't return a value
-
----
-
-## Defining Functions
-
-```rust
-fn add(a: i32, b: i32) -> i32 {
-    a + b   // no semicolon = return value
-}
-
-fn greet(name: &str) {
-    println!("Hello, {}!", name);
-}
-
-fn main() {
-    println!("{}", add(3, 5));
-    greet("Rust");
-}
-```
-
----
-
-## What's Next?
-
-Next: **Ownership and References** — how Rust manages memory.
+Key insight: the last expression in a function body is its return value — no `return` keyword needed.

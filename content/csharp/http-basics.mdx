@@ -1,98 +1,14 @@
 ---
 title: "HTTP Basics"
-description: "Making HTTP requests with HttpClient, handling responses, headers, and REST patterns in C#."
-order: 17
+description: "Make HTTP requests with HttpClient, parse JSON responses, and handle HTTP errors."
+order: 25
 difficulty: "intermediate"
-estimatedMinutes: 12
+estimatedMinutes: 20
+concepts: ["HttpClient", "GetAsync", "PostAsync", "GetStringAsync", "JsonSerializer", "HttpResponseMessage", "StatusCode"]
 ---
 
-## HttpClient
+## HTTP and the web
 
-The standard way to make HTTP requests in .NET:
+`HttpClient` is the modern .NET way to make HTTP requests. Combine it with `async/await` for non-blocking network calls.
 
-```csharp
-using System.Net.Http;
-using System.Net.Http.Json;
-
-// Create once and reuse (avoid creating per-request — it exhausts sockets)
-using var client = new HttpClient {
-    BaseAddress = new Uri("https://jsonplaceholder.typicode.com"),
-};
-```
-
----
-
-## GET Request
-
-```csharp
-var response = await client.GetAsync("/posts/1");
-response.EnsureSuccessStatusCode();          // throws on 4xx/5xx
-
-string json = await response.Content.ReadAsStringAsync();
-Console.WriteLine(json);
-```
-
-Deserialize JSON directly:
-
-```csharp
-var post = await client.GetFromJsonAsync<Post>("/posts/1");
-Console.WriteLine(post?.Title);
-```
-
----
-
-## POST Request
-
-```csharp
-var newPost = new { title = "Hello", body = "World", userId = 1 };
-var response = await client.PostAsJsonAsync("/posts", newPost);
-response.EnsureSuccessStatusCode();
-
-var created = await response.Content.ReadFromJsonAsync<Post>();
-Console.WriteLine(created?.Id);
-```
-
----
-
-## Setting Headers
-
-```csharp
-client.DefaultRequestHeaders.Authorization =
-    new AuthenticationHeaderValue("Bearer", "your-token");
-
-client.DefaultRequestHeaders.Accept.Add(
-    new MediaTypeWithQualityHeaderValue("application/json"));
-```
-
----
-
-## Response Status Codes
-
-```csharp
-var response = await client.GetAsync("/items/999");
-
-if (response.StatusCode == System.Net.HttpStatusCode.NotFound) {
-    Console.WriteLine("Not found");
-} else if (!response.IsSuccessStatusCode) {
-    Console.WriteLine($"Error: {(int)response.StatusCode}");
-}
-```
-
----
-
-## IHttpClientFactory (Production Pattern)
-
-Register in DI and inject — avoids socket exhaustion:
-
-```csharp
-// In Program.cs / Startup.cs
-builder.Services.AddHttpClient<IMyApiClient, MyApiClient>(c => {
-    c.BaseAddress = new Uri("https://api.example.com");
-});
-```
-
----
-
-## What's Next?
-
-You can integrate any REST API. Next: **JSON encoding** — `System.Text.Json`, serialization, deserialization, and custom converters.
+`System.Text.Json` is the built-in JSON serialiser — fast, lightweight, and part of the standard library.

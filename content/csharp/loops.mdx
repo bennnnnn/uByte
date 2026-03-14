@@ -1,86 +1,12 @@
 ---
 title: "Loops"
-description: "for, while, do/while, foreach, and loop control (break/continue) in C#."
-order: 5
+description: "for, while, do-while, foreach — all the ways to repeat code in C#."
+order: 6
 difficulty: "beginner"
-estimatedMinutes: 10
+estimatedMinutes: 15
+concepts: ["for", "while", "do-while", "foreach", "break", "continue"]
 ---
 
-## for Loop
+## Repeating code
 
-```csharp
-for (int i = 0; i < 5; i++) {
-    Console.WriteLine(i);
-}
-// 0 1 2 3 4
-```
-
----
-
-## while Loop
-
-```csharp
-int count = 0;
-while (count < 3) {
-    Console.WriteLine(count);
-    count++;
-}
-```
-
----
-
-## do/while Loop
-
-Executes the body **at least once**:
-
-```csharp
-int n = 0;
-do {
-    Console.WriteLine(n);
-    n++;
-} while (n < 3);
-```
-
----
-
-## foreach Loop
-
-The cleanest way to iterate over a collection:
-
-```csharp
-string[] fruits = { "apple", "banana", "cherry" };
-foreach (string fruit in fruits) {
-    Console.WriteLine(fruit);
-}
-```
-
----
-
-## break and continue
-
-```csharp
-for (int i = 0; i < 10; i++) {
-    if (i == 5) break;        // exit the loop
-    if (i % 2 == 0) continue; // skip even numbers
-    Console.WriteLine(i);     // prints 1, 3
-}
-```
-
----
-
-## Nested Loops
-
-```csharp
-for (int row = 1; row <= 3; row++) {
-    for (int col = 1; col <= 3; col++) {
-        Console.Write($"{row * col,3}");
-    }
-    Console.WriteLine();
-}
-```
-
----
-
-## What's Next?
-
-You can loop over anything. Next: **arrays and collections** — arrays, `List<T>`, and basic collection operations.
+C# has four loop constructs. Use `foreach` for collections, `for` for index-based access, `while` for condition-based looping.

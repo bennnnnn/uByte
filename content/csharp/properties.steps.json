@@ -1,0 +1,78 @@
+[
+  {
+    "title": "Auto-properties",
+    "instruction": "Auto-properties generate a backing field automatically.\n\nRun this.",
+    "starter": "using System;\n\nclass Person {\n    public string Name { get; set; }\n    public int Age { get; set; }\n}\n\nclass Program {\n    static void Main() {\n        var p = new Person { Name = \"Alice\", Age = 30 };\n        Console.WriteLine($\"{p.Name} is {p.Age}\");\n        p.Age = 31;\n        Console.WriteLine(p.Age);\n    }\n}",
+    "expectedOutput": [
+      "Alice is 30",
+      "31"
+    ],
+    "successMessage": "{ get; set; } is the full auto-property. It generates a private backing field transparently."
+  },
+  {
+    "title": "Read-only property",
+    "instruction": "`{ get; }` without a setter makes the property read-only after construction.\n\nRun this.",
+    "starter": "using System;\n\nclass Circle {\n    public double Radius { get; }\n    public Circle(double r) { Radius = r; }\n    public double Area => Math.PI * Radius * Radius;\n}\n\nclass Program {\n    static void Main() {\n        var c = new Circle(5);\n        Console.WriteLine(c.Radius);\n        Console.WriteLine($\"{c.Area:F2}\");\n        // c.Radius = 10; // won't compile\n    }\n}",
+    "expectedOutput": [
+      "5",
+      "78.54"
+    ],
+    "successMessage": "Read-only properties can only be set in the constructor. Area uses an expression body (=>) — a computed property."
+  },
+  {
+    "title": "get with validation in set",
+    "instruction": "Provide logic in the setter to validate before accepting values.\n\nRun this.",
+    "starter": "using System;\n\nclass Temperature {\n    private double _celsius;\n\n    public double Celsius {\n        get => _celsius;\n        set {\n            if (value < -273.15) throw new ArgumentException(\"Below absolute zero!\");\n            _celsius = value;\n        }\n    }\n\n    public double Fahrenheit => _celsius * 9 / 5 + 32;\n}\n\nclass Program {\n    static void Main() {\n        var t = new Temperature { Celsius = 100 };\n        Console.WriteLine($\"{t.Celsius}C = {t.Fahrenheit}F\");\n    }\n}",
+    "expectedOutput": [
+      "100C = 212F"
+    ],
+    "successMessage": "The setter validates the value before assigning. Fahrenheit is a computed property — no backing field needed."
+  },
+  {
+    "title": "init-only properties",
+    "instruction": "`init` allows setting only during construction — immutable after.\n\nRun this.",
+    "starter": "using System;\n\nclass Config {\n    public string Host { get; init; }\n    public int Port { get; init; }\n}\n\nclass Program {\n    static void Main() {\n        var cfg = new Config { Host = \"example.com\", Port = 443 };\n        Console.WriteLine($\"{cfg.Host}:{cfg.Port}\");\n        // cfg.Port = 80; // won't compile — init-only\n    }\n}",
+    "expectedOutput": [
+      "example.com:443"
+    ],
+    "successMessage": "init-only properties enforce immutability after construction. Great for configuration and value objects."
+  },
+  {
+    "title": "Required properties (C# 11)",
+    "instruction": "`required` forces callers to initialise a property.\n\nRun this.",
+    "starter": "using System;\n\nclass Product {\n    public required string Name { get; init; }\n    public required decimal Price { get; init; }\n    public string Category { get; init; } = \"General\";\n}\n\nclass Program {\n    static void Main() {\n        var p = new Product { Name = \"Widget\", Price = 9.99m };\n        Console.WriteLine($\"{p.Name}: {p.Price:C} [{p.Category}]\");\n    }\n}",
+    "expectedOutput": [
+      "Widget: $9.99 [General]"
+    ],
+    "successMessage": "required ensures Name and Price are always set. Category has a default. Callers cannot create Product without providing the required properties."
+  },
+  {
+    "title": "Computed properties",
+    "instruction": "Properties without a setter compute their value from other properties.\n\nRun this.",
+    "starter": "using System;\n\nclass Rectangle {\n    public double Width { get; set; }\n    public double Height { get; set; }\n    public double Area => Width * Height;\n    public double Perimeter => 2 * (Width + Height);\n    public bool IsSquare => Width == Height;\n}\n\nclass Program {\n    static void Main() {\n        var r = new Rectangle { Width = 4, Height = 4 };\n        Console.WriteLine($\"area={r.Area} perimeter={r.Perimeter} square={r.IsSquare}\");\n    }\n}",
+    "expectedOutput": [
+      "area=16 perimeter=16 square=True"
+    ],
+    "successMessage": "Computed properties are recalculated every time they are accessed. They keep the class consistent — no stale cached values."
+  },
+  {
+    "title": "Private setter",
+    "instruction": "`{ get; private set; }` allows reading from outside but only setting from inside.\n\nRun this.",
+    "starter": "using System;\n\nclass Counter {\n    public int Count { get; private set; } = 0;\n    public void Increment() => Count++;\n    public void Reset() => Count = 0;\n}\n\nclass Program {\n    static void Main() {\n        var c = new Counter();\n        c.Increment(); c.Increment(); c.Increment();\n        Console.WriteLine(c.Count);\n        c.Reset();\n        Console.WriteLine(c.Count);\n        // c.Count = 5; // won't compile\n    }\n}",
+    "expectedOutput": [
+      "3",
+      "0"
+    ],
+    "successMessage": "private set means only Counter's own methods can change Count. External code can read it but not write it."
+  },
+  {
+    "title": "Static properties",
+    "instruction": "Static properties belong to the class, not instances.\n\nRun this.",
+    "starter": "using System;\n\nclass AppConfig {\n    public static string Version { get; } = \"1.0.0\";\n    public static string AppName { get; set; } = \"MyApp\";\n}\n\nclass Program {\n    static void Main() {\n        Console.WriteLine($\"{AppConfig.AppName} v{AppConfig.Version}\");\n        AppConfig.AppName = \"BetterApp\";\n        Console.WriteLine(AppConfig.AppName);\n    }\n}",
+    "expectedOutput": [
+      "MyApp v1.0.0",
+      "BetterApp"
+    ],
+    "successMessage": "Static properties are accessed via the class name. They share state across all code — useful for configuration and singletons."
+  }
+]

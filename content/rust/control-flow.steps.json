@@ -1,0 +1,80 @@
+[
+  {
+    "title": "if and else",
+    "instruction": "No parentheses needed around the condition. Braces are always required.\n\nRun this, then change x to 3 and run again.",
+    "starter": "fn main() {\n    let x = 10;\n    if x > 5 {\n        println!(\"big\");\n    } else {\n        println!(\"small\");\n    }\n}",
+    "expectedOutput": [
+      "big"
+    ],
+    "successMessage": "Rust's if looks clean without parentheses. The else is optional — omitting it means 'do nothing if false'."
+  },
+  {
+    "title": "else if chains",
+    "instruction": "Chain multiple conditions:\n\nRun this then change `score` to 75 and 45.",
+    "starter": "fn main() {\n    let score = 85;\n    if score >= 90 {\n        println!(\"A\");\n    } else if score >= 80 {\n        println!(\"B\");\n    } else if score >= 70 {\n        println!(\"C\");\n    } else {\n        println!(\"F\");\n    }\n}",
+    "expectedOutput": [
+      "B"
+    ],
+    "successMessage": "The first true condition wins. Remaining branches are skipped."
+  },
+  {
+    "title": "if as an expression",
+    "instruction": "Rust's if returns a value. Both branches must return the same type.\n\nRun this.",
+    "starter": "fn main() {\n    let n = 7;\n    let kind = if n % 2 == 0 { \"even\" } else { \"odd\" };\n    println!(\"{} is {}\", n, kind);\n}",
+    "expectedOutput": [
+      "7 is odd"
+    ],
+    "successMessage": "if as an expression replaces the ternary operator. The compiler enforces that both branches return the same type."
+  },
+  {
+    "title": "loop",
+    "instruction": "`loop` runs forever until `break`. It can also return a value via `break value`.\n\nRun this.",
+    "starter": "fn main() {\n    let mut count = 0;\n    let result = loop {\n        count += 1;\n        if count == 5 {\n            break count * 2;\n        }\n    };\n    println!(\"result: {}\", result);\n}",
+    "expectedOutput": [
+      "result: 10"
+    ],
+    "successMessage": "break count * 2 exits the loop and returns the value. That value is assigned to result. Loops as expressions are a clean Rust pattern."
+  },
+  {
+    "title": "while loop",
+    "instruction": "`while` repeats while a condition is true.\n\nRun this.",
+    "starter": "fn main() {\n    let mut n = 1;\n    while n <= 5 {\n        print!(\"{} \", n);\n        n += 1;\n    }\n    println!();\n}",
+    "expectedOutput": [
+      "1 2 3 4 5 "
+    ],
+    "successMessage": "println!() with no arguments prints just a newline. print! outputs without a newline."
+  },
+  {
+    "title": "for with a range",
+    "instruction": "`1..=5` is an inclusive range (1 through 5). `1..5` excludes the end.\n\nRun this.",
+    "starter": "fn main() {\n    for i in 1..=5 {\n        println!(\"{}\", i);\n    }\n}",
+    "expectedOutput": [
+      "1",
+      "2",
+      "3",
+      "4",
+      "5"
+    ],
+    "successMessage": "for with a range is idiomatic Rust for counted loops. No index variable to manage, no off-by-one risk."
+  },
+  {
+    "title": "for over a collection",
+    "instruction": "`for x in &collection` iterates over references to elements.\n\nRun this.",
+    "starter": "fn main() {\n    let langs = [\"Go\", \"Rust\", \"Python\"];\n    for lang in &langs {\n        println!(\"{}\", lang);\n    }\n}",
+    "expectedOutput": [
+      "Go",
+      "Rust",
+      "Python"
+    ],
+    "successMessage": "&langs borrows the array. Without &, the array would be moved into the loop and unusable afterwards."
+  },
+  {
+    "title": "continue",
+    "instruction": "`continue` skips to the next iteration.\n\nRun this.",
+    "starter": "fn main() {\n    for i in 1..=10 {\n        if i % 2 == 0 { continue; }\n        print!(\"{} \", i);\n    }\n    println!();\n}",
+    "expectedOutput": [
+      "1 3 5 7 9 "
+    ],
+    "successMessage": "continue skips even numbers. The rest of the loop body runs only for odd numbers."
+  }
+]

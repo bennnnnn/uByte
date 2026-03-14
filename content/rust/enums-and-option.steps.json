@@ -1,0 +1,82 @@
+[
+  {
+    "title": "Basic enum",
+    "instruction": "Define an enum with variants. Use `::` to construct a variant.\n\nRun this.",
+    "starter": "enum Direction {\n    North,\n    South,\n    East,\n    West,\n}\n\nfn describe(d: Direction) {\n    match d {\n        Direction::North => println!(\"Going north\"),\n        Direction::South => println!(\"Going south\"),\n        Direction::East  => println!(\"Going east\"),\n        Direction::West  => println!(\"Going west\"),\n    }\n}\n\nfn main() {\n    describe(Direction::North);\n    describe(Direction::East);\n}",
+    "expectedOutput": [
+      "Going north",
+      "Going east"
+    ],
+    "successMessage": "match on an enum must cover all variants — the compiler enforces exhaustive patterns."
+  },
+  {
+    "title": "Enums with data",
+    "instruction": "Enum variants can carry data of different types:\n\n```rust\nenum Shape {\n    Circle(f64),\n    Rectangle(f64, f64),\n}\n```\n\nRun this.",
+    "starter": "enum Shape {\n    Circle(f64),\n    Rectangle(f64, f64),\n}\n\nfn area(s: Shape) -> f64 {\n    match s {\n        Shape::Circle(r) => std::f64::consts::PI * r * r,\n        Shape::Rectangle(w, h) => w * h,\n    }\n}\n\nfn main() {\n    println!(\"{:.2}\", area(Shape::Circle(3.0)));\n    println!(\"{:.2}\", area(Shape::Rectangle(4.0, 5.0)));\n}",
+    "expectedOutput": [
+      "28.27",
+      "20.00"
+    ],
+    "successMessage": "Each variant can carry different data. Pattern matching extracts the values. This is Rust's algebraic data types."
+  },
+  {
+    "title": "Option<T> — no null",
+    "instruction": "`Option<T>` is either `Some(value)` or `None`. It replaces null.\n\nRun this.",
+    "starter": "fn divide(a: f64, b: f64) -> Option<f64> {\n    if b == 0.0 { None } else { Some(a / b) }\n}\n\nfn main() {\n    println!(\"{:?}\", divide(10.0, 2.0));\n    println!(\"{:?}\", divide(10.0, 0.0));\n}",
+    "expectedOutput": [
+      "Some(5.0)",
+      "None"
+    ],
+    "successMessage": "Some(5.0) wraps the result. None represents absence. The type signature tells callers this function might fail — they cannot ignore it."
+  },
+  {
+    "title": "Unwrapping Option",
+    "instruction": "`unwrap()` extracts the value from `Some`, panicking on `None`.\n\nUse it only when you are certain the value is Some.\n\nRun this.",
+    "starter": "fn main() {\n    let v = vec![1, 2, 3];\n    let first = v.first(); // Option<&i32>\n    println!(\"{}\", first.unwrap());\n\n    let empty: Vec<i32> = vec![];\n    println!(\"{:?}\", empty.first()); // None\n}",
+    "expectedOutput": [
+      "1",
+      "None"
+    ],
+    "successMessage": "first() returns Option because the vec might be empty. unwrap() is fine when you know it is Some. Use expect() to give a better panic message."
+  },
+  {
+    "title": "if let with Option",
+    "instruction": "`if let Some(x) = option` destructures Some without needing a full match.\n\nRun this.",
+    "starter": "fn find_first_even(nums: &[i32]) -> Option<i32> {\n    for &n in nums {\n        if n % 2 == 0 { return Some(n); }\n    }\n    None\n}\n\nfn main() {\n    let v = [1, 3, 4, 7, 8];\n    if let Some(n) = find_first_even(&v) {\n        println!(\"first even: {}\", n);\n    } else {\n        println!(\"no even numbers\");\n    }\n}",
+    "expectedOutput": [
+      "first even: 4"
+    ],
+    "successMessage": "if let is idiomatic for 'do this if the option has a value'. Cleaner than a full match when you only care about one variant."
+  },
+  {
+    "title": "unwrap_or and unwrap_or_else",
+    "instruction": "Provide a fallback instead of panicking:\n\nRun this.",
+    "starter": "fn main() {\n    let some_val: Option<i32> = Some(42);\n    let none_val: Option<i32> = None;\n\n    println!(\"{}\", some_val.unwrap_or(0));\n    println!(\"{}\", none_val.unwrap_or(0));\n    println!(\"{}\", none_val.unwrap_or_else(|| 99));\n}",
+    "expectedOutput": [
+      "42",
+      "0",
+      "99"
+    ],
+    "successMessage": "unwrap_or gives a default. unwrap_or_else takes a closure — useful when the default is expensive to compute."
+  },
+  {
+    "title": "Option methods: map and and_then",
+    "instruction": "`map` transforms the inner value. `and_then` chains Options.\n\nRun this.",
+    "starter": "fn main() {\n    let maybe: Option<i32> = Some(5);\n    let doubled = maybe.map(|x| x * 2);\n    println!(\"{:?}\", doubled);\n\n    let result = Some(\"42\")\n        .and_then(|s| s.parse::<i32>().ok());\n    println!(\"{:?}\", result);\n}",
+    "expectedOutput": [
+      "Some(10)",
+      "Some(42)"
+    ],
+    "successMessage": "map transforms inside Some, leaving None unchanged. and_then chains operations that might fail. These are the functional foundations of Option."
+  },
+  {
+    "title": "Nested Option with ?",
+    "instruction": "In functions returning Option, use `?` to propagate None automatically.\n\nRun this.",
+    "starter": "fn first_char(s: &str) -> Option<char> {\n    let c = s.chars().next()?;\n    Some(c.to_ascii_uppercase())\n}\n\nfn main() {\n    println!(\"{:?}\", first_char(\"hello\"));\n    println!(\"{:?}\", first_char(\"\"));\n}",
+    "expectedOutput": [
+      "Some('H')",
+      "None"
+    ],
+    "successMessage": "? on an Option returns None immediately if the value is None. Otherwise it unwraps Some. This makes chains of optional operations concise."
+  }
+]

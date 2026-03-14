@@ -1,0 +1,85 @@
+[
+  {
+    "title": "Basic match",
+    "instruction": "`match` compares a value against patterns and runs the first matching arm.\n\nEvery possible case must be covered.\n\nRun this.",
+    "starter": "fn main() {\n    let n = 3;\n    match n {\n        1 => println!(\"one\"),\n        2 => println!(\"two\"),\n        3 => println!(\"three\"),\n        _ => println!(\"other\"),\n    }\n}",
+    "expectedOutput": [
+      "three"
+    ],
+    "successMessage": "_ is the catch-all pattern. Without it, the compiler would complain that not all cases are handled."
+  },
+  {
+    "title": "Matching ranges",
+    "instruction": "Use `..=` to match a range of values in a pattern.\n\nRun this.",
+    "starter": "fn grade(score: u32) -> &'static str {\n    match score {\n        90..=100 => \"A\",\n        80..=89  => \"B\",\n        70..=79  => \"C\",\n        _        => \"F\",\n    }\n}\n\nfn main() {\n    println!(\"{}\", grade(95));\n    println!(\"{}\", grade(82));\n    println!(\"{}\", grade(60));\n}",
+    "expectedOutput": [
+      "A",
+      "B",
+      "F"
+    ],
+    "successMessage": "Range patterns 90..=100 match any value in that inclusive range. Elegant and readable."
+  },
+  {
+    "title": "Multiple patterns with |",
+    "instruction": "Use `|` to match multiple patterns in one arm.\n\nRun this.",
+    "starter": "fn main() {\n    for i in 1..=10 {\n        let label = match i {\n            1 | 2 | 3 => \"small\",\n            4 | 5 | 6 => \"medium\",\n            _          => \"large\",\n        };\n        println!(\"{}: {}\", i, label);\n    }\n}",
+    "expectedOutput": [
+      "1: small",
+      "2: small",
+      "3: small",
+      "4: medium",
+      "5: medium",
+      "6: medium",
+      "7: large",
+      "8: large",
+      "9: large",
+      "10: large"
+    ],
+    "successMessage": "| separates alternative patterns in a single arm. Both patterns must be the same type."
+  },
+  {
+    "title": "Destructuring tuples",
+    "instruction": "Match and destructure a tuple in one go.\n\nRun this.",
+    "starter": "fn main() {\n    let point = (3, -2);\n    match point {\n        (0, 0) => println!(\"origin\"),\n        (x, 0) => println!(\"on x-axis at {}\", x),\n        (0, y) => println!(\"on y-axis at {}\", y),\n        (x, y) => println!(\"at ({}, {})\", x, y),\n    }\n}",
+    "expectedOutput": [
+      "at (3, -2)"
+    ],
+    "successMessage": "Pattern (x, y) both matches and destructures in one step. The variables x and y are bound to the tuple elements."
+  },
+  {
+    "title": "Destructuring structs",
+    "instruction": "Match fields of a struct by name.\n\nRun this.",
+    "starter": "struct Point { x: i32, y: i32 }\n\nfn main() {\n    let p = Point { x: 0, y: 7 };\n    match p {\n        Point { x: 0, y } => println!(\"on y-axis at {}\", y),\n        Point { x, y: 0 } => println!(\"on x-axis at {}\", x),\n        Point { x, y }    => println!(\"at ({}, {})\", x, y),\n    }\n}",
+    "expectedOutput": [
+      "on y-axis at 7"
+    ],
+    "successMessage": "Struct patterns match specific field values and bind the rest. Unmatched fields use the field name as the variable name."
+  },
+  {
+    "title": "Match guards",
+    "instruction": "Add an `if` condition to a pattern arm — a guard:\n\nRun this.",
+    "starter": "fn main() {\n    let n = 4;\n    match n {\n        x if x < 0 => println!(\"{} is negative\", x),\n        x if x % 2 == 0 => println!(\"{} is positive even\", x),\n        x => println!(\"{} is positive odd\", x),\n    }\n}",
+    "expectedOutput": [
+      "4 is positive even"
+    ],
+    "successMessage": "Guards add conditions beyond what patterns alone can express. The variable x is bound first, then the guard is checked."
+  },
+  {
+    "title": "@ bindings",
+    "instruction": "Bind a name to the matched value while also testing a pattern:\n\nRun this.",
+    "starter": "fn main() {\n    let n = 15;\n    match n {\n        x @ 1..=12 => println!(\"{} is a month number\", x),\n        x @ 13..=19 => println!(\"{} is a teen\", x),\n        x => println!(\"{} is something else\", x),\n    }\n}",
+    "expectedOutput": [
+      "15 is a teen"
+    ],
+    "successMessage": "@ binds the matched value to x while the range pattern tests it. You get both the check and the variable."
+  },
+  {
+    "title": "while let",
+    "instruction": "`while let` loops as long as a pattern matches.\n\nRun this.",
+    "starter": "fn main() {\n    let mut stack = vec![1, 2, 3, 4, 5];\n    while let Some(top) = stack.pop() {\n        print!(\"{} \", top);\n    }\n    println!();\n}",
+    "expectedOutput": [
+      "5 4 3 2 1 "
+    ],
+    "successMessage": "while let Some(top) = stack.pop() loops until pop returns None (empty stack). Pattern matching controls the loop condition."
+  }
+]

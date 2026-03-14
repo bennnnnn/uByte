@@ -1,0 +1,83 @@
+[
+  {
+    "title": "Values drop at end of scope",
+    "instruction": "When a variable goes out of scope, Rust drops its value and frees memory.\n\nRun this.",
+    "starter": "fn main() {\n    {\n        let s = String::from(\"hello\");\n        println!(\"{}\", s);\n    } // s dropped here\n    println!(\"scope ended\");\n}",
+    "expectedOutput": [
+      "hello",
+      "scope ended"
+    ],
+    "successMessage": "No free() call needed. Rust inserts it automatically at the closing brace. This is deterministic destruction."
+  },
+  {
+    "title": "Move semantics",
+    "instruction": "Assigning a `String` moves ownership. The original variable becomes invalid.\n\nRun this — it will fail. Read the error.",
+    "hint": "s1 was moved to s2. Use s2, or clone s1 before moving.",
+    "starter": "fn main() {\n    let s1 = String::from(\"hello\");\n    let s2 = s1;\n    println!(\"{}\", s1); // error: s1 moved\n}",
+    "expectedOutput": [],
+    "codeChecks": [
+      {
+        "pattern": "println!.*s1",
+        "required": false,
+        "message": "s1 was moved into s2. Use s2 instead, or clone s1 before the assignment."
+      }
+    ],
+    "successMessage": "This prevents double-free. If both s1 and s2 tried to free the same memory, the program would crash. The move makes s1 invalid."
+  },
+  {
+    "title": "Clone",
+    "instruction": "`.clone()` makes a deep copy. Both variables own independent copies.\n\nRun this.",
+    "starter": "fn main() {\n    let s1 = String::from(\"hello\");\n    let s2 = s1.clone();\n    println!(\"s1={} s2={}\", s1, s2);\n}",
+    "expectedOutput": [
+      "s1=hello s2=hello"
+    ],
+    "successMessage": "clone allocates new heap memory and copies the data. Both s1 and s2 are valid. Clone is intentionally verbose — heap allocation costs time."
+  },
+  {
+    "title": "Copy types",
+    "instruction": "Simple stack types like integers implement `Copy`. Assigning them copies the value — no move.\n\nRun this.",
+    "starter": "fn main() {\n    let x = 5;\n    let y = x; // copy, not move\n    println!(\"x={} y={}\", x, y);\n}",
+    "expectedOutput": [
+      "x=5 y=5"
+    ],
+    "successMessage": "i32, f64, bool, char are all Copy. The stack copy is so cheap Rust does it automatically. Heap types like String are not Copy."
+  },
+  {
+    "title": "Passing to functions moves",
+    "instruction": "Passing a non-Copy value to a function moves it.\n\nRun this.",
+    "starter": "fn consume(s: String) {\n    println!(\"{}\", s);\n}\n\nfn main() {\n    let s = String::from(\"hello\");\n    consume(s);\n    // s is no longer valid\n    println!(\"done\");\n}",
+    "expectedOutput": [
+      "hello",
+      "done"
+    ],
+    "successMessage": "The function takes ownership of s. When consume returns, s is dropped. The caller can no longer use it."
+  },
+  {
+    "title": "Return gives back ownership",
+    "instruction": "A function can return a value to transfer ownership back to the caller.\n\nRun this.",
+    "starter": "fn make_greeting(name: &str) -> String {\n    format!(\"Hello, {}!\", name)\n}\n\nfn main() {\n    let g = make_greeting(\"Rustacean\");\n    println!(\"{}\", g);\n}",
+    "expectedOutput": [
+      "Hello, Rustacean!"
+    ],
+    "successMessage": "The function creates a String and returns it — ownership goes to g. When main ends, g is dropped."
+  },
+  {
+    "title": "Stack vs heap",
+    "instruction": "Stack values (integers, booleans, arrays of fixed size) implement Copy.\nHeap values (String, Vec) are moved.\n\nRun this.",
+    "starter": "fn main() {\n    // Stack - copied\n    let arr = [1, 2, 3]; // fixed size array: Copy\n    let arr2 = arr;\n    println!(\"{:?} {:?}\", arr, arr2);\n\n    // Heap - moved\n    let v: Vec<i32> = vec![1, 2, 3];\n    let v2 = v;\n    // v is moved -- use v2\n    println!(\"{:?}\", v2);\n}",
+    "expectedOutput": [
+      "[1, 2, 3] [1, 2, 3]",
+      "[1, 2, 3]"
+    ],
+    "successMessage": "Fixed-size arrays are Copy (stack-allocated). Vec is not Copy (heap-allocated). The pattern: if the size is known at compile time, it is usually Copy."
+  },
+  {
+    "title": "Ownership summary",
+    "instruction": "Three rules:\n1. Each value has exactly one owner\n2. There can only be one owner at a time\n3. When the owner goes out of scope, the value is dropped\n\nRun this to confirm.",
+    "starter": "fn main() {\n    let s = String::from(\"I am owned\");\n    let s2 = s; // move: s2 is now the owner\n    println!(\"{}\", s2); // use s2\n} // s2 dropped here — memory freed",
+    "expectedOutput": [
+      "I am owned"
+    ],
+    "successMessage": "Three rules, zero garbage collector. The compiler enforces all of this at compile time. No runtime overhead."
+  }
+]

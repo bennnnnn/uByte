@@ -1,0 +1,88 @@
+[
+  {
+    "title": "Integer types",
+    "instruction": "The most common integer is `i32`. Rust also has `i8`, `i16`, `i64`, `i128` and unsigned versions `u8`..`u128`.\n\nRun this.",
+    "starter": "fn main() {\n    let small: i8 = 100;\n    let normal: i32 = 1_000_000;\n    let big: i64 = 9_000_000_000;\n    println!(\"{} {} {}\", small, normal, big);\n}",
+    "expectedOutput": [
+      "100 1000000 9000000000"
+    ],
+    "successMessage": "Each integer type has a range. Use the smallest type that fits. The _ separator is purely visual — 1_000_000 equals 1000000."
+  },
+  {
+    "title": "Floating-point",
+    "instruction": "`f64` (double precision) is the default float type. Use `f32` only when memory is critical.\n\nRun this.",
+    "starter": "fn main() {\n    let x = 2.5;\n    let y: f32 = 3.0;\n    println!(\"{} {}\", x, y);\n    println!(\"{:.4}\", 22.0 / 7.0);\n}",
+    "expectedOutput": [
+      "2.5 3",
+      "3.1429"
+    ],
+    "successMessage": "{:.4} formats to 4 decimal places. f64 is the workhorse float for most Rust programs."
+  },
+  {
+    "title": "Integer arithmetic",
+    "instruction": "Standard operators: `+`, `-`, `*`, `/`, `%`. Integer division truncates.\n\nRun this.",
+    "starter": "fn main() {\n    println!(\"{}\", 10 + 3);\n    println!(\"{}\", 10 - 3);\n    println!(\"{}\", 10 * 3);\n    println!(\"{}\", 10 / 3);\n    println!(\"{}\", 10 % 3);\n}",
+    "expectedOutput": [
+      "13",
+      "7",
+      "30",
+      "3",
+      "1"
+    ],
+    "successMessage": "10 / 3 = 3 in integer division (truncated). The remainder operator % gives 1."
+  },
+  {
+    "title": "Boolean type",
+    "instruction": "A `bool` is `true` or `false`. Comparison operators produce booleans.\n\nRun this.",
+    "starter": "fn main() {\n    let t = true;\n    let f = false;\n    println!(\"{} {}\", t, f);\n    println!(\"{}\", 5 > 3);\n    println!(\"{}\", 5 == 5);\n    println!(\"{}\", !true);\n}",
+    "expectedOutput": [
+      "true false",
+      "true",
+      "true",
+      "false"
+    ],
+    "successMessage": "! negates a boolean. &&, ||, ! are the logical operators. Booleans are the fuel for all control flow."
+  },
+  {
+    "title": "The char type",
+    "instruction": "A `char` uses single quotes and stores a single Unicode scalar value — including emoji.\n\nRun this.",
+    "starter": "fn main() {\n    let letter = 'A';\n    let digit = '9';\n    let crab = '\\u{1F980}';\n    println!(\"{} {} {}\", letter, digit, crab);\n    println!(\"{}\", 'z' as u32);\n}",
+    "expectedOutput": [
+      "A 9 🦀",
+      "122"
+    ],
+    "successMessage": "Rust chars are 4 bytes and store any Unicode code point. 'z' as u32 gives its numeric value 122."
+  },
+  {
+    "title": "Type conversion with as",
+    "instruction": "Rust never converts types implicitly. Use `as` to convert between numerics.\n\nNote: converting float to int *truncates*, it does not round.\n\nRun this.",
+    "starter": "fn main() {\n    let x: i32 = 42;\n    let y = x as f64;\n    let z = 3.99_f64 as i32;\n    println!(\"{} {} {}\", x, y, z);\n}",
+    "expectedOutput": [
+      "42 42 3"
+    ],
+    "successMessage": "3.99 as i32 becomes 3 — truncation, not rounding. as is explicit, so you always know a conversion is happening."
+  },
+  {
+    "title": "Overflow behaviour",
+    "instruction": "In debug mode, integer overflow panics. In release mode it wraps.\n\nUse checked operations for safe arithmetic:\n\nRun this.",
+    "starter": "fn main() {\n    let x: i32 = i32::MAX;\n    println!(\"max i32: {}\", x);\n    println!(\"checked add: {:?}\", x.checked_add(1));\n    println!(\"saturating: {}\", x.saturating_add(1));\n}",
+    "expectedOutput": [
+      "max i32: 2147483647",
+      "checked add: None",
+      "saturating: 2147483647"
+    ],
+    "successMessage": "checked_add returns None on overflow. saturating_add clamps to MAX. These prevent silent data corruption."
+  },
+  {
+    "title": "Numeric methods",
+    "instruction": "Numbers have built-in methods. Explore a few.\n\nRun this.",
+    "starter": "fn main() {\n    let n: i32 = -42;\n    println!(\"{}\", n.abs());\n    println!(\"{}\", 2_i32.pow(8));\n    println!(\"{:.2}\", 2.0_f64.sqrt());\n    println!(\"{}\", i32::MIN);\n}",
+    "expectedOutput": [
+      "42",
+      "256",
+      "1.41",
+      "-2147483648"
+    ],
+    "successMessage": "abs, pow, sqrt — numeric methods make math expressive. i32::MIN is an associated constant giving the smallest i32 value."
+  }
+]

@@ -1,0 +1,85 @@
+[
+  {
+    "title": "Where (filter)",
+    "instruction": "`Where` filters elements matching a predicate.\n\nRun this.",
+    "starter": "using System;\nusing System.Linq;\nusing System.Collections.Generic;\n\nclass Program {\n    static void Main() {\n        var nums = new List<int> { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };\n        var evens = nums.Where(n => n % 2 == 0).ToList();\n        Console.WriteLine(string.Join(\" \", evens));\n    }\n}",
+    "expectedOutput": [
+      "2 4 6 8 10"
+    ],
+    "successMessage": "Where returns an IEnumerable, ToList materialises it. The lambda n => n % 2 == 0 is the predicate."
+  },
+  {
+    "title": "Select (transform)",
+    "instruction": "`Select` transforms each element.\n\nRun this.",
+    "starter": "using System;\nusing System.Linq;\nusing System.Collections.Generic;\n\nclass Program {\n    static void Main() {\n        var words = new[] { \"hello\", \"world\", \"linq\" };\n        var upper = words.Select(w => w.ToUpper()).ToList();\n        var lengths = words.Select(w => w.Length).ToList();\n        Console.WriteLine(string.Join(\" \", upper));\n        Console.WriteLine(string.Join(\" \", lengths));\n    }\n}",
+    "expectedOutput": [
+      "HELLO WORLD LINQ",
+      "5 5 4"
+    ],
+    "successMessage": "Select maps each element to a new value. The output type can be different from the input type."
+  },
+  {
+    "title": "Chaining LINQ operations",
+    "instruction": "Chain multiple LINQ methods to build a pipeline.\n\nRun this.",
+    "starter": "using System;\nusing System.Linq;\n\nclass Program {\n    static void Main() {\n        var nums = new[] { 3, 1, 4, 1, 5, 9, 2, 6, 5, 3, 5 };\n        var result = nums\n            .Where(n => n > 3)\n            .Distinct()\n            .OrderBy(n => n)\n            .ToList();\n        Console.WriteLine(string.Join(\" \", result));\n    }\n}",
+    "expectedOutput": [
+      "4 5 6 9"
+    ],
+    "successMessage": "Where filters > 3, Distinct removes duplicates, OrderBy sorts. Chains read naturally left to right."
+  },
+  {
+    "title": "OrderBy and ThenBy",
+    "instruction": "Sort with `OrderBy` and add secondary sort with `ThenBy`.\n\nRun this.",
+    "starter": "using System;\nusing System.Linq;\n\nclass Student {\n    public string Name { get; set; }\n    public int Grade { get; set; }\n}\n\nclass Program {\n    static void Main() {\n        var students = new[] {\n            new Student { Name = \"Carol\", Grade = 85 },\n            new Student { Name = \"Alice\", Grade = 92 },\n            new Student { Name = \"Bob\",   Grade = 85 }\n        };\n        var sorted = students.OrderBy(s => s.Grade).ThenBy(s => s.Name);\n        foreach (var s in sorted)\n            Console.WriteLine($\"{s.Name}: {s.Grade}\");\n    }\n}",
+    "expectedOutput": [
+      "Bob: 85",
+      "Carol: 85",
+      "Alice: 92"
+    ],
+    "successMessage": "OrderBy sorts by Grade. ThenBy breaks ties alphabetically by Name. Bob and Carol both have 85, Bob comes first alphabetically."
+  },
+  {
+    "title": "GroupBy",
+    "instruction": "`GroupBy` groups elements by a key.\n\nRun this.",
+    "starter": "using System;\nusing System.Linq;\n\nclass Product {\n    public string Name { get; set; }\n    public string Category { get; set; }\n    public decimal Price { get; set; }\n}\n\nclass Program {\n    static void Main() {\n        var products = new[] {\n            new Product { Name = \"Apple\",  Category = \"Fruit\",  Price = 1.2m },\n            new Product { Name = \"Banana\", Category = \"Fruit\",  Price = 0.5m },\n            new Product { Name = \"Carrot\", Category = \"Veggie\", Price = 0.8m }\n        };\n        var grouped = products.GroupBy(p => p.Category);\n        foreach (var group in grouped) {\n            Console.WriteLine($\"{group.Key}: {string.Join(\", \", group.Select(p => p.Name))}\");\n        }\n    }\n}",
+    "expectedOutput": [
+      "Fruit: Apple, Banana",
+      "Veggie: Carrot"
+    ],
+    "successMessage": "GroupBy returns IGrouping<K,T> objects. Each group has a Key and contains the matching elements."
+  },
+  {
+    "title": "Aggregates",
+    "instruction": "`Count`, `Sum`, `Min`, `Max`, `Average` aggregate a collection into a single value.\n\nRun this.",
+    "starter": "using System;\nusing System.Linq;\n\nclass Program {\n    static void Main() {\n        var nums = new[] { 3, 1, 4, 1, 5, 9, 2, 6 };\n        Console.WriteLine($\"count={nums.Count()} sum={nums.Sum()}\");\n        Console.WriteLine($\"min={nums.Min()} max={nums.Max()}\");\n        Console.WriteLine($\"avg={nums.Average():F2}\");\n    }\n}",
+    "expectedOutput": [
+      "count=8 sum=31",
+      "min=1 max=9",
+      "avg=3.88"
+    ],
+    "successMessage": "Aggregates consume the entire sequence and produce a scalar. They force evaluation — no more laziness after these."
+  },
+  {
+    "title": "First, Single, Any, All",
+    "instruction": "Predicates that return a single value or bool.\n\nRun this.",
+    "starter": "using System;\nusing System.Linq;\n\nclass Program {\n    static void Main() {\n        var nums = new[] { 2, 4, 6, 7, 8 };\n        Console.WriteLine(nums.First());\n        Console.WriteLine(nums.First(n => n > 5));\n        Console.WriteLine(nums.FirstOrDefault(n => n > 100));\n        Console.WriteLine(nums.Any(n => n % 2 != 0));\n        Console.WriteLine(nums.All(n => n > 0));\n    }\n}",
+    "expectedOutput": [
+      "2",
+      "6",
+      "0",
+      "True",
+      "True"
+    ],
+    "successMessage": "First throws if empty. FirstOrDefault returns default(T) if not found. Any checks if any element matches. All checks if all match."
+  },
+  {
+    "title": "Aggregate for custom reduction",
+    "instruction": "`Aggregate` is the general fold operation.\n\nRun this.",
+    "starter": "using System;\nusing System.Linq;\n\nclass Program {\n    static void Main() {\n        var words = new[] { \"C#\", \"is\", \"awesome\" };\n        string sentence = words.Aggregate((acc, w) => acc + \" \" + w);\n        Console.WriteLine(sentence);\n\n        int product = new[] { 1, 2, 3, 4, 5 }.Aggregate(1, (acc, n) => acc * n);\n        Console.WriteLine(product);\n    }\n}",
+    "expectedOutput": [
+      "C# is awesome",
+      "120"
+    ],
+    "successMessage": "Aggregate combines all elements with a function. The two-argument version takes a seed value (1 for product). Same as fold/reduce in other languages."
+  }
+]

@@ -1,0 +1,80 @@
+[
+  {
+    "title": "String slices",
+    "instruction": "A string slice `&str` references part of a String. `&s[start..end]` creates it.\n\nRun this.",
+    "starter": "fn main() {\n    let s = String::from(\"hello world\");\n    let hello = &s[..5];\n    let world = &s[6..];\n    println!(\"{} | {}\", hello, world);\n}",
+    "expectedOutput": [
+      "hello | world"
+    ],
+    "successMessage": "[..5] means from the beginning to index 4. [6..] means from index 6 to the end. No data is copied — just a view."
+  },
+  {
+    "title": "Array slices",
+    "instruction": "Slices work on any contiguous sequence. The type is `&[T]`.\n\nRun this.",
+    "starter": "fn main() {\n    let arr = [1, 2, 3, 4, 5];\n    let middle = &arr[1..4];\n    println!(\"{:?}\", middle);\n    println!(\"len: {}\", middle.len());\n}",
+    "expectedOutput": [
+      "[2, 3, 4]",
+      "len: 3"
+    ],
+    "successMessage": "&arr[1..4] creates a slice of 3 elements. The slice type here is &[i32]. It is a view, not a copy."
+  },
+  {
+    "title": "Functions accepting slices",
+    "instruction": "Use `&[T]` as the parameter type — it accepts any contiguous sequence.\n\nRun this.",
+    "starter": "fn sum(nums: &[i32]) -> i32 {\n    let mut total = 0;\n    for &n in nums {\n        total += n;\n    }\n    total\n}\n\nfn main() {\n    let v = [10, 20, 30, 40, 50];\n    println!(\"{}\", sum(&v));\n    println!(\"{}\", sum(&v[1..4]));\n}",
+    "expectedOutput": [
+      "150",
+      "90"
+    ],
+    "successMessage": "sum accepts a slice so it works on both the whole array and any sub-range. &v coerces the array to a slice automatically."
+  },
+  {
+    "title": "Iterating a slice",
+    "instruction": "`for item in slice` iterates over references. Use `&` in the pattern to destructure.\n\nRun this.",
+    "starter": "fn main() {\n    let primes = [2, 3, 5, 7, 11];\n    for &p in &primes {\n        print!(\"{} \", p);\n    }\n    println!();\n}",
+    "expectedOutput": [
+      "2 3 5 7 11 "
+    ],
+    "successMessage": "for &p in &primes destructures the reference, giving you the value directly. The & in the for pattern and the & before primes both matter."
+  },
+  {
+    "title": "Mutable slices",
+    "instruction": "A mutable slice `&mut [T]` lets you modify elements in place.\n\nRun this.",
+    "starter": "fn scale(slice: &mut [i32], factor: i32) {\n    for x in slice {\n        *x *= factor;\n    }\n}\n\nfn main() {\n    let mut data = [1, 2, 3, 4, 5];\n    scale(&mut data[1..4], 10);\n    println!(\"{:?}\", data);\n}",
+    "expectedOutput": [
+      "[1, 20, 30, 40, 5]"
+    ],
+    "successMessage": "Only indices 1, 2, 3 were scaled. *x dereferences the mutable reference to write through it."
+  },
+  {
+    "title": "Slice methods",
+    "instruction": "Slices have useful built-in methods.\n\nRun this.",
+    "starter": "fn main() {\n    let mut v = [5, 2, 8, 1, 9, 3];\n    v.sort();\n    println!(\"{:?}\", v);\n    println!(\"first={:?} last={:?}\", v.first(), v.last());\n    println!(\"contains 8: {}\", v.contains(&8));\n}",
+    "expectedOutput": [
+      "[1, 2, 3, 5, 8, 9]",
+      "first=Some(1) last=Some(9)",
+      "contains 8: true"
+    ],
+    "successMessage": "sort modifies in place. first and last return Option because the slice might be empty. contains checks membership."
+  },
+  {
+    "title": "Splitting slices",
+    "instruction": "`split_at(n)` divides a slice into two at index n.\n\nRun this.",
+    "starter": "fn main() {\n    let arr = [1, 2, 3, 4, 5, 6];\n    let (left, right) = arr.split_at(3);\n    println!(\"left: {:?}\", left);\n    println!(\"right: {:?}\", right);\n}",
+    "expectedOutput": [
+      "left: [1, 2, 3]",
+      "right: [4, 5, 6]"
+    ],
+    "successMessage": "split_at returns two non-overlapping slices. No data is copied — both are views into the original array."
+  },
+  {
+    "title": "windows and chunks",
+    "instruction": "`windows(n)` gives overlapping windows; `chunks(n)` gives non-overlapping groups.\n\nRun this.",
+    "starter": "fn main() {\n    let data = [1, 2, 3, 4, 5];\n    for w in data.windows(3) {\n        print!(\"{:?} \", w);\n    }\n    println!();\n    for c in data.chunks(2) {\n        print!(\"{:?} \", c);\n    }\n    println!();\n}",
+    "expectedOutput": [
+      "[1, 2, 3] [2, 3, 4] [3, 4, 5] ",
+      "[1, 2] [3, 4] [5] "
+    ],
+    "successMessage": "windows slides over the data with overlap. chunks divides without overlap. Both are zero-copy views."
+  }
+]

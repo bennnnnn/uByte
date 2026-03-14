@@ -1,0 +1,83 @@
+[
+  {
+    "title": "String literals are &str",
+    "instruction": "String literals are `&str` — references to text embedded in the binary. Immutable and fixed-size.\n\nRun this.",
+    "starter": "fn main() {\n    let s: &str = \"Hello, Rust!\";\n    println!(\"{}\", s);\n    println!(\"length: {}\", s.len());\n}",
+    "expectedOutput": [
+      "Hello, Rust!",
+      "length: 12"
+    ],
+    "successMessage": "&str is a view into text. No heap allocation. Fast and lightweight."
+  },
+  {
+    "title": "Owned String",
+    "instruction": "`String::from()` creates a heap-allocated string you can grow and modify.\n\nRun this.",
+    "starter": "fn main() {\n    let mut s = String::from(\"Hello\");\n    s.push_str(\", Rust!\");\n    println!(\"{}\", s);\n    println!(\"length: {}\", s.len());\n}",
+    "expectedOutput": [
+      "Hello, Rust!",
+      "length: 13"
+    ],
+    "successMessage": "String is growable. push_str appends a &str to it. Must be declared mut."
+  },
+  {
+    "title": "push a character",
+    "instruction": "`push` appends a single `char`. `push_str` appends a string slice.\n\nRun this.",
+    "starter": "fn main() {\n    let mut s = String::from(\"hel\");\n    s.push('l');\n    s.push('o');\n    s.push_str(\" world\");\n    println!(\"{}\", s);\n}",
+    "expectedOutput": [
+      "hello world"
+    ],
+    "successMessage": "push and push_str are the two ways to extend a String. push takes a char (single quotes), push_str takes a &str (double quotes)."
+  },
+  {
+    "title": "format! macro",
+    "instruction": "`format!` creates a new String from parts without printing.\n\n```rust\nlet s = format!(\"{} {}\", first, second);\n```\n\nRun this.",
+    "starter": "fn main() {\n    let first = \"Hello\";\n    let second = \"Rust\";\n    let msg = format!(\"{}, {}! Version {}\", first, second, 2024);\n    println!(\"{}\", msg);\n}",
+    "expectedOutput": [
+      "Hello, Rust! Version 2024"
+    ],
+    "successMessage": "format! is the cleanest way to build a String from multiple pieces. It does not take ownership of its arguments."
+  },
+  {
+    "title": "Common string methods",
+    "instruction": "Strings have many built-in methods.\n\nRun this.",
+    "starter": "fn main() {\n    let s = String::from(\"  hello rust  \");\n    println!(\"{}\", s.trim());\n    println!(\"{}\", s.trim().to_uppercase());\n    println!(\"{}\", s.contains(\"rust\"));\n    println!(\"{}\", s.replace(\"rust\", \"world\"));\n}",
+    "expectedOutput": [
+      "hello rust",
+      "HELLO RUST",
+      "true",
+      "  hello world  "
+    ],
+    "successMessage": "trim removes whitespace from both ends. to_uppercase, contains, replace — these methods do not modify the original, they return new values."
+  },
+  {
+    "title": "Splitting strings",
+    "instruction": "`split()` returns an iterator of string slices. Collect it into a Vec.\n\nRun this.",
+    "starter": "fn main() {\n    let csv = \"one,two,three,four\";\n    let parts: Vec<&str> = csv.split(',').collect();\n    println!(\"{:?}\", parts);\n    println!(\"count: {}\", parts.len());\n}",
+    "expectedOutput": [
+      "[\"one\", \"two\", \"three\", \"four\"]",
+      "count: 4"
+    ],
+    "successMessage": "split(',') produces an iterator, collect() turns it into a Vec. This pattern — iterate then collect — appears everywhere in Rust."
+  },
+  {
+    "title": "starts_with and ends_with",
+    "instruction": "Check the beginning or end of a string:\n\nRun this.",
+    "starter": "fn main() {\n    let url = \"https://rust-lang.org\";\n    println!(\"{}\", url.starts_with(\"https\"));\n    println!(\"{}\", url.ends_with(\".org\"));\n    println!(\"{}\", url.find(\"rust\"));\n}",
+    "expectedOutput": [
+      "true",
+      "true",
+      "Some(8)"
+    ],
+    "successMessage": "find returns Option<usize> — Some(index) if found, None if not. You will learn Option fully in the enums chapter."
+  },
+  {
+    "title": "Convert to String and back",
+    "instruction": "`.to_string()` converts anything printable to a String. `.parse()` goes the other way.\n\nRun this.",
+    "starter": "fn main() {\n    let n: i32 = 42;\n    let s = n.to_string();\n    println!(\"string: {}\", s);\n    let back: i32 = s.parse().unwrap();\n    println!(\"number: {}\", back);\n}",
+    "expectedOutput": [
+      "string: 42",
+      "number: 42"
+    ],
+    "successMessage": "to_string and parse are the bridge between text and numbers. unwrap assumes success — you will learn safer error handling soon."
+  }
+]

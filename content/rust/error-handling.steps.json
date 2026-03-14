@@ -1,0 +1,83 @@
+[
+  {
+    "title": "Result type",
+    "instruction": "`Result<T, E>` is either `Ok(value)` or `Err(error)`. Functions return it to signal possible failure.\n\nRun this.",
+    "starter": "fn divide(a: f64, b: f64) -> Result<f64, String> {\n    if b == 0.0 {\n        Err(String::from(\"division by zero\"))\n    } else {\n        Ok(a / b)\n    }\n}\n\nfn main() {\n    println!(\"{:?}\", divide(10.0, 2.0));\n    println!(\"{:?}\", divide(10.0, 0.0));\n}",
+    "expectedOutput": [
+      "Ok(5.0)",
+      "Err(\"division by zero\")"
+    ],
+    "successMessage": "Result is an enum: Ok wraps success, Err wraps the error. The caller is forced to handle both cases."
+  },
+  {
+    "title": "match on Result",
+    "instruction": "Handle both variants explicitly with match.\n\nRun this.",
+    "starter": "fn parse_number(s: &str) -> Result<i32, String> {\n    s.parse::<i32>().map_err(|e| e.to_string())\n}\n\nfn main() {\n    match parse_number(\"42\") {\n        Ok(n)  => println!(\"Parsed: {}\", n),\n        Err(e) => println!(\"Error: {}\", e),\n    }\n    match parse_number(\"abc\") {\n        Ok(n)  => println!(\"Parsed: {}\", n),\n        Err(e) => println!(\"Error: {}\", e),\n    }\n}",
+    "expectedOutput": [
+      "Parsed: 42",
+      "Error: invalid digit found in string"
+    ],
+    "successMessage": "match on Result is the exhaustive approach. You must handle both Ok and Err. No way to accidentally ignore an error."
+  },
+  {
+    "title": "The ? operator",
+    "instruction": "`?` after a Result either unwraps Ok or returns the Err to the caller.\n\nThis is the idiomatic way to propagate errors.\n\nRun this.",
+    "starter": "fn double_parsed(s: &str) -> Result<i32, String> {\n    let n = s.parse::<i32>().map_err(|e| e.to_string())?;\n    Ok(n * 2)\n}\n\nfn main() {\n    println!(\"{:?}\", double_parsed(\"21\"));\n    println!(\"{:?}\", double_parsed(\"oops\"));\n}",
+    "expectedOutput": [
+      "Ok(42)",
+      "Err(\"invalid digit found in string\")"
+    ],
+    "successMessage": "? is syntax sugar: if Ok, unwrap and continue; if Err, return early with the error. It threads errors through function chains without boilerplate."
+  },
+  {
+    "title": "unwrap and expect",
+    "instruction": "`unwrap()` panics on Err. `expect(msg)` panics with a custom message.\n\nUse them in tests or when you KNOW the value is Ok.\n\nRun this.",
+    "starter": "fn main() {\n    let n: i32 = \"42\".parse().expect(\"hardcoded literal always parses\");\n    println!(\"{}\", n);\n\n    let v = vec![1, 2, 3];\n    println!(\"{}\", v.get(1).unwrap());\n}",
+    "expectedOutput": [
+      "42",
+      "2"
+    ],
+    "successMessage": "expect is better than unwrap because the message explains why you believe it is safe. If it panics, the message helps diagnose the bug."
+  },
+  {
+    "title": "map and and_then on Result",
+    "instruction": "`map` transforms Ok. `and_then` chains fallible operations.\n\nRun this.",
+    "starter": "fn main() {\n    let doubled = \"21\".parse::<i32>()\n        .map(|n| n * 2);\n    println!(\"{:?}\", doubled);\n\n    let result = \"10\".parse::<i32>()\n        .and_then(|n| if n > 0 { Ok(n) } else { Err(\"negative\".parse::<i32>().unwrap_err()) });\n    println!(\"{:?}\", result);\n}",
+    "expectedOutput": [
+      "Ok(42)",
+      "Ok(10)"
+    ],
+    "successMessage": "map transforms Ok values, leaving Err unchanged. and_then chains operations where each might fail."
+  },
+  {
+    "title": "unwrap_or and unwrap_or_else",
+    "instruction": "Provide a fallback value instead of panicking.\n\nRun this.",
+    "starter": "fn main() {\n    let good: Result<i32, &str> = Ok(42);\n    let bad:  Result<i32, &str> = Err(\"oops\");\n\n    println!(\"{}\", good.unwrap_or(0));\n    println!(\"{}\", bad.unwrap_or(0));\n    println!(\"{}\", bad.unwrap_or_else(|e| {\n        println!(\"error was: {}\", e);\n        -1\n    }));\n}",
+    "expectedOutput": [
+      "42",
+      "0",
+      "error was: oops",
+      "-1"
+    ],
+    "successMessage": "unwrap_or gives a default without panicking. unwrap_or_else calls a closure — handy for logging the error before returning the default."
+  },
+  {
+    "title": "Collecting Results",
+    "instruction": "When mapping over an iterator and each operation returns Result, collect into `Result<Vec<T>, E>` to fail fast.\n\nRun this.",
+    "starter": "fn main() {\n    let strings = vec![\"1\", \"2\", \"3\", \"four\", \"5\"];\n    let result: Result<Vec<i32>, _> = strings.iter()\n        .map(|s| s.parse::<i32>())\n        .collect();\n    println!(\"{:?}\", result);\n\n    let ok_strings = vec![\"1\", \"2\", \"3\"];\n    let ok: Result<Vec<i32>, _> = ok_strings.iter()\n        .map(|s| s.parse::<i32>())\n        .collect();\n    println!(\"{:?}\", ok);\n}",
+    "expectedOutput": [
+      "Err(invalid digit found in string)",
+      "Ok([1, 2, 3])"
+    ],
+    "successMessage": "Collecting into Result<Vec<T>,E> stops at the first Err and returns it. All values Ok gives Ok(Vec). Great for parsing user input."
+  },
+  {
+    "title": "panic! for bugs",
+    "instruction": "`panic!` is for unrecoverable bugs — index out of bounds, contract violations.\n\nUse Result for expected errors. Use panic for impossible situations.\n\nRun this.",
+    "starter": "fn get_item(v: &[i32], i: usize) -> i32 {\n    if i >= v.len() {\n        panic!(\"index {} out of bounds for len {}\", i, v.len());\n    }\n    v[i]\n}\n\nfn main() {\n    let v = vec![10, 20, 30];\n    println!(\"{}\", get_item(&v, 1));\n}",
+    "expectedOutput": [
+      "20"
+    ],
+    "successMessage": "Panic is for bugs, not expected errors. A caller passing an out-of-bounds index is a programming mistake, not a recoverable error."
+  }
+]

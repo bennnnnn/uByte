@@ -1,40 +1,12 @@
 ---
-title: "Threads and Channels in Rust"
-description: "Spawn threads and communicate with channels (std::sync::mpsc)."
-order: 15
-difficulty: "intermediate"
-estimatedMinutes: 15
+title: "Concurrency"
+description: "Spawn threads, share data with Arc and Mutex, and pass messages with channels."
+order: 23
+difficulty: "advanced"
+estimatedMinutes: 22
+concepts: ["thread::spawn", "join", "Arc", "Mutex", "mpsc", "channels", "Send", "Sync"]
 ---
 
-## Concepts in this chapter
+## Fearless concurrency
 
-You will learn and practice:
-
-- **thread::spawn** — spawn a new thread; returns a JoinHandle
-- **join()** — wait for the thread to finish
-- **move** — move ownership into the closure for the thread
-- **mpsc::channel** — multi-producer, single-consumer channel
-- **Send and Sync** — trait bounds for thread safety
-
----
-
-## Spawning a Thread
-
-```rust
-use std::thread;
-use std::time::Duration;
-
-fn main() {
-    let handle = thread::spawn(|| {
-        println!("Hello from thread");
-    });
-    handle.join().unwrap();
-    println!("Main done");
-}
-```
-
----
-
-## What's Next?
-
-Next: **Testing with #[test]** — unit tests in Rust.
+Rust's type system prevents data races at compile time. The same ownership rules that manage memory also manage thread safety.

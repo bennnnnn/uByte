@@ -1,0 +1,14 @@
+---
+title: "Lifetimes"
+description: "Lifetime annotations, the borrow checker, and why Rust needs lifetime parameters."
+order: 21
+difficulty: "advanced"
+estimatedMinutes: 22
+concepts: ["'a", "lifetime annotation", "lifetime elision", "static lifetime", "struct lifetimes"]
+---
+
+## Lifetimes
+
+Every reference in Rust has a lifetime — the scope during which it is valid.
+
+Usually Rust infers lifetimes automatically. You only need to annotate when the compiler cannot figure out the relationship between multiple references.

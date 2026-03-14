@@ -1,0 +1,89 @@
+[
+  {
+    "title": "try/catch basics",
+    "instruction": "Wrap code that might throw in try. Catch the exception type.\n\nRun this.",
+    "starter": "using System;\n\nclass Program {\n    static void Main() {\n        try {\n            int[] arr = new int[3];\n            arr[10] = 99; // IndexOutOfRangeException\n        } catch (IndexOutOfRangeException ex) {\n            Console.WriteLine($\"Error: {ex.Message}\");\n        }\n        Console.WriteLine(\"Program continues\");\n    }\n}",
+    "expectedOutput": [
+      "Error: Index was outside the bounds of the array.",
+      "Program continues"
+    ],
+    "successMessage": "The exception is caught, handled, and execution continues. Without try/catch, the program would crash."
+  },
+  {
+    "title": "Multiple catch blocks",
+    "instruction": "Catch different exception types in order, most specific first.\n\nRun this.",
+    "starter": "using System;\n\nclass Program {\n    static void Parse(string s) {\n        try {\n            int n = int.Parse(s);\n            Console.WriteLine(100 / n);\n        } catch (DivideByZeroException) {\n            Console.WriteLine(\"Cannot divide by zero\");\n        } catch (FormatException) {\n            Console.WriteLine($\"'{s}' is not a number\");\n        } catch (Exception ex) {\n            Console.WriteLine($\"Unexpected: {ex.Message}\");\n        }\n    }\n\n    static void Main() {\n        Parse(\"0\");\n        Parse(\"abc\");\n        Parse(\"5\");\n    }\n}",
+    "expectedOutput": [
+      "Cannot divide by zero",
+      "'abc' is not a number",
+      "20"
+    ],
+    "successMessage": "Catch blocks are checked in order — most specific first. The generic Exception at the end catches anything else."
+  },
+  {
+    "title": "finally block",
+    "instruction": "`finally` runs whether or not an exception occurred. Use it for cleanup.\n\nRun this.",
+    "starter": "using System;\n\nclass Program {\n    static void Main() {\n        Console.WriteLine(\"start\");\n        try {\n            Console.WriteLine(\"in try\");\n            throw new Exception(\"oops\");\n        } catch (Exception ex) {\n            Console.WriteLine($\"caught: {ex.Message}\");\n        } finally {\n            Console.WriteLine(\"finally always runs\");\n        }\n        Console.WriteLine(\"end\");\n    }\n}",
+    "expectedOutput": [
+      "start",
+      "in try",
+      "caught: oops",
+      "finally always runs",
+      "end"
+    ],
+    "successMessage": "finally is for cleanup code — closing files, releasing resources. It runs even if an exception is not caught or if the catch re-throws."
+  },
+  {
+    "title": "Throwing exceptions",
+    "instruction": "Use `throw` to raise an exception.\n\nRun this.",
+    "starter": "using System;\n\nstatic int Divide(int a, int b) {\n    if (b == 0) throw new DivideByZeroException(\"denominator cannot be zero\");\n    return a / b;\n}\n\nclass Program {\n    static void Main() {\n        try {\n            Console.WriteLine(Divide(10, 2));\n            Console.WriteLine(Divide(10, 0));\n        } catch (DivideByZeroException ex) {\n            Console.WriteLine(ex.Message);\n        }\n    }\n}",
+    "expectedOutput": [
+      "5",
+      "denominator cannot be zero"
+    ],
+    "successMessage": "throw creates and raises an exception with a descriptive message. The caller's catch block handles it."
+  },
+  {
+    "title": "Custom exceptions",
+    "instruction": "Create custom exception types for domain-specific errors.\n\nRun this.",
+    "starter": "using System;\n\nclass InsufficientFundsException : Exception {\n    public decimal Amount { get; }\n    public InsufficientFundsException(decimal amount)\n        : base($\"Insufficient funds: need {amount:C} more\") {\n        Amount = amount;\n    }\n}\n\nclass Account {\n    public decimal Balance { get; private set; }\n    public Account(decimal initial) { Balance = initial; }\n    public void Withdraw(decimal amount) {\n        if (amount > Balance)\n            throw new InsufficientFundsException(amount - Balance);\n        Balance -= amount;\n    }\n}\n\nclass Program {\n    static void Main() {\n        var acc = new Account(100);\n        try { acc.Withdraw(150); }\n        catch (InsufficientFundsException ex) {\n            Console.WriteLine(ex.Message);\n            Console.WriteLine($\"Short by: {ex.Amount:C}\");\n        }\n    }\n}",
+    "expectedOutput": [
+      "Insufficient funds: need $50.00 more",
+      "Short by: $50.00"
+    ],
+    "successMessage": "Custom exceptions carry domain data. Callers can catch the specific type and access the Amount property."
+  },
+  {
+    "title": "Exception filters with when",
+    "instruction": "`catch (Exception ex) when (condition)` adds a filter to catch blocks.\n\nRun this.",
+    "starter": "using System;\n\nclass Program {\n    static void Main() {\n        for (int code = 400; code <= 404; code++) {\n            try {\n                throw new Exception($\"HTTP {code}\");\n            } catch (Exception ex) when (ex.Message.Contains(\"404\")) {\n                Console.WriteLine($\"Not Found: {ex.Message}\");\n            } catch (Exception ex) {\n                Console.WriteLine($\"Other error: {ex.Message}\");\n            }\n        }\n    }\n}",
+    "expectedOutput": [
+      "Other error: HTTP 400",
+      "Other error: HTTP 401",
+      "Other error: HTTP 402",
+      "Other error: HTTP 403",
+      "Not Found: HTTP 404"
+    ],
+    "successMessage": "when filters apply an additional condition. The 404 exception is caught by the first block, others by the second."
+  },
+  {
+    "title": "Re-throwing exceptions",
+    "instruction": "Use `throw;` (no argument) to re-throw preserving the stack trace.\n\nRun this.",
+    "starter": "using System;\n\nstatic void Inner() { throw new InvalidOperationException(\"inner error\"); }\n\nstatic void Outer() {\n    try { Inner(); }\n    catch (Exception ex) {\n        Console.WriteLine($\"Outer caught: {ex.Message}\");\n        throw; // re-throw, preserving stack trace\n    }\n}\n\nclass Program {\n    static void Main() {\n        try { Outer(); }\n        catch (Exception ex) {\n            Console.WriteLine($\"Main caught: {ex.Message}\");\n        }\n    }\n}",
+    "expectedOutput": [
+      "Outer caught: inner error",
+      "Main caught: inner error"
+    ],
+    "successMessage": "throw; (no argument) re-throws the caught exception with the original stack trace intact. throw ex; would reset the stack trace — avoid it."
+  },
+  {
+    "title": "Exception properties",
+    "instruction": "Exception has useful properties: Message, StackTrace, InnerException.\n\nRun this.",
+    "starter": "using System;\n\nclass Program {\n    static void Main() {\n        try {\n            try {\n                throw new InvalidOperationException(\"original\");\n            } catch (Exception inner) {\n                throw new ApplicationException(\"wrapper\", inner);\n            }\n        } catch (Exception ex) {\n            Console.WriteLine(ex.Message);\n            Console.WriteLine(ex.InnerException?.Message);\n        }\n    }\n}",
+    "expectedOutput": [
+      "wrapper",
+      "original"
+    ],
+    "successMessage": "InnerException chains exceptions. The outer exception wraps the inner with additional context. ?. safely handles null InnerException."
+  }
+]

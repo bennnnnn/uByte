@@ -1,0 +1,12 @@
+---
+title: "Ownership"
+description: "Move semantics, the Copy trait, clone, and how Rust manages memory without a garbage collector."
+order: 7
+difficulty: "intermediate"
+estimatedMinutes: 22
+concepts: ["ownership", "move", "Copy", "Clone", "drop", "scope"]
+---
+
+## The feature that makes Rust unique
+
+Every value has exactly one owner. When the owner goes out of scope, the value is freed automatically — no GC, no malloc/free.

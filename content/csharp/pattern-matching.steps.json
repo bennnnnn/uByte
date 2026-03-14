@@ -1,0 +1,93 @@
+[
+  {
+    "title": "switch expression",
+    "instruction": "Modern switch expression returns a value. No break needed.\n\nRun this.",
+    "starter": "using System;\n\nstatic string Classify(int n) => n switch {\n    < 0  => \"negative\",\n    0    => \"zero\",\n    < 10 => \"small positive\",\n    _    => \"large positive\"\n};\n\nclass Program {\n    static void Main() {\n        foreach (int n in new[] { -5, 0, 3, 100 })\n            Console.WriteLine($\"{n}: {Classify(n)}\");\n    }\n}",
+    "expectedOutput": [
+      "-5: negative",
+      "0: zero",
+      "3: small positive",
+      "100: large positive"
+    ],
+    "successMessage": "Relational patterns (< 0, 0) and the discard _ default. Switch expressions are exhaustive — the compiler warns about missing cases."
+  },
+  {
+    "title": "Type patterns",
+    "instruction": "Match on the runtime type of an object.\n\nRun this.",
+    "starter": "using System;\n\nstatic string Describe(object obj) => obj switch {\n    int n when n < 0  => $\"negative int: {n}\",\n    int n             => $\"positive int: {n}\",\n    string s          => $\"string of length {s.Length}\",\n    null              => \"null\",\n    _                 => $\"unknown: {obj.GetType().Name}\"\n};\n\nclass Program {\n    static void Main() {\n        Console.WriteLine(Describe(-5));\n        Console.WriteLine(Describe(42));\n        Console.WriteLine(Describe(\"hello\"));\n        Console.WriteLine(Describe(null));\n        Console.WriteLine(Describe(3.14));\n    }\n}",
+    "expectedOutput": [
+      "negative int: -5",
+      "positive int: 42",
+      "string of length 5",
+      "null",
+      "unknown: Double"
+    ],
+    "successMessage": "Type patterns bind the matched value to a variable (n, s). when adds an extra condition. The order matters — more specific patterns first."
+  },
+  {
+    "title": "Property patterns",
+    "instruction": "Match specific property values with property patterns.\n\nRun this.",
+    "starter": "using System;\n\nrecord Point(int X, int Y);\n\nstatic string Quadrant(Point p) => p switch {\n    { X: > 0, Y: > 0 } => \"Q1\",\n    { X: < 0, Y: > 0 } => \"Q2\",\n    { X: < 0, Y: < 0 } => \"Q3\",\n    { X: > 0, Y: < 0 } => \"Q4\",\n    { X: 0 } or { Y: 0 } => \"on axis\",\n    _ => \"origin\"\n};\n\nclass Program {\n    static void Main() {\n        Console.WriteLine(Quadrant(new Point(3, 4)));\n        Console.WriteLine(Quadrant(new Point(-1, 2)));\n        Console.WriteLine(Quadrant(new Point(0, 5)));\n    }\n}",
+    "expectedOutput": [
+      "Q1",
+      "Q2",
+      "on axis"
+    ],
+    "successMessage": "Property patterns { X: > 0, Y: > 0 } check multiple properties simultaneously. or combines patterns."
+  },
+  {
+    "title": "Tuple patterns",
+    "instruction": "Match on tuples — great for combining conditions.\n\nRun this.",
+    "starter": "using System;\n\nstatic string RockPaperScissors(string a, string b) => (a, b) switch {\n    (\"Rock\",     \"Scissors\") => $\"{a} wins\",\n    (\"Scissors\", \"Paper\")   => $\"{a} wins\",\n    (\"Paper\",    \"Rock\")    => $\"{a} wins\",\n    (var x, var y) when x == y => \"Tie\",\n    _ => $\"{b} wins\"\n};\n\nclass Program {\n    static void Main() {\n        Console.WriteLine(RockPaperScissors(\"Rock\", \"Scissors\"));\n        Console.WriteLine(RockPaperScissors(\"Paper\", \"Paper\"));\n        Console.WriteLine(RockPaperScissors(\"Scissors\", \"Rock\"));\n    }\n}",
+    "expectedOutput": [
+      "Rock wins",
+      "Tie",
+      "Rock wins"
+    ],
+    "successMessage": "Tuple patterns match on multiple values simultaneously. var x in a pattern captures the value."
+  },
+  {
+    "title": "Deconstruction",
+    "instruction": "Deconstruct objects into variables with tuple-style assignment.\n\nRun this.",
+    "starter": "using System;\n\nrecord Person(string Name, int Age);\n\nclass Program {\n    static void Main() {\n        var p = new Person(\"Alice\", 30);\n        var (name, age) = p; // deconstruct\n        Console.WriteLine($\"{name} is {age}\");\n\n        // Also works with tuples\n        (int x, int y) = (10, 20);\n        Console.WriteLine($\"x={x} y={y}\");\n    }\n}",
+    "expectedOutput": [
+      "Alice is 30",
+      "x=10 y=20"
+    ],
+    "successMessage": "Deconstruction extracts fields into separate variables. Records support deconstruction automatically."
+  },
+  {
+    "title": "List patterns (C# 11)",
+    "instruction": "Match on the contents of a list or array.\n\nRun this.",
+    "starter": "using System;\n\nstatic string DescribeList(int[] nums) => nums switch {\n    []             => \"empty\",\n    [var x]        => $\"single: {x}\",\n    [var x, var y] => $\"pair: {x}, {y}\",\n    [var first, .., var last] => $\"many: starts {first}, ends {last}\"\n};\n\nclass Program {\n    static void Main() {\n        Console.WriteLine(DescribeList(new int[] {}));\n        Console.WriteLine(DescribeList(new[] { 42 }));\n        Console.WriteLine(DescribeList(new[] { 1, 2 }));\n        Console.WriteLine(DescribeList(new[] { 1, 2, 3, 4, 5 }));\n    }\n}",
+    "expectedOutput": [
+      "empty",
+      "single: 42",
+      "pair: 1, 2",
+      "many: starts 1, ends 5"
+    ],
+    "successMessage": "List patterns match array/list contents. .. is the 'rest' pattern. This is C# 11 — modern and expressive."
+  },
+  {
+    "title": "Combining patterns with and/or/not",
+    "instruction": "Combine patterns with `and`, `or`, `not`.\n\nRun this.",
+    "starter": "using System;\n\nstatic bool IsLetter(char c) => c is >= 'a' and <= 'z' or >= 'A' and <= 'Z';\nstatic bool IsDigit(char c) => c is >= '0' and <= '9';\nstatic bool IsAlphanumeric(char c) => c is var ch && (IsLetter(ch) || IsDigit(ch));\n\nclass Program {\n    static void Main() {\n        Console.WriteLine(IsLetter('A'));\n        Console.WriteLine(IsDigit('5'));\n        Console.WriteLine(IsAlphanumeric('@'));\n    }\n}",
+    "expectedOutput": [
+      "True",
+      "True",
+      "False"
+    ],
+    "successMessage": "and/or/not combine patterns inline. >= 'a' and <= 'z' is a range check — cleaner than two separate conditions."
+  },
+  {
+    "title": "Pattern matching in real code",
+    "instruction": "Pattern matching shines in domain logic.\n\nRun this.",
+    "starter": "using System;\n\nabstract record Shape;\nrecord Circle(double Radius) : Shape;\nrecord Rect(double W, double H) : Shape;\nrecord Triangle(double Base, double Height) : Shape;\n\nstatic double Area(Shape s) => s switch {\n    Circle(var r)          => Math.PI * r * r,\n    Rect(var w, var h)     => w * h,\n    Triangle(var b, var h) => 0.5 * b * h,\n    _ => throw new ArgumentException(\"Unknown shape\")\n};\n\nclass Program {\n    static void Main() {\n        Shape[] shapes = { new Circle(5), new Rect(4, 6), new Triangle(3, 8) };\n        foreach (var s in shapes)\n            Console.WriteLine($\"{s.GetType().Name}: {Area(s):F2}\");\n    }\n}",
+    "expectedOutput": [
+      "Circle: 78.54",
+      "Rect: 24.00",
+      "Triangle: 12.00"
+    ],
+    "successMessage": "Records support positional deconstruction in patterns. The switch is exhaustive and type-safe. Adding a new Shape type requires updating Area — the compiler helps you find all the places."
+  }
+]

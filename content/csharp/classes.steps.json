@@ -1,0 +1,79 @@
+[
+  {
+    "title": "Define a class",
+    "instruction": "A class has fields (data) and methods (behaviour).\n\nRun this.",
+    "starter": "using System;\n\nclass Dog {\n    public string Name;\n    public int Age;\n\n    public void Bark() {\n        Console.WriteLine($\"{Name} says: Woof!\");\n    }\n}\n\nclass Program {\n    static void Main() {\n        Dog rex = new Dog();\n        rex.Name = \"Rex\";\n        rex.Age = 3;\n        rex.Bark();\n        Console.WriteLine($\"{rex.Name} is {rex.Age} years old\");\n    }\n}",
+    "expectedOutput": [
+      "Rex says: Woof!",
+      "Rex is 3 years old"
+    ],
+    "successMessage": "new Dog() creates an instance. dot notation accesses fields and methods. public means accessible from outside the class."
+  },
+  {
+    "title": "Constructor",
+    "instruction": "A constructor initialises an object when created with `new`.\n\nRun this.",
+    "starter": "using System;\n\nclass Point {\n    public double X;\n    public double Y;\n\n    public Point(double x, double y) {\n        X = x;\n        Y = y;\n    }\n\n    public double DistanceFromOrigin() {\n        return Math.Sqrt(X * X + Y * Y);\n    }\n}\n\nclass Program {\n    static void Main() {\n        var p = new Point(3, 4);\n        Console.WriteLine($\"({p.X}, {p.Y})\");\n        Console.WriteLine($\"distance: {p.DistanceFromOrigin()}\");\n    }\n}",
+    "expectedOutput": [
+      "(3, 4)",
+      "distance: 5"
+    ],
+    "successMessage": "The constructor runs when you call new Point(3, 4). It receives the arguments and initialises the fields."
+  },
+  {
+    "title": "this keyword",
+    "instruction": "`this` refers to the current instance. Use it when parameter names shadow field names.\n\nRun this.",
+    "starter": "using System;\n\nclass Person {\n    private string name;\n    private int age;\n\n    public Person(string name, int age) {\n        this.name = name; // this.name = field, name = parameter\n        this.age = age;\n    }\n\n    public string Describe() {\n        return $\"{this.name} is {this.age}\";\n    }\n}\n\nclass Program {\n    static void Main() {\n        var p = new Person(\"Alice\", 30);\n        Console.WriteLine(p.Describe());\n    }\n}",
+    "expectedOutput": [
+      "Alice is 30"
+    ],
+    "successMessage": "this.name refers to the field. name (without this) refers to the parameter. Without this, parameter shadows the field."
+  },
+  {
+    "title": "Multiple constructors",
+    "instruction": "A class can have multiple constructors with different parameters (overloading).\n\nRun this.",
+    "starter": "using System;\n\nclass Rectangle {\n    public double Width, Height;\n\n    public Rectangle(double width, double height) {\n        Width = width; Height = height;\n    }\n    public Rectangle(double side) : this(side, side) {} // square\n\n    public double Area() => Width * Height;\n}\n\nclass Program {\n    static void Main() {\n        var rect = new Rectangle(6, 4);\n        var square = new Rectangle(5);\n        Console.WriteLine($\"rect: {rect.Area()}\");\n        Console.WriteLine($\"square: {square.Area()}\");\n    }\n}",
+    "expectedOutput": [
+      "rect: 24",
+      "square: 25"
+    ],
+    "successMessage": "Constructor chaining with : this(...) reuses another constructor. The square constructor calls the full constructor with equal width and height."
+  },
+  {
+    "title": "Encapsulation with private",
+    "instruction": "Use `private` fields with `public` methods to protect internal state.\n\nRun this.",
+    "starter": "using System;\n\nclass BankAccount {\n    private decimal balance = 0;\n\n    public void Deposit(decimal amount) {\n        if (amount <= 0) throw new ArgumentException(\"Positive amounts only\");\n        balance += amount;\n    }\n\n    public bool Withdraw(decimal amount) {\n        if (amount > balance) return false;\n        balance -= amount;\n        return true;\n    }\n\n    public decimal Balance => balance;\n}\n\nclass Program {\n    static void Main() {\n        var account = new BankAccount();\n        account.Deposit(100);\n        Console.WriteLine(account.Withdraw(30));\n        Console.WriteLine(account.Balance);\n    }\n}",
+    "expectedOutput": [
+      "True",
+      "70"
+    ],
+    "successMessage": "balance is private — code outside cannot set it directly. Deposit and Withdraw enforce the business rules. This is encapsulation."
+  },
+  {
+    "title": "Static members",
+    "instruction": "Static fields and methods belong to the class, not instances.\n\nRun this.",
+    "starter": "using System;\n\nclass Counter {\n    private static int count = 0;\n\n    public Counter() { count++; }\n    public static int Count => count;\n}\n\nclass Program {\n    static void Main() {\n        new Counter();\n        new Counter();\n        new Counter();\n        Console.WriteLine(Counter.Count);\n    }\n}",
+    "expectedOutput": [
+      "3"
+    ],
+    "successMessage": "count is static — shared across all instances. Every new Counter() increments the same count. Static members are accessed via the class name."
+  },
+  {
+    "title": "ToString override",
+    "instruction": "Override `ToString()` to control how your object prints.\n\nRun this.",
+    "starter": "using System;\n\nclass Temperature {\n    private double celsius;\n    public Temperature(double c) { celsius = c; }\n    public override string ToString() => $\"{celsius}°C ({celsius * 9/5 + 32:F1}°F)\";\n}\n\nclass Program {\n    static void Main() {\n        var t = new Temperature(100);\n        Console.WriteLine(t);\n        Console.WriteLine($\"Temp: {t}\");\n    }\n}",
+    "expectedOutput": [
+      "100°C (212.0°F)",
+      "Temp: 100°C (212.0°F)"
+    ],
+    "successMessage": "Overriding ToString() controls what Console.WriteLine and string interpolation display. Essential for debugging and logging."
+  },
+  {
+    "title": "Object initialiser syntax",
+    "instruction": "Set public properties in a `{}` block after the constructor call.\n\nRun this.",
+    "starter": "using System;\n\nclass Config {\n    public string Host { get; set; } = \"localhost\";\n    public int Port { get; set; } = 80;\n    public bool Debug { get; set; } = false;\n}\n\nclass Program {\n    static void Main() {\n        var cfg = new Config { Host = \"example.com\", Port = 443, Debug = true };\n        Console.WriteLine($\"{cfg.Host}:{cfg.Port} debug={cfg.Debug}\");\n    }\n}",
+    "expectedOutput": [
+      "example.com:443 debug=True"
+    ],
+    "successMessage": "Object initialisers are clean and readable, especially for configuration or DTO objects. No constructor needed."
+  }
+]

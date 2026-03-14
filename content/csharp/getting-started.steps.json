@@ -1,0 +1,93 @@
+[
+  {
+    "title": "Hello, C#",
+    "instruction": "Every C# program starts at the `Main` method inside a class.\n\n`Console.WriteLine()` prints a line. Run this.",
+    "starter": "using System;\n\nclass Program {\n    static void Main() {\n        Console.WriteLine(\"Hello, C#!\");\n    }\n}",
+    "expectedOutput": [
+      "Hello, C#!"
+    ],
+    "successMessage": "You just ran a C# program. The using System line imports the standard library. class Program is the container. static void Main() is where execution begins."
+  },
+  {
+    "title": "Print multiple lines",
+    "instruction": "Each `Console.WriteLine()` prints a separate line.\n\nAdd two more lines and run it.",
+    "hint": "Add two more Console.WriteLine(\"text\"); lines inside Main.",
+    "starter": "using System;\n\nclass Program {\n    static void Main() {\n        Console.WriteLine(\"C# is powerful.\");\n        // Add two more lines\n    }\n}",
+    "expectedOutput": [
+      "C# is powerful.",
+      "It runs everywhere.",
+      "Let's learn it!"
+    ],
+    "codeChecks": [
+      {
+        "pattern": "Console\\.WriteLine[\\s\\S]*Console\\.WriteLine[\\s\\S]*Console\\.WriteLine",
+        "required": true,
+        "message": "Add two more Console.WriteLine calls — three total."
+      }
+    ],
+    "successMessage": "Three lines, three outputs. C# executes them top to bottom."
+  },
+  {
+    "title": "Print with Write (no newline)",
+    "instruction": "`Console.Write()` prints without adding a newline. Use it to build output piece by piece.\n\nRun this.",
+    "starter": "using System;\n\nclass Program {\n    static void Main() {\n        Console.Write(\"Hello\");\n        Console.Write(\", \");\n        Console.Write(\"World\");\n        Console.WriteLine(\"!\");\n    }\n}",
+    "expectedOutput": [
+      "Hello, World!"
+    ],
+    "successMessage": "Write does not add a newline. The final WriteLine does. Together they build a single line from parts."
+  },
+  {
+    "title": "Print numbers and variables",
+    "instruction": "C# can print numbers directly. Use `{}` as a format placeholder:\n\n```csharp\nConsole.WriteLine(\"Value: {0}\", 42);\n```\n\nRun this.",
+    "starter": "using System;\n\nclass Program {\n    static void Main() {\n        Console.WriteLine(42);\n        Console.WriteLine(3.14);\n        Console.WriteLine(true);\n        Console.WriteLine(\"Value: {0}\", 100);\n    }\n}",
+    "expectedOutput": [
+      "42",
+      "3.14",
+      "True",
+      "Value: 100"
+    ],
+    "successMessage": "C# booleans print as True/False (capitalised). {0} in a format string is replaced by the first argument after the format."
+  },
+  {
+    "title": "String interpolation",
+    "instruction": "Modern C# uses `$\"...\"` for string interpolation — put expressions inside `{}`:\n\n```csharp\nstring name = \"Alice\";\nConsole.WriteLine($\"Hello, {name}!\");\n```\n\nRun this.",
+    "starter": "using System;\n\nclass Program {\n    static void Main() {\n        string name = \"Alice\";\n        int age = 30;\n        Console.WriteLine($\"Name: {name}, Age: {age}\");\n        Console.WriteLine($\"Next year: {age + 1}\");\n    }\n}",
+    "expectedOutput": [
+      "Name: Alice, Age: 30",
+      "Next year: 31"
+    ],
+    "successMessage": "String interpolation with $ is the modern C# way. You can put any expression inside {}, not just variable names."
+  },
+  {
+    "title": "Comments",
+    "instruction": "C# has three comment styles:\n- `// single line`\n- `/* multi-line */`\n- `/// XML doc comment`\n\nRun this.",
+    "starter": "using System;\n\nclass Program {\n    static void Main() {\n        // Single-line comment\n        Console.WriteLine(\"Comments are invisible.\");\n\n        /* Multi-line comment\n           spanning two lines */\n        Console.WriteLine(\"Only output appears.\");\n    }\n}",
+    "expectedOutput": [
+      "Comments are invisible.",
+      "Only output appears."
+    ],
+    "successMessage": "Comments are stripped by the compiler. Write them to explain WHY, not what."
+  },
+  {
+    "title": "Fix the syntax error",
+    "instruction": "This program has a bug. Run it, read the error, and fix it.",
+    "hint": "Check the string — count the quote characters carefully.",
+    "starter": "using System;\n\nclass Program {\n    static void Main() {\n        Console.WriteLine(\"C# is great);\n    }\n}",
+    "expectedOutput": [
+      "C# is great"
+    ],
+    "successMessage": "C# compiler errors are detailed. Learning to read them quickly is a core skill."
+  },
+  {
+    "title": "Write from scratch",
+    "instruction": "Write a C# program that prints:\n- `C# is modern`\n- `C# is fast`\n- `C# is fun`",
+    "hint": "Add three Console.WriteLine calls inside Main.",
+    "starter": "using System;\n\nclass Program {\n    static void Main() {\n        // Write your three Console.WriteLine calls here\n    }\n}",
+    "expectedOutput": [
+      "C# is modern",
+      "C# is fast",
+      "C# is fun"
+    ],
+    "successMessage": "You wrote a complete C# program from scratch. The template — using System, class, Main — will become second nature."
+  }
+]

@@ -1,0 +1,84 @@
+[
+  {
+    "title": "Basic closure",
+    "instruction": "A closure is written as `|params| body`.\n\nRun this.",
+    "starter": "fn main() {\n    let double = |x| x * 2;\n    let add = |a, b| a + b;\n    println!(\"{}\", double(5));\n    println!(\"{}\", add(3, 4));\n}",
+    "expectedOutput": [
+      "10",
+      "7"
+    ],
+    "successMessage": "Closures infer their parameter and return types. double infers |x: i32| -> i32. add infers |a: i32, b: i32| -> i32."
+  },
+  {
+    "title": "Capturing by reference",
+    "instruction": "Closures capture variables from their environment.\n\nRun this.",
+    "starter": "fn main() {\n    let threshold = 5;\n    let is_big = |n| n > threshold; // captures threshold\n    println!(\"{}\", is_big(10));\n    println!(\"{}\", is_big(3));\n    println!(\"threshold still: {}\", threshold);\n}",
+    "expectedOutput": [
+      "true",
+      "false",
+      "threshold still: 5"
+    ],
+    "successMessage": "is_big captures threshold by reference. The closure can use it as long as threshold is in scope."
+  },
+  {
+    "title": "Capturing by value with move",
+    "instruction": "`move` forces the closure to take ownership of captured variables.\n\nNecessary for closures used in threads.\n\nRun this.",
+    "starter": "fn main() {\n    let msg = String::from(\"hello\");\n    let greet = move || println!(\"{}\", msg); // msg is moved\n    greet();\n    greet();\n    // msg is no longer accessible here\n}",
+    "expectedOutput": [
+      "hello",
+      "hello"
+    ],
+    "successMessage": "move transfers ownership of msg into the closure. The closure can be called multiple times and msg is available each time."
+  },
+  {
+    "title": "Closures as arguments",
+    "instruction": "Pass closures to functions that take `impl Fn`, `impl FnMut`, or `impl FnOnce`.\n\nRun this.",
+    "starter": "fn apply<F: Fn(i32) -> i32>(f: F, x: i32) -> i32 {\n    f(x)\n}\n\nfn main() {\n    let double = |x| x * 2;\n    let square = |x| x * x;\n    println!(\"{}\", apply(double, 5));\n    println!(\"{}\", apply(square, 5));\n    println!(\"{}\", apply(|x| x + 10, 5));\n}",
+    "expectedOutput": [
+      "10",
+      "25",
+      "15"
+    ],
+    "successMessage": "F: Fn(i32)->i32 is a trait bound for closures and functions. You can pass named closures, anonymous closures, or named functions."
+  },
+  {
+    "title": "Returning closures",
+    "instruction": "Return a closure with `impl Fn` (when the type can be inferred) or `Box<dyn Fn>`.\n\nRun this.",
+    "starter": "fn make_adder(n: i32) -> impl Fn(i32) -> i32 {\n    move |x| x + n\n}\n\nfn main() {\n    let add5 = make_adder(5);\n    let add10 = make_adder(10);\n    println!(\"{}\", add5(3));\n    println!(\"{}\", add10(3));\n}",
+    "expectedOutput": [
+      "8",
+      "13"
+    ],
+    "successMessage": "make_adder returns a closure that captures n. Each returned closure remembers its own n. This is a function factory."
+  },
+  {
+    "title": "FnOnce — consume captured data",
+    "instruction": "`FnOnce` closures can only be called once because they consume their captured data.\n\nRun this.",
+    "starter": "fn call_once<F: FnOnce() -> String>(f: F) -> String {\n    f()\n}\n\nfn main() {\n    let name = String::from(\"Ferris\");\n    let greet = move || format!(\"Hello, {}!\", name);\n    println!(\"{}\", call_once(greet));\n    // greet cannot be called again — it was consumed\n}",
+    "expectedOutput": [
+      "Hello, Ferris!"
+    ],
+    "successMessage": "FnOnce is for closures that consume their captures. Rust's type system prevents calling them twice."
+  },
+  {
+    "title": "Closures and iterators",
+    "instruction": "Closures shine with iterator methods like map, filter, and fold.\n\nRun this.",
+    "starter": "fn main() {\n    let nums = vec![1, 2, 3, 4, 5, 6, 7, 8, 9, 10];\n    let result: Vec<i32> = nums.iter()\n        .filter(|&&x| x % 2 == 0)\n        .map(|&x| x * x)\n        .collect();\n    println!(\"{:?}\", result);\n    \n    let sum: i32 = nums.iter().sum();\n    println!(\"sum: {}\", sum);\n}",
+    "expectedOutput": [
+      "[4, 16, 36, 64, 100]",
+      "sum: 55"
+    ],
+    "successMessage": "filter keeps evens, map squares each. collect turns the iterator into Vec. This functional pipeline is concise and expressive."
+  },
+  {
+    "title": "Mutable closure with FnMut",
+    "instruction": "`FnMut` closures can mutate captured variables. They can be called multiple times.\n\nRun this.",
+    "starter": "fn main() {\n    let mut count = 0;\n    let mut increment = || {\n        count += 1;\n        count\n    };\n    println!(\"{}\", increment());\n    println!(\"{}\", increment());\n    println!(\"{}\", increment());\n}",
+    "expectedOutput": [
+      "1",
+      "2",
+      "3"
+    ],
+    "successMessage": "The closure captures count mutably and increments it each call. FnMut allows this — the closure can modify its captured environment."
+  }
+]

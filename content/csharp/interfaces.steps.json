@@ -1,0 +1,82 @@
+[
+  {
+    "title": "Define and implement an interface",
+    "instruction": "An interface declares methods without implementation. Classes implement them.\n\nRun this.",
+    "starter": "using System;\n\ninterface IShape {\n    double Area();\n    string Name { get; }\n}\n\nclass Circle : IShape {\n    private double r;\n    public Circle(double r) { this.r = r; }\n    public double Area() => Math.PI * r * r;\n    public string Name => \"Circle\";\n}\n\nclass Square : IShape {\n    private double s;\n    public Square(double s) { this.s = s; }\n    public double Area() => s * s;\n    public string Name => \"Square\";\n}\n\nclass Program {\n    static void Main() {\n        IShape[] shapes = { new Circle(3), new Square(4) };\n        foreach (var sh in shapes)\n            Console.WriteLine($\"{sh.Name}: {sh.Area():F2}\");\n    }\n}",
+    "expectedOutput": [
+      "Circle: 28.27",
+      "Square: 16.00"
+    ],
+    "successMessage": "Both Circle and Square implement IShape. The foreach treats them identically through the interface."
+  },
+  {
+    "title": "Multiple interfaces",
+    "instruction": "A class can implement multiple interfaces.\n\nRun this.",
+    "starter": "using System;\n\ninterface IFlyable  { void Fly(); }\ninterface ISwimmable { void Swim(); }\n\nclass Duck : IFlyable, ISwimmable {\n    public void Fly()  => Console.WriteLine(\"Duck flies\");\n    public void Swim() => Console.WriteLine(\"Duck swims\");\n}\n\nclass Program {\n    static void Main() {\n        var duck = new Duck();\n        duck.Fly();\n        duck.Swim();\n        IFlyable f = duck;  // Duck IS an IFlyable\n        f.Fly();\n    }\n}",
+    "expectedOutput": [
+      "Duck flies",
+      "Duck swims",
+      "Duck flies"
+    ],
+    "successMessage": "Duck implements both interfaces. It can be used as either IFlyable or ISwimmable depending on context."
+  },
+  {
+    "title": "Interface as parameter type",
+    "instruction": "Accepting an interface type makes functions work with any implementation.\n\nRun this.",
+    "starter": "using System;\n\ninterface IPrintable { string Format(); }\n\nclass Invoice : IPrintable {\n    public string Format() => \"Invoice #001: $100.00\";\n}\nclass Receipt : IPrintable {\n    public string Format() => \"Receipt: paid $100.00\";\n}\n\nvoid PrintDocument(IPrintable doc) {\n    Console.WriteLine($\"Printing: {doc.Format()}\");\n}\n\nclass Program {\n    static void Main() {\n        PrintDocument(new Invoice());\n        PrintDocument(new Receipt());\n    }\n}",
+    "expectedOutput": [
+      "Printing: Invoice #001: $100.00",
+      "Printing: Receipt: paid $100.00"
+    ],
+    "successMessage": "PrintDocument accepts any IPrintable. Adding a new document type only requires implementing IPrintable — no changes to PrintDocument."
+  },
+  {
+    "title": "Default interface methods",
+    "instruction": "C# 8+ allows default method implementations in interfaces.\n\nRun this.",
+    "starter": "using System;\n\ninterface ILogger {\n    void Log(string msg);\n    void LogError(string msg) => Log($\"[ERROR] {msg}\");\n    void LogInfo(string msg) => Log($\"[INFO] {msg}\");\n}\n\nclass ConsoleLogger : ILogger {\n    public void Log(string msg) => Console.WriteLine(msg);\n}\n\nclass Program {\n    static void Main() {\n        ILogger log = new ConsoleLogger();\n        log.LogInfo(\"App started\");\n        log.LogError(\"Connection failed\");\n    }\n}",
+    "expectedOutput": [
+      "[INFO] App started",
+      "[ERROR] Connection failed"
+    ],
+    "successMessage": "ConsoleLogger only implements Log(). LogInfo and LogError use the default implementations that call Log(). Existing implementations are not broken when you add default methods."
+  },
+  {
+    "title": "IComparable<T>",
+    "instruction": "Implementing `IComparable<T>` allows sorting with built-in methods.\n\nRun this.",
+    "starter": "using System;\nusing System.Collections.Generic;\n\nclass Student : IComparable<Student> {\n    public string Name { get; set; }\n    public int Grade { get; set; }\n\n    public int CompareTo(Student other) => this.Grade.CompareTo(other.Grade);\n\n    public override string ToString() => $\"{Name}:{Grade}\";\n}\n\nclass Program {\n    static void Main() {\n        var students = new List<Student> {\n            new Student { Name = \"Carol\", Grade = 92 },\n            new Student { Name = \"Alice\", Grade = 85 },\n            new Student { Name = \"Bob\",   Grade = 97 }\n        };\n        students.Sort();\n        students.ForEach(s => Console.WriteLine(s));\n    }\n}",
+    "expectedOutput": [
+      "Alice:85",
+      "Carol:92",
+      "Bob:97"
+    ],
+    "successMessage": "IComparable<T> defines how to compare two instances. List.Sort() uses CompareTo to sort by Grade."
+  },
+  {
+    "title": "IEnumerable<T>",
+    "instruction": "Implement `IEnumerable<T>` to make your type usable in foreach.\n\nRun this.",
+    "starter": "using System;\nusing System.Collections;\nusing System.Collections.Generic;\n\nclass NumberRange : IEnumerable<int> {\n    private int start, end;\n    public NumberRange(int start, int end) { this.start = start; this.end = end; }\n\n    public IEnumerator<int> GetEnumerator() {\n        for (int i = start; i <= end; i++) yield return i;\n    }\n    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();\n}\n\nclass Program {\n    static void Main() {\n        foreach (int n in new NumberRange(1, 5)) {\n            Console.Write($\"{n} \");\n        }\n        Console.WriteLine();\n    }\n}",
+    "expectedOutput": [
+      "1 2 3 4 5 "
+    ],
+    "successMessage": "yield return produces values lazily. NumberRange is now foreach-able and LINQ-compatible — all from implementing IEnumerable<T>."
+  },
+  {
+    "title": "Interface segregation",
+    "instruction": "Many small interfaces beat one large interface.\n\nRun this.",
+    "starter": "using System;\n\ninterface IReadable  { string Read(); }\ninterface IWritable  { void Write(string data); }\ninterface ISeekable  { void Seek(int pos); }\n\nclass FileStream : IReadable, IWritable, ISeekable {\n    private string content = \"\";\n    private int pos = 0;\n    public string Read() => content.Substring(pos);\n    public void Write(string data) { content += data; pos = content.Length; }\n    public void Seek(int p) { pos = p; }\n}\n\nclass Program {\n    static void Main() {\n        var fs = new FileStream();\n        fs.Write(\"hello \");\n        fs.Write(\"world\");\n        fs.Seek(0);\n        Console.WriteLine(fs.Read());\n    }\n}",
+    "expectedOutput": [
+      "hello world"
+    ],
+    "successMessage": "Separate interfaces allow passing the minimal contract. A function needing only IReadable does not force the caller to provide write/seek capability."
+  },
+  {
+    "title": "Explicit interface implementation",
+    "instruction": "Explicitly implement when two interfaces have the same method name.\n\nRun this.",
+    "starter": "using System;\n\ninterface IMetric { double Measure(); }\ninterface IImperial { double Measure(); }\n\nclass Distance : IMetric, IImperial {\n    private double metres;\n    public Distance(double m) { metres = m; }\n    double IMetric.Measure()   => metres;\n    double IImperial.Measure() => metres * 3.28084;\n}\n\nclass Program {\n    static void Main() {\n        var d = new Distance(10);\n        Console.WriteLine(((IMetric)d).Measure());\n        Console.WriteLine($\"{((IImperial)d).Measure():F2}\");\n    }\n}",
+    "expectedOutput": [
+      "10",
+      "32.81"
+    ],
+    "successMessage": "Explicit implementation resolves name conflicts. The method is only callable through the interface reference, not through the concrete type directly."
+  }
+]

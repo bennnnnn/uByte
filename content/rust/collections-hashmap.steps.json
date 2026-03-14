@@ -1,0 +1,90 @@
+[
+  {
+    "title": "Create a HashMap",
+    "instruction": "Import `HashMap` from `std::collections`. Use `insert` to add entries.\n\nRun this.",
+    "starter": "use std::collections::HashMap;\n\nfn main() {\n    let mut scores: HashMap<String, i32> = HashMap::new();\n    scores.insert(String::from(\"Alice\"), 92);\n    scores.insert(String::from(\"Bob\"), 85);\n    println!(\"{:?}\", scores.get(\"Alice\"));\n    println!(\"{:?}\", scores.get(\"Charlie\"));\n}",
+    "expectedOutput": [
+      "Some(92)",
+      "None"
+    ],
+    "successMessage": "get returns Option<&V> — Some if found, None if not. HashMap keys must implement Eq and Hash."
+  },
+  {
+    "title": "Iterate a HashMap",
+    "instruction": "Iterating gives (key, value) pairs. Order is not guaranteed.\n\nRun this (output order may vary).",
+    "starter": "use std::collections::HashMap;\n\nfn main() {\n    let mut map = HashMap::new();\n    map.insert(\"one\", 1);\n    map.insert(\"two\", 2);\n    map.insert(\"three\", 3);\n    let mut pairs: Vec<(&&str, &i32)> = map.iter().collect();\n    pairs.sort_by_key(|&(k, _)| *k);\n    for (k, v) in pairs {\n        println!(\"{}: {}\", k, v);\n    }\n}",
+    "expectedOutput": [
+      "one: 1",
+      "three: 3",
+      "two: 2"
+    ],
+    "successMessage": "We sorted the pairs by key so output is deterministic. HashMap iteration order is random — always sort if you need predictable output."
+  },
+  {
+    "title": "contains_key and remove",
+    "instruction": "Check existence with `contains_key`. Remove with `remove`.\n\nRun this.",
+    "starter": "use std::collections::HashMap;\n\nfn main() {\n    let mut m = HashMap::new();\n    m.insert(\"a\", 1);\n    m.insert(\"b\", 2);\n    println!(\"{}\", m.contains_key(\"a\"));\n    m.remove(\"a\");\n    println!(\"{}\", m.contains_key(\"a\"));\n    println!(\"len: {}\", m.len());\n}",
+    "expectedOutput": [
+      "true",
+      "false",
+      "len: 1"
+    ],
+    "successMessage": "remove returns Option<V> with the removed value. Here we discard it. contains_key is O(1) just like get."
+  },
+  {
+    "title": "entry API",
+    "instruction": "The `entry` API updates a value or inserts a default elegantly:\n\n```rust\nmap.entry(key).or_insert(default)\n```\n\nRun this.",
+    "starter": "use std::collections::HashMap;\n\nfn main() {\n    let text = \"hello world hello rust world hello\";\n    let mut counts: HashMap<&str, i32> = HashMap::new();\n    for word in text.split_whitespace() {\n        let count = counts.entry(word).or_insert(0);\n        *count += 1;\n    }\n    let mut pairs: Vec<(&&str, &i32)> = counts.iter().collect();\n    pairs.sort_by_key(|&(k, _)| *k);\n    for (word, count) in pairs {\n        println!(\"{}: {}\", word, count);\n    }\n}",
+    "expectedOutput": [
+      "hello: 3",
+      "rust: 1",
+      "world: 2"
+    ],
+    "successMessage": "entry().or_insert(0) either gets the existing value or inserts 0. Then we dereference and increment. Classic word-count pattern."
+  },
+  {
+    "title": "HashMap from iterator",
+    "instruction": "Build a HashMap from an iterator of (key, value) pairs using `.collect()`.\n\nRun this.",
+    "starter": "use std::collections::HashMap;\n\nfn main() {\n    let keys = vec![\"a\", \"b\", \"c\"];\n    let values = vec![1, 2, 3];\n    let map: HashMap<&str, i32> = keys.into_iter().zip(values).collect();\n    println!(\"{}\", map[\"b\"]);\n}",
+    "expectedOutput": [
+      "2"
+    ],
+    "successMessage": "zip combines two iterators into pairs. collect turns them into a HashMap. map[\"b\"] is indexing — it panics if key is missing, unlike get."
+  },
+  {
+    "title": "Counting with HashMap",
+    "instruction": "A common pattern: count frequencies.\n\nRun this.",
+    "starter": "use std::collections::HashMap;\n\nfn char_frequency(s: &str) -> HashMap<char, usize> {\n    let mut map = HashMap::new();\n    for c in s.chars() {\n        *map.entry(c).or_insert(0) += 1;\n    }\n    map\n}\n\nfn main() {\n    let freq = char_frequency(\"mississippi\");\n    let mut pairs: Vec<(char, usize)> = freq.into_iter().collect();\n    pairs.sort();\n    for (c, n) in pairs {\n        println!(\"{}: {}\", c, n);\n    }\n}",
+    "expectedOutput": [
+      "i: 4",
+      "m: 1",
+      "p: 2",
+      "s: 4"
+    ],
+    "successMessage": "into_iter() consumes the HashMap, giving owned (K, V) pairs. The sort works on tuples (sorts by first element, then second)."
+  },
+  {
+    "title": "Nested HashMap",
+    "instruction": "HashMap values can be any type, including other HashMaps.\n\nRun this.",
+    "starter": "use std::collections::HashMap;\n\nfn main() {\n    let mut db: HashMap<&str, HashMap<&str, i32>> = HashMap::new();\n    db.entry(\"alice\").or_default().insert(\"math\", 95);\n    db.entry(\"alice\").or_default().insert(\"english\", 88);\n    db.entry(\"bob\").or_default().insert(\"math\", 72);\n    for (student, grades) in &db {\n        for (subject, score) in grades {\n            println!(\"{} {}: {}\", student, subject, score);\n        }\n    }\n}",
+    "expectedOutput": [],
+    "codeChecks": [
+      {
+        "pattern": "or_default",
+        "required": true,
+        "message": "Use or_default() to initialise the inner HashMap when first inserting."
+      }
+    ],
+    "successMessage": "or_default() inserts and returns a reference to a default value (empty HashMap here). Output order varies — HashMap is unordered."
+  },
+  {
+    "title": "HashMap vs Vec — when to use which",
+    "instruction": "Use Vec when order matters or data is indexed by position.\nUse HashMap when you look up by a meaningful key.\n\nRun this.",
+    "starter": "use std::collections::HashMap;\n\nfn main() {\n    // Vec: ordered list of items\n    let todo: Vec<&str> = vec![\"write tests\", \"fix bug\", \"deploy\"];\n    println!(\"first task: {}\", todo[0]);\n\n    // HashMap: look up by name\n    let mut config: HashMap<&str, &str> = HashMap::new();\n    config.insert(\"host\", \"localhost\");\n    config.insert(\"port\", \"8080\");\n    println!(\"host: {}\", config[\"host\"]);\n}",
+    "expectedOutput": [
+      "first task: write tests",
+      "host: localhost"
+    ],
+    "successMessage": "Vec for sequences, HashMap for lookups. Choosing the right data structure is one of the most impactful decisions in a program."
+  }
+]

@@ -1,71 +1,14 @@
 ---
 title: "Getting Started with C#"
-description: "Write your first C# program, understand the Main method, and learn how C# compiles and runs on .NET."
+description: "Write your first C# program, understand the class structure, and get comfortable with Console.WriteLine."
 order: 1
 difficulty: "beginner"
-estimatedMinutes: 10
+estimatedMinutes: 12
+concepts: ["class", "Main", "Console.WriteLine", "using", "namespace"]
 ---
 
-## What is C#?
+## Your first C# program
 
-C# (pronounced "C sharp") is a modern, object-oriented language built by Microsoft for the **.NET** platform. It powers web apps (ASP.NET), desktop apps, game development (Unity), and cloud services.
+C# is a modern, object-oriented language created by Microsoft. Every C# program has a `Main` method as its entry point.
 
-**Why learn C#?**
-- **Type-safe** — catches errors at compile time, not runtime
-- **Modern** — async/await, LINQ, pattern matching, nullable reference types
-- **Versatile** — web, desktop, games, mobile (Xamarin/MAUI), cloud
-- **Large ecosystem** — NuGet package manager, rich standard library
-
----
-
-## Hello, World!
-
-```csharp
-using System;
-
-class Program {
-    static void Main() {
-        Console.WriteLine("Hello, World!");
-    }
-}
-```
-
-- `using System;` imports the core .NET namespace (gives you `Console`, `Math`, etc.)
-- `class Program` wraps your code — everything in C# lives inside a class
-- `static void Main()` is the entry point of every C# program
-- `Console.WriteLine()` prints a line to the console
-
----
-
-## Variables & Types
-
-```csharp
-int age = 25;
-string name = "Alice";
-bool isReady = true;
-double pi = 3.14;
-```
-
-C# is **statically typed** — each variable has a fixed type. Use `var` when the type is obvious:
-
-```csharp
-var greeting = "Hello";   // compiler infers string
-var count    = 42;        // infers int
-```
-
----
-
-## String Interpolation
-
-```csharp
-string name = "World";
-Console.WriteLine($"Hello, {name}!");   // Hello, World!
-```
-
-Prefix a string with `$` to embed expressions inside `{}`.
-
----
-
-## What's Next?
-
-You've written your first C# program. Next: **variables and types** — value types, reference types, type conversion, and constants.
+`Console.WriteLine()` prints a line to the console — the equivalent of `fmt.Println` in Go or `print()` in Python.

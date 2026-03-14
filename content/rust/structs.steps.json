@@ -1,0 +1,76 @@
+[
+  {
+    "title": "Define a struct",
+    "instruction": "Declare a struct with named fields. Create instances with field names.\n\nRun this.",
+    "starter": "struct Point {\n    x: f64,\n    y: f64,\n}\n\nfn main() {\n    let p = Point { x: 3.0, y: 4.0 };\n    println!(\"({}, {})\", p.x, p.y);\n}",
+    "expectedOutput": [
+      "(3, 4)"
+    ],
+    "successMessage": "Point bundles two f64 values with names. Access fields with dot notation."
+  },
+  {
+    "title": "Mutable struct instance",
+    "instruction": "To change a field, the variable must be `mut`.\n\nRun this.",
+    "starter": "struct Counter {\n    value: i32,\n    step: i32,\n}\n\nfn main() {\n    let mut c = Counter { value: 0, step: 5 };\n    c.value += c.step;\n    c.value += c.step;\n    println!(\"{}\", c.value);\n}",
+    "expectedOutput": [
+      "10"
+    ],
+    "successMessage": "Rust's mutability is all-or-nothing: the whole binding is mut or not. You cannot make individual fields selectively mutable."
+  },
+  {
+    "title": "Debug formatting",
+    "instruction": "`#[derive(Debug)]` generates a debug print. Use `{:?}` or `{:#?}`.\n\nRun this.",
+    "starter": "#[derive(Debug)]\nstruct Rect {\n    width: f64,\n    height: f64,\n}\n\nfn main() {\n    let r = Rect { width: 10.0, height: 5.0 };\n    println!(\"{:?}\", r);\n    println!(\"{:#?}\", r);\n}",
+    "expectedOutput": [
+      "Rect { width: 10.0, height: 5.0 }",
+      "Rect {\n    width: 10.0,\n    height: 5.0,\n}"
+    ],
+    "successMessage": "#[derive(Debug)] is free documentation. {:?} compact, {:#?} pretty. Essential while building programs."
+  },
+  {
+    "title": "Methods with impl",
+    "instruction": "Methods live in an `impl` block. The first parameter `&self` refers to the instance.\n\nRun this.",
+    "starter": "struct Rect { width: f64, height: f64 }\n\nimpl Rect {\n    fn area(&self) -> f64 {\n        self.width * self.height\n    }\n    fn perimeter(&self) -> f64 {\n        2.0 * (self.width + self.height)\n    }\n}\n\nfn main() {\n    let r = Rect { width: 6.0, height: 4.0 };\n    println!(\"area={} perimeter={}\", r.area(), r.perimeter());\n}",
+    "expectedOutput": [
+      "area=24 perimeter=20"
+    ],
+    "successMessage": "&self gives read-only access to the instance. Multiple methods can share an impl block."
+  },
+  {
+    "title": "Mutating methods",
+    "instruction": "Use `&mut self` to modify the struct in a method.\n\nRun this.",
+    "starter": "struct Stack {\n    items: Vec<i32>,\n}\n\nimpl Stack {\n    fn push(&mut self, n: i32) {\n        self.items.push(n);\n    }\n    fn pop(&mut self) -> Option<i32> {\n        self.items.pop()\n    }\n    fn len(&self) -> usize {\n        self.items.len()\n    }\n}\n\nfn main() {\n    let mut s = Stack { items: vec![] };\n    s.push(1); s.push(2); s.push(3);\n    println!(\"{:?}\", s.pop());\n    println!(\"len: {}\", s.len());\n}",
+    "expectedOutput": [
+      "Some(3)",
+      "len: 2"
+    ],
+    "successMessage": "&mut self lets the method modify the struct. pop returns Option because the stack might be empty."
+  },
+  {
+    "title": "Associated functions",
+    "instruction": "Associated functions do not take `self`. Call them with `TypeName::function()`.\n\nBy convention, `new()` is the constructor.\n\nRun this.",
+    "starter": "struct Circle {\n    radius: f64,\n}\n\nimpl Circle {\n    fn new(radius: f64) -> Circle {\n        Circle { radius }\n    }\n    fn area(&self) -> f64 {\n        std::f64::consts::PI * self.radius * self.radius\n    }\n}\n\nfn main() {\n    let c = Circle::new(5.0);\n    println!(\"{:.4}\", c.area());\n}",
+    "expectedOutput": [
+      "78.5398"
+    ],
+    "successMessage": "Circle::new is the constructor. The shorthand Circle { radius } works because the field name matches the variable name."
+  },
+  {
+    "title": "Struct update syntax",
+    "instruction": "Reuse fields from an existing struct with `..existing`:\n\nRun this.",
+    "starter": "#[derive(Debug)]\nstruct Config {\n    debug: bool,\n    log_level: u8,\n    timeout: u32,\n}\n\nfn main() {\n    let defaults = Config { debug: False, log_level: 1, timeout: 30 };\n    let dev = Config { debug: True, ..defaults };\n    println!(\"{:?}\", dev);\n}",
+    "expectedOutput": [
+      "Config { debug: True, log_level: 1, timeout: 30 }"
+    ],
+    "successMessage": "..defaults fills in the fields not explicitly set. Great for configuration structs with many fields."
+  },
+  {
+    "title": "Tuple structs",
+    "instruction": "Tuple structs wrap values without field names. Access via `.0`, `.1`, etc.\n\nRun this.",
+    "starter": "struct Metres(f64);\nstruct Kilograms(f64);\n\nfn bmi(weight: Kilograms, height: Metres) -> f64 {\n    weight.0 / (height.0 * height.0)\n}\n\nfn main() {\n    let bmi = bmi(Kilograms(70.0), Metres(1.75));\n    println!(\"{:.1}\", bmi);\n}",
+    "expectedOutput": [
+      "22.9"
+    ],
+    "successMessage": "You cannot accidentally pass Metres where Kilograms is expected. The compiler enforces it. This 'newtype pattern' adds type safety for free."
+  }
+]
