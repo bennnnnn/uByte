@@ -4,12 +4,14 @@
  * Floating onboarding checklist — shown in the bottom-right corner for new users.
  * Automatically hides when all 3 steps are done or the user dismisses it.
  * Dismissed state is stored in localStorage so it survives page refreshes.
+ * Status re-fetches on window focus and every 30 s so completed steps tick in real-time.
  */
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import { useAuth } from "@/components/AuthProvider";
 
 const DISMISSED_KEY = "ubyte_onboarding_dismissed";
+const POLL_INTERVAL = 30_000;
 
 interface Status {
   show: boolean;
@@ -17,6 +19,24 @@ interface Status {
   solvedPracticeProblem: boolean;
   attemptedCert: boolean;
 }
+
+const STEPS = [
+  {
+    label: "Complete your first tutorial step",
+    key: "completedTutorialStep" as const,
+    href: "/tutorial/go/getting-started",
+  },
+  {
+    label: "Solve a practice problem",
+    key: "solvedPracticeProblem" as const,
+    href: "/practice/go/two-sum",
+  },
+  {
+    label: "Attempt a certification exam",
+    key: "attemptedCert" as const,
+    href: "/certifications",
+  },
+];
 
 function CheckCircle({ done }: { done: boolean }) {
   return done ? (
@@ -35,6 +55,7 @@ export default function OnboardingChecklist() {
   const [status, setStatus] = useState<Status | null>(null);
   const [open, setOpen] = useState(true);
   const [dismissed, setDismissed] = useState(false);
+  const [allDoneVisible, setAllDoneVisible] = useState(false);
 
   useEffect(() => {
     if (typeof window !== "undefined" && localStorage.getItem(DISMISSED_KEY) === "1") {
@@ -42,39 +63,74 @@ export default function OnboardingChecklist() {
     }
   }, []);
 
-  useEffect(() => {
-    if (!user || loading || dismissed) return;
+  const fetchStatus = useCallback(() => {
+    if (!user || dismissed) return;
     fetch("/api/onboarding-status")
       .then((r) => r.json())
-      .then((j: Status) => setStatus(j))
+      .then((j: Status) => {
+        setStatus((prev) => {
+          // If all 3 just became done, show a brief "all done" state before auto-dismissing
+          const allNowDone = j.completedTutorialStep && j.solvedPracticeProblem && j.attemptedCert;
+          const wasAllDoneBefore = prev
+            ? prev.completedTutorialStep && prev.solvedPracticeProblem && prev.attemptedCert
+            : false;
+          if (allNowDone && !wasAllDoneBefore) {
+            setAllDoneVisible(true);
+            setTimeout(() => {
+              localStorage.setItem(DISMISSED_KEY, "1");
+              setDismissed(true);
+            }, 3000);
+          }
+          return j;
+        });
+      })
       .catch(() => {});
-  }, [user, loading, dismissed]);
+  }, [user, dismissed]);
+
+  // Initial fetch
+  useEffect(() => {
+    if (!user || loading || dismissed) return;
+    fetchStatus();
+  }, [user, loading, dismissed, fetchStatus]);
+
+  // Re-fetch on window focus (catches when user returns after completing a step)
+  useEffect(() => {
+    if (!user || dismissed) return;
+    const onFocus = () => fetchStatus();
+    window.addEventListener("focus", onFocus);
+    return () => window.removeEventListener("focus", onFocus);
+  }, [user, dismissed, fetchStatus]);
+
+  // Poll every 30 s as a fallback
+  useEffect(() => {
+    if (!user || dismissed) return;
+    const id = setInterval(fetchStatus, POLL_INTERVAL);
+    return () => clearInterval(id);
+  }, [user, dismissed, fetchStatus]);
 
   const dismiss = () => {
     localStorage.setItem(DISMISSED_KEY, "1");
     setDismissed(true);
   };
 
-  if (!user || loading || dismissed || !status?.show) return null;
+  if (!user || loading || dismissed) return null;
+  if (!status?.show && !allDoneVisible) return null;
 
-  const steps = [
-    {
-      label: "Complete your first tutorial step",
-      done: status.completedTutorialStep,
-      href: "/tutorial/go",
-    },
-    {
-      label: "Solve a practice problem",
-      done: status.solvedPracticeProblem,
-      href: "/practice",
-    },
-    {
-      label: "Attempt a certification exam",
-      done: status.attemptedCert,
-      href: "/certifications",
-    },
-  ];
+  const steps = STEPS.map((s) => ({ ...s, done: status ? status[s.key] : false }));
   const completedCount = steps.filter((s) => s.done).length;
+
+  // All-done celebration state
+  if (allDoneVisible) {
+    return (
+      <div className="fixed bottom-6 right-6 z-40 w-72 rounded-2xl border border-emerald-200 bg-white shadow-2xl dark:border-emerald-800 dark:bg-zinc-900">
+        <div className="flex flex-col items-center gap-2 px-6 py-6 text-center">
+          <span className="text-3xl">🎉</span>
+          <p className="font-bold text-zinc-900 dark:text-zinc-100">You&apos;re all set!</p>
+          <p className="text-sm text-zinc-500 dark:text-zinc-400">Great start — keep the momentum going.</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="fixed bottom-6 right-6 z-40 w-72 rounded-2xl border border-zinc-200 bg-white shadow-2xl dark:border-zinc-700 dark:bg-zinc-900">
@@ -106,7 +162,7 @@ export default function OnboardingChecklist() {
 
       {/* Steps */}
       {open && (
-        <ul className="px-4 py-3 space-y-3">
+        <ul className="space-y-3 px-4 py-3">
           {steps.map((step) => (
             <li key={step.label}>
               <Link
