@@ -42,6 +42,7 @@ export const POST = withErrorHandling("POST /api/admin/blog", async (request: Ne
     author?: string;
     published?: boolean;
     slug?: string;
+    og_image?: string;
   };
 
   if (!body.title?.trim()) {
@@ -61,6 +62,7 @@ export const POST = withErrorHandling("POST /api/admin/blog", async (request: Ne
     read_time:   body.read_time?.trim() ?? "5 min read",
     author:      body.author?.trim() ?? "uByte Team",
     published:   body.published ?? true,
+    og_image:    body.og_image?.trim() ?? "",
   });
 
   return NextResponse.json({ post }, { status: 201 });

@@ -17,9 +17,11 @@ export interface BlogPostMeta {
   title: string;
   description: string;
   date: string;
+  updatedAt?: string;
   readTime: string;
   category: string;
   tags: string[];
+  ogImage?: string;
   /** true = from database (admin-created), false = MDX file */
   fromDb?: boolean;
 }
@@ -88,9 +90,11 @@ export async function getAllBlogPosts(): Promise<BlogPostMeta[]> {
         title:       r.title,
         description: r.description,
         date:        r.created_at.slice(0, 10),
+        updatedAt:   r.updated_at.slice(0, 10),
         readTime:    r.read_time,
         category:    r.category,
         tags:        r.tags,
+        ogImage:     r.og_image || undefined,
         fromDb:      true,
       }));
   } catch { /* DB unavailable — fall back to MDX only */ }
@@ -107,19 +111,22 @@ export async function getAllBlogPosts(): Promise<BlogPostMeta[]> {
 
 /**
  * Returns a single blog post. Checks DB first, then MDX.
+ * Pass `allowDraft = true` to return unpublished DB posts (admin preview).
  */
-export async function getBlogPost(slug: string): Promise<BlogPost | null> {
+export async function getBlogPost(slug: string, allowDraft = false): Promise<BlogPost | null> {
   try {
     const dbPost = await getDbBlogPost(slug);
-    if (dbPost && dbPost.published) {
+    if (dbPost && (dbPost.published || allowDraft)) {
       return {
         slug:        dbPost.slug,
         title:       dbPost.title,
         description: dbPost.description,
         date:        dbPost.created_at.slice(0, 10),
+        updatedAt:   dbPost.updated_at.slice(0, 10),
         readTime:    dbPost.read_time,
         category:    dbPost.category,
         tags:        dbPost.tags,
+        ogImage:     dbPost.og_image || undefined,
         content:     dbPost.content,
         fromDb:      true,
       };

@@ -18,6 +18,7 @@ export interface DbBlogPost {
   read_time: string;
   author: string;
   published: boolean;
+  og_image: string;
   created_at: string;
   updated_at: string;
 }
@@ -40,10 +41,13 @@ async function ensureTable(): Promise<void> {
       read_time   TEXT    NOT NULL DEFAULT '5 min read',
       author      TEXT    NOT NULL DEFAULT 'uByte Team',
       published   BOOLEAN NOT NULL DEFAULT true,
+      og_image    TEXT    NOT NULL DEFAULT '',
       created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
       updated_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
     )
   `;
+  // Add og_image column to existing tables (safe migration)
+  await sql`ALTER TABLE blog_posts ADD COLUMN IF NOT EXISTS og_image TEXT NOT NULL DEFAULT ''`.catch(() => {});
   _ready = true;
 }
 
@@ -61,6 +65,7 @@ function parse(row: Record<string, unknown>): DbBlogPost {
     read_time:   row.read_time as string,
     author:      row.author as string,
     published:   row.published as boolean,
+    og_image:    (row.og_image as string) ?? "",
     created_at:  row.created_at as string,
     updated_at:  row.updated_at as string,
   };
@@ -92,9 +97,9 @@ export async function createDbBlogPost(input: DbBlogPostInput): Promise<DbBlogPo
   const sql = getSql();
   const tagsJson = JSON.stringify(input.tags ?? []);
   const rows = await sql`
-    INSERT INTO blog_posts (slug, title, description, content, category, tags, read_time, author, published)
+    INSERT INTO blog_posts (slug, title, description, content, category, tags, read_time, author, published, og_image)
     VALUES (${input.slug}, ${input.title}, ${input.description}, ${input.content},
-            ${input.category}, ${tagsJson}, ${input.read_time}, ${input.author}, ${input.published})
+            ${input.category}, ${tagsJson}, ${input.read_time}, ${input.author}, ${input.published}, ${input.og_image ?? ""})
     RETURNING *
   `;
   return parse(rows[0]);
@@ -115,6 +120,7 @@ export async function updateDbBlogPost(id: number, input: Partial<DbBlogPostInpu
       read_time   = COALESCE(${input.read_time ?? null}, read_time),
       author      = COALESCE(${input.author ?? null}, author),
       published   = COALESCE(${input.published ?? null}, published),
+      og_image    = COALESCE(${input.og_image ?? null}, og_image),
       updated_at  = NOW()
     WHERE id = ${id}
     RETURNING *

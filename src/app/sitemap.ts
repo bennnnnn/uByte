@@ -15,8 +15,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const languageSlugs = getAllLanguageSlugs();
   const practiceProblems = getAllPracticeProblems();
 
-  const blogSlugs = getMdxBlogSlugs();
+  const allBlogSlugs = getMdxBlogSlugs();
   const dbPosts = await getAllDbBlogPosts().catch(() => []);
+  // DB posts override MDX posts on slug collision — deduplicate
+  const dbPublished = dbPosts.filter((p) => p.published);
+  const dbSlugsSet = new Set(dbPublished.map((p) => p.slug));
+  const blogSlugs = allBlogSlugs.filter((s) => !dbSlugsSet.has(s));
   const entries: MetadataRoute.Sitemap = [
     // Core pages — highest priority
     { url: abs("/"), lastModified: now, changeFrequency: "weekly", priority: 1.0 },
@@ -41,15 +45,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: "monthly" as const,
       priority: 0.75,
     })),
-    // DB blog posts (admin-created) — only published ones
-    ...dbPosts
-      .filter((p) => p.published)
-      .map((p) => ({
-        url: abs(`/blog/${p.slug}`),
-        lastModified: p.updated_at ? new Date(p.updated_at) : now,
-        changeFrequency: "monthly" as const,
-        priority: 0.75,
-      })),
+    // DB blog posts — published only (deduped with MDX above)
+    ...dbPublished.map((p) => ({
+      url: abs(`/blog/${p.slug}`),
+      lastModified: p.updated_at ? new Date(p.updated_at) : now,
+      changeFrequency: "monthly" as const,
+      priority: 0.80,
+    })),
   ];
 
   for (const lang of languageSlugs) {

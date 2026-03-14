@@ -6,9 +6,12 @@ import rehypePrettyCode from "rehype-pretty-code";
 import { getMdxBlogSlugs, getBlogPost, getAllBlogPosts } from "@/lib/blog";
 import { absoluteUrl } from "@/lib/seo";
 import { APP_NAME, BASE_URL } from "@/lib/constants";
+import { getCurrentUser } from "@/lib/auth";
+import { getUserById } from "@/lib/db";
 
 interface Props {
   params: Promise<{ slug: string }>;
+  searchParams: Promise<{ preview?: string }>;
 }
 
 export const dynamic = "force-dynamic";
@@ -19,14 +22,15 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const post = await getBlogPost(slug);
+  const post = await getBlogPost(slug, true);
   if (!post) return {};
-  const ogTitle = encodeURIComponent(post.title);
-  const ogDesc = encodeURIComponent(post.description);
+  const ogImage = post.ogImage
+    ? post.ogImage
+    : `${BASE_URL}/api/og?title=${encodeURIComponent(post.title)}&description=${encodeURIComponent(post.description)}`;
   return {
     title: post.title,
     description: post.description,
-    authors: [{ name: APP_NAME, url: BASE_URL }],
+    authors: [{ name: post.fromDb ? (post as { author?: string }).author ?? APP_NAME : APP_NAME, url: BASE_URL }],
     alternates: { canonical: absoluteUrl(`/blog/${slug}`) },
     openGraph: {
       type: "article",
@@ -34,15 +38,16 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       description: post.description,
       url: absoluteUrl(`/blog/${slug}`),
       publishedTime: post.date,
+      modifiedTime: post.updatedAt ?? post.date,
       authors: [BASE_URL],
       tags: post.tags,
-      images: [{ url: `${BASE_URL}/api/og?title=${ogTitle}&description=${ogDesc}`, width: 1200, height: 630 }],
+      images: [{ url: ogImage, width: 1200, height: 630 }],
     },
     twitter: {
       card: "summary_large_image",
       title: post.title,
       description: post.description,
-      images: [`${BASE_URL}/api/og?title=${ogTitle}&description=${ogDesc}`],
+      images: [ogImage],
     },
   };
 }
@@ -53,9 +58,21 @@ const rehypePrettyCodeOptions: any = {
   keepBackground: false,
 };
 
-export default async function BlogPostPage({ params }: Props) {
+export default async function BlogPostPage({ params, searchParams }: Props) {
   const { slug } = await params;
-  const post = await getBlogPost(slug);
+  const { preview } = await searchParams;
+
+  // Allow admin to preview drafts via ?preview=1
+  let allowDraft = false;
+  if (preview === "1") {
+    const session = await getCurrentUser();
+    if (session) {
+      const user = await getUserById(session.userId);
+      allowDraft = !!(user?.is_admin);
+    }
+  }
+
+  const post = await getBlogPost(slug, allowDraft);
   if (!post) notFound();
 
   const allPosts = await getAllBlogPosts();
@@ -73,23 +90,28 @@ export default async function BlogPostPage({ params }: Props) {
     },
   });
 
+  const ogImageUrl = post.ogImage
+    ? post.ogImage
+    : `${BASE_URL}/api/og?title=${encodeURIComponent(post.title)}&description=${encodeURIComponent(post.description)}`;
+
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "Article",
     headline: post.title,
     description: post.description,
     datePublished: post.date,
-    dateModified: post.date,
+    dateModified: post.updatedAt ?? post.date,
+    image: ogImageUrl,
     author: {
       "@type": "Organization",
-      name: "uByte",
+      name: APP_NAME,
       url: BASE_URL,
     },
     publisher: {
       "@type": "Organization",
-      name: "uByte",
+      name: APP_NAME,
       url: BASE_URL,
-      logo: { "@type": "ImageObject", url: `${BASE_URL}/favicon.ico` },
+      logo: { "@type": "ImageObject", url: `${BASE_URL}/icon.png` },
     },
     mainEntityOfPage: {
       "@type": "WebPage",
@@ -108,6 +130,17 @@ export default async function BlogPostPage({ params }: Props) {
       />
 
       <div className="mx-auto max-w-3xl px-6 py-14">
+        {/* Draft preview banner */}
+        {allowDraft && preview === "1" && (
+          <div className="mb-6 flex items-center gap-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 dark:border-amber-900/50 dark:bg-amber-950/30">
+            <span className="text-amber-500">⚠</span>
+            <p className="text-sm font-medium text-amber-700 dark:text-amber-300">
+              <strong>Admin preview</strong> — this post is a draft and not visible to the public.{" "}
+              <a href="/admin" className="underline hover:no-underline">Back to admin →</a>
+            </p>
+          </div>
+        )}
+
         {/* Back */}
         <Link
           href="/blog"

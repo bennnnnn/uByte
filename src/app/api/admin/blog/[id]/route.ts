@@ -32,6 +32,7 @@ export const PUT = withErrorHandling("PUT /api/admin/blog/[id]", async (request:
     author?: string;
     published?: boolean;
     slug?: string;
+    og_image?: string;
   };
 
   const updated = await updateDbBlogPost(id, {
@@ -44,6 +45,7 @@ export const PUT = withErrorHandling("PUT /api/admin/blog/[id]", async (request:
     ...(body.read_time   !== undefined && { read_time:   body.read_time.trim() }),
     ...(body.author      !== undefined && { author:      body.author.trim() }),
     ...(body.published   !== undefined && { published:   body.published }),
+    ...(body.og_image    !== undefined && { og_image:    body.og_image.trim() }),
   });
 
   if (!updated) return NextResponse.json({ error: "Post not found" }, { status: 404 });

@@ -23,6 +23,7 @@ interface BlogPost {
   read_time: string;
   author: string;
   published: boolean;
+  og_image: string;
   created_at: string;
   updated_at: string;
 }
@@ -37,6 +38,7 @@ const EMPTY: Omit<BlogPost, "id" | "created_at" | "updated_at"> = {
   read_time: "5 min read",
   author: "uByte Team",
   published: true,
+  og_image: "",
 };
 
 const CATEGORIES = ["General", "Interview Prep", "Learning Guide", "Language Deep Dive", "Comparison", "News"];
@@ -195,6 +197,7 @@ export default function BlogTab() {
       read_time:   post.read_time,
       author:      post.author,
       published:   post.published,
+      og_image:    post.og_image ?? "",
     });
     setTagInput("");
     setEditing(post);
@@ -389,6 +392,27 @@ export default function BlogTab() {
               </div>
             </div>
 
+            {/* OG Image */}
+            <div>
+              <label className="mb-1 block text-xs font-semibold text-zinc-600 dark:text-zinc-400">
+                Custom OG Image URL
+                <span className="ml-1 font-normal text-zinc-400">(optional — leave blank to auto-generate from title)</span>
+              </label>
+              <input
+                type="url"
+                value={form.og_image}
+                onChange={(e) => setForm((f) => ({ ...f, og_image: e.target.value }))}
+                placeholder="https://yourdomain.com/images/post-cover.png"
+                className="w-full rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-800 focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-200 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200"
+              />
+              {form.og_image && (
+                <div className="mt-2">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={form.og_image} alt="OG preview" className="h-32 w-full rounded-lg object-cover border border-zinc-200 dark:border-zinc-700" onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }} />
+                </div>
+              )}
+            </div>
+
             {/* Content editor with preview toggle */}
             <div>
               <div className="mb-1 flex items-center justify-between">
@@ -444,8 +468,28 @@ export default function BlogTab() {
                 disabled={saving}
                 className="rounded-xl bg-indigo-600 px-5 py-2 text-sm font-semibold text-white transition-colors hover:bg-indigo-500 disabled:opacity-60"
               >
-                {saving ? "Saving…" : isNew ? "Publish post" : "Save changes"}
+                {saving ? "Saving…" : isNew ? "Create post" : "Save changes"}
               </button>
+              {editing && !form.published && editing.slug && (
+                <a
+                  href={`/blog/${editing.slug}?preview=1`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="rounded-xl border border-amber-200 bg-amber-50 px-5 py-2 text-sm font-semibold text-amber-700 transition-colors hover:bg-amber-100 dark:border-amber-900/50 dark:bg-amber-950/30 dark:text-amber-300"
+                >
+                  Preview draft →
+                </a>
+              )}
+              {editing && form.published && editing.slug && (
+                <a
+                  href={`/blog/${editing.slug}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="rounded-xl border border-zinc-200 bg-white px-5 py-2 text-sm font-semibold text-zinc-600 transition-colors hover:bg-zinc-50 dark:border-zinc-700 dark:bg-transparent dark:text-zinc-400"
+                >
+                  View live →
+                </a>
+              )}
               {editing && (
                 <button
                   type="button"
