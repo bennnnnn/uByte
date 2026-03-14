@@ -17,6 +17,7 @@ import { createNotification } from "@/lib/db/notifications";
 import { getCurrentUser } from "@/lib/auth";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 import { withErrorHandling } from "@/lib/api-utils";
+import { verifyCsrf } from "@/lib/csrf";
 import { getPracticeProblemBySlug } from "@/lib/practice/problems";
 
 export const GET = withErrorHandling(
@@ -41,6 +42,9 @@ export const GET = withErrorHandling(
 export const POST = withErrorHandling(
   "POST /api/discussion/[slug]",
   async (req: NextRequest, ctx: unknown) => {
+    const csrfError = verifyCsrf(req);
+    if (csrfError) return NextResponse.json({ error: csrfError }, { status: 403 });
+
     const { slug } = await (ctx as { params: Promise<{ slug: string }> }).params;
 
     // Auth required

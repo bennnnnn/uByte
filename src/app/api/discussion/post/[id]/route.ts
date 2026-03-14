@@ -7,10 +7,14 @@ import { NextRequest, NextResponse } from "next/server";
 import { softDeletePost } from "@/lib/db/discussion";
 import { getCurrentUser } from "@/lib/auth";
 import { withErrorHandling } from "@/lib/api-utils";
+import { verifyCsrf } from "@/lib/csrf";
 
 export const DELETE = withErrorHandling(
   "DELETE /api/discussion/[id]",
-  async (_req: NextRequest, ctx: unknown) => {
+  async (req: NextRequest, ctx: unknown) => {
+    const csrfError = verifyCsrf(req);
+    if (csrfError) return NextResponse.json({ error: csrfError }, { status: 403 });
+
     const { id: idStr } = await (ctx as { params: Promise<{ id: string }> }).params;
     const id = parseInt(idStr, 10);
     if (!id) return NextResponse.json({ error: "Invalid id" }, { status: 400 });

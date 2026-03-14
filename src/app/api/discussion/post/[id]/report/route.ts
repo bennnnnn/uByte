@@ -6,6 +6,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { withErrorHandling } from "@/lib/api-utils";
 import { getCurrentUser } from "@/lib/auth";
+import { verifyCsrf } from "@/lib/csrf";
 import { getSql } from "@/lib/db/client";
 
 const VALID_REASONS = ["spam", "harassment", "inappropriate", "other"] as const;
@@ -28,6 +29,9 @@ async function ensureTable() {
 export const POST = withErrorHandling(
   "POST /api/discussion/post/[id]/report",
   async (req: NextRequest, ctx: unknown) => {
+    const csrfError = verifyCsrf(req);
+    if (csrfError) return NextResponse.json({ error: csrfError }, { status: 403 });
+
     const user = await getCurrentUser();
     if (!user) {
       return NextResponse.json({ error: "Sign in to report a post." }, { status: 401 });

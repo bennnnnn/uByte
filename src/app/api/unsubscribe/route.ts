@@ -13,9 +13,17 @@ import { NextRequest, NextResponse } from "next/server";
 import { createHmac, timingSafeEqual as cryptoTimingSafeEqual } from "crypto";
 import { unsubscribeByEmail } from "@/lib/db/users";
 
+function getSecret(): string {
+  const secret = process.env.UNSUBSCRIBE_SECRET ?? process.env.JWT_SECRET;
+  if (!secret) {
+    // Hard-fail at request time rather than silently accepting forged tokens.
+    throw new Error("UNSUBSCRIBE_SECRET (or JWT_SECRET) env var is not set");
+  }
+  return secret;
+}
+
 function makeToken(email: string): string {
-  const secret = process.env.UNSUBSCRIBE_SECRET ?? process.env.JWT_SECRET ?? "fallback-secret";
-  return createHmac("sha256", secret).update(email.toLowerCase().trim()).digest("hex");
+  return createHmac("sha256", getSecret()).update(email.toLowerCase().trim()).digest("hex");
 }
 
 export async function GET(request: NextRequest): Promise<NextResponse> {
@@ -27,7 +35,14 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     return NextResponse.redirect(new URL("/", request.url));
   }
 
-  const expected = makeToken(email);
+  let expected: string;
+  try {
+    expected = makeToken(email);
+  } catch {
+    // Misconfigured server — redirect silently rather than exposing the error.
+    return NextResponse.redirect(new URL("/", request.url));
+  }
+
   // Constant-time comparison
   if (expected.length !== token.length || !timingSafeEqual(expected, token)) {
     return NextResponse.redirect(new URL("/", request.url));
