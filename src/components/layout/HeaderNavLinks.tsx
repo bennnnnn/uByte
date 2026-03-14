@@ -4,6 +4,10 @@ import Link from "next/link";
 import { useState, useRef, useCallback, useEffect } from "react";
 import { usePathname } from "next/navigation";
 
+// How long (ms) to wait before closing after mouse leaves — lets the cursor
+// travel from the trigger button into the panel without the menu snapping shut.
+const CLOSE_DELAY = 120;
+
 const LANGUAGES = [
   { slug: "go",         icon: "🐹", label: "Go",         sub: "Beginner-friendly"    },
   { slug: "python",     icon: "🐍", label: "Python",     sub: "Clean & readable"      },
@@ -30,6 +34,9 @@ const linkBase =
 type DropdownId = "tutorials" | "interview" | "certifications";
 
 // Reusable dropdown wrapper — handles hover AND keyboard open/close with ARIA attributes.
+// Uses a delayed close so the cursor can travel from the trigger into the panel.
+// NO CSS group-hover — visibility is driven purely by JS state to avoid the
+// bug where group-hover keeps the panel open after a link click.
 function NavDropdown({
   id,
   label,
@@ -48,8 +55,23 @@ function NavDropdown({
   children: React.ReactNode;
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
+  const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Close when focus leaves this entire dropdown container.
+  const scheduleClose = useCallback(() => {
+    closeTimer.current = setTimeout(onClose, CLOSE_DELAY);
+  }, [onClose]);
+
+  const cancelClose = useCallback(() => {
+    if (closeTimer.current) {
+      clearTimeout(closeTimer.current);
+      closeTimer.current = null;
+    }
+  }, []);
+
+  // Clean up timer on unmount
+  useEffect(() => () => { if (closeTimer.current) clearTimeout(closeTimer.current); }, []);
+
+  // Close when keyboard focus leaves the container entirely
   const handleBlur = useCallback(
     (e: React.FocusEvent) => {
       if (!containerRef.current?.contains(e.relatedTarget as Node)) {
@@ -59,15 +81,14 @@ function NavDropdown({
     [onClose],
   );
 
-  const isVisible = open;
   const dropdownClasses = `absolute left-0 top-full z-50 mt-1.5 origin-top-left rounded-2xl border border-zinc-200 bg-white shadow-xl shadow-zinc-200/60 transition-all duration-150 dark:border-zinc-700 dark:bg-zinc-900 dark:shadow-black/40 ${
-    isVisible ? "visible opacity-100" : "invisible opacity-0 group-hover:visible group-hover:opacity-100"
+    open ? "visible opacity-100" : "invisible opacity-0 pointer-events-none"
   }`;
 
   return (
     <div
       ref={containerRef}
-      className="group relative"
+      className="relative"
       onBlur={handleBlur}
     >
       <button
@@ -76,8 +97,8 @@ function NavDropdown({
         aria-haspopup="true"
         aria-expanded={open}
         aria-controls={menuId}
-        onMouseEnter={() => onOpen(id)}
-        onMouseLeave={onClose}
+        onMouseEnter={() => { cancelClose(); onOpen(id); }}
+        onMouseLeave={scheduleClose}
         onClick={() => (open ? onClose() : onOpen(id))}
         onKeyDown={(e) => {
           if (e.key === "Enter" || e.key === " " || e.key === "ArrowDown") {
@@ -89,7 +110,7 @@ function NavDropdown({
       >
         {label}
         <svg
-          className={`ml-1 inline-block h-3.5 w-3.5 transition-transform duration-200 ${open ? "rotate-180" : "group-hover:rotate-180"}`}
+          className={`ml-1 inline-block h-3.5 w-3.5 transition-transform duration-200 ${open ? "rotate-180" : ""}`}
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
@@ -100,15 +121,15 @@ function NavDropdown({
         </svg>
       </button>
 
-      {/* Dropdown panel — keyboard-reachable via Tab when open */}
+      {/* Dropdown panel */}
       <div
         id={menuId}
         role="menu"
         aria-label={`${label} menu`}
         className={dropdownClasses}
-        onMouseEnter={() => onOpen(id)}
-        onMouseLeave={onClose}
-        onKeyDown={(e) => { if (e.key === "Escape") { onClose(); } }}
+        onMouseEnter={cancelClose}
+        onMouseLeave={scheduleClose}
+        onKeyDown={(e) => { if (e.key === "Escape") onClose(); }}
       >
         {children}
       </div>
