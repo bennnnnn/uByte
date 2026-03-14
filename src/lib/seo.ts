@@ -66,3 +66,86 @@ export function buildSiteSearchJsonLd() {
     },
   };
 }
+
+export function buildOrganizationJsonLd() {
+  return {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: APP_NAME,
+    url: absoluteUrl("/"),
+    logo: absoluteUrl("/icon.png"),
+    sameAs: [],
+    description:
+      "uByte offers interactive programming tutorials, LeetCode-style coding challenges, and certification exams for Go, Python, JavaScript, Java, Rust, C++, and C#.",
+  };
+}
+
+export function buildCourseJsonLd({
+  name,
+  description,
+  url,
+  lessonCount,
+}: {
+  name: string;
+  description: string;
+  url: string;
+  lessonCount?: number;
+}) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "Course",
+    name,
+    description,
+    url: absoluteUrl(url),
+    provider: {
+      "@type": "Organization",
+      name: APP_NAME,
+      url: absoluteUrl("/"),
+    },
+    ...(lessonCount !== undefined && {
+      hasCourseInstance: {
+        "@type": "CourseInstance",
+        courseMode: "online",
+        courseWorkload: `PT${Math.ceil(lessonCount * 5)}M`,
+      },
+    }),
+  };
+}
+
+export function buildArticleJsonLd({
+  headline,
+  description,
+  url,
+  datePublished,
+  dateModified,
+  image,
+}: {
+  headline: string;
+  description: string;
+  url: string;
+  datePublished?: string;
+  dateModified?: string;
+  image?: string;
+}) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline,
+    description,
+    url: absoluteUrl(url),
+    ...(datePublished && { datePublished }),
+    ...(dateModified && { dateModified }),
+    ...(image && { image }),
+    author: {
+      "@type": "Organization",
+      name: APP_NAME,
+      url: absoluteUrl("/"),
+    },
+    publisher: {
+      "@type": "Organization",
+      name: APP_NAME,
+      url: absoluteUrl("/"),
+      logo: { "@type": "ImageObject", url: absoluteUrl("/icon.png") },
+    },
+  };
+}

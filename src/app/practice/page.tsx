@@ -30,6 +30,12 @@ export const metadata: Metadata = {
       "Coding problems across multiple languages. Write real code in the browser and get instant feedback.",
     type: "website",
     url: absoluteUrl("/practice"),
+    images: [{ url: absoluteUrl("/api/og?title=Interview+Prep&description=LeetCode-style+problems+in+7+languages"), width: 1200, height: 630 }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Interview Prep — Ace Your Coding Interview | uByte",
+    description: "LeetCode-style coding problems in Go, Python, JavaScript, Java, Rust, C++, and C#. Write code in-browser with instant test feedback.",
   },
 };
 

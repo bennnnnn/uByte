@@ -1,0 +1,535 @@
+---
+title: "Top 20 C++ Interview Questions (With Answers & Code)"
+description: "The most commonly asked C++ interview questions with detailed answers and code examples. Covers memory management, RAII, move semantics, STL, templates, and modern C++17/20 features."
+date: "2026-03-03"
+readTime: "20 min read"
+category: "Interview Prep"
+tags: ["C++", "Interview Prep", "Systems Programming"]
+---
+
+C++ is still the language of choice for systems programming, game engines, high-frequency trading, compilers, and performance-critical software. Interviews at companies like Google, Bloomberg, Jane Street, and NVIDIA go deep on C++ fundamentals. Here are the 20 questions you're most likely to face — with real code, not textbook definitions.
+
+## Table of Contents
+
+1. [What is RAII?](#raii)
+2. [What is a smart pointer?](#smart-pointers)
+3. [What is the difference between `new` and `malloc`?](#new-malloc)
+4. [What are move semantics?](#move-semantics)
+5. [What is an rvalue reference?](#rvalue-ref)
+6. [What is the Rule of Five?](#rule-of-five)
+7. [What is `const` correctness?](#const-correctness)
+8. [What is a virtual function and vtable?](#vtable)
+9. [What is the difference between `override` and `final`?](#override-final)
+10. [What is a template?](#templates)
+11. [What is template specialization?](#template-specialization)
+12. [What is `std::move`?](#std-move)
+13. [What is `std::forward` and perfect forwarding?](#perfect-forwarding)
+14. [What is undefined behavior?](#ub)
+15. [What is the difference between `std::vector` and `std::list`?](#vector-list)
+16. [What is `std::optional`?](#optional)
+17. [What are lambda expressions?](#lambdas)
+18. [What is the difference between `nullptr` and `NULL`?](#nullptr)
+19. [What is `constexpr`?](#constexpr)
+20. [What are C++20 concepts?](#concepts)
+
+---
+
+## 1. What is RAII? {#raii}
+
+**Resource Acquisition Is Initialization** is a core C++ idiom: tie resource lifetime to object lifetime. Acquire in the constructor, release in the destructor. When the object goes out of scope, the destructor runs automatically — even if an exception is thrown.
+
+```cpp
+class FileHandle {
+public:
+    explicit FileHandle(const std::string& path) {
+        file_ = std::fopen(path.c_str(), "r");
+        if (!file_) throw std::runtime_error("Cannot open file: " + path);
+    }
+
+    ~FileHandle() {
+        if (file_) std::fclose(file_);  // always runs
+    }
+
+    // Prevent copying (use move semantics instead)
+    FileHandle(const FileHandle&) = delete;
+    FileHandle& operator=(const FileHandle&) = delete;
+
+private:
+    FILE* file_;
+};
+
+void process() {
+    FileHandle f("data.txt");
+    // use f...
+}  // destructor called here — file always closed
+```
+
+> RAII is why you should prefer `std::fstream`, `std::unique_ptr`, and `std::lock_guard` over manual resource management.
+
+---
+
+## 2. What is a smart pointer? {#smart-pointers}
+
+Smart pointers manage heap memory automatically using RAII.
+
+```cpp
+#include <memory>
+
+// unique_ptr: sole ownership, zero overhead
+auto up = std::make_unique<int>(42);
+// Deleted when up goes out of scope
+
+// shared_ptr: shared ownership via reference counting
+auto sp1 = std::make_shared<std::string>("hello");
+auto sp2 = sp1;  // refcount = 2
+// Deleted when last shared_ptr is destroyed
+
+// weak_ptr: non-owning reference (breaks cycles)
+std::weak_ptr<std::string> wp = sp1;
+if (auto locked = wp.lock()) {  // check still alive
+    std::cout << *locked;
+}
+```
+
+| Pointer | Ownership | Overhead |
+|---------|-----------|---------|
+| `unique_ptr` | Sole | Zero (same as raw ptr) |
+| `shared_ptr` | Shared | Reference count (thread-safe atomic) |
+| `weak_ptr` | None | None |
+
+> **Rule**: Prefer `unique_ptr`. Use `shared_ptr` only when you truly need shared ownership. Avoid raw owning pointers.
+
+---
+
+## 3. What is the difference between `new` and `malloc`? {#new-malloc}
+
+| | `new` | `malloc` |
+|---|---|---|
+| Type safety | Yes (typed) | No (returns `void*`) |
+| Calls constructor? | Yes | No |
+| Calls destructor? | Yes (via `delete`) | No |
+| On failure | Throws `std::bad_alloc` | Returns `nullptr` |
+| Overridable? | Yes (`operator new`) | No |
+
+```cpp
+// new: allocates AND constructs
+MyClass* obj = new MyClass(42);
+delete obj;  // destructs AND deallocates
+
+// malloc: raw memory only
+MyClass* raw = static_cast<MyClass*>(malloc(sizeof(MyClass)));
+// constructor NOT called!
+free(raw);  // destructor NOT called!
+```
+
+> In modern C++, you rarely need to call `new` directly. Use `std::make_unique` or `std::make_shared`.
+
+---
+
+## 4. What are move semantics? {#move-semantics}
+
+Move semantics (C++11) allow transferring resources from a temporary object rather than copying them, avoiding expensive deep copies.
+
+```cpp
+std::vector<int> createBigVector() {
+    std::vector<int> v(1'000'000);
+    // fill v...
+    return v;  // moved, not copied (NRVO or move)
+}
+
+auto big = createBigVector();  // no million-element copy
+
+// Explicit move
+std::string src = "hello";
+std::string dst = std::move(src);  // src is now in valid-but-unspecified state
+// dst owns the string's memory
+```
+
+---
+
+## 5. What is an rvalue reference? {#rvalue-ref}
+
+An rvalue reference (`T&&`) binds to **temporaries** (rvalues). This is the mechanism behind move semantics.
+
+```cpp
+void process(std::string&& s) {  // binds to rvalues only
+    // Can safely "steal" s's memory
+    std::string local = std::move(s);
+}
+
+process(std::string("temp"));  // OK: temporary is rvalue
+std::string str = "persistent";
+// process(str);  // Error: str is an lvalue
+process(std::move(str));       // OK: explicitly cast to rvalue
+```
+
+---
+
+## 6. What is the Rule of Five? {#rule-of-five}
+
+If you define any of: destructor, copy constructor, copy assignment, move constructor, move assignment — you should explicitly define all five (or use `= default`/`= delete`).
+
+```cpp
+class Buffer {
+public:
+    explicit Buffer(size_t size) : size_(size), data_(new char[size]) {}
+
+    ~Buffer() { delete[] data_; }  // 1. Destructor
+
+    // 2. Copy constructor
+    Buffer(const Buffer& other) : size_(other.size_), data_(new char[other.size_]) {
+        std::copy(other.data_, other.data_ + size_, data_);
+    }
+
+    // 3. Copy assignment
+    Buffer& operator=(const Buffer& other) {
+        if (this != &other) {
+            delete[] data_;
+            size_ = other.size_;
+            data_ = new char[size_];
+            std::copy(other.data_, other.data_ + size_, data_);
+        }
+        return *this;
+    }
+
+    // 4. Move constructor
+    Buffer(Buffer&& other) noexcept : size_(other.size_), data_(other.data_) {
+        other.size_ = 0;
+        other.data_ = nullptr;
+    }
+
+    // 5. Move assignment
+    Buffer& operator=(Buffer&& other) noexcept {
+        if (this != &other) {
+            delete[] data_;
+            size_ = other.size_;
+            data_ = other.data_;
+            other.size_ = 0;
+            other.data_ = nullptr;
+        }
+        return *this;
+    }
+
+private:
+    size_t size_;
+    char* data_;
+};
+```
+
+---
+
+## 7. What is `const` correctness? {#const-correctness}
+
+Using `const` to communicate and enforce that objects and methods don't mutate state.
+
+```cpp
+class Circle {
+public:
+    explicit Circle(double r) : radius_(r) {}
+
+    double area() const {   // "const member function" — cannot modify members
+        return 3.14159 * radius_ * radius_;
+    }
+
+    void setRadius(double r) { radius_ = r; }  // non-const: modifies state
+
+private:
+    double radius_;
+};
+
+void printArea(const Circle& c) {  // "const reference" — cheap, read-only
+    std::cout << c.area();   // OK: area() is const
+    // c.setRadius(5);       // Error: cannot call non-const method on const ref
+}
+```
+
+---
+
+## 8. What is a virtual function and vtable? {#vtable}
+
+A `virtual` function enables **dynamic dispatch** — the correct derived-class implementation is called at runtime based on the actual object type.
+
+```cpp
+struct Shape {
+    virtual double area() const = 0;  // pure virtual
+    virtual ~Shape() = default;        // always virtual destructor for polymorphic base!
+};
+
+struct Circle : Shape {
+    double r;
+    explicit Circle(double r) : r(r) {}
+    double area() const override { return 3.14159 * r * r; }
+};
+
+// Runtime polymorphism
+std::unique_ptr<Shape> s = std::make_unique<Circle>(5.0);
+s->area();  // calls Circle::area(), not Shape::area()
+```
+
+**Vtable**: Each class with virtual functions has a vtable (array of function pointers). Each object has a hidden `vptr` pointing to its class's vtable. Virtual dispatch = indirect function call through vptr[index].
+
+> **Always declare a virtual destructor** in polymorphic base classes, or deleting a derived object through a base pointer is undefined behavior.
+
+---
+
+## 9. What is the difference between `override` and `final`? {#override-final}
+
+- `override`: Tells the compiler this method overrides a virtual function. Compile error if it doesn't.
+- `final`: Prevents further overriding (or inheritance if on a class).
+
+```cpp
+struct Base {
+    virtual void foo(int);
+    virtual void bar();
+};
+
+struct Derived : Base {
+    void foo(int) override;  // OK
+    // void foo(double) override;  // Error: no matching virtual function
+    void bar() final;  // can't be overridden further
+};
+```
+
+---
+
+## 10. What is a template? {#templates}
+
+Templates generate code for multiple types at **compile time** with zero runtime overhead.
+
+```cpp
+// Function template
+template<typename T>
+T max_val(T a, T b) {
+    return a > b ? a : b;
+}
+
+auto m = max_val(3, 5);         // T = int
+auto n = max_val(3.14, 2.71);   // T = double
+
+// Class template
+template<typename T, size_t N>
+class FixedArray {
+    T data[N];
+public:
+    T& operator[](size_t i) { return data[i]; }
+    constexpr size_t size() const { return N; }
+};
+
+FixedArray<int, 10> arr;
+arr[0] = 42;
+```
+
+---
+
+## 11. What is template specialization? {#template-specialization}
+
+Provide a custom implementation for a specific type.
+
+```cpp
+// Primary template
+template<typename T>
+void serialize(const T& val) {
+    std::cout << val;
+}
+
+// Full specialization for bool
+template<>
+void serialize<bool>(const bool& val) {
+    std::cout << (val ? "true" : "false");
+}
+
+// Partial specialization for pointer types
+template<typename T>
+void serialize<T*>(T* const& ptr) {
+    if (ptr) serialize(*ptr);
+    else std::cout << "null";
+}
+```
+
+---
+
+## 12. What is `std::move`? {#std-move}
+
+`std::move` is a **cast** to an rvalue reference. It doesn't move anything itself — it enables move semantics by signaling "this object can be moved from."
+
+```cpp
+std::vector<int> a = {1, 2, 3, 4, 5};
+std::vector<int> b = std::move(a);  // b takes ownership of a's memory
+// a is now empty (valid but unspecified state)
+
+// After move, don't use 'a' unless you reassign it
+a = {10, 20};  // safe to reuse after reassignment
+```
+
+---
+
+## 13. What is `std::forward` and perfect forwarding? {#perfect-forwarding}
+
+`std::forward` preserves the value category (lvalue/rvalue) of an argument when forwarding to another function — critical for template wrapper functions.
+
+```cpp
+template<typename T, typename... Args>
+std::unique_ptr<T> make(Args&&... args) {
+    // Without forward: args are lvalues inside this function
+    // With forward: preserves original lvalue/rvalue nature
+    return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
+}
+
+// This is essentially how std::make_unique works
+auto p = make<MyClass>(1, std::string("hello"), 3.14);
+```
+
+---
+
+## 14. What is undefined behavior? {#ub}
+
+Undefined behavior (UB) is when the C++ standard places **no requirements** on what the program does. The compiler is free to assume UB never happens and optimize accordingly — with potentially catastrophic results.
+
+```cpp
+// Common UB examples:
+int arr[5];
+arr[10] = 1;         // out-of-bounds write — UB
+int* p = nullptr;
+*p = 5;              // null dereference — UB
+int i = 0;
+i = ++i + i++;       // order of evaluation — UB (pre-C++17)
+int x = INT_MAX;
+x++;                 // signed integer overflow — UB
+```
+
+> **Tools**: Use `-fsanitize=address,undefined` (ASan/UBSan) during development to catch UB at runtime.
+
+---
+
+## 15. What is the difference between `std::vector` and `std::list`? {#vector-list}
+
+| | `vector` | `list` (doubly linked) |
+|---|---|---|
+| Memory layout | Contiguous | Scattered nodes |
+| Index access | O(1) | O(n) |
+| Insert/erase at end | O(1) amortized | O(1) |
+| Insert/erase in middle | O(n) | O(1) with iterator |
+| Cache friendliness | Excellent | Poor |
+
+> **In practice**: `vector` is faster for almost everything due to cache locality, even for insert-in-middle workloads unless they're very frequent. Default to `vector`.
+
+---
+
+## 16. What is `std::optional`? {#optional}
+
+`std::optional<T>` (C++17) represents a value that may or may not be present — without heap allocation.
+
+```cpp
+#include <optional>
+
+std::optional<int> divide(int a, int b) {
+    if (b == 0) return std::nullopt;
+    return a / b;
+}
+
+auto result = divide(10, 2);
+if (result) {
+    std::cout << *result;  // 5
+}
+
+// Monadic operations (C++23)
+auto doubled = divide(10, 2).transform([](int x) { return x * 2; });
+```
+
+---
+
+## 17. What are lambda expressions? {#lambdas}
+
+Lambdas are anonymous function objects with optional capture of surrounding variables.
+
+```cpp
+auto square = [](int x) { return x * x; };
+std::cout << square(5);  // 25
+
+// Capture by value
+int factor = 3;
+auto multiply = [factor](int x) { return x * factor; };
+
+// Capture by reference
+int sum = 0;
+std::vector<int> v = {1, 2, 3, 4, 5};
+std::for_each(v.begin(), v.end(), [&sum](int x) { sum += x; });
+
+// Generic lambda (C++14)
+auto identity = [](auto x) { return x; };
+identity(42);
+identity("hello");
+```
+
+---
+
+## 18. What is the difference between `nullptr` and `NULL`? {#nullptr}
+
+`nullptr` (C++11) is a typed null pointer constant of type `std::nullptr_t`. `NULL` is typically `0` or `(void*)0` — an integer.
+
+```cpp
+void f(int x);
+void f(int* x);
+
+f(NULL);     // ambiguous — calls f(int) since NULL is 0
+f(nullptr);  // unambiguous — calls f(int*)
+```
+
+> Always use `nullptr`. `NULL` can cause subtle overload resolution bugs.
+
+---
+
+## 19. What is `constexpr`? {#constexpr}
+
+`constexpr` forces evaluation at **compile time** when possible, producing zero-cost constants and functions.
+
+```cpp
+constexpr int factorial(int n) {
+    return n <= 1 ? 1 : n * factorial(n - 1);
+}
+
+constexpr int fac5 = factorial(5);  // computed at compile time: 120
+
+// constexpr class
+struct Point {
+    int x, y;
+    constexpr int distSq() const { return x*x + y*y; }
+};
+
+constexpr Point p{3, 4};
+static_assert(p.distSq() == 25);  // checked at compile time
+```
+
+---
+
+## 20. What are C++20 concepts? {#concepts}
+
+Concepts constrain template type parameters with readable, compiler-enforced requirements — replacing SFINAE.
+
+```cpp
+#include <concepts>
+
+// Define a concept
+template<typename T>
+concept Numeric = std::integral<T> || std::floating_point<T>;
+
+// Constrained function template
+template<Numeric T>
+T add(T a, T b) { return a + b; }
+
+add(1, 2);       // OK
+add(1.5, 2.5);   // OK
+// add("a", "b"); // Clear error: "a" doesn't satisfy Numeric
+
+// Standard library concepts
+template<std::sortable Container>
+void sortContainer(Container& c) {
+    std::sort(c.begin(), c.end());
+}
+```
+
+---
+
+## Practice & Certification
+
+These concepts appear directly in the [uByte C++ certification exam](/certifications/cpp). Try the [C++ practice problems](/practice/cpp) to solidify your understanding before your interview.

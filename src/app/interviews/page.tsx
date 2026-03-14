@@ -1,22 +1,45 @@
 import Link from "next/link";
+import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import { getApprovedExperiences, countApprovedExperiences } from "@/lib/db/interview-experiences";
 import type { Difficulty, Outcome } from "@/lib/db/interview-experiences";
 import { getCurrentUser } from "@/lib/auth";
 import VoteButton from "./VoteButton";
+import { absoluteUrl, SITE_KEYWORDS } from "@/lib/seo";
+import { APP_NAME } from "@/lib/constants";
 
-const COMPANIES = [
-  "Google", "Meta", "Amazon", "Apple", "Microsoft", "Netflix",
-  "Stripe", "Airbnb", "Uber", "Lyft", "LinkedIn", "Salesforce",
-  "Adobe", "Oracle", "IBM", "Palantir", "Coinbase", "Shopify",
-  "Atlassian", "Dropbox", "Snap", "DoorDash", "Instacart", "Robinhood",
-  "Block", "Twilio", "Datadog", "MongoDB", "Cloudflare", "Figma",
-  "Notion", "Vercel", "GitHub", "GitLab", "Spotify", "Twitter / X",
-];
-
-export const metadata = {
-  title: "Interview Experiences · uByte",
-  description: "Real developer interview experiences shared anonymously. Learn what to expect at top tech companies.",
+export const metadata: Metadata = {
+  title: "Developer Interview Experiences",
+  description:
+    "Real developer interview experiences shared anonymously. See what questions get asked at Google, Meta, Amazon, Microsoft, and other top tech companies. Filter by company, difficulty, and outcome.",
+  keywords: [
+    ...SITE_KEYWORDS,
+    "developer interview experiences",
+    "tech interview questions",
+    "software engineer interview",
+    "google interview questions",
+    "meta interview questions",
+    "amazon interview questions",
+    "faang interview prep",
+    "interview experience community",
+  ],
+  alternates: { canonical: absoluteUrl("/interviews") },
+  openGraph: {
+    type: "website",
+    title: "Developer Interview Experiences | uByte",
+    description:
+      "Real anonymous interview stories from developers at top tech companies. Learn what to expect and how to prepare.",
+    url: absoluteUrl("/interviews"),
+    siteName: APP_NAME,
+    locale: "en_US",
+    images: [{ url: absoluteUrl("/api/og?title=Interview+Experiences&description=Real+stories+from+developers+at+top+tech+companies"), width: 1200, height: 630 }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Developer Interview Experiences | uByte",
+    description:
+      "Real anonymous interview stories from developers at Google, Meta, Amazon, and more. Filter by company, difficulty, and outcome.",
+  },
 };
 
 /* ── Constants ──────────────────────────────────────────────────────────── */
@@ -61,8 +84,27 @@ export default async function InterviewsPage({ searchParams }: Props) {
   const totalPages = Math.ceil(total / PAGE_SIZE);
   const hasFilters = !!(company || difficulty || outcome);
 
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "DiscussionForumPosting",
+    headline: "Developer Interview Experiences",
+    description: "Real developer interview experiences shared anonymously. Learn what to expect at top tech companies.",
+    url: absoluteUrl("/interviews"),
+    publisher: {
+      "@type": "Organization",
+      name: APP_NAME,
+      url: absoluteUrl("/"),
+    },
+    interactionStatistic: {
+      "@type": "InteractionCounter",
+      interactionType: "https://schema.org/CommentAction",
+      userInteractionCount: total,
+    },
+  };
+
   return (
     <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
 
       {/* Header */}
       <div className="mb-8">

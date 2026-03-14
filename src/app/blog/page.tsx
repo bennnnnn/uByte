@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { getAllBlogPosts } from "@/lib/blog";
-import { absoluteUrl, SITE_KEYWORDS } from "@/lib/seo";
-import { BASE_URL } from "@/lib/constants";
+import { absoluteUrl, SITE_KEYWORDS, buildOrganizationJsonLd } from "@/lib/seo";
+import { BASE_URL, APP_NAME } from "@/lib/constants";
 
 export const metadata: Metadata = {
   title: "Blog — Programming Tutorials & Guides",
@@ -49,8 +49,25 @@ export const dynamic = "force-dynamic";
 export default async function BlogPage() {
   const posts = await getAllBlogPosts();
 
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Blog",
+    name: `${APP_NAME} Blog`,
+    description: "Programming tutorials, interview prep guides, and language deep-dives.",
+    url: absoluteUrl("/blog"),
+    publisher: buildOrganizationJsonLd(),
+    blogPost: posts.slice(0, 10).map((post) => ({
+      "@type": "BlogPosting",
+      headline: post.title,
+      description: post.description,
+      url: absoluteUrl(`/blog/${post.slug}`),
+      ...(post.date && { datePublished: post.date }),
+    })),
+  };
+
   return (
     <div className="min-h-full overflow-y-auto">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <div className="mx-auto max-w-4xl px-6 py-14">
 
         <section className="mb-12">

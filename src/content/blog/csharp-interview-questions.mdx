@@ -1,0 +1,549 @@
+---
+title: "Top 20 C# Interview Questions (With Answers & Code)"
+description: "The most commonly asked C# interview questions with detailed answers and code examples. Covers async/await, LINQ, generics, delegates, garbage collection, and .NET internals."
+date: "2026-03-03"
+readTime: "19 min read"
+category: "Interview Prep"
+tags: ["C#", "Interview Prep", "Backend Engineering", ".NET"]
+---
+
+C# is the language of .NET, ASP.NET Core, Unity game development, and enterprise software. Companies like Microsoft, Accenture, Capgemini, and countless startups and banks hire C# developers at scale. These are the 20 questions that come up most in C# interviews — from junior to senior level.
+
+## Table of Contents
+
+1. [What is the difference between `class` and `struct`?](#class-struct)
+2. [What is boxing and unboxing?](#boxing)
+3. [What is `null` vs `Nullable<T>`?](#nullable)
+4. [What are delegates and events?](#delegates-events)
+5. [What is LINQ?](#linq)
+6. [What is the difference between `IEnumerable`, `ICollection`, and `IList`?](#collections)
+7. [What is `async`/`await`?](#async-await)
+8. [What is the difference between `Task` and `Thread`?](#task-thread)
+9. [What is the `using` statement?](#using)
+10. [What is garbage collection in .NET?](#gc)
+11. [What is `ref` vs `out` vs `in`?](#ref-out-in)
+12. [What are generics?](#generics)
+13. [What is covariance and contravariance?](#variance)
+14. [What is the `yield` keyword?](#yield)
+15. [What is `record` in C#?](#records)
+16. [What is dependency injection in ASP.NET Core?](#di)
+17. [What is the difference between `==` and `.Equals()`?](#equality)
+18. [What are extension methods?](#extension-methods)
+19. [What is `Span<T>`?](#span)
+20. [What are pattern matching expressions?](#pattern-matching)
+
+---
+
+## 1. What is the difference between `class` and `struct`? {#class-struct}
+
+| | `class` | `struct` |
+|---|---|---|
+| Type kind | Reference type (heap) | Value type (stack or inline) |
+| Assignment | Copies reference | Copies entire value |
+| Nullable | Yes (null is valid) | No (unless `Nullable<T>`) |
+| Inheritance | Yes | No (can implement interfaces) |
+| Default | `null` | Default value of each field |
+
+```csharp
+class Point2D { public int X, Y; }  // reference type
+struct Point3D { public int X, Y, Z; }  // value type
+
+var p1 = new Point2D { X = 1 };
+var p2 = p1;   // p2 references the same object
+p2.X = 99;
+Console.WriteLine(p1.X);  // 99 — shared reference
+
+var p3 = new Point3D { X = 1 };
+var p4 = p3;   // p4 is a full copy
+p4.X = 99;
+Console.WriteLine(p3.X);  // 1 — independent copy
+```
+
+> **When to use struct**: Small, immutable data (`Vector3`, `DateTime`, `KeyValuePair`). Avoid mutable structs — they cause confusing copy semantics.
+
+---
+
+## 2. What is boxing and unboxing? {#boxing}
+
+Boxing wraps a value type in a heap-allocated `object`. Unboxing extracts it. Both involve memory allocation and potential `InvalidCastException`.
+
+```csharp
+int i = 42;
+object boxed = i;           // boxing: allocates heap object
+int unboxed = (int)boxed;   // unboxing: copies value back
+
+// Performance trap: boxing in tight loops
+var list = new ArrayList();  // non-generic — stores object
+list.Add(1);   // boxes each int
+list.Add(2);
+int sum = 0;
+foreach (int x in list) sum += x;  // unboxes each element
+
+// Fix: use generic collections (no boxing)
+var list2 = new List<int>();
+list2.Add(1);  // no boxing
+```
+
+---
+
+## 3. What is `null` vs `Nullable<T>`? {#nullable}
+
+Reference types can be `null` by default. Value types cannot — unless wrapped in `Nullable<T>` (shorthand `T?`).
+
+```csharp
+int? age = null;          // Nullable<int>
+if (age.HasValue) Console.WriteLine(age.Value);
+int actual = age ?? 0;    // null-coalescing: default to 0
+
+// Null-conditional operator
+string? name = null;
+int? length = name?.Length;   // null instead of NullReferenceException
+Console.WriteLine(name?.ToUpper() ?? "UNKNOWN");
+
+// Nullable reference types (C# 8+, opt-in)
+#nullable enable
+string nonNull = "hello";   // cannot be null
+string? maybeNull = null;   // explicitly nullable
+```
+
+---
+
+## 4. What are delegates and events? {#delegates-events}
+
+A **delegate** is a type-safe function pointer — a reference to a method with a specific signature. An **event** is a delegate restricted so only the owning class can invoke it.
+
+```csharp
+// Delegate type
+delegate int Transform(int x);
+
+Transform square = x => x * x;
+Transform cube = x => x * x * x;
+Console.WriteLine(square(5));  // 25
+
+// Multicast delegate (+=)
+Transform chain = square;
+chain += cube;
+// chain(3) invokes both — returns last result (27)
+
+// Event
+class Button {
+    public event EventHandler<EventArgs>? Clicked;  // event (delegate restricted)
+
+    public void Click() => Clicked?.Invoke(this, EventArgs.Empty);
+}
+
+var btn = new Button();
+btn.Clicked += (s, e) => Console.WriteLine("clicked!");
+btn.Click();
+```
+
+---
+
+## 5. What is LINQ? {#linq}
+
+LINQ (Language-Integrated Query) lets you query any `IEnumerable` or `IQueryable` with a unified syntax — in-memory collections, databases (via EF Core), XML, etc.
+
+```csharp
+var numbers = new[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
+
+// Method syntax (preferred in code)
+var result = numbers
+    .Where(n => n % 2 == 0)
+    .Select(n => n * n)
+    .OrderByDescending(n => n)
+    .ToList();  // [100, 64, 36, 16, 4]
+
+// Query syntax (resembles SQL)
+var result2 = (from n in numbers
+               where n % 2 == 0
+               orderby n descending
+               select n * n).ToList();
+
+// EF Core: LINQ translates to SQL
+var activeUsers = await dbContext.Users
+    .Where(u => u.IsActive && u.CreatedAt > cutoff)
+    .OrderBy(u => u.Name)
+    .Select(u => new { u.Id, u.Name })
+    .ToListAsync();
+```
+
+---
+
+## 6. What is the difference between `IEnumerable`, `ICollection`, and `IList`? {#collections}
+
+| Interface | Supports | Use when |
+|---|---|---|
+| `IEnumerable<T>` | Iteration only | Read-only sequences, LINQ |
+| `ICollection<T>` | + Count, Add, Remove | You need to know the count |
+| `IList<T>` | + indexing, Insert | You need random access |
+
+```csharp
+// Prefer the most restrictive interface in method signatures
+void ProcessItems(IEnumerable<string> items) {
+    foreach (var item in items) { /* ... */ }
+}
+
+// Can pass List, Array, HashSet, etc. to IEnumerable
+ProcessItems(new[] { "a", "b" });
+ProcessItems(new List<string> { "x", "y" });
+```
+
+---
+
+## 7. What is `async`/`await`? {#async-await}
+
+`async`/`await` enables non-blocking I/O without blocking threads. The `await` keyword suspends the method and releases the thread until the awaited task completes.
+
+```csharp
+// Blocking (bad): ties up a thread for the entire I/O operation
+string content = File.ReadAllText("large.json");
+
+// Non-blocking (good): thread is freed during I/O
+string content = await File.ReadAllTextAsync("large.json");
+
+// Parallel async work
+var task1 = FetchUserAsync(id1);
+var task2 = FetchOrdersAsync(userId);
+await Task.WhenAll(task1, task2);  // both run concurrently
+
+// ConfigureAwait(false): don't capture synchronization context (for library code)
+var data = await GetDataAsync().ConfigureAwait(false);
+```
+
+> **Common mistake**: `async void` — only acceptable for event handlers. Always return `Task` or `Task<T>` from async methods, so callers can await and handle exceptions.
+
+---
+
+## 8. What is the difference between `Task` and `Thread`? {#task-thread}
+
+| | `Thread` | `Task` |
+|---|---|---|
+| Level | OS thread (expensive) | Abstraction over ThreadPool |
+| Creation cost | High (~1MB stack) | Low |
+| Continuation | Manual | Built-in (`ContinueWith`, `await`) |
+| Return value | None | Yes (`Task<T>`) |
+| Exception handling | Manual | Propagated via `await` |
+
+```csharp
+// Thread: raw OS thread
+var thread = new Thread(() => Console.WriteLine("in thread"));
+thread.Start();
+thread.Join();
+
+// Task: ThreadPool work item
+var task = Task.Run(() => ComputeHeavy());
+int result = await task;
+
+// Don't mix Task and Thread.Sleep — use Task.Delay
+await Task.Delay(1000);  // non-blocking 1-second wait
+```
+
+---
+
+## 9. What is the `using` statement? {#using}
+
+`using` ensures `IDisposable.Dispose()` is called when the block exits, even if an exception is thrown — similar to `finally`.
+
+```csharp
+// Classic using block
+using (var conn = new SqlConnection(connString)) {
+    conn.Open();
+    // use conn
+}  // Dispose() called here — connection released
+
+// C# 8+ declaration (no braces)
+using var reader = new StreamReader("file.txt");
+string content = await reader.ReadToEndAsync();
+// Dispose() called at end of enclosing scope
+
+// Implementing IDisposable
+class ResourceHolder : IDisposable {
+    private bool _disposed = false;
+    public void Dispose() {
+        if (!_disposed) {
+            CleanupNativeResources();
+            _disposed = true;
+        }
+    }
+}
+```
+
+---
+
+## 10. What is garbage collection in .NET? {#gc}
+
+.NET's GC is a generational, tracing garbage collector. Objects are allocated in generations:
+
+- **Gen 0**: New objects. Collected most frequently (milliseconds).
+- **Gen 1**: Objects that survived Gen 0. Buffer between Gen 0 and Gen 2.
+- **Gen 2**: Long-lived objects. Collected rarely (full GC).
+- **Large Object Heap (LOH)**: Objects ≥ 85KB. Collected with Gen 2.
+
+```csharp
+// Forcing GC (rarely needed — usually a sign of a problem)
+GC.Collect();
+GC.WaitForPendingFinalizers();
+
+// Object pooling to reduce GC pressure
+var pool = new ObjectPool<MyObject>(() => new MyObject());
+var obj = pool.Get();
+// ... use obj ...
+pool.Return(obj);  // reuse instead of GC
+```
+
+> **Key insight**: Gen 0 collections are cheap and frequent. Design objects to be short-lived (Gen 0) or very long-lived (Gen 2). Mid-lifetime objects promoted to Gen 1/2 are the most expensive.
+
+---
+
+## 11. What is `ref` vs `out` vs `in`? {#ref-out-in}
+
+| Modifier | Must be initialized before call? | Can read in method? | Must assign in method? |
+|---|---|---|---|
+| `ref` | Yes | Yes | No |
+| `out` | No | No (technically) | Yes |
+| `in` | Yes | Yes (read-only) | No |
+
+```csharp
+void Modify(ref int x) { x *= 2; }
+void Initialize(out int x) { x = 42; }  // must assign
+void ReadOnly(in int x) { /* x = 5; ERROR */ }
+
+int a = 10;
+Modify(ref a);    // a = 20
+Initialize(out int b);  // b = 42
+
+// Common use: Try-pattern
+if (int.TryParse("42", out int result)) {
+    Console.WriteLine(result);  // 42
+}
+```
+
+---
+
+## 12. What are generics? {#generics}
+
+Generics provide type-safe, reusable code without boxing.
+
+```csharp
+// Generic class
+class Stack<T> {
+    private readonly List<T> _items = new();
+    public void Push(T item) => _items.Add(item);
+    public T Pop() { var item = _items[^1]; _items.RemoveAt(_items.Count - 1); return item; }
+}
+
+var intStack = new Stack<int>();
+intStack.Push(1);
+var top = intStack.Pop();  // type-safe, no cast
+
+// Constraints
+T Max<T>(T a, T b) where T : IComparable<T> => a.CompareTo(b) > 0 ? a : b;
+
+// new() constraint: T must have a parameterless constructor
+T Create<T>() where T : new() => new T();
+```
+
+---
+
+## 13. What is covariance and contravariance? {#variance}
+
+- **Covariance** (`out`): `IEnumerable<Derived>` can be used as `IEnumerable<Base>`. "More specific → less specific".
+- **Contravariance** (`in`): `Action<Base>` can be used as `Action<Derived>`. "Less specific → more specific".
+
+```csharp
+// Covariance (out): read-only
+IEnumerable<string> strings = new List<string> { "a", "b" };
+IEnumerable<object> objects = strings;  // covariant: OK
+
+// Contravariance (in): write-only
+Action<object> printObject = o => Console.WriteLine(o);
+Action<string> printString = printObject;  // contravariant: OK
+printString("hello");
+```
+
+---
+
+## 14. What is the `yield` keyword? {#yield}
+
+`yield return` creates a lazy iterator — values are produced one at a time on demand, without building a full collection in memory.
+
+```csharp
+IEnumerable<int> EvenNumbers(int max) {
+    for (int i = 0; i <= max; i += 2) {
+        yield return i;  // pauses here, resumes on next MoveNext()
+    }
+}
+
+// Infinite sequences
+IEnumerable<int> FibSequence() {
+    int a = 0, b = 1;
+    while (true) {
+        yield return a;
+        (a, b) = (b, a + b);
+    }
+}
+
+var first10 = FibSequence().Take(10).ToList();
+// [0, 1, 1, 2, 3, 5, 8, 13, 21, 34]
+```
+
+---
+
+## 15. What is `record` in C#? {#records}
+
+Records (C# 9+) are immutable reference types with value-based equality and a concise syntax.
+
+```csharp
+record Person(string Name, int Age);
+
+var alice = new Person("Alice", 30);
+var alice2 = new Person("Alice", 30);
+
+Console.WriteLine(alice == alice2);  // true — value equality
+Console.WriteLine(alice);            // Person { Name = Alice, Age = 30 }
+
+// Non-destructive mutation with `with`
+var older = alice with { Age = 31 };
+Console.WriteLine(older);  // Person { Name = Alice, Age = 31 }
+
+// record struct (C# 10+): value type version
+record struct Point(double X, double Y);
+```
+
+---
+
+## 16. What is dependency injection in ASP.NET Core? {#di}
+
+ASP.NET Core has a built-in DI container. Services are registered with a lifetime and injected via constructors.
+
+```csharp
+// Registration in Program.cs
+builder.Services.AddScoped<IOrderService, OrderService>();
+builder.Services.AddSingleton<ICache, MemoryCache>();
+builder.Services.AddTransient<IEmailSender, SmtpEmailSender>();
+
+// Injection via constructor
+public class OrderController : ControllerBase {
+    private readonly IOrderService _orders;
+    private readonly ICache _cache;
+
+    public OrderController(IOrderService orders, ICache cache) {
+        _orders = orders;
+        _cache = cache;
+    }
+}
+```
+
+**Service lifetimes**:
+- **Transient**: New instance per injection. For stateless, lightweight services.
+- **Scoped**: One instance per HTTP request. For services with request-scoped state (like `DbContext`).
+- **Singleton**: One instance for the entire app lifetime. For expensive, stateless, thread-safe services.
+
+---
+
+## 17. What is the difference between `==` and `.Equals()`? {#equality}
+
+For reference types: `==` checks reference equality by default; `.Equals()` can be overridden for value equality.
+
+```csharp
+var s1 = new string("hello");
+var s2 = new string("hello");
+
+Console.WriteLine(s1 == s2);        // true — string overloads ==
+Console.WriteLine(s1.Equals(s2));   // true
+
+// Custom class without overrides
+class Box { public int Value; }
+var b1 = new Box { Value = 1 };
+var b2 = new Box { Value = 1 };
+Console.WriteLine(b1 == b2);        // false — reference comparison
+Console.WriteLine(b1.Equals(b2));   // false — same as == by default
+```
+
+> When overriding `.Equals()`, also override `GetHashCode()` — they must be consistent.
+
+---
+
+## 18. What are extension methods? {#extension-methods}
+
+Extension methods add methods to existing types without modifying or inheriting them.
+
+```csharp
+public static class StringExtensions {
+    public static bool IsValidEmail(this string s) =>
+        s.Contains('@') && s.Contains('.');
+
+    public static string Truncate(this string s, int maxLength) =>
+        s.Length <= maxLength ? s : s[..maxLength] + "…";
+}
+
+// Usage — looks like instance methods
+bool valid = "user@example.com".IsValidEmail();  // true
+string short_ = "A very long title that should be truncated".Truncate(20);
+```
+
+LINQ itself is built entirely on extension methods on `IEnumerable<T>`.
+
+---
+
+## 19. What is `Span<T>`? {#span}
+
+`Span<T>` is a stack-allocated view over a contiguous block of memory (array, stack memory, unmanaged memory). It enables slice operations with **zero allocation**.
+
+```csharp
+string text = "Hello, World!";
+
+// Substring creates a new string (allocates)
+string sub = text.Substring(7, 5);
+
+// Span: no allocation — just a view
+ReadOnlySpan<char> span = text.AsSpan(7, 5);
+Console.WriteLine(span.ToString());  // "World"
+
+// Parsing without allocation
+ReadOnlySpan<char> numberSpan = "42".AsSpan();
+int.TryParse(numberSpan, out int n);  // no string allocation for parse
+```
+
+> Critical for high-performance code: JSON parsing, HTTP server frameworks, protocol parsing. ASP.NET Core uses `Span<T>` internally to parse HTTP headers with zero allocation.
+
+---
+
+## 20. What are pattern matching expressions? {#pattern-matching}
+
+Pattern matching (C# 7+, expanded through C# 9/10/11) allows elegant type checking and deconstruction.
+
+```csharp
+object obj = "hello";
+
+// Type patterns
+string msg = obj switch {
+    int n when n > 0 => $"positive: {n}",
+    int n            => $"non-positive: {n}",
+    string s         => $"string: {s}",
+    null             => "null",
+    _                => "other"
+};
+
+// Property patterns
+record Address(string City, string Country);
+record User(string Name, Address Home);
+
+var user = new User("Alice", new Address("Seattle", "US"));
+bool isUS = user is { Home: { Country: "US" } };
+
+// Positional patterns (deconstruct)
+(int x, int y) = (3, 4);
+string quadrant = (x, y) switch {
+    (> 0, > 0) => "Q1",
+    (< 0, > 0) => "Q2",
+    (< 0, < 0) => "Q3",
+    _           => "Q4 or axis"
+};
+```
+
+---
+
+## Practice & Certification
+
+These topics are covered in the [uByte C# certification exam](/certifications/csharp). Solidify your knowledge with [C# practice problems](/practice/csharp) — the best way to make this knowledge interview-ready.

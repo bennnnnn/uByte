@@ -1,0 +1,189 @@
+---
+title: "How to Prepare for a Technical Coding Interview in 2026"
+description: "A complete, actionable guide to cracking technical coding interviews at top tech companies. Covers data structures, algorithms, behavioral questions, system design, and a realistic study plan."
+date: "2026-03-03"
+readTime: "15 min read"
+category: "Interview Prep"
+tags: ["Interview Prep", "Algorithms", "Data Structures", "Career"]
+---
+
+Technical coding interviews are a skill. Like any skill, they can be learned with deliberate practice. This guide gives you the exact framework used by engineers who crack interviews at Google, Meta, Amazon, and the fastest-growing startups — without six months of grinding.
+
+## The Truth About Coding Interviews
+
+Most people fail coding interviews not because they don't know how to code, but because:
+1. They can't verbalize their thinking while writing code
+2. They've memorized solutions instead of understanding patterns
+3. They panic when stuck and go silent
+4. They haven't practiced under time pressure
+
+The fix isn't to solve 500 LeetCode problems. It's to understand **patterns** and build the habit of thinking out loud.
+
+---
+
+## What's Actually Tested
+
+### 1. Core Data Structures (know these cold)
+
+| Structure | Key operations | When to reach for it |
+|---|---|---|
+| Array / Slice | O(1) access, O(n) insert | Random access, two-pointer problems |
+| Hash Map | O(1) lookup/insert | Counting, deduplication, anagram detection |
+| Stack | O(1) push/pop | Parentheses matching, monotonic stack problems |
+| Queue / Deque | O(1) enqueue/dequeue | BFS, sliding window |
+| Heap (priority queue) | O(log n) push/pop | Top-K, Dijkstra, scheduling |
+| Binary Tree / BST | O(log n) balanced ops | Hierarchical data, search |
+| Graph (adjacency list) | Varies | Connectivity, shortest path, topological sort |
+| Trie | O(m) where m=key length | Prefix search, autocomplete |
+
+### 2. Algorithm Patterns (learn patterns, not solutions)
+
+- **Two pointers**: Sorted arrays, palindromes, container with most water
+- **Sliding window**: Max/min subarray of length k, substring problems
+- **Binary search**: Sorted arrays, "find the minimum that satisfies X"
+- **BFS/DFS**: Trees, graphs, grid problems
+- **Dynamic programming**: Overlapping subproblems, optimization
+- **Backtracking**: Permutations, combinations, Sudoku
+- **Greedy**: Interval scheduling, coin change (sometimes)
+- **Divide and conquer**: Merge sort, quicksort, tree problems
+
+### 3. Complexity Analysis
+
+Every solution needs a time and space complexity explanation. Practice stating it automatically:
+
+- "This is O(n) time because I traverse the array once"
+- "Space is O(k) where k is the window size"
+- "This DP solution is O(n²) time and O(n) space"
+
+---
+
+## The Problem-Solving Framework
+
+Never jump into code. Use this 5-step process:
+
+### Step 1: Understand (2 minutes)
+- Restate the problem in your own words
+- Ask clarifying questions: edge cases, constraints, expected output format
+- *"Can the input be empty? Can values be negative? What's the max input size?"*
+
+### Step 2: Examples (2 minutes)
+- Walk through the provided example
+- Create your own simple example
+- Think about edge cases: empty input, single element, all same values
+
+### Step 3: Plan (3-5 minutes)
+- Think out loud: *"My first thought is brute force — O(n²). Can I do better?"*
+- Sketch the approach in pseudocode or bullet points
+- Get interviewer buy-in before coding
+
+### Step 4: Code (10-15 minutes)
+- Write clean code with meaningful variable names
+- Keep talking: *"I'm using a hash map here to get O(1) lookup..."*
+- If you get stuck, say it: *"I'm not sure about this part — let me think..."*
+
+### Step 5: Test (5 minutes)
+- Trace through your code with an example
+- Test edge cases explicitly
+- Find bugs before the interviewer does
+
+---
+
+## Study Plan: 8 Weeks
+
+### Weeks 1–2: Foundations
+- Arrays, strings, hash maps, two pointers, sliding window
+- Goal: 20 easy problems, all solved without looking at hints
+- Daily: 1 problem + 30 minutes of review
+
+### Weeks 3–4: Trees and Graphs
+- Binary trees (DFS/BFS, recursion)
+- Graphs (BFS/DFS, topological sort, union-find)
+- Goal: 15 easy + 10 medium problems
+
+### Weeks 5–6: Dynamic Programming
+- Fibonacci variants, knapsack, LCS, grid DP
+- Goal: Recognize the pattern, not memorize solutions
+- 15 medium DP problems
+
+### Weeks 7–8: Mixed Practice + Mock Interviews
+- Mix of all topics, timed (45 minutes per problem)
+- At least 2 full mock interviews (pramp.com, a friend, or recorded solo)
+- Review your mistakes — each error is a learning opportunity
+
+**Total**: ~100 problems over 8 weeks. Quality > quantity.
+
+---
+
+## Behavioral Questions: The STAR Method
+
+Every technical interview has behavioral questions. Prepare 5-7 stories from your experience using the **STAR** format:
+
+- **S**ituation: Set the scene briefly
+- **T**ask: What were you responsible for?
+- **A**ction: What did *you* specifically do?
+- **R**esult: Quantify the outcome
+
+**Prepare stories for**:
+- A time you disagreed with a teammate
+- A time you missed a deadline
+- Your biggest technical failure
+- A time you took ownership beyond your role
+- Your most impactful project
+
+---
+
+## System Design (for senior roles)
+
+If you're interviewing for senior positions, expect a 45-minute system design round. Key areas:
+
+**Requirements gathering**: Ask about scale, consistency requirements, read/write ratio, latency targets.
+
+**Core components**: Load balancer → App servers → Cache (Redis) → Database → Message queue → CDN
+
+**Deep dives**: Database sharding, replication, CAP theorem, rate limiting, consistent hashing.
+
+**Recommended practice**: Design URL shortener, news feed, rate limiter, notification system, chat application.
+
+---
+
+## Language Selection
+
+Use the language you know best. Interviewers don't penalize for language choice. However:
+
+- **Python**: Fastest to write, excellent for interviews. Built-in `heapq`, `collections.Counter`, `defaultdict`.
+- **Java**: Strong typing, verbose but clear. Good for OOP questions.
+- **JavaScript**: Great for front-end roles. `Map`, `Set`, array methods are convenient.
+- **Go**: Clean, fast. Growing in SRE/backend interviews.
+- **C++**: Expected for systems/HFT roles. STL knowledge matters.
+
+---
+
+## The Day Before
+
+1. Don't practice new problems — review your notes
+2. Get 8 hours of sleep (more impactful than 3 more hours of cramming)
+3. Review the company's tech stack
+4. Prepare 3 thoughtful questions to ask the interviewer
+
+---
+
+## During the Interview
+
+- **Silence is death**. Keep talking. Interviewers want to see your thought process.
+- **Start simple**. A brute-force solution that works beats an optimal solution that doesn't compile.
+- **If stuck**: *"I'm going to try working through a small example to find the pattern."*
+- **Don't forget edge cases**: Empty input, null, single element, very large input.
+
+---
+
+## Resources
+
+- [uByte Practice Problems](/practice): LeetCode-style problems with multiple language support
+- [uByte Interview Simulator](/interview): Practice behavioral and technical questions
+- [uByte Certifications](/certifications): Prove your language knowledge to employers
+- *Cracking the Coding Interview* by Gayle Laakmann McDowell: Still the best book
+- *Designing Data-Intensive Applications* by Martin Kleppmann: System design bible
+
+---
+
+The engineers who crack top-tier interviews aren't necessarily the smartest — they're the most prepared. Start today, stay consistent, and trust the process.

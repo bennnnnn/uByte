@@ -48,6 +48,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       title: `${title} | uByte`,
       description: `${name} interview prep with runnable coding challenges and instant feedback.`,
       url: canonical,
+      images: [{ url: absoluteUrl(`/api/og?title=${encodeURIComponent(title)}&description=${encodeURIComponent(`${name} coding interview problems with instant feedback`)}`), width: 1200, height: 630 }],
     },
     twitter: { card: "summary_large_image" as const, title: `${title} | uByte`, description },
   };

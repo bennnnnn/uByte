@@ -18,90 +18,22 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const blogSlugs = getMdxBlogSlugs();
   const dbPosts = await getAllDbBlogPosts().catch(() => []);
   const entries: MetadataRoute.Sitemap = [
-    {
-      url: abs("/"),
-      lastModified: now,
-      changeFrequency: "weekly",
-      priority: 1,
-    },
-    {
-      url: abs("/practice"),
-      lastModified: now,
-      changeFrequency: "daily",
-      priority: 0.9,
-    },
-    {
-      url: abs("/certifications"),
-      lastModified: now,
-      changeFrequency: "daily",
-      priority: 0.9,
-    },
-    {
-      url: abs("/pricing"),
-      lastModified: now,
-      changeFrequency: "weekly",
-      priority: 0.8,
-    },
-    {
-      url: abs("/leaderboard"),
-      lastModified: now,
-      changeFrequency: "daily",
-      priority: 0.7,
-    },
-    {
-      url: abs("/about"),
-      lastModified: now,
-      changeFrequency: "monthly",
-      priority: 0.6,
-    },
-    {
-      url: abs("/contact"),
-      lastModified: now,
-      changeFrequency: "monthly",
-      priority: 0.6,
-    },
-    {
-      url: abs("/help"),
-      lastModified: now,
-      changeFrequency: "weekly",
-      priority: 0.65,
-    },
-    {
-      url: abs("/terms"),
-      lastModified: now,
-      changeFrequency: "yearly",
-      priority: 0.3,
-    },
-    {
-      url: abs("/privacy"),
-      lastModified: now,
-      changeFrequency: "yearly",
-      priority: 0.3,
-    },
-    {
-      url: abs("/blog"),
-      lastModified: now,
-      changeFrequency: "weekly",
-      priority: 0.8,
-    },
-    {
-      url: abs("/interview"),
-      lastModified: now,
-      changeFrequency: "weekly",
-      priority: 0.85,
-    },
-    {
-      url: abs("/interviews"),
-      lastModified: now,
-      changeFrequency: "daily",
-      priority: 0.8,
-    },
-    {
-      url: abs("/daily"),
-      lastModified: now,
-      changeFrequency: "daily",
-      priority: 0.8,
-    },
+    // Core pages — highest priority
+    { url: abs("/"), lastModified: now, changeFrequency: "weekly", priority: 1.0 },
+    { url: abs("/practice"), lastModified: now, changeFrequency: "daily", priority: 0.95 },
+    { url: abs("/certifications"), lastModified: now, changeFrequency: "weekly", priority: 0.95 },
+    { url: abs("/blog"), lastModified: now, changeFrequency: "weekly", priority: 0.90 },
+    { url: abs("/interview"), lastModified: now, changeFrequency: "weekly", priority: 0.88 },
+    { url: abs("/interviews"), lastModified: now, changeFrequency: "daily", priority: 0.85 },
+    { url: abs("/daily"), lastModified: now, changeFrequency: "daily", priority: 0.82 },
+    { url: abs("/leaderboard"), lastModified: now, changeFrequency: "daily", priority: 0.75 },
+    // Info pages
+    { url: abs("/pricing"), lastModified: now, changeFrequency: "weekly", priority: 0.80 },
+    { url: abs("/about"), lastModified: now, changeFrequency: "monthly", priority: 0.60 },
+    { url: abs("/contact"), lastModified: now, changeFrequency: "monthly", priority: 0.55 },
+    { url: abs("/help"), lastModified: now, changeFrequency: "weekly", priority: 0.65 },
+    { url: abs("/terms"), lastModified: now, changeFrequency: "yearly", priority: 0.30 },
+    { url: abs("/privacy"), lastModified: now, changeFrequency: "yearly", priority: 0.30 },
     // MDX blog posts
     ...blogSlugs.map((slug) => ({
       url: abs(`/blog/${slug}`),

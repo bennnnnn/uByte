@@ -71,6 +71,7 @@ export async function generateMetadata({
       url: canonicalUrl,
       siteName: APP_NAME,
       locale: "en_US",
+      images: [{ url: absoluteUrl(`/api/og?title=${encodeURIComponent(tutorial.title)}&description=${encodeURIComponent(`${config.name} tutorial`)}`), width: 1200, height: 630 }],
     },
     twitter: {
       card: "summary_large_image",

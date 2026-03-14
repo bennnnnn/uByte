@@ -18,6 +18,7 @@ export const metadata: Metadata = {
     description:
       "See the top learners on uByte. Compete by earning XP through tutorials and practice.",
     url: absoluteUrl("/leaderboard"),
+    images: [{ url: absoluteUrl("/api/og?title=Leaderboard&description=Top+uByte+learners+ranked+by+XP"), width: 1200, height: 630 }],
   },
   twitter: {
     card: "summary_large_image",

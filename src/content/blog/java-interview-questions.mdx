@@ -1,0 +1,598 @@
+---
+title: "Top 25 Java Interview Questions (With Answers & Code)"
+description: "The most commonly asked Java interview questions, with detailed answers and code examples. Covers OOP, concurrency, JVM internals, collections, Spring, and system design."
+date: "2026-03-03"
+readTime: "22 min read"
+category: "Interview Prep"
+tags: ["Java", "Interview Prep", "Backend Engineering"]
+---
+
+Java remains one of the most in-demand languages in enterprise software, Android development, and large-scale backend systems. Companies like Amazon, Google, LinkedIn, and Goldman Sachs conduct Java interviews — and the questions are notoriously deep. This guide covers the 25 questions you're most likely to face, with real code and clear explanations.
+
+## Table of Contents
+
+1. [What is the difference between JDK, JRE, and JVM?](#jdk-jre-jvm)
+2. [What is the difference between `==` and `.equals()`?](#equals)
+3. [What is autoboxing?](#autoboxing)
+4. [What are checked vs unchecked exceptions?](#exceptions)
+5. [What is the difference between `HashMap` and `Hashtable`?](#hashmap)
+6. [What is a `ConcurrentHashMap`?](#concurrenthashmap)
+7. [What is the difference between `ArrayList` and `LinkedList`?](#arraylist-linkedlist)
+8. [What is the `String` pool?](#string-pool)
+9. [What is the difference between `final`, `finally`, and `finalize`?](#final)
+10. [What are Java generics?](#generics)
+11. [What is a functional interface?](#functional-interface)
+12. [What is a `Stream`?](#streams)
+13. [What is the difference between `Runnable` and `Callable`?](#runnable-callable)
+14. [What is a `volatile` variable?](#volatile)
+15. [What is `synchronized`?](#synchronized)
+16. [What is a deadlock?](#deadlock)
+17. [What is the `ThreadLocal` class?](#threadlocal)
+18. [What is `CompletableFuture`?](#completable-future)
+19. [What is the difference between `abstract class` and `interface`?](#abstract-interface)
+20. [What are Java design patterns?](#design-patterns)
+21. [What is the `Optional` class?](#optional)
+22. [What is garbage collection in Java?](#gc)
+23. [What is reflection?](#reflection)
+24. [What are Java records?](#records)
+25. [How does Spring dependency injection work?](#spring-di)
+
+---
+
+## 1. What is the difference between JDK, JRE, and JVM? {#jdk-jre-jvm}
+
+- **JVM (Java Virtual Machine)**: Executes Java bytecode. Provides memory management, garbage collection, and platform independence.
+- **JRE (Java Runtime Environment)**: JVM + the standard libraries needed to *run* Java programs.
+- **JDK (Java Development Kit)**: JRE + compiler (`javac`), debugger, and other tools needed to *develop* Java programs.
+
+> **Interview tip**: You deploy JRE in production. Developers install JDK. JVM is what actually runs the code.
+
+---
+
+## 2. What is the difference between `==` and `.equals()`? {#equals}
+
+`==` compares **object references** (memory addresses). `.equals()` compares **content**.
+
+```java
+String a = new String("hello");
+String b = new String("hello");
+
+System.out.println(a == b);       // false — different objects
+System.out.println(a.equals(b));  // true  — same content
+```
+
+For primitives (`int`, `char`, `boolean`), `==` compares values directly.
+
+> **Common trap**: `Integer a = 127; Integer b = 127; a == b;` is `true` due to integer caching (for values -128 to 127). But `Integer a = 128; Integer b = 128; a == b;` is `false`. Always use `.equals()` for objects.
+
+---
+
+## 3. What is autoboxing? {#autoboxing}
+
+Autoboxing is automatic conversion between primitive types and their wrapper classes.
+
+```java
+// Autoboxing: int → Integer
+List<Integer> list = new ArrayList<>();
+list.add(42);  // Java silently wraps 42 as Integer.valueOf(42)
+
+// Unboxing: Integer → int
+int x = list.get(0);  // silently calls intValue()
+```
+
+**Performance pitfall**: Autoboxing in tight loops is expensive because it creates heap objects.
+
+```java
+// Slow: autoboxes each long
+Long sum = 0L;
+for (long i = 0; i < 1_000_000; i++) {
+    sum += i;  // unbox sum, add, rebox result — every iteration
+}
+
+// Fast: use primitive
+long sum2 = 0L;
+for (long i = 0; i < 1_000_000; i++) {
+    sum2 += i;
+}
+```
+
+---
+
+## 4. What are checked vs unchecked exceptions? {#exceptions}
+
+| | Checked | Unchecked |
+|---|---|---|
+| Extends | `Exception` | `RuntimeException` |
+| Must handle? | Yes (compile error if not) | No |
+| Examples | `IOException`, `SQLException` | `NullPointerException`, `ArrayIndexOutOfBoundsException` |
+
+```java
+// Checked: must declare or catch
+public void readFile(String path) throws IOException {
+    Files.readAllLines(Paths.get(path));
+}
+
+// Unchecked: optional to catch
+public int divide(int a, int b) {
+    return a / b;  // throws ArithmeticException if b == 0
+}
+```
+
+> **Best practice**: Use checked exceptions for recoverable conditions (file not found, network timeout). Use unchecked for programmer errors (null dereference, bad array index).
+
+---
+
+## 5. What is the difference between `HashMap` and `Hashtable`? {#hashmap}
+
+| | `HashMap` | `Hashtable` |
+|---|---|---|
+| Thread safety | Not thread-safe | Synchronized (thread-safe) |
+| Null keys/values | Allows one null key, multiple null values | Does not allow null keys or values |
+| Performance | Faster (no sync overhead) | Slower |
+| Legacy? | Modern (Java 2+) | Legacy — don't use in new code |
+
+**Modern alternative for concurrency**: Use `ConcurrentHashMap` instead of `Hashtable`.
+
+---
+
+## 6. What is a `ConcurrentHashMap`? {#concurrenthashmap}
+
+`ConcurrentHashMap` is a thread-safe `HashMap` that uses **segment locking** (Java 7) or **CAS + bin-level locks** (Java 8+) instead of synchronizing the entire map. This gives much better read throughput.
+
+```java
+ConcurrentHashMap<String, Integer> map = new ConcurrentHashMap<>();
+
+// Thread-safe atomic update
+map.put("counter", 0);
+map.computeIfAbsent("key", k -> expensiveCompute(k));
+map.merge("counter", 1, Integer::sum);  // atomic increment
+```
+
+> **Key distinction**: Unlike `Collections.synchronizedMap()`, `ConcurrentHashMap` allows concurrent reads without locking and segments writes to minimize contention.
+
+---
+
+## 7. What is the difference between `ArrayList` and `LinkedList`? {#arraylist-linkedlist}
+
+| Operation | `ArrayList` | `LinkedList` |
+|---|---|---|
+| Get by index | O(1) | O(n) |
+| Add/remove at end | O(1) amortized | O(1) |
+| Add/remove in middle | O(n) | O(1) (if you have iterator position) |
+| Memory | Compact (array) | More (node objects + pointers) |
+
+**When to use `LinkedList`**: When you frequently add/remove from the beginning or middle AND don't need random access. In practice, `ArrayList` is faster for most use cases due to cache locality.
+
+---
+
+## 8. What is the `String` pool? {#string-pool}
+
+The JVM maintains a **string pool** (interned strings) in the heap to avoid creating duplicate `String` objects for string literals.
+
+```java
+String a = "hello";     // stored in string pool
+String b = "hello";     // reuses same object from pool
+String c = new String("hello");  // explicitly creates new object, NOT in pool
+
+System.out.println(a == b);       // true  — same pool reference
+System.out.println(a == c);       // false — c is in heap, not pool
+System.out.println(a == c.intern()); // true — intern() returns pool reference
+```
+
+---
+
+## 9. What is the difference between `final`, `finally`, and `finalize`? {#final}
+
+- **`final`**: Keyword. A `final` variable can't be reassigned; a `final` method can't be overridden; a `final` class can't be subclassed.
+- **`finally`**: Block in try-catch-finally. Always executes, even if an exception is thrown (useful for cleanup).
+- **`finalize()`**: Deprecated method in `Object`. Called by GC before object is reclaimed. Unreliable — don't use it.
+
+```java
+// final
+final int MAX = 100;
+// MAX = 200; // compile error
+
+// finally
+try {
+    riskyOperation();
+} catch (Exception e) {
+    handle(e);
+} finally {
+    closeResources();  // always runs
+}
+```
+
+---
+
+## 10. What are Java generics? {#generics}
+
+Generics provide **type safety at compile time** without sacrificing performance at runtime (thanks to type erasure).
+
+```java
+// Without generics — unsafe cast
+List list = new ArrayList();
+list.add("hello");
+String s = (String) list.get(0);  // ClassCastException risk
+
+// With generics — type-safe
+List<String> strings = new ArrayList<>();
+strings.add("hello");
+String s2 = strings.get(0);  // no cast needed
+```
+
+**Bounded type parameters**:
+
+```java
+// T must be a Number or subtype
+public <T extends Number> double sum(List<T> list) {
+    return list.stream().mapToDouble(Number::doubleValue).sum();
+}
+
+// Wildcard: accept any List<? extends Number>
+public void printAll(List<? extends Number> list) {
+    list.forEach(System.out::println);
+}
+```
+
+---
+
+## 11. What is a functional interface? {#functional-interface}
+
+A functional interface has **exactly one abstract method**. It can be used as the target type for lambda expressions.
+
+```java
+@FunctionalInterface
+interface Transformer<T, R> {
+    R transform(T input);
+}
+
+// Lambda
+Transformer<String, Integer> lengthOf = s -> s.length();
+System.out.println(lengthOf.transform("hello"));  // 5
+
+// Built-in examples
+Predicate<Integer> isEven = n -> n % 2 == 0;
+Function<String, String> toUpper = String::toUpperCase;
+Supplier<List<String>> listFactory = ArrayList::new;
+Consumer<String> printer = System.out::println;
+```
+
+---
+
+## 12. What is a `Stream`? {#streams}
+
+Streams are declarative pipelines for processing sequences of elements. They support lazy evaluation and can be parallelized.
+
+```java
+List<String> names = List.of("Alice", "Bob", "Charlie", "Diana", "Eve");
+
+// Filter, transform, and collect
+List<String> result = names.stream()
+    .filter(name -> name.length() > 3)
+    .map(String::toLowerCase)
+    .sorted()
+    .collect(Collectors.toList());
+// ["alice", "charlie", "diana"]
+
+// Aggregation
+long count = names.stream().filter(n -> n.startsWith("A")).count();
+
+// Parallel stream (use carefully)
+int sum = IntStream.rangeClosed(1, 100).parallel().sum();
+```
+
+---
+
+## 13. What is the difference between `Runnable` and `Callable`? {#runnable-callable}
+
+| | `Runnable` | `Callable<V>` |
+|---|---|---|
+| Return type | `void` | `V` (generic) |
+| Checked exception | Cannot throw | Can throw `Exception` |
+| Used with | `Thread`, `Executor` | `ExecutorService.submit()` → `Future<V>` |
+
+```java
+// Runnable
+Runnable r = () -> System.out.println("Running");
+new Thread(r).start();
+
+// Callable
+Callable<Integer> c = () -> {
+    Thread.sleep(100);
+    return 42;
+};
+ExecutorService exec = Executors.newSingleThreadExecutor();
+Future<Integer> future = exec.submit(c);
+System.out.println(future.get());  // 42 (blocks until done)
+```
+
+---
+
+## 14. What is a `volatile` variable? {#volatile}
+
+`volatile` guarantees that reads and writes to a variable are visible to all threads — they always go to main memory, not thread-local caches.
+
+```java
+class SharedFlag {
+    private volatile boolean running = true;
+
+    public void stop() {
+        running = false;  // visible to all threads immediately
+    }
+
+    public void work() {
+        while (running) {
+            // do work
+        }
+    }
+}
+```
+
+> **Limitation**: `volatile` doesn't make compound operations atomic. `count++` (read-modify-write) is still a race condition even on a `volatile int`. Use `AtomicInteger` for that.
+
+---
+
+## 15. What is `synchronized`? {#synchronized}
+
+`synchronized` ensures mutual exclusion — only one thread can execute the synchronized block or method at a time.
+
+```java
+class Counter {
+    private int count = 0;
+
+    // synchronized method: locks on "this"
+    public synchronized void increment() {
+        count++;
+    }
+
+    // synchronized block: explicit lock object
+    public void incrementBlock() {
+        synchronized (this) {
+            count++;
+        }
+    }
+}
+```
+
+> **Performance**: `synchronized` is expensive due to lock acquisition. For simple counters, prefer `AtomicInteger`. For complex logic, consider `ReentrantLock` for more control (tryLock, timeout, fairness).
+
+---
+
+## 16. What is a deadlock? {#deadlock}
+
+A deadlock occurs when two or more threads are **blocked forever**, each waiting for a lock the other holds.
+
+```java
+// Classic deadlock
+Object lockA = new Object();
+Object lockB = new Object();
+
+Thread t1 = new Thread(() -> {
+    synchronized (lockA) {
+        synchronized (lockB) { /* ... */ }  // waits for lockB
+    }
+});
+
+Thread t2 = new Thread(() -> {
+    synchronized (lockB) {
+        synchronized (lockA) { /* ... */ }  // waits for lockA
+    }
+});
+```
+
+**Prevention**: Always acquire locks in a **consistent order** across all threads.
+
+---
+
+## 17. What is the `ThreadLocal` class? {#threadlocal}
+
+`ThreadLocal` gives each thread its own independent copy of a variable.
+
+```java
+private static final ThreadLocal<SimpleDateFormat> DATE_FORMAT =
+    ThreadLocal.withInitial(() -> new SimpleDateFormat("yyyy-MM-dd"));
+
+public String formatDate(Date date) {
+    return DATE_FORMAT.get().format(date);  // each thread has its own formatter
+}
+```
+
+> **Warning**: Always call `ThreadLocal.remove()` when done, especially in thread pools, or you'll get memory leaks and stale data.
+
+---
+
+## 18. What is `CompletableFuture`? {#completable-future}
+
+`CompletableFuture` enables non-blocking, composable async programming in Java.
+
+```java
+CompletableFuture<String> future = CompletableFuture
+    .supplyAsync(() -> fetchUserFromDb(userId))      // async
+    .thenApply(user -> enrichWithProfile(user))      // transform
+    .thenCompose(user -> fetchOrdersAsync(user.id))  // flat-map
+    .exceptionally(ex -> fallbackValue());           // error handling
+
+// Combine two futures
+CompletableFuture<String> a = CompletableFuture.supplyAsync(() -> "Hello");
+CompletableFuture<String> b = CompletableFuture.supplyAsync(() -> "World");
+CompletableFuture<String> combined = a.thenCombine(b, (x, y) -> x + " " + y);
+```
+
+---
+
+## 19. What is the difference between `abstract class` and `interface`? {#abstract-interface}
+
+| | Abstract Class | Interface |
+|---|---|---|
+| Constructor | Yes | No |
+| Multiple inheritance | No (single) | Yes (multiple) |
+| State | Can have instance fields | No instance fields (only static final) |
+| Methods | Any access modifier | Default `public`; `default`/`static` since Java 8 |
+| Use for | Sharing code + enforcing structure | Defining a contract |
+
+```java
+// Abstract class: partial implementation
+abstract class Shape {
+    String color;
+    abstract double area();
+    public String describe() { return color + " shape, area=" + area(); }
+}
+
+// Interface: pure contract (+ default methods since Java 8)
+interface Printable {
+    void print();
+    default void printToConsole() { System.out.println(this); }
+}
+```
+
+---
+
+## 20. What are Java design patterns? {#design-patterns}
+
+**Creational**:
+- **Singleton**: One instance. Use `enum Singleton { INSTANCE }` for thread-safe, serialization-safe singletons.
+- **Builder**: Constructing complex objects step by step.
+- **Factory Method**: Create objects via interface without specifying the exact class.
+
+**Structural**:
+- **Decorator**: Add behavior to objects at runtime (like `BufferedReader` wrapping `FileReader`).
+- **Adapter**: Wrap an incompatible interface.
+
+**Behavioral**:
+- **Observer**: Event listeners / publish-subscribe.
+- **Strategy**: Swap algorithms at runtime via interface.
+
+```java
+// Builder pattern
+User user = new User.Builder("alice@example.com")
+    .name("Alice")
+    .age(30)
+    .build();
+```
+
+---
+
+## 21. What is the `Optional` class? {#optional}
+
+`Optional<T>` is a container that may or may not hold a value. It forces callers to handle the null case.
+
+```java
+public Optional<User> findById(int id) {
+    return Optional.ofNullable(db.query("SELECT ... WHERE id = ?", id));
+}
+
+// Usage
+findById(42)
+    .map(User::getName)
+    .filter(name -> name.length() > 2)
+    .ifPresent(System.out::println);
+
+// With fallback
+String name = findById(99)
+    .map(User::getName)
+    .orElse("Unknown");
+```
+
+> **Don't**: `optional.get()` without `isPresent()` — that's as bad as null. `Optional` should be used as a return type, not as a method parameter or field.
+
+---
+
+## 22. What is garbage collection in Java? {#gc}
+
+The JVM's garbage collector automatically reclaims memory from objects that are no longer reachable. The main collectors:
+
+- **G1 GC** (default since Java 9): Low-pause, suitable for most applications.
+- **ZGC**: Sub-millisecond pauses, for very large heaps (Java 15+).
+- **Shenandoah**: Also ultra-low pause (OpenJDK).
+
+**Heap structure (G1)**:
+- **Young gen** (Eden + Survivor spaces): New objects allocated here; short-lived objects collected frequently (minor GC).
+- **Old gen**: Long-lived objects promoted here; collected less often (major GC).
+
+> **Tuning tips**: `-Xms`/`-Xmx` for heap size, `-XX:+UseG1GC`, `-XX:MaxGCPauseMillis=200`. Profile with JFR before tuning.
+
+---
+
+## 23. What is reflection? {#reflection}
+
+Reflection allows you to inspect and manipulate classes, methods, and fields at **runtime**, even private ones.
+
+```java
+Class<?> clazz = Class.forName("com.example.User");
+Method method = clazz.getDeclaredMethod("getName");
+method.setAccessible(true);  // bypass private
+
+Object instance = clazz.getDeclaredConstructor().newInstance();
+String name = (String) method.invoke(instance);
+```
+
+**Uses**: Frameworks (Spring, Hibernate), serialization, test mocking.
+
+**Downsides**: Slower than direct calls, bypasses compile-time safety, can break with module system (`--add-opens` required in Java 9+).
+
+---
+
+## 24. What are Java records? {#records}
+
+Records (Java 16+) are immutable data classes. The compiler auto-generates constructor, getters, `equals`, `hashCode`, and `toString`.
+
+```java
+// Traditional POJO: ~50 lines
+// With record: 1 line
+record Point(int x, int y) {}
+
+Point p = new Point(3, 4);
+System.out.println(p.x());   // 3
+System.out.println(p);        // Point[x=3, y=4]
+
+Point p2 = new Point(3, 4);
+System.out.println(p.equals(p2));  // true
+
+// Custom compact constructor for validation
+record Range(int min, int max) {
+    Range {
+        if (min > max) throw new IllegalArgumentException("min > max");
+    }
+}
+```
+
+---
+
+## 25. How does Spring dependency injection work? {#spring-di}
+
+Spring's IoC (Inversion of Control) container creates and wires your objects, so you don't call `new` manually.
+
+```java
+@Service
+public class OrderService {
+    private final PaymentGateway gateway;
+
+    // Constructor injection (preferred)
+    @Autowired
+    public OrderService(PaymentGateway gateway) {
+        this.gateway = gateway;
+    }
+
+    public void placeOrder(Order order) {
+        gateway.charge(order.total());
+    }
+}
+
+@Component
+public class StripeGateway implements PaymentGateway {
+    @Override
+    public void charge(BigDecimal amount) { /* ... */ }
+}
+```
+
+Spring scans `@Component`/`@Service`/`@Repository` classes, creates them as beans, and injects them wherever required.
+
+> **Constructor injection is preferred** over field injection (`@Autowired` on field) because it makes dependencies explicit and enables easy unit testing without a Spring context.
+
+---
+
+## Practice & Certification
+
+These concepts are all covered in depth in the [uByte Java certification exam](/certifications/java). After reading this guide, take a few [Java practice problems](/practice/java) to make sure the knowledge sticks.
+
+Good luck with your interview — you've got this.

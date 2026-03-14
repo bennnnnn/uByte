@@ -31,6 +31,12 @@ export const metadata: Metadata = {
       "Take timed programming certifications and earn shareable certificates.",
     type: "website",
     url: absoluteUrl("/certifications"),
+    images: [{ url: absoluteUrl("/api/og?title=Certifications&description=Prove+your+programming+skills+with+timed+exams"), width: 1200, height: 630 }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Programming Certifications | uByte",
+    description: "Take timed programming certifications and earn shareable certificates in Go, Python, JavaScript, Java, Rust, C++, and C#.",
   },
 };
 

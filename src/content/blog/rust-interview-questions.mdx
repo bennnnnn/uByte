@@ -1,0 +1,537 @@
+---
+title: "Top 20 Rust Interview Questions (With Answers & Code)"
+description: "The most commonly asked Rust interview questions, with detailed answers and code examples. Covers ownership, borrowing, lifetimes, async, traits, error handling, and unsafe Rust."
+date: "2026-03-03"
+readTime: "20 min read"
+category: "Interview Prep"
+tags: ["Rust", "Interview Prep", "Systems Programming"]
+---
+
+Rust is the fastest-growing systems language, beloved for its memory safety without a garbage collector. Companies like AWS (Firecracker), Cloudflare, Discord, Mozilla, and Microsoft are betting heavily on Rust. If you have a Rust interview coming up — or you want to prove you understand the language at depth — this guide covers the 20 questions that separate beginners from engineers who truly get Rust.
+
+## Table of Contents
+
+1. [What is ownership?](#ownership)
+2. [What is the borrow checker?](#borrow-checker)
+3. [What is the difference between `&T` and `&mut T`?](#references)
+4. [What are lifetimes?](#lifetimes)
+5. [What is the difference between `String` and `&str`?](#string-str)
+6. [What is `Clone` vs `Copy`?](#clone-copy)
+7. [What is a trait?](#traits)
+8. [What is `impl Trait` vs `dyn Trait`?](#impl-dyn)
+9. [What are enums and pattern matching?](#enums)
+10. [What is `Option<T>` and how do you use it?](#option)
+11. [What is `Result<T, E>` and the `?` operator?](#result)
+12. [What is the difference between `Box<T>`, `Rc<T>`, and `Arc<T>`?](#smart-pointers)
+13. [What is interior mutability?](#interior-mut)
+14. [What are closures in Rust?](#closures)
+15. [What are iterators?](#iterators)
+16. [What is async/await in Rust?](#async)
+17. [What is `Send` and `Sync`?](#send-sync)
+18. [What is `unsafe` Rust?](#unsafe)
+19. [What are macros?](#macros)
+20. [What is zero-cost abstraction?](#zero-cost)
+
+---
+
+## 1. What is ownership? {#ownership}
+
+Ownership is Rust's central memory management model. Every value has exactly one owner. When the owner goes out of scope, the value is dropped (memory freed). **No garbage collector, no manual free.**
+
+```rust
+fn main() {
+    let s1 = String::from("hello");
+    let s2 = s1;  // s1's ownership moves to s2
+    // println!("{s1}");  // compile error: s1 was moved
+
+    let s3 = s2.clone();  // explicit deep copy
+    println!("{s2} {s3}"); // both valid
+
+    {
+        let temp = String::from("temporary");
+    }  // temp dropped here — memory freed automatically
+}
+```
+
+---
+
+## 2. What is the borrow checker? {#borrow-checker}
+
+The borrow checker is Rust's compile-time analysis that enforces:
+1. You can have **any number of shared references** (`&T`) — read-only, no mutation.
+2. OR you can have **exactly one mutable reference** (`&mut T`) — but nothing else can reference the value.
+3. References must **not outlive** the data they point to.
+
+```rust
+let mut data = vec![1, 2, 3];
+
+let r1 = &data;     // shared reference — OK
+let r2 = &data;     // another shared reference — OK
+println!("{r1:?} {r2:?}");
+
+// After r1, r2 are last used (above), we can borrow mutably:
+let r3 = &mut data;  // mutable reference — OK (no other refs active)
+r3.push(4);
+println!("{r3:?}");
+```
+
+---
+
+## 3. What is the difference between `&T` and `&mut T`? {#references}
+
+| | `&T` (shared) | `&mut T` (mutable) |
+|---|---|---|
+| Number allowed | Unlimited | Exactly one |
+| Can mutate? | No | Yes |
+| Aliasing | Yes | No (exclusive) |
+| Thread safety | Yes (multiple readers) | Must be exclusive |
+
+```rust
+fn read_only(v: &Vec<i32>) -> usize { v.len() }
+
+fn add_item(v: &mut Vec<i32>, item: i32) { v.push(item); }
+
+let mut nums = vec![1, 2, 3];
+read_only(&nums);         // shared borrow
+add_item(&mut nums, 4);   // mutable borrow
+```
+
+---
+
+## 4. What are lifetimes? {#lifetimes}
+
+Lifetimes tell the compiler how long references are valid. Usually inferred, but sometimes you must be explicit.
+
+```rust
+// Without lifetime annotations: compiler can't know which input's lifetime 'result' has
+fn longest<'a>(x: &'a str, y: &'a str) -> &'a str {
+    if x.len() > y.len() { x } else { y }
+}
+
+let s1 = String::from("long string");
+let result;
+{
+    let s2 = String::from("xyz");
+    result = longest(s1.as_str(), s2.as_str());
+    println!("{result}"); // OK: result used inside s2's scope
+}
+// println!("{result}"); // Would be error: s2 dropped, result might dangle
+```
+
+**In structs**:
+
+```rust
+struct Excerpt<'a> {
+    text: &'a str,  // struct can't outlive the string it borrows
+}
+```
+
+---
+
+## 5. What is the difference between `String` and `&str`? {#string-str}
+
+| | `String` | `&str` |
+|---|---|---|
+| Ownership | Owned, heap-allocated | Borrowed slice |
+| Mutability | Mutable | Read-only |
+| Size | Dynamic | Fixed (slice) |
+| Use as | Function output, stored fields | Function parameters (prefer) |
+
+```rust
+fn greet(name: &str) -> String {  // accept &str, return owned String
+    format!("Hello, {}!", name)
+}
+
+let owned = String::from("Alice");
+let borrowed: &str = "Bob";       // string literal is &'static str
+
+greet(&owned);   // &String coerces to &str
+greet(borrowed);
+```
+
+> **Rule**: Take `&str` as parameter (flexible — accepts both `&String` and `&str`). Return `String` when you create a new value.
+
+---
+
+## 6. What is `Clone` vs `Copy`? {#clone-copy}
+
+- **`Copy`**: Implicit bitwise copy. For types with no heap allocation (integers, booleans, `f64`, tuples of `Copy` types). Assignment doesn't move ownership.
+- **`Clone`**: Explicit, potentially expensive deep copy. Must call `.clone()`.
+
+```rust
+let x: i32 = 5;
+let y = x;  // Copy — x is still valid (no move)
+println!("{x} {y}");  // 5 5
+
+let s1 = String::from("hello");
+let s2 = s1.clone();  // Clone — explicit deep copy
+println!("{s1} {s2}"); // hello hello
+
+// You can't Copy a String — it owns heap memory
+```
+
+---
+
+## 7. What is a trait? {#traits}
+
+A trait defines a set of methods (an interface) that types can implement. Rust uses traits for polymorphism, operator overloading, and generic constraints.
+
+```rust
+trait Summary {
+    fn summarize(&self) -> String;
+
+    // Default implementation (optional override)
+    fn preview(&self) -> String {
+        format!("{}...", &self.summarize()[..50.min(self.summarize().len())])
+    }
+}
+
+struct Article {
+    headline: String,
+    content: String,
+}
+
+impl Summary for Article {
+    fn summarize(&self) -> String {
+        format!("{}: {}", self.headline, &self.content[..100.min(self.content.len())])
+    }
+}
+```
+
+---
+
+## 8. What is `impl Trait` vs `dyn Trait`? {#impl-dyn}
+
+- **`impl Trait`**: Static dispatch — the concrete type is resolved at compile time. Zero overhead. One concrete type per call site.
+- **`dyn Trait`**: Dynamic dispatch — the concrete type is resolved at runtime via vtable. Small overhead. Different types can be mixed (e.g., `Vec<Box<dyn Trait>>`).
+
+```rust
+// impl Trait: compiler generates specialized code for each T
+fn notify(item: &impl Summary) {
+    println!("{}", item.summarize());
+}
+
+// dyn Trait: runtime dispatch, heterogeneous collections
+fn notify_all(items: &[Box<dyn Summary>]) {
+    for item in items {
+        println!("{}", item.summarize());
+    }
+}
+```
+
+---
+
+## 9. What are enums and pattern matching? {#enums}
+
+Rust enums are algebraic data types — each variant can hold different data. Pattern matching with `match` is exhaustive (compiler enforces all cases).
+
+```rust
+enum Shape {
+    Circle { radius: f64 },
+    Rectangle { width: f64, height: f64 },
+    Triangle { base: f64, height: f64 },
+}
+
+fn area(shape: &Shape) -> f64 {
+    match shape {
+        Shape::Circle { radius } => std::f64::consts::PI * radius * radius,
+        Shape::Rectangle { width, height } => width * height,
+        Shape::Triangle { base, height } => 0.5 * base * height,
+    }
+    // No default needed — all variants covered (compiler verified)
+}
+```
+
+---
+
+## 10. What is `Option<T>` and how do you use it? {#option}
+
+`Option<T>` is Rust's null-free way to represent a value that may or may not exist.
+
+```rust
+fn find_user(id: u32) -> Option<String> {
+    if id == 1 { Some(String::from("Alice")) } else { None }
+}
+
+// Pattern matching
+match find_user(1) {
+    Some(name) => println!("Found: {name}"),
+    None => println!("Not found"),
+}
+
+// Chaining
+let username = find_user(1)
+    .map(|n| n.to_uppercase())
+    .unwrap_or_else(|| String::from("GUEST"));
+
+// The ? operator in Option context
+fn get_first_char(id: u32) -> Option<char> {
+    let name = find_user(id)?;  // returns None if find_user returns None
+    name.chars().next()
+}
+```
+
+---
+
+## 11. What is `Result<T, E>` and the `?` operator? {#result}
+
+`Result<T, E>` represents either success (`Ok(T)`) or failure (`Err(E)`). The `?` operator propagates errors automatically.
+
+```rust
+use std::fs;
+use std::num::ParseIntError;
+
+fn read_number(path: &str) -> Result<i32, Box<dyn std::error::Error>> {
+    let content = fs::read_to_string(path)?;  // ? propagates io::Error
+    let number: i32 = content.trim().parse()?;  // ? propagates ParseIntError
+    Ok(number)
+}
+
+// Custom error type
+#[derive(Debug)]
+enum AppError {
+    Io(std::io::Error),
+    Parse(ParseIntError),
+}
+
+impl From<std::io::Error> for AppError {
+    fn from(e: std::io::Error) -> Self { AppError::Io(e) }
+}
+```
+
+---
+
+## 12. What is the difference between `Box<T>`, `Rc<T>`, and `Arc<T>`? {#smart-pointers}
+
+| | `Box<T>` | `Rc<T>` | `Arc<T>` |
+|---|---|---|---|
+| Ownership | Single | Shared (single thread) | Shared (multi-thread) |
+| Ref counting | No | Yes | Yes (atomic) |
+| Thread safe | Yes | No | Yes |
+| Overhead | Zero | None on clone | Atomic ops |
+
+```rust
+// Box: heap-allocate, single owner (used for recursive types, trait objects)
+let b: Box<dyn std::fmt::Display> = Box::new(42);
+
+// Rc: multiple owners in single-threaded code
+use std::rc::Rc;
+let rc1 = Rc::new(vec![1, 2, 3]);
+let rc2 = Rc::clone(&rc1);  // refcount = 2, no data copy
+
+// Arc: multiple owners across threads
+use std::sync::Arc;
+let arc = Arc::new(String::from("shared"));
+let arc2 = Arc::clone(&arc);
+std::thread::spawn(move || println!("{arc2}"));
+```
+
+---
+
+## 13. What is interior mutability? {#interior-mut}
+
+Interior mutability lets you mutate data through a shared reference — normally forbidden by the borrow checker. Achieved with `Cell<T>` (single-threaded, `Copy` types) and `RefCell<T>` (single-threaded, runtime borrow checks).
+
+```rust
+use std::cell::RefCell;
+
+let data = RefCell::new(vec![1, 2, 3]);
+
+// Borrow shared
+println!("{:?}", data.borrow());
+
+// Borrow mutable (runtime panic if already borrowed)
+data.borrow_mut().push(4);
+
+// Common pattern: Rc<RefCell<T>> for shared mutability in single-threaded code
+use std::rc::Rc;
+let shared = Rc::new(RefCell::new(0));
+let clone = Rc::clone(&shared);
+*clone.borrow_mut() += 1;
+```
+
+---
+
+## 14. What are closures in Rust? {#closures}
+
+Closures are anonymous functions that can capture variables from their environment. Rust infers whether to capture by reference or by value.
+
+```rust
+let threshold = 5;
+let is_big = |n: &i32| n > &threshold;  // captures threshold by ref
+
+let nums = vec![1, 3, 7, 2, 9, 4];
+let big_nums: Vec<_> = nums.iter().filter(|n| is_big(n)).collect();
+
+// move: force capture by value (needed for threads)
+let greeting = String::from("hello");
+let f = move || println!("{greeting}");  // greeting moved into closure
+std::thread::spawn(f).join().unwrap();
+
+// Fn, FnMut, FnOnce traits:
+// FnOnce: called once (consumes captured values)
+// FnMut:  called multiple times, mutates captures
+// Fn:     called multiple times, shared reference to captures
+```
+
+---
+
+## 15. What are iterators? {#iterators}
+
+Rust's iterator adapters form lazy zero-cost pipelines — no intermediate allocations.
+
+```rust
+let sum: i32 = (1..=10)
+    .filter(|n| n % 2 == 0)   // lazy: no allocation
+    .map(|n| n * n)            // lazy: no allocation
+    .sum();                    // drives the iterator, consumes it
+
+// Collect into various types
+let squares: Vec<i32> = (1..=5).map(|x| x * x).collect();
+let set: std::collections::HashSet<i32> = vec![1, 2, 2, 3].into_iter().collect();
+
+// Implementing Iterator
+struct Counter { count: u32, max: u32 }
+impl Iterator for Counter {
+    type Item = u32;
+    fn next(&mut self) -> Option<u32> {
+        if self.count < self.max {
+            self.count += 1;
+            Some(self.count)
+        } else {
+            None
+        }
+    }
+}
+```
+
+---
+
+## 16. What is async/await in Rust? {#async}
+
+Rust's async model is zero-cost: `async fn` returns a `Future` that is **polled** by a runtime (like Tokio) rather than spawning threads.
+
+```rust
+use tokio;
+
+#[tokio::main]
+async fn main() {
+    let result = fetch_data("https://api.example.com/user/1").await;
+    println!("{result:?}");
+}
+
+async fn fetch_data(url: &str) -> Result<String, reqwest::Error> {
+    let response = reqwest::get(url).await?;
+    let text = response.text().await?;
+    Ok(text)
+}
+
+// Concurrent execution (both run at the same time)
+let (a, b) = tokio::join!(
+    fetch_data("https://api.example.com/1"),
+    fetch_data("https://api.example.com/2")
+);
+```
+
+---
+
+## 17. What is `Send` and `Sync`? {#send-sync}
+
+`Send` and `Sync` are marker traits that the compiler uses to verify thread safety:
+
+- **`Send`**: Type can be **transferred** to another thread. (e.g., `String`, `Vec<T>` where `T: Send`)
+- **`Sync`**: Type can be **shared by reference** across threads. (e.g., immutable types, `Arc<T>`, `Mutex<T>`)
+
+```rust
+// Rc<T> is NOT Send (non-atomic refcount — data race)
+// Arc<T> IS Send + Sync (atomic refcount)
+
+use std::sync::{Arc, Mutex};
+
+let shared = Arc::new(Mutex::new(0));
+let shared2 = Arc::clone(&shared);
+
+std::thread::spawn(move || {
+    let mut guard = shared2.lock().unwrap();
+    *guard += 1;
+});  // Arc<Mutex<i32>>: Send + Sync ✓
+```
+
+The compiler enforces these at compile time — if you try to share a non-`Sync` type across threads, you get a compile error.
+
+---
+
+## 18. What is `unsafe` Rust? {#unsafe}
+
+`unsafe` blocks let you opt out of Rust's safety guarantees for operations the borrow checker can't verify: raw pointer derefs, FFI calls, mutable static access, and `unsafe` trait implementations.
+
+```rust
+let mut val = 42;
+let raw = &mut val as *mut i32;
+
+unsafe {
+    *raw = 100;  // raw pointer dereference
+}
+
+// FFI (calling C)
+extern "C" {
+    fn abs(n: i32) -> i32;
+}
+unsafe { abs(-5); }
+
+// unsafe is for small, audited sections — wrap it in a safe abstraction
+fn safe_abs(n: i32) -> i32 {
+    unsafe { abs(n) }  // safe to call: we know abs has no UB
+}
+```
+
+> **Rule**: `unsafe` means "I, the programmer, guarantee correctness here." Keep unsafe blocks small, well-documented, and wrapped in safe APIs.
+
+---
+
+## 19. What are macros? {#macros}
+
+Rust has two kinds of macros — both operate at compile time:
+
+**Declarative macros** (`macro_rules!`): Pattern-matching on syntax.
+
+```rust
+macro_rules! assert_range {
+    ($val:expr, $min:expr, $max:expr) => {
+        assert!($val >= $min && $val <= $max,
+            "{} not in range [{}, {}]", $val, $min, $max);
+    };
+}
+
+assert_range!(5, 1, 10);   // OK
+// assert_range!(15, 1, 10); // panics
+```
+
+**Procedural macros**: Full Rust code that transforms token streams. Used for `#[derive(Debug)]`, `#[tokio::main]`, etc.
+
+---
+
+## 20. What is zero-cost abstraction? {#zero-cost}
+
+Zero-cost abstraction means you can use high-level abstractions (iterators, generics, traits) with **no runtime overhead** compared to writing low-level code manually. The compiler optimizes them away.
+
+```rust
+// High-level: iterator chain
+let sum: i64 = (0..1_000_000_i64).filter(|n| n % 2 == 0).sum();
+
+// Equivalent low-level loop — same machine code after optimization:
+let mut sum: i64 = 0;
+let mut i: i64 = 0;
+while i < 1_000_000 {
+    if i % 2 == 0 { sum += i; }
+    i += 1;
+}
+```
+
+Rustc (backed by LLVM) compiles both to identical assembly. You write clean code; you get fast code.
+
+---
+
+## Practice & Certification
+
+All these topics appear in the [uByte Rust certification exam](/certifications/rust). Get hands-on with the [Rust practice problems](/practice/rust) to build real fluency before your interview.
