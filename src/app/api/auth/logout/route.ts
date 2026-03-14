@@ -9,5 +9,5 @@ export const POST = withErrorHandling("POST /api/auth/logout", async (request: N
     return NextResponse.json({ error: csrfError }, { status: 403 });
   }
   await clearAuthCookie();
-  return NextResponse.json({ success: true });
+  return NextResponse.json({ ok: true });
 });

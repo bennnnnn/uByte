@@ -346,7 +346,7 @@ export async function verifyEmail(token: string): Promise<User | undefined> {
   const tokenHash = await hashToken(token);
   const [user] = await sql`
     SELECT * FROM users
-    WHERE (email_verification_token = ${tokenHash} OR email_verification_token = ${token})
+    WHERE email_verification_token = ${tokenHash}
       AND email_verified = 0
       AND (
         email_verification_expires_at IS NULL

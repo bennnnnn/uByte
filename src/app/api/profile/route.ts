@@ -97,14 +97,14 @@ export const PUT = withErrorHandling("PUT /api/profile", async (request: NextReq
       isAdmin: tokenUser.isAdmin,
     });
     await setAuthCookie(newToken);
-    return NextResponse.json({ success: true });
+    return NextResponse.json({ ok: true });
   }
 
   // Email marketing preference toggle (standalone — doesn't require other fields)
   if (typeof body.email_marketing === "boolean") {
     const { setEmailMarketingPreference } = await import("@/lib/db/users");
     await setEmailMarketingPreference(tokenUser.userId, body.email_marketing);
-    return NextResponse.json({ success: true });
+    return NextResponse.json({ ok: true });
   }
 
   // Profile update
@@ -146,5 +146,5 @@ export const DELETE = withErrorHandling("DELETE /api/profile", async (request: N
 
   await deleteUser(tokenUser.userId);
   await clearAuthCookie();
-  return NextResponse.json({ success: true });
+  return NextResponse.json({ ok: true });
 });

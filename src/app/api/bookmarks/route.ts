@@ -42,6 +42,6 @@ export const DELETE = withErrorHandling("DELETE /api/bookmarks",
       return NextResponse.json({ error: "id is required" }, { status: 400 });
     }
     await deleteBookmark(user.userId, id);
-    return NextResponse.json({ success: true });
+    return NextResponse.json({ ok: true });
   })
 );

@@ -12,6 +12,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createHmac, timingSafeEqual as cryptoTimingSafeEqual } from "crypto";
 import { unsubscribeByEmail } from "@/lib/db/users";
+import { withErrorHandling } from "@/lib/api-utils";
 
 function getSecret(): string {
   const secret = process.env.UNSUBSCRIBE_SECRET ?? process.env.JWT_SECRET;
@@ -26,7 +27,7 @@ function makeToken(email: string): string {
   return createHmac("sha256", getSecret()).update(email.toLowerCase().trim()).digest("hex");
 }
 
-export async function GET(request: NextRequest): Promise<NextResponse> {
+export const GET = withErrorHandling("GET /api/unsubscribe", async (request: NextRequest): Promise<NextResponse> => {
   const { searchParams } = new URL(request.url);
   const email = searchParams.get("email")?.trim().toLowerCase() ?? "";
   const token = searchParams.get("token") ?? "";
@@ -50,7 +51,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
 
   await unsubscribeByEmail(email).catch(() => {});
   return NextResponse.redirect(new URL("/unsubscribed", request.url));
-}
+});
 
 function timingSafeEqual(a: string, b: string): boolean {
   try {
