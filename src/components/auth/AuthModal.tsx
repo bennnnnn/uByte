@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useAuth } from "@/components/AuthProvider";
 import { Button, Card, Input } from "@/components/ui";
 import AuthFormFields from "@/components/auth/AuthFormFields";
@@ -40,6 +41,7 @@ interface Props {
 
 export default function AuthModal({ onClose, initialMode }: Props) {
   const { login, signup, loginWithGoogle } = useAuth();
+  const router = useRouter();
   const [mode, setMode] = useState<ModalMode>(initialMode ?? "login");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -83,12 +85,16 @@ export default function AuthModal({ onClose, initialMode }: Props) {
     credentialHandlerRef.current = async (credential: string) => {
       setError("");
       setSubmitting(true);
-      const err = await loginWithGoogle(credential);
+      const result = await loginWithGoogle(credential);
       setSubmitting(false);
-      if (err) setError(err);
-      else onClose();
+      if (result.error) {
+        setError(result.error);
+      } else {
+        onClose();
+        if (result.isNewUser) router.push("/onboarding");
+      }
     };
-  }, [loginWithGoogle, onClose]);
+  }, [loginWithGoogle, onClose, router]);
 
   function reset() {
     setName("");
@@ -173,6 +179,7 @@ export default function AuthModal({ onClose, initialMode }: Props) {
       setError(err);
     } else {
       onClose();
+      if (mode === "signup") router.push("/onboarding");
     }
   }
 

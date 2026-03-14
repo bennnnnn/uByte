@@ -56,7 +56,7 @@ function VerifyEmailContent() {
             </div>
             <h1 className="mb-2 text-xl font-bold text-zinc-900 dark:text-zinc-100">Email verified!</h1>
             <p className="text-sm text-zinc-500 dark:text-zinc-400">
-              Your email has been verified. Redirecting to your profile…
+              Your email has been verified. Redirecting to your dashboard…
             </p>
           </>
         )}

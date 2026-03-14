@@ -11,7 +11,7 @@
  * Requires: NEXT_PUBLIC_GOOGLE_CLIENT_ID env var.
  */
 import { useEffect, useRef } from "react";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useAuth } from "@/components/AuthProvider";
 
 const CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ?? "";
@@ -22,6 +22,7 @@ const SKIP_PATHS = ["/login", "/signup"];
 export default function GoogleOneTap() {
   const { user, loading, loginWithGoogle } = useAuth();
   const pathname = usePathname();
+  const router = useRouter();
   const initialized = useRef(false);
 
   useEffect(() => {
@@ -35,7 +36,8 @@ export default function GoogleOneTap() {
       (window.google.accounts.id.initialize as (config: Record<string, unknown>) => void)({
         client_id: CLIENT_ID,
         callback: async (res: { credential: string }) => {
-          await loginWithGoogle(res.credential);
+          const result = await loginWithGoogle(res.credential);
+          if (!result.error && result.isNewUser) router.push("/onboarding");
         },
         cancel_on_tap_outside: false,
         auto_select: false,
@@ -63,7 +65,7 @@ export default function GoogleOneTap() {
       }
     }, 4000);
     return () => clearTimeout(timer);
-  }, [loading, user, pathname, loginWithGoogle]);
+  }, [loading, user, pathname, loginWithGoogle, router]);
 
   // Cancel One Tap when the user logs in (avoids a stale prompt)
   useEffect(() => {

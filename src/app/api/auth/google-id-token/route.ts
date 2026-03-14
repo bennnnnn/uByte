@@ -119,7 +119,7 @@ export const POST = withErrorHandling("POST /api/auth/google-id-token", async (r
   await logActivity(user.id, "login_google");
   await updateStreak(user.id);
 
-  const res = NextResponse.json({ user: { id: user.id, name: user.name, email: user.email } });
+  const res = NextResponse.json({ user: { id: user.id, name: user.name, email: user.email }, isNewUser });
   setCsrfCookie(res);
   return res;
 });

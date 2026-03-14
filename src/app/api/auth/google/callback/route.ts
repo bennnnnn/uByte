@@ -126,7 +126,10 @@ export const GET = withErrorHandling("GET /api/auth/google/callback", async (req
     await logActivity(user.id, "login_google");
     await updateStreak(user.id);
 
-    const response = NextResponse.redirect(`${origin}${nextPath}`);
+    const destination = isNewUser
+      ? `/onboarding${nextPath !== "/" ? `?next=${encodeURIComponent(nextPath)}` : ""}`
+      : nextPath;
+    const response = NextResponse.redirect(`${origin}${destination}`);
     clearOauthFlowCookies(response);
     setCsrfCookie(response);
     return response;

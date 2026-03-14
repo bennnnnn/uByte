@@ -32,7 +32,7 @@ interface UserContextType {
   user: User | null;
   loading: boolean;
   login: (email: string, password: string) => Promise<string | null>;
-  loginWithGoogle: (credential: string) => Promise<string | null>;
+  loginWithGoogle: (credential: string) => Promise<{ error: string | null; isNewUser: boolean }>;
   signup: (name: string, email: string, password: string) => Promise<string | null>;
   logout: () => Promise<void>;
   logoutAll: () => Promise<void>;
@@ -42,7 +42,7 @@ const UserContext = createContext<UserContextType>({
   user: null,
   loading: true,
   login: async () => null,
-  loginWithGoogle: async () => null,
+  loginWithGoogle: async () => ({ error: null, isNewUser: false }),
   signup: async () => null,
   logout: async () => {},
   logoutAll: async () => {},
@@ -296,7 +296,7 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
     return null;
   }, [hydrateAfterAuth]);
 
-  const loginWithGoogle = useCallback(async (credential: string): Promise<string | null> => {
+  const loginWithGoogle = useCallback(async (credential: string): Promise<{ error: string | null; isNewUser: boolean }> => {
     const res = await apiFetch("/api/auth/google-id-token", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -304,7 +304,7 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
     });
     if (!res.ok) {
       const data = await res.json().catch(() => ({}));
-      return data.error || "Google sign-in failed";
+      return { error: data.error || "Google sign-in failed", isNewUser: false };
     }
     const data = await res.json().catch(() => ({}));
     if (data.user) {
@@ -312,7 +312,7 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
       trackConversion("login", { method: "google" });
       try { localStorage.setItem("ubyte_has_account", "1"); } catch { /* noop */ }
     }
-    return null;
+    return { error: null, isNewUser: data.isNewUser ?? false };
   }, [hydrateAfterAuth]);
 
   const logout = useCallback(async () => {

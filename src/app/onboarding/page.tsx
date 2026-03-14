@@ -32,7 +32,7 @@ const GOALS = [
     desc: "Pick up Go, Python, JavaScript, Rust, Java, or C++ from scratch",
     color: "border-indigo-200 hover:border-indigo-400 dark:border-indigo-800 dark:hover:border-indigo-500",
     selectedColor: "border-indigo-500 bg-indigo-50 dark:border-indigo-400 dark:bg-indigo-950/30",
-    path: "/tutorial",
+    path: "/tutorial/go/getting-started",
   },
   {
     id: "level-up",
@@ -48,7 +48,7 @@ const GOALS = [
 type GoalId = (typeof GOALS)[number]["id"];
 
 function OnboardingInner() {
-  const { user, profile } = useAuth();
+  const { user, profile, loading } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
   const nextPath = searchParams.get("next") ?? null;
@@ -108,6 +108,12 @@ function OnboardingInner() {
   }
 
   const firstName = user?.name?.split(" ")[0] ?? "there";
+
+  useEffect(() => {
+    if (!user && !loading) {
+      router.replace("/login?next=/onboarding");
+    }
+  }, [user, loading, router]);
 
   if (!user) return null;
 
