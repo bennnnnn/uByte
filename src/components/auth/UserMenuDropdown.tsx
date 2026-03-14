@@ -79,8 +79,8 @@ export default function UserMenuDropdown() {
 
       {open && (
         <div className="absolute right-0 top-full z-[100] mt-2 w-72 overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-xl dark:border-zinc-800 dark:bg-zinc-900">
-          {/* User info — clicking goes to public profile */}
-          <Link href={`/u/${user.id}`} onClick={close} className="block border-b border-zinc-100 px-4 py-3 transition-colors hover:bg-zinc-50 dark:border-zinc-800 dark:hover:bg-zinc-800/50">
+          {/* User info — clicking goes to dashboard */}
+          <Link href="/dashboard" onClick={close} className="block border-b border-zinc-100 px-4 py-3 transition-colors hover:bg-zinc-50 dark:border-zinc-800 dark:hover:bg-zinc-800/50">
             <div className="flex items-center gap-3">
               <Avatar avatarKey={profile?.avatar ?? "gopher"} size="sm" />
               <div className="min-w-0 flex-1">
@@ -99,7 +99,6 @@ export default function UserMenuDropdown() {
               <div className="mt-2 flex items-center gap-3 text-xs text-zinc-400">
                 <span>⭐ {profile.xp} XP</span>
                 <span>🔥 {profile.streak_days}d streak</span>
-                <span className="ml-auto text-[10px] text-zinc-300 dark:text-zinc-600">View public profile →</span>
               </div>
             )}
           </Link>
@@ -107,17 +106,15 @@ export default function UserMenuDropdown() {
           <div className="max-h-[60vh] overflow-y-auto p-1.5">
             {/* Learning */}
             <SectionLabel>Learning</SectionLabel>
-            <MenuItem href="/dashboard" icon={<DashboardIcon />} label="Dashboard" onClick={close} />
-            <MenuItem href="/dashboard?tab=progress" icon={<ProgressIcon />} label="Progress" onClick={close} />
-            <MenuItem href="/dashboard?tab=bookmarks" icon={<BookmarkIcon />} label="Bookmarks" onClick={close} />
-            <MenuItem href="/dashboard?tab=achievements" icon={<AchievementsIcon />} label="Achievements" onClick={close} />
-            <MenuItem href="/dashboard?tab=certifications" icon={<CertificateIcon />} label="Certifications" onClick={close} />
+            <MenuItem href="/dashboard" icon={<DashboardIcon />} label="My Dashboard" onClick={close} />
+            <MenuItem href="/notifications" icon={<NotificationsIcon />} label="Notifications" onClick={close} />
 
             {/* Account */}
             <SectionLabel>Account</SectionLabel>
             <MenuItem href="/referral" icon={<ReferralIcon />} label="Refer & Earn 🎁" accent onClick={close} />
             <MenuItem href="/billing" icon={<PlanIcon />} label="Plan & Billing" onClick={close} />
             <MenuItem href="/settings" icon={<SettingsIcon />} label="Settings" onClick={close} />
+            <MenuItem href={`/u/${user.id}`} icon={<ExternalProfileIcon />} label="Public profile ↗" onClick={close} />
 
             {profile?.isAdmin && (
               <>
@@ -151,34 +148,18 @@ function DashboardIcon() {
   );
 }
 
-function ProgressIcon() {
+function NotificationsIcon() {
   return (
     <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-      <path strokeLinecap="round" strokeLinejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+      <path strokeLinecap="round" strokeLinejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
     </svg>
   );
 }
 
-function BookmarkIcon() {
+function ExternalProfileIcon() {
   return (
     <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-      <path strokeLinecap="round" strokeLinejoin="round" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
-    </svg>
-  );
-}
-
-function AchievementsIcon() {
-  return (
-    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-      <path strokeLinecap="round" strokeLinejoin="round" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
-    </svg>
-  );
-}
-
-function CertificateIcon() {
-  return (
-    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-      <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
+      <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
     </svg>
   );
 }
