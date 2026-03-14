@@ -162,5 +162,4 @@ export async function rewardReferrer(referredUserId: number): Promise<void> {
     WHERE referred_user_id = ${referredUserId}
   `;
 
-  console.log(`[referrals] Rewarded referrer ${referrerId} +30 days for referred user ${referredUserId}`);
 }

@@ -3,6 +3,7 @@ import { getCurrentUser } from "@/lib/auth";
 import { getCodeDraft, upsertCodeDraft, deleteCodeDraft } from "@/lib/db";
 import { withErrorHandling, requireAuth } from "@/lib/api-utils";
 import { verifyCsrf } from "@/lib/csrf";
+import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 
 export const GET = withErrorHandling("GET /api/code-drafts", async (request: NextRequest) => {
   const user = await getCurrentUser();
@@ -21,6 +22,9 @@ export const GET = withErrorHandling("GET /api/code-drafts", async (request: Nex
 export const PUT = withErrorHandling("PUT /api/code-drafts", async (request: NextRequest) => {
   const csrfError = verifyCsrf(request);
   if (csrfError) return NextResponse.json({ error: csrfError }, { status: 403 });
+  const ip = getClientIp(request.headers);
+  const { limited } = await checkRateLimit(`code-drafts:${ip}`, 120, 60_000);
+  if (limited) return NextResponse.json({ error: "Too many requests" }, { status: 429 });
 
   const { user, response } = await requireAuth();
   if (!user) return response;
@@ -45,6 +49,9 @@ export const PUT = withErrorHandling("PUT /api/code-drafts", async (request: Nex
 export const DELETE = withErrorHandling("DELETE /api/code-drafts", async (request: NextRequest) => {
   const csrfError = verifyCsrf(request);
   if (csrfError) return NextResponse.json({ error: csrfError }, { status: 403 });
+  const ip = getClientIp(request.headers);
+  const { limited } = await checkRateLimit(`code-drafts:${ip}`, 60, 60_000);
+  if (limited) return NextResponse.json({ error: "Too many requests" }, { status: 429 });
 
   const { user, response } = await requireAuth();
   if (!user) return response;

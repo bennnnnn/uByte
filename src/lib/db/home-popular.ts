@@ -1,3 +1,4 @@
+import { unstable_cache } from "next/cache";
 import { getSql } from "./client";
 import { getAllLanguageSlugs, getLanguageConfig, isSupportedLanguage } from "@/lib/languages/registry";
 import { getAllTutorials } from "@/lib/tutorials";
@@ -29,37 +30,41 @@ export interface PopularPracticeProblem {
 }
 
 /** Popular languages by completion count (from progress table). */
-export async function getPopularLanguages(): Promise<PopularLanguage[]> {
-  const sql = getSql();
-  try {
-    const rows = await sql`
-      SELECT language AS lang, COUNT(*)::int AS c
-      FROM progress
-      WHERE language IS NOT NULL AND language != ''
-      GROUP BY language
-      ORDER BY c DESC
-      LIMIT ${LIMIT_LANGUAGES}
-    `;
-    const supported = getAllLanguageSlugs();
-    const result: PopularLanguage[] = [];
-    for (const r of rows) {
-      const lang = (r.lang as string)?.toLowerCase();
-      if (lang && supported.includes(lang)) {
-        const config = getLanguageConfig(lang);
-        if (config)
-          result.push({
-            slug: lang,
-            name: config.name,
-            completionCount: (r.c as number) ?? 0,
-          });
+export const getPopularLanguages = unstable_cache(
+  async (): Promise<PopularLanguage[]> => {
+    const sql = getSql();
+    try {
+      const rows = await sql`
+        SELECT language AS lang, COUNT(*)::int AS c
+        FROM progress
+        WHERE language IS NOT NULL AND language != ''
+        GROUP BY language
+        ORDER BY c DESC
+        LIMIT ${LIMIT_LANGUAGES}
+      `;
+      const supported = getAllLanguageSlugs();
+      const result: PopularLanguage[] = [];
+      for (const r of rows) {
+        const lang = (r.lang as string)?.toLowerCase();
+        if (lang && supported.includes(lang)) {
+          const config = getLanguageConfig(lang);
+          if (config)
+            result.push({
+              slug: lang,
+              name: config.name,
+              completionCount: (r.c as number) ?? 0,
+            });
+        }
       }
+      return result;
+    } catch (err: unknown) {
+      if ((err as { code?: string })?.code === UNDEFINED_COLUMN) return [];
+      throw err;
     }
-    return result;
-  } catch (err: unknown) {
-    if ((err as { code?: string })?.code === UNDEFINED_COLUMN) return [];
-    throw err;
-  }
-}
+  },
+  ["popular-languages"],
+  { revalidate: 300, tags: ["home-popular"] }
+);
 
 /** Popular tutorials by completion count (from progress table). */
 export async function getPopularTutorials(): Promise<PopularTutorial[]> {
@@ -116,30 +121,34 @@ export async function recordPracticeView(viewerId: string, problemSlug: string):
 }
 
 /** Popular interview prep problems by view count (from practice_views table). */
-export async function getPopularPracticeProblems(): Promise<PopularPracticeProblem[]> {
-  const sql = getSql();
-  try {
-    const rows = await sql`
-      SELECT problem_slug AS slug, COUNT(*)::int AS c
-      FROM practice_views
-      GROUP BY problem_slug
-      ORDER BY c DESC
-      LIMIT ${LIMIT_PRACTICE}
-    `;
-    return rows.map((r) => {
-      const slug = r.slug as string;
-      const problem = getPracticeProblemBySlug(slug);
-      return {
-        slug,
-        title: problem?.title ?? slug,
-        viewCount: (r.c as number) ?? 0,
-      };
-    });
-  } catch (err: unknown) {
-    if ((err as { code?: string })?.code === "42P01") return []; /* table does not exist */
-    throw err;
-  }
-}
+export const getPopularPracticeProblems = unstable_cache(
+  async (): Promise<PopularPracticeProblem[]> => {
+    const sql = getSql();
+    try {
+      const rows = await sql`
+        SELECT problem_slug AS slug, COUNT(*)::int AS c
+        FROM practice_views
+        GROUP BY problem_slug
+        ORDER BY c DESC
+        LIMIT ${LIMIT_PRACTICE}
+      `;
+      return rows.map((r) => {
+        const slug = r.slug as string;
+        const problem = getPracticeProblemBySlug(slug);
+        return {
+          slug,
+          title: problem?.title ?? slug,
+          viewCount: (r.c as number) ?? 0,
+        };
+      });
+    } catch (err: unknown) {
+      if ((err as { code?: string })?.code === "42P01") return []; /* table does not exist */
+      throw err;
+    }
+  },
+  ["popular-practice-problems"],
+  { revalidate: 300, tags: ["home-popular"] }
+);
 
 /** Fallback when DB has no data: return all languages and all interview prep problems. */
 export function getFallbackPopularLanguages(): PopularLanguage[] {

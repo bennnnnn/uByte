@@ -9,11 +9,12 @@
  * Built with next/og (Vercel Edge runtime / @vercel/og) — no sharp required.
  */
 import { ImageResponse } from "next/og";
-import { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
 export const runtime = "edge";
 
 export async function GET(request: NextRequest) {
+  try {
   const { searchParams } = new URL(request.url);
   const title = searchParams.get("title") ?? "Interactive Coding Tutorials & Certifications";
   const description =
@@ -135,5 +136,9 @@ export async function GET(request: NextRequest) {
       </div>
     ),
     { width: 1200, height: 630 }
-  );
+    );
+  } catch (err) {
+    console.error("[GET /api/og] error:", err);
+    return NextResponse.json({ error: "Failed to generate image" }, { status: 500 });
+  }
 }

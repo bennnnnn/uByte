@@ -3,9 +3,12 @@ import bcrypt from "bcryptjs";
 import { getPasswordResetToken, incrementTokenVersion, markResetTokenUsed, updateUserPassword } from "@/lib/db";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 import { withErrorHandling } from "@/lib/api-utils";
+import { verifyCsrf } from "@/lib/csrf";
 import { isValidPassword, PASSWORD_POLICY_MESSAGE } from "@/lib/password-policy";
 
 export const POST = withErrorHandling("POST /api/auth/reset-password", async (request: NextRequest) => {
+  const csrfError = verifyCsrf(request);
+  if (csrfError) return NextResponse.json({ error: "Invalid CSRF token" }, { status: 403 });
   const ip = getClientIp(request.headers);
   const { limited, retryAfter } = await checkRateLimit(`reset-password:${ip}`, 5, 60_000);
   if (limited) {

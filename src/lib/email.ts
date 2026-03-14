@@ -208,7 +208,7 @@ export async function sendDay3Email(to: string, name: string): Promise<void> {
   if (!resend) return;
 
   const firstName = name.split(" ")[0];
-  await resend.emails.send({
+  try { await resend.emails.send({
     from: FROM,
     to,
     subject: `${firstName}, ready for your first challenge? 🎯`,
@@ -232,7 +232,7 @@ export async function sendDay3Email(to: string, name: string): Promise<void> {
         </div>
       </div>
     `,
-  });
+  }); } catch (err) { console.error("[email] sendDay3Email failed:", err); }
 }
 
 /** Day 7 — celebrate one week, push certifications and Pro. */
@@ -241,7 +241,7 @@ export async function sendDay7Email(to: string, name: string): Promise<void> {
   if (!resend) return;
 
   const firstName = name.split(" ")[0];
-  await resend.emails.send({
+  try { await resend.emails.send({
     from: FROM,
     to,
     subject: `One week on uByte 🎉 — ready to earn a certification?`,
@@ -268,7 +268,7 @@ export async function sendDay7Email(to: string, name: string): Promise<void> {
         </div>
       </div>
     `,
-  });
+  }); } catch (err) { console.error("[email] sendDay7Email failed:", err); }
 }
 
 /** Weekly progress digest — sent every Sunday to active users. */
@@ -463,7 +463,7 @@ export async function sendExamFailedEmail(
   const scoreDiff = passPercent - score;
   if (scoreDiff > 20) return;
 
-  await resend.emails.send({
+  try { await resend.emails.send({
     from: FROM,
     to,
     subject: `So close! Your ${langLabel} exam result — uByte`,
@@ -507,7 +507,7 @@ export async function sendExamFailedEmail(
         </div>
       </div>
     `,
-  });
+  }); } catch (err) { console.error("[email] sendExamFailedEmail failed:", err); }
 }
 
 /** Day 14 — win-back for users who haven't logged in since signup week. */

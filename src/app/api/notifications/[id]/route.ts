@@ -1,10 +1,14 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { deleteNotification } from "@/lib/db";
 import { withErrorHandling, requireAuth } from "@/lib/api-utils";
+import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 
 export const DELETE = withErrorHandling(
   "DELETE /api/notifications/[id]",
-  async (_req, ctx: unknown) => {
+  async (req: NextRequest, ctx: unknown) => {
+    const ip = getClientIp(req.headers);
+    const { limited } = await checkRateLimit(`notif-delete:${ip}`, 60, 60_000);
+    if (limited) return NextResponse.json({ error: "Too many requests" }, { status: 429 });
     const { user: tokenUser, response } = await requireAuth();
     if (!tokenUser) return response;
 

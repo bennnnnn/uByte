@@ -10,10 +10,12 @@ import {
 } from "@/lib/db";
 import { signToken, setAuthCookie } from "@/lib/auth";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
-import { setCsrfCookie } from "@/lib/csrf";
+import { setCsrfCookie, verifyCsrf } from "@/lib/csrf";
 import { withErrorHandling } from "@/lib/api-utils";
 
 export const POST = withErrorHandling("POST /api/auth/login", async (request: NextRequest) => {
+  const csrfError = verifyCsrf(request);
+  if (csrfError) return NextResponse.json({ error: "Invalid CSRF token" }, { status: 403 });
   const ip = getClientIp(request.headers);
   const { limited, retryAfter } = await checkRateLimit(`login:${ip}`, 5, 60_000);
   if (limited) {

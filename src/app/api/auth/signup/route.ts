@@ -3,13 +3,15 @@ import bcrypt from "bcryptjs";
 import { createUser, getUserByEmail, createEmailVerificationToken, getReferrerByCode, recordReferralSignup } from "@/lib/db";
 import { signToken, setAuthCookie } from "@/lib/auth";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
-import { setCsrfCookie } from "@/lib/csrf";
+import { setCsrfCookie, verifyCsrf } from "@/lib/csrf";
 import { sendVerificationEmail, sendWelcomeEmail } from "@/lib/email";
 import crypto from "crypto";
 import { withErrorHandling } from "@/lib/api-utils";
 import { isValidPassword, PASSWORD_POLICY_MESSAGE } from "@/lib/password-policy";
 
 export const POST = withErrorHandling("POST /api/auth/signup", async (request: NextRequest) => {
+  const csrfError = verifyCsrf(request);
+  if (csrfError) return NextResponse.json({ error: "Invalid CSRF token" }, { status: 403 });
   const ip = getClientIp(request.headers);
   const { limited, retryAfter } = await checkRateLimit(`signup:${ip}`, 3, 60_000);
   if (limited) {

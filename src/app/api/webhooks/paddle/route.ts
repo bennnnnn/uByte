@@ -171,20 +171,14 @@ async function resolveUserId(
   // Step 1: Paddle customer ID already linked in users.paddle_customer_id
   if (paddleCustomerId) {
     const existing = await getUserByPaddleCustomerId(paddleCustomerId);
-    if (existing) {
-      console.log("[paddle-webhook] Resolved user by paddle customer ID:", existing.id);
-      return existing.id;
-    }
+    if (existing) return existing.id;
   }
 
   // Step 2: Server-generated nonce (secure, set by /api/billing/checkout)
   const nonce = customData?.["checkoutNonce"];
   if (nonce) {
     const uid = await resolveCheckoutNonce(nonce);
-    if (uid) {
-      console.log("[paddle-webhook] Resolved user by checkout nonce:", uid);
-      return uid;
-    }
+    if (uid) return uid;
     console.warn("[paddle-webhook] Checkout nonce not found or expired:", nonce);
   }
 
@@ -193,10 +187,7 @@ async function resolveUserId(
     const email = await getPaddleCustomerEmail(paddleCustomerId);
     if (email) {
       const u = await getUserByEmail(email);
-      if (u) {
-        console.log("[paddle-webhook] Resolved user by Paddle customer email:", u.id, email);
-        return u.id;
-      }
+      if (u) return u.id;
       console.error("[paddle-webhook] No uByte user found for Paddle customer email:", email);
     }
   }
@@ -281,22 +272,16 @@ export const POST = withErrorHandling("POST /api/webhooks/paddle", async (reques
   }
 
   const eventId = (event as Record<string, unknown>).event_id as string | undefined;
-  console.log("[paddle-webhook] Event type:", event.event_type, "event_id:", eventId);
 
   if (eventId) {
     const duplicate = await isDuplicateEvent(eventId, event.event_type);
-    if (duplicate) {
-      console.log("[paddle-webhook] Duplicate event — already processed:", eventId);
-      return NextResponse.json({ received: true, duplicate: true });
-    }
+    if (duplicate) return NextResponse.json({ received: true, duplicate: true });
   }
 
   const data = event.data;
   const customData = data["custom_data"] as Record<string, string> | null;
   const paddleCustomerId = data["customer_id"] as string | undefined;
   const status = data["status"] as string | undefined;
-
-  console.log("[paddle-webhook] customer_id:", paddleCustomerId, "custom_data:", JSON.stringify(customData));
 
   // Determine which plan to activate based on the price ID in the transaction/subscription
   const yearlyPriceId = process.env.NEXT_PUBLIC_PADDLE_YEARLY_PRICE_ID;
@@ -317,17 +302,10 @@ export const POST = withErrorHandling("POST /api/webhooks/paddle", async (reques
      */
     case "transaction.completed":
     case "transaction.updated": {
-      if (status !== "completed") {
-        console.log("[paddle-webhook] Skipping transaction event with status:", status);
-        break;
-      }
-      console.log("[paddle-webhook] transaction completed data:", JSON.stringify({
-        status, paddleCustomerId, customData, purchasedPriceId
-      }));
+      if (status !== "completed") break;
       const uid = await resolveUserId(paddleCustomerId, customData);
       if (uid) {
         await updateUserPlan(uid, activatedPlan, paddleCustomerId);
-        console.log("[paddle-webhook] transaction completed — updated user", uid, "to plan:", activatedPlan);
         const amountCents = activatedPlan === "yearly" ? YEARLY_PRICE_CENTS : MONTHLY_PRICE_CENTS;
         await recordSubscriptionEvent(uid, activatedPlan, amountCents, "activated");
         await recordReferralSubscription(uid).catch((err) =>
@@ -374,7 +352,6 @@ export const POST = withErrorHandling("POST /api/webhooks/paddle", async (reques
             );
           }
         }
-        console.log("[paddle-webhook] subscription — updated user", uid, "to plan:", subPlan, "(status:", status, ")");
 
         if (isTrial) {
           await createNotification(
@@ -417,17 +394,13 @@ export const POST = withErrorHandling("POST /api/webhooks/paddle", async (reques
     case "subscription.updated": {
       if (paddleCustomerId && status) {
         const plan = planFromSubscription(status, purchasedPriceId);
-        if (plan === null) {
-          console.log("[paddle-webhook] subscription.updated — status", status, "is past_due/paused; preserving existing plan");
-          break;
-        }
+        if (plan === null) break;
         const uid = await resolveUserId(paddleCustomerId, customData);
         if (uid) {
           const prevUser = await getUserById(uid).catch(() => null);
           const wasOnTrial = prevUser?.plan?.startsWith("trial");
 
           await updateUserPlan(uid, plan, paddleCustomerId);
-          console.log("[paddle-webhook] subscription updated — user", uid, "plan:", plan, "(prev:", prevUser?.plan, ")");
 
           // Trial → active conversion: fire upgrade email + referral rewards
           if (wasOnTrial && plan !== "free" && !plan.startsWith("trial")) {
@@ -472,11 +445,8 @@ export const POST = withErrorHandling("POST /api/webhooks/paddle", async (reques
 
         if (expiresAt) {
           await cancelUserPlanGracefully(uid, expiresAt);
-          console.log("[paddle-webhook] subscription canceled — user", uid, "access until", expiresAt);
         } else {
-          // Fallback: no period info — downgrade immediately
           await updateUserPlan(uid, "free");
-          console.log("[paddle-webhook] subscription canceled (no period end) — user", uid, "downgraded to free");
         }
         if (user) await recordSubscriptionEvent(uid, user.plan, 0, "canceled");
       }
@@ -484,7 +454,6 @@ export const POST = withErrorHandling("POST /api/webhooks/paddle", async (reques
     }
 
     default:
-      console.log("[paddle-webhook] Unhandled event type:", event.event_type);
       break;
   }
 

@@ -110,17 +110,19 @@ export const POST = withErrorHandling(
     const mentionTokens = [...text.matchAll(/@([\w.-]+)/g)].map((m) => m[1]);
     if (mentionTokens.length > 0) {
       const mentioned = await findUsersByNames(mentionTokens);
-      for (const m of mentioned) {
-        if (m.id === user.userId) continue; // don't self-notify
-        if (alreadyNotified.has(m.id)) continue; // already notified via reply
-        await createNotification(
-          m.id,
-          "mention",
-          `${authorName} mentioned you`,
-          `On "${problemTitle}": "${preview}"`,
-          pageUrl,
-        );
-      }
+      await Promise.all(
+        mentioned
+          .filter((m) => m.id !== user.userId && !alreadyNotified.has(m.id))
+          .map((m) =>
+            createNotification(
+              m.id,
+              "mention",
+              `${authorName} mentioned you`,
+              `On "${problemTitle}": "${preview}"`,
+              pageUrl,
+            )
+          )
+      );
     }
 
     return NextResponse.json({ post }, { status: 201 });

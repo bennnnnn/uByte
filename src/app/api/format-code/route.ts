@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { withErrorHandling } from "@/lib/api-utils";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
+import { verifyCsrf } from "@/lib/csrf";
 
 const MAX_CODE_LENGTH = 64 * 1024; // 64 KB — same limit as run-code
 
@@ -15,6 +16,8 @@ const MAX_CODE_LENGTH = 64 * 1024; // 64 KB — same limit as run-code
  *   { code: string; changed: boolean }
  */
 export const POST = withErrorHandling("POST /api/format-code", async (request: NextRequest) => {
+  const csrfError = verifyCsrf(request);
+  if (csrfError) return NextResponse.json({ error: "Invalid CSRF token" }, { status: 403 });
   const ip = getClientIp(request.headers);
   const { limited } = await checkRateLimit(`format:${ip}`, 30, 60_000);
   if (limited) {

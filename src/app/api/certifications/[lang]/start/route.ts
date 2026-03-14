@@ -8,6 +8,7 @@ import { getExamConfigForLang } from "@/lib/db/exam-settings";
 import { withErrorHandling } from "@/lib/api-utils";
 import { isExamLang } from "@/lib/exams/config";
 import { verifyCsrf } from "@/lib/csrf";
+import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 
 function shuffle<T>(arr: T[]): T[] {
   const out = [...arr];
@@ -24,6 +25,9 @@ export const POST = withErrorHandling(
   async (request: NextRequest, context?: unknown) => {
     const csrfError = verifyCsrf(request);
     if (csrfError) return NextResponse.json({ error: csrfError }, { status: 403 });
+    const ip = getClientIp(request.headers);
+    const { limited } = await checkRateLimit(`exam-start:${ip}`, 10, 60_000);
+    if (limited) return NextResponse.json({ error: "Too many requests. Please wait before starting another exam." }, { status: 429 });
     const user = await getCurrentUser();
     if (!user) return NextResponse.json({ error: "Sign in to start an exam" }, { status: 401 });
 

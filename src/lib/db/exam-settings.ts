@@ -1,3 +1,4 @@
+import { unstable_cache } from "next/cache";
 import { getSql } from "./client";
 import {
   EXAM_LANGS,
@@ -133,53 +134,59 @@ export async function getExamConfigForLang(lang: string): Promise<ExamConfig> {
 }
 
 /** Get exam config for all exam languages. Uses exam_lang_settings; falls back to site_settings (same value for all langs) when table missing. */
-export async function getExamConfigForAllLangs(): Promise<Record<string, ExamConfig>> {
-  try {
-    const sql = getSql();
-    const rows = await sql`
-      SELECT lang, exam_size, exam_duration_minutes, pass_percent FROM exam_lang_settings
-    `;
-    const byLang = new Map<string, ExamConfig>();
-    for (const r of rows as { lang: string; exam_size: number; exam_duration_minutes: number; pass_percent?: number }[]) {
-      const pp = Number(r.pass_percent);
-      byLang.set(r.lang, {
-        examSize: Math.max(1, Math.min(MAX_EXAM_SIZE, Number(r.exam_size) || DEFAULT_EXAM_SIZE)),
-        examDurationMinutes: Math.max(5, Math.min(180, Number(r.exam_duration_minutes) || DEFAULT_EXAM_DURATION_MINUTES)),
-        passPercent: Number.isInteger(pp) && pp >= 1 && pp <= 100 ? pp : DEFAULT_EXAM_PASS_PERCENT,
-      });
+export const getExamConfigForAllLangs = unstable_cache(
+  async (): Promise<Record<string, ExamConfig>> => {
+    try {
+      const sql = getSql();
+      const rows = await sql`
+        SELECT lang, exam_size, exam_duration_minutes, pass_percent FROM exam_lang_settings
+      `;
+      const byLang = new Map<string, ExamConfig>();
+      for (const r of rows as { lang: string; exam_size: number; exam_duration_minutes: number; pass_percent?: number }[]) {
+        const pp = Number(r.pass_percent);
+        byLang.set(r.lang, {
+          examSize: Math.max(1, Math.min(MAX_EXAM_SIZE, Number(r.exam_size) || DEFAULT_EXAM_SIZE)),
+          examDurationMinutes: Math.max(5, Math.min(180, Number(r.exam_duration_minutes) || DEFAULT_EXAM_DURATION_MINUTES)),
+          passPercent: Number.isInteger(pp) && pp >= 1 && pp <= 100 ? pp : DEFAULT_EXAM_PASS_PERCENT,
+        });
+      }
+      const result: Record<string, ExamConfig> = {};
+      for (const lang of EXAM_LANGS) {
+        result[lang] = byLang.get(lang) ?? DEFAULT_EXAM_CONFIG;
+      }
+      return result;
+    } catch {
+      return getExamConfigFromSiteSettingsForAllLangs();
     }
-    const result: Record<string, ExamConfig> = {};
-    for (const lang of EXAM_LANGS) {
-      result[lang] = byLang.get(lang) ?? DEFAULT_EXAM_CONFIG;
-    }
-    return result;
-  } catch {
-    return getExamConfigFromSiteSettingsForAllLangs();
-  }
-}
+  },
+  ["exam-config-all"],
+  { revalidate: 300, tags: ["exam-config"] }
+);
 
 /** Write per-lang settings to site_settings so each exam keeps its own value. */
 async function setExamConfigInSiteSettingsBulk(settings: Record<string, ExamConfig>): Promise<void> {
   const sql = getSql();
+  const writes: Promise<unknown>[] = [];
   for (const lang of EXAM_LANGS) {
     const config = settings[lang];
     if (!config) continue;
     const examSize = Math.max(1, Math.min(MAX_EXAM_SIZE, Math.floor(Number(config.examSize))));
     const examDurationMinutes = Math.max(5, Math.min(180, Math.floor(Number(config.examDurationMinutes))));
     const passPercent = Math.max(1, Math.min(100, Math.floor(Number(config.passPercent) || DEFAULT_EXAM_PASS_PERCENT)));
-    await sql`
+    writes.push(sql`
       INSERT INTO site_settings (key, value, updated_at) VALUES (${siteKeyQuestionsPerExam(lang)}, ${String(examSize)}, NOW())
       ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value, updated_at = NOW()
-    `;
-    await sql`
+    `);
+    writes.push(sql`
       INSERT INTO site_settings (key, value, updated_at) VALUES (${siteKeyDurationMinutes(lang)}, ${String(examDurationMinutes)}, NOW())
       ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value, updated_at = NOW()
-    `;
-    await sql`
+    `);
+    writes.push(sql`
       INSERT INTO site_settings (key, value, updated_at) VALUES (${siteKeyPassPercent(lang)}, ${String(passPercent)}, NOW())
       ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value, updated_at = NOW()
-    `;
+    `);
   }
+  await Promise.all(writes);
 }
 
 /** Update exam settings for one language (admin only). Uses exam_lang_settings; throws if table missing. */
@@ -215,11 +222,11 @@ export async function setExamSettingsBulk(
   settings: Record<string, Partial<ExamConfig>>
 ): Promise<void> {
   try {
-    for (const lang of Object.keys(settings)) {
-      if (EXAM_LANGS.includes(lang as ExamLang)) {
-        await setExamSettingsForLang(lang, settings[lang] ?? {});
-      }
-    }
+    await Promise.all(
+      Object.keys(settings)
+        .filter((lang) => EXAM_LANGS.includes(lang as ExamLang))
+        .map((lang) => setExamSettingsForLang(lang, settings[lang] ?? {}))
+    );
   } catch {
     const current = await getExamConfigFromSiteSettingsForAllLangs();
     const merged: Record<string, ExamConfig> = {};

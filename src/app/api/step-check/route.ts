@@ -1,11 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { withErrorHandling } from "@/lib/api-utils";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
+import { verifyCsrf } from "@/lib/csrf";
 import { recordStepCheck } from "@/lib/db";
 import { getSteps } from "@/lib/tutorial-steps";
 import { isSupportedLanguage } from "@/lib/languages/registry";
 
 export const POST = withErrorHandling("POST /api/step-check", async (request: NextRequest) => {
+  const csrfError = verifyCsrf(request);
+  if (csrfError) return NextResponse.json({ error: "Invalid CSRF token" }, { status: 403 });
   const ip = getClientIp(request.headers);
   const { limited } = await checkRateLimit(`step-check:${ip}`, 60, 60_000);
   if (limited) {

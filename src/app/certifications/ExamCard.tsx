@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { LANGUAGES } from "@/lib/languages/registry";
 import { getLangIcon } from "@/lib/languages/icons";
+import type { UserExamLangStats } from "@/lib/db/exam-attempts";
 
 function getDifficultyFromPassRate(passRate: number, hasData: boolean): { label: string; color: string } {
   if (!hasData) return { label: "New", color: "bg-zinc-100 text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400" };
@@ -9,13 +10,7 @@ function getDifficultyFromPassRate(passRate: number, hasData: boolean): { label:
   return { label: "Advanced", color: "bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300" };
 }
 
-export interface ExamCardStats {
-  attemptCount: number;
-  lastPassed: boolean | null;
-  lastScore: number | null;
-  bestScore: number | null;
-  hasCertificate: boolean;
-}
+export type ExamCardStats = Omit<UserExamLangStats, "lang">;
 
 export interface ExamCardPublicStats {
   usersTaken: number;
