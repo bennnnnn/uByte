@@ -12,6 +12,7 @@ import {
 } from "@/lib/db/interview-experiences";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 import { withErrorHandling } from "@/lib/api-utils";
+import { verifyCsrf } from "@/lib/csrf";
 import { getCurrentUser } from "@/lib/auth";
 
 const PAGE_SIZE = 20;
@@ -32,6 +33,9 @@ export const GET = withErrorHandling("GET /api/interview-experiences", async (re
 });
 
 export const POST = withErrorHandling("POST /api/interview-experiences", async (req: NextRequest) => {
+  const csrfError = verifyCsrf(req);
+  if (csrfError) return NextResponse.json({ error: csrfError }, { status: 403 });
+
   const ip = getClientIp(req.headers);
   const { limited } = await checkRateLimit(`interview-submit:${ip}`, 5, 24 * 60 * 60 * 1000);
   if (limited) {

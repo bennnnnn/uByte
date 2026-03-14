@@ -46,14 +46,19 @@ export default function InterviewSimulatorPage() {
   const [duration, setDuration] = useState(45);
   const [language, setLanguage] = useState("go");
   const [starting, setStarting] = useState(false);
+  const [startError, setStartError] = useState("");
 
   const languageSlugs = getAllLanguageSlugs();
 
   function startInterview() {
+    setStartError("");
     setStarting(true);
     const problems = getAllPracticeProblems().filter((p) => p.difficulty === difficulty && p.testCases?.length);
     if (problems.length === 0) {
       setStarting(false);
+      setStartError(
+        `No ${difficulty} problems are available right now. Try a different difficulty.`
+      );
       return;
     }
     // Pick a random problem
@@ -134,7 +139,7 @@ export default function InterviewSimulatorPage() {
             <button
               key={d.value}
               type="button"
-              onClick={() => setDifficulty(d.value)}
+              onClick={() => { setDifficulty(d.value); setStartError(""); }}
               className={`rounded-xl border-2 py-3 text-sm font-bold transition-all capitalize ${
                 difficulty === d.value ? d.selectedColor : d.color + " bg-white dark:bg-zinc-900"
               } text-zinc-800 dark:text-zinc-200`}
@@ -166,6 +171,12 @@ export default function InterviewSimulatorPage() {
           ))}
         </div>
       </div>
+
+      {startError && (
+        <div className="mb-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700 dark:border-amber-800/50 dark:bg-amber-950/20 dark:text-amber-400">
+          {startError}
+        </div>
+      )}
 
       <button
         type="button"

@@ -5,12 +5,16 @@ import { NextRequest, NextResponse } from "next/server";
 import { voteOnExperience } from "@/lib/db/interview-experiences";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 import { withErrorHandling } from "@/lib/api-utils";
+import { verifyCsrf } from "@/lib/csrf";
 import { getCurrentUser } from "@/lib/auth";
 import { cookies } from "next/headers";
 
 export const POST = withErrorHandling(
   "POST /api/interview-experiences/[id]/vote",
   async (req: NextRequest, ctx: unknown) => {
+    const csrfError = verifyCsrf(req);
+    if (csrfError) return NextResponse.json({ error: csrfError }, { status: 403 });
+
     const { id: idStr } = await (ctx as { params: Promise<{ id: string }> }).params;
     const id = parseInt(idStr, 10);
     if (!id) return NextResponse.json({ error: "Invalid id" }, { status: 400 });
