@@ -41,6 +41,8 @@ export default async function PracticePage() {
   const hard   = problems.filter((p) => p.difficulty === "hard").length;
   const langSlugs = getAllLanguageSlugs() as SupportedLanguage[];
 
+  const defaultLang = langSlugs[0] ?? "go";
+
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "CollectionPage",
@@ -49,7 +51,7 @@ export default async function PracticePage() {
     hasPart: problems.slice(0, 8).map((p) => ({
       "@type": "CreativeWork",
       name: p.title,
-      url: absoluteUrl(`/practice/go/${p.slug}`),
+      url: absoluteUrl(`/practice/${defaultLang}/${p.slug}`),
     })),
   };
 
@@ -104,7 +106,7 @@ export default async function PracticePage() {
               </Link>
             ))}
             <Link
-              href="/practice/go"
+              href={`/practice/${defaultLang}`}
               className="inline-flex items-center gap-2 rounded-full bg-indigo-600 px-4 py-1.5 text-xs font-bold text-white transition-all hover:bg-indigo-500"
             >
               Start solving →
@@ -122,7 +124,7 @@ export default async function PracticePage() {
             return (
               <Link
                 key={cat}
-                href={`/practice/go?category=${cat}`}
+                href={`/practice/${defaultLang}?category=${cat}`}
                 className="group rounded-xl border border-zinc-200 bg-white p-4 transition-all hover:-translate-y-0.5 hover:border-indigo-200 hover:shadow-md dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-indigo-800"
               >
                 <p className="text-sm font-bold text-zinc-800 group-hover:text-indigo-700 dark:text-zinc-200 dark:group-hover:text-indigo-400">
@@ -143,31 +145,40 @@ export default async function PracticePage() {
           </div>
           <ul className="divide-y divide-zinc-100 dark:divide-zinc-800">
             {problems.map((p, i) => (
-              <li key={p.slug}>
-                <Link
-                  href={`/practice/go/${p.slug}`}
-                  className="group flex items-center gap-3 px-5 py-3.5 transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-800/50"
-                >
-                  <span className="w-7 shrink-0 text-right text-xs tabular-nums text-zinc-300 dark:text-zinc-600">
-                    {i + 1}
-                  </span>
-                  <span className="min-w-0 flex-1">
-                    <span className="truncate text-sm font-semibold text-zinc-800 group-hover:text-indigo-700 dark:text-zinc-200 dark:group-hover:text-indigo-400">
-                      {p.title}
-                    </span>
-                  </span>
+              <li key={p.slug} className="flex items-start gap-3 px-5 py-3.5">
+                <span className="mt-0.5 w-7 shrink-0 text-right text-xs tabular-nums text-zinc-300 dark:text-zinc-600">
+                  {i + 1}
+                </span>
+                <div className="min-w-0 flex-1">
+                  <Link
+                    href={`/practice/${defaultLang}/${p.slug}`}
+                    className="block truncate text-sm font-semibold text-zinc-800 transition-colors hover:text-indigo-700 dark:text-zinc-200 dark:hover:text-indigo-400"
+                  >
+                    {p.title}
+                  </Link>
+                  {/* Per-language solve links */}
+                  <div className="mt-1 flex flex-wrap gap-x-2 gap-y-0.5">
+                    {langSlugs.map((slug) => (
+                      <Link
+                        key={slug}
+                        href={`/practice/${slug}/${p.slug}`}
+                        className="text-[10px] font-medium text-zinc-400 transition-colors hover:text-indigo-600 dark:text-zinc-500 dark:hover:text-indigo-400"
+                      >
+                        {getLangIcon(slug)} {LANGUAGES[slug]?.name ?? slug}
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+                <div className="flex shrink-0 items-center gap-2 pt-0.5">
                   {p.category && (
-                    <span className="hidden shrink-0 rounded-full bg-zinc-100 px-2.5 py-0.5 text-[10px] font-semibold text-zinc-500 sm:inline dark:bg-zinc-800 dark:text-zinc-400">
+                    <span className="hidden rounded-full bg-zinc-100 px-2.5 py-0.5 text-[10px] font-semibold text-zinc-500 sm:inline dark:bg-zinc-800 dark:text-zinc-400">
                       {getCategoryLabel(p.category)}
                     </span>
                   )}
-                  <span className={`shrink-0 rounded-full px-2.5 py-0.5 text-[10px] font-bold capitalize ${DIFFICULTY_BADGE[p.difficulty]}`}>
+                  <span className={`rounded-full px-2.5 py-0.5 text-[10px] font-bold capitalize ${DIFFICULTY_BADGE[p.difficulty]}`}>
                     {p.difficulty}
                   </span>
-                  <svg className="h-4 w-4 shrink-0 text-zinc-300 transition-colors group-hover:text-indigo-500 dark:text-zinc-600 dark:group-hover:text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-                  </svg>
-                </Link>
+                </div>
               </li>
             ))}
           </ul>
