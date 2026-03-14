@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
+import { usePathname } from "next/navigation";
 
 const LANGUAGES = [
   { slug: "go",         icon: "🐹", label: "Go",         sub: "Beginner-friendly"    },
@@ -117,9 +118,15 @@ function NavDropdown({
 
 export default function HeaderNavLinks({ side = "left" }: { side?: "left" }) {
   const [openMenu, setOpenMenu] = useState<DropdownId | null>(null);
+  const pathname = usePathname();
 
   const handleOpen = useCallback((id: DropdownId) => setOpenMenu(id), []);
   const handleClose = useCallback(() => setOpenMenu(null), []);
+
+  // Close all dropdowns whenever the route changes (link was clicked)
+  useEffect(() => {
+    setOpenMenu(null);
+  }, [pathname]);
 
   if (side === "left") {
     return (
@@ -195,34 +202,6 @@ export default function HeaderNavLinks({ side = "left" }: { side?: "left" }) {
               </Link>
             ))}
 
-            <div className="my-1.5 border-t border-zinc-100 dark:border-zinc-800" />
-
-            <Link
-              href="/daily"
-              role="menuitem"
-              onClick={handleClose}
-              className="flex items-center gap-3 rounded-xl px-3 py-2.5 transition-colors hover:bg-zinc-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-indigo-500 dark:hover:bg-zinc-800"
-            >
-              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-amber-100 text-base dark:bg-amber-950/60">⚡</span>
-              <span>
-                <span className="block text-sm font-semibold text-zinc-800 dark:text-zinc-100">Daily challenge</span>
-                <span className="block text-xs text-zinc-400 dark:text-zinc-500">One new problem every day</span>
-              </span>
-            </Link>
-
-            <Link
-              href="/interview"
-              role="menuitem"
-              onClick={handleClose}
-              className="flex items-center gap-3 rounded-xl px-3 py-2.5 transition-colors hover:bg-zinc-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-indigo-500 dark:hover:bg-zinc-800"
-            >
-              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-violet-100 text-base dark:bg-violet-950/60">🎤</span>
-              <span>
-                <span className="block text-sm font-semibold text-zinc-800 dark:text-zinc-100">Interview simulator</span>
-                <span className="block text-xs text-zinc-400 dark:text-zinc-500">Timed mock interview + AI debrief</span>
-              </span>
-            </Link>
-
             <Link
               href="/interviews"
               role="menuitem"
@@ -237,11 +216,6 @@ export default function HeaderNavLinks({ side = "left" }: { side?: "left" }) {
             </Link>
           </div>
         </NavDropdown>
-
-        {/* ── Leaderboard ─────────────────────────────────────────── */}
-        <Link href="/leaderboard" className={linkBase}>
-          Leaderboard
-        </Link>
 
         {/* ── Certifications dropdown ──────────────────────────────── */}
         <NavDropdown
