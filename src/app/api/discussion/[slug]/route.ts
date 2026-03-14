@@ -56,13 +56,14 @@ export const POST = withErrorHandling(
       return NextResponse.json({ error: "Slow down — too many posts." }, { status: 429 });
     }
 
-    const body = await req.json() as { body?: string; parentId?: number; pageUrl?: string };
+    const body = await req.json() as { body?: string; parentId?: number; replyToUserId?: number | null; pageUrl?: string };
     const text = body.body?.trim() ?? "";
     if (!text) return NextResponse.json({ error: "Message cannot be empty." }, { status: 400 });
     if (text.length > 2000) return NextResponse.json({ error: "Message too long (max 2000 chars)." }, { status: 400 });
 
-    const parentId = typeof body.parentId === "number" ? body.parentId : null;
-    const pageUrl  = typeof body.pageUrl === "string" ? body.pageUrl : null;
+    const parentId      = typeof body.parentId === "number" ? body.parentId : null;
+    const replyToUserId = typeof body.replyToUserId === "number" ? body.replyToUserId : null;
+    const pageUrl       = typeof body.pageUrl === "string" ? body.pageUrl : null;
 
     const post = await createPost(user.userId, slug, text, parentId);
 
@@ -71,11 +72,23 @@ export const POST = withErrorHandling(
     const problemTitle = problem?.title ?? slug;
     const preview = text.length > 120 ? text.slice(0, 120) + "…" : text;
     const authorName = user.name || "Someone";
-    // Track who already got a reply notification so we don't double-notify via @mention
+    // Track who already got a notification so we don't double-notify
     const alreadyNotified = new Set<number>();
 
-    // 1. Reply notification — tell the parent post's author
-    if (parentId) {
+    // 1. Reply notification — notify the direct target (the specific reply's author when
+    //    replying to a nested reply, or the top-level post's author for a direct reply).
+    //    replyToUserId is sent by the client and always identifies the person being replied to.
+    if (replyToUserId && replyToUserId !== user.userId) {
+      await createNotification(
+        replyToUserId,
+        "reply",
+        `${authorName} replied to your comment`,
+        `On "${problemTitle}": "${preview}"`,
+        pageUrl,
+      );
+      alreadyNotified.add(replyToUserId);
+    } else if (parentId) {
+      // Fallback: look up the parent post's author (handles cases where replyToUserId was not sent)
       const parent = await getPostById(parentId);
       if (parent?.user_id && parent.user_id !== user.userId) {
         await createNotification(

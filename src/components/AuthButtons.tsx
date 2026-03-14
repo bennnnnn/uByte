@@ -36,12 +36,21 @@ export default function AuthButtons() {
 
   useEffect(() => {
     if (!user) return;
-    fetch("/api/notifications", { credentials: "same-origin" })
-      .then((r) => r.json())
-      .then((data) => {
-        if (typeof data.unreadCount === "number") setUnreadCount(data.unreadCount);
-      })
-      .catch(() => {});
+
+    const fetchCount = () => {
+      fetch("/api/notifications", { credentials: "same-origin" })
+        .then((r) => r.json())
+        .then((data: unknown) => {
+          if (data && typeof data === "object" && "unreadCount" in data && typeof (data as { unreadCount: unknown }).unreadCount === "number") {
+            setUnreadCount((data as { unreadCount: number }).unreadCount);
+          }
+        })
+        .catch(() => {});
+    };
+
+    fetchCount();
+    const interval = setInterval(fetchCount, 30_000);
+    return () => clearInterval(interval);
   }, [user]);
 
   useEffect(() => {

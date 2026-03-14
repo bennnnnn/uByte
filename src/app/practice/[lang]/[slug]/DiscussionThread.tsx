@@ -260,13 +260,14 @@ function PostCard({
   isReply: boolean;
   /** For replies: the id of the top-level parent post to attach new replies to */
   rootPostId?: number;
-  onReplySubmit: (parentId: number, text: string) => Promise<void>;
+  onReplySubmit: (parentId: number, text: string, replyToUserId?: number | null) => Promise<void>;
   onDelete: (postId: number) => void;
   onToggleReplies: (postId: number) => void;
   onLoadReplies: (postId: number) => Promise<void>;
 }) {
   const [replying, setReplying] = useState(false);
   const [replyPrefill, setReplyPrefill] = useState("");
+  const [replyToUserId, setReplyToUserId] = useState<number | null>(null);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [reporting, setReporting] = useState(false);
 
@@ -282,9 +283,9 @@ function PostCard({
   };
 
   // Called when "Reply" is clicked on a nested reply — opens parent compose with @name prefilled
-  const handleReplyToReply = (authorName: string) => {
-    const prefill = `@${authorName} `;
-    setReplyPrefill(prefill);
+  const handleReplyToReply = (authorName: string, authorId: number | null) => {
+    setReplyPrefill(`@${authorName} `);
+    setReplyToUserId(authorId);
     setReplying(true);
   };
 
@@ -330,13 +331,9 @@ function PostCard({
             <button
               type="button"
               onClick={() => {
-                if (isReply) {
-                  // Bubble up: tell parent PostCard to open its compose with @mention
-                  // (handled via onReplyToUser prop on reply cards — see below)
-                } else {
-                  setReplyPrefill("");
-                  setReplying((r) => !r);
-                }
+                setReplyPrefill("");
+                setReplyToUserId(post.user_id ?? null);
+                setReplying((r) => !r);
               }}
               className="text-[11px] font-medium text-zinc-400 transition-colors hover:text-indigo-600 dark:hover:text-indigo-400"
             >
@@ -409,11 +406,12 @@ function PostCard({
               placeholder={replyPrefill ? `Replying… (use @name to mention)` : `Reply to ${post.author_name ?? "this comment"}… (use @name to mention)`}
               prefill={replyPrefill}
               autoFocus
-              onCancel={() => { setReplying(false); setReplyPrefill(""); }}
+              onCancel={() => { setReplying(false); setReplyPrefill(""); setReplyToUserId(null); }}
               onSubmit={async (text) => {
-                await onReplySubmit(replyParentId, text);
+                await onReplySubmit(replyParentId, text, replyToUserId);
                 setReplying(false);
                 setReplyPrefill("");
+                setReplyToUserId(null);
               }}
             />
           </div>
@@ -460,7 +458,7 @@ function ReplyCard({
   isSignedIn: boolean;
   rootPostId: number;
   /** Called when the user clicks "Reply" — parent PostCard handles the compose */
-  onReplyTo: (authorName: string) => void;
+  onReplyTo: (authorName: string, authorId: number | null) => void;
   onDelete: (postId: number) => void;
 }) {
   const [confirmDelete, setConfirmDelete] = useState(false);
@@ -504,7 +502,7 @@ function ReplyCard({
           {isSignedIn && (
             <button
               type="button"
-              onClick={() => onReplyTo(post.author_name ?? "user")}
+              onClick={() => onReplyTo(post.author_name ?? "user", post.user_id)}
               className="text-[11px] font-medium text-zinc-400 transition-colors hover:text-indigo-600 dark:hover:text-indigo-400"
             >
               Reply
@@ -614,11 +612,11 @@ export default function DiscussionThread({ slug, currentUserId, isSignedIn }: Pr
   }, [slug]);
 
   /* ── Submit reply (or reply-to-reply, flat threading) ───────────────── */
-  const submitReply = useCallback(async (parentId: number, text: string) => {
+  const submitReply = useCallback(async (parentId: number, text: string, replyToUserId?: number | null) => {
     const res  = await apiFetch(`/api/discussion/${slug}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ body: text, parentId, pageUrl: window.location.pathname }),
+      body: JSON.stringify({ body: text, parentId, replyToUserId: replyToUserId ?? null, pageUrl: window.location.pathname }),
     });
     if (!res.ok) {
       const data = await res.json() as { error?: string };
