@@ -49,7 +49,6 @@ export async function saveLastActivity(userId: number, input: SaveLastActivityIn
 }
 
 export async function getLastActivity(userId: number): Promise<LastActivity | null> {
-  await ensureLastActivityTable();
   const sql = getSql();
   const [row] = await sql`
     SELECT user_id, activity_type, lang, slug, step, updated_at
