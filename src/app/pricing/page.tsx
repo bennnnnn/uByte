@@ -131,6 +131,9 @@ function PricingContent() {
     apiFetch("/api/billing/sync").then((res) => {
       if (res.ok) refreshProfile();
     }).catch(() => {});
+  // refreshProfile is excluded: it's a stable function from useAuth but its reference
+  // is not guaranteed by the type, and including it risks re-triggering the sync on
+  // unrelated re-renders. showSuccess + user are the only meaningful triggers here.
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [showSuccess, user]);
 

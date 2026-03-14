@@ -46,6 +46,9 @@ export const POST = withErrorHandling("POST /api/run-code", async (request: Next
     // ── Go: go.dev playground (best error messages + vet) ────────────────────
     if (lang === "go") {
       const urlParams = new URLSearchParams({ version: "2", body: code, withVet: "true" });
+      // Fallback to the official Go Playground is intentional: it's the canonical
+      // endpoint and provides vet output. Override with GO_COMPILE_URL env var
+      // if you run a self-hosted compile proxy (e.g. to avoid user code leaving your infra).
       const goCompileUrl = process.env.GO_COMPILE_URL || "https://go.dev/_/compile";
       const res = await fetch(goCompileUrl, {
         method:  "POST",

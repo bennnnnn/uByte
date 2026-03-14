@@ -130,13 +130,16 @@ export default function InteractiveTutorial({
       .finally(() => { draftLoadingRef.current = false; });
   }
 
-  // When IDE language or its steps change, load the draft (or starter) for the current step
+  // When IDE language or its steps change, load the draft (or starter) for the current step.
+  // loadDraft is excluded: it's defined inline (not useCallback) so its reference changes
+  // every render — including it would cause an infinite loop. stepIndexRef is a ref, not state.
   useEffect(() => {
     loadDraft(stepIndexRef.current);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ideLang, stepsForLang]);
 
-  // When the user navigates to a different step, load the draft for that step
+  // When the user navigates to a different step, load the draft for that step.
+  // loadDraft excluded for the same reason as above — inline function, not useCallback.
   useEffect(() => {
     loadDraft(stepProgress.stepIndex);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -160,6 +163,8 @@ export default function InteractiveTutorial({
       }).catch(() => {});
     }, 1000);
     return () => { if (saveDraftTimerRef.current) clearTimeout(saveDraftTimerRef.current); };
+    // Only editor.code triggers the debounce. All other deps (user, slug, lang, stepIndex)
+    // are accessed via refs inside the timeout callback so they never go stale.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [editor.code]);
 
@@ -169,7 +174,8 @@ export default function InteractiveTutorial({
     if (stepProgress.status === "failed" && isMobile) setMobileTab("code");
   }, [stepProgress.status, isMobile]);
 
-  // Load shared code from ?share= URL param on mount (client-side — page is statically generated)
+  // Load shared code from ?share= URL param on mount (client-side — page is statically generated).
+  // Intentionally mount-only: the share param is a one-time initial load from the URL bar.
   useEffect(() => {
     const encoded = new URLSearchParams(window.location.search).get("share");
     if (encoded) {

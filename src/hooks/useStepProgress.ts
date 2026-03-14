@@ -244,7 +244,9 @@ export function useStepProgress(
   useEffect(() => {
     if (!tutorialDone || countdown > 0) return;
     router.push(next ? tutorialUrl(lang, next.slug) : "/");
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // router is stable (Next.js guarantees it). next, lang, and tutorialUrl are props/constants
+    // that don't change during a session — including them would add noise without value.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [countdown, tutorialDone]);
 
   // ── Auto-advance to next step after passing ──
@@ -260,6 +262,8 @@ export function useStepProgress(
       setShowInlineChat(false);
     }, 2000);
     return () => clearTimeout(id);
+    // steps is a stable prop (content array from JSON, never mutated).
+    // State setters (setStepIndex, setCode, etc.) are guaranteed stable by React.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [status, stepIndex]);
 

@@ -34,6 +34,9 @@ export const POST = withErrorHandling("POST /api/format-code", async (request: N
   // Go: use the playground's fmt endpoint which calls gofmt
   if (language === "go") {
     try {
+      // Same intentional fallback as run-code: official Go Playground fmt endpoint.
+      // Override by setting GO_COMPILE_URL to a self-hosted proxy (/_/compile suffix
+      // is replaced with /_/fmt automatically).
       const goFmtUrl = process.env.GO_COMPILE_URL
         ? process.env.GO_COMPILE_URL.replace("/_/compile", "/_/fmt")
         : "https://go.dev/_/fmt";

@@ -135,7 +135,10 @@ export function PracticeIDE({ problem, initialLang, initialCode, categoryFilter 
       .then((r) => r.json())
       .then((d) => { if (typeof d?.code === "string" && d.code) editor.setCode(d.code); })
       .catch(() => {});
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // editor and initialCode omitted: editor is an imperative handle (not state),
+    // initialCode is a one-time mount value. user?.id used instead of user to avoid
+    // re-running on unrelated profile changes (e.g. XP, streak).
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [problem.slug, user?.id]);
 
   // Debounce-save code draft to DB on every change (1 s idle, logged-in only)
@@ -153,7 +156,9 @@ export function PracticeIDE({ problem, initialLang, initialCode, categoryFilter 
       }).catch(() => {});
     }, 1000);
     return () => { if (codeTimerRef.current) clearTimeout(codeTimerRef.current); };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // user omitted: accessed via userRef2 inside the timeout so it's always fresh
+    // without needing to be a dep (which would reset the debounce timer on every auth event).
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [editor.code, problem.slug, lang]);
 
   // When language changes, load the saved draft for that lang (or fall back to starter)
@@ -224,7 +229,9 @@ export function PracticeIDE({ problem, initialLang, initialCode, categoryFilter 
         setBookmarkId(match?.id ?? null);
       })
       .catch(() => {});
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // user?.id instead of user: only re-fetch when the logged-in identity changes,
+    // not on unrelated profile updates. lang omitted — bookmarks are per-problem, not per-lang.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.id, problem.slug]);
 
   // Load notes: DB for logged-in users, localStorage for guests
@@ -239,7 +246,8 @@ export function PracticeIDE({ problem, initialLang, initialCode, categoryFilter 
     } else {
       try { setNotes(localStorage.getItem(notesKey) ?? ""); } catch { /* ignore */ }
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // user?.id instead of user: only reload notes when identity changes, not on profile updates.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [problem.slug, user?.id]);
 
   // Keep a ref to user so the debounced save always sees the latest auth state
@@ -262,7 +270,9 @@ export function PracticeIDE({ problem, initialLang, initialCode, categoryFilter 
       }
     }, 800);
     return () => { if (saveTimerRef.current) clearTimeout(saveTimerRef.current); };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // user omitted: accessed via userRef inside the timeout so it's always current
+    // without resetting the debounce timer on every auth state change.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [notes, problem.slug]);
 
 

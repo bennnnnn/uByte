@@ -92,9 +92,9 @@ export default function Sidebar({ lang, tutorials }: { lang: string; tutorials: 
           {/* Search dropdown */}
           {displayShowDropdown && displayResults.length > 0 && (
             <div className="absolute left-0 right-0 top-full z-50 mt-1 max-h-72 overflow-y-auto rounded-xl border border-zinc-200 bg-white shadow-lg dark:border-zinc-700 dark:bg-zinc-900">
-              {displayResults.map((r, i) => (
+              {displayResults.map((r) => (
                 <button
-                  key={i}
+                  key={`${r.lang ?? ""}:${r.slug}:${r.stepIndex ?? ""}:${r.matchType}`}
                   onMouseDown={() => {
                     const resultLang = r.lang ?? lang;
                     const href = r.matchType === "step" && r.stepIndex !== undefined

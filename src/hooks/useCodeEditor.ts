@@ -106,6 +106,9 @@ export function useCodeEditor(
     if (preRef.current) {
       preRef.current.innerHTML = highlightFnRef.current(initialCode) + "\n";
     }
+  // Intentionally mount-only: paints the initial highlighted content once.
+  // All subsequent updates go through setCode() which writes imperatively,
+  // so re-running on highlightFn or initialCode changes would double-write.
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   function setCode(newCode: string) {
