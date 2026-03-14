@@ -338,11 +338,16 @@ function DashboardPage() {
         <div className="mb-6 sm:hidden">
           <select
             value={tab}
-            onChange={(e) => setTab(e.target.value as Tab)}
+            onChange={(e) => {
+              const v = e.target.value;
+              if (v === "__leaderboard__") { router.push("/leaderboard"); return; }
+              setTab(v as Tab);
+            }}
             className="w-full rounded-xl border border-zinc-200 bg-white px-4 py-2.5 text-sm font-medium text-zinc-900 shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
           >
             <optgroup label="Learning">
               {LEARNING_TABS.map((t) => <option key={t} value={t}>{TAB_LABELS[t]}</option>)}
+              <option value="__leaderboard__">🏆 Leaderboard ↗</option>
             </optgroup>
             <optgroup label="Account">
               {ACCOUNT_TABS.map((t) => <option key={t} value={t}>{TAB_LABELS[t]}</option>)}
@@ -373,6 +378,18 @@ function DashboardPage() {
                       />
                     </li>
                   ))}
+                  <li>
+                    <Link
+                      href="/leaderboard"
+                      className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium text-zinc-600 transition-colors hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-200"
+                    >
+                      <span className="text-base leading-none">🏆</span>
+                      Leaderboard
+                      <svg className="ml-auto h-3 w-3 text-zinc-300 dark:text-zinc-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                      </svg>
+                    </Link>
+                  </li>
                 </ul>
               </div>
 

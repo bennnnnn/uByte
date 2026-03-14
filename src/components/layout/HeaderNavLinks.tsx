@@ -238,6 +238,11 @@ export default function HeaderNavLinks({ side = "left" }: { side?: "left" }) {
           </div>
         </NavDropdown>
 
+        {/* ── Leaderboard ─────────────────────────────────────────── */}
+        <Link href="/leaderboard" className={linkBase}>
+          Leaderboard
+        </Link>
+
         {/* ── Certifications dropdown ──────────────────────────────── */}
         <NavDropdown
           id="certifications"
