@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useState, Suspense } from "react";
+import { useEffect, useState, useCallback, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
+import { apiFetch } from "@/lib/api-client";
 
 function VerifyEmailContent() {
   const searchParams = useSearchParams();
@@ -15,15 +16,15 @@ function VerifyEmailContent() {
   const [message, setMessage] = useState(
     () => (token ? "" : "No verification token provided.")
   );
+  const [resendStatus, setResendStatus] = useState<"idle" | "sending" | "sent" | "failed">("idle");
 
   useEffect(() => {
-    if (!token) return; // initial state already set to "error"
+    if (!token) return;
 
     fetch(`/api/auth/verify-email?token=${encodeURIComponent(token)}`)
       .then(async (res) => {
         if (res.ok) {
           setStatus("success");
-          // Redirect to profile after 3 seconds
           setTimeout(() => router.push("/dashboard"), 3000);
         } else {
           const data = await res.json();
@@ -36,6 +37,16 @@ function VerifyEmailContent() {
         setMessage("Something went wrong. Please try again.");
       });
   }, [token, router]);
+
+  const handleResend = useCallback(async () => {
+    setResendStatus("sending");
+    try {
+      const res = await apiFetch("/api/auth/resend-verification", { method: "POST" });
+      setResendStatus(res.ok ? "sent" : "failed");
+    } catch {
+      setResendStatus("failed");
+    }
+  }, []);
 
   return (
     <div className="flex min-h-[60vh] items-center justify-center px-4">
@@ -70,12 +81,47 @@ function VerifyEmailContent() {
             </div>
             <h1 className="mb-2 text-xl font-bold text-zinc-900 dark:text-zinc-100">Verification failed</h1>
             <p className="mb-6 text-sm text-zinc-500 dark:text-zinc-400">{message}</p>
-            <Link
-              href="/dashboard"
-              className="inline-block rounded-lg bg-indigo-700 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-800"
-            >
-              Go to dashboard
-            </Link>
+
+            {/* Resend verification */}
+            <div className="mb-4">
+              {resendStatus === "sent" ? (
+                <p className="text-sm font-medium text-emerald-600 dark:text-emerald-400">
+                  ✓ A new verification email has been sent. Check your inbox.
+                </p>
+              ) : resendStatus === "failed" ? (
+                <p className="text-sm text-red-500 dark:text-red-400">
+                  Could not send email. Make sure you&apos;re signed in, then{" "}
+                  <button type="button" onClick={handleResend} className="underline hover:no-underline">
+                    try again
+                  </button>.
+                </p>
+              ) : (
+                <button
+                  type="button"
+                  onClick={handleResend}
+                  disabled={resendStatus === "sending"}
+                  className="w-full rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-indigo-700 disabled:opacity-50"
+                >
+                  {resendStatus === "sending" ? "Sending…" : "Resend verification email"}
+                </button>
+              )}
+            </div>
+
+            {/* Secondary actions */}
+            <div className="flex flex-col items-center gap-2 border-t border-zinc-100 pt-4 dark:border-zinc-800">
+              <Link
+                href="/dashboard"
+                className="text-sm text-zinc-500 transition-colors hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-200"
+              >
+                Go to dashboard
+              </Link>
+              <Link
+                href="/contact"
+                className="text-sm text-zinc-500 transition-colors hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-200"
+              >
+                Contact support
+              </Link>
+            </div>
           </>
         )}
       </div>

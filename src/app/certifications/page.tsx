@@ -477,12 +477,17 @@ export default async function PracticeExamsPage() {
                   <h3 className="font-semibold text-zinc-900 dark:text-zinc-100">{title}</h3>
                   <p className="mt-1.5 text-sm text-zinc-500 dark:text-zinc-400">{body}</p>
                   {step === "2" && (
-                    <div className="mt-4 rounded-xl border-2 border-indigo-200 bg-white px-4 py-3 text-center dark:border-indigo-800/50 dark:bg-zinc-800">
-                      <p className="text-[10px] font-semibold uppercase tracking-widest text-indigo-500 dark:text-indigo-400">Certificate</p>
-                      <p className="mt-1 text-sm font-bold text-zinc-800 dark:text-zinc-200">Your Name</p>
-                      <p className="text-[10px] text-zinc-400">Python Certification Exam</p>
-                      <div className="mx-auto mt-1.5 h-px w-12 bg-indigo-200 dark:bg-indigo-700" />
-                      <p className="mt-1 text-[9px] text-zinc-400">ID: abc-1234 · Verified</p>
+                    <div className="mt-4 rounded-xl border-2 border-indigo-200 bg-gradient-to-br from-indigo-50 to-white px-5 py-4 text-center dark:border-indigo-800/50 dark:from-indigo-950/30 dark:to-zinc-800">
+                      <div className="mb-2 flex items-center justify-center gap-1.5">
+                        <span className="text-base">🏆</span>
+                        <p className="text-[10px] font-bold uppercase tracking-widest text-indigo-500 dark:text-indigo-400">Certificate of Completion</p>
+                      </div>
+                      <p className="text-xs font-semibold text-zinc-500 dark:text-zinc-400">This certifies that</p>
+                      <p className="mt-1 text-base font-extrabold text-zinc-800 dark:text-zinc-100">Alex Johnson</p>
+                      <p className="mt-0.5 text-[11px] text-zinc-500 dark:text-zinc-400">has successfully passed the</p>
+                      <p className="mt-0.5 text-sm font-bold text-indigo-600 dark:text-indigo-400">Go Language Certification</p>
+                      <div className="mx-auto mt-3 h-px w-16 bg-indigo-200 dark:bg-indigo-700" />
+                      <p className="mt-2 text-[9px] font-mono text-zinc-400 dark:text-zinc-500">ubyte.dev/cert/a3f9b2c1 · {new Date().getFullYear()}</p>
                     </div>
                   )}
                   <TextLink

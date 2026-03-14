@@ -267,15 +267,15 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
     const data = await res.json().catch(() => ({}));
     if (!res.ok) return data.error || "Signup failed";
     if (data.user) {
-      setUser(data.user);
-      setProfile({ avatar: "gopher", bio: "", theme: "system", xp: 0, streak_days: 0, plan: "free", emailVerified: false, isAdmin: false });
-      setLimited(false);
-      setViewCount(0);
+      // Use hydrateAfterAuth (same as login) so profile, progress, stepCounts
+      // and all derived state are loaded from the DB immediately — avoids stale
+      // data (e.g. wrong plan, missing XP) until the user manually refreshes.
+      await hydrateAfterAuth(data.user);
       trackConversion("signup");
       try { localStorage.setItem("ubyte_has_account", "1"); } catch { /* noop */ }
     }
     return null;
-  }, []);
+  }, [hydrateAfterAuth]);
 
   const login = useCallback(async (email: string, password: string): Promise<string | null> => {
     const res = await apiFetch("/api/auth/login", {
