@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Card, Eyebrow, TextLink } from "@/components/ui";
 import { LANGUAGES, getAllLanguageSlugs } from "@/lib/languages/registry";
+import { getLangIcon } from "@/lib/languages/icons";
 import type { SupportedLanguage } from "@/lib/languages/types";
 import { getCurrentUser } from "@/lib/auth";
 import { getUserPlan, getExamConfigForAllLangs, getUserExamStats, getExamPublicStatsByLang, DEFAULT_EXAM_CONFIG } from "@/lib/db";
