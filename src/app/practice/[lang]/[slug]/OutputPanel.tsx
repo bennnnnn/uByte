@@ -474,7 +474,7 @@ export function OutputPanel({
               <div className="mb-2">
                 <p className="mb-1 text-xs font-semibold text-emerald-600 dark:text-emerald-400">✓ Strengths</p>
                 <ul className="space-y-0.5 text-xs text-zinc-600 dark:text-zinc-400">
-                  {codeReview.strengths.map((s, i) => <li key={i}>• {s}</li>)}
+                  {codeReview.strengths.map((s, i) => <li key={`str-${i}`}>• {s}</li>)}
                 </ul>
               </div>
             )}
@@ -482,7 +482,7 @@ export function OutputPanel({
               <div className="mb-2">
                 <p className="mb-1 text-xs font-semibold text-amber-600 dark:text-amber-400">↑ Improvements</p>
                 <ul className="space-y-0.5 text-xs text-zinc-600 dark:text-zinc-400">
-                  {codeReview.improvements.map((s, i) => <li key={i}>• {s}</li>)}
+                  {codeReview.improvements.map((s, i) => <li key={`imp-${i}`}>• {s}</li>)}
                 </ul>
               </div>
             )}

@@ -42,7 +42,7 @@ export default function TestimonialsStrip() {
           Loved by developers
         </h2>
         <p className="mt-2 text-sm text-zinc-500 dark:text-zinc-400">
-          Real learners. Real results. Real careers.
+          What developers say about uByte.
         </p>
       </div>
 

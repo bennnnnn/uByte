@@ -57,7 +57,7 @@ function ExamStartWarning({
 
         <ul className="mb-7 space-y-3">
           {rules.map(({ text, type }, i) => (
-            <li key={i} className="flex items-start gap-3 text-sm">
+            <li key={text} className="flex items-start gap-3 text-sm">
               <span className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[10px] font-bold ${
                 type === "danger"
                   ? "bg-red-100 text-red-600 dark:bg-red-900/40 dark:text-red-400"

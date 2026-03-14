@@ -138,7 +138,7 @@ export default function ExamsTab({ data }: Props) {
             <p className="text-sm font-medium text-zinc-900 dark:text-zinc-100">Inserted: {examUploadResult.inserted}</p>
             {examUploadResult.errors.length > 0 && (
               <ul className="mt-1.5 list-inside list-disc text-xs text-amber-700 dark:text-amber-400">
-                {examUploadResult.errors.slice(0, 10).map((e, i) => <li key={i}>{e}</li>)}
+                {examUploadResult.errors.slice(0, 10).map((e, i) => <li key={`err-${i}-${e.slice(0, 30)}`}>{e}</li>)}
                 {examUploadResult.errors.length > 10 && <li>… and {examUploadResult.errors.length - 10} more</li>}
               </ul>
             )}
