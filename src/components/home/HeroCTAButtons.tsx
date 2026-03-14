@@ -19,7 +19,7 @@ export default function HeroCTAButtons() {
 
   return (
     <>
-      <div className="mb-10 flex flex-wrap gap-3">
+      <div className="mb-8 flex flex-wrap gap-3">
         {!loading && isPro ? (
           <>
             <Link
