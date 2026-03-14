@@ -141,7 +141,7 @@ export default function AuthButtons() {
 function NotificationBell({ unreadCount }: { unreadCount: number }) {
   return (
     <Link
-      href="/profile?tab=notifications"
+      href="/notifications"
       className="relative flex h-9 w-9 items-center justify-center rounded-lg text-zinc-500 transition-colors hover:bg-zinc-100 hover:text-zinc-700 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-200"
       aria-label={unreadCount > 0 ? `${unreadCount} unread notifications` : "Notifications"}
     >

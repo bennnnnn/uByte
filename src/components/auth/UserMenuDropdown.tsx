@@ -113,9 +113,9 @@ export default function UserMenuDropdown() {
 
             {/* Account */}
             <SectionLabel>Account</SectionLabel>
-            <MenuItem href="/profile?tab=referral" icon={<ReferralIcon />} label="Refer & Earn 🎁" accent onClick={close} />
-            <MenuItem href="/profile?tab=plan" icon={<PlanIcon />} label="Plan & billing" onClick={close} />
-            <MenuItem href="/profile?tab=settings" icon={<SettingsIcon />} label="Settings" onClick={close} />
+            <MenuItem href="/settings#referral" icon={<ReferralIcon />} label="Refer & Earn 🎁" accent onClick={close} />
+            <MenuItem href="/settings#plan" icon={<PlanIcon />} label="Plan & billing" onClick={close} />
+            <MenuItem href="/settings" icon={<SettingsIcon />} label="Settings" onClick={close} />
             <MenuItem href={`/u/${user.id}`} icon={<ProfileIcon />} label="Public profile" onClick={close} />
 
             {profile?.isAdmin && (

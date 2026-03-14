@@ -3,21 +3,15 @@
 import { Suspense, useState, useEffect, useCallback, startTransition } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/components/AuthProvider";
-import { trackConversion } from "@/lib/analytics";
-import { apiFetch } from "@/lib/api-client";
 import Link from "next/link";
 import ProfileHeader from "@/components/profile/ProfileHeader";
 import StatsRow from "@/components/profile/StatsRow";
 import OverviewTab from "@/components/profile/OverviewTab";
 import ProgressTab from "@/components/profile/ProgressTab";
-import PlanTab from "@/components/profile/PlanTab";
 import AchievementsTab from "@/components/profile/AchievementsTab";
-import NotificationsTab from "@/components/profile/NotificationsTab";
 import BookmarksTab from "@/components/profile/BookmarksTab";
 import CertificationsTab from "@/components/profile/CertificationsTab";
-import SettingsTab from "@/components/profile/SettingsTab";
-import ReferralSection from "@/components/profile/ReferralSection";
-import type { Profile, Stats, Badge, Achievement, Bookmark, Notification } from "@/components/profile/types";
+import type { Profile, Stats, Badge, Achievement, Bookmark } from "@/components/profile/types";
 
 export default function ProfilePageWrapper() {
   return (
@@ -56,43 +50,32 @@ function ProfileSkeleton() {
   );
 }
 
-const VALID_TABS = ["overview", "progress", "certifications", "plan", "referral", "achievements", "notifications", "bookmarks", "settings"] as const;
+const VALID_TABS = ["overview", "progress", "certifications", "achievements", "bookmarks"] as const;
 type Tab = (typeof VALID_TABS)[number];
 
 const TAB_LABELS: Record<Tab, string> = {
-  overview: "Overview",
-  progress: "Progress",
+  overview:       "Overview",
+  progress:       "Progress",
   certifications: "Certifications",
-  plan: "Plan",
-  referral: "Refer & Earn",
-  achievements: "Achievements",
-  notifications: "Notifications",
-  bookmarks: "Bookmarks",
-  settings: "Settings",
+  achievements:   "Achievements",
+  bookmarks:      "Bookmarks",
 };
 
 const TAB_ICONS: Record<Tab, string> = {
   overview:       "◈",
   progress:       "📈",
   certifications: "🏅",
-  plan:           "💳",
-  referral:       "🎁",
   achievements:   "🏆",
-  notifications:  "🔔",
   bookmarks:      "🔖",
-  settings:       "⚙️",
 };
 
-// Sidebar groups — keeps the nav organised on desktop
+// Sidebar groups
 const SIDEBAR_GROUPS: { label: string; tabs: Tab[] }[] = [
-  { label: "Learning",  tabs: ["overview", "progress", "certifications", "achievements"] },
-  { label: "Account",   tabs: ["plan", "referral"] },
-  { label: "Activity",  tabs: ["notifications", "bookmarks"] },
-  { label: "Settings",  tabs: ["settings"] },
+  { label: "Learning", tabs: ["overview", "progress", "certifications", "achievements", "bookmarks"] },
 ];
 
 function ProfilePage() {
-  const { user, loading, logout, logoutAll } = useAuth();
+  const { user, loading } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -104,19 +87,12 @@ function ProfilePage() {
   const [bmHasMore, setBmHasMore] = useState(false);
   const [bmLoading, setBmLoading] = useState(false);
   const [bmTotal, setBmTotal] = useState(0);
-  const [notifications, setNotifications] = useState<Notification[]>([]);
-  const [unreadCount, setUnreadCount] = useState(0);
   const [error, setError] = useState("");
   const [activeTab, setActiveTab] = useState<Tab | null>(null);
 
   const paramTab = searchParams.get("tab") as Tab | null;
-  const planSuccess = searchParams.get("plan") === "success";
-  const tabFromUrl: Tab | null = planSuccess ? "plan" : (paramTab && VALID_TABS.includes(paramTab) ? paramTab : null);
+  const tabFromUrl: Tab | null = paramTab && VALID_TABS.includes(paramTab) ? paramTab : null;
   const tab: Tab = tabFromUrl ?? activeTab ?? "overview";
-
-  useEffect(() => {
-    if (planSuccess) trackConversion("checkout_completed");
-  }, [planSuccess]);
 
   const setTab = (t: Tab) => {
     setActiveTab(t);
@@ -125,11 +101,10 @@ function ProfilePage() {
 
   const fetchProfile = useCallback(async () => {
     try {
-      const [profRes, statsRes, bmRes, notifRes] = await Promise.all([
+      const [profRes, statsRes, bmRes] = await Promise.all([
         fetch("/api/profile", { credentials: "same-origin" }),
         fetch("/api/profile/stats", { credentials: "same-origin" }),
         fetch("/api/bookmarks", { credentials: "same-origin" }),
-        fetch("/api/notifications", { credentials: "same-origin" }),
       ]);
 
       if (profRes.status === 401 || statsRes.status === 401) {
@@ -141,11 +116,10 @@ function ProfilePage() {
         return;
       }
 
-      const [profData, statsData, bmData, notifData] = await Promise.all([
+      const [profData, statsData, bmData] = await Promise.all([
         profRes.json().catch(() => ({})),
         statsRes.json().catch(() => ({})),
         bmRes.ok ? bmRes.json().catch(() => ({ bookmarks: [], hasMore: false, total: 0 })) : { bookmarks: [], hasMore: false, total: 0 },
-        notifRes.ok ? notifRes.json().catch(() => ({ notifications: [], unreadCount: 0 })) : { notifications: [], unreadCount: 0 },
       ]);
 
       setError("");
@@ -159,10 +133,6 @@ function ProfilePage() {
         setBookmarks(bmData.bookmarks);
         setBmHasMore(bmData.hasMore ?? false);
         setBmTotal(bmData.total ?? 0);
-      }
-      if (notifData.notifications) {
-        setNotifications(notifData.notifications);
-        setUnreadCount(notifData.unreadCount ?? 0);
       }
     } catch (err) {
       console.error("Profile fetch error:", err);
@@ -181,44 +151,6 @@ function ProfilePage() {
       setActiveTab(tabFromUrl);
     }
   }, [tabFromUrl]);
-
-  const saveProfile = async (data: { name: string; bio: string; avatar: string; theme: string }): Promise<boolean> => {
-    const res = await apiFetch("/api/profile", {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data),
-    });
-    if (res.ok) {
-      const json = await res.json();
-      setProfile(json.profile);
-      applyTheme(data.theme);
-      return true;
-    }
-    return false;
-  };
-
-  const changePassword = async (currentPw: string, newPw: string): Promise<string | null> => {
-    const res = await apiFetch("/api/profile", {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ currentPassword: currentPw, newPassword: newPw }),
-    });
-    if (res.ok) return null;
-    const data = await res.json();
-    return data.error || "Failed to change password";
-  };
-
-  const deleteAccount = async () => {
-    await apiFetch("/api/profile", { method: "DELETE" });
-    logout();
-    router.push("/");
-  };
-
-  const resetProgress = async () => {
-    const res = await apiFetch("/api/progress/reset", { method: "DELETE" });
-    if (!res.ok) throw new Error("Reset failed");
-    await fetchProfile();
-  };
 
   const deleteBookmark = async (id: number) => {
     await fetch("/api/bookmarks", {
@@ -244,12 +176,6 @@ function ProfilePage() {
       console.error("Load more bookmarks error:", err);
     }
     setBmLoading(false);
-  };
-
-  const markNotificationsRead = async () => {
-    await apiFetch("/api/notifications", { method: "PATCH" });
-    setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
-    setUnreadCount(0);
   };
 
   if (loading || (!profile && !error)) return <ProfileSkeleton />;
@@ -300,6 +226,16 @@ function ProfilePage() {
 
       <StatsRow stats={stats} />
 
+      {/* Quick-links to other sections */}
+      <div className="mb-6 flex flex-wrap gap-2 sm:hidden">
+        <Link href="/notifications" className="inline-flex items-center gap-1.5 rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-1.5 text-xs font-medium text-zinc-600 transition-colors hover:bg-zinc-100 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-400">
+          🔔 Notifications
+        </Link>
+        <Link href="/settings" className="inline-flex items-center gap-1.5 rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-1.5 text-xs font-medium text-zinc-600 transition-colors hover:bg-zinc-100 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-400">
+          ⚙️ Settings
+        </Link>
+      </div>
+
       {/* Mobile: native select dropdown */}
       <div className="mb-6 sm:hidden">
         <select
@@ -309,10 +245,7 @@ function ProfilePage() {
           aria-label="Profile section"
         >
           {VALID_TABS.map((t) => (
-            <option key={t} value={t}>
-              {TAB_LABELS[t]}
-              {t === "notifications" && unreadCount > 0 ? ` (${unreadCount})` : ""}
-            </option>
+            <option key={t} value={t}>{TAB_LABELS[t]}</option>
           ))}
         </select>
       </div>
@@ -342,17 +275,28 @@ function ProfilePage() {
                       >
                         <span className="text-base leading-none">{TAB_ICONS[t]}</span>
                         {TAB_LABELS[t]}
-                        {t === "notifications" && unreadCount > 0 && (
-                          <span className="ml-auto rounded-full bg-indigo-600 px-1.5 py-0.5 text-[10px] font-bold leading-none text-white">
-                            {unreadCount}
-                          </span>
-                        )}
                       </button>
                     </li>
                   ))}
                 </ul>
               </div>
             ))}
+            {/* Links to dedicated pages */}
+            <div>
+              <p className="mb-1 px-3 text-[11px] font-semibold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">Account</p>
+              <ul className="space-y-0.5">
+                <li>
+                  <Link href="/notifications" className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium text-zinc-600 transition-colors hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-200">
+                    <span className="text-base leading-none">🔔</span>Notifications
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/settings" className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium text-zinc-600 transition-colors hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-200">
+                    <span className="text-base leading-none">⚙️</span>Settings
+                  </Link>
+                </li>
+              </ul>
+            </div>
           </nav>
         </aside>
 
@@ -364,22 +308,8 @@ function ProfilePage() {
           {tab === "progress" && (
             <ProgressTab stats={stats} userId={profile.id} />
           )}
-          {tab === "plan" && (
-            <>
-              {planSuccess && (
-                <div className="mb-6 rounded-2xl border border-emerald-200 bg-emerald-50 px-6 py-4 dark:border-emerald-900/50 dark:bg-emerald-950/30">
-                  <p className="font-semibold text-emerald-800 dark:text-emerald-200">Payment successful. Welcome to Pro!</p>
-                  <p className="mt-1 text-sm text-emerald-700 dark:text-emerald-300">Your plan is active. Check your email for the receipt.</p>
-                </div>
-              )}
-              <PlanTab plan={profile.plan} expiresAtProp={profile.subscription_expires_at} />
-            </>
-          )}
           {tab === "certifications" && <CertificationsTab />}
           {tab === "achievements" && <AchievementsTab badges={badges} achievements={achievements} />}
-          {tab === "notifications" && (
-            <NotificationsTab notifications={notifications} onMarkRead={markNotificationsRead} />
-          )}
           {tab === "bookmarks" && (
             <BookmarksTab
               bookmarks={bookmarks}
@@ -390,27 +320,6 @@ function ProfilePage() {
               loadingMore={bmLoading}
             />
           )}
-          {tab === "settings" && (
-            <SettingsTab
-              profile={profile}
-              plan={profile.plan}
-              onSave={saveProfile}
-              onChangePassword={changePassword}
-              onDeleteAccount={deleteAccount}
-              onResetProgress={resetProgress}
-              onLogoutAll={async () => { await logoutAll(); router.push("/"); }}
-            />
-          )}
-          {tab === "referral" && (
-            <div className="max-w-lg">
-              <h2 className="mb-4 text-xl font-bold text-zinc-900 dark:text-zinc-100">Refer &amp; Earn</h2>
-              <p className="mb-6 text-sm text-zinc-500 dark:text-zinc-400">
-                Invite friends to uByte. For each person who signs up with your link and upgrades to Pro,
-                you earn <span className="font-semibold text-indigo-600 dark:text-indigo-400">30 free days of Pro</span>.
-              </p>
-              <ReferralSection />
-            </div>
-          )}
         </div>
 
       </div>
@@ -419,11 +328,3 @@ function ProfilePage() {
   );
 }
 
-function applyTheme(theme: string) {
-  if (typeof window === "undefined") return;
-  localStorage.setItem("theme", theme);
-  const html = document.documentElement;
-  html.classList.remove("light", "dark");
-  if (theme === "dark") html.classList.add("dark");
-  else if (theme === "light") html.classList.add("light");
-}

@@ -18,9 +18,11 @@ interface Props {
   onDeleteAccount: () => Promise<void>;
   onResetProgress: () => Promise<void>;
   onLogoutAll: () => Promise<void>;
+  /** When true, DangerZone section is omitted so the parent page can render it in a different position. Default: true */
+  renderDangerZone?: boolean;
 }
 
-export default function SettingsTab({ profile, onSave, onChangePassword, onDeleteAccount, onResetProgress, onLogoutAll }: Props) {
+export default function SettingsTab({ profile, onSave, onChangePassword, onDeleteAccount, onResetProgress, onLogoutAll, renderDangerZone = true }: Props) {
   const { toast } = useToast();
   const [editName, setEditName] = useState(profile.name);
   const [editBio, setEditBio] = useState(profile.bio);
@@ -113,7 +115,9 @@ export default function SettingsTab({ profile, onSave, onChangePassword, onDelet
         </label>
       </div>
 
-      <DangerZoneSection onDeleteAccount={onDeleteAccount} onResetProgress={onResetProgress} onLogoutAll={onLogoutAll} onToast={toast} />
+      {renderDangerZone && (
+        <DangerZoneSection onDeleteAccount={onDeleteAccount} onResetProgress={onResetProgress} onLogoutAll={onLogoutAll} onToast={toast} />
+      )}
     </div>
   );
 }
