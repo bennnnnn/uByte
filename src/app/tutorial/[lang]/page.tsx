@@ -108,15 +108,6 @@ export default async function TutorialLangLandingPage({
         }}
       />
 
-      {/* Breadcrumb back link */}
-      <nav className="mb-6 flex items-center gap-1.5 text-sm text-zinc-500 dark:text-zinc-400">
-        <Link href="/" className="hover:text-zinc-800 dark:hover:text-zinc-200">Home</Link>
-        <span>/</span>
-        <Link href="/#languages-heading" className="hover:text-zinc-800 dark:hover:text-zinc-200">Tutorials</Link>
-        <span>/</span>
-        <span className="font-medium text-zinc-800 dark:text-zinc-200">{config.name}</span>
-      </nav>
-
       <TutorialLangHero config={config} firstSlug={tutorials[0]?.slug ?? null} />
 
       {tutorials.length > 0 ? (
