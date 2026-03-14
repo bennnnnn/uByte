@@ -2,10 +2,20 @@ import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
 import { saveLastActivity } from "@/lib/db";
 import { withErrorHandling } from "@/lib/api-utils";
+import { verifyCsrf } from "@/lib/csrf";
+import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 
 export const POST = withErrorHandling("POST /api/last-activity", async (request: NextRequest) => {
+  const csrfError = verifyCsrf(request);
+  if (csrfError) return NextResponse.json({ error: csrfError }, { status: 403 });
+
   const user = await getCurrentUser();
-  if (!user) return NextResponse.json({ error: "Unauthorised" }, { status: 401 });
+  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  // 60 updates per minute per user is more than enough for any real usage
+  const ip = getClientIp(request.headers);
+  const { limited } = await checkRateLimit(`last-activity:${user.userId}:${ip}`, 60, 60_000);
+  if (limited) return NextResponse.json({ error: "Too many requests" }, { status: 429 });
 
   const body = await request.json();
   const type = body?.type;

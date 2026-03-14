@@ -57,6 +57,8 @@ function OnboardingInner() {
   const [selected, setSelected] = useState<GoalId | null>(null);
   const [saving, setSaving] = useState(false);
   const [referralData, setReferralData] = useState<{ code: string; shareUrl: string } | null>(null);
+  const [referralLoading, setReferralLoading] = useState(false);
+  const [referralError, setReferralError] = useState(false);
   const [copied, setCopied] = useState(false);
 
   // If user already completed onboarding, skip to destination
@@ -67,16 +69,28 @@ function OnboardingInner() {
   }, [profile, nextPath, router]);
 
   // Fetch referral data for step 2
-  useEffect(() => {
-    if (step === 2 && user) {
-      apiFetch("/api/referral").then(async (r) => {
-        if (r.ok) {
-          const d = await r.json();
-          setReferralData(d);
-        }
-      }).catch(() => {});
+  const fetchReferral = useCallback(async () => {
+    if (!user) return;
+    setReferralLoading(true);
+    setReferralError(false);
+    try {
+      const r = await apiFetch("/api/referral");
+      if (r.ok) {
+        const d = await r.json();
+        setReferralData(d);
+      } else {
+        setReferralError(true);
+      }
+    } catch {
+      setReferralError(true);
+    } finally {
+      setReferralLoading(false);
     }
-  }, [step, user]);
+  }, [user]);
+
+  useEffect(() => {
+    if (step === 2) fetchReferral();
+  }, [step, fetchReferral]);
 
   const handleContinue = useCallback(async () => {
     if (!selected || saving) return;
@@ -190,32 +204,54 @@ function OnboardingInner() {
                 <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-zinc-400">
                   Your referral link
                 </p>
-                <div className="flex items-center gap-2">
-                  <code className="flex-1 truncate rounded-lg bg-white px-3 py-2 text-sm font-mono text-zinc-700 border border-zinc-200 dark:bg-zinc-800 dark:border-zinc-700 dark:text-zinc-300">
-                    {referralData?.shareUrl ?? "Loading…"}
-                  </code>
-                  <button
-                    type="button"
-                    onClick={copyLink}
-                    disabled={!referralData}
-                    className="shrink-0 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-100 disabled:opacity-40 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700"
-                  >
-                    {copied ? "Copied ✓" : "Copy"}
-                  </button>
-                </div>
 
-                {referralData && (
-                  <a
-                    href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(`I just joined uByte to level up my coding skills 🚀 — interactive tutorials, interview prep, and AI hints. Try it: ${referralData.shareUrl}`)}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="mt-3 flex items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700"
-                  >
-                    <svg viewBox="0 0 24 24" className="h-4 w-4 fill-current" aria-hidden="true">
-                      <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.746l7.73-8.835L1.254 2.25H8.08l4.26 5.632 5.905-5.632Zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
-                    </svg>
-                    Share on X
-                  </a>
+                {referralError ? (
+                  <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 dark:border-amber-800/50 dark:bg-amber-950/20">
+                    <p className="text-sm text-amber-700 dark:text-amber-400">
+                      Could not load your referral link.{" "}
+                      <button
+                        type="button"
+                        onClick={fetchReferral}
+                        className="font-semibold underline hover:no-underline"
+                      >
+                        Try again
+                      </button>
+                    </p>
+                  </div>
+                ) : (
+                  <>
+                    <div className="flex items-center gap-2">
+                      <code className="flex-1 truncate rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm font-mono text-zinc-700 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">
+                        {referralLoading ? (
+                          <span className="text-zinc-400">Loading…</span>
+                        ) : (
+                          referralData?.shareUrl ?? ""
+                        )}
+                      </code>
+                      <button
+                        type="button"
+                        onClick={copyLink}
+                        disabled={!referralData || referralLoading}
+                        className="shrink-0 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-100 disabled:opacity-40 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700"
+                      >
+                        {copied ? "Copied ✓" : "Copy"}
+                      </button>
+                    </div>
+
+                    {referralData && (
+                      <a
+                        href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(`I just joined uByte to level up my coding skills 🚀 — interactive tutorials, interview prep, and AI hints. Try it: ${referralData.shareUrl}`)}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="mt-3 flex items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700"
+                      >
+                        <svg viewBox="0 0 24 24" className="h-4 w-4 fill-current" aria-hidden="true">
+                          <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.746l7.73-8.835L1.254 2.25H8.08l4.26 5.632 5.905-5.632Zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+                        </svg>
+                        Share on X
+                      </a>
+                    )}
+                  </>
                 )}
               </div>
 
