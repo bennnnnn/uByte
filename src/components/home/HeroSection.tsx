@@ -57,7 +57,7 @@ export default function HeroSection({
             {/* Subtitle */}
             <p className="mb-7 max-w-[480px] text-base leading-relaxed text-zinc-500 dark:text-zinc-400 sm:text-lg">
               The complete path from beginner to job-ready — interactive tutorials,
-              LeetCode-style interview prep, and certification exams. All in one place, no installs needed.
+              coding interview prep, and certification exams. All in one place, no installs needed.
             </p>
 
             {/* Feature list — hidden on mobile to keep hero compact */}

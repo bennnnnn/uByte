@@ -33,7 +33,7 @@ import ReferralPromptBanner from "@/components/ReferralPromptBanner";
 export const metadata: Metadata = {
   title: "uByte — Learn, Practice, and Get Certified in 7 Languages",
   description:
-    "The complete path from beginner to job-ready. Interactive tutorials, LeetCode-style interview prep, and verifiable certificates — all in Go, Python, JavaScript, Java, Rust, C++, and C#.",
+    "The complete path from beginner to job-ready. Interactive tutorials, coding interview prep, and certification exams — all in Go, Python, JavaScript, Java, Rust, C++, and C#.",
   keywords: [
     ...SITE_KEYWORDS,
     "coding bootcamp alternative",
@@ -45,7 +45,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "uByte — Learn, Practice, and Get Certified in 7 Languages",
     description:
-      "Interactive tutorials, LeetCode-style interview prep, and verifiable certificates for Go, Python, JavaScript, Java, Rust, C++, and C#.",
+      "Interactive tutorials, coding interview prep, and certification exams for Go, Python, JavaScript, Java, Rust, C++, and C#.",
     type: "website",
     url: absoluteUrl("/"),
   },
