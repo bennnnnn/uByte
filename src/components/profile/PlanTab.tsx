@@ -194,7 +194,7 @@ export default function PlanTab({ plan, expiresAtProp }: Props & { expiresAtProp
       customData: checkoutNonce ? { checkoutNonce } : (user ? { userId: String(user.id) } : undefined),
       customer: user ? { email: user.email } : undefined,
       settings: {
-        successUrl: `${origin}/settings?plan=success`,
+        successUrl: `${origin}/billing?plan=success`,
         displayMode: "overlay",
         variant: "one-page",
       },

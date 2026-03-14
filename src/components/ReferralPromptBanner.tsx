@@ -90,7 +90,7 @@ export default function ReferralPromptBanner() {
             {copied ? "✓ Copied!" : "Copy link"}
           </button>
           <a
-            href="/settings#referral"
+            href="/billing"
             className="rounded-xl border border-indigo-200 bg-white px-3 py-2 text-xs font-semibold text-indigo-700 transition-colors hover:bg-indigo-50 dark:border-indigo-700 dark:bg-transparent dark:text-indigo-400"
           >
             View stats →

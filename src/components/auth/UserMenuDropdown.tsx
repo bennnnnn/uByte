@@ -79,8 +79,8 @@ export default function UserMenuDropdown() {
 
       {open && (
         <div className="absolute right-0 top-full z-[100] mt-2 w-72 overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-xl dark:border-zinc-800 dark:bg-zinc-900">
-          {/* User info — tapping goes to profile */}
-          <Link href="/profile" onClick={close} className="block border-b border-zinc-100 px-4 py-3 transition-colors hover:bg-zinc-50 dark:border-zinc-800 dark:hover:bg-zinc-800/50">
+          {/* User info — clicking goes to public profile */}
+          <Link href={`/u/${user.id}`} onClick={close} className="block border-b border-zinc-100 px-4 py-3 transition-colors hover:bg-zinc-50 dark:border-zinc-800 dark:hover:bg-zinc-800/50">
             <div className="flex items-center gap-3">
               <Avatar avatarKey={profile?.avatar ?? "gopher"} size="sm" />
               <div className="min-w-0 flex-1">
@@ -99,6 +99,7 @@ export default function UserMenuDropdown() {
               <div className="mt-2 flex items-center gap-3 text-xs text-zinc-400">
                 <span>⭐ {profile.xp} XP</span>
                 <span>🔥 {profile.streak_days}d streak</span>
+                <span className="ml-auto text-[10px] text-zinc-300 dark:text-zinc-600">View public profile →</span>
               </div>
             )}
           </Link>
@@ -106,17 +107,17 @@ export default function UserMenuDropdown() {
           <div className="max-h-[60vh] overflow-y-auto p-1.5">
             {/* Learning */}
             <SectionLabel>Learning</SectionLabel>
-            <MenuItem href="/profile?tab=progress" icon={<ProgressIcon />} label="Progress" onClick={close} />
-            <MenuItem href="/profile?tab=bookmarks" icon={<BookmarkIcon />} label="Bookmarks" onClick={close} />
-            <MenuItem href="/profile?tab=achievements" icon={<AchievementsIcon />} label="Achievements" onClick={close} />
-            <MenuItem href="/profile?tab=certifications" icon={<CertificateIcon />} label="Certifications" onClick={close} />
+            <MenuItem href="/dashboard" icon={<DashboardIcon />} label="Dashboard" onClick={close} />
+            <MenuItem href="/dashboard?tab=progress" icon={<ProgressIcon />} label="Progress" onClick={close} />
+            <MenuItem href="/dashboard?tab=bookmarks" icon={<BookmarkIcon />} label="Bookmarks" onClick={close} />
+            <MenuItem href="/dashboard?tab=achievements" icon={<AchievementsIcon />} label="Achievements" onClick={close} />
+            <MenuItem href="/dashboard?tab=certifications" icon={<CertificateIcon />} label="Certifications" onClick={close} />
 
             {/* Account */}
             <SectionLabel>Account</SectionLabel>
-            <MenuItem href="/settings#referral" icon={<ReferralIcon />} label="Refer & Earn 🎁" accent onClick={close} />
-            <MenuItem href="/settings#plan" icon={<PlanIcon />} label="Plan & billing" onClick={close} />
+            <MenuItem href="/billing#referral" icon={<ReferralIcon />} label="Refer & Earn 🎁" accent onClick={close} />
+            <MenuItem href="/billing" icon={<PlanIcon />} label="Plan & Billing" onClick={close} />
             <MenuItem href="/settings" icon={<SettingsIcon />} label="Settings" onClick={close} />
-            <MenuItem href={`/u/${user.id}`} icon={<ProfileIcon />} label="Public profile" onClick={close} />
 
             {profile?.isAdmin && (
               <>
@@ -139,6 +140,14 @@ export default function UserMenuDropdown() {
         </div>
       )}
     </div>
+  );
+}
+
+function DashboardIcon() {
+  return (
+    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+    </svg>
   );
 }
 
@@ -188,14 +197,6 @@ function SettingsIcon() {
     <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
       <path strokeLinecap="round" strokeLinejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
       <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-    </svg>
-  );
-}
-
-function ProfileIcon() {
-  return (
-    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-      <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
     </svg>
   );
 }

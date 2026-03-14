@@ -104,7 +104,7 @@ function NotificationsPage() {
         {/* Breadcrumb */}
         <div className="mb-6">
           <Link
-            href="/profile"
+            href="/dashboard"
             className="inline-flex items-center gap-1.5 text-sm text-zinc-400 transition-colors hover:text-zinc-600 dark:hover:text-zinc-300"
           >
             <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>

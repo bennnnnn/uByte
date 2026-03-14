@@ -21,8 +21,8 @@ export default function UnsubscribedPage() {
         </p>
         <p className="mb-8 text-sm text-zinc-500 dark:text-zinc-500">
           Changed your mind? You can re-enable emails from your{" "}
-          <Link href="/profile" className="text-indigo-600 underline dark:text-indigo-400">
-            profile settings
+          <Link href="/settings" className="text-indigo-600 underline dark:text-indigo-400">
+            settings
           </Link>
           .
         </p>

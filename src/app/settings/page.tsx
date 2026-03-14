@@ -1,14 +1,12 @@
 "use client";
 
 import { Suspense, useEffect, useState, useCallback, startTransition } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/components/AuthProvider";
 import { useToast } from "@/components/Toast";
 import { apiFetch } from "@/lib/api-client";
 import SettingsTab from "@/components/profile/SettingsTab";
-import PlanTab from "@/components/profile/PlanTab";
-import ReferralSection from "@/components/profile/ReferralSection";
 import DangerZoneSection from "@/components/profile/settings/DangerZoneSection";
 import type { Profile } from "@/components/profile/types";
 
@@ -28,7 +26,6 @@ function SettingsSkeleton() {
   );
 }
 
-/* ── Wrapper with Suspense (needed for useSearchParams in PlanTab) ─────── */
 export default function SettingsPageWrapper() {
   return (
     <Suspense fallback={<SettingsSkeleton />}>
@@ -54,11 +51,9 @@ function SectionDivider({ label }: { label: string }) {
 function SettingsPage() {
   const { user, loading, logout, logoutAll } = useAuth();
   const router = useRouter();
-  const searchParams = useSearchParams();
   const { toast } = useToast();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [error, setError] = useState("");
-  const planSuccess = searchParams.get("plan") === "success";
 
   const fetchProfile = useCallback(async () => {
     try {
@@ -140,7 +135,7 @@ function SettingsPage() {
         {/* Breadcrumb */}
         <div className="mb-6">
           <Link
-            href="/profile"
+            href="/dashboard"
             className="inline-flex items-center gap-1.5 text-sm text-zinc-400 transition-colors hover:text-zinc-600 dark:hover:text-zinc-300"
           >
             <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -151,9 +146,24 @@ function SettingsPage() {
         </div>
 
         {/* Page title */}
-        <h1 className="mb-8 text-2xl font-bold text-zinc-900 dark:text-zinc-100">Settings</h1>
+        <div className="mb-8 flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100">Settings</h1>
+            <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
+              Manage your profile, appearance, and email preferences.
+            </p>
+          </div>
+          {/* Link to Billing */}
+          <Link
+            href="/billing"
+            className="inline-flex items-center gap-1.5 rounded-xl border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm font-medium text-zinc-600 transition-colors hover:border-zinc-300 hover:bg-zinc-100 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700"
+          >
+            <span>💳</span>
+            Billing
+          </Link>
+        </div>
 
-        {/* ── Profile / Appearance / Password ──────────────────────────── */}
+        {/* ── Profile / Appearance / Password / Email ───────────────────── */}
         <SettingsTab
           profile={profile}
           plan={profile.plan}
@@ -164,22 +174,6 @@ function SettingsPage() {
           onLogoutAll={async () => { await logoutAll(); router.push("/"); }}
           renderDangerZone={false}
         />
-
-        {/* ── Plan & Billing ───────────────────────────────────────────── */}
-        <SectionDivider label="Plan & Billing" />
-
-        {planSuccess && (
-          <div className="mb-6 rounded-2xl border border-emerald-200 bg-emerald-50 px-6 py-4 dark:border-emerald-900/50 dark:bg-emerald-950/30">
-            <p className="font-semibold text-emerald-800 dark:text-emerald-200">Payment successful. Welcome to Pro!</p>
-            <p className="mt-1 text-sm text-emerald-700 dark:text-emerald-300">Your plan is active. Check your email for the receipt.</p>
-          </div>
-        )}
-
-        <PlanTab plan={profile.plan} expiresAtProp={profile.subscription_expires_at} />
-
-        {/* ── Refer & Earn ─────────────────────────────────────────────── */}
-        <SectionDivider label="Refer & Earn" />
-        <ReferralSection />
 
         {/* ── Danger Zone ──────────────────────────────────────────────── */}
         <SectionDivider label="Danger Zone" />

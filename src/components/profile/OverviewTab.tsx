@@ -96,7 +96,7 @@ export default function OverviewTab({ stats, badges, achievements, userId }: Pro
           <span className="text-xs text-zinc-400">
             {stats.total_tutorials - stats.completed_count} lesson{stats.total_tutorials - stats.completed_count !== 1 ? "s" : ""} remaining
           </span>
-          <Link href="/profile?tab=progress" className="text-xs text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200">
+          <Link href="/dashboard?tab=progress" className="text-xs text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200">
             View details →
           </Link>
         </div>
@@ -157,7 +157,7 @@ export default function OverviewTab({ stats, badges, achievements, userId }: Pro
         <div className="mb-3 flex items-center justify-between">
           <h2 className="font-semibold text-zinc-900 dark:text-zinc-100">Recent badges</h2>
           {achievements.length > 0 && (
-            <Link href="/profile?tab=achievements" className="text-xs text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200">
+            <Link href="/dashboard?tab=achievements" className="text-xs text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200">
               View all →
             </Link>
           )}

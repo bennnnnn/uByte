@@ -24,7 +24,7 @@ function VerifyEmailContent() {
         if (res.ok) {
           setStatus("success");
           // Redirect to profile after 3 seconds
-          setTimeout(() => router.push("/profile"), 3000);
+          setTimeout(() => router.push("/dashboard"), 3000);
         } else {
           const data = await res.json();
           setStatus("error");
@@ -71,10 +71,10 @@ function VerifyEmailContent() {
             <h1 className="mb-2 text-xl font-bold text-zinc-900 dark:text-zinc-100">Verification failed</h1>
             <p className="mb-6 text-sm text-zinc-500 dark:text-zinc-400">{message}</p>
             <Link
-              href="/profile"
+              href="/dashboard"
               className="inline-block rounded-lg bg-indigo-700 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-800"
             >
-              Go to profile
+              Go to dashboard
             </Link>
           </>
         )}
