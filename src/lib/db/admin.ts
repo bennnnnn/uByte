@@ -1,6 +1,7 @@
 import { getSql } from "./client";
 import type { AdminUserRow, AdminTutorialRow, AdminRevenueStats } from "./types";
 import { resetAllProgress } from "./progress";
+import { incrementTokenVersion } from "./users";
 
 export type AdminRole = "super" | "limited";
 
@@ -107,6 +108,8 @@ export async function setAdminStatus(userId: number, isAdmin: boolean, role: Adm
     await sql`UPDATE users SET is_admin = 1, admin_role = ${role} WHERE id = ${userId}`;
   } else {
     await sql`UPDATE users SET is_admin = 0, admin_role = NULL WHERE id = ${userId}`;
+    // Invalidate the demoted user's session immediately so their isAdmin JWT claim is rejected
+    await incrementTokenVersion(userId);
   }
 }
 
