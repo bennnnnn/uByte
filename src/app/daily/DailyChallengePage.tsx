@@ -59,7 +59,7 @@ export default function DailyChallengePage() {
       apiFetch("/api/leaderboard?period=week").then((r) => r.json()),
     ])    .then(([d, l]) => {
       setDaily(d?.slug ? d : null);
-      setLeaders(Array.isArray(l) ? l.slice(0, 10) : []);
+      setLeaders(Array.isArray(l?.users) ? l.users.slice(0, 10) : []);
     }).catch(() => {}).finally(() => setLoading(false));
   }, []);
 

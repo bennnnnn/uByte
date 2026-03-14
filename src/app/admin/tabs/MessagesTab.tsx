@@ -7,7 +7,7 @@
  * Supports marking individual / all messages as read and deleting.
  */
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, Fragment } from "react";
 import { apiFetch } from "@/lib/api-client";
 import { SectionCard, EmptyRow } from "../components";
 
@@ -94,9 +94,8 @@ export default function MessagesTab() {
               </thead>
               <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800">
                 {messages.map((msg) => (
-                  <>
+                  <Fragment key={msg.id}>
                     <tr
-                      key={msg.id}
                       className={`cursor-pointer transition-colors hover:bg-zinc-50/80 dark:hover:bg-zinc-800/40 ${!msg.read ? "font-semibold" : ""}`}
                       onClick={() => {
                         setExpanded((e) => (e === msg.id ? null : msg.id));
@@ -140,7 +139,7 @@ export default function MessagesTab() {
                         </td>
                       </tr>
                     )}
-                  </>
+                  </Fragment>
                 ))}
                 {messages.length === 0 && <EmptyRow cols={4} text="No messages yet." />}
               </tbody>

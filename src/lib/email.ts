@@ -221,7 +221,7 @@ export async function sendDay3Email(to: string, name: string): Promise<void> {
           <div style="background:#fff;border:1px solid #e5e7eb;border-radius:10px;padding:20px;margin:20px 0">
             <p style="margin:0 0 12px;font-weight:600">🔥 Try this today — it only takes 5 minutes:</p>
             <p style="color:#6b7280;margin:0 0 16px;font-size:14px">Pick a language, open the first tutorial step, and run your first piece of code. The feeling of seeing it work is addictive.</p>
-            <a href="${BASE_URL}/tutorial" style="display:inline-block;padding:12px 24px;background:#4f46e5;color:#fff;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px">Open tutorials →</a>
+            <a href="${BASE_URL}/tutorial/go" style="display:inline-block;padding:12px 24px;background:#4f46e5;color:#fff;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px">Open tutorials →</a>
           </div>
           <p style="color:#6b7280;font-size:14px">Or jump straight into an interview prep problem:</p>
           <a href="${BASE_URL}/practice" style="color:#4f46e5;font-size:14px">Browse interview questions →</a>
@@ -459,7 +459,7 @@ export async function sendDay14WinBackEmail(to: string, name: string): Promise<v
           <div style="background:#fff;border:2px solid #4f46e5;border-radius:10px;padding:20px;margin:20px 0">
             <p style="margin:0 0 8px;font-weight:700;color:#4f46e5">Pick up right where you left off</p>
             <p style="color:#6b7280;margin:0 0 16px;font-size:14px">Even 10 minutes a day adds up. Start with one lesson or one practice problem — that's all it takes to build momentum.</p>
-            <a href="${BASE_URL}/tutorial" style="display:inline-block;padding:12px 24px;background:#4f46e5;color:#fff;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px">Resume my journey →</a>
+            <a href="${BASE_URL}/tutorial/go" style="display:inline-block;padding:12px 24px;background:#4f46e5;color:#fff;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px">Resume my journey →</a>
           </div>
           <p style="color:#6b7280;font-size:14px">Or try the daily challenge — a new problem every day, takes about 15 minutes:</p>
           <a href="${BASE_URL}/daily" style="color:#4f46e5;font-size:14px;font-weight:600">⚡ Today's challenge →</a>

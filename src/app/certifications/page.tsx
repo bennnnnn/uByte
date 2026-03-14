@@ -458,7 +458,7 @@ export default async function PracticeExamsPage() {
                   icon: "📖",
                   title: "Build understanding",
                   body: "Start with bite-sized tutorials. Master syntax, data structures, and core concepts at your own pace — then practice with hands-on coding challenges.",
-                  link: "/tutorial",
+                  link: "/tutorial/go",
                   linkLabel: "Browse tutorials",
                 },
                 {
