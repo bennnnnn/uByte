@@ -70,7 +70,7 @@ export default function InteractiveTutorial({
     try { const s = localStorage.getItem("ide-font-size"); if (s === "16") return 16; if (s === "18") return 18; } catch { /* ignore */ }
     return 14;
   });
-  const [mobileTab, setMobileTab] = useState<"instructions" | "code">("instructions");
+  const [mobileTab, setMobileTab] = useState<"instructions" | "discuss" | "code">("instructions");
   const [leftTab, setLeftTab] = useState<"instructions" | "discuss" | "outline">("instructions");
   const isMobile = useIsMobile();
 
@@ -252,31 +252,37 @@ export default function InteractiveTutorial({
 
       {/* Mobile tab bar */}
       <div className="flex shrink-0 items-center border-b border-zinc-200 dark:border-zinc-800 md:hidden">
-        {(["instructions", "code"] as const).map((tab) => (
-          <button key={tab} onClick={() => setMobileTab(tab)} className={`relative flex-1 py-2 text-sm font-medium capitalize transition-colors ${mobileTab === tab ? "border-b-2 border-indigo-500 text-indigo-600 dark:text-indigo-400" : "text-zinc-500 dark:text-zinc-400"}`}>
-            {tab === "instructions" ? "Instructions" : (
+        {(["instructions", "discuss", "code"] as const).map((tab) => (
+          <button
+            key={tab}
+            onClick={() => setMobileTab(tab)}
+            className={`relative flex-1 py-2 text-sm font-medium transition-colors ${mobileTab === tab ? "border-b-2 border-indigo-500 text-indigo-600 dark:text-indigo-400" : "text-zinc-500 dark:text-zinc-400"}`}
+          >
+            {tab === "instructions" ? "Instructions" : tab === "discuss" ? "Discuss" : (
               <>
-                Code Editor
+                Code
                 {stepProgress.output && (stepProgress.outputIsError || stepProgress.status === "failed") && mobileTab !== "code" && (
-                  <span className="absolute right-6 top-2 h-2 w-2 rounded-full bg-red-500" />
+                  <span className="absolute right-1 top-2 h-2 w-2 rounded-full bg-red-500" />
                 )}
               </>
             )}
           </button>
         ))}
-        {/* Font size controls — mobile only */}
-        <div className="flex items-center gap-0.5 px-2">
-          <button onClick={() => { const s = fontSize === 18 ? 16 : 14; setFontSize(s); try { localStorage.setItem("ide-font-size", String(s)); } catch { /* ignore */ } }} aria-label="Decrease font size" className="rounded px-1.5 py-1 text-xs text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800">A⁻</button>
-          <button onClick={() => { const s = fontSize === 14 ? 16 : 18; setFontSize(s); try { localStorage.setItem("ide-font-size", String(s)); } catch { /* ignore */ } }} aria-label="Increase font size" className="rounded px-1.5 py-1 text-xs text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800">A⁺</button>
-        </div>
+        {/* Font size controls — only relevant when on the code tab */}
+        {mobileTab === "code" && (
+          <div className="flex items-center gap-0.5 px-1.5">
+            <button onClick={() => { const s = fontSize === 18 ? 16 : 14; setFontSize(s); try { localStorage.setItem("ide-font-size", String(s)); } catch { /* ignore */ } }} aria-label="Decrease font size" className="rounded px-1.5 py-1 text-xs text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800">A⁻</button>
+            <button onClick={() => { const s = fontSize === 14 ? 16 : 18; setFontSize(s); try { localStorage.setItem("ide-font-size", String(s)); } catch { /* ignore */ } }} aria-label="Increase font size" className="rounded px-1.5 py-1 text-xs text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800">A⁺</button>
+          </div>
+        )}
       </div>
 
       {/* Main Split */}
       <div className="flex flex-1 overflow-hidden">
         {/* Left panel */}
-        <aside className={`flex min-w-0 flex-col overflow-hidden bg-surface-card ${mobileTab === "instructions" ? "flex shrink" : "hidden"} md:flex md:shrink-0`} style={isMobile ? undefined : { width: leftWidth }} suppressHydrationWarning>
-          {/* Tab strip: ☰ hamburger | Steps | Discuss */}
-          <div className="flex shrink-0 items-stretch border-b border-zinc-200 dark:border-zinc-800">
+        <aside className={`min-w-0 flex-col overflow-hidden bg-surface-card ${mobileTab !== "code" ? "flex shrink" : "hidden"} md:flex md:shrink-0`} style={isMobile ? undefined : { width: leftWidth }} suppressHydrationWarning>
+          {/* Tab strip: ☰ hamburger | Instructions | Discuss — desktop only (mobile uses top tab bar) */}
+          <div className="hidden shrink-0 items-stretch border-b border-zinc-200 dark:border-zinc-800 md:flex">
             {/* Hamburger toggle — expands/collapses the outline */}
             <button
               type="button"
@@ -317,7 +323,7 @@ export default function InteractiveTutorial({
             ))}
           </div>
 
-          {leftTab === "outline" && (
+          {!isMobile && leftTab === "outline" && (
             <nav className="flex-1 overflow-y-auto px-3 py-3">
               <ul className="space-y-0.5">
                 {allTutorials.map((t) => {
@@ -393,7 +399,7 @@ export default function InteractiveTutorial({
             </nav>
           )}
 
-          {leftTab === "instructions" && (
+          {(isMobile ? mobileTab === "instructions" : leftTab === "instructions") && (
             <InstructionsSidebar
               lang={lang}
               step={currentStep}
@@ -404,8 +410,8 @@ export default function InteractiveTutorial({
             />
           )}
 
-          {leftTab === "discuss" && (
-            <div className="min-w-0 flex-1 overflow-hidden">
+          {(isMobile ? mobileTab === "discuss" : leftTab === "discuss") && (
+            <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
               <DiscussionThread
                 slug={`tutorial:${lang}:${tutorialSlug}`}
                 currentUserId={user?.id ?? null}
