@@ -42,6 +42,15 @@ export const metadata: Metadata = {
   },
 };
 
+const COMPANIES = [
+  "Google", "Meta", "Amazon", "Apple", "Microsoft", "Netflix",
+  "Stripe", "Airbnb", "Uber", "Lyft", "LinkedIn", "Salesforce",
+  "Adobe", "Oracle", "IBM", "Palantir", "Coinbase", "Shopify",
+  "Atlassian", "Dropbox", "Snap", "DoorDash", "Instacart", "Robinhood",
+  "Block", "Twilio", "Datadog", "MongoDB", "Cloudflare", "Figma",
+  "Notion", "Vercel", "GitHub", "GitLab", "Spotify", "Twitter / X",
+];
+
 /* ── Constants ──────────────────────────────────────────────────────────── */
 const DIFFICULTY_LABEL: Record<Difficulty, string> = { easy: "Easy", medium: "Medium", hard: "Hard" };
 const OUTCOME_LABEL: Record<Outcome, string>        = { offer: "Got offer", rejection: "Rejected", ongoing: "Ongoing", ghosted: "Ghosted" };
