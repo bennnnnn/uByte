@@ -156,7 +156,7 @@ export default async function PracticeExamLangPage({ params }: Props) {
                     `${examConfig.examSize} questions`,
                     `${examConfig.examDurationMinutes} min`,
                     `${passMin} correct to pass (${EXAM_PASS_PERCENT}%)`,
-                    "Verifiable certificate",
+                    "Certificate on pass",
                   ].map((label) => (
                     <span
                       key={label}
@@ -283,7 +283,7 @@ export default async function PracticeExamLangPage({ params }: Props) {
                       <p className="text-lg font-bold text-emerald-700 dark:text-emerald-400">Certified</p>
                     </div>
                     <p className="text-sm text-zinc-500 dark:text-zinc-400">
-                      You passed this exam. Your certificate is publicly verifiable and can be shared anytime.
+                      You passed this exam. Your certificate is publicly verifiable and can be shared anytime. Want to beat your score? Retaking is optional.
                     </p>
                     <div className="mt-5 flex flex-col gap-3">
                       <Link
@@ -292,7 +292,7 @@ export default async function PracticeExamLangPage({ params }: Props) {
                       >
                         View certificate
                       </Link>
-                      <StartExamButton lang={lang} langName={name} fullWidth />
+                      <StartExamButton lang={lang} langName={name} fullWidth isRetake />
                     </div>
                   </>
                 ) : canTakeExam && userLangStats && userLangStats.attemptCount > 0 ? (
@@ -307,7 +307,7 @@ export default async function PracticeExamLangPage({ params }: Props) {
                       `${examConfig.examSize} randomised questions`,
                       `${examConfig.examDurationMinutes} min time limit`,
                       `${passMin} correct (${EXAM_PASS_PERCENT}%) to pass`,
-                      "Verifiable certificate on pass",
+                      "Certificate on pass",
                       "Unlimited retakes",
                     ]} />
 
@@ -327,7 +327,7 @@ export default async function PracticeExamLangPage({ params }: Props) {
                       `${examConfig.examSize} randomised questions`,
                       `${examConfig.examDurationMinutes} min — can't be paused`,
                       `${passMin} correct (${EXAM_PASS_PERCENT}%) to pass`,
-                      "Verifiable certificate on pass",
+                      "Certificate on pass",
                       "Retake anytime",
                     ]} />
 
@@ -345,9 +345,8 @@ export default async function PracticeExamLangPage({ params }: Props) {
 
                     <CheckList items={[
                       "Timed exam with real scoring",
-                      "Verifiable certificate on pass",
-                      "Add to LinkedIn and resume",
-                      "All 7 language exams included",
+                      "Certificate on pass",
+                      `All ${langSlugs.length} language exams included`,
                       "Unlimited retakes",
                     ]} />
 

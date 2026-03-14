@@ -204,6 +204,8 @@ export default function PracticeExamAttemptPage() {
   const questionRefs = useRef<(HTMLDivElement | null)[]>([]);
   // Queue a scroll to this question index after the next render
   const pendingScrollRef = useRef<number | null>(null);
+  // Prevent concurrent submit calls (timer expiry + tab-switch can fire simultaneously)
+  const submitInProgressRef = useRef(false);
 
   // ── Load attempt ────────────────────────────────────────────────────────────
   useEffect(() => {
@@ -281,6 +283,9 @@ export default function PracticeExamAttemptPage() {
   const handleSubmit = useCallback(async (opts?: { force?: boolean }) => {
     if (!attempt) return;
     if (!opts?.force && !allAnswered) return;
+    // Guard against concurrent calls (timer + tab-switch can both fire at expiry)
+    if (submitInProgressRef.current) return;
+    submitInProgressRef.current = true;
     setSubmitting(true);
     setError(null);
     try {
@@ -293,12 +298,14 @@ export default function PracticeExamAttemptPage() {
       if (!res.ok) {
         setError(getApiErrorMessage(res, data, "Submission failed. Please try again."));
         setSubmitting(false);
+        submitInProgressRef.current = false;
         return;
       }
       const { score, passed, certificateId } = data;
       const params = new URLSearchParams();
       params.set("score", String(score));
       params.set("passed", passed ? "1" : "0");
+      params.set("total", String(totalQuestions));
       if (certificateId) params.set("cert", certificateId);
       // Exit fullscreen before navigating away
       if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
@@ -306,8 +313,9 @@ export default function PracticeExamAttemptPage() {
     } catch {
       setError("Network error. Please try again.");
       setSubmitting(false);
+      submitInProgressRef.current = false;
     }
-  }, [allAnswered, answers, attempt, lang, router]);
+  }, [allAnswered, answers, attempt, lang, router, totalQuestions]);
 
   // ── Language switch ──────────────────────────────────────────────────────
   const handleSwitchLanguage = (nextLang: string) => {
@@ -461,13 +469,13 @@ export default function PracticeExamAttemptPage() {
             </div>
           </div>
 
-          {/* Progress pill */}
-          <div className="hidden items-center gap-2 sm:flex">
+          {/* Progress pill — visible on all sizes, label hidden on xs */}
+          <div className="flex items-center gap-2">
             <div className="flex h-8 items-center gap-1.5 rounded-full border border-zinc-200 bg-zinc-50 px-3 text-xs font-semibold dark:border-zinc-700 dark:bg-zinc-800">
               <span className={answeredCount === totalQuestions ? "text-emerald-600" : "text-zinc-500"}>
                 {answeredCount}/{totalQuestions}
               </span>
-              <span className="text-zinc-400">answered</span>
+              <span className="hidden text-zinc-400 sm:inline">answered</span>
             </div>
           </div>
 

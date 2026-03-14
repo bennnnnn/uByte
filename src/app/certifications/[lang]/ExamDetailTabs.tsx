@@ -1,28 +1,22 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Card } from "@/components/ui";
 import type { ExamDetailContent } from "@/lib/exams/content";
 
 function FaqAccordion({ items }: { items: { question: string; answer: string }[] }) {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
-  const [hoverIndex, setHoverIndex] = useState<number | null>(null);
 
   return (
     <div className="divide-y divide-zinc-100 dark:divide-zinc-800">
       {items.map((item, i) => {
-        const isOpen = openIndex === i || hoverIndex === i;
+        const isOpen = openIndex === i;
         return (
-          <div
-            key={i}
-            className="group"
-            onMouseEnter={() => setHoverIndex(i)}
-            onMouseLeave={() => setHoverIndex(null)}
-          >
+          <div key={i}>
             <button
               type="button"
               onClick={() => setOpenIndex(isOpen ? null : i)}
-              className="flex w-full cursor-pointer items-center justify-between gap-3 py-4 text-left font-semibold text-zinc-900 transition-colors hover:bg-zinc-50 hover:text-indigo-600 dark:text-zinc-100 dark:hover:bg-zinc-800/50 dark:hover:text-indigo-400"
+              className="flex w-full cursor-pointer items-center justify-between gap-3 py-4 text-left font-semibold text-zinc-900 transition-colors hover:text-indigo-600 dark:text-zinc-100 dark:hover:text-indigo-400"
               aria-expanded={isOpen}
               aria-controls={`faq-answer-${i}`}
               id={`faq-question-${i}`}
@@ -76,6 +70,7 @@ interface Props {
 
 export default function ExamDetailTabs({ langName, content, examSize, examDurationMinutes, passPercent }: Props) {
   const [activeTab, setActiveTab] = useState<TabId>("overview");
+  const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
 
   const tagline =
     content?.tagline ??
@@ -113,15 +108,29 @@ export default function ExamDetailTabs({ langName, content, examSize, examDurati
         className="flex border-b border-zinc-200 dark:border-zinc-700"
         role="tablist"
         aria-label="Exam details"
+        onKeyDown={(e) => {
+          const idx = TAB_LABELS.findIndex((t) => t.id === activeTab);
+          if (e.key === "ArrowRight") {
+            const next = TAB_LABELS[(idx + 1) % TAB_LABELS.length];
+            setActiveTab(next.id);
+            tabRefs.current[(idx + 1) % TAB_LABELS.length]?.focus();
+          } else if (e.key === "ArrowLeft") {
+            const prev = TAB_LABELS[(idx - 1 + TAB_LABELS.length) % TAB_LABELS.length];
+            setActiveTab(prev.id);
+            tabRefs.current[(idx - 1 + TAB_LABELS.length) % TAB_LABELS.length]?.focus();
+          }
+        }}
       >
-        {TAB_LABELS.map(({ id, label }) => (
+        {TAB_LABELS.map(({ id, label }, idx) => (
           <button
             key={id}
+            ref={(el) => { tabRefs.current[idx] = el; }}
             type="button"
             role="tab"
             aria-selected={activeTab === id}
             aria-controls={`tabpanel-${id}`}
             id={`tab-${id}`}
+            tabIndex={activeTab === id ? 0 : -1}
             onClick={() => setActiveTab(id)}
             className={`min-w-0 flex-1 border-b-2 px-4 py-4 text-sm font-semibold transition-colors sm:flex-initial sm:px-6 ${
               activeTab === id

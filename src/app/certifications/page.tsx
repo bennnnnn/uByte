@@ -97,9 +97,8 @@ function ExamCard({
         {/* Divider */}
         <div className="h-px bg-zinc-100 dark:bg-zinc-800" />
 
-        {/* Exam info + stats
-            grid-cols-2 on mobile (2×2) avoids 4 columns squeezing into ~60px each on narrow cards */}
-        <div className="grid grid-cols-2 gap-x-4 gap-y-3 sm:grid-cols-4">
+        {/* Exam info + stats */}
+        <div className="grid grid-cols-2 gap-x-4 gap-y-3">
           <div>
             <p className="text-xs text-zinc-400 dark:text-zinc-500">Questions</p>
             <p className="mt-0.5 text-lg font-bold tabular-nums text-zinc-900 dark:text-zinc-100">{examConfig.examSize}</p>
@@ -113,19 +112,27 @@ function ExamCard({
           <div>
             <p className="text-xs text-zinc-400 dark:text-zinc-500">Attempts</p>
             <p className="mt-0.5 text-lg font-bold tabular-nums text-zinc-900 dark:text-zinc-100">
-              {isLoggedIn && userAttempts > 0
-                ? <>{userAttempts}<span className="ml-1 text-sm font-normal text-zinc-400">/ {hasData ? totalAttempts.toLocaleString() : "0"}</span></>
-                : hasData ? totalAttempts.toLocaleString() : "—"}
+              {totalAttempts > 0 ? totalAttempts.toLocaleString() : "0"}
             </p>
           </div>
-          <div>
-            <p className="text-xs text-zinc-400 dark:text-zinc-500">Pass rate</p>
-            <p className={`mt-0.5 text-lg font-bold tabular-nums ${
-              !hasData ? "text-zinc-400" : passRate >= 60 ? "text-emerald-600 dark:text-emerald-400" : "text-amber-600 dark:text-amber-400"
-            }`}>
-              {hasData ? `${passRate}%` : "—"}
-            </p>
-          </div>
+          {/* Show user's best score if they've failed before; otherwise show community pass rate */}
+          {isLoggedIn && tryAgain && stats?.bestScore != null ? (
+            <div>
+              <p className="text-xs text-zinc-400 dark:text-zinc-500">Your best</p>
+              <p className="mt-0.5 text-lg font-bold tabular-nums text-amber-600 dark:text-amber-400">
+                {stats.bestScore}%
+              </p>
+            </div>
+          ) : (
+            <div>
+              <p className="text-xs text-zinc-400 dark:text-zinc-500">Pass rate</p>
+              <p className={`mt-0.5 text-lg font-bold tabular-nums ${
+                !hasData ? "text-zinc-400" : passRate >= 60 ? "text-emerald-600 dark:text-emerald-400" : "text-amber-600 dark:text-amber-400"
+              }`}>
+                {hasData ? `${passRate}%` : "—"}
+              </p>
+            </div>
+          )}
         </div>
 
         {/* CTA button */}
@@ -268,7 +275,7 @@ export default async function PracticeExamsPage() {
                 Programming Certifications
               </h1>
               <p className="mt-3 text-lg text-zinc-500 dark:text-zinc-400">
-                Timed exams by language. Pass to earn a verifiable certificate you can add to your LinkedIn, portfolio, or resume.
+                Timed exams by language. Pass to earn a verifiable certificate that proves you know your stuff.
               </p>
             </div>
 
@@ -458,7 +465,7 @@ export default async function PracticeExamsPage() {
                   icon: "📖",
                   title: "Build understanding",
                   body: "Start with bite-sized tutorials. Master syntax, data structures, and core concepts at your own pace — then practice with hands-on coding challenges.",
-                  link: "/tutorial/go",
+                  link: "/tutorial",
                   linkLabel: "Browse tutorials",
                 },
                 {
@@ -477,17 +484,22 @@ export default async function PracticeExamsPage() {
                   <h3 className="font-semibold text-zinc-900 dark:text-zinc-100">{title}</h3>
                   <p className="mt-1.5 text-sm text-zinc-500 dark:text-zinc-400">{body}</p>
                   {step === "2" && (
-                    <div className="mt-4 rounded-xl border-2 border-indigo-200 bg-gradient-to-br from-indigo-50 to-white px-5 py-4 text-center dark:border-indigo-800/50 dark:from-indigo-950/30 dark:to-zinc-800">
-                      <div className="mb-2 flex items-center justify-center gap-1.5">
-                        <span className="text-base">🏆</span>
-                        <p className="text-[10px] font-bold uppercase tracking-widest text-indigo-500 dark:text-indigo-400">Certificate of Completion</p>
+                    <div className="mt-4 overflow-hidden rounded-xl border-2 border-indigo-200 bg-gradient-to-br from-indigo-50 to-white dark:border-indigo-800/50 dark:from-indigo-950/30 dark:to-zinc-800">
+                      <div className="border-b border-indigo-100 bg-indigo-50/60 px-3 py-1.5 text-center dark:border-indigo-800/40 dark:bg-indigo-950/30">
+                        <span className="text-[10px] font-semibold uppercase tracking-widest text-indigo-400 dark:text-indigo-500">Example certificate</span>
                       </div>
-                      <p className="text-xs font-semibold text-zinc-500 dark:text-zinc-400">This certifies that</p>
-                      <p className="mt-1 text-base font-extrabold text-zinc-800 dark:text-zinc-100">Alex Johnson</p>
-                      <p className="mt-0.5 text-[11px] text-zinc-500 dark:text-zinc-400">has successfully passed the</p>
-                      <p className="mt-0.5 text-sm font-bold text-indigo-600 dark:text-indigo-400">Go Language Certification</p>
-                      <div className="mx-auto mt-3 h-px w-16 bg-indigo-200 dark:bg-indigo-700" />
-                      <p className="mt-2 text-[9px] font-mono text-zinc-400 dark:text-zinc-500">ubyte.dev/cert/a3f9b2c1 · {new Date().getFullYear()}</p>
+                      <div className="px-5 py-4 text-center">
+                        <div className="mb-2 flex items-center justify-center gap-1.5">
+                          <span className="text-base">🏆</span>
+                          <p className="text-[10px] font-bold uppercase tracking-widest text-indigo-500 dark:text-indigo-400">Certificate of Completion</p>
+                        </div>
+                        <p className="text-xs font-semibold text-zinc-500 dark:text-zinc-400">This certifies that</p>
+                        <p className="mt-1 text-base font-extrabold text-zinc-800 dark:text-zinc-100">Alex Johnson</p>
+                        <p className="mt-0.5 text-[11px] text-zinc-500 dark:text-zinc-400">has successfully passed the</p>
+                        <p className="mt-0.5 text-sm font-bold text-indigo-600 dark:text-indigo-400">Go Language Certification</p>
+                        <div className="mx-auto mt-3 h-px w-16 bg-indigo-200 dark:bg-indigo-700" />
+                        <p className="mt-2 text-[9px] font-mono text-zinc-400 dark:text-zinc-500">ubyte.dev/cert/a3f9b2c1 · {new Date().getFullYear()}</p>
+                      </div>
                     </div>
                   )}
                   <TextLink
@@ -547,32 +559,40 @@ export default async function PracticeExamsPage() {
 
         {/* ── Why get certified? ───────────────────────────────────── */}
         <section className="mt-14 mb-0">
-            <Eyebrow className="mb-6">
-              Why get certified?
+          <Eyebrow className="mb-6">
+            Why get certified?
           </Eyebrow>
           <div className="grid gap-4 sm:grid-cols-3">
             {[
               {
-                icon: "📄",
-                title: "Strengthen your resume",
-                body: "Add a verifiable credential to your resume or LinkedIn profile. Each certificate has a unique ID that employers can check.",
-              },
-              {
                 icon: "🎯",
+                accent: "bg-indigo-50 dark:bg-indigo-950/40",
+                iconBg: "bg-indigo-100 dark:bg-indigo-900/50",
                 title: "Validate your knowledge",
                 body: "Timed exams test real understanding, not just memorization. Passing proves you can apply concepts under pressure.",
               },
               {
+                icon: "📄",
+                accent: "bg-emerald-50 dark:bg-emerald-950/30",
+                iconBg: "bg-emerald-100 dark:bg-emerald-900/40",
+                title: "Strengthen your resume",
+                body: "Add a verifiable credential to your resume. Each certificate has a unique ID that employers and recruiters can check.",
+              },
+              {
                 icon: "🔗",
+                accent: "bg-violet-50 dark:bg-violet-950/30",
+                iconBg: "bg-violet-100 dark:bg-violet-900/40",
                 title: "Share with anyone",
                 body: "Every certificate has a public verification page. Share the link with recruiters, teammates, or on social media.",
               },
-            ].map(({ icon, title, body }) => (
-              <Card key={title} className="p-5">
-                <span className="text-2xl">{icon}</span>
-                <h3 className="mt-3 font-semibold text-zinc-900 dark:text-zinc-100">{title}</h3>
-                <p className="mt-1.5 text-sm text-zinc-500 dark:text-zinc-400">{body}</p>
-              </Card>
+            ].map(({ icon, accent, iconBg, title, body }) => (
+              <div key={title} className={`rounded-2xl border border-zinc-200 p-6 dark:border-zinc-700 ${accent}`}>
+                <span className={`inline-flex h-10 w-10 items-center justify-center rounded-xl text-xl ${iconBg}`}>
+                  {icon}
+                </span>
+                <h3 className="mt-4 font-semibold text-zinc-900 dark:text-zinc-100">{title}</h3>
+                <p className="mt-1.5 text-sm leading-relaxed text-zinc-500 dark:text-zinc-400">{body}</p>
+              </div>
             ))}
           </div>
         </section>

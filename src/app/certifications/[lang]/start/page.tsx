@@ -1,15 +1,21 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
+import { LANGUAGES } from "@/lib/languages/registry";
+import type { SupportedLanguage } from "@/lib/languages/types";
 import { callStartExamApi } from "@/lib/exams/start-exam";
 import UpgradeWall from "@/components/UpgradeWall";
+import Spinner from "@/components/Spinner";
 
 export default function PracticeExamStartPage() {
   const { lang } = useParams<{ lang: string }>();
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [showUpgrade, setShowUpgrade] = useState(false);
+
+  const langName = LANGUAGES[lang as SupportedLanguage]?.name ?? lang;
 
   useEffect(() => {
     let cancelled = false;
@@ -40,29 +46,43 @@ export default function PracticeExamStartPage() {
   if (showUpgrade) {
     return (
       <UpgradeWall
-        tutorialTitle={`${lang.charAt(0).toUpperCase() + lang.slice(1)} Certification`}
+        tutorialTitle={`${langName} Certification`}
         subtitle="Certification exams are a Pro feature. Upgrade to take timed exams and earn verifiable certificates."
         backHref={`/certifications/${lang}`}
-        backLabel={`← Back to ${lang} certification`}
+        backLabel={`← Back to ${langName} certification`}
         context="certification"
       />
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex min-h-[60vh] items-center justify-center px-4">
+        <div className="w-full max-w-md text-center">
+          <p className="mb-4 text-sm text-red-500 dark:text-red-400">{error}</p>
+          <Link
+            href={`/certifications/${lang}`}
+            className="text-sm font-medium text-indigo-600 hover:text-indigo-700 dark:text-indigo-400"
+          >
+            ← Back to {langName} certification
+          </Link>
+        </div>
+      </div>
     );
   }
 
   return (
     <div className="flex min-h-[60vh] items-center justify-center px-4">
       <div className="w-full max-w-md text-center">
-        <p className="mb-2 text-sm font-medium text-zinc-900 dark:text-zinc-100">
-          Preparing your exam…
+        <div className="mb-6 flex justify-center">
+          <Spinner label="Preparing your exam…" />
+        </div>
+        <p className="mb-1 text-sm font-medium text-zinc-900 dark:text-zinc-100">
+          Preparing your {langName} exam…
         </p>
         <p className="text-sm text-zinc-500 dark:text-zinc-400">
           We&apos;re selecting your questions at random. This may take a few seconds.
         </p>
-        {error && (
-          <p className="mt-4 text-sm text-red-500">
-            {error}
-          </p>
-        )}
       </div>
     </div>
   );

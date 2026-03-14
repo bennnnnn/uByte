@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 
 export async function generateMetadata(): Promise<Metadata> {
   return {
-    title: "Exam result – uByte",
-    description: "View your certification result and certificate.",
+    title: "Exam result — uByte",
+    description: "Your certification exam result. See your score, correct/incorrect answers, and download your certificate if you passed.",
     robots: { index: false, follow: false },
   };
 }

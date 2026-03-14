@@ -9,9 +9,10 @@ interface Props {
   lang: string;
   langName: string;
   fullWidth?: boolean;
+  isRetake?: boolean;
 }
 
-export default function StartExamButton({ lang, langName, fullWidth }: Props) {
+export default function StartExamButton({ lang, langName, fullWidth, isRetake }: Props) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -56,9 +57,18 @@ export default function StartExamButton({ lang, langName, fullWidth }: Props) {
         type="button"
         onClick={handleStart}
         disabled={loading}
-        className={`inline-flex items-center justify-center rounded-xl bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-indigo-500 disabled:cursor-not-allowed disabled:opacity-60 ${fullWidth ? "w-full" : ""}`}
+        className={`inline-flex items-center justify-center gap-2 rounded-xl bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-indigo-500 disabled:cursor-not-allowed disabled:opacity-60 ${fullWidth ? "w-full" : ""}`}
       >
-        {loading ? "Starting exam..." : `Start ${langName} exam`}
+        {loading ? (
+          <>
+            <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" aria-hidden="true" />
+            Starting exam…
+          </>
+        ) : isRetake ? (
+          "Retake exam"
+        ) : (
+          `Start ${langName} exam`
+        )}
       </button>
       {error && (
         <p className="text-sm text-red-500">

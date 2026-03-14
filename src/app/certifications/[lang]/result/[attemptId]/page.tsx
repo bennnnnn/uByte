@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { trackConversion } from "@/lib/analytics";
 import { LANGUAGES } from "@/lib/languages/registry";
 import type { SupportedLanguage } from "@/lib/languages/types";
@@ -65,6 +65,9 @@ function ConfettiBurst() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
+    // Respect reduced-motion preference
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
@@ -188,14 +191,53 @@ function LinkedInButton({ certUrl, langName }: { certUrl: string; langName: stri
 }
 
 // ── Main page ─────────────────────────────────────────────────────────────────
-export default function PracticeExamResultPage() {
+export default function PracticeExamResultPageWrapper() {
+  return (
+    <Suspense>
+      <PracticeExamResultPage />
+    </Suspense>
+  );
+}
+
+function PracticeExamResultPage() {
   const { lang, attemptId } = useParams<{ lang: string; attemptId: string }>();
   const router = useRouter();
-  const [result, setResult] = useState<ExamResultResponse | null>(null);
-  const [loading, setLoading] = useState(true);
+  const searchParams = useSearchParams();
+  const passPercent = usePassPercent(lang);
+
+  // Build an optimistic result from URL params passed by the attempt page
+  // (score, passed, cert). This shows the result instantly without waiting
+  // for the API round-trip — the API fetch below revalidates in the background.
+  const optimisticScore = searchParams.get("score");
+  const optimisticPassed = searchParams.get("passed");
+  const optimisticCert = searchParams.get("cert");
+  const optimisticTotal = searchParams.get("total");
+  const optimistic: ExamResultResponse | null =
+    optimisticScore && optimisticPassed
+      ? {
+          score: Number(optimisticScore),
+          passed: optimisticPassed === "1",
+          certificateId: optimisticCert ?? null,
+          // Use the total passed in the URL so correct/wrong counts display immediately.
+          totalQuestions: optimisticTotal ? Number(optimisticTotal) : 0,
+        }
+      : null;
+
+  const [result, setResult] = useState<ExamResultResponse | null>(optimistic);
+  const [loading, setLoading] = useState(!optimistic);
   const [error, setError] = useState<string | null>(null);
   const [showConfetti, setShowConfetti] = useState(false);
-  const passPercent = usePassPercent(lang);
+  const confettiFiredRef = useRef(false);
+
+  useEffect(() => {
+    // Fire confetti immediately if we have optimistic pass data
+    if (optimistic?.passed && !confettiFiredRef.current) {
+      confettiFiredRef.current = true;
+      setTimeout(() => setShowConfetti(true), 300);
+      setTimeout(() => setShowConfetti(false), 4000);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -217,12 +259,15 @@ export default function PracticeExamResultPage() {
         }
         const r = data as ExamResultResponse;
         setResult(r);
-        if (r.passed) {
+        if (r.passed && !confettiFiredRef.current) {
           // Track exam pass for PostHog / Vercel Analytics funnel.
           trackConversion("exam_passed", { lang: String(lang), score: r.score });
-          // Slight delay so the page renders before confetti fires.
+          confettiFiredRef.current = true;
           setTimeout(() => setShowConfetti(true), 300);
           setTimeout(() => setShowConfetti(false), 4000);
+        } else if (r.passed) {
+          // Optimistic confetti already fired — just track conversion
+          trackConversion("exam_passed", { lang: String(lang), score: r.score });
         }
       } catch {
         if (!cancelled) setError("Network error. Please try again.");
@@ -232,7 +277,7 @@ export default function PracticeExamResultPage() {
     }
     void load();
     return () => { cancelled = true; };
-  }, [attemptId, router]);
+  }, [attemptId, lang, router]);
 
   if (loading) {
     return (
@@ -244,11 +289,13 @@ export default function PracticeExamResultPage() {
 
   if (error || !result) {
     return (
-      <div className="mx-auto max-w-2xl px-6 py-14">
-        <p className="mb-4 text-sm text-red-500">{error ?? "Result not found."}</p>
-        <Link href="/certifications" className="text-sm font-medium text-indigo-600 hover:text-indigo-700 dark:text-indigo-400">
-          ← Back to certifications
-        </Link>
+      <div className="flex min-h-[60vh] items-center justify-center px-6">
+        <div className="text-center">
+          <p className="mb-4 text-sm text-red-500">{error ?? "Result not found."}</p>
+          <Link href="/certifications" className="text-sm font-medium text-indigo-600 hover:text-indigo-700 dark:text-indigo-400">
+            ← Back to certifications
+          </Link>
+        </div>
       </div>
     );
   }

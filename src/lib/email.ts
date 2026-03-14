@@ -11,6 +11,8 @@ import { Resend } from "resend";
 
 import { BASE_URL } from "@/lib/constants";
 import { makeUnsubscribeUrl } from "@/lib/unsubscribe";
+import { LANGUAGES } from "@/lib/languages/registry";
+import type { SupportedLanguage } from "@/lib/languages/types";
 const FROM = process.env.RESEND_FROM_EMAIL ?? "noreply@resend.dev";
 
 /** Standard unsubscribe footer for all marketing emails. */
@@ -408,11 +410,11 @@ export async function sendCertificationEmail(
   if (!resend) return;
 
   const firstName = name.split(" ")[0];
-  const langLabel = language.charAt(0).toUpperCase() + language.slice(1);
+  const langLabel = LANGUAGES[language as SupportedLanguage]?.name ?? language;
   await resend.emails.send({
     from: FROM,
     to,
-    subject: `You earned your ${langLabel} certificate! 🏅 — uByte`,
+    subject: `You passed the ${langLabel} certification! 🏅 — uByte`,
     html: `
       <div style="font-family:sans-serif;max-width:520px;margin:auto;color:#18181b">
         <div style="background:#4f46e5;padding:32px;border-radius:12px 12px 0 0;text-align:center">
@@ -423,15 +425,85 @@ export async function sendCertificationEmail(
             <span style="font-size:56px">🏅</span>
           </div>
           <h2 style="margin:0 0 8px;text-align:center">Congratulations, ${firstName}!</h2>
-          <p style="color:#6b7280;text-align:center">You've passed the <strong>${langLabel} certification</strong> on uByte. Your certificate is ready.</p>
+          <p style="color:#6b7280;text-align:center">You've passed the <strong>${langLabel} certification</strong> on uByte. Your certificate is ready to view and share.</p>
           <div style="background:#fff;border:2px solid #4f46e5;border-radius:10px;padding:20px;margin:20px 0;text-align:center">
             <p style="margin:0 0 4px;font-weight:700;color:#4f46e5">Your ${langLabel} Certificate</p>
-            <p style="color:#6b7280;margin:0 0 16px;font-size:14px">Verifiable, shareable, and ready for LinkedIn or your resume.</p>
+            <p style="color:#6b7280;margin:0 0 16px;font-size:14px">Each certificate has a unique ID — share the link with anyone who wants to verify it.</p>
             <a href="${certificateUrl}" style="display:inline-block;padding:12px 24px;background:#4f46e5;color:#fff;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px">View your certificate →</a>
           </div>
-          <p style="color:#6b7280;font-size:14px;text-align:center">Share it with the world — you earned it!</p>
+          <p style="color:#6b7280;font-size:14px;text-align:center">You earned it. Keep going — more certifications await.</p>
           <hr style="border:none;border-top:1px solid #e5e7eb;margin:24px 0">
           <p style="color:#9ca3af;font-size:12px;text-align:center">You're receiving this because you just earned a certificate on uByte. <a href="${BASE_URL}/settings" style="color:#9ca3af">Manage preferences</a>.</p>
+        </div>
+      </div>
+    `,
+  });
+}
+
+/** Sent when a user fails a certification exam — encourages a retake. */
+export async function sendExamFailedEmail(
+  to: string,
+  name: string,
+  language: string,
+  score: number,
+  correct: number,
+  total: number,
+  passPercent: number,
+  retakeUrl: string
+): Promise<void> {
+  const resend = getResend();
+  if (!resend) return;
+
+  const firstName = name.split(" ")[0];
+  const langLabel = LANGUAGES[language as SupportedLanguage]?.name ?? language;
+  const needed = Math.ceil((total * passPercent) / 100);
+  const gap = needed - correct;
+  // Only send if the user was reasonably close (within 20 percentage points) — avoid
+  // emailing users who scored very low, as it may feel discouraging rather than motivating.
+  const scoreDiff = passPercent - score;
+  if (scoreDiff > 20) return;
+
+  await resend.emails.send({
+    from: FROM,
+    to,
+    subject: `So close! Your ${langLabel} exam result — uByte`,
+    html: `
+      <div style="font-family:sans-serif;max-width:520px;margin:auto;color:#18181b">
+        <div style="background:#4f46e5;padding:32px;border-radius:12px 12px 0 0;text-align:center">
+          <span style="color:#fff;font-size:28px;font-weight:800;letter-spacing:-1px">uByte</span>
+        </div>
+        <div style="background:#f9fafb;padding:32px;border-radius:0 0 12px 12px;border:1px solid #e5e7eb;border-top:none">
+          <h2 style="margin:0 0 8px">Hi ${firstName} — you almost had it.</h2>
+          <p style="color:#6b7280;margin:0 0 24px">You scored <strong style="color:#18181b">${score}%</strong> on the ${langLabel} certification. You needed ${passPercent}% to pass. That's just ${gap} more question${gap === 1 ? "" : "s"} — you're very close.</p>
+
+          <div style="background:#fff;border:1px solid #e5e7eb;border-radius:10px;padding:20px;margin:0 0 24px">
+            <table style="width:100%;border-collapse:collapse">
+              <tr>
+                <td style="padding:8px 0;color:#6b7280;font-size:14px">Your score</td>
+                <td style="padding:8px 0;text-align:right;font-weight:700;color:#f59e0b;font-size:18px">${score}%</td>
+              </tr>
+              <tr style="border-top:1px solid #f3f4f6">
+                <td style="padding:8px 0;color:#6b7280;font-size:14px">Correct answers</td>
+                <td style="padding:8px 0;text-align:right;font-weight:700;color:#18181b">${correct} / ${total}</td>
+              </tr>
+              <tr style="border-top:1px solid #f3f4f6">
+                <td style="padding:8px 0;color:#6b7280;font-size:14px">Passing score</td>
+                <td style="padding:8px 0;text-align:right;font-weight:700;color:#18181b">${passPercent}%</td>
+              </tr>
+              <tr style="border-top:1px solid #f3f4f6">
+                <td style="padding:8px 0;color:#6b7280;font-size:14px">Needed to pass</td>
+                <td style="padding:8px 0;text-align:right;font-weight:700;color:#18181b">${needed} / ${total}</td>
+              </tr>
+            </table>
+          </div>
+
+          <div style="text-align:center;margin-bottom:24px">
+            <p style="color:#6b7280;font-size:14px;margin:0 0 16px">Review the topics you missed and give it another shot. You can retake it as many times as you need.</p>
+            <a href="${retakeUrl}" style="display:inline-block;padding:12px 24px;background:#4f46e5;color:#fff;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px">Retake the ${langLabel} exam →</a>
+          </div>
+
+          <hr style="border:none;border-top:1px solid #e5e7eb;margin:24px 0">
+          <p style="color:#9ca3af;font-size:12px;text-align:center">You're receiving this because you recently took a certification exam on uByte. <a href="${BASE_URL}/settings" style="color:#9ca3af">Manage preferences</a>.</p>
         </div>
       </div>
     `,

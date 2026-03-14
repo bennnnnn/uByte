@@ -45,6 +45,16 @@ export interface ExamUploadResult {
   errors: string[];
 }
 
+export interface ExamQuestionAdminRow {
+  id: number;
+  lang: string;
+  prompt: string;
+  choices_json: string[];
+  correct_index: number;
+  explanation: string | null;
+  created_at: string;
+}
+
 /* ── Hook ────────────────────────────────────────────────────────────────── */
 
 export function useAdminData() {
@@ -87,6 +97,14 @@ export function useAdminData() {
   const [examSettings, setExamSettings] = useState<ExamSettingsMap | null>(null);
   const [examSettingsSaving, setExamSettingsSaving] = useState(false);
   const [examSettingsMessage, setExamSettingsMessage] = useState<string | null>(null);
+  // Question browser
+  const [questionBrowserLang, setQuestionBrowserLang] = useState<string | null>(null);
+  const [questionBrowserRows, setQuestionBrowserRows] = useState<ExamQuestionAdminRow[]>([]);
+  const [questionBrowserTotal, setQuestionBrowserTotal] = useState(0);
+  const [questionBrowserPage, setQuestionBrowserPage] = useState(1);
+  const [questionBrowserLoading, setQuestionBrowserLoading] = useState(false);
+  const [clearLangConfirm, setClearLangConfirm] = useState<string | null>(null);
+  const [clearLangLoading, setClearLangLoading] = useState(false);
 
   /* ── State: banner tab ───────────────────────────────────────────────── */
   const [bannerData, setBannerData] = useState<BannerData | null>(null);
@@ -236,6 +254,48 @@ export function useAdminData() {
     } catch (err) { setExamUploadResult({ inserted: 0, errors: [String(err)] }); } finally { setExamUploading(false); }
   }, [examUploadFile]);
 
+  /* ── Question browser ────────────────────────────────────────────────── */
+  const loadQuestions = useCallback(async (lang: string, page = 1) => {
+    setQuestionBrowserLoading(true);
+    setQuestionBrowserLang(lang);
+    setQuestionBrowserPage(page);
+    try {
+      const res = await fetch(`/api/admin/exam-questions?lang=${encodeURIComponent(lang)}&page=${page}&limit=50`, { credentials: "same-origin" });
+      if (res.ok) {
+        const data = await res.json();
+        setQuestionBrowserRows(data.rows ?? []);
+        setQuestionBrowserTotal(data.total ?? 0);
+      }
+    } finally {
+      setQuestionBrowserLoading(false);
+    }
+  }, []);
+
+  const deleteQuestion = useCallback(async (id: number) => {
+    await apiFetch(`/api/admin/exam-questions/question/${id}`, { method: "DELETE" });
+    setQuestionBrowserRows((prev) => prev.filter((r) => r.id !== id));
+    setQuestionBrowserTotal((prev) => Math.max(0, prev - 1));
+    // Refresh stats
+    const st = await fetch("/api/admin/exam-stats", { credentials: "same-origin" });
+    if (st.ok) setExamStats(await st.json());
+  }, []);
+
+  const clearAllQuestionsForLang = useCallback(async (lang: string) => {
+    setClearLangLoading(true);
+    try {
+      const res = await apiFetch(`/api/admin/exam-questions/lang/${encodeURIComponent(lang)}`, { method: "DELETE" });
+      if (res.ok) {
+        setQuestionBrowserRows([]);
+        setQuestionBrowserTotal(0);
+        setClearLangConfirm(null);
+        const st = await fetch("/api/admin/exam-stats", { credentials: "same-origin" });
+        if (st.ok) setExamStats(await st.json());
+      }
+    } finally {
+      setClearLangLoading(false);
+    }
+  }, []);
+
   /* ── Banner save ─────────────────────────────────────────────────────── */
   const saveBanner = useCallback(async () => {
     if (!bannerData) return;
@@ -338,6 +398,10 @@ export function useAdminData() {
     /* exams */
     examStats, examStatsLoading, examUploadFile, setExamUploadFile, examUploading, examUploadResult, setExamUploadResult,
     examSettings, setExamSettings, examSettingsSaving, examSettingsMessage, saveExamSettings, uploadExamQuestions,
+    /* question browser */
+    questionBrowserLang, questionBrowserRows, questionBrowserTotal, questionBrowserPage,
+    questionBrowserLoading, loadQuestions, deleteQuestion,
+    clearLangConfirm, setClearLangConfirm, clearLangLoading, clearAllQuestionsForLang,
     /* banner */
     bannerData, setBannerData, bannerSaving, bannerMessage, saveBanner,
     /* revenue helpers */

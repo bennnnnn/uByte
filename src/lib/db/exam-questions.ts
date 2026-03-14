@@ -81,6 +81,53 @@ export interface ExamQuestionInsertRow {
   explanation?: string | null;
 }
 
+export interface AdminExamQuestionRow {
+  id: number;
+  lang: string;
+  prompt: string;
+  choices_json: string[];
+  correct_index: number;
+  explanation: string | null;
+  created_at: string;
+}
+
+/** List exam questions for admin (paginated), with correct_index visible. */
+export async function listExamQuestionsForAdmin(
+  lang: string,
+  limit = 50,
+  offset = 0
+): Promise<{ rows: AdminExamQuestionRow[]; total: number }> {
+  const sql = getSql();
+  const [countRow] = await sql`
+    SELECT COUNT(*)::int AS total FROM exam_questions WHERE lang = ${lang}
+  `;
+  const total = (countRow as { total: number }).total ?? 0;
+  const rows = await sql`
+    SELECT id, lang, prompt, choices_json, correct_index, explanation, created_at
+    FROM exam_questions
+    WHERE lang = ${lang}
+    ORDER BY id DESC
+    LIMIT ${limit} OFFSET ${offset}
+  `;
+  return { rows: rows as AdminExamQuestionRow[], total };
+}
+
+/** Delete a single exam question by ID. */
+export async function deleteExamQuestion(id: number): Promise<void> {
+  const sql = getSql();
+  await sql`DELETE FROM exam_questions WHERE id = ${id}`;
+}
+
+/** Delete all exam questions for a language. Returns the number deleted. */
+export async function deleteExamQuestionsByLang(lang: string): Promise<number> {
+  const sql = getSql();
+  const [row] = await sql`
+    WITH deleted AS (DELETE FROM exam_questions WHERE lang = ${lang} RETURNING id)
+    SELECT COUNT(*)::int AS n FROM deleted
+  `;
+  return (row as { n: number }).n ?? 0;
+}
+
 /** Bulk insert exam questions. Returns inserted count and per-row errors. */
 export async function insertExamQuestions(
   rows: ExamQuestionInsertRow[]

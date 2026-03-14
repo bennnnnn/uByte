@@ -11,7 +11,7 @@ import { Button } from "@/components/ui";
 import Spinner from "@/components/Spinner";
 
 function formatDate(iso: string) {
-  return new Date(iso).toLocaleDateString("en-US", {
+  return new Date(iso).toLocaleDateString(undefined, {
     year: "numeric",
     month: "long",
     day: "numeric",
@@ -74,11 +74,15 @@ export default function ExamCertificatePage() {
       try {
         await navigator.share({ title: `${data?.name} — ${data?.lang} Certificate`, url });
         return;
-      } catch { /* user cancelled or not supported */ }
+      } catch { /* user cancelled or not supported — fall through to clipboard */ }
     }
-    await navigator.clipboard.writeText(url);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    try {
+      await navigator.clipboard.writeText(url);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      // Clipboard unavailable (non-secure context or permission denied) — no-op
+    }
   };
 
   if (error) {
@@ -140,7 +144,7 @@ export default function ExamCertificatePage() {
           </a>
           <a
             href={pdfUrl}
-            download
+            download={data ? `uByte-${LANGUAGES[data.lang as SupportedLanguage]?.name ?? data.lang}-Certificate-${data.id.slice(0, 8)}.pdf` : "uByte-Certificate.pdf"}
             className="inline-flex items-center justify-center gap-2 rounded-xl bg-indigo-600 px-5 py-3 text-sm font-bold text-white shadow-md shadow-indigo-500/20 transition-all hover:-translate-y-0.5 hover:bg-indigo-500"
           >
             Download PDF

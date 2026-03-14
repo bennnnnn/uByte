@@ -17,7 +17,7 @@ import {
   hasAttemptExpired,
   isDisplayedAnswerCorrect,
 } from "@/lib/exams/attempt-utils";
-import { sendCertificationEmail } from "@/lib/email";
+import { sendCertificationEmail, sendExamFailedEmail } from "@/lib/email";
 import { BASE_URL } from "@/lib/constants";
 import { addXp } from "@/lib/db";
 
@@ -123,6 +123,21 @@ export const POST = withErrorHandling(
           sendCertificationEmail(user.email, user.name, attempt.lang, certUrl).catch((err) =>
             console.error("[submit] sendCertificationEmail failed:", err)
           );
+        }
+      } else {
+        // Send encouragement email for near-miss fails (fire-and-forget)
+        if (user.email) {
+          const retakeUrl = `${BASE_URL}/certifications/${attempt.lang}`;
+          sendExamFailedEmail(
+            user.email,
+            user.name,
+            attempt.lang,
+            score,
+            correct,
+            total,
+            examConfig.passPercent,
+            retakeUrl
+          ).catch((err) => console.error("[submit] sendExamFailedEmail failed:", err));
         }
       }
 

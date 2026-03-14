@@ -34,7 +34,7 @@ if (!url) {
 }
 
 const sql = neon(url);
-const VALID_LANGS = new Set(["go", "python", "javascript", "java", "rust", "cpp"]);
+const VALID_LANGS = new Set(["go", "python", "javascript", "java", "rust", "cpp", "csharp"]);
 
 function loadQuestions(files) {
   const all = [];
