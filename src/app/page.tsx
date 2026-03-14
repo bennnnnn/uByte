@@ -7,7 +7,7 @@ import { getAllPracticeProblems, getPracticeProblemBySlug } from "@/lib/practice
 import { LANGUAGES, getAllLanguageSlugs } from "@/lib/languages/registry";
 import { getLangIcon } from "@/lib/languages/icons";
 import { APP_NAME, BASE_URL } from "@/lib/constants";
-import { getExamConfigForAllLangs, getLastActivity, getUserPlan } from "@/lib/db";
+import { getExamConfigForAllLangs, getLastActivity, getUserPlan, getExamPublicStatsByLang, getUserExamStats } from "@/lib/db";
 import { hasPaidAccess } from "@/lib/plans";
 import { getPopularLanguages, getPopularPracticeProblems, getFallbackPopularLanguages, getFallbackPopularPracticeProblems } from "@/lib/db/home-popular";
 import { tutorialLangUrl, tutorialUrl } from "@/lib/urls";
@@ -56,23 +56,27 @@ export default async function Home() {
   const topicCount = goTutorials.length;
   const problemCount = getAllPracticeProblems().length;
   // Kick off all independent async work in parallel
-  const [examConfigByLang, user, popularLanguages, popularProblems] = await Promise.all([
+  const [examConfigByLang, user, popularLanguages, popularProblems, publicExamStats] = await Promise.all([
     getExamConfigForAllLangs(),
     getCurrentUser(),
     getPopularLanguages(),
     getPopularPracticeProblems(),
+    getExamPublicStatsByLang(),
   ]);
 
-  // Resolve "You left off at..." + user plan — both need user but are independent of each other
+  // Resolve "You left off at..." + user plan + user exam stats — need user but independent of each other
   let leftOff: { href: string; label: string } | null = null;
   let continueLang: SupportedLanguage = "go";
   let userPlan = "free";
+  let userExamStats: { lang: string; attemptCount: number; lastPassed: boolean | null; lastScore: number | null; bestScore: number | null; hasCertificate: boolean }[] = [];
 
   if (user) {
-    const [last, fetchedPlan] = await Promise.all([
+    const [last, fetchedPlan, examStats] = await Promise.all([
       getLastActivity(user.userId),
       getUserPlan(user.userId),
+      getUserExamStats(user.userId),
     ]);
+    userExamStats = examStats;
     userPlan = fetchedPlan;
     if (last) {
       if (last.activity_type === "tutorial" && last.slug) {
@@ -111,6 +115,8 @@ export default async function Home() {
   const certificationCount = Object.values(examConfigByLang).filter(Boolean).length;
 
   const isPro = hasPaidAccess(userPlan);
+  const publicStatsByLang = Object.fromEntries(publicExamStats.map((s) => [s.lang, s]));
+  const examStatsByLang = Object.fromEntries(userExamStats.map((s) => [s.lang, s]));
   const popularPracticeProblems =
     popularProblems.length > 0 ? popularProblems : getFallbackPopularPracticeProblems();
   const popularLangs =
@@ -212,7 +218,12 @@ export default async function Home() {
         <PopularInterviewPrepSection problems={popularPracticeProblems} />
 
         {/* Certifications */}
-        <PracticeExamsSection examConfigByLang={examConfigByLang} />
+        <PracticeExamsSection
+          examConfigByLang={examConfigByLang}
+          publicStatsByLang={publicStatsByLang}
+          statsByLang={examStatsByLang}
+          isLoggedIn={!!user}
+        />
 
         {/* Spacer before footer */}
         <div className="pb-8 sm:pb-12" />
