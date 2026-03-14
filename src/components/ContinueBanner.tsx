@@ -43,7 +43,7 @@ export default function ContinueBanner({ lang, tutorials }: { lang: string; tuto
           </span>
         </div>
         <Link
-          href="/profile?tab=achievements"
+          href="/dashboard?tab=achievements"
           className="rounded-lg bg-emerald-600 px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-emerald-700"
         >
           View achievements →

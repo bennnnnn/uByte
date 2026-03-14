@@ -46,6 +46,9 @@ export default function OverviewTab({ stats, badges, achievements, userId }: Pro
   const [examCerts, setExamCerts] = useState<
     { id: string; lang: string; passed_at: string }[]
   >([]);
+  const [examStats, setExamStats] = useState<
+    { lang: string; attemptCount: number; bestScore: number | null; lastPassed: boolean | null }[]
+  >([]);
   const [certsLoading, setCertsLoading] = useState(!!userId);
   const [certsError, setCertsError] = useState(false);
 
@@ -69,8 +72,9 @@ export default function OverviewTab({ stats, badges, achievements, userId }: Pro
     fetch("/api/profile/exam-certificates", { credentials: "same-origin" })
       .then((r) => r.json())
       .then((d) => {
-        if (!cancelled && Array.isArray(d.certificates)) {
-          setExamCerts(d.certificates);
+        if (!cancelled) {
+          if (Array.isArray(d.certificates)) setExamCerts(d.certificates);
+          if (Array.isArray(d.examStats)) setExamStats(d.examStats);
         }
       })
       .catch(() => { if (!cancelled) setCertsError(true); })
@@ -109,19 +113,38 @@ export default function OverviewTab({ stats, badges, achievements, userId }: Pro
       {!certsLoading && certsError && (
         <p className="text-sm text-zinc-400">Could not load certificates.</p>
       )}
-      {!certsLoading && !certsError && examCerts.length === 0 && (
-        <Card className="p-5">
-          <div className="mb-1 flex items-center justify-between">
-            <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">Exam certificates</h2>
-          </div>
-          <p className="text-sm text-zinc-400 dark:text-zinc-500">
-            No certificates yet.{" "}
-            <Link href="/certifications" className="font-medium text-indigo-600 hover:underline dark:text-indigo-400">
-              Take a certification exam →
-            </Link>
-          </p>
-        </Card>
-      )}
+      {!certsLoading && !certsError && examCerts.length === 0 && (() => {
+        const attempted = examStats.filter((s) => s.attemptCount > 0);
+        const bestAttempt = attempted.sort((a, b) => (b.bestScore ?? 0) - (a.bestScore ?? 0))[0];
+        return (
+          <Card className="p-5">
+            <h2 className="mb-1 text-sm font-semibold text-zinc-900 dark:text-zinc-100">Exam certificates</h2>
+            {attempted.length === 0 ? (
+              <p className="text-sm text-zinc-400 dark:text-zinc-500">
+                No exams taken yet.{" "}
+                <Link href="/certifications" className="font-medium text-indigo-600 hover:underline dark:text-indigo-400">
+                  Take your first certification exam →
+                </Link>
+              </p>
+            ) : (
+              <div>
+                <p className="text-sm text-zinc-400 dark:text-zinc-500">
+                  No certificates earned yet — keep going!
+                  {bestAttempt?.bestScore != null && (
+                    <span className="ml-1">Best score: <span className="font-medium text-zinc-700 dark:text-zinc-300">{bestAttempt.bestScore}%</span>.</span>
+                  )}
+                </p>
+                <Link
+                  href="/certifications"
+                  className="mt-2 inline-block text-sm font-medium text-indigo-600 hover:underline dark:text-indigo-400"
+                >
+                  Retry exam →
+                </Link>
+              </div>
+            )}
+          </Card>
+        );
+      })()}
       {!certsLoading && !certsError && examCerts.length > 0 && (
         <Card className="p-5">
           <div className="mb-3 flex items-center justify-between">

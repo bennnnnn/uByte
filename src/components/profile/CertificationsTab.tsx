@@ -13,6 +13,7 @@ const LANG_META: Record<string, { icon: string; name: string }> = {
   java:       { icon: "☕", name: "Java" },
   rust:       { icon: "🦀", name: "Rust" },
   cpp:        { icon: "⚙️", name: "C++" },
+  csharp:     { icon: "💜", name: "C#" },
 };
 
 const ALL_LANGS = Object.keys(LANG_META);
