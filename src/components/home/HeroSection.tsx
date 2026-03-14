@@ -1,6 +1,10 @@
+import dynamic from "next/dynamic";
 import { GradientText } from "@/components/ui";
 import HeroCTAButtons from "./HeroCTAButtons";
-import HeroIDE from "./HeroIDE";
+
+// HeroIDE is only shown on lg+ screens (hidden on mobile). Lazy-load it so its
+// JS is excluded from the critical bundle — saves ~15 KiB on mobile.
+const HeroIDE = dynamic(() => import("./HeroIDE"), { ssr: false, loading: () => null });
 
 const FEATURES = [
   "Write real code in your browser — zero setup, zero installs",

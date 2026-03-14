@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import dynamic from "next/dynamic";
 import AuthProvider from "@/components/AuthProvider";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import { ToastProvider } from "@/components/Toast";
@@ -9,17 +10,19 @@ import MobileStandaloneHeader from "@/components/layout/MobileStandaloneHeader";
 import SiteFooter from "@/components/layout/SiteFooter";
 import LazyCookieConsentAndAnalytics from "@/components/LazyCookieConsentAndAnalytics";
 import SiteBanner from "@/components/SiteBanner";
-import TrialBanner from "@/components/TrialBanner";
 import { APP_NAME, BASE_URL } from "@/lib/constants";
 import { SITE_KEYWORDS } from "@/lib/seo";
 import Script from "next/script";
-import { Suspense } from "react";
-import ReferralTracker from "@/components/ReferralTracker";
-import OnboardingChecklist from "@/components/OnboardingChecklist";
-import PushPermissionBanner from "@/components/PushPermissionBanner";
-import GoogleOneTap from "@/components/GoogleOneTap";
-import EmailVerificationBanner from "@/components/EmailVerificationBanner";
-import PostHogProvider from "@/components/PostHogProvider";
+// Deferred: these components are non-critical for LCP and first paint.
+// Using dynamic + ssr:false splits them into separate chunks loaded after hydration,
+// reducing initial JS parse/execute time and improving LCP + TBT.
+const TrialBanner            = dynamic(() => import("@/components/TrialBanner"),            { ssr: false, loading: () => null });
+const EmailVerificationBanner = dynamic(() => import("@/components/EmailVerificationBanner"), { ssr: false, loading: () => null });
+const ReferralTracker         = dynamic(() => import("@/components/ReferralTracker"),         { ssr: false, loading: () => null });
+const PostHogProvider         = dynamic(() => import("@/components/PostHogProvider"),         { ssr: false, loading: () => null });
+const GoogleOneTap            = dynamic(() => import("@/components/GoogleOneTap"),            { ssr: false, loading: () => null });
+const OnboardingChecklist     = dynamic(() => import("@/components/OnboardingChecklist"),     { ssr: false, loading: () => null });
+const PushPermissionBanner    = dynamic(() => import("@/components/PushPermissionBanner"),    { ssr: false, loading: () => null });
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -137,9 +140,9 @@ export default function RootLayout({
           </div>
           <LazyCookieConsentAndAnalytics />
           {/* Reads ?ref= from URL and persists to localStorage for signup attribution */}
-          <Suspense fallback={null}><ReferralTracker /></Suspense>
+          <ReferralTracker />
           {/* PostHog page-view tracking + user identification */}
-          <Suspense fallback={null}><PostHogProvider /></Suspense>
+          <PostHogProvider />
           {/* Google One Tap — auto-shows "Continue as [name]" for guests */}
           <GoogleOneTap />
           {/* Floating checklist for new users — hides once all 3 steps are done */}

@@ -14,21 +14,23 @@ import { tutorialLangUrl, tutorialUrl } from "@/lib/urls";
 import { absoluteUrl, SITE_KEYWORDS, buildSiteSearchJsonLd } from "@/lib/seo";
 import { getCurrentUser } from "@/lib/auth";
 import type { SupportedLanguage } from "@/lib/languages/types";
+import dynamic from "next/dynamic";
 import {
   LangCard,
   SectionHeading,
   HeroSection,
   PracticeExamsSection,
-  StepsSection,
-  ValuePropBanner,
-  PopularTutorialsSection,
-  PopularInterviewPrepSection,
-  TestimonialsStrip,
 } from "@/components/home";
 import ContinueBanner from "@/components/ContinueBanner";
 import LeftOffBanner from "@/components/LeftOffBanner";
 import GoogleOAuthError from "@/components/GoogleOAuthError";
 import ReferralPromptBanner from "@/components/ReferralPromptBanner";
+
+// Below-fold sections: lazy-loaded to reduce initial bundle
+const StepsSection              = dynamic(() => import("@/components/home/StepsSection"));
+const ValuePropBanner           = dynamic(() => import("@/components/home/ValuePropBanner"));
+const PopularTutorialsSection   = dynamic(() => import("@/components/home/PopularTutorialsSection"));
+const PopularInterviewPrepSection = dynamic(() => import("@/components/home/PopularInterviewPrepSection"));
 
 export const metadata: Metadata = {
   title: "uByte — Learn, Practice, and Get Certified in 7 Languages",
@@ -185,8 +187,7 @@ export default async function Home() {
         {/* Why upgrade — value proposition banner (hidden for Pro users) */}
         <ValuePropBanner isPro={isPro} />
 
-        {/* Social proof — developer testimonials */}
-        <TestimonialsStrip />
+        {/* Social proof — developer testimonials (removed until real testimonials exist) */}
 
         {/* Languages */}
         <section aria-labelledby="languages-heading">

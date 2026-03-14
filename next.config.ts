@@ -67,9 +67,9 @@ const nextConfig: NextConfig = {
       config.resolve.alias = {
         ...config.resolve.alias,
         // Eliminate Next.js's hardcoded polyfills for Array.at, Object.hasOwn, etc.
-        // All are natively supported by Chrome 93+, Safari 15.4+, Firefox 92+.
-        // Must use the bare module path (how Next.js registers it), not an absolute path.
+        // All are natively supported by Chrome 109+, Safari 16.4+, Firefox 109+.
         "next/dist/build/polyfills/polyfill-module": false,
+        "next/dist/build/polyfills/polyfills": false,
       };
     }
     return config;
