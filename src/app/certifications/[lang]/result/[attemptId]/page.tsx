@@ -434,7 +434,7 @@ export default function PracticeExamResultPage() {
         <div className="mt-6 rounded-2xl border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900">
           <p className="mb-3 text-sm font-bold text-zinc-800 dark:text-zinc-200">Explore other certifications</p>
           <div className="flex flex-wrap gap-2">
-            {(["go", "python", "javascript", "java", "rust", "cpp"] as SupportedLanguage[])
+            {(Object.keys(LANGUAGES) as SupportedLanguage[])
               .filter((l) => l !== lang)
               .map((l) => {
                 const cfg = LANGUAGES[l];

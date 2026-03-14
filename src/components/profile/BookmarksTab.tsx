@@ -73,7 +73,7 @@ export default function BookmarksTab({ bookmarks, hasMore, total, onDelete, onLo
           {total} bookmark{total !== 1 ? "s" : ""}
         </p>
       )}
-      {bookmarks.length === 0 ? (
+      {total === 0 ? (
         <div className="rounded-xl border border-zinc-200 p-8 text-center dark:border-zinc-800">
           <p className="text-zinc-400">
             No bookmarks yet. Click the bookmark icon on any tutorial code example or interview prep problem to save it.

@@ -187,10 +187,10 @@ export default function OverviewTab({ stats, badges, achievements, userId }: Pro
         </div>
         {achievements.length === 0 ? (
           <p className="text-sm text-zinc-400">
-            No badges yet.{" "}
-            <Link href="/tutorial/go" className="font-medium text-indigo-600 hover:underline dark:text-indigo-400">
-              Start a tutorial to earn your first →
-            </Link>
+            {!activityLoading && activity.length > 0
+              ? <>Keep going — complete a tutorial to earn your first badge. <Link href="/tutorial/go" className="font-medium text-indigo-600 hover:underline dark:text-indigo-400">Continue →</Link></>
+              : <>No badges yet. <Link href="/tutorial/go" className="font-medium text-indigo-600 hover:underline dark:text-indigo-400">Start a tutorial to earn your first →</Link></>
+            }
           </p>
         ) : (
           <div className="flex flex-wrap gap-2">

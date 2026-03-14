@@ -19,7 +19,7 @@ function unsubFooter(email: string): string {
   return `<p style="color:#9ca3af;font-size:11px;text-align:center;margin-top:16px">
     You're receiving this because you have an account on uByte.<br>
     <a href="${url}" style="color:#9ca3af">Unsubscribe from marketing emails</a> ·
-    <a href="${BASE_URL}/profile" style="color:#9ca3af">Manage preferences</a>
+    <a href="${BASE_URL}/settings" style="color:#9ca3af">Manage preferences</a>
   </p>`;
 }
 
@@ -72,7 +72,7 @@ export async function sendGoogleLinkedEmail(
         <p>Hi ${name},</p>
         <p>Google sign-in has been linked to your uByte account. You can now sign in with either your password or Google.</p>
         <p style="color:#dc2626;font-weight:600">If you didn't do this, your account may be compromised. Change your password immediately.</p>
-        <a href="${siteUrl}/profile" style="display:inline-block;margin:16px 0;padding:12px 24px;background:#dc2626;color:#fff;border-radius:8px;text-decoration:none;font-weight:600">Secure my account</a>
+        <a href="${siteUrl}/settings" style="display:inline-block;margin:16px 0;padding:12px 24px;background:#dc2626;color:#fff;border-radius:8px;text-decoration:none;font-weight:600">Secure my account</a>
         <p style="color:#6b7280;font-size:12px">You're receiving this because a Google account was linked to your uByte account.</p>
       </div>
     `,
@@ -431,7 +431,7 @@ export async function sendCertificationEmail(
           </div>
           <p style="color:#6b7280;font-size:14px;text-align:center">Share it with the world — you earned it!</p>
           <hr style="border:none;border-top:1px solid #e5e7eb;margin:24px 0">
-          <p style="color:#9ca3af;font-size:12px;text-align:center">You're receiving this because you just earned a certificate on uByte. <a href="${BASE_URL}/profile" style="color:#9ca3af">Manage preferences</a>.</p>
+          <p style="color:#9ca3af;font-size:12px;text-align:center">You're receiving this because you just earned a certificate on uByte. <a href="${BASE_URL}/settings" style="color:#9ca3af">Manage preferences</a>.</p>
         </div>
       </div>
     `,
@@ -559,7 +559,7 @@ export async function sendTrialEndingEmail(
           <hr style="border:none;border-top:1px solid #e5e7eb;margin:24px 0">
           <p style="color:#9ca3af;font-size:11px;text-align:center">
             You're receiving this because you're on a free trial at uByte.<br>
-            <a href="${BASE_URL}/profile" style="color:#9ca3af">Manage preferences</a>
+            <a href="${BASE_URL}/settings" style="color:#9ca3af">Manage preferences</a>
           </p>
         </div>
       </div>

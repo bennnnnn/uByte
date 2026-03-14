@@ -8,6 +8,7 @@ import { LANGUAGES, getAllLanguageSlugs } from "@/lib/languages/registry";
 import { getLangIcon } from "@/lib/languages/icons";
 import { APP_NAME, BASE_URL } from "@/lib/constants";
 import { getExamConfigForAllLangs, getLastActivity, getUserPlan } from "@/lib/db";
+import { hasPaidAccess } from "@/lib/plans";
 import { getPopularLanguages, getPopularPracticeProblems, getFallbackPopularLanguages, getFallbackPopularPracticeProblems } from "@/lib/db/home-popular";
 import { tutorialLangUrl, tutorialUrl } from "@/lib/urls";
 import { absoluteUrl, SITE_KEYWORDS, buildSiteSearchJsonLd } from "@/lib/seo";
@@ -109,7 +110,7 @@ export default async function Home() {
   // Number of languages with a published exam config (dynamic — add a new lang and it counts itself)
   const certificationCount = Object.values(examConfigByLang).filter(Boolean).length;
 
-  const isPro = userPlan === "pro" || userPlan === "yearly";
+  const isPro = hasPaidAccess(userPlan);
   const popularPracticeProblems =
     popularProblems.length > 0 ? popularProblems : getFallbackPopularPracticeProblems();
   const popularLangs =
