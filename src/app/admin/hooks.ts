@@ -103,13 +103,16 @@ export function useAdminData() {
 
     let cancelled = false;
 
+    // Fetch users (may 403 for limited admins — that's expected)
+    const usersPromise = fetch("/api/admin/users", { credentials: "same-origin" }).then(async (r) => {
+      if (r.status === 403) return null; // limited admin — not an error
+      const data = await r.json();
+      if (!r.ok) throw new Error(data.error ?? "HTTP " + r.status);
+      return data;
+    });
+
     Promise.all([
-      fetch("/api/admin/users", { credentials: "same-origin" }).then(async (r) => {
-        if (r.status === 403) { router.push("/"); return null; }
-        const data = await r.json();
-        if (!r.ok) throw new Error(data.error ?? "HTTP " + r.status);
-        return data;
-      }),
+      usersPromise,
       fetch("/api/admin/users?view=analytics", { credentials: "same-origin" }).then(async (r) => { const d = await r.json(); return r.ok ? d : { analytics: [] }; }),
       fetch("/api/admin/users?view=practice-stats", { credentials: "same-origin" }).then(async (r) => { const d = await r.json(); return r.ok ? d : { stats: [] }; }),
       fetch("/api/admin/stats?period=7days", { credentials: "same-origin" }).then(async (r) => r.ok ? r.json() : null),
@@ -179,8 +182,8 @@ export function useAdminData() {
       else if (action === "reset_progress") setUsers((p) => p.map((u) => u.id === userId ? { ...u, completed_count: 0, xp: 0, streak_days: 0 } : u));
       else if (action === "ban_user") setUsers((p) => p.map((u) => u.id === userId ? { ...u, banned: true } : u));
       else if (action === "unban_user") setUsers((p) => p.map((u) => u.id === userId ? { ...u, banned: false } : u));
-      else if (action === "set_admin") setUsers((p) => p.map((u) => u.id === userId ? { ...u, is_admin: 1 } : u));
-      else if (action === "remove_admin") setUsers((p) => p.map((u) => u.id === userId ? { ...u, is_admin: 0 } : u));
+      else if (action === "set_admin") setUsers((p) => p.map((u) => u.id === userId ? { ...u, is_admin: 1, admin_role: "limited" } : u));
+      else if (action === "remove_admin") setUsers((p) => p.map((u) => u.id === userId ? { ...u, is_admin: 0, admin_role: null } : u));
       else if (action === "set_plan" && extra?.plan) setUsers((p) => p.map((u) => u.id === userId ? { ...u, plan: extra.plan! } : u));
     } catch { alert("Action failed."); } finally { setPending(null); }
   }, []);
@@ -311,9 +314,15 @@ export function useAdminData() {
   const totalCompletions = analytics.reduce((s, t) => s + t.completed_count, 0);
   const mrr = revenue ? (revenue.monthlySubscribers * MONTHLY_PRICE_CENTS + revenue.yearlySubscribers * YEARLY_PRICE_CENTS) / 12 : 0;
 
+  // Derive the current admin's role from the users list (null = super / legacy)
+  const currentAdminRow = users.find((u) => u.id === user?.id);
+  const currentAdminRole: string | null = currentAdminRow?.admin_role ?? null;
+
   return {
     /* auth */
     user, loading, router,
+    /* current admin role */
+    currentAdminRole,
     /* tab nav */
     tab, setTab, query, setQuery,
     /* core data */

@@ -53,6 +53,19 @@ export async function requireAdmin(): Promise<
   return { admin: user, response: null };
 }
 
+/** Same as requireAdmin but rejects limited admins — use for user mgmt, revenue, audit. */
+export async function requireSuperAdmin(): Promise<
+  { admin: User; response: null } | { admin: null; response: NextResponse }
+> {
+  const { admin, response } = await requireAdmin();
+  if (!admin) return { admin: null, response: response! };
+  // NULL admin_role means the user was promoted before roles existed — treat as super
+  if (admin.admin_role !== null && admin.admin_role !== "super") {
+    return { admin: null, response: NextResponse.json({ error: "Forbidden — requires super admin" }, { status: 403 }) };
+  }
+  return { admin, response: null };
+}
+
 // ─── Protected-route middleware ─────────────────────
 
 export interface ProtectedRouteOptions {

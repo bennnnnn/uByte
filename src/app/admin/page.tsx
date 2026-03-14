@@ -8,34 +8,37 @@
 
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
 import { useAdminData } from "./hooks";
 import { Spinner, TabIcon } from "./components";
-import { TAB_LABELS } from "./types";
+import { TAB_LABELS, LIMITED_ADMIN_TABS } from "./types";
 import type { Tab } from "./types";
-import { UsersTab, AnalyticsTab, RevenueTab, GrowthTab, ExamsTab, BannerTab, AuditTab, BlogTab, MessagesTab, InterviewsTab } from "./tabs";
+import { UsersTab, AnalyticsTab, RevenueTab, GrowthTab, ExamsTab, BannerTab, AuditTab, BlogTab, MessagesTab, InterviewsTab, AdminsTab, SiteSettingsTab } from "./tabs";
 
 /* ── Tab header subtitles (concise one-liners per tab) ───────────────────── */
 const TAB_SUBTITLES: Record<Tab, string> = {
-  users:      "Registered users",
-  analytics:  "Tutorial completions & practice stats",
-  revenue:    "Income, subscribers & billing events",
-  growth:     "Conversion funnel, signup trend & churn signals",
-  audit:      "Admin action history",
-  exams:      "Questions, attempts, pass threshold, settings & upload",
-  banner:     "Site-wide announcement banner",
-  blog:       "Create and edit blog posts without touching the repo",
-  messages:   "Contact form submissions from users",
-  interviews: "Moderate user-submitted interview experiences",
+  users:           "Registered users",
+  analytics:       "Tutorial completions & practice stats",
+  revenue:         "Income, subscribers & billing events",
+  growth:          "Conversion funnel, signup trend & churn signals",
+  audit:           "Admin action history",
+  exams:           "Questions, attempts, pass threshold, settings & upload",
+  banner:          "Site-wide announcement banner",
+  blog:            "Create and edit blog posts without touching the repo",
+  messages:        "Contact form submissions from users",
+  interviews:      "Moderate user-submitted interview experiences",
+  admins:          "Manage admin access and roles",
+  "site-settings": "Global site configuration",
 };
 
-/* ── Sidebar section definitions ─────────────────────────────────────────── */
-const SIDEBAR_SECTIONS: { label: string; tabs: Tab[] }[] = [
+/* ── Full sidebar section definitions (super admin sees all) ─────────────── */
+const ALL_SIDEBAR_SECTIONS: { label: string; tabs: Tab[] }[] = [
   { label: "Overview", tabs: ["users", "analytics", "revenue", "growth"] },
   { label: "Manage",   tabs: ["exams", "banner", "blog", "interviews"] },
   { label: "Inbox",    tabs: ["messages"] },
   { label: "History",  tabs: ["audit"] },
+  { label: "Admin",    tabs: ["admins", "site-settings"] },
 ];
 
 /* ── Active tab button classes (shared between sidebar groups) ────────────── */
@@ -44,8 +47,17 @@ const defaultCls = "text-zinc-600 hover:bg-zinc-50 hover:text-zinc-900 dark:text
 
 export default function AdminPage() {
   const data = useAdminData();
-  const { user, loading, fetching, error, router, tab, setTab, query, setQuery, users, revenue, revenuePeriod, setRevenuePeriod, exportRevenueCSV, printRevenuePDF, exportUsersCSV, printRef } = data;
+  const { user, loading, fetching, error, router, tab, setTab, query, setQuery, users, revenue, revenuePeriod, setRevenuePeriod, exportRevenueCSV, printRevenuePDF, exportUsersCSV, printRef, currentAdminRole } = data;
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const isSuperAdmin = !currentAdminRole || currentAdminRole === "super";
+
+  // Filter sidebar sections based on role
+  const sidebarSections = useMemo(() => {
+    if (isSuperAdmin) return ALL_SIDEBAR_SECTIONS;
+    return ALL_SIDEBAR_SECTIONS
+      .map((s) => ({ ...s, tabs: s.tabs.filter((t) => LIMITED_ADMIN_TABS.includes(t)) }))
+      .filter((s) => s.tabs.length > 0);
+  }, [isSuperAdmin]);
 
   useEffect(() => {
     setSidebarOpen(false);
@@ -98,7 +110,17 @@ export default function AdminPage() {
       </div>
 
       <nav className="flex-1 space-y-0.5 overflow-y-auto px-3 py-4">
-        {SIDEBAR_SECTIONS.map((section, idx) => (
+        {/* Role badge */}
+        {currentAdminRole && (
+          <div className={`mx-3 mb-4 rounded-lg px-2.5 py-1.5 text-[11px] font-semibold ${
+            isSuperAdmin
+              ? "bg-violet-50 text-violet-700 dark:bg-violet-900/20 dark:text-violet-400"
+              : "bg-indigo-50 text-indigo-700 dark:bg-indigo-900/20 dark:text-indigo-400"
+          }`}>
+            {isSuperAdmin ? "⭐ Super admin" : "🔒 Limited admin"}
+          </div>
+        )}
+        {sidebarSections.map((section, idx) => (
           <div key={section.label}>
             <p className={`${idx > 0 ? "mt-5 " : ""}mb-2 px-3 text-[10px] font-semibold uppercase tracking-widest text-zinc-400 dark:text-zinc-600`}>
               {section.label}
@@ -213,16 +235,18 @@ export default function AdminPage() {
 
         {/* Active tab content */}
         <div className="flex-1 overflow-y-auto p-3 sm:p-6">
-          {tab === "users"      && <UsersTab      data={data} />}
-          {tab === "analytics"  && <AnalyticsTab  data={data} />}
-          {tab === "revenue"    && <RevenueTab    data={data} />}
-          {tab === "growth"     && <GrowthTab     data={data} />}
-          {tab === "exams"      && <ExamsTab      data={data} />}
-          {tab === "banner"     && <BannerTab     data={data} />}
-          {tab === "audit"      && <AuditTab      data={data} />}
-          {tab === "blog"       && <BlogTab />}
-          {tab === "messages"   && <MessagesTab />}
-          {tab === "interviews" && <InterviewsTab />}
+          {tab === "users"          && <UsersTab        data={data} />}
+          {tab === "analytics"      && <AnalyticsTab    data={data} />}
+          {tab === "revenue"        && <RevenueTab      data={data} />}
+          {tab === "growth"         && <GrowthTab       data={data} />}
+          {tab === "exams"          && <ExamsTab        data={data} />}
+          {tab === "banner"         && <BannerTab       data={data} />}
+          {tab === "audit"          && <AuditTab        data={data} />}
+          {tab === "blog"           && <BlogTab />}
+          {tab === "messages"       && <MessagesTab />}
+          {tab === "interviews"     && <InterviewsTab />}
+          {tab === "admins"         && <AdminsTab       data={data} />}
+          {tab === "site-settings"  && <SiteSettingsTab />}
         </div>
       </main>
 

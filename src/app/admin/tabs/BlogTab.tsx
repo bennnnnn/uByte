@@ -8,7 +8,7 @@
  * pre-existing MDX content without touching the repo).
  */
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useMemo } from "react";
 import { apiFetch } from "@/lib/api-client";
 import { SectionCard } from "../components";
 
@@ -40,6 +40,115 @@ const EMPTY: Omit<BlogPost, "id" | "created_at" | "updated_at"> = {
 };
 
 const CATEGORIES = ["General", "Interview Prep", "Learning Guide", "Language Deep Dive", "Comparison", "News"];
+
+/**
+ * Lightweight Markdown → HTML renderer (no external deps).
+ * Handles: headings (h1–h3), bold, italic, inline code, fenced code blocks,
+ * blockquotes, unordered/ordered lists, links, images, horizontal rules,
+ * and paragraphs.
+ */
+function renderMarkdown(md: string): string {
+  const lines = md.split("\n");
+  const html: string[] = [];
+  let inCodeBlock = false;
+  let codeLang = "";
+  let codeLines: string[] = [];
+  let inUl = false;
+  let inOl = false;
+
+  function closeList() {
+    if (inUl) { html.push("</ul>"); inUl = false; }
+    if (inOl) { html.push("</ol>"); inOl = false; }
+  }
+
+  function esc(s: string) {
+    return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+
+  function inline(s: string): string {
+    return s
+      .replace(/!\[([^\]]*)\]\(([^)]+)\)/g, (_, alt, src) => `<img src="${src}" alt="${esc(alt)}" class="max-w-full rounded" />`)
+      .replace(/\[([^\]]+)\]\(([^)]+)\)/g, (_, text, href) => `<a href="${href}" target="_blank" rel="noopener noreferrer" class="text-indigo-600 underline dark:text-indigo-400">${text}</a>`)
+      .replace(/`([^`]+)`/g, (_, c) => `<code class="rounded bg-zinc-100 px-1 py-0.5 font-mono text-xs dark:bg-zinc-800">${esc(c)}</code>`)
+      .replace(/\*\*\*(.+?)\*\*\*/g, "<strong><em>$1</em></strong>")
+      .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
+      .replace(/__(.+?)__/g, "<strong>$1</strong>")
+      .replace(/\*(.+?)\*/g, "<em>$1</em>")
+      .replace(/_(.+?)_/g, "<em>$1</em>");
+  }
+
+  for (const raw of lines) {
+    const line = raw;
+
+    // Fenced code block
+    if (line.startsWith("```")) {
+      if (!inCodeBlock) {
+        closeList();
+        inCodeBlock = true;
+        codeLang = line.slice(3).trim();
+        codeLines = [];
+      } else {
+        const langLabel = codeLang ? `<span class="text-zinc-400 text-[10px] font-mono">${esc(codeLang)}</span>` : "";
+        html.push(
+          `<div class="relative my-3 rounded-lg bg-zinc-900 dark:bg-zinc-950">` +
+          `<div class="flex items-center justify-between px-3 pt-2 pb-1">${langLabel}</div>` +
+          `<pre class="overflow-x-auto px-3 pb-3 text-xs text-zinc-100"><code>${esc(codeLines.join("\n"))}</code></pre></div>`
+        );
+        inCodeBlock = false;
+        codeLang = "";
+        codeLines = [];
+      }
+      continue;
+    }
+    if (inCodeBlock) { codeLines.push(line); continue; }
+
+    // Horizontal rule
+    if (/^---+$/.test(line.trim())) { closeList(); html.push('<hr class="my-4 border-zinc-200 dark:border-zinc-700" />'); continue; }
+
+    // Headings
+    const h1 = line.match(/^# (.+)/);
+    const h2 = line.match(/^## (.+)/);
+    const h3 = line.match(/^### (.+)/);
+    if (h1) { closeList(); html.push(`<h1 class="mt-6 mb-2 text-xl font-bold text-zinc-900 dark:text-zinc-100">${inline(h1[1])}</h1>`); continue; }
+    if (h2) { closeList(); html.push(`<h2 class="mt-5 mb-1.5 text-lg font-semibold text-zinc-900 dark:text-zinc-100">${inline(h2[1])}</h2>`); continue; }
+    if (h3) { closeList(); html.push(`<h3 class="mt-4 mb-1 text-base font-semibold text-zinc-800 dark:text-zinc-200">${inline(h3[1])}</h3>`); continue; }
+
+    // Blockquote
+    if (line.startsWith("> ")) {
+      closeList();
+      html.push(`<blockquote class="my-2 border-l-4 border-indigo-300 pl-3 text-sm italic text-zinc-500 dark:border-indigo-700 dark:text-zinc-400">${inline(line.slice(2))}</blockquote>`);
+      continue;
+    }
+
+    // Unordered list
+    const ulMatch = line.match(/^[\*\-] (.+)/);
+    if (ulMatch) {
+      if (inOl) { html.push("</ol>"); inOl = false; }
+      if (!inUl) { html.push('<ul class="my-2 list-disc space-y-0.5 pl-5 text-sm">'); inUl = true; }
+      html.push(`<li>${inline(ulMatch[1])}</li>`);
+      continue;
+    }
+
+    // Ordered list
+    const olMatch = line.match(/^\d+\. (.+)/);
+    if (olMatch) {
+      if (inUl) { html.push("</ul>"); inUl = false; }
+      if (!inOl) { html.push('<ol class="my-2 list-decimal space-y-0.5 pl-5 text-sm">'); inOl = true; }
+      html.push(`<li>${inline(olMatch[1])}</li>`);
+      continue;
+    }
+
+    // Blank line — close lists, add paragraph break
+    if (line.trim() === "") { closeList(); html.push('<div class="h-2" />'); continue; }
+
+    // Regular paragraph line
+    closeList();
+    html.push(`<p class="text-sm leading-relaxed text-zinc-700 dark:text-zinc-300">${inline(line)}</p>`);
+  }
+
+  closeList();
+  return html.join("\n");
+}
 
 export default function BlogTab() {
   const [posts, setPosts]       = useState<BlogPost[]>([]);
@@ -147,6 +256,7 @@ export default function BlogTab() {
   }
 
   const showEditor = isNew || editing !== null;
+  const previewHtml = useMemo(() => renderMarkdown(form.content), [form.content]);
 
   return (
     <div className="space-y-6">
@@ -293,17 +403,8 @@ export default function BlogTab() {
               </div>
               {preview ? (
                 <div
-                  className="prose prose-zinc dark:prose-invert max-w-none min-h-[320px] rounded-lg border border-zinc-200 bg-white p-4 text-sm dark:border-zinc-700 dark:bg-zinc-900"
-                  dangerouslySetInnerHTML={{
-                    __html: form.content
-                      .replace(/^## (.+)$/gm, "<h2>$1</h2>")
-                      .replace(/^### (.+)$/gm, "<h3>$1</h3>")
-                      .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
-                      .replace(/`([^`]+)`/g, "<code>$1</code>")
-                      .replace(/\n\n/g, "</p><p>")
-                      .replace(/^/, "<p>")
-                      .replace(/$/, "</p>"),
-                  }}
+                  className="min-h-[320px] rounded-lg border border-zinc-200 bg-white p-5 dark:border-zinc-700 dark:bg-zinc-900"
+                  dangerouslySetInnerHTML={{ __html: previewHtml }}
                 />
               ) : (
                 <textarea

@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAdminRevenueStats, getAdminRecentSubscriptionEvents, getAdminRevenueByPeriod } from "@/lib/db";
 import type { RevenuePeriod } from "@/lib/db";
-import { withErrorHandling, requireAdmin } from "@/lib/api-utils";
+import { withErrorHandling, requireSuperAdmin } from "@/lib/api-utils";
 
 const PERIODS: RevenuePeriod[] = ["7days", "month", "year"];
 
 export const GET = withErrorHandling("GET /api/admin/stats", async (request: NextRequest) => {
-  const { admin, response } = await requireAdmin();
+  const { admin, response } = await requireSuperAdmin();
   if (!admin) return response;
 
   const { searchParams } = new URL(request.url);

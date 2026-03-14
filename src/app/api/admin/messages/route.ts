@@ -10,6 +10,7 @@ import {
   deleteContactMessage,
 } from "@/lib/db/contact-messages";
 import { requireAdmin, withErrorHandling } from "@/lib/api-utils";
+import { verifyCsrf } from "@/lib/csrf";
 
 export const GET = withErrorHandling("GET /api/admin/messages", async () => {
   const { admin, response } = await requireAdmin();
@@ -20,6 +21,9 @@ export const GET = withErrorHandling("GET /api/admin/messages", async () => {
 });
 
 export const PATCH = withErrorHandling("PATCH /api/admin/messages", async (req: NextRequest) => {
+  const csrfError = verifyCsrf(req);
+  if (csrfError) return NextResponse.json({ error: "Invalid CSRF token" }, { status: 403 });
+
   const { admin, response } = await requireAdmin();
   if (!admin) return response;
 

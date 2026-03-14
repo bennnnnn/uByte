@@ -2,16 +2,57 @@ import { getSql } from "./client";
 import type { AdminUserRow, AdminTutorialRow, AdminRevenueStats } from "./types";
 import { resetAllProgress } from "./progress";
 
+export type AdminRole = "super" | "limited";
+
+// Ensure admin_role column exists (idempotent migration)
+let _adminRoleReady = false;
+async function ensureAdminRoleColumn(): Promise<void> {
+  if (_adminRoleReady) return;
+  const sql = getSql();
+  await sql`
+    ALTER TABLE users
+    ADD COLUMN IF NOT EXISTS admin_role TEXT DEFAULT NULL
+      CHECK (admin_role IS NULL OR admin_role IN ('super', 'limited'))
+  `;
+  // Backfill existing super admins with 'super' role
+  await sql`
+    UPDATE users SET admin_role = 'super'
+    WHERE is_admin = 1 AND admin_role IS NULL
+  `;
+  _adminRoleReady = true;
+}
+
 export async function getAdminUsers(): Promise<AdminUserRow[]> {
+  await ensureAdminRoleColumn();
   const sql = getSql();
   const rows = await sql`
     SELECT
       u.id, u.name, u.email, u.xp, u.streak_days, u.created_at, u.last_active_at,
-      u.is_admin, u.locked_until, COALESCE(u.plan, 'free') AS plan,
+      u.is_admin, u.admin_role, u.locked_until, COALESCE(u.plan, 'free') AS plan,
       (SELECT COUNT(*)::int FROM progress WHERE user_id = u.id) AS completed_count,
       (SELECT COUNT(*)::int FROM bookmarks WHERE user_id = u.id) AS bookmark_count
     FROM users u
     ORDER BY u.created_at DESC
+  `;
+  const now = new Date();
+  return rows.map((r) => ({
+    ...r,
+    banned: !!r.locked_until && new Date(r.locked_until as string) > now,
+  })) as AdminUserRow[];
+}
+
+export async function getAdminList(): Promise<AdminUserRow[]> {
+  await ensureAdminRoleColumn();
+  const sql = getSql();
+  const rows = await sql`
+    SELECT
+      u.id, u.name, u.email, u.xp, u.streak_days, u.created_at, u.last_active_at,
+      u.is_admin, u.admin_role, u.locked_until, COALESCE(u.plan, 'free') AS plan,
+      (SELECT COUNT(*)::int FROM progress WHERE user_id = u.id) AS completed_count,
+      (SELECT COUNT(*)::int FROM bookmarks WHERE user_id = u.id) AS bookmark_count
+    FROM users u
+    WHERE u.is_admin = 1
+    ORDER BY u.admin_role ASC, u.created_at ASC
   `;
   const now = new Date();
   return rows.map((r) => ({
@@ -59,9 +100,20 @@ export async function adminResetUserProgress(userId: number): Promise<void> {
   return resetAllProgress(userId);
 }
 
-export async function setAdminStatus(userId: number, isAdmin: boolean): Promise<void> {
+export async function setAdminStatus(userId: number, isAdmin: boolean, role: AdminRole = "limited"): Promise<void> {
+  await ensureAdminRoleColumn();
   const sql = getSql();
-  await sql`UPDATE users SET is_admin = ${isAdmin ? 1 : 0} WHERE id = ${userId}`;
+  if (isAdmin) {
+    await sql`UPDATE users SET is_admin = 1, admin_role = ${role} WHERE id = ${userId}`;
+  } else {
+    await sql`UPDATE users SET is_admin = 0, admin_role = NULL WHERE id = ${userId}`;
+  }
+}
+
+export async function setAdminRole(userId: number, role: AdminRole): Promise<void> {
+  await ensureAdminRoleColumn();
+  const sql = getSql();
+  await sql`UPDATE users SET admin_role = ${role} WHERE id = ${userId} AND is_admin = 1`;
 }
 
 // ─── Step Checks (pass/fail heatmap) ──────────────────

@@ -9,6 +9,7 @@ export interface AdminUser {
   created_at: string;
   last_active_at: string | null;
   is_admin: number;
+  admin_role: string | null;
   banned: boolean;
   completed_count: number;
   bookmark_count: number;
@@ -70,20 +71,27 @@ export interface ExamStats {
   passRatePercent: number;
 }
 
-export type Tab = "users" | "analytics" | "revenue" | "growth" | "audit" | "exams" | "banner" | "blog" | "messages" | "interviews";
+export type Tab = "users" | "analytics" | "revenue" | "growth" | "audit" | "exams" | "banner" | "blog" | "messages" | "interviews" | "admins" | "site-settings";
 export type RevenuePeriod = "7days" | "month" | "year";
 
 export const TAB_LABELS: Record<Tab, string> = {
-  users:      "Users",
-  analytics:  "Analytics",
-  revenue:    "Revenue",
-  growth:     "Growth",
-  audit:      "Audit log",
-  exams:      "Certifications",
-  banner:     "Site banner",
-  blog:       "Blog editor",
-  messages:   "Messages",
-  interviews: "Interviews",
+  users:           "Users",
+  analytics:       "Analytics",
+  revenue:         "Revenue",
+  growth:          "Growth",
+  audit:           "Audit log",
+  exams:           "Certifications",
+  banner:          "Site banner",
+  blog:            "Blog editor",
+  messages:        "Messages",
+  interviews:      "Interviews",
+  admins:          "Admins",
+  "site-settings": "Site settings",
 };
+
+/** Tabs accessible to limited admins. Super admins see everything. */
+export const LIMITED_ADMIN_TABS: Tab[] = [
+  "analytics", "banner", "blog", "interviews", "messages", "exams",
+];
 
 export type { AdminRevenueStats };

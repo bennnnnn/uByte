@@ -62,7 +62,11 @@ export default function UsersTab({ data }: Props) {
                       <div className="flex flex-wrap items-center gap-1.5">
                         <span className="font-medium text-zinc-900 dark:text-zinc-100">{u.name}</span>
                         <PlanBadge plan={u.plan} />
-                        {u.is_admin === 1 && <Badge color="violet">admin</Badge>}
+                        {u.is_admin === 1 && (
+                          <Badge color={u.admin_role === "limited" ? "indigo" : "violet"}>
+                            {u.admin_role === "limited" ? "limited admin" : "super admin"}
+                          </Badge>
+                        )}
                         {u.banned && <Badge color="red">banned</Badge>}
                         {isMe && <Badge color="zinc">you</Badge>}
                       </div>
@@ -134,9 +138,10 @@ function PlanBadge({ plan }: { plan: string }) {
 }
 
 /** Generic tiny badge. */
-function Badge({ color, children }: { color: "violet" | "red" | "zinc"; children: React.ReactNode }) {
+function Badge({ color, children }: { color: "violet" | "indigo" | "red" | "zinc"; children: React.ReactNode }) {
   const map = {
     violet: "bg-violet-100 text-violet-700 dark:bg-violet-900/40 dark:text-violet-400",
+    indigo: "bg-indigo-100 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-400",
     red: "bg-red-100 text-red-600 dark:bg-red-900/40 dark:text-red-400",
     zinc: "bg-zinc-200 text-zinc-500 dark:bg-zinc-700 dark:text-zinc-400",
   };
@@ -174,7 +179,7 @@ function ActionsMenu({
       {/* Admin toggle */}
       {!isMe && (isAdmin
         ? <button type="button" onClick={() => doAction(userId, "remove_admin", "Remove admin from " + name + "?")} className={`${btnCls} text-zinc-600 dark:text-zinc-400`}>Remove admin</button>
-        : <button type="button" onClick={() => doAction(userId, "set_admin", "Make " + name + " admin?")} className={`${btnCls} text-indigo-600 dark:text-indigo-400`}>Make admin</button>
+        : <button type="button" onClick={() => doAction(userId, "set_admin", "Make " + name + " a limited admin?")} className={`${btnCls} text-indigo-600 dark:text-indigo-400`}>Make limited admin</button>
       )}
 
       {divider}

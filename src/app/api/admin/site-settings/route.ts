@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { withErrorHandling, requireAdmin } from "@/lib/api-utils";
+import { withErrorHandling, requireAdmin, requireSuperAdmin } from "@/lib/api-utils";
 import { getAllSiteSettings, setSiteSettings } from "@/lib/db/site-settings";
 import { verifyCsrf } from "@/lib/csrf";
 
@@ -16,7 +16,7 @@ export const PUT = withErrorHandling("PUT /api/admin/site-settings", async (req:
   const csrfError = verifyCsrf(req);
   if (csrfError) return NextResponse.json({ error: "Invalid CSRF token" }, { status: 403 });
 
-  const { admin, response } = await requireAdmin();
+  const { admin, response } = await requireSuperAdmin();
   if (!admin) return response;
 
   let body: Record<string, string>;
