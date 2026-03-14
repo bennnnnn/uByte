@@ -9,7 +9,11 @@ export const metadata: Metadata = {
 
 export default function SignupPage() {
   return (
-    <Suspense fallback={<div className="min-h-[100svh]" />}>
+    <Suspense fallback={
+      <div className="flex min-h-[100svh] items-center justify-center">
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-zinc-200 border-t-indigo-600" />
+      </div>
+    }>
       <AuthPage variant="signup" />
     </Suspense>
   );

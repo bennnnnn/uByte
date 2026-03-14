@@ -7,8 +7,12 @@ import { sendContactEmail } from "@/lib/email";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 import { withErrorHandling } from "@/lib/api-utils";
 import { saveContactMessage } from "@/lib/db/contact-messages";
+import { verifyCsrf } from "@/lib/csrf";
 
 export const POST = withErrorHandling("POST /api/contact", async (req: NextRequest) => {
+  const csrfError = verifyCsrf(req);
+  if (csrfError) return NextResponse.json({ error: csrfError }, { status: 403 });
+
   const ip = getClientIp(req.headers);
   const { limited } = await checkRateLimit(`contact:${ip}`, 3, 60 * 60 * 1000);
   if (limited) {

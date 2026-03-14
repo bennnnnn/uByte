@@ -87,6 +87,7 @@ export default async function PracticeExamLangPage({ params }: Props) {
 
   const examStats = user && canTakeExam ? await getUserExamStats(user.userId) : [];
   const userLangStats = examStats.find((s) => s.lang === lang);
+  const statsByLang = Object.fromEntries(examStats.map((s) => [s.lang, s]));
   const publicStatsByLang = Object.fromEntries(publicStats.map((s) => [s.lang, s]));
   const langPublicStats = publicStatsByLang[lang];
 
@@ -388,6 +389,8 @@ export default async function PracticeExamLangPage({ params }: Props) {
           langSlugs={langSlugs}
           examConfigByLang={examConfigByLang}
           publicStatsByLang={publicStatsByLang}
+          statsByLang={statsByLang}
+          isLoggedIn={!!user}
         />
       </div>
     </div>

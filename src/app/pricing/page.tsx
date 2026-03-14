@@ -68,7 +68,7 @@ const TESTIMONIALS = [
 const FAQ_ITEMS = [
   {
     q: "What's included in Pro?",
-    a: "Unlimited tutorials in all 7 languages, unlimited interview prep problems, AI code feedback on every step, and timed certification exams with verifiable certificates you can add to LinkedIn.",
+    a: "Unlimited tutorials in all 7 languages, unlimited interview prep problems, AI code feedback on every step, and timed certification exams with shareable certificates.",
   },
   {
     q: "Can I cancel anytime?",
@@ -524,7 +524,7 @@ function PricingContent() {
           </p>
           <div className="grid gap-4 sm:grid-cols-3">
             {[
-              { icon: "📖", title: "Learn", body: "Interactive tutorials in Go, Python, JavaScript, Java, Rust, and C++. Bite-sized lessons with built-in code editor." },
+              { icon: "📖", title: "Learn", body: "Interactive tutorials in Go, Python, JavaScript, Java, Rust, C++, and C#. Bite-sized lessons with built-in code editor." },
               { icon: "💪", title: "Interview Prep", body: "Hundreds of coding challenges across all languages. AI feedback helps you understand mistakes and improve." },
               { icon: "🏆", title: "Get certified", body: "Timed exams with real scoring. Pass and earn a verifiable digital certificate for your LinkedIn and resume." },
             ].map(({ icon, title, body }) => (
@@ -672,7 +672,11 @@ function PricingContent() {
 
 export default function PricingPage() {
   return (
-    <Suspense fallback={<div className="min-h-0 flex-1" />}>
+    <Suspense fallback={
+      <div className="flex min-h-0 flex-1 items-center justify-center">
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-zinc-200 border-t-indigo-600" />
+      </div>
+    }>
       <PricingContent />
     </Suspense>
   );

@@ -12,7 +12,7 @@ const FAQ_ITEMS = [
   {
     question: "Which programming languages are available?",
     answer:
-      "uByte currently supports Go, Python, C++, JavaScript, Java, and Rust. More languages are on the roadmap.",
+      "uByte currently supports Go, Python, C++, JavaScript, Java, Rust, and C#. More languages are on the roadmap.",
   },
   {
     question: "Are there free lessons?",
@@ -23,7 +23,7 @@ const FAQ_ITEMS = [
   {
     question: "How do certifications work?",
     answer:
-      "Each language has a timed certification exam. Pass it to earn a shareable certificate you can add to your LinkedIn profile or résumé. Pro subscribers unlock all certification exams.",
+      "Each language has a timed certification exam. Pass it to earn a shareable certificate you can add to your résumé or portfolio. Pro subscribers unlock all certification exams.",
   },
   {
     question: "What is Interview Prep?",
@@ -44,7 +44,7 @@ const FAQ_ITEMS = [
   {
     question: "Can I switch between monthly and yearly billing?",
     answer:
-      "Yes. Go to your profile → Plan tab and choose the billing cycle that works for you. Upgrading to yearly saves you two months compared to monthly billing.",
+      "Yes. Go to your Dashboard → Plan and choose the billing cycle that works for you. Upgrading to yearly saves you two months compared to monthly billing.",
   },
   {
     question: "Is there a refund policy?",
@@ -65,7 +65,7 @@ const FAQ_ITEMS = [
   {
     question: "How do I delete my account?",
     answer:
-      "You can delete your account instantly from your Profile → Settings → Danger Zone. All your data is permanently removed immediately. If you need help, email support@ubyte.dev.",
+      "You can delete your account instantly from your Dashboard → Settings → Danger Zone. All your data is permanently removed immediately. If you need help, email support@ubyte.dev.",
   },
 ];
 

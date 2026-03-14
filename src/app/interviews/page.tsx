@@ -1,6 +1,8 @@
 import Link from "next/link";
+import { cookies } from "next/headers";
 import { getApprovedExperiences, countApprovedExperiences } from "@/lib/db/interview-experiences";
 import type { Difficulty, Outcome } from "@/lib/db/interview-experiences";
+import { getCurrentUser } from "@/lib/auth";
 import VoteButton from "./VoteButton";
 
 const COMPANIES = [
@@ -46,8 +48,13 @@ export default async function InterviewsPage({ searchParams }: Props) {
   const outcome    = (params.outcome?.trim()    || undefined) as Outcome    | undefined;
   const page       = Math.max(1, parseInt(params.page ?? "1", 10));
 
+  // Resolve current user and visitor cookie so my_vote can be returned
+  const [user, cookieStore] = await Promise.all([getCurrentUser(), cookies()]);
+  const userId    = user?.userId ?? null;
+  const visitorId = cookieStore.get("vid")?.value ?? null;
+
   const [experiences, total] = await Promise.all([
-    getApprovedExperiences({ company, difficulty, outcome, limit: PAGE_SIZE, offset: (page - 1) * PAGE_SIZE }),
+    getApprovedExperiences({ company, difficulty, outcome, limit: PAGE_SIZE, offset: (page - 1) * PAGE_SIZE, userId, visitorId }),
     countApprovedExperiences({ company, difficulty, outcome }),
   ]);
 
@@ -159,7 +166,7 @@ export default async function InterviewsPage({ searchParams }: Props) {
                   <p className="mt-0.5 text-xs text-zinc-400">
                     {exp.anonymous ? "Anonymous" : (exp.author_name ?? "Anonymous")}
                     {" · "}
-                    {new Date(exp.created_at).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" })}
+                    {new Date(exp.created_at).toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" })}
                   </p>
                 </div>
                 <div className="flex flex-wrap gap-1.5">
@@ -187,7 +194,11 @@ export default async function InterviewsPage({ searchParams }: Props) {
               )}
 
               {/* Helpful vote button */}
-              <VoteButton experienceId={exp.id} initialScore={exp.vote_score} />
+              <VoteButton
+                experienceId={exp.id}
+                initialScore={exp.vote_score}
+                initialVote={(exp.my_vote ?? 0) as 1 | -1 | 0}
+              />
             </article>
           ))}
         </div>

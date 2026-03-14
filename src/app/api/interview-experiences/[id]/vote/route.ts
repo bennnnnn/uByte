@@ -25,8 +25,8 @@ export const POST = withErrorHandling(
 
     const body = await req.json() as { vote?: number };
     const vote = body.vote;
-    if (vote !== 1 && vote !== -1) {
-      return NextResponse.json({ error: "vote must be 1 or -1" }, { status: 400 });
+    if (vote !== 1 && vote !== -1 && vote !== 0) {
+      return NextResponse.json({ error: "vote must be 1, -1, or 0" }, { status: 400 });
     }
 
     const user = await getCurrentUser();
@@ -41,7 +41,7 @@ export const POST = withErrorHandling(
       res.cookies.set("vid", visitorId, { maxAge: 60 * 60 * 24 * 365, path: "/", sameSite: "lax" });
     }
 
-    await voteOnExperience(id, vote as 1 | -1, user?.userId ?? null, user ? null : visitorId);
+    await voteOnExperience(id, vote as 1 | -1 | 0, user?.userId ?? null, user ? null : visitorId);
     return res;
   },
 );

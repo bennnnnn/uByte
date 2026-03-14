@@ -27,7 +27,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Interview Prep — Ace Your Coding Interview | uByte",
     description:
-      "LeetCode-style coding problems across 7 languages. Write real code in the browser and get instant feedback.",
+      "Coding problems across multiple languages. Write real code in the browser and get instant feedback.",
     type: "website",
     url: absoluteUrl("/practice"),
   },
@@ -89,7 +89,7 @@ export default async function PracticePage() {
             </span>
             <span className="text-xs text-zinc-400">·</span>
             <span className="text-xs font-medium text-zinc-500 dark:text-zinc-400">
-              7 languages
+              {langSlugs.length} languages
             </span>
           </div>
 

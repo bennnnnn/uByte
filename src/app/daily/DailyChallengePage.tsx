@@ -44,6 +44,8 @@ export default function DailyChallengePage() {
   const [daily, setDaily] = useState<DailyData | null>(null);
   const [leaders, setLeaders] = useState<LeaderboardEntry[]>([]);
   const [loading, setLoading] = useState(true);
+  const [fetchError, setFetchError] = useState(false);
+  const [retryKey, setRetryKey] = useState(0);
   const [selectedLang, setSelectedLang] = useState("go");
 
   const languageSlugs = getAllLanguageSlugs();
@@ -54,14 +56,18 @@ export default function DailyChallengePage() {
   }, []);
 
   useEffect(() => {
+    setLoading(true);
+    setFetchError(false);
     Promise.all([
       apiFetch("/api/daily-challenge").then((r) => r.json()),
       apiFetch("/api/leaderboard?period=week").then((r) => r.json()),
-    ])    .then(([d, l]) => {
+    ]).then(([d, l]) => {
       setDaily(d?.slug ? d : null);
       setLeaders(Array.isArray(l?.users) ? l.users.slice(0, 10) : []);
-    }).catch(() => {}).finally(() => setLoading(false));
-  }, []);
+    }).catch(() => {
+      setFetchError(true);
+    }).finally(() => setLoading(false));
+  }, [retryKey]);
 
   function handleLangChange(lang: string) {
     setSelectedLang(lang);
@@ -80,10 +86,22 @@ export default function DailyChallengePage() {
     );
   }
 
-  if (!daily) {
+  if (fetchError || !daily) {
     return (
-      <div className="flex min-h-[60vh] items-center justify-center text-zinc-500">
-        Could not load today&apos;s challenge. Try again later.
+      <div className="flex min-h-[60vh] items-center justify-center px-4">
+        <div className="text-center">
+          <p className="mb-1 text-base font-semibold text-zinc-700 dark:text-zinc-300">
+            Could not load today&apos;s challenge
+          </p>
+          <p className="mb-5 text-sm text-zinc-400">Check your connection and try again.</p>
+          <button
+            type="button"
+            onClick={() => setRetryKey((k) => k + 1)}
+            className="inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-indigo-500"
+          >
+            Try again
+          </button>
+        </div>
       </div>
     );
   }

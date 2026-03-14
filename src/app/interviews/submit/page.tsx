@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { apiFetch } from "@/lib/api-client";
 
 type Difficulty = "easy" | "medium" | "hard";
@@ -64,8 +63,6 @@ const selectCls =
 
 /* ── Page ───────────────────────────────────────────────────────────────── */
 export default function SubmitInterviewPage() {
-  const router = useRouter();
-
   /* Company */
   const [companyChoice, setCompanyChoice] = useState<string>("Google");
   const [companyCustom,  setCompanyCustom]  = useState("");
@@ -113,6 +110,10 @@ export default function SubmitInterviewPage() {
     if (!company) { setError("Please enter the company name."); return; }
     if (!role.trim()) { setError("Role is required."); return; }
 
+    // Require at least one non-empty question across all rounds
+    const hasQuestion = rounds.some((r) => r.questions.some((q) => q.trim().length > 0));
+    if (!hasQuestion) { setError("Please add at least one question for your first round."); return; }
+
     const roundsText = serializeRounds(rounds);
     if (!roundsText.trim()) { setError("Please describe at least one interview round."); return; }
 
@@ -124,7 +125,6 @@ export default function SubmitInterviewPage() {
         body: JSON.stringify({ company, role: role.trim(), difficulty, outcome, rounds: roundsText, tips: tips.trim(), anonymous }),
       });
       setStatus("success");
-      setTimeout(() => router.push("/interviews"), 2000);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Something went wrong.");
       setStatus("error");
@@ -143,9 +143,15 @@ export default function SubmitInterviewPage() {
           </span>
         </div>
         <h2 className="mb-2 text-xl font-bold text-zinc-900 dark:text-zinc-100">Thanks for sharing!</h2>
-        <p className="text-sm text-zinc-500 dark:text-zinc-400">
-          Your experience has been submitted and will be visible after a quick review. Redirecting you back…
+        <p className="mb-5 text-sm text-zinc-500 dark:text-zinc-400">
+          Your experience has been submitted and will be visible after a quick review.
         </p>
+        <Link
+          href="/interviews"
+          className="inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-indigo-500"
+        >
+          Browse experiences →
+        </Link>
       </div>
     );
   }
@@ -345,9 +351,14 @@ export default function SubmitInterviewPage() {
 
         {/* ── Tips ────────────────────────────────────────────────────── */}
         <div>
-          <label className="mb-1.5 block text-sm font-medium text-zinc-700 dark:text-zinc-300">
-            Tips for future candidates <span className="font-normal text-zinc-400">(optional)</span>
-          </label>
+          <div className="mb-1.5 flex items-baseline justify-between">
+            <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
+              Tips for future candidates <span className="font-normal text-zinc-400">(optional)</span>
+            </label>
+            <span className={`text-xs tabular-nums ${tips.length > 1800 ? "text-amber-500" : "text-zinc-400"}`}>
+              {tips.length} / 2000
+            </span>
+          </div>
           <textarea
             value={tips}
             onChange={(e) => setTips(e.target.value)}
@@ -385,9 +396,14 @@ export default function SubmitInterviewPage() {
           <button
             type="submit"
             disabled={status === "submitting"}
-            className="rounded-lg bg-indigo-600 px-6 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-indigo-700 disabled:opacity-60"
+            className="inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-6 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-indigo-500 disabled:cursor-not-allowed disabled:opacity-60"
           >
-            {status === "submitting" ? "Submitting…" : "Submit experience"}
+            {status === "submitting" ? (
+              <>
+                <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" aria-hidden />
+                Submitting…
+              </>
+            ) : "Submit experience"}
           </button>
           <Link href="/interviews" className="text-sm text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300">
             Cancel
