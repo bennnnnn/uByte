@@ -115,7 +115,7 @@ export default function UserMenuDropdown() {
 
             {/* Account */}
             <SectionLabel>Account</SectionLabel>
-            <MenuItem href="/billing#referral" icon={<ReferralIcon />} label="Refer & Earn 🎁" accent onClick={close} />
+            <MenuItem href="/referral" icon={<ReferralIcon />} label="Refer & Earn 🎁" accent onClick={close} />
             <MenuItem href="/billing" icon={<PlanIcon />} label="Plan & Billing" onClick={close} />
             <MenuItem href="/settings" icon={<SettingsIcon />} label="Settings" onClick={close} />
 

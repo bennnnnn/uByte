@@ -254,6 +254,7 @@ function DashboardPage() {
           <div className="flex flex-wrap gap-2">
             <Link href="/notifications" className="inline-flex items-center gap-1.5 rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-1.5 text-xs font-medium text-zinc-600 hover:bg-zinc-100 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-400">🔔 Notifications</Link>
             <Link href="/billing" className="inline-flex items-center gap-1.5 rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-1.5 text-xs font-medium text-zinc-600 hover:bg-zinc-100 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-400">💳 Billing</Link>
+            <Link href="/referral" className="inline-flex items-center gap-1.5 rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-1.5 text-xs font-medium text-zinc-600 hover:bg-zinc-100 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-400">🎁 Refer & Earn</Link>
             <Link href="/settings" className="inline-flex items-center gap-1.5 rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-1.5 text-xs font-medium text-zinc-600 hover:bg-zinc-100 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-400">⚙️ Settings</Link>
           </div>
         </div>
@@ -294,6 +295,7 @@ function DashboardPage() {
                 <ul className="space-y-0.5">
                   <li><SidebarLink href="/notifications" icon="🔔" label="Notifications" /></li>
                   <li><SidebarLink href="/billing" icon="💳" label="Billing" /></li>
+                  <li><SidebarLink href="/referral" icon="🎁" label="Refer & Earn" /></li>
                   <li><SidebarLink href="/settings" icon="⚙️" label="Settings" /></li>
                   <li>
                     <Link

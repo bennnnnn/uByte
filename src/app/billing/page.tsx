@@ -5,18 +5,14 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/components/AuthProvider";
 import PlanTab from "@/components/profile/PlanTab";
-import ReferralSection from "@/components/profile/ReferralSection";
 import type { Profile } from "@/components/profile/types";
 
-/* ── Skeleton ──────────────────────────────────────────────────────────── */
 function BillingSkeleton() {
   return (
     <div className="mx-auto max-w-2xl animate-pulse px-4 py-12 sm:px-6">
       <div className="mb-8 h-4 w-24 rounded bg-zinc-200 dark:bg-zinc-800" />
       <div className="mb-10 h-8 w-32 rounded-lg bg-zinc-200 dark:bg-zinc-800" />
-      <div className="mb-8 h-32 rounded-2xl border border-zinc-200 bg-zinc-100 dark:border-zinc-800 dark:bg-zinc-900" />
-      <div className="mb-6 h-4 w-20 rounded bg-zinc-200 dark:bg-zinc-800" />
-      <div className="h-24 rounded-2xl border border-zinc-200 bg-zinc-100 dark:border-zinc-800 dark:bg-zinc-900" />
+      <div className="h-40 rounded-2xl border border-zinc-200 bg-zinc-100 dark:border-zinc-800 dark:bg-zinc-900" />
     </div>
   );
 }
@@ -29,20 +25,6 @@ export default function BillingPageWrapper() {
   );
 }
 
-/* ── Section divider ───────────────────────────────────────────────────── */
-function SectionDivider({ label }: { label: string }) {
-  return (
-    <div className="mb-6 mt-10 flex items-center gap-4">
-      <div className="flex-1 border-t border-zinc-200 dark:border-zinc-800" />
-      <span className="text-xs font-semibold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">
-        {label}
-      </span>
-      <div className="flex-1 border-t border-zinc-200 dark:border-zinc-800" />
-    </div>
-  );
-}
-
-/* ── Main page ─────────────────────────────────────────────────────────── */
 function BillingPage() {
   const { user, loading } = useAuth();
   const router = useRouter();
@@ -104,11 +86,20 @@ function BillingPage() {
         </div>
 
         {/* Page title */}
-        <div className="mb-8">
-          <h1 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100">Billing</h1>
-          <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
-            Manage your plan and earn free Pro time by referring friends.
-          </p>
+        <div className="mb-8 flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100">Plan &amp; Billing</h1>
+            <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
+              View and manage your current subscription.
+            </p>
+          </div>
+          <Link
+            href="/referral"
+            className="inline-flex items-center gap-1.5 rounded-xl border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm font-medium text-zinc-600 transition-colors hover:border-zinc-300 hover:bg-zinc-100 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700"
+          >
+            <span>🎁</span>
+            Refer &amp; Earn
+          </Link>
         </div>
 
         {/* Plan success banner */}
@@ -119,12 +110,7 @@ function BillingPage() {
           </div>
         )}
 
-        {/* ── Plan ─────────────────────────────────────────────────────── */}
         <PlanTab plan={profile.plan} expiresAtProp={profile.subscription_expires_at} />
-
-        {/* ── Refer & Earn ─────────────────────────────────────────────── */}
-        <SectionDivider label="Refer & Earn" />
-        <ReferralSection />
 
         <div className="h-12" />
       </div>

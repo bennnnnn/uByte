@@ -153,14 +153,23 @@ function SettingsPage() {
               Manage your profile, appearance, and email preferences.
             </p>
           </div>
-          {/* Link to Billing */}
-          <Link
-            href="/billing"
-            className="inline-flex items-center gap-1.5 rounded-xl border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm font-medium text-zinc-600 transition-colors hover:border-zinc-300 hover:bg-zinc-100 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700"
-          >
-            <span>💳</span>
-            Billing
-          </Link>
+          {/* Quick links to adjacent pages */}
+          <div className="flex items-center gap-2">
+            <Link
+              href="/billing"
+              className="inline-flex items-center gap-1.5 rounded-xl border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm font-medium text-zinc-600 transition-colors hover:border-zinc-300 hover:bg-zinc-100 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700"
+            >
+              <span>💳</span>
+              Billing
+            </Link>
+            <Link
+              href="/referral"
+              className="inline-flex items-center gap-1.5 rounded-xl border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm font-medium text-zinc-600 transition-colors hover:border-zinc-300 hover:bg-zinc-100 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700"
+            >
+              <span>🎁</span>
+              Refer &amp; Earn
+            </Link>
+          </div>
         </div>
 
         {/* ── Profile / Appearance / Password / Email ───────────────────── */}
