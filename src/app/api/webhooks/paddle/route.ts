@@ -245,6 +245,10 @@ function planFromSubscription(status: string, priceId?: string): string | null {
   }
   // past_due / paused — keep existing plan (return null = no-op)
   if (status === "past_due" || status === "paused") return null;
+  // canceled — let subscription.canceled handle this with graceful period-end logic.
+  // Returning null here prevents subscription.updated from immediately downgrading
+  // a user who should stay on "canceling" until their billing period ends.
+  if (status === "canceled") return null;
   return "free";
 }
 

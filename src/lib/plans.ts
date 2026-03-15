@@ -69,6 +69,15 @@ export function isTrialPlan(plan?: string | null): boolean {
   return plan === "trial" || plan === "trial_yearly";
 }
 
+/**
+ * Returns true for users actively paying via Paddle (not free, trial, or canceling).
+ * Used to hide the referral "Earn 30 free days" offer — showing it to active
+ * subscribers could incentivise them to cancel to redeem the reward.
+ */
+export function isActiveSubscriber(plan?: string | null): boolean {
+  return plan === "yearly" || plan === "pro" || plan === "monthly";
+}
+
 // ─── Pricing + Paddle config (shared between client and server) ──────────────
 
 export const MONTHLY_PRICE_CENTS = 999;

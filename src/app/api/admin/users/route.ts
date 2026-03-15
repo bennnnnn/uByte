@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import {
   getAdminUsers,
+  getAdminUsersPaginated,
   adminResetUserProgress,
   adminDeleteUser,
   adminBanUser,
@@ -34,6 +35,16 @@ export const GET = withErrorHandling("GET /api/admin/users", async (request: Nex
     const stats = await getPracticeProblemStats();
     return NextResponse.json({ stats });
   }
+  // Paginated user list with optional search + plan filter
+  if (searchParams.has("page") || searchParams.has("search")) {
+    const search = searchParams.get("search") ?? "";
+    const plan   = searchParams.get("plan")   ?? "";
+    const page   = Math.max(1, parseInt(searchParams.get("page")  ?? "1",  10));
+    const limit  = Math.min(100, Math.max(1, parseInt(searchParams.get("limit") ?? "25", 10)));
+    const { users, total } = await getAdminUsersPaginated(search, page, limit, plan);
+    return NextResponse.json({ users, total, page, limit, totalPages: Math.ceil(total / limit) });
+  }
+
   if (searchParams.get("export") === "csv") {
     const users = await getAdminUsers();
     const header = "id,name,email,xp,streak_days,created_at,last_active_at,is_admin,banned,completed_count,bookmark_count,plan";

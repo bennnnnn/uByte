@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/components/AuthProvider";
 import ReferralSection from "@/components/profile/ReferralSection";
+import { isActiveSubscriber } from "@/lib/plans";
 
 function ReferralSkeleton() {
   return (
@@ -33,6 +34,13 @@ function ReferralPage() {
   }, [user, loading, router]);
 
   if (loading || !user) return <ReferralSkeleton />;
+
+  // Active subscribers see the referral reward but can't use it meaningfully —
+  // redirect them to billing instead of showing a potentially misleading offer.
+  if (isActiveSubscriber(user.plan)) {
+    startTransition(() => { router.replace("/dashboard?tab=billing"); });
+    return <ReferralSkeleton />;
+  }
 
   return (
     <div className="min-h-0 flex-1 overflow-y-auto">

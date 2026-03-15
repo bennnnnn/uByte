@@ -42,6 +42,76 @@ export async function getAdminUsers(): Promise<AdminUserRow[]> {
   })) as AdminUserRow[];
 }
 
+/** Paginated user list with optional full-text search on name/email and plan filter. */
+export async function getAdminUsersPaginated(
+  search: string,
+  page: number,
+  limit: number,
+  plan = "",
+): Promise<{ users: AdminUserRow[]; total: number }> {
+  await ensureAdminRoleColumn();
+  const sql = getSql();
+  const offset  = (page - 1) * limit;
+  const pattern = `%${search.toLowerCase()}%`;
+  const hasSearch = search.trim().length > 0;
+  const hasPlan   = plan.trim().length > 0;
+
+  const [rows, countRows] = await Promise.all([
+    hasSearch && hasPlan
+      ? sql`
+          SELECT u.id, u.name, u.email, u.xp, u.streak_days, u.created_at, u.last_active_at,
+                 u.is_admin, u.admin_role, u.locked_until, COALESCE(u.plan, 'free') AS plan,
+                 (SELECT COUNT(*)::int FROM progress  WHERE user_id = u.id) AS completed_count,
+                 (SELECT COUNT(*)::int FROM bookmarks WHERE user_id = u.id) AS bookmark_count
+          FROM users u
+          WHERE (LOWER(u.email) LIKE ${pattern} OR LOWER(u.name) LIKE ${pattern})
+            AND COALESCE(u.plan, 'free') = ${plan}
+          ORDER BY u.created_at DESC LIMIT ${limit} OFFSET ${offset}`
+      : hasSearch
+      ? sql`
+          SELECT u.id, u.name, u.email, u.xp, u.streak_days, u.created_at, u.last_active_at,
+                 u.is_admin, u.admin_role, u.locked_until, COALESCE(u.plan, 'free') AS plan,
+                 (SELECT COUNT(*)::int FROM progress  WHERE user_id = u.id) AS completed_count,
+                 (SELECT COUNT(*)::int FROM bookmarks WHERE user_id = u.id) AS bookmark_count
+          FROM users u
+          WHERE LOWER(u.email) LIKE ${pattern} OR LOWER(u.name) LIKE ${pattern}
+          ORDER BY u.created_at DESC LIMIT ${limit} OFFSET ${offset}`
+      : hasPlan
+      ? sql`
+          SELECT u.id, u.name, u.email, u.xp, u.streak_days, u.created_at, u.last_active_at,
+                 u.is_admin, u.admin_role, u.locked_until, COALESCE(u.plan, 'free') AS plan,
+                 (SELECT COUNT(*)::int FROM progress  WHERE user_id = u.id) AS completed_count,
+                 (SELECT COUNT(*)::int FROM bookmarks WHERE user_id = u.id) AS bookmark_count
+          FROM users u
+          WHERE COALESCE(u.plan, 'free') = ${plan}
+          ORDER BY u.created_at DESC LIMIT ${limit} OFFSET ${offset}`
+      : sql`
+          SELECT u.id, u.name, u.email, u.xp, u.streak_days, u.created_at, u.last_active_at,
+                 u.is_admin, u.admin_role, u.locked_until, COALESCE(u.plan, 'free') AS plan,
+                 (SELECT COUNT(*)::int FROM progress  WHERE user_id = u.id) AS completed_count,
+                 (SELECT COUNT(*)::int FROM bookmarks WHERE user_id = u.id) AS bookmark_count
+          FROM users u
+          ORDER BY u.created_at DESC LIMIT ${limit} OFFSET ${offset}`,
+
+    hasSearch && hasPlan
+      ? sql`SELECT COUNT(*)::int AS total FROM users WHERE (LOWER(email) LIKE ${pattern} OR LOWER(name) LIKE ${pattern}) AND COALESCE(plan,'free') = ${plan}`
+      : hasSearch
+      ? sql`SELECT COUNT(*)::int AS total FROM users WHERE LOWER(email) LIKE ${pattern} OR LOWER(name) LIKE ${pattern}`
+      : hasPlan
+      ? sql`SELECT COUNT(*)::int AS total FROM users WHERE COALESCE(plan,'free') = ${plan}`
+      : sql`SELECT COUNT(*)::int AS total FROM users`,
+  ]);
+
+  const now = new Date();
+  return {
+    users: rows.map((r) => ({
+      ...r,
+      banned: !!r.locked_until && new Date(r.locked_until as string) > now,
+    })) as AdminUserRow[],
+    total: Number(countRows[0]?.total ?? 0),
+  };
+}
+
 export async function getAdminList(): Promise<AdminUserRow[]> {
   await ensureAdminRoleColumn();
   const sql = getSql();

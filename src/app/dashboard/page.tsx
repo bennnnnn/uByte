@@ -18,7 +18,7 @@ import PlanTab from "@/components/profile/PlanTab";
 import ReferralSection from "@/components/profile/ReferralSection";
 import SettingsTab from "@/components/profile/SettingsTab";
 import DangerZoneSection from "@/components/profile/settings/DangerZoneSection";
-import { hasPaidAccess } from "@/lib/plans";
+import { hasPaidAccess, isActiveSubscriber } from "@/lib/plans";
 import type { Profile, Stats, Badge, Achievement, Bookmark, Notification } from "@/components/profile/types";
 
 /* ── Skeleton ──────────────────────────────────────────────────────────── */
@@ -350,7 +350,7 @@ function DashboardPage() {
               <option value="__leaderboard__">🏆 Leaderboard ↗</option>
             </optgroup>
             <optgroup label="Account">
-              {ACCOUNT_TABS.map((t) => <option key={t} value={t}>{TAB_LABELS[t]}</option>)}
+              {ACCOUNT_TABS.filter((t) => !(t === "referral" && isActiveSubscriber(profile.plan))).map((t) => <option key={t} value={t}>{TAB_LABELS[t]}</option>)}
             </optgroup>
           </select>
         </div>
@@ -399,7 +399,7 @@ function DashboardPage() {
                   Account
                 </p>
                 <ul className="space-y-0.5">
-                  {ACCOUNT_TABS.map((t) => (
+                  {ACCOUNT_TABS.filter((t) => !(t === "referral" && isActiveSubscriber(profile.plan))).map((t) => (
                     <li key={t}>
                       <SidebarBtn
                         icon={TAB_ICONS[t]}

@@ -191,7 +191,7 @@ export default function PlanTab({ plan, expiresAtProp }: Props & { expiresAtProp
     const origin = typeof window !== "undefined" ? window.location.origin : "";
     const params: Parameters<typeof window.Paddle.Checkout.open>[0] = {
       items: [{ priceId, quantity: 1 }],
-      customData: checkoutNonce ? { checkoutNonce } : (user ? { userId: String(user.id) } : undefined),
+      customData: checkoutNonce ? { checkoutNonce } : undefined,
       customer: user ? { email: user.email } : undefined,
       settings: {
         successUrl: `${origin}/billing?plan=success`,
