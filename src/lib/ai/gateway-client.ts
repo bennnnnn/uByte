@@ -37,6 +37,7 @@ export async function callGateway(opts: GatewayOptions): Promise<string> {
   // Accept either GOOGLE_GENERATIVE_AI_API_KEY or GEMINI_API_KEY (same key, two common names)
   const googleKey = process.env.GOOGLE_GENERATIVE_AI_API_KEY ?? process.env.GEMINI_API_KEY;
   const openaiKey = process.env.OPENAI_API_KEY;
+  console.log(`[AI] callGateway model=${opts.model} google_key=${googleKey ? "set" : "MISSING"} openai_key=${openaiKey ? "set" : "missing"}`);
 
   const isGoogleModel =
     opts.model.startsWith("gemini") || opts.model.startsWith("google/");

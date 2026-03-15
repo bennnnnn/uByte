@@ -47,15 +47,14 @@ export async function callAiFeedback(
   try {
     return await callFeedbackGateway(evidenceBundle, hintLevel, verdict, userName);
   } catch (err) {
-    // Log full error so it appears in Vercel Function logs for debugging.
-    console.error("[AI hint] callFeedbackGateway failed:", err);
-    const greeting = userName ? `${userName}, ` : "";
+    const errMsg = err instanceof Error ? err.message : String(err);
+    console.error("[AI hint] callFeedbackGateway failed:", errMsg, err);
     return {
-      friendly_one_liner: `${greeting}AI hint is temporarily unavailable. Check the output above for clues.`,
+      friendly_one_liner: `AI error: ${errMsg.slice(0, 200)}`,
       root_cause: "ai_unavailable",
       evidence: [],
-      hint: "Compare your actual output with the expected output shown below the editor. Look for spacing, capitalisation, or extra characters.",
-      next_step: "Fix the difference and click Check again.",
+      hint: errMsg,
+      next_step: "Share this error with your developer.",
       confidence: 0,
     };
   }
