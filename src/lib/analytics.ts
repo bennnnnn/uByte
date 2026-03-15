@@ -85,6 +85,7 @@ export function trackConversion(
     // PostHog
     const ph = getPostHog();
     if (ph) ph.capture(event, payload);
+
   } catch {
     // never let analytics crash the app
   }

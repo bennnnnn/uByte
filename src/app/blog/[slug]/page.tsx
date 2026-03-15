@@ -8,6 +8,7 @@ import { absoluteUrl } from "@/lib/seo";
 import { APP_NAME, BASE_URL } from "@/lib/constants";
 import { getCurrentUser } from "@/lib/auth";
 import { getUserById } from "@/lib/db";
+import ScrollToTop from "@/components/ScrollToTop";
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -128,6 +129,7 @@ export default async function BlogPostPage({ params, searchParams }: Props) {
 
   return (
     <div className="min-h-full">
+      <ScrollToTop />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}

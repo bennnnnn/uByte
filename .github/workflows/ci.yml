@@ -31,3 +31,14 @@ jobs:
 
       - name: Test
         run: npm test
+
+      - name: Build
+        run: npm run build
+        env:
+          # Provide stub values so Next.js env-validation doesn't abort the build.
+          # The build itself doesn't need live credentials — this just proves the
+          # code compiles and all imports resolve correctly.
+          DATABASE_URL: postgresql://ci:ci@localhost:5432/ci
+          JWT_SECRET: ci-secret-at-least-32-characters-long
+          NEXT_PUBLIC_GOOGLE_CLIENT_ID: 000000000000-ci.apps.googleusercontent.com
+          NEXT_PUBLIC_BASE_URL: https://www.ubyte.dev

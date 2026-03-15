@@ -11,6 +11,7 @@ import { EXAM_LANGS } from "@/lib/exams/config";
 import { tutorialLangUrl } from "@/lib/urls";
 import { absoluteUrl, SITE_KEYWORDS } from "@/lib/seo";
 import ExamCard from "./ExamCard";
+import ScrollToTop from "@/components/ScrollToTop";
 
 export const dynamic = "force-dynamic";
 
@@ -157,6 +158,7 @@ export default async function PracticeExamsPage() {
 
   return (
     <div className="min-h-full">
+      <ScrollToTop />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
