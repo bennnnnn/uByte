@@ -1,9 +1,9 @@
 /**
  * Vercel AI Gateway client — single entry point for all AI calls.
  *
- * Uses Vercel AI SDK v6. When AI_GATEWAY_API_KEY is set in the environment,
- * the SDK automatically routes "provider/model" strings through the gateway.
- * No manual provider setup needed — just set the env var and use the model string.
+ * Uses @ai-sdk/openai with the Vercel AI Gateway's OpenAI-compatible endpoint.
+ * The gateway routes "provider/model" names to the right provider automatically.
+ * See: https://vercel.com/docs/ai-gateway/sdks-and-apis/openai-chat-completions
  *
  * Required env var (Vercel project → Settings → Environment Variables):
  *   AI_GATEWAY_API_KEY  — from vercel.com/[team]/~/ai-gateway/api-keys
@@ -15,6 +15,7 @@
  */
 
 import { generateText } from "ai";
+import { createOpenAI } from "@ai-sdk/openai";
 
 /** Fast, cheap model for tutorial hints — verified in gateway catalog. */
 export const HINTS_MODEL       = "google/gemini-2.5-flash-lite";
@@ -25,6 +26,7 @@ export const CODE_REVIEW_MODEL = "openai/gpt-4o-mini";
 /** Balanced conversational model for interview simulator / tutorial chat. */
 export const CHAT_MODEL        = "google/gemini-2.5-flash";
 
+const GATEWAY_BASE_URL = "https://ai-gateway.vercel.sh/v1";
 const DEFAULT_TIMEOUT_MS = 15_000;
 
 export interface GatewayMessage {
@@ -41,12 +43,31 @@ export interface GatewayOptions {
 }
 
 /**
- * Call the Vercel AI Gateway and return the assistant text.
- * The AI SDK v6 reads AI_GATEWAY_API_KEY from the environment automatically
- * and routes "provider/model" strings to the right provider.
+ * Call the Vercel AI Gateway using its OpenAI-compatible endpoint.
+ * The gateway accepts any "provider/model" string and routes to the right provider.
  * Throws on API error or timeout — callers should catch and return a graceful fallback.
  */
 export async function callGateway(opts: GatewayOptions): Promise<string> {
+  const apiKey =
+    process.env.AI_GATEWAY_API_KEY ??
+    process.env.VERCEL_AI_GATEWAY_TOKEN;
+
+  if (!apiKey) {
+    throw new Error(
+      "AI_GATEWAY_API_KEY is not set. Add it in Vercel project settings " +
+      "(obtain from vercel.com/[team]/~/ai-gateway/api-keys)."
+    );
+  }
+
+  console.log(`[AI gateway] calling model=${opts.model}`);
+
+  // Use @ai-sdk/openai pointed at the Vercel AI Gateway's OpenAI-compatible URL.
+  // The gateway handles routing "google/..." and "openai/..." model names.
+  const gateway = createOpenAI({
+    baseURL: GATEWAY_BASE_URL,
+    apiKey,
+  });
+
   const systemMsg = opts.messages.find((m) => m.role === "system");
   const conversationMsgs = opts.messages
     .filter((m) => m.role !== "system")
@@ -59,20 +80,15 @@ export async function callGateway(opts: GatewayOptions): Promise<string> {
   );
 
   try {
-    const hasKey = !!(process.env.AI_GATEWAY_API_KEY ?? process.env.VERCEL_AI_GATEWAY_TOKEN);
-    console.log(`[AI gateway] model=${opts.model} key_present=${hasKey}`);
-
-    // AI SDK v6: passing a "provider/model" string works automatically
-    // when AI_GATEWAY_API_KEY is set — no createOpenAI() wrapper needed.
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { text } = await generateText({
-      model: opts.model as any,
+      model: gateway(opts.model),
       system: systemMsg?.content,
       messages: conversationMsgs,
       maxOutputTokens: opts.maxTokens ?? 512,
       temperature: opts.temperature ?? 0.3,
       abortSignal: abortController.signal,
     });
+    console.log(`[AI gateway] success model=${opts.model} chars=${text.length}`);
     return text.trim();
   } finally {
     clearTimeout(timeout);
