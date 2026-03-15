@@ -62,38 +62,25 @@ async function callGoogleDirect(opts: GatewayOptions, apiKey: string): Promise<s
   const systemMsg = opts.messages.find((m) => m.role === "system");
   const userMsgs  = opts.messages.filter((m) => m.role !== "system");
 
-  // Build contents array — prepend system instruction into first user message if present
+  // Google API uses "model" for assistant role, not "assistant"
   const contents = userMsgs.map((m) => ({
-    role: m.role as "user" | "model",
+    role: m.role === "assistant" ? "model" : "user",
     parts: [{ text: m.content }],
   }));
 
-  if (contents.length > 0 && systemMsg) {
-    contents[0].parts.unshift({ text: `${systemMsg.content}\n\n` });
-  }
+  const response = await ai.models.generateContent({
+    model: opts.model,
+    contents,
+    config: {
+      systemInstruction: systemMsg?.content,
+      temperature: opts.temperature ?? 0.3,
+      maxOutputTokens: opts.maxTokens ?? 512,
+    },
+  });
 
-  const abortController = new AbortController();
-  const timeout = setTimeout(
-    () => abortController.abort(),
-    opts.timeoutMs ?? DEFAULT_TIMEOUT_MS
-  );
-
-  try {
-    const response = await ai.models.generateContent({
-      model: opts.model,
-      contents,
-      config: {
-        temperature: opts.temperature ?? 0.3,
-        maxOutputTokens: opts.maxTokens ?? 512,
-      },
-    });
-
-    const text = response.text ?? "";
-    console.log(`[AI] success chars=${text.length}`);
-    return text.trim();
-  } finally {
-    clearTimeout(timeout);
-  }
+  const text = response.text ?? "";
+  console.log(`[AI] success chars=${text.length}`);
+  return text.trim();
 }
 
 async function callOpenAIDirect(opts: GatewayOptions, apiKey: string): Promise<string> {
