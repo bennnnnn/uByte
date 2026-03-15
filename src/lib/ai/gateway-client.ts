@@ -1,28 +1,23 @@
 /**
- * AI client — routes through Vercel AI Gateway if AI_GATEWAY_API_KEY is set,
- * otherwise falls back to Google directly via GOOGLE_GENERATIVE_AI_API_KEY.
+ * AI client — uses @google/genai (official Google SDK) for Google models,
+ * and @ai-sdk/openai for OpenAI models.
  *
- * Recommended setup (simplest — free Google AI Studio key):
+ * Required env var (pick one):
  *   GOOGLE_GENERATIVE_AI_API_KEY  — from aistudio.google.com (free tier)
+ *   GEMINI_API_KEY                — same key, alternate name used in Google docs
  *
- * Optional (for Vercel AI Gateway observability):
- *   AI_GATEWAY_API_KEY  — from vercel.com/[team]/~/ai-gateway/api-keys
- *
- * Verified model names (direct Google API — not Vercel gateway aliases):
- *   HINTS_MODEL        gemini-2.0-flash   fast & cheap for short hints
- *   CODE_REVIEW_MODEL  gpt-4o-mini        strong code understanding
- *   CHAT_MODEL         gemini-2.0-flash   balanced for multi-turn chat
+ * Optional (for OpenAI fallback):
+ *   OPENAI_API_KEY
  */
 
+import { GoogleGenAI } from "@google/genai";
 import { generateText } from "ai";
-import { createGoogleGenerativeAI } from "@ai-sdk/google";
 import { createOpenAI } from "@ai-sdk/openai";
 
 export const HINTS_MODEL       = "gemini-2.0-flash";
-export const CODE_REVIEW_MODEL = "gpt-4o-mini";
+export const CODE_REVIEW_MODEL = "gemini-2.0-flash";
 export const CHAT_MODEL        = "gemini-2.0-flash";
 
-const GATEWAY_BASE_URL = "https://ai-gateway.vercel.sh/v1";
 const DEFAULT_TIMEOUT_MS = 15_000;
 
 export interface GatewayMessage {
@@ -39,40 +34,73 @@ export interface GatewayOptions {
 }
 
 export async function callGateway(opts: GatewayOptions): Promise<string> {
-  // Priority: Google direct > OpenAI direct > Vercel AI Gateway
-  // Google/OpenAI direct keys are checked first because they are reliable.
-  // AI_GATEWAY_API_KEY (the proper dedicated key) is used as a fallback.
-  // VERCEL_AI_GATEWAY_TOKEN is intentionally NOT used — it was a wrong key name.
-  const googleKey  = process.env.GOOGLE_GENERATIVE_AI_API_KEY;
-  const openaiKey  = process.env.OPENAI_API_KEY;
-  const gatewayKey = process.env.AI_GATEWAY_API_KEY;
+  // Accept either GOOGLE_GENERATIVE_AI_API_KEY or GEMINI_API_KEY (same key, two common names)
+  const googleKey = process.env.GOOGLE_GENERATIVE_AI_API_KEY ?? process.env.GEMINI_API_KEY;
+  const openaiKey = process.env.OPENAI_API_KEY;
 
-  const isGoogleModel = opts.model.startsWith("gemini");
-  const isOpenAIModel = opts.model.startsWith("gpt-") || opts.model.startsWith("o1") || opts.model.startsWith("o3");
-
-  let sdkModel: ReturnType<ReturnType<typeof createGoogleGenerativeAI | typeof createOpenAI>>;
+  const isGoogleModel =
+    opts.model.startsWith("gemini") || opts.model.startsWith("google/");
 
   if (isGoogleModel && googleKey) {
-    // Direct Google — free tier at aistudio.google.com
-    const google = createGoogleGenerativeAI({ apiKey: googleKey });
-    sdkModel = google(opts.model);
-    console.log(`[AI] via Google direct model=${opts.model}`);
-  } else if (isOpenAIModel && openaiKey) {
-    // Direct OpenAI
-    const openai = createOpenAI({ apiKey: openaiKey });
-    sdkModel = openai(opts.model);
-    console.log(`[AI] via OpenAI direct model=${opts.model}`);
-  } else if (gatewayKey) {
-    // Vercel AI Gateway — requires AI_GATEWAY_API_KEY (not VERCEL_AI_GATEWAY_TOKEN)
-    const gateway = createOpenAI({ baseURL: GATEWAY_BASE_URL, apiKey: gatewayKey });
-    const prefixedModel = isGoogleModel ? `google/${opts.model}` : isOpenAIModel ? `openai/${opts.model}` : opts.model;
-    sdkModel = gateway(prefixedModel);
-    console.log(`[AI] via gateway model=${prefixedModel}`);
-  } else {
-    throw new Error(
-      `No AI key found. Set GOOGLE_GENERATIVE_AI_API_KEY (free at aistudio.google.com) in Vercel env vars.`
-    );
+    return callGoogleDirect(opts, googleKey);
   }
+
+  if (openaiKey) {
+    return callOpenAIDirect(opts, openaiKey);
+  }
+
+  throw new Error(
+    "No AI key found. Set GOOGLE_GENERATIVE_AI_API_KEY in Vercel env vars (free at aistudio.google.com)."
+  );
+}
+
+async function callGoogleDirect(opts: GatewayOptions, apiKey: string): Promise<string> {
+  console.log(`[AI] via Google direct (official SDK) model=${opts.model}`);
+
+  const ai = new GoogleGenAI({ apiKey });
+
+  const systemMsg = opts.messages.find((m) => m.role === "system");
+  const userMsgs  = opts.messages.filter((m) => m.role !== "system");
+
+  // Build contents array — prepend system instruction into first user message if present
+  const contents = userMsgs.map((m) => ({
+    role: m.role as "user" | "model",
+    parts: [{ text: m.content }],
+  }));
+
+  if (contents.length > 0 && systemMsg) {
+    contents[0].parts.unshift({ text: `${systemMsg.content}\n\n` });
+  }
+
+  const abortController = new AbortController();
+  const timeout = setTimeout(
+    () => abortController.abort(),
+    opts.timeoutMs ?? DEFAULT_TIMEOUT_MS
+  );
+
+  try {
+    const response = await ai.models.generateContent({
+      model: opts.model,
+      contents,
+      config: {
+        temperature: opts.temperature ?? 0.3,
+        maxOutputTokens: opts.maxTokens ?? 512,
+      },
+    });
+
+    const text = response.text ?? "";
+    console.log(`[AI] success chars=${text.length}`);
+    return text.trim();
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
+async function callOpenAIDirect(opts: GatewayOptions, apiKey: string): Promise<string> {
+  console.log(`[AI] via OpenAI direct model=${opts.model}`);
+
+  const openai = createOpenAI({ apiKey });
+  const sdkModel = openai(opts.model);
 
   const systemMsg = opts.messages.find((m) => m.role === "system");
   const conversationMsgs = opts.messages
@@ -80,7 +108,10 @@ export async function callGateway(opts: GatewayOptions): Promise<string> {
     .map((m) => ({ role: m.role as "user" | "assistant", content: m.content }));
 
   const abortController = new AbortController();
-  const timeout = setTimeout(() => abortController.abort(), opts.timeoutMs ?? DEFAULT_TIMEOUT_MS);
+  const timeout = setTimeout(
+    () => abortController.abort(),
+    opts.timeoutMs ?? DEFAULT_TIMEOUT_MS
+  );
 
   try {
     const { text } = await generateText({
