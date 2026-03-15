@@ -2,11 +2,11 @@
  * AI client — uses @google/genai (official Google SDK) for Google models,
  * and @ai-sdk/openai for OpenAI models.
  *
- * Required env var (pick one):
- *   GOOGLE_GENERATIVE_AI_API_KEY  — from aistudio.google.com (free tier)
- *   GEMINI_API_KEY                — same key, alternate name used in Google docs
+ * Required env var (pick one — both accepted):
+ *   GOOGLE_GENERATIVE_AI_API_KEY  — standard name used by many integrations
+ *   GEMINI_API_KEY                — name used in Google AI Studio docs
  *
- * Optional (for OpenAI fallback):
+ * Optional (for OpenAI models):
  *   OPENAI_API_KEY
  */
 
@@ -34,13 +34,10 @@ export interface GatewayOptions {
 }
 
 export async function callGateway(opts: GatewayOptions): Promise<string> {
-  // Accept either GOOGLE_GENERATIVE_AI_API_KEY or GEMINI_API_KEY (same key, two common names)
   const googleKey = process.env.GOOGLE_GENERATIVE_AI_API_KEY ?? process.env.GEMINI_API_KEY;
   const openaiKey = process.env.OPENAI_API_KEY;
-  console.log(`[AI] callGateway model=${opts.model} google_key=${googleKey ? "set" : "MISSING"} openai_key=${openaiKey ? "set" : "missing"}`);
 
-  const isGoogleModel =
-    opts.model.startsWith("gemini") || opts.model.startsWith("google/");
+  const isGoogleModel = opts.model.startsWith("gemini") || opts.model.startsWith("google/");
 
   if (isGoogleModel && googleKey) {
     return callGoogleDirect(opts, googleKey);
@@ -51,19 +48,16 @@ export async function callGateway(opts: GatewayOptions): Promise<string> {
   }
 
   throw new Error(
-    "No AI key found. Set GOOGLE_GENERATIVE_AI_API_KEY in Vercel env vars (free at aistudio.google.com)."
+    "No AI key configured. Set GOOGLE_GENERATIVE_AI_API_KEY in Vercel env vars (free key at aistudio.google.com)."
   );
 }
 
 async function callGoogleDirect(opts: GatewayOptions, apiKey: string): Promise<string> {
-  console.log(`[AI] via Google direct (official SDK) model=${opts.model}`);
-
   const ai = new GoogleGenAI({ apiKey });
 
   const systemMsg = opts.messages.find((m) => m.role === "system");
   const userMsgs  = opts.messages.filter((m) => m.role !== "system");
 
-  // Google API uses "model" for assistant role, not "assistant"
   const contents = userMsgs.map((m) => ({
     role: m.role === "assistant" ? "model" : "user",
     parts: [{ text: m.content }],
@@ -79,14 +73,10 @@ async function callGoogleDirect(opts: GatewayOptions, apiKey: string): Promise<s
     },
   });
 
-  const text = response.text ?? "";
-  console.log(`[AI] success chars=${text.length}`);
-  return text.trim();
+  return (response.text ?? "").trim();
 }
 
 async function callOpenAIDirect(opts: GatewayOptions, apiKey: string): Promise<string> {
-  console.log(`[AI] via OpenAI direct model=${opts.model}`);
-
   const openai = createOpenAI({ apiKey });
   const sdkModel = openai(opts.model);
 
@@ -110,7 +100,6 @@ async function callOpenAIDirect(opts: GatewayOptions, apiKey: string): Promise<s
       temperature: opts.temperature ?? 0.3,
       abortSignal: abortController.signal,
     });
-    console.log(`[AI] success chars=${text.length}`);
     return text.trim();
   } finally {
     clearTimeout(timeout);

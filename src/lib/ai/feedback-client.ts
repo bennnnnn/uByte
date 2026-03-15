@@ -1,6 +1,6 @@
 /**
  * AI feedback client — tutorial hints and inline step feedback.
- * Routes through Vercel AI Gateway → google/gemini-2.5-flash-lite (0.3s, $0.10/M).
+ * Uses gemini-2.5-flash via @google/genai (official Google SDK).
  */
 
 import { callGateway, HINTS_MODEL } from "./gateway-client";
@@ -32,10 +32,10 @@ export async function callAiFeedback(
   verdict: string,
   userName?: string,
 ): Promise<AiFeedbackSchema> {
-  if (!process.env.AI_GATEWAY_API_KEY && !process.env.GOOGLE_GENERATIVE_AI_API_KEY && !process.env.GEMINI_API_KEY && !process.env.OPENAI_API_KEY) {
+  if (!process.env.GOOGLE_GENERATIVE_AI_API_KEY && !process.env.GEMINI_API_KEY && !process.env.OPENAI_API_KEY) {
     const greeting = userName ? `Hey ${userName}!` : "Hey!";
     return {
-      friendly_one_liner: `${greeting} AI feedback is not configured — set VERCEL_AI_GATEWAY_TOKEN in Vercel project settings.`,
+      friendly_one_liner: `${greeting} AI hints are not configured yet.`,
       root_cause: "no_ai_config",
       evidence: [],
       hint: "Review the compiler or runtime output above and try a small fix.",
@@ -47,14 +47,14 @@ export async function callAiFeedback(
   try {
     return await callFeedbackGateway(evidenceBundle, hintLevel, verdict, userName);
   } catch (err) {
-    const errMsg = err instanceof Error ? err.message : String(err);
-    console.error("[AI hint] callFeedbackGateway failed:", errMsg, err);
+    console.error("[AI hint] failed:", err);
+    const greeting = userName ? `${userName}, ` : "";
     return {
-      friendly_one_liner: `AI error: ${errMsg.slice(0, 200)}`,
+      friendly_one_liner: `${greeting}AI hint is temporarily unavailable.`,
       root_cause: "ai_unavailable",
       evidence: [],
-      hint: errMsg,
-      next_step: "Share this error with your developer.",
+      hint: "Compare your actual output with the expected output shown below the editor.",
+      next_step: "Fix the difference and click Check again.",
       confidence: 0,
     };
   }

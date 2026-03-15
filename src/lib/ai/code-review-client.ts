@@ -1,10 +1,7 @@
 /**
  * AI code review client — full structured review of submitted code.
  * Different from tutorial-hint / ai-feedback (which give hints for failing steps).
- * This is for a comprehensive post-solve or on-demand review.
- *
- * Routes through Vercel AI Gateway → openai/gpt-5.1-codex-mini (1.1s, $0.25/$2.00/M).
- * Code-specialized model gives better complexity analysis and style feedback.
+ * Uses gemini-2.5-flash via @google/genai (official Google SDK).
  */
 import { callGateway, CODE_REVIEW_MODEL } from "./gateway-client";
 
@@ -34,13 +31,13 @@ export async function callCodeReview(
   verdict?: string,
   userName?: string,
 ): Promise<CodeReviewSchema> {
-  if (!process.env.AI_GATEWAY_API_KEY && !process.env.GOOGLE_GENERATIVE_AI_API_KEY && !process.env.GEMINI_API_KEY && !process.env.OPENAI_API_KEY) {
+  if (!process.env.GOOGLE_GENERATIVE_AI_API_KEY && !process.env.GEMINI_API_KEY && !process.env.OPENAI_API_KEY) {
     return {
-      summary: "AI code review is not configured. Set VERCEL_AI_GATEWAY_TOKEN in Vercel project settings.",
+      summary: "AI code review is not configured.",
       time_complexity: "Unknown",
       space_complexity: "Unknown",
       strengths: [],
-      improvements: ["Set VERCEL_AI_GATEWAY_TOKEN to enable AI code review."],
+      improvements: ["Set GOOGLE_GENERATIVE_AI_API_KEY in Vercel env vars to enable AI code review."],
       code_style: "N/A",
       score: 0,
     };
