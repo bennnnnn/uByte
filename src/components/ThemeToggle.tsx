@@ -7,15 +7,18 @@ import { applyTheme } from "@/lib/theme";
 export { applyTheme };
 
 function getStoredTheme(): "light" | "dark" {
-  if (typeof window === "undefined") return "dark";
   const saved = localStorage.getItem("theme");
   if (saved === "light" || saved === "dark") return saved;
   return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
 }
 
 export default function ThemeToggle({ className }: { className?: string }) {
-  const [theme, setTheme] = useState<"light" | "dark">(getStoredTheme);
+  const [theme, setTheme] = useState<"light" | "dark">("dark");
   const { user } = useAuth();
+
+  useEffect(() => {
+    setTheme(getStoredTheme());
+  }, []);
 
   useEffect(() => {
     document.documentElement.classList.remove("light", "dark");

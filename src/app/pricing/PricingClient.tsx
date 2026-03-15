@@ -472,6 +472,8 @@ function PricingContent() {
                 <div className="space-y-2">
                   {/* Optional coupon code field — Paddle applies the discount at checkout */}
                   <input
+                    id="pricing-coupon"
+                    name="coupon"
                     type="text"
                     placeholder="Coupon code (optional)"
                     value={coupon}

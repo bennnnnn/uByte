@@ -198,6 +198,8 @@ export default function TutorialChat({ chatSlug, lang, onClose, currentCode, inl
           <div className="flex gap-2">
             <textarea
               ref={inputRef}
+              id="chat-message"
+              name="message"
               aria-label="Chat message"
               value={input}
               onChange={(e) => setInput(e.target.value)}

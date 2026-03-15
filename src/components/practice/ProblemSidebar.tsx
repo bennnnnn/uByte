@@ -106,6 +106,8 @@ export default function ProblemSidebar({
         {availableCategories.length > 0 && (
           <div className="relative">
             <select
+              id="problem-category"
+              name="category"
               value={selectedCategory}
               onChange={(e) => handleCategoryChange(e.target.value as ProblemCategory | "all")}
               className="w-full appearance-none rounded-lg border border-zinc-200 bg-white py-1.5 pl-2.5 pr-7 text-xs font-medium text-zinc-700 shadow-sm transition-colors focus:border-indigo-400 focus:outline-none focus:ring-1 focus:ring-indigo-400 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-200 dark:focus:border-indigo-600"

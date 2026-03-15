@@ -43,6 +43,8 @@ export function EditorToolbar({
     return (
       <div className="fixed bottom-0 left-0 right-0 z-[54] flex items-center gap-2 border-t border-zinc-200 bg-zinc-50 px-3 py-2 md:hidden dark:border-zinc-800 dark:bg-zinc-900">
         <select
+          id="mobile-lang-select"
+          name="language"
           value={lang}
           onChange={(e) => onLangChange(e.target.value as SupportedLanguage)}
           aria-label="Code language"
@@ -73,6 +75,8 @@ export function EditorToolbar({
   return (
     <div className="hidden shrink-0 items-center gap-2 border-t border-zinc-200 bg-zinc-50 px-4 py-2 dark:border-zinc-800 dark:bg-zinc-900 md:flex">
       <select
+        id="desktop-lang-select"
+        name="language"
         value={lang}
         onChange={(e) => onLangChange(e.target.value as SupportedLanguage)}
         aria-label="Code language"

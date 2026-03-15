@@ -449,7 +449,7 @@ export default function BlogTab() {
             <div className="grid gap-4 sm:grid-cols-2">
               <div>
                 <label className="mb-1 block text-xs font-semibold text-zinc-600 dark:text-zinc-400">Title *</label>
-                <input type="text" value={form.title}
+                <input id="blog-title" name="title" type="text" value={form.title}
                   onChange={(e) => {
                     const title = e.target.value;
                     setForm((f) => ({
@@ -472,7 +472,7 @@ export default function BlogTab() {
               <label className="mb-1 block text-xs font-semibold text-zinc-600 dark:text-zinc-400">
                 Description <span className="font-normal text-zinc-400">(SEO meta — shown in search results)</span>
               </label>
-              <input type="text" value={form.description}
+              <input id="blog-description" name="description" type="text" value={form.description}
                 onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
                 placeholder="One-sentence summary" className={inputCls} />
             </div>
@@ -491,12 +491,12 @@ export default function BlogTab() {
                 <label className="mb-1 block text-xs font-semibold text-zinc-600 dark:text-zinc-400">
                   Read time <span className="font-normal text-zinc-400">(auto)</span>
                 </label>
-                <input type="text" value={form.read_time} readOnly
+                <input id="blog-read-time" name="read_time" type="text" value={form.read_time} readOnly
                   className={`${inputCls} cursor-default bg-zinc-50 dark:bg-zinc-800/50`} />
               </div>
               <div>
                 <label className="mb-1 block text-xs font-semibold text-zinc-600 dark:text-zinc-400">Author</label>
-                <input type="text" value={form.author}
+                <input id="blog-author" name="author" type="text" value={form.author}
                   onChange={(e) => setForm((f) => ({ ...f, author: e.target.value }))}
                   placeholder="uByte Team" className={inputCls} />
               </div>
@@ -515,7 +515,7 @@ export default function BlogTab() {
                 ))}
               </div>
               <div className="flex gap-2">
-                <input type="text" value={tagInput}
+                <input id="blog-tag-input" name="tag" type="text" value={tagInput}
                   onChange={(e) => setTagInput(e.target.value)}
                   onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); addTag(); } }}
                   placeholder="Type a tag and press Enter"
@@ -532,7 +532,7 @@ export default function BlogTab() {
               <label className="mb-1 block text-xs font-semibold text-zinc-600 dark:text-zinc-400">
                 Custom OG Image URL <span className="font-normal text-zinc-400">(optional)</span>
               </label>
-              <input type="url" value={form.og_image}
+              <input id="blog-og-image" name="og_image" type="url" value={form.og_image}
                 onChange={(e) => setForm((f) => ({ ...f, og_image: e.target.value }))}
                 placeholder="https://yourdomain.com/images/cover.png" className={inputCls} />
               {form.og_image && (
@@ -637,6 +637,8 @@ export default function BlogTab() {
                 {viewMode !== "preview" && (
                   <textarea
                     ref={textareaRef}
+                    id="blog-content"
+                    name="content"
                     value={form.content}
                     onChange={(e) => setForm((f) => ({ ...f, content: e.target.value }))}
                     onKeyDown={handleKeyDown}
@@ -669,7 +671,7 @@ export default function BlogTab() {
 
             {/* Published toggle */}
             <label className="flex items-center gap-2.5 cursor-pointer">
-              <input type="checkbox" checked={form.published}
+              <input id="blog-published" name="published" type="checkbox" checked={form.published}
                 onChange={(e) => setForm((f) => ({ ...f, published: e.target.checked }))}
                 className="h-4 w-4 rounded border-zinc-300 text-indigo-600 focus:ring-indigo-500" />
               <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Published (visible to readers)</span>

@@ -140,6 +140,8 @@ export default function InstructionsSidebar({
             {showNote && (
               <div className="mt-2 space-y-2">
                 <textarea
+                  id="step-note"
+                  name="note"
                   value={note}
                   onChange={(e) => handleNoteChange(e.target.value)}
                   onBlur={() => note.trim() && saveNote(note)}

@@ -63,7 +63,7 @@ export default function SiteFooter() {
     return (
       <footer className="shrink-0 border-t border-zinc-100 bg-white px-6 py-3 dark:border-zinc-800 dark:bg-zinc-950">
         <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-zinc-500 dark:text-zinc-400">
-          <span>© {new Date().getFullYear()} uByte</span>
+          <span suppressHydrationWarning>© {new Date().getFullYear()} uByte</span>
           <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
             <FooterLink href="/pricing" label="Pricing" />
             <FooterLink href="/help" label="Help" />
@@ -142,7 +142,7 @@ export default function SiteFooter() {
         </div>
 
         <div className="flex flex-col gap-1 border-t border-zinc-100 pt-4 text-xs text-zinc-500 dark:border-zinc-800 dark:text-zinc-400 sm:flex-row sm:items-center sm:justify-between sm:gap-2">
-          <span>© {new Date().getFullYear()} uByte. Learn, practice, get certified.</span>
+          <span suppressHydrationWarning>© {new Date().getFullYear()} uByte. Learn, practice, get certified.</span>
           <span>Based in the cloud. Available worldwide.</span>
         </div>
       </div>

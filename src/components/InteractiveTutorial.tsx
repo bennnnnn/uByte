@@ -66,10 +66,14 @@ export default function InteractiveTutorial({
   const [expandedSlug, setExpandedSlug] = useState(tutorialSlug);
   const [showSnapshots, setShowSnapshots] = useState(false);
   const { shareCopied, handleShare } = useShareCode(() => editor.code);
-  const [fontSize, setFontSize] = useState<14 | 16 | 18>(() => {
-    try { const s = localStorage.getItem("ide-font-size"); if (s === "16") return 16; if (s === "18") return 18; } catch { /* ignore */ }
-    return 14;
-  });
+  const [fontSize, setFontSize] = useState<14 | 16 | 18>(14);
+  useEffect(() => {
+    try {
+      const s = localStorage.getItem("ide-font-size");
+      if (s === "16") setFontSize(16);
+      else if (s === "18") setFontSize(18);
+    } catch { /* ignore */ }
+  }, []);
   const [mobileTab, setMobileTab] = useState<"instructions" | "discuss" | "code">("instructions");
   const [leftTab, setLeftTab] = useState<"instructions" | "discuss" | "outline">("instructions");
   const isMobile = useIsMobile();

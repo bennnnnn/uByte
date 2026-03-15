@@ -25,6 +25,8 @@ export default function BannerTab({ data }: Props) {
             {/* ── Enabled toggle ───────────────────────────────────────── */}
             <label className="flex items-center gap-2.5">
               <input
+                id="banner-enabled"
+                name="banner_enabled"
                 type="checkbox"
                 checked={bannerData.enabled}
                 onChange={(e) => setBannerData((b) => b ? { ...b, enabled: e.target.checked } : b)}
@@ -39,6 +41,8 @@ export default function BannerTab({ data }: Props) {
               <label className="flex flex-col gap-1.5">
                 <span className="text-xs font-medium text-zinc-500 dark:text-zinc-400">Message</span>
                 <textarea
+                  id="banner-message"
+                  name="banner_message"
                   value={bannerData.message}
                   onChange={(e) => setBannerData((b) => b ? { ...b, message: e.target.value } : b)}
                   placeholder="e.g. 80% off this week!"
@@ -54,7 +58,7 @@ export default function BannerTab({ data }: Props) {
                 </label>
                 <label className="flex flex-col gap-1.5">
                   <span className="text-xs font-medium text-zinc-500 dark:text-zinc-400">Link text</span>
-                  <input type="text" value={bannerData.linkText} onChange={(e) => setBannerData((b) => b ? { ...b, linkText: e.target.value } : b)} placeholder="Sign up" className="rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-200" />
+                  <input id="banner-link-text" name="banner_link_text" type="text" value={bannerData.linkText} onChange={(e) => setBannerData((b) => b ? { ...b, linkText: e.target.value } : b)} placeholder="Sign up" className="rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-200" />
                 </label>
               </div>
             </div>

@@ -835,6 +835,8 @@ export function PracticeIDE({ problem, initialLang, initialCode, categoryFilter 
                     </button>
                   </div>
                   <textarea
+                    id="practice-notes"
+                    name="notes"
                     value={notes}
                     onChange={(e) => { setNotes(e.target.value); setNoteSaved(false); }}
                     placeholder="Write your approach, observations, or ideas here…"

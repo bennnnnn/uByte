@@ -168,6 +168,8 @@ export default function UsersTab({ data }: Props) {
             <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z" />
           </svg>
           <input
+            id="admin-users-search"
+            name="search"
             type="text"
             placeholder="Search by name or email…"
             value={search}

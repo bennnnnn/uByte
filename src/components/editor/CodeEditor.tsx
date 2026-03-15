@@ -57,6 +57,8 @@ export function CodeEditor({ editor, onKeyDown, fontSize }: CodeEditorProps) {
         />
         <textarea
           ref={editor.textareaRef}
+          id="code-editor"
+          name="code"
           defaultValue={editor.code}
           onChange={(e) => editor.setCode(e.target.value)}
           onScroll={editor.syncScroll}

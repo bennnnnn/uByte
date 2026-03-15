@@ -305,6 +305,8 @@ export default function PlanTab({ plan, expiresAtProp }: Props & { expiresAtProp
         <div className="space-y-3">
         {/* Coupon input — shown above the checkout buttons when user is on free plan */}
         <input
+          id="plan-coupon"
+          name="coupon"
           type="text"
           placeholder="Coupon code (optional)"
           value={coupon}

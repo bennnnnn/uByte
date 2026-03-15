@@ -499,6 +499,8 @@ export default function PracticeExamAttemptPage() {
 
           {/* Switch language */}
           <select
+            id="exam-language"
+            name="language"
             value={attempt.lang}
             onChange={(e) => handleSwitchLanguage(e.target.value)}
             className="hidden rounded-lg border border-zinc-200 bg-white px-2 py-1.5 text-xs text-zinc-600 shadow-sm dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300 sm:block"

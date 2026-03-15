@@ -126,6 +126,8 @@ function ComposeBox({
     <div className="space-y-2">
       <textarea
         ref={ref}
+        id="discussion-reply"
+        name="reply"
         value={text}
         onChange={(e) => setText(e.target.value)}
         placeholder={placeholder}

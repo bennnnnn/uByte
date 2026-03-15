@@ -414,7 +414,7 @@ export default async function PracticeExamsPage() {
                         <p className="mt-0.5 text-[11px] text-zinc-500 dark:text-zinc-400">has successfully passed the</p>
                         <p className="mt-0.5 text-sm font-bold text-indigo-600 dark:text-indigo-400">Go Language Certification</p>
                         <div className="mx-auto mt-3 h-px w-16 bg-indigo-200 dark:bg-indigo-700" />
-                        <p className="mt-2 text-[9px] font-mono text-zinc-400 dark:text-zinc-500">ubyte.dev/cert/a3f9b2c1 · {new Date().getFullYear()}</p>
+                        <p className="mt-2 text-[9px] font-mono text-zinc-400 dark:text-zinc-500" suppressHydrationWarning>ubyte.dev/cert/a3f9b2c1 · {new Date().getFullYear()}</p>
                       </div>
                     </div>
                   )}

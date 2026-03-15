@@ -269,6 +269,8 @@ export function PracticeListClient({
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-4.35-4.35M17 11A6 6 0 105 11a6 6 0 0012 0z" />
             </svg>
             <input
+              id="practice-search"
+              name="search"
               type="search"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}

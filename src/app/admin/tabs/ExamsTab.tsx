@@ -288,6 +288,8 @@ export default function ExamsTab({ data }: Props) {
 
         <div className="flex flex-wrap items-center gap-3">
           <input
+            id="exam-upload-file"
+            name="exam_file"
             type="file"
             accept=".csv,.json,text/csv,application/json"
             onChange={(e) => { setExamUploadFile(e.target.files?.[0] ?? null); setExamUploadResult(null); }}
@@ -320,6 +322,7 @@ export default function ExamsTab({ data }: Props) {
 function NumberInput({ value, min, max, onChange }: { value: number; min: number; max: number; onChange: (v: number) => void }) {
   return (
     <input
+      name="number_input"
       type="number"
       min={min}
       max={max}

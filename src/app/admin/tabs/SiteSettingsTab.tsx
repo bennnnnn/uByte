@@ -101,6 +101,8 @@ export default function SiteSettingsTab() {
         >
           <div className="flex items-center gap-3">
             <input
+              id="default-pass-percent"
+              name="pass_percent"
               type="number"
               min={1}
               max={100}

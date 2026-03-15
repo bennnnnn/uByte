@@ -19,8 +19,8 @@ export default function TutorialStepLoading() {
         </div>
         <div className="flex-1 bg-zinc-900 p-4">
           <div className="space-y-2">
-            {Array.from({ length: 8 }).map((_, i) => (
-              <div key={i} className="h-4 animate-pulse rounded bg-zinc-800" style={{ width: `${40 + Math.random() * 50}%` }} />
+            {[65, 80, 45, 72, 58, 90, 50, 68].map((w, i) => (
+              <div key={i} className="h-4 animate-pulse rounded bg-zinc-800" style={{ width: `${w}%` }} />
             ))}
           </div>
         </div>

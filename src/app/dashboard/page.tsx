@@ -337,6 +337,8 @@ function DashboardPage() {
         {/* ── Mobile: grouped select ─────────────────────────────────── */}
         <div className="mb-6 sm:hidden">
           <select
+            id="dashboard-tab-select"
+            name="tab"
             value={tab}
             onChange={(e) => {
               const v = e.target.value;

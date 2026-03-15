@@ -158,6 +158,8 @@ export default function AdminsTab({ data }: Props) {
         <h2 className="mb-4 text-sm font-semibold text-zinc-900 dark:text-zinc-100">Promote a user to admin</h2>
         <form onSubmit={handlePromote} className="flex flex-wrap gap-3">
           <input
+            id="promote-email"
+            name="email"
             type="email"
             value={promoteEmail}
             onChange={(e) => setPromoteEmail(e.target.value)}
@@ -165,6 +167,8 @@ export default function AdminsTab({ data }: Props) {
             className="min-w-0 flex-1 rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm placeholder-zinc-400 focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-100 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100 dark:focus:border-indigo-600 dark:focus:ring-indigo-900/30"
           />
           <select
+            id="promote-role"
+            name="role"
             value={promoteRole}
             onChange={(e) => setPromoteRole(e.target.value as AdminRole)}
             className="rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm text-zinc-700 focus:border-indigo-400 focus:outline-none dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300"

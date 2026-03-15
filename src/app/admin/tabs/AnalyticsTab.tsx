@@ -91,6 +91,8 @@ export default function AnalyticsTab({ data }: Props) {
       {/* ── Step difficulty heatmap ────────────────────────────────────── */}
       <SectionCard title="Step difficulty heatmap" description="Pick a tutorial to see pass rates per step.">
         <select
+          id="heatmap-tutorial"
+          name="tutorial"
           value={heatmapSlug}
           onChange={(e) => loadStepStats(e.target.value)}
           className="rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-1.5 text-sm dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300"

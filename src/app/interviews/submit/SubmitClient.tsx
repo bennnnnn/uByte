@@ -183,6 +183,8 @@ export default function SubmitClient() {
           <div>
             <label className="mb-1.5 block text-sm font-medium text-zinc-700 dark:text-zinc-300">Company *</label>
             <select
+              id="interview-company"
+              name="company"
               value={companyChoice}
               onChange={(e) => setCompanyChoice(e.target.value)}
               className={selectCls}
@@ -208,6 +210,8 @@ export default function SubmitClient() {
           <div>
             <label className="mb-1.5 block text-sm font-medium text-zinc-700 dark:text-zinc-300">Role / Position *</label>
             <input
+              id="interview-role"
+              name="role"
               required
               type="text"
               value={role}
@@ -223,7 +227,7 @@ export default function SubmitClient() {
         <div className="grid gap-4 sm:grid-cols-2">
           <div>
             <label className="mb-1.5 block text-sm font-medium text-zinc-700 dark:text-zinc-300">Difficulty *</label>
-            <select value={difficulty} onChange={(e) => setDifficulty(e.target.value as Difficulty)} className={selectCls}>
+            <select id="interview-difficulty" name="difficulty" value={difficulty} onChange={(e) => setDifficulty(e.target.value as Difficulty)} className={selectCls}>
               <option value="easy">Easy</option>
               <option value="medium">Medium</option>
               <option value="hard">Hard</option>
@@ -231,7 +235,7 @@ export default function SubmitClient() {
           </div>
           <div>
             <label className="mb-1.5 block text-sm font-medium text-zinc-700 dark:text-zinc-300">Outcome *</label>
-            <select value={outcome} onChange={(e) => setOutcome(e.target.value as Outcome)} className={selectCls}>
+            <select id="interview-outcome" name="outcome" value={outcome} onChange={(e) => setOutcome(e.target.value as Outcome)} className={selectCls}>
               <option value="offer">Got the offer</option>
               <option value="rejection">Rejected</option>
               <option value="ongoing">Still ongoing</option>
@@ -288,6 +292,8 @@ export default function SubmitClient() {
                     <div key={qIdx} className="flex items-center gap-2">
                       <span className="w-5 shrink-0 text-right text-xs font-medium text-zinc-400">{qIdx + 1}.</span>
                       <input
+                        id={`round-${rIdx}-q-${qIdx}`}
+                        name={`round_${rIdx}_question_${qIdx}`}
                         type="text"
                         value={q}
                         onChange={(e) => setQuestion(rIdx, qIdx, e.target.value)}
@@ -325,6 +331,8 @@ export default function SubmitClient() {
                 <div>
                   <p className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-zinc-400">Notes <span className="font-normal normal-case text-zinc-400">(optional — duration, format, vibe…)</span></p>
                   <textarea
+                    id={`round-notes-${rIdx}`}
+                    name={`round_notes_${rIdx}`}
                     value={round.notes}
                     onChange={(e) => updateRound(rIdx, { notes: e.target.value })}
                     rows={2}
@@ -360,6 +368,8 @@ export default function SubmitClient() {
             </span>
           </div>
           <textarea
+            id="interview-tips"
+            name="tips"
             value={tips}
             onChange={(e) => setTips(e.target.value)}
             rows={3}

@@ -93,6 +93,8 @@ export default function SettingsTab({ profile, onSave, onChangePassword, onDelet
         <label className="flex cursor-pointer items-start gap-3">
           <div className="relative mt-0.5 flex-shrink-0">
             <input
+              id="email-marketing-opt-in"
+              name="email_marketing"
               type="checkbox"
               checked={emailMarketing}
               disabled={emailSaving}
