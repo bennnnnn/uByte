@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
 import { tutorialUrl } from "@/lib/urls";
 
@@ -18,15 +18,17 @@ interface NavItem {
 export function useNavState(tutorials: NavItem[], lang: string = "go") {
   const pathname = usePathname();
   const [expanded, setExpanded] = useState<string | null>(null);
-  const [prevPathname, setPrevPathname] = useState(pathname);
   const [activeHash, setActiveHash] = useState("");
+  const prevPathRef = useRef(pathname);
 
-  // Synchronously expand the active tutorial when pathname changes
-  if (pathname !== prevPathname) {
-    setPrevPathname(pathname);
-    const active = tutorials.find((t) => pathname === tutorialUrl(lang, t.slug));
-    if (active) setExpanded(active.slug);
-  }
+  // Expand the active tutorial when pathname changes (in useEffect, not during render)
+  useEffect(() => {
+    if (pathname !== prevPathRef.current) {
+      prevPathRef.current = pathname;
+      const active = tutorials.find((t) => pathname === tutorialUrl(lang, t.slug));
+      if (active) setExpanded(active.slug);
+    }
+  }, [pathname, tutorials, lang]);
 
   // Track the URL hash for active subtopic highlighting
   useEffect(() => {

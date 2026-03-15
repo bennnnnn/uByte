@@ -1,8 +1,10 @@
+import { createHash } from "crypto";
 import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
 import { getUserById } from "@/lib/db";
 import { hasPaidAccess } from "@/lib/plans";
 import { canMakeAiCall, getLifetimeAiHintCount, incrementTodayAiUsage, isInCooldown, setLastAiCallAt, AI_COOLDOWN_SECONDS, FREE_HINT_LIMIT } from "@/lib/db/ai-usage";
+import { getCachedAiResponse, setCachedAiResponse } from "@/lib/db/ai-feedback-responses";
 import { callCodeReview } from "@/lib/ai/code-review-client";
 import { withErrorHandling } from "@/lib/api-utils";
 import { verifyCsrf } from "@/lib/csrf";
@@ -61,11 +63,29 @@ export const POST = withErrorHandling("POST /api/code-review", async (request: N
     );
   }
 
+  // Cache key based on code + language + problem context
+  const codeHash = createHash("sha256").update(code.trim()).digest("hex");
+  const cacheKey = {
+    problemId: `review:${lang}:${problem_title ?? "untitled"}`,
+    language: lang,
+    codeHash,
+    verdict: verdict ?? "none",
+    failureSignature: "review",
+    hintLevel: 0,
+    modelName: "gemini-2.5-flash",
+  };
+
+  const cached = await getCachedAiResponse(cacheKey);
+  if (cached) return NextResponse.json(cached);
+
   const firstName = user.name?.split(" ")[0] ?? undefined;
   const review = await callCodeReview(code, lang, problem_title, verdict, firstName);
 
-  await incrementTodayAiUsage(user.userId);
-  await setLastAiCallAt(user.userId);
+  if (review.score > 0) {
+    await setCachedAiResponse(cacheKey, review as unknown as Record<string, unknown>);
+    await incrementTodayAiUsage(user.userId);
+    await setLastAiCallAt(user.userId);
+  }
 
   return NextResponse.json(review);
 });

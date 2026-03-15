@@ -36,6 +36,9 @@ function ManageOrCancelButtons({
   const [loading, setLoading] = useState(false);
   const [syncing, setSyncing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const pollRef = useRef<ReturnType<typeof setInterval>>(undefined);
+
+  useEffect(() => () => clearInterval(pollRef.current), []);
 
   async function openPortal(action: "manage" | "cancel") {
     setError(null);
@@ -48,12 +51,12 @@ function ManageOrCancelButtons({
       const url = action === "cancel" && data.cancelUrl ? data.cancelUrl : data.portalUrl;
       if (!url) { setError("Billing portal URL was not returned. Please contact support."); return; }
 
-      // Open the portal, then sync plan status when the user returns to this tab
       const popup = window.open(url, "_blank", "noopener,noreferrer");
       if (popup) {
-        const pollClosed = setInterval(async () => {
+        clearInterval(pollRef.current);
+        pollRef.current = setInterval(async () => {
           if (popup.closed) {
-            clearInterval(pollClosed);
+            clearInterval(pollRef.current);
             setSyncing(true);
             try { await onSyncPlan?.(); } finally { setSyncing(false); }
           }

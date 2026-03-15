@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { encodeShareCode } from "@/lib/share-code";
 
 /**
@@ -10,6 +10,9 @@ import { encodeShareCode } from "@/lib/share-code";
  */
 export function useShareCode(getCode: () => string) {
   const [shareCopied, setShareCopied] = useState(false);
+  const timerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
+
+  useEffect(() => () => clearTimeout(timerRef.current), []);
 
   function handleShare() {
     try {
@@ -20,7 +23,8 @@ export function useShareCode(getCode: () => string) {
         .writeText(url.toString())
         .then(() => {
           setShareCopied(true);
-          setTimeout(() => setShareCopied(false), 2500);
+          clearTimeout(timerRef.current);
+          timerRef.current = setTimeout(() => setShareCopied(false), 2500);
         })
         .catch(() => {});
     } catch {

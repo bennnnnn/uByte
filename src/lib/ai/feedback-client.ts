@@ -60,6 +60,11 @@ export async function callAiFeedback(
   }
 }
 
+/** Strip non-alpha characters from user names to prevent prompt injection. */
+function sanitizeName(name: string): string {
+  return name.replace(/[^a-zA-Z\s'-]/g, "").trim().slice(0, 30) || "learner";
+}
+
 async function callFeedbackGateway(
   evidenceBundle: string,
   hintLevel: number,
@@ -72,8 +77,9 @@ async function callFeedbackGateway(
     hintLevel === 3 ? "Suggest a concrete fix (minimal_patch) if applicable. No full solution." :
     "Teach the concept briefly; keep hint and next_step actionable. No full solution.";
 
-  const nameInstruction = userName
-    ? `The learner's name is ${userName}. Address them by first name naturally in friendly_one_liner (e.g. "Nice try, ${userName}!" or "${userName}, your logic is close —"). Do not repeat the name more than once.`
+  const safeName = userName ? sanitizeName(userName) : undefined;
+  const nameInstruction = safeName
+    ? `The learner's name is ${safeName}. Address them by first name naturally in friendly_one_liner (e.g. "Nice try, ${safeName}!" or "${safeName}, your logic is close —"). Do not repeat the name more than once.`
     : "Address the learner in a friendly, encouraging tone.";
 
   const system = `You are a friendly coding tutor. ${nameInstruction} ${SCHEMA_DESC} ${levelPrompt} Respond with ONLY a single JSON object.`;

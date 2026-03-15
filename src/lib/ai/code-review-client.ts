@@ -43,8 +43,9 @@ export async function callCodeReview(
     };
   }
 
-  const nameInstruction = userName
-    ? `The developer's name is ${userName}. Address them by first name once in the summary.`
+  const safeName = userName ? userName.replace(/[^a-zA-Z\s'-]/g, "").trim().slice(0, 30) : undefined;
+  const nameInstruction = safeName
+    ? `The developer's name is ${safeName}. Address them by first name once in the summary.`
     : "Address the developer in a professional, encouraging tone.";
 
   const context = problemTitle ? `Problem: "${problemTitle}"\n` : "";

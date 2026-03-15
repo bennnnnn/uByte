@@ -187,28 +187,27 @@ export function useStepProgress(
   // ── Save last activity for "You left off at..." (logged-in only) ──
   useEffect(() => {
     if (userId == null) return;
+    const controller = new AbortController();
     apiFetch("/api/last-activity", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ type: "tutorial", lang, slug: tutorialSlug, step: stepIndex }),
+      signal: controller.signal,
     }).catch(() => {});
+    return () => controller.abort();
   }, [userId, lang, tutorialSlug, stepIndex]);
 
   // ── Restore step progress from DB on mount ──
   useEffect(() => {
     if (userId == null || !tutorialSlug) return;
-    apiFetch(`/api/progress/steps?slug=${encodeURIComponent(tutorialSlug)}&lang=${encodeURIComponent(lang)}`)
+    const controller = new AbortController();
+    apiFetch(`/api/progress/steps?slug=${encodeURIComponent(tutorialSlug)}&lang=${encodeURIComponent(lang)}`, { signal: controller.signal })
       .then((r) => r.json())
       .then((d) => {
+        if (controller.signal.aborted) return;
         const completed: number[] = Array.isArray(d?.steps) ? d.steps : [];
         const skipped: number[] = Array.isArray(d?.skippedSteps) ? d.skippedSteps : [];
 
-        // IMPORTANT: if all steps are already in the DB, the tutorial was previously
-        // completed. Set markedRef=true NOW (before setCompletedSteps triggers a
-        // re-render) so the "tutorial completion" effect below never fires on reload.
-        // Without this, the effect would see completedSteps.size===steps.length,
-        // call toggleProgress, and — because the slug is already in progressByLang —
-        // accidentally send completed=false (markIncomplete), wiping the DB row.
         if (steps.length > 0 && (completed.length + skipped.length) >= steps.length) {
           markedRef.current = true;
         }
@@ -216,6 +215,7 @@ export function useStepProgress(
         setSkippedSteps((prev) => new Set([...prev, ...skipped]));
       })
       .catch(() => {});
+    return () => controller.abort();
   }, [userId, tutorialSlug, lang, steps.length]);
 
   // ── Chapter completion — fires once when the user passes the LAST step ──

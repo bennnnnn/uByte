@@ -6,11 +6,16 @@ import { withErrorHandling } from "@/lib/api-utils";
 import { getCurrentUser } from "@/lib/auth";
 import { getUserById } from "@/lib/db";
 import { FREE_TUTORIAL_LIMIT, hasPaidAccess } from "@/lib/plans";
+import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 import type { SupportedLanguage } from "@/lib/languages/types";
 
 export const dynamic = "force-dynamic";
 
 export const GET = withErrorHandling("GET /api/tutorial-steps", async (request: NextRequest) => {
+  const ip = getClientIp(request.headers);
+  const { limited } = await checkRateLimit(`tutorial-steps:${ip}`, 60, 60_000);
+  if (limited) return NextResponse.json({ error: "Too many requests" }, { status: 429 });
+
   const { searchParams } = new URL(request.url);
   const lang = searchParams.get("lang")?.trim();
   const slug = searchParams.get("slug")?.trim();

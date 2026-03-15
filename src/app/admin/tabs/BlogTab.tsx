@@ -94,20 +94,28 @@ function renderMarkdown(md: string): string {
     return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
   }
 
+  function safeHref(href: string): string {
+    const trimmed = href.trim().toLowerCase();
+    if (trimmed.startsWith("javascript:") || trimmed.startsWith("data:") || trimmed.startsWith("vbscript:")) {
+      return "#";
+    }
+    return esc(href);
+  }
+
   function inline(s: string): string {
     return s
       .replace(/!\[([^\]]*)\]\(([^)]+)\)/g, (_, alt, src) =>
-        `<img src="${src}" alt="${esc(alt)}" class="max-w-full rounded my-2" />`)
+        `<img src="${safeHref(src)}" alt="${esc(alt)}" class="max-w-full rounded my-2" />`)
       .replace(/\[([^\]]+)\]\(([^)]+)\)/g, (_, text, href) =>
-        `<a href="${href}" target="_blank" rel="noopener noreferrer" class="text-indigo-600 underline dark:text-indigo-400">${text}</a>`)
+        `<a href="${safeHref(href)}" target="_blank" rel="noopener noreferrer" class="text-indigo-600 underline dark:text-indigo-400">${esc(text)}</a>`)
       .replace(/`([^`]+)`/g, (_, c) =>
         `<code class="rounded bg-zinc-100 px-1.5 py-0.5 font-mono text-[0.8em] text-zinc-800 dark:bg-zinc-800 dark:text-zinc-200">${esc(c)}</code>`)
-      .replace(/~~(.+?)~~/g, "<del>$1</del>")
-      .replace(/\*\*\*(.+?)\*\*\*/g, "<strong><em>$1</em></strong>")
-      .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
-      .replace(/__(.+?)__/g, "<strong>$1</strong>")
-      .replace(/\*(.+?)\*/g, "<em>$1</em>")
-      .replace(/_(.+?)_/g, "<em>$1</em>");
+      .replace(/~~(.+?)~~/g, (_, t) => `<del>${esc(t)}</del>`)
+      .replace(/\*\*\*(.+?)\*\*\*/g, (_, t) => `<strong><em>${esc(t)}</em></strong>`)
+      .replace(/\*\*(.+?)\*\*/g, (_, t) => `<strong>${esc(t)}</strong>`)
+      .replace(/__(.+?)__/g, (_, t) => `<strong>${esc(t)}</strong>`)
+      .replace(/\*(.+?)\*/g, (_, t) => `<em>${esc(t)}</em>`)
+      .replace(/_(.+?)_/g, (_, t) => `<em>${esc(t)}</em>`);
   }
 
   for (const raw of lines) {

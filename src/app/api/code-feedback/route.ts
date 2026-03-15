@@ -6,6 +6,7 @@ import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 import { verifyCsrf } from "@/lib/csrf";
 import { getSteps } from "@/lib/tutorial-steps";
 import { getCachedFeedback, setCachedFeedback } from "@/lib/db/ai-feedback-cache";
+import { canMakeAiCall, incrementTodayAiUsage } from "@/lib/db/ai-usage";
 import { resolveLanguage } from "@/lib/languages/registry";
 import { callGateway, HINTS_MODEL } from "@/lib/ai/gateway-client";
 
@@ -57,6 +58,15 @@ export const POST = withErrorHandling("POST /api/code-feedback", async (req: Nex
     return NextResponse.json({ feedback: null });
   }
 
+  // Daily AI quota check
+  const { allowed, used, limit } = await canMakeAiCall(user.userId);
+  if (!allowed) {
+    return NextResponse.json(
+      { error: "Daily AI limit reached", message: `You've used ${used} of ${limit} AI calls today.` },
+      { status: 429 }
+    );
+  }
+
   const hasError = Boolean(error);
   const cacheKey = feedbackCacheKey(language, String(tutorialSlug), stepIdx, String(code), hasError);
   const cached = await getCachedFeedback(cacheKey);
@@ -102,7 +112,10 @@ No prefix like "Feedback:" — just the sentence.`;
       maxTokens: 80,
       temperature: 0.3,
     });
-    if (feedback) await setCachedFeedback(cacheKey, feedback);
+    if (feedback) {
+      await setCachedFeedback(cacheKey, feedback);
+      await incrementTodayAiUsage(user.userId);
+    }
     return NextResponse.json({ feedback: feedback || null });
   } catch {
     return NextResponse.json({ feedback: null });

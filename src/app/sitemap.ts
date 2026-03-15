@@ -36,6 +36,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: abs("/about"), lastModified: now, changeFrequency: "monthly", priority: 0.60 },
     { url: abs("/contact"), lastModified: now, changeFrequency: "monthly", priority: 0.55 },
     { url: abs("/help"), lastModified: now, changeFrequency: "weekly", priority: 0.65 },
+    { url: abs("/search"), lastModified: now, changeFrequency: "weekly", priority: 0.60 },
+    { url: abs("/referral"), lastModified: now, changeFrequency: "monthly", priority: 0.45 },
     { url: abs("/terms"), lastModified: now, changeFrequency: "yearly", priority: 0.30 },
     { url: abs("/privacy"), lastModified: now, changeFrequency: "yearly", priority: 0.30 },
     // MDX blog posts

@@ -1,11 +1,15 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { withErrorHandling } from "@/lib/api-utils";
 import { getAllPracticeProblems } from "@/lib/practice/problems";
 import { getCurrentUser } from "@/lib/auth";
 import { getSql } from "@/lib/db/client";
+import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 
 /** Returns a deterministic daily problem (changes at midnight UTC) + today's solver count. */
-export const GET = withErrorHandling("GET /api/daily-challenge", async () => {
+export const GET = withErrorHandling("GET /api/daily-challenge", async (request: NextRequest) => {
+  const ip = getClientIp(request.headers);
+  const { limited } = await checkRateLimit(`daily-challenge:${ip}`, 30, 60_000);
+  if (limited) return NextResponse.json({ error: "Too many requests" }, { status: 429 });
   const problems = getAllPracticeProblems();
   if (problems.length === 0) return NextResponse.json({ error: "No problems" }, { status: 500 });
 
