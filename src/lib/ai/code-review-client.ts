@@ -34,7 +34,7 @@ export async function callCodeReview(
   verdict?: string,
   userName?: string,
 ): Promise<CodeReviewSchema> {
-  if (!process.env.VERCEL_AI_GATEWAY_TOKEN && !process.env.VERCEL_TOKEN) {
+  if (!process.env.AI_GATEWAY_API_KEY && !process.env.VERCEL_AI_GATEWAY_TOKEN && !process.env.VERCEL_TOKEN) {
     return {
       summary: "AI code review is not configured. Set VERCEL_AI_GATEWAY_TOKEN in Vercel project settings.",
       time_complexity: "Unknown",

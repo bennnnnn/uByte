@@ -1,34 +1,32 @@
 /**
  * Vercel AI Gateway client — single entry point for all AI calls.
  *
- * The gateway is OpenAI-compatible and accepts ANY provider model in the
- * format "provider/model-name". Authentication uses a Vercel API token.
+ * Uses Vercel AI SDK v6 with the AI Gateway. The SDK accepts model strings in
+ * the format "provider/model-name" and automatically routes them through the
+ * gateway when AI_GATEWAY_API_KEY is present.
  *
  * Required env var (Vercel project → Settings → Environment Variables):
- *   VERCEL_AI_GATEWAY_TOKEN  — a Vercel API token (vercel.com/account/tokens)
+ *   AI_GATEWAY_API_KEY  — obtained from vercel.com/[team]/~/ai-gateway/api-keys
+ *                         (NOT a regular Vercel API token — a dedicated gateway key)
  *
- * For local development, set one of these as a fallback:
- *   GOOGLE_GENERATIVE_AI_API_KEY  — Google AI Studio key (for Gemini models)
- *   OPENAI_API_KEY                — OpenAI key (for GPT models)
- *
- * Verified model names in the Vercel AI Gateway:
- *   HINTS_MODEL        google/gemini-2.0-flash-lite   fast & cheap for short hints
- *   CODE_REVIEW_MODEL  openai/gpt-4o-mini             strong code understanding
- *   CHAT_MODEL         google/gemini-2.0-flash        balanced for multi-turn chat
+ * Verified model names from https://vercel.com/ai-gateway/models:
+ *   HINTS_MODEL        google/gemini-2.5-flash-lite   0.3s · $0.10/$0.40 per M tokens
+ *   CODE_REVIEW_MODEL  openai/gpt-4o-mini             0.5s · $0.15/$0.60 per M tokens
+ *   CHAT_MODEL         google/gemini-2.5-flash        0.4s · $0.30/$2.50 per M tokens
  */
 
+import { generateText } from "ai";
 import { createOpenAI } from "@ai-sdk/openai";
 import { createGoogleGenerativeAI } from "@ai-sdk/google";
-import { generateText } from "ai";
 
-/** Fast, cheap model for tutorial hints. */
-export const HINTS_MODEL       = "google/gemini-2.0-flash-lite";
+/** Fast, cheap model for tutorial hints — verified in gateway catalog. */
+export const HINTS_MODEL       = "google/gemini-2.5-flash-lite";
 
 /** Code-specialised model for post-solve code reviews. */
 export const CODE_REVIEW_MODEL = "openai/gpt-4o-mini";
 
 /** Balanced conversational model for interview simulator / tutorial chat. */
-export const CHAT_MODEL        = "google/gemini-2.0-flash";
+export const CHAT_MODEL        = "google/gemini-2.5-flash";
 
 const GATEWAY_BASE_URL = "https://ai-gateway.vercel.sh/v1";
 const DEFAULT_TIMEOUT_MS = 15_000;
@@ -48,40 +46,20 @@ export interface GatewayOptions {
 
 /**
  * Call the Vercel AI Gateway and return the assistant text.
- * Routes through the gateway when VERCEL_AI_GATEWAY_TOKEN is set,
- * otherwise falls back to provider-specific API keys for local dev.
  * Throws on API error or timeout — callers should catch and return a graceful fallback.
  */
 export async function callGateway(opts: GatewayOptions): Promise<string> {
-  const gatewayToken = process.env.VERCEL_AI_GATEWAY_TOKEN ?? process.env.VERCEL_TOKEN;
+  const gatewayKey =
+    process.env.AI_GATEWAY_API_KEY ??
+    // Legacy env var names — kept for backwards compatibility during migration
+    process.env.VERCEL_AI_GATEWAY_TOKEN ??
+    process.env.VERCEL_TOKEN;
 
-  // Determine which SDK provider to use.
-  // Through the gateway ALL models go via the single OpenAI-compatible endpoint.
-  // For local dev without gateway, route to the appropriate direct provider.
-  let sdkModel: ReturnType<ReturnType<typeof createOpenAI>>;
-
-  if (gatewayToken) {
-    // Gateway: use OpenAI-compatible client for all models (gateway handles routing)
-    const gateway = createOpenAI({
-      baseURL: GATEWAY_BASE_URL,
-      apiKey: gatewayToken,
-    });
-    sdkModel = gateway(opts.model);
-  } else {
-    // Local dev fallback: pick provider based on model prefix
-    const isGoogle = opts.model.startsWith("google/");
-    if (isGoogle) {
-      const googleKey = process.env.GOOGLE_GENERATIVE_AI_API_KEY;
-      if (!googleKey) throw new Error("Set VERCEL_AI_GATEWAY_TOKEN or GOOGLE_GENERATIVE_AI_API_KEY.");
-      const google = createGoogleGenerativeAI({ apiKey: googleKey });
-      // Strip the "google/" prefix for the direct Google provider
-      sdkModel = google(opts.model.replace(/^google\//, "")) as ReturnType<ReturnType<typeof createOpenAI>>;
-    } else {
-      const openaiKey = process.env.OPENAI_API_KEY;
-      if (!openaiKey) throw new Error("Set VERCEL_AI_GATEWAY_TOKEN or OPENAI_API_KEY.");
-      const openai = createOpenAI({ apiKey: openaiKey });
-      sdkModel = openai(opts.model.replace(/^openai\//, ""));
-    }
+  if (!gatewayKey) {
+    throw new Error(
+      "No AI Gateway key found. Set AI_GATEWAY_API_KEY in Vercel project settings " +
+      "(obtain from vercel.com/[team]/~/ai-gateway/api-keys)."
+    );
   }
 
   const systemMsg = opts.messages.find((m) => m.role === "system");
@@ -89,12 +67,22 @@ export async function callGateway(opts: GatewayOptions): Promise<string> {
     .filter((m) => m.role !== "system")
     .map((m) => ({ role: m.role as "user" | "assistant", content: m.content }));
 
+  // Route all models through the Vercel AI Gateway OpenAI-compatible endpoint.
+  // The gateway handles provider routing based on the "provider/model" prefix.
+  const gateway = createOpenAI({
+    baseURL: GATEWAY_BASE_URL,
+    apiKey: gatewayKey,
+  });
+
   const abortController = new AbortController();
-  const timeout = setTimeout(() => abortController.abort(), opts.timeoutMs ?? DEFAULT_TIMEOUT_MS);
+  const timeout = setTimeout(
+    () => abortController.abort(),
+    opts.timeoutMs ?? DEFAULT_TIMEOUT_MS
+  );
 
   try {
     const { text } = await generateText({
-      model: sdkModel,
+      model: gateway(opts.model),
       system: systemMsg?.content,
       messages: conversationMsgs,
       maxOutputTokens: opts.maxTokens ?? 512,
