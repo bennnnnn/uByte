@@ -46,9 +46,9 @@ export async function callAiFeedback(
 
   try {
     return await callFeedbackGateway(evidenceBundle, hintLevel, verdict, userName);
-  } catch {
-    // AI provider error (rate limit, outage, invalid key) — return a graceful fallback
-    // so the hint section always shows something rather than silently failing.
+  } catch (err) {
+    // Log full error so it appears in Vercel Function logs for debugging.
+    console.error("[AI hint] callFeedbackGateway failed:", err);
     const greeting = userName ? `${userName}, ` : "";
     return {
       friendly_one_liner: `${greeting}AI hint is temporarily unavailable. Check the output above for clues.`,

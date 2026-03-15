@@ -59,6 +59,9 @@ export async function callGateway(opts: GatewayOptions): Promise<string> {
   );
 
   try {
+    const hasKey = !!(process.env.AI_GATEWAY_API_KEY ?? process.env.VERCEL_AI_GATEWAY_TOKEN);
+    console.log(`[AI gateway] model=${opts.model} key_present=${hasKey}`);
+
     // AI SDK v6: passing a "provider/model" string works automatically
     // when AI_GATEWAY_API_KEY is set — no createOpenAI() wrapper needed.
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
