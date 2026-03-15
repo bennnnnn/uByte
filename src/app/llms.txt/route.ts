@@ -7,7 +7,7 @@ export function GET() {
 
   const body = `# ${APP_NAME}
 
-> ${APP_NAME} is a free, interactive coding education platform offering step-by-step tutorials, LeetCode-style practice problems, AI-powered hints, timed mock interviews, and verifiable certifications for ${langs.map((l) => l.label).join(", ")}.
+> ${APP_NAME} is a free, interactive coding education platform offering step-by-step tutorials, LeetCode-style practice problems, AI-powered hints, timed mock interviews, and verifiable certifications for ${langs.map((l) => l.name).join(", ")}.
 
 ## Site
 
@@ -19,19 +19,19 @@ export function GET() {
 
 Interactive, in-browser tutorials with live code execution and instant feedback.
 
-${langs.map((l) => `- [${l.label} Tutorials](${BASE_URL}/tutorial/${l.slug})`).join("\n")}
+${langs.map((l) => `- [${l.name} Tutorials](${BASE_URL}/tutorial/${l.slug})`).join("\n")}
 
 ## Practice Problems
 
 LeetCode-style coding challenges with automated test validation.
 
-${langs.map((l) => `- [${l.label} Practice](${BASE_URL}/practice/${l.slug})`).join("\n")}
+${langs.map((l) => `- [${l.name} Practice](${BASE_URL}/practice/${l.slug})`).join("\n")}
 
 ## Certifications
 
 Timed certification exams with verifiable digital certificates.
 
-${langs.map((l) => `- [${l.label} Certification](${BASE_URL}/certifications/${l.slug})`).join("\n")}
+${langs.map((l) => `- [${l.name} Certification](${BASE_URL}/certifications/${l.slug})`).join("\n")}
 
 ## Other
 
