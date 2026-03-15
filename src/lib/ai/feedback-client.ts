@@ -32,7 +32,7 @@ export async function callAiFeedback(
   verdict: string,
   userName?: string,
 ): Promise<AiFeedbackSchema> {
-  if (!process.env.AI_GATEWAY_API_KEY && !process.env.VERCEL_AI_GATEWAY_TOKEN && !process.env.VERCEL_TOKEN) {
+  if (!process.env.AI_GATEWAY_API_KEY && !process.env.GOOGLE_GENERATIVE_AI_API_KEY && !process.env.OPENAI_API_KEY) {
     const greeting = userName ? `Hey ${userName}!` : "Hey!";
     return {
       friendly_one_liner: `${greeting} AI feedback is not configured — set VERCEL_AI_GATEWAY_TOKEN in Vercel project settings.`,

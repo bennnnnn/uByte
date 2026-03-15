@@ -39,39 +39,38 @@ export interface GatewayOptions {
 }
 
 export async function callGateway(opts: GatewayOptions): Promise<string> {
-  const gatewayKey  = process.env.AI_GATEWAY_API_KEY ?? process.env.VERCEL_AI_GATEWAY_TOKEN;
-  const googleKey   = process.env.GOOGLE_GENERATIVE_AI_API_KEY;
-  const openaiKey   = process.env.OPENAI_API_KEY;
+  // Priority: Google direct > OpenAI direct > Vercel AI Gateway
+  // Google/OpenAI direct keys are checked first because they are reliable.
+  // AI_GATEWAY_API_KEY (the proper dedicated key) is used as a fallback.
+  // VERCEL_AI_GATEWAY_TOKEN is intentionally NOT used — it was a wrong key name.
+  const googleKey  = process.env.GOOGLE_GENERATIVE_AI_API_KEY;
+  const openaiKey  = process.env.OPENAI_API_KEY;
+  const gatewayKey = process.env.AI_GATEWAY_API_KEY;
 
   const isGoogleModel = opts.model.startsWith("gemini");
   const isOpenAIModel = opts.model.startsWith("gpt-") || opts.model.startsWith("o1") || opts.model.startsWith("o3");
 
   let sdkModel: ReturnType<ReturnType<typeof createGoogleGenerativeAI | typeof createOpenAI>>;
 
-  if (gatewayKey) {
-    // Route everything through Vercel AI Gateway (OpenAI-compatible endpoint)
-    const gateway = createOpenAI({ baseURL: GATEWAY_BASE_URL, apiKey: gatewayKey });
-    // Gateway requires provider-prefixed model names
-    const prefixedModel = isGoogleModel
-      ? `google/${opts.model}`
-      : isOpenAIModel
-      ? `openai/${opts.model}`
-      : opts.model;
-    sdkModel = gateway(prefixedModel);
-    console.log(`[AI] via gateway model=${prefixedModel}`);
-  } else if (isGoogleModel && googleKey) {
-    // Direct Google — free tier, no gateway needed
+  if (isGoogleModel && googleKey) {
+    // Direct Google — free tier at aistudio.google.com
     const google = createGoogleGenerativeAI({ apiKey: googleKey });
     sdkModel = google(opts.model);
     console.log(`[AI] via Google direct model=${opts.model}`);
   } else if (isOpenAIModel && openaiKey) {
+    // Direct OpenAI
     const openai = createOpenAI({ apiKey: openaiKey });
     sdkModel = openai(opts.model);
     console.log(`[AI] via OpenAI direct model=${opts.model}`);
+  } else if (gatewayKey) {
+    // Vercel AI Gateway — requires AI_GATEWAY_API_KEY (not VERCEL_AI_GATEWAY_TOKEN)
+    const gateway = createOpenAI({ baseURL: GATEWAY_BASE_URL, apiKey: gatewayKey });
+    const prefixedModel = isGoogleModel ? `google/${opts.model}` : isOpenAIModel ? `openai/${opts.model}` : opts.model;
+    sdkModel = gateway(prefixedModel);
+    console.log(`[AI] via gateway model=${prefixedModel}`);
   } else {
     throw new Error(
-      `No API key found. Set GOOGLE_GENERATIVE_AI_API_KEY (free at aistudio.google.com) ` +
-      `or AI_GATEWAY_API_KEY in Vercel environment variables.`
+      `No AI key found. Set GOOGLE_GENERATIVE_AI_API_KEY (free at aistudio.google.com) in Vercel env vars.`
     );
   }
 
