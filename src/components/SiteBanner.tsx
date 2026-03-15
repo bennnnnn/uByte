@@ -1,22 +1,35 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useAuth } from "@/components/AuthProvider";
 
-interface BannerData {
+export interface BannerData {
   enabled: boolean;
   message: string;
   linkUrl: string;
   linkText: string;
 }
 
-export default function SiteBanner() {
+interface Props {
+  /** Pre-fetched server-side banner data. When provided the client-side fetch
+   *  is skipped entirely, so the banner is in the initial SSR HTML and causes
+   *  no layout shift. Falls back to a client fetch when omitted. */
+  initialData?: BannerData | null;
+}
+
+export default function SiteBanner({ initialData }: Props = {}) {
   const { user } = useAuth();
-  const [banner, setBanner] = useState<BannerData | null>(null);
+  const [banner, setBanner] = useState<BannerData | null>(
+    initialData?.enabled && initialData.message.trim() ? initialData : null,
+  );
   const [dismissed, setDismissed] = useState(false);
+  const fetchedRef = useRef(false);
 
   useEffect(() => {
+    // Skip the client fetch when the server already provided data.
+    if (initialData !== undefined || fetchedRef.current) return;
+    fetchedRef.current = true;
     fetch("/api/banner", { credentials: "same-origin" })
       .then((r) => r.json())
       .then((data) => {
@@ -30,7 +43,7 @@ export default function SiteBanner() {
         }
       })
       .catch(() => {});
-  }, []);
+  }, [initialData]);
 
   if (!banner || dismissed) return null;
 

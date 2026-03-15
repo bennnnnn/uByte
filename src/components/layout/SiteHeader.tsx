@@ -18,7 +18,9 @@ export default function SiteHeader() {
         <HeaderNavLinks side="left" />
       </div>
       <div className="flex items-center gap-2">
-        <Suspense fallback={<div className="h-9 w-20 animate-pulse rounded-lg bg-zinc-200 dark:bg-zinc-800" />}>
+        {/* w-56 (224px) approximates the "Pricing · Log in · Sign up" guest layout on desktop.
+            Matching the final width prevents a layout shift when auth state resolves. */}
+        <Suspense fallback={<div className="h-9 w-56 animate-pulse rounded-lg bg-zinc-200 dark:bg-zinc-800" />}>
           <AuthButtons />
         </Suspense>
       </div>

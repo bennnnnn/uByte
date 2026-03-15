@@ -14,6 +14,8 @@ import DeferredWidgets from "@/components/layout/DeferredWidgets";
 import { APP_NAME, BASE_URL } from "@/lib/constants";
 import { SITE_KEYWORDS } from "@/lib/seo";
 import Script from "next/script";
+import { getSiteBanner } from "@/lib/db/site-banner";
+import { unstable_cache } from "next/cache";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -94,11 +96,19 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+// Cache the banner for 60 s across all requests so every page load doesn't
+// hit the DB — same TTL as the /api/banner Cache-Control header.
+const getCachedBanner = unstable_cache(getSiteBanner, ["site-banner"], { revalidate: 60 });
+
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // Fetch server-side so the banner is in the initial SSR HTML.
+  // If disabled or errored, returns { enabled: false, ... } which SiteBanner ignores.
+  const bannerData = await getCachedBanner();
+
   return (
     <html lang="en" suppressHydrationWarning>
       {/* beforeInteractive places this in <head>, running before any JS hydration.
@@ -122,7 +132,7 @@ export default function RootLayout({
         <AuthProvider>
           <ToastProvider>
           <div className="flex min-h-dvh flex-col overflow-x-clip">
-            <SiteBanner />
+            <SiteBanner initialData={bannerData} />
             <SiteHeader />
             <MobileStandaloneHeader />
             {/* Home / practice: just scrollable content. /tutorial/[lang]: sidebar + content from tutorial layout */}

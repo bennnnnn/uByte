@@ -58,9 +58,14 @@ const nextConfig: NextConfig = {
     "**/*": ["./content/**/*"],
   },
   experimental: {
-    // Inline CSS so styles arrive with HTML — removes render-blocking CSS request (~280ms LCP win).
+    // Inline ALL global CSS into the HTML document.
+    // With optimizeCss (critters), only "critical" CSS is inlined and the rest is deferred.
+    // Critters renders at mobile width, so lg: breakpoint rules (e.g. the hero section's
+    // lg:min-h-[calc(100svh-3.5rem)]) are marked non-critical and loaded async — AFTER
+    // the first paint. When that deferred CSS finally applies, the hero expands ~430 px,
+    // pushing the footer out of the viewport and producing a CLS of ~0.344.
+    // Using inlineCss alone inlines everything with no deferral, eliminating all CSS-driven CLS.
     inlineCss: true,
-    optimizeCss: true,
     optimizePackageImports: ["@sentry/nextjs", "canvas-confetti"],
   },
   webpack(config, { isServer }) {

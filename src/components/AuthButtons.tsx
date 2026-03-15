@@ -63,9 +63,9 @@ export default function AuthButtons() {
   }, [menuOpen]);
 
   if (loading) {
-    // w-9 matches the mobile guest icon; md:w-20 keeps the desktop skeleton wider.
-    // Matching the final rendered size prevents layout shifts (CLS).
-    return <div className="h-9 w-9 animate-pulse rounded-lg bg-zinc-200 dark:bg-zinc-800 md:w-20" />;
+    // w-9 matches the mobile icon; md:w-56 approximates "Pricing · Log in · Sign up"
+    // on desktop to prevent a layout shift when auth state resolves.
+    return <div className="h-9 w-9 animate-pulse rounded-lg bg-zinc-200 dark:bg-zinc-800 md:w-56" />;
   }
 
   if (user) {
