@@ -56,7 +56,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const rehypePrettyCodeOptions: any = {
   theme: { dark: "github-dark", light: "github-light" },
-  keepBackground: false,
+  // keepBackground: true lets Shiki inject the theme's background-color as
+  // an inline style on <pre>. Without it the pre is transparent and prose
+  // styles clobber the token colours, making code blocks look dim.
+  keepBackground: true,
 };
 
 export default async function BlogPostPage({ params, searchParams }: Props) {
@@ -185,7 +188,7 @@ export default async function BlogPostPage({ params, searchParams }: Props) {
         </header>
 
         {/* MDX body — styled with Tailwind Typography */}
-        <article className="prose prose-zinc max-w-none dark:prose-invert prose-headings:font-bold prose-headings:tracking-tight prose-a:text-indigo-600 prose-a:no-underline hover:prose-a:underline dark:prose-a:text-indigo-400 prose-code:rounded prose-code:bg-zinc-100 prose-code:px-1.5 prose-code:py-0.5 prose-code:font-mono prose-code:text-sm prose-code:before:content-none prose-code:after:content-none dark:prose-code:bg-zinc-800 prose-pre:p-0 prose-pre:bg-transparent">
+        <article className="prose prose-zinc max-w-none dark:prose-invert prose-headings:font-bold prose-headings:tracking-tight prose-a:text-indigo-600 prose-a:no-underline hover:prose-a:underline dark:prose-a:text-indigo-400 prose-code:rounded prose-code:bg-zinc-100 prose-code:px-1.5 prose-code:py-0.5 prose-code:font-mono prose-code:text-sm prose-code:before:content-none prose-code:after:content-none dark:prose-code:bg-zinc-800 prose-pre:p-0">
           {content}
         </article>
 

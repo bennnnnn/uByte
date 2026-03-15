@@ -114,6 +114,18 @@ pre.shiki code {
   margin-right: -1.5rem;
   padding-right: 1.5rem;
 }
+/* Prevent Tailwind Typography (prose-code:*) from clobbering the token
+   colours that Shiki injects as inline styles on <span> elements.
+   keepBackground: true means <pre> already has the theme background;
+   the inner <code> must be fully transparent so the spans show through. */
+.prose [data-rehype-pretty-code-figure] pre code {
+  background-color: transparent !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+  font-size: inherit !important;
+  color: inherit !important;
+}
+
 /* language badge above code blocks */
 [data-rehype-pretty-code-title] {
   display: inline-block;
