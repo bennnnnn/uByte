@@ -1,0 +1,343 @@
+---
+title: "How to Learn Python: A Complete Beginner-to-Advanced Roadmap (2026)"
+description: "A step-by-step guide to learning Python from scratch — covering syntax, data structures, projects, and how to go from beginner to job-ready developer."
+date: "2026-01-10"
+category: "Python"
+tags: ["how to learn python", "learn python for beginners", "python roadmap", "python tutorial", "python programming", "how to study python", "how to master python", "python from scratch", "python basics", "python advanced"]
+readTime: "14 min read"
+---
+
+Python is consistently the most popular programming language for beginners — and for good reason. It has readable syntax, an enormous ecosystem, and is used everywhere from web development to data science, automation, and AI. But knowing *where to start* and *what to focus on* is the hardest part.
+
+This guide gives you a clear, opinionated roadmap for going from zero to job-ready with Python.
+
+## Why Learn Python First?
+
+Before diving in, the "best language to learn first" debate:
+
+- **Python reads like English** — less syntax noise than Java, C++, or JavaScript
+- **Immediate feedback** — you can run Python in a browser, REPL, or notebook without any setup
+- **Versatile** — web backends (Django/FastAPI), data science (pandas/NumPy), automation (scripts), AI/ML (PyTorch, TensorFlow)
+- **High demand** — Python is consistently in the top 3 most hired-for languages
+
+The tradeoff: Python is slower than compiled languages and its dynamic typing can hide bugs. Learn it first, then add a second language (Go, Rust, or Java) for depth.
+
+---
+
+## Stage 1: Fundamentals (Weeks 1–3)
+
+### What to cover
+
+**Variables and data types**
+```python
+name = "Alice"        # str
+age = 30              # int
+score = 9.5           # float
+is_active = True      # bool
+```
+
+**Control flow**
+```python
+if age >= 18:
+    print("Adult")
+elif age >= 13:
+    print("Teen")
+else:
+    print("Child")
+```
+
+**Loops**
+```python
+# for loop
+for i in range(5):
+    print(i)
+
+# while loop
+count = 0
+while count < 5:
+    count += 1
+```
+
+**Functions**
+```python
+def greet(name: str) -> str:
+    return f"Hello, {name}!"
+
+print(greet("Bob"))  # Hello, Bob!
+```
+
+**Lists, dicts, sets, tuples**
+```python
+fruits = ["apple", "banana", "cherry"]
+person = {"name": "Alice", "age": 30}
+unique = {1, 2, 3, 2}          # {1, 2, 3}
+coords = (40.7128, -74.0060)   # immutable
+```
+
+### How to practice
+
+Don't just read — type every example. Then modify it. Break it. Fix it.
+
+- Use the Python REPL (`python3` in your terminal) for quick experiments
+- Work through small exercises: FizzBuzz, factorial, palindrome check, word count
+
+**Time goal:** 2–4 hours per day for 3 weeks gets you through fundamentals.
+
+---
+
+## Stage 2: Intermediate Python (Weeks 4–7)
+
+### List comprehensions
+
+One of Python's most distinctive features:
+
+```python
+# Instead of:
+squares = []
+for x in range(10):
+    squares.append(x ** 2)
+
+# Write:
+squares = [x ** 2 for x in range(10)]
+
+# With condition:
+evens = [x for x in range(20) if x % 2 == 0]
+```
+
+### Classes and OOP
+
+```python
+class Animal:
+    def __init__(self, name: str, sound: str):
+        self.name = name
+        self.sound = sound
+
+    def speak(self) -> str:
+        return f"{self.name} says {self.sound}"
+
+class Dog(Animal):
+    def fetch(self) -> str:
+        return f"{self.name} fetches the ball!"
+
+dog = Dog("Rex", "woof")
+print(dog.speak())   # Rex says woof
+print(dog.fetch())   # Rex fetches the ball!
+```
+
+### Error handling
+
+```python
+def divide(a: float, b: float) -> float:
+    if b == 0:
+        raise ValueError("Cannot divide by zero")
+    return a / b
+
+try:
+    result = divide(10, 0)
+except ValueError as e:
+    print(f"Error: {e}")
+finally:
+    print("Division attempted")
+```
+
+### File I/O
+
+```python
+# Write
+with open("data.txt", "w") as f:
+    f.write("Hello, file!")
+
+# Read
+with open("data.txt") as f:
+    content = f.read()
+    print(content)
+```
+
+### Modules and packages
+
+```python
+import os
+import json
+from datetime import datetime
+from pathlib import Path
+
+# Your own module
+# utils.py
+def format_name(first: str, last: str) -> str:
+    return f"{first.title()} {last.title()}"
+```
+
+---
+
+## Stage 3: Data Structures and Algorithms (Weeks 8–11)
+
+This is where most learners skip ahead and regret it later. If your goal includes job interviews, you need to understand how to:
+
+- Implement and use linked lists, stacks, queues, trees, graphs, and hash maps in Python
+- Analyze time and space complexity (Big O)
+- Recognize patterns: sliding window, two pointers, DFS/BFS, dynamic programming
+
+### The most important Python data structures for interviews
+
+```python
+from collections import defaultdict, Counter, deque
+import heapq
+
+# Counter — frequency counting
+text = "aabbbcccc"
+freq = Counter(text)  # {'c': 4, 'b': 3, 'a': 2}
+
+# defaultdict — no KeyError on missing keys
+graph = defaultdict(list)
+graph["A"].append("B")
+
+# deque — O(1) append/pop from both ends (use for BFS queues)
+queue = deque([1, 2, 3])
+queue.appendleft(0)
+queue.pop()
+
+# heapq — min-heap in Python
+heap = [3, 1, 4, 1, 5]
+heapq.heapify(heap)
+smallest = heapq.heappop(heap)  # 1
+```
+
+### Classic problems to solve in Python
+
+| Problem | Pattern | Difficulty |
+|---------|---------|------------|
+| Two Sum | Hash map | Easy |
+| Valid Parentheses | Stack | Easy |
+| Merge Intervals | Sort + greedy | Medium |
+| LRU Cache | Hash map + doubly linked list | Medium |
+| Word Search | DFS + backtracking | Medium |
+| Coin Change | DP | Medium |
+
+Solve these before any technical interview.
+
+---
+
+## Stage 4: Build Real Projects (Weeks 12–16)
+
+Reading and solving exercises isn't enough. You need to ship things. Recruiters want to see code you wrote, not exercises.
+
+**Beginner projects:**
+- CLI to-do list (file-based persistence)
+- Weather CLI using the OpenWeatherMap API
+- Word frequency analyzer for any text file
+- Simple web scraper with `requests` + `BeautifulSoup`
+
+**Intermediate projects:**
+- REST API with FastAPI + SQLite
+- Discord/Slack bot
+- Data dashboard with pandas + matplotlib
+- Automated email sender with a cron job
+
+**Advanced projects:**
+- Full web app with FastAPI + PostgreSQL + React frontend
+- Machine learning model with scikit-learn or PyTorch
+- CLI tool published to PyPI
+
+---
+
+## Stage 5: Python for the Job Market
+
+Once you have fundamentals + 2 projects, you're ready to target jobs. But the interview process has specific requirements.
+
+### What Python interviews actually test
+
+1. **Data structures and algorithms** — LeetCode-style problems, solved in Python
+2. **Systems design** (senior roles) — how to build scalable services
+3. **Python-specific knowledge** — generators, decorators, GIL, context managers
+
+### Python-specific interview topics
+
+**Generators (memory-efficient iteration)**
+```python
+def fibonacci():
+    a, b = 0, 1
+    while True:
+        yield a
+        a, b = b, a + b
+
+fib = fibonacci()
+for _ in range(10):
+    print(next(fib))
+```
+
+**Decorators**
+```python
+import functools
+import time
+
+def timer(func):
+    @functools.wraps(func)
+    def wrapper(*args, **kwargs):
+        start = time.time()
+        result = func(*args, **kwargs)
+        print(f"{func.__name__} took {time.time() - start:.4f}s")
+        return result
+    return wrapper
+
+@timer
+def slow_function():
+    time.sleep(1)
+
+slow_function()  # slow_function took 1.0001s
+```
+
+**Context managers**
+```python
+class ManagedFile:
+    def __init__(self, filename):
+        self.filename = filename
+
+    def __enter__(self):
+        self.file = open(self.filename)
+        return self.file
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.file.close()
+
+with ManagedFile("data.txt") as f:
+    content = f.read()
+```
+
+---
+
+## How Long Does It Take to Learn Python?
+
+| Goal | Time |
+|------|------|
+| Write basic scripts | 2–4 weeks |
+| Build a small project | 6–8 weeks |
+| Pass an entry-level interview | 3–4 months |
+| Land a Python developer job | 6–12 months |
+
+These assume consistent daily practice (1–3 hours/day). Consistency beats intensity — 30 minutes every day beats 8 hours on Sunday.
+
+---
+
+## Common Mistakes to Avoid
+
+1. **Tutorial hell** — watching videos without typing code. Always code along.
+2. **Skipping algorithms** — you will be tested on them. Learn them early.
+3. **Memorizing syntax** — Python is readable, but you need to practice reading docs.
+4. **Never building** — exercises are scaffolding. Projects are the real work.
+5. **Giving up too early** — the first 4 weeks are the hardest. It gets better.
+
+---
+
+## Summary Roadmap
+
+```
+Week 1–3:  Syntax basics, loops, functions, data types
+Week 4–7:  OOP, comprehensions, error handling, file I/O, modules
+Week 8–11: Data structures, algorithms, Big O, interview patterns
+Week 12–16: Build 2–3 real projects
+Week 17+:  Interview prep, system design, contribute to open source
+```
+
+The most important thing: **write code every single day**. Even 20 minutes builds the habit and the skill.
+
+Ready to start? uByte has interactive Python tutorials that run directly in your browser — no installation needed. You write real code and get instant feedback at every step.

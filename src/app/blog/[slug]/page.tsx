@@ -30,6 +30,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: post.title,
     description: post.description,
+    keywords: post.tags,
     authors: [{ name: post.fromDb ? (post as { author?: string }).author ?? APP_NAME : APP_NAME, url: BASE_URL }],
     alternates: { canonical: absoluteUrl(`/blog/${slug}`) },
     openGraph: {
@@ -123,7 +124,7 @@ export default async function BlogPostPage({ params, searchParams }: Props) {
   };
 
   return (
-    <div className="min-h-full overflow-y-auto">
+    <div className="min-h-full">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
