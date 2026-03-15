@@ -19,6 +19,7 @@
     "seed:exams": "node scripts/seeds/run-exam-seed.mjs"
   },
   "dependencies": {
+    "@ai-sdk/google": "^3.0.43",
     "@ai-sdk/openai": "^3.0.41",
     "@neondatabase/serverless": "^1.0.2",
     "@sentry/nextjs": "^10.40.0",
