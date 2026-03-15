@@ -146,14 +146,27 @@ export function useStepProgress(
   const [failCount, setFailCount] = useState(0);
 
   // Set to true synchronously the moment a hint fetch starts (before any React re-render),
-  // so subsequent auto-trigger checks inside setFailCount updaters always see the right value
-  // regardless of whether React has re-rendered yet.  Reset when the step changes or passes.
+  // so subsequent auto-trigger checks always see the right value regardless of whether
+  // React has re-rendered yet. Reset when the step changes or passes.
   const hintInflightRef = useRef(false);
+  // Stores the last failed check's data so the auto-hint useEffect can fire fetchAiFeedback
+  // outside of a state updater (React can re-invoke updaters in concurrent mode).
+  const pendingAutoHintRef = useRef<{ code: string; output: string; isError: boolean; stepIndex: number } | null>(null);
   const [showInlineChat, setShowInlineChat] = useState(false);
   const [tutorialDone, setTutorialDone] = useState(false);
   const [countdown, setCountdown] = useState(3);
   const [showHint, setShowHint] = useState(false);
   const markedRef = useRef(false);
+
+  // ── Auto-hint after 2+ failures — runs as an effect, not inside a state updater ──
+  useEffect(() => {
+    if (failCount >= 2 && !hintInflightRef.current && pendingAutoHintRef.current) {
+      const { code, output, isError, stepIndex } = pendingAutoHintRef.current;
+      pendingAutoHintRef.current = null;
+      fetchAiFeedback(code, output, isError, stepIndex);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [failCount]);
 
   // ── Analytics: fire started_tutorial once per session when user is logged in ──
   useEffect(() => {
@@ -274,6 +287,7 @@ export function useStepProgress(
     setFailCount(0);
     setAiFeedbackLoginRequired(false);
     hintInflightRef.current = false;
+    pendingAutoHintRef.current = null;
     // Persist to DB as skipped so it's distinguished from genuinely completed steps on refresh
     if (userId != null) {
       apiFetch("/api/progress/steps", {
@@ -295,6 +309,7 @@ export function useStepProgress(
     setAiFeedbackUpgrade(false);
     setAiFeedbackLoginRequired(false);
     hintInflightRef.current = false;
+    pendingAutoHintRef.current = null;
     setShowInlineChat(false);
   }
 
@@ -360,7 +375,7 @@ export function useStepProgress(
 
   /** Manual "Get hint" — can also be triggered automatically after 2 failures. */
   function requestHint(code: string) {
-    if (status !== "failed") return;
+    if (status !== "failed" || hintInflightRef.current || aiFeedbackLoading) return;
     fetchAiFeedback(code, output ?? "", outputIsError, stepIndex);
   }
 
@@ -421,13 +436,8 @@ export function useStepProgress(
         if (hasError) {
         setErrorLines(parseErrorLines(out, lang));
         setStatus("failed");
-        setFailCount((n) => {
-          const next = n + 1;
-          if (next >= 2 && !hintInflightRef.current) {
-            fetchAiFeedback(code, out, true, stepIndex);
-          }
-          return next;
-        });
+        pendingAutoHintRef.current = { code, output: out, isError: true, stepIndex };
+        setFailCount((n) => n + 1);
         apiFetch("/api/step-check", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -447,13 +457,8 @@ export function useStepProgress(
           setOutputIsError(false);
           setOutput(failMsg);
           setStatus("failed");
-          setFailCount((n) => {
-            const next = n + 1;
-            if (next >= 2 && !hintInflightRef.current) {
-              fetchAiFeedback(code, out, false, stepIndex);
-            }
-            return next;
-          });
+          pendingAutoHintRef.current = { code, output: out, isError: false, stepIndex };
+          setFailCount((n) => n + 1);
           apiFetch("/api/step-check", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -468,6 +473,7 @@ export function useStepProgress(
         setAiFeedbackUpgrade(false);
         setAiFeedbackLoginRequired(false);
         hintInflightRef.current = false;
+        pendingAutoHintRef.current = null;
         setCompletedSteps((prev) => new Set([...prev, stepIndex]));
         // Increment the in-memory step count so the progress bar updates immediately
         // without waiting for a DB refetch. The DB write happens via /api/progress/steps.
@@ -486,13 +492,8 @@ export function useStepProgress(
         }
       } else {
         setStatus("failed");
-        setFailCount((n) => {
-          const next = n + 1;
-          if (next >= 2 && !hintInflightRef.current) {
-            fetchAiFeedback(code, out, false, stepIndex);
-          }
-          return next;
-        });
+        pendingAutoHintRef.current = { code, output: out, isError: false, stepIndex };
+        setFailCount((n) => n + 1);
         apiFetch("/api/step-check", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -514,6 +515,7 @@ export function useStepProgress(
     setAiFeedbackUpgrade(false);
     setAiFeedbackLoginRequired(false);
     hintInflightRef.current = false;
+    pendingAutoHintRef.current = null;
   }
 
   return {
