@@ -27,6 +27,11 @@ import { HARD_PROBLEMS_4 } from "./problems-hard-4";
 import { EASY_PROBLEMS_4 } from "./problems-easy-4";
 import { MEDIUM_PROBLEMS_5 } from "./problems-medium-5";
 import { HARD_PROBLEMS_5 } from "./problems-hard-5";
+import { EASY_PROBLEMS_5 } from "./problems-easy-5";
+import { EASY_PROBLEMS_6 } from "./problems-easy-6";
+import { MEDIUM_PROBLEMS_6 } from "./problems-medium-6";
+import { MEDIUM_PROBLEMS_7 } from "./problems-medium-7";
+import { HARD_PROBLEMS_6 } from "./problems-hard-6";
 
 // ─── Default starters ───────────────────────────────────────────────────────
 
@@ -76,6 +81,11 @@ export const PRACTICE_PROBLEMS: PracticeProblem[] = [
   ...EASY_PROBLEMS_4,
   ...MEDIUM_PROBLEMS_5,
   ...HARD_PROBLEMS_5,
+  ...EASY_PROBLEMS_5,
+  ...EASY_PROBLEMS_6,
+  ...MEDIUM_PROBLEMS_6,
+  ...MEDIUM_PROBLEMS_7,
+  ...HARD_PROBLEMS_6,
 ];
 
 // ─── Category helpers (derived from problem definitions) ─────────────────────

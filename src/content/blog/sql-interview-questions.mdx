@@ -1,0 +1,479 @@
+---
+title: "Top SQL Interview Questions and Answers (2026)"
+description: "Essential SQL interview questions covering SELECT, JOINs, aggregations, window functions, indexes, query optimization, and system design. Prepare for backend and data engineering interviews."
+date: "2026-02-22"
+tags: ["sql", "interview", "sql interview questions", "database interview", "joins", "window functions", "query optimization", "backend interview", "data engineering"]
+category: "Interview Prep"
+readTime: "20 min read"
+author: "uByte Team"
+---
+
+SQL is tested in virtually every backend, data engineering, and analytics interview. Companies like Google, Amazon, Meta, and Stripe rely heavily on SQL for data analysis and backend systems. This guide covers the most frequently asked SQL interview questions with detailed answers.
+
+---
+
+## Basic SQL Questions
+
+### 1. What is the difference between WHERE and HAVING?
+
+- **WHERE** filters rows **before** aggregation.
+- **HAVING** filters groups **after** aggregation.
+
+```sql
+-- WHERE: filter individual rows
+SELECT department, COUNT(*) as emp_count
+FROM employees
+WHERE salary > 50000          -- filter rows first
+GROUP BY department;
+
+-- HAVING: filter after grouping
+SELECT department, COUNT(*) as emp_count
+FROM employees
+GROUP BY department
+HAVING COUNT(*) > 5;           -- filter groups
+
+-- Using both
+SELECT department, AVG(salary) as avg_sal
+FROM employees
+WHERE hire_date > '2020-01-01' -- exclude old hires
+GROUP BY department
+HAVING AVG(salary) > 70000;    -- only high-paying depts
+```
+
+### 2. Explain the different types of JOINs
+
+```sql
+-- Setup tables
+-- employees: id, name, department_id, salary
+-- departments: id, name, manager_id
+
+-- INNER JOIN — only matching rows from both tables
+SELECT e.name, d.name as dept
+FROM employees e
+INNER JOIN departments d ON e.department_id = d.id;
+
+-- LEFT JOIN — all rows from left + matching from right (NULL if no match)
+SELECT e.name, d.name as dept
+FROM employees e
+LEFT JOIN departments d ON e.department_id = d.id;
+-- Returns employees even if they have no department
+
+-- RIGHT JOIN — all rows from right + matching from left
+SELECT e.name, d.name as dept
+FROM employees e
+RIGHT JOIN departments d ON e.department_id = d.id;
+-- Returns all departments even if no employees
+
+-- FULL OUTER JOIN — all rows from both tables
+SELECT e.name, d.name as dept
+FROM employees e
+FULL OUTER JOIN departments d ON e.department_id = d.id;
+
+-- CROSS JOIN — cartesian product (every combination)
+SELECT e.name, d.name
+FROM employees e
+CROSS JOIN departments d;  -- m × n rows
+
+-- SELF JOIN — join table with itself
+SELECT e1.name as employee, e2.name as manager
+FROM employees e1
+LEFT JOIN employees e2 ON e1.manager_id = e2.id;
+```
+
+### 3. What is the difference between UNION and UNION ALL?
+
+```sql
+-- UNION — combines and removes duplicates (slower, sorts)
+SELECT name FROM employees_us
+UNION
+SELECT name FROM employees_eu;
+
+-- UNION ALL — combines and keeps duplicates (faster)
+SELECT name FROM employees_us
+UNION ALL
+SELECT name FROM employees_eu;
+
+-- Performance: prefer UNION ALL when you know there are no duplicates
+-- or when you explicitly want duplicates
+
+-- Requirements: same number of columns, compatible data types
+```
+
+### 4. How do you find duplicates in a table?
+
+```sql
+-- Find duplicate emails
+SELECT email, COUNT(*) as cnt
+FROM users
+GROUP BY email
+HAVING COUNT(*) > 1;
+
+-- Find all rows that are duplicates
+SELECT *
+FROM users
+WHERE email IN (
+  SELECT email
+  FROM users
+  GROUP BY email
+  HAVING COUNT(*) > 1
+)
+ORDER BY email;
+
+-- Delete duplicates, keep the one with the lowest id
+DELETE FROM users
+WHERE id NOT IN (
+  SELECT MIN(id)
+  FROM users
+  GROUP BY email
+);
+```
+
+---
+
+## Intermediate SQL Questions
+
+### 5. What are window functions?
+
+Window functions perform calculations **across rows related to the current row** without collapsing them (unlike GROUP BY).
+
+```sql
+-- Syntax: function() OVER (PARTITION BY ... ORDER BY ... ROWS/RANGE ...)
+
+-- ROW_NUMBER — unique sequential number per partition
+SELECT
+  name,
+  department,
+  salary,
+  ROW_NUMBER() OVER (PARTITION BY department ORDER BY salary DESC) as rank_in_dept
+FROM employees;
+
+-- RANK vs DENSE_RANK
+-- RANK: 1, 2, 2, 4  (skips after tie)
+-- DENSE_RANK: 1, 2, 2, 3 (no skip)
+SELECT
+  name,
+  salary,
+  RANK()       OVER (ORDER BY salary DESC) as rank,
+  DENSE_RANK() OVER (ORDER BY salary DESC) as dense_rank
+FROM employees;
+
+-- SUM / AVG running total
+SELECT
+  date,
+  revenue,
+  SUM(revenue) OVER (ORDER BY date ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) as running_total,
+  AVG(revenue) OVER (ORDER BY date ROWS BETWEEN 6 PRECEDING AND CURRENT ROW) as rolling_7day_avg
+FROM daily_sales;
+
+-- LAG / LEAD — access previous/next row
+SELECT
+  date,
+  revenue,
+  LAG(revenue, 1)  OVER (ORDER BY date) as prev_day_revenue,
+  LEAD(revenue, 1) OVER (ORDER BY date) as next_day_revenue,
+  revenue - LAG(revenue, 1) OVER (ORDER BY date) as day_over_day_change
+FROM daily_sales;
+
+-- FIRST_VALUE / LAST_VALUE
+SELECT
+  name,
+  salary,
+  FIRST_VALUE(name) OVER (PARTITION BY department ORDER BY salary DESC) as highest_paid_in_dept
+FROM employees;
+
+-- NTILE — divide into N buckets (for percentiles)
+SELECT name, salary,
+  NTILE(4) OVER (ORDER BY salary) as salary_quartile
+FROM employees;
+```
+
+### 6. What are CTEs (Common Table Expressions)?
+
+CTEs create **named temporary result sets** that can be referenced within a query. They improve readability and enable recursive queries.
+
+```sql
+-- Basic CTE
+WITH high_earners AS (
+  SELECT id, name, salary, department_id
+  FROM employees
+  WHERE salary > 100000
+)
+SELECT h.name, d.name as department
+FROM high_earners h
+JOIN departments d ON h.department_id = d.id;
+
+-- Multiple CTEs
+WITH
+dept_stats AS (
+  SELECT department_id, AVG(salary) as avg_sal, COUNT(*) as emp_count
+  FROM employees
+  GROUP BY department_id
+),
+large_depts AS (
+  SELECT department_id FROM dept_stats WHERE emp_count > 10
+)
+SELECT e.name, e.salary, ds.avg_sal
+FROM employees e
+JOIN dept_stats ds ON e.department_id = ds.department_id
+WHERE e.department_id IN (SELECT department_id FROM large_depts)
+  AND e.salary > ds.avg_sal;
+
+-- Recursive CTE — traverse hierarchies (org chart, categories)
+WITH RECURSIVE org_chart AS (
+  -- Base case: top-level employees (no manager)
+  SELECT id, name, manager_id, 0 as level, name as path
+  FROM employees
+  WHERE manager_id IS NULL
+
+  UNION ALL
+
+  -- Recursive case: add direct reports
+  SELECT e.id, e.name, e.manager_id, oc.level + 1, oc.path || ' > ' || e.name
+  FROM employees e
+  JOIN org_chart oc ON e.manager_id = oc.id
+)
+SELECT id, name, level, path
+FROM org_chart
+ORDER BY path;
+```
+
+### 7. How do you find the Nth highest salary?
+
+A classic interview problem with multiple solutions:
+
+```sql
+-- Solution 1: subquery (works everywhere)
+SELECT DISTINCT salary
+FROM employees
+ORDER BY salary DESC
+LIMIT 1 OFFSET N-1;  -- N=2 for 2nd highest
+
+-- Solution 2: DENSE_RANK window function (best)
+SELECT salary
+FROM (
+  SELECT salary, DENSE_RANK() OVER (ORDER BY salary DESC) as rnk
+  FROM employees
+) ranked
+WHERE rnk = 2;  -- 2nd highest
+
+-- Solution 3: correlated subquery (classic, but slow for large tables)
+SELECT MAX(salary) as second_highest
+FROM employees
+WHERE salary < (SELECT MAX(salary) FROM employees);
+
+-- General Nth highest (portable):
+SELECT salary FROM employees e1
+WHERE N-1 = (
+  SELECT COUNT(DISTINCT e2.salary)
+  FROM employees e2
+  WHERE e2.salary > e1.salary
+);
+```
+
+### 8. What is the difference between indexes and when should you use them?
+
+```sql
+-- B-Tree Index (default) — good for equality and range queries
+CREATE INDEX idx_employees_email ON employees(email);
+CREATE INDEX idx_employees_dept_salary ON employees(department_id, salary); -- composite
+
+-- When to index:
+-- ✓ Columns in WHERE clauses
+-- ✓ JOIN columns (foreign keys)
+-- ✓ ORDER BY / GROUP BY columns
+-- ✓ High cardinality columns (many unique values)
+
+-- When NOT to index:
+-- ✗ Small tables (full scan is faster)
+-- ✗ Columns rarely used in queries
+-- ✗ Tables with heavy write loads (indexes slow writes)
+-- ✗ Low cardinality columns (e.g., boolean flags)
+
+-- Partial index — only index a subset of rows
+CREATE INDEX idx_active_users ON users(email) WHERE active = true;
+
+-- Covering index — includes all needed columns to avoid table lookup
+CREATE INDEX idx_orders_covering ON orders(user_id, created_at, status, total);
+
+-- Explain query plan
+EXPLAIN ANALYZE SELECT * FROM employees WHERE department_id = 5;
+-- Look for "Seq Scan" → add index
+-- Look for "Index Scan" → index is being used
+```
+
+---
+
+## Advanced SQL Questions
+
+### 9. How do you solve the "Employees who earn more than their managers" problem?
+
+```sql
+-- Table: Employee(id, name, salary, managerId)
+-- Classic interview question at Facebook, Google, etc.
+
+-- Solution using self-join
+SELECT e.name as employee
+FROM employee e
+JOIN employee m ON e.manager_id = m.id
+WHERE e.salary > m.salary;
+
+-- Solution using correlated subquery
+SELECT name
+FROM employee e
+WHERE salary > (
+  SELECT salary
+  FROM employee
+  WHERE id = e.manager_id
+);
+```
+
+### 10. Write a query to find users who logged in on consecutive days
+
+```sql
+-- Table: logins(user_id, login_date)
+-- Find users with at least 3 consecutive login days
+
+WITH consecutive AS (
+  SELECT
+    user_id,
+    login_date,
+    login_date - INTERVAL (ROW_NUMBER() OVER (PARTITION BY user_id ORDER BY login_date) - 1) DAY as grp
+  FROM (SELECT DISTINCT user_id, login_date FROM logins) t
+),
+streaks AS (
+  SELECT user_id, grp, COUNT(*) as streak_length, MIN(login_date) as streak_start
+  FROM consecutive
+  GROUP BY user_id, grp
+)
+SELECT DISTINCT user_id
+FROM streaks
+WHERE streak_length >= 3;
+```
+
+### 11. What is query optimization and how do you approach it?
+
+```sql
+-- 1. Use EXPLAIN ANALYZE to understand query plan
+EXPLAIN ANALYZE SELECT * FROM orders o
+JOIN users u ON o.user_id = u.id
+WHERE o.created_at > '2024-01-01';
+
+-- 2. Avoid SELECT * — specify columns
+-- Bad:
+SELECT * FROM large_table;
+-- Good:
+SELECT id, name, email FROM users;
+
+-- 3. Use indexes appropriately
+-- Bad: function on indexed column (can't use index)
+SELECT * FROM users WHERE UPPER(email) = 'ALICE@EXAMPLE.COM';
+-- Good:
+SELECT * FROM users WHERE email = 'alice@example.com';
+
+-- 4. Avoid N+1 queries — use JOINs or subqueries
+-- Bad (N+1):
+-- for each user: SELECT * FROM orders WHERE user_id = ?
+-- Good:
+SELECT u.name, COUNT(o.id) as order_count
+FROM users u
+LEFT JOIN orders o ON u.id = o.user_id
+GROUP BY u.id, u.name;
+
+-- 5. Use EXISTS instead of IN for large subqueries
+-- Slower:
+SELECT * FROM users WHERE id IN (SELECT user_id FROM orders);
+-- Faster:
+SELECT * FROM users u WHERE EXISTS (SELECT 1 FROM orders o WHERE o.user_id = u.id);
+
+-- 6. Pagination: use keyset (cursor) pagination instead of OFFSET
+-- Slow for large offsets:
+SELECT * FROM posts ORDER BY id DESC LIMIT 20 OFFSET 10000;
+-- Fast: use last seen id
+SELECT * FROM posts WHERE id < :last_id ORDER BY id DESC LIMIT 20;
+```
+
+### 12. What are transactions and ACID properties?
+
+```sql
+-- ACID: Atomicity, Consistency, Isolation, Durability
+
+-- Transaction example
+BEGIN;
+
+UPDATE accounts SET balance = balance - 100 WHERE id = 1;  -- debit
+UPDATE accounts SET balance = balance + 100 WHERE id = 2;  -- credit
+
+-- Both succeed or neither do (Atomicity)
+COMMIT;
+
+-- On error:
+ROLLBACK;  -- undoes both updates
+
+-- Isolation levels (from lowest to highest isolation):
+-- READ UNCOMMITTED — can read dirty (uncommitted) data
+-- READ COMMITTED   — only read committed data (default in PostgreSQL)
+-- REPEATABLE READ  — same query returns same result within transaction
+-- SERIALIZABLE     — transactions execute as if serial (highest, slowest)
+
+SET TRANSACTION ISOLATION LEVEL SERIALIZABLE;
+
+-- Savepoints — partial rollback
+BEGIN;
+INSERT INTO orders VALUES (1, 'pending');
+SAVEPOINT before_payment;
+INSERT INTO payments VALUES (1, 500);  -- might fail
+ROLLBACK TO before_payment;             -- undo just the payment
+COMMIT;                                 -- commit the order
+```
+
+---
+
+## SQL Problem-Solving Patterns
+
+### 13. Pivot table (rows to columns)
+
+```sql
+-- Monthly sales per product to a pivot
+SELECT
+  product_id,
+  SUM(CASE WHEN month = 1 THEN sales ELSE 0 END) AS jan,
+  SUM(CASE WHEN month = 2 THEN sales ELSE 0 END) AS feb,
+  SUM(CASE WHEN month = 3 THEN sales ELSE 0 END) AS mar
+FROM monthly_sales
+GROUP BY product_id;
+```
+
+### 14. Gaps and islands in sequences
+
+```sql
+-- Find gaps in sequential order IDs
+SELECT id + 1 AS gap_start, next_id - 1 AS gap_end
+FROM (
+  SELECT id, LEAD(id) OVER (ORDER BY id) AS next_id
+  FROM orders
+) t
+WHERE next_id - id > 1;
+```
+
+---
+
+## Quick Reference Table
+
+| Concept | Key Points |
+|---------|-----------|
+| `WHERE` | Filter rows before GROUP BY |
+| `HAVING` | Filter groups after GROUP BY |
+| `INNER JOIN` | Matching rows only |
+| `LEFT JOIN` | All left + matching right |
+| `WINDOW FUNCTIONS` | Calculations over partitioned rows |
+| `CTE (WITH)` | Named subquery, readable code |
+| `RECURSIVE CTE` | Hierarchical/tree data traversal |
+| `DENSE_RANK` | Rank without gaps (ties allowed) |
+| `EXPLAIN ANALYZE` | Show actual query execution plan |
+| `ACID` | Database transaction guarantees |
+| Covering index | All needed columns in index |
+| Keyset pagination | Fast pagination over large datasets |
+
+---
+
+*Ready to practice? Try our [coding challenges](/practice) that include data structure problems you'll face alongside SQL in technical interviews.*

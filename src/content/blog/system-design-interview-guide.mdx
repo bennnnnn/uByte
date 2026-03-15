@@ -1,0 +1,419 @@
+---
+title: "System Design Interview Guide: How to Answer Any Question (2026)"
+description: "Complete guide to system design interviews covering scalability, databases, caching, load balancing, microservices, and real-world design examples like URL shortener, Twitter, and Netflix."
+date: "2026-02-25"
+tags: ["system design", "interview", "system design interview", "scalability", "distributed systems", "microservices", "caching", "load balancing", "faang interview", "backend interview", "senior engineer interview"]
+category: "Interview Prep"
+readTime: "22 min read"
+author: "uByte Team"
+---
+
+System design interviews are the gatekeepers for senior software engineer roles at top companies. Unlike coding problems, there are no right or wrong answers — you're evaluated on your **structured thinking, trade-off analysis, and breadth of knowledge**. This guide gives you a proven framework plus deep dives on the most common design questions.
+
+---
+
+## The RESHADED Framework
+
+Use this 7-step framework for every system design question:
+
+1. **R** — Requirements (functional + non-functional)
+2. **E** — Estimation (scale, traffic, storage)
+3. **S** — System interface (APIs)
+4. **H** — High-level design (boxes and arrows)
+5. **A** — Architecture deep dive
+6. **D** — Data model
+7. **E** — Extended discussion (trade-offs, bottlenecks, failure modes)
+
+---
+
+## Step 1: Requirements Clarification (5 minutes)
+
+Always spend the first few minutes asking clarifying questions. Never assume.
+
+**Functional requirements** (what it does):
+- What are the core features? (read vs write heavy?)
+- Who are the users? (global, millions, or internal?)
+- What is the user flow?
+
+**Non-functional requirements** (how well it does it):
+- **Scale**: How many DAUs? 1M? 100M? 1B?
+- **Latency**: p99 < 100ms? Real-time?
+- **Availability**: 99.9% (8.7h downtime/yr) vs 99.99% (52min/yr)?
+- **Consistency**: Strong (bank) or eventual (social feed)?
+- **Durability**: Can we lose any data?
+
+---
+
+## Step 2: Back-of-the-Envelope Estimation
+
+### Key numbers to memorize:
+
+| Resource | Latency / Throughput |
+|----------|---------------------|
+| L1 cache | 0.5 ns |
+| L2 cache | 7 ns |
+| RAM read | 100 ns |
+| SSD read | 150 μs |
+| HDD read | 10 ms |
+| Network round trip (same DC) | 0.5 ms |
+| Network round trip (cross-continent) | 150 ms |
+| Single SQL read | ~1 ms |
+| Redis GET | ~0.1 ms |
+
+### Estimation example (URL Shortener):
+```
+100M URLs created per day
+= 100M / 86400 ≈ 1200 writes/sec
+
+Read:write ratio = 10:1
+= 12,000 reads/sec
+
+Storage per URL: 500 bytes
+100M URLs/day × 500 bytes = 50 GB/day
+5 years: 50 GB × 365 × 5 = ~90 TB
+```
+
+---
+
+## Core Building Blocks
+
+### Load Balancing
+
+Distributes traffic across multiple servers.
+
+```
+                    ┌─────────────────┐
+Clients ──────────► │  Load Balancer  │
+                    └────────┬────────┘
+                    ┌────────┼────────┐
+                    ▼        ▼        ▼
+                 Server1  Server2  Server3
+```
+
+**Algorithms:**
+- **Round Robin**: requests distributed in order
+- **Least Connections**: send to server with fewest active connections
+- **Consistent Hashing**: great for caching layers (same key → same server)
+- **IP Hash**: user always routes to same server (session affinity)
+
+**Layer 4 vs Layer 7:**
+- L4 (TCP/UDP): fast, no content inspection (HAProxy, AWS NLB)
+- L7 (HTTP): can route by URL, headers, cookies (Nginx, AWS ALB)
+
+### Caching
+
+The single most impactful optimization.
+
+```
+Client → Cache (Redis) → Database
+          HIT: return cached data
+          MISS: fetch from DB, store in cache, return
+```
+
+**Cache policies:**
+- **LRU** (Least Recently Used): evict the oldest accessed key
+- **LFU** (Least Frequently Used): evict the least accessed key
+- **TTL**: expire entries after a set time
+
+**Cache invalidation strategies (hardest problem in CS):**
+
+| Strategy | Description | Best for |
+|----------|-------------|----------|
+| Cache-aside | App manages cache + DB explicitly | Most common |
+| Write-through | Write to cache AND DB together | Consistency critical |
+| Write-behind | Write to cache, async to DB | High write throughput |
+| Read-through | Cache fetches from DB on miss | Transparent caching |
+
+**Cache problems:**
+- **Cache stampede**: many requests miss at once; use locking/probabilistic refresh
+- **Cache penetration**: queries for non-existent keys; use bloom filters
+- **Cache avalanche**: many keys expire at once; stagger TTLs
+
+### Databases
+
+**SQL (PostgreSQL, MySQL) vs NoSQL (MongoDB, Cassandra, DynamoDB)**
+
+| Factor | SQL | NoSQL |
+|--------|-----|-------|
+| Schema | Fixed | Flexible |
+| ACID | Full support | Eventual consistency (usually) |
+| Scale | Vertical + read replicas | Horizontal sharding |
+| Joins | Excellent | Limited/none |
+| Best for | Financial, user data | High-throughput, flexible schema |
+
+**Database scaling patterns:**
+
+```
+1. Read replicas (scale reads):
+   Primary DB → Replica 1, Replica 2, Replica 3
+   Writes → Primary
+   Reads → Round-robin across replicas
+
+2. Sharding (scale writes):
+   User IDs 0-25M → Shard A
+   User IDs 25M-50M → Shard B
+   
+   Problem: cross-shard queries, rebalancing
+   Solution: consistent hashing
+
+3. CQRS (Command Query Responsibility Segregation):
+   Writes → Write model (optimized for commands)
+   Reads → Read model (optimized for queries)
+```
+
+---
+
+## Classic Design Problems
+
+### Design a URL Shortener (bit.ly)
+
+**Requirements:** Create short URLs, redirect to original, 100M URLs/day, 1.2K writes/sec, 12K reads/sec.
+
+**Key decisions:**
+
+**1. Short URL generation:**
+```
+Option A: Hash (MD5/SHA256) → take first 7 chars
+  Problem: collisions, not unique
+
+Option B: Base62 encoding of auto-increment ID
+  7 chars × 62 symbols = 3.5 trillion URLs ✓
+
+Option C: Pre-generated keys (key generation service)
+  Most scalable, no collision risk
+```
+
+**2. Architecture:**
+```
+Client
+  → CDN (cache popular redirects, <5ms)
+  → API Gateway / Load Balancer
+  → URL Service Cluster
+       Write: MySQL (slug → long URL, user_id, created_at, expiry)
+       Read:  Redis cache (slug → long URL, TTL=1h for popular URLs)
+  → Analytics Service (async, via Kafka)
+  → MySQL Sharded by slug hash
+```
+
+**3. Redirect:**
+```
+HTTP 301 (permanent) vs HTTP 302 (temporary):
+- 301: Browser caches → less load, but can't track clicks
+- 302: Always hits server → accurate analytics, more load
+→ Use 301 for performance, 302 if click analytics needed
+```
+
+---
+
+### Design a Rate Limiter
+
+**Goal:** Limit each user to N requests per time window.
+
+**Algorithms:**
+
+```
+1. Token Bucket (most common):
+   - Each user has a bucket of N tokens
+   - Tokens refill at R per second
+   - Each request consumes 1 token
+   - Burst-friendly
+
+2. Sliding Window Counter:
+   - Track timestamps of last N requests in Redis sorted set
+   - ZADD + ZRANGEBYSCORE in O(log N)
+   - Precise but higher memory
+
+3. Fixed Window Counter:
+   - Simple: INCR in Redis, reset every minute
+   - Problem: allows 2x rate at window boundaries
+```
+
+**Redis implementation (sliding window):**
+
+```
+MULTI
+ZADD user:rate_limit:{user_id} {timestamp} {timestamp}
+ZREMRANGEBYSCORE user:rate_limit:{user_id} 0 {timestamp - window_size}
+ZCARD user:rate_limit:{user_id}
+EXPIRE user:rate_limit:{user_id} {window_size}
+EXEC
+
+if ZCARD > limit: reject with 429
+```
+
+**Distributed rate limiting:**
+```
+- Local: fast, no network hop, but per-instance
+- Centralized Redis: accurate but network overhead
+- Redis cluster with sliding window: best balance
+```
+
+---
+
+### Design a Social Media Feed (Twitter/Instagram)
+
+**Core features:** Post tweet, follow users, view timeline (home feed).
+
+**Push vs Pull model:**
+
+```
+PUSH (fan-out on write):
+When user A posts:
+  → Pre-compute and push to all followers' timelines
+  → Write to each follower's feed in Redis
+  
+  Pros: Fast reads O(1)
+  Cons: Huge write amplification for celebrities
+        (Kylie Jenner: 300M followers × 1 write = 300M ops!)
+
+PULL (fan-out on read):
+When user B requests feed:
+  → Fetch tweets from all followed users' tweet lists
+  → Merge and sort by timestamp
+  
+  Pros: No write amplification
+  Cons: Slow reads (N queries for N followings)
+
+HYBRID (Twitter's approach):
+  - Regular users: push model
+  - Celebrity accounts (>1M followers): pull model
+  - Merge celebrity tweets at read time
+```
+
+**Data model:**
+```sql
+-- Tweets table
+tweets(id, user_id, content, created_at, media_url, reply_to_id)
+
+-- Follows table
+follows(follower_id, followee_id, created_at)
+-- Index: (followee_id, follower_id) for "who follows me"
+-- Index: (follower_id, followee_id) for "who do I follow"
+
+-- Feed cache (Redis Sorted Set)
+-- Key: feed:{user_id}
+-- Score: tweet timestamp
+-- Member: tweet_id
+-- Cap at 800 most recent tweets per user
+```
+
+---
+
+### Design a Notification System
+
+**Types:** push, email, SMS. **Scale:** 10M notifications/day.
+
+```
+              ┌──────────────────────────────┐
+              │    Notification Service       │
+              │  ┌─────────────────────────┐ │
+API → Kafka ─►│  │     Message Queue       │ │
+              │  └──────┬──────────────────┘ │
+              │  ┌──────┼──────────────────┐ │
+              │  │ Worker Pool (N workers) │ │
+              │  └──────┬──────────────────┘ │
+              └─────────┼────────────────────┘
+                        │
+            ┌───────────┼───────────┐
+            ▼           ▼           ▼
+        Push Service  Email       SMS
+        (APNs/FCM)  (SendGrid)  (Twilio)
+```
+
+**Key considerations:**
+- **Idempotency**: use message IDs to prevent duplicate sends
+- **Retry with exponential backoff**: for delivery failures
+- **Priority queues**: urgent (OTP) > marketing
+- **Rate limiting**: per user (don't spam), per provider (API limits)
+- **User preferences**: respect opt-out, quiet hours
+
+---
+
+### Design a Distributed Key-Value Store
+
+**Similar to:** Redis, DynamoDB, Cassandra.
+
+**CAP Theorem:** A distributed system can guarantee at most **two** of:
+- **C**onsistency: all nodes see same data at same time
+- **A**vailability: every request gets a response
+- **P**artition tolerance: system works despite network splits
+
+```
+CP (Consistency + Partition): HBase, Zookeeper, etcd
+  → Good for: banks, inventory, coordination
+AP (Availability + Partition): Cassandra, DynamoDB, CouchDB  
+  → Good for: social feeds, shopping carts, DNS
+```
+
+**Consistent hashing** (how to shard data):
+```
+Ring of hash values 0 → 2^32
+Each node owns a range of the ring
+Key hashes to a position → routes to next node on ring
+
+Virtual nodes: each physical node = multiple points on ring
+→ Better load distribution, easier rebalancing
+```
+
+**Replication:**
+```
+Replication factor N=3 (write to 3 nodes)
+W = write quorum (how many must acknowledge)
+R = read quorum (how many must return)
+
+W + R > N → strong consistency
+Example: N=3, W=2, R=2 → quorum reads/writes
+```
+
+---
+
+## Common Trade-offs to Know
+
+### Consistency vs Availability
+
+| Scenario | Preference | Reason |
+|----------|-----------|--------|
+| Bank balance | Consistency | Must be accurate |
+| Social media likes | Availability | Approximate count OK |
+| Inventory (checkout) | Consistency | Can't oversell |
+| DNS records | Availability | Must always resolve |
+| Shopping cart | Availability | Merge carts on conflict |
+
+### SQL vs NoSQL
+
+| Use SQL when... | Use NoSQL when... |
+|-----------------|-------------------|
+| Complex joins needed | Schema changes frequently |
+| ACID transactions required | Massive horizontal scale |
+| Existing SQL expertise | Simple access patterns |
+| Reporting/analytics | High write throughput |
+
+### Microservices vs Monolith
+
+| Start with Monolith | Switch to Microservices |
+|--------------------|------------------------|
+| < 10 engineers | 50+ engineers, multiple teams |
+| Unclear domain boundaries | Well-defined service boundaries |
+| Early stage startup | Scaling bottlenecks identified |
+
+---
+
+## Interview Tips
+
+1. **Think out loud** — interviewers want to hear your reasoning
+2. **Start simple** — describe the basic system, then add complexity
+3. **Ask, don't assume** — clarify requirements before designing
+4. **State trade-offs explicitly** — "I chose X over Y because..."
+5. **Draw diagrams** — use boxes and arrows to show data flow
+6. **Address failure modes** — what happens if a service goes down?
+7. **Discuss monitoring** — how do you know the system is healthy?
+
+### Numbers to remember:
+- **1 million users**: single server, no sharding needed
+- **10 million users**: read replicas, basic caching
+- **100 million users**: sharding, CDN, microservices
+- **1 billion users**: global distribution, full microservices
+
+---
+
+*Looking to sharpen your coding skills alongside system design? Practice data structures and algorithms in [7 languages](/practice) to complete your interview preparation.*

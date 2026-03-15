@@ -1,0 +1,493 @@
+---
+title: "Top TypeScript Interview Questions and Answers (2026)"
+description: "Comprehensive TypeScript interview questions covering types, generics, decorators, utility types, and advanced patterns. Prepare for frontend and full-stack engineering interviews."
+date: "2026-02-20"
+tags: ["typescript", "interview", "interview questions", "typescript interview", "frontend interview", "javascript", "generics", "utility types"]
+category: "Interview Prep"
+readTime: "18 min read"
+author: "uByte Team"
+---
+
+TypeScript has become the standard for production JavaScript applications. Interviewers at companies like Google, Meta, Stripe, and Airbnb frequently ask TypeScript-specific questions for frontend and full-stack roles. This guide covers the most common TypeScript interview questions with in-depth answers.
+
+---
+
+## Basic TypeScript Questions
+
+### 1. What is TypeScript and how is it different from JavaScript?
+
+TypeScript is a **statically typed superset of JavaScript** developed by Microsoft. Key differences:
+
+| Feature | JavaScript | TypeScript |
+|---------|-----------|------------|
+| Type System | Dynamic (runtime) | Static (compile-time) |
+| Compilation | Interpreted | Compiled to JS |
+| Error detection | Runtime | Compile time |
+| IDE support | Limited | Full IntelliSense |
+| Interfaces | No | Yes |
+| Generics | No | Yes |
+
+```typescript
+// JavaScript - error caught only at runtime
+function add(a, b) { return a + b; }
+add("1", 2); // "12" — silent bug
+
+// TypeScript - error caught at compile time
+function add(a: number, b: number): number { return a + b; }
+add("1", 2); // Error: Argument of type 'string' is not assignable to parameter of type 'number'
+```
+
+### 2. What are the primitive types in TypeScript?
+
+TypeScript has the following primitives: `string`, `number`, `boolean`, `bigint`, `symbol`, `undefined`, `null`.
+
+```typescript
+let name: string = "Alice";
+let age: number = 30;
+let isActive: boolean = true;
+let bigNum: bigint = 9007199254740993n;
+let sym: symbol = Symbol("id");
+let nothing: undefined = undefined;
+let empty: null = null;
+```
+
+### 3. What is the difference between `interface` and `type`?
+
+Both define shapes, but have key differences:
+
+```typescript
+// interface — can be merged (declaration merging), better for OOP
+interface User {
+  id: number;
+  name: string;
+}
+interface User { // merges with above
+  email: string;
+}
+// Effective type: { id: number; name: string; email: string }
+
+// type alias — more flexible, supports unions/intersections
+type ID = string | number;
+type User = { id: ID; name: string };
+type Admin = User & { role: string };  // intersection
+
+// When to use each:
+// interface → public API shapes, class implementations, declaration merging
+// type     → unions, tuples, mapped types, computed types
+```
+
+### 4. Explain `unknown` vs `any` vs `never`
+
+```typescript
+// any — disables type checking (avoid in production)
+let val: any = "hello";
+val.toUpperCase(); // No error, but risky
+
+// unknown — type-safe any; must narrow before use
+let data: unknown = fetchData();
+if (typeof data === "string") {
+  data.toUpperCase(); // OK — narrowed
+}
+
+// never — function never returns (throws or infinite loop)
+function fail(msg: string): never {
+  throw new Error(msg);
+}
+
+// never also appears in exhaustive checks
+type Shape = "circle" | "square";
+function area(s: Shape): number {
+  if (s === "circle") return 3.14;
+  if (s === "square") return 1;
+  const _exhaustive: never = s; // Error if new shape added
+  return _exhaustive;
+}
+```
+
+---
+
+## Intermediate TypeScript Questions
+
+### 5. What are generics and why are they useful?
+
+Generics enable **reusable, type-safe code** that works with multiple types.
+
+```typescript
+// Without generics — loses type info
+function identity(arg: any): any { return arg; }
+
+// With generics — preserves type
+function identity<T>(arg: T): T { return arg; }
+const str = identity("hello");   // type: string
+const num = identity(42);        // type: number
+
+// Generic constraints
+function getLength<T extends { length: number }>(arg: T): number {
+  return arg.length;
+}
+getLength("hello");    // OK
+getLength([1, 2, 3]);  // OK
+getLength(42);         // Error: number has no length
+
+// Generic interfaces
+interface Repository<T> {
+  findById(id: number): T;
+  findAll(): T[];
+  save(entity: T): void;
+}
+
+// Multiple generic params
+function pair<K, V>(key: K, value: V): [K, V] {
+  return [key, value];
+}
+```
+
+### 6. What are TypeScript utility types?
+
+TypeScript ships built-in generic utility types:
+
+```typescript
+interface User {
+  id: number;
+  name: string;
+  email: string;
+  password: string;
+}
+
+// Partial<T> — all properties optional
+type UpdateUser = Partial<User>;
+// { id?: number; name?: string; email?: string; password?: string }
+
+// Required<T> — all properties required
+type StrictUser = Required<Partial<User>>;
+
+// Readonly<T> — immutable
+const user: Readonly<User> = { id: 1, name: "Alice", email: "a@b.com", password: "x" };
+// user.name = "Bob"; // Error!
+
+// Pick<T, K> — select subset of keys
+type PublicUser = Pick<User, "id" | "name" | "email">;
+
+// Omit<T, K> — exclude keys
+type SafeUser = Omit<User, "password">;
+
+// Record<K, V> — key-value map
+type RoleMap = Record<"admin" | "user" | "guest", User[]>;
+
+// Exclude<T, U> — remove from union
+type NonNullable<T> = Exclude<T, null | undefined>;
+
+// ReturnType<F> — infer function return type
+type Fetched = ReturnType<typeof fetch>; // Promise<Response>
+
+// Parameters<F> — infer parameter tuple
+type FetchParams = Parameters<typeof fetch>; // [input: RequestInfo, init?: RequestInit]
+```
+
+### 7. Explain type narrowing with examples
+
+Type narrowing is the process of refining a broader type to a more specific one:
+
+```typescript
+function process(input: string | number | null) {
+  // typeof narrowing
+  if (typeof input === "string") {
+    console.log(input.toUpperCase()); // string
+  }
+  // null check
+  if (input === null) return;
+  // Now input is string | number
+  
+  // instanceof narrowing
+  if (input instanceof Date) {
+    console.log(input.toISOString());
+  }
+}
+
+// Discriminated unions — best practice
+type Circle = { kind: "circle"; radius: number };
+type Square = { kind: "square"; side: number };
+type Shape = Circle | Square;
+
+function area(shape: Shape): number {
+  switch (shape.kind) {
+    case "circle": return Math.PI * shape.radius ** 2;
+    case "square": return shape.side ** 2;
+  }
+}
+
+// User-defined type guard
+function isString(val: unknown): val is string {
+  return typeof val === "string";
+}
+```
+
+### 8. What are conditional types?
+
+Conditional types enable type-level if/else expressions:
+
+```typescript
+type IsString<T> = T extends string ? "yes" : "no";
+type A = IsString<string>;  // "yes"
+type B = IsString<number>;  // "no"
+
+// infer keyword — extract types
+type UnpackPromise<T> = T extends Promise<infer U> ? U : T;
+type Resolved = UnpackPromise<Promise<string>>;  // string
+type Same = UnpackPromise<number>;               // number
+
+// Distributive conditional types
+type NonNullable<T> = T extends null | undefined ? never : T;
+type Clean = NonNullable<string | null | undefined>;  // string
+
+// Real-world: extract return type
+type ReturnType<T extends (...args: any) => any> =
+  T extends (...args: any) => infer R ? R : any;
+```
+
+---
+
+## Advanced TypeScript Questions
+
+### 9. What are mapped types?
+
+Mapped types transform the properties of an existing type:
+
+```typescript
+// Make all properties optional
+type Partial<T> = { [P in keyof T]?: T[P] };
+
+// Make all properties readonly
+type Readonly<T> = { readonly [P in keyof T]: T[P] };
+
+// Make all properties nullable
+type Nullable<T> = { [P in keyof T]: T[P] | null };
+
+// Convert all values to string
+type Stringify<T> = { [P in keyof T]: string };
+
+// Practical: API response wrapper
+type ApiResponse<T> = {
+  [P in keyof T]: T[P] | null;  // fields may be null from API
+} & {
+  _meta: { timestamp: string; version: string };
+};
+
+// Template literal types (TS 4.1+)
+type EventName<T extends string> = `on${Capitalize<T>}`;
+type ClickHandler = EventName<"click">;  // "onClick"
+```
+
+### 10. How do decorators work in TypeScript?
+
+Decorators are functions that modify classes, methods, or properties at runtime. They require `"experimentalDecorators": true` in tsconfig.
+
+```typescript
+// Class decorator
+function Singleton<T extends { new(...args: any[]): {} }>(constructor: T) {
+  let instance: T;
+  return class extends constructor {
+    constructor(...args: any[]) {
+      if (instance) return instance;
+      super(...args);
+      instance = this as unknown as T;
+    }
+  };
+}
+
+@Singleton
+class Database {
+  connect() { console.log("connected"); }
+}
+
+// Method decorator — logging
+function Log(target: any, key: string, descriptor: PropertyDescriptor) {
+  const original = descriptor.value;
+  descriptor.value = function (...args: any[]) {
+    console.log(`Calling ${key} with`, args);
+    const result = original.apply(this, args);
+    console.log(`${key} returned`, result);
+    return result;
+  };
+  return descriptor;
+}
+
+class Calculator {
+  @Log
+  add(a: number, b: number) { return a + b; }
+}
+
+// Property decorator
+function Required(target: any, propertyKey: string) {
+  // Can validate at runtime, integrate with metadata
+}
+```
+
+### 11. What is `satisfies` operator (TypeScript 4.9+)?
+
+`satisfies` validates a value against a type without widening:
+
+```typescript
+type Colors = "red" | "green" | "blue";
+type Palette = Record<Colors, string | [number, number, number]>;
+
+// Without satisfies:
+const palette: Palette = {
+  red: [255, 0, 0],
+  green: "#00ff00",
+  blue: [0, 0, 255],
+};
+// palette.red — type is string | [number, number, number]
+// Can't call .map() directly
+
+// With satisfies:
+const palette2 = {
+  red: [255, 0, 0],
+  green: "#00ff00",
+  blue: [0, 0, 255],
+} satisfies Palette;
+// palette2.red — type is [number, number, number] (preserved!)
+palette2.red.map(v => v / 255); // OK!
+palette2.green.toUpperCase();   // OK!
+```
+
+### 12. How do you configure TypeScript for a production project?
+
+Key `tsconfig.json` options:
+
+```json
+{
+  "compilerOptions": {
+    "strict": true,              // Enable all strict checks
+    "target": "ES2022",          // Output JS version
+    "module": "ESNext",          // Module system
+    "moduleResolution": "Bundler", // For Vite/webpack
+    "lib": ["ES2022", "DOM"],    // Type libs to include
+    "baseUrl": ".",              // For path aliases
+    "paths": {
+      "@/*": ["./src/*"]
+    },
+    "noUncheckedIndexedAccess": true,  // Safer array access
+    "exactOptionalPropertyTypes": true, // Strict optional
+    "noImplicitReturns": true,   // All code paths must return
+    "noFallthroughCasesInSwitch": true,
+    "skipLibCheck": true,        // Skip checking .d.ts files
+    "declaration": true,         // Generate .d.ts files
+    "sourceMap": true
+  }
+}
+```
+
+---
+
+## TypeScript + React Questions
+
+### 13. How do you type React components in TypeScript?
+
+```typescript
+import React, { FC, ReactNode, useState, useCallback } from "react";
+
+// Function component with typed props
+interface ButtonProps {
+  label: string;
+  onClick: () => void;
+  variant?: "primary" | "secondary" | "ghost";
+  disabled?: boolean;
+  children?: ReactNode;
+}
+
+const Button: FC<ButtonProps> = ({ label, onClick, variant = "primary", disabled, children }) => (
+  <button
+    onClick={onClick}
+    disabled={disabled}
+    className={`btn-${variant}`}
+  >
+    {children ?? label}
+  </button>
+);
+
+// Generic components
+interface ListProps<T> {
+  items: T[];
+  renderItem: (item: T, index: number) => ReactNode;
+  keyExtractor: (item: T) => string;
+}
+
+function List<T>({ items, renderItem, keyExtractor }: ListProps<T>) {
+  return (
+    <ul>
+      {items.map((item, i) => (
+        <li key={keyExtractor(item)}>{renderItem(item, i)}</li>
+      ))}
+    </ul>
+  );
+}
+
+// Typed hooks
+function useLocalStorage<T>(key: string, initialValue: T): [T, (value: T) => void] {
+  const [storedValue, setStoredValue] = useState<T>(() => {
+    const item = window.localStorage.getItem(key);
+    return item ? JSON.parse(item) : initialValue;
+  });
+
+  const setValue = useCallback((value: T) => {
+    setStoredValue(value);
+    window.localStorage.setItem(key, JSON.stringify(value));
+  }, [key]);
+
+  return [storedValue, setValue];
+}
+```
+
+---
+
+## Common Interview Pitfalls
+
+### ❌ Using `any` everywhere
+
+```typescript
+// Bad
+function processData(data: any) { return data.value; }
+
+// Good
+function processData<T extends { value: unknown }>(data: T) {
+  return data.value;
+}
+```
+
+### ❌ `as` type assertions without narrowing
+
+```typescript
+// Bad — bypasses safety
+const input = document.getElementById("input") as HTMLInputElement;
+
+// Good — with null check
+const el = document.getElementById("input");
+if (!(el instanceof HTMLInputElement)) throw new Error("Expected input element");
+const input = el; // typed as HTMLInputElement
+```
+
+### ❌ Forgetting to use `strict` mode
+
+Always enable `"strict": true` in `tsconfig.json`. It enables `noImplicitAny`, `strictNullChecks`, `strictFunctionTypes`, and more.
+
+---
+
+## Quick Reference: Key Concepts
+
+| Concept | Use Case |
+|---------|----------|
+| `interface` | Object shapes, class contracts, mergeable |
+| `type` | Unions, intersections, computed types |
+| `generics` | Reusable type-safe logic |
+| `unknown` | Safe alternative to `any` |
+| `never` | Exhaustive checks, unreachable code |
+| `Partial<T>` | Optional updates (PATCH requests) |
+| `Readonly<T>` | Immutable state, constants |
+| `Pick/Omit` | API response shaping |
+| `ReturnType<F>` | Infer return types |
+| `satisfies` | Validate without widening |
+
+---
+
+*Practice TypeScript in a real environment with our [TypeScript coding challenges](/practice/javascript). Master generics, type manipulation, and advanced patterns hands-on.*
