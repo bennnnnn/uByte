@@ -1,5 +1,6 @@
 import type { NextConfig } from "next";
 import { withSentryConfig } from "@sentry/nextjs";
+import path from "path";
 
 const securityHeaders = [
   // Prevent the page from being embedded in iframes on other domains (clickjacking).
@@ -64,12 +65,23 @@ const nextConfig: NextConfig = {
   },
   webpack(config, { isServer }) {
     if (!isServer) {
+      // Next.js loads polyfills via relative imports inside next/dist/client/app-globals.js
+      // (e.g. require("../build/polyfills/polyfill-module")).
+      // Webpack resolves those to absolute paths, so we must alias the absolute path —
+      // a bare package-name alias like "next/dist/build/polyfills/polyfill-module" only
+      // matches absolute-path imports and does NOT match the relative ones Next.js uses.
+      // Setting the alias value to `false` tells webpack to resolve it to an empty module.
+      const polyfillRoot = path.resolve("node_modules/next/dist/build/polyfills");
       config.resolve.alias = {
         ...config.resolve.alias,
-        // Eliminate Next.js's hardcoded polyfills for Array.at, Object.hasOwn, etc.
-        // All are natively supported by Chrome 109+, Safari 16.4+, Firefox 109+.
-        "next/dist/build/polyfills/polyfill-module": false,
-        "next/dist/build/polyfills/polyfills": false,
+        // Absolute-path aliases — match the relative imports inside Next.js internals
+        [path.join(polyfillRoot, "polyfill-module")]:  false,
+        [path.join(polyfillRoot, "polyfill-nomodule")]: false,
+        [path.join(polyfillRoot, "polyfills")]:         false,
+        // Package-name aliases — match any direct imports from consuming code
+        "next/dist/build/polyfills/polyfill-module":  false,
+        "next/dist/build/polyfills/polyfill-nomodule": false,
+        "next/dist/build/polyfills/polyfills":         false,
       };
     }
     return config;
