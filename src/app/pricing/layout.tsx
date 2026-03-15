@@ -18,12 +18,14 @@ export const metadata: Metadata = {
     description:
       "Upgrade to uByte Pro for unlimited tutorials, interview prep, AI hints, and more.",
     url: absoluteUrl("/pricing"),
+    images: [{ url: absoluteUrl("/api/og?title=Pricing&description=Free+and+Pro+plans+for+coding+tutorials+and+certifications"), width: 1200, height: 630 }],
   },
   twitter: {
     card: "summary_large_image",
     title: "Pricing | uByte",
     description:
       "Upgrade to uByte Pro for unlimited tutorials, interview prep, AI hints, and more.",
+    images: [absoluteUrl("/api/og?title=Pricing&description=Free+and+Pro+plans+for+coding+tutorials+and+certifications")],
   },
 };
 

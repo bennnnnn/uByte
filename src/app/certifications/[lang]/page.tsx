@@ -44,22 +44,39 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const name = config?.name ?? lang;
   const examConfig = await getExamConfigForLang(lang);
   const canonical = absoluteUrl(`/certifications/${lang}`);
+  const title = `${name} Certification Exam — Prove Your ${name} Skills`;
+  const description = `Take the ${name} certification exam: ${examConfig.examSize} questions in ${examConfig.examDurationMinutes} minutes. Score ${examConfig.passPercent}%+ to earn a verifiable ${name} certificate for your LinkedIn and resume. Practice with free ${name} tutorials first.`;
   return {
-    title: `${name} Certification Exam`,
-    description: `Take the ${name} certification exam. ${examConfig.examSize} questions, ${examConfig.examDurationMinutes} minutes. Score ${examConfig.passPercent}%+ to earn a certificate.`,
+    title,
+    description,
     keywords: [
       ...SITE_KEYWORDS,
       `${name} certification`,
       `${name} certification exam`,
-      `${name} interview prep`,
+      `${name} certificate`,
+      `${name} skills test`,
+      `${name} programming test`,
+      `${name} online exam`,
       `${name} assessment`,
+      `${name} certification online`,
+      `get ${name} certified`,
+      `${name} certificate for LinkedIn`,
+      `${name} interview prep`,
+      `${name} coding test`,
+      `verify ${name} skills`,
     ],
     alternates: { canonical },
     openGraph: {
       type: "website",
       title: `${name} Certification Exam | uByte`,
-      description: `Timed ${name} exam with certificate on pass.`,
+      description,
       url: canonical,
+      images: [{ url: absoluteUrl(`/api/og?title=${encodeURIComponent(`${name} Certification`)}&description=${encodeURIComponent(`Timed ${name} exam — earn a verifiable certificate`)}`), width: 1200, height: 630 }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${name} Certification Exam | uByte`,
+      description,
     },
   };
 }

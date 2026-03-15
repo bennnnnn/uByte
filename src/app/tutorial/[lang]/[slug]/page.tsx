@@ -41,26 +41,33 @@ export async function generateMetadata({
   const config = getLanguageConfig(lang);
   if (!config) return { title: "Not Found" };
   const canonicalUrl = tutorialCanonicalUrl(BASE_URL, lang, slug);
-  const ogTitle = `${tutorial.title} | ${APP_NAME}`;
-  const description = `${tutorial.description} Free interactive ${config.name} tutorial with live code examples on ${APP_NAME}.`;
+  const title = `${config.name} ${tutorial.title} Tutorial — Learn ${tutorial.title} in ${config.name}`;
+  const ogTitle = `${config.name} ${tutorial.title} Tutorial | ${APP_NAME}`;
+  const description = `Learn ${config.name} ${tutorial.title.toLowerCase()} step by step. ${tutorial.description} Free interactive ${config.name} tutorial with hands-on coding exercises and instant feedback on ${APP_NAME}.`;
 
+  const conceptKeywords = (tutorial.subtopics ?? []).map(
+    (s: { id: string; title: string }) => `${config.name} ${s.title}`
+  );
   const keywords = [
-    tutorial.title,
-    `${tutorial.title} ${config.name}`,
+    `${config.name} ${tutorial.title.toLowerCase()}`,
+    `${config.name} ${tutorial.title.toLowerCase()} tutorial`,
+    `${tutorial.title.toLowerCase()} in ${config.name}`,
+    `learn ${config.name} ${tutorial.title.toLowerCase()}`,
+    `${config.name} ${tutorial.title.toLowerCase()} for beginners`,
+    `${config.name} ${tutorial.title.toLowerCase()} examples`,
     `${config.name} tutorial`,
     `${config.name} course`,
     `learn ${config.name}`,
     `${config.name} programming`,
     `${config.name} for beginners`,
-    `${config.name} interview prep`,
-    `${config.name} certification prep`,
-    `interactive ${config.name}`,
+    `interactive ${config.name} tutorial`,
+    `${config.name} coding exercises`,
+    ...conceptKeywords,
     APP_NAME,
-    tutorial.difficulty,
   ];
 
   return {
-    title: tutorial.title,
+    title,
     description,
     keywords,
     alternates: { canonical: canonicalUrl },
@@ -71,7 +78,7 @@ export async function generateMetadata({
       url: canonicalUrl,
       siteName: APP_NAME,
       locale: "en_US",
-      images: [{ url: absoluteUrl(`/api/og?title=${encodeURIComponent(tutorial.title)}&description=${encodeURIComponent(`${config.name} tutorial`)}`), width: 1200, height: 630 }],
+      images: [{ url: absoluteUrl(`/api/og?title=${encodeURIComponent(`${config.name}: ${tutorial.title}`)}&description=${encodeURIComponent(`Interactive ${config.name} ${tutorial.title.toLowerCase()} tutorial`)}`), width: 1200, height: 630 }],
     },
     twitter: {
       card: "summary_large_image",

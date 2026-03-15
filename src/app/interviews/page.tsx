@@ -9,36 +9,49 @@ import { absoluteUrl, SITE_KEYWORDS } from "@/lib/seo";
 import { APP_NAME } from "@/lib/constants";
 
 export const metadata: Metadata = {
-  title: "Developer Interview Experiences",
+  title: "Developer Interview Experiences — Real Stories from FAANG & Top Companies | uByte",
   description:
-    "Real developer interview experiences shared anonymously. See what questions get asked at Google, Meta, Amazon, Microsoft, and other top tech companies. Filter by company, difficulty, and outcome.",
+    "Read real, anonymous developer interview experiences from Google, Meta, Amazon, Apple, Microsoft, Netflix, Stripe, and 20+ top tech companies. See what coding questions get asked, the difficulty level, and whether candidates passed. Filter by company, difficulty, and outcome.",
   keywords: [
     ...SITE_KEYWORDS,
     "developer interview experiences",
     "tech interview questions",
     "software engineer interview",
     "google interview questions",
+    "google interview experience",
     "meta interview questions",
+    "meta interview experience",
     "amazon interview questions",
+    "amazon interview experience",
+    "apple interview experience",
+    "microsoft interview experience",
+    "netflix interview experience",
     "faang interview prep",
+    "faang interview questions",
+    "tech company interview process",
+    "coding interview tips",
+    "what to expect in a coding interview",
     "interview experience community",
+    "software engineer interview stories",
+    "stripe interview experience",
+    "uber interview experience",
   ],
   alternates: { canonical: absoluteUrl("/interviews") },
   openGraph: {
     type: "website",
-    title: "Developer Interview Experiences | uByte",
+    title: "Developer Interview Experiences — Real FAANG Stories | uByte",
     description:
-      "Real anonymous interview stories from developers at top tech companies. Learn what to expect and how to prepare.",
+      "Anonymous interview stories from developers at Google, Meta, Amazon, Apple, Microsoft, and 20+ top companies. See what to expect.",
     url: absoluteUrl("/interviews"),
     siteName: APP_NAME,
     locale: "en_US",
-    images: [{ url: absoluteUrl("/api/og?title=Interview+Experiences&description=Real+stories+from+developers+at+top+tech+companies"), width: 1200, height: 630 }],
+    images: [{ url: absoluteUrl("/api/og?title=Interview+Experiences&description=Real+anonymous+stories+from+developers+at+FAANG+and+top+companies"), width: 1200, height: 630 }],
   },
   twitter: {
     card: "summary_large_image",
     title: "Developer Interview Experiences | uByte",
     description:
-      "Real anonymous interview stories from developers at Google, Meta, Amazon, and more. Filter by company, difficulty, and outcome.",
+      "Real anonymous interview stories from developers at Google, Meta, Amazon, and 20+ top companies. Filter by company, difficulty, and outcome.",
   },
 };
 

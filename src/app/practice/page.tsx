@@ -11,31 +11,48 @@ import { absoluteUrl, SITE_KEYWORDS } from "@/lib/seo";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Interview Prep — Ace Your Coding Interview",
+  title: "Coding Interview Prep — Practice Problems in 7 Languages | uByte",
   description:
-    "Practice coding interview problems in Go, Python, C++, JavaScript, Java, and Rust. LeetCode-style challenges with an in-browser editor and instant test feedback.",
+    "Ace your coding interview with 200+ practice problems in Go, Python, JavaScript, Java, C++, Rust, and C#. Arrays, strings, trees, graphs, dynamic programming, and more — solve in-browser with instant test feedback. Free problems included.",
   keywords: [
     ...SITE_KEYWORDS,
     "coding interview questions",
+    "coding interview prep",
+    "coding interview practice",
     "leetcode alternative",
     "hackerrank alternative",
     "data structures and algorithms",
     "interview prep",
     "coding challenges",
+    "two sum solution",
+    "sliding window problems",
+    "dynamic programming problems",
+    "tree and graph problems",
+    "array interview questions",
+    "string manipulation problems",
+    "coding interview questions and answers",
+    "software engineer interview prep",
+    "technical interview practice",
+    "free coding interview problems",
+    "coding practice online",
+    "neetcode alternative",
+    "algoexpert alternative",
+    "codewars alternative",
+    "best coding interview practice site",
   ],
   alternates: { canonical: absoluteUrl("/practice") },
   openGraph: {
-    title: "Interview Prep — Ace Your Coding Interview | uByte",
+    title: "Coding Interview Prep — Practice Problems in 7 Languages | uByte",
     description:
-      "Coding problems across multiple languages. Write real code in the browser and get instant feedback.",
+      "200+ coding interview problems across Go, Python, JavaScript, Java, C++, Rust, and C#. Write real code in the browser and get instant test feedback.",
     type: "website",
     url: absoluteUrl("/practice"),
-    images: [{ url: absoluteUrl("/api/og?title=Interview+Prep&description=LeetCode-style+problems+in+7+languages"), width: 1200, height: 630 }],
+    images: [{ url: absoluteUrl("/api/og?title=Interview+Prep&description=200%2B+coding+problems+in+7+languages+with+instant+feedback"), width: 1200, height: 630 }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Interview Prep — Ace Your Coding Interview | uByte",
-    description: "LeetCode-style coding problems in Go, Python, JavaScript, Java, Rust, C++, and C#. Write code in-browser with instant test feedback.",
+    title: "Coding Interview Prep — Practice Problems in 7 Languages | uByte",
+    description: "200+ LeetCode-style problems in Go, Python, JavaScript, Java, Rust, C++, and C#. Solve in-browser with instant test feedback.",
   },
 };
 

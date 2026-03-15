@@ -33,21 +33,29 @@ const PopularTutorialsSection   = dynamic(() => import("@/components/home/Popula
 const PopularInterviewPrepSection = dynamic(() => import("@/components/home/PopularInterviewPrepSection"));
 
 export const metadata: Metadata = {
-  title: "uByte — Learn, Practice, and Get Certified in 7 Languages",
+  title: "uByte — Learn to Code with Interactive Tutorials, Interview Prep & Certifications",
   description:
-    "The complete path from beginner to job-ready. Interactive tutorials, coding interview prep, and certification exams — all in Go, Python, JavaScript, Java, Rust, C++, and C#.",
+    "The best alternative to W3Schools, Codecademy, and LeetCode — combined. Free interactive coding tutorials, 200+ interview prep problems, and certification exams in Go, Python, JavaScript, Java, C++, Rust, and C#. Write and run real code in your browser.",
   keywords: [
     ...SITE_KEYWORDS,
     "coding bootcamp alternative",
     "software engineer interview prep",
     "programming certification online",
     "learn to code and get certified",
+    "best coding platform",
+    "coding website like w3schools",
+    "better than codecademy",
+    "coding tutorial website",
+    "learn programming online",
+    "free coding website",
+    "coding practice website",
+    "interactive programming course",
   ],
   alternates: { canonical: absoluteUrl("/") },
   openGraph: {
-    title: "uByte — Learn, Practice, and Get Certified in 7 Languages",
+    title: "uByte — Interactive Coding Tutorials, Interview Prep & Certifications",
     description:
-      "Interactive tutorials, coding interview prep, and certification exams for Go, Python, JavaScript, Java, Rust, C++, and C#.",
+      "Free interactive tutorials, 200+ coding problems, and certification exams in Go, Python, JavaScript, Java, C++, Rust, and C#. The best alternative to W3Schools and Codecademy.",
     type: "website",
     url: absoluteUrl("/"),
   },

@@ -13,6 +13,13 @@ export const metadata: Metadata = {
     title: "About uByte",
     description: "Learn why we built uByte and what we believe about learning to code.",
     url: absoluteUrl("/about"),
+    images: [{ url: absoluteUrl("/api/og?title=About+uByte&description=Interactive+coding+tutorials+across+7+languages"), width: 1200, height: 630 }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "About uByte",
+    description: "Learn why we built uByte and what we believe about learning to code.",
+    images: [absoluteUrl("/api/og?title=About+uByte&description=Interactive+coding+tutorials+across+7+languages")],
   },
 };
 

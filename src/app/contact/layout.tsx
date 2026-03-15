@@ -10,6 +10,12 @@ export const metadata: Metadata = {
     title: "Contact Us — uByte",
     description: "Reach the uByte team for support, feedback, or questions.",
     url: `${BASE_URL}/contact`,
+    images: [{ url: `${BASE_URL}/api/og?title=Contact+Us&description=Get+in+touch+with+the+uByte+team`, width: 1200, height: 630 }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Contact Us — uByte",
+    description: "Reach the uByte team for support, feedback, or questions.",
   },
 };
 

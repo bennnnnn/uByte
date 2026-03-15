@@ -85,6 +85,12 @@ export const metadata: Metadata = {
     title: "uByte Help Center",
     description: "Support articles and answers for tutorials, interview prep, and certification exams.",
     url: absoluteUrl("/help"),
+    images: [{ url: absoluteUrl("/api/og?title=Help+Center&description=FAQs+for+tutorials+interview+prep+and+certifications"), width: 1200, height: 630 }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "uByte Help Center",
+    description: "Support articles and answers for tutorials, interview prep, and certification exams.",
   },
 };
 

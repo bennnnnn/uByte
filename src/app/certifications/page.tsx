@@ -16,28 +16,44 @@ import ScrollToTop from "@/components/ScrollToTop";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Programming Certifications",
+  title: "Programming Certification Exams — Get Certified in 7 Languages | uByte",
   description:
-    "Timed certification-style programming exams by language. Practice real assessment formats and earn shareable certificates when you pass.",
+    "Prove your programming skills with timed certification exams. Take exams in Go, Python, JavaScript, Java, C++, Rust, and C# — earn verifiable certificates you can add to your LinkedIn and resume. Free practice, Pro for full exams.",
   keywords: [
     ...SITE_KEYWORDS,
     "programming certification exams",
+    "coding certification",
+    "programming certificate online",
     "coding certification practice",
     "technical assessment practice",
+    "Go certification",
+    "Python certification",
+    "JavaScript certification",
+    "Java certification",
+    "C++ certification",
+    "Rust certification",
+    "C# certification",
+    "online coding exam",
+    "programming skills test",
+    "developer certification",
+    "verifiable coding certificate",
+    "add coding certificate to LinkedIn",
+    "coding assessment test",
+    "timed programming exam",
   ],
   alternates: { canonical: absoluteUrl("/certifications") },
   openGraph: {
-    title: "Programming Certifications | uByte",
+    title: "Programming Certification Exams — Get Certified in 7 Languages | uByte",
     description:
-      "Take timed programming certifications and earn shareable certificates.",
+      "Timed certification exams in Go, Python, JavaScript, Java, C++, Rust, and C#. Pass to earn verifiable certificates for your resume.",
     type: "website",
     url: absoluteUrl("/certifications"),
-    images: [{ url: absoluteUrl("/api/og?title=Certifications&description=Prove+your+programming+skills+with+timed+exams"), width: 1200, height: 630 }],
+    images: [{ url: absoluteUrl("/api/og?title=Certifications&description=Prove+your+skills+with+timed+exams+in+7+languages"), width: 1200, height: 630 }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Programming Certifications | uByte",
-    description: "Take timed programming certifications and earn shareable certificates in Go, Python, JavaScript, Java, Rust, C++, and C#.",
+    title: "Programming Certification Exams | uByte",
+    description: "Timed certification exams in Go, Python, JavaScript, Java, Rust, C++, and C#. Earn verifiable certificates for your LinkedIn and resume.",
   },
 };
 

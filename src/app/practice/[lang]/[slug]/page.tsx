@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import Link from "next/link";
 import type { Metadata } from "next";
 import { getPracticeProblemBySlug, getAllPracticeProblems, getPracticeCategories } from "@/lib/practice/problems";
 import { isSupportedLanguage, LANGUAGES, ALL_LANGUAGE_KEYS } from "@/lib/languages/registry";
@@ -27,26 +28,35 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const langName = isSupportedLanguage(lang) ? LANGUAGES[lang as SupportedLanguage]?.name : lang;
   if (!problem) return { title: "Not found" };
   const canonical = absoluteUrl(`/practice/${lang}/${slug}`);
-  const title = `${problem.title} (${langName}) | Interview Prep`;
-  const description = problem.description.slice(0, 160);
+  const title = `${problem.title} — ${langName} ${problem.difficulty.charAt(0).toUpperCase() + problem.difficulty.slice(1)} Coding Problem`;
+  const description = `Solve "${problem.title}" in ${langName}. ${problem.description.slice(0, 120)} Practice this ${problem.difficulty} ${problem.category} problem with instant test feedback on uByte.`;
   return {
     title,
     description,
     keywords: [
-      ...SITE_KEYWORDS,
       problem.title,
       `${problem.title} ${langName}`,
+      `${problem.title} solution`,
+      `${problem.title} ${langName} solution`,
+      `${langName} ${problem.category} problem`,
       `${langName} coding problem`,
+      `${langName} interview question`,
       `${langName} interview prep`,
+      `${langName} ${problem.difficulty} problem`,
+      `${problem.category} coding problems`,
+      `${problem.category} interview questions`,
+      `${langName} coding challenge`,
+      APP_NAME,
     ],
     alternates: { canonical },
     openGraph: {
       type: "article",
-      title: `${title} | uByte`,
+      title: `${problem.title} (${langName}) | uByte Interview Prep`,
       description,
       url: canonical,
+      images: [{ url: absoluteUrl(`/api/og?title=${encodeURIComponent(problem.title)}&description=${encodeURIComponent(`${langName} ${problem.difficulty} ${problem.category} problem`)}`), width: 1200, height: 630 }],
     },
-    twitter: { card: "summary_large_image" as const, title: `${title} | uByte`, description },
+    twitter: { card: "summary_large_image" as const, title: `${problem.title} (${langName}) | uByte`, description },
   };
 }
 
@@ -177,6 +187,34 @@ export default async function PracticeProblemPage({ params, searchParams }: Prop
         interviewMode={interviewMode}
         interviewDeadline={interviewDeadline}
       />
+
+      {/* Server-rendered content for search engine crawlers */}
+      <article className="sr-only" aria-hidden="true">
+        <h1>{problem.title} — {langName} Coding Problem</h1>
+        <p>Difficulty: {problem.difficulty} | Category: {problem.category}</p>
+        <section>
+          <h2>Problem Description</h2>
+          <p>{problem.description}</p>
+        </section>
+        {problem.examples.length > 0 && (
+          <section>
+            <h2>Examples</h2>
+            {problem.examples.map((ex, i) => (
+              <div key={i}>
+                <h3>Example {i + 1}</h3>
+                <p>Input: {ex.input}</p>
+                <p>Output: {ex.output}</p>
+                {ex.explanation && <p>Explanation: {ex.explanation}</p>}
+              </div>
+            ))}
+          </section>
+        )}
+        <nav>
+          <Link href={`/practice/${lang}`}>← Back to {langName} Problems</Link>
+          {" · "}
+          <Link href="/practice">All Interview Prep Problems</Link>
+        </nav>
+      </article>
     </>
   );
 }
