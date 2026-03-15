@@ -8,19 +8,19 @@
  * Optional (for Vercel AI Gateway observability):
  *   AI_GATEWAY_API_KEY  — from vercel.com/[team]/~/ai-gateway/api-keys
  *
- * Verified model names:
- *   HINTS_MODEL        gemini-2.5-flash-lite   fast & cheap for short hints
- *   CODE_REVIEW_MODEL  gpt-4o-mini             strong code understanding
- *   CHAT_MODEL         gemini-2.5-flash        balanced for multi-turn chat
+ * Verified model names (direct Google API — not Vercel gateway aliases):
+ *   HINTS_MODEL        gemini-2.0-flash   fast & cheap for short hints
+ *   CODE_REVIEW_MODEL  gpt-4o-mini        strong code understanding
+ *   CHAT_MODEL         gemini-2.0-flash   balanced for multi-turn chat
  */
 
 import { generateText } from "ai";
 import { createGoogleGenerativeAI } from "@ai-sdk/google";
 import { createOpenAI } from "@ai-sdk/openai";
 
-export const HINTS_MODEL       = "gemini-2.5-flash-lite";
+export const HINTS_MODEL       = "gemini-2.0-flash";
 export const CODE_REVIEW_MODEL = "gpt-4o-mini";
-export const CHAT_MODEL        = "gemini-2.5-flash";
+export const CHAT_MODEL        = "gemini-2.0-flash";
 
 const GATEWAY_BASE_URL = "https://ai-gateway.vercel.sh/v1";
 const DEFAULT_TIMEOUT_MS = 15_000;
