@@ -112,9 +112,13 @@ export const POST = withErrorHandling("POST /api/tutorial-hint", async (request:
   const firstName = user.name?.split(" ")[0] ?? undefined;
   const response = await callAiFeedback(evidenceBundle, 1, verdict, firstName);
 
-  await setCachedAiResponse(cacheKey, response as unknown as Record<string, unknown>);
-  await incrementTodayAiUsage(user.userId);
-  await setLastAiCallAt(user.userId);
+  // Only cache genuine AI responses — never cache error fallbacks.
+  const isErrorFallback = response.root_cause === "ai_unavailable" || response.root_cause === "no_ai_config" || response.confidence === 0;
+  if (!isErrorFallback) {
+    await setCachedAiResponse(cacheKey, response as unknown as Record<string, unknown>);
+    await incrementTodayAiUsage(user.userId);
+    await setLastAiCallAt(user.userId);
+  }
 
   return NextResponse.json(response);
 });

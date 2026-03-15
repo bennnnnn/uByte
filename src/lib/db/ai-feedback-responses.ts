@@ -45,7 +45,12 @@ export async function getCachedAiResponse(key: AiFeedbackCacheKey): Promise<Reco
         AND model_name = ${key.modelName}
     `;
     if (!row?.response_json) return null;
-    return row.response_json as Record<string, unknown>;
+    const cached = row.response_json as Record<string, unknown>;
+    // Skip cached error fallbacks — they were stored when AI was misconfigured.
+    if (cached.root_cause === "ai_unavailable" || cached.root_cause === "no_ai_config" || cached.confidence === 0) {
+      return null;
+    }
+    return cached;
   } catch (err: unknown) {
     if ((err as { code?: string })?.code === TABLE_MISSING) {
       await ensureAiFeedbackTable();
