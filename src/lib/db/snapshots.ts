@@ -17,6 +17,13 @@ async function ensureSnapshotsTable(): Promise<void> {
       saved_at   TIMESTAMPTZ NOT NULL DEFAULT NOW()
     )
   `;
+  // Add language column if table existed before multi-language support
+  await sql`
+    DO $$ BEGIN
+      ALTER TABLE code_snapshots ADD COLUMN language TEXT NOT NULL DEFAULT 'go';
+    EXCEPTION WHEN duplicate_column THEN NULL;
+    END $$
+  `;
   await sql`CREATE INDEX IF NOT EXISTS idx_snapshots_user_lang_slug ON code_snapshots(user_id, language, slug, step_index)`;
   _snapshotsReady = true;
 }

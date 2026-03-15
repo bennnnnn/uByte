@@ -32,6 +32,8 @@ const securityHeaders = [
       "frame-src https://paddle.com https://*.paddle.com https://accounts.google.com",
       // Prevent <base> tag injection (could redirect all relative URLs to an attacker's origin).
       "base-uri 'self'",
+      // Code editor (CodeMirror/Monaco) creates web workers from blob URLs for syntax parsing.
+      "worker-src 'self' blob:",
       // Block Flash, Java applets, and other legacy plugins — none are used here.
       "object-src 'none'",
       // CSP-level iframe protection (supersedes X-Frame-Options in modern browsers).

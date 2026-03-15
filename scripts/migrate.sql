@@ -96,9 +96,22 @@ CREATE TABLE IF NOT EXISTS ratings (
   user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   tutorial_slug TEXT NOT NULL,
   value INTEGER NOT NULL CHECK(value IN (1, -1)),
+  language TEXT NOT NULL DEFAULT 'go',
   created_at TEXT DEFAULT (NOW()::text),
-  UNIQUE(user_id, tutorial_slug)
+  UNIQUE(user_id, language, tutorial_slug)
 );
+
+-- Backfill: add language column to existing ratings tables missing it
+DO $$ BEGIN
+  ALTER TABLE ratings ADD COLUMN language TEXT NOT NULL DEFAULT 'go';
+EXCEPTION WHEN duplicate_column THEN NULL;
+END $$;
+
+DO $$ BEGIN
+  ALTER TABLE ratings DROP CONSTRAINT IF EXISTS ratings_user_id_tutorial_slug_key;
+  ALTER TABLE ratings ADD CONSTRAINT ratings_user_lang_slug_key UNIQUE (user_id, language, tutorial_slug);
+EXCEPTION WHEN duplicate_table THEN NULL;
+END $$;
 
 CREATE TABLE IF NOT EXISTS playground_snippets (
   id SERIAL PRIMARY KEY,
