@@ -111,8 +111,8 @@ export default function HeroIDE() {
   return (
     <div className="relative pb-6 sm:pb-8">
       {/* Floating success badge */}
-      <div className="absolute right-2 top-0 z-10 flex -translate-y-1/2 items-center gap-2 rounded-xl border border-emerald-200 bg-surface-card px-3.5 py-2 text-xs font-semibold text-emerald-600 shadow-lg shadow-zinc-200/60 dark:border-emerald-800 dark:text-emerald-400 dark:shadow-zinc-900/80 sm:-right-3 sm:-top-5 sm:translate-y-0">
-        <span className="flex h-5 w-5 items-center justify-center rounded-full bg-emerald-100 text-[11px] dark:bg-emerald-900/50">✓</span>
+      <div className="absolute right-2 top-0 z-10 flex -translate-y-1/2 items-center gap-2 rounded-xl border border-emerald-200 bg-surface-card px-3.5 py-2 text-xs font-semibold text-emerald-700 shadow-lg shadow-zinc-200/60 dark:border-emerald-800 dark:text-emerald-400 dark:shadow-zinc-900/80 sm:-right-3 sm:-top-5 sm:translate-y-0">
+        <span className="flex h-5 w-5 items-center justify-center rounded-full bg-emerald-100 text-[11px] text-emerald-800 dark:bg-emerald-900/50 dark:text-emerald-300">✓</span>
         Step passed! +10 XP
       </div>
 

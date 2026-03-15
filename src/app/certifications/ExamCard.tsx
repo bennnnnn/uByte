@@ -43,7 +43,7 @@ export default function ExamCard({ slug, examConfig, stats, publicStats, isLogge
   return (
     <Link
       href={`/certifications/${slug}`}
-      aria-label={`${config.name} certification — ${difficulty.label}`}
+      aria-label={`${config.name} certification exam — difficulty: ${difficulty.label}`}
       className="group relative flex flex-col overflow-hidden rounded-2xl border border-zinc-200 bg-surface-card shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/40 dark:border-zinc-700"
     >
       <div className="flex flex-1 flex-col gap-5 p-6">
