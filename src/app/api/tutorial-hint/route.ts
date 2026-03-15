@@ -12,7 +12,7 @@ import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 import { getSteps } from "@/lib/tutorial-steps";
 import type { SupportedLanguage } from "@/lib/languages/types";
 
-const MODEL_NAME = "gemini-2.0-flash";
+const MODEL_NAME = "gemini-2.5-flash";
 
 /** POST /api/tutorial-hint — returns structured AI hint for a failing tutorial step. */
 export const POST = withErrorHandling("POST /api/tutorial-hint", async (request: NextRequest) => {

@@ -14,9 +14,9 @@ import { GoogleGenAI } from "@google/genai";
 import { generateText } from "ai";
 import { createOpenAI } from "@ai-sdk/openai";
 
-export const HINTS_MODEL       = "gemini-2.0-flash";
-export const CODE_REVIEW_MODEL = "gemini-2.0-flash";
-export const CHAT_MODEL        = "gemini-2.0-flash";
+export const HINTS_MODEL       = "gemini-2.5-flash";
+export const CODE_REVIEW_MODEL = "gemini-2.5-flash";
+export const CHAT_MODEL        = "gemini-2.5-flash";
 
 const DEFAULT_TIMEOUT_MS = 15_000;
 
