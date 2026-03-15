@@ -4,7 +4,8 @@ import { getLangIcon } from "@/lib/languages/icons";
 import type { UserExamLangStats } from "@/lib/db/exam-attempts";
 
 function getDifficultyFromPassRate(passRate: number, hasData: boolean): { label: string; color: string } {
-  if (!hasData) return { label: "New", color: "bg-zinc-100 text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400" };
+  // text-*-700 on *-100 backgrounds: all pass WCAG AA (≥4.5:1) for the 11px badge text.
+  if (!hasData) return { label: "New", color: "bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300" };
   if (passRate >= 70) return { label: "Beginner", color: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300" };
   if (passRate >= 40) return { label: "Intermediate", color: "bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300" };
   return { label: "Advanced", color: "bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300" };
@@ -42,6 +43,7 @@ export default function ExamCard({ slug, examConfig, stats, publicStats, isLogge
   return (
     <Link
       href={`/certifications/${slug}`}
+      aria-label={`${config.name} certification — ${difficulty.label}`}
       className="group relative flex flex-col overflow-hidden rounded-2xl border border-zinc-200 bg-surface-card shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/40 dark:border-zinc-700"
     >
       <div className="flex flex-1 flex-col gap-5 p-6">
@@ -71,17 +73,17 @@ export default function ExamCard({ slug, examConfig, stats, publicStats, isLogge
         {/* Exam info + stats */}
         <div className="grid grid-cols-2 gap-x-4 gap-y-3">
           <div>
-            <p className="text-xs text-zinc-400 dark:text-zinc-500">Questions</p>
+            <p className="text-xs text-zinc-600 dark:text-zinc-400">Questions</p>
             <p className="mt-0.5 text-lg font-bold tabular-nums text-zinc-900 dark:text-zinc-100">{examConfig.examSize}</p>
           </div>
           <div>
-            <p className="text-xs text-zinc-400 dark:text-zinc-500">Time limit</p>
+            <p className="text-xs text-zinc-600 dark:text-zinc-400">Time limit</p>
             <p className="mt-0.5 text-lg font-bold tabular-nums text-zinc-900 dark:text-zinc-100">
-              {examConfig.examDurationMinutes}<span className="ml-0.5 text-sm font-normal text-zinc-400">min</span>
+              {examConfig.examDurationMinutes}<span className="ml-0.5 text-sm font-normal text-zinc-600 dark:text-zinc-400">min</span>
             </p>
           </div>
           <div>
-            <p className="text-xs text-zinc-400 dark:text-zinc-500">Attempts</p>
+            <p className="text-xs text-zinc-600 dark:text-zinc-400">Attempts</p>
             <p className="mt-0.5 text-lg font-bold tabular-nums text-zinc-900 dark:text-zinc-100">
               {totalAttempts > 0 ? totalAttempts.toLocaleString() : "0"}
             </p>
@@ -89,16 +91,17 @@ export default function ExamCard({ slug, examConfig, stats, publicStats, isLogge
           {/* Show user's best score if they've failed before; otherwise show community pass rate */}
           {isLoggedIn && tryAgain && stats?.bestScore != null ? (
             <div>
-              <p className="text-xs text-zinc-400 dark:text-zinc-500">Your best</p>
-              <p className="mt-0.5 text-lg font-bold tabular-nums text-amber-600 dark:text-amber-400">
+              <p className="text-xs text-zinc-600 dark:text-zinc-400">Your best</p>
+              {/* amber-700 on white: ~5.0:1 — passes WCAG AA */}
+              <p className="mt-0.5 text-lg font-bold tabular-nums text-amber-700 dark:text-amber-400">
                 {stats.bestScore}%
               </p>
             </div>
           ) : (
             <div>
-              <p className="text-xs text-zinc-400 dark:text-zinc-500">Pass rate</p>
+              <p className="text-xs text-zinc-600 dark:text-zinc-400">Pass rate</p>
               <p className={`mt-0.5 text-lg font-bold tabular-nums ${
-                !hasData ? "text-zinc-400" : passRate >= 60 ? "text-emerald-600 dark:text-emerald-400" : "text-amber-600 dark:text-amber-400"
+                !hasData ? "text-zinc-500 dark:text-zinc-400" : passRate >= 60 ? "text-emerald-700 dark:text-emerald-400" : "text-amber-700 dark:text-amber-400"
               }`}>
                 {hasData ? `${passRate}%` : "—"}
               </p>
