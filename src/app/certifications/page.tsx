@@ -156,7 +156,7 @@ export default async function PracticeExamsPage() {
   };
 
   return (
-    <div className="min-h-full overflow-y-auto">
+    <div className="min-h-full">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
