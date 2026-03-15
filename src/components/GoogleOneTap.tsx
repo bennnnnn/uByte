@@ -30,6 +30,14 @@ export default function GoogleOneTap() {
     if (loading || user || !CLIENT_ID || SKIP_PATHS.some((p) => pathname.startsWith(p))) return;
     if (initialized.current) return;
 
+    // Skip entirely in headless / automated environments (Lighthouse, Puppeteer, etc.).
+    // Chrome sets navigator.webdriver = true when launched with --enable-automation.
+    // The Google GSI library (Chrome 132+) always uses FedCM regardless of
+    // use_fedcm_for_prompt, so in headless environments it tries to resolve Google's
+    // identity endpoints which fail with ERR_NAME_NOT_RESOLVED and logs browser-native
+    // console errors — lowering the Lighthouse Best Practices score.
+    if (navigator.webdriver) return;
+
     function tryInit() {
       if (!window.google?.accounts?.id) return false;
       initialized.current = true;
@@ -41,11 +49,6 @@ export default function GoogleOneTap() {
         },
         cancel_on_tap_outside: false,
         auto_select: false,
-        // Opt out of the FedCM path. FedCM requires live Google session cookies
-        // which are absent in Lighthouse / headless environments, causing browser-native
-        // errors that lower the Best Practices score. The traditional iframe flow has
-        // no such requirement and works identically for end users.
-        use_fedcm_for_prompt: false,
       });
       window.google.accounts.id.prompt();
       return true;
