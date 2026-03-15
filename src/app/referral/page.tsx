@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useEffect, startTransition } from "react";
+import { Suspense, useEffect, useState, startTransition } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/components/AuthProvider";
@@ -28,16 +28,26 @@ export default function ReferralPageWrapper() {
 function ReferralPage() {
   const { user, loading } = useAuth();
   const router = useRouter();
+  const [plan, setPlan] = useState<string | null>(null);
 
   useEffect(() => {
     if (!loading && !user) startTransition(() => { router.push("/"); });
   }, [user, loading, router]);
 
-  if (loading || !user) return <ReferralSkeleton />;
+  // Fetch the user's current plan to check if they're an active subscriber.
+  useEffect(() => {
+    if (!user) return;
+    fetch("/api/profile", { credentials: "same-origin" })
+      .then((r) => r.ok ? r.json() : null)
+      .then((d) => { setPlan((d?.plan as string) ?? "free"); })
+      .catch(() => { setPlan("free"); });
+  }, [user]);
 
-  // Active subscribers see the referral reward but can't use it meaningfully —
-  // redirect them to billing instead of showing a potentially misleading offer.
-  if (isActiveSubscriber(user.plan)) {
+  if (loading || !user || plan === null) return <ReferralSkeleton />;
+
+  // Active subscribers: redirect to billing — showing the earn-30-days offer
+  // could incentivise them to cancel their subscription to claim the reward.
+  if (isActiveSubscriber(plan)) {
     startTransition(() => { router.replace("/dashboard?tab=billing"); });
     return <ReferralSkeleton />;
   }
