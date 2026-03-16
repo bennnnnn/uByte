@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useAuth } from "@/components/AuthProvider";
 import AuthModal from "@/components/auth/AuthModal";
 import { buildAuthPageHref } from "@/lib/auth-redirect";
-import { BILLING_CONFIG, type BillingPlan } from "@/lib/plans";
+import { BILLING_CONFIG, MONTHLY_EQUIVALENT_CENTS, YEARLY_PRICE_CENTS, type BillingPlan } from "@/lib/plans";
 
 interface UpgradeWallProps {
   /** Title of the locked item (tutorial name, problem name, etc.) */
@@ -141,6 +141,12 @@ export default function UpgradeWall({
             {(["yearly", "monthly"] as BillingPlan[]).map((plan) => {
               const cfg = BILLING_CONFIG[plan];
               const active = selected === plan;
+              const displayPrice = plan === "yearly"
+                ? `$${(MONTHLY_EQUIVALENT_CENTS / 100).toFixed(2)}/mo`
+                : cfg.priceText;
+              const displaySub = plan === "yearly"
+                ? `$${(YEARLY_PRICE_CENTS / 100).toFixed(2)} billed yearly`
+                : cfg.subLabel;
               return (
                 <button
                   key={plan}
@@ -161,9 +167,9 @@ export default function UpgradeWall({
                     {cfg.label}
                   </span>
                   <span className="mt-0.5 text-xl font-black text-zinc-900 dark:text-zinc-100">
-                    {cfg.priceText}
+                    {displayPrice}
                   </span>
-                  <span className="text-[11px] text-zinc-400">{cfg.subLabel}</span>
+                  <span className="text-[11px] text-zinc-400">{displaySub}</span>
                   {active && (
                     <span className="absolute right-2.5 top-2.5 text-indigo-500">
                       <svg className="h-3.5 w-3.5" fill="currentColor" viewBox="0 0 20 20">
@@ -182,7 +188,7 @@ export default function UpgradeWall({
               href={`/pricing?plan=${selected}`}
               className="block w-full rounded-2xl bg-indigo-600 py-3.5 text-center text-sm font-bold text-white shadow-md shadow-indigo-500/25 transition-all hover:-translate-y-0.5 hover:bg-indigo-500 hover:shadow-indigo-500/40"
             >
-              {`Unlock Now — ${BILLING_CONFIG[selected].priceText}`}
+              {`Unlock Now — ${selected === "yearly" ? `$${(MONTHLY_EQUIVALENT_CENTS / 100).toFixed(2)}/mo` : BILLING_CONFIG[selected].priceText}`}
             </Link>
           ) : (
             <div className="space-y-2">
