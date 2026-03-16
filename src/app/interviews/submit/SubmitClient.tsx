@@ -195,6 +195,8 @@ export default function SubmitClient() {
             </select>
             {companyChoice === "Other" && (
               <input
+                id="interview-company-custom"
+                name="company_custom"
                 type="text"
                 value={companyCustom}
                 onChange={(e) => setCompanyCustom(e.target.value)}
@@ -265,6 +267,8 @@ export default function SubmitClient() {
                     {rIdx + 1}
                   </span>
                   <select
+                    id={`round-type-${rIdx}`}
+                    name={`round_type_${rIdx}`}
                     value={round.type}
                     onChange={(e) => updateRound(rIdx, { type: e.target.value })}
                     className="flex-1 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-700 focus:border-indigo-300 focus:outline-none dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300"

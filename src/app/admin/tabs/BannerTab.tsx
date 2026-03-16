@@ -54,7 +54,7 @@ export default function BannerTab({ data }: Props) {
               <div className="space-y-3">
                 <label className="flex flex-col gap-1.5">
                   <span className="text-xs font-medium text-zinc-500 dark:text-zinc-400">Link URL</span>
-                  <input type="text" value={bannerData.linkUrl} onChange={(e) => setBannerData((b) => b ? { ...b, linkUrl: e.target.value } : b)} placeholder="/pricing" className="rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-200" />
+                  <input id="banner-link-url" name="banner_link_url" type="text" value={bannerData.linkUrl} onChange={(e) => setBannerData((b) => b ? { ...b, linkUrl: e.target.value } : b)} placeholder="/pricing" className="rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-200" />
                 </label>
                 <label className="flex flex-col gap-1.5">
                   <span className="text-xs font-medium text-zinc-500 dark:text-zinc-400">Link text</span>

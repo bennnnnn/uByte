@@ -461,7 +461,7 @@ export default function BlogTab() {
               </div>
               <div>
                 <label className="mb-1 block text-xs font-semibold text-zinc-600 dark:text-zinc-400">Slug</label>
-                <input type="text" value={form.slug}
+                <input id="blog-slug" name="slug" type="text" value={form.slug}
                   onChange={(e) => setForm((f) => ({ ...f, slug: e.target.value }))}
                   placeholder="auto-generated-from-title" className={inputCls} />
               </div>
@@ -481,7 +481,7 @@ export default function BlogTab() {
             <div className="grid gap-4 sm:grid-cols-3">
               <div>
                 <label className="mb-1 block text-xs font-semibold text-zinc-600 dark:text-zinc-400">Category</label>
-                <select value={form.category}
+                <select id="blog-category" name="category" value={form.category}
                   onChange={(e) => setForm((f) => ({ ...f, category: e.target.value }))}
                   className={inputCls}>
                   {CATEGORIES.map((c) => <option key={c}>{c}</option>)}
