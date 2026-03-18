@@ -115,7 +115,13 @@ export default function AuthPage({ variant }: { variant: AuthPageMode }) {
     }
   }
 
-  if (user) return null;
+  if (user) {
+    return (
+      <div className="flex min-h-[100svh] items-center justify-center">
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-indigo-500 border-t-transparent" role="status" aria-label="Redirecting…" />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-[100svh] text-zinc-950 dark:text-zinc-50">

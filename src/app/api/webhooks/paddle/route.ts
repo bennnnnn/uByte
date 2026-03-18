@@ -241,7 +241,7 @@ function planFromSubscription(status: string, priceId?: string): string | null {
   }
   if (status === "active") {
     const yearlyPriceId = process.env.NEXT_PUBLIC_PADDLE_YEARLY_PRICE_ID;
-    return yearlyPriceId && priceId === yearlyPriceId ? "yearly" : "pro";
+    return yearlyPriceId && priceId === yearlyPriceId ? "yearly" : "monthly";
   }
   // past_due / paused — keep existing plan (return null = no-op)
   if (status === "past_due" || status === "paused") return null;
@@ -390,7 +390,7 @@ export const POST = withErrorHandling("POST /api/webhooks/paddle", async (reques
     /**
      * PLAN CHANGES
      * Fires when a subscription is upgraded, downgraded, paused, or resumed.
-     * planFromSubscription() maps status + priceId → "yearly" | "pro" | "free"
+     * planFromSubscription() maps status + priceId → "yearly" | "monthly" | "free"
      *
      * FUTURE: if you add more plans (e.g. team, enterprise), update
      * planFromSubscription() and BILLING_CONFIG in src/lib/plans.ts.

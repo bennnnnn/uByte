@@ -15,6 +15,8 @@ import { absoluteUrl } from "@/lib/seo";
 import { buildAuthPageHref } from "@/lib/auth-redirect";
 import { Button, Card, CheckIcon, Eyebrow, GradientText } from "@/components/ui";
 import { apiFetch } from "@/lib/api-client";
+import PricingFAQ from "./PricingFAQ";
+import PricingComparisonTable from "./PricingComparisonTable";
 
 const CLIENT_TOKEN     = process.env.NEXT_PUBLIC_PADDLE_CLIENT_TOKEN ?? "";
 
@@ -98,7 +100,6 @@ function PricingContent() {
   const { user, profile, refreshProfile } = useAuth();
   const paddleReady = useRef(false);
   const [billing, setBilling]       = useState<"monthly" | "yearly">("yearly");
-  const [faqOpen, setFaqOpen]       = useState<number | null>(null);
   const [userCount, setUserCount]   = useState<number | null>(null);
   const [coupon, setCoupon]         = useState("");
 
@@ -203,7 +204,7 @@ function PricingContent() {
   }
 
   const isYearly          = profile?.plan === "yearly";
-  const isMonthly         = profile?.plan === "pro";
+  const isMonthly         = profile?.plan === "monthly" || profile?.plan === "pro";
   const isPaid            = hasPaidAccess(profile?.plan);
   const selectedPriceId   = billing === "yearly" ? YEARLY_PRICE_ID : MONTHLY_PRICE_ID;
   const alreadyOnSelected = billing === "yearly" ? isYearly : isMonthly;
@@ -471,15 +472,20 @@ function PricingContent() {
               ) : (
                 <div className="space-y-2">
                   {/* Optional coupon code field — Paddle applies the discount at checkout */}
-                  <input
-                    id="pricing-coupon"
-                    name="coupon"
-                    type="text"
-                    placeholder="Coupon code (optional)"
-                    value={coupon}
-                    onChange={(e) => setCoupon(e.target.value)}
-                    className="w-full rounded-xl border border-zinc-200 bg-white px-4 py-2.5 text-sm text-zinc-800 placeholder-zinc-400 focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-200 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200 dark:placeholder-zinc-500 dark:focus:border-indigo-500 dark:focus:ring-indigo-900/40"
-                  />
+                  <div>
+                    <label htmlFor="pricing-coupon" className="sr-only">
+                      Coupon code (optional)
+                    </label>
+                    <input
+                      id="pricing-coupon"
+                      name="coupon"
+                      type="text"
+                      placeholder="Coupon code (optional)"
+                      value={coupon}
+                      onChange={(e) => setCoupon(e.target.value)}
+                      className="w-full rounded-xl border border-zinc-200 bg-white px-4 py-2.5 text-sm text-zinc-800 placeholder-zinc-400 focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-200 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200 dark:placeholder-zinc-500 dark:focus:border-indigo-500 dark:focus:ring-indigo-900/40"
+                    />
+                  </div>
                   <Button
                     type="button"
                     onClick={() => openCheckout(selectedPriceId)}
@@ -563,82 +569,10 @@ function PricingContent() {
         </div>
 
         {/* ── Feature comparison table ─────────────────────── */}
-        <div className="mx-auto mt-16 max-w-2xl">
-          <h2 className="mb-6 text-center text-lg font-bold text-zinc-900 dark:text-zinc-100">
-            Compare plans
-          </h2>
-          {/* overflow-x-auto lets the table scroll horizontally on narrow phones
-              instead of overflowing and breaking the layout */}
-          <div className="overflow-x-auto rounded-2xl border border-zinc-200 dark:border-zinc-700">
-            <table className="w-full min-w-[420px] text-sm">
-              <thead>
-                <tr className="border-b border-zinc-200 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-800/50">
-                  <th className="px-5 py-3 text-left font-semibold text-zinc-700 dark:text-zinc-300">Feature</th>
-                  <th className="px-5 py-3 text-center font-semibold text-zinc-500 dark:text-zinc-400">Free</th>
-                  <th className="px-5 py-3 text-center font-semibold text-indigo-600 dark:text-indigo-400">Pro</th>
-                </tr>
-              </thead>
-              <tbody>
-                {COMPARISON_FEATURES.map((row, i) => (
-                  <tr key={row.name} className={i < COMPARISON_FEATURES.length - 1 ? "border-b border-zinc-100 dark:border-zinc-800" : ""}>
-                    <td className="px-5 py-3 text-zinc-700 dark:text-zinc-300">{row.name}</td>
-                    <td className="px-5 py-3 text-center text-zinc-500 dark:text-zinc-400">{row.free}</td>
-                    <td className="px-5 py-3 text-center font-medium text-zinc-900 dark:text-zinc-100">{row.pro}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
+        <PricingComparisonTable rows={COMPARISON_FEATURES} />
 
         {/* ── FAQ (accordion) ─────────────────────────────── */}
-        <div className="mx-auto mt-14 max-w-2xl">
-          <h2 className="mb-6 text-center text-lg font-bold text-zinc-900 dark:text-zinc-100">
-            Frequently asked questions
-          </h2>
-          <dl className="space-y-2">
-            {FAQ_ITEMS.map((faq, i) => {
-              const isOpen = faqOpen === i;
-              return (
-                <div
-                  key={faq.q}
-                  className="rounded-xl border border-zinc-200 bg-surface-card dark:border-zinc-700"
-                >
-                  <dt>
-                    <button
-                      type="button"
-                      onClick={() => setFaqOpen(isOpen ? null : i)}
-                      className="flex w-full items-center justify-between gap-3 px-4 py-3.5 text-left font-semibold text-zinc-900 transition-colors hover:bg-zinc-50 dark:text-zinc-100 dark:hover:bg-zinc-800/50"
-                      aria-expanded={isOpen}
-                      aria-controls={`faq-answer-${i}`}
-                      id={`faq-question-${i}`}
-                    >
-                      {faq.q}
-                      <span
-                        className={`shrink-0 text-zinc-400 transition-transform dark:text-zinc-500 ${isOpen ? "rotate-180" : ""}`}
-                        aria-hidden
-                      >
-                        <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-                        </svg>
-                      </span>
-                    </button>
-                  </dt>
-                  <dd
-                    id={`faq-answer-${i}`}
-                    role="region"
-                    aria-labelledby={`faq-question-${i}`}
-                    className={`overflow-hidden text-sm text-zinc-600 transition-[height] dark:text-zinc-400 ${
-                      isOpen ? "visible" : "hidden"
-                    }`}
-                  >
-                    <p className="border-t border-zinc-100 px-4 pb-3.5 pt-1.5 dark:border-zinc-700">{faq.a}</p>
-                  </dd>
-                </div>
-              );
-            })}
-          </dl>
-        </div>
+        <PricingFAQ items={FAQ_ITEMS} />
 
         {/* ── Trust strip ────────────────────────────────── */}
         <div className="mx-auto mt-14 max-w-2xl">

@@ -115,6 +115,44 @@ export async function saveAnswersBatch(
   `;
 }
 
+/**
+ * Atomically save answers + write final score in one DB transaction.
+ * Prevents the inconsistency where answers are saved but score is missing
+ * if the process crashes between the two writes.
+ */
+export async function submitAttemptWithAnswersTx(
+  attemptId: string,
+  answers: { questionId: number; chosenIndex: number }[],
+  score: number,
+  passed: boolean
+): Promise<void> {
+  const sql = getSql();
+  const attemptIds = answers.map(() => attemptId);
+  const questionIds = answers.map((a) => a.questionId);
+  const chosenIndexes = answers.map((a) => a.chosenIndex);
+
+  if (answers.length > 0) {
+    await sql.transaction([
+      sql`
+        INSERT INTO exam_answers (attempt_id, question_id, chosen_index)
+        SELECT * FROM UNNEST(${attemptIds}::uuid[], ${questionIds}::bigint[], ${chosenIndexes}::int[])
+        ON CONFLICT (attempt_id, question_id) DO UPDATE SET chosen_index = EXCLUDED.chosen_index
+      `,
+      sql`
+        UPDATE exam_attempts
+        SET submitted_at = NOW(), score = ${score}, passed = ${passed}
+        WHERE id = ${attemptId}
+      `,
+    ]);
+  } else {
+    await sql`
+      UPDATE exam_attempts
+      SET submitted_at = NOW(), score = ${score}, passed = ${passed}
+      WHERE id = ${attemptId}
+    `;
+  }
+}
+
 export async function getAnswers(attemptId: string): Promise<{ question_id: number; chosen_index: number }[]> {
   const sql = getSql();
   const rows = await sql`

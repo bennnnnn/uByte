@@ -95,18 +95,26 @@ export const POST = withErrorHandling("POST /api/tutorial-hint", async (request:
 
   // Build evidence bundle from step content + user code + output
   const MAX = 1200;
+  const MAX_CODE = 4000;   // ~100 lines — more than enough for a tutorial step
+  const MAX_OUTPUT = 800;  // truncate runaway outputs before they inflate tokens
   const summary = [
     `Lesson: ${step.title}`,
     `Task: ${step.instruction}`,
     step.expectedOutput.length > 0 ? `Expected output: ${step.expectedOutput.join(", ")}` : "",
   ].filter(Boolean).join("\n");
 
+  const truncatedCode = code.trim().replace(/\n{3,}/g, "\n\n");
+  const safeCode = truncatedCode.length > MAX_CODE
+    ? truncatedCode.slice(0, MAX_CODE) + "\n…(truncated)"
+    : truncatedCode;
+  const safeOutput = String(actualOutput ?? "").slice(0, MAX_OUTPUT);
+
   const evidenceBundle = [
     "## Tutorial lesson\n" + (summary.length > MAX ? summary.slice(0, MAX) + "…" : summary),
     "\n## Language\n" + lang,
-    "\n## User code\n```\n" + code.trim().replace(/\n{3,}/g, "\n\n") + "\n```",
+    "\n## User code\n```\n" + safeCode + "\n```",
     "\n## Verdict\n" + verdict,
-    actualOutput ? "\n## Actual output\n" + String(actualOutput).slice(0, 800) : "",
+    safeOutput ? "\n## Actual output\n" + safeOutput : "",
   ].filter(Boolean).join("\n");
 
   const firstName = user.name?.split(" ")[0] ?? undefined;

@@ -6,7 +6,6 @@ import type { TutorialStep } from "@/lib/tutorial-steps";
 import { useAuth } from "@/components/AuthProvider";
 import ThemeToggle from "@/components/ThemeToggle";
 import AuthButtons from "@/components/AuthButtons";
-import ShareButton from "@/components/ShareButton";
 import UpgradeWall from "@/components/UpgradeWall";
 import { hasPaidAccess } from "@/lib/plans";
 import { useCodeEditor } from "@/hooks/useCodeEditor";
@@ -15,7 +14,6 @@ import { usePanelResize } from "@/hooks/usePanelResize";
 import OutputPanel from "@/components/tutorial/OutputPanel";
 import InstructionsSidebar from "@/components/tutorial/InstructionsSidebar";
 import SnapshotDrawer from "@/components/tutorial/SnapshotDrawer";
-import { tutorialUrl } from "@/lib/urls";
 import { LANGUAGES } from "@/lib/languages/registry";
 import type { SupportedLanguage } from "@/lib/languages/types";
 import GripDots from "@/components/GripDots";
@@ -29,6 +27,9 @@ import { useEditorKeyDown } from "@/hooks/useEditorKeyDown";
 import { tryDecodeShareCode } from "@/lib/share-code";
 import DiscussionThread from "@/app/practice/[lang]/[slug]/DiscussionThread";
 import { apiFetch } from "@/lib/api-client";
+import CongratsModal from "@/components/tutorial/CongratsModal";
+import MobileTabBar from "@/components/tutorial/MobileTabBar";
+import CourseOutlinePanel from "@/components/tutorial/CourseOutlinePanel";
 
 interface Props {
   lang: string;
@@ -261,31 +262,13 @@ export default function InteractiveTutorial({
       </header>
 
       {/* Mobile tab bar */}
-      <div className="flex shrink-0 items-center border-b border-zinc-200 dark:border-zinc-800 md:hidden">
-        {(["instructions", "discuss", "code"] as const).map((tab) => (
-          <button
-            key={tab}
-            onClick={() => setMobileTab(tab)}
-            className={`relative flex-1 py-2 text-sm font-medium transition-colors ${mobileTab === tab ? "border-b-2 border-indigo-500 text-indigo-600 dark:text-indigo-400" : "text-zinc-500 dark:text-zinc-400"}`}
-          >
-            {tab === "instructions" ? "Instructions" : tab === "discuss" ? "Discuss" : (
-              <>
-                Code
-                {stepProgress.output && (stepProgress.outputIsError || stepProgress.status === "failed") && mobileTab !== "code" && (
-                  <span className="absolute right-1 top-2 h-2 w-2 rounded-full bg-red-500" />
-                )}
-              </>
-            )}
-          </button>
-        ))}
-        {/* Font size controls — only relevant when on the code tab */}
-        {mobileTab === "code" && (
-          <div className="flex items-center gap-0.5 px-1.5">
-            <button onClick={() => { const s = fontSize === 18 ? 16 : 14; setFontSize(s); try { localStorage.setItem("ide-font-size", String(s)); } catch { /* ignore */ } }} aria-label="Decrease font size" className="rounded px-1.5 py-1 text-xs text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800">A⁻</button>
-            <button onClick={() => { const s = fontSize === 14 ? 16 : 18; setFontSize(s); try { localStorage.setItem("ide-font-size", String(s)); } catch { /* ignore */ } }} aria-label="Increase font size" className="rounded px-1.5 py-1 text-xs text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800">A⁺</button>
-          </div>
-        )}
-      </div>
+      <MobileTabBar
+        activeTab={mobileTab}
+        onTabChange={setMobileTab}
+        hasOutputError={!!(stepProgress.output && (stepProgress.outputIsError || stepProgress.status === "failed"))}
+        fontSize={fontSize}
+        onFontSizeChange={setFontSize}
+      />
 
       {/* Main Split */}
       <div className="flex flex-1 overflow-hidden">
@@ -334,79 +317,20 @@ export default function InteractiveTutorial({
           </div>
 
           {!isMobile && leftTab === "outline" && (
-            <nav className="flex-1 overflow-y-auto px-3 py-3">
-              <ul className="space-y-0.5">
-                {allTutorials.map((t) => {
-                  const isCurrent = t.slug === tutorialSlug;
-                  const isDone = (progressByLang[lang] ?? []).includes(t.slug);
-                  const isExpanded = expandedSlug === t.slug;
-                  const subSteps = allTutorialSteps[t.slug] ?? [];
-                  return (
-                    <li key={t.slug}>
-                      <Link
-                        href={tutorialUrl(lang, t.slug)}
-                        onClick={() => { if (subSteps.length > 0) setExpandedSlug(isExpanded ? "" : t.slug); }}
-                        className={`flex items-center justify-between rounded-lg px-3 py-2 text-sm transition-all duration-150 ${
-                          isCurrent
-                            ? "bg-white font-semibold text-indigo-700 shadow-sm dark:bg-zinc-800 dark:text-indigo-400"
-                            : "font-medium text-zinc-800 hover:bg-zinc-200/70 hover:text-zinc-900 dark:text-zinc-200 dark:hover:bg-zinc-800 dark:hover:text-white"
-                        }`}
-                      >
-                        <span className="flex-1 leading-snug">{t.title}</span>
-                        {isDone && !isCurrent && (
-                          <svg className="mr-1 h-3.5 w-3.5 shrink-0 text-emerald-500 dark:text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
-                          </svg>
-                        )}
-                        {subSteps.length > 0 && (
-                          <svg
-                            className={`h-3.5 w-3.5 shrink-0 transition-transform duration-200 ${isExpanded ? "rotate-90" : ""} ${isCurrent ? "text-indigo-500 dark:text-indigo-400" : "text-zinc-400 dark:text-zinc-500"}`}
-                            fill="none" viewBox="0 0 24 24" stroke="currentColor"
-                          >
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
-                          </svg>
-                        )}
-                      </Link>
-
-                      {isExpanded && subSteps.length > 0 && (
-                        <ul className="ml-3 mt-0.5 space-y-0.5 border-l border-zinc-200 pl-3 dark:border-zinc-700">
-                          {subSteps.map((step) => {
-                            const isActiveStep = isCurrent && step.index === stepProgress.stepIndex;
-                            const isStepSkipped = isCurrent && stepProgress.skippedSteps.has(step.index);
-                            const isStepDone = isCurrent && stepProgress.completedSteps.has(step.index) && !isStepSkipped;
-                            return (
-                              <li key={step.index}>
-                                {isCurrent ? (
-                                  <button
-                                    onClick={() => { stepProgress.goToStep(step.index); setLeftTab("instructions"); }}
-                                    className={`flex w-full items-center justify-between rounded-md px-2 py-1.5 text-xs transition-all duration-150 ${
-                                      isActiveStep
-                                        ? "font-medium text-indigo-600 dark:text-indigo-400"
-                                        : "text-zinc-400 hover:bg-zinc-200/70 hover:text-zinc-700 dark:text-zinc-500 dark:hover:bg-zinc-800 dark:hover:text-zinc-300"
-                                    }`}
-                                  >
-                                    <span>{step.title}</span>
-                                    {isStepDone    && <span className="shrink-0 text-emerald-500 dark:text-emerald-400">✓</span>}
-                                    {isStepSkipped && <span className="shrink-0 text-zinc-400 dark:text-zinc-500" title="Skipped">›</span>}
-                                  </button>
-                                ) : (
-                                  <Link
-                                    href={tutorialUrl(lang, t.slug, step.index)}
-                                    className="block rounded-md px-2 py-1.5 text-xs text-zinc-400 transition-all duration-150 hover:bg-zinc-200/70 hover:text-zinc-700 dark:text-zinc-500 dark:hover:bg-zinc-800 dark:hover:text-zinc-300"
-                                  >
-                                    {step.title}
-                                  </Link>
-                                )}
-                              </li>
-                            );
-                          })}
-                        </ul>
-                      )}
-                    </li>
-                  );
-                })}
-              </ul>
-            </nav>
+            <CourseOutlinePanel
+              lang={lang}
+              tutorialSlug={tutorialSlug}
+              allTutorials={allTutorials}
+              allTutorialSteps={allTutorialSteps}
+              stepIndex={stepProgress.stepIndex}
+              progressByLang={progressByLang}
+              expandedSlug={expandedSlug}
+              onExpandedSlugChange={setExpandedSlug}
+              completedSteps={stepProgress.completedSteps}
+              skippedSteps={stepProgress.skippedSteps}
+              onGoToStep={stepProgress.goToStep}
+              onStepClick={() => setLeftTab("instructions")}
+            />
           )}
 
           {(isMobile ? mobileTab === "instructions" : leftTab === "instructions") && (
@@ -552,23 +476,14 @@ export default function InteractiveTutorial({
 
       {/* Congratulations modal */}
       {stepProgress.tutorialDone && (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/75 backdrop-blur-sm" role="dialog" aria-modal="true" aria-labelledby="congrats-title">
-          <div className="w-full max-w-md rounded-2xl border border-emerald-300 bg-white p-8 text-center shadow-2xl dark:border-emerald-800 dark:bg-zinc-900">
-            <div className="mb-3 text-5xl">🎉</div>
-            <h2 id="congrats-title" className="mb-2 text-2xl font-bold text-zinc-900 dark:text-zinc-100">Tutorial Complete!</h2>
-            <p className="mb-2 text-zinc-500 dark:text-zinc-400">You finished <span className="font-medium text-zinc-800 dark:text-zinc-200">{tutorialTitle}</span>. Great work!</p>
-            <p className="mb-6 text-xs text-zinc-400 dark:text-zinc-500">{next ? `Continuing to "${next.title}" in ${stepProgress.countdown}…` : `Returning home in ${stepProgress.countdown}…`}</p>
-            <div className="flex flex-wrap justify-center gap-3">
-              <button onClick={() => stepProgress.setTutorialDone(false)} className="rounded-lg border border-zinc-300 px-4 py-2 text-sm text-zinc-600 transition-colors hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800">Review steps</button>
-              <ShareButton text={`I just completed "${tutorialTitle}" on uByte! 🐹`} url={typeof window !== "undefined" ? `${window.location.origin}${tutorialUrl(lang, tutorialSlug)}` : ""} />
-              {next ? (
-                <Link href={tutorialUrl(lang, next.slug)} className="rounded-lg bg-indigo-700 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-indigo-800">Next: {next.title} →</Link>
-              ) : (
-                <Link href="/" className="rounded-lg bg-indigo-700 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-indigo-800">All Tutorials</Link>
-              )}
-            </div>
-          </div>
-        </div>
+        <CongratsModal
+          tutorialTitle={tutorialTitle}
+          lang={lang}
+          tutorialSlug={tutorialSlug}
+          next={next}
+          countdown={stepProgress.countdown}
+          onDismiss={() => stepProgress.setTutorialDone(false)}
+        />
       )}
     </div>
   );

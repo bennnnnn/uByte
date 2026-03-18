@@ -4,8 +4,7 @@ import {
   getAttempt,
   lockAttemptForSubmit,
   releaseAttemptSubmitLock,
-  saveAnswersBatch,
-  submitAttempt,
+  submitAttemptWithAnswersTx,
 } from "@/lib/db/exam-attempts";
 import { getCorrectAndExplanationBatch } from "@/lib/db/exam-questions";
 import { createCertificate } from "@/lib/db/exam-certificates";
@@ -78,10 +77,7 @@ export const POST = withErrorHandling(
 
     let finalized = false;
     try {
-      // Batch save all answers in one query
-      await saveAnswersBatch(attemptId, validatedAnswers);
-
-      // Batch fetch correct answers for all questions in one query
+      // Batch fetch correct answers before writing — read-only, no risk
       const answerMap = new Map(validatedAnswers.map((a) => [a.questionId, a.chosenIndex]));
       const metaBatch = await getCorrectAndExplanationBatch(attempt.question_ids_json);
 
@@ -106,8 +102,9 @@ export const POST = withErrorHandling(
       const score = Math.round((correct / total) * 100);
       const passed = score >= examConfig.passPercent;
 
-      // Update with final score (submitted_at was already set by lockAttemptForSubmit)
-      await submitAttempt(attemptId, score, passed);
+      // Atomically save answers + final score in one transaction so we can never
+      // end up with answers saved but no score (or vice versa).
+      await submitAttemptWithAnswersTx(attemptId, validatedAnswers, score, passed);
       finalized = true;
 
       let certificateId: string | null = null;

@@ -304,15 +304,20 @@ export default function PlanTab({ plan, expiresAtProp }: Props & { expiresAtProp
       {!isPaid ? (
         <div className="space-y-3">
         {/* Coupon input — shown above the checkout buttons when user is on free plan */}
-        <input
-          id="plan-coupon"
-          name="coupon"
-          type="text"
-          placeholder="Coupon code (optional)"
-          value={coupon}
-          onChange={(e) => setCoupon(e.target.value)}
-          className="w-full rounded-xl border border-zinc-200 bg-white px-4 py-2.5 text-sm text-zinc-800 placeholder-zinc-400 focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-200 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200 dark:placeholder-zinc-500 dark:focus:ring-indigo-900/40"
-        />
+        <div>
+          <label htmlFor="plan-coupon" className="sr-only">
+            Coupon code (optional)
+          </label>
+          <input
+            id="plan-coupon"
+            name="coupon"
+            type="text"
+            placeholder="Coupon code (optional)"
+            value={coupon}
+            onChange={(e) => setCoupon(e.target.value)}
+            className="w-full rounded-xl border border-zinc-200 bg-white px-4 py-2.5 text-sm text-zinc-800 placeholder-zinc-400 focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-200 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200 dark:placeholder-zinc-500 dark:focus:ring-indigo-900/40"
+          />
+        </div>
         <div className="grid gap-4 sm:grid-cols-2">
           <Card className="p-5">
             <p className="text-lg font-bold text-zinc-900 dark:text-zinc-100">

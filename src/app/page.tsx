@@ -20,6 +20,7 @@ import {
   SectionHeading,
   HeroSection,
   PracticeExamsSection,
+  TestimonialsStrip,
 } from "@/components/home";
 import ContinueBanner from "@/components/ContinueBanner";
 import LeftOffBanner from "@/components/LeftOffBanner";
@@ -195,7 +196,8 @@ export default async function Home() {
         {/* Why upgrade — value proposition banner (hidden for Pro users) */}
         <ValuePropBanner isPro={isPro} />
 
-        {/* Social proof — developer testimonials (removed until real testimonials exist) */}
+        {/* Social proof — developer testimonials */}
+        <TestimonialsStrip />
 
         {/* Languages */}
         <section aria-labelledby="languages-heading">

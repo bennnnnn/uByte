@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { useAuth } from "@/components/AuthProvider";
 import AuthModal from "@/components/auth/AuthModal";
@@ -94,6 +94,39 @@ export default function UpgradeWall({
   const [selected, setSelected] = useState<"yearly" | "monthly">("yearly");
   const [authOpen, setAuthOpen] = useState(false);
   const [authMode, setAuthMode] = useState<"login" | "signup">("signup");
+  const dialogRef = useRef<HTMLDivElement>(null);
+
+  // Focus the dialog on mount
+  useEffect(() => {
+    dialogRef.current?.focus();
+  }, []);
+
+  // Escape key dismissal and focus trap
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (!dialogRef.current) return;
+      if (e.key === "Escape") {
+        window.history.back();
+        return;
+      }
+      if (e.key !== "Tab") return;
+      const focusable = dialogRef.current.querySelectorAll<HTMLElement>(
+        'a[href], button:not([disabled]), input:not([disabled]), [tabindex]:not([tabindex="-1"])'
+      );
+      if (focusable.length === 0) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    };
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, []);
 
   const lines = previewLines ?? PLACEHOLDERS[context];
 
@@ -107,7 +140,13 @@ export default function UpgradeWall({
 
   return (
     <>
-      <div className="fixed inset-0 z-50 flex items-end justify-center sm:items-center">
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="upgrade-wall-title"
+        aria-describedby="upgrade-wall-desc"
+        className="fixed inset-0 z-50 flex items-end justify-center sm:items-center"
+      >
         {/* Blurred content preview — the "peek behind the curtain" */}
         <div className="absolute inset-0 select-none">
           <BlurredBackground lines={lines} />
@@ -118,7 +157,11 @@ export default function UpgradeWall({
         </div>
 
         {/* Upgrade card */}
-        <div className="relative z-10 mx-4 mb-0 w-full max-w-md rounded-t-3xl bg-white p-7 shadow-2xl ring-1 ring-zinc-200/80 sm:mb-0 sm:rounded-3xl dark:bg-zinc-900 dark:ring-zinc-800">
+        <div
+          ref={dialogRef}
+          tabIndex={-1}
+          className="relative z-10 mx-4 mb-0 w-full max-w-md rounded-t-3xl bg-white p-7 shadow-2xl ring-1 ring-zinc-200/80 outline-none sm:mb-0 sm:rounded-3xl dark:bg-zinc-900 dark:ring-zinc-800"
+        >
 
           {/* Lock icon */}
           <div className="mb-3 flex justify-center">
@@ -129,10 +172,10 @@ export default function UpgradeWall({
             </div>
           </div>
 
-          <h2 className="mb-1.5 text-center text-lg font-bold text-zinc-900 dark:text-zinc-100">
+          <h2 id="upgrade-wall-title" className="mb-1.5 text-center text-lg font-bold text-zinc-900 dark:text-zinc-100">
             {title}
           </h2>
-          <p className="mb-5 text-center text-sm leading-relaxed text-zinc-500 dark:text-zinc-400">
+          <p id="upgrade-wall-desc" className="mb-5 text-center text-sm leading-relaxed text-zinc-500 dark:text-zinc-400">
             {subtitle ?? "Upgrade to unlock all tutorials, AI feedback, interview prep and verifiable certificates."}
           </p>
 
@@ -151,6 +194,7 @@ export default function UpgradeWall({
                 <button
                   key={plan}
                   type="button"
+                  aria-pressed={active}
                   onClick={() => setSelected(plan)}
                   className={`relative flex flex-col rounded-2xl border-2 px-4 py-3 text-left transition-all ${
                     active
