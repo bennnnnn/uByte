@@ -31,8 +31,8 @@ const StepsSection              = dynamic(() => import("@/components/home/StepsS
 const ValuePropBanner           = dynamic(() => import("@/components/home/ValuePropBanner"));
 const PopularTutorialsSection   = dynamic(() => import("@/components/home/PopularTutorialsSection"));
 const PopularInterviewPrepSection = dynamic(() => import("@/components/home/PopularInterviewPrepSection"));
-// Testimonials are below the fold and not SEO-critical; skip SSR to keep initial HTML small
-const TestimonialsStrip         = dynamic(() => import("@/components/home/TestimonialsStrip"), { ssr: false, loading: () => null });
+// Testimonials are below the fold — client-only wrapper keeps them out of initial HTML
+import TestimonialsStripDeferred from "@/components/home/TestimonialsStripDeferred";
 
 export const metadata: Metadata = {
   title: "uByte — Learn to Code with Interactive Tutorials, Interview Prep & Certifications",
@@ -198,7 +198,7 @@ export default async function Home() {
         <ValuePropBanner isPro={isPro} />
 
         {/* Social proof — developer testimonials */}
-        <TestimonialsStrip />
+        <TestimonialsStripDeferred />
 
         {/* Languages */}
         <section aria-labelledby="languages-heading">
