@@ -20,7 +20,6 @@ import {
   SectionHeading,
   HeroSection,
   PracticeExamsSection,
-  TestimonialsStrip,
 } from "@/components/home";
 import ContinueBanner from "@/components/ContinueBanner";
 import LeftOffBanner from "@/components/LeftOffBanner";
@@ -32,6 +31,8 @@ const StepsSection              = dynamic(() => import("@/components/home/StepsS
 const ValuePropBanner           = dynamic(() => import("@/components/home/ValuePropBanner"));
 const PopularTutorialsSection   = dynamic(() => import("@/components/home/PopularTutorialsSection"));
 const PopularInterviewPrepSection = dynamic(() => import("@/components/home/PopularInterviewPrepSection"));
+// Testimonials are below the fold and not SEO-critical; skip SSR to keep initial HTML small
+const TestimonialsStrip         = dynamic(() => import("@/components/home/TestimonialsStrip"), { ssr: false, loading: () => null });
 
 export const metadata: Metadata = {
   title: "uByte — Learn to Code with Interactive Tutorials, Interview Prep & Certifications",
