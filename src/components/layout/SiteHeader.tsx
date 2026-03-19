@@ -17,9 +17,9 @@ export default function SiteHeader() {
         <HeaderNavLinks side="left" />
       </div>
 
-      {/* Right: Search + Pricing + Auth */}
-      <div className="flex items-center gap-2">
-        {/* Inline search bar */}
+      {/* Right: Search + Auth */}
+      <div className="flex items-center gap-4">
+        {/* Live search — wider, more breathing room */}
         <NavSearch />
 
         <Suspense fallback={<div className="h-9 w-56 animate-pulse rounded-lg bg-zinc-200 dark:bg-zinc-800" />}>
