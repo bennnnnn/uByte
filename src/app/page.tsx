@@ -176,6 +176,7 @@ export default async function Home() {
           totalCertificates={totalCertificates}
           totalAttempts={totalAttempts}
           statsByLang={publicStatsByLang}
+          examConfigByLang={examConfigByLang}
         />
 
         {/* 🧩 Interview prep — popular problems */}
