@@ -6,9 +6,11 @@ import { usePathname } from "next/navigation";
 
 // How long (ms) to wait before closing after mouse leaves — lets the cursor
 // travel from the trigger button into the panel without the menu snapping shut.
-const CLOSE_DELAY = 120;
+// Generous enough that the cursor can travel from the trigger into the panel
+// without the menu snapping shut even on diagonal mouse paths.
+const CLOSE_DELAY = 200;
 
-const LANGUAGES = [
+const ALL_LANGS = [
   { slug: "go",         icon: "🐹", label: "Go",         sub: "Beginner-friendly"    },
   { slug: "python",     icon: "🐍", label: "Python",     sub: "Clean & readable"      },
   { slug: "javascript", icon: "🟨", label: "JavaScript", sub: "Web & Node.js"         },
@@ -18,16 +20,6 @@ const LANGUAGES = [
   { slug: "cpp",        icon: "⚙️", label: "C++",        sub: "Performance & control" },
   { slug: "csharp",     icon: "💜", label: "C#",         sub: ".NET & game dev"       },
   { slug: "sql",        icon: "🗄️", label: "SQL",        sub: "Databases & queries"   },
-];
-
-const PRACTICE_LANGS = [
-  { slug: "go",         icon: "🐹", label: "Go"         },
-  { slug: "python",     icon: "🐍", label: "Python"     },
-  { slug: "javascript", icon: "🟨", label: "JavaScript" },
-  { slug: "java",       icon: "☕", label: "Java"       },
-  { slug: "rust",       icon: "🦀", label: "Rust"       },
-  { slug: "cpp",        icon: "⚙️", label: "C++"        },
-  { slug: "csharp",     icon: "💜", label: "C#"         },
 ];
 
 const linkBase =
@@ -164,24 +156,39 @@ export default function HeaderNavLinks({ side = "left" }: { side?: "left" }) {
           onClose={handleClose}
           menuId="nav-tutorials-menu"
         >
-          <div className="w-64 p-2">
-            {LANGUAGES.map((l) => (
+          <div className="p-3">
+            <p className="mb-2 px-1 text-[10px] font-bold uppercase tracking-widest text-zinc-400 dark:text-zinc-500">
+              Choose a language
+            </p>
+            <div className="grid grid-cols-2 gap-0.5" style={{ width: 340 }}>
+              {ALL_LANGS.map((l) => (
+                <Link
+                  key={l.slug}
+                  href={`/tutorial/${l.slug}`}
+                  role="menuitem"
+                  onClick={handleClose}
+                  className="flex items-center gap-2.5 rounded-lg px-3 py-2 transition-colors hover:bg-zinc-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-indigo-500 dark:hover:bg-zinc-800"
+                >
+                  <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-zinc-100 text-sm dark:bg-zinc-800">
+                    {l.icon}
+                  </span>
+                  <span>
+                    <span className="block text-sm font-semibold text-zinc-800 dark:text-zinc-100">{l.label}</span>
+                    <span className="block text-[11px] text-zinc-400 dark:text-zinc-500">{l.sub}</span>
+                  </span>
+                </Link>
+              ))}
+            </div>
+            <div className="mt-3 border-t border-zinc-100 pt-3 dark:border-zinc-800">
               <Link
-                key={l.slug}
-                href={`/tutorial/${l.slug}`}
+                href="/tutorial"
                 role="menuitem"
                 onClick={handleClose}
-                className="flex items-center gap-3 rounded-xl px-3 py-2.5 transition-colors hover:bg-zinc-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-indigo-500 dark:hover:bg-zinc-800"
+                className="flex items-center gap-1.5 px-1 text-xs font-semibold text-indigo-600 hover:text-indigo-500 dark:text-indigo-400"
               >
-                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-zinc-100 text-base dark:bg-zinc-800">
-                  {l.icon}
-                </span>
-                <span>
-                  <span className="block text-sm font-semibold text-zinc-800 dark:text-zinc-100">{l.label}</span>
-                  <span className="block text-xs text-zinc-400 dark:text-zinc-500">{l.sub}</span>
-                </span>
+                Browse all tutorials →
               </Link>
-            ))}
+            </div>
           </div>
         </NavDropdown>
 
@@ -212,7 +219,7 @@ export default function HeaderNavLinks({ side = "left" }: { side?: "left" }) {
 
             <div className="my-1.5 border-t border-zinc-100 dark:border-zinc-800" />
 
-            {PRACTICE_LANGS.map((l) => (
+            {ALL_LANGS.map((l) => (
               <Link
                 key={l.slug}
                 href={`/practice/${l.slug}`}
@@ -277,36 +284,42 @@ export default function HeaderNavLinks({ side = "left" }: { side?: "left" }) {
           onClose={handleClose}
           menuId="nav-certifications-menu"
         >
-          <div className="w-56 p-2">
+          <div className="p-3" style={{ width: 260 }}>
             <Link
               href="/certifications"
               role="menuitem"
               onClick={handleClose}
-              className="flex items-center gap-3 rounded-xl px-3 py-2.5 transition-colors hover:bg-zinc-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-indigo-500 dark:hover:bg-zinc-800"
+              className="flex items-center gap-3 rounded-lg bg-indigo-50 px-3 py-2.5 transition-colors hover:bg-indigo-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-indigo-500 dark:bg-indigo-950/40 dark:hover:bg-indigo-950/70"
             >
-              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-amber-100 text-base dark:bg-amber-950/60">
-                📝
+              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-indigo-600 text-base text-white">
+                🎓
               </span>
               <span>
-                <span className="block text-sm font-semibold text-zinc-800 dark:text-zinc-100">Certifications</span>
-                <span className="block text-xs text-zinc-400 dark:text-zinc-500">Coding exams by language</span>
+                <span className="block text-sm font-bold text-zinc-800 dark:text-zinc-100">All certifications</span>
+                <span className="block text-xs text-zinc-500 dark:text-zinc-400">Free exams by language</span>
               </span>
             </Link>
 
-            <div className="my-1.5 border-t border-zinc-100 dark:border-zinc-800" />
+            <div className="my-2 border-t border-zinc-100 dark:border-zinc-800" />
 
-            {PRACTICE_LANGS.map((l) => (
-              <Link
-                key={l.slug}
-                href={`/certifications/${l.slug}`}
-                role="menuitem"
-                onClick={handleClose}
-                className="flex items-center gap-3 rounded-xl px-3 py-2 transition-colors hover:bg-zinc-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-indigo-500 dark:hover:bg-zinc-800"
-              >
-                <span className="w-6 text-center text-base">{l.icon}</span>
-                <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300">{l.label}</span>
-              </Link>
-            ))}
+            <p className="mb-1.5 px-1 text-[10px] font-bold uppercase tracking-widest text-zinc-400 dark:text-zinc-500">
+              Languages
+            </p>
+
+            <div className="grid grid-cols-2 gap-0.5">
+              {ALL_LANGS.map((l) => (
+                <Link
+                  key={l.slug}
+                  href={`/certifications/${l.slug}`}
+                  role="menuitem"
+                  onClick={handleClose}
+                  className="flex items-center gap-2 rounded-lg px-2.5 py-1.5 transition-colors hover:bg-zinc-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-indigo-500 dark:hover:bg-zinc-800"
+                >
+                  <span className="text-sm">{l.icon}</span>
+                  <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300">{l.label}</span>
+                </Link>
+              ))}
+            </div>
           </div>
         </NavDropdown>
       </nav>

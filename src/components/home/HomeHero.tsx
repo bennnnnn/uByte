@@ -232,6 +232,19 @@ function LoggedInHero({
   );
 }
 
+// Language badges shown as a floating visual in the hero
+const LANG_BADGES = [
+  { icon: "🐹", label: "Go",         color: "bg-cyan-50    ring-cyan-100    dark:bg-cyan-950/40  dark:ring-cyan-800/50"   },
+  { icon: "🐍", label: "Python",     color: "bg-blue-50    ring-blue-100    dark:bg-blue-950/40  dark:ring-blue-800/50"   },
+  { icon: "🟨", label: "JavaScript", color: "bg-yellow-50  ring-yellow-100  dark:bg-yellow-950/40 dark:ring-yellow-800/50" },
+  { icon: "🔷", label: "TypeScript", color: "bg-indigo-50  ring-indigo-100  dark:bg-indigo-950/40 dark:ring-indigo-800/50" },
+  { icon: "☕", label: "Java",       color: "bg-orange-50  ring-orange-100  dark:bg-orange-950/40 dark:ring-orange-800/50" },
+  { icon: "🦀", label: "Rust",       color: "bg-red-50     ring-red-100     dark:bg-red-950/40   dark:ring-red-800/50"    },
+  { icon: "⚙️", label: "C++",        color: "bg-slate-50   ring-slate-100   dark:bg-slate-800/60 dark:ring-slate-700/50"  },
+  { icon: "💜", label: "C#",         color: "bg-violet-50  ring-violet-100  dark:bg-violet-950/40 dark:ring-violet-800/50"},
+  { icon: "🗄️", label: "SQL",        color: "bg-emerald-50 ring-emerald-100 dark:bg-emerald-950/40 dark:ring-emerald-800/50"},
+];
+
 // ─── Guest hero ───────────────────────────────────────────────────────────────
 
 function GuestHero({
@@ -244,92 +257,138 @@ function GuestHero({
   certCount: number;
 }) {
   return (
-    <section className="border-b border-zinc-100 bg-white dark:border-zinc-800 dark:bg-zinc-950">
+    <section className="relative overflow-hidden border-b border-zinc-100 dark:border-zinc-800">
 
-      <div className="mx-auto max-w-5xl px-4 py-16 text-center sm:px-6 sm:py-20 lg:py-24">
+      {/* ── Background: subtle dot-grid + soft radial gradient ── */}
+      <div
+        className="absolute inset-0 bg-white dark:bg-zinc-950"
+        style={{
+          backgroundImage:
+            "radial-gradient(circle at 60% 0%, rgba(99,102,241,0.06) 0%, transparent 60%), " +
+            "radial-gradient(circle at 10% 90%, rgba(139,92,246,0.05) 0%, transparent 50%)",
+        }}
+      />
+      {/* dot grid overlay */}
+      <div
+        className="absolute inset-0 opacity-[0.35] dark:opacity-[0.15]"
+        style={{
+          backgroundImage:
+            "radial-gradient(circle, #c7d2fe 1px, transparent 1px)",
+          backgroundSize: "28px 28px",
+        }}
+      />
 
-        <p className="mb-5 inline-flex items-center gap-2 rounded-full bg-emerald-50 px-4 py-1.5 text-sm font-semibold text-emerald-700 ring-1 ring-emerald-100 dark:bg-emerald-950/40 dark:text-emerald-400 dark:ring-emerald-800">
-          🎓 Certifications are completely free — no credit card, no subscription
-        </p>
+      {/* ── Main content ── */}
+      <div className="relative mx-auto max-w-6xl px-4 pb-10 pt-16 sm:px-6 sm:pt-20 lg:pt-24">
+        <div className="flex flex-col items-center gap-12 lg:flex-row lg:items-start lg:gap-16">
 
-        <h1 className="text-4xl font-black tracking-tight text-zinc-900 sm:text-5xl lg:text-[3.5rem] lg:leading-tight dark:text-zinc-100">
-          Learn to code.{" "}
-          <span className="text-indigo-600 dark:text-indigo-400">Get certified for free.</span>
-          <br className="hidden sm:block" />
-          Actually get hired.
-        </h1>
+          {/* Left: copy */}
+          <div className="flex-1 text-center lg:text-left">
 
-        <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-zinc-500 dark:text-zinc-400">
-          Write and run real code in your browser — no setup, no installs.
-          Learn step by step, sharpen your skills with real interview problems,
-          then{" "}
-          <strong className="font-semibold text-zinc-700 dark:text-zinc-300">
-            take a free timed exam and earn a certificate you can actually share.
-          </strong>
-        </p>
+            {/* Badge */}
+            <p className="mb-5 inline-flex items-center gap-2 rounded-full bg-indigo-50 px-4 py-1.5 text-sm font-semibold text-indigo-700 ring-1 ring-indigo-100 dark:bg-indigo-950/50 dark:text-indigo-300 dark:ring-indigo-800/60">
+              🎓 Exams &amp; certificates are always free
+            </p>
 
-        <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-          <Link
-            href="/signup"
-            className="rounded-xl bg-indigo-600 px-8 py-3.5 text-base font-bold text-white shadow-sm transition-all hover:-translate-y-0.5 hover:bg-indigo-500 hover:shadow-md"
-          >
-            Start for free →
-          </Link>
-          <Link
-            href="/certifications"
-            className="rounded-xl border border-zinc-200 bg-white px-8 py-3.5 text-base font-bold text-zinc-700 transition-all hover:border-indigo-200 hover:text-indigo-600 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-200"
-          >
-            See certifications
-          </Link>
-        </div>
+            {/* Headline */}
+            <h1 className="text-4xl font-black tracking-tight text-zinc-900 sm:text-5xl lg:text-[3.25rem] lg:leading-[1.15] dark:text-white">
+              Learn to code.{" "}
+              <span
+                className="bg-gradient-to-r from-indigo-600 to-violet-500 bg-clip-text text-transparent dark:from-indigo-400 dark:to-violet-400"
+              >
+                Get certified.
+              </span>
+              <br />
+              Actually get hired.
+            </h1>
 
-        <p className="mt-4 text-xs text-zinc-400">
-          Free forever · No credit card required · Certification exams are free
-        </p>
+            {/* Sub-headline */}
+            <p className="mx-auto mt-5 max-w-xl text-lg leading-relaxed text-zinc-500 lg:mx-0 dark:text-zinc-400">
+              Step-by-step tutorials, real interview problems, and{" "}
+              <span className="font-semibold text-zinc-700 dark:text-zinc-300">
+                free timed certification exams
+              </span>{" "}
+              — all running live in your browser. Zero setup.
+            </p>
 
-        <div className="mt-12 grid grid-cols-2 gap-4 border-t border-zinc-100 pt-10 sm:grid-cols-4 dark:border-zinc-800">
-          {[
-            { value: "9",                  label: "Languages",           sub: "Go, Python, TypeScript, SQL & more" },
-            { value: `${totalLessons}+`,   label: "Lessons",             sub: "Step-by-step, run in your browser" },
-            { value: `${problemCount}+`,   label: "Interview problems",  sub: "LeetCode-style with test cases" },
-            { value: `${certCount}`,       label: "Free certifications", sub: "Timed exams, shareable certificate" },
-          ].map(stat => (
-            <div key={stat.label} className="text-center">
-              <p className="text-3xl font-black text-zinc-900 dark:text-zinc-100">{stat.value}</p>
-              <p className="mt-0.5 text-sm font-semibold text-zinc-700 dark:text-zinc-300">{stat.label}</p>
-              <p className="mt-0.5 text-xs text-zinc-400 dark:text-zinc-500">{stat.sub}</p>
+            {/* CTAs */}
+            <div className="mt-8 flex flex-wrap items-center justify-center gap-3 lg:justify-start">
+              <Link
+                href="/signup"
+                className="rounded-xl bg-indigo-600 px-7 py-3 text-base font-bold text-white shadow-md shadow-indigo-500/20 transition-all hover:-translate-y-0.5 hover:bg-indigo-500 hover:shadow-lg hover:shadow-indigo-500/25"
+              >
+                Start learning free →
+              </Link>
+              <Link
+                href="/certifications"
+                className="rounded-xl border border-zinc-200 bg-white px-7 py-3 text-base font-bold text-zinc-700 shadow-sm transition-all hover:border-indigo-200 hover:text-indigo-600 dark:border-zinc-700 dark:bg-zinc-800/80 dark:text-zinc-200 dark:hover:border-indigo-700 dark:hover:text-indigo-400"
+              >
+                See certifications
+              </Link>
             </div>
-          ))}
+
+            <p className="mt-4 text-xs text-zinc-400">
+              Exams are free · No subscription required · Shareable certificates
+            </p>
+
+            {/* Stats */}
+            <div className="mt-10 grid grid-cols-2 gap-x-6 gap-y-4 border-t border-zinc-100 pt-8 sm:grid-cols-4 dark:border-zinc-800">
+              {[
+                { value: "9",                  label: "Languages"          },
+                { value: `${totalLessons}+`,   label: "Lessons"            },
+                { value: `${problemCount}+`,   label: "Interview problems" },
+                { value: `${certCount}`,       label: "Free certs"         },
+              ].map(stat => (
+                <div key={stat.label} className="text-center lg:text-left">
+                  <p className="text-2xl font-black text-zinc-900 dark:text-zinc-100">{stat.value}</p>
+                  <p className="mt-0.5 text-sm text-zinc-500 dark:text-zinc-400">{stat.label}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Right: language badge cloud */}
+          <div className="hidden shrink-0 lg:block" aria-hidden="true">
+            <div className="relative h-72 w-64">
+              {LANG_BADGES.map((b, i) => {
+                // Arrange badges in a loose grid (3 cols × 3 rows)
+                const col = i % 3;
+                const row = Math.floor(i / 3);
+                const left = col * 80 + (row % 2 === 1 ? 38 : 0);
+                const top  = row * 86;
+                return (
+                  <div
+                    key={b.label}
+                    className={`absolute flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold text-zinc-700 shadow-sm ring-1 transition-transform hover:-translate-y-0.5 dark:text-zinc-200 ${b.color}`}
+                    style={{ left, top }}
+                  >
+                    <span className="text-base leading-none">{b.icon}</span>
+                    {b.label}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
         </div>
       </div>
 
-      <div className="border-t border-zinc-100 bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900/50">
-        <div className="mx-auto max-w-5xl px-4 py-6 sm:px-6">
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+      {/* ── Value strip ── */}
+      <div className="relative border-t border-zinc-100 bg-zinc-50/80 dark:border-zinc-800 dark:bg-zinc-900/40">
+        <div className="mx-auto max-w-6xl px-4 py-5 sm:px-6">
+          <div className="grid grid-cols-1 divide-y divide-zinc-100 sm:grid-cols-3 sm:divide-x sm:divide-y-0 dark:divide-zinc-800">
             {[
-              {
-                icon: "💻",
-                title: "Code runs in your browser",
-                desc: "No IDE, no terminal, no installs. Open the page and start coding in seconds.",
-              },
-              {
-                icon: "🧩",
-                title: "Learn → Practice → Certify",
-                desc: "Tutorials build the knowledge. Practice problems sharpen it. Certifications prove it.",
-              },
-              {
-                icon: "🎓",
-                title: "Real certificates, zero cost",
-                desc: "Unlike Codecademy and Coursera — our exams and certificates are 100% free, always.",
-              },
+              { icon: "💻", title: "Runs in your browser",     desc: "No installs. Start coding in seconds." },
+              { icon: "🧩", title: "Learn → Practice → Certify", desc: "A clear path from beginner to certified." },
+              { icon: "🎓", title: "Certificates are free",    desc: "Unlike Codecademy — exams are always free." },
             ].map(item => (
-              <div key={item.title} className="flex items-start gap-3 rounded-xl p-4">
-                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-white text-lg shadow-sm ring-1 ring-zinc-100 dark:bg-zinc-800 dark:ring-zinc-700">
+              <div key={item.title} className="flex items-center gap-3 px-4 py-3 sm:px-6">
+                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-white text-lg shadow-sm ring-1 ring-zinc-200 dark:bg-zinc-800 dark:ring-zinc-700">
                   {item.icon}
                 </span>
                 <div>
-                  <p className="text-sm font-bold text-zinc-900 dark:text-zinc-100">{item.title}</p>
-                  <p className="mt-0.5 text-xs leading-relaxed text-zinc-500 dark:text-zinc-400">{item.desc}</p>
+                  <p className="text-sm font-bold text-zinc-800 dark:text-zinc-100">{item.title}</p>
+                  <p className="text-xs text-zinc-500 dark:text-zinc-400">{item.desc}</p>
                 </div>
               </div>
             ))}
