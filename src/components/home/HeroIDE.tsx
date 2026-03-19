@@ -8,13 +8,15 @@ import type { SupportedLanguage } from "@/lib/languages/types";
 type Lang = SupportedLanguage;
 
 const LANG_META: Record<Lang, { label: string; ext: string }> = {
-  go:         { label: "Go",     ext: "go"   },
-  python:     { label: "Python", ext: "py"   },
-  javascript: { label: "JS",     ext: "js"   },
-  java:       { label: "Java",   ext: "java" },
-  rust:       { label: "Rust",   ext: "rs"   },
-  cpp:        { label: "C++",    ext: "cpp"  },
-  csharp:     { label: "C#",     ext: "cs"   },
+  go:         { label: "Go",  ext: "go"   },
+  python:     { label: "Py",  ext: "py"   },
+  javascript: { label: "JS",  ext: "js"   },
+  java:       { label: "Java",ext: "java" },
+  rust:       { label: "Rust",ext: "rs"   },
+  cpp:        { label: "C++", ext: "cpp"  },
+  csharp:     { label: "C#",  ext: "cs"   },
+  typescript: { label: "TS",  ext: "ts"   },
+  sql:        { label: "SQL", ext: "sql"  },
 };
 
 const K = "text-violet-700 dark:text-violet-400";
@@ -91,6 +93,22 @@ const CODE: Record<Lang, T[][]> = {
     [{ t: "  }", c: D }],
     [{ t: "}", c: D }],
   ],
+  typescript: [
+    [{ t: "// greeting.ts", c: C }],
+    [],
+    [{ t: "const ", c: K }, { t: "greet", c: D }, { t: " = (", c: D }, { t: "name", c: D }, { t: ": ", c: K }, { t: "string", c: P }, { t: "): ", c: D }, { t: "string", c: P }, { t: " => {", c: D }],
+    [{ t: "  return ", c: K }, { t: "`Hello, ${name}!`", c: S }],
+    [{ t: "};", c: D }],
+    [],
+    [{ t: "console", c: P }, { t: ".", c: D }, { t: "log", c: F }, { t: '(greet("World"))', c: D }],
+  ],
+  sql: [
+    [{ t: "-- greeting.sql", c: C }],
+    [],
+    [{ t: "SELECT ", c: K }],
+    [{ t: "  'Hello, World!' ", c: S }, { t: "AS ", c: K }, { t: "message,", c: D }],
+    [{ t: "  CURRENT_DATE  ", c: S }, { t: "AS ", c: K }, { t: "today;", c: D }],
+  ],
 };
 
 const STEP_TEXT: Record<Lang, string> = {
@@ -101,6 +119,8 @@ const STEP_TEXT: Record<Lang, string> = {
   rust:       'Use the println!() macro to output "Hello, World!".',
   cpp:        'Use std::cout to write "Hello, World!" to stdout.',
   csharp:     'Use Console.WriteLine() inside the Main method.',
+  typescript: 'Add a type annotation `: string` to the name parameter.',
+  sql:        'Use SELECT to query data and AS to name the output column.',
 };
 
 export default function HeroIDE() {
