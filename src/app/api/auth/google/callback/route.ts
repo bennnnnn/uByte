@@ -11,6 +11,7 @@ import { signToken, setAuthCookie } from "@/lib/auth";
 import { setCsrfCookie } from "@/lib/csrf";
 import { withErrorHandling } from "@/lib/api-utils";
 import { sendGoogleLinkedEmail, sendWelcomeEmail } from "@/lib/email";
+import { createNotification } from "@/lib/db/notifications";
 import { buildAuthPageHref, getSafeNextPath, type AuthPageMode } from "@/lib/auth-redirect";
 import { getReferrerByCode, recordReferralSignup } from "@/lib/db";
 
@@ -99,6 +100,14 @@ export const GET = withErrorHandling("GET /api/auth/google/callback", async (req
     if (isNewUser) {
       // Day-0 welcome email — fire-and-forget
       sendWelcomeEmail(user.email, user.name).catch(() => {});
+      // In-app welcome notification
+      createNotification(
+        user.id,
+        "success",
+        "Welcome to uByte! 🎉",
+        "Your account is ready. Start with a tutorial, tackle an interview problem, or take a free certification exam.",
+        "/tutorial/go"
+      ).catch(() => {});
       // Track referral if user arrived via an invite link
       if (referralCode && /^[a-z0-9]{6,16}$/i.test(referralCode)) {
         getReferrerByCode(referralCode)

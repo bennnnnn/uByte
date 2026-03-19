@@ -11,6 +11,7 @@ import { signToken, setAuthCookie } from "@/lib/auth";
 import { setCsrfCookie } from "@/lib/csrf";
 import { withErrorHandling } from "@/lib/api-utils";
 import { sendGoogleLinkedEmail, sendWelcomeEmail } from "@/lib/email";
+import { createNotification } from "@/lib/db/notifications";
 import { getReferrerByCode, recordReferralSignup } from "@/lib/db";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 
@@ -90,6 +91,13 @@ export const POST = withErrorHandling("POST /api/auth/google-id-token", async (r
 
   if (isNewUser) {
     sendWelcomeEmail(user.email, user.name).catch(() => {});
+    createNotification(
+      user.id,
+      "success",
+      "Welcome to uByte! 🎉",
+      "Your account is ready. Start with a tutorial, tackle an interview problem, or take a free certification exam.",
+      "/tutorial/go"
+    ).catch(() => {});
     if (referralCode && /^[a-z0-9]{6,16}$/i.test(referralCode)) {
       getReferrerByCode(referralCode)
         .then((referrerId) => {

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { createUser, getUserByEmail, createEmailVerificationToken, getReferrerByCode, recordReferralSignup } from "@/lib/db";
+import { createNotification } from "@/lib/db/notifications";
 import { signToken, setAuthCookie } from "@/lib/auth";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 import { setCsrfCookie, verifyCsrf } from "@/lib/csrf";
@@ -48,6 +49,14 @@ export const POST = withErrorHandling("POST /api/auth/signup", async (request: N
   });
   // Day-0 welcome email — fire-and-forget, never blocks signup
   sendWelcomeEmail(email, name).catch(() => {});
+  // In-app welcome notification
+  createNotification(
+    user.id,
+    "success",
+    "Welcome to uByte! 🎉",
+    "Your account is ready. Start with a tutorial, tackle an interview problem, or take a free certification exam.",
+    "/tutorial/go"
+  ).catch(() => {});
 
   // Attribute referral if the new user came via an invite link
   if (typeof referralCode === "string" && /^[a-z0-9]{6,16}$/i.test(referralCode)) {
