@@ -197,16 +197,16 @@ export default async function PracticeExamsPage() {
               /* Not logged in */
               <div className="flex flex-wrap gap-3">
                 <Link
-                  href="/login?next=/certifications"
+                  href="/signup?next=/certifications"
                   className="inline-flex items-center justify-center gap-2 rounded-xl bg-indigo-600 px-5 py-3 text-sm font-bold text-white shadow-md shadow-indigo-500/20 transition-all hover:-translate-y-0.5 hover:bg-indigo-500"
                 >
-                  Get started free
+                  Create free account
                 </Link>
                 <Link
-                  href="/pricing"
+                  href="/login?next=/certifications"
                   className="inline-flex items-center justify-center gap-2 rounded-xl border border-zinc-300 bg-white px-5 py-2.5 text-sm font-semibold text-zinc-700 transition-all hover:border-zinc-400 hover:bg-zinc-50 dark:border-zinc-600 dark:bg-surface-card dark:text-zinc-200 dark:hover:border-zinc-500"
                 >
-                  See pricing
+                  Log in
                 </Link>
               </div>
             ) : passedLangs.length === EXAM_LANGS.length ? (
@@ -500,20 +500,20 @@ export default async function PracticeExamsPage() {
           <div className="mt-16 rounded-2xl border border-indigo-100 bg-indigo-50 p-8 text-center dark:border-indigo-900/40 dark:bg-indigo-950/20">
             <h2 className="text-xl font-bold text-zinc-900 dark:text-zinc-100">Ready to prove your skills?</h2>
             <p className="mx-auto mt-2 max-w-md text-sm text-zinc-500 dark:text-zinc-400">
-              Create a free account to get started, then upgrade to Pro to unlock timed exams and earn shareable certificates.
+              Create a free account and start taking certification exams — no subscription, no credit card.
             </p>
             <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
               <Link
-                href="/login?next=/certifications"
+                href="/signup?next=/certifications"
                 className="inline-flex items-center justify-center gap-2 rounded-xl bg-indigo-600 px-5 py-3 text-sm font-bold text-white shadow-md shadow-indigo-500/20 transition-all hover:-translate-y-0.5 hover:bg-indigo-500"
               >
                 Sign up free
               </Link>
               <Link
-                href="/pricing"
+                href="/login?next=/certifications"
                 className="inline-flex items-center justify-center gap-2 rounded-xl border border-zinc-300 bg-white px-5 py-2.5 text-sm font-semibold text-zinc-700 transition-all hover:border-zinc-400 hover:bg-zinc-50 dark:border-zinc-600 dark:bg-surface-card dark:text-zinc-200 dark:hover:border-zinc-500"
               >
-                See pricing
+                Log in
               </Link>
             </div>
           </div>

@@ -371,25 +371,18 @@ export default async function PracticeExamLangPage({ params }: Props) {
                       {!user ? (
                         <>
                           <Link
-                            href={`/login?next=/certifications/${lang}`}
+                            href={`/signup?next=/certifications/${lang}`}
                             className="inline-flex items-center justify-center gap-2 rounded-xl bg-indigo-600 px-5 py-3 text-sm font-bold text-white shadow-md shadow-indigo-500/20 transition-all hover:-translate-y-0.5 hover:bg-indigo-500"
                           >
-                            Sign up free
+                            Create free account
                           </Link>
                           <Link
-                            href="/pricing"
+                            href={`/login?next=/certifications/${lang}`}
                             className="inline-flex items-center justify-center gap-2 rounded-xl border border-zinc-300 bg-white px-5 py-2.5 text-sm font-semibold text-zinc-700 transition-all hover:border-zinc-400 hover:bg-zinc-50 dark:border-zinc-600 dark:bg-surface-card dark:text-zinc-200 dark:hover:border-zinc-500"
                           >
-                            See pricing
+                            Log in
                           </Link>
                         </>
-                      ) : (
-                        <Link
-                          href="/pricing"
-                          className="inline-flex items-center justify-center gap-2 rounded-xl bg-indigo-600 px-5 py-3 text-sm font-bold text-white shadow-md shadow-indigo-500/20 transition-all hover:-translate-y-0.5 hover:bg-indigo-500"
-                        >
-                          Upgrade to Pro
-                        </Link>
                       )}
                     </div>
                   </>
