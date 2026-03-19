@@ -2,13 +2,13 @@ import Link from "next/link";
 import { getLangIcon } from "@/lib/languages/icons";
 
 const CERT_LANGUAGES = [
-  { slug: "go",         name: "Go"         },
-  { slug: "python",     name: "Python"     },
-  { slug: "javascript", name: "JavaScript" },
-  { slug: "java",       name: "Java"       },
-  { slug: "rust",       name: "Rust"       },
-  { slug: "cpp",        name: "C++"        },
-  { slug: "csharp",     name: "C#"         },
+  { slug: "go",         name: "Go",         questions: 47 },
+  { slug: "python",     name: "Python",     questions: 47 },
+  { slug: "javascript", name: "JavaScript", questions: 47 },
+  { slug: "java",       name: "Java",       questions: 46 },
+  { slug: "rust",       name: "Rust",       questions: 47 },
+  { slug: "cpp",        name: "C++",        questions: 44 },
+  { slug: "csharp",     name: "C#",         questions: 44 },
 ];
 
 interface Props {
@@ -18,22 +18,25 @@ interface Props {
 
 export default function CertificationsHighlight({ totalCertificates, totalAttempts }: Props) {
   return (
-    <section aria-labelledby="certs-highlight-heading" className="overflow-hidden rounded-2xl border border-indigo-100 bg-gradient-to-br from-indigo-50 to-violet-50 dark:border-indigo-900/40 dark:from-indigo-950/30 dark:to-violet-950/20">
-      <div className="px-6 py-8 sm:px-8">
+    <section aria-labelledby="certs-highlight-heading">
+
+      {/* Big feature card */}
+      <div className="overflow-hidden rounded-2xl border border-indigo-100 bg-gradient-to-br from-indigo-50 to-violet-50 px-6 py-8 sm:px-8 dark:border-indigo-900/40 dark:from-indigo-950/30 dark:to-violet-950/20">
         <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
-          {/* Left */}
+
+          {/* Left — copy */}
           <div className="max-w-md">
-          <p className="mb-1 text-xs font-bold uppercase tracking-widest text-indigo-600 dark:text-indigo-400">
-            🎓 Free certifications
-          </p>
-          <h2 id="certs-highlight-heading" className="text-2xl font-black text-zinc-900 dark:text-zinc-100">
-            A certificate that actually means something.
-          </h2>
-          <p className="mt-2 text-sm leading-relaxed text-zinc-600 dark:text-zinc-300">
-            Our exams are timed, hard, and randomized — just like real technical screenings.
-            Pass one and earn a shareable certificate with a public verification URL.
-            <strong className="font-semibold text-zinc-800 dark:text-zinc-200"> 100% free. No subscription required.</strong>
-          </p>
+            <p className="mb-1 text-xs font-bold uppercase tracking-widest text-indigo-600 dark:text-indigo-400">
+              🎓 Free certifications
+            </p>
+            <h2 id="certs-highlight-heading" className="text-2xl font-black text-zinc-900 dark:text-zinc-100">
+              A certificate that actually means something.
+            </h2>
+            <p className="mt-2 text-sm leading-relaxed text-zinc-600 dark:text-zinc-300">
+              Our exams are timed, hard, and randomized — just like real technical screenings.
+              Pass one and earn a shareable certificate with a public verification URL.{" "}
+              <strong className="font-semibold text-zinc-800 dark:text-zinc-200">100% free. No subscription required.</strong>
+            </p>
 
             {/* Stats */}
             {totalCertificates > 0 && (
@@ -50,38 +53,61 @@ export default function CertificationsHighlight({ totalCertificates, totalAttemp
                 )}
               </div>
             )}
+          </div>
 
-            <div className="mt-5 flex gap-3">
-              <Link
-                href="/certifications"
-                className="rounded-xl bg-indigo-600 px-5 py-2.5 text-sm font-bold text-white shadow-sm transition-all hover:-translate-y-0.5 hover:bg-indigo-500 hover:shadow-md"
-              >
-                Browse certifications
-              </Link>
-              <Link
-                href="/tutorial/go"
-                className="rounded-xl border border-indigo-200 bg-white px-5 py-2.5 text-sm font-bold text-indigo-600 transition-all hover:border-indigo-300 hover:bg-indigo-50 dark:border-indigo-800 dark:bg-transparent dark:text-indigo-400"
-              >
-                Study first →
-              </Link>
+          {/* Right — visual */}
+          <div className="flex flex-col items-start gap-3 sm:items-end">
+            <div className="rounded-2xl border border-indigo-100 bg-white/80 p-5 shadow-sm backdrop-blur dark:border-indigo-800/40 dark:bg-zinc-800/60">
+              <p className="text-xs font-semibold text-zinc-400 dark:text-zinc-500">Certificate of completion</p>
+              <p className="mt-1 text-lg font-black text-zinc-900 dark:text-zinc-100">Go Programming</p>
+              <p className="text-sm text-zinc-500">Issued by uByte · Verified</p>
+              <div className="mt-3 flex items-center gap-2">
+                <span className="flex h-7 w-7 items-center justify-center rounded-full bg-emerald-100 text-sm dark:bg-emerald-900/40">✓</span>
+                <span className="text-xs font-semibold text-emerald-700 dark:text-emerald-400">Passed with 84% · 45 min exam</span>
+              </div>
             </div>
           </div>
 
-          {/* Right — language badges */}
-          <div className="flex flex-wrap gap-2 sm:max-w-xs">
-            {CERT_LANGUAGES.map(lang => (
-              <Link
-                key={lang.slug}
-                href={`/certifications/${lang.slug}`}
-                className="inline-flex items-center gap-2 rounded-xl border border-indigo-100 bg-white/80 px-3 py-2 text-sm font-semibold text-zinc-700 shadow-sm backdrop-blur transition-all hover:-translate-y-0.5 hover:border-indigo-300 hover:shadow dark:border-indigo-800/40 dark:bg-zinc-800/60 dark:text-zinc-200"
-              >
-                <span>{getLangIcon(lang.slug)}</span>
-                <span>{lang.name}</span>
-              </Link>
-            ))}
-          </div>
         </div>
       </div>
+
+      {/* Certification list */}
+      <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+        {CERT_LANGUAGES.map(lang => (
+          <Link
+            key={lang.slug}
+            href={`/certifications/${lang.slug}`}
+            className="group flex items-center gap-3 rounded-xl border border-zinc-200 bg-white px-4 py-3 transition-all hover:-translate-y-0.5 hover:border-indigo-200 hover:shadow-sm dark:border-zinc-700/60 dark:bg-zinc-800/80 dark:hover:border-indigo-700"
+          >
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-zinc-50 text-lg ring-1 ring-zinc-100 dark:bg-zinc-700 dark:ring-zinc-600">
+              {getLangIcon(lang.slug)}
+            </span>
+            <div className="min-w-0">
+              <p className="text-sm font-bold text-zinc-800 group-hover:text-indigo-600 dark:text-zinc-100 dark:group-hover:text-indigo-400">
+                {lang.name}
+              </p>
+              <p className="text-xs text-zinc-400">{lang.questions} questions</p>
+            </div>
+          </Link>
+        ))}
+
+        {/* Browse all card */}
+        <Link
+          href="/certifications"
+          className="group flex items-center gap-3 rounded-xl border border-dashed border-indigo-200 bg-indigo-50/50 px-4 py-3 transition-all hover:-translate-y-0.5 hover:border-indigo-300 hover:bg-indigo-50 dark:border-indigo-800/50 dark:bg-indigo-950/20 dark:hover:border-indigo-700"
+        >
+          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-indigo-100 text-lg dark:bg-indigo-900/40">
+            🎓
+          </span>
+          <div>
+            <p className="text-sm font-bold text-indigo-600 dark:text-indigo-400">
+              Browse all
+            </p>
+            <p className="text-xs text-indigo-400 dark:text-indigo-500">View all exams →</p>
+          </div>
+        </Link>
+      </div>
+
     </section>
   );
 }
