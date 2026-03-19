@@ -1,8 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
 import { useAuth } from "@/components/AuthProvider";
 
 interface Props {
@@ -12,130 +10,122 @@ interface Props {
 }
 
 export default function HomeHero({ totalLessons, problemCount, certCount }: Props) {
-  const { user, profile } = useAuth();
-  const [query, setQuery] = useState("");
-  const router = useRouter();
-
-  function handleSearch(e: React.FormEvent) {
-    e.preventDefault();
-    const q = query.trim();
-    if (!q) return;
-    router.push(`/search?q=${encodeURIComponent(q)}`);
-  }
+  const { user } = useAuth();
 
   const isLoggedIn = !!user;
-  const firstName = profile ? (user as { name?: string })?.name?.split(" ")[0] : null;
+  const firstName = (user as { name?: string } | null)?.name?.split(" ")[0];
 
   return (
-    <section className="relative overflow-hidden bg-gradient-to-b from-indigo-600 to-indigo-700 py-20 sm:py-28 lg:py-32">
-      {/* Subtle dot pattern */}
-      <div className="pointer-events-none absolute inset-0 opacity-10 [background-image:radial-gradient(circle,white_1px,transparent_1px)] [background-size:24px_24px]" />
+    <section className="border-b border-zinc-100 bg-white py-16 sm:py-20 lg:py-24 dark:border-zinc-800 dark:bg-zinc-950">
+      <div className="mx-auto max-w-5xl px-4 text-center sm:px-6">
 
-      <div className="relative mx-auto max-w-5xl px-4 text-center sm:px-6">
+        {/* Badge */}
         {isLoggedIn && firstName ? (
-          // Returning user
+          <p className="mb-4 inline-flex items-center gap-2 rounded-full bg-indigo-50 px-4 py-1.5 text-sm font-semibold text-indigo-600 ring-1 ring-indigo-100 dark:bg-indigo-950/40 dark:text-indigo-400 dark:ring-indigo-800">
+            👋 Welcome back, {firstName}
+          </p>
+        ) : (
+          <p className="mb-4 inline-flex items-center gap-2 rounded-full bg-indigo-50 px-4 py-1.5 text-sm font-semibold text-indigo-600 ring-1 ring-indigo-100 dark:bg-indigo-950/40 dark:text-indigo-400 dark:ring-indigo-800">
+            ✨ Free tutorials · Interview prep · Certifications
+          </p>
+        )}
+
+        {/* Headline */}
+        {isLoggedIn && firstName ? (
           <>
-            <p className="mb-3 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-sm font-semibold text-white/90">
-              👋 Welcome back, {firstName}
-            </p>
-            <h1 className="text-4xl font-black tracking-tight text-white sm:text-5xl lg:text-6xl">
+            <h1 className="text-4xl font-black tracking-tight text-zinc-900 sm:text-5xl lg:text-6xl dark:text-zinc-100">
               Keep the{" "}
-              <span className="text-yellow-300">
-                momentum
-              </span>{" "}
+              <span className="text-indigo-600 dark:text-indigo-400">momentum</span>{" "}
               going.
             </h1>
-            <p className="mx-auto mt-5 max-w-2xl text-lg text-indigo-100">
-              You&apos;re making progress. Pick up where you left off, tackle a new challenge, or take a certification exam.
+            <p className="mx-auto mt-5 max-w-2xl text-lg text-zinc-500 dark:text-zinc-400">
+              Pick up where you left off, tackle a new challenge, or take a certification exam — all free.
             </p>
           </>
         ) : (
-          // Guest
           <>
-            <p className="mb-3 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-sm font-semibold text-white/90">
-              ✨ Learn · Practice · Get Certified
-            </p>
-            <h1 className="text-4xl font-black tracking-tight text-white sm:text-5xl lg:text-6xl">
-              The fastest way to{" "}
-              <span className="text-yellow-300">
-                master coding
-              </span>{" "}
+            <h1 className="text-4xl font-black tracking-tight text-zinc-900 sm:text-5xl lg:text-6xl dark:text-zinc-100">
+              The best way to{" "}
+              <span className="text-indigo-600 dark:text-indigo-400">master coding</span>{" "}
               and get hired.
             </h1>
-            <p className="mx-auto mt-5 max-w-2xl text-lg text-indigo-100">
-              Interactive tutorials, real interview prep, and industry certifications — all in one place.
-              Write and run code directly in your browser. No setup required.
+            <p className="mx-auto mt-5 max-w-2xl text-lg text-zinc-500 dark:text-zinc-400">
+              Interactive tutorials, 114+ practice problems, and free certification exams — all in one place.
+              Write and run code directly in your browser. Zero setup.
             </p>
           </>
         )}
 
-        {/* Search bar */}
-        <form onSubmit={handleSearch} className="mx-auto mt-8 flex max-w-xl gap-2">
-          <div className="relative flex-1">
-            <svg className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
-            <input
-              type="search"
-              value={query}
-              onChange={e => setQuery(e.target.value)}
-              placeholder="Search tutorials, topics, languages…"
-              className="w-full rounded-xl border border-transparent bg-white py-3 pl-10 pr-4 text-sm text-zinc-900 placeholder-zinc-400 shadow outline-none focus:ring-2 focus:ring-white/50"
-            />
-          </div>
-          <button
-            type="submit"
-            className="rounded-xl bg-indigo-900 px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-indigo-800 focus:outline-none focus:ring-2 focus:ring-white/30"
-          >
-            Search
-          </button>
-        </form>
+        {/* CTAs */}
+        <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+          {isLoggedIn ? (
+            <>
+              <Link
+                href="/tutorial/go"
+                className="rounded-xl bg-indigo-600 px-7 py-3 text-sm font-bold text-white shadow-sm transition-all hover:-translate-y-0.5 hover:bg-indigo-500 hover:shadow-md"
+              >
+                Continue learning
+              </Link>
+              <Link
+                href="/certifications"
+                className="rounded-xl border border-zinc-200 bg-white px-7 py-3 text-sm font-bold text-zinc-700 transition-all hover:border-indigo-200 hover:text-indigo-600 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-200"
+              >
+                Take a certification exam
+              </Link>
+            </>
+          ) : (
+            <>
+              <Link
+                href="/signup"
+                className="rounded-xl bg-indigo-600 px-7 py-3 text-sm font-bold text-white shadow-sm transition-all hover:-translate-y-0.5 hover:bg-indigo-500 hover:shadow-md"
+              >
+                Start for free
+              </Link>
+              <Link
+                href="/tutorial/go"
+                className="rounded-xl border border-zinc-200 bg-white px-7 py-3 text-sm font-bold text-zinc-700 transition-all hover:border-indigo-200 hover:text-indigo-600 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-200"
+              >
+                Browse tutorials
+              </Link>
+            </>
+          )}
+        </div>
 
-        {/* Quick tags */}
-        <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
-          {["Go", "Python", "TypeScript", "SQL", "Interview Prep"].map(tag => (
+        {/* Quick language links */}
+        <div className="mt-6 flex flex-wrap items-center justify-center gap-2">
+          <span className="text-xs text-zinc-400">Popular:</span>
+          {[
+            { label: "Go", href: "/tutorial/go" },
+            { label: "Python", href: "/tutorial/python" },
+            { label: "TypeScript", href: "/tutorial/typescript" },
+            { label: "SQL", href: "/tutorial/sql" },
+            { label: "Interview Prep", href: "/practice" },
+          ].map(item => (
             <Link
-              key={tag}
-              href={tag === "Interview Prep" ? "/practice" : `/tutorial/${tag.toLowerCase()}`}
-              className="rounded-full border border-white/30 bg-white/10 px-3 py-1 text-xs font-medium text-white/90 transition-colors hover:bg-white/20 hover:text-white"
+              key={item.label}
+              href={item.href}
+              className="rounded-full border border-zinc-200 bg-zinc-50 px-3 py-1 text-xs font-medium text-zinc-600 transition-colors hover:border-indigo-200 hover:bg-indigo-50 hover:text-indigo-600 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-400 dark:hover:text-indigo-400"
             >
-              {tag}
+              {item.label}
             </Link>
           ))}
         </div>
 
-        {/* CTAs */}
-        {!isLoggedIn && (
-          <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-            <Link
-              href="/signup"
-              className="rounded-xl bg-white px-7 py-3 text-sm font-bold text-indigo-700 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md"
-            >
-              Start for free
-            </Link>
-            <Link
-              href="/certifications"
-              className="rounded-xl border border-white/30 bg-white/10 px-7 py-3 text-sm font-bold text-white transition-all hover:bg-white/20"
-            >
-              View certifications
-            </Link>
-          </div>
-        )}
-
         {/* Stats bar */}
-        <div className="mt-12 flex flex-wrap items-center justify-center gap-8">
+        <div className="mt-10 flex flex-wrap items-center justify-center gap-8 border-t border-zinc-100 pt-8 dark:border-zinc-800">
           {[
-            { value: "9", label: "Languages" },
-            { value: `${totalLessons}+`, label: "Lessons" },
-            { value: `${problemCount}+`, label: "Practice problems" },
-            { value: `${certCount}`, label: "Free certifications" },
+            { value: "9",               label: "Languages" },
+            { value: `${totalLessons}+`,label: "Lessons" },
+            { value: `${problemCount}+`,label: "Practice problems" },
+            { value: `${certCount}`,    label: "Free certifications" },
           ].map(stat => (
             <div key={stat.label} className="text-center">
-              <p className="text-2xl font-black text-white">{stat.value}</p>
-              <p className="text-xs text-indigo-200">{stat.label}</p>
+              <p className="text-2xl font-black text-zinc-900 dark:text-zinc-100">{stat.value}</p>
+              <p className="text-xs text-zinc-400">{stat.label}</p>
             </div>
           ))}
         </div>
+
       </div>
     </section>
   );
