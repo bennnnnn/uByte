@@ -17,10 +17,10 @@ export default function TrendingSection({ languages }: Props) {
       <div className="mb-6 flex items-center justify-between">
         <div>
           <p className="mb-1 text-xs font-bold uppercase tracking-widest text-indigo-600 dark:text-indigo-400">
-            🔥 Trending this week
+            🔥 Most popular
           </p>
           <h2 id="trending-heading" className="text-xl font-bold text-zinc-900 dark:text-zinc-100">
-            Most popular among learners
+            Where other developers are starting
           </h2>
         </div>
         <Link

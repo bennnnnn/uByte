@@ -23,16 +23,17 @@ export default function CertificationsHighlight({ totalCertificates, totalAttemp
         <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
           {/* Left */}
           <div className="max-w-md">
-            <p className="mb-1 text-xs font-bold uppercase tracking-widest text-indigo-600 dark:text-indigo-400">
-              🎓 Free certifications
-            </p>
-            <h2 id="certs-highlight-heading" className="text-2xl font-black text-zinc-900 dark:text-zinc-100">
-              Prove what you know.
-            </h2>
-            <p className="mt-2 text-sm leading-relaxed text-zinc-600 dark:text-zinc-300">
-              Take a timed exam and earn a verifiable certificate — free for everyone.
-              The exams are genuinely hard. Passing one means something.
-            </p>
+          <p className="mb-1 text-xs font-bold uppercase tracking-widest text-indigo-600 dark:text-indigo-400">
+            🎓 Free certifications
+          </p>
+          <h2 id="certs-highlight-heading" className="text-2xl font-black text-zinc-900 dark:text-zinc-100">
+            A certificate that actually means something.
+          </h2>
+          <p className="mt-2 text-sm leading-relaxed text-zinc-600 dark:text-zinc-300">
+            Our exams are timed, hard, and randomized — just like real technical screenings.
+            Pass one and earn a shareable certificate with a public verification URL.
+            <strong className="font-semibold text-zinc-800 dark:text-zinc-200"> 100% free. No subscription required.</strong>
+          </p>
 
             {/* Stats */}
             {totalCertificates > 0 && (

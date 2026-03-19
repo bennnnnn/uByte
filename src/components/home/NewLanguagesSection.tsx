@@ -31,10 +31,10 @@ export default function NewLanguagesSection() {
     <section aria-labelledby="new-heading">
       <div className="mb-6">
         <p className="mb-1 text-xs font-bold uppercase tracking-widest text-violet-600 dark:text-violet-400">
-          ✨ Just added
+          ✨ Just launched
         </p>
         <h2 id="new-heading" className="text-xl font-bold text-zinc-900 dark:text-zinc-100">
-          New tutorial tracks
+          Two languages every developer needs in 2025
         </h2>
       </div>
 
