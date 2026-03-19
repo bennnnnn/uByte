@@ -1,30 +1,100 @@
 [
   {
-    "title": "Number and string types",
-    "instruction": "TypeScript has `number`, `string`, and `boolean` as its core primitive types. Annotate and use them.\n\nRun this.",
-    "starter": "const pi: number = 3.14159;\nconst language: string = \"TypeScript\";\nconst isTyped: boolean = true;\n\nconsole.log(pi);\nconsole.log(language);\nconsole.log(isTyped);",
-    "expectedOutput": ["3.14159", "TypeScript", "true"],
-    "successMessage": "TypeScript's primitive types map directly to JavaScript's runtime types."
+    "title": "The primitive types — string, number, boolean",
+    "instruction": "Every value in TypeScript has a type. The three most fundamental are `string`, `number`, and `boolean`. TypeScript infers them automatically from literals.\n\nDeclare variables and see TypeScript's inferred types.",
+    "starter": "const name    = \"Alice\";      // string\nconst score   = 2850;          // number\nconst isAdmin = true;          // boolean\nconst price   = 9.99;          // number (no int/float distinction)\n\nconsole.log(`Name:  ${name}`);\nconsole.log(`Score: ${score}`);\nconsole.log(`Admin: ${isAdmin}`);\nconsole.log(`Price: $${price}`);",
+    "expectedOutput": ["Name:  Alice", "Score: 2850", "Admin: true", "Price: $9.99"],
+    "successMessage": "Three types cover most variables. TypeScript uses one `number` type for all numeric values — no `int` vs `float`. `2850` and `9.99` are both `number`."
   },
   {
-    "title": "Arrays",
-    "instruction": "Declare a typed array using `type[]` syntax. TypeScript ensures every element matches the declared type.\n\nRun this.",
-    "starter": "const scores: number[] = [95, 87, 92, 78];\nconst names: string[] = [\"Alice\", \"Bob\", \"Carol\"];\n\nconsole.log(scores[0]);\nconsole.log(names.length);\nconsole.log(scores.filter(s => s >= 90).length);",
-    "expectedOutput": ["95", "3", "2"],
-    "successMessage": "Array methods like `filter` preserve the type — `scores.filter(...)` still returns `number[]`."
+    "title": "null and undefined — the billion-dollar mistake",
+    "instruction": "Tony Hoare called null \"my billion-dollar mistake\". TypeScript's strict mode separates `null` and `undefined` from other types — you must explicitly opt in to allow them.\n\nSee the difference between null and undefined in TypeScript.",
+    "starter": "// undefined: value was never assigned\nlet unassigned: undefined = undefined;\n\n// null: deliberately empty/absent\nlet empty: null = null;\n\n// Union types — a value that might be absent\nlet userId: number | null = null;\nlet nickname: string | undefined = undefined;\n\n// After assignment\nuserId = 42;\nnickname = \"alice_dev\";\n\nconsole.log(`UserId: ${userId}`);\nconsole.log(`Nickname: ${nickname}`);\nconsole.log(`Unassigned: ${unassigned}`);\nconsole.log(`Empty: ${empty}`);",
+    "expectedOutput": ["UserId: 42", "Nickname: alice_dev", "Unassigned: undefined", "Empty: null"],
+    "successMessage": "In TypeScript strict mode, `number` does NOT include `null` or `undefined` — you must write `number | null` explicitly. This eliminates most \"undefined is not a function\" errors."
   },
   {
-    "title": "Tuples",
-    "instruction": "A tuple is a fixed-length array where each position has its own type. Great for pairs and structured data.\n\nRun this.",
-    "starter": "const point: [number, number] = [10, 20];\nconst user: [string, number] = [\"alice\", 42];\n\nconsole.log(`x=${point[0]}, y=${point[1]}`);\nconsole.log(`${user[0]} is ${user[1]} years old`);",
-    "expectedOutput": ["x=10, y=20", "alice is 42 years old"],
-    "successMessage": "Tuples enforce both the length and per-position types. TypeScript will error if you add a third element or swap types."
+    "title": "any — the escape hatch (use sparingly)",
+    "instruction": "`any` opts out of type checking entirely. It's useful when migrating JavaScript code or working with truly dynamic data — but every `any` is a potential runtime error waiting to happen.\n\nSee how `any` disables type checking.",
+    "starter": "// any: TypeScript stops checking\nlet data: any = \"hello\";\ndata = 42;          // no error\ndata = { x: 1 };    // no error\ndata = [1, 2, 3];   // no error\n\n// unknown: the safe alternative to any\nlet input: unknown = \"user input\";\n\n// Must narrow unknown before using it\nif (typeof input === \"string\") {\n  console.log(input.toUpperCase());  // safe — narrowed to string\n}\n\nconsole.log(`any data: ${JSON.stringify(data)}`);\nconsole.log(`any is dangerous — avoid it`);",
+    "expectedOutput": ["USER INPUT", "any data: [1,2,3]", "any is dangerous — avoid it"],
+    "successMessage": "`any` is useful during migrations but dangerous in production. Prefer `unknown` — it requires narrowing before use, maintaining safety while still accepting any value."
   },
   {
-    "title": "The unknown type",
-    "instruction": "`unknown` is a safer alternative to `any`. You must narrow the type before using it.\n\nRun this.",
-    "starter": "function describe(value: unknown): string {\n  if (typeof value === \"string\") {\n    return `string: \"${value}\"`;\n  }\n  if (typeof value === \"number\") {\n    return `number: ${value}`;\n  }\n  return \"unknown type\";\n}\n\nconsole.log(describe(\"hello\"));\nconsole.log(describe(42));\nconsole.log(describe(true));",
-    "expectedOutput": ["string: \"hello\"", "number: 42", "unknown type"],
-    "successMessage": "`unknown` forces you to check the type before using the value — much safer than `any` which skips all checks."
+    "title": "Template literal types — string patterns",
+    "instruction": "Template literal types create new string types by combining string literals. They're used for route patterns, event names, and any string that follows a specific format.\n\nBuild typed event names using template literal types.",
+    "starter": "type Entity = \"user\" | \"order\" | \"product\";\ntype Action = \"created\" | \"updated\" | \"deleted\";\n\n// Template literal type — all 9 combinations\ntype EventName = `${Entity}:${Action}`;\n\nfunction on(event: EventName, handler: () => void): void {\n  console.log(`Registered: ${event}`);\n  handler();\n}\n\non(\"user:created\",   () => console.log(\"  → sending welcome email\"));\non(\"order:updated\",  () => console.log(\"  → notifying customer\"));\non(\"product:deleted\",() => console.log(\"  → clearing cache\"));\n// on(\"payment:failed\", () => {});  // ← TypeScript error: not a valid EventName",
+    "expectedOutput": ["Registered: user:created", "  → sending welcome email", "Registered: order:updated", "  → notifying customer", "Registered: product:deleted", "  → clearing cache"],
+    "successMessage": "`EventName` is the union of all 9 combinations. TypeScript prevents you from registering `\"payment:failed\"` — it's not in the allowed set. This is a zero-cost way to prevent typos in event names."
+  },
+  {
+    "title": "Literal types — exact values",
+    "instruction": "A literal type is a type that allows only one specific value. Combined with union types, literal types create powerful, exhaustive enumerations without the overhead of enums.\n\nBuild a status machine with literal types.",
+    "starter": "type OrderStatus = \"draft\" | \"pending\" | \"processing\" | \"shipped\" | \"delivered\" | \"cancelled\";\n\nfunction getStatusColor(status: OrderStatus): string {\n  const colors: Record<OrderStatus, string> = {\n    draft:      \"gray\",\n    pending:    \"yellow\",\n    processing: \"blue\",\n    shipped:    \"indigo\",\n    delivered:  \"green\",\n    cancelled:  \"red\",\n  };\n  return colors[status];\n}\n\nfunction canTransition(from: OrderStatus, to: OrderStatus): boolean {\n  const allowed: Partial<Record<OrderStatus, OrderStatus[]>> = {\n    draft:      [\"pending\", \"cancelled\"],\n    pending:    [\"processing\", \"cancelled\"],\n    processing: [\"shipped\"],\n    shipped:    [\"delivered\"],\n  };\n  return (allowed[from] ?? []).includes(to);\n}\n\nconst statuses: OrderStatus[] = [\"draft\", \"pending\", \"shipped\", \"delivered\"];\nfor (const s of statuses) {\n  console.log(`${s}: ${getStatusColor(s)}`);\n}\nconsole.log(`draft → pending: ${canTransition(\"draft\", \"pending\")}`);\nconsole.log(`shipped → pending: ${canTransition(\"shipped\", \"pending\")}`);",
+    "expectedOutput": ["draft: gray", "pending: yellow", "shipped: indigo", "delivered: green", "draft → pending: true", "shipped → pending: false"],
+    "successMessage": "`Record<OrderStatus, string>` is exhaustive — TypeScript errors if any status is missing from the `colors` map. Adding a new status to the union immediately highlights every place that needs updating."
+  },
+  {
+    "title": "bigint — large integers",
+    "instruction": "`bigint` handles integers larger than `Number.MAX_SAFE_INTEGER` (2^53 - 1). It's used in cryptography, database IDs, and financial calculations that need exact precision.\n\nCalculate with large numbers using bigint.",
+    "starter": "// Regular number loses precision above 2^53\nconst maxSafe = Number.MAX_SAFE_INTEGER;\nconsole.log(`Max safe int: ${maxSafe}`);\nconsole.log(`Max safe + 1: ${maxSafe + 1}`);\nconsole.log(`Max safe + 2: ${maxSafe + 2}`);  // same as +1 — precision lost!\n\n// BigInt keeps exact precision\nconst bigMax = BigInt(Number.MAX_SAFE_INTEGER);\nconsole.log(`BigInt max: ${bigMax}`);\nconsole.log(`BigInt + 1: ${bigMax + 1n}`);\nconsole.log(`BigInt + 2: ${bigMax + 2n}`);  // correctly different",
+    "expectedOutput": ["Max safe int: 9007199254740991", "Max safe + 1: 9007199254740992", "Max safe + 2: 9007199254740992", "BigInt max: 9007199254740991", "BigInt + 1: 9007199254740992", "BigInt + 2: 9007199254740993"],
+    "successMessage": "`number` loses precision above 2^53 — `maxSafe + 1` and `maxSafe + 2` are the same! `bigint` maintains exact precision. Use `n` suffix for bigint literals: `1n`, `42n`, `9007199254740993n`."
+  },
+  {
+    "title": "symbol — unique identifiers",
+    "instruction": "Every `Symbol()` call creates a unique, non-comparable value. Symbols are used as unique property keys that can't accidentally collide with other keys.\n\nUse symbols as unique identifiers.",
+    "starter": "const ID   = Symbol(\"id\");\nconst NAME = Symbol(\"name\");\n\n// Two symbols are never equal, even with the same description\nconst s1 = Symbol(\"test\");\nconst s2 = Symbol(\"test\");\nconsole.log(`s1 === s2: ${String(s1 === s2)}`);  // always false\n\n// Symbols as object keys — won't collide with string keys\nconst obj: { [k: symbol]: string; name?: string } = {};\nobj[ID]   = \"unique-id-42\";\nobj[NAME] = \"Alice\";\n\nconsole.log(`ID:   ${String(obj[ID])}`);\nconsole.log(`NAME: ${String(obj[NAME])}`);\nconsole.log(`Symbol keys hidden from Object.keys: ${JSON.stringify(Object.keys(obj))}`);",
+    "expectedOutput": ["s1 === s2: false", "ID:   unique-id-42", "NAME: Alice", "Symbol keys hidden from Object.keys: []"],
+    "successMessage": "Symbols are unique even with the same description. Symbol-keyed properties are invisible to `Object.keys()`, `JSON.stringify()`, and `for...in` loops — they're private by convention."
+  },
+  {
+    "title": "Type widening — const vs let",
+    "instruction": "TypeScript widens types for `let` (reassignable) but keeps them narrow for `const` (fixed). This affects how types flow through your code.\n\nObserve the difference between const and let inference.",
+    "starter": "// const → literal type (narrow)\nconst greeting = \"hello\";   // type: \"hello\"\nconst maxItems = 10;         // type: 10\nconst isEnabled = true;      // type: true\n\n// let → widened type\nlet message = \"hello\";      // type: string\nlet count = 10;              // type: number\nlet active = true;           // type: boolean\n\n// 'as const' — force narrow types on let\nlet direction = \"north\" as const;  // type: \"north\"\n\ntype CardinalDirection = \"north\" | \"south\" | \"east\" | \"west\";\n\nfunction move(dir: CardinalDirection) {\n  console.log(`Moving ${dir}`);\n}\n\nmove(greeting as CardinalDirection);  // works — \"hello\" is wrong but forced\nmove(direction);                       // works — \"north\" is valid\nconsole.log(`Direction: ${direction}`);",
+    "expectedOutput": ["Moving hello", "Moving north", "Direction: north"],
+    "successMessage": "`const` creates a literal type (`\"hello\"`) while `let` creates a wide type (`string`). `as const` forces a literal type on a `let` variable. In real code, `as const` is rarely needed — use `const` instead."
+  },
+  {
+    "title": "Type assertions — when you know better",
+    "instruction": "Sometimes TypeScript can't figure out the type from context, but you know. Type assertions (`as Type`) tell TypeScript to trust you — but they don't perform runtime conversion.\n\nAssert types when working with DOM elements and JSON.",
+    "starter": "// Simulating working with untyped data\nconst jsonData: unknown = JSON.parse('{\"name\": \"Alice\", \"score\": 2850, \"level\": 8}');\n\n// Assert the shape we know the data has\nconst user = jsonData as { name: string; score: number; level: number };\n\nconsole.log(`Player: ${user.name}`);\nconsole.log(`Score:  ${user.score}`);\nconsole.log(`Level:  ${user.level}`);\n\n// Double assertion — when TypeScript refuses a direct assertion\n// Use sparingly — it means you're bypassing two levels of safety\nconst config = { debug: true, version: 3 } as unknown as { env: string };\nconsole.log(`Config type: ${typeof config}`);",
+    "expectedOutput": ["Player: Alice", "Score:  2850", "Level:  8", "Config type: object"],
+    "successMessage": "Type assertions bypass type checking — you're telling TypeScript \"trust me, I know the shape\". Use them when you know more than TypeScript (e.g., API responses). Prefer type guards over assertions when possible — they're checked at runtime."
+  },
+  {
+    "title": "Non-null assertion — telling TypeScript a value exists",
+    "instruction": "The non-null assertion operator `!` tells TypeScript a value is definitely not null or undefined. It's a compile-time-only assertion — no runtime check happens.\n\nUse non-null assertions when you're certain a value exists.",
+    "starter": "interface Config {\n  database: {\n    host: string;\n    port: number;\n  } | null;\n}\n\nconst config: Config = {\n  database: {\n    host: \"localhost\",\n    port: 5432,\n  }\n};\n\n// Without non-null assertion: TypeScript complains\n// config.database.host;  // Error: Object is possibly null\n\n// With non-null assertion: you're telling TypeScript \"I guarantee it's not null\"\nconst host = config.database!.host;\nconst port = config.database!.port;\n\nconsole.log(`Database: ${host}:${port}`);\n\n// Safer alternative: optional chaining\nconst safeHost = config.database?.host ?? \"default\";\nconsole.log(`Safe host: ${safeHost}`);",
+    "expectedOutput": ["Database: localhost:5432", "Safe host: localhost"],
+    "successMessage": "`!` removes null/undefined from the type — use it only when you're certain the value exists. Prefer `?.` (optional chaining) + `??` (nullish coalescing) — they're checked at runtime and won't crash if the value is null."
+  },
+  {
+    "title": "Checking types at runtime — typeof and instanceof",
+    "instruction": "`typeof` checks primitive types at runtime. `instanceof` checks if a value is an instance of a class. TypeScript narrows the type based on these checks.\n\nWrite a function that handles multiple types.",
+    "starter": "function processValue(value: string | number | boolean | null): string {\n  if (value === null) {\n    return \"[null]\";\n  }\n\n  switch (typeof value) {\n    case \"string\":\n      return `string: \"${value.toUpperCase()}\"`;\n    case \"number\":\n      return `number: ${value.toFixed(2)}`;\n    case \"boolean\":\n      return `boolean: ${value ? \"YES\" : \"NO\"}`;\n    default:\n      return `unknown: ${String(value)}`;\n  }\n}\n\nconst values = [\"hello\", 42, 3.14159, true, false, null];\nfor (const v of values) {\n  console.log(processValue(v));\n}",
+    "expectedOutput": ["string: \"HELLO\"", "number: 42.00", "number: 3.14", "boolean: YES", "boolean: NO", "[null]"],
+    "successMessage": "Inside each `case`, TypeScript narrows the type. In `case \"string\"`, TypeScript knows `value` is `string` — so `.toUpperCase()` is available. In `case \"number\"`, `.toFixed()` is available."
+  },
+  {
+    "title": "Type predicates — custom narrowing functions",
+    "instruction": "A type predicate `value is Type` in a function return type tells TypeScript to narrow the type when the function returns `true`. This is how you create reusable narrowing logic.\n\nWrite type predicates for API response validation.",
+    "starter": "interface SuccessResponse { status: \"success\"; data: unknown; }\ninterface ErrorResponse   { status: \"error\";   message: string; code: number; }\n\ntype ApiResponse = SuccessResponse | ErrorResponse;\n\nfunction isSuccess(r: ApiResponse): r is SuccessResponse {\n  return r.status === \"success\";\n}\n\nfunction isError(r: ApiResponse): r is ErrorResponse {\n  return r.status === \"error\";\n}\n\nconst responses: ApiResponse[] = [\n  { status: \"success\", data: { users: 42 } },\n  { status: \"error\",   message: \"Not found\",       code: 404 },\n  { status: \"success\", data: { products: 100 } },\n  { status: \"error\",   message: \"Unauthorized\",    code: 401 },\n];\n\nfor (const r of responses) {\n  if (isSuccess(r)) {\n    console.log(`✓ Data: ${JSON.stringify(r.data)}`);\n  } else {\n    console.log(`✗ ${r.code}: ${r.message}`);\n  }\n}",
+    "expectedOutput": ["✓ Data: {\"users\":42}", "✗ 404: Not found", "✓ Data: {\"products\":100}", "✗ 401: Unauthorized"],
+    "successMessage": "After `if (isSuccess(r))`, TypeScript narrows `r` to `SuccessResponse` — `.data` is accessible. In the `else` branch, it's `ErrorResponse` — `.code` and `.message` are accessible. Clean, reusable narrowing."
+  },
+  {
+    "title": "Satisfies vs as — validation without widening",
+    "instruction": "`as` asserts a type (bypasses checking). `satisfies` validates against a type but preserves the inferred type. Both are useful, but `satisfies` is safer.\n\nCompare the two approaches for a route configuration.",
+    "starter": "type Method = \"GET\" | \"POST\" | \"PUT\" | \"DELETE\";\ntype Route = { method: Method; path: string; handler: string };\n\n// 'satisfies' validates the array elements\n// but preserves the exact literal types of each element\nconst routes = [\n  { method: \"GET\",    path: \"/users\",    handler: \"listUsers\"  },\n  { method: \"POST\",   path: \"/users\",    handler: \"createUser\" },\n  { method: \"GET\",    path: \"/users/:id\",handler: \"getUser\"    },\n  { method: \"DELETE\", path: \"/users/:id\",handler: \"deleteUser\" },\n] satisfies Route[];\n\nconst getMethods = routes\n  .filter(r => r.method === \"GET\")\n  .map(r => `GET ${r.path}`);\n\nconsole.log(`Total routes: ${routes.length}`);\nconsole.log(`GET routes: ${getMethods.join(\", \")}`);",
+    "expectedOutput": ["Total routes: 4", "GET routes: GET /users, GET /users/:id"],
+    "successMessage": "`satisfies` validates that every element matches `Route` (e.g., method must be one of the four HTTP methods) while keeping each element's inferred type. `as Route[]` would also work but provides less type safety."
+  },
+  {
+    "title": "Branded types — prevent value mix-ups",
+    "instruction": "Branded types prevent mixing up values of the same underlying type. A `UserId` and an `OrderId` are both `number`, but you should never accidentally pass one where the other is expected.\n\nCreate branded types for IDs.",
+    "starter": "type UserId  = number & { readonly _brand: \"UserId\"  };\ntype OrderId = number & { readonly _brand: \"OrderId\" };\n\nfunction createUserId(id: number):  UserId  { return id as UserId;  }\nfunction createOrderId(id: number): OrderId { return id as OrderId; }\n\nfunction getUser(id: UserId): string {\n  return `User #${id}`;\n}\n\nfunction getOrder(id: OrderId): string {\n  return `Order #${id}`;\n}\n\nconst userId  = createUserId(42);\nconst orderId = createOrderId(100);\n\nconsole.log(getUser(userId));\nconsole.log(getOrder(orderId));\n// getUser(orderId);  // ← TypeScript error: OrderId is not UserId\n// getOrder(userId);  // ← TypeScript error: UserId is not OrderId\nconsole.log(`User ID: ${userId}, Order ID: ${orderId}`);",
+    "expectedOutput": ["User #42", "Order #100", "User ID: 42, Order ID: 100"],
+    "successMessage": "Branded types add a phantom property that exists only in TypeScript's type system — no runtime overhead. `UserId` and `OrderId` are both `number` at runtime, but TypeScript prevents them from being swapped. This catches a whole class of bugs."
   }
 ]

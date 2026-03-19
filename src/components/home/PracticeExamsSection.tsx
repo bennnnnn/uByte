@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { getAllLanguageSlugs } from "@/lib/languages/registry";
 import { DEFAULT_EXAM_CONFIG } from "@/lib/db";
 import ExamCard from "@/app/certifications/ExamCard";
 import type { ExamCardStats, ExamCardPublicStats } from "@/app/certifications/ExamCard";
@@ -10,6 +9,8 @@ interface Props {
   publicStatsByLang?: Record<string, ExamCardPublicStats>;
   statsByLang?: Record<string, ExamCardStats>;
   isLoggedIn?: boolean;
+  /** Languages to show — defaults to only those with exam questions */
+  languages?: string[];
 }
 
 export default function PracticeExamsSection({
@@ -17,8 +18,12 @@ export default function PracticeExamsSection({
   publicStatsByLang = {},
   statsByLang = {},
   isLoggedIn = false,
+  languages,
 }: Props) {
-  const slugs = getAllLanguageSlugs();
+  // Show only languages that actually have exam questions configured
+  const slugs = languages ?? Object.keys(examConfigByLang).filter(
+    (slug) => !!examConfigByLang[slug]
+  );
 
   return (
     <section aria-labelledby="certifications-heading">

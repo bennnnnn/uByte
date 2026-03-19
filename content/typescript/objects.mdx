@@ -1,0 +1,72 @@
+---
+title: "Objects"
+description: "Object types, index signatures, structural typing, object spread, and working with Object methods."
+order: 6
+difficulty: "beginner"
+estimatedMinutes: 18
+---
+
+## Object Type Annotations
+
+```typescript
+// Inline object type
+const user: { name: string; age: number } = { name: "Alice", age: 30 };
+
+// Type alias (preferred for reuse)
+type Point = { x: number; y: number };
+
+// Interface (preferred for object shapes used across multiple files)
+interface Config { host: string; port: number; }
+```
+
+---
+
+## Index Signatures — Dynamic Keys
+
+When you don't know the keys in advance:
+
+```typescript
+type StringMap = { [key: string]: string };
+type NumberMap = { [key: string]: number };
+
+const headers: StringMap = {
+  "Content-Type": "application/json",
+  "Authorization": "Bearer token123",
+};
+```
+
+---
+
+## Structural Typing
+
+TypeScript uses structural typing — if an object has the required shape, it satisfies the type:
+
+```typescript
+interface HasName { name: string; }
+
+function greet(x: HasName): string {
+  return `Hello, ${x.name}`;
+}
+
+// Any object with a name property works
+greet({ name: "Alice", age: 30 });  // ✓
+greet({ name: "Bob",   role: "admin" }); // ✓
+```
+
+---
+
+## Object Spread and Merge
+
+```typescript
+const defaults = { theme: "light", language: "en" };
+const overrides = { theme: "dark" };
+
+const merged = { ...defaults, ...overrides };
+// { theme: "dark", language: "en" }
+```
+
+---
+
+## What's Next?
+
+Next: **Interfaces** — defining reusable object shapes and contracts.

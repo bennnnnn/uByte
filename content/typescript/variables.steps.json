@@ -1,0 +1,100 @@
+[
+  {
+    "title": "const — the right default",
+    "instruction": "`const` is your default variable declaration. It signals that the binding won't change, which makes code easier to reason about and helps the compiler optimize.\n\nRun this and observe how const variables behave.",
+    "starter": "const appName = \"uByte\";\nconst version = 3;\nconst isProd = true;\n\nconsole.log(appName);\nconsole.log(version);\nconsole.log(isProd);",
+    "expectedOutput": ["uByte", "3", "true"],
+    "successMessage": "Three const declarations — TypeScript inferred `string`, `number`, and `boolean` without annotations. If you tried to reassign any of them, TypeScript would immediately error."
+  },
+  {
+    "title": "let — for values that change",
+    "instruction": "`let` is block-scoped and reassignable. Use it when a value needs to change — like a counter, a score, or a running total.\n\nSee how let tracks a changing score across multiple updates.",
+    "starter": "let score = 0;\nlet level = 1;\n\nscore += 100;\nscore += 50;\nlevel = 2;\nscore += 200;\n\nconsole.log(`Level: ${level}`);\nconsole.log(`Score: ${score}`);",
+    "expectedOutput": ["Level: 2", "Score: 350"],
+    "successMessage": "`let` allows reassignment — `score` changed three times. TypeScript still enforces the type: once TypeScript infers `score` as `number`, you can't assign a string to it."
+  },
+  {
+    "title": "Type annotations — be explicit when needed",
+    "instruction": "While TypeScript infers types from values, sometimes you need to annotate explicitly — especially when declaring a variable without immediately assigning a value.\n\nDeclare variables with and without annotations.",
+    "starter": "// Annotated\nlet username: string;\nlet loginCount: number;\nlet isVerified: boolean;\n\n// Now assign values\nusername = \"alice_dev\";\nloginCount = 42;\nisVerified = true;\n\nconsole.log(`${username} — logins: ${loginCount} — verified: ${isVerified}`);",
+    "expectedOutput": ["alice_dev — logins: 42 — verified: true"],
+    "successMessage": "When you declare without assigning, TypeScript can't infer the type — so you must annotate. Try assigning `loginCount = \"forty-two\"` and TypeScript would immediately tell you that's wrong."
+  },
+  {
+    "title": "Inference vs annotation — when to use each",
+    "instruction": "A common question: when should you annotate, when should you let TypeScript infer?\n\nRule: annotate when the type isn't obvious from the value, or when you're declaring without assigning. Let TypeScript infer everything else.",
+    "starter": "// Infer — value makes type obvious\nconst maxRetries = 3;\nconst defaultLanguage = \"go\";\nconst featureEnabled = false;\n\n// Annotate — return type of function isn't obvious at call site\nfunction getDiscount(tier: string): number {\n  if (tier === \"pro\") return 0.2;\n  if (tier === \"enterprise\") return 0.35;\n  return 0;\n}\n\nconst discount = getDiscount(\"pro\");\nconsole.log(`Max retries: ${maxRetries}`);\nconsole.log(`Discount: ${discount * 100}%`);",
+    "expectedOutput": ["Max retries: 3", "Discount: 20%"],
+    "successMessage": "Inference keeps code clean for obvious cases. Function return type annotation `: number` tells callers what to expect without reading the implementation."
+  },
+  {
+    "title": "const with objects — binding vs mutation",
+    "instruction": "`const` prevents reassigning the variable itself, but the object it points to can still be mutated. This trips up many beginners.\n\nSee the difference between binding immutability and value immutability.",
+    "starter": "const user = {\n  name: \"Alice\",\n  plan: \"free\",\n  xp: 0,\n};\n\n// Mutating the object is fine\nuser.xp += 100;\nuser.plan = \"pro\";\n\n// user = {};  // ← This would be a TypeScript error\n\nconsole.log(`${user.name}: ${user.plan}, ${user.xp} XP`);",
+    "expectedOutput": ["Alice: pro, 100 XP"],
+    "successMessage": "`const user` means the variable `user` always points to the same object. It doesn't mean the object is frozen. Use `Object.freeze()` or `Readonly<T>` if you need deep immutability."
+  },
+  {
+    "title": "const with arrays — same rule applies",
+    "instruction": "Arrays declared with `const` can still be pushed to, sorted, and modified. `const` only prevents reassigning the variable.\n\nBuild a todo list with a const array.",
+    "starter": "const todos: string[] = [];\n\ntodos.push(\"Learn TypeScript\");\ntodos.push(\"Build a project\");\ntodos.push(\"Get certified\");\n\ntodos.sort();\n\nconsole.log(`${todos.length} todos:`);\nfor (const todo of todos) {\n  console.log(`  - ${todo}`);\n}",
+    "expectedOutput": ["3 todos:", "  - Build a project", "  - Get certified", "  - Learn TypeScript"],
+    "successMessage": "`const todos` prevents `todos = []` (new array assignment) but not `todos.push()`. The annotation `string[]` ensures only strings can be added — `todos.push(42)` would be a type error."
+  },
+  {
+    "title": "Destructuring with const",
+    "instruction": "Destructuring lets you unpack values from objects and arrays into named variables. Combined with `const`, it's one of the most readable patterns in TypeScript.\n\nDestructure a user object and a coordinates array.",
+    "starter": "const user = {\n  id: 42,\n  name: \"Carol Davis\",\n  email: \"carol@company.com\",\n  role: \"admin\",\n};\n\nconst { name, role, email } = user;\n\nconst coordinates = [40.7128, -74.0060] as const;\nconst [lat, lng] = coordinates;\n\nconsole.log(`${name} (${role})`);\nconsole.log(`Email: ${email}`);\nconsole.log(`Location: ${lat}, ${lng}`);",
+    "expectedOutput": ["Carol Davis (admin)", "Email: carol@company.com", "Location: 40.7128, -74.006"],
+    "successMessage": "Destructuring creates named variables from object properties or array positions. TypeScript infers each variable's type from its source — `name` is `string`, `lat` is `number`."
+  },
+  {
+    "title": "Default values in destructuring",
+    "instruction": "When destructuring, you can provide default values for missing properties. This is a clean pattern for config objects with optional fields.\n\nDestructure a config object with sensible defaults.",
+    "starter": "interface Config {\n  host?: string;\n  port?: number;\n  debug?: boolean;\n  timeout?: number;\n}\n\nfunction connect(config: Config = {}) {\n  const {\n    host    = \"localhost\",\n    port    = 3000,\n    debug   = false,\n    timeout = 5000,\n  } = config;\n\n  console.log(`Connecting to ${host}:${port}`);\n  console.log(`Debug: ${debug}, Timeout: ${timeout}ms`);\n}\n\nconnect({ host: \"api.example.com\", port: 443 });\nconnect();",
+    "expectedOutput": ["Connecting to api.example.com:443", "Debug: false, Timeout: 5000ms", "Connecting to localhost:3000", "Debug: false, Timeout: 5000ms"],
+    "successMessage": "Default values in destructuring replace `undefined` (not `null`). The second call uses all defaults — a clean pattern for optional configuration."
+  },
+  {
+    "title": "Renaming during destructuring",
+    "instruction": "Destructuring lets you rename variables using `originalName: newName`. This is useful when the property name conflicts with an existing variable or when you want a more descriptive name.\n\nRename during destructuring to avoid naming conflicts.",
+    "starter": "const apiResponse = {\n  id: 1,\n  name: \"TypeScript Pro\",\n  price: 49.99,\n  currency: \"USD\",\n};\n\n// Rename 'name' to 'productName' to avoid shadowing\nconst { id: productId, name: productName, price, currency } = apiResponse;\n\nconsole.log(`Product ${productId}: ${productName}`);\nconsole.log(`Price: ${currency} ${price.toFixed(2)}`);",
+    "expectedOutput": ["Product 1: TypeScript Pro", "Price: USD 49.99"],
+    "successMessage": "`name: productName` reads as \"take `name` from the object and call the local variable `productName`\". Useful when the API uses generic names like `name` or `id` that you want to make more specific."
+  },
+  {
+    "title": "Rest syntax in destructuring",
+    "instruction": "The `...rest` syntax captures all remaining properties or elements that weren't individually destructured. It's perfect for separating \"known\" fields from \"everything else\".\n\nSeparate a user's core identity from their metadata.",
+    "starter": "const fullUser = {\n  id: 1,\n  name: \"Alice\",\n  email: \"alice@co.com\",\n  createdAt: \"2022-01-15\",\n  updatedAt: \"2024-01-01\",\n  lastLogin: \"2024-04-10\",\n  xp: 2850,\n  plan: \"pro\",\n};\n\nconst { id, name, email, ...metadata } = fullUser;\n\nconsole.log(`User: ${name} (${email})`);\nconsole.log(`ID: ${id}`);\nconsole.log(`Metadata keys: ${Object.keys(metadata).join(\", \")}`);",
+    "expectedOutput": ["User: Alice (alice@co.com)", "ID: 1", "Metadata keys: createdAt, updatedAt, lastLogin, xp, plan"],
+    "successMessage": "`...metadata` captures all remaining properties. This pattern is used when you want to split an object — e.g., separating the body of a user record from its audit fields."
+  },
+  {
+    "title": "Template literals — powerful string interpolation",
+    "instruction": "Template literals (backtick strings) enable multi-line strings and embedded expressions. They're far more readable than string concatenation.\n\nBuild a formatted report using template literals.",
+    "starter": "const report = {\n  title: \"Monthly Revenue\",\n  period: \"January 2024\",\n  revenue: 84320,\n  growth: 12.4,\n  topProduct: \"Enterprise Plan\",\n};\n\nconst summary = `\n=== ${report.title} ===\nPeriod:      ${report.period}\nRevenue:     $${report.revenue.toLocaleString()}\nGrowth:      ${report.growth}%\nTop product: ${report.topProduct}\n`.trim();\n\nconsole.log(summary);",
+    "expectedOutput": ["=== Monthly Revenue ===", "Period:      January 2024", "Revenue:     $84,320", "Growth:      12.4%", "Top product: Enterprise Plan"],
+    "successMessage": "Template literals can span multiple lines and embed any JavaScript expression inside `${}`. `.trim()` removes the leading/trailing newlines from the multiline string."
+  },
+  {
+    "title": "Nullish coalescing — safe defaults",
+    "instruction": "The `??` operator returns the right side when the left is `null` or `undefined` (but not `0` or `false`). This is safer than `||` for numeric/boolean defaults.\n\nSee the difference between `??` and `||` for default values.",
+    "starter": "interface UserProfile {\n  name: string;\n  bio?: string;\n  xp?: number;\n  isPremium?: boolean;\n}\n\nfunction displayProfile(user: UserProfile) {\n  const bio       = user.bio ?? \"No bio yet\";\n  const xp        = user.xp ?? 0;           // ?? keeps 0 as a valid value\n  const isPremium = user.isPremium ?? false;\n\n  console.log(`${user.name}: ${bio}`);\n  console.log(`XP: ${xp}, Premium: ${isPremium}`);\n}\n\ndisplayProfile({ name: \"Alice\", xp: 0, isPremium: false });\ndisplayProfile({ name: \"Bob\", bio: \"Senior Engineer\", xp: 2850, isPremium: true });",
+    "expectedOutput": ["Alice: No bio yet", "XP: 0, Premium: false", "Bob: Senior Engineer", "XP: 2850, Premium: true"],
+    "successMessage": "`??` treats `0` and `false` as real values (only `null`/`undefined` trigger the default). If you used `||`, Alice's `xp` of `0` would wrongly display as `0` via the fallback — both happen to be 0 here, but `false` for `isPremium` would become the fallback `false`, which is still correct but for the wrong reason."
+  },
+  {
+    "title": "Optional chaining — safe navigation",
+    "instruction": "Optional chaining `?.` short-circuits to `undefined` if the left side is `null` or `undefined`, instead of throwing. It's essential when working with data that may be partially populated.\n\nSafely navigate a deeply nested object.",
+    "starter": "interface Address {\n  street: string;\n  city: string;\n  country: string;\n}\n\ninterface User {\n  id: number;\n  name: string;\n  address?: Address;       // user may not have an address\n  employer?: {\n    name: string;\n    department?: string;   // department may be missing\n  };\n}\n\nfunction getUserLocation(user: User): string {\n  return user.address?.city ?? \"Unknown city\";\n}\n\nfunction getDepartment(user: User): string {\n  return user.employer?.department ?? \"No department\";\n}\n\nconst alice: User = {\n  id: 1, name: \"Alice\",\n  address: { street: \"123 Main St\", city: \"San Francisco\", country: \"USA\" },\n  employer: { name: \"TechCorp\" },\n};\n\nconst bob: User = { id: 2, name: \"Bob\" };\n\nconsole.log(`${alice.name}: ${getUserLocation(alice)}, ${getDepartment(alice)}`);\nconsole.log(`${bob.name}: ${getUserLocation(bob)}, ${getDepartment(bob)}`);",
+    "expectedOutput": ["Alice: San Francisco, No department", "Bob: Unknown city, No department"],
+    "successMessage": "`?.` prevents the dreaded `Cannot read properties of undefined`. Without it, `bob.address.city` would throw because `bob.address` is `undefined`. With `?.`, it safely returns `undefined` instead."
+  },
+  {
+    "title": "Type widening and narrowing with variables",
+    "instruction": "TypeScript widens types when you use `let` (the value might change) and narrows them when you use `const` (the value is fixed). This affects literal types.\n\nSee how `const` creates narrower types than `let`.",
+    "starter": "// const gives a literal type — TypeScript knows EXACTLY which value\nconst direction = \"north\";  // type: \"north\" (not just string)\nconst code = 404;           // type: 404 (not just number)\n\n// let gives a wider type — value might change\nlet status = \"pending\";     // type: string (could become anything)\nlet retries = 0;            // type: number\n\n// Practical: const literal types work as discriminants\ntype Direction = \"north\" | \"south\" | \"east\" | \"west\";\n\nfunction describeDirection(d: Direction): string {\n  if (d === \"north\" || d === \"south\") return `${d} (vertical)`;\n  return `${d} (horizontal)`;\n}\n\nconsole.log(describeDirection(direction));  // works because type is \"north\"\nconsole.log(`Status: ${status}`);\nconsole.log(`Retries: ${retries}`);",
+    "expectedOutput": ["north (vertical)", "Status: pending", "Retries: 0"],
+    "successMessage": "`const direction = \"north\"` has type `\"north\"` — a literal type. This is why it's accepted as a `Direction` without a cast. `let status = \"pending\"` has type `string` — too wide to use as a `Direction`."
+  }
+]

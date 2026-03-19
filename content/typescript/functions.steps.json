@@ -1,0 +1,100 @@
+[
+  {
+    "title": "Your first typed function",
+    "instruction": "A function with typed parameters and a return type is a **contract**: TypeScript checks every caller and every return statement against it.\n\nWrite a function that calculates compound interest.",
+    "starter": "function compoundInterest(\n  principal: number,\n  rate: number,\n  years: number\n): number {\n  return principal * Math.pow(1 + rate, years);\n}\n\nconst result = compoundInterest(10000, 0.07, 10);\nconsole.log(`$10,000 at 7% for 10 years: $${result.toFixed(2)}`);",
+    "expectedOutput": ["$10,000 at 7% for 10 years: $19671.51"],
+    "successMessage": "The function signature `(principal: number, rate: number, years: number): number` tells TypeScript — and every developer reading this code — exactly what goes in and what comes out. No documentation needed."
+  },
+  {
+    "title": "Arrow functions — concise syntax",
+    "instruction": "Arrow functions with type annotations are the standard for callbacks, transformations, and one-liners. The return type can often be inferred.\n\nRewrite the same calculation as an arrow function.",
+    "starter": "const formatCurrency = (amount: number, currency = \"USD\"): string =>\n  `${currency} ${amount.toFixed(2)}`;\n\nconst addTax = (price: number, taxRate: number): number =>\n  price * (1 + taxRate);\n\nconst prices = [29.99, 49.99, 99.99];\nconst taxed = prices.map(p => addTax(p, 0.1));\n\nfor (const price of taxed) {\n  console.log(formatCurrency(price));\n}",
+    "expectedOutput": ["USD 32.99", "USD 54.99", "USD 109.99"],
+    "successMessage": "Arrow functions are concise and work seamlessly with array methods like `.map()`. TypeScript infers the return type from the expression — no need to annotate `formatCurrency`'s return as `string`."
+  },
+  {
+    "title": "Default parameters — avoid undefined",
+    "instruction": "Default parameters provide fallback values when a caller doesn't pass an argument (or passes `undefined`). They're better than `||` for this purpose.\n\nBuild a pagination helper with sensible defaults.",
+    "starter": "function paginate(\n  total: number,\n  page: number = 1,\n  perPage: number = 20\n): { start: number; end: number; totalPages: number } {\n  const totalPages = Math.ceil(total / perPage);\n  const start = (page - 1) * perPage + 1;\n  const end = Math.min(page * perPage, total);\n  return { start, end, totalPages };\n}\n\nconst p1 = paginate(147);\nconsole.log(`Page 1: ${p1.start}-${p1.end} of 147 (${p1.totalPages} pages)`);\n\nconst p3 = paginate(147, 3);\nconsole.log(`Page 3: ${p3.start}-${p3.end} of 147`);\n\nconst small = paginate(147, 1, 10);\nconsole.log(`Page 1 (10/page): ${small.start}-${small.end} of 147 (${small.totalPages} pages)`);",
+    "expectedOutput": ["Page 1: 1-20 of 147 (8 pages)", "Page 3: 41-60 of 147", "Page 1 (10/page): 1-10 of 147 (15 pages)"],
+    "successMessage": "Default parameters make functions self-documenting and safe to call with partial arguments. The return type is inferred from the object literal — TypeScript knows exactly what `paginate()` returns."
+  },
+  {
+    "title": "Optional parameters — may or may not be provided",
+    "instruction": "Mark a parameter with `?` to make it optional. Inside the function, TypeScript knows it may be `undefined` and enforces you handle that case.\n\nBuild a logging function where context is optional.",
+    "starter": "function logEvent(\n  event: string,\n  userId?: number,\n  metadata?: Record<string, string>\n): void {\n  const user = userId ? `user:${userId}` : \"anonymous\";\n  const meta = metadata\n    ? ` [${Object.entries(metadata).map(([k, v]) => `${k}=${v}`).join(\", \")}]`\n    : \"\";\n  console.log(`[${user}] ${event}${meta}`);\n}\n\nlogEvent(\"page_view\");\nlogEvent(\"tutorial_start\", 42);\nlogEvent(\"purchase\", 42, { plan: \"pro\", period: \"annual\" });",
+    "expectedOutput": ["[anonymous] page_view", "[user:42] tutorial_start", "[user:42] purchase [plan=pro, period=annual]"],
+    "successMessage": "Optional parameters are `T | undefined` inside the function. TypeScript enforces you check `userId` before using it as a number. The `?` in the signature communicates intent to callers too."
+  },
+  {
+    "title": "Rest parameters — variable argument lists",
+    "instruction": "Rest parameters collect any number of arguments into a typed array. They must be the last parameter.\n\nBuild a stats function that accepts any number of scores.",
+    "starter": "function stats(...values: number[]): {\n  count: number;\n  sum: number;\n  min: number;\n  max: number;\n  avg: number;\n} {\n  const count = values.length;\n  const sum = values.reduce((a, b) => a + b, 0);\n  return {\n    count,\n    sum,\n    min: Math.min(...values),\n    max: Math.max(...values),\n    avg: Math.round(sum / count),\n  };\n}\n\nconst result = stats(88, 92, 79, 95, 84, 91, 78);\nconsole.log(`Count: ${result.count}`);\nconsole.log(`Range: ${result.min}–${result.max}`);\nconsole.log(`Average: ${result.avg}`);",
+    "expectedOutput": ["Count: 7", "Range: 78–95", "Average: 87"],
+    "successMessage": "Rest parameters collect all arguments into `number[]`. The caller can pass 1 argument or 100. TypeScript ensures every argument is a `number` — `stats(88, \"ninety\")` would error."
+  },
+  {
+    "title": "Function types — functions as values",
+    "instruction": "In TypeScript, functions are first-class values. You can describe a function's shape with a type, then pass functions around just like any other value.\n\nBuild a pipeline that applies multiple text transformations.",
+    "starter": "type TextTransformer = (text: string) => string;\n\nconst trim: TextTransformer       = s => s.trim();\nconst lowercase: TextTransformer  = s => s.toLowerCase();\nconst removeSpaces: TextTransformer = s => s.replace(/\\s+/g, \"-\");\nconst addPrefix = (prefix: string): TextTransformer => s => `${prefix}-${s}`;\n\nfunction pipeline(text: string, ...transformers: TextTransformer[]): string {\n  return transformers.reduce((s, fn) => fn(s), text);\n}\n\nconst raw = \"  TypeScript Tutorial  \";\nconst slug = pipeline(raw, trim, lowercase, removeSpaces, addPrefix(\"ts\"));\nconsole.log(slug);",
+    "expectedOutput": ["ts-typescript-tutorial"],
+    "successMessage": "`TextTransformer` is a function type. `addPrefix` returns a `TextTransformer` — a function that creates functions. This is the foundation of functional programming patterns in TypeScript."
+  },
+  {
+    "title": "Void return type — side-effect functions",
+    "instruction": "`void` means the function doesn't return a meaningful value. It's used for functions whose purpose is a side effect: logging, sending an event, updating state.\n\nBuild an event emitter pattern.",
+    "starter": "type EventHandler = (event: string, payload?: unknown) => void;\n\nconst handlers: EventHandler[] = [];\n\nfunction on(handler: EventHandler): void {\n  handlers.push(handler);\n}\n\nfunction emit(event: string, payload?: unknown): void {\n  for (const handler of handlers) {\n    handler(event, payload);\n  }\n}\n\non((event, payload) => {\n  console.log(`Event: ${event}`);\n  if (payload) console.log(`Payload: ${JSON.stringify(payload)}`);\n});\n\nemit(\"user.login\", { userId: 42, timestamp: \"2024-01-15\" });\nemit(\"page.view\");",
+    "expectedOutput": ["Event: user.login", "Payload: {\"userId\":42,\"timestamp\":\"2024-01-15\"}", "Event: page.view"],
+    "successMessage": "`void` explicitly signals this function is for side effects. Callers know not to use the return value. The `EventHandler` type makes every handler consistent — any deviation is a type error."
+  },
+  {
+    "title": "Overloads — multiple function signatures",
+    "instruction": "Sometimes a function behaves differently depending on its argument types. Function overloads let you define multiple signatures and TypeScript picks the right one.\n\nBuild a `format` function that formats differently based on the input type.",
+    "starter": "function format(value: number): string;\nfunction format(value: Date): string;\nfunction format(value: boolean): string;\nfunction format(value: number | Date | boolean): string {\n  if (typeof value === \"number\") {\n    return `$${value.toFixed(2)}`;\n  } else if (value instanceof Date) {\n    return value.toISOString().slice(0, 10);\n  } else {\n    return value ? \"Yes\" : \"No\";\n  }\n}\n\nconsole.log(format(49.99));\nconsole.log(format(new Date(\"2024-01-15\")));\nconsole.log(format(true));\nconsole.log(format(false));",
+    "expectedOutput": ["$49.99", "2024-01-15", "Yes", "No"],
+    "successMessage": "Overload signatures appear before the implementation signature. TypeScript uses the first matching overload — callers see clean, specific signatures, not the messy union type of the implementation."
+  },
+  {
+    "title": "Higher-order functions — functions that return functions",
+    "instruction": "A higher-order function either takes functions as parameters or returns a function. This pattern is everywhere in TypeScript — middleware, decorators, memoization.\n\nBuild a rate limiter using a higher-order function.",
+    "starter": "function rateLimit<T extends unknown[]>(\n  fn: (...args: T) => void,\n  limitMs: number\n): (...args: T) => void {\n  let lastCall = 0;\n  return (...args: T) => {\n    const now = Date.now();\n    if (now - lastCall >= limitMs) {\n      lastCall = now;\n      fn(...args);\n    } else {\n      console.log(`Rate limited — wait ${limitMs}ms between calls`);\n    }\n  };\n}\n\nfunction sendAlert(message: string): void {\n  console.log(`ALERT: ${message}`);\n}\n\nconst throttledAlert = rateLimit(sendAlert, 1000);\n\nthrottledAlert(\"Server is down!\");\nthrottledAlert(\"Still down!\");  // rate limited\nthrottledAlert(\"And again!\");   // rate limited",
+    "expectedOutput": ["ALERT: Server is down!", "Rate limited — wait 1000ms between calls", "Rate limited — wait 1000ms between calls"],
+    "successMessage": "`rateLimit` wraps any function and enforces a time gap between calls. The generic `T extends unknown[]` captures the parameter types of the wrapped function — so `throttledAlert` still expects a `string`."
+  },
+  {
+    "title": "Memoization — caching function results",
+    "instruction": "Memoization caches function results for expensive computations. It's a classic higher-order function pattern.\n\nBuild a generic memoize function.",
+    "starter": "function memoize<TArgs extends unknown[], TReturn>(\n  fn: (...args: TArgs) => TReturn\n): (...args: TArgs) => TReturn {\n  const cache = new Map<string, TReturn>();\n  return (...args: TArgs) => {\n    const key = JSON.stringify(args);\n    if (cache.has(key)) {\n      return cache.get(key)!;\n    }\n    const result = fn(...args);\n    cache.set(key, result);\n    return result;\n  };\n}\n\nfunction slowFibonacci(n: number): number {\n  if (n <= 1) return n;\n  return slowFibonacci(n - 1) + slowFibonacci(n - 2);\n}\n\nconst fastFib = memoize(slowFibonacci);\n\nconsole.log(fastFib(10));\nconsole.log(fastFib(15));\nconsole.log(fastFib(20));",
+    "expectedOutput": ["55", "610", "6765"],
+    "successMessage": "`memoize` works with any function. The generic `TArgs` and `TReturn` capture the wrapped function's exact types — `fastFib` still expects a `number` and returns a `number`."
+  },
+  {
+    "title": "Callbacks with typed parameters",
+    "instruction": "Array methods like `.map()`, `.filter()`, and `.reduce()` accept callbacks. When the array is typed, TypeScript knows the callback parameter type automatically.\n\nProcess a list of orders using typed callbacks.",
+    "starter": "interface Order {\n  id: string;\n  customerId: number;\n  product: string;\n  amount: number;\n  status: \"pending\" | \"paid\" | \"cancelled\";\n}\n\nconst orders: Order[] = [\n  { id: \"O1\", customerId: 1, product: \"Pro Plan\",    amount: 49,  status: \"paid\"      },\n  { id: \"O2\", customerId: 2, product: \"Starter\",     amount: 19,  status: \"pending\"   },\n  { id: \"O3\", customerId: 1, product: \"Enterprise\",  amount: 199, status: \"paid\"      },\n  { id: \"O4\", customerId: 3, product: \"Pro Plan\",    amount: 49,  status: \"cancelled\" },\n];\n\nconst paidOrders = orders.filter(o => o.status === \"paid\");\nconst revenue = paidOrders.reduce((sum, o) => sum + o.amount, 0);\nconst products = paidOrders.map(o => o.product);\n\nconsole.log(`Paid orders: ${paidOrders.length}`);\nconsole.log(`Revenue: $${revenue}`);\nconsole.log(`Products: ${products.join(\", \")}`);",
+    "expectedOutput": ["Paid orders: 2", "Revenue: $248", "Products: Pro Plan, Enterprise"],
+    "successMessage": "TypeScript infers the callback parameter type from the array — `o` is `Order` inside `.filter()`, `.map()`, and `.reduce()`. No annotations needed in the callbacks themselves."
+  },
+  {
+    "title": "Function composition",
+    "instruction": "Function composition chains multiple functions together so the output of one becomes the input of the next. It's a powerful pattern for building pipelines.\n\nCompose data transformation functions.",
+    "starter": "const double    = (n: number): number => n * 2;\nconst addOne    = (n: number): number => n + 1;\nconst square    = (n: number): number => n * n;\nconst toString  = (n: number): string => `Result: ${n}`;\n\n// Compose number transformers\nfunction compose<A, B, C, D>(\n  f: (a: A) => B,\n  g: (b: B) => C,\n  h: (c: C) => D\n): (a: A) => D {\n  return (a) => h(g(f(a)));\n}\n\nconst transform = compose(double, addOne, square);\n\nfor (const n of [1, 2, 3, 4, 5]) {\n  console.log(`${n} → double → +1 → square = ${transform(n)}`);\n}",
+    "expectedOutput": ["1 → double → +1 → square = 9", "2 → double → +1 → square = 25", "3 → double → +1 → square = 49", "4 → double → +1 → square = 81", "5 → double → +1 → square = 121"],
+    "successMessage": "`compose` chains three functions with precise types: `(A → B) → (B → C) → (C → D) → (A → D)`. TypeScript ensures the types line up — you can't compose `(number → string)` followed by `(number → number)` because the types don't match."
+  },
+  {
+    "title": "Async functions — returning Promises",
+    "instruction": "An `async` function always returns `Promise<T>`. TypeScript tracks the type inside the Promise so you know exactly what `await` will give you.\n\nWrite async functions that fetch and process data.",
+    "starter": "async function delay(ms: number): Promise<void> {\n  return new Promise(resolve => setTimeout(resolve, ms));\n}\n\nasync function fetchPrice(product: string): Promise<number> {\n  await delay(0); // simulate async\n  const prices: Record<string, number> = {\n    \"starter\":    19,\n    \"pro\":        49,\n    \"enterprise\": 199,\n  };\n  return prices[product] ?? 0;\n}\n\nasync function main(): Promise<void> {\n  const plans = [\"starter\", \"pro\", \"enterprise\"];\n  for (const plan of plans) {\n    const price = await fetchPrice(plan); // price is number, not Promise<number>\n    console.log(`${plan}: $${price}/mo`);\n  }\n}\n\nmain();",
+    "expectedOutput": ["starter: $19/mo", "pro: $49/mo", "enterprise: $199/mo"],
+    "successMessage": "Inside `main`, `await fetchPrice(plan)` unwraps `Promise<number>` to `number`. TypeScript knows this — `price` is typed as `number`, so `$${price}/mo` works perfectly without any casting."
+  },
+  {
+    "title": "never return type — exhaustive checks",
+    "instruction": "`never` is the type for values that should never occur. It's used in exhaustive switch statements to make TypeScript error if a new case is added but not handled.\n\nBuild a shape renderer with exhaustive type checking.",
+    "starter": "type Shape =\n  | { kind: \"circle\";    radius: number }\n  | { kind: \"square\";    side: number }\n  | { kind: \"rectangle\"; width: number; height: number };\n\nfunction assertNever(x: never): never {\n  throw new Error(`Unhandled case: ${JSON.stringify(x)}`);\n}\n\nfunction describe(shape: Shape): string {\n  switch (shape.kind) {\n    case \"circle\":    return `Circle with radius ${shape.radius}`;\n    case \"square\":    return `Square with side ${shape.side}`;\n    case \"rectangle\": return `Rectangle ${shape.width}×${shape.height}`;\n    default:          return assertNever(shape); // compile error if a case is missing\n  }\n}\n\nconst shapes: Shape[] = [\n  { kind: \"circle\",    radius: 5 },\n  { kind: \"square\",    side: 4 },\n  { kind: \"rectangle\", width: 6, height: 3 },\n];\n\nfor (const s of shapes) {\n  console.log(describe(s));\n}",
+    "expectedOutput": ["Circle with radius 5", "Square with side 4", "Rectangle 6×3"],
+    "successMessage": "If you add a new shape to the union but forget to add its `case`, TypeScript errors on the `default: assertNever(shape)` line — because `shape` would no longer be `never`. It's a compile-time guarantee of exhaustiveness."
+  }
+]

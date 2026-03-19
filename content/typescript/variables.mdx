@@ -1,0 +1,86 @@
+---
+title: "Variables"
+description: "Declaring variables with let, const, and var — and why TypeScript makes variable declarations safer."
+order: 2
+difficulty: "beginner"
+estimatedMinutes: 18
+---
+
+## The Three Ways to Declare Variables
+
+TypeScript inherits JavaScript's three keywords, but adds type safety to all of them.
+
+```typescript
+var   name = "Alice";   // function-scoped, hoisted — avoid
+let   age  = 30;        // block-scoped, reassignable
+const role = "admin";   // block-scoped, cannot be reassigned
+```
+
+**Rule of thumb:** Always reach for `const` first. Use `let` only when you need to reassign.
+
+---
+
+## const — Your Default Choice
+
+```typescript
+const MAX_RETRIES = 3;
+const appName = "uByte";
+const pi = 3.14159;
+
+// const prevents reassignment:
+// appName = "Other";  // Error: Cannot assign to 'appName' (const)
+
+// But objects/arrays declared with const are still mutable:
+const user = { name: "Alice", age: 30 };
+user.age = 31;  // ✓ — mutation of the object is allowed
+// user = {};   // ✗ — reassigning the binding is not
+```
+
+---
+
+## let — When You Need to Reassign
+
+```typescript
+let score = 0;
+score += 10;   // ✓
+score += 5;    // ✓
+
+let message: string;   // declared without value — type required
+message = "Hello!";    // assigned later
+```
+
+---
+
+## Type Annotations on Variables
+
+```typescript
+let firstName: string = "Alice";
+let age: number = 30;
+let isAdmin: boolean = true;
+let score: number;      // declared but not yet assigned
+
+// TypeScript infers when you initialize immediately:
+const city = "London";  // inferred as string
+const count = 42;       // inferred as number
+```
+
+---
+
+## Variable Scope
+
+```typescript
+function greet() {
+  const message = "Hello";   // scoped to this function
+  if (true) {
+    let inner = "World";     // scoped to the if block
+    console.log(message);    // ✓ outer scope is accessible
+  }
+  // console.log(inner);     // ✗ block-scoped, not visible here
+}
+```
+
+---
+
+## What's Next?
+
+Next: **Basic Types** — the full set of primitive types in TypeScript.

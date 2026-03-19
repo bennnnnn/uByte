@@ -1,0 +1,69 @@
+---
+title: "Arrays & Tuples"
+description: "Typed arrays, readonly arrays, tuples, and working with array methods in TypeScript."
+order: 5
+difficulty: "beginner"
+estimatedMinutes: 18
+---
+
+## Array Type Syntax
+
+Two equivalent ways to declare a typed array:
+
+```typescript
+let scores: number[] = [95, 87, 92];
+let names: Array<string> = ["Alice", "Bob"];
+```
+
+---
+
+## Readonly Arrays
+
+When an array shouldn't be modified after creation:
+
+```typescript
+const LANGUAGES: readonly string[] = ["go", "python", "typescript"];
+const CODES: ReadonlyArray<number> = [200, 201, 204, 400, 404, 500];
+
+// LANGUAGES.push("sql");  // Error: Property 'push' does not exist on type 'readonly string[]'
+```
+
+---
+
+## Tuples — Fixed-Length Typed Arrays
+
+Tuples have a fixed length where each position has a specific type:
+
+```typescript
+type Point = [number, number];
+type NamedPoint = [string, number, number];
+type Result<T> = [T, null] | [null, Error];
+
+const origin: Point = [0, 0];
+const labeled: NamedPoint = ["center", 0, 0];
+```
+
+---
+
+## Array Methods with Types
+
+TypeScript infers element types through array method chains:
+
+```typescript
+const products = [
+  { name: "Go",   price: 29 },
+  { name: "TS",   price: 49 },
+  { name: "Rust", price: 59 },
+];
+
+// map returns { name: string; discounted: number }[]
+const discounted = products
+  .filter(p => p.price > 30)
+  .map(p => ({ name: p.name, discounted: p.price * 0.8 }));
+```
+
+---
+
+## What's Next?
+
+Next: **Objects** — typed objects, index signatures, and structural typing.

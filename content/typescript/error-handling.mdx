@@ -1,0 +1,63 @@
+---
+title: "Error Handling"
+description: "try/catch with unknown errors, custom error classes, Result types, and building robust error handling patterns."
+order: 16
+difficulty: "intermediate"
+estimatedMinutes: 20
+---
+
+## The Problem: Errors Are Untyped
+
+TypeScript's `catch` blocks give you `unknown` — not `Error`. You must narrow the type before using it.
+
+```typescript
+try {
+  doSomethingRisky();
+} catch (error) {
+  // error is `unknown` — not Error!
+  if (error instanceof Error) {
+    console.error(error.message);  // safe
+  }
+}
+```
+
+---
+
+## Custom Error Classes
+
+```typescript
+class AppError extends Error {
+  constructor(
+    message: string,
+    public readonly code: string,
+    public readonly statusCode: number = 500
+  ) {
+    super(message);
+    this.name = "AppError";
+  }
+}
+
+class NotFoundError extends AppError {
+  constructor(resource: string, id: number) {
+    super(`${resource} ${id} not found`, "NOT_FOUND", 404);
+  }
+}
+```
+
+---
+
+## The Result Pattern
+
+Inspired by Rust — instead of throwing, return either a success or failure value:
+
+```typescript
+type Result<T, E = Error> =
+  | { ok: true;  value: T }
+  | { ok: false; error: E };
+```
+
+---
+
+## What's Next?
+
+You've completed the core TypeScript track. Explore **Advanced Types** for mapped types, conditional types, and template literal types.

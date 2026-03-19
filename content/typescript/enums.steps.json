@@ -1,23 +1,86 @@
 [
   {
-    "title": "String enums",
-    "instruction": "String enums assign explicit string values to each member. They're more readable than numeric enums in logs and APIs.\n\nRun this.",
-    "starter": "enum Status {\n  Pending  = \"PENDING\",\n  Active   = \"ACTIVE\",\n  Archived = \"ARCHIVED\",\n}\n\nfunction describe(s: Status): string {\n  switch (s) {\n    case Status.Pending:  return \"Waiting for review\";\n    case Status.Active:   return \"Currently active\";\n    case Status.Archived: return \"No longer active\";\n  }\n}\n\nconsole.log(Status.Active);\nconsole.log(describe(Status.Pending));\nconsole.log(describe(Status.Archived));",
-    "expectedOutput": ["ACTIVE", "Waiting for review", "No longer active"],
-    "successMessage": "String enums are the safest kind — they appear as readable strings in JSON and logs instead of opaque numbers."
+    "title": "String enums — readable constants",
+    "instruction": "String enums assign explicit string values to each member. They appear as readable strings in logs and JSON responses — far more useful than numeric enums.\n\nCreate an order status enum.",
+    "starter": "enum OrderStatus {\n  Pending   = \"PENDING\",\n  Processing= \"PROCESSING\",\n  Shipped   = \"SHIPPED\",\n  Delivered = \"DELIVERED\",\n  Cancelled = \"CANCELLED\",\n}\n\nfunction describe(status: OrderStatus): string {\n  switch (status) {\n    case OrderStatus.Pending:    return \"Awaiting confirmation\";\n    case OrderStatus.Processing: return \"Being prepared\";\n    case OrderStatus.Shipped:    return \"On the way\";\n    case OrderStatus.Delivered:  return \"Delivered!\";\n    case OrderStatus.Cancelled:  return \"Cancelled\";\n  }\n}\n\nconst statuses: OrderStatus[] = [\n  OrderStatus.Pending,\n  OrderStatus.Processing,\n  OrderStatus.Shipped,\n];\n\nfor (const s of statuses) {\n  console.log(`${s}: ${describe(s)}`);\n}",
+    "expectedOutput": ["PENDING: Awaiting confirmation", "PROCESSING: Being prepared", "SHIPPED: On the way"],
+    "successMessage": "String enum values appear as-is in logs and JSON. The `switch` statement is exhaustive — TypeScript knows every possible `OrderStatus` value, so there's no need for a `default` case."
   },
   {
-    "title": "Numeric enums",
-    "instruction": "Numeric enums auto-assign incrementing values starting at 0. They support reverse mapping — you can look up the name from the value.\n\nRun this.",
-    "starter": "enum Priority {\n  Low,    // 0\n  Medium, // 1\n  High,   // 2\n  Critical // 3\n}\n\nconst p: Priority = Priority.High;\nconsole.log(p);\nconsole.log(Priority[p]);\nconsole.log(Priority.Critical);",
-    "expectedOutput": ["2", "High", "3"],
-    "successMessage": "`Priority[p]` is reverse mapping — numeric enums compile a lookup object so you can go both ways."
+    "title": "Numeric enums — automatic values",
+    "instruction": "Numeric enums auto-assign incrementing values starting at 0. They support reverse mapping — you can look up the name from the value.\n\nBuild a severity level enum for logging.",
+    "starter": "enum LogLevel {\n  Debug   = 0,\n  Info    = 1,\n  Warning = 2,\n  Error   = 3,\n  Fatal   = 4,\n}\n\nlet currentLevel = LogLevel.Info;\n\nfunction log(level: LogLevel, message: string): void {\n  if (level >= currentLevel) {\n    const label = LogLevel[level];  // reverse mapping\n    console.log(`[${label}] ${message}`);\n  }\n}\n\nlog(LogLevel.Debug,   \"Variable x = 42\");       // filtered\nlog(LogLevel.Info,    \"Server started\");\nlog(LogLevel.Warning, \"High memory usage\");\nlog(LogLevel.Error,   \"Database timeout\");",
+    "expectedOutput": ["[Info] Server started", "[Warning] High memory usage", "[Error] Database timeout"],
+    "successMessage": "Numeric enum values can be compared with `>=`. Reverse mapping (`LogLevel[level]`) gives you the name from the number — only available with numeric enums, not string enums."
   },
   {
-    "title": "Enum in a function",
-    "instruction": "Use an enum as a parameter type to restrict what values can be passed.\n\nRun this.",
-    "starter": "enum Day {\n  Mon = \"Monday\",\n  Tue = \"Tuesday\",\n  Wed = \"Wednesday\",\n  Thu = \"Thursday\",\n  Fri = \"Friday\",\n}\n\nfunction isWeekend(day: Day): boolean {\n  return false; // all enum values are weekdays here\n}\n\nconst schedule: Day[] = [Day.Mon, Day.Wed, Day.Fri];\nfor (const day of schedule) {\n  console.log(`${day}: working`);\n}",
-    "expectedOutput": ["Monday: working", "Wednesday: working", "Friday: working"],
-    "successMessage": "The `Day` enum acts as a closed set — you can only pass valid enum members, not arbitrary strings."
+    "title": "Const enums — zero-overhead enums",
+    "instruction": "`const enum` is completely erased at compile time — TypeScript replaces every usage with the literal value. This eliminates the runtime object but removes reverse mapping.\n\nUse const enums for HTTP status codes.",
+    "starter": "const enum HttpStatus {\n  OK        = 200,\n  Created   = 201,\n  NoContent = 204,\n  BadReq    = 400,\n  NotFound  = 404,\n  ServerErr = 500,\n}\n\nfunction handleResponse(status: HttpStatus): string {\n  if (status >= 200 && status < 300) return \"Success\";\n  if (status >= 400 && status < 500) return \"Client error\";\n  return \"Server error\";\n}\n\nconsole.log(`200: ${handleResponse(HttpStatus.OK)}`);\nconsole.log(`201: ${handleResponse(HttpStatus.Created)}`);\nconsole.log(`404: ${handleResponse(HttpStatus.NotFound)}`);\nconsole.log(`500: ${handleResponse(HttpStatus.ServerErr)}`);",
+    "expectedOutput": ["200: Success", "201: Success", "404: Client error", "500: Server error"],
+    "successMessage": "Const enums compile to their literal values — `HttpStatus.OK` becomes `200` in the output. Zero runtime overhead. The trade-off: no reverse mapping and can't be used across package boundaries."
+  },
+  {
+    "title": "Enums vs union types — when to use each",
+    "instruction": "Many TypeScript teams prefer union types over enums for simplicity. Here's a comparison — when does each approach shine?\n\nCompare an enum vs a union type for the same use case.",
+    "starter": "// Approach 1: Enum\nenum DirectionEnum {\n  North = \"NORTH\",\n  South = \"SOUTH\",\n  East  = \"EAST\",\n  West  = \"WEST\",\n}\n\n// Approach 2: Union type (preferred by many teams)\ntype Direction = \"NORTH\" | \"SOUTH\" | \"EAST\" | \"WEST\";\n\n// Both work identically for type checking\nfunction moveEnum(dir: DirectionEnum): string {\n  return `Moving ${dir} (enum)`;\n}\n\nfunction moveUnion(dir: Direction): string {\n  return `Moving ${dir} (union)`;\n}\n\nconsole.log(moveEnum(DirectionEnum.North));\nconsole.log(moveUnion(\"NORTH\"));\n\n// Union advantage: works with string literals directly\n// Enum advantage: namespace prevents typos at the call site",
+    "expectedOutput": ["Moving NORTH (enum)", "Moving NORTH (union)"],
+    "successMessage": "Both work. Enum advantage: callers write `DirectionEnum.North` — no way to typo it. Union advantage: simpler, no extra syntax, `\"NORTH\"` is directly assignable. Most modern TypeScript uses union types for simple cases."
+  },
+  {
+    "title": "Enums as function parameters",
+    "instruction": "Enums serve as descriptive parameters that prevent magic strings or magic numbers. They make function calls self-documenting.\n\nBuild a report generator with enum parameters.",
+    "starter": "enum ReportFormat { PDF = \"PDF\", CSV = \"CSV\", JSON = \"JSON\" }\nenum DateRange { Today = \"TODAY\", Week = \"WEEK\", Month = \"MONTH\", Year = \"YEAR\" }\n\nfunction generateReport(\n  format: ReportFormat,\n  range: DateRange,\n  title: string\n): string {\n  return `[${format}] ${title} — ${range} report`;\n}\n\nconst reports = [\n  generateReport(ReportFormat.PDF,  DateRange.Month, \"Revenue\"),\n  generateReport(ReportFormat.CSV,  DateRange.Week,  \"Users\"),\n  generateReport(ReportFormat.JSON, DateRange.Year,  \"Analytics\"),\n];\n\nfor (const r of reports) {\n  console.log(r);\n}",
+    "expectedOutput": ["[PDF] Revenue — MONTH report", "[CSV] Users — WEEK report", "[JSON] Analytics — YEAR report"],
+    "successMessage": "Function calls read like English: `generateReport(ReportFormat.PDF, DateRange.Month, \"Revenue\")`. Swapping `format` and `range` would be a type error — both have different enum types even though they're both strings."
+  },
+  {
+    "title": "Enum member expressions",
+    "instruction": "Numeric enum members can be computed using bit flags. This is a classic pattern for representing combinations of options (like file permissions).\n\nBuild a permission system using bit-flag enums.",
+    "starter": "enum Permission {\n  None    = 0,\n  Read    = 1 << 0,  // 1\n  Write   = 1 << 1,  // 2\n  Execute = 1 << 2,  // 4\n  Admin   = Read | Write | Execute,  // 7\n}\n\nfunction hasPermission(userPerms: Permission, check: Permission): boolean {\n  return (userPerms & check) === check;\n}\n\nfunction describePermissions(perms: Permission): string {\n  const parts: string[] = [];\n  if (hasPermission(perms, Permission.Read))    parts.push(\"read\");\n  if (hasPermission(perms, Permission.Write))   parts.push(\"write\");\n  if (hasPermission(perms, Permission.Execute)) parts.push(\"execute\");\n  return parts.join(\", \") || \"none\";\n}\n\nconst viewer = Permission.Read;\nconst editor = Permission.Read | Permission.Write;\nconst admin  = Permission.Admin;\n\nconsole.log(`Viewer (${viewer}): ${describePermissions(viewer)}`);\nconsole.log(`Editor (${editor}): ${describePermissions(editor)}`);\nconsole.log(`Admin  (${admin}): ${describePermissions(admin)}`);\nconsole.log(`Editor can write: ${hasPermission(editor, Permission.Write)}`);",
+    "expectedOutput": ["Viewer (1): read", "Editor (3): read, write", "Admin  (7): read, write, execute", "Editor can write: true"],
+    "successMessage": "Bit flags let you combine permissions with `|` and check them with `&`. A single number can represent multiple permissions simultaneously — `3` (binary `11`) means read AND write."
+  },
+  {
+    "title": "Iterating over enum values",
+    "instruction": "You can iterate over a numeric enum's values, but it requires care because numeric enums have both forward and reverse mappings.\n\nIterate over enum values correctly.",
+    "starter": "enum Weekday {\n  Monday    = 1,\n  Tuesday   = 2,\n  Wednesday = 3,\n  Thursday  = 4,\n  Friday    = 5,\n}\n\n// Get only the string keys (filter out reverse-mapped numeric keys)\nconst weekdays = Object.values(Weekday)\n  .filter((v): v is Weekday => typeof v === \"number\") as Weekday[];\n\nfor (const day of weekdays) {\n  const name = Weekday[day];  // reverse mapping\n  const isHumpDay = day === Weekday.Wednesday;\n  console.log(`${name} (${day})${isHumpDay ? \" 🐪\" : \"\"}`);\n}",
+    "expectedOutput": ["Monday (1)", "Tuesday (2)", "Wednesday (3) 🐪", "Thursday (4)", "Friday (5)"],
+    "successMessage": "Numeric enums have reverse mappings — `Object.values()` returns both `1, 2, 3, 4, 5` AND `\"Monday\", \"Tuesday\", ...`. Filtering to only numbers gives you the enum values. String enums don't have this issue."
+  },
+  {
+    "title": "Ambient enums — working with external definitions",
+    "instruction": "When declaring types for external JavaScript code (like a third-party library), you use `declare enum` to describe enums that exist at runtime but weren't written in TypeScript.\n\nSimulate an ambient enum for an external library.",
+    "starter": "// Imagine this comes from a third-party JS library (already exists at runtime)\ndeclare enum ExternalStatus {\n  Active   = \"ACTIVE\",\n  Inactive = \"INACTIVE\",\n  Pending  = \"PENDING\",\n}\n\n// In practice, use a regular enum when you control the code\nenum Status {\n  Active   = \"ACTIVE\",\n  Inactive = \"INACTIVE\",\n  Pending  = \"PENDING\",\n}\n\ninterface Account {\n  id: number;\n  name: string;\n  status: Status;\n}\n\nconst accounts: Account[] = [\n  { id: 1, name: \"Alice\",  status: Status.Active   },\n  { id: 2, name: \"Bob\",    status: Status.Pending  },\n  { id: 3, name: \"Carol\",  status: Status.Inactive },\n];\n\nconst active = accounts.filter(a => a.status === Status.Active);\nconsole.log(`Active accounts: ${active.map(a => a.name).join(\", \")}`);\nconsole.log(`All statuses: ${accounts.map(a => a.status).join(\", \")}`);",
+    "expectedOutput": ["Active accounts: Alice", "All statuses: ACTIVE, PENDING, INACTIVE"],
+    "successMessage": "`declare enum` is used in `.d.ts` declaration files to describe enums from JavaScript libraries. At runtime, the enum object is provided by the library. TypeScript just adds type checking around it."
+  },
+  {
+    "title": "Enum in a class — bundling related constants",
+    "instruction": "Enums can be declared inside or alongside classes to bundle related constants. This creates a clean namespace.\n\nBuild a User class with an inline Status enum.",
+    "starter": "class User {\n  static readonly Status = {\n    Active:    \"active\",\n    Suspended: \"suspended\",\n    Deleted:   \"deleted\",\n  } as const;\n\n  type Status = typeof User.Status[keyof typeof User.Status];\n\n  constructor(\n    public readonly id: number,\n    public readonly name: string,\n    public status: string = User.Status.Active\n  ) {}\n\n  suspend(): void {\n    this.status = User.Status.Suspended;\n  }\n\n  describe(): string {\n    return `${this.name} [${this.status}]`;\n  }\n}\n\nconst alice = new User(1, \"Alice\");\nconst bob   = new User(2, \"Bob\");\n\nconsole.log(alice.describe());\nbob.suspend();\nconsole.log(bob.describe());\nconsole.log(`Alice active: ${alice.status === User.Status.Active}`);",
+    "expectedOutput": ["Alice [active]", "Bob [suspended]", "Alice active: true"],
+    "successMessage": "Bundling constants inside a class namespace prevents pollution of the global scope. `User.Status.Active` is more readable than a standalone `UserStatus.Active` enum. The `as const` makes the values literal types."
+  },
+  {
+    "title": "Enum exhaustiveness check",
+    "instruction": "One of the most powerful uses of enums is exhaustiveness checking — TypeScript can verify that every enum value is handled in a switch statement.\n\nBuild an action handler with exhaustive checking.",
+    "starter": "enum ActionType {\n  Increment = \"INCREMENT\",\n  Decrement = \"DECREMENT\",\n  Reset     = \"RESET\",\n  SetValue  = \"SET_VALUE\",\n}\n\ninterface Action {\n  type: ActionType;\n  payload?: number;\n}\n\nfunction reducer(state: number, action: Action): number {\n  switch (action.type) {\n    case ActionType.Increment: return state + 1;\n    case ActionType.Decrement: return state - 1;\n    case ActionType.Reset:     return 0;\n    case ActionType.SetValue:  return action.payload ?? state;\n    default: {\n      // This would error if a new ActionType was added but not handled\n      const exhaustive: never = action.type;\n      return state;\n    }\n  }\n}\n\nconst actions: Action[] = [\n  { type: ActionType.SetValue, payload: 10 },\n  { type: ActionType.Increment },\n  { type: ActionType.Increment },\n  { type: ActionType.Decrement },\n  { type: ActionType.Reset },\n];\n\nlet count = 0;\nfor (const action of actions) {\n  count = reducer(count, action);\n  console.log(`${action.type} → ${count}`);\n}",
+    "expectedOutput": ["SET_VALUE → 10", "INCREMENT → 11", "INCREMENT → 12", "DECREMENT → 11", "RESET → 0"],
+    "successMessage": "The `default: never` pattern ensures every `ActionType` value is handled. Add a new value to `ActionType` and forget to handle it — TypeScript errors on the `never` line. This is the Redux pattern, and it works perfectly with TypeScript enums."
+  },
+  {
+    "title": "Map with enum keys — type-safe lookup tables",
+    "instruction": "Using an enum as the key type in a `Map` or `Record` creates exhaustive lookup tables where TypeScript ensures every enum value has an entry.\n\nBuild a configuration table using enum keys.",
+    "starter": "enum Environment {\n  Development = \"development\",\n  Staging     = \"staging\",\n  Production  = \"production\",\n}\n\nconst envConfig: Record<Environment, {\n  apiUrl: string;\n  logLevel: string;\n  debug: boolean;\n}> = {\n  [Environment.Development]: {\n    apiUrl:   \"http://localhost:3000\",\n    logLevel: \"debug\",\n    debug:    true,\n  },\n  [Environment.Staging]: {\n    apiUrl:   \"https://staging.api.com\",\n    logLevel: \"info\",\n    debug:    false,\n  },\n  [Environment.Production]: {\n    apiUrl:   \"https://api.production.com\",\n    logLevel: \"error\",\n    debug:    false,\n  },\n};\n\nfor (const env of Object.values(Environment)) {\n  const config = envConfig[env];\n  console.log(`${env}: ${config.apiUrl} (${config.logLevel})`);\n}",
+    "expectedOutput": ["development: http://localhost:3000 (debug)", "staging: https://staging.api.com (info)", "production: https://api.production.com (error)"],
+    "successMessage": "`Record<Environment, Config>` requires a config entry for EVERY environment. Add a new `Environment.Testing` value and TypeScript immediately tells you to add its config. Zero chance of a missing environment."
+  },
+  {
+    "title": "Enum values as object keys with computed properties",
+    "instruction": "Enum members can be used as computed property names in object literals. This creates type-safe mappings between enum values and any data.\n\nMap enum values to icons and descriptions.",
+    "starter": "enum NotificationType {\n  Success = \"success\",\n  Warning = \"warning\",\n  Error   = \"error\",\n  Info    = \"info\",\n}\n\nconst notificationStyles: Record<NotificationType, { icon: string; color: string }> = {\n  [NotificationType.Success]: { icon: \"✅\", color: \"green\"  },\n  [NotificationType.Warning]: { icon: \"⚠️\", color: \"amber\"  },\n  [NotificationType.Error]:   { icon: \"❌\", color: \"red\"    },\n  [NotificationType.Info]:    { icon: \"ℹ️\", color: \"blue\"   },\n};\n\nfunction showNotification(type: NotificationType, message: string): void {\n  const style = notificationStyles[type];\n  console.log(`${style.icon} [${style.color.toUpperCase()}] ${message}`);\n}\n\nshowNotification(NotificationType.Success, \"File uploaded successfully\");\nshowNotification(NotificationType.Warning, \"Storage at 80% capacity\");\nshowNotification(NotificationType.Error,   \"Connection failed\");\nshowNotification(NotificationType.Info,    \"New version available\");",
+    "expectedOutput": ["✅ [GREEN] File uploaded successfully", "⚠️ [AMBER] Storage at 80% capacity", "❌ [RED] Connection failed", "ℹ️ [BLUE] New version available"],
+    "successMessage": "The `Record<NotificationType, { icon; color }>` requires all four notification types. Each maps to its own style. The icon emoji may render slightly differently depending on your environment."
   }
 ]

@@ -1,0 +1,93 @@
+[
+  {
+    "title": "Declaring typed arrays",
+    "instruction": "TypeScript infers the element type of an array from its initial values. Once inferred, only matching values can be added.\n\nCreate arrays of different types and explore their behavior.",
+    "starter": "const scores: number[] = [95, 87, 92, 78, 100];\nconst languages: string[] = [\"go\", \"typescript\", \"python\"];\nconst flags: boolean[] = [true, false, true, true];\n\n// scores.push(\"ninety\");  // ← Type error\n\nconsole.log(`Scores: ${scores.join(\", \")}`);\nconsole.log(`Languages: ${languages.join(\", \")}`);\nconsole.log(`Flags: ${flags.join(\", \")}`);",
+    "expectedOutput": ["Scores: 95, 87, 92, 78, 100", "Languages: go, typescript, python", "Flags: true, false, true, true"],
+    "successMessage": "Each array has a locked element type. Trying to push a `string` into a `number[]` is a compile-time error. This prevents a whole class of runtime bugs."
+  },
+  {
+    "title": "Array of objects — typed collections",
+    "instruction": "When an array holds objects, TypeScript enforces the shape of every element. This is one of the most common patterns in real applications.\n\nBuild a typed collection of users.",
+    "starter": "interface User {\n  id: number;\n  name: string;\n  role: \"admin\" | \"editor\" | \"viewer\";\n}\n\nconst users: User[] = [\n  { id: 1, name: \"Alice\", role: \"admin\"  },\n  { id: 2, name: \"Bob\",   role: \"editor\" },\n  { id: 3, name: \"Carol\", role: \"viewer\" },\n];\n\nconst admins = users.filter(u => u.role === \"admin\");\nconsole.log(`Total users: ${users.length}`);\nconsole.log(`Admins: ${admins.map(u => u.name).join(\", \")}`);\nconsole.log(`First user: ${users[0].name} (${users[0].role})`);",
+    "expectedOutput": ["Total users: 3", "Admins: Alice", "First user: Alice (admin)"],
+    "successMessage": "TypeScript knows every element of `users` is a `User`. Inside `.filter()` and `.map()`, TypeScript infers `u` is `User` automatically — giving you autocomplete and type checking in callbacks."
+  },
+  {
+    "title": "map — transform every element",
+    "instruction": "`.map()` transforms an array, creating a new array of the same length. TypeScript infers the return array's type from your callback's return type.\n\nTransform a price list into formatted strings.",
+    "starter": "interface Product {\n  id: number;\n  name: string;\n  price: number;\n}\n\nconst products: Product[] = [\n  { id: 1, name: \"Starter Plan\",    price: 19 },\n  { id: 2, name: \"Pro Plan\",        price: 49 },\n  { id: 3, name: \"Enterprise Plan\", price: 199 },\n];\n\nconst formatted = products.map(p => ({\n  label: p.name,\n  display: `$${p.price}/mo`,\n  annual: `$${(p.price * 12 * 0.8).toFixed(0)}/yr (20% off)`,\n}));\n\nfor (const item of formatted) {\n  console.log(`${item.label}: ${item.display} | ${item.annual}`);\n}",
+    "expectedOutput": ["Starter Plan: $19/mo | $182/yr (20% off)", "Pro Plan: $49/mo | $470/yr (20% off)", "Enterprise Plan: $199/mo | $1910/yr (20% off)"],
+    "successMessage": "`.map()` returns `{ label: string; display: string; annual: string }[]` — TypeScript infers the shape from the callback. You don't need to annotate it."
+  },
+  {
+    "title": "filter — select matching elements",
+    "instruction": "`.filter()` returns a new array containing only elements where the callback returns `true`. TypeScript preserves the element type in the filtered array.\n\nFilter orders by status and calculate totals.",
+    "starter": "interface Order {\n  id: string;\n  amount: number;\n  status: \"pending\" | \"paid\" | \"cancelled\";\n}\n\nconst orders: Order[] = [\n  { id: \"O1\", amount: 249, status: \"paid\"      },\n  { id: \"O2\", amount: 49,  status: \"pending\"   },\n  { id: \"O3\", amount: 199, status: \"paid\"      },\n  { id: \"O4\", amount: 99,  status: \"cancelled\" },\n  { id: \"O5\", amount: 149, status: \"paid\"      },\n];\n\nconst paid = orders.filter(o => o.status === \"paid\");\nconst revenue = paid.reduce((sum, o) => sum + o.amount, 0);\n\nconsole.log(`Total orders: ${orders.length}`);\nconsole.log(`Paid: ${paid.length}`);\nconsole.log(`Revenue: $${revenue}`);",
+    "expectedOutput": ["Total orders: 5", "Paid: 3", "Revenue: $597"],
+    "successMessage": "`paid` has type `Order[]` — the filter doesn't change the element type. If you use a type guard in the filter callback, TypeScript can narrow the element type of the result."
+  },
+  {
+    "title": "reduce — accumulate a result",
+    "instruction": "`.reduce()` accumulates a result by running a callback for each element. The accumulator type must be annotated when it differs from the element type.\n\nGroup orders by customer using reduce.",
+    "starter": "interface Order {\n  customerId: number;\n  product: string;\n  amount: number;\n}\n\nconst orders: Order[] = [\n  { customerId: 1, product: \"Pro Plan\",        amount: 49  },\n  { customerId: 2, product: \"Enterprise Plan\",  amount: 199 },\n  { customerId: 1, product: \"Support Add-on\",   amount: 29  },\n  { customerId: 3, product: \"Starter Plan\",     amount: 19  },\n  { customerId: 2, product: \"Training Package\", amount: 299 },\n];\n\nconst byCustomer = orders.reduce<Record<number, number>>((acc, order) => {\n  acc[order.customerId] = (acc[order.customerId] ?? 0) + order.amount;\n  return acc;\n}, {});\n\nfor (const [customerId, total] of Object.entries(byCustomer)) {\n  console.log(`Customer ${customerId}: $${total}`);\n}",
+    "expectedOutput": ["Customer 1: $78", "Customer 2: $498", "Customer 3: $19"],
+    "successMessage": "The `<Record<number, number>>` annotation tells TypeScript what type the accumulator starts as. Without it, TypeScript would infer `{}` (empty object type) and the type of the accumulator would be wrong."
+  },
+  {
+    "title": "find and findIndex — locate elements",
+    "instruction": "`.find()` returns the first matching element (or `undefined`). TypeScript knows the return type is `T | undefined`, forcing you to handle the not-found case.\n\nLook up users by ID and email.",
+    "starter": "interface User {\n  id: number;\n  name: string;\n  email: string;\n  plan: \"free\" | \"pro\";\n}\n\nconst users: User[] = [\n  { id: 1, name: \"Alice\", email: \"alice@co.com\", plan: \"pro\"  },\n  { id: 2, name: \"Bob\",   email: \"bob@co.com\",   plan: \"free\" },\n  { id: 3, name: \"Carol\", email: \"carol@co.com\", plan: \"pro\"  },\n];\n\nconst found = users.find(u => u.id === 2);\nconst missing = users.find(u => u.id === 99);\nconst proIdx = users.findIndex(u => u.plan === \"pro\");\n\nconsole.log(`Found: ${found?.name ?? \"not found\"}`);\nconsole.log(`Missing: ${missing?.name ?? \"not found\"}`);\nconsole.log(`First pro user index: ${proIdx}`);",
+    "expectedOutput": ["Found: Bob", "Missing: not found", "First pro user index: 0"],
+    "successMessage": "`find()` returns `User | undefined`. TypeScript forces you to handle `undefined` — that's why `?.` and `??` are needed. This prevents runtime errors when an element isn't found."
+  },
+  {
+    "title": "sort — sort in place with a comparator",
+    "instruction": "`.sort()` sorts an array in place. For non-string arrays, you must provide a comparator function. TypeScript ensures the comparator returns a number.\n\nSort users by name and by score.",
+    "starter": "interface Player {\n  name: string;\n  score: number;\n  level: number;\n}\n\nconst players: Player[] = [\n  { name: \"Charlie\", score: 1850, level: 5 },\n  { name: \"Alice\",   score: 2850, level: 8 },\n  { name: \"Bob\",     score: 1200, level: 3 },\n  { name: \"Diana\",   score: 3100, level: 9 },\n];\n\n// Sort by score descending (doesn't mutate original)\nconst leaderboard = [...players].sort((a, b) => b.score - a.score);\n\nconsole.log(\"Leaderboard:\");\nleaderboard.forEach((p, i) => {\n  console.log(`${i + 1}. ${p.name}: ${p.score} pts (lvl ${p.level})`);\n});",
+    "expectedOutput": ["Leaderboard:", "1. Diana: 3100 pts (lvl 9)", "2. Alice: 2850 pts (lvl 8)", "3. Charlie: 1850 pts (lvl 5)", "4. Bob: 1200 pts (lvl 3)"],
+    "successMessage": "`[...players]` creates a copy before sorting — `.sort()` mutates in place. The comparator `(a, b) => b.score - a.score` sorts descending. Positive result = b comes first."
+  },
+  {
+    "title": "flat and flatMap — working with nested arrays",
+    "instruction": "`.flat()` flattens nested arrays. `.flatMap()` combines map and flat in one step. Both are useful for working with API responses that contain nested data.\n\nFlatten a list of categories with their items.",
+    "starter": "interface Category {\n  name: string;\n  items: string[];\n}\n\nconst catalog: Category[] = [\n  { name: \"Frontend\",  items: [\"HTML\", \"CSS\", \"JavaScript\", \"TypeScript\"] },\n  { name: \"Backend\",   items: [\"Node.js\", \"Python\", \"Go\"]                 },\n  { name: \"Database\",  items: [\"SQL\", \"PostgreSQL\", \"Redis\"]              },\n];\n\n// All items in a flat list\nconst allItems = catalog.flatMap(cat => cat.items);\n\n// All items with their category\nconst tagged = catalog.flatMap(cat =>\n  cat.items.map(item => `${cat.name}/${item}`)\n);\n\nconsole.log(`Total items: ${allItems.length}`);\nconsole.log(`First 4: ${allItems.slice(0, 4).join(\", \")}`);\nconsole.log(`Tagged sample: ${tagged.slice(0, 3).join(\", \")}`);",
+    "expectedOutput": ["Total items: 10", "First 4: HTML, CSS, JavaScript, TypeScript", "Tagged sample: Frontend/HTML, Frontend/CSS, Frontend/JavaScript"],
+    "successMessage": "`.flatMap()` maps then flattens one level — cleaner than `.map().flat()`. TypeScript infers the result type from the callback return type."
+  },
+  {
+    "title": "Tuples — fixed-length typed arrays",
+    "instruction": "A tuple is an array where the length and type of each position are fixed. TypeScript enforces both the length and the type at each index.\n\nUse tuples to represent coordinates and key-value pairs.",
+    "starter": "type Point2D = [number, number];\ntype Point3D = [number, number, number];\ntype KeyValue = [string, number];\n\nconst origin: Point2D = [0, 0];\nconst location: Point2D = [40.7128, -74.0060];\nconst peak: Point3D = [37.3382, -121.8863, 1085];\n\n// Destructure tuples by position\nconst [lat, lng] = location;\nconst [x, y, z] = peak;\n\nconst entries: KeyValue[] = [[\"users\", 1247], [\"orders\", 384], [\"revenue\", 84320]];\n\nconsole.log(`Origin: (${origin[0]}, ${origin[1]})`);\nconsole.log(`Location: lat=${lat}, lng=${lng}`);\nconsole.log(`Peak altitude: ${z}m`);\nfor (const [key, value] of entries) {\n  console.log(`${key}: ${value}`);\n}",
+    "expectedOutput": ["Origin: (0, 0)", "Location: lat=40.7128, lng=-74.006", "Peak altitude: 1085", "users: 1247", "orders: 384", "revenue: 84320"],
+    "successMessage": "Tuples are destructured by position. `const [lat, lng] = location` gives `lat` and `lng` both type `number`. Position 0 and 1 of `Point2D` are both `number`, so both are correctly typed."
+  },
+  {
+    "title": "Readonly arrays — immutable collections",
+    "instruction": "`readonly T[]` prevents mutation — no push, pop, splice, or sort. Use it for constants and data that shouldn't change.\n\nCreate immutable configuration arrays.",
+    "starter": "const SUPPORTED_LANGUAGES: readonly string[] = [\n  \"go\", \"python\", \"typescript\", \"javascript\", \"java\", \"rust\", \"csharp\", \"sql\"\n];\n\nconst HTTP_SUCCESS_CODES: readonly number[] = [200, 201, 204];\nconst HTTP_ERROR_CODES: readonly number[] = [400, 401, 403, 404, 500];\n\n// SUPPORTED_LANGUAGES.push(\"ruby\");  // ← Error: Property 'push' does not exist\n\nfunction isValidLanguage(lang: string): boolean {\n  return SUPPORTED_LANGUAGES.includes(lang);\n}\n\nfunction isSuccessCode(code: number): boolean {\n  return HTTP_SUCCESS_CODES.includes(code);\n}\n\nconsole.log(`Valid: go=${isValidLanguage(\"go\")}, ruby=${isValidLanguage(\"ruby\")}`);\nconsole.log(`200 is success: ${isSuccessCode(200)}`);\nconsole.log(`Languages count: ${SUPPORTED_LANGUAGES.length}`);",
+    "expectedOutput": ["Valid: go=true, ruby=false", "200 is success: true", "Languages count: 8"],
+    "successMessage": "`readonly string[]` is assignable to `string[]` but not vice versa. Functions that only need to read can accept `readonly T[]`, ensuring they don't accidentally mutate their input."
+  },
+  {
+    "title": "Array spread and rest — combining arrays",
+    "instruction": "The spread operator `...` unpacks an array. It's used to combine arrays, pass array elements as arguments, and create copies.\n\nCombine and split arrays using spread.",
+    "starter": "const frontend = [\"HTML\", \"CSS\", \"JavaScript\"];\nconst backend  = [\"Node.js\", \"Python\", \"Go\"];\nconst devops   = [\"Docker\", \"Kubernetes\"];\n\n// Combine without mutating originals\nconst fullStack = [...frontend, \"TypeScript\", ...backend];\nconst allSkills = [...frontend, ...backend, ...devops];\n\n// Clone and modify\nconst updatedFrontend = [...frontend, \"TypeScript\", \"React\"];\n\nconsole.log(`Full stack (${fullStack.length}): ${fullStack.join(\", \")}`);\nconsole.log(`All skills (${allSkills.length}): ${allSkills.join(\", \")}`);\nconsole.log(`Updated frontend: ${updatedFrontend.join(\", \")}`);",
+    "expectedOutput": ["Full stack (7): HTML, CSS, JavaScript, TypeScript, Node.js, Python, Go", "All skills (8): HTML, CSS, JavaScript, Node.js, Python, Go, Docker, Kubernetes", "Updated frontend: HTML, CSS, JavaScript, TypeScript, React"],
+    "successMessage": "Spread creates new arrays without mutating the originals. TypeScript infers the combined array type — if arrays have different element types, TypeScript creates a union type array."
+  },
+  {
+    "title": "every and some — testing array conditions",
+    "instruction": "`.every()` returns true if ALL elements pass the test. `.some()` returns true if ANY element passes. Both short-circuit for performance.\n\nValidate a batch of form inputs.",
+    "starter": "interface FormField {\n  name: string;\n  value: string;\n  required: boolean;\n}\n\nconst fields: FormField[] = [\n  { name: \"username\", value: \"alice\",             required: true  },\n  { name: \"email\",    value: \"alice@example.com\",  required: true  },\n  { name: \"bio\",      value: \"\",                  required: false },\n  { name: \"website\", value: \"https://alice.dev\",  required: false },\n];\n\nconst allRequiredFilled = fields\n  .filter(f => f.required)\n  .every(f => f.value.trim() !== \"\");\n\nconst hasEmptyFields = fields.some(f => f.value.trim() === \"\");\n\nconst filledCount = fields.filter(f => f.value !== \"\").length;\n\nconsole.log(`Form valid: ${allRequiredFilled}`);\nconsole.log(`Has empty fields: ${hasEmptyFields}`);\nconsole.log(`Filled: ${filledCount}/${fields.length} fields`);",
+    "expectedOutput": ["Form valid: true", "Has empty fields: true", "Filled: 3/4 fields"],
+    "successMessage": "`.every()` checked all required fields — they're all filled, so the form is valid. `.some()` found the empty bio field. Both are often cleaner than manual loops."
+  },
+  {
+    "title": "Type guards with arrays — narrowing element types",
+    "instruction": "When an array contains a union type, you can use type guards inside array methods to narrow the type and work safely with specific variants.\n\nProcess a mixed array of different event types.",
+    "starter": "type LoginEvent  = { type: \"login\";  userId: number; timestamp: string };\ntype LogoutEvent = { type: \"logout\"; userId: number; timestamp: string };\ntype ErrorEvent  = { type: \"error\";  message: string; code: number };\n\ntype AppEvent = LoginEvent | LogoutEvent | ErrorEvent;\n\nconst events: AppEvent[] = [\n  { type: \"login\",  userId: 1, timestamp: \"2024-01-15T10:00:00Z\" },\n  { type: \"error\",  message: \"DB timeout\", code: 503 },\n  { type: \"login\",  userId: 2, timestamp: \"2024-01-15T10:01:00Z\" },\n  { type: \"logout\", userId: 1, timestamp: \"2024-01-15T10:30:00Z\" },\n  { type: \"error\",  message: \"Auth failed\", code: 401 },\n];\n\nconst logins = events.filter((e): e is LoginEvent => e.type === \"login\");\nconst errors = events.filter((e): e is ErrorEvent => e.type === \"error\");\n\nconsole.log(`Logins: ${logins.map(e => `user ${e.userId}`).join(\", \")}`);\nconsole.log(`Errors: ${errors.map(e => `${e.code} ${e.message}`).join(\" | \")}`);\nconsole.log(`Total events: ${events.length}`);",
+    "expectedOutput": ["Logins: user 1, user 2", "Errors: 503 DB timeout | 401 Auth failed", "Total events: 5"],
+    "successMessage": "The `(e): e is LoginEvent` return type annotation is a **type predicate** — it tells TypeScript that when the filter callback returns `true`, the element is `LoginEvent`. After filtering, `logins` is `LoginEvent[]`, giving you access to `.userId`."
+  }
+]

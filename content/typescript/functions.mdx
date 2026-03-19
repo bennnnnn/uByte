@@ -1,0 +1,77 @@
+---
+title: "Functions"
+description: "Typed function parameters, return types, overloads, rest parameters, and higher-order functions."
+order: 4
+difficulty: "beginner"
+estimatedMinutes: 20
+---
+
+## Basic Function Syntax
+
+```typescript
+function add(a: number, b: number): number {
+  return a + b;
+}
+```
+
+TypeScript checks both the **parameters** (what goes in) and the **return type** (what comes out).
+
+---
+
+## Arrow Functions
+
+```typescript
+const multiply = (a: number, b: number): number => a * b;
+
+// With a body:
+const greet = (name: string): string => {
+  return `Hello, ${name}!`;
+};
+```
+
+---
+
+## Optional and Default Parameters
+
+```typescript
+function createUser(name: string, role: string = "viewer", id?: number) {
+  return { id: id ?? Math.random(), name, role };
+}
+
+createUser("Alice");               // role = "viewer", id = random
+createUser("Bob", "admin");        // id = random
+createUser("Carol", "editor", 42); // all provided
+```
+
+---
+
+## Rest Parameters
+
+```typescript
+function sum(...numbers: number[]): number {
+  return numbers.reduce((total, n) => total + n, 0);
+}
+
+sum(1, 2, 3, 4, 5); // 15
+```
+
+---
+
+## Function Types
+
+```typescript
+type Transformer = (value: string) => string;
+
+const uppercase: Transformer = (s) => s.toUpperCase();
+const trim: Transformer = (s) => s.trim();
+
+function applyAll(str: string, ...fns: Transformer[]): string {
+  return fns.reduce((s, fn) => fn(s), str);
+}
+```
+
+---
+
+## What's Next?
+
+Next: **Arrays** — typed arrays, tuples, and array methods in TypeScript.

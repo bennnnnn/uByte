@@ -200,27 +200,62 @@ export default async function Home() {
         {/* Social proof — developer testimonials */}
         <TestimonialsStripDeferred />
 
-        {/* Languages */}
+        {/* Languages — tiered: featured top 4 + secondary grid */}
         <section aria-labelledby="languages-heading">
           <SectionHeading
             id="languages-heading"
             eyebrow="Languages"
             title="The languages that get you hired."
-            subtitle="Pick one and build real skills — guided tutorials, interview prep, and a verifiable certificate, every step of the way."
+            subtitle="From beginner to interview-ready. Pick a track and build real skills with guided tutorials, practice problems, and a verifiable certificate."
           />
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {languageEntries.map(({ slug, config }) => (
-              <LangCard
-                key={slug}
-                href={tutorialLangUrl(slug)}
-                icon={getLangIcon(slug)}
-                name={config.name}
-                badge={`${getTotalLessonCount(slug as SupportedLanguage)} lessons`}
-                description={config.seo.defaultDescription}
-                cta="View tutorials"
-              />
-            ))}
-          </div>
+
+          {/* Featured top row — most popular */}
+          {(() => {
+            const featuredSlugs = ["go", "python", "javascript", "typescript"];
+            const featured = languageEntries.filter(e => featuredSlugs.includes(e.slug));
+            const others   = languageEntries.filter(e => !featuredSlugs.includes(e.slug));
+            const newLangs = new Set(["typescript", "sql"]);
+            return (
+              <>
+                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                  {featured.map(({ slug, config }) => {
+                    const lessonCount = getTotalLessonCount(slug as SupportedLanguage);
+                    const badge = newLangs.has(slug) ? "New" : `${lessonCount} lessons`;
+                    return (
+                      <LangCard
+                        key={slug}
+                        href={tutorialLangUrl(slug)}
+                        icon={getLangIcon(slug)}
+                        name={config.name}
+                        badge={badge}
+                        description={config.seo.defaultDescription}
+                        cta="Start learning"
+                      />
+                    );
+                  })}
+                </div>
+
+                {/* Secondary row — other languages */}
+                <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+                  {others.map(({ slug, config }) => {
+                    const lessonCount = getTotalLessonCount(slug as SupportedLanguage);
+                    const badge = newLangs.has(slug) ? "New" : `${lessonCount} lessons`;
+                    return (
+                      <LangCard
+                        key={slug}
+                        href={tutorialLangUrl(slug)}
+                        icon={getLangIcon(slug)}
+                        name={config.name}
+                        badge={badge}
+                        description={config.seo.defaultDescription}
+                        cta="Explore"
+                      />
+                    );
+                  })}
+                </div>
+              </>
+            );
+          })()}
         </section>
 
         {/* Popular languages — sorted by real learner count */}

@@ -1,0 +1,93 @@
+[
+  {
+    "title": "Object types — shape your data",
+    "instruction": "In TypeScript, every object has a type that describes its shape. The most direct way is an inline type annotation — but for objects you'll use more than once, a `type` or `interface` is cleaner.\n\nCreate typed objects for a product catalog.",
+    "starter": "type Product = {\n  id: number;\n  name: string;\n  price: number;\n  inStock: boolean;\n};\n\nconst keyboard: Product = {\n  id: 1,\n  name: \"Mechanical Keyboard\",\n  price: 129.99,\n  inStock: true,\n};\n\nconst mouse: Product = {\n  id: 2,\n  name: \"Wireless Mouse\",\n  price: 49.99,\n  inStock: false,\n};\n\nconsole.log(`${keyboard.name}: $${keyboard.price} (${keyboard.inStock ? \"in stock\" : \"out of stock\"})`);\nconsole.log(`${mouse.name}: $${mouse.price} (${mouse.inStock ? \"in stock\" : \"out of stock\"})`);",
+    "expectedOutput": ["Mechanical Keyboard: $129.99 (in stock)", "Wireless Mouse: $49.99 (out of stock)"],
+    "successMessage": "Both objects satisfy the `Product` type. TypeScript checks that every required field is present with the correct type. Missing a field or getting a type wrong is immediately an error."
+  },
+  {
+    "title": "Structural typing — shape matters, name doesn't",
+    "instruction": "TypeScript uses **structural typing** — a value satisfies a type if it has the right shape, regardless of how it was created. This is different from Java/C# where you must explicitly declare that you implement an interface.\n\nSee structural typing in action.",
+    "starter": "interface Printable {\n  toString(): string;\n}\n\ninterface HasArea {\n  area(): number;\n}\n\nfunction printArea(shape: HasArea & Printable): void {\n  console.log(`${shape.toString()} has area ${shape.area().toFixed(2)}`);\n}\n\n// No explicit 'implements' needed — shape matches\nconst circle = {\n  radius: 5,\n  area()     { return Math.PI * this.radius ** 2; },\n  toString() { return `Circle(r=${this.radius})`; },\n};\n\nconst rectangle = {\n  width: 4,\n  height: 6,\n  area()     { return this.width * this.height; },\n  toString() { return `Rectangle(${this.width}×${this.height})`; },\n};\n\nprintArea(circle);\nprintArea(rectangle);",
+    "expectedOutput": ["Circle(r=5) has area 78.54", "Rectangle(4×6) has area 24.00"],
+    "successMessage": "Neither `circle` nor `rectangle` explicitly implements anything — they just happen to have the right methods. TypeScript checks the shape at compile time. This is called 'duck typing': if it walks like a duck and quacks like a duck, it is a duck."
+  },
+  {
+    "title": "Index signatures — dynamic key-value maps",
+    "instruction": "When you need an object with dynamic keys (you don't know the keys in advance), use an index signature `[key: string]: ValueType`.\n\nBuild a cache and a settings store using index signatures.",
+    "starter": "type Cache = { [key: string]: string };\ntype Metrics = { [key: string]: number };\n\nconst requestCache: Cache = {};\nconst pageMetrics: Metrics = {};\n\n// Add dynamic keys\nrequestCache[\"user:1\"] = JSON.stringify({ name: \"Alice\" });\nrequestCache[\"user:2\"] = JSON.stringify({ name: \"Bob\" });\n\npageMetrics[\"/home\"]     = 1247;\npageMetrics[\"/pricing\"]  = 834;\npageMetrics[\"/tutorial\"] = 3891;\n\nconsole.log(`Cache size: ${Object.keys(requestCache).length}`);\nconsole.log(`Most visited: ${Object.entries(pageMetrics).sort(([,a],[,b]) => b-a)[0][0]}`);\nconsole.log(requestCache[\"user:1\"]);",
+    "expectedOutput": ["Cache size: 2", "Most visited: /tutorial", "{\"name\":\"Alice\"}"],
+    "successMessage": "Index signatures allow any string key. The value type is enforced — `pageMetrics[\"/home\"] = \"many\"` would be a type error. `Object.entries()` returns `[string, number][]` because TypeScript knows the value type."
+  },
+  {
+    "title": "Object spread — merge and override",
+    "instruction": "The spread operator `...` creates new objects by merging existing ones. Later properties override earlier ones. TypeScript infers the merged type.\n\nBuild a configuration merge system.",
+    "starter": "interface AppConfig {\n  apiUrl: string;\n  timeout: number;\n  debug: boolean;\n  maxRetries: number;\n  version: string;\n}\n\nconst defaults: AppConfig = {\n  apiUrl:     \"http://localhost:3000\",\n  timeout:    5000,\n  debug:      false,\n  maxRetries: 3,\n  version:    \"1.0.0\",\n};\n\nconst production: Partial<AppConfig> = {\n  apiUrl: \"https://api.production.com\",\n  debug:  false,\n};\n\nconst development: Partial<AppConfig> = {\n  debug:   true,\n  timeout: 30000,\n};\n\nconst prodConfig  = { ...defaults, ...production };\nconst devConfig   = { ...defaults, ...development };\n\nconsole.log(`Prod: ${prodConfig.apiUrl} (debug=${prodConfig.debug})`);\nconsole.log(`Dev:  ${devConfig.apiUrl} (debug=${devConfig.debug}, timeout=${devConfig.timeout})ms`);",
+    "expectedOutput": ["Prod: https://api.production.com (debug=false)", "Dev:  http://localhost:3000 (debug=true, timeout=30000)ms"],
+    "successMessage": "Spread merges objects — later properties win. `devConfig` keeps the default `apiUrl` because `development` doesn't override it. This pattern is everywhere in configuration management."
+  },
+  {
+    "title": "Nested objects — complex data shapes",
+    "instruction": "Objects can be nested. TypeScript tracks types at every level — you get autocomplete and type checking even deep inside nested structures.\n\nModel an e-commerce order with nested data.",
+    "starter": "interface Address {\n  street: string;\n  city: string;\n  country: string;\n  zip: string;\n}\n\ninterface OrderItem {\n  productId: number;\n  name: string;\n  qty: number;\n  unitPrice: number;\n}\n\ninterface Order {\n  id: string;\n  customer: { id: number; name: string; email: string };\n  shippingAddress: Address;\n  items: OrderItem[];\n  status: \"pending\" | \"shipped\" | \"delivered\";\n}\n\nconst order: Order = {\n  id: \"ORD-2024-001\",\n  customer:        { id: 42, name: \"Alice Chen\", email: \"alice@co.com\" },\n  shippingAddress: { street: \"123 Main St\", city: \"San Francisco\", country: \"USA\", zip: \"94105\" },\n  items: [\n    { productId: 1, name: \"Pro Plan\",    qty: 1, unitPrice: 49  },\n    { productId: 2, name: \"Support\",     qty: 1, unitPrice: 29  },\n  ],\n  status: \"pending\",\n};\n\nconst total = order.items.reduce((sum, item) => sum + item.qty * item.unitPrice, 0);\nconsole.log(`Order ${order.id}: ${order.customer.name}`);\nconsole.log(`Ship to: ${order.shippingAddress.city}, ${order.shippingAddress.country}`);\nconsole.log(`Items: ${order.items.length}, Total: $${total}`);",
+    "expectedOutput": ["Order ORD-2024-001: Alice Chen", "Ship to: San Francisco, USA", "Items: 2, Total: $78"],
+    "successMessage": "TypeScript tracks types through every level of nesting. `order.customer.email` is `string`, `order.items[0].unitPrice` is `number` — no manual type checks needed at any depth."
+  },
+  {
+    "title": "Object.keys, entries, values — iterate safely",
+    "instruction": "`Object.keys()`, `Object.values()`, and `Object.entries()` let you iterate over an object's properties. TypeScript types these returns carefully.\n\nBuild a settings inspector using Object methods.",
+    "starter": "const settings = {\n  theme:         \"dark\",\n  language:      \"en\",\n  notifications: \"enabled\",\n  fontSize:      \"16\",\n  timezone:      \"America/Los_Angeles\",\n};\n\n// keys returns string[]\nconst keys = Object.keys(settings);\n\n// values returns string[]\nconst values = Object.values(settings);\n\n// entries returns [string, string][]\nconst entries = Object.entries(settings);\n\nconsole.log(`Settings count: ${keys.length}`);\nconsole.log(\"All settings:\");\nfor (const [key, value] of entries) {\n  console.log(`  ${key}: ${value}`);\n}",
+    "expectedOutput": ["Settings count: 5", "All settings:", "  theme: dark", "  language: en", "  notifications: enabled", "  fontSize: 16", "  timezone: America/Los_Angeles"],
+    "successMessage": "`Object.entries()` returns `[string, string][]` here — TypeScript infers the value type from the object. The key type is always `string` (TypeScript's limitation — keys are always widened to `string`)."
+  },
+  {
+    "title": "Computed property names — dynamic keys",
+    "instruction": "Square bracket notation lets you create objects with dynamic key names. Combined with TypeScript, you can create type-safe lookup maps.\n\nBuild a dynamic response code registry.",
+    "starter": "type HttpMethod = \"GET\" | \"POST\" | \"PUT\" | \"DELETE\" | \"PATCH\";\n\nconst methods: HttpMethod[] = [\"GET\", \"POST\", \"PUT\", \"DELETE\", \"PATCH\"];\n\n// Build a lookup object with computed property names\nconst methodDescriptions: Record<HttpMethod, string> = {\n  GET:    \"Retrieve a resource\",\n  POST:   \"Create a resource\",\n  PUT:    \"Replace a resource\",\n  DELETE: \"Remove a resource\",\n  PATCH:  \"Partially update a resource\",\n};\n\n// Build from array using computed names\nconst methodCodes: Record<HttpMethod, number> = {\n  GET: 200, POST: 201, PUT: 200, DELETE: 204, PATCH: 200,\n};\n\nfor (const method of methods) {\n  console.log(`${method} (${methodCodes[method]}): ${methodDescriptions[method]}`);\n}",
+    "expectedOutput": ["GET (200): Retrieve a resource", "POST (201): Create a resource", "PUT (200): Replace a resource", "DELETE (204): Remove a resource", "PATCH (200): Partially update a resource"],
+    "successMessage": "`Record<HttpMethod, string>` ensures every method in the union has an entry. Add `\"OPTIONS\"` to the `HttpMethod` union and TypeScript immediately tells you to add it to both records."
+  },
+  {
+    "title": "Object.assign — merge with type safety",
+    "instruction": "`Object.assign()` merges objects in place. TypeScript infers the result type. However, spread syntax is generally preferred for its clarity and immutability.\n\nCompare Object.assign with spread syntax.",
+    "starter": "interface UserProfile {\n  id: number;\n  name: string;\n  plan: string;\n  xp: number;\n}\n\nconst base: UserProfile = { id: 1, name: \"Alice\", plan: \"free\", xp: 0 };\n\n// Object.assign mutates the target\nconst upgraded = Object.assign({}, base, { plan: \"pro\", xp: 500 });\n\n// Spread (preferred — clearer intent, always creates a new object)\nconst promoted = { ...base, plan: \"enterprise\", xp: 2000 };\n\nconsole.log(`Original: ${base.plan}, ${base.xp} XP`);\nconsole.log(`Upgraded: ${upgraded.plan}, ${upgraded.xp} XP`);\nconsole.log(`Promoted: ${promoted.plan}, ${promoted.xp} XP`);",
+    "expectedOutput": ["Original: free, 0 XP", "Upgraded: pro, 500 XP", "Promoted: enterprise, 2000 XP"],
+    "successMessage": "Both `Object.assign({}, ...)` and spread `{ ...base, ... }` produce a new object. Prefer spread — it's more readable and the intent is clearer. Note: `base` was not mutated because we passed `{}` as the target."
+  },
+  {
+    "title": "Destructuring objects from function returns",
+    "instruction": "Functions that return objects can be destructured at the call site. This is the standard pattern for returning multiple values from a function.\n\nBuild a validator that returns both a result and an error.",
+    "starter": "interface ValidationResult {\n  isValid: boolean;\n  errors: string[];\n  sanitized?: string;\n}\n\nfunction validateEmail(input: string): ValidationResult {\n  const errors: string[] = [];\n  const trimmed = input.trim().toLowerCase();\n\n  if (!trimmed.includes(\"@\")) errors.push(\"Missing @ symbol\");\n  if (!trimmed.includes(\".\")) errors.push(\"Missing domain extension\");\n  if (trimmed.length < 5)    errors.push(\"Too short\");\n\n  return {\n    isValid:   errors.length === 0,\n    errors,\n    sanitized: errors.length === 0 ? trimmed : undefined,\n  };\n}\n\nconst { isValid: v1, errors: e1, sanitized: s1 } = validateEmail(\" Alice@Example.COM \");\nconst { isValid: v2, errors: e2 } = validateEmail(\"notanemail\");\n\nconsole.log(`Valid: ${v1}, sanitized: ${s1}`);\nconsole.log(`Invalid: ${v2}, errors: ${e2.join(\", \")}`);",
+    "expectedOutput": ["Valid: true, sanitized: alice@example.com", "Invalid: false, errors: Missing @ symbol, Missing domain extension"],
+    "successMessage": "Destructuring with renaming (`isValid: v1`) lets you avoid name conflicts when calling the validator multiple times. TypeScript knows each destructured variable's exact type."
+  },
+  {
+    "title": "Freezing objects — true runtime immutability",
+    "instruction": "`Object.freeze()` prevents runtime mutation. When combined with `as const`, TypeScript also makes the type fully immutable (literal types, not just `readonly`).\n\nCreate truly immutable configuration objects.",
+    "starter": "const STATUS_CODES = Object.freeze({\n  OK:                  200,\n  CREATED:             201,\n  NO_CONTENT:          204,\n  BAD_REQUEST:         400,\n  UNAUTHORIZED:        401,\n  FORBIDDEN:           403,\n  NOT_FOUND:           404,\n  INTERNAL_ERROR:      500,\n} as const);\n\n// STATUS_CODES.OK = 999;  // ← Runtime error AND TypeScript error\n\ntype StatusCode = typeof STATUS_CODES[keyof typeof STATUS_CODES];\n\nfunction getStatusMessage(code: StatusCode): string {\n  const messages: Record<StatusCode, string> = {\n    200: \"OK\", 201: \"Created\", 204: \"No Content\",\n    400: \"Bad Request\", 401: \"Unauthorized\",\n    403: \"Forbidden\", 404: \"Not Found\", 500: \"Internal Server Error\",\n  };\n  return messages[code];\n}\n\nconsole.log(getStatusMessage(200));\nconsole.log(getStatusMessage(404));\nconsole.log(getStatusMessage(500));",
+    "expectedOutput": ["OK", "Not Found", "Internal Server Error"],
+    "successMessage": "`as const` narrows all values to their literal types — `OK` is `200` not `number`. `StatusCode` becomes the union `200 | 201 | 204 | 400 | 401 | 403 | 404 | 500`. The `Record<StatusCode, string>` ensures all codes are handled."
+  },
+  {
+    "title": "Pick specific properties with object spread",
+    "instruction": "You can extract specific properties from an object without destructuring the rest. This is useful when preparing data for APIs that only need certain fields.\n\nExtract public fields from a user object.",
+    "starter": "interface InternalUser {\n  id: number;\n  name: string;\n  email: string;\n  passwordHash: string;\n  sessionToken: string;\n  lastIp: string;\n  createdAt: string;\n}\n\nfunction toPublicProfile(user: InternalUser) {\n  const { passwordHash, sessionToken, lastIp, ...publicFields } = user;\n  void passwordHash; void sessionToken; void lastIp; // explicitly unused\n  return publicFields;\n}\n\nconst user: InternalUser = {\n  id: 1, name: \"Alice Chen\", email: \"alice@co.com\",\n  passwordHash: \"$2b$10$...\", sessionToken: \"tok_xyz\",\n  lastIp: \"192.168.1.1\", createdAt: \"2022-01-15\",\n};\n\nconst profile = toPublicProfile(user);\nconsole.log(`Name: ${profile.name}`);\nconsole.log(`Email: ${profile.email}`);\nconsole.log(`Created: ${profile.createdAt}`);\nconsole.log(`Fields: ${Object.keys(profile).join(\", \")}`);",
+    "expectedOutput": ["Name: Alice Chen", "Email: alice@co.com", "Created: 2022-01-15", "Fields: id, name, email, createdAt"],
+    "successMessage": "Destructuring with `...rest` splits the sensitive fields from the safe ones. `toPublicProfile` cannot accidentally include `passwordHash` because it's destructured out — TypeScript's type system mirrors this safety."
+  },
+  {
+    "title": "Object type guards — narrow at runtime",
+    "instruction": "A type guard function checks an object's shape at runtime. TypeScript narrows the type after the check, giving you safe access to specific properties.\n\nWrite type guards for different API response shapes.",
+    "starter": "interface SuccessResponse {\n  success: true;\n  data: unknown;\n  count: number;\n}\n\ninterface ErrorResponse {\n  success: false;\n  error: string;\n  code: number;\n}\n\ntype ApiResponse = SuccessResponse | ErrorResponse;\n\nfunction isSuccess(r: ApiResponse): r is SuccessResponse {\n  return r.success === true;\n}\n\nfunction handleResponse(response: ApiResponse): void {\n  if (isSuccess(response)) {\n    console.log(`Success: ${response.count} items returned`);\n  } else {\n    console.log(`Error ${response.code}: ${response.error}`);\n  }\n}\n\nhandleResponse({ success: true,  data: [],          count: 42 });\nhandleResponse({ success: false, error: \"Not found\", code: 404 });\nhandleResponse({ success: true,  data: { id: 1 },   count: 1  });",
+    "expectedOutput": ["Success: 42 items returned", "Error 404: Not found", "Success: 1 items returned"],
+    "successMessage": "Inside `if (isSuccess(response))`, TypeScript narrows `response` to `SuccessResponse` — `.count` is accessible. In the `else` branch, it's `ErrorResponse` — `.error` and `.code` are accessible. Perfect type safety."
+  },
+  {
+    "title": "Satisfies operator — validate without widening",
+    "instruction": "The `satisfies` operator (TypeScript 4.9+) validates that a value matches a type without changing the inferred type. This preserves literal types while still type-checking the structure.\n\nUse satisfies for a theme configuration.",
+    "starter": "type Color = `#${string}` | \"transparent\";\ntype Theme = { [key: string]: Color | Theme };\n\n// Without 'satisfies': colors would be typed as 'Color' (too wide)\n// With 'satisfies': colors are typed as their literal values\nconst palette = {\n  primary:   \"#6366f1\",\n  secondary: \"#10b981\",\n  danger:    \"#ef4444\",\n  warning:   \"#f59e0b\",\n  transparent: \"transparent\" as const,\n} satisfies Record<string, Color>;\n\n// TypeScript knows exact literal types\nconst primaryUpper = palette.primary.toUpperCase();\nconst secUpper = palette.secondary.toUpperCase();\n\nconsole.log(`Primary:   ${primaryUpper}`);\nconsole.log(`Secondary: ${secUpper}`);\nconsole.log(`Danger:    ${palette.danger}`);\nconsole.log(`Warning:   ${palette.warning}`);",
+    "expectedOutput": ["Primary:   #6366F1", "Secondary: #10B981", "Danger:    #ef4444", "Warning:   #f59e0b"],
+    "successMessage": "`satisfies` validates the structure (all values must be `Color`) while keeping the inferred type narrow (each property is its literal type). This is useful for configs where you need both type safety and exact value types."
+  }
+]
