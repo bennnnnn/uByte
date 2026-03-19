@@ -23,9 +23,9 @@ import CertificationsHighlight from "@/components/home/CertificationsHighlight";
 import ContinueBanner     from "@/components/ContinueBanner";
 import GoogleOAuthError   from "@/components/GoogleOAuthError";
 import ReferralPromptBanner from "@/components/ReferralPromptBanner";
+import TestimonialsStripDeferred from "@/components/home/TestimonialsStripDeferred";
 
 const PopularInterviewPrepSection = dynamic(() => import("@/components/home/PopularInterviewPrepSection"));
-const TestimonialsStripDeferred   = dynamic(() => import("@/components/home/TestimonialsStripDeferred") as Promise<{ default: React.ComponentType }>, { ssr: false });
 
 export const metadata: Metadata = {
   title: "uByte — Interactive Coding Tutorials, Interview Prep & Free Certifications",
