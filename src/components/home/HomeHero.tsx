@@ -70,11 +70,12 @@ export default function HomeHero({ totalLessons, problemCount, certCount }: Prop
         </h1>
 
         {/* Sub-headline — specifics, not generics */}
-        <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-zinc-500 dark:text-zinc-400">
-          Interactive tutorials in 9 languages, {problemCount}+ real interview problems, and
-          timed certification exams that actually prove your skills.{" "}
-          <strong className="font-semibold text-zinc-700 dark:text-zinc-300">Everything in your browser. Nothing to install.</strong>
-        </p>
+            <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-zinc-500 dark:text-zinc-400">
+              Write and run real code in your browser — no setup, no installs.
+              Learn step by step, sharpen your skills with real interview problems,
+              then{" "}
+              <strong className="font-semibold text-zinc-700 dark:text-zinc-300">take a free timed exam and earn a certificate you can actually share.</strong>
+            </p>
 
         {/* CTAs */}
         <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
