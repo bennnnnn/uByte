@@ -517,37 +517,15 @@ export default async function PracticeExamsPage() {
               </Link>
             </div>
           </div>
-        ) : (
+        ) : passedLangs.length < EXAM_LANGS.length ? (
           <div className="mt-16 rounded-2xl border border-indigo-100 bg-indigo-50 p-8 text-center dark:border-indigo-900/40 dark:bg-indigo-950/20">
             <h2 className="text-xl font-bold text-zinc-900 dark:text-zinc-100">Certifications are free to take</h2>
-            <p className="mx-auto mt-2 max-w-md text-sm text-zinc-500 dark:text-zinc-400">
-              Pick a language, take the timed exam, and earn a shareable certificate. No subscription required.
-              Struggling? Our tutorials cover exactly what the exams test.
-            </p>
-            <div className="mt-6">
-              <a
-                href="#all-certifications"
-                className="inline-flex items-center justify-center gap-2 rounded-xl bg-indigo-600 px-5 py-3 text-sm font-bold text-white shadow-md shadow-indigo-500/20 transition-all hover:-translate-y-0.5 hover:bg-indigo-500"
-              >
-                Browse certifications
-              </a>
-            </div>
-          </div>
-        ) : passedLangs.length < EXAM_LANGS.length ? (
-          <Card className="mt-16 p-8 text-center">
-            <h2 className="text-xl font-bold text-zinc-900 dark:text-zinc-100">
-              {passedLangs.length > 0
-                ? `${EXAM_LANGS.length - passedLangs.length} certification${EXAM_LANGS.length - passedLangs.length !== 1 ? "s" : ""} remaining`
-                : tryAgainLangs.length > 0
-                ? "So close — keep pushing!"
-                : "Take your first certification"}
-            </h2>
             <p className="mx-auto mt-2 max-w-md text-sm text-zinc-500 dark:text-zinc-400">
               {passedLangs.length > 0
                 ? `You've passed ${passedLangs.length} of ${EXAM_LANGS.length}. Keep going to complete the full set.`
                 : tryAgainLangs.length > 0
                 ? `You've already attempted the ${LANGUAGES[tryAgainLangs[0]]?.name} exam. Review the areas where you scored lower and try again.`
-                : "You have Pro access. Pick a language and earn your first certificate."}
+                : "Pick a language, take the timed exam, and earn a shareable certificate. Struggling? Our tutorials cover exactly what the exams test."}
             </p>
             <div className="mt-6">
               <Link
@@ -558,10 +536,10 @@ export default async function PracticeExamsPage() {
                   ? `Retake ${LANGUAGES[tryAgainLangs[0]]?.name} exam`
                   : passedLangs.length > 0
                   ? `Next: ${LANGUAGES[suggestedLang]?.name} exam`
-                  : `Start ${LANGUAGES[suggestedLang]?.name} exam`}
+                  : "Browse certifications"}
               </Link>
             </div>
-          </Card>
+          </div>
         ) : null}
 
         {/* ── Footer nav ────────────────────────────────────────────────────── */}
