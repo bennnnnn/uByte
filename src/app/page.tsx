@@ -20,7 +20,6 @@ import TrendingSection    from "@/components/home/TrendingSection";
 import NewLanguagesSection from "@/components/home/NewLanguagesSection";
 import CategoryBrowse     from "@/components/home/CategoryBrowse";
 import CertificationsHighlight from "@/components/home/CertificationsHighlight";
-import ContinueBanner     from "@/components/ContinueBanner";
 import GoogleOAuthError   from "@/components/GoogleOAuthError";
 import ReferralPromptBanner from "@/components/ReferralPromptBanner";
 import TestimonialsStripDeferred from "@/components/home/TestimonialsStripDeferred";
@@ -134,11 +133,15 @@ export default async function Home() {
         <GoogleOAuthError />
       </Suspense>
 
-      {/* ── HERO — dark, full-bleed, with search ───────────────────────── */}
+      {/* ── HERO — personalized for logged-in, conversion-focused for guests ── */}
       <HomeHero
         totalLessons={totalLessonCount}
         problemCount={problemCount}
         certCount={certCount}
+        leftOff={leftOff}
+        continueLang={continueLang}
+        continueTutorials={continueTutorialList}
+        isLoggedInServer={!!user}
       />
 
       {/* ── MAIN CONTENT ─────────────────────────────────────────────────── */}
@@ -146,16 +149,6 @@ export default async function Home() {
 
         {/* Referral banner */}
         <ReferralPromptBanner />
-
-        {/* Continue learning — logged-in users only */}
-        {leftOff && (
-          <section>
-            <p className="mb-3 text-xs font-bold uppercase tracking-widest text-zinc-500">
-              ▶️ Continue where you left off
-            </p>
-            <ContinueBanner lang={continueLang} tutorials={continueTutorialList} />
-          </section>
-        )}
 
         {/* 🔥 Trending this week — real learner data */}
         <TrendingSection languages={popularLangs} />

@@ -383,7 +383,7 @@ export default async function PracticeExamLangPage({ params }: Props) {
                             Log in
                           </Link>
                         </>
-                      )}
+                      ) : null}
                     </div>
                   </>
                 )}
