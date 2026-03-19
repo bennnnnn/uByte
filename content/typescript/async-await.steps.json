@@ -1,23 +1,23 @@
 [
   {
-    "title": "Async functions return Promise<T>",
-    "instruction": "An async function always returns a Promise. Annotate the return type as `Promise<T>` to be explicit about what it resolves to.\n\nRun this.",
-    "starter": "async function delay(ms: number): Promise<string> {\n  return new Promise(resolve => {\n    setTimeout(() => resolve(`Done after ${ms}ms`), ms);\n  });\n}\n\nasync function main() {\n  const result = await delay(0);\n  console.log(result);\n  console.log(\"Async functions always return a Promise\");\n}\n\nmain();",
-    "expectedOutput": ["Done after 0ms", "Async functions always return a Promise"],
-    "successMessage": "The `await` keyword pauses execution until the Promise resolves. Outside an async function, you'd receive a `Promise<string>` instead of the value."
+    "title": "Async functions always return a Promise",
+    "instruction": "The most important rule: any function marked `async` returns `Promise<T>`, even if you return a plain value. TypeScript enforces this and tracks what's inside the Promise.\n\nSee how TypeScript types async functions and how `await` unwraps the Promise.",
+    "starter": "// Simulating async operations (no real network in this environment)\nasync function fetchUserById(id: number): Promise<{ id: number; name: string; role: string }> {\n  // In real code, this would be: await fetch(`/api/users/${id}`)\n  const users = [\n    { id: 1, name: \"Alice\", role: \"admin\" },\n    { id: 2, name: \"Bob\",   role: \"editor\" },\n    { id: 3, name: \"Carol\", role: \"viewer\" },\n  ];\n  const user = users.find(u => u.id === id);\n  if (!user) throw new Error(`User ${id} not found`);\n  return user;\n}\n\nasync function displayUser(id: number): Promise<void> {\n  const user = await fetchUserById(id);  // user is { id, name, role } — NOT a Promise\n  console.log(`${user.name} (${user.role})`);\n}\n\nasync function main() {\n  await displayUser(1);\n  await displayUser(2);\n  await displayUser(3);\n}\n\nmain();\n",
+    "expectedOutput": ["Alice (admin)", "Bob (editor)", "Carol (viewer)"],
+    "successMessage": "`await` unwraps the Promise — inside `displayUser`, `user` has type `{ id, name, role }`, not `Promise<...>`. TypeScript tracks this automatically."
   },
   {
-    "title": "Error handling with unknown",
-    "instruction": "In TypeScript, caught errors are typed as `unknown`. You must narrow the type before accessing properties.\n\nRun this.",
-    "starter": "function riskyOperation(shouldFail: boolean): string {\n  if (shouldFail) throw new Error(\"Operation failed!\");\n  return \"Success\";\n}\n\nfunction safeRun(shouldFail: boolean): string {\n  try {\n    return riskyOperation(shouldFail);\n  } catch (error) {\n    if (error instanceof Error) {\n      return `Caught: ${error.message}`;\n    }\n    return \"Caught unknown error\";\n  }\n}\n\nconsole.log(safeRun(false));\nconsole.log(safeRun(true));",
-    "expectedOutput": ["Success", "Caught: Operation failed!"],
-    "successMessage": "Always check `error instanceof Error` before accessing `.message`. TypeScript types caught errors as `unknown` to force this check."
+    "title": "Parallel async with Promise.all",
+    "instruction": "Running async operations sequentially when they're independent wastes time. `Promise.all` runs them in parallel and TypeScript correctly types the result as a tuple.\n\nFetch three independent resources at once instead of one by one.",
+    "starter": "async function getUser(id: number): Promise<string> {\n  const names = [\"Alice\", \"Bob\", \"Carol\", \"Dan\"];\n  return names[id - 1] ?? \"Unknown\";\n}\n\nasync function getScore(userId: number): Promise<number> {\n  const scores = [2850, 1920, 3100, 740];\n  return scores[userId - 1] ?? 0;\n}\n\nasync function getBadges(userId: number): Promise<string[]> {\n  const allBadges = [[\"streak_7\", \"first_tutorial\"], [\"bookworm\"], [\"streak_30\", \"speedster\", \"all_done\"], [\"first_tutorial\"]];\n  return allBadges[userId - 1] ?? [];\n}\n\nasync function getUserProfile(userId: number): Promise<void> {\n  // All three run in parallel — not sequentially\n  const [name, score, badges] = await Promise.all([\n    getUser(userId),\n    getScore(userId),\n    getBadges(userId),\n  ]);\n\n  // TypeScript knows: name=string, score=number, badges=string[]\n  console.log(`${name}: ${score} XP, badges: ${badges.join(\", \") || \"none\"}`);\n}\n\nasync function main() {\n  await getUserProfile(1);\n  await getUserProfile(3);\n}\n\nmain();\n",
+    "expectedOutput": ["Alice: 2850 XP, badges: streak_7, first_tutorial", "Carol: 3100 XP, badges: streak_30, speedster, all_done"],
+    "successMessage": "`Promise.all` returns a tuple — TypeScript knows `[name, score, badges]` are `[string, number, string[]]`. Three independent fetches run simultaneously instead of sequentially."
   },
   {
-    "title": "Promise.all for parallel execution",
-    "instruction": "`Promise.all` runs multiple promises in parallel and waits for all to complete. The result type is inferred from the input types.\n\nRun this.",
-    "starter": "async function fetchNumber(n: number): Promise<number> {\n  return n * n;\n}\n\nasync function main() {\n  const [a, b, c]: [number, number, number] = await Promise.all([\n    fetchNumber(2),\n    fetchNumber(3),\n    fetchNumber(4),\n  ]);\n\n  console.log(a);\n  console.log(b);\n  console.log(c);\n  console.log(`Total: ${a + b + c}`);\n}\n\nmain();",
-    "expectedOutput": ["4", "9", "16", "Total: 29"],
-    "successMessage": "`Promise.all` resolves when ALL promises resolve. TypeScript infers the tuple type from the array — `[number, number, number]` here."
+    "title": "Handling errors properly in async code",
+    "instruction": "Async functions can fail. The two patterns — `try/catch` and `Promise.allSettled` — handle failures differently. `allSettled` is better when you want all results even if some fail.\n\nBuild a dashboard loader that handles partial failures gracefully.",
+    "starter": "async function loadMetric(name: string, shouldFail: boolean): Promise<number> {\n  if (shouldFail) throw new Error(`${name} service unavailable`);\n  const mockData: Record<string, number> = {\n    users: 1247, revenue: 84320, conversions: 342, churn: 28\n  };\n  return mockData[name] ?? 0;\n}\n\nasync function loadDashboard(): Promise<void> {\n  const metrics = [\"users\", \"revenue\", \"conversions\", \"churn\"];\n  const failures = new Set([\"churn\"]); // simulate one failing service\n\n  const results = await Promise.allSettled(\n    metrics.map(m => loadMetric(m, failures.has(m)))\n  );\n\n  for (let i = 0; i < results.length; i++) {\n    const result = results[i];\n    const name = metrics[i];\n\n    if (result.status === \"fulfilled\") {\n      console.log(`✅ ${name}: ${result.value}`);\n    } else {\n      console.log(`❌ ${name}: ${result.reason.message}`);\n    }\n  }\n}\n\nloadDashboard();\n",
+    "expectedOutput": ["✅ users: 1247", "✅ revenue: 84320", "✅ conversions: 342", "❌ churn: churn service unavailable"],
+    "successMessage": "`Promise.allSettled` — unlike `Promise.all` — never rejects. It returns all results, fulfilled or rejected. The dashboard still loads even when one service is down."
   }
 ]

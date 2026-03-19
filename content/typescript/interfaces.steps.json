@@ -1,30 +1,30 @@
 [
   {
-    "title": "Define and use an interface",
-    "instruction": "An interface describes the shape of an object. Any object with the required properties satisfies the interface.\n\nRun this.",
-    "starter": "interface User {\n  id: number;\n  name: string;\n  email: string;\n}\n\nconst user: User = {\n  id: 1,\n  name: \"Alice\",\n  email: \"alice@example.com\",\n};\n\nconsole.log(user.name);\nconsole.log(user.email);",
-    "expectedOutput": ["Alice", "alice@example.com"],
-    "successMessage": "The object must have all required properties. Missing one or adding an unexpected type causes a compile error."
+    "title": "The problem interfaces solve",
+    "instruction": "Imagine you're building a user profile system. Without interfaces, every function has to guess what shape the user object has. With interfaces, you define the shape **once** and TypeScript enforces it everywhere.\n\nRun this and see how an interface documents and enforces the shape of a `User`.",
+    "starter": "interface User {\n  id: number;\n  name: string;\n  email: string;\n  role: \"admin\" | \"editor\" | \"viewer\";\n  createdAt: string;\n}\n\nfunction formatUserBadge(user: User): string {\n  const roleEmoji = { admin: \"🔑\", editor: \"✏️\", viewer: \"👁️\" };\n  return `${roleEmoji[user.role]} ${user.name} <${user.email}>`;\n}\n\nconst users: User[] = [\n  { id: 1, name: \"Alice Chen\",  email: \"alice@co.com\",  role: \"admin\",  createdAt: \"2022-01-15\" },\n  { id: 2, name: \"Bob Taylor\",  email: \"bob@co.com\",   role: \"editor\", createdAt: \"2022-06-20\" },\n  { id: 3, name: \"Carol Davis\", email: \"carol@co.com\", role: \"viewer\", createdAt: \"2023-02-10\" },\n];\n\nfor (const user of users) {\n  console.log(formatUserBadge(user));\n}\n",
+    "expectedOutput": ["🔑 Alice Chen <alice@co.com>", "✏️ Bob Taylor <bob@co.com>", "👁️ Carol Davis <carol@co.com>"],
+    "successMessage": "The `User` interface is the single source of truth. Every function that takes a `User` knows exactly what fields are available — no documentation needed, no runtime surprises."
   },
   {
-    "title": "Optional properties",
-    "instruction": "Mark properties with `?` to make them optional. The object can omit them.\n\nRun this.",
-    "starter": "interface Product {\n  id: number;\n  name: string;\n  description?: string;\n  price: number;\n}\n\nconst shirt: Product = { id: 1, name: \"T-Shirt\", price: 19.99 };\nconst mug: Product = { id: 2, name: \"Mug\", description: \"16oz ceramic\", price: 12.99 };\n\nconsole.log(shirt.description ?? \"no description\");\nconsole.log(mug.description ?? \"no description\");",
-    "expectedOutput": ["no description", "16oz ceramic"],
-    "successMessage": "Optional properties may be `undefined`. The `??` (nullish coalescing) operator provides a fallback."
+    "title": "Optional properties and defaults",
+    "instruction": "Not every field is required. Mark optional fields with `?`. When reading them, TypeScript reminds you to handle the `undefined` case — preventing another common class of bugs.\n\nThe `??` (nullish coalescing) operator provides safe defaults.",
+    "starter": "interface Product {\n  id: number;\n  name: string;\n  price: number;\n  description?: string;    // optional — may be undefined\n  discount?: number;       // optional — may be undefined\n  tags?: string[];         // optional — may be undefined\n}\n\nfunction formatProduct(p: Product): string {\n  const finalPrice = p.discount\n    ? p.price * (1 - p.discount)\n    : p.price;\n\n  const desc = p.description ?? \"No description available\";\n  const tagStr = p.tags?.join(\", \") ?? \"none\";\n\n  return `${p.name}: $${finalPrice.toFixed(2)} | ${desc} | Tags: ${tagStr}`;\n}\n\nconst products: Product[] = [\n  { id: 1, name: \"TypeScript Course\", price: 49, description: \"Master TS in 30 days\", discount: 0.2, tags: [\"programming\", \"web\"] },\n  { id: 2, name: \"React Bootcamp\",    price: 79 },\n  { id: 3, name: \"Node.js Basics\",    price: 29, description: \"Backend fundamentals\" },\n];\n\nfor (const p of products) {\n  console.log(formatProduct(p));\n}\n",
+    "expectedOutput": ["TypeScript Course: $39.20 | Master TS in 30 days | Tags: programming, web", "React Bootcamp: $79.00 | No description available | Tags: none", "Node.js Basics: $29.00 | Backend fundamentals | Tags: none"],
+    "successMessage": "The `?.` (optional chaining) and `??` (nullish coalescing) operators work hand-in-hand with optional properties. TypeScript enforces you handle the missing-value case — no more `Cannot read properties of undefined`."
   },
   {
-    "title": "Functions in interfaces",
-    "instruction": "Interfaces can include method signatures. Any object implementing the interface must provide those methods.\n\nRun this.",
-    "starter": "interface Greeter {\n  greet(name: string): string;\n  farewell(name: string): string;\n}\n\nconst formal: Greeter = {\n  greet: (name) => `Good morning, ${name}.`,\n  farewell: (name) => `Goodbye, ${name}.`,\n};\n\nconsole.log(formal.greet(\"Dr. Smith\"));\nconsole.log(formal.farewell(\"Dr. Smith\"));",
-    "expectedOutput": ["Good morning, Dr. Smith.", "Goodbye, Dr. Smith."],
-    "successMessage": "The object satisfies the `Greeter` interface by providing both methods with matching signatures."
+    "title": "Readonly — immutable by design",
+    "instruction": "Some data should never change after creation — IDs, creation timestamps, immutable config. Mark those fields `readonly` and TypeScript prevents accidental mutation.\n\nThis is critical for things like order records, audit logs, and config objects.",
+    "starter": "interface OrderRecord {\n  readonly id: string;\n  readonly createdAt: string;\n  readonly customerId: number;\n  product: string;         // mutable — can be updated\n  status: \"pending\" | \"shipped\" | \"delivered\" | \"cancelled\";\n  amount: number;\n}\n\nfunction shipOrder(order: OrderRecord): OrderRecord {\n  // order.id = \"new-id\";  // ← TypeScript error: Cannot assign to 'id' (readonly)\n  return { ...order, status: \"shipped\" };\n}\n\nconst order: OrderRecord = {\n  id: \"ORD-2024-001\",\n  createdAt: \"2024-01-15\",\n  customerId: 42,\n  product: \"TypeScript Pro Plan\",\n  status: \"pending\",\n  amount: 299,\n};\n\nconst shipped = shipOrder(order);\nconsole.log(`Order ${shipped.id}: ${shipped.status}`);\nconsole.log(`Customer: ${shipped.customerId}`);\nconsole.log(`Amount: $${shipped.amount}`);\n",
+    "expectedOutput": ["Order ORD-2024-001: shipped", "Customer: 42", "Amount: $299"],
+    "successMessage": "`readonly` prevents bugs where code accidentally mutates a record it shouldn't touch. The spread `{ ...order, status: \"shipped\" }` creates a new object — the original is unchanged."
   },
   {
-    "title": "Extending interfaces",
-    "instruction": "Use `extends` to build more specific interfaces from general ones.\n\nRun this.",
-    "starter": "interface Shape {\n  color: string;\n  area(): number;\n}\n\ninterface Circle extends Shape {\n  radius: number;\n}\n\nconst circle: Circle = {\n  color: \"red\",\n  radius: 5,\n  area() {\n    return Math.PI * this.radius * this.radius;\n  },\n};\n\nconsole.log(circle.color);\nconsole.log(circle.area().toFixed(2));",
-    "expectedOutput": ["red", "78.54"],
-    "successMessage": "`Circle` inherits `color` and `area()` from `Shape` and adds `radius`. This is structural composition."
+    "title": "Extending interfaces — composition",
+    "instruction": "Real systems have hierarchies. A `BlogPost` shares fields with a `Comment`. Instead of duplicating them, extend a base interface. This keeps your type definitions DRY and consistent.\n\nBuild a content system using interface extension.",
+    "starter": "interface ContentBase {\n  id: number;\n  authorId: number;\n  authorName: string;\n  createdAt: string;\n  updatedAt: string;\n}\n\ninterface BlogPost extends ContentBase {\n  title: string;\n  slug: string;\n  body: string;\n  tags: string[];\n  published: boolean;\n}\n\ninterface Comment extends ContentBase {\n  postId: number;\n  body: string;\n  likes: number;\n}\n\nfunction summarise(content: ContentBase): string {\n  return `[${content.id}] by ${content.authorName} on ${content.createdAt}`;\n}\n\nconst post: BlogPost = {\n  id: 1, authorId: 10, authorName: \"Alice\",\n  createdAt: \"2024-01-10\", updatedAt: \"2024-01-11\",\n  title: \"TypeScript for Real Projects\",\n  slug: \"ts-real-projects\", body: \"...\",\n  tags: [\"typescript\", \"programming\"], published: true,\n};\n\nconst comment: Comment = {\n  id: 99, authorId: 20, authorName: \"Bob\",\n  createdAt: \"2024-01-12\", updatedAt: \"2024-01-12\",\n  postId: 1, body: \"Great article!\", likes: 14,\n};\n\nconsole.log(summarise(post));\nconsole.log(summarise(comment));\nconsole.log(`Post tags: ${post.tags.join(\", \")}`);\nconsole.log(`Comment likes: ${comment.likes}`);\n",
+    "expectedOutput": ["[1] by Alice on 2024-01-10", "[99] by Bob on 2024-01-12", "Post tags: typescript, programming", "Comment likes: 14"],
+    "successMessage": "`extends` composes interfaces cleanly. `summarise()` accepts any `ContentBase` — it works for posts, comments, and any future content type. That's the power of structural typing."
   }
 ]

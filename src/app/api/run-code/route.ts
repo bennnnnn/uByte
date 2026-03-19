@@ -4,6 +4,7 @@ import { withErrorHandling } from "@/lib/api-utils";
 import { verifyCsrf } from "@/lib/csrf";
 import { isSupportedLanguage } from "@/lib/languages/registry";
 import { JUDGE0_URL, JUDGE0_LANG_IDS, b64, normaliseJudge0RunOutput, prepareCodeForJudge } from "@/lib/judge0";
+import { SQL_PREAMBLE } from "@/lib/sql-schema";
 
 const MAX_CODE_LENGTH = 64 * 1024; // 64 KB
 const TIMEOUT_MS = 20_000;
@@ -32,11 +33,14 @@ export const POST = withErrorHandling("POST /api/run-code", async (request: Next
 
   const lang = typeof language === "string" && isSupportedLanguage(language) ? language : "go";
 
+  // SQL: prepend the shared company database schema + seed data so users query
+  // a realistic database without writing CREATE TABLE or INSERT themselves.
+  let runCode = lang === "sql" ? SQL_PREAMBLE + code : code;
+
   // C# practice starters use `public class Solution` with no Main().
   // Inject a stub entry point so clicking Run produces a message instead of CS5001.
-  let runCode = code;
   if (lang === "csharp" && !/\bstatic\s+(void|int)\s+Main\s*\(/.test(code)) {
-    runCode =
+    runCode = runCode +
       code +
       '\nclass __Runner__ { static void Main() {' +
       ' System.Console.WriteLine("Solution class loaded. Click Submit to run against all test cases."); } }';

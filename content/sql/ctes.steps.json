@@ -1,23 +1,23 @@
 [
   {
-    "title": "Basic CTE",
-    "instruction": "A CTE (WITH clause) names a subquery so the main query can reference it. This makes complex queries much more readable.\n\nRun this.",
-    "starter": "CREATE TABLE orders (id INTEGER, customer TEXT, total REAL, status TEXT);\nINSERT INTO orders VALUES (1,'Alice',120,'completed'),(2,'Bob',50,'cancelled'),(3,'Alice',200,'completed'),(4,'Carol',75,'completed'),(5,'Bob',300,'completed');\n\nWITH completed_orders AS (\n  SELECT customer, total FROM orders WHERE status = 'completed'\n)\nSELECT customer, SUM(total) AS revenue\nFROM completed_orders\nGROUP BY customer\nORDER BY revenue DESC;",
-    "expectedOutput": ["Bob|300.0", "Alice|320.0", "Carol|75.0"],
-    "successMessage": "The CTE filters to completed orders first, then the main query aggregates. This is cleaner than a nested subquery and easier to debug."
+    "title": "CTE — break complex queries into readable steps",
+    "instruction": "This query would be a deeply nested mess without CTEs. With CTEs, each step has a name and the final query reads like a story.\n\nCalculate which departments are over budget by comparing actual payroll to their budget.",
+    "starter": "WITH dept_payroll AS (\n  SELECT\n    department_id,\n    SUM(salary) AS total_payroll,\n    COUNT(*) AS headcount\n  FROM employees\n  GROUP BY department_id\n)\nSELECT\n  d.name                                   AS department,\n  dp.headcount,\n  dp.total_payroll,\n  d.budget,\n  ROUND(dp.total_payroll * 100.0 / d.budget, 1) AS payroll_pct\nFROM dept_payroll dp\nJOIN departments d ON d.id = dp.department_id\nORDER BY payroll_pct DESC;",
+    "expectedOutput": ["HR|2|208000|500000|41.6", "Marketing|3|355000|800000|44.4", "Sales|3|342000|1200000|28.5", "Data Science|2|333000|1600000|20.8", "Engineering|5|668000|2400000|27.8"],
+    "successMessage": "Engineering's payroll is $668k against a $2.4M budget (27.8%) — there's room to hire. Data Science is at 20.8% — they have significant budget capacity. CTEs let you compute `dept_payroll` once and reference it clearly."
   },
   {
-    "title": "Multiple CTEs",
-    "instruction": "Chain multiple CTEs to build up logic in stages — each CTE can reference previous ones.\n\nRun this.",
-    "starter": "CREATE TABLE sales (rep TEXT, region TEXT, amount REAL);\nINSERT INTO sales VALUES ('Alice','North',500),('Alice','North',300),('Bob','South',800),('Carol','North',200),('Bob','South',400);\n\nWITH\n  rep_totals AS (\n    SELECT rep, region, SUM(amount) AS total\n    FROM sales\n    GROUP BY rep, region\n  ),\n  top_reps AS (\n    SELECT * FROM rep_totals WHERE total >= 700\n  )\nSELECT rep, region, total FROM top_reps ORDER BY total DESC;",
-    "expectedOutput": ["Bob|South|1200.0", "Alice|North|800.0"],
-    "successMessage": "Two CTEs: `rep_totals` aggregates, `top_reps` filters. Each stage is named and readable. Try rewriting this as nested subqueries — it's much harder to follow."
+    "title": "Multiple CTEs — a complete revenue report",
+    "instruction": "Chain multiple CTEs to build up analysis step by step. Each CTE can reference the ones before it.\n\nBuild a full customer health report: total revenue, order count, and average deal size.",
+    "starter": "WITH paid_orders AS (\n  SELECT customer_id, amount\n  FROM orders\n  WHERE status = 'paid'\n),\ncustomer_revenue AS (\n  SELECT\n    customer_id,\n    COUNT(*)           AS orders,\n    SUM(amount)        AS revenue,\n    ROUND(AVG(amount)) AS avg_deal\n  FROM paid_orders\n  GROUP BY customer_id\n),\ntop_customers AS (\n  SELECT * FROM customer_revenue\n  WHERE revenue >= 24000\n)\nSELECT\n  c.name,\n  c.country,\n  tc.orders,\n  tc.revenue,\n  tc.avg_deal\nFROM top_customers tc\nJOIN customers c ON c.id = tc.customer_id\nORDER BY tc.revenue DESC;",
+    "expectedOutput": ["Momentum Co|USA|3|72000.0|24000", "Pinnacle Inc|USA|2|48000.0|24000", "Acme Corp|USA|2|32500.0|16250", "Globex Ltd|UK|2|32500.0|16250"],
+    "successMessage": "Three CTEs building on each other: `paid_orders` filters, `customer_revenue` aggregates, `top_customers` filters to high-value accounts. Momentum Co is the top customer with 3 Enterprise Plan renewals. Try lowering the $24k threshold to see more customers."
   },
   {
-    "title": "Recursive CTE — number sequence",
-    "instruction": "Recursive CTEs reference themselves to build sequences or traverse trees. The base case + recursive step pattern works like a loop.\n\nRun this.",
-    "starter": "WITH RECURSIVE numbers(n) AS (\n  SELECT 1            -- base case\n  UNION ALL\n  SELECT n + 1        -- recursive step\n  FROM numbers\n  WHERE n < 5         -- stop condition\n)\nSELECT n FROM numbers;",
-    "expectedOutput": ["1", "2", "3", "4", "5"],
-    "successMessage": "The recursive CTE starts at 1 and adds 1 each iteration until n reaches 5. This pattern is used for date ranges, org chart traversals, and path finding."
+    "title": "Recursive CTE — generate a date range",
+    "instruction": "Recursive CTEs can generate sequences. This is essential for time-series reports — if you want revenue-per-day, you need a complete list of dates even for days with no orders.\n\nGenerate the first 7 days of 2024 to simulate a date spine.",
+    "starter": "WITH RECURSIVE date_spine(day_num, day_label) AS (\n  SELECT 1, '2024-01-01'\n  UNION ALL\n  SELECT\n    day_num + 1,\n    DATE('2024-01-01', '+' || day_num || ' days')\n  FROM date_spine\n  WHERE day_num < 7\n)\nSELECT\n  day_num,\n  day_label,\n  CASE CAST(strftime('%w', day_label) AS INTEGER)\n    WHEN 0 THEN 'Sunday'\n    WHEN 1 THEN 'Monday'\n    WHEN 2 THEN 'Tuesday'\n    WHEN 3 THEN 'Wednesday'\n    WHEN 4 THEN 'Thursday'\n    WHEN 5 THEN 'Friday'\n    WHEN 6 THEN 'Saturday'\n  END AS weekday\nFROM date_spine;",
+    "expectedOutput": ["1|2024-01-01|Monday", "2|2024-01-02|Tuesday", "3|2024-01-03|Wednesday", "4|2024-01-04|Thursday", "5|2024-01-05|Friday", "6|2024-01-06|Saturday", "7|2024-01-07|Sunday"],
+    "successMessage": "A 7-day date spine. In real analytics, you LEFT JOIN this against your orders table to fill in zeros for days with no revenue — giving you a complete time-series instead of gaps. Recursive CTEs are essential for this pattern."
   }
 ]

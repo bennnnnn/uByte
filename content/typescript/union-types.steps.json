@@ -1,30 +1,23 @@
 [
   {
-    "title": "Union types",
-    "instruction": "A union type `A | B` means a value can be either type. Use `typeof` to narrow the type before using it.\n\nRun this.",
-    "starter": "type StringOrNumber = string | number;\n\nfunction double(value: StringOrNumber): StringOrNumber {\n  if (typeof value === \"number\") {\n    return value * 2;\n  }\n  return value.repeat(2);\n}\n\nconsole.log(double(5));\nconsole.log(double(\"ha\"));",
-    "expectedOutput": ["10", "haha"],
-    "successMessage": "Type narrowing with `typeof` tells TypeScript which branch handles which type — no unsafe casts needed."
+    "title": "Modeling real states with union types",
+    "instruction": "A payment can be pending, paid, or failed — nothing else. A plain `string` would allow `\"banana\"`. A union type `\"pending\" | \"paid\" | \"failed\"` allows exactly those three values and nothing else.\n\nThis is one of TypeScript's most practical features.",
+    "starter": "type PaymentStatus = \"pending\" | \"processing\" | \"paid\" | \"failed\" | \"refunded\";\n\ninterface Payment {\n  id: string;\n  amount: number;\n  status: PaymentStatus;\n  customerId: number;\n}\n\nfunction getStatusLabel(status: PaymentStatus): string {\n  const labels: Record<PaymentStatus, string> = {\n    pending:    \"⏳ Awaiting payment\",\n    processing: \"⚙️  Processing\",\n    paid:       \"✅ Paid\",\n    failed:     \"❌ Payment failed\",\n    refunded:   \"↩️  Refunded\",\n  };\n  return labels[status];\n}\n\nconst payments: Payment[] = [\n  { id: \"PAY-001\", amount: 299, status: \"paid\",       customerId: 1 },\n  { id: \"PAY-002\", amount: 89,  status: \"pending\",    customerId: 2 },\n  { id: \"PAY-003\", amount: 149, status: \"failed\",     customerId: 3 },\n  { id: \"PAY-004\", amount: 499, status: \"processing\", customerId: 4 },\n];\n\nfor (const p of payments) {\n  console.log(`${p.id} ($${p.amount}): ${getStatusLabel(p.status)}`);\n}\n",
+    "expectedOutput": ["PAY-001 ($299): ✅ Paid", "PAY-002 ($89): ⏳ Awaiting payment", "PAY-003 ($149): ❌ Payment failed", "PAY-004 ($499): ⚙️  Processing"],
+    "successMessage": "The `Record<PaymentStatus, string>` on line 11 ensures you handle EVERY status. If you add a new status to the union later and forget to add it to `labels`, TypeScript will immediately error — exhaustiveness checking for free."
   },
   {
-    "title": "Literal union types",
-    "instruction": "Restrict a value to a specific set of literals. This is safer than a plain string type.\n\nRun this.",
-    "starter": "type Direction = \"north\" | \"south\" | \"east\" | \"west\";\n\nfunction describe(dir: Direction): string {\n  if (dir === \"north\" || dir === \"south\") return `${dir} (vertical)`;\n  return `${dir} (horizontal)`;\n}\n\nconsole.log(describe(\"north\"));\nconsole.log(describe(\"east\"));\nconsole.log(describe(\"south\"));",
-    "expectedOutput": ["north (vertical)", "east (horizontal)", "south (vertical)"],
-    "successMessage": "Literal unions act as exhaustive enumerations. TypeScript will error if you pass a string not in the union."
+    "title": "Discriminated unions — the most powerful pattern",
+    "instruction": "A `Shape` can be a circle or a rectangle. Each has different fields. A discriminated union (using a `kind` or `type` field) lets TypeScript narrow the type automatically in switch statements.\n\nThis pattern eliminates entire categories of runtime errors.",
+    "starter": "type Shape =\n  | { kind: \"circle\";    radius: number }\n  | { kind: \"rectangle\"; width: number; height: number }\n  | { kind: \"triangle\";  base: number;  height: number };\n\nfunction area(shape: Shape): number {\n  switch (shape.kind) {\n    case \"circle\":    return Math.PI * shape.radius ** 2;\n    case \"rectangle\": return shape.width * shape.height;\n    case \"triangle\":  return 0.5 * shape.base * shape.height;\n    // TypeScript ensures all cases are handled\n  }\n}\n\nfunction describe(shape: Shape): string {\n  switch (shape.kind) {\n    case \"circle\":    return `Circle (r=${shape.radius})`;\n    case \"rectangle\": return `Rectangle (${shape.width}×${shape.height})`;\n    case \"triangle\":  return `Triangle (b=${shape.base}, h=${shape.height})`;\n  }\n}\n\nconst shapes: Shape[] = [\n  { kind: \"circle\",    radius: 5 },\n  { kind: \"rectangle\", width: 4, height: 6 },\n  { kind: \"triangle\",  base: 8, height: 3 },\n];\n\nfor (const s of shapes) {\n  console.log(`${describe(s)}: area = ${area(s).toFixed(2)}`);\n}\n",
+    "expectedOutput": ["Circle (r=5): area = 78.54", "Rectangle (4×6): area = 24.00", "Triangle (b=8, h=3): area = 12.00"],
+    "successMessage": "Inside each `case`, TypeScript knows the exact type. In `case \"circle\"`, `shape.radius` exists. In `case \"rectangle\"`, `shape.width` and `shape.height` exist. No casting, no runtime checks needed."
   },
   {
-    "title": "Discriminated unions",
-    "instruction": "Add a `kind` (or `type`) discriminant field to each variant so TypeScript can narrow automatically in switch statements.\n\nRun this.",
-    "starter": "type Circle = { kind: \"circle\"; radius: number };\ntype Rectangle = { kind: \"rectangle\"; width: number; height: number };\ntype Shape = Circle | Rectangle;\n\nfunction area(shape: Shape): number {\n  switch (shape.kind) {\n    case \"circle\":    return Math.PI * shape.radius ** 2;\n    case \"rectangle\": return shape.width * shape.height;\n  }\n}\n\nconsole.log(area({ kind: \"circle\", radius: 5 }).toFixed(2));\nconsole.log(area({ kind: \"rectangle\", width: 4, height: 6 }));",
-    "expectedOutput": ["78.54", "24"],
-    "successMessage": "Inside each case, TypeScript knows exactly which shape variant you have — no casting needed. This is a core TypeScript pattern."
-  },
-  {
-    "title": "Intersection types",
-    "instruction": "An intersection type `A & B` combines both types — the value must satisfy all properties of both.\n\nRun this.",
-    "starter": "type HasName = { name: string };\ntype HasAge = { age: number };\ntype Person = HasName & HasAge;\n\nfunction introduce(p: Person): string {\n  return `Hi, I'm ${p.name} and I'm ${p.age} years old.`;\n}\n\nconsole.log(introduce({ name: \"Alice\", age: 30 }));\nconsole.log(introduce({ name: \"Bob\", age: 25 }));",
-    "expectedOutput": ["Hi, I'm Alice and I'm 30 years old.", "Hi, I'm Bob and I'm 25 years old."],
-    "successMessage": "Intersection types are great for composing reusable type pieces without full class inheritance."
+    "title": "Intersection types — combine multiple contracts",
+    "instruction": "Intersection types (`A & B`) require a value to satisfy **both** types. This is useful for composing reusable type pieces — like mixing audit trail fields into any entity.\n\nBuild an auditable entity system.",
+    "starter": "type WithAudit = {\n  createdAt: string;\n  updatedAt: string;\n  createdBy: string;\n};\n\ntype WithSoftDelete = {\n  deletedAt: string | null;\n  isDeleted: boolean;\n};\n\ninterface UserEntity {\n  id: number;\n  name: string;\n  email: string;\n  role: string;\n}\n\n// Combine all three contracts\ntype AuditableUser = UserEntity & WithAudit & WithSoftDelete;\n\nfunction formatAuditLog(entity: AuditableUser): string {\n  const status = entity.isDeleted ? \"DELETED\" : \"ACTIVE\";\n  return `[${status}] ${entity.name} | Created by ${entity.createdBy} on ${entity.createdAt}`;\n}\n\nconst users: AuditableUser[] = [\n  { id: 1, name: \"Alice\", email: \"alice@co.com\", role: \"admin\",\n    createdAt: \"2022-01-15\", updatedAt: \"2024-01-01\", createdBy: \"system\",\n    deletedAt: null, isDeleted: false },\n  { id: 2, name: \"Bob\",   email: \"bob@co.com\",   role: \"editor\",\n    createdAt: \"2022-06-20\", updatedAt: \"2023-11-01\", createdBy: \"alice\",\n    deletedAt: \"2024-01-01\", isDeleted: true },\n];\n\nfor (const u of users) {\n  console.log(formatAuditLog(u));\n}\n",
+    "expectedOutput": ["[ACTIVE] Alice | Created by system on 2022-01-15", "[DELETED] Bob | Created by alice on 2022-06-20"],
+    "successMessage": "Intersection types compose perfectly. `WithAudit` and `WithSoftDelete` are reusable type mixins — add them to `UserEntity`, `OrderEntity`, or any other entity with a single `&`."
   }
 ]

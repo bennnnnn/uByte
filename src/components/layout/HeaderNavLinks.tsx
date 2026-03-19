@@ -12,10 +12,12 @@ const LANGUAGES = [
   { slug: "go",         icon: "🐹", label: "Go",         sub: "Beginner-friendly"    },
   { slug: "python",     icon: "🐍", label: "Python",     sub: "Clean & readable"      },
   { slug: "javascript", icon: "🟨", label: "JavaScript", sub: "Web & Node.js"         },
+  { slug: "typescript", icon: "🔷", label: "TypeScript", sub: "Typed JavaScript"      },
   { slug: "java",       icon: "☕", label: "Java",       sub: "Enterprise & OOP"      },
   { slug: "rust",       icon: "🦀", label: "Rust",       sub: "Systems programming"   },
   { slug: "cpp",        icon: "⚙️", label: "C++",        sub: "Performance & control" },
   { slug: "csharp",     icon: "💜", label: "C#",         sub: ".NET & game dev"       },
+  { slug: "sql",        icon: "🗄️", label: "SQL",        sub: "Databases & queries"   },
 ];
 
 const PRACTICE_LANGS = [

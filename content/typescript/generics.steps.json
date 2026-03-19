@@ -1,30 +1,30 @@
 [
   {
-    "title": "Your first generic function",
-    "instruction": "A generic function uses `<T>` as a type parameter that gets filled in at the call site. Write a generic `identity` function and use it with different types.\n\nRun this.",
-    "starter": "function identity<T>(value: T): T {\n  return value;\n}\n\nconsole.log(identity(42));\nconsole.log(identity(\"hello\"));\nconsole.log(identity(true));",
-    "expectedOutput": ["42", "hello", "true"],
-    "successMessage": "`T` is inferred from the argument — `identity(42)` infers `T = number`. No casting or `any` needed."
+    "title": "The problem generics solve",
+    "instruction": "Without generics, you'd write a separate `getFirst` function for every type — `getFirstNumber`, `getFirstString`, etc. Generics let you write it **once** and have TypeScript figure out the type at the call site.\n\nRun this and notice that each call returns the correct type automatically.",
+    "starter": "// One function, many types — TypeScript infers T at each call site\nfunction getFirst<T>(arr: T[]): T | undefined {\n  return arr[0];\n}\n\nfunction getLast<T>(arr: T[]): T | undefined {\n  return arr[arr.length - 1];\n}\n\nconst scores = [95, 87, 92, 78, 100];\nconst names = [\"Alice\", \"Bob\", \"Carol\"];\nconst dates = [\"2024-01-01\", \"2024-06-15\", \"2024-12-31\"];\n\n// TypeScript infers: getFirst<number>, getFirst<string>\nconsole.log(`Top score: ${getFirst(scores)}`);\nconsole.log(`Last score: ${getLast(scores)}`);\nconsole.log(`First name: ${getFirst(names)}`);\nconsole.log(`Latest date: ${getLast(dates)}`);\n",
+    "expectedOutput": ["Top score: 95", "Last score: 100", "First name: Alice", "Latest date: 2024-12-31"],
+    "successMessage": "T is inferred separately for each call — `number` for scores, `string` for names. You wrote the logic once and TypeScript handled the types. That's what generics are for."
   },
   {
-    "title": "Generic arrays",
-    "instruction": "Write a generic function that returns the first element of any array. `T[]` means 'array of T'.\n\nRun this.",
-    "starter": "function first<T>(arr: T[]): T | undefined {\n  return arr[0];\n}\n\nconsole.log(first([10, 20, 30]));\nconsole.log(first([\"a\", \"b\", \"c\"]));\nconsole.log(first([]));",
-    "expectedOutput": ["10", "a", "undefined"],
-    "successMessage": "The return type `T | undefined` handles the empty array case. TypeScript infers `T` from what you pass in."
+    "title": "Generic API response wrapper",
+    "instruction": "A common real-world pattern: every API endpoint returns a response with the same shape (`success`, `data`, `error`) but different `data` types. A generic wrapper models this perfectly.\n\nThis is the pattern used in virtually every TypeScript API client.",
+    "starter": "interface ApiResponse<T> {\n  success: boolean;\n  data: T | null;\n  error: string | null;\n  timestamp: string;\n}\n\nfunction successResponse<T>(data: T): ApiResponse<T> {\n  return { success: true, data, error: null, timestamp: new Date().toISOString().slice(0, 10) };\n}\n\nfunction errorResponse<T>(message: string): ApiResponse<T> {\n  return { success: false, data: null, error: message, timestamp: new Date().toISOString().slice(0, 10) };\n}\n\ninterface User { id: number; name: string; }\ninterface Order { id: string; amount: number; }\n\nconst userResult: ApiResponse<User> = successResponse({ id: 1, name: \"Alice\" });\nconst orderResult: ApiResponse<Order> = successResponse({ id: \"ORD-001\", amount: 299 });\nconst failResult: ApiResponse<User> = errorResponse(\"User not found\");\n\nconsole.log(`User: ${userResult.data?.name ?? \"N/A\"}`);\nconsole.log(`Order: $${orderResult.data?.amount ?? 0}`);\nconsole.log(`Error: ${failResult.error}`);\n",
+    "expectedOutput": ["User: Alice", "Order: $299", "Error: User not found"],
+    "successMessage": "One `ApiResponse<T>` handles users, orders, products — any type. And TypeScript knows that `userResult.data` is `User | null`, so it enforces the null check. Real codebases use this pattern constantly."
   },
   {
-    "title": "Generic constraints with extends",
-    "instruction": "Use `T extends SomeType` to restrict which types are allowed. This lets you safely access properties that exist on the constraint.\n\nRun this.",
-    "starter": "function longest<T extends { length: number }>(a: T, b: T): T {\n  return a.length >= b.length ? a : b;\n}\n\nconsole.log(longest(\"hi\", \"hello\"));\nconsole.log(longest([1, 2], [1, 2, 3]));",
-    "expectedOutput": ["hello", "1,2,3"],
-    "successMessage": "`T extends { length: number }` guarantees `.length` exists. Works for strings, arrays, or any object with a length property."
+    "title": "Generic constraints — only accept what you need",
+    "instruction": "Sometimes you want generics but need to guarantee certain properties exist. Use `extends` to constrain what types are allowed.\n\nBuild a function that works on any object with an `id` — without caring about the rest of the object.",
+    "starter": "interface HasId {\n  id: number;\n}\n\ninterface HasTimestamps {\n  createdAt: string;\n  updatedAt: string;\n}\n\n// T must have an id — but can have anything else\nfunction findById<T extends HasId>(items: T[], id: number): T | undefined {\n  return items.find(item => item.id === id);\n}\n\n// T must have timestamps — returns the most recently updated\nfunction getMostRecent<T extends HasTimestamps>(items: T[]): T | undefined {\n  return items.reduce((latest, item) =>\n    item.updatedAt > latest.updatedAt ? item : latest\n  , items[0]);\n}\n\nconst products = [\n  { id: 1, name: \"Keyboard\",  price: 129, createdAt: \"2024-01-01\", updatedAt: \"2024-03-15\" },\n  { id: 2, name: \"Monitor\",   price: 399, createdAt: \"2024-01-05\", updatedAt: \"2024-04-01\" },\n  { id: 3, name: \"Headphones\",price: 89,  createdAt: \"2024-02-10\", updatedAt: \"2024-02-10\" },\n];\n\nconst found = findById(products, 2);\nconsole.log(`Found: ${found?.name} — $${found?.price}`);\n\nconst recent = getMostRecent(products);\nconsole.log(`Most recently updated: ${recent?.name}`);\n",
+    "expectedOutput": ["Found: Monitor — $399", "Most recently updated: Monitor"],
+    "successMessage": "`T extends HasId` means TypeScript guarantees `.id` exists, so `.find(item => item.id === id)` compiles. But you didn't restrict T to only having an id — it can carry any other fields too."
   },
   {
     "title": "Multiple type parameters",
-    "instruction": "Functions can have multiple independent type parameters. Each is inferred separately.\n\nRun this.",
-    "starter": "function zip<A, B>(a: A[], b: B[]): [A, B][] {\n  return a.map((item, i) => [item, b[i]]);\n}\n\nconst result = zip([1, 2, 3], [\"one\", \"two\", \"three\"]);\nfor (const [num, word] of result) {\n  console.log(`${num} = ${word}`);\n}",
-    "expectedOutput": ["1 = one", "2 = two", "3 = three"],
-    "successMessage": "`A` and `B` are inferred independently — `zip([1,2,3], [\"a\",\"b\",\"c\"])` gives `[number, string][]`."
+    "instruction": "Functions can have multiple type parameters that are inferred independently. This is useful for transformations, pairings, and mappings.\n\nBuild a `groupBy` function that works with any array and any key.",
+    "starter": "function groupBy<T, K extends string | number>(\n  items: T[],\n  keyFn: (item: T) => K\n): Map<K, T[]> {\n  const map = new Map<K, T[]>();\n  for (const item of items) {\n    const key = keyFn(item);\n    const group = map.get(key) ?? [];\n    group.push(item);\n    map.set(key, group);\n  }\n  return map;\n}\n\nconst employees = [\n  { name: \"Alice\",  dept: \"Engineering\", salary: 145000 },\n  { name: \"Bob\",    dept: \"Marketing\",   salary: 108000 },\n  { name: \"Carol\",  dept: \"Engineering\", salary: 128000 },\n  { name: \"Dan\",    dept: \"HR\",          salary: 95000  },\n  { name: \"Eva\",    dept: \"Engineering\", salary: 138000 },\n];\n\nconst byDept = groupBy(employees, e => e.dept);\n\nfor (const [dept, team] of byDept) {\n  const avgSalary = Math.round(team.reduce((s, e) => s + e.salary, 0) / team.length);\n  console.log(`${dept}: ${team.length} people, avg $${avgSalary}`);\n}\n",
+    "expectedOutput": ["Engineering: 3 people, avg $137000", "Marketing: 1 people, avg $108000", "HR: 1 people, avg $95000"],
+    "successMessage": "Two type parameters: `T` for the item type, `K` for the key type — both inferred automatically. `groupBy` works for employees, products, orders, anything."
   }
 ]

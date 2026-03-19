@@ -1,23 +1,23 @@
 [
   {
-    "title": "INSERT — add rows",
-    "instruction": "`INSERT INTO table (cols) VALUES (...)` adds new rows. Insert multiple rows in one statement for efficiency.\n\nRun this.",
-    "starter": "CREATE TABLE tasks (\n  id     INTEGER PRIMARY KEY,\n  title  TEXT NOT NULL,\n  done   INTEGER DEFAULT 0\n);\n\nINSERT INTO tasks (id, title) VALUES\n  (1, 'Learn SQL basics'),\n  (2, 'Practice JOINs'),\n  (3, 'Build a real project');\n\nSELECT id, title, done FROM tasks;",
-    "expectedOutput": ["1|Learn SQL basics|0", "2|Practice JOINs|0", "3|Build a real project|0"],
-    "successMessage": "All three rows inserted in one statement. `done` defaults to 0 (the column default). Batching inserts is more efficient than inserting one at a time."
+    "title": "INSERT — add a new order",
+    "instruction": "The company database is live — you can add new rows and immediately query them.\n\nInsert a new order for Acme Corp and verify it appears in their order history.",
+    "starter": "-- Add a new order\nINSERT INTO orders (id, customer_id, product, amount, order_date, status)\nVALUES (19, 1, 'Enterprise Plan', 24000.00, '2025-01-15', 'pending');\n\n-- Verify Acme Corp's complete order history\nSELECT o.product, o.amount, o.order_date, o.status\nFROM orders o\nJOIN customers c ON o.customer_id = c.id\nWHERE c.name = 'Acme Corp'\nORDER BY o.order_date;",
+    "expectedOutput": ["Enterprise Plan|24000.0|2024-01-15|paid", "Support Add-on|3600.0|2024-01-15|paid", "Training Package|8500.0|2024-04-15|pending", "Enterprise Plan|24000.0|2025-01-15|pending"],
+    "successMessage": "The new order (id=19) appears immediately. Acme Corp now has 4 orders — 2 paid, 2 pending. Notice the 2025 renewal is pending; it hasn't been paid yet. INSERT and SELECT work together — no delay."
   },
   {
-    "title": "UPDATE — modify rows",
-    "instruction": "`UPDATE` changes existing rows. Always include a `WHERE` clause — without it, every row is updated.\n\nRun this.",
-    "starter": "CREATE TABLE tasks (id INTEGER, title TEXT, done INTEGER DEFAULT 0);\nINSERT INTO tasks VALUES (1, 'Learn SQL', 0), (2, 'Practice JOINs', 0), (3, 'Build project', 0);\n\n-- Mark first two tasks as done\nUPDATE tasks SET done = 1 WHERE id <= 2;\n\nSELECT title, done FROM tasks ORDER BY id;",
-    "expectedOutput": ["Learn SQL|1", "Practice JOINs|1", "Build project|0"],
-    "successMessage": "Only rows where `id <= 2` were updated. Task 3 remains `done = 0`. The WHERE clause is your safety net."
+    "title": "UPDATE — mark an order as paid",
+    "instruction": "`UPDATE` modifies existing rows. **Always include a WHERE clause** — without it you'd update every row in the table.\n\nMark Acme Corp's pending training package as paid.",
+    "starter": "-- Mark order 16 (Acme Corp Training Package) as paid\nUPDATE orders\nSET status = 'paid',\n    order_date = '2025-01-20'\nWHERE id = 16;\n\n-- Verify the change\nSELECT id, product, amount, order_date, status\nFROM orders\nWHERE id = 16;",
+    "expectedOutput": ["16|Training Package|8500.0|2025-01-20|paid"],
+    "successMessage": "Order 16 is now paid with an updated date. The `WHERE id = 16` is critical — without it, ALL 18 orders would have been updated to `paid`. Always confirm with a SELECT before running UPDATE or DELETE."
   },
   {
-    "title": "DELETE — remove rows",
-    "instruction": "`DELETE FROM table WHERE condition` removes matching rows. Without `WHERE`, all rows are deleted.\n\nRun this.",
-    "starter": "CREATE TABLE sessions (id INTEGER, user_id INTEGER, expires_at TEXT);\nINSERT INTO sessions VALUES (1, 1, '2020-01-01');\nINSERT INTO sessions VALUES (2, 2, '2099-12-31');\nINSERT INTO sessions VALUES (3, 3, '2020-06-15');\nINSERT INTO sessions VALUES (4, 4, '2099-12-31');\n\n-- Delete expired sessions\nDELETE FROM sessions WHERE expires_at < '2024-01-01';\n\nSELECT COUNT(*) AS remaining FROM sessions;",
-    "expectedOutput": ["2"],
-    "successMessage": "Two expired sessions deleted. Two valid sessions remain. `DELETE WHERE condition` is the safe pattern — always verify with a SELECT first."
+    "title": "DELETE — remove stale pending orders",
+    "instruction": "`DELETE` removes rows permanently. Best practice: run a SELECT first to preview exactly which rows you'll delete, then replace SELECT with DELETE.\n\nFind and remove orders that have been pending for over a year (before 2024-01-01).",
+    "starter": "-- Step 1: preview what would be deleted\nSELECT id, customer_id, product, amount, order_date\nFROM orders\nWHERE status = 'pending'\n  AND order_date < '2024-01-01';\n\n-- (In a real scenario, run the DELETE after confirming)\n-- DELETE FROM orders WHERE status = 'pending' AND order_date < '2024-01-01';",
+    "expectedOutput": ["11|8|Pro Plan|12000.0|2024-02-20"],
+    "successMessage": "Only order 11 (Vertex Solutions' Pro Plan) matches — it's been pending since February 2024. The preview pattern (SELECT first) is a safety habit every data engineer follows before running DELETE. Uncomment the DELETE to actually remove it."
   }
 ]

@@ -1,23 +1,23 @@
 [
   {
-    "title": "COUNT, SUM, AVG",
-    "instruction": "Aggregate functions summarize many rows into a single value. Run this to see them in action.",
-    "starter": "CREATE TABLE sales (product TEXT, amount REAL, quantity INTEGER);\nINSERT INTO sales VALUES ('Widget', 9.99, 50);\nINSERT INTO sales VALUES ('Gadget', 49.99, 20);\nINSERT INTO sales VALUES ('Thingamajig', 24.99, 35);\n\nSELECT\n  COUNT(*)          AS total_products,\n  SUM(amount)       AS total_revenue,\n  ROUND(AVG(amount), 2) AS avg_price,\n  MIN(amount)       AS cheapest,\n  MAX(amount)       AS priciest\nFROM sales;",
-    "expectedOutput": ["3|84.97|28.32|9.99|49.99"],
-    "successMessage": "Aggregates collapse all rows into a single summary row. `ROUND(AVG(...), 2)` limits decimal places."
+    "title": "Salary statistics by department",
+    "instruction": "Aggregate functions summarize many rows into single numbers. `AVG`, `MIN`, `MAX`, and `COUNT` are the most common.\n\nGet salary statistics per department — this is a real HR reporting query.",
+    "starter": "SELECT\n  d.name                           AS department,\n  COUNT(e.id)                      AS headcount,\n  MIN(e.salary)                    AS min_salary,\n  MAX(e.salary)                    AS max_salary,\n  ROUND(AVG(e.salary))             AS avg_salary\nFROM employees e\nJOIN departments d ON e.department_id = d.id\nGROUP BY d.name\nORDER BY avg_salary DESC;",
+    "expectedOutput": ["Data Science|2|138000|195000|166500", "Engineering|5|92000|185000|133600", "Sales|3|72000|172000|114000", "HR|2|78000|130000|104000", "Marketing|3|85000|162000|118333"],
+    "successMessage": "Data Science has only 2 people but the highest average salary ($166,500). Engineering has 5 people but a wider range ($92k–$185k). This kind of report helps HR spot pay equity issues and budget gaps."
   },
   {
-    "title": "GROUP BY",
-    "instruction": "`GROUP BY` splits rows into groups, then applies aggregates to each group separately.\n\nRun this.",
-    "starter": "CREATE TABLE employees (name TEXT, dept TEXT, salary INTEGER);\nINSERT INTO employees VALUES ('Alice', 'Engineering', 95000);\nINSERT INTO employees VALUES ('Bob',   'Engineering', 105000);\nINSERT INTO employees VALUES ('Carol', 'Marketing',   72000);\nINSERT INTO employees VALUES ('Dave',  'Marketing',   68000);\nINSERT INTO employees VALUES ('Eve',   'HR',          65000);\n\nSELECT dept, COUNT(*) AS headcount, AVG(salary) AS avg_salary\nFROM employees\nGROUP BY dept\nORDER BY avg_salary DESC;",
-    "expectedOutput": ["Engineering|2|100000.0", "Marketing|2|70000.0", "HR|1|65000.0"],
-    "successMessage": "Each department becomes one row in the output. `GROUP BY` is the foundation of all reporting queries."
+    "title": "Revenue analysis — SUM with filters",
+    "instruction": "`SUM` adds up numeric values. Combined with `WHERE` or `HAVING`, you can build revenue dashboards.\n\nFind total revenue by product type, but only show product categories with over $20k in revenue.",
+    "starter": "SELECT\n  product,\n  COUNT(*)                         AS order_count,\n  ROUND(SUM(amount))               AS total_revenue,\n  ROUND(AVG(amount))               AS avg_order_value\nFROM orders\nWHERE status = 'paid'\nGROUP BY product\nHAVING SUM(amount) > 20000\nORDER BY total_revenue DESC;",
+    "expectedOutput": ["Enterprise Plan|8|192000|24000", "Pro Plan|5|60000|12000", "Training Package|3|25500|8500"],
+    "successMessage": "Enterprise Plan drives $192k of revenue — by far the biggest. `HAVING SUM(amount) > 20000` filters after aggregation (unlike `WHERE` which filters before). The Support Add-on falls below $20k so it's excluded."
   },
   {
-    "title": "HAVING — filter groups",
-    "instruction": "`HAVING` filters after aggregation. `WHERE` can't use aggregate results — `HAVING` can.\n\nRun this.",
-    "starter": "CREATE TABLE orders (customer TEXT, total REAL);\nINSERT INTO orders VALUES ('Alice', 50);\nINSERT INTO orders VALUES ('Alice', 120);\nINSERT INTO orders VALUES ('Bob',   30);\nINSERT INTO orders VALUES ('Carol', 200);\nINSERT INTO orders VALUES ('Carol', 150);\nINSERT INTO orders VALUES ('Carol', 90);\n\n-- Customers who have spent more than $100 in total\nSELECT customer, SUM(total) AS total_spent\nFROM orders\nGROUP BY customer\nHAVING SUM(total) > 100\nORDER BY total_spent DESC;",
-    "expectedOutput": ["Carol|440.0", "Alice|170.0"],
-    "successMessage": "`HAVING SUM(total) > 100` filters out Bob (only $30 total). Remember: `WHERE` filters rows, `HAVING` filters groups."
+    "title": "HAVING vs WHERE — know the difference",
+    "instruction": "`WHERE` filters rows **before** grouping. `HAVING` filters groups **after** aggregation. Mixing them up is one of the most common SQL mistakes.\n\nFind departments where the average salary is above $120k AND have more than 2 employees.",
+    "starter": "SELECT\n  d.name                       AS department,\n  COUNT(e.id)                  AS headcount,\n  ROUND(AVG(e.salary))         AS avg_salary,\n  SUM(e.salary)                AS total_payroll\nFROM employees e\nJOIN departments d ON e.department_id = d.id\nGROUP BY d.name\nHAVING COUNT(e.id) > 2 AND AVG(e.salary) > 120000\nORDER BY avg_salary DESC;",
+    "expectedOutput": ["Engineering|5|133600|668000"],
+    "successMessage": "Only Engineering passes both filters: more than 2 people AND average salary above $120k. Marketing has 3 people but its average is only $118k — it's filtered out by `HAVING AVG(e.salary) > 120000`."
   }
 ]

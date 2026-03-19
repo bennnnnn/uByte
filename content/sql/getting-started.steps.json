@@ -1,30 +1,23 @@
 [
   {
-    "title": "Your first SQL query",
-    "instruction": "SQL `SELECT` retrieves data. Use it with expressions to compute values directly.\n\nRun this.",
-    "starter": "SELECT 'Hello, SQL!' AS message;",
-    "expectedOutput": ["Hello, SQL!"],
-    "successMessage": "`SELECT` is the most common SQL statement. `AS message` names the output column."
+    "title": "Your first query against a real database",
+    "instruction": "You have access to a real company database with 5 tables:\n- **employees** (id, name, department_id, job_title, salary, hire_date)\n- **departments** (id, name, manager, budget, location)\n- **projects** (id, name, department_id, status, budget, deadline)\n- **customers** (id, name, email, country, joined_date)\n- **orders** (id, customer_id, product, amount, order_date, status)\n\nQuery all departments to see what you're working with.",
+    "starter": "SELECT id, name, location, budget\nFROM departments\nORDER BY budget DESC;",
+    "expectedOutput": ["5|Data Science|San Francisco|1600000", "1|Engineering|San Francisco|2400000", "3|Sales|Chicago|1200000", "2|Marketing|New York|800000", "4|HR|Austin|500000"],
+    "successMessage": "You queried a real table with real data. The `ORDER BY budget DESC` sorted from largest to smallest. This database has 15 employees, 8 projects, 10 customers, and 18 orders — all ready to explore."
   },
   {
-    "title": "SELECT with expressions",
-    "instruction": "SQL can evaluate expressions. The `||` operator concatenates strings in SQLite.\n\nRun this.",
-    "starter": "SELECT\n  2 + 2 AS sum,\n  10 * 3 AS product,\n  'Hello' || ', ' || 'World' AS greeting;",
-    "expectedOutput": ["4|30|Hello, World"],
-    "successMessage": "SQL evaluates arithmetic and string expressions inline. Multiple columns are separated by `|` in this output."
+    "title": "SELECT specific columns — don't fetch what you don't need",
+    "instruction": "Selecting `*` fetches every column. In production, that wastes bandwidth and exposes sensitive fields. Always name the columns you actually need.\n\nFetch just the employee names, titles, and salaries.",
+    "starter": "SELECT name, job_title, salary\nFROM employees\nORDER BY salary DESC;",
+    "expectedOutput": ["Eva Martinez|Head of Data Science|195000", "Alice Chen|VP Engineering|185000", "Carol Davis|VP Sales|172000", "Bob Taylor|VP Marketing|162000", "Lucas White|Data Scientist|138000", "James Park|Senior Engineer|145000", "Noah Kim|DevOps Engineer|128000", "Sophia Lee|Marketing Manager|108000", "Priya Sharma|Engineer|118000", "Olivia Jones|Account Executive|98000", "Dan Wilson|HR Director|130000", "Mia Robinson|HR Specialist|78000", "Ethan Brown|Content Strategist|85000", "Aiden Garcia|Sales Rep|72000", "Liam Foster|Junior Engineer|92000"],
+    "successMessage": "15 employees, sorted by salary. You'll notice VP/Head roles earn the most. In the next lesson you'll learn to filter — showing only engineering employees, or only those earning above a threshold."
   },
   {
-    "title": "Create a table and insert data",
-    "instruction": "`CREATE TABLE` defines a schema. `INSERT INTO` adds rows. `SELECT` retrieves them.\n\nRun this.",
-    "starter": "CREATE TABLE fruits (\n  id   INTEGER PRIMARY KEY,\n  name TEXT NOT NULL,\n  color TEXT\n);\n\nINSERT INTO fruits VALUES (1, 'Apple', 'red');\nINSERT INTO fruits VALUES (2, 'Banana', 'yellow');\nINSERT INTO fruits VALUES (3, 'Grape', 'purple');\n\nSELECT name, color FROM fruits;",
-    "expectedOutput": ["Apple|red", "Banana|yellow", "Grape|purple"],
-    "successMessage": "You created a table, inserted 3 rows, and retrieved them. This is the foundation of every SQL database."
-  },
-  {
-    "title": "SELECT all columns",
-    "instruction": "Use `SELECT *` to retrieve all columns. It's convenient for exploration but not recommended in production code.\n\nRun this.",
-    "starter": "CREATE TABLE products (\n  id    INTEGER PRIMARY KEY,\n  name  TEXT,\n  price REAL\n);\n\nINSERT INTO products VALUES (1, 'Widget', 9.99);\nINSERT INTO products VALUES (2, 'Gadget', 24.99);\n\nSELECT * FROM products;",
-    "expectedOutput": ["1|Widget|9.99", "2|Gadget|24.99"],
-    "successMessage": "`SELECT *` retrieves all columns in the order they were defined. In production, name your columns explicitly for clarity and resilience to schema changes."
+    "title": "COUNT — how big is the dataset?",
+    "instruction": "Before writing complex queries, it's useful to understand the scale of the data. `COUNT(*)` tells you exactly how many rows a query would return.\n\nCount customers per country to see your customer distribution.",
+    "starter": "SELECT country, COUNT(*) AS customer_count\nFROM customers\nGROUP BY country\nORDER BY customer_count DESC;",
+    "expectedOutput": ["USA|5", "Canada|2", "Germany|1", "UK|1", "Australia|1"],
+    "successMessage": "5 US customers, 2 Canadian, 3 international. `GROUP BY country` splits into groups, `COUNT(*)` counts each group. This pattern — group then aggregate — is the foundation of all reporting queries."
   }
 ]

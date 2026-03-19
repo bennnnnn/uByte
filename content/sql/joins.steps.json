@@ -1,23 +1,23 @@
 [
   {
-    "title": "INNER JOIN",
-    "instruction": "`INNER JOIN` returns rows where the join condition matches in both tables. Rows with no match are excluded.\n\nRun this.",
-    "starter": "CREATE TABLE customers (id INTEGER, name TEXT);\nCREATE TABLE orders (id INTEGER, customer_id INTEGER, total REAL);\n\nINSERT INTO customers VALUES (1, 'Alice'), (2, 'Bob'), (3, 'Carol');\nINSERT INTO orders VALUES (1, 1, 50.00), (2, 1, 120.00), (3, 2, 30.00);\n\nSELECT customers.name, orders.total\nFROM orders\nINNER JOIN customers ON orders.customer_id = customers.id\nORDER BY customers.name, orders.total;",
-    "expectedOutput": ["Alice|50.0", "Alice|120.0", "Bob|30.0"],
-    "successMessage": "Carol has no orders, so she doesn't appear. INNER JOIN = only rows with a match in BOTH tables."
+    "title": "INNER JOIN — combine employees with their departments",
+    "instruction": "The `employees` table stores `department_id` — a number. But you want to see the department name. `JOIN` connects the two tables through that shared key.\n\nThis is the most fundamental JOIN query you'll write in any system.",
+    "starter": "SELECT\n  e.name        AS employee,\n  e.job_title,\n  e.salary,\n  d.name        AS department,\n  d.location\nFROM employees e\nJOIN departments d ON e.department_id = d.id\nORDER BY d.name, e.salary DESC;",
+    "expectedOutput": ["Lucas White|Data Scientist|138000|Data Science|San Francisco", "Eva Martinez|Head of Data Science|195000|Data Science|San Francisco", "Alice Chen|VP Engineering|185000|Engineering|San Francisco", "James Park|Senior Engineer|145000|Engineering|San Francisco", "Noah Kim|DevOps Engineer|128000|Engineering|San Francisco", "Priya Sharma|Engineer|118000|Engineering|San Francisco", "Liam Foster|Junior Engineer|92000|Engineering|San Francisco", "Dan Wilson|HR Director|130000|HR|Austin", "Mia Robinson|HR Specialist|78000|HR|Austin", "Bob Taylor|VP Marketing|162000|Marketing|New York", "Sophia Lee|Marketing Manager|108000|Marketing|New York", "Ethan Brown|Content Strategist|85000|Marketing|New York", "Carol Davis|VP Sales|172000|Sales|Chicago", "Olivia Jones|Account Executive|98000|Sales|Chicago", "Aiden Garcia|Sales Rep|72000|Sales|Chicago"],
+    "successMessage": "15 rows — every employee matched with their department. The `ON e.department_id = d.id` is the join condition. `e` and `d` are table aliases that make the query shorter and clearer."
   },
   {
-    "title": "LEFT JOIN — include all left rows",
-    "instruction": "`LEFT JOIN` returns all rows from the left table even when there's no matching row on the right. Missing values are `NULL`.\n\nRun this.",
-    "starter": "CREATE TABLE customers (id INTEGER, name TEXT);\nCREATE TABLE orders (id INTEGER, customer_id INTEGER, total REAL);\n\nINSERT INTO customers VALUES (1, 'Alice'), (2, 'Bob'), (3, 'Carol');\nINSERT INTO orders VALUES (1, 1, 50.00), (2, 2, 30.00);\n\nSELECT c.name, COALESCE(o.total, 0) AS total\nFROM customers c\nLEFT JOIN orders o ON o.customer_id = c.id\nORDER BY c.name;",
-    "expectedOutput": ["Alice|50.0", "Bob|30.0", "Carol|0"],
-    "successMessage": "Carol has no orders but appears with `total = 0` (thanks to `COALESCE`). LEFT JOIN is great for 'show all X with optional Y' queries."
+    "title": "Multiple JOINs — orders, customers, and revenue",
+    "instruction": "Real business queries join 3 or more tables. The pattern is the same: each JOIN adds a new table connected through a shared key.\n\nBuild a revenue report that shows customer name, country, product, and total spend.",
+    "starter": "SELECT\n  c.name          AS customer,\n  c.country,\n  o.product,\n  COUNT(o.id)     AS order_count,\n  SUM(o.amount)   AS total_spent\nFROM orders o\nJOIN customers c ON o.customer_id = c.id\nWHERE o.status = 'paid'\nGROUP BY c.name, c.country, o.product\nORDER BY total_spent DESC\nLIMIT 8;",
+    "expectedOutput": ["Momentum Co|USA|Enterprise Plan|3|72000.0", "Acme Corp|USA|Enterprise Plan|1|24000.0", "Globex Ltd|UK|Enterprise Plan|1|24000.0", "Pinnacle Inc|USA|Enterprise Plan|2|48000.0", "SkyLine Systems|USA|Pro Plan|1|12000.0", "TechStart GmbH|Germany|Pro Plan|1|12000.0", "Apex Digital|USA|Pro Plan|1|12000.0", "Acme Corp|USA|Training Package|1|8500.0"],
+    "successMessage": "Momentum Co is the top customer with 3 Enterprise Plan renewals ($72k). This query joins `orders` → `customers`, filters to paid orders, then aggregates by customer and product. Real CRM reports look exactly like this."
   },
   {
-    "title": "Multiple JOINs",
-    "instruction": "Chain multiple JOINs to bring together data from more than two tables.\n\nRun this.",
-    "starter": "CREATE TABLE authors (id INTEGER, name TEXT);\nCREATE TABLE books (id INTEGER, author_id INTEGER, title TEXT);\nCREATE TABLE sales (book_id INTEGER, copies INTEGER);\n\nINSERT INTO authors VALUES (1, 'Alice Author'), (2, 'Bob Writer');\nINSERT INTO books VALUES (1, 1, 'TypeScript Guide'), (2, 1, 'SQL Mastery'), (3, 2, 'Go Handbook');\nINSERT INTO sales VALUES (1, 500), (2, 1200), (3, 350);\n\nSELECT a.name, b.title, s.copies\nFROM books b\nJOIN authors a ON b.author_id = a.id\nJOIN sales s ON s.book_id = b.id\nORDER BY s.copies DESC;",
-    "expectedOutput": ["Alice Author|SQL Mastery|1200", "Alice Author|TypeScript Guide|500", "Bob Writer|Go Handbook|350"],
-    "successMessage": "Three tables, two JOINs. The query reads: 'give me each book with its author's name and sales figures, sorted by copies sold.'"
+    "title": "LEFT JOIN — find what's missing",
+    "instruction": "`LEFT JOIN` returns ALL rows from the left table, plus matching rows from the right. When there's no match, the right-side columns are `NULL`.\n\nFind all customers and their total spending — including customers who haven't ordered yet.",
+    "starter": "SELECT\n  c.name                         AS customer,\n  c.country,\n  COUNT(o.id)                    AS order_count,\n  COALESCE(SUM(o.amount), 0)     AS total_spent\nFROM customers c\nLEFT JOIN orders o ON o.customer_id = c.id AND o.status = 'paid'\nGROUP BY c.name, c.country\nORDER BY total_spent DESC;",
+    "expectedOutput": ["Momentum Co|USA|3|72000.0", "Pinnacle Inc|USA|2|48000.0", "Acme Corp|USA|2|32500.0", "Globex Ltd|UK|2|32500.0", "SkyLine Systems|USA|1|12000.0", "TechStart GmbH|Germany|1|12000.0", "Apex Digital|USA|1|12000.0", "BrightPath|Australia|1|4800.0", "NovaSoft|Canada|0|0", "Vertex Solutions|Canada|0|0"],
+    "successMessage": "NovaSoft and Vertex Solutions appear with 0 orders — they signed up but never completed a paid purchase (their orders are `pending`). `LEFT JOIN` surfaces this. An `INNER JOIN` would have silently excluded them."
   }
 ]

@@ -1,23 +1,23 @@
 [
   {
-    "title": "Sort with ORDER BY",
-    "instruction": "`ORDER BY` sorts rows. Default is ascending (`ASC`). Use `DESC` to reverse.\n\nRun this.",
-    "starter": "CREATE TABLE scores (player TEXT, score INTEGER);\nINSERT INTO scores VALUES ('Alice', 850);\nINSERT INTO scores VALUES ('Bob', 1200);\nINSERT INTO scores VALUES ('Carol', 950);\nINSERT INTO scores VALUES ('Dave', 750);\n\nSELECT player, score FROM scores ORDER BY score DESC;",
-    "expectedOutput": ["Bob|1200", "Carol|950", "Alice|850", "Dave|750"],
-    "successMessage": "`ORDER BY score DESC` ranks highest to lowest. Swap to `ASC` (or remove `DESC`) for lowest to highest."
+    "title": "ORDER BY — sort employees by salary",
+    "instruction": "`ORDER BY` controls the order of results. Without it, the database returns rows in an undefined order — never rely on it. Always sort explicitly when order matters.\n\nSort employees from highest to lowest salary.",
+    "starter": "SELECT name, job_title, salary\nFROM employees\nORDER BY salary DESC;",
+    "expectedOutput": ["Eva Martinez|Head of Data Science|195000", "Alice Chen|VP Engineering|185000", "Carol Davis|VP Sales|172000", "Bob Taylor|VP Marketing|162000", "Lucas White|Data Scientist|138000", "James Park|Senior Engineer|145000", "Dan Wilson|HR Director|130000", "Noah Kim|DevOps Engineer|128000", "Priya Sharma|Engineer|118000", "Sophia Lee|Marketing Manager|108000", "Olivia Jones|Account Executive|98000", "Liam Foster|Junior Engineer|92000", "Mia Robinson|HR Specialist|78000", "Ethan Brown|Content Strategist|85000", "Aiden Garcia|Sales Rep|72000"],
+    "successMessage": "Eva Martinez tops the list at $195k. The range from $72k (Sales Rep) to $195k (Head of DS) spans 2.7x. Swap `DESC` for `ASC` to reverse the order."
   },
   {
-    "title": "LIMIT — top N rows",
-    "instruction": "`LIMIT` caps the number of returned rows. Combined with `ORDER BY`, it retrieves the top N.\n\nRun this.",
-    "starter": "CREATE TABLE products (name TEXT, price REAL);\nINSERT INTO products VALUES ('Widget', 9.99);\nINSERT INTO products VALUES ('Gadget', 49.99);\nINSERT INTO products VALUES ('Thingamajig', 24.99);\nINSERT INTO products VALUES ('Doohickey', 14.99);\nINSERT INTO products VALUES ('Gizmo', 99.99);\n\nSELECT name, price FROM products ORDER BY price DESC LIMIT 3;",
-    "expectedOutput": ["Gizmo|99.99", "Gadget|49.99", "Thingamajig|24.99"],
-    "successMessage": "Top 3 most expensive products. `ORDER BY DESC` then `LIMIT 3` is the standard pattern for leaderboards and rankings."
+    "title": "Multi-column ORDER BY — sort by department, then salary",
+    "instruction": "You can sort by multiple columns. The database sorts by the first column, then breaks ties using the second column.\n\nSort employees by department name, then by salary within each department.",
+    "starter": "SELECT\n  d.name    AS department,\n  e.name    AS employee,\n  e.salary\nFROM employees e\nJOIN departments d ON e.department_id = d.id\nORDER BY d.name ASC, e.salary DESC;",
+    "expectedOutput": ["Data Science|Eva Martinez|195000", "Data Science|Lucas White|138000", "Engineering|Alice Chen|185000", "Engineering|James Park|145000", "Engineering|Noah Kim|128000", "Engineering|Priya Sharma|118000", "Engineering|Liam Foster|92000", "HR|Dan Wilson|130000", "HR|Mia Robinson|78000", "Marketing|Bob Taylor|162000", "Marketing|Sophia Lee|108000", "Marketing|Ethan Brown|85000", "Sales|Carol Davis|172000", "Sales|Olivia Jones|98000", "Sales|Aiden Garcia|72000"],
+    "successMessage": "Departments are alphabetical (ASC). Within each department, employees are ranked by salary (DESC). This is the pattern for org charts, leaderboards, and any grouped ranking."
   },
   {
-    "title": "OFFSET — pagination",
-    "instruction": "`OFFSET` skips rows before returning results. Combined with `LIMIT`, this implements pagination.\n\nRun this.",
-    "starter": "CREATE TABLE articles (id INTEGER, title TEXT);\nINSERT INTO articles VALUES (1, 'Article One');\nINSERT INTO articles VALUES (2, 'Article Two');\nINSERT INTO articles VALUES (3, 'Article Three');\nINSERT INTO articles VALUES (4, 'Article Four');\nINSERT INTO articles VALUES (5, 'Article Five');\n\n-- Page 2: skip first 2, get next 2\nSELECT title FROM articles ORDER BY id LIMIT 2 OFFSET 2;",
-    "expectedOutput": ["Article Three", "Article Four"],
-    "successMessage": "`LIMIT 2 OFFSET 2` skips the first 2 rows and returns the next 2. Page N = `LIMIT size OFFSET (N-1)*size`."
+    "title": "LIMIT and OFFSET — top N and pagination",
+    "instruction": "`LIMIT N` returns at most N rows. `OFFSET M` skips the first M rows. Together they power pagination in web apps and 'top 10' reports.\n\nGet the top 5 highest-paid employees — page 1 of a salary report.",
+    "starter": "-- Page 1: top 5\nSELECT name, job_title, salary\nFROM employees\nORDER BY salary DESC\nLIMIT 5;\n",
+    "expectedOutput": ["Eva Martinez|Head of Data Science|195000", "Alice Chen|VP Engineering|185000", "Carol Davis|VP Sales|172000", "Bob Taylor|VP Marketing|162000", "James Park|Senior Engineer|145000"],
+    "successMessage": "The top 5 earners — all VP/Head level plus one Senior Engineer. Change `LIMIT 5` to `LIMIT 5 OFFSET 5` to get positions 6–10 (page 2). This is exactly how every paginated API endpoint works."
   }
 ]

@@ -1,30 +1,30 @@
 [
   {
-    "title": "Filter rows with WHERE",
-    "instruction": "The `WHERE` clause filters rows. Only rows matching the condition are returned.\n\nRun this.",
-    "starter": "CREATE TABLE employees (\n  id     INTEGER PRIMARY KEY,\n  name   TEXT,\n  dept   TEXT,\n  salary INTEGER\n);\nINSERT INTO employees VALUES (1, 'Alice', 'Engineering', 95000);\nINSERT INTO employees VALUES (2, 'Bob',   'Marketing',   72000);\nINSERT INTO employees VALUES (3, 'Carol', 'Engineering', 105000);\nINSERT INTO employees VALUES (4, 'Dave',  'HR',          68000);\n\nSELECT name, salary FROM employees WHERE dept = 'Engineering';",
-    "expectedOutput": ["Alice|95000", "Carol|105000"],
-    "successMessage": "Only rows where `dept = 'Engineering'` are returned. String comparisons in SQL use single quotes."
+    "title": "Filter with WHERE — find the engineers",
+    "instruction": "The `WHERE` clause filters rows before they're returned. Every column in the table can be a filter.\n\nFind all employees in the Engineering department (department_id = 1).",
+    "starter": "SELECT name, job_title, salary\nFROM employees\nWHERE department_id = 1\nORDER BY salary DESC;",
+    "expectedOutput": ["Alice Chen|VP Engineering|185000", "James Park|Senior Engineer|145000", "Noah Kim|DevOps Engineer|128000", "Priya Sharma|Engineer|118000", "Liam Foster|Junior Engineer|92000"],
+    "successMessage": "5 engineers, from VP to Junior. Notice the salary range: $92k to $185k. In the next step you'll filter by salary range using `BETWEEN` to find the mid-level engineers."
   },
   {
-    "title": "AND and OR conditions",
-    "instruction": "Combine conditions with `AND` (both must be true) and `OR` (either must be true).\n\nRun this.",
-    "starter": "CREATE TABLE products (id INTEGER, name TEXT, price REAL, in_stock INTEGER);\nINSERT INTO products VALUES (1, 'Laptop', 999.99, 1);\nINSERT INTO products VALUES (2, 'Mouse',  29.99,  1);\nINSERT INTO products VALUES (3, 'Monitor', 399.99, 0);\nINSERT INTO products VALUES (4, 'Keyboard', 79.99, 1);\n\nSELECT name, price FROM products\nWHERE in_stock = 1 AND price < 100;",
-    "expectedOutput": ["Mouse|29.99", "Keyboard|79.99"],
-    "successMessage": "Both conditions must be true. Only in-stock products under $100 are returned."
+    "title": "BETWEEN — salary band analysis",
+    "instruction": "`BETWEEN x AND y` filters rows where a value falls in a range (inclusive). This is cleaner than writing `salary >= 100000 AND salary <= 150000`.\n\nFind all employees earning between $100k and $150k — the mid-to-senior band.",
+    "starter": "SELECT name, job_title, salary,\n       ROUND(salary / 1000.0, 0) AS salary_k\nFROM employees\nWHERE salary BETWEEN 100000 AND 150000\nORDER BY salary DESC;",
+    "expectedOutput": ["James Park|Senior Engineer|145000|145.0", "Lucas White|Data Scientist|138000|138.0", "Noah Kim|DevOps Engineer|128000|128.0", "Priya Sharma|Engineer|118000|118.0", "Sophia Lee|Marketing Manager|108000|108.0", "Olivia Jones|Account Executive|98000|98.0", "Dan Wilson|HR Director|130000|130.0"],
+    "successMessage": "7 employees in the $100k–$150k band. The `ROUND(salary / 1000.0, 0)` expression computes a derived column — you can do math directly in SELECT without storing the result."
   },
   {
-    "title": "LIKE for pattern matching",
-    "instruction": "`LIKE` matches string patterns. `%` is a wildcard for any sequence, `_` for a single character.\n\nRun this.",
-    "starter": "CREATE TABLE users (id INTEGER, name TEXT, email TEXT);\nINSERT INTO users VALUES (1, 'Alice Smith', 'alice@gmail.com');\nINSERT INTO users VALUES (2, 'Bob Jones',   'bob@yahoo.com');\nINSERT INTO users VALUES (3, 'Carol Brown', 'carol@gmail.com');\nINSERT INTO users VALUES (4, 'Dave Wilson', 'dave@company.com');\n\nSELECT name FROM users WHERE email LIKE '%@gmail.com';",
-    "expectedOutput": ["Alice Smith", "Carol Brown"],
-    "successMessage": "`%@gmail.com` matches any email ending in `@gmail.com`. The `%` wildcard matches zero or more characters."
+    "title": "IN — filter across multiple values",
+    "instruction": "`IN (v1, v2, v3)` is cleaner than writing `OR` for each value. It reads naturally and scales well.\n\nFind all customers from English-speaking countries.",
+    "starter": "SELECT name, country, joined_date\nFROM customers\nWHERE country IN ('USA', 'UK', 'Canada', 'Australia')\nORDER BY joined_date;",
+    "expectedOutput": ["Pinnacle Inc|USA|2019-11-05", "Globex Ltd|UK|2020-09-10", "Momentum Co|USA|2020-05-25", "Acme Corp|USA|2021-01-15", "Vertex Solutions|Canada|2021-03-30", "NovaSoft|Canada|2022-02-28", "BrightPath|Australia|2022-07-14", "SkyLine Systems|USA|2023-01-18", "Apex Digital|USA|2023-04-09"],
+    "successMessage": "9 of 10 customers are from English-speaking countries. `NOT IN (...)` would give you the inverse — non-English-speaking countries. Both are cleaner than chaining multiple OR conditions."
   },
   {
-    "title": "IN and BETWEEN",
-    "instruction": "`IN` matches against a list. `BETWEEN` matches a range (inclusive on both ends).\n\nRun this.",
-    "starter": "CREATE TABLE orders (id INTEGER, customer TEXT, total REAL, status TEXT);\nINSERT INTO orders VALUES (1, 'Alice', 45.99, 'delivered');\nINSERT INTO orders VALUES (2, 'Bob',   120.00, 'shipped');\nINSERT INTO orders VALUES (3, 'Carol', 89.50, 'cancelled');\nINSERT INTO orders VALUES (4, 'Dave',  15.99, 'delivered');\nINSERT INTO orders VALUES (5, 'Eve',   200.00, 'shipped');\n\nSELECT customer, total FROM orders\nWHERE status IN ('delivered', 'shipped')\n  AND total BETWEEN 40 AND 150;",
-    "expectedOutput": ["Alice|45.99", "Bob|120.0"],
-    "successMessage": "`IN` is cleaner than multiple `OR` conditions. `BETWEEN 40 AND 150` is inclusive — it includes both 40 and 150."
+    "title": "LIKE — search by partial text",
+    "instruction": "`LIKE` matches patterns in text. `%` matches any sequence of characters. It's how you build search features.\n\nFind all employees whose title contains \"Engineer\" or whose name starts with specific letters.",
+    "starter": "SELECT name, job_title, salary\nFROM employees\nWHERE job_title LIKE '%Engineer%'\nORDER BY salary DESC;",
+    "expectedOutput": ["Alice Chen|VP Engineering|185000", "James Park|Senior Engineer|145000", "Noah Kim|DevOps Engineer|128000", "Priya Sharma|Engineer|118000", "Liam Foster|Junior Engineer|92000"],
+    "successMessage": "`'%Engineer%'` matches any title containing the word Engineer anywhere — VP Engineering, Senior Engineer, DevOps Engineer, etc. Case sensitivity depends on your database (SQLite is case-insensitive by default for ASCII)."
   }
 ]
