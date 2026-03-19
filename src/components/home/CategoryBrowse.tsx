@@ -143,32 +143,16 @@ export default function CategoryBrowse() {
                       New
                     </span>
                   )}
+                </div>
+                <div className="mt-1.5 flex items-center gap-2">
                   <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ring-1 ${LEVEL_COLORS[lang.level]}`}>
                     {lang.level}
                   </span>
-                </div>
-
-                <p className="mt-0.5 text-xs text-zinc-500 dark:text-zinc-400 line-clamp-1">
-                  {lang.tagline}
-                </p>
-
-                {/* Use cases */}
-                <div className="mt-2 flex flex-wrap gap-1">
-                  {lang.usedFor.map(use => (
-                    <span
-                      key={use}
-                      className="rounded-md bg-zinc-100 px-1.5 py-0.5 text-[11px] text-zinc-500 dark:bg-zinc-700 dark:text-zinc-400"
-                    >
-                      {use}
-                    </span>
-                  ))}
+                  <span className="text-xs text-zinc-400 dark:text-zinc-500">
+                    {lessonCount} lessons
+                  </span>
                 </div>
               </div>
-
-              {/* Lesson count — top right */}
-              <span className="absolute right-4 top-4 text-xs font-semibold text-zinc-400 dark:text-zinc-500">
-                {lessonCount} lessons
-              </span>
             </Link>
           );
         })}
