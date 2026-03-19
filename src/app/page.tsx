@@ -1,43 +1,36 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
-import { getAllTutorials } from "@/lib/tutorials";
 import { getTotalLessonCount } from "@/lib/tutorial-steps";
 import { ALL_LANGUAGE_KEYS } from "@/lib/languages/registry";
 import { getAllPracticeProblems, getPracticeProblemBySlug } from "@/lib/practice/problems";
-import { LANGUAGES, getAllLanguageSlugs } from "@/lib/languages/registry";
-import { getLangIcon } from "@/lib/languages/icons";
 import { APP_NAME, BASE_URL } from "@/lib/constants";
-import { getExamConfigForAllLangs, getLastActivity, getUserPlan, getExamPublicStatsByLang, getUserExamStats } from "@/lib/db";
-import { hasPaidAccess } from "@/lib/plans";
+import { getExamConfigForAllLangs, getLastActivity, getExamPublicStatsByLang } from "@/lib/db";
 import { getPopularLanguages, getPopularPracticeProblems, getFallbackPopularLanguages, getFallbackPopularPracticeProblems } from "@/lib/db/home-popular";
-import { tutorialLangUrl, tutorialUrl } from "@/lib/urls";
+import { tutorialUrl } from "@/lib/urls";
 import { absoluteUrl, SITE_KEYWORDS, buildSiteSearchJsonLd } from "@/lib/seo";
 import { getCurrentUser } from "@/lib/auth";
+import { getAllTutorials } from "@/lib/tutorials";
+import { LANGUAGES } from "@/lib/languages/registry";
 import type { SupportedLanguage } from "@/lib/languages/types";
 import dynamic from "next/dynamic";
-import {
-  LangCard,
-  SectionHeading,
-  HeroSection,
-  PracticeExamsSection,
-} from "@/components/home";
-import ContinueBanner from "@/components/ContinueBanner";
-import LeftOffBanner from "@/components/LeftOffBanner";
-import GoogleOAuthError from "@/components/GoogleOAuthError";
+
+// Homepage sections
+import HomeHero           from "@/components/home/HomeHero";
+import TrendingSection    from "@/components/home/TrendingSection";
+import NewLanguagesSection from "@/components/home/NewLanguagesSection";
+import CategoryBrowse     from "@/components/home/CategoryBrowse";
+import CertificationsHighlight from "@/components/home/CertificationsHighlight";
+import ContinueBanner     from "@/components/ContinueBanner";
+import GoogleOAuthError   from "@/components/GoogleOAuthError";
 import ReferralPromptBanner from "@/components/ReferralPromptBanner";
 
-// Below-fold sections: lazy-loaded to reduce initial bundle
-const StepsSection              = dynamic(() => import("@/components/home/StepsSection"));
-const ValuePropBanner           = dynamic(() => import("@/components/home/ValuePropBanner"));
-const PopularTutorialsSection   = dynamic(() => import("@/components/home/PopularTutorialsSection"));
 const PopularInterviewPrepSection = dynamic(() => import("@/components/home/PopularInterviewPrepSection"));
-// Testimonials are below the fold — client-only wrapper keeps them out of initial HTML
-import TestimonialsStripDeferred from "@/components/home/TestimonialsStripDeferred";
+const TestimonialsStripDeferred   = dynamic(() => import("@/components/home/TestimonialsStripDeferred") as Promise<{ default: React.ComponentType }>, { ssr: false });
 
 export const metadata: Metadata = {
-  title: "uByte — Learn to Code with Interactive Tutorials, Interview Prep & Certifications",
+  title: "uByte — Interactive Coding Tutorials, Interview Prep & Free Certifications",
   description:
-    "The best alternative to W3Schools, Codecademy, and LeetCode — combined. Free interactive coding tutorials, 200+ interview prep problems, and certification exams in Go, Python, JavaScript, Java, C++, Rust, and C#. Write and run real code in your browser.",
+    "Master Go, Python, TypeScript, SQL, Java, Rust, C++ and C# with interactive tutorials. Practice with 114+ interview problems. Take free certification exams. Write and run real code in your browser.",
   keywords: [
     ...SITE_KEYWORDS,
     "coding bootcamp alternative",
@@ -47,27 +40,23 @@ export const metadata: Metadata = {
     "best coding platform",
     "coding website like w3schools",
     "better than codecademy",
-    "coding tutorial website",
-    "learn programming online",
-    "free coding website",
-    "coding practice website",
-    "interactive programming course",
+    "free coding certification",
+    "learn typescript online",
+    "learn sql online",
   ],
   alternates: { canonical: absoluteUrl("/") },
   openGraph: {
-    title: "uByte — Interactive Coding Tutorials, Interview Prep & Certifications",
+    title: "uByte — Interactive Coding Tutorials, Interview Prep & Free Certifications",
     description:
-      "Free interactive tutorials, 200+ coding problems, and certification exams in Go, Python, JavaScript, Java, C++, Rust, and C#. The best alternative to W3Schools and Codecademy.",
+      "Interactive tutorials for Go, Python, TypeScript, SQL and more. 114+ practice problems. Free certification exams. Zero setup — code in your browser.",
     type: "website",
     url: absoluteUrl("/"),
   },
 };
 
 export default async function Home() {
-  const goTutorials = getAllTutorials("go");
-  const topicCount = goTutorials.length;
   const problemCount = getAllPracticeProblems().length;
-  // Kick off all independent async work in parallel
+
   const [examConfigByLang, user, popularLanguages, popularProblems, publicExamStats] = await Promise.all([
     getExamConfigForAllLangs(),
     getCurrentUser(),
@@ -76,25 +65,20 @@ export default async function Home() {
     getExamPublicStatsByLang(),
   ]);
 
-  // Resolve "You left off at..." + user plan + user exam stats — need user but independent of each other
+  // User-specific data
   let leftOff: { href: string; label: string } | null = null;
   let continueLang: SupportedLanguage = "go";
-  let userPlan = "free";
-  let userExamStats: { lang: string; attemptCount: number; lastPassed: boolean | null; lastScore: number | null; bestScore: number | null; hasCertificate: boolean }[] = [];
+  let continueTutorialList: { slug: string; title: string }[] = [];
 
   if (user) {
-    const [last, fetchedPlan, examStats] = await Promise.all([
+    const [last] = await Promise.all([
       getLastActivity(user.userId),
-      getUserPlan(user.userId),
-      getUserExamStats(user.userId),
     ]);
-    userExamStats = examStats;
-    userPlan = fetchedPlan;
     if (last) {
       if (last.activity_type === "tutorial" && last.slug) {
         continueLang = last.lang as SupportedLanguage;
         const tutorials = getAllTutorials(continueLang);
-        const meta = tutorials.find((t) => t.slug === last.slug);
+        const meta = tutorials.find(t => t.slug === last.slug);
         if (meta) {
           const step = last.step != null ? last.step : undefined;
           leftOff = {
@@ -102,6 +86,7 @@ export default async function Home() {
             label: step != null ? `${meta.title} · Step ${step + 1}` : meta.title,
           };
         }
+        continueTutorialList = getAllTutorials(continueLang).map(({ slug, title }) => ({ slug, title }));
       } else if (last.activity_type === "practice" && last.slug) {
         const problem = getPracticeProblemBySlug(last.slug);
         if (problem) {
@@ -115,24 +100,19 @@ export default async function Home() {
     }
   }
 
-  const continueTutorialList = getAllTutorials(continueLang).map(({ slug, title }) => ({ slug, title }));
-
-  // Total lessons summed across ALL languages — updates automatically when new tutorials are added
   const totalLessonCount = ALL_LANGUAGE_KEYS.reduce(
     (sum, lang) => sum + getTotalLessonCount(lang),
     0
   );
 
-  // Number of languages with a published exam config (dynamic — add a new lang and it counts itself)
-  const certificationCount = Object.values(examConfigByLang).filter(Boolean).length;
+  const certCount = Object.values(examConfigByLang).filter(Boolean).length;
 
-  const isPro = hasPaidAccess(userPlan);
-  const publicStatsByLang = Object.fromEntries(publicExamStats.map((s) => [s.lang, s]));
-  const examStatsByLang = Object.fromEntries(userExamStats.map((s) => [s.lang, s]));
-  const popularPracticeProblems =
-    popularProblems.length > 0 ? popularProblems : getFallbackPopularPracticeProblems();
-  const popularLangs =
-    popularLanguages.length > 0 ? popularLanguages : getFallbackPopularLanguages();
+  void publicExamStats; // used for aggregate stats below, not per-lang on homepage
+  const totalAttempts     = publicExamStats.reduce((s, r) => s + r.attemptsSubmitted, 0);
+  const totalCertificates = publicExamStats.reduce((s, r) => s + r.usersPassed, 0);
+
+  const popularLangs        = popularLanguages.length > 0 ? popularLanguages : getFallbackPopularLanguages();
+  const popularPracticeProbs = popularProblems.length  > 0 ? popularProblems  : getFallbackPopularPracticeProblems();
 
   const websiteJsonLd = buildSiteSearchJsonLd();
   const orgJsonLd = {
@@ -142,137 +122,65 @@ export default async function Home() {
     url: BASE_URL,
     sameAs: [BASE_URL],
   };
-  const itemListJsonLd = {
-    "@context": "https://schema.org",
-    "@type": "ItemList",
-    name: "Programming language tutorial tracks on uByte",
-    itemListElement: getAllLanguageSlugs().map((slug, index) => ({
-      "@type": "ListItem",
-      position: index + 1,
-      name: LANGUAGES[slug as SupportedLanguage]?.name ?? slug,
-      url: absoluteUrl(tutorialLangUrl(slug)),
-    })),
-  };
-
-  const languageEntries = getAllLanguageSlugs()
-    .map((slug) => ({ slug, config: LANGUAGES[slug as keyof typeof LANGUAGES] }))
-    .filter((e): e is { slug: string; config: (typeof LANGUAGES)["go"] } => !!e.config);
 
   return (
     <div className="min-h-0 flex-1 overflow-y-auto">
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify([websiteJsonLd, orgJsonLd, itemListJsonLd]),
-        }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify([websiteJsonLd, orgJsonLd]) }}
       />
+
       <Suspense>
         <GoogleOAuthError />
       </Suspense>
 
-      {/* ── 1. Hero — full bleed, dark ───────────────────────────────── */}
-      <HeroSection
-        topicCount={topicCount}
-        totalLessonCount={totalLessonCount}
+      {/* ── HERO — dark, full-bleed, with search ───────────────────────── */}
+      <HomeHero
+        totalLessons={totalLessonCount}
         problemCount={problemCount}
-        languageCount={ALL_LANGUAGE_KEYS.length}
-        certificationCount={certificationCount}
+        certCount={certCount}
       />
 
-      {/* ── Referral prompt banner — client-rendered, dismissable ─────── */}
-      <ReferralPromptBanner />
+      {/* ── MAIN CONTENT ─────────────────────────────────────────────────── */}
+      <div className="mx-auto max-w-6xl space-y-16 px-4 py-14 sm:px-6 lg:px-8 lg:py-18">
 
-      {/* ── 2-N. Sections — constrained ─────────────────────────────── */}
-      <div className="mx-auto max-w-6xl space-y-16 px-4 py-16 sm:px-6 lg:px-8 lg:py-20">
+        {/* Referral banner */}
+        <ReferralPromptBanner />
 
-        {/* You left off at... (from DB, logged-in only) */}
-        {leftOff && <LeftOffBanner href={leftOff.href} label={leftOff.label} />}
+        {/* Continue learning — logged-in users only */}
+        {leftOff && (
+          <section>
+            <p className="mb-3 text-xs font-bold uppercase tracking-widest text-zinc-500">
+              ▶️ Continue where you left off
+            </p>
+            <ContinueBanner lang={continueLang} tutorials={continueTutorialList} />
+          </section>
+        )}
 
-        {/* Continue banner (logged-in users only) */}
-        <ContinueBanner lang={continueLang} tutorials={continueTutorialList} />
+        {/* 🔥 Trending this week — real learner data */}
+        <TrendingSection languages={popularLangs} />
 
-        {/* How it works */}
-        <StepsSection />
+        {/* ✨ New languages */}
+        <NewLanguagesSection />
 
-        {/* Why upgrade — value proposition banner (hidden for Pro users) */}
-        <ValuePropBanner isPro={isPro} />
+        {/* 🗂️ Browse by category */}
+        <CategoryBrowse />
 
-        {/* Social proof — developer testimonials */}
-        <TestimonialsStripDeferred />
+        {/* Testimonials */}
+        <Suspense>
+          <TestimonialsStripDeferred />
+        </Suspense>
 
-        {/* Languages — tiered: featured top 4 + secondary grid */}
-        <section aria-labelledby="languages-heading">
-          <SectionHeading
-            id="languages-heading"
-            eyebrow="Languages"
-            title="The languages that get you hired."
-            subtitle="From beginner to interview-ready. Pick a track and build real skills with guided tutorials, practice problems, and a verifiable certificate."
-          />
-
-          {/* Featured top row — most popular */}
-          {(() => {
-            const featuredSlugs = ["go", "python", "javascript", "typescript"];
-            const featured = languageEntries.filter(e => featuredSlugs.includes(e.slug));
-            const others   = languageEntries.filter(e => !featuredSlugs.includes(e.slug));
-            const newLangs = new Set(["typescript", "sql"]);
-            return (
-              <>
-                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                  {featured.map(({ slug, config }) => {
-                    const lessonCount = getTotalLessonCount(slug as SupportedLanguage);
-                    const badge = newLangs.has(slug) ? "New" : `${lessonCount} lessons`;
-                    return (
-                      <LangCard
-                        key={slug}
-                        href={tutorialLangUrl(slug)}
-                        icon={getLangIcon(slug)}
-                        name={config.name}
-                        badge={badge}
-                        description={config.seo.defaultDescription}
-                        cta="Start learning"
-                      />
-                    );
-                  })}
-                </div>
-
-                {/* Secondary row — other languages */}
-                <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
-                  {others.map(({ slug, config }) => {
-                    const lessonCount = getTotalLessonCount(slug as SupportedLanguage);
-                    const badge = newLangs.has(slug) ? "New" : `${lessonCount} lessons`;
-                    return (
-                      <LangCard
-                        key={slug}
-                        href={tutorialLangUrl(slug)}
-                        icon={getLangIcon(slug)}
-                        name={config.name}
-                        badge={badge}
-                        description={config.seo.defaultDescription}
-                        cta="Explore"
-                      />
-                    );
-                  })}
-                </div>
-              </>
-            );
-          })()}
-        </section>
-
-        {/* Popular languages — sorted by real learner count */}
-        <PopularTutorialsSection languages={popularLangs} />
-
-        {/* Popular interview prep — sorted by real view count */}
-        <PopularInterviewPrepSection problems={popularPracticeProblems} />
-
-        {/* Certifications */}
-        <PracticeExamsSection
-          examConfigByLang={examConfigByLang}
-          publicStatsByLang={publicStatsByLang}
-          statsByLang={examStatsByLang}
-          isLoggedIn={!!user}
+        {/* 🎓 Certifications highlight */}
+        <CertificationsHighlight
+          totalCertificates={totalCertificates}
+          totalAttempts={totalAttempts}
         />
 
-        {/* Spacer before footer */}
+        {/* 🧩 Interview prep — popular problems */}
+        <PopularInterviewPrepSection problems={popularPracticeProbs} />
+
+        {/* Spacer */}
         <div className="pb-8 sm:pb-12" />
       </div>
     </div>

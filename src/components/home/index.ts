@@ -1,6 +1,11 @@
 export { default as LangCard } from "./LangCard";
 export { default as SectionHeading } from "./SectionHeading";
 export { default as HeroSection } from "./HeroSection";
+export { default as HomeHero } from "./HomeHero";
+export { default as TrendingSection } from "./TrendingSection";
+export { default as NewLanguagesSection } from "./NewLanguagesSection";
+export { default as CategoryBrowse } from "./CategoryBrowse";
+export { default as CertificationsHighlight } from "./CertificationsHighlight";
 export { default as PracticeExamsSection } from "./PracticeExamsSection";
 export { default as StepsSection } from "./StepsSection";
 export { default as ValuePropBanner } from "./ValuePropBanner";
