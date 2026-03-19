@@ -107,9 +107,9 @@ export default async function Home() {
 
   const certCount = Object.values(examConfigByLang).filter(Boolean).length;
 
-  void publicExamStats; // used for aggregate stats below, not per-lang on homepage
   const totalAttempts     = publicExamStats.reduce((s, r) => s + r.attemptsSubmitted, 0);
   const totalCertificates = publicExamStats.reduce((s, r) => s + r.usersPassed, 0);
+  const publicStatsByLang = Object.fromEntries(publicExamStats.map(s => [s.lang, s]));
 
   const popularLangs        = popularLanguages.length > 0 ? popularLanguages : getFallbackPopularLanguages();
   const popularPracticeProbs = popularProblems.length  > 0 ? popularProblems  : getFallbackPopularPracticeProblems();
@@ -175,6 +175,7 @@ export default async function Home() {
         <CertificationsHighlight
           totalCertificates={totalCertificates}
           totalAttempts={totalAttempts}
+          statsByLang={publicStatsByLang}
         />
 
         {/* 🧩 Interview prep — popular problems */}

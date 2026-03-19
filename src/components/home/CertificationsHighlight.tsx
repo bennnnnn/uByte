@@ -11,12 +11,21 @@ const CERT_LANGUAGES = [
   { slug: "csharp",     name: "C#",         questions: 44 },
 ];
 
+interface LangStats {
+  attemptsSubmitted: number;
+  usersPassed: number;
+}
+
 interface Props {
   totalCertificates: number;
   totalAttempts: number;
+  statsByLang?: Record<string, LangStats>;
 }
 
-export default function CertificationsHighlight({ totalCertificates, totalAttempts }: Props) {
+/** Only show learner count once it reaches this threshold — avoids showing "2 learners" */
+const MIN_LEARNERS_TO_SHOW = 10;
+
+export default function CertificationsHighlight({ totalCertificates, totalAttempts, statsByLang = {} }: Props) {
   return (
     <section aria-labelledby="certs-highlight-heading">
 
@@ -73,23 +82,32 @@ export default function CertificationsHighlight({ totalCertificates, totalAttemp
 
       {/* Certification list */}
       <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
-        {CERT_LANGUAGES.map(lang => (
-          <Link
-            key={lang.slug}
-            href={`/certifications/${lang.slug}`}
-            className="group flex items-center gap-3 rounded-xl border border-zinc-200 bg-white px-4 py-3 transition-all hover:-translate-y-0.5 hover:border-indigo-200 hover:shadow-sm dark:border-zinc-700/60 dark:bg-zinc-800/80 dark:hover:border-indigo-700"
-          >
-            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-zinc-50 text-lg ring-1 ring-zinc-100 dark:bg-zinc-700 dark:ring-zinc-600">
-              {getLangIcon(lang.slug)}
-            </span>
-            <div className="min-w-0">
-              <p className="text-sm font-bold text-zinc-800 group-hover:text-indigo-600 dark:text-zinc-100 dark:group-hover:text-indigo-400">
-                {lang.name}
-              </p>
-              <p className="text-xs text-zinc-400">{lang.questions} questions</p>
-            </div>
-          </Link>
-        ))}
+        {CERT_LANGUAGES.map(lang => {
+          const stats = statsByLang[lang.slug];
+          const learners = stats?.attemptsSubmitted ?? 0;
+          const showLearners = learners >= MIN_LEARNERS_TO_SHOW;
+          return (
+            <Link
+              key={lang.slug}
+              href={`/certifications/${lang.slug}`}
+              className="group flex items-center gap-3 rounded-xl border border-zinc-200 bg-white px-4 py-3 transition-all hover:-translate-y-0.5 hover:border-indigo-200 hover:shadow-sm dark:border-zinc-700/60 dark:bg-zinc-800/80 dark:hover:border-indigo-700"
+            >
+              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-zinc-50 text-lg ring-1 ring-zinc-100 dark:bg-zinc-700 dark:ring-zinc-600">
+                {getLangIcon(lang.slug)}
+              </span>
+              <div className="min-w-0">
+                <p className="text-sm font-bold text-zinc-800 group-hover:text-indigo-600 dark:text-zinc-100 dark:group-hover:text-indigo-400">
+                  {lang.name}
+                </p>
+                <p className="text-xs text-zinc-400">
+                  {showLearners
+                    ? `${learners.toLocaleString()} learners · ${lang.questions} questions`
+                    : `${lang.questions} questions`}
+                </p>
+              </div>
+            </Link>
+          );
+        })}
 
         {/* Browse all card */}
         <Link
