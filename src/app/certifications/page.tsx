@@ -209,22 +209,6 @@ export default async function PracticeExamsPage() {
                   See pricing
                 </Link>
               </div>
-            ) : (
-              /* Logged in — exams are free */
-              <div className="flex flex-wrap gap-3">
-                <a
-                  href="#all-certifications"
-                  className="inline-flex items-center justify-center gap-2 rounded-xl bg-indigo-600 px-5 py-3 text-sm font-bold text-white shadow-md shadow-indigo-500/20 transition-all hover:-translate-y-0.5 hover:bg-indigo-500"
-                >
-                  Browse certifications
-                </a>
-                <a
-                  href="#all-certifications"
-                  className="inline-flex items-center justify-center gap-2 rounded-xl border border-zinc-300 bg-white px-5 py-2.5 text-sm font-semibold text-zinc-700 transition-all hover:border-zinc-400 hover:bg-zinc-50 dark:border-zinc-600 dark:bg-surface-card dark:text-zinc-200 dark:hover:border-zinc-500"
-                >
-                  Browse certifications
-                </a>
-              </div>
             ) : passedLangs.length === EXAM_LANGS.length ? (
               /* Pro, all passed */
               <div className="flex flex-wrap items-center gap-3">
