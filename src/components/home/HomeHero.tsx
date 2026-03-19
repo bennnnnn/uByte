@@ -27,44 +27,42 @@ export default function HomeHero({ totalLessons, problemCount, certCount }: Prop
   const firstName = profile ? (user as { name?: string })?.name?.split(" ")[0] : null;
 
   return (
-    <section className="relative overflow-hidden bg-gradient-to-br from-zinc-950 via-indigo-950/40 to-zinc-950 py-20 sm:py-28 lg:py-32">
-      {/* Background grid */}
-      <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(rgba(99,102,241,0.04)_1px,transparent_1px),linear-gradient(90deg,rgba(99,102,241,0.04)_1px,transparent_1px)] bg-[size:72px_72px]" />
-      {/* Radial glow */}
-      <div className="pointer-events-none absolute left-1/2 top-0 h-96 w-96 -translate-x-1/2 -translate-y-1/2 rounded-full bg-indigo-600/20 blur-3xl" />
+    <section className="relative overflow-hidden bg-gradient-to-b from-indigo-600 to-indigo-700 py-20 sm:py-28 lg:py-32">
+      {/* Subtle dot pattern */}
+      <div className="pointer-events-none absolute inset-0 opacity-10 [background-image:radial-gradient(circle,white_1px,transparent_1px)] [background-size:24px_24px]" />
 
       <div className="relative mx-auto max-w-5xl px-4 text-center sm:px-6">
         {isLoggedIn && firstName ? (
           // Returning user
           <>
-            <p className="mb-3 inline-flex items-center gap-2 rounded-full border border-indigo-500/30 bg-indigo-500/10 px-4 py-1.5 text-sm font-semibold text-indigo-300">
+            <p className="mb-3 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-sm font-semibold text-white/90">
               👋 Welcome back, {firstName}
             </p>
             <h1 className="text-4xl font-black tracking-tight text-white sm:text-5xl lg:text-6xl">
               Keep the{" "}
-              <span className="bg-gradient-to-r from-indigo-400 to-violet-400 bg-clip-text text-transparent">
+              <span className="text-yellow-300">
                 momentum
               </span>{" "}
               going.
             </h1>
-            <p className="mx-auto mt-5 max-w-2xl text-lg text-zinc-300">
+            <p className="mx-auto mt-5 max-w-2xl text-lg text-indigo-100">
               You&apos;re making progress. Pick up where you left off, tackle a new challenge, or take a certification exam.
             </p>
           </>
         ) : (
           // Guest
           <>
-            <p className="mb-3 inline-flex items-center gap-2 rounded-full border border-indigo-500/30 bg-indigo-500/10 px-4 py-1.5 text-sm font-semibold text-indigo-300">
+            <p className="mb-3 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-sm font-semibold text-white/90">
               ✨ Learn · Practice · Get Certified
             </p>
             <h1 className="text-4xl font-black tracking-tight text-white sm:text-5xl lg:text-6xl">
               The fastest way to{" "}
-              <span className="bg-gradient-to-r from-indigo-400 to-violet-400 bg-clip-text text-transparent">
+              <span className="text-yellow-300">
                 master coding
               </span>{" "}
               and get hired.
             </h1>
-            <p className="mx-auto mt-5 max-w-2xl text-lg text-zinc-300">
+            <p className="mx-auto mt-5 max-w-2xl text-lg text-indigo-100">
               Interactive tutorials, real interview prep, and industry certifications — all in one place.
               Write and run code directly in your browser. No setup required.
             </p>
@@ -82,12 +80,12 @@ export default function HomeHero({ totalLessons, problemCount, certCount }: Prop
               value={query}
               onChange={e => setQuery(e.target.value)}
               placeholder="Search tutorials, topics, languages…"
-              className="w-full rounded-xl border border-white/10 bg-white/10 py-3 pl-10 pr-4 text-sm text-white placeholder-zinc-400 outline-none backdrop-blur-sm focus:border-indigo-400 focus:ring-2 focus:ring-indigo-400/30"
+              className="w-full rounded-xl border border-transparent bg-white py-3 pl-10 pr-4 text-sm text-zinc-900 placeholder-zinc-400 shadow outline-none focus:ring-2 focus:ring-white/50"
             />
           </div>
           <button
             type="submit"
-            className="rounded-xl bg-indigo-600 px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-400"
+            className="rounded-xl bg-indigo-900 px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-indigo-800 focus:outline-none focus:ring-2 focus:ring-white/30"
           >
             Search
           </button>
@@ -99,7 +97,7 @@ export default function HomeHero({ totalLessons, problemCount, certCount }: Prop
             <Link
               key={tag}
               href={tag === "Interview Prep" ? "/practice" : `/tutorial/${tag.toLowerCase()}`}
-              className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-medium text-zinc-300 transition-colors hover:border-indigo-500/50 hover:bg-indigo-500/10 hover:text-indigo-300"
+              className="rounded-full border border-white/30 bg-white/10 px-3 py-1 text-xs font-medium text-white/90 transition-colors hover:bg-white/20 hover:text-white"
             >
               {tag}
             </Link>
@@ -111,13 +109,13 @@ export default function HomeHero({ totalLessons, problemCount, certCount }: Prop
           <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
             <Link
               href="/signup"
-              className="rounded-xl bg-indigo-600 px-7 py-3 text-sm font-bold text-white shadow-lg shadow-indigo-500/30 transition-all hover:-translate-y-0.5 hover:bg-indigo-500 hover:shadow-xl"
+              className="rounded-xl bg-white px-7 py-3 text-sm font-bold text-indigo-700 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md"
             >
               Start for free
             </Link>
             <Link
               href="/certifications"
-              className="rounded-xl border border-white/20 bg-white/5 px-7 py-3 text-sm font-bold text-white backdrop-blur transition-all hover:border-white/30 hover:bg-white/10"
+              className="rounded-xl border border-white/30 bg-white/10 px-7 py-3 text-sm font-bold text-white transition-all hover:bg-white/20"
             >
               View certifications
             </Link>
@@ -134,7 +132,7 @@ export default function HomeHero({ totalLessons, problemCount, certCount }: Prop
           ].map(stat => (
             <div key={stat.label} className="text-center">
               <p className="text-2xl font-black text-white">{stat.value}</p>
-              <p className="text-xs text-zinc-400">{stat.label}</p>
+              <p className="text-xs text-indigo-200">{stat.label}</p>
             </div>
           ))}
         </div>

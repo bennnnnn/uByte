@@ -22,23 +22,7 @@ export default function SiteHeader() {
         {/* Inline search bar */}
         <NavSearch />
 
-        {/* Direct links */}
-        <Link
-          href="/pricing"
-          className="rounded-lg px-3 py-2 text-sm font-medium text-zinc-600 transition-colors hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-200"
-        >
-          Pricing
-        </Link>
-        <Link
-          href="/certifications"
-          className="rounded-lg px-3 py-2 text-sm font-medium text-zinc-600 transition-colors hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-200"
-        >
-          Certifications
-        </Link>
-
-        <div className="h-5 w-px bg-zinc-200 dark:bg-zinc-700" />
-
-        <Suspense fallback={<div className="h-9 w-40 animate-pulse rounded-lg bg-zinc-200 dark:bg-zinc-800" />}>
+        <Suspense fallback={<div className="h-9 w-56 animate-pulse rounded-lg bg-zinc-200 dark:bg-zinc-800" />}>
           <AuthButtons />
         </Suspense>
       </div>
