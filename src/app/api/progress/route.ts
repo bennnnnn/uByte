@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
 import { getProgress, markComplete, markIncomplete, addXp, logActivity, updateStreak, getUserById, addStreakFreeze } from "@/lib/db";
+import { createNotification } from "@/lib/db/notifications";
 import { checkBadges, BADGE_MAP } from "@/lib/badges";
 import { verifyCsrf } from "@/lib/csrf";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
@@ -64,6 +65,8 @@ export const POST = withErrorHandling("POST /api/progress", async (request: Next
     return NextResponse.json({ error: "Unknown tutorial" }, { status: 400 });
   }
 
+  const events: { type: string; message: string }[] = [];
+
   if (completed) {
     // markComplete uses ON CONFLICT DO NOTHING, so only the first insert succeeds.
     // We use the DB as the source of truth for first-completion to prevent race conditions.
@@ -74,18 +77,25 @@ export const POST = withErrorHandling("POST /api/progress", async (request: Next
 
     if (!alreadyComplete) {
       const today = new Date().toISOString().slice(0, 10);
-      const [, , dbUserBefore, { streak_days }] = await Promise.all([
+      const [, , dbUserBefore, streakResult] = await Promise.all([
         addXp(user.userId, 10),
         logActivity(user.userId, "complete", slug),
         getUserById(user.userId),
         updateStreak(user.userId),
       ]);
+      const { streak_days, freeze_used } = streakResult;
       const isSpeedster = dbUserBefore?.created_at?.startsWith(today) ?? false;
+
+      if (freeze_used) {
+        events.push({ type: "freeze_used", message: "Streak freeze used — your streak is safe! 🛡️" });
+        createNotification(user.userId, "info", "Streak Freeze Used 🛡️", "You missed a day but your streak freeze saved you! Keep going.").catch(() => {});
+      }
 
       const newBadges = await checkBadges(user.userId, {
         streakDays: streak_days,
         justCompletedSlug: slug,
         speedster: isSpeedster,
+        language,
       });
       for (const key of newBadges) {
         const badge = BADGE_MAP[key];
@@ -94,6 +104,8 @@ export const POST = withErrorHandling("POST /api/progress", async (request: Next
 
       if (streak_days > 0 && streak_days % 7 === 0) {
         await addStreakFreeze(user.userId);
+        events.push({ type: "freeze_earned", message: `🛡️ Streak freeze earned! ${streak_days}-day streak milestone reached.` });
+        createNotification(user.userId, "success", `Streak Freeze Earned! 🛡️`, `You hit a ${streak_days}-day streak — a freeze shield has been added to your account.`).catch(() => {});
       }
     }
   } else {
@@ -101,5 +113,5 @@ export const POST = withErrorHandling("POST /api/progress", async (request: Next
   }
 
   const progress = await getProgress(user.userId, language);
-  return NextResponse.json({ progress });
+  return NextResponse.json({ progress, events });
 });

@@ -1,0 +1,90 @@
+---
+title: "Subqueries"
+description: "Use the result of one SELECT query inside another — in WHERE, FROM, and SELECT clauses."
+order: 7
+difficulty: "intermediate"
+estimatedMinutes: 12
+---
+
+## What is a Subquery?
+
+A subquery (inner query) is a `SELECT` nested inside another SQL statement:
+
+```sql
+-- Find users who have placed at least one order
+SELECT name FROM users
+WHERE id IN (
+  SELECT DISTINCT user_id FROM orders
+);
+```
+
+---
+
+## Subquery in WHERE
+
+```sql
+-- Products more expensive than the average price
+SELECT name, price FROM products
+WHERE price > (SELECT AVG(price) FROM products);
+
+-- Users in departments with avg salary above 80k
+SELECT name FROM employees
+WHERE dept_id IN (
+  SELECT id FROM departments
+  WHERE avg_salary > 80000
+);
+```
+
+---
+
+## Subquery in FROM (Derived Table)
+
+Use a subquery as a virtual table:
+
+```sql
+-- Top spenders per country
+SELECT country, name, total
+FROM (
+  SELECT country, name, SUM(total) AS total
+  FROM orders
+  GROUP BY country, name
+) AS spending
+WHERE total > 1000;
+```
+
+---
+
+## Correlated Subquery
+
+A subquery that references the outer query — runs once per row:
+
+```sql
+-- Find employees earning more than their department's average
+SELECT name, salary, dept
+FROM employees e
+WHERE salary > (
+  SELECT AVG(salary)
+  FROM employees
+  WHERE dept = e.dept  -- references outer query
+);
+```
+
+---
+
+## EXISTS
+
+Check if a subquery returns any rows:
+
+```sql
+-- Customers who have at least one order
+SELECT name FROM customers c
+WHERE EXISTS (
+  SELECT 1 FROM orders WHERE customer_id = c.id
+);
+```
+
+---
+
+## What's Next?
+
+Next: **CTEs** — Common Table Expressions for readable, reusable query fragments.

@@ -1,0 +1,88 @@
+---
+title: "Common Table Expressions (CTEs)"
+description: "Write cleaner, readable queries with WITH clauses — reusable named subqueries."
+order: 8
+difficulty: "intermediate"
+estimatedMinutes: 12
+---
+
+## What is a CTE?
+
+A CTE (Common Table Expression) gives a subquery a name you can reference in the main query:
+
+```sql
+WITH active_users AS (
+  SELECT id, name FROM users WHERE active = 1
+)
+SELECT * FROM active_users WHERE name LIKE 'A%';
+```
+
+CTEs make complex queries readable by naming intermediate results.
+
+---
+
+## Basic CTE Syntax
+
+```sql
+WITH cte_name AS (
+  SELECT ...
+)
+SELECT ... FROM cte_name;
+```
+
+---
+
+## Multiple CTEs
+
+Chain multiple CTEs separated by commas:
+
+```sql
+WITH
+  top_customers AS (
+    SELECT customer_id, SUM(total) AS lifetime_value
+    FROM orders
+    GROUP BY customer_id
+    HAVING SUM(total) > 1000
+  ),
+  vip_details AS (
+    SELECT u.name, tc.lifetime_value
+    FROM top_customers tc
+    JOIN users u ON u.id = tc.customer_id
+  )
+SELECT * FROM vip_details ORDER BY lifetime_value DESC;
+```
+
+---
+
+## Recursive CTEs
+
+Generate sequences or traverse hierarchical data:
+
+```sql
+-- Generate numbers 1–10
+WITH RECURSIVE counter(n) AS (
+  SELECT 1
+  UNION ALL
+  SELECT n + 1 FROM counter WHERE n < 10
+)
+SELECT n FROM counter;
+```
+
+---
+
+## CTE vs Subquery
+
+| | CTE | Subquery |
+|---|---|---|
+| Named | ✓ | ✗ |
+| Reusable in query | ✓ | ✗ |
+| Readable | Better for complex queries | Fine for simple ones |
+| Recursive | ✓ | ✗ |
+
+Prefer CTEs when your query has multiple stages or you need to reference the same subquery more than once.
+
+---
+
+## What's Next?
+
+You've completed the SQL track! Practice with the **SQL Interview Prep** problems or earn your **SQL Certificate**.

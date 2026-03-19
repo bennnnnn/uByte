@@ -5,8 +5,7 @@ import { notFound } from "next/navigation";
 import { LANGUAGES, getAllLanguageSlugs } from "@/lib/languages/registry";
 import type { SupportedLanguage } from "@/lib/languages/types";
 import { getCurrentUser } from "@/lib/auth";
-import { getUserPlan, getExamConfigForLang, getExamConfigForAllLangs, getProgressCount, getUserExamStats, getExamPublicStatsByLang } from "@/lib/db";
-import { hasPaidAccess } from "@/lib/plans";
+import { getExamConfigForLang, getExamConfigForAllLangs, getProgressCount, getUserExamStats, getExamPublicStatsByLang } from "@/lib/db";
 import { getAllTutorials } from "@/lib/tutorials";
 import { getTotalLessonCount } from "@/lib/tutorial-steps";
 import { getLangIcon } from "@/lib/languages/icons";
@@ -91,8 +90,8 @@ export default async function PracticeExamLangPage({ params }: Props) {
     getExamConfigForAllLangs(),
     getExamPublicStatsByLang(),
   ]);
-  const plan = user ? await getUserPlan(user.userId) : "free";
-  const canTakeExam = hasPaidAccess(plan);
+  // Certifications are free — any logged-in user can take an exam
+  const canTakeExam = !!user;
 
   // totalLessons — individual steps, matches the number shown on LangCard / tutorial page.
   // totalTopics  — number of tutorial topics; getProgressCount also returns a topic count,
@@ -102,7 +101,7 @@ export default async function PracticeExamLangPage({ params }: Props) {
   const completedTutorials = user ? await getProgressCount(user.userId, lang) : 0;
   const hasStartedTutorials = completedTutorials > 0;
 
-  const examStats = user && canTakeExam ? await getUserExamStats(user.userId) : [];
+  const examStats = user ? await getUserExamStats(user.userId) : [];
   const userLangStats = examStats.find((s) => s.lang === lang);
   const statsByLang = Object.fromEntries(examStats.map((s) => [s.lang, s]));
   const publicStatsByLang = Object.fromEntries(publicStats.map((s) => [s.lang, s]));

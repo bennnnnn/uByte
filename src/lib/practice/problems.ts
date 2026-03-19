@@ -150,10 +150,15 @@ export function sortProblemsByCategoryAndDifficulty<T extends { slug: string; di
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
+/**
+ * Synchronous in-memory lookup — used as a fast-path and fallback.
+ * Prefer the async DB versions below for API routes.
+ */
 export function getPracticeProblemBySlug(slug: string): PracticeProblem | null {
   return PRACTICE_PROBLEMS.find((p) => p.slug === slug) ?? null;
 }
 
+/** Returns all problems from the in-memory array. Used as seeding source and fallback. */
 export function getAllPracticeProblems(): PracticeProblem[] {
   return [...PRACTICE_PROBLEMS];
 }

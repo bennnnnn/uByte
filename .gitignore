@@ -28,6 +28,9 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+# internal planning docs — never commit these
+/docs/
 .pnpm-debug.log*
 
 # env files (can opt-in for committing if needed)

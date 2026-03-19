@@ -448,31 +448,39 @@ function PracticeExamResultPage() {
           </div>
         ) : (
           /* ── Retake section (fail) ──────────────────────────────────────── */
-          <div className="mt-6 rounded-2xl border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-900">
-            <div className="flex items-start gap-4">
-              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-indigo-100 text-2xl dark:bg-indigo-900/40">
-                📚
-              </div>
-              <div className="flex-1">
-                <p className="font-bold text-zinc-900 dark:text-zinc-100">Ready to try again?</p>
-                <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
-                  Questions are randomized each attempt. Review the tutorials to strengthen the areas where you struggled.
-                </p>
-                <div className="mt-4 flex flex-wrap gap-3">
-                  <Link
-                    href={`/certifications/${lang}`}
-                    className="inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-5 py-2.5 text-sm font-bold text-white shadow-md transition-all hover:-translate-y-0.5 hover:bg-indigo-500"
-                  >
-                    Retake {langName} exam
-                  </Link>
-                  <Link
-                    href={`/tutorial/${lang}`}
-                    className="inline-flex items-center gap-2 rounded-xl border border-zinc-200 px-4 py-2.5 text-sm font-semibold text-zinc-700 transition-colors hover:bg-zinc-50 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800"
-                  >
-                    Review tutorials
-                  </Link>
+          <div className="mt-6 overflow-hidden rounded-2xl border border-amber-200 bg-amber-50 dark:border-amber-900/40 dark:bg-amber-950/20">
+            <div className="p-6">
+              <div className="flex items-start gap-4">
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-amber-100 text-2xl dark:bg-amber-900/40">
+                  📚
+                </div>
+                <div className="flex-1">
+                  <p className="font-bold text-zinc-900 dark:text-zinc-100">The exam is hard — that&apos;s the point.</p>
+                  <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
+                    Our {langName} tutorials cover exactly what this exam tests — from fundamentals to the advanced patterns that trip most people up.
+                    Go through them, then come back. You&apos;ll notice the difference.
+                  </p>
+                  <div className="mt-4 flex flex-wrap gap-3">
+                    <Link
+                      href={`/tutorial/${lang}`}
+                      className="inline-flex items-center gap-2 rounded-xl bg-amber-500 px-5 py-2.5 text-sm font-bold text-white shadow-md transition-all hover:-translate-y-0.5 hover:bg-amber-400"
+                    >
+                      Study the {langName} tutorials →
+                    </Link>
+                    <Link
+                      href={`/certifications/${lang}`}
+                      className="inline-flex items-center gap-2 rounded-xl border border-zinc-200 px-4 py-2.5 text-sm font-semibold text-zinc-700 transition-colors hover:bg-zinc-50 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800"
+                    >
+                      Retake exam now
+                    </Link>
+                  </div>
                 </div>
               </div>
+            </div>
+            <div className="border-t border-amber-100 bg-white/50 px-6 py-3 dark:border-amber-900/30 dark:bg-black/10">
+              <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                💡 Questions are randomized every attempt. Your score of <strong>{score}%</strong> is saved — passing score is {passPercent}%.
+              </p>
             </div>
           </div>
         )}

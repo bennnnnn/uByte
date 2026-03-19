@@ -1,0 +1,66 @@
+---
+title: "Getting Started with TypeScript"
+description: "What TypeScript is, why it exists, and how to write your first typed program."
+order: 1
+difficulty: "beginner"
+estimatedMinutes: 10
+---
+
+## What is TypeScript?
+
+TypeScript is JavaScript with **static types**. It compiles to plain JavaScript, so it runs everywhere JavaScript runs — browsers, Node.js, Deno, Bun.
+
+```typescript
+// JavaScript — no types, errors caught only at runtime
+function add(a, b) {
+  return a + b;
+}
+
+// TypeScript — types checked at compile time
+function add(a: number, b: number): number {
+  return a + b;
+}
+
+add(1, 2);      // ✓ fine
+add("1", 2);    // ✗ Error: Argument of type 'string' is not assignable to type 'number'
+```
+
+TypeScript catches bugs **before your code runs**. That's the core value.
+
+---
+
+## Type Annotations
+
+You annotate variables, parameters, and return values with `: Type`:
+
+```typescript
+let name: string = "Alice";
+let age: number = 30;
+let active: boolean = true;
+
+function greet(name: string): string {
+  return `Hello, ${name}!`;
+}
+```
+
+---
+
+## Type Inference
+
+TypeScript is smart — it can infer types without annotations:
+
+```typescript
+let city = "London";   // inferred as string
+let count = 42;        // inferred as number
+let flag = true;       // inferred as boolean
+
+city = 123;  // Error: Type 'number' is not assignable to type 'string'
+```
+
+You don't need to annotate everything. TypeScript infers from context.
+
+---
+
+## What's Next?
+
+In the next lesson you'll learn the full set of TypeScript's **basic types** — primitive types, arrays, tuples, and special types like `any`, `unknown`, and `never`.

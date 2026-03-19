@@ -1,0 +1,80 @@
+---
+title: "Enums"
+description: "Named constant sets with numeric and string enums, const enums, and when to use them."
+order: 7
+difficulty: "beginner"
+estimatedMinutes: 10
+---
+
+## Numeric Enums
+
+```typescript
+enum Direction {
+  North,  // 0
+  South,  // 1
+  East,   // 2
+  West,   // 3
+}
+
+let dir: Direction = Direction.North;
+console.log(dir);           // 0
+console.log(Direction[0]);  // "North" — reverse mapping
+```
+
+---
+
+## String Enums
+
+More readable than numeric — prefer these in most cases:
+
+```typescript
+enum Status {
+  Pending = "PENDING",
+  Active  = "ACTIVE",
+  Closed  = "CLOSED",
+}
+
+function process(status: Status) {
+  if (status === Status.Active) {
+    console.log("Processing active record");
+  }
+}
+```
+
+---
+
+## Const Enums
+
+Completely erased at compile time — just inlines the values. Faster but no reverse mapping:
+
+```typescript
+const enum Color {
+  Red   = "RED",
+  Green = "GREEN",
+  Blue  = "BLUE",
+}
+
+const c: Color = Color.Red; // compiles to: const c = "RED"
+```
+
+---
+
+## Enum vs Union Type
+
+For most cases, a **string literal union** is simpler:
+
+```typescript
+// Enum
+enum Direction { North, South, East, West }
+
+// Equivalent union — preferred by many TypeScript teams
+type Direction = "north" | "south" | "east" | "west";
+```
+
+Use enums when you need reverse mapping or want a shared named namespace. Use unions for simple flags and status values.
+
+---
+
+## What's Next?
+
+Next: **Utility Types** — TypeScript's built-in type transformers like `Partial`, `Required`, `Pick`, and `Omit`.

@@ -1,0 +1,112 @@
+---
+title: "Classes"
+description: "TypeScript classes with access modifiers, readonly, abstract classes, and interface implementation."
+order: 6
+difficulty: "intermediate"
+estimatedMinutes: 15
+---
+
+## Class Basics
+
+TypeScript adds access modifiers and type annotations to JavaScript classes:
+
+```typescript
+class Person {
+  name: string;
+  private age: number;
+
+  constructor(name: string, age: number) {
+    this.name = name;
+    this.age = age;
+  }
+
+  greet(): string {
+    return `Hi, I'm ${this.name}`;
+  }
+}
+
+const p = new Person("Alice", 30);
+console.log(p.greet());   // "Hi, I'm Alice"
+console.log(p.name);      // ✓
+console.log(p.age);       // ✗ Error: 'age' is private
+```
+
+---
+
+## Access Modifiers
+
+| Modifier | Accessible from |
+|---|---|
+| `public` | Anywhere (default) |
+| `private` | Only within the class |
+| `protected` | Within the class and subclasses |
+| `readonly` | Anywhere but not reassignable |
+
+---
+
+## Constructor Shorthand
+
+Declare and assign in one step:
+
+```typescript
+class Point {
+  constructor(
+    public readonly x: number,
+    public readonly y: number
+  ) {}
+
+  distance(): number {
+    return Math.sqrt(this.x ** 2 + this.y ** 2);
+  }
+}
+
+const p = new Point(3, 4);
+console.log(p.distance()); // 5
+```
+
+---
+
+## Implementing Interfaces
+
+```typescript
+interface Printable {
+  print(): void;
+}
+
+class Invoice implements Printable {
+  constructor(private amount: number) {}
+
+  print(): void {
+    console.log(`Invoice: $${this.amount}`);
+  }
+}
+```
+
+---
+
+## Abstract Classes
+
+Abstract classes define a template — they can't be instantiated directly:
+
+```typescript
+abstract class Animal {
+  abstract sound(): string;
+
+  describe(): string {
+    return `I make the sound: ${this.sound()}`;
+  }
+}
+
+class Dog extends Animal {
+  sound(): string { return "Woof"; }
+}
+
+const dog = new Dog();
+console.log(dog.describe()); // "I make the sound: Woof"
+```
+
+---
+
+## What's Next?
+
+Next: **Enums** — named constant sets for representing fixed choices.

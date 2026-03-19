@@ -1,0 +1,118 @@
+---
+title: "Type Guards & Narrowing"
+description: "Safely narrow union types at runtime using typeof, instanceof, in, and custom type guards."
+order: 9
+difficulty: "intermediate"
+estimatedMinutes: 12
+---
+
+## What is Narrowing?
+
+TypeScript starts wide (a union type) and narrows based on runtime checks:
+
+```typescript
+function process(input: string | number) {
+  // Here: input is string | number
+  if (typeof input === "string") {
+    // Here: input is string ← narrowed
+    console.log(input.toUpperCase());
+  } else {
+    // Here: input is number ← narrowed
+    console.log(input.toFixed(2));
+  }
+}
+```
+
+---
+
+## typeof Guard
+
+```typescript
+type Primitive = string | number | boolean;
+
+function describe(val: Primitive): string {
+  if (typeof val === "string")  return `"${val}"`;
+  if (typeof val === "number")  return val.toFixed(2);
+  return val ? "true" : "false";
+}
+```
+
+---
+
+## instanceof Guard
+
+```typescript
+class Cat { meow() { return "Meow!"; } }
+class Dog { bark() { return "Woof!"; } }
+
+function makeNoise(animal: Cat | Dog): string {
+  if (animal instanceof Cat) return animal.meow();
+  return animal.bark();
+}
+```
+
+---
+
+## in Guard
+
+Check if a property exists on an object:
+
+```typescript
+interface Circle { kind: "circle"; radius: number }
+interface Square { kind: "square"; side: number }
+
+function area(shape: Circle | Square): number {
+  if ("radius" in shape) return Math.PI * shape.radius ** 2;
+  return shape.side ** 2;
+}
+```
+
+---
+
+## Custom Type Guard Functions
+
+Return `value is Type` to create reusable narrowing functions:
+
+```typescript
+interface Fish { swim(): void }
+interface Bird { fly(): void }
+
+function isFish(animal: Fish | Bird): animal is Fish {
+  return "swim" in animal;
+}
+
+function move(animal: Fish | Bird) {
+  if (isFish(animal)) {
+    animal.swim(); // TypeScript knows it's Fish here
+  } else {
+    animal.fly();  // TypeScript knows it's Bird here
+  }
+}
+```
+
+---
+
+## Exhaustive Checks with never
+
+Use `never` to ensure you've handled all union members:
+
+```typescript
+type Shape = "circle" | "square" | "triangle";
+
+function describe(s: Shape): string {
+  switch (s) {
+    case "circle":   return "round";
+    case "square":   return "4 equal sides";
+    case "triangle": return "3 sides";
+    default:
+      const exhausted: never = s; // Error if a case is missing
+      return exhausted;
+  }
+}
+```
+
+---
+
+## What's Next?
+
+Next: **Async/Await** — typing async functions and Promises in TypeScript.

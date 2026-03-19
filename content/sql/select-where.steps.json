@@ -1,0 +1,30 @@
+[
+  {
+    "title": "Filter rows with WHERE",
+    "instruction": "The `WHERE` clause filters rows. Only rows matching the condition are returned.\n\nRun this.",
+    "starter": "CREATE TABLE employees (\n  id     INTEGER PRIMARY KEY,\n  name   TEXT,\n  dept   TEXT,\n  salary INTEGER\n);\nINSERT INTO employees VALUES (1, 'Alice', 'Engineering', 95000);\nINSERT INTO employees VALUES (2, 'Bob',   'Marketing',   72000);\nINSERT INTO employees VALUES (3, 'Carol', 'Engineering', 105000);\nINSERT INTO employees VALUES (4, 'Dave',  'HR',          68000);\n\nSELECT name, salary FROM employees WHERE dept = 'Engineering';",
+    "expectedOutput": ["Alice|95000", "Carol|105000"],
+    "successMessage": "Only rows where `dept = 'Engineering'` are returned. String comparisons in SQL use single quotes."
+  },
+  {
+    "title": "AND and OR conditions",
+    "instruction": "Combine conditions with `AND` (both must be true) and `OR` (either must be true).\n\nRun this.",
+    "starter": "CREATE TABLE products (id INTEGER, name TEXT, price REAL, in_stock INTEGER);\nINSERT INTO products VALUES (1, 'Laptop', 999.99, 1);\nINSERT INTO products VALUES (2, 'Mouse',  29.99,  1);\nINSERT INTO products VALUES (3, 'Monitor', 399.99, 0);\nINSERT INTO products VALUES (4, 'Keyboard', 79.99, 1);\n\nSELECT name, price FROM products\nWHERE in_stock = 1 AND price < 100;",
+    "expectedOutput": ["Mouse|29.99", "Keyboard|79.99"],
+    "successMessage": "Both conditions must be true. Only in-stock products under $100 are returned."
+  },
+  {
+    "title": "LIKE for pattern matching",
+    "instruction": "`LIKE` matches string patterns. `%` is a wildcard for any sequence, `_` for a single character.\n\nRun this.",
+    "starter": "CREATE TABLE users (id INTEGER, name TEXT, email TEXT);\nINSERT INTO users VALUES (1, 'Alice Smith', 'alice@gmail.com');\nINSERT INTO users VALUES (2, 'Bob Jones',   'bob@yahoo.com');\nINSERT INTO users VALUES (3, 'Carol Brown', 'carol@gmail.com');\nINSERT INTO users VALUES (4, 'Dave Wilson', 'dave@company.com');\n\nSELECT name FROM users WHERE email LIKE '%@gmail.com';",
+    "expectedOutput": ["Alice Smith", "Carol Brown"],
+    "successMessage": "`%@gmail.com` matches any email ending in `@gmail.com`. The `%` wildcard matches zero or more characters."
+  },
+  {
+    "title": "IN and BETWEEN",
+    "instruction": "`IN` matches against a list. `BETWEEN` matches a range (inclusive on both ends).\n\nRun this.",
+    "starter": "CREATE TABLE orders (id INTEGER, customer TEXT, total REAL, status TEXT);\nINSERT INTO orders VALUES (1, 'Alice', 45.99, 'delivered');\nINSERT INTO orders VALUES (2, 'Bob',   120.00, 'shipped');\nINSERT INTO orders VALUES (3, 'Carol', 89.50, 'cancelled');\nINSERT INTO orders VALUES (4, 'Dave',  15.99, 'delivered');\nINSERT INTO orders VALUES (5, 'Eve',   200.00, 'shipped');\n\nSELECT customer, total FROM orders\nWHERE status IN ('delivered', 'shipped')\n  AND total BETWEEN 40 AND 150;",
+    "expectedOutput": ["Alice|45.99", "Bob|120.0"],
+    "successMessage": "`IN` is cleaner than multiple `OR` conditions. `BETWEEN 40 AND 150` is inclusive — it includes both 40 and 150."
+  }
+]

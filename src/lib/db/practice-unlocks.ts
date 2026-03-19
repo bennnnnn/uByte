@@ -1,28 +1,13 @@
 import { getSql } from "./client";
 
-/** How many NEW problems a free user can unlock per day. */
-export const DAILY_DRIP = 2;
+/** How many problems a free user unlocks per day (set to max so all are available from day 1). */
+export const DAILY_DRIP = 20;
 
-/** Maximum total free problems a user can ever unlock. */
-export const MAX_FREE_PROBLEMS = 10;
-
-/** Auto-creates the table on first use. */
-export async function ensurePracticeUnlocksTable(): Promise<void> {
-  const sql = getSql();
-  await sql`
-    CREATE TABLE IF NOT EXISTS practice_unlocks (
-      id           SERIAL      PRIMARY KEY,
-      user_id      INTEGER     NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-      problem_slug TEXT        NOT NULL,
-      unlocked_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-      UNIQUE (user_id, problem_slug)
-    )
-  `;
-}
+/** Maximum total free practice problems. */
+export const MAX_FREE_PROBLEMS = 20;
 
 /** Get the slugs of all problems a user has unlocked. */
 export async function getUnlockedSlugs(userId: number): Promise<string[]> {
-  await ensurePracticeUnlocksTable();
   const sql = getSql();
   const rows = await sql`
     SELECT problem_slug FROM practice_unlocks
@@ -34,7 +19,6 @@ export async function getUnlockedSlugs(userId: number): Promise<string[]> {
 
 /** Count how many problems a user has unlocked. */
 export async function getUnlockedCount(userId: number): Promise<number> {
-  await ensurePracticeUnlocksTable();
   const sql = getSql();
   const [row] = await sql`
     SELECT COUNT(*)::int AS c FROM practice_unlocks WHERE user_id = ${userId}
@@ -78,7 +62,6 @@ export async function tryUnlockProblem(
   allowance: number;
   isNew: boolean;
 }> {
-  await ensurePracticeUnlocksTable();
   const sql = getSql();
 
   const unlocked = await getUnlockedSlugs(userId);

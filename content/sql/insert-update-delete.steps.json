@@ -1,0 +1,23 @@
+[
+  {
+    "title": "INSERT — add rows",
+    "instruction": "`INSERT INTO table (cols) VALUES (...)` adds new rows. Insert multiple rows in one statement for efficiency.\n\nRun this.",
+    "starter": "CREATE TABLE tasks (\n  id     INTEGER PRIMARY KEY,\n  title  TEXT NOT NULL,\n  done   INTEGER DEFAULT 0\n);\n\nINSERT INTO tasks (id, title) VALUES\n  (1, 'Learn SQL basics'),\n  (2, 'Practice JOINs'),\n  (3, 'Build a real project');\n\nSELECT id, title, done FROM tasks;",
+    "expectedOutput": ["1|Learn SQL basics|0", "2|Practice JOINs|0", "3|Build a real project|0"],
+    "successMessage": "All three rows inserted in one statement. `done` defaults to 0 (the column default). Batching inserts is more efficient than inserting one at a time."
+  },
+  {
+    "title": "UPDATE — modify rows",
+    "instruction": "`UPDATE` changes existing rows. Always include a `WHERE` clause — without it, every row is updated.\n\nRun this.",
+    "starter": "CREATE TABLE tasks (id INTEGER, title TEXT, done INTEGER DEFAULT 0);\nINSERT INTO tasks VALUES (1, 'Learn SQL', 0), (2, 'Practice JOINs', 0), (3, 'Build project', 0);\n\n-- Mark first two tasks as done\nUPDATE tasks SET done = 1 WHERE id <= 2;\n\nSELECT title, done FROM tasks ORDER BY id;",
+    "expectedOutput": ["Learn SQL|1", "Practice JOINs|1", "Build project|0"],
+    "successMessage": "Only rows where `id <= 2` were updated. Task 3 remains `done = 0`. The WHERE clause is your safety net."
+  },
+  {
+    "title": "DELETE — remove rows",
+    "instruction": "`DELETE FROM table WHERE condition` removes matching rows. Without `WHERE`, all rows are deleted.\n\nRun this.",
+    "starter": "CREATE TABLE sessions (id INTEGER, user_id INTEGER, expires_at TEXT);\nINSERT INTO sessions VALUES (1, 1, '2020-01-01');\nINSERT INTO sessions VALUES (2, 2, '2099-12-31');\nINSERT INTO sessions VALUES (3, 3, '2020-06-15');\nINSERT INTO sessions VALUES (4, 4, '2099-12-31');\n\n-- Delete expired sessions\nDELETE FROM sessions WHERE expires_at < '2024-01-01';\n\nSELECT COUNT(*) AS remaining FROM sessions;",
+    "expectedOutput": ["2"],
+    "successMessage": "Two expired sessions deleted. Two valid sessions remain. `DELETE WHERE condition` is the safe pattern — always verify with a SELECT first."
+  }
+]

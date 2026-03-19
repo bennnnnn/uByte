@@ -5,7 +5,6 @@ import { apiFetch } from "@/lib/api-client";
 export type StartExamResult =
   | { kind: "success"; attemptId: string }
   | { kind: "redirect"; url: string }
-  | { kind: "upgrade" }
   | { kind: "error"; message: string };
 
 export async function callStartExamApi(lang: string): Promise<StartExamResult> {
@@ -15,10 +14,8 @@ export async function callStartExamApi(lang: string): Promise<StartExamResult> {
   });
   const data = await parseJson<StartExamResponse & StartExamError>(res);
 
-  if (res.status === 401) return { kind: "redirect", url: "/login" };
-  if (res.status === 403 && data?.code === "upgrade_required") {
-    return { kind: "upgrade" };
-  }
+  // Certifications are free — only login is required
+  if (res.status === 401) return { kind: "redirect", url: `/login?redirect=/certifications/${lang}/start` };
   if (!res.ok || !data?.attemptId) {
     return { kind: "error", message: getApiErrorMessage(res, data, "Unable to start exam. Please try again.") };
   }

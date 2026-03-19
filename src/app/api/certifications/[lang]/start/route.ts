@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
-import { getUserById } from "@/lib/db";
-import { hasPaidAccess } from "@/lib/plans";
 import { getQuestionIdsByLang, getQuestionsByIds } from "@/lib/db/exam-questions";
 import { createAttempt } from "@/lib/db/exam-attempts";
 import { getExamConfigForLang } from "@/lib/db/exam-settings";
@@ -29,15 +27,7 @@ export const POST = withErrorHandling(
     const { limited } = await checkRateLimit(`exam-start:${ip}`, 10, 60_000);
     if (limited) return NextResponse.json({ error: "Too many requests. Please wait before starting another exam." }, { status: 429 });
     const user = await getCurrentUser();
-    if (!user) return NextResponse.json({ error: "Sign in to start an exam" }, { status: 401 });
-
-    const profile = await getUserById(user.userId);
-    if (!hasPaidAccess(profile?.plan)) {
-      return NextResponse.json(
-        { error: "Certifications require a paid plan", code: "upgrade_required" },
-        { status: 403 }
-      );
-    }
+    if (!user) return NextResponse.json({ error: "Sign in to start an exam", code: "login_required" }, { status: 401 });
 
     const { lang } = (context as { params?: Promise<{ lang: string }> }).params
       ? await (context as { params: Promise<{ lang: string }> }).params

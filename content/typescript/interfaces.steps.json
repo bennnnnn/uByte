@@ -1,0 +1,30 @@
+[
+  {
+    "title": "Define and use an interface",
+    "instruction": "An interface describes the shape of an object. Any object with the required properties satisfies the interface.\n\nRun this.",
+    "starter": "interface User {\n  id: number;\n  name: string;\n  email: string;\n}\n\nconst user: User = {\n  id: 1,\n  name: \"Alice\",\n  email: \"alice@example.com\",\n};\n\nconsole.log(user.name);\nconsole.log(user.email);",
+    "expectedOutput": ["Alice", "alice@example.com"],
+    "successMessage": "The object must have all required properties. Missing one or adding an unexpected type causes a compile error."
+  },
+  {
+    "title": "Optional properties",
+    "instruction": "Mark properties with `?` to make them optional. The object can omit them.\n\nRun this.",
+    "starter": "interface Product {\n  id: number;\n  name: string;\n  description?: string;\n  price: number;\n}\n\nconst shirt: Product = { id: 1, name: \"T-Shirt\", price: 19.99 };\nconst mug: Product = { id: 2, name: \"Mug\", description: \"16oz ceramic\", price: 12.99 };\n\nconsole.log(shirt.description ?? \"no description\");\nconsole.log(mug.description ?? \"no description\");",
+    "expectedOutput": ["no description", "16oz ceramic"],
+    "successMessage": "Optional properties may be `undefined`. The `??` (nullish coalescing) operator provides a fallback."
+  },
+  {
+    "title": "Functions in interfaces",
+    "instruction": "Interfaces can include method signatures. Any object implementing the interface must provide those methods.\n\nRun this.",
+    "starter": "interface Greeter {\n  greet(name: string): string;\n  farewell(name: string): string;\n}\n\nconst formal: Greeter = {\n  greet: (name) => `Good morning, ${name}.`,\n  farewell: (name) => `Goodbye, ${name}.`,\n};\n\nconsole.log(formal.greet(\"Dr. Smith\"));\nconsole.log(formal.farewell(\"Dr. Smith\"));",
+    "expectedOutput": ["Good morning, Dr. Smith.", "Goodbye, Dr. Smith."],
+    "successMessage": "The object satisfies the `Greeter` interface by providing both methods with matching signatures."
+  },
+  {
+    "title": "Extending interfaces",
+    "instruction": "Use `extends` to build more specific interfaces from general ones.\n\nRun this.",
+    "starter": "interface Shape {\n  color: string;\n  area(): number;\n}\n\ninterface Circle extends Shape {\n  radius: number;\n}\n\nconst circle: Circle = {\n  color: \"red\",\n  radius: 5,\n  area() {\n    return Math.PI * this.radius * this.radius;\n  },\n};\n\nconsole.log(circle.color);\nconsole.log(circle.area().toFixed(2));",
+    "expectedOutput": ["red", "78.54"],
+    "successMessage": "`Circle` inherits `color` and `area()` from `Shape` and adds `radius`. This is structural composition."
+  }
+]

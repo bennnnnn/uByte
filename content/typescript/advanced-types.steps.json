@@ -1,0 +1,23 @@
+[
+  {
+    "title": "Mapped types",
+    "instruction": "A mapped type creates a new type by iterating over an existing type's keys with `[K in keyof T]`.\n\nRun this.",
+    "starter": "type Stringify<T> = {\n  [K in keyof T]: string;\n};\n\ninterface Config {\n  port: number;\n  debug: boolean;\n  host: string;\n}\n\ntype StringConfig = Stringify<Config>;\n// { port: string; debug: string; host: string }\n\nconst cfg: StringConfig = {\n  port: \"3000\",\n  debug: \"false\",\n  host: \"localhost\",\n};\n\nfor (const [k, v] of Object.entries(cfg)) {\n  console.log(`${k}: ${v}`);\n}",
+    "expectedOutput": ["port: 3000", "debug: false", "host: localhost"],
+    "successMessage": "`Stringify<T>` maps over every key and changes the value type to `string`. This is how built-in utilities like `Partial<T>` and `Readonly<T>` work under the hood."
+  },
+  {
+    "title": "Conditional types",
+    "instruction": "Conditional types choose between types based on a condition: `T extends U ? TrueType : FalseType`.\n\nRun this.",
+    "starter": "type IsArray<T> = T extends unknown[] ? true : false;\ntype ElementType<T> = T extends (infer E)[] ? E : never;\n\ntype A = IsArray<number[]>;   // true\ntype B = IsArray<string>;     // false\ntype C = ElementType<Date[]>; // Date\n\n// Demonstrate at runtime\nfunction processIfArray<T>(value: T): string {\n  if (Array.isArray(value)) {\n    return `Array of ${(value as unknown[]).length} items`;\n  }\n  return `Single value: ${value}`;\n}\n\nconsole.log(processIfArray([1, 2, 3]));\nconsole.log(processIfArray(\"hello\"));\nconsole.log(processIfArray([\"a\", \"b\"]));",
+    "expectedOutput": ["Array of 3 items", "Single value: hello", "Array of 2 items"],
+    "successMessage": "`infer E` extracts the element type from an array type. This is how `ReturnType<T>` and `Parameters<T>` work internally."
+  },
+  {
+    "title": "Template literal types",
+    "instruction": "Template literal types combine string literal types to build new string types programmatically.\n\nRun this.",
+    "starter": "type Side = \"top\" | \"right\" | \"bottom\" | \"left\";\ntype CssProp = `margin-${Side}` | `padding-${Side}`;\n\nfunction setSpacing(prop: CssProp, value: number): string {\n  return `${prop}: ${value}px`;\n}\n\nconsole.log(setSpacing(\"margin-top\", 16));\nconsole.log(setSpacing(\"padding-left\", 8));\nconsole.log(setSpacing(\"margin-bottom\", 24));",
+    "expectedOutput": ["margin-top: 16px", "padding-left: 8px", "margin-bottom: 24px"],
+    "successMessage": "Template literal types generate all combinations of the constituent literals. `setSpacing(\"margin-diagonal\", 8)` would be a type error."
+  }
+]

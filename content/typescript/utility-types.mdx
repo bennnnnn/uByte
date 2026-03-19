@@ -1,0 +1,110 @@
+---
+title: "Utility Types"
+description: "TypeScript's built-in type transformers: Partial, Required, Readonly, Pick, Omit, Record, and more."
+order: 8
+difficulty: "intermediate"
+estimatedMinutes: 12
+---
+
+## Partial\<T\>
+
+Makes all properties optional:
+
+```typescript
+interface User {
+  id: number;
+  name: string;
+  email: string;
+}
+
+function updateUser(id: number, changes: Partial<User>) {
+  // changes can have any subset of User's properties
+}
+
+updateUser(1, { name: "Bob" });          // ✓
+updateUser(1, { email: "b@b.com" });     // ✓
+updateUser(1, { name: "Bob", email: "b@b.com" }); // ✓
+```
+
+---
+
+## Required\<T\>
+
+Makes all optional properties required — the opposite of `Partial`:
+
+```typescript
+interface Config {
+  host?: string;
+  port?: number;
+}
+
+const config: Required<Config> = {
+  host: "localhost", // now required
+  port: 3000,        // now required
+};
+```
+
+---
+
+## Readonly\<T\>
+
+Makes all properties readonly:
+
+```typescript
+const user: Readonly<User> = { id: 1, name: "Alice", email: "a@a.com" };
+user.name = "Bob"; // ✗ Error: Cannot assign to 'name'
+```
+
+---
+
+## Pick\<T, K\>
+
+Create a type with only the specified properties:
+
+```typescript
+type UserPreview = Pick<User, "id" | "name">;
+// { id: number; name: string }
+```
+
+---
+
+## Omit\<T, K\>
+
+Create a type with all properties **except** the specified ones:
+
+```typescript
+type UserWithoutEmail = Omit<User, "email">;
+// { id: number; name: string }
+```
+
+---
+
+## Record\<K, V\>
+
+Create an object type with specific keys and value type:
+
+```typescript
+type Scores = Record<string, number>;
+const scores: Scores = { alice: 95, bob: 87, carol: 92 };
+
+type UserRoles = Record<"admin" | "editor" | "viewer", boolean>;
+```
+
+---
+
+## ReturnType\<T\> and Parameters\<T\>
+
+Extract the return type or parameter types from a function:
+
+```typescript
+function fetchUser(id: number): Promise<User> { /* ... */ }
+
+type FetchReturn = ReturnType<typeof fetchUser>;     // Promise<User>
+type FetchParams = Parameters<typeof fetchUser>;     // [id: number]
+```
+
+---
+
+## What's Next?
+
+Next: **Type Guards & Narrowing** — safely narrow union types at runtime.

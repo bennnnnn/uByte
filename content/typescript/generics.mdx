@@ -1,0 +1,96 @@
+---
+title: "Generics"
+description: "Write reusable, type-safe functions and data structures with generics."
+order: 5
+difficulty: "intermediate"
+estimatedMinutes: 15
+---
+
+## The Problem Generics Solve
+
+Without generics you'd need separate functions for every type:
+
+```typescript
+function firstNumber(arr: number[]): number { return arr[0]; }
+function firstString(arr: string[]): string { return arr[0]; }
+
+// With generics — one function, any type:
+function first<T>(arr: T[]): T {
+  return arr[0];
+}
+
+first([1, 2, 3]);         // returns number
+first(["a", "b", "c"]);   // returns string
+```
+
+`T` is a **type parameter** — a placeholder filled in when the function is called.
+
+---
+
+## Generic Functions
+
+```typescript
+function identity<T>(value: T): T {
+  return value;
+}
+
+function pair<A, B>(a: A, b: B): [A, B] {
+  return [a, b];
+}
+
+console.log(identity(42));         // 42
+console.log(pair("hello", true)); // ["hello", true]
+```
+
+---
+
+## Generic Interfaces
+
+```typescript
+interface Box<T> {
+  value: T;
+  transform<U>(fn: (v: T) => U): Box<U>;
+}
+```
+
+---
+
+## Generic Constraints
+
+Use `extends` to restrict what types a generic can be:
+
+```typescript
+interface HasLength {
+  length: number;
+}
+
+function logLength<T extends HasLength>(item: T): void {
+  console.log(item.length);
+}
+
+logLength("hello");         // ✓ strings have .length
+logLength([1, 2, 3]);       // ✓ arrays have .length
+logLength({ length: 5 });   // ✓ object with length
+logLength(42);              // ✗ Error: number has no length
+```
+
+---
+
+## keyof and Generic Lookup
+
+```typescript
+function getProperty<T, K extends keyof T>(obj: T, key: K): T[K] {
+  return obj[key];
+}
+
+const user = { name: "Alice", age: 30 };
+getProperty(user, "name"); // string ✓
+getProperty(user, "age");  // number ✓
+getProperty(user, "foo");  // ✗ Error: "foo" not in user
+```
+
+---
+
+## What's Next?
+
+Next: **Classes** — TypeScript's class system with access modifiers, abstract classes, and interfaces.

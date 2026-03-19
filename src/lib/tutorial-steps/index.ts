@@ -6,6 +6,8 @@ import { javascriptSteps } from "./javascript";
 import { javaSteps } from "./java";
 import { rustSteps } from "./rust";
 import { csharpSteps } from "./csharp";
+import { typescriptSteps } from "./typescript";
+import { sqlSteps } from "./sql";
 import type { SupportedLanguage } from "../languages/types";
 import { loadStepsFromContent } from "./load-from-content";
 import { getAllTutorials } from "../tutorials";
@@ -36,6 +38,8 @@ const stepsByLanguage: Record<SupportedLanguage, Record<string, TutorialStep[]>>
   java:       javaSteps,
   rust:       rustSteps,
   csharp:     csharpSteps,
+  typescript: typescriptSteps,
+  sql:        sqlSteps,
 };
 
 /**

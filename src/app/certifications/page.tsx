@@ -5,8 +5,7 @@ import { LANGUAGES, getAllLanguageSlugs } from "@/lib/languages/registry";
 import { getLangIcon } from "@/lib/languages/icons";
 import type { SupportedLanguage } from "@/lib/languages/types";
 import { getCurrentUser } from "@/lib/auth";
-import { getUserPlan, getExamConfigForAllLangs, getUserExamStats, getExamPublicStatsByLang, DEFAULT_EXAM_CONFIG } from "@/lib/db";
-import { hasPaidAccess } from "@/lib/plans";
+import { getExamConfigForAllLangs, getUserExamStats, getExamPublicStatsByLang, DEFAULT_EXAM_CONFIG } from "@/lib/db";
 import { EXAM_LANGS } from "@/lib/exams/config";
 import { tutorialLangUrl } from "@/lib/urls";
 import { absoluteUrl, SITE_KEYWORDS } from "@/lib/seo";
@@ -100,10 +99,9 @@ export default async function PracticeExamsPage() {
     getExamPublicStatsByLang(),
   ]);
 
-  const plan = user ? await getUserPlan(user.userId) : "free";
-  const isPro = hasPaidAccess(plan);
+  // Certifications are free — any logged-in user can take exams
   const langSlugs = getAllLanguageSlugs() as SupportedLanguage[];
-  const examStats = user && isPro ? await getUserExamStats(user.userId) : [];
+  const examStats = user ? await getUserExamStats(user.userId) : [];
   const statsByLang = Object.fromEntries(examStats.map((s) => [s.lang, s]));
   const publicStatsByLang = Object.fromEntries(publicStats.map((s) => [s.lang, s]));
 
@@ -111,7 +109,7 @@ export default async function PracticeExamsPage() {
   const totalAttempts = publicStats.reduce((s, r) => s + r.attemptsSubmitted, 0);
   const totalCertificates = publicStats.reduce((s, r) => s + r.usersPassed, 0);
 
-  // Per-user sections (Pro only)
+  // Per-user progress sections
   const tryAgainLangs = EXAM_LANGS.filter(
     (lang) => statsByLang[lang] && statsByLang[lang].attemptCount > 0
       && !statsByLang[lang].lastPassed && !statsByLang[lang].hasCertificate
@@ -211,15 +209,15 @@ export default async function PracticeExamsPage() {
                   See pricing
                 </Link>
               </div>
-            ) : !isPro ? (
-              /* Logged in, free plan */
+            ) : (
+              /* Logged in — exams are free */
               <div className="flex flex-wrap gap-3">
-                <Link
-                  href="/pricing"
+                <a
+                  href="#all-certifications"
                   className="inline-flex items-center justify-center gap-2 rounded-xl bg-indigo-600 px-5 py-3 text-sm font-bold text-white shadow-md shadow-indigo-500/20 transition-all hover:-translate-y-0.5 hover:bg-indigo-500"
                 >
-                  Upgrade to Pro
-                </Link>
+                  Browse certifications
+                </a>
                 <a
                   href="#all-certifications"
                   className="inline-flex items-center justify-center gap-2 rounded-xl border border-zinc-300 bg-white px-5 py-2.5 text-sm font-semibold text-zinc-700 transition-all hover:border-zinc-400 hover:bg-zinc-50 dark:border-zinc-600 dark:bg-surface-card dark:text-zinc-200 dark:hover:border-zinc-500"
@@ -304,8 +302,8 @@ export default async function PracticeExamsPage() {
       <div className="mx-auto max-w-5xl px-6 py-12 sm:py-14">
 
         {/* ── Learning journey OR progress dashboard ──────────────────────── */}
-        {isPro && examStats.length > 0 ? (
-          /* Progress dashboard for Pro users with exam history */
+        {examStats.length > 0 ? (
+          /* Progress dashboard for users with exam history */
           <section className="mb-14">
             <Eyebrow className="mb-6">
               Your progress
@@ -535,19 +533,20 @@ export default async function PracticeExamsPage() {
               </Link>
             </div>
           </div>
-        ) : !isPro ? (
+        ) : (
           <div className="mt-16 rounded-2xl border border-indigo-100 bg-indigo-50 p-8 text-center dark:border-indigo-900/40 dark:bg-indigo-950/20">
-            <h2 className="text-xl font-bold text-zinc-900 dark:text-zinc-100">Unlock all certifications</h2>
+            <h2 className="text-xl font-bold text-zinc-900 dark:text-zinc-100">Certifications are free to take</h2>
             <p className="mx-auto mt-2 max-w-md text-sm text-zinc-500 dark:text-zinc-400">
-              Upgrade to Pro to take timed exams, get scored, and earn a shareable certificate for every language you pass.
+              Pick a language, take the timed exam, and earn a shareable certificate. No subscription required.
+              Struggling? Our tutorials cover exactly what the exams test.
             </p>
             <div className="mt-6">
-              <Link
-                href="/pricing"
+              <a
+                href="#all-certifications"
                 className="inline-flex items-center justify-center gap-2 rounded-xl bg-indigo-600 px-5 py-3 text-sm font-bold text-white shadow-md shadow-indigo-500/20 transition-all hover:-translate-y-0.5 hover:bg-indigo-500"
               >
-                Upgrade to Pro
-              </Link>
+                Browse certifications
+              </a>
             </div>
           </div>
         ) : passedLangs.length < EXAM_LANGS.length ? (

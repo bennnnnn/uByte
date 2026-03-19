@@ -1,0 +1,23 @@
+[
+  {
+    "title": "Subquery in WHERE with IN",
+    "instruction": "A subquery can produce a list for the `IN` operator. The outer query checks each row against the inner result.\n\nRun this.",
+    "starter": "CREATE TABLE users (id INTEGER, name TEXT);\nCREATE TABLE orders (id INTEGER, user_id INTEGER, total REAL);\n\nINSERT INTO users VALUES (1,'Alice'),(2,'Bob'),(3,'Carol'),(4,'Dave');\nINSERT INTO orders VALUES (1,1,50),(2,1,120),(3,3,30);\n\n-- Users who placed at least one order\nSELECT name FROM users\nWHERE id IN (\n  SELECT DISTINCT user_id FROM orders\n)\nORDER BY name;",
+    "expectedOutput": ["Alice", "Carol"],
+    "successMessage": "The inner query produces `[1, 3]`. The outer query returns users with those IDs. Bob and Dave have no orders."
+  },
+  {
+    "title": "Subquery with scalar comparison",
+    "instruction": "A subquery returning a single value (scalar) can be compared with `>`, `<`, `=`, etc.\n\nRun this.",
+    "starter": "CREATE TABLE products (name TEXT, price REAL);\nINSERT INTO products VALUES ('Widget',9.99),('Gadget',49.99),('Thingamajig',24.99),('Gizmo',99.99),('Doohickey',14.99);\n\n-- Products more expensive than average\nSELECT name, price FROM products\nWHERE price > (SELECT AVG(price) FROM products)\nORDER BY price DESC;",
+    "expectedOutput": ["Gizmo|99.99", "Gadget|49.99"],
+    "successMessage": "The average price is ~39.99. Only Gizmo (99.99) and Gadget (49.99) exceed it. The subquery is evaluated once and its result reused for each row."
+  },
+  {
+    "title": "EXISTS",
+    "instruction": "`EXISTS` returns true if the subquery produces any rows. It stops as soon as it finds the first match — efficient for existence checks.\n\nRun this.",
+    "starter": "CREATE TABLE departments (id INTEGER, name TEXT);\nCREATE TABLE employees (id INTEGER, dept_id INTEGER, name TEXT);\n\nINSERT INTO departments VALUES (1,'Engineering'),(2,'Marketing'),(3,'Legal');\nINSERT INTO employees VALUES (1,1,'Alice'),(2,1,'Bob'),(3,2,'Carol');\n\n-- Departments that have at least one employee\nSELECT name FROM departments d\nWHERE EXISTS (\n  SELECT 1 FROM employees WHERE dept_id = d.id\n)\nORDER BY name;",
+    "expectedOutput": ["Engineering", "Marketing"],
+    "successMessage": "Legal has no employees so it's excluded. `SELECT 1` is conventional — we only care about existence, not the actual value returned."
+  }
+]

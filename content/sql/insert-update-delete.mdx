@@ -1,0 +1,85 @@
+---
+title: "INSERT, UPDATE, DELETE"
+description: "Modify data in your database — add rows, change values, and remove records safely."
+order: 6
+difficulty: "beginner"
+estimatedMinutes: 10
+---
+
+## INSERT
+
+Add new rows to a table:
+
+```sql
+-- Insert one row (specifying columns)
+INSERT INTO users (name, email, plan)
+VALUES ('Alice', 'alice@example.com', 'free');
+
+-- Insert without column list (must match table order)
+INSERT INTO users VALUES (1, 'Alice', 'alice@example.com', 'free');
+
+-- Insert multiple rows
+INSERT INTO products (name, price) VALUES
+  ('Widget', 9.99),
+  ('Gadget', 49.99),
+  ('Thingamajig', 24.99);
+```
+
+---
+
+## INSERT OR IGNORE / ON CONFLICT
+
+Handle duplicate inserts gracefully:
+
+```sql
+-- SQLite: ignore if the row already exists
+INSERT OR IGNORE INTO users (email, name) VALUES ('alice@example.com', 'Alice');
+
+-- PostgreSQL: upsert pattern
+INSERT INTO users (email, name) VALUES ('alice@example.com', 'Alice')
+ON CONFLICT (email) DO UPDATE SET name = EXCLUDED.name;
+```
+
+---
+
+## UPDATE
+
+Change existing rows:
+
+```sql
+-- Always include WHERE — without it, every row is updated!
+UPDATE users SET plan = 'pro' WHERE id = 42;
+
+-- Update multiple columns
+UPDATE products
+SET price = price * 1.1, updated_at = CURRENT_TIMESTAMP
+WHERE category = 'electronics';
+```
+
+---
+
+## DELETE
+
+Remove rows:
+
+```sql
+-- Delete specific rows
+DELETE FROM sessions WHERE expires_at < CURRENT_TIMESTAMP;
+
+-- Delete all rows (keeps table structure)
+DELETE FROM temp_data;
+```
+
+---
+
+## Safety Rules
+
+1. **Always test with SELECT first** — run a `SELECT WHERE...` to confirm which rows you'll affect before running `UPDATE`/`DELETE`
+2. **Use transactions** — wrap destructive operations in `BEGIN`/`COMMIT`
+3. **Never run UPDATE/DELETE without WHERE** unless you mean to affect every row
+
+---
+
+## What's Next?
+
+Next: **Subqueries** — use the result of one query inside another.

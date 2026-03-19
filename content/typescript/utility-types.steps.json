@@ -1,0 +1,30 @@
+[
+  {
+    "title": "Partial<T>",
+    "instruction": "`Partial<T>` makes all properties of T optional. Perfect for update/patch operations where you only send changed fields.\n\nRun this.",
+    "starter": "interface Config {\n  host: string;\n  port: number;\n  debug: boolean;\n}\n\nconst defaults: Config = {\n  host: \"localhost\",\n  port: 3000,\n  debug: false,\n};\n\nfunction applyConfig(base: Config, overrides: Partial<Config>): Config {\n  return { ...base, ...overrides };\n}\n\nconst prod = applyConfig(defaults, { host: \"api.example.com\", debug: false });\nconsole.log(prod.host);\nconsole.log(prod.port);\nconsole.log(prod.debug);",
+    "expectedOutput": ["api.example.com", "3000", "false"],
+    "successMessage": "`Partial<Config>` allows passing any subset of Config properties. The spread merges base with overrides."
+  },
+  {
+    "title": "Pick and Omit",
+    "instruction": "`Pick<T, K>` selects specific properties; `Omit<T, K>` removes them. Both create new types from an existing one.\n\nRun this.",
+    "starter": "interface Article {\n  id: number;\n  title: string;\n  content: string;\n  authorId: number;\n  publishedAt: string;\n}\n\ntype ArticlePreview = Pick<Article, \"id\" | \"title\" | \"publishedAt\">;\ntype ArticleInput = Omit<Article, \"id\" | \"publishedAt\">;\n\nconst preview: ArticlePreview = {\n  id: 1,\n  title: \"TypeScript Tips\",\n  publishedAt: \"2024-01-15\",\n};\n\nconsole.log(preview.title);\nconsole.log(Object.keys(preview).join(\", \"));",
+    "expectedOutput": ["TypeScript Tips", "id, title, publishedAt"],
+    "successMessage": "`Pick` and `Omit` are great for creating API response shapes and form input types from a single source-of-truth interface."
+  },
+  {
+    "title": "Record<K, V>",
+    "instruction": "`Record<K, V>` creates a type where all keys are of type K and all values are of type V. Cleaner than index signatures for known key sets.\n\nRun this.",
+    "starter": "type Lang = \"go\" | \"python\" | \"typescript\";\ntype LangInfo = Record<Lang, { icon: string; level: string }>;\n\nconst languages: LangInfo = {\n  go:         { icon: \"🐹\", level: \"intermediate\" },\n  python:     { icon: \"🐍\", level: \"beginner\" },\n  typescript: { icon: \"🔷\", level: \"intermediate\" },\n};\n\nfor (const [lang, info] of Object.entries(languages)) {\n  console.log(`${info.icon} ${lang}: ${info.level}`);\n}",
+    "expectedOutput": ["🐹 go: intermediate", "🐍 python: beginner", "🔷 typescript: intermediate"],
+    "successMessage": "`Record<Lang, LangInfo>` ensures every language key is present and every value has `icon` and `level`. Exhaustive and type-safe."
+  },
+  {
+    "title": "ReturnType and Parameters",
+    "instruction": "Extract the return type and parameter types from any function using `ReturnType` and `Parameters`.\n\nRun this.",
+    "starter": "function createUser(name: string, age: number, admin: boolean) {\n  return { name, age, admin, createdAt: new Date().getFullYear() };\n}\n\ntype UserResult = ReturnType<typeof createUser>;\ntype CreateParams = Parameters<typeof createUser>;\n\nconst params: CreateParams = [\"Alice\", 30, false];\nconst user: UserResult = createUser(...params);\n\nconsole.log(user.name);\nconsole.log(user.age);\nconsole.log(user.admin);",
+    "expectedOutput": ["Alice", "30", "false"],
+    "successMessage": "`ReturnType` and `Parameters` let you derive types from existing functions — great for keeping types in sync without duplication."
+  }
+]

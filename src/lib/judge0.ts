@@ -13,6 +13,8 @@ export const JUDGE0_LANG_IDS: Record<string, number> = {
   rust: 73,
   cpp: 54,
   csharp: 51, // C# (Mono 6.6.0.161)
+  typescript: 74, // TypeScript 3.7.4
+  sql: 82, // SQLite 3.27.2
 };
 
 export function b64(s: string): string {

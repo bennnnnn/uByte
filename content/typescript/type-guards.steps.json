@@ -1,0 +1,23 @@
+[
+  {
+    "title": "typeof narrowing",
+    "instruction": "TypeScript narrows union types inside conditional blocks. Use `typeof` to narrow primitive types.\n\nRun this.",
+    "starter": "function format(value: string | number | boolean): string {\n  if (typeof value === \"string\") {\n    return `\"${value}\"`;\n  }\n  if (typeof value === \"number\") {\n    return value.toFixed(2);\n  }\n  return value ? \"yes\" : \"no\";\n}\n\nconsole.log(format(\"hello\"));\nconsole.log(format(3.14159));\nconsole.log(format(true));",
+    "expectedOutput": ["\"hello\"", "3.14", "yes"],
+    "successMessage": "Inside each branch, TypeScript knows the exact type — `value.toFixed()` is only allowed in the `number` branch."
+  },
+  {
+    "title": "instanceof narrowing",
+    "instruction": "Use `instanceof` to narrow class instances. TypeScript understands the class hierarchy.\n\nRun this.",
+    "starter": "class Temperature {\n  constructor(public celsius: number) {}\n  toFahrenheit(): number { return this.celsius * 9 / 5 + 32; }\n}\n\nclass Distance {\n  constructor(public meters: number) {}\n  toKm(): number { return this.meters / 1000; }\n}\n\nfunction describe(measurement: Temperature | Distance): string {\n  if (measurement instanceof Temperature) {\n    return `${measurement.celsius}°C = ${measurement.toFahrenheit()}°F`;\n  }\n  return `${measurement.meters}m = ${measurement.toKm()}km`;\n}\n\nconsole.log(describe(new Temperature(100)));\nconsole.log(describe(new Distance(5000)));",
+    "expectedOutput": ["100°C = 212°F", "5000m = 5km"],
+    "successMessage": "`instanceof` narrows to the specific class. TypeScript knows which methods are available in each branch."
+  },
+  {
+    "title": "Custom type guard",
+    "instruction": "A function returning `value is Type` is a custom type guard — it narrows the type in the calling code.\n\nRun this.",
+    "starter": "interface Cat { name: string; meow(): string; }\ninterface Dog { name: string; bark(): string; }\n\nfunction isCat(animal: Cat | Dog): animal is Cat {\n  return \"meow\" in animal;\n}\n\nconst animals: (Cat | Dog)[] = [\n  { name: \"Whiskers\", meow: () => \"Meow!\" },\n  { name: \"Rex\",      bark: () => \"Woof!\" },\n  { name: \"Luna\",     meow: () => \"Purrr\" },\n];\n\nfor (const a of animals) {\n  if (isCat(a)) {\n    console.log(`${a.name}: ${a.meow()}`);\n  } else {\n    console.log(`${a.name}: ${a.bark()}`);\n  }\n}",
+    "expectedOutput": ["Whiskers: Meow!", "Rex: Woof!", "Luna: Purrr"],
+    "successMessage": "Custom type guards let you encapsulate complex narrowing logic in a reusable function. The `is` keyword is only valid in return type position."
+  }
+]

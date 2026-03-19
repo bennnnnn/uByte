@@ -1,0 +1,30 @@
+[
+  {
+    "title": "Number and string types",
+    "instruction": "TypeScript has `number`, `string`, and `boolean` as its core primitive types. Annotate and use them.\n\nRun this.",
+    "starter": "const pi: number = 3.14159;\nconst language: string = \"TypeScript\";\nconst isTyped: boolean = true;\n\nconsole.log(pi);\nconsole.log(language);\nconsole.log(isTyped);",
+    "expectedOutput": ["3.14159", "TypeScript", "true"],
+    "successMessage": "TypeScript's primitive types map directly to JavaScript's runtime types."
+  },
+  {
+    "title": "Arrays",
+    "instruction": "Declare a typed array using `type[]` syntax. TypeScript ensures every element matches the declared type.\n\nRun this.",
+    "starter": "const scores: number[] = [95, 87, 92, 78];\nconst names: string[] = [\"Alice\", \"Bob\", \"Carol\"];\n\nconsole.log(scores[0]);\nconsole.log(names.length);\nconsole.log(scores.filter(s => s >= 90).length);",
+    "expectedOutput": ["95", "3", "2"],
+    "successMessage": "Array methods like `filter` preserve the type — `scores.filter(...)` still returns `number[]`."
+  },
+  {
+    "title": "Tuples",
+    "instruction": "A tuple is a fixed-length array where each position has its own type. Great for pairs and structured data.\n\nRun this.",
+    "starter": "const point: [number, number] = [10, 20];\nconst user: [string, number] = [\"alice\", 42];\n\nconsole.log(`x=${point[0]}, y=${point[1]}`);\nconsole.log(`${user[0]} is ${user[1]} years old`);",
+    "expectedOutput": ["x=10, y=20", "alice is 42 years old"],
+    "successMessage": "Tuples enforce both the length and per-position types. TypeScript will error if you add a third element or swap types."
+  },
+  {
+    "title": "The unknown type",
+    "instruction": "`unknown` is a safer alternative to `any`. You must narrow the type before using it.\n\nRun this.",
+    "starter": "function describe(value: unknown): string {\n  if (typeof value === \"string\") {\n    return `string: \"${value}\"`;\n  }\n  if (typeof value === \"number\") {\n    return `number: ${value}`;\n  }\n  return \"unknown type\";\n}\n\nconsole.log(describe(\"hello\"));\nconsole.log(describe(42));\nconsole.log(describe(true));",
+    "expectedOutput": ["string: \"hello\"", "number: 42", "unknown type"],
+    "successMessage": "`unknown` forces you to check the type before using the value — much safer than `any` which skips all checks."
+  }
+]

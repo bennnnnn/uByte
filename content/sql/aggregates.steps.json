@@ -1,0 +1,23 @@
+[
+  {
+    "title": "COUNT, SUM, AVG",
+    "instruction": "Aggregate functions summarize many rows into a single value. Run this to see them in action.",
+    "starter": "CREATE TABLE sales (product TEXT, amount REAL, quantity INTEGER);\nINSERT INTO sales VALUES ('Widget', 9.99, 50);\nINSERT INTO sales VALUES ('Gadget', 49.99, 20);\nINSERT INTO sales VALUES ('Thingamajig', 24.99, 35);\n\nSELECT\n  COUNT(*)          AS total_products,\n  SUM(amount)       AS total_revenue,\n  ROUND(AVG(amount), 2) AS avg_price,\n  MIN(amount)       AS cheapest,\n  MAX(amount)       AS priciest\nFROM sales;",
+    "expectedOutput": ["3|84.97|28.32|9.99|49.99"],
+    "successMessage": "Aggregates collapse all rows into a single summary row. `ROUND(AVG(...), 2)` limits decimal places."
+  },
+  {
+    "title": "GROUP BY",
+    "instruction": "`GROUP BY` splits rows into groups, then applies aggregates to each group separately.\n\nRun this.",
+    "starter": "CREATE TABLE employees (name TEXT, dept TEXT, salary INTEGER);\nINSERT INTO employees VALUES ('Alice', 'Engineering', 95000);\nINSERT INTO employees VALUES ('Bob',   'Engineering', 105000);\nINSERT INTO employees VALUES ('Carol', 'Marketing',   72000);\nINSERT INTO employees VALUES ('Dave',  'Marketing',   68000);\nINSERT INTO employees VALUES ('Eve',   'HR',          65000);\n\nSELECT dept, COUNT(*) AS headcount, AVG(salary) AS avg_salary\nFROM employees\nGROUP BY dept\nORDER BY avg_salary DESC;",
+    "expectedOutput": ["Engineering|2|100000.0", "Marketing|2|70000.0", "HR|1|65000.0"],
+    "successMessage": "Each department becomes one row in the output. `GROUP BY` is the foundation of all reporting queries."
+  },
+  {
+    "title": "HAVING — filter groups",
+    "instruction": "`HAVING` filters after aggregation. `WHERE` can't use aggregate results — `HAVING` can.\n\nRun this.",
+    "starter": "CREATE TABLE orders (customer TEXT, total REAL);\nINSERT INTO orders VALUES ('Alice', 50);\nINSERT INTO orders VALUES ('Alice', 120);\nINSERT INTO orders VALUES ('Bob',   30);\nINSERT INTO orders VALUES ('Carol', 200);\nINSERT INTO orders VALUES ('Carol', 150);\nINSERT INTO orders VALUES ('Carol', 90);\n\n-- Customers who have spent more than $100 in total\nSELECT customer, SUM(total) AS total_spent\nFROM orders\nGROUP BY customer\nHAVING SUM(total) > 100\nORDER BY total_spent DESC;",
+    "expectedOutput": ["Carol|440.0", "Alice|170.0"],
+    "successMessage": "`HAVING SUM(total) > 100` filters out Bob (only $30 total). Remember: `WHERE` filters rows, `HAVING` filters groups."
+  }
+]

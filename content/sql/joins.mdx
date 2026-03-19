@@ -1,0 +1,81 @@
+---
+title: "JOINs"
+description: "Combine data from multiple tables with INNER JOIN, LEFT JOIN, and RIGHT JOIN."
+order: 5
+difficulty: "intermediate"
+estimatedMinutes: 15
+---
+
+## Why JOINs?
+
+Data is spread across tables to avoid duplication. JOINs bring related data together:
+
+```
+users:                     orders:
+┌────┬───────┐             ┌────┬─────────┬───────┐
+│ id │ name  │             │ id │ user_id │ total │
+├────┼───────┤             ├────┼─────────┼───────┤
+│  1 │ Alice │             │  1 │    1    │  50   │
+│  2 │ Bob   │             │  2 │    1    │ 120   │
+│  3 │ Carol │             │  3 │    2    │  30   │
+└────┴───────┘             └────┴─────────┴───────┘
+```
+
+---
+
+## INNER JOIN
+
+Returns rows where the condition matches in **both** tables:
+
+```sql
+SELECT users.name, orders.total
+FROM orders
+INNER JOIN users ON orders.user_id = users.id;
+```
+
+Result: only users who have at least one order.
+
+---
+
+## LEFT JOIN
+
+Returns **all rows from the left table**, plus matching rows from the right. NULLs fill in when there's no match:
+
+```sql
+SELECT users.name, orders.total
+FROM users
+LEFT JOIN orders ON orders.user_id = users.id;
+```
+
+Result: all users, even those with no orders (Carol → total is NULL).
+
+---
+
+## Table Aliases
+
+Use aliases to shorten queries:
+
+```sql
+SELECT u.name, o.total
+FROM orders o
+JOIN users u ON o.user_id = u.id
+WHERE o.total > 100;
+```
+
+---
+
+## Multiple JOINs
+
+```sql
+SELECT u.name, p.title, r.rating
+FROM reviews r
+JOIN users u ON r.user_id = u.id
+JOIN products p ON r.product_id = p.id
+ORDER BY r.rating DESC;
+```
+
+---
+
+## What's Next?
+
+Next: **INSERT, UPDATE, DELETE** — modify data in your tables.

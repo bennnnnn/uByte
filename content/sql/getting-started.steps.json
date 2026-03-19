@@ -1,0 +1,30 @@
+[
+  {
+    "title": "Your first SQL query",
+    "instruction": "SQL `SELECT` retrieves data. Use it with expressions to compute values directly.\n\nRun this.",
+    "starter": "SELECT 'Hello, SQL!' AS message;",
+    "expectedOutput": ["Hello, SQL!"],
+    "successMessage": "`SELECT` is the most common SQL statement. `AS message` names the output column."
+  },
+  {
+    "title": "SELECT with expressions",
+    "instruction": "SQL can evaluate expressions. The `||` operator concatenates strings in SQLite.\n\nRun this.",
+    "starter": "SELECT\n  2 + 2 AS sum,\n  10 * 3 AS product,\n  'Hello' || ', ' || 'World' AS greeting;",
+    "expectedOutput": ["4|30|Hello, World"],
+    "successMessage": "SQL evaluates arithmetic and string expressions inline. Multiple columns are separated by `|` in this output."
+  },
+  {
+    "title": "Create a table and insert data",
+    "instruction": "`CREATE TABLE` defines a schema. `INSERT INTO` adds rows. `SELECT` retrieves them.\n\nRun this.",
+    "starter": "CREATE TABLE fruits (\n  id   INTEGER PRIMARY KEY,\n  name TEXT NOT NULL,\n  color TEXT\n);\n\nINSERT INTO fruits VALUES (1, 'Apple', 'red');\nINSERT INTO fruits VALUES (2, 'Banana', 'yellow');\nINSERT INTO fruits VALUES (3, 'Grape', 'purple');\n\nSELECT name, color FROM fruits;",
+    "expectedOutput": ["Apple|red", "Banana|yellow", "Grape|purple"],
+    "successMessage": "You created a table, inserted 3 rows, and retrieved them. This is the foundation of every SQL database."
+  },
+  {
+    "title": "SELECT all columns",
+    "instruction": "Use `SELECT *` to retrieve all columns. It's convenient for exploration but not recommended in production code.\n\nRun this.",
+    "starter": "CREATE TABLE products (\n  id    INTEGER PRIMARY KEY,\n  name  TEXT,\n  price REAL\n);\n\nINSERT INTO products VALUES (1, 'Widget', 9.99);\nINSERT INTO products VALUES (2, 'Gadget', 24.99);\n\nSELECT * FROM products;",
+    "expectedOutput": ["1|Widget|9.99", "2|Gadget|24.99"],
+    "successMessage": "`SELECT *` retrieves all columns in the order they were defined. In production, name your columns explicitly for clarity and resilience to schema changes."
+  }
+]

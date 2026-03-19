@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { callStartExamApi } from "@/lib/exams/start-exam";
-import UpgradeWall from "@/components/UpgradeWall";
 
 interface Props {
   lang: string;
@@ -16,7 +15,6 @@ export default function StartExamButton({ lang, langName, fullWidth, isRetake }:
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [showUpgrade, setShowUpgrade] = useState(false);
 
   const handleStart = async () => {
     setLoading(true);
@@ -25,8 +23,6 @@ export default function StartExamButton({ lang, langName, fullWidth, isRetake }:
       const result = await callStartExamApi(lang);
       if (result.kind === "redirect") {
         router.push(result.url);
-      } else if (result.kind === "upgrade") {
-        setShowUpgrade(true);
       } else if (result.kind === "error") {
         setError(result.message);
       } else {
@@ -38,18 +34,6 @@ export default function StartExamButton({ lang, langName, fullWidth, isRetake }:
       setLoading(false);
     }
   };
-
-  if (showUpgrade) {
-    return (
-      <UpgradeWall
-        tutorialTitle={`${langName} Certification`}
-        subtitle="Upgrade to Pro to take timed certification exams and earn verifiable digital certificates."
-        backHref={`/certifications/${lang}`}
-        backLabel={`← Back to ${langName} certification`}
-        context="certification"
-      />
-    );
-  }
 
   return (
     <div className="space-y-2">

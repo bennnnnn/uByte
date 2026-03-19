@@ -16,7 +16,12 @@
     "lint": "eslint",
     "test": "vitest run",
     "migrate": "node scripts/run-migrate.mjs",
-    "seed:exams": "node scripts/seeds/run-exam-seed.mjs"
+    "seed:exams": "node scripts/seeds/run-exam-seed.mjs",
+    "seed:problems": "node scripts/seeds/seed-practice-problems.mjs",
+    "export:problems": "npx tsx scripts/seeds/export-practice-problems.ts",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "test:e2e:report": "playwright show-report"
   },
   "dependencies": {
     "@ai-sdk/openai": "^3.0.41",
@@ -25,6 +30,8 @@
     "@sentry/nextjs": "^10.40.0",
     "@tailwindcss/typography": "^0.5.19",
     "@types/web-push": "^3.6.4",
+    "@upstash/ratelimit": "^2.0.8",
+    "@upstash/redis": "^1.37.0",
     "@vercel/analytics": "^1.6.1",
     "ai": "^6.0.116",
     "bcryptjs": "^3.0.3",
@@ -46,6 +53,7 @@
     "zod": "^4.3.6"
   },
   "devDependencies": {
+    "@playwright/test": "^1.58.2",
     "@tailwindcss/postcss": "^4",
     "@types/bcryptjs": "^2.4.6",
     "@types/canvas-confetti": "^1.9.0",
@@ -56,6 +64,7 @@
     "eslint-config-next": "16.1.6",
     "prettier": "^3.8.1",
     "tailwindcss": "^4",
+    "tsx": "^4.21.0",
     "typescript": "^5",
     "vitest": "^4.0.18"
   }

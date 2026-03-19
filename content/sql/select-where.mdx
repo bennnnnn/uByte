@@ -1,0 +1,89 @@
+---
+title: "SELECT & WHERE"
+description: "Filter rows with WHERE conditions, comparison operators, LIKE, IN, and BETWEEN."
+order: 2
+difficulty: "beginner"
+estimatedMinutes: 12
+---
+
+## The WHERE Clause
+
+Filter rows that match a condition:
+
+```sql
+SELECT name, email FROM users WHERE active = 1;
+
+SELECT name, price FROM products WHERE price < 20;
+```
+
+---
+
+## Comparison Operators
+
+| Operator | Meaning |
+|---|---|
+| `=` | Equal |
+| `<>` or `!=` | Not equal |
+| `<` `>` | Less / greater than |
+| `<=` `>=` | Less / greater than or equal |
+| `IS NULL` | Value is null |
+| `IS NOT NULL` | Value is not null |
+
+```sql
+SELECT name FROM users WHERE age >= 18 AND age <= 65;
+SELECT name FROM products WHERE description IS NOT NULL;
+```
+
+---
+
+## AND, OR, NOT
+
+```sql
+-- Both conditions must be true
+SELECT * FROM orders WHERE status = 'shipped' AND total > 100;
+
+-- Either condition is true
+SELECT * FROM users WHERE plan = 'pro' OR is_admin = 1;
+
+-- Negate a condition
+SELECT * FROM products WHERE NOT discontinued;
+```
+
+---
+
+## LIKE — Pattern Matching
+
+```sql
+-- % matches any sequence of characters
+SELECT name FROM users WHERE email LIKE '%@gmail.com';
+
+-- _ matches exactly one character
+SELECT code FROM products WHERE code LIKE 'SKU-___';
+```
+
+---
+
+## IN — Match a List
+
+```sql
+SELECT name FROM products WHERE category IN ('electronics', 'clothing', 'books');
+
+-- NOT IN
+SELECT * FROM orders WHERE status NOT IN ('cancelled', 'refunded');
+```
+
+---
+
+## BETWEEN
+
+```sql
+SELECT name, price FROM products WHERE price BETWEEN 10 AND 50;
+
+SELECT * FROM orders WHERE created_at BETWEEN '2024-01-01' AND '2024-12-31';
+```
+
+---
+
+## What's Next?
+
+Next: **ORDER BY & LIMIT** — sort results and retrieve top N rows.

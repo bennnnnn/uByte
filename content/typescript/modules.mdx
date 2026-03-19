@@ -1,0 +1,87 @@
+---
+title: "Modules & Namespaces"
+description: "Organize TypeScript code with ES modules, export patterns, and declaration files."
+order: 11
+difficulty: "intermediate"
+estimatedMinutes: 10
+---
+
+## ES Module Syntax
+
+TypeScript uses the same `import`/`export` syntax as modern JavaScript:
+
+```typescript
+// math.ts — named exports
+export function add(a: number, b: number): number {
+  return a + b;
+}
+
+export const PI = 3.14159;
+
+export interface Vector {
+  x: number;
+  y: number;
+}
+
+// main.ts — named imports
+import { add, PI, Vector } from "./math";
+```
+
+---
+
+## Default Export
+
+```typescript
+// logger.ts
+export default function log(msg: string): void {
+  console.log(`[LOG] ${msg}`);
+}
+
+// main.ts
+import log from "./logger";
+log("Server started");
+```
+
+---
+
+## Re-exporting
+
+```typescript
+// index.ts — barrel file
+export { add, PI } from "./math";
+export { default as log } from "./logger";
+export type { Vector } from "./math";
+```
+
+---
+
+## Type-only Imports
+
+Avoid importing runtime code just for types:
+
+```typescript
+import type { User } from "./types";  // erased at compile time
+import { createUser } from "./users"; // kept in output
+```
+
+---
+
+## Declaration Files (.d.ts)
+
+For libraries without TypeScript support, declaration files describe the API:
+
+```typescript
+// lodash.d.ts (simplified)
+declare module "lodash" {
+  export function chunk<T>(arr: T[], size: number): T[][];
+  export function flatten<T>(arr: T[][]): T[];
+}
+```
+
+Most popular packages include `.d.ts` files or have `@types/package-name` on npm.
+
+---
+
+## What's Next?
+
+Next: **Advanced Types** — mapped types, conditional types, and template literal types.

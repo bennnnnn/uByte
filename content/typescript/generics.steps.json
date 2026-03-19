@@ -1,0 +1,30 @@
+[
+  {
+    "title": "Your first generic function",
+    "instruction": "A generic function uses `<T>` as a type parameter that gets filled in at the call site. Write a generic `identity` function and use it with different types.\n\nRun this.",
+    "starter": "function identity<T>(value: T): T {\n  return value;\n}\n\nconsole.log(identity(42));\nconsole.log(identity(\"hello\"));\nconsole.log(identity(true));",
+    "expectedOutput": ["42", "hello", "true"],
+    "successMessage": "`T` is inferred from the argument — `identity(42)` infers `T = number`. No casting or `any` needed."
+  },
+  {
+    "title": "Generic arrays",
+    "instruction": "Write a generic function that returns the first element of any array. `T[]` means 'array of T'.\n\nRun this.",
+    "starter": "function first<T>(arr: T[]): T | undefined {\n  return arr[0];\n}\n\nconsole.log(first([10, 20, 30]));\nconsole.log(first([\"a\", \"b\", \"c\"]));\nconsole.log(first([]));",
+    "expectedOutput": ["10", "a", "undefined"],
+    "successMessage": "The return type `T | undefined` handles the empty array case. TypeScript infers `T` from what you pass in."
+  },
+  {
+    "title": "Generic constraints with extends",
+    "instruction": "Use `T extends SomeType` to restrict which types are allowed. This lets you safely access properties that exist on the constraint.\n\nRun this.",
+    "starter": "function longest<T extends { length: number }>(a: T, b: T): T {\n  return a.length >= b.length ? a : b;\n}\n\nconsole.log(longest(\"hi\", \"hello\"));\nconsole.log(longest([1, 2], [1, 2, 3]));",
+    "expectedOutput": ["hello", "1,2,3"],
+    "successMessage": "`T extends { length: number }` guarantees `.length` exists. Works for strings, arrays, or any object with a length property."
+  },
+  {
+    "title": "Multiple type parameters",
+    "instruction": "Functions can have multiple independent type parameters. Each is inferred separately.\n\nRun this.",
+    "starter": "function zip<A, B>(a: A[], b: B[]): [A, B][] {\n  return a.map((item, i) => [item, b[i]]);\n}\n\nconst result = zip([1, 2, 3], [\"one\", \"two\", \"three\"]);\nfor (const [num, word] of result) {\n  console.log(`${num} = ${word}`);\n}",
+    "expectedOutput": ["1 = one", "2 = two", "3 = three"],
+    "successMessage": "`A` and `B` are inferred independently — `zip([1,2,3], [\"a\",\"b\",\"c\"])` gives `[number, string][]`."
+  }
+]

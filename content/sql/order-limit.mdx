@@ -1,0 +1,54 @@
+---
+title: "ORDER BY & LIMIT"
+description: "Sort query results with ORDER BY and retrieve top N rows with LIMIT and OFFSET."
+order: 3
+difficulty: "beginner"
+estimatedMinutes: 8
+---
+
+## ORDER BY
+
+Sort results by one or more columns:
+
+```sql
+-- Ascending (default)
+SELECT name, price FROM products ORDER BY price;
+
+-- Descending
+SELECT name, salary FROM employees ORDER BY salary DESC;
+
+-- Multiple columns — sort by dept, then by name within each dept
+SELECT name, dept, salary FROM employees
+ORDER BY dept ASC, salary DESC;
+```
+
+---
+
+## LIMIT and OFFSET
+
+Retrieve only N rows:
+
+```sql
+-- Top 5 most expensive products
+SELECT name, price FROM products ORDER BY price DESC LIMIT 5;
+
+-- Skip first 10, get next 5 (pagination)
+SELECT name FROM users ORDER BY created_at DESC LIMIT 5 OFFSET 10;
+```
+
+---
+
+## NULL Ordering
+
+NULLs appear last by default in ascending order, first in descending:
+
+```sql
+-- Put NULLs last regardless of sort direction
+SELECT name, bio FROM users ORDER BY bio NULLS LAST;
+```
+
+---
+
+## What's Next?
+
+Next: **Aggregate Functions** — `COUNT`, `SUM`, `AVG`, `MIN`, `MAX`.

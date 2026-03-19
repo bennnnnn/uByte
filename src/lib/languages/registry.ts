@@ -6,6 +6,8 @@ import { highlightCpp } from "@/lib/highlight-cpp";
 import { highlightJava } from "@/lib/highlight-java";
 import { highlightRust } from "@/lib/highlight-rust";
 import { highlightCsharp } from "@/lib/highlight-csharp";
+import { highlightTypeScript } from "@/lib/highlight-typescript";
+import { highlightSql } from "@/lib/highlight-sql";
 
 export const LANGUAGES: Record<SupportedLanguage, LanguageConfig> = {
   go: {
@@ -227,27 +229,45 @@ export const LANGUAGES: Record<SupportedLanguage, LanguageConfig> = {
       defaultTitle: "Learn C# Programming — Free Interactive C# Tutorial",
       defaultDescription: "Learn C# step by step with interactive, hands-on tutorials. Cover variables, data types, classes, LINQ, async/await, interfaces, and .NET patterns — compile and run real C# code in your browser. Free beginner lessons included.",
       keywords: [
-        "C# programming",
-        "Learn C#",
-        "C# tutorial",
-        "C# for beginners",
-        "free C# course",
-        "interactive C# tutorial",
-        "C# variables tutorial",
-        "C# classes tutorial",
-        "C# LINQ tutorial",
-        "C# async await tutorial",
-        "C# data types",
-        "C# online course free",
-        "learn C# online free",
-        "C# programming for beginners",
-        ".NET programming tutorial",
-        "C# coding practice",
-        "C# error handling",
-        "C# interview prep",
-        "C# certification",
-        "C# exercises online",
-        "uByte",
+        "C# programming", "Learn C#", "C# tutorial", "C# for beginners", "free C# course",
+        "interactive C# tutorial", "C# classes tutorial", "C# LINQ tutorial", "C# async await tutorial",
+        "C# online course free", "learn C# online free", "C# interview prep", "C# certification", "uByte",
+      ],
+    },
+  },
+  typescript: {
+    id: "typescript",
+    name: "TypeScript",
+    slug: "typescript",
+    contentDir: "content/typescript",
+    defaultStarter: '// Your TypeScript code here\nconst greeting: string = "Hello, World!";\nconsole.log(greeting);',
+    fileExtension: ".ts",
+    seo: {
+      defaultTitle: "Learn TypeScript — Free Interactive TypeScript Tutorial",
+      defaultDescription: "Master TypeScript from scratch with hands-on, interactive tutorials. Learn static types, interfaces, generics, decorators, and advanced type patterns — write and run real TypeScript code in your browser. Free beginner lessons included.",
+      keywords: [
+        "TypeScript tutorial", "Learn TypeScript", "TypeScript for beginners", "free TypeScript course",
+        "TypeScript types", "TypeScript interfaces", "TypeScript generics", "TypeScript online course free",
+        "learn TypeScript online free", "TypeScript interview prep", "TypeScript certification",
+        "TypeScript vs JavaScript", "TypeScript exercises online", "uByte",
+      ],
+    },
+  },
+  sql: {
+    id: "sql",
+    name: "SQL",
+    slug: "sql",
+    contentDir: "content/sql",
+    defaultStarter: "-- Write your SQL query here\nSELECT 'Hello, World!' AS message;",
+    fileExtension: ".sql",
+    seo: {
+      defaultTitle: "Learn SQL — Free Interactive SQL Tutorial",
+      defaultDescription: "Learn SQL from scratch with hands-on, interactive tutorials. Master SELECT queries, JOINs, aggregates, subqueries, indexes, and transactions — write and run real SQL in your browser. Free beginner lessons included.",
+      keywords: [
+        "SQL tutorial", "Learn SQL", "SQL for beginners", "free SQL course",
+        "SQL SELECT tutorial", "SQL JOIN tutorial", "SQL aggregate functions", "SQL subqueries",
+        "SQL online course free", "learn SQL online free", "SQL interview prep", "SQL certification",
+        "SQLite tutorial", "database tutorial", "uByte",
       ],
     },
   },
@@ -270,6 +290,10 @@ export function getHighlighter(lang: SupportedLanguage): (code: string) => strin
       return highlightRust;
     case "csharp":
       return highlightCsharp;
+    case "typescript":
+      return highlightTypeScript;
+    case "sql":
+      return highlightSql;
     default:
       return (code: string) =>
         code.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");

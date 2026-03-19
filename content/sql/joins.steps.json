@@ -1,0 +1,23 @@
+[
+  {
+    "title": "INNER JOIN",
+    "instruction": "`INNER JOIN` returns rows where the join condition matches in both tables. Rows with no match are excluded.\n\nRun this.",
+    "starter": "CREATE TABLE customers (id INTEGER, name TEXT);\nCREATE TABLE orders (id INTEGER, customer_id INTEGER, total REAL);\n\nINSERT INTO customers VALUES (1, 'Alice'), (2, 'Bob'), (3, 'Carol');\nINSERT INTO orders VALUES (1, 1, 50.00), (2, 1, 120.00), (3, 2, 30.00);\n\nSELECT customers.name, orders.total\nFROM orders\nINNER JOIN customers ON orders.customer_id = customers.id\nORDER BY customers.name, orders.total;",
+    "expectedOutput": ["Alice|50.0", "Alice|120.0", "Bob|30.0"],
+    "successMessage": "Carol has no orders, so she doesn't appear. INNER JOIN = only rows with a match in BOTH tables."
+  },
+  {
+    "title": "LEFT JOIN — include all left rows",
+    "instruction": "`LEFT JOIN` returns all rows from the left table even when there's no matching row on the right. Missing values are `NULL`.\n\nRun this.",
+    "starter": "CREATE TABLE customers (id INTEGER, name TEXT);\nCREATE TABLE orders (id INTEGER, customer_id INTEGER, total REAL);\n\nINSERT INTO customers VALUES (1, 'Alice'), (2, 'Bob'), (3, 'Carol');\nINSERT INTO orders VALUES (1, 1, 50.00), (2, 2, 30.00);\n\nSELECT c.name, COALESCE(o.total, 0) AS total\nFROM customers c\nLEFT JOIN orders o ON o.customer_id = c.id\nORDER BY c.name;",
+    "expectedOutput": ["Alice|50.0", "Bob|30.0", "Carol|0"],
+    "successMessage": "Carol has no orders but appears with `total = 0` (thanks to `COALESCE`). LEFT JOIN is great for 'show all X with optional Y' queries."
+  },
+  {
+    "title": "Multiple JOINs",
+    "instruction": "Chain multiple JOINs to bring together data from more than two tables.\n\nRun this.",
+    "starter": "CREATE TABLE authors (id INTEGER, name TEXT);\nCREATE TABLE books (id INTEGER, author_id INTEGER, title TEXT);\nCREATE TABLE sales (book_id INTEGER, copies INTEGER);\n\nINSERT INTO authors VALUES (1, 'Alice Author'), (2, 'Bob Writer');\nINSERT INTO books VALUES (1, 1, 'TypeScript Guide'), (2, 1, 'SQL Mastery'), (3, 2, 'Go Handbook');\nINSERT INTO sales VALUES (1, 500), (2, 1200), (3, 350);\n\nSELECT a.name, b.title, s.copies\nFROM books b\nJOIN authors a ON b.author_id = a.id\nJOIN sales s ON s.book_id = b.id\nORDER BY s.copies DESC;",
+    "expectedOutput": ["Alice Author|SQL Mastery|1200", "Alice Author|TypeScript Guide|500", "Bob Writer|Go Handbook|350"],
+    "successMessage": "Three tables, two JOINs. The query reads: 'give me each book with its author's name and sales figures, sorted by copies sold.'"
+  }
+]

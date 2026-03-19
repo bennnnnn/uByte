@@ -1,0 +1,119 @@
+---
+title: "Interfaces"
+description: "Define object shapes with interfaces — the backbone of TypeScript's structural type system."
+order: 3
+difficulty: "beginner"
+estimatedMinutes: 12
+---
+
+## Defining an Interface
+
+An interface describes the **shape** of an object:
+
+```typescript
+interface User {
+  id: number;
+  name: string;
+  email: string;
+}
+
+const user: User = {
+  id: 1,
+  name: "Alice",
+  email: "alice@example.com",
+};
+```
+
+---
+
+## Optional Properties
+
+Use `?` to mark a property as optional:
+
+```typescript
+interface Product {
+  id: number;
+  name: string;
+  description?: string; // optional
+  price: number;
+}
+
+const shirt: Product = { id: 1, name: "T-Shirt", price: 19.99 };       // ✓
+const mug: Product = { id: 2, name: "Mug", description: "16oz", price: 12.99 }; // ✓
+```
+
+---
+
+## Readonly Properties
+
+Prevent a property from being reassigned after creation:
+
+```typescript
+interface Config {
+  readonly apiUrl: string;
+  timeout: number;
+}
+
+const config: Config = { apiUrl: "https://api.example.com", timeout: 3000 };
+config.timeout = 5000;   // ✓ allowed
+config.apiUrl = "...";   // ✗ Error: Cannot assign to 'apiUrl'
+```
+
+---
+
+## Function Types in Interfaces
+
+```typescript
+interface Calculator {
+  add(a: number, b: number): number;
+  multiply(a: number, b: number): number;
+}
+
+const calc: Calculator = {
+  add: (a, b) => a + b,
+  multiply: (a, b) => a * b,
+};
+```
+
+---
+
+## Extending Interfaces
+
+Interfaces can extend other interfaces to compose shapes:
+
+```typescript
+interface Animal {
+  name: string;
+  sound(): string;
+}
+
+interface Dog extends Animal {
+  breed: string;
+}
+
+const dog: Dog = {
+  name: "Rex",
+  breed: "Labrador",
+  sound: () => "Woof!",
+};
+```
+
+---
+
+## Interface vs Type Alias
+
+Both work for most cases. Key differences:
+
+| | Interface | Type Alias |
+|---|---|---|
+| Extending | `extends` keyword | `&` intersection |
+| Declaration merging | ✓ (multiple declarations merge) | ✗ |
+| Primitives/unions | ✗ | ✓ |
+
+Prefer `interface` for object shapes, `type` for unions and complex types.
+
+---
+
+## What's Next?
+
+Next: **Type Aliases and Union Types** — compose multiple types into one.

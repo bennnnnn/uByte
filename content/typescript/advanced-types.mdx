@@ -1,0 +1,103 @@
+---
+title: "Advanced Types"
+description: "Mapped types, conditional types, template literal types, and infer keyword."
+order: 12
+difficulty: "advanced"
+estimatedMinutes: 20
+---
+
+## Mapped Types
+
+Transform every property in a type:
+
+```typescript
+type Optional<T> = {
+  [K in keyof T]?: T[K];
+};
+
+type Nullable<T> = {
+  [K in keyof T]: T[K] | null;
+};
+
+interface User { id: number; name: string; email: string; }
+
+type OptionalUser = Optional<User>; // same as Partial<User>
+type NullableUser = Nullable<User>; // all props can be null
+```
+
+---
+
+## Conditional Types
+
+Types that depend on a condition:
+
+```typescript
+type IsString<T> = T extends string ? "yes" : "no";
+
+type A = IsString<string>;  // "yes"
+type B = IsString<number>;  // "no"
+
+// Unwrap array element type
+type Unarray<T> = T extends Array<infer Item> ? Item : T;
+
+type N = Unarray<number[]>;  // number
+type S = Unarray<string>;    // string (not an array — returns T)
+```
+
+---
+
+## Template Literal Types
+
+Combine string literals with types:
+
+```typescript
+type EventName = "click" | "focus" | "blur";
+type Handler = `on${Capitalize<EventName>}`;
+// "onClick" | "onFocus" | "onBlur"
+
+type Getters<T> = {
+  [K in keyof T as `get${Capitalize<string & K>}`]: () => T[K];
+};
+```
+
+---
+
+## The infer Keyword
+
+Extract a type from within a conditional:
+
+```typescript
+type UnpackPromise<T> = T extends Promise<infer U> ? U : T;
+
+type StringResult = UnpackPromise<Promise<string>>;   // string
+type NumberResult = UnpackPromise<Promise<number>>;   // number
+type PlainValue = UnpackPromise<boolean>;             // boolean
+
+type FirstArg<T> = T extends (arg: infer A, ...rest: unknown[]) => unknown ? A : never;
+type F = FirstArg<(x: number, y: string) => void>; // number
+```
+
+---
+
+## Combining It All
+
+```typescript
+// Build event emitter types automatically from an interface
+interface AppEvents {
+  login: { userId: number };
+  logout: void;
+  error: { message: string };
+}
+
+type EventHandlers = {
+  [K in keyof AppEvents]: AppEvents[K] extends void
+    ? () => void
+    : (payload: AppEvents[K]) => void;
+};
+```
+
+---
+
+## What's Next?
+
+You've completed the TypeScript track! Practice what you've learned in the **Interview Prep** section or earn your **TypeScript Certificate**.

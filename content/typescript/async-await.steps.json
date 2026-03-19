@@ -1,0 +1,23 @@
+[
+  {
+    "title": "Async functions return Promise<T>",
+    "instruction": "An async function always returns a Promise. Annotate the return type as `Promise<T>` to be explicit about what it resolves to.\n\nRun this.",
+    "starter": "async function delay(ms: number): Promise<string> {\n  return new Promise(resolve => {\n    setTimeout(() => resolve(`Done after ${ms}ms`), ms);\n  });\n}\n\nasync function main() {\n  const result = await delay(0);\n  console.log(result);\n  console.log(\"Async functions always return a Promise\");\n}\n\nmain();",
+    "expectedOutput": ["Done after 0ms", "Async functions always return a Promise"],
+    "successMessage": "The `await` keyword pauses execution until the Promise resolves. Outside an async function, you'd receive a `Promise<string>` instead of the value."
+  },
+  {
+    "title": "Error handling with unknown",
+    "instruction": "In TypeScript, caught errors are typed as `unknown`. You must narrow the type before accessing properties.\n\nRun this.",
+    "starter": "function riskyOperation(shouldFail: boolean): string {\n  if (shouldFail) throw new Error(\"Operation failed!\");\n  return \"Success\";\n}\n\nfunction safeRun(shouldFail: boolean): string {\n  try {\n    return riskyOperation(shouldFail);\n  } catch (error) {\n    if (error instanceof Error) {\n      return `Caught: ${error.message}`;\n    }\n    return \"Caught unknown error\";\n  }\n}\n\nconsole.log(safeRun(false));\nconsole.log(safeRun(true));",
+    "expectedOutput": ["Success", "Caught: Operation failed!"],
+    "successMessage": "Always check `error instanceof Error` before accessing `.message`. TypeScript types caught errors as `unknown` to force this check."
+  },
+  {
+    "title": "Promise.all for parallel execution",
+    "instruction": "`Promise.all` runs multiple promises in parallel and waits for all to complete. The result type is inferred from the input types.\n\nRun this.",
+    "starter": "async function fetchNumber(n: number): Promise<number> {\n  return n * n;\n}\n\nasync function main() {\n  const [a, b, c]: [number, number, number] = await Promise.all([\n    fetchNumber(2),\n    fetchNumber(3),\n    fetchNumber(4),\n  ]);\n\n  console.log(a);\n  console.log(b);\n  console.log(c);\n  console.log(`Total: ${a + b + c}`);\n}\n\nmain();",
+    "expectedOutput": ["4", "9", "16", "Total: 29"],
+    "successMessage": "`Promise.all` resolves when ALL promises resolve. TypeScript infers the tuple type from the array — `[number, number, number]` here."
+  }
+]

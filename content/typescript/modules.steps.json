@@ -1,0 +1,16 @@
+[
+  {
+    "title": "Named exports and imports",
+    "instruction": "TypeScript uses ES module syntax. Export functions and types with `export`, import them with `import { ... } from`.\n\nRun this.",
+    "starter": "// Inline module simulation (everything in one file for the sandbox)\nfunction add(a: number, b: number): number { return a + b; }\nfunction multiply(a: number, b: number): number { return a * b; }\nconst PI = 3.14159;\n\n// Usage\nconst sum = add(3, 4);\nconst product = multiply(3, 4);\nconst circumference = 2 * PI * 5;\n\nconsole.log(sum);\nconsole.log(product);\nconsole.log(circumference.toFixed(2));",
+    "expectedOutput": ["7", "12", "31.42"],
+    "successMessage": "In a real project you'd split these into separate files and use `export`/`import`. TypeScript checks that imported names actually exist in the source file."
+  },
+  {
+    "title": "Type aliases as module contracts",
+    "instruction": "Exported type aliases and interfaces define the contract between modules. They're erased at runtime but checked at compile time.\n\nRun this.",
+    "starter": "// Types that would normally be in a separate file\ninterface ApiResponse<T> {\n  data: T;\n  status: number;\n  message: string;\n}\n\ninterface User {\n  id: number;\n  name: string;\n}\n\n// Function that uses the types\nfunction createResponse<T>(data: T, status = 200): ApiResponse<T> {\n  return { data, status, message: status === 200 ? \"OK\" : \"Error\" };\n}\n\nconst userResponse: ApiResponse<User> = createResponse({ id: 1, name: \"Alice\" });\nconsole.log(userResponse.status);\nconsole.log(userResponse.data.name);\nconsole.log(userResponse.message);",
+    "expectedOutput": ["200", "Alice", "OK"],
+    "successMessage": "Generic interfaces like `ApiResponse<T>` are a common pattern for typed API wrappers. They enforce consistent response shapes across your entire codebase."
+  }
+]

@@ -1,0 +1,23 @@
+[
+  {
+    "title": "String enums",
+    "instruction": "String enums assign explicit string values to each member. They're more readable than numeric enums in logs and APIs.\n\nRun this.",
+    "starter": "enum Status {\n  Pending  = \"PENDING\",\n  Active   = \"ACTIVE\",\n  Archived = \"ARCHIVED\",\n}\n\nfunction describe(s: Status): string {\n  switch (s) {\n    case Status.Pending:  return \"Waiting for review\";\n    case Status.Active:   return \"Currently active\";\n    case Status.Archived: return \"No longer active\";\n  }\n}\n\nconsole.log(Status.Active);\nconsole.log(describe(Status.Pending));\nconsole.log(describe(Status.Archived));",
+    "expectedOutput": ["ACTIVE", "Waiting for review", "No longer active"],
+    "successMessage": "String enums are the safest kind — they appear as readable strings in JSON and logs instead of opaque numbers."
+  },
+  {
+    "title": "Numeric enums",
+    "instruction": "Numeric enums auto-assign incrementing values starting at 0. They support reverse mapping — you can look up the name from the value.\n\nRun this.",
+    "starter": "enum Priority {\n  Low,    // 0\n  Medium, // 1\n  High,   // 2\n  Critical // 3\n}\n\nconst p: Priority = Priority.High;\nconsole.log(p);\nconsole.log(Priority[p]);\nconsole.log(Priority.Critical);",
+    "expectedOutput": ["2", "High", "3"],
+    "successMessage": "`Priority[p]` is reverse mapping — numeric enums compile a lookup object so you can go both ways."
+  },
+  {
+    "title": "Enum in a function",
+    "instruction": "Use an enum as a parameter type to restrict what values can be passed.\n\nRun this.",
+    "starter": "enum Day {\n  Mon = \"Monday\",\n  Tue = \"Tuesday\",\n  Wed = \"Wednesday\",\n  Thu = \"Thursday\",\n  Fri = \"Friday\",\n}\n\nfunction isWeekend(day: Day): boolean {\n  return false; // all enum values are weekdays here\n}\n\nconst schedule: Day[] = [Day.Mon, Day.Wed, Day.Fri];\nfor (const day of schedule) {\n  console.log(`${day}: working`);\n}",
+    "expectedOutput": ["Monday: working", "Wednesday: working", "Friday: working"],
+    "successMessage": "The `Day` enum acts as a closed set — you can only pass valid enum members, not arbitrary strings."
+  }
+]

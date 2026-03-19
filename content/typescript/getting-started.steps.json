@@ -1,0 +1,30 @@
+[
+  {
+    "title": "Your first TypeScript program",
+    "instruction": "TypeScript adds type annotations to JavaScript. Declare a variable with a type annotation using `: type` syntax.\n\nRun this.",
+    "starter": "const message: string = \"Hello, TypeScript!\";\nconsole.log(message);",
+    "expectedOutput": ["Hello, TypeScript!"],
+    "successMessage": "TypeScript compiles to JavaScript. The `: string` annotation tells the compiler what type `message` must hold."
+  },
+  {
+    "title": "Type annotations on functions",
+    "instruction": "Annotate function parameters and return types. TypeScript will catch mismatches before the code runs.\n\nRun this.",
+    "starter": "function add(a: number, b: number): number {\n  return a + b;\n}\n\nconsole.log(add(3, 4));",
+    "expectedOutput": ["7"],
+    "successMessage": "Both parameters are typed as `number` and the return type is `number`. TypeScript ensures you can't accidentally pass a string."
+  },
+  {
+    "title": "Type inference",
+    "instruction": "TypeScript infers types automatically. You don't need to annotate every variable — the compiler figures it out from the value.\n\nRun this.",
+    "starter": "const city = \"London\";   // inferred: string\nconst count = 42;        // inferred: number\nconst active = true;     // inferred: boolean\n\nconsole.log(city);\nconsole.log(count);\nconsole.log(active);",
+    "expectedOutput": ["London", "42", "true"],
+    "successMessage": "TypeScript inferred all three types without annotations. Only add annotations when the type isn't obvious from context."
+  },
+  {
+    "title": "Boolean and template literals",
+    "instruction": "Use boolean types and template literals, just like JavaScript — but now TypeScript enforces the types.\n\nRun this.",
+    "starter": "const isAdmin: boolean = false;\nconst username: string = \"alice\";\n\nconst status = isAdmin ? \"admin\" : \"user\";\nconsole.log(`${username} is a ${status}`);",
+    "expectedOutput": ["alice is a user"],
+    "successMessage": "TypeScript supports all JavaScript features — template literals, ternaries, and more — with the added safety of types."
+  }
+]

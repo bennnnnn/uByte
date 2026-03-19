@@ -1,0 +1,76 @@
+---
+title: "Aggregate Functions"
+description: "COUNT, SUM, AVG, MIN, MAX — summarize groups of rows into single values."
+order: 4
+difficulty: "beginner"
+estimatedMinutes: 12
+---
+
+## Core Aggregate Functions
+
+| Function | Returns |
+|---|---|
+| `COUNT(*)` | Number of rows |
+| `COUNT(col)` | Number of non-NULL values |
+| `SUM(col)` | Total of numeric values |
+| `AVG(col)` | Average of numeric values |
+| `MIN(col)` | Smallest value |
+| `MAX(col)` | Largest value |
+
+```sql
+SELECT
+  COUNT(*)        AS total_orders,
+  SUM(total)      AS revenue,
+  AVG(total)      AS avg_order,
+  MIN(total)      AS smallest,
+  MAX(total)      AS largest
+FROM orders;
+```
+
+---
+
+## GROUP BY
+
+Group rows before aggregating:
+
+```sql
+SELECT
+  dept,
+  COUNT(*)   AS headcount,
+  AVG(salary) AS avg_salary,
+  MAX(salary) AS top_salary
+FROM employees
+GROUP BY dept
+ORDER BY avg_salary DESC;
+```
+
+---
+
+## HAVING — Filter Groups
+
+`WHERE` filters rows before grouping. `HAVING` filters groups after aggregation:
+
+```sql
+-- Departments with more than 5 employees and avg salary > 80k
+SELECT dept, COUNT(*) AS count, AVG(salary) AS avg
+FROM employees
+GROUP BY dept
+HAVING COUNT(*) > 5 AND AVG(salary) > 80000;
+```
+
+---
+
+## COUNT DISTINCT
+
+Count unique values:
+
+```sql
+-- How many unique customers placed orders?
+SELECT COUNT(DISTINCT customer_id) AS unique_customers FROM orders;
+```
+
+---
+
+## What's Next?
+
+Next: **JOINs** — combine data from multiple tables.

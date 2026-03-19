@@ -1,0 +1,96 @@
+---
+title: "Async/Await"
+description: "Type async functions, Promises, and handle errors in asynchronous TypeScript code."
+order: 10
+difficulty: "intermediate"
+estimatedMinutes: 12
+---
+
+## Typing Async Functions
+
+An `async` function always returns a `Promise<T>`:
+
+```typescript
+async function fetchUser(id: number): Promise<User> {
+  const res = await fetch(`/api/users/${id}`);
+  if (!res.ok) throw new Error("Not found");
+  return res.json() as Promise<User>;
+}
+```
+
+---
+
+## Promise Types
+
+```typescript
+// Promise that resolves to a string
+const p1: Promise<string> = Promise.resolve("hello");
+
+// Promise that resolves to void (no return value)
+async function sendEmail(to: string): Promise<void> {
+  await emailService.send(to);
+}
+
+// Promise that might reject
+async function divide(a: number, b: number): Promise<number> {
+  if (b === 0) throw new Error("Division by zero");
+  return a / b;
+}
+```
+
+---
+
+## Error Handling
+
+TypeScript's `catch` errors are always `unknown` — narrow before using:
+
+```typescript
+async function loadData(url: string): Promise<string> {
+  try {
+    const res = await fetch(url);
+    return await res.text();
+  } catch (error) {
+    // error is `unknown` — must narrow
+    if (error instanceof Error) {
+      console.error(error.message);
+    }
+    throw error;
+  }
+}
+```
+
+---
+
+## Parallel Execution
+
+```typescript
+async function loadAll(ids: number[]): Promise<User[]> {
+  const promises = ids.map(id => fetchUser(id));
+  return Promise.all(promises); // all run in parallel
+}
+
+// With individual error handling:
+const results = await Promise.allSettled([
+  fetchUser(1),
+  fetchUser(2),
+  fetchUser(999), // might fail
+]);
+```
+
+---
+
+## Typed Callbacks to Async
+
+```typescript
+type AsyncHandler<T> = (value: T) => Promise<void>;
+
+const handleUser: AsyncHandler<User> = async (user) => {
+  await save(user);
+};
+```
+
+---
+
+## What's Next?
+
+Next: **Modules** — organizing TypeScript code with imports, exports, and module patterns.

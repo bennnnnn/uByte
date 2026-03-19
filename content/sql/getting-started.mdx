@@ -1,0 +1,76 @@
+---
+title: "Getting Started with SQL"
+description: "What SQL is, how databases work, and your first SELECT query."
+order: 1
+difficulty: "beginner"
+estimatedMinutes: 10
+---
+
+## What is SQL?
+
+SQL (Structured Query Language) is the standard language for working with **relational databases** — think MySQL, PostgreSQL, SQLite, and SQL Server.
+
+A relational database stores data in **tables**, like spreadsheets:
+
+```
+users table:
+┌────┬─────────┬───────────────────┐
+│ id │  name   │       email       │
+├────┼─────────┼───────────────────┤
+│  1 │  Alice  │ alice@example.com │
+│  2 │  Bob    │ bob@example.com   │
+│  3 │  Carol  │ carol@example.com │
+└────┴─────────┴───────────────────┘
+```
+
+SQL lets you query, insert, update, and delete data in these tables.
+
+---
+
+## Your First Query
+
+```sql
+SELECT name, email FROM users;
+```
+
+- `SELECT` — choose which columns to return
+- `FROM` — specify the table
+
+Retrieve all columns with `*`:
+
+```sql
+SELECT * FROM users;
+```
+
+---
+
+## Comments
+
+```sql
+-- This is a single-line comment
+
+/*
+  This is a
+  multi-line comment
+*/
+SELECT 'Hello, SQL!' AS greeting;
+```
+
+---
+
+## Expressions and Aliases
+
+```sql
+SELECT
+  2 + 2 AS sum,
+  'Hello' || ' World' AS message,
+  UPPER('sql') AS upper_sql;
+```
+
+The `AS` keyword renames the output column.
+
+---
+
+## What's Next?
+
+Next: **SELECT and WHERE** — filter rows with conditions.

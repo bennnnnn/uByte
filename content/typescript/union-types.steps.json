@@ -1,0 +1,30 @@
+[
+  {
+    "title": "Union types",
+    "instruction": "A union type `A | B` means a value can be either type. Use `typeof` to narrow the type before using it.\n\nRun this.",
+    "starter": "type StringOrNumber = string | number;\n\nfunction double(value: StringOrNumber): StringOrNumber {\n  if (typeof value === \"number\") {\n    return value * 2;\n  }\n  return value.repeat(2);\n}\n\nconsole.log(double(5));\nconsole.log(double(\"ha\"));",
+    "expectedOutput": ["10", "haha"],
+    "successMessage": "Type narrowing with `typeof` tells TypeScript which branch handles which type — no unsafe casts needed."
+  },
+  {
+    "title": "Literal union types",
+    "instruction": "Restrict a value to a specific set of literals. This is safer than a plain string type.\n\nRun this.",
+    "starter": "type Direction = \"north\" | \"south\" | \"east\" | \"west\";\n\nfunction describe(dir: Direction): string {\n  if (dir === \"north\" || dir === \"south\") return `${dir} (vertical)`;\n  return `${dir} (horizontal)`;\n}\n\nconsole.log(describe(\"north\"));\nconsole.log(describe(\"east\"));\nconsole.log(describe(\"south\"));",
+    "expectedOutput": ["north (vertical)", "east (horizontal)", "south (vertical)"],
+    "successMessage": "Literal unions act as exhaustive enumerations. TypeScript will error if you pass a string not in the union."
+  },
+  {
+    "title": "Discriminated unions",
+    "instruction": "Add a `kind` (or `type`) discriminant field to each variant so TypeScript can narrow automatically in switch statements.\n\nRun this.",
+    "starter": "type Circle = { kind: \"circle\"; radius: number };\ntype Rectangle = { kind: \"rectangle\"; width: number; height: number };\ntype Shape = Circle | Rectangle;\n\nfunction area(shape: Shape): number {\n  switch (shape.kind) {\n    case \"circle\":    return Math.PI * shape.radius ** 2;\n    case \"rectangle\": return shape.width * shape.height;\n  }\n}\n\nconsole.log(area({ kind: \"circle\", radius: 5 }).toFixed(2));\nconsole.log(area({ kind: \"rectangle\", width: 4, height: 6 }));",
+    "expectedOutput": ["78.54", "24"],
+    "successMessage": "Inside each case, TypeScript knows exactly which shape variant you have — no casting needed. This is a core TypeScript pattern."
+  },
+  {
+    "title": "Intersection types",
+    "instruction": "An intersection type `A & B` combines both types — the value must satisfy all properties of both.\n\nRun this.",
+    "starter": "type HasName = { name: string };\ntype HasAge = { age: number };\ntype Person = HasName & HasAge;\n\nfunction introduce(p: Person): string {\n  return `Hi, I'm ${p.name} and I'm ${p.age} years old.`;\n}\n\nconsole.log(introduce({ name: \"Alice\", age: 30 }));\nconsole.log(introduce({ name: \"Bob\", age: 25 }));",
+    "expectedOutput": ["Hi, I'm Alice and I'm 30 years old.", "Hi, I'm Bob and I'm 25 years old."],
+    "successMessage": "Intersection types are great for composing reusable type pieces without full class inheritance."
+  }
+]

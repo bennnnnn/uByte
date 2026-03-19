@@ -1,0 +1,84 @@
+---
+title: "Basic Types"
+description: "Primitive types, arrays, tuples, and special types like any, unknown, and never."
+order: 2
+difficulty: "beginner"
+estimatedMinutes: 12
+---
+
+## Primitive Types
+
+```typescript
+let name: string = "Alice";
+let age: number = 30;
+let price: number = 9.99;
+let active: boolean = true;
+let nothing: null = null;
+let missing: undefined = undefined;
+let id: bigint = 9007199254740991n;
+let sym: symbol = Symbol("unique");
+```
+
+---
+
+## Arrays
+
+```typescript
+let nums: number[] = [1, 2, 3];
+let names: string[] = ["Alice", "Bob"];
+
+// Generic syntax (equivalent)
+let scores: Array<number> = [100, 95, 87];
+```
+
+---
+
+## Tuples
+
+Fixed-length arrays where each position has a known type:
+
+```typescript
+let point: [number, number] = [10, 20];
+let entry: [string, number] = ["age", 30];
+
+console.log(point[0]); // 10
+console.log(entry[1]); // 30
+```
+
+---
+
+## Special Types
+
+| Type | Meaning |
+|---|---|
+| `any` | Opt out of type checking — use sparingly |
+| `unknown` | Like `any` but safe — must narrow before use |
+| `never` | A value that never occurs (e.g. unreachable code) |
+| `void` | Function that returns nothing |
+| `object` | Non-primitive value |
+
+```typescript
+// unknown is safer than any — must check type before using
+function process(input: unknown) {
+  if (typeof input === "string") {
+    console.log(input.toUpperCase()); // safe
+  }
+}
+```
+
+---
+
+## Type Assertions
+
+When you know more than TypeScript:
+
+```typescript
+const input = document.getElementById("email") as HTMLInputElement;
+const value = input.value; // TypeScript now knows it's an input element
+```
+
+---
+
+## What's Next?
+
+Next: **Interfaces** — how to define the shape of objects.
