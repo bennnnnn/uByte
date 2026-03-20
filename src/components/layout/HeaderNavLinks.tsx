@@ -147,50 +147,13 @@ export default function HeaderNavLinks({ side = "left" }: { side?: "left" }) {
     return (
       <nav className="flex items-center gap-1" aria-label="Main navigation">
 
-        {/* ── Tutorials dropdown ──────────────────────────────────── */}
-        <NavDropdown
-          id="tutorials"
-          label="Tutorials"
-          open={openMenu === "tutorials"}
-          onOpen={handleOpen}
-          onClose={handleClose}
-          menuId="nav-tutorials-menu"
+        {/* ── Tutorials — plain link to the browse page ──────────── */}
+        <Link
+          href="/tutorial"
+          className={`${linkBase} ${pathname === "/tutorial" ? "bg-zinc-100 text-zinc-900 dark:bg-zinc-800 dark:text-zinc-100" : ""}`}
         >
-          <div className="p-3">
-            <p className="mb-2 px-1 text-[10px] font-bold uppercase tracking-widest text-zinc-400 dark:text-zinc-500">
-              Choose a language
-            </p>
-            <div className="grid grid-cols-2 gap-0.5" style={{ width: 340 }}>
-              {ALL_LANGS.map((l) => (
-                <Link
-                  key={l.slug}
-                  href={`/tutorial/${l.slug}`}
-                  role="menuitem"
-                  onClick={handleClose}
-                  className="flex items-center gap-2.5 rounded-lg px-3 py-2 transition-colors hover:bg-zinc-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-indigo-500 dark:hover:bg-zinc-800"
-                >
-                  <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-zinc-100 text-sm dark:bg-zinc-800">
-                    {l.icon}
-                  </span>
-                  <span>
-                    <span className="block text-sm font-semibold text-zinc-800 dark:text-zinc-100">{l.label}</span>
-                    <span className="block text-[11px] text-zinc-400 dark:text-zinc-500">{l.sub}</span>
-                  </span>
-                </Link>
-              ))}
-            </div>
-            <div className="mt-3 border-t border-zinc-100 pt-3 dark:border-zinc-800">
-              <Link
-                href="/tutorial"
-                role="menuitem"
-                onClick={handleClose}
-                className="flex items-center gap-1.5 px-1 text-xs font-semibold text-indigo-600 hover:text-indigo-500 dark:text-indigo-400"
-              >
-                Browse all tutorials →
-              </Link>
-            </div>
-          </div>
-        </NavDropdown>
+          Tutorials
+        </Link>
 
         {/* ── Interview Prep dropdown ──────────────────────────────── */}
         <NavDropdown
