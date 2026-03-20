@@ -23,8 +23,6 @@ import CertificationsHighlight   from "@/components/home/CertificationsHighlight
 import ContinueBanner            from "@/components/ContinueBanner";
 import GoogleOAuthError          from "@/components/GoogleOAuthError";
 import ReferralPromptBanner      from "@/components/ReferralPromptBanner";
-import TestimonialsStripDeferred from "@/components/home/TestimonialsStripDeferred";
-
 const PopularInterviewPrepSection = dynamic(() => import("@/components/home/PopularInterviewPrepSection"));
 
 export const metadata: Metadata = {
@@ -224,11 +222,6 @@ export default async function Home() {
 
             {/* 5. Interview prep — proves depth */}
             {interviewSection}
-
-            {/* 6. Testimonials — social proof to close */}
-            <Suspense>
-              <TestimonialsStripDeferred />
-            </Suspense>
 
           </div>
         </>
