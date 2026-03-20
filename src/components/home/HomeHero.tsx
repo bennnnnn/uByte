@@ -142,7 +142,7 @@ function LoggedInHero({
                 href="/certifications"
                 className="flex items-center gap-2 rounded-xl border border-zinc-200 bg-white px-4 py-2.5 text-sm font-semibold text-zinc-700 shadow-sm transition-all hover:border-indigo-200 hover:text-indigo-600 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:border-indigo-700 dark:hover:text-indigo-400"
               >
-                🎓 Take a free exam
+                🎓 Get certified
               </Link>
               <Link
                 href="/practice"
@@ -287,7 +287,7 @@ function GuestHero({
 
             {/* Badge */}
             <p className="mb-5 inline-flex items-center gap-2 rounded-full bg-indigo-50 px-4 py-1.5 text-sm font-semibold text-indigo-700 ring-1 ring-indigo-100 dark:bg-indigo-950/50 dark:text-indigo-300 dark:ring-indigo-800/60">
-              🎓 Exams &amp; certificates are always free
+              🎓 Free certifications — no subscription required
             </p>
 
             {/* Headline */}
@@ -306,7 +306,7 @@ function GuestHero({
             <p className="mx-auto mt-5 max-w-xl text-lg leading-relaxed text-zinc-500 lg:mx-0 dark:text-zinc-400">
               Step-by-step tutorials, real interview problems, and{" "}
               <span className="font-semibold text-zinc-700 dark:text-zinc-300">
-                free timed certification exams
+                free certifications
               </span>{" "}
               — all running live in your browser. Zero setup.
             </p>
@@ -328,7 +328,7 @@ function GuestHero({
             </div>
 
             <p className="mt-4 text-xs text-zinc-400">
-              Exams are free · No subscription required · Shareable certificates
+              Get certified for free · Shareable credential · No subscription
             </p>
 
             {/* Stats */}
@@ -380,7 +380,7 @@ function GuestHero({
             {[
               { icon: "💻", title: "Runs in your browser",     desc: "No installs. Start coding in seconds." },
               { icon: "🧩", title: "Learn → Practice → Certify", desc: "A clear path from beginner to certified." },
-              { icon: "🎓", title: "Certificates are free",    desc: "Unlike Codecademy — exams are always free." },
+              { icon: "🎓", title: "Free certifications",       desc: "Learn, prove your skills, and get a shareable certificate — at no cost." },
             ].map(item => (
               <div key={item.title} className="flex items-center gap-3 px-4 py-3 sm:px-6">
                 <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-white text-lg shadow-sm ring-1 ring-zinc-200 dark:bg-zinc-800 dark:ring-zinc-700">
