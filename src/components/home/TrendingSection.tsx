@@ -7,32 +7,39 @@ import type { SupportedLanguage } from "@/lib/languages/types";
 
 interface Props {
   languages: PopularLanguage[];
+  /** compact=true shows 3 cards in a row — used on the logged-in homepage */
+  compact?: boolean;
 }
 
-export default function TrendingSection({ languages }: Props) {
+export default function TrendingSection({ languages, compact = false }: Props) {
   if (languages.length === 0) return null;
+
+  const limit = compact ? 3 : 6;
+  const gridCols = compact
+    ? "grid-cols-1 gap-3 sm:grid-cols-3"
+    : "grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6";
 
   return (
     <section aria-labelledby="trending-heading">
       <div className="mb-6 flex items-center justify-between">
         <div>
           <p className="mb-1 text-xs font-bold uppercase tracking-widest text-indigo-600 dark:text-indigo-400">
-            🔥 Most popular
+            Most popular
           </p>
           <h2 id="trending-heading" className="text-xl font-bold text-zinc-900 dark:text-zinc-100">
-            Where other developers are starting
+            {compact ? "Trending this week" : "Where other developers are starting"}
           </h2>
         </div>
         <Link
-          href="/tutorial/go"
+          href="/tutorial"
           className="shrink-0 text-sm font-semibold text-indigo-600 hover:text-indigo-500 dark:text-indigo-400"
         >
           All languages →
         </Link>
       </div>
 
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
-        {languages.slice(0, 4).map((lang, idx) => {
+      <div className={`grid ${gridCols}`}>
+        {languages.slice(0, limit).map((lang, idx) => {
           const lessonCount = getTotalLessonCount(lang.slug as SupportedLanguage);
           const rank = idx + 1;
           return (

@@ -14,14 +14,15 @@ import { LANGUAGES } from "@/lib/languages/registry";
 import type { SupportedLanguage } from "@/lib/languages/types";
 import dynamic from "next/dynamic";
 
-// Homepage sections
-import HomeHero           from "@/components/home/HomeHero";
-import TrendingSection    from "@/components/home/TrendingSection";
-import NewLanguagesSection from "@/components/home/NewLanguagesSection";
-import CategoryBrowse     from "@/components/home/CategoryBrowse";
-import CertificationsHighlight from "@/components/home/CertificationsHighlight";
-import GoogleOAuthError   from "@/components/GoogleOAuthError";
-import ReferralPromptBanner from "@/components/ReferralPromptBanner";
+// ── Homepage sections ──────────────────────────────────────────────────────
+import HomeHero                  from "@/components/home/HomeHero";
+import StepsSection              from "@/components/home/StepsSection";
+import TrendingSection           from "@/components/home/TrendingSection";
+import ValuePropBanner           from "@/components/home/ValuePropBanner";
+import CertificationsHighlight   from "@/components/home/CertificationsHighlight";
+import ContinueBanner            from "@/components/ContinueBanner";
+import GoogleOAuthError          from "@/components/GoogleOAuthError";
+import ReferralPromptBanner      from "@/components/ReferralPromptBanner";
 import TestimonialsStripDeferred from "@/components/home/TestimonialsStripDeferred";
 
 const PopularInterviewPrepSection = dynamic(() => import("@/components/home/PopularInterviewPrepSection"));
@@ -64,15 +65,13 @@ export default async function Home() {
     getExamPublicStatsByLang(),
   ]);
 
-  // User-specific data
+  // ── User-specific data ─────────────────────────────────────────────────
   let leftOff: { href: string; label: string } | null = null;
   let continueLang: SupportedLanguage = "go";
   let continueTutorialList: { slug: string; title: string }[] = [];
 
   if (user) {
-    const [last] = await Promise.all([
-      getLastActivity(user.userId),
-    ]);
+    const last = await getLastActivity(user.userId);
     if (last) {
       if (last.activity_type === "tutorial" && last.slug) {
         continueLang = last.lang as SupportedLanguage;
@@ -99,19 +98,17 @@ export default async function Home() {
     }
   }
 
+  // ── Shared computed values ─────────────────────────────────────────────
   const totalLessonCount = ALL_LANGUAGE_KEYS.reduce(
     (sum, lang) => sum + getTotalLessonCount(lang),
     0
   );
-
-  const certCount = Object.values(examConfigByLang).filter(Boolean).length;
-
-  const totalAttempts     = publicExamStats.reduce((s, r) => s + r.attemptsSubmitted, 0);
-  const totalCertificates = publicExamStats.reduce((s, r) => s + r.usersPassed, 0);
-  const publicStatsByLang = Object.fromEntries(publicExamStats.map(s => [s.lang, s]));
-
-  const popularLangs        = popularLanguages.length > 0 ? popularLanguages : getFallbackPopularLanguages();
-  const popularPracticeProbs = popularProblems.length  > 0 ? popularProblems  : getFallbackPopularPracticeProblems();
+  const certCount          = Object.values(examConfigByLang).filter(Boolean).length;
+  const totalAttempts      = publicExamStats.reduce((s, r) => s + r.attemptsSubmitted, 0);
+  const totalCertificates  = publicExamStats.reduce((s, r) => s + r.usersPassed, 0);
+  const publicStatsByLang  = Object.fromEntries(publicExamStats.map(s => [s.lang, s]));
+  const popularLangs       = popularLanguages.length > 0 ? popularLanguages : getFallbackPopularLanguages();
+  const popularPracticeProbs = popularProblems.length > 0 ? popularProblems : getFallbackPopularPracticeProblems();
 
   const websiteJsonLd = buildSiteSearchJsonLd();
   const orgJsonLd = {
@@ -121,6 +118,20 @@ export default async function Home() {
     url: BASE_URL,
     sameAs: [BASE_URL],
   };
+
+  // ── Shared cert section (used in both layouts) ─────────────────────────
+  const certSection = (
+    <CertificationsHighlight
+      totalCertificates={totalCertificates}
+      totalAttempts={totalAttempts}
+      statsByLang={publicStatsByLang}
+      examConfigByLang={examConfigByLang}
+    />
+  );
+
+  const interviewSection = (
+    <PopularInterviewPrepSection problems={popularPracticeProbs} />
+  );
 
   return (
     <div className="min-h-0 flex-1 overflow-y-auto">
@@ -133,7 +144,7 @@ export default async function Home() {
         <GoogleOAuthError />
       </Suspense>
 
-      {/* ── HERO — personalized for logged-in, conversion-focused for guests ── */}
+      {/* ── HERO — personalized for logged-in users, conversion for guests ── */}
       <HomeHero
         totalLessons={totalLessonCount}
         problemCount={problemCount}
@@ -144,40 +155,80 @@ export default async function Home() {
         isLoggedInServer={!!user}
       />
 
-      {/* ── MAIN CONTENT ─────────────────────────────────────────────────── */}
-      <div className="mx-auto max-w-6xl space-y-16 px-4 py-14 sm:px-6 lg:px-8 lg:py-18">
+      {user ? (
+        // ════════════════════════════════════════════════════════════════
+        // LOGGED-IN LAYOUT — personalized feed, no marketing fluff
+        // ════════════════════════════════════════════════════════════════
+        <div className="mx-auto max-w-6xl space-y-14 px-4 py-12 sm:px-6 lg:px-8">
 
-        {/* Referral banner */}
-        <ReferralPromptBanner />
+          {/* Referral banner */}
+          <ReferralPromptBanner />
 
-        {/* 🔥 Trending this week — real learner data */}
-        <TrendingSection languages={popularLangs} />
+          {/* Active track — continue where you left off */}
+          {leftOff && continueTutorialList.length > 0 && (
+            <section>
+              <div className="mb-4 flex items-center justify-between">
+                <div>
+                  <p className="mb-0.5 text-xs font-bold uppercase tracking-widest text-indigo-600 dark:text-indigo-400">
+                    Your active track
+                  </p>
+                  <h2 className="text-xl font-bold text-zinc-900 dark:text-zinc-100">
+                    Keep the momentum going
+                  </h2>
+                </div>
+              </div>
+              <ContinueBanner lang={continueLang} tutorials={continueTutorialList} />
+            </section>
+          )}
 
-        {/* ✨ New languages */}
-        <NewLanguagesSection />
+          {/* Trending — compact 3-card row */}
+          <TrendingSection languages={popularLangs} compact />
 
-        {/* 🗂️ Browse by category */}
-        <CategoryBrowse />
+          {/* Certifications */}
+          {certSection}
 
-        {/* Testimonials */}
-        <Suspense>
-          <TestimonialsStripDeferred />
-        </Suspense>
+          {/* Interview prep */}
+          {interviewSection}
 
-        {/* 🎓 Certifications highlight */}
-        <CertificationsHighlight
-          totalCertificates={totalCertificates}
-          totalAttempts={totalAttempts}
-          statsByLang={publicStatsByLang}
-          examConfigByLang={examConfigByLang}
-        />
+        </div>
+      ) : (
+        // ════════════════════════════════════════════════════════════════
+        // GUEST LAYOUT — conversion funnel
+        // ════════════════════════════════════════════════════════════════
+        <>
+          <div className="mx-auto max-w-6xl space-y-20 px-4 py-16 sm:px-6 lg:px-8">
 
-        {/* 🧩 Interview prep — popular problems */}
-        <PopularInterviewPrepSection problems={popularPracticeProbs} />
+            {/* 1. How it works — builds immediate trust */}
+            <StepsSection />
 
-        {/* Spacer */}
-        <div className="pb-8 sm:pb-12" />
-      </div>
+            {/* 2. Popular languages — shows breadth */}
+            <TrendingSection languages={popularLangs} />
+
+          </div>
+
+          {/* 3. Dark value-prop break — mid-page visual anchor */}
+          <div className="px-4 sm:px-6 lg:px-8">
+            <div className="mx-auto max-w-6xl">
+              <ValuePropBanner />
+            </div>
+          </div>
+
+          <div className="mx-auto max-w-6xl space-y-20 px-4 py-16 sm:px-6 lg:px-8">
+
+            {/* 4. Certifications — the differentiator */}
+            {certSection}
+
+            {/* 5. Interview prep — proves depth */}
+            {interviewSection}
+
+            {/* 6. Testimonials — social proof to close */}
+            <Suspense>
+              <TestimonialsStripDeferred />
+            </Suspense>
+
+          </div>
+        </>
+      )}
     </div>
   );
 }

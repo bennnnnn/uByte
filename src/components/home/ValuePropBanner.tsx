@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { MONTHLY_PRICE_CENTS } from "@/lib/plans";
 
 const PILLARS = [
   {
@@ -31,13 +30,7 @@ const PILLARS = [
   },
 ];
 
-interface ValuePropBannerProps {
-  isPro?: boolean;
-}
-
-export default function ValuePropBanner({ isPro = false }: ValuePropBannerProps) {
-  if (isPro) return null;
-
+export default function ValuePropBanner() {
   return (
     <section
       aria-labelledby="value-prop-heading"
@@ -86,19 +79,19 @@ export default function ValuePropBanner({ isPro = false }: ValuePropBannerProps)
       {/* CTA */}
       <div className="relative flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
         <Link
-          href="/pricing"
+          href="/signup"
           className="inline-flex items-center justify-center gap-2 rounded-xl bg-white px-7 py-3 text-sm font-bold text-indigo-900 shadow-md transition-all hover:-translate-y-0.5 hover:bg-indigo-50"
         >
-          See plans — from ${(MONTHLY_PRICE_CENTS / 100).toFixed(2)}/mo
+          Start learning free
           <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
           </svg>
         </Link>
         <Link
-          href="/tutorial/go"
+          href="/certifications"
           className="text-sm font-semibold text-indigo-300 underline-offset-2 transition-colors hover:text-white hover:underline"
         >
-          Start free first →
+          See free certifications →
         </Link>
       </div>
     </section>
