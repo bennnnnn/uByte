@@ -22,6 +22,9 @@ const ALL_LANGS = [
   { slug: "sql",        icon: "🗄️", label: "SQL",        sub: "Databases & queries"   },
 ];
 
+// Top languages shown in the nav dropdown — most popular first
+const NAV_LANGS = ALL_LANGS.slice(0, 6);
+
 const linkBase =
   "rounded-lg px-3 py-2 text-sm font-medium text-zinc-600 transition-colors hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500";
 
@@ -156,29 +159,27 @@ export default function HeaderNavLinks({ side = "left" }: { side?: "left" }) {
           onClose={handleClose}
           menuId="nav-tutorials-menu"
         >
-          <div className="p-3" style={{ width: 260 }}>
-            <div className="grid grid-cols-2 gap-0.5">
-              {ALL_LANGS.map((l) => (
-                <Link
-                  key={l.slug}
-                  href={`/tutorial/${l.slug}`}
-                  role="menuitem"
-                  onClick={handleClose}
-                  className="flex items-center gap-2.5 rounded-lg px-3 py-2 transition-colors hover:bg-zinc-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-indigo-500 dark:hover:bg-zinc-800"
-                >
-                  <span className="text-base leading-none">{l.icon}</span>
-                  <span className="text-sm font-semibold text-zinc-800 dark:text-zinc-100">{l.label}</span>
-                </Link>
-              ))}
-            </div>
-            <div className="mt-2 border-t border-zinc-100 pt-2 dark:border-zinc-800">
+          <div className="p-2" style={{ width: 200 }}>
+            {NAV_LANGS.map((l) => (
+              <Link
+                key={l.slug}
+                href={`/tutorial/${l.slug}`}
+                role="menuitem"
+                onClick={handleClose}
+                className="flex items-center gap-2.5 rounded-lg px-3 py-2 transition-colors hover:bg-zinc-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-indigo-500 dark:hover:bg-zinc-800"
+              >
+                <span className="text-base leading-none">{l.icon}</span>
+                <span className="text-sm font-semibold text-zinc-800 dark:text-zinc-100">{l.label}</span>
+              </Link>
+            ))}
+            <div className="mt-1 border-t border-zinc-100 px-3 pt-2 dark:border-zinc-800">
               <Link
                 href="/tutorial"
                 role="menuitem"
                 onClick={handleClose}
-                className="flex items-center gap-1.5 px-1 text-xs font-semibold text-indigo-600 hover:text-indigo-500 dark:text-indigo-400"
+                className="text-xs font-semibold text-indigo-600 hover:text-indigo-500 dark:text-indigo-400"
               >
-                Browse all tutorials →
+                Browse all languages →
               </Link>
             </div>
           </div>
