@@ -125,11 +125,11 @@ export default function NavSearch() {
             placeholder="Search tutorials…"
             autoComplete="off"
             aria-label="Search tutorials"
-            className="w-48 rounded-lg border border-zinc-200 bg-zinc-50 py-1.5 pl-9 pr-14 text-sm text-zinc-700 placeholder-zinc-400 outline-none transition-all duration-200 focus:w-64 focus:border-indigo-300 focus:bg-white focus:ring-2 focus:ring-indigo-100 dark:border-zinc-700 dark:bg-zinc-800/60 dark:text-zinc-200 dark:placeholder-zinc-500 dark:focus:border-indigo-600 dark:focus:bg-zinc-800 dark:focus:ring-indigo-900/40"
+            className="w-56 rounded-lg border border-zinc-200 bg-zinc-50 py-2 pl-9 pr-8 text-sm text-zinc-700 placeholder-zinc-400 outline-none transition-all duration-200 focus:w-72 focus:border-indigo-300 focus:bg-white focus:ring-2 focus:ring-indigo-100 dark:border-zinc-700 dark:bg-zinc-800/60 dark:text-zinc-200 dark:placeholder-zinc-500 dark:focus:border-indigo-600 dark:focus:bg-zinc-800 dark:focus:ring-indigo-900/40"
           />
 
-          {/* Right slot: spinner | clear | ⌘K hint */}
-          <div className="pointer-events-none absolute right-2.5 flex items-center gap-1">
+          {/* Right slot: spinner | clear */}
+          <div className="pointer-events-none absolute right-2.5 flex items-center">
             {loading ? (
               <span className="pointer-events-none h-3.5 w-3.5 animate-spin rounded-full border-2 border-zinc-300 border-t-indigo-500" />
             ) : query ? (
@@ -143,11 +143,7 @@ export default function NavSearch() {
                   <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </button>
-            ) : (
-              <kbd className="rounded border border-zinc-200 bg-white px-1 py-0.5 font-mono text-[10px] font-medium text-zinc-400 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-500">
-                ⌘K
-              </kbd>
-            )}
+            ) : null}
           </div>
         </div>
       </form>

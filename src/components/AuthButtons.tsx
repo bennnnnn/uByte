@@ -71,11 +71,6 @@ export default function AuthButtons() {
   if (user) {
     return (
       <div className="flex items-center gap-1.5">
-        {!isPro && (
-          <Link href="/pricing" className={`${linkBase} hidden md:inline-flex`}>
-            Pricing
-          </Link>
-        )}
         <NotificationBell unreadCount={unreadCount} />
         <UserMenuDropdown />
       </div>
@@ -132,7 +127,7 @@ export default function AuthButtons() {
       </Link>
       <Link
         href={signupHref}
-        className="rounded-lg bg-indigo-700 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-indigo-800"
+        className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-indigo-500"
       >
         Sign up
       </Link>

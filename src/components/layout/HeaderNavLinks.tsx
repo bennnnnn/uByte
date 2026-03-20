@@ -31,7 +31,7 @@ const linkBase =
   "rounded-lg px-3 py-2 text-sm font-medium text-zinc-600 transition-colors hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500";
 
 const menuItemBase =
-  "flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50 dark:text-zinc-300 dark:hover:bg-zinc-800";
+  "block rounded-lg px-3 py-2 text-sm font-semibold text-zinc-700 transition-colors hover:bg-zinc-50 dark:text-zinc-300 dark:hover:bg-zinc-800";
 
 type DropdownId = "tutorials" | "interview" | "certifications";
 
@@ -134,7 +134,6 @@ export default function HeaderNavLinks({ side = "left" }: { side?: "left" }) {
           <Link key={l.slug} href={`/tutorial/${l.slug}`} role="menuitem" onClick={handleClose}
             className={menuItemBase}
           >
-            <span className="text-base leading-none">{l.icon}</span>
             {l.label}
           </Link>
         ))}
@@ -153,22 +152,10 @@ export default function HeaderNavLinks({ side = "left" }: { side?: "left" }) {
         onOpen={handleOpen} onClose={handleClose}
         menuId="nav-interview-menu"
       >
-        <Link href="/practice" role="menuitem" onClick={handleClose} className={menuItemBase}>
-          <span className="text-base leading-none">🎯</span>
-          All problems
-        </Link>
-        <Link href="/daily" role="menuitem" onClick={handleClose} className={menuItemBase}>
-          <span className="text-base leading-none">⚡</span>
-          Daily challenge
-        </Link>
-        <Link href="/interview" role="menuitem" onClick={handleClose} className={menuItemBase}>
-          <span className="text-base leading-none">🎤</span>
-          Interview simulator
-        </Link>
-        <Link href="/interviews" role="menuitem" onClick={handleClose} className={menuItemBase}>
-          <span className="text-base leading-none">💬</span>
-          Interview experiences
-        </Link>
+        <Link href="/practice"   role="menuitem" onClick={handleClose} className={menuItemBase}>All problems</Link>
+        <Link href="/daily"      role="menuitem" onClick={handleClose} className={menuItemBase}>Daily challenge</Link>
+        <Link href="/interview"  role="menuitem" onClick={handleClose} className={menuItemBase}>Interview simulator</Link>
+        <Link href="/interviews" role="menuitem" onClick={handleClose} className={menuItemBase}>Interview experiences</Link>
       </NavDropdown>
 
       {/* ── Certifications ────────────────────────────────────────── */}
@@ -182,7 +169,6 @@ export default function HeaderNavLinks({ side = "left" }: { side?: "left" }) {
           <Link key={l.slug} href={`/certifications/${l.slug}`} role="menuitem" onClick={handleClose}
             className={menuItemBase}
           >
-            <span className="text-base leading-none">{l.icon}</span>
             {l.label}
           </Link>
         ))}
