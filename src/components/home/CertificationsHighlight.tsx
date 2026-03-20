@@ -85,51 +85,92 @@ export default function CertificationsHighlight({
         </div>
       </div>
 
-      {/* Certification list — data comes from admin settings, not hardcoded */}
-      <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+      {/* Certification cards — one per language, full details */}
+      <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {CERT_SLUGS.map(slug => {
           const config   = examConfigByLang[slug];
           const stats    = statsByLang[slug];
           const langName = LANGUAGES[slug as keyof typeof LANGUAGES]?.name ?? slug;
-          const learners = stats?.attemptsSubmitted ?? 0;
-          const showLearners = learners >= MIN_LEARNERS_TO_SHOW;
+          const attempts = stats?.attemptsSubmitted ?? 0;
+          const passed   = stats?.usersPassed ?? 0;
+          const passRate = attempts > 0 ? Math.round((passed / attempts) * 100) : null;
+          const showAttempts = attempts >= MIN_LEARNERS_TO_SHOW;
 
           return (
             <Link
               key={slug}
               href={`/certifications/${slug}`}
-              className="group flex items-center gap-3 rounded-xl border border-zinc-200 bg-white px-4 py-3 transition-all hover:-translate-y-0.5 hover:border-indigo-200 hover:shadow-sm dark:border-zinc-700/60 dark:bg-zinc-800/80 dark:hover:border-indigo-700"
+              className="group flex flex-col gap-4 rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-indigo-200 hover:shadow-md dark:border-zinc-700/60 dark:bg-zinc-900 dark:hover:border-indigo-700"
             >
-              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-zinc-50 text-lg ring-1 ring-zinc-100 dark:bg-zinc-700 dark:ring-zinc-600">
-                {getLangIcon(slug)}
-              </span>
-              <div className="min-w-0">
-                <p className="text-sm font-bold text-zinc-800 group-hover:text-indigo-600 dark:text-zinc-100 dark:group-hover:text-indigo-400">
+              {/* Header: icon + name */}
+              <div className="flex items-center gap-3">
+                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-zinc-50 text-xl ring-1 ring-zinc-100 dark:bg-zinc-800 dark:ring-zinc-700">
+                  {getLangIcon(slug)}
+                </span>
+                <p className="text-base font-bold text-zinc-900 group-hover:text-indigo-600 dark:text-zinc-100 dark:group-hover:text-indigo-400">
                   {langName}
                 </p>
-                <p className="text-xs text-zinc-400">
-                  {showLearners && `${learners.toLocaleString()} learners · `}
-                  {config ? `${config.examSize} questions · ${config.examDurationMinutes} min` : "Loading…"}
+              </div>
+
+              {/* Stats grid */}
+              <div className="grid grid-cols-2 gap-2">
+                <div className="rounded-lg bg-zinc-50 px-3 py-2 dark:bg-zinc-800">
+                  <p className="text-[11px] font-medium text-zinc-400 dark:text-zinc-500">Questions</p>
+                  <p className="text-sm font-bold text-zinc-800 dark:text-zinc-200">
+                    {config ? config.examSize : "—"}
+                  </p>
+                </div>
+                <div className="rounded-lg bg-zinc-50 px-3 py-2 dark:bg-zinc-800">
+                  <p className="text-[11px] font-medium text-zinc-400 dark:text-zinc-500">Time limit</p>
+                  <p className="text-sm font-bold text-zinc-800 dark:text-zinc-200">
+                    {config ? `${config.examDurationMinutes} min` : "—"}
+                  </p>
+                </div>
+                <div className="rounded-lg bg-zinc-50 px-3 py-2 dark:bg-zinc-800">
+                  <p className="text-[11px] font-medium text-zinc-400 dark:text-zinc-500">Pass score</p>
+                  <p className="text-sm font-bold text-zinc-800 dark:text-zinc-200">
+                    {config ? `${config.passPercent}%` : "—"}
+                  </p>
+                </div>
+                <div className="rounded-lg bg-zinc-50 px-3 py-2 dark:bg-zinc-800">
+                  <p className="text-[11px] font-medium text-zinc-400 dark:text-zinc-500">
+                    {passRate !== null ? "Pass rate" : "Attempts"}
+                  </p>
+                  <p className="text-sm font-bold text-zinc-800 dark:text-zinc-200">
+                    {passRate !== null
+                      ? `${passRate}%`
+                      : showAttempts
+                        ? attempts.toLocaleString()
+                        : "—"}
+                  </p>
+                </div>
+              </div>
+
+              {/* Attempts footer */}
+              {showAttempts && (
+                <p className="text-xs text-zinc-400 dark:text-zinc-500">
+                  {attempts.toLocaleString()} attempts · {passed.toLocaleString()} passed
                 </p>
+              )}
+
+              {/* CTA */}
+              <div className="mt-auto flex items-center justify-between border-t border-zinc-100 pt-3 dark:border-zinc-800">
+                <span className="text-xs font-semibold text-indigo-600 group-hover:underline dark:text-indigo-400">
+                  View certification →
+                </span>
               </div>
             </Link>
           );
         })}
 
-        {/* Browse all card */}
+        {/* Browse all */}
         <Link
           href="/certifications"
-          className="group flex items-center gap-3 rounded-xl border border-dashed border-indigo-200 bg-indigo-50/50 px-4 py-3 transition-all hover:-translate-y-0.5 hover:border-indigo-300 hover:bg-indigo-50 dark:border-indigo-800/50 dark:bg-indigo-950/20 dark:hover:border-indigo-700"
+          className="group flex flex-col items-center justify-center gap-2 rounded-2xl border border-dashed border-indigo-200 bg-indigo-50/50 p-5 text-center transition-all hover:border-indigo-300 hover:bg-indigo-50 dark:border-indigo-800/50 dark:bg-indigo-950/20 dark:hover:border-indigo-700"
         >
-          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-indigo-100 text-lg dark:bg-indigo-900/40">
-            🎓
-          </span>
-          <div>
-            <p className="text-sm font-bold text-indigo-600 dark:text-indigo-400">
-              Browse all
-            </p>
-            <p className="text-xs text-indigo-400 dark:text-indigo-500">View all exams →</p>
-          </div>
+          <span className="text-2xl">🎓</span>
+          <p className="text-sm font-bold text-indigo-600 dark:text-indigo-400">Browse all certifications</p>
+          <p className="text-xs text-indigo-400 dark:text-indigo-500">See every available language →</p>
         </Link>
       </div>
 

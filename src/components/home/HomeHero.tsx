@@ -287,7 +287,7 @@ function GuestHero({
 
             {/* Badge */}
             <p className="mb-5 inline-flex items-center gap-2 rounded-full bg-indigo-50 px-4 py-1.5 text-sm font-semibold text-indigo-700 ring-1 ring-indigo-100 dark:bg-indigo-950/50 dark:text-indigo-300 dark:ring-indigo-800/60">
-              🎓 Free certifications — no subscription required
+              🎓 Free certifications
             </p>
 
             {/* Headline */}
@@ -328,7 +328,7 @@ function GuestHero({
             </div>
 
             <p className="mt-4 text-xs text-zinc-400">
-              Get certified for free · Shareable credential · No subscription
+              Get certified for free
             </p>
 
             {/* Stats */}
@@ -380,7 +380,7 @@ function GuestHero({
             {[
               { icon: "💻", title: "Runs in your browser",     desc: "No installs. Start coding in seconds." },
               { icon: "🧩", title: "Learn → Practice → Certify", desc: "A clear path from beginner to certified." },
-              { icon: "🎓", title: "Free certifications",       desc: "Learn, prove your skills, and get a shareable certificate — at no cost." },
+              { icon: "🎓", title: "Free certifications",       desc: "Prove your skills with a timed certification. Pass and earn a credential." },
             ].map(item => (
               <div key={item.title} className="flex items-center gap-3 px-4 py-3 sm:px-6">
                 <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-white text-lg shadow-sm ring-1 ring-zinc-200 dark:bg-zinc-800 dark:ring-zinc-700">
