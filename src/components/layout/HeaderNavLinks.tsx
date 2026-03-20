@@ -147,13 +147,42 @@ export default function HeaderNavLinks({ side = "left" }: { side?: "left" }) {
     return (
       <nav className="flex items-center gap-1" aria-label="Main navigation">
 
-        {/* ── Tutorials — plain link to the browse page ──────────── */}
-        <Link
-          href="/tutorial"
-          className={`${linkBase} ${pathname === "/tutorial" ? "bg-zinc-100 text-zinc-900 dark:bg-zinc-800 dark:text-zinc-100" : ""}`}
+        {/* ── Tutorials dropdown ──────────────────────────────────── */}
+        <NavDropdown
+          id="tutorials"
+          label="Tutorials"
+          open={openMenu === "tutorials"}
+          onOpen={handleOpen}
+          onClose={handleClose}
+          menuId="nav-tutorials-menu"
         >
-          Tutorials
-        </Link>
+          <div className="p-3" style={{ width: 260 }}>
+            <div className="grid grid-cols-2 gap-0.5">
+              {ALL_LANGS.map((l) => (
+                <Link
+                  key={l.slug}
+                  href={`/tutorial/${l.slug}`}
+                  role="menuitem"
+                  onClick={handleClose}
+                  className="flex items-center gap-2.5 rounded-lg px-3 py-2 transition-colors hover:bg-zinc-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-indigo-500 dark:hover:bg-zinc-800"
+                >
+                  <span className="text-base leading-none">{l.icon}</span>
+                  <span className="text-sm font-semibold text-zinc-800 dark:text-zinc-100">{l.label}</span>
+                </Link>
+              ))}
+            </div>
+            <div className="mt-2 border-t border-zinc-100 pt-2 dark:border-zinc-800">
+              <Link
+                href="/tutorial"
+                role="menuitem"
+                onClick={handleClose}
+                className="flex items-center gap-1.5 px-1 text-xs font-semibold text-indigo-600 hover:text-indigo-500 dark:text-indigo-400"
+              >
+                Browse all tutorials →
+              </Link>
+            </div>
+          </div>
+        </NavDropdown>
 
         {/* ── Interview Prep dropdown ──────────────────────────────── */}
         <NavDropdown
