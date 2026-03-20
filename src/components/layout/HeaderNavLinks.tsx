@@ -31,7 +31,7 @@ const linkBase =
   "rounded-lg px-3 py-2 text-sm font-medium text-zinc-600 transition-colors hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500";
 
 const menuItemBase =
-  "block rounded-lg px-3 py-2 text-sm font-semibold text-zinc-700 transition-colors hover:bg-zinc-50 dark:text-zinc-300 dark:hover:bg-zinc-800";
+  "flex items-center justify-between rounded-lg px-3 py-2 text-sm font-semibold text-zinc-700 transition-colors hover:bg-zinc-50 hover:text-indigo-600 dark:text-zinc-300 dark:hover:bg-zinc-800 dark:hover:text-indigo-400";
 
 type DropdownId = "tutorials" | "interview" | "certifications";
 
@@ -131,10 +131,9 @@ export default function HeaderNavLinks({ side = "left" }: { side?: "left" }) {
         menuId="nav-tutorials-menu"
       >
         {NAV_LANGS.map((l) => (
-          <Link key={l.slug} href={`/tutorial/${l.slug}`} role="menuitem" onClick={handleClose}
-            className={menuItemBase}
-          >
-            {l.label}
+          <Link key={l.slug} href={`/tutorial/${l.slug}`} role="menuitem" onClick={handleClose} className={menuItemBase}>
+            <span>{l.label}</span>
+            <span className="text-zinc-300 dark:text-zinc-600">›</span>
           </Link>
         ))}
         <div className="mx-3 my-1.5 border-t border-zinc-100 dark:border-zinc-800" />
@@ -152,10 +151,17 @@ export default function HeaderNavLinks({ side = "left" }: { side?: "left" }) {
         onOpen={handleOpen} onClose={handleClose}
         menuId="nav-interview-menu"
       >
-        <Link href="/practice"   role="menuitem" onClick={handleClose} className={menuItemBase}>All problems</Link>
-        <Link href="/daily"      role="menuitem" onClick={handleClose} className={menuItemBase}>Daily challenge</Link>
-        <Link href="/interview"  role="menuitem" onClick={handleClose} className={menuItemBase}>Interview simulator</Link>
-        <Link href="/interviews" role="menuitem" onClick={handleClose} className={menuItemBase}>Interview experiences</Link>
+        {[
+          { href: "/practice",   label: "All problems"          },
+          { href: "/daily",      label: "Daily challenge"       },
+          { href: "/interview",  label: "Interview simulator"   },
+          { href: "/interviews", label: "Interview experiences" },
+        ].map(item => (
+          <Link key={item.href} href={item.href} role="menuitem" onClick={handleClose} className={menuItemBase}>
+            <span>{item.label}</span>
+            <span className="text-zinc-300 dark:text-zinc-600">›</span>
+          </Link>
+        ))}
       </NavDropdown>
 
       {/* ── Certifications ────────────────────────────────────────── */}
@@ -166,10 +172,9 @@ export default function HeaderNavLinks({ side = "left" }: { side?: "left" }) {
         menuId="nav-certifications-menu"
       >
         {ALL_LANGS.slice(0, 6).map((l) => (
-          <Link key={l.slug} href={`/certifications/${l.slug}`} role="menuitem" onClick={handleClose}
-            className={menuItemBase}
-          >
-            {l.label}
+          <Link key={l.slug} href={`/certifications/${l.slug}`} role="menuitem" onClick={handleClose} className={menuItemBase}>
+            <span>{l.label}</span>
+            <span className="text-zinc-300 dark:text-zinc-600">›</span>
           </Link>
         ))}
         <div className="mx-3 my-1.5 border-t border-zinc-100 dark:border-zinc-800" />
