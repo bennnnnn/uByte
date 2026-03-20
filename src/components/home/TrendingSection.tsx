@@ -14,10 +14,10 @@ interface Props {
 export default function TrendingSection({ languages, compact = false }: Props) {
   if (languages.length === 0) return null;
 
-  const limit = compact ? 3 : 6;
+  const limit = compact ? 3 : 9;
   const gridCols = compact
     ? "grid-cols-1 gap-3 sm:grid-cols-3"
-    : "grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6";
+    : "grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5";
 
   return (
     <section aria-labelledby="trending-heading">

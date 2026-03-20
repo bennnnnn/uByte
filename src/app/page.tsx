@@ -107,7 +107,11 @@ export default async function Home() {
   const totalAttempts      = publicExamStats.reduce((s, r) => s + r.attemptsSubmitted, 0);
   const totalCertificates  = publicExamStats.reduce((s, r) => s + r.usersPassed, 0);
   const publicStatsByLang  = Object.fromEntries(publicExamStats.map(s => [s.lang, s]));
-  const popularLangs       = popularLanguages.length > 0 ? popularLanguages : getFallbackPopularLanguages();
+  // Always show every language; overlay real learner counts from the DB
+  // so popular ones sort to the top, but no language is ever hidden.
+  const popularLangs = getFallbackPopularLanguages()
+    .map(lang => popularLanguages.find(p => p.slug === lang.slug) ?? lang)
+    .sort((a, b) => b.completionCount - a.completionCount);
   const popularPracticeProbs = popularProblems.length > 0 ? popularProblems : getFallbackPopularPracticeProblems();
 
   const websiteJsonLd = buildSiteSearchJsonLd();
