@@ -3,12 +3,12 @@ import { randomUUID } from "crypto";
 import { getUserByEmail, createPasswordResetToken } from "@/lib/db";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 import { withErrorHandling } from "@/lib/api-utils";
-import { verifyCsrf } from "@/lib/csrf";
 import { sendPasswordResetEmail } from "@/lib/email";
 
+// No CSRF check: unauthenticated users sending their email address have no
+// session cookie and therefore no CSRF token. Rate limiting (3/min) is the
+// abuse guard; the endpoint never reveals whether an account exists.
 export const POST = withErrorHandling("POST /api/auth/forgot-password", async (request: NextRequest) => {
-  const csrfError = verifyCsrf(request);
-  if (csrfError) return NextResponse.json({ error: "Invalid CSRF token" }, { status: 403 });
   const ip = getClientIp(request.headers);
   const { limited, retryAfter } = await checkRateLimit(`forgot-password:${ip}`, 3, 60_000);
   if (limited) {
