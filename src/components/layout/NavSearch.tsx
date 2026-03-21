@@ -86,7 +86,7 @@ export default function NavSearch() {
     setResults([]);
   }, [pathname]);
 
-  function handleSubmit(e: React.FormEvent) {
+  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const q = query.trim();
     if (!q) return;

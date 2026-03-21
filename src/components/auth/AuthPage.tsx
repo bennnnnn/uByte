@@ -76,7 +76,7 @@ export default function AuthPage({ variant }: { variant: AuthPageMode }) {
     resetFields();
   }
 
-  async function handleSubmit(event: React.FormEvent) {
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError("");
     setSubmitting(true);

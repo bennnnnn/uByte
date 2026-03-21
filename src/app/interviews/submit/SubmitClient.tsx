@@ -102,7 +102,7 @@ export default function SubmitClient() {
     });
 
   /* ── Submit ─────────────────────────────────────────────────────────── */
-  const submit = async (e: React.FormEvent) => {
+  const submit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError("");
 

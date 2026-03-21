@@ -16,7 +16,7 @@ export interface AuthFormFieldsProps {
   onPasswordChange: (v: string) => void;
   error: string;
   submitting: boolean;
-  onSubmit: (e: React.FormEvent) => void;
+  onSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
   onSwitchMode: (mode: "login" | "signup") => void;
   onForgot?: () => void;
   /** Custom class for inputs (different border radius per context) */

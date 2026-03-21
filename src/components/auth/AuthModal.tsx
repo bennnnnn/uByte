@@ -141,7 +141,7 @@ export default function AuthModal({ onClose, initialMode }: Props) {
     };
   }, [mode]);
 
-  async function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setError("");
     setSubmitting(true);

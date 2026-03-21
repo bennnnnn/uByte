@@ -88,7 +88,7 @@ export default function AdminsTab({ data }: Props) {
     finally { setPending(null); }
   }, [load]);
 
-  const handlePromote = useCallback(async (e: React.FormEvent) => {
+  const handlePromote = useCallback(async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setPromoteError("");
     setPromoteSuccess("");

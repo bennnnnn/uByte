@@ -52,7 +52,7 @@ export function SearchPageClient() {
     runSearch(initialQ);
   }, [initialQ, runSearch]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const trimmed = query.trim();
     if (trimmed.length >= 2) {
