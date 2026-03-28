@@ -18,7 +18,7 @@ import PlanTab from "@/components/profile/PlanTab";
 import ReferralSection from "@/components/profile/ReferralSection";
 import SettingsTab from "@/components/profile/SettingsTab";
 import DangerZoneSection from "@/components/profile/settings/DangerZoneSection";
-import { hasPaidAccess, isActiveSubscriber } from "@/lib/plans";
+import { hasPaidAccess } from "@/lib/plans";
 import type { Profile, Stats, Badge, Achievement, Bookmark, Notification } from "@/components/profile/types";
 
 /* ── Skeleton ──────────────────────────────────────────────────────────── */
@@ -399,7 +399,6 @@ function DashboardPage() {
             <span className="mx-0.5 shrink-0 self-center border-l border-zinc-200 py-2.5 dark:border-zinc-700" />
             {/* Account group */}
             {ACCOUNT_TABS
-              .filter((t) => !(t === "referral" && isActiveSubscriber(profile.plan)))
               .map((t) => (
                 <button
                   key={t}
@@ -473,7 +472,7 @@ function DashboardPage() {
                   Account
                 </p>
                 <ul className="space-y-0.5">
-                  {ACCOUNT_TABS.filter((t) => !(t === "referral" && isActiveSubscriber(profile.plan))).map((t) => (
+                  {ACCOUNT_TABS.map((t) => (
                     <li key={t}>
                       <SidebarBtn
                         icon={TAB_ICONS[t]}

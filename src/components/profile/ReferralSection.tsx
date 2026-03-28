@@ -30,7 +30,7 @@ export default function ReferralSection() {
 
   const tweetUrl = data
     ? `https://twitter.com/intent/tweet?text=${encodeURIComponent(
-        "Learning to code on @ubyte_dev — try it free 👇"
+        "Practicing coding with AI hints & interview prep on @ubyte_dev — try it free 👇"
       )}&url=${encodeURIComponent(data.shareUrl)}`
     : "#";
 
@@ -44,12 +44,19 @@ export default function ReferralSection() {
       </div>
 
       <p className="mb-1 text-sm text-zinc-600 dark:text-zinc-400">
-        Share your unique link. When a friend subscribes to Pro, you&apos;ll earn{" "}
+        Share your link. Every friend who goes Pro gives you{" "}
         <span className="font-semibold text-indigo-600 dark:text-indigo-400">
           30 free days of Pro
-        </span>{" "}
-        — for each one.
+        </span>
+        {" "}— which means 30 more days of AI hints, AI explanations, interview debriefs, and detailed code reviews.
       </p>
+
+      {/* Pro feature reminder */}
+      <div className="my-3 flex flex-wrap gap-2">
+        {["💡 AI hints", "🔍 Code reviews", "🎤 Interview debrief", "📖 Step explanations"].map((f) => (
+          <span key={f} className="rounded-full bg-indigo-50 px-2.5 py-1 text-xs font-medium text-indigo-700 dark:bg-indigo-950/40 dark:text-indigo-300">{f}</span>
+        ))}
+      </div>
 
       {/* Stats */}
       <div className="my-4 flex gap-6">
@@ -67,10 +74,10 @@ export default function ReferralSection() {
         </div>
       </div>
 
-      {/* Zero-state hint — shown once data has loaded and no one has used the link yet */}
+      {/* Zero-state hint */}
       {data && data.signups === 0 && (
         <p className="mb-3 rounded-lg bg-indigo-50 px-3 py-2 text-xs text-indigo-700 dark:bg-indigo-950/40 dark:text-indigo-300">
-          Share your link below to get started. You earn one free Pro month for every friend who subscribes.
+          Share your link below. You earn one free Pro month for every friend who subscribes — no limit on rewards.
         </p>
       )}
 
