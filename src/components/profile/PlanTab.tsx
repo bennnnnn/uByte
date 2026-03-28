@@ -104,6 +104,7 @@ export default function PlanTab({ plan, expiresAtProp }: Props & { expiresAtProp
   const isYearly = currentPlan === "yearly";
   const isMonthly = currentPlan === "pro";
   const isCanceling = currentPlan === "canceling";
+  const isTrial = currentPlan === "trial";
   const paddleReady = useRef(false);
   const [coupon, setCoupon] = useState("");
 
