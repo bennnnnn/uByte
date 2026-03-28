@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { revalidateTag } from "next/cache";
+import { updateTag } from "next/cache";
 import { withErrorHandling, requireAdmin } from "@/lib/api-utils";
 import { getExamConfigForAllLangs, setExamSettingsBulk } from "@/lib/db";
 import { verifyCsrf } from "@/lib/csrf";
@@ -44,7 +44,7 @@ export const PUT = withErrorHandling("PUT /api/admin/exam-settings", async (req:
   }
 
   await setExamSettingsBulk(settings);
-  revalidateTag("exam-config");
+  updateTag("exam-config");
   const updated = await getExamConfigForAllLangs();
   return NextResponse.json(updated);
 });
