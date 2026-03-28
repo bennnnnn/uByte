@@ -131,7 +131,7 @@ function LoggedInHero({
                   Pick a language and start your first lesson — it only takes a few minutes.
                 </p>
                 <Link
-                  href="/tutorials"
+                  href="/tutorial"
                   className="mt-4 inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-6 py-2.5 text-sm font-bold text-white shadow-sm transition-all hover:-translate-y-0.5 hover:bg-indigo-500 hover:shadow-md"
                 >
                   Browse tutorials →
