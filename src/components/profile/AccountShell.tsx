@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -57,7 +58,7 @@ const NAV_ITEMS = [
 ] as const;
 
 /* ── Shared nav link component ───────────────────────────────────────── */
-function NavLink({ href, label, Icon, active }: { href: string; label: string; Icon: () => JSX.Element; active: boolean }) {
+function NavLink({ href, label, Icon, active }: { href: string; label: string; Icon: () => React.JSX.Element; active: boolean }) {
   return (
     <Link
       href={href}
