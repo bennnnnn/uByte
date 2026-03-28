@@ -131,7 +131,7 @@ const TAB_ICONS: Record<Tab, () => React.JSX.Element> = {
 
 /* ── Sidebar button (shared style) ────────────────────────────────────── */
 function SidebarBtn({ icon: Icon, label, active, onClick }: {
-  icon: () => JSX.Element; label: string; active: boolean; onClick: () => void;
+  icon: () => React.JSX.Element; label: string; active: boolean; onClick: () => void;
 }) {
   return (
     <button
