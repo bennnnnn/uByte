@@ -15,12 +15,14 @@ export default function TrendingSection({ languages, compact = false }: Props) {
   if (languages.length === 0) return null;
 
   const MIN_LEARNERS = 50;
+  // Show top ~30% of available languages in the popular row (at least 1)
+  const popularCount = Math.max(1, Math.round(languages.length * 0.3));
 
   // Languages with enough real learner data to show publicly
   const withLearners = languages
     .filter(l => l.learnerCount >= MIN_LEARNERS)
     .sort((a, b) => b.learnerCount - a.learnerCount)
-    .slice(0, 3);
+    .slice(0, popularCount);
 
   const showPopular = !compact && withLearners.length > 0;
   const allLangs = languages.slice(0, compact ? 3 : 9);

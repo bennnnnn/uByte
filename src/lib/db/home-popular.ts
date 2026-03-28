@@ -6,7 +6,6 @@ import { getAllPracticeProblems, getPracticeProblemBySlug } from "@/lib/practice
 import type { SupportedLanguage } from "@/lib/languages/types";
 
 const UNDEFINED_COLUMN = "42703";
-const LIMIT_LANGUAGES = 12; // covers all 9 current languages with room to grow
 const LIMIT_TUTORIALS = 6;
 const LIMIT_PRACTICE = 6;
 
@@ -41,7 +40,6 @@ export const getPopularLanguages = unstable_cache(
         WHERE language IS NOT NULL AND language != ''
         GROUP BY language
         ORDER BY c DESC
-        LIMIT ${LIMIT_LANGUAGES}
       `;
       const supported = getAllLanguageSlugs();
       const result: PopularLanguage[] = [];
