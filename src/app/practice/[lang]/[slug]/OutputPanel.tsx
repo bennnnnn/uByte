@@ -136,8 +136,8 @@ export function OutputPanel({
           </button>
         ))}
 
-        {/* AI hint button — hidden while a hint is already visible */}
-        {verdict && verdict.type !== "accepted" && verdict.submissionId != null && !aiFeedback && (
+        {/* AI hint button — hidden in interview mode (debrief replaces it) and while a hint is already visible */}
+        {!interviewMode && verdict && verdict.type !== "accepted" && verdict.submissionId != null && !aiFeedback && (
           <div className="ml-auto px-3">
             {aiLoginRequired ? (
               <div className="flex items-center gap-2 rounded-lg border border-indigo-200 bg-indigo-50 px-3 py-1.5 dark:border-indigo-800 dark:bg-indigo-950/40">
@@ -412,18 +412,18 @@ export function OutputPanel({
           </div>
         )}
 
-        {/* AI feedback */}
-        {aiLoading && (
+        {/* AI feedback — hidden in interview mode */}
+        {!interviewMode && aiLoading && (
           <div className="border-t border-zinc-200 px-4 py-3 dark:border-zinc-800">
             <p className="animate-pulse text-xs text-zinc-400 dark:text-zinc-500">🤖 Analyzing your code…</p>
           </div>
         )}
-        {aiError && (
+        {!interviewMode && aiError && (
           <div className="border-t border-red-200 bg-red-50 px-4 py-3 dark:border-red-800 dark:bg-red-950/30">
             <p className="text-xs text-red-600 dark:text-red-400">{aiError}</p>
           </div>
         )}
-        {aiFeedback && (
+        {!interviewMode && aiFeedback && (
           <div className="border-t border-indigo-200 bg-indigo-50/60 px-4 py-3 dark:border-indigo-800 dark:bg-indigo-950/30">
             <AiFeedbackCard
               feedback={aiFeedback}
@@ -434,15 +434,13 @@ export function OutputPanel({
           </div>
         )}
 
-        {/* Code review / Interview debrief */}
-        {codeReviewLoading && (
+        {/* Code review (non-interview mode only) */}
+        {!interviewMode && codeReviewLoading && (
           <div className="border-t border-violet-200 px-4 py-3 dark:border-violet-800">
-            <p className="animate-pulse text-xs text-violet-500 dark:text-violet-400">
-              {interviewMode ? "🎤 Generating your interview debrief…" : "🔍 Reviewing your code…"}
-            </p>
+            <p className="animate-pulse text-xs text-violet-500 dark:text-violet-400">🔍 Reviewing your code…</p>
           </div>
         )}
-        {codeReviewUpgrade && !codeReview && (
+        {!interviewMode && codeReviewUpgrade && !codeReview && (
           <div className="border-t border-amber-200 bg-amber-50/60 px-4 py-3 dark:border-amber-800 dark:bg-amber-950/20">
             <p className="text-xs font-semibold text-amber-700 dark:text-amber-300">💡 Get a detailed code review & explanation</p>
             <a href="/pricing" className="mt-1 inline-block text-xs font-bold text-amber-700 underline underline-offset-2 hover:text-amber-600 dark:text-amber-400">
@@ -450,12 +448,10 @@ export function OutputPanel({
             </a>
           </div>
         )}
-        {codeReview && (
+        {!interviewMode && codeReview && (
           <div className="border-t border-violet-200 bg-violet-50/40 px-4 py-4 dark:border-violet-800 dark:bg-violet-950/20">
             <div className="mb-3 flex items-center justify-between">
-              <p className="text-xs font-bold uppercase tracking-wider text-violet-600 dark:text-violet-400">
-                {interviewMode ? "🎤 Interview Debrief" : "🔍 Code Review"}
-              </p>
+              <p className="text-xs font-bold uppercase tracking-wider text-violet-600 dark:text-violet-400">🔍 Code Review</p>
               <div className="flex items-center gap-2">
                 <span className={`text-xs font-bold ${codeReview.score >= 7 ? "text-emerald-600 dark:text-emerald-400" : codeReview.score >= 5 ? "text-amber-600 dark:text-amber-400" : "text-red-600 dark:text-red-400"}`}>
                   {codeReview.score}/10
@@ -496,20 +492,127 @@ export function OutputPanel({
           </div>
         )}
 
-        {/* "Get interview debrief" button — interview simulation only */}
-        {interviewMode && !codeReview && !codeReviewLoading && verdict && (
-          <div className="border-t border-zinc-100 px-4 py-2 dark:border-zinc-800">
-            <button
-              type="button"
-              onClick={onRequestCodeReview}
-              disabled={codeReviewLoading}
-              className="flex items-center gap-1.5 text-xs font-medium text-violet-600 hover:text-violet-800 dark:text-violet-400 dark:hover:text-violet-300"
-            >
-              <span>🔍</span>
-              Get interview debrief
-            </button>
+        {/* ── Interview debrief (interview mode only) ──────────────────────── */}
+        {interviewMode && codeReviewLoading && (
+          <div className="border-t border-violet-200 px-4 py-4 dark:border-violet-800">
+            <p className="animate-pulse text-sm font-medium text-violet-600 dark:text-violet-400">🎤 Grading your interview…</p>
+            <p className="mt-1 text-xs text-zinc-400 dark:text-zinc-500">Analyzing code quality, time usage, and correctness…</p>
           </div>
         )}
+
+        {/* Pro upgrade prompt — shown in interview mode when user is not Pro */}
+        {interviewMode && !isPro && codeReviewUpgrade && !codeReview && !codeReviewLoading && verdict && (
+          <div className="border-t border-amber-200 bg-amber-50/60 px-4 py-4 dark:border-amber-800 dark:bg-amber-950/20">
+            <p className="text-sm font-bold text-amber-800 dark:text-amber-300">🎤 Unlock your interview debrief</p>
+            <p className="mt-1 text-xs text-amber-700 dark:text-amber-400">
+              Get a HackerRank-style scorecard: hire recommendation, time management feedback, code quality grade, and specific interview tips.
+            </p>
+            <a href="/pricing" className="mt-2 inline-block rounded-lg bg-amber-600 px-3 py-1.5 text-xs font-bold text-white hover:bg-amber-700">
+              Go Pro →
+            </a>
+          </div>
+        )}
+
+        {/* Full interview debrief card */}
+        {interviewMode && codeReview && (() => {
+          const rec = codeReview.hire_recommendation;
+          const recConfig = {
+            strong_hire: { label: "Strong Hire", bg: "bg-emerald-100 dark:bg-emerald-900/50", text: "text-emerald-700 dark:text-emerald-300", border: "border-emerald-300 dark:border-emerald-700", dot: "bg-emerald-500" },
+            hire:        { label: "Hire",        bg: "bg-emerald-50 dark:bg-emerald-950/40",  text: "text-emerald-600 dark:text-emerald-400", border: "border-emerald-200 dark:border-emerald-800", dot: "bg-emerald-400" },
+            borderline:  { label: "Borderline",  bg: "bg-amber-50 dark:bg-amber-950/40",      text: "text-amber-700 dark:text-amber-300",   border: "border-amber-200 dark:border-amber-800",   dot: "bg-amber-400" },
+            no_hire:     { label: "No Hire",     bg: "bg-red-50 dark:bg-red-950/40",           text: "text-red-700 dark:text-red-300",       border: "border-red-200 dark:border-red-800",       dot: "bg-red-500" },
+          };
+          const cfg = recConfig[rec ?? "borderline"] ?? recConfig.borderline;
+          return (
+            <div className="border-t border-violet-200 bg-violet-50/30 px-4 py-4 dark:border-violet-800 dark:bg-violet-950/10">
+              {/* Header */}
+              <div className="mb-4 flex items-start justify-between">
+                <div>
+                  <p className="text-xs font-bold uppercase tracking-wider text-violet-600 dark:text-violet-400">🎤 Interview Debrief</p>
+                  <p className="mt-2 text-sm text-zinc-700 dark:text-zinc-300">{codeReview.summary}</p>
+                </div>
+                <button onClick={onClearCodeReview} className="ml-2 shrink-0 text-xs text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300">✕</button>
+              </div>
+
+              {/* Hire recommendation + score */}
+              <div className="mb-4 flex items-center gap-3">
+                <div className={`flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-bold ${cfg.bg} ${cfg.text} ${cfg.border}`}>
+                  <span className={`h-2 w-2 rounded-full ${cfg.dot}`} />
+                  {cfg.label}
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <span className={`text-lg font-bold ${codeReview.score >= 7 ? "text-emerald-600 dark:text-emerald-400" : codeReview.score >= 5 ? "text-amber-600 dark:text-amber-400" : "text-red-600 dark:text-red-400"}`}>
+                    {codeReview.score}
+                  </span>
+                  <span className="text-xs text-zinc-400">/10</span>
+                </div>
+              </div>
+
+              {/* Time management feedback */}
+              {codeReview.time_management && (
+                <div className="mb-3 rounded-lg border border-zinc-200 bg-white px-3 py-2.5 dark:border-zinc-700 dark:bg-zinc-800">
+                  <p className="mb-1 text-[11px] font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">⏱ Time Management</p>
+                  <p className="text-xs text-zinc-700 dark:text-zinc-300">{codeReview.time_management}</p>
+                </div>
+              )}
+
+              {/* Correctness */}
+              {codeReview.correctness_assessment && (
+                <div className="mb-3 rounded-lg border border-zinc-200 bg-white px-3 py-2.5 dark:border-zinc-700 dark:bg-zinc-800">
+                  <p className="mb-1 text-[11px] font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">✓ Correctness</p>
+                  <p className="text-xs text-zinc-700 dark:text-zinc-300">{codeReview.correctness_assessment}</p>
+                </div>
+              )}
+
+              {/* Complexity */}
+              <div className="mb-3 grid grid-cols-2 gap-2 text-xs">
+                <div className="rounded-lg border border-zinc-200 bg-white px-3 py-2 dark:border-zinc-700 dark:bg-zinc-800">
+                  <span className="font-semibold text-zinc-400 dark:text-zinc-500">Time complexity</span>
+                  <p className="mt-0.5 font-mono text-zinc-800 dark:text-zinc-200">{codeReview.time_complexity}</p>
+                </div>
+                <div className="rounded-lg border border-zinc-200 bg-white px-3 py-2 dark:border-zinc-700 dark:bg-zinc-800">
+                  <span className="font-semibold text-zinc-400 dark:text-zinc-500">Space complexity</span>
+                  <p className="mt-0.5 font-mono text-zinc-800 dark:text-zinc-200">{codeReview.space_complexity}</p>
+                </div>
+              </div>
+
+              {/* Strengths */}
+              {codeReview.strengths.length > 0 && (
+                <div className="mb-3">
+                  <p className="mb-1.5 text-xs font-semibold text-emerald-600 dark:text-emerald-400">✓ What went well</p>
+                  <ul className="space-y-1 text-xs text-zinc-600 dark:text-zinc-400">
+                    {codeReview.strengths.map((s, i) => <li key={`str-${i}`} className="flex gap-1.5"><span className="shrink-0 text-emerald-500">•</span>{s}</li>)}
+                  </ul>
+                </div>
+              )}
+
+              {/* Improvements */}
+              {codeReview.improvements.length > 0 && (
+                <div className="mb-3">
+                  <p className="mb-1.5 text-xs font-semibold text-amber-600 dark:text-amber-400">↑ What to improve</p>
+                  <ul className="space-y-1 text-xs text-zinc-600 dark:text-zinc-400">
+                    {codeReview.improvements.map((s, i) => <li key={`imp-${i}`} className="flex gap-1.5"><span className="shrink-0 text-amber-500">•</span>{s}</li>)}
+                  </ul>
+                </div>
+              )}
+
+              {/* Interview tips */}
+              {codeReview.interview_tips && codeReview.interview_tips.length > 0 && (
+                <div className="mb-3 rounded-lg border border-indigo-100 bg-indigo-50/60 px-3 py-2.5 dark:border-indigo-900/40 dark:bg-indigo-950/20">
+                  <p className="mb-1.5 text-xs font-semibold text-indigo-600 dark:text-indigo-400">💡 Interview tips</p>
+                  <ul className="space-y-1 text-xs text-zinc-600 dark:text-zinc-400">
+                    {codeReview.interview_tips.map((t, i) => <li key={`tip-${i}`} className="flex gap-1.5"><span className="shrink-0 text-indigo-400">→</span>{t}</li>)}
+                  </ul>
+                </div>
+              )}
+
+              {/* Code style */}
+              {codeReview.code_style && (
+                <p className="text-xs italic text-zinc-400 dark:text-zinc-500">{codeReview.code_style}</p>
+              )}
+            </div>
+          );
+        })()}
       </div>
     </div>
   );

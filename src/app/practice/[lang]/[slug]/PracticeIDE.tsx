@@ -124,6 +124,8 @@ export function PracticeIDE({ problem, initialLang, initialCode, categoryFilter 
   const [interviewTimeLeft, setInterviewTimeLeft] = useState<number | null>(
     interviewDeadline ? Math.max(0, Math.round((interviewDeadline - Date.now()) / 1000)) : null
   );
+  // Track when the interview session started so we can report time-taken in the debrief
+  const interviewStartTimeRef = useRef<number>(Date.now());
 
   // Use shared code from ?share= if present, otherwise fall back to the problem's starter
   const editor = useCodeEditor(initialCode ?? getStarterForLanguage(problem, initialLang), lang);
@@ -357,18 +359,15 @@ export function PracticeIDE({ problem, initialLang, initialCode, categoryFilter 
         setAiFeedback(null);  // Problem solved — clear hint so panel is clean.
         setAiUpgradeRequired(false);
         setAiLoginRequired(false);
-        // In interview mode, auto-trigger the full code review on solve
-        if (interviewMode && user) {
-          setTimeout(() => requestCodeReview(), 300);
-        }
         if (data.xpAwarded > 0) {
           setXpToast(data.xpAwarded);
           setTimeout(() => setXpToast(null), 3500);
         }
       } else if (["wrong_answer", "runtime_error", "compile_error", "tle"].includes(data.verdict)) {
         setStatuses((prev) => ({ ...prev, [problem.slug]: "failed" }));
-        // Only auto-trigger AI for logged-in users when no hint is already showing.
-        if (user && data.consecutive_failures >= 2 && data.submission_id && !aiFeedback && !aiLoading) {
+        // In interview mode: no hints — only the debrief matters.
+        // Outside interview mode: auto-show hint after 2+ consecutive failures.
+        if (!interviewMode && user && data.consecutive_failures >= 2 && data.submission_id && !aiFeedback && !aiLoading) {
           setAiLoading(true);
           setAiError(null);
           setAiUpgradeRequired(false);
@@ -395,6 +394,11 @@ export function PracticeIDE({ problem, initialLang, initialCode, categoryFilter 
             .catch(() => setAiError("Network error"))
             .finally(() => setAiLoading(false));
         }
+      }
+      // In interview mode: auto-trigger debrief on every submit (Pro gate enforced server-side)
+      if (interviewMode && user) {
+        setCodeReview(null);
+        setTimeout(() => requestCodeReview(), 300);
       }
     } catch {
       setVerdict({ type: "error", message: "Network error. Please try again." });
@@ -449,6 +453,11 @@ export function PracticeIDE({ problem, initialLang, initialCode, categoryFilter 
     setCodeReviewLoading(true);
     setCodeReviewUpgrade(false);
     try {
+      const timeTakenSeconds = Math.round((Date.now() - interviewStartTimeRef.current) / 1000);
+      const timeAllowedSeconds = interviewDeadline
+        ? Math.round((interviewDeadline - interviewStartTimeRef.current) / 1000)
+        : undefined;
+
       const res = await apiFetch("/api/code-review", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -457,6 +466,15 @@ export function PracticeIDE({ problem, initialLang, initialCode, categoryFilter 
           lang,
           problem_title: problem.title,
           verdict: verdict?.type ?? undefined,
+          // Interview-specific context
+          ...(interviewMode && {
+            is_interview: true,
+            problem_slug: problem.slug,
+            time_taken_seconds: timeTakenSeconds,
+            time_allowed_seconds: timeAllowedSeconds,
+            passed_cases: verdict?.passedCases ?? 0,
+            total_cases: verdict?.totalCases ?? problem.testCases?.length ?? 0,
+          }),
         }),
       });
       const data = await res.json();
@@ -471,7 +489,7 @@ export function PracticeIDE({ problem, initialLang, initialCode, categoryFilter 
     } finally {
       setCodeReviewLoading(false);
     }
-  }, [user, codeReviewLoading, editor.code, lang, problem.title, verdict?.type]);
+  }, [user, codeReviewLoading, editor.code, lang, problem.title, problem.slug, problem.testCases, verdict?.type, verdict?.passedCases, verdict?.totalCases, interviewMode, interviewDeadline]);
 
   const canSubmit = !!problem.testCases?.length;
   // Pass ALL problems to the sidebar so it can handle its own category filter + pagination.
