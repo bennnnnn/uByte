@@ -3,16 +3,14 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Eyebrow } from "@/components/ui";
+import { ALL_LANGUAGE_KEYS, LANGUAGES } from "@/lib/languages/registry";
 
-const LEARN_LINKS = [
-  { href: "/tutorial/go", label: "Go Tutorials" },
-  { href: "/tutorial/python", label: "Python Tutorials" },
-  { href: "/tutorial/javascript", label: "JavaScript Tutorials" },
-  { href: "/tutorial/java", label: "Java Tutorials" },
-  { href: "/tutorial/rust", label: "Rust Tutorials" },
-  { href: "/tutorial/cpp", label: "C++ Tutorials" },
-  { href: "/tutorial/csharp", label: "C# Tutorials" },
-];
+// Derived from the central language registry — adding a new language here
+// automatically adds it to the footer with no manual changes needed.
+const LEARN_LINKS = ALL_LANGUAGE_KEYS.map((slug) => ({
+  href: `/tutorial/${slug}`,
+  label: `${LANGUAGES[slug].name} Tutorials`,
+}));
 
 const PRACTICE_LINKS = [
   { href: "/practice", label: "Interview Prep" },
