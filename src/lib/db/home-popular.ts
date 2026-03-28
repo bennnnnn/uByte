@@ -6,7 +6,7 @@ import { getAllPracticeProblems, getPracticeProblemBySlug } from "@/lib/practice
 import type { SupportedLanguage } from "@/lib/languages/types";
 
 const UNDEFINED_COLUMN = "42703";
-const LIMIT_LANGUAGES = 8;
+const LIMIT_LANGUAGES = 12; // covers all 9 current languages with room to grow
 const LIMIT_TUTORIALS = 6;
 const LIMIT_PRACTICE = 6;
 
