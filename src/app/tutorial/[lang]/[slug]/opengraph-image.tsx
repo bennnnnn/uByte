@@ -55,8 +55,8 @@ export default async function OgImage({
       >
         {title}
       </div>
-      <div style={{ fontSize: 28, color: "rgba(255,255,255,0.7)", marginTop: "24px" }}>
-        Free interactive {config?.name ?? "Go"} tutorial
+      <div style={{ display: "flex", fontSize: 28, color: "rgba(255,255,255,0.7)", marginTop: "24px" }}>
+        {`Free interactive ${config?.name ?? "Go"} tutorial`}
       </div>
     </div>,
     size

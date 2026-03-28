@@ -55,6 +55,9 @@ export default function OgImage() {
       {/* Headline */}
       <div
         style={{
+          display: "flex",
+          flexWrap: "wrap",
+          justifyContent: "center",
           fontSize: 60,
           fontWeight: 900,
           color: "white",
@@ -62,11 +65,12 @@ export default function OgImage() {
           lineHeight: 1.15,
           letterSpacing: "-1.5px",
           maxWidth: 900,
+          gap: "0 8px",
         }}
       >
-        Learn to code.{" "}
+        <span>Learn to code.</span>
         <span style={{ color: "#a5b4fc" }}>Get certified free.</span>
-        {" "}Get interview-ready.
+        <span>Get interview-ready.</span>
       </div>
 
       {/* Sub-headline */}
