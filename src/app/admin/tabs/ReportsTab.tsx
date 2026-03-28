@@ -10,7 +10,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { apiFetch } from "@/lib/api-client";
-import { SectionCard, EmptyRow } from "../components";
+import { SectionCard } from "../components";
 
 interface Report {
   post_id: number;
@@ -99,7 +99,7 @@ export default function ReportsTab() {
       {loading ? (
         <div className="py-10 text-center text-sm text-zinc-400">Loading…</div>
       ) : reports.length === 0 ? (
-        <EmptyRow message="No reported comments — all clear." />
+        <div className="py-10 text-center text-sm text-zinc-400">No reported comments — all clear.</div>
       ) : (
         <div className="divide-y divide-zinc-100 dark:divide-zinc-800">
           {reports.map((r) => (
