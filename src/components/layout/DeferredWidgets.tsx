@@ -8,19 +8,17 @@
  */
 import dynamic from "next/dynamic";
 
-const TrialBanner             = dynamic(() => import("@/components/TrialBanner"),             { ssr: false, loading: () => null });
-const EmailVerificationBanner = dynamic(() => import("@/components/EmailVerificationBanner"),  { ssr: false, loading: () => null });
-const ReferralTracker         = dynamic(() => import("@/components/ReferralTracker"),          { ssr: false, loading: () => null });
-const PostHogProvider         = dynamic(() => import("@/components/PostHogProvider"),          { ssr: false, loading: () => null });
-const GoogleOneTap            = dynamic(() => import("@/components/GoogleOneTap"),             { ssr: false, loading: () => null });
-const OnboardingChecklist     = dynamic(() => import("@/components/OnboardingChecklist"),      { ssr: false, loading: () => null });
-const PushPermissionBanner    = dynamic(() => import("@/components/PushPermissionBanner"),     { ssr: false, loading: () => null });
+const TrialBanner          = dynamic(() => import("@/components/TrialBanner"),          { ssr: false, loading: () => null });
+const ReferralTracker      = dynamic(() => import("@/components/ReferralTracker"),       { ssr: false, loading: () => null });
+const PostHogProvider      = dynamic(() => import("@/components/PostHogProvider"),       { ssr: false, loading: () => null });
+const GoogleOneTap         = dynamic(() => import("@/components/GoogleOneTap"),          { ssr: false, loading: () => null });
+const OnboardingChecklist  = dynamic(() => import("@/components/OnboardingChecklist"),   { ssr: false, loading: () => null });
+const PushPermissionBanner = dynamic(() => import("@/components/PushPermissionBanner"),  { ssr: false, loading: () => null });
 
 export default function DeferredWidgets() {
   return (
     <>
       <TrialBanner />
-      <EmailVerificationBanner />
       <ReferralTracker />
       <PostHogProvider />
       <GoogleOneTap />

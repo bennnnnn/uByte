@@ -7,6 +7,7 @@ import { ToastProvider } from "@/components/Toast";
 import SiteHeader from "@/components/layout/SiteHeader";
 import MobileStandaloneHeader from "@/components/layout/MobileStandaloneHeader";
 import SiteFooter from "@/components/layout/SiteFooter";
+import EmailVerificationBanner from "@/components/EmailVerificationBanner";
 import LazyCookieConsentAndAnalytics from "@/components/LazyCookieConsentAndAnalytics";
 import SiteBanner from "@/components/SiteBanner";
 // "use client" wrapper that lazy-loads non-critical widgets with ssr:false
@@ -139,6 +140,7 @@ export default async function RootLayout({
             <SiteBanner initialData={bannerData} />
             <SiteHeader />
             <MobileStandaloneHeader />
+            <EmailVerificationBanner />
             {/* Home / practice: just scrollable content. /tutorial/[lang]: sidebar + content from tutorial layout */}
             <main id="main-content" className="flex min-h-0 flex-1 flex-col overflow-x-clip bg-surface-page">
               <ErrorBoundary>{children}</ErrorBoundary>
