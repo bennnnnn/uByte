@@ -159,13 +159,13 @@ export function PracticeListClient({
                 </p>
               </div>
             </div>
-            <div className="flex flex-wrap gap-2">
+            <div className="flex gap-2 overflow-x-auto pb-1 sm:flex-wrap sm:overflow-visible sm:pb-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
               {ALL_LANGUAGE_KEYS.map((l2) => (
                 <button
                   key={l2}
                   type="button"
                   onClick={() => handleLanguageClick(l2)}
-                  className={`rounded-lg px-3 py-2 text-sm font-medium transition-all ${
+                  className={`shrink-0 rounded-lg px-3 py-2 text-sm font-medium transition-all ${
                     l2 === selectedLang
                       ? "bg-indigo-600 text-white"
                       : "border border-zinc-200 bg-white text-zinc-600 hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800"
@@ -194,20 +194,23 @@ export function PracticeListClient({
       </section>
 
       <div className="mx-auto flex max-w-6xl flex-col lg:flex-row">
-        {/* Left: Category sidebar */}
+        {/* Left: Category sidebar — horizontal scroll on mobile, vertical sidebar on lg+ */}
         <aside className="shrink-0 border-b border-zinc-100 bg-surface-card dark:border-zinc-800 lg:w-56 lg:border-b-0 lg:border-r lg:py-6">
-          <div className="px-4 py-4 lg:px-4">
-            <h2 className="mb-3 text-sm font-semibold text-zinc-700 dark:text-zinc-300">
+          <div className="px-4 py-3 lg:px-4 lg:py-4">
+            <h2 className="mb-2 text-xs font-semibold uppercase tracking-wider text-zinc-400 dark:text-zinc-500 lg:mb-3 lg:text-sm lg:normal-case lg:tracking-normal lg:text-zinc-700 lg:dark:text-zinc-300">
               Category
             </h2>
-            <nav className="flex flex-wrap gap-2 lg:flex-col lg:gap-0" aria-label="Filter by category">
+            <nav
+              className="flex gap-1.5 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden lg:flex-col lg:overflow-visible lg:pb-0 lg:gap-0"
+              aria-label="Filter by category"
+            >
               <Link
                 href={buildUrl(selectedLang, { category: "", status: statusFilter ?? undefined, difficulty: difficultyFilter ?? undefined, page: 1 })}
                 scroll={false}
-                className={`block rounded-lg px-3 py-2 text-sm font-medium transition-colors lg:rounded-r-none lg:border-l-2 lg:pl-3 ${
+                className={`shrink-0 block rounded-lg px-3 py-1.5 text-sm font-medium transition-colors lg:rounded-r-none lg:border-l-2 lg:pl-3 lg:py-2 ${
                   categoryFilter === null
-                    ? "border-indigo-500 bg-indigo-50 text-indigo-700 dark:border-indigo-400 dark:bg-indigo-950/50 dark:text-indigo-300"
-                    : "border-transparent text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-200"
+                    ? "bg-indigo-600 text-white lg:bg-indigo-50 lg:text-indigo-700 lg:border-indigo-500 dark:lg:bg-indigo-950/50 dark:lg:text-indigo-300 dark:lg:border-indigo-400"
+                    : "border border-zinc-200 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 dark:border-zinc-700 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-200 lg:border-transparent lg:border-l-2 lg:border-l-transparent"
                 }`}
               >
                 All
@@ -217,10 +220,10 @@ export function PracticeListClient({
                   key={cat}
                   href={buildUrl(selectedLang, { category: cat, status: statusFilter ?? undefined, difficulty: difficultyFilter ?? undefined, page: 1 })}
                   scroll={false}
-                  className={`block rounded-lg px-3 py-2 text-sm font-medium transition-colors lg:rounded-r-none lg:border-l-2 lg:pl-3 ${
+                  className={`shrink-0 block rounded-lg px-3 py-1.5 text-sm font-medium transition-colors lg:rounded-r-none lg:border-l-2 lg:pl-3 lg:py-2 ${
                     categoryFilter === cat
-                      ? "border-indigo-500 bg-indigo-50 text-indigo-700 dark:border-indigo-400 dark:bg-indigo-950/50 dark:text-indigo-300"
-                      : "border-transparent text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-200"
+                      ? "bg-indigo-600 text-white lg:bg-indigo-50 lg:text-indigo-700 lg:border-indigo-500 dark:lg:bg-indigo-950/50 dark:lg:text-indigo-300 dark:lg:border-indigo-400"
+                      : "border border-zinc-200 text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 dark:border-zinc-700 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-200 lg:border-transparent lg:border-l-2 lg:border-l-transparent"
                   }`}
                 >
                   {getCategoryLabel(cat)}
@@ -252,62 +255,47 @@ export function PracticeListClient({
           </div>
 
           {/* Filters bar */}
-          <div className="mb-4 flex flex-wrap items-center gap-4 rounded-xl border border-zinc-200 bg-surface-card p-4 dark:border-zinc-700">
-            <div className="flex flex-wrap items-center gap-3">
-              <span className="text-sm font-medium text-zinc-500 dark:text-zinc-400">Status:</span>
-              <div className="flex gap-2">
-                <Link
-                  href={buildUrl(selectedLang, { status: "", category: categoryFilter ?? undefined, difficulty: difficultyFilter ?? undefined, page: 1 })}
-                  scroll={false}
-                  className={`rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
-                    statusFilter === null
-                      ? "bg-indigo-600 text-white"
-                      : "bg-zinc-100 text-zinc-700 hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700"
-                  }`}
+          <div className="mb-4 flex flex-col gap-3 rounded-xl border border-zinc-200 bg-surface-card p-3 dark:border-zinc-700 sm:p-4">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              {/* Status */}
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-semibold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">Status</span>
+                <div className="flex gap-1">
+                  {([["", "All"], ["solved", "✓ Solved"], ["unsolved", "Unsolved"]] as const).map(([val, label]) => (
+                    <Link
+                      key={val}
+                      href={buildUrl(selectedLang, { status: val, category: categoryFilter ?? undefined, difficulty: difficultyFilter ?? undefined, page: 1 })}
+                      scroll={false}
+                      className={`rounded-lg px-2.5 py-1.5 text-xs font-medium transition-colors sm:px-3 sm:py-2 sm:text-sm ${
+                        (val === "" ? statusFilter === null : statusFilter === val)
+                          ? "bg-indigo-600 text-white"
+                          : "bg-zinc-100 text-zinc-700 hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700"
+                      }`}
+                    >
+                      {label}
+                    </Link>
+                  ))}
+                </div>
+              </div>
+              {/* Difficulty */}
+              <div className="flex items-center gap-2">
+                <label htmlFor="difficulty-filter" className="text-xs font-semibold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">
+                  Difficulty
+                </label>
+                <select
+                  id="difficulty-filter"
+                  value={difficultyFilter ?? ""}
+                  onChange={handleDifficultyChange}
+                  className="rounded-lg border border-zinc-200 bg-white px-2.5 py-1.5 text-xs font-medium text-zinc-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-300 sm:px-3 sm:py-2 sm:text-sm"
                 >
-                  All
-                </Link>
-                <Link
-                  href={buildUrl(selectedLang, { status: "solved", category: categoryFilter ?? undefined, difficulty: difficultyFilter ?? undefined, page: 1 })}
-                  scroll={false}
-                  className={`rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
-                    statusFilter === "solved"
-                      ? "bg-indigo-600 text-white"
-                      : "bg-zinc-100 text-zinc-700 hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700"
-                  }`}
-                >
-                  ✓ Solved
-                </Link>
-                <Link
-                  href={buildUrl(selectedLang, { status: "unsolved", category: categoryFilter ?? undefined, difficulty: difficultyFilter ?? undefined, page: 1 })}
-                  scroll={false}
-                  className={`rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
-                    statusFilter === "unsolved"
-                      ? "bg-indigo-600 text-white"
-                      : "bg-zinc-100 text-zinc-700 hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700"
-                  }`}
-                >
-                  Not solved
-                </Link>
+                  <option value="">All</option>
+                  <option value="easy">Easy</option>
+                  <option value="medium">Medium</option>
+                  <option value="hard">Hard</option>
+                </select>
               </div>
             </div>
-            <div className="flex items-center gap-3">
-              <label htmlFor="difficulty-filter" className="text-sm font-medium text-zinc-500 dark:text-zinc-400">
-                Difficulty:
-              </label>
-              <select
-                id="difficulty-filter"
-                value={difficultyFilter ?? ""}
-                onChange={handleDifficultyChange}
-                className="rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm font-medium text-zinc-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-300"
-              >
-                <option value="">All</option>
-                <option value="easy">Easy</option>
-                <option value="medium">Medium</option>
-                <option value="hard">Hard</option>
-              </select>
-            </div>
-            <p className="ml-auto text-sm text-zinc-500 dark:text-zinc-400">
+            <p className="text-xs text-zinc-400 dark:text-zinc-500 sm:text-sm">
               Showing {isSearching ? displayProblems.length : sortedLength} problem{(isSearching ? displayProblems.length : sortedLength) !== 1 ? "s" : ""}
               {isSearching && ` for "${searchQuery.trim()}"`}
             </p>
@@ -343,9 +331,9 @@ export function PracticeListClient({
                   <li key={p.slug}>
                     <Link
                       href={buildProblemHref(p.slug)}
-                      className="group flex flex-wrap items-center gap-3 px-4 py-3.5 transition-colors hover:bg-zinc-50 sm:flex-nowrap dark:hover:bg-zinc-800/50"
+                      className="group flex items-center gap-2 px-4 py-3.5 transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-800/50 sm:gap-3"
                     >
-                      <span className="flex w-6 shrink-0 items-center justify-center" title={status === "solved" ? "Solved" : status === "failed" ? "Attempted" : "Not attempted"}>
+                      <span className="flex w-5 shrink-0 items-center justify-center sm:w-6" title={status === "solved" ? "Solved" : status === "failed" ? "Attempted" : "Not attempted"}>
                         {status === "solved" ? (
                           <span className="flex h-5 w-5 items-center justify-center rounded-full bg-emerald-100 text-emerald-600 dark:bg-emerald-900/50 dark:text-emerald-400">
                             <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
@@ -358,14 +346,14 @@ export function PracticeListClient({
                           <span className="h-5 w-5 rounded-full border-2 border-zinc-300 dark:border-zinc-600" />
                         )}
                       </span>
-                      <span className="w-7 shrink-0 text-center text-sm font-bold tabular-nums text-zinc-400 group-hover:text-indigo-500 dark:text-zinc-500 dark:group-hover:text-indigo-400">
+                      <span className="w-6 shrink-0 text-center text-xs font-bold tabular-nums text-zinc-400 group-hover:text-indigo-500 dark:text-zinc-500 dark:group-hover:text-indigo-400 sm:w-7 sm:text-sm">
                         {displayStart + idx + 1}
                       </span>
-                      <span className="min-w-0 flex-1 font-medium text-zinc-900 group-hover:text-indigo-700 dark:text-zinc-100 dark:group-hover:text-indigo-400">
+                      <span className="min-w-0 flex-1 truncate text-sm font-medium text-zinc-900 group-hover:text-indigo-700 dark:text-zinc-100 dark:group-hover:text-indigo-400">
                         {p.title}
                       </span>
                       {cat && (
-                        <span className="shrink-0 rounded-md border border-zinc-200 bg-zinc-50 px-2 py-0.5 text-xs font-medium text-zinc-600 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-400">
+                        <span className="hidden shrink-0 rounded-md border border-zinc-200 bg-zinc-50 px-2 py-0.5 text-xs font-medium text-zinc-600 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-400 sm:inline">
                           {getCategoryLabel(cat)}
                         </span>
                       )}
