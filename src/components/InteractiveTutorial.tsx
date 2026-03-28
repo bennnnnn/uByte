@@ -363,7 +363,7 @@ export default function InteractiveTutorial({
           <GripDots vertical />
         </div>
 
-        {/* Right panel */}
+        {/* Right panel — pb-[60px] on mobile gives room above the fixed action bar */}
         <div className={`relative flex-col overflow-hidden ${mobileTab === "code" ? "flex" : "hidden"} md:flex flex-1`}>
           {/* Shared code editor surface */}
           <CodeEditor editor={editor} onKeyDown={handleKeyDown} fontSize={isMobile ? fontSize : undefined} />
@@ -503,60 +503,101 @@ export default function InteractiveTutorial({
         </div>
       </div>
 
-      {/* Mobile bottom bar — shared EditorToolbar in mobile mode */}
+      {/* ── Mobile bottom action bar ─────────────────────────────────────────
+           Icon-only on mobile for breathing room and clean aesthetics.
+           The lang selector uses abbreviated display; all buttons are 44 px tall
+           for comfortable tap targets (Apple HIG minimum). ──────────────────── */}
       {mobileTab === "code" && (
-        <EditorToolbar
-          lang={ideLang}
-          onLangChange={setIdeLang}
-          langOptions={Object.keys(LANGUAGES) as SupportedLanguage[]}
-          mobile
-        >
+        <div className="fixed bottom-0 left-0 right-0 z-[54] flex items-center gap-2 border-t border-zinc-200 bg-zinc-50 px-3 py-2 md:hidden dark:border-zinc-800 dark:bg-zinc-900">
+          {/* Language selector — compact, shows abbreviated name */}
+          <select
+            id="mobile-lang-select"
+            name="language"
+            value={ideLang}
+            onChange={(e) => setIdeLang(e.target.value as SupportedLanguage)}
+            aria-label="Code language"
+            className="h-11 w-20 shrink-0 rounded-xl border border-zinc-300 bg-white px-2 text-xs font-medium text-zinc-700 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-200"
+          >
+            {(Object.keys(LANGUAGES) as SupportedLanguage[]).map((l) => (
+              <option key={l} value={l}>{LANGUAGES[l]?.name ?? l}</option>
+            ))}
+          </select>
+
+          {/* Run */}
           <button
             type="button"
             onClick={() => stepProgress.handleRun(editor.code, editor.setErrorLines)}
             disabled={stepProgress.status === "running"}
-            aria-label={stepProgress.status === "running" ? "Running" : "Run code"}
-            className="flex flex-1 items-center justify-center gap-1 rounded-md bg-green-100 py-2 text-sm font-medium text-green-800 disabled:opacity-50 dark:bg-green-900/40 dark:text-green-300"
+            aria-label={stepProgress.status === "running" ? "Running…" : "Run code"}
+            title="Run (Ctrl+Enter)"
+            className="flex h-11 flex-1 items-center justify-center rounded-xl bg-emerald-500 text-white shadow-sm shadow-emerald-500/20 transition-colors hover:bg-emerald-600 disabled:opacity-50 dark:bg-emerald-600 dark:hover:bg-emerald-500"
           >
-            {stepProgress.status === "running" ? "…" : "▶ Run"}
+            {stepProgress.status === "running" ? (
+              <svg className="h-5 w-5 animate-spin" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" />
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4l3-3-3-3v4a10 10 0 100 10z" />
+              </svg>
+            ) : (
+              <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M8 5.14v14l11-7-11-7z" />
+              </svg>
+            )}
           </button>
+
+          {/* Check */}
           <button
             type="button"
             onClick={() => stepProgress.handleCheck(editor.code, currentStep, editor.setCode, editor.setErrorLines)}
             disabled={stepProgress.status === "running"}
             aria-label="Check answer"
-            className="flex flex-1 items-center justify-center gap-1 rounded-md bg-indigo-700 py-2 text-sm font-medium text-white disabled:opacity-50"
+            title="Check (Ctrl+Shift+Enter)"
+            className="flex h-11 flex-1 items-center justify-center rounded-xl bg-indigo-600 text-white shadow-sm shadow-indigo-600/20 transition-colors hover:bg-indigo-700 disabled:opacity-50"
           >
-            ✓ Check
+            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
           </button>
+
+          {/* Reset */}
           <button
             type="button"
             onClick={handleReset}
-            aria-label="Reset to original starter code"
-            className={`flex shrink-0 items-center justify-center rounded-md border px-3 py-2 text-sm transition-colors ${
+            aria-label="Reset to starter code"
+            title="Reset to starter code"
+            className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border transition-colors ${
               resetDone
-                ? "border-emerald-400 text-emerald-600 dark:border-emerald-600 dark:text-emerald-400"
-                : "border-zinc-300 text-zinc-500 dark:border-zinc-700 dark:text-zinc-400"
+                ? "border-emerald-400 bg-emerald-50 text-emerald-600 dark:border-emerald-600 dark:bg-emerald-950/30 dark:text-emerald-400"
+                : "border-zinc-300 bg-white text-zinc-500 hover:border-zinc-400 hover:text-zinc-700 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-400 dark:hover:border-zinc-500"
             }`}
           >
-            {resetDone ? "✓" : "↺"}
+            {resetDone ? (
+              <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+              </svg>
+            ) : (
+              <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              </svg>
+            )}
           </button>
+
+          {/* Notes */}
           <button
             type="button"
             onClick={() => setNotesOpen((v) => !v)}
             aria-label="My notes"
-            className={`flex shrink-0 items-center justify-center gap-1 rounded-md border px-3 py-2 text-sm transition-all ${
+            title="My notes"
+            className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border transition-colors ${
               notesOpen
-                ? "border-amber-400 bg-amber-50 text-amber-700 dark:border-amber-600 dark:bg-amber-950/30 dark:text-amber-400"
-                : "border-zinc-300 text-zinc-500 dark:border-zinc-700 dark:text-zinc-400"
+                ? "border-amber-400 bg-amber-50 text-amber-600 dark:border-amber-600 dark:bg-amber-950/30 dark:text-amber-400"
+                : "border-zinc-300 bg-white text-zinc-500 hover:border-zinc-400 hover:text-zinc-700 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-400 dark:hover:border-zinc-500"
             }`}
           >
-            <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
             </svg>
-            Notes
           </button>
-        </EditorToolbar>
+        </div>
       )}
       {showSnapshots && (
         <SnapshotDrawer
