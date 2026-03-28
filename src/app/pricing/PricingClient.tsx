@@ -28,11 +28,11 @@ const FREE_FEATURES = [
 ];
 
 const PRO_FEATURES = [
-  "AI hints when you're stuck on a tutorial step",
-  "AI code review on every practice submission",
-  "Interview simulator with AI debrief",
+  "Hints when you're stuck on any tutorial step",
+  "Instant code feedback on every practice submission",
+  "Mock interview simulator with personalized debrief",
+  "Exam hints when you need a nudge on a question",
   "Priority support",
-  "New AI features as they ship",
 ];
 
 const COMPARISON_FEATURES: { name: string; free: string; pro: string }[] = [
@@ -43,15 +43,16 @@ const COMPARISON_FEATURES: { name: string; free: string; pro: string }[] = [
   { name: "Verifiable certificates", free: "✓", pro: "✓" },
   { name: "Code editor", free: "✓", pro: "✓" },
   { name: "Progress tracking", free: "✓", pro: "✓" },
-  { name: "AI hints on tutorial steps", free: "—", pro: "✓" },
-  { name: "AI code review on submissions", free: "—", pro: "✓" },
-  { name: "Interview simulator AI debrief", free: "—", pro: "✓" },
+  { name: "Hints when stuck on a step", free: "—", pro: "✓" },
+  { name: "Code feedback on submissions", free: "—", pro: "✓" },
+  { name: "Mock interview with debrief", free: "—", pro: "✓" },
+  { name: "Exam hints when stuck", free: "—", pro: "✓" },
 ];
 
 const FAQ_ITEMS = [
   {
-    q: "What's included in Pro?",
-    a: "Unlimited tutorials in all 9 languages, unlimited interview prep problems, AI code feedback on every step, and timed certification exams with shareable certificates.",
+    q: "What does Pro actually give me?",
+    a: "When you hit a wall on a tutorial step or practice problem, Pro lets you ask for a hint so you can keep moving instead of spending an hour stuck. You also get code feedback after every practice submission, a mock interview simulator to practice under pressure, and hints on certification exam questions. It's everything that keeps your momentum going.",
   },
   {
     q: "Can I cancel anytime?",
@@ -59,7 +60,7 @@ const FAQ_ITEMS = [
   },
   {
     q: "How does the free plan work?",
-    a: "Everything is free — all tutorials, all interview prep problems, and all certification exams. Create a free account and start immediately. Upgrade to Pro for AI-powered hints, code review, and interview debriefs.",
+    a: "Everything is free — all tutorials across 9 languages, all interview prep problems, and all certification exams. Create a free account and start coding immediately. Upgrade to Pro whenever you want the extra support.",
   },
   {
     q: "Do I get a certificate?",
@@ -80,16 +81,8 @@ function PricingContent() {
   const searchParams = useSearchParams();
   const { user, profile, refreshProfile } = useAuth();
   const paddleReady = useRef(false);
-  const [billing, setBilling]       = useState<"monthly" | "yearly">("yearly");
-  const [userCount, setUserCount]   = useState<number | null>(null);
-  const [coupon, setCoupon]         = useState("");
-
-  useEffect(() => {
-    fetch("/api/stats/public")
-      .then((r) => r.json())
-      .then((j: { userCount: number }) => { if (j.userCount > 0) setUserCount(j.userCount); })
-      .catch(() => {});
-  }, []);
+  const [billing, setBilling] = useState<"monthly" | "yearly">("yearly");
+  const [coupon, setCoupon]   = useState("");
   const showSuccess = searchParams.get("success") === "1";
   const planParam = searchParams.get("plan");
   const signupParam = searchParams.get("signup") === "1";
@@ -212,33 +205,31 @@ function PricingContent() {
         {/* ── Header (compact) ────────────────────────────── */}
         <div className="mx-auto max-w-2xl text-center">
           <h1 className="text-2xl font-black tracking-tight text-zinc-900 dark:text-white sm:text-3xl">
-            Everything free.{" "}
+            Free forever.{" "}
             <GradientText>
-              AI makes it faster.
+              Never get stuck.
             </GradientText>
           </h1>
           <p className="mt-2 text-sm text-zinc-500 dark:text-zinc-400 sm:text-base">
-            All tutorials, all problems, and certifications are free for every user.
-            <span className="ml-1 font-medium text-indigo-600 dark:text-indigo-400">Upgrade for AI hints, code review, and interview debriefs.</span>
+            All tutorials, problems, and certifications are free for everyone.
+            <span className="ml-1 font-medium text-indigo-600 dark:text-indigo-400">Upgrade to Pro when you want hints, code feedback, and mock interview practice to keep your momentum going.</span>
           </p>
         </div>
 
         {/* ── Social proof bar ─────────────────────────────── */}
         <div className="mx-auto mt-5 flex max-w-lg flex-wrap items-center justify-center gap-x-6 gap-y-2">
           <span className="flex items-center gap-1.5 text-sm font-medium text-zinc-600 dark:text-zinc-400">
-            <span className="text-base">👩‍💻</span>
-            {userCount
-              ? `${userCount.toLocaleString()}+ developers enrolled`
-              : "Developers worldwide"}
+            <span className="text-base">🎓</span>
+            Free certifications
           </span>
           <span className="hidden text-zinc-300 dark:text-zinc-700 sm:block">·</span>
           <span className="flex items-center gap-1.5 text-sm font-medium text-zinc-600 dark:text-zinc-400">
-            <span className="text-base">🤖</span>
-            AI code feedback
+            <span className="text-base">💡</span>
+            Hints when stuck
           </span>
           <span className="hidden text-zinc-300 dark:text-zinc-700 sm:block">·</span>
           <span className="flex items-center gap-1.5 text-sm font-medium text-zinc-600 dark:text-zinc-400">
-            <span className="text-base">✦</span>
+            <span className="text-base">↩️</span>
             Cancel anytime
           </span>
         </div>
@@ -454,10 +445,10 @@ function PricingContent() {
         {/* ── Bottom CTA ─────────────────────────────────── */}
         <div className="mx-auto mt-10 max-w-xl rounded-2xl border-2 border-indigo-200 bg-indigo-50 p-8 text-center dark:border-indigo-800/50 dark:bg-indigo-950/20">
           <p className="text-xl font-black text-zinc-900 dark:text-zinc-100">
-            Ready to go unlimited?
+            Stop getting stuck. Keep moving.
           </p>
           <p className="mx-auto mt-2 max-w-sm text-sm text-zinc-500 dark:text-zinc-400">
-            Cancel anytime. 7-day refund if you're not happy.
+            Hints on demand, code feedback, mock interviews. Cancel anytime — 7-day refund if you change your mind.
           </p>
           <div className="mt-6">
             {!user ? (
