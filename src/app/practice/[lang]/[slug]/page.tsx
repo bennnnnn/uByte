@@ -7,7 +7,6 @@ import type { SupportedLanguage } from "@/lib/languages/types";
 import type { ProblemCategory } from "@/lib/practice/types";
 import { PracticeIDE } from "./PracticeIDE";
 import { getCurrentUser } from "@/lib/auth";
-import UpgradeWall from "@/components/UpgradeWall";
 import { absoluteUrl, SITE_KEYWORDS } from "@/lib/seo";
 import { APP_NAME, BASE_URL } from "@/lib/constants";
 import { tryDecodeShareCode } from "@/lib/share-code";
@@ -76,50 +75,6 @@ export default async function PracticeProblemPage({ params, searchParams }: Prop
   const { hasPaidAccess } = await import("@/lib/plans");
   const dbUser = user ? await getUserById(user.userId) : null;
   const isPro = hasPaidAccess(dbUser?.plan);
-
-  // Daily challenge is always free — verify the slug matches today's actual daily problem.
-  const isDailyChallenge = sp.daily === "1" && (() => {
-    const all = getAllPracticeProblems();
-    const epochDay = Math.floor(Date.now() / (1000 * 60 * 60 * 24));
-    return all.length > 0 && all[epochDay % all.length]?.slug === slug;
-  })();
-
-  // All logged-in users (free and Pro) can access all problems.
-  // Guests are prompted to sign up for free.
-  let canAccess = isDailyChallenge || !!user;
-  const dripMessage = !user
-    ? "Create a free account to solve all problems."
-    : "";
-
-  if (!canAccess) {
-    const backQuery = new URLSearchParams();
-    if (sp.category) backQuery.set("category", sp.category);
-    if (sp.page && sp.page !== "1") backQuery.set("page", sp.page);
-    if (sp.status) backQuery.set("status", sp.status);
-    if (sp.difficulty) backQuery.set("difficulty", sp.difficulty);
-    const backQueryStr = backQuery.toString();
-    // Build a preview of the problem description to show blurred behind the wall
-    const previewLines = [
-      `// ${problem.title} — ${problem.difficulty.toUpperCase()}`,
-      `// Category: ${problem.category}`,
-      "",
-      ...problem.description.split("\n").slice(0, 6),
-      "",
-      ...(problem.examples?.[0]
-        ? [`Example: ${problem.examples[0].input}`, `Output:  ${problem.examples[0].output}`]
-        : []),
-    ];
-    return (
-      <UpgradeWall
-        tutorialTitle={problem.title}
-        subtitle={dripMessage}
-        backHref={`/practice/${lang}${backQueryStr ? `?${backQueryStr}` : ""}`}
-        backLabel={`← Back to ${LANGUAGES[lang as SupportedLanguage]?.name ?? lang} problems`}
-        previewLines={previewLines}
-        context="practice"
-      />
-    );
-  }
 
   const categories = getPracticeCategories();
   const categoryFilter =
