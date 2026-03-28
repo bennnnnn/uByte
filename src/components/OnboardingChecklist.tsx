@@ -20,23 +20,25 @@ interface Status {
   attemptedCert: boolean;
 }
 
-const STEPS = [
-  {
-    label: "Complete your first tutorial step",
-    key: "completedTutorialStep" as const,
-    href: "/tutorial/go/getting-started",
-  },
-  {
-    label: "Solve a practice problem",
-    key: "solvedPracticeProblem" as const,
-    href: "/practice/go/two-sum",
-  },
-  {
-    label: "Attempt a certification exam",
-    key: "attemptedCert" as const,
-    href: "/certifications",
-  },
-];
+function buildSteps(lang: string) {
+  return [
+    {
+      label: "Complete your first tutorial step",
+      key: "completedTutorialStep" as const,
+      href: `/tutorial/${lang}/getting-started`,
+    },
+    {
+      label: "Solve a practice problem",
+      key: "solvedPracticeProblem" as const,
+      href: `/practice/${lang}`,
+    },
+    {
+      label: "Attempt a certification exam",
+      key: "attemptedCert" as const,
+      href: "/certifications",
+    },
+  ];
+}
 
 function CheckCircle({ done }: { done: boolean }) {
   return done ? (
@@ -51,7 +53,7 @@ function CheckCircle({ done }: { done: boolean }) {
 }
 
 export default function OnboardingChecklist() {
-  const { user, loading } = useAuth();
+  const { user, loading, profile } = useAuth();
   const [status, setStatus] = useState<Status | null>(null);
   const [open, setOpen] = useState(true);
   const [dismissed, setDismissed] = useState(false);
@@ -116,6 +118,8 @@ export default function OnboardingChecklist() {
   if (!user || loading || dismissed) return null;
   if (!status?.show && !allDoneVisible) return null;
 
+  const lang = profile?.onboarding_lang ?? "go";
+  const STEPS = buildSteps(lang);
   const steps = STEPS.map((s) => ({ ...s, done: status ? status[s.key] : false }));
   const completedCount = steps.filter((s) => s.done).length;
 

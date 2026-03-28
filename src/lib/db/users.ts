@@ -22,6 +22,22 @@ export async function setOnboardingGoal(userId: number, goal: string): Promise<v
   await sql`UPDATE users SET onboarding_goal = ${goal} WHERE id = ${userId}`;
 }
 
+let _onboardingLangReady = false;
+async function ensureOnboardingLangColumn(): Promise<void> {
+  if (_onboardingLangReady) return;
+  const sql = getSql();
+  try {
+    await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS onboarding_lang TEXT`;
+  } catch { /* ignore */ }
+  _onboardingLangReady = true;
+}
+
+export async function setOnboardingLang(userId: number, lang: string): Promise<void> {
+  await ensureOnboardingLangColumn();
+  const sql = getSql();
+  await sql`UPDATE users SET onboarding_lang = ${lang} WHERE id = ${userId}`;
+}
+
 let _emailVerifyExpiryReady = false;
 async function ensureEmailVerificationExpiryColumn(): Promise<void> {
   if (_emailVerifyExpiryReady) return;
@@ -132,6 +148,9 @@ export async function updateStreak(
     return { streak_days: streak, longest_streak: longest };
   } else if (user.streak_last_date === yesterday) {
     streak += 1;
+  } else if (user.streak_last_date === null) {
+    // Brand-new user — first ever activity, start at day 1 without touching freezes
+    streak = 1;
   } else {
     // Missed a day — try freeze
     if (freezes > 0) {

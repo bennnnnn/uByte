@@ -49,7 +49,7 @@ export async function sendStreakReminderEmail(
         <p>Hi ${name},</p>
         <p>You have a <strong>${streakDays}-day</strong> streak on uByte — don't let it slip today!</p>
         <a href="${BASE_URL}" style="display:inline-block;margin:16px 0;padding:12px 24px;background:#0891b2;color:#fff;border-radius:8px;text-decoration:none;font-weight:600">Keep my streak 🔥</a>
-        <p style="color:#6b7280;font-size:13px">Complete any tutorial step to keep your streak going.</p>
+        <p style="color:#6b7280;font-size:13px">Complete a tutorial step, solve a practice problem, or just log in — any activity counts.</p>
         ${unsubFooter(to)}
       </div>
     `,

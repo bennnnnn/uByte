@@ -14,7 +14,8 @@ const GOALS = [
     desc: "Land my first dev role or switch into software engineering",
     color: "border-violet-200 hover:border-violet-400 dark:border-violet-800 dark:hover:border-violet-500",
     selectedColor: "border-violet-500 bg-violet-50 dark:border-violet-400 dark:bg-violet-950/30",
-    path: "/practice/go",
+    needsLang: true,
+    getLangPath: (lang: string) => `/practice/${lang}`,
   },
   {
     id: "ace-interviews",
@@ -23,7 +24,8 @@ const GOALS = [
     desc: "Sharpen algorithms, data structures, and coding problem skills",
     color: "border-amber-200 hover:border-amber-400 dark:border-amber-800 dark:hover:border-amber-500",
     selectedColor: "border-amber-500 bg-amber-50 dark:border-amber-400 dark:bg-amber-950/30",
-    path: "/practice/go",
+    needsLang: true,
+    getLangPath: (lang: string) => `/practice/${lang}`,
   },
   {
     id: "learn-language",
@@ -32,7 +34,8 @@ const GOALS = [
     desc: "Pick up Go, Python, JavaScript, Rust, Java, or C++ from scratch",
     color: "border-indigo-200 hover:border-indigo-400 dark:border-indigo-800 dark:hover:border-indigo-500",
     selectedColor: "border-indigo-500 bg-indigo-50 dark:border-indigo-400 dark:bg-indigo-950/30",
-    path: "/tutorial/go/getting-started",
+    needsLang: true,
+    getLangPath: (lang: string) => `/tutorial/${lang}/getting-started`,
   },
   {
     id: "level-up",
@@ -41,11 +44,24 @@ const GOALS = [
     desc: "Improve code quality, learn new patterns, earn certifications",
     color: "border-emerald-200 hover:border-emerald-400 dark:border-emerald-800 dark:hover:border-emerald-500",
     selectedColor: "border-emerald-500 bg-emerald-50 dark:border-emerald-400 dark:bg-emerald-950/30",
-    path: "/certifications",
+    needsLang: false,
+    getLangPath: () => "/certifications",
   },
 ] as const;
 
+const LANGUAGES = [
+  { id: "go",         icon: "🐹", name: "Go" },
+  { id: "python",     icon: "🐍", name: "Python" },
+  { id: "javascript", icon: "🟨", name: "JavaScript" },
+  { id: "typescript", icon: "🟦", name: "TypeScript" },
+  { id: "java",       icon: "☕", name: "Java" },
+  { id: "rust",       icon: "🦀", name: "Rust" },
+  { id: "cpp",        icon: "⚙️",  name: "C++" },
+  { id: "csharp",     icon: "💜", name: "C#" },
+] as const;
+
 type GoalId = (typeof GOALS)[number]["id"];
+type LangId = (typeof LANGUAGES)[number]["id"];
 
 function OnboardingInner() {
   const { user, profile, loading } = useAuth();
@@ -54,12 +70,17 @@ function OnboardingInner() {
   const nextPath = searchParams.get("next") ?? null;
 
   const [step, setStep] = useState<1 | 2>(1);
-  const [selected, setSelected] = useState<GoalId | null>(null);
+  const [selectedGoal, setSelectedGoal] = useState<GoalId | null>(null);
+  const [selectedLang, setSelectedLang] = useState<LangId | null>(null);
   const [saving, setSaving] = useState(false);
   const [referralData, setReferralData] = useState<{ code: string; shareUrl: string } | null>(null);
   const [referralLoading, setReferralLoading] = useState(false);
   const [referralError, setReferralError] = useState(false);
   const [copied, setCopied] = useState(false);
+
+  const goal = GOALS.find((g) => g.id === selectedGoal);
+  const needsLang = goal?.needsLang ?? false;
+  const canContinue = selectedGoal !== null && (!needsLang || selectedLang !== null);
 
   // If user already completed onboarding, skip to destination
   useEffect(() => {
@@ -93,13 +114,16 @@ function OnboardingInner() {
   }, [step, fetchReferral]);
 
   const handleContinue = useCallback(async () => {
-    if (!selected || saving) return;
+    if (!canContinue || saving) return;
     setSaving(true);
     try {
       await apiFetch("/api/onboarding/goal", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ goal: selected }),
+        body: JSON.stringify({
+          goal: selectedGoal,
+          ...(selectedLang ? { lang: selectedLang } : {}),
+        }),
       });
     } catch {
       // Non-fatal — continue anyway
@@ -107,12 +131,13 @@ function OnboardingInner() {
       setSaving(false);
     }
     setStep(2);
-  }, [selected, saving]);
+  }, [canContinue, saving, selectedGoal, selectedLang]);
 
   const handleFinish = useCallback(() => {
-    const goal = GOALS.find((g) => g.id === selected);
-    router.replace(nextPath ?? goal?.path ?? "/");
-  }, [selected, nextPath, router]);
+    if (!goal) { router.replace(nextPath ?? "/"); return; }
+    const lang = selectedLang ?? "go";
+    router.replace(nextPath ?? goal.getLangPath(lang));
+  }, [goal, selectedLang, nextPath, router]);
 
   async function copyLink() {
     if (!referralData) return;
@@ -159,17 +184,22 @@ function OnboardingInner() {
                 Welcome, {firstName}! 🎉
               </h1>
               <p className="mb-8 text-zinc-500 dark:text-zinc-400">
-                What&apos;s your main goal? We&apos;ll personalize your experience.
+                What&apos;s your main goal? We&apos;ll send you to the right place.
               </p>
 
+              {/* Goal picker */}
               <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                 {GOALS.map((g) => (
                   <button
                     key={g.id}
                     type="button"
-                    onClick={() => setSelected(g.id)}
+                    onClick={() => {
+                      setSelectedGoal(g.id);
+                      // Reset lang when goal changes
+                      if (!g.needsLang) setSelectedLang(null);
+                    }}
                     className={`flex items-start gap-3 rounded-xl border-2 p-4 text-left transition-all ${
-                      selected === g.id ? g.selectedColor : g.color + " bg-white dark:bg-zinc-900"
+                      selectedGoal === g.id ? g.selectedColor : g.color + " bg-white dark:bg-zinc-900"
                     }`}
                   >
                     <span className="mt-0.5 text-2xl">{g.icon}</span>
@@ -181,10 +211,36 @@ function OnboardingInner() {
                 ))}
               </div>
 
+              {/* Language picker — appears when a goal that needs a language is selected */}
+              {needsLang && (
+                <div className="mt-6">
+                  <p className="mb-3 text-sm font-semibold text-zinc-700 dark:text-zinc-300">
+                    Which language?
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    {LANGUAGES.map((l) => (
+                      <button
+                        key={l.id}
+                        type="button"
+                        onClick={() => setSelectedLang(l.id)}
+                        className={`flex items-center gap-1.5 rounded-xl border-2 px-3 py-2 text-sm font-medium transition-all ${
+                          selectedLang === l.id
+                            ? "border-indigo-500 bg-indigo-50 text-indigo-700 dark:border-indigo-400 dark:bg-indigo-950/30 dark:text-indigo-300"
+                            : "border-zinc-200 bg-white text-zinc-700 hover:border-zinc-300 hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:border-zinc-600"
+                        }`}
+                      >
+                        <span>{l.icon}</span>
+                        {l.name}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               <button
                 type="button"
                 onClick={handleContinue}
-                disabled={!selected || saving}
+                disabled={!canContinue || saving}
                 className="mt-8 w-full rounded-xl bg-indigo-600 py-3 text-sm font-bold text-white transition-colors hover:bg-indigo-500 disabled:opacity-40"
               >
                 {saving ? "Saving…" : "Continue →"}
@@ -196,8 +252,8 @@ function OnboardingInner() {
                 Invite your friends 🎁
               </h1>
               <p className="mb-6 text-zinc-500 dark:text-zinc-400">
-                Refer a friend who subscribes to Pro and you both win — you get{" "}
-                <span className="font-semibold text-zinc-700 dark:text-zinc-300">30 days of Pro free</span>.
+                Refer a friend who goes Pro and you both win — you get{" "}
+                <span className="font-semibold text-zinc-700 dark:text-zinc-300">30 days of AI features free</span>.
               </p>
 
               <div className="rounded-xl border border-zinc-200 bg-zinc-50 p-5 dark:border-zinc-800 dark:bg-zinc-900">

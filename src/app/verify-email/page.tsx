@@ -25,7 +25,8 @@ function VerifyEmailContent() {
       .then(async (res) => {
         if (res.ok) {
           setStatus("success");
-          setTimeout(() => router.push("/dashboard"), 3000);
+          // Redirect to onboarding — it auto-skips if the user already set a goal
+          setTimeout(() => router.push("/onboarding"), 3000);
         } else {
           const data = await res.json();
           setStatus("error");
@@ -67,7 +68,7 @@ function VerifyEmailContent() {
             </div>
             <h1 className="mb-2 text-xl font-bold text-zinc-900 dark:text-zinc-100">Email verified!</h1>
             <p className="text-sm text-zinc-500 dark:text-zinc-400">
-              Your email has been verified. Redirecting to your dashboard…
+              Your email has been verified. Redirecting…
             </p>
           </>
         )}

@@ -29,6 +29,8 @@ function buildProfile(user: User) {
     plan: user.plan ?? "free",
     subscription_expires_at: user.subscription_expires_at ?? null,
     email_marketing: user.email_marketing !== 0,
+    onboarding_goal: user.onboarding_goal ?? null,
+    onboarding_lang: user.onboarding_lang ?? null,
   };
 }
 

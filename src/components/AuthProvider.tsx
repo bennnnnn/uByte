@@ -24,6 +24,7 @@ export interface ProfileData {
   emailVerified: boolean;
   isAdmin: boolean;
   onboarding_goal?: string | null;
+  onboarding_lang?: string | null;
 }
 
 // ─── Auth Context (user, login, signup, logout) ──────
@@ -130,6 +131,7 @@ function extractProfile(data: { profile?: Record<string, unknown> }): ProfileDat
     emailVerified: !!(p.email_verified as number),
     isAdmin: !!(p.is_admin as number),
     onboarding_goal: (p.onboarding_goal as string | null) ?? null,
+    onboarding_lang: (p.onboarding_lang as string | null) ?? null,
   };
 }
 

@@ -187,9 +187,18 @@ function DashboardPage() {
 
   // ── Active tab ─────────────────────────────────────────────────────────
   const [activeTab, setActiveTab] = useState<Tab | null>(null);
-  const paramTab    = searchParams.get("tab") as Tab | null;
-  const tabFromUrl: Tab | null = paramTab && (VALID_TABS as readonly string[]).includes(paramTab) ? paramTab : null;
+  const paramTab    = searchParams.get("tab");
+  const tabFromUrl: Tab | null = paramTab && (VALID_TABS as readonly string[]).includes(paramTab)
+    ? (paramTab as Tab)
+    : null;
   const tab: Tab = tabFromUrl ?? activeTab ?? "overview";
+
+  // Correct the URL if an invalid ?tab= was provided
+  useEffect(() => {
+    if (paramTab && !tabFromUrl) {
+      router.replace("/dashboard", { scroll: false });
+    }
+  }, [paramTab, tabFromUrl, router]);
 
   const setTab = (t: Tab) => {
     setActiveTab(t);
@@ -213,11 +222,10 @@ function DashboardPage() {
       ]);
       setError("");
       if (profData.profile) setProfile(profData.profile);
-      if (statsData.stats) {
-        setStats(statsData.stats);
-        setBadges(statsData.all_badges ?? []);
-        setAchievements(statsData.achievements ?? []);
-      }
+      // Always set stats (even as empty object) so the skeleton doesn't get stuck
+      setStats(statsData.stats ?? {});
+      setBadges(statsData.all_badges ?? []);
+      setAchievements(statsData.achievements ?? []);
       if (bmData.bookmarks != null) {
         setBookmarks(bmData.bookmarks);
         setBmHasMore(bmData.hasMore ?? false);

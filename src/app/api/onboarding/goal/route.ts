@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
-import { setOnboardingGoal } from "@/lib/db";
+import { setOnboardingGoal, setOnboardingLang } from "@/lib/db";
 import { withErrorHandling } from "@/lib/api-utils";
 import { verifyCsrf } from "@/lib/csrf";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
+import { isSupportedLanguage } from "@/lib/languages/registry";
 
 const VALID_GOALS = new Set(["get-job", "ace-interviews", "learn-language", "level-up"]);
 
@@ -17,11 +18,16 @@ export const POST = withErrorHandling("POST /api/onboarding/goal", async (req: N
   const { limited } = await checkRateLimit(`onboarding-goal:${getClientIp(req.headers)}:${user.userId}`, 10, 60_000);
   if (limited) return NextResponse.json({ error: "Too many requests" }, { status: 429 });
 
-  const { goal } = (await req.json()) as { goal?: string };
+  const { goal, lang } = (await req.json()) as { goal?: string; lang?: string };
   if (!goal || !VALID_GOALS.has(goal)) {
     return NextResponse.json({ error: "Invalid goal" }, { status: 400 });
   }
 
   await setOnboardingGoal(user.userId, goal);
+
+  if (lang && isSupportedLanguage(lang)) {
+    await setOnboardingLang(user.userId, lang);
+  }
+
   return NextResponse.json({ ok: true });
 });

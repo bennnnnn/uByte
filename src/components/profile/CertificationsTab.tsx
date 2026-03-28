@@ -31,7 +31,10 @@ export default function CertificationsTab() {
   useEffect(() => {
     let cancelled = false;
     fetch("/api/profile/exam-certificates", { credentials: "same-origin" })
-      .then((r) => r.json())
+      .then(async (r) => {
+        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+        return r.json();
+      })
       .then((d) => { if (!cancelled) setData({ certificates: d.certificates ?? [], examStats: d.examStats ?? [] }); })
       .catch(() => { if (!cancelled) setFetchError(true); })
       .finally(() => { if (!cancelled) setLoading(false); });
