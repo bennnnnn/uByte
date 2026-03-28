@@ -1,7 +1,39 @@
+import type { Metadata } from "next";
 import Link from "next/link";
-import { absoluteUrl } from "@/lib/seo";
+import { absoluteUrl, SITE_KEYWORDS } from "@/lib/seo";
 import { APP_NAME, BASE_URL } from "@/lib/constants";
 import InterviewClient from "./InterviewClient";
+
+export const metadata: Metadata = {
+  title: "Coding Interview Simulator — Practice Mock Interviews",
+  description:
+    "Simulate a real technical interview with a timed coding session in 9 languages. Get an AI-powered debrief on time complexity, code style, and improvement areas.",
+  keywords: [
+    ...SITE_KEYWORDS,
+    "mock coding interview",
+    "technical interview simulator",
+    "coding interview practice",
+    "timed coding challenge",
+    "AI code review",
+    "interview prep simulator",
+  ],
+  alternates: { canonical: absoluteUrl("/interview") },
+  openGraph: {
+    type: "website",
+    url: absoluteUrl("/interview"),
+    title: "Coding Interview Simulator",
+    description:
+      "Timed mock technical interviews in 9 languages. Solve a random problem under pressure, then get AI feedback on complexity, style, and improvements.",
+    siteName: APP_NAME,
+    images: [{ url: absoluteUrl("/api/og?title=Interview+Simulator&description=Timed+mock+technical+interviews+with+AI+feedback"), width: 1200, height: 630 }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Coding Interview Simulator",
+    description: "Timed mock technical interviews in 9 languages with AI feedback after submission.",
+    images: [absoluteUrl("/api/og?title=Interview+Simulator&description=Timed+mock+technical+interviews+with+AI+feedback")],
+  },
+};
 
 export default function InterviewSimulatorPage() {
   const jsonLd = {
@@ -9,14 +41,14 @@ export default function InterviewSimulatorPage() {
     "@type": "WebPage",
     name: "Coding Interview Simulator",
     description:
-      "Simulate a real coding interview with timed mock sessions in 7 languages.",
+      "Simulate a real coding interview with timed mock sessions in 9 languages.",
     url: absoluteUrl("/interview"),
     isPartOf: { "@type": "WebSite", name: APP_NAME, url: BASE_URL },
   };
 
   return (
     <>
-      <script
+      <script async
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
@@ -37,7 +69,7 @@ export default function InterviewSimulatorPage() {
         <section>
           <h2>How It Works</h2>
           <ol>
-            <li>Choose your language: Go, Python, JavaScript, Java, C++, Rust, or C#</li>
+            <li>Choose your language: Go, Python, JavaScript, TypeScript, Java, C++, Rust, C#, or SQL</li>
             <li>Pick a difficulty: Easy, Medium, or Hard</li>
             <li>Set a time limit: 20, 45, or 60 minutes</li>
             <li>Solve a randomly selected problem with a visible countdown timer</li>
@@ -51,7 +83,7 @@ export default function InterviewSimulatorPage() {
             <li>Real countdown timer that simulates interview pressure</li>
             <li>Random problem selection — you never know what you will get</li>
             <li>AI debrief after submission: complexity analysis, style review, and improvement tips</li>
-            <li>Practice in 7 programming languages with instant test feedback</li>
+            <li>Practice in 9 programming languages with instant test feedback</li>
           </ul>
         </section>
 

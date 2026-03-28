@@ -135,7 +135,7 @@ export default function UpgradeWall({
     : context === "certification"
     ? "Certification Exams — Pro only"
     : context === "practice"
-    ? "Unlock this problem"
+    ? "Sign up free to solve all problems"
     : "Pro tutorial";
 
   return (
@@ -176,7 +176,11 @@ export default function UpgradeWall({
             {title}
           </h2>
           <p id="upgrade-wall-desc" className="mb-5 text-center text-sm leading-relaxed text-zinc-500 dark:text-zinc-400">
-            {subtitle ?? "Upgrade to unlock all tutorials, AI feedback, interview prep and verifiable certificates."}
+            {subtitle
+              ? subtitle
+              : context === "practice"
+              ? "Free account. All problems. Start solving now."
+              : "Upgrade to Pro for unlimited tutorials, unlimited interview prep, and AI feedback on every step."}
           </p>
 
           {/* Plan toggle */}

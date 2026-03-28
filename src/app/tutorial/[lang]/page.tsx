@@ -47,6 +47,11 @@ const LANG_SEO_INTRO: Record<string, { whyLearn: string; whatYoullLearn: string;
     whatYoullLearn: "This free, interactive C# course covers variables, data types, control flow, loops, functions, classes, inheritance, interfaces, LINQ, async/await, error handling, and .NET patterns — all by compiling and running real C# code in your browser.",
     whoIsItFor: "Aspiring game developers (Unity), .NET web developers, Windows application developers, and engineers preparing for C# coding interviews.",
   },
+  typescript: {
+    whyLearn: "TypeScript is JavaScript with superpowers — it adds static types, interfaces, and powerful tooling to the world's most popular language. Companies like Microsoft, Airbnb, Slack, and Stripe use TypeScript to build large-scale applications with fewer bugs and better developer experience. If you know JavaScript, TypeScript is the natural next step. If you're starting fresh, TypeScript sets you up with professional-grade habits from day one.",
+    whatYoullLearn: "This free, interactive TypeScript course covers type annotations, interfaces, type aliases, union and intersection types, generics, enums, classes, access modifiers, decorators, modules, utility types (Partial, Pick, Omit, Record), and strict null checking — all by writing and running real TypeScript code in your browser.",
+    whoIsItFor: "JavaScript developers who want safer, more maintainable code, frontend engineers working with React or Angular, backend developers using Node.js, and anyone preparing for TypeScript coding interviews or full-stack roles.",
+  },
 };
 
 export async function generateStaticParams() {
@@ -146,7 +151,7 @@ export default async function TutorialLangLandingPage({
 
   return (
     <div className="mx-auto max-w-4xl px-6 py-14">
-      <script
+      <script async
         type="application/ld+json"
         dangerouslySetInnerHTML={{
           __html: JSON.stringify([courseJsonLd, breadcrumbJsonLd, listJsonLd]),
@@ -219,7 +224,7 @@ export default async function TutorialLangLandingPage({
                       <span className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">{t.title}</span>
                       <span className="mt-0.5 block text-xs text-zinc-500 dark:text-zinc-400">
                         {t.description.slice(0, 80)}{t.description.length > 80 ? "…" : ""}
-                        {" · "}{stepCountBySlug[t.slug] ?? 0} lessons · {t.estimatedMinutes} min
+                        {" · "}{stepCountBySlug[t.slug] ?? 0} lessons
                       </span>
                     </span>
                   </Link>

@@ -3,8 +3,6 @@ import { createHash } from "crypto";
 import { getCurrentUser } from "@/lib/auth";
 import { insertSubmission, getConsecutiveFailures } from "@/lib/db/submissions";
 import { savePracticeAttempt, addXp, getUserById, updateStreak } from "@/lib/db";
-import { hasPaidAccess } from "@/lib/plans";
-import { getUnlockedSlugs } from "@/lib/db/practice-unlocks";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 import { withErrorHandling } from "@/lib/api-utils";
 import { verifyCsrf } from "@/lib/csrf";
@@ -104,11 +102,8 @@ export const POST = withErrorHandling("POST /api/submit", async (request: NextRe
     const [consecutiveFailures, profile] = userExtras;
     (response as Record<string, number>).consecutive_failures = consecutiveFailures;
 
-    let canSaveProgress = hasPaidAccess(profile?.plan);
-    if (!canSaveProgress) {
-      const unlocked = await getUnlockedSlugs(user.userId);
-      canSaveProgress = unlocked.includes(String(problemId));
-    }
+    // All problems are free for signed-in users — always save progress.
+    const canSaveProgress = !!profile;
     if (canSaveProgress) {
       if (result.verdict === "accepted") {
         const { wasFirstSolve } = await savePracticeAttempt(user.userId, String(problemId), "solved");

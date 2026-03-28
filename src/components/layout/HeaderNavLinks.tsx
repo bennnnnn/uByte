@@ -4,17 +4,7 @@ import Link from "next/link";
 import { useState, useRef, useCallback, useEffect } from "react";
 import { usePathname } from "next/navigation";
 
-// Top languages to show in nav dropdowns (most popular first)
-const NAV_LANGS = [
-  { slug: "go",         icon: "🐹", label: "Go"         },
-  { slug: "python",     icon: "🐍", label: "Python"     },
-  { slug: "javascript", icon: "🟨", label: "JavaScript" },
-  { slug: "typescript", icon: "🔷", label: "TypeScript" },
-  { slug: "java",       icon: "☕", label: "Java"       },
-  { slug: "rust",       icon: "🦀", label: "Rust"       },
-];
-
-// Full list used for certifications (all 9)
+// All 9 languages — used in both Tutorials and Certifications dropdowns
 const ALL_LANGS = [
   { slug: "go",         icon: "🐹", label: "Go"         },
   { slug: "python",     icon: "🐍", label: "Python"     },
@@ -72,7 +62,7 @@ function NavDropdown({
       <button
         type="button"
         className={`${linkBase} flex items-center gap-1`}
-        aria-haspopup="true"
+        aria-haspopup="menu"
         aria-expanded={open}
         aria-controls={menuId}
         onClick={() => (open ? onClose() : onOpen(id))}
@@ -130,14 +120,25 @@ export default function HeaderNavLinks({ side = "left" }: { side?: "left" }) {
         onOpen={handleOpen} onClose={handleClose}
         menuId="nav-tutorials-menu"
       >
-        {NAV_LANGS.map((l) => (
-          <Link key={l.slug} href={`/tutorial/${l.slug}`} role="menuitem" onClick={handleClose} className={menuItemBase}>
+        {ALL_LANGS.map((l) => (
+          <Link
+            key={l.slug}
+            href={`/tutorial/${l.slug}`}
+            role="menuitem"
+            onClick={handleClose}
+            aria-current={pathname.startsWith(`/tutorial/${l.slug}`) ? "page" : undefined}
+            className={menuItemBase}
+          >
             <span>{l.label}</span>
             <span className="text-zinc-300 dark:text-zinc-600">›</span>
           </Link>
         ))}
         <div className="mx-3 my-1.5 border-t border-zinc-100 dark:border-zinc-800" />
-        <Link href="/tutorial" role="menuitem" onClick={handleClose}
+        <Link
+          href="/tutorial"
+          role="menuitem"
+          onClick={handleClose}
+          aria-current={pathname === "/tutorial" ? "page" : undefined}
           className="block px-3 py-2 text-xs font-semibold text-indigo-600 hover:text-indigo-500 dark:text-indigo-400"
         >
           Browse all languages →
@@ -152,12 +153,19 @@ export default function HeaderNavLinks({ side = "left" }: { side?: "left" }) {
         menuId="nav-interview-menu"
       >
         {[
-          { href: "/practice",   label: "All problems"          },
-          { href: "/daily",      label: "Daily challenge"       },
-          { href: "/interview",  label: "Interview simulator"   },
-          { href: "/interviews", label: "Interview experiences" },
+          { href: "/practice",   label: "All Problems"          },
+          { href: "/daily",      label: "Daily Challenge"       },
+          { href: "/interview",  label: "Interview Simulator"   },
+          { href: "/interviews", label: "Interview Experiences" },
         ].map(item => (
-          <Link key={item.href} href={item.href} role="menuitem" onClick={handleClose} className={menuItemBase}>
+          <Link
+            key={item.href}
+            href={item.href}
+            role="menuitem"
+            onClick={handleClose}
+            aria-current={pathname === item.href ? "page" : undefined}
+            className={menuItemBase}
+          >
             <span>{item.label}</span>
             <span className="text-zinc-300 dark:text-zinc-600">›</span>
           </Link>
@@ -171,14 +179,25 @@ export default function HeaderNavLinks({ side = "left" }: { side?: "left" }) {
         onOpen={handleOpen} onClose={handleClose}
         menuId="nav-certifications-menu"
       >
-        {ALL_LANGS.slice(0, 6).map((l) => (
-          <Link key={l.slug} href={`/certifications/${l.slug}`} role="menuitem" onClick={handleClose} className={menuItemBase}>
+        {ALL_LANGS.map((l) => (
+          <Link
+            key={l.slug}
+            href={`/certifications/${l.slug}`}
+            role="menuitem"
+            onClick={handleClose}
+            aria-current={pathname.startsWith(`/certifications/${l.slug}`) ? "page" : undefined}
+            className={menuItemBase}
+          >
             <span>{l.label}</span>
             <span className="text-zinc-300 dark:text-zinc-600">›</span>
           </Link>
         ))}
         <div className="mx-3 my-1.5 border-t border-zinc-100 dark:border-zinc-800" />
-        <Link href="/certifications" role="menuitem" onClick={handleClose}
+        <Link
+          href="/certifications"
+          role="menuitem"
+          onClick={handleClose}
+          aria-current={pathname === "/certifications" ? "page" : undefined}
           className="block px-3 py-2 text-xs font-semibold text-indigo-600 hover:text-indigo-500 dark:text-indigo-400"
         >
           Browse all certifications →

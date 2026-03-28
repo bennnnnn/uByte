@@ -15,8 +15,10 @@ interface EditorToolbarProps {
   onLangChange: (lang: SupportedLanguage) => void;
   /** Ordered list of languages to show in the selector */
   langOptions: SupportedLanguage[];
-  shareCopied: boolean;
-  onShare: () => void;
+  /** When omitted the Share button is hidden entirely */
+  shareCopied?: boolean;
+  /** When omitted the Share button is hidden entirely */
+  onShare?: () => void;
   /** Action buttons (Run / Check or Submit / Reset) rendered between lang select and share */
   children?: ReactNode;
   /** Extra content after the lang selector, before children (e.g. "Loading…" spinner) */
@@ -55,19 +57,21 @@ export function EditorToolbar({
           ))}
         </select>
         {children}
-        <button
-          type="button"
-          onClick={onShare}
-          aria-label="Share code"
-          title="Share code"
-          className={`flex shrink-0 items-center justify-center rounded-md border px-3 py-2 text-sm transition-all ${
-            shareCopied
-              ? "border-indigo-400 bg-indigo-50 text-indigo-700 dark:border-indigo-600 dark:bg-indigo-950/30 dark:text-indigo-400"
-              : "border-zinc-300 text-zinc-500 dark:border-zinc-700 dark:text-zinc-400"
-          }`}
-        >
-          {shareCopied ? "✓" : SHARE_ICON}
-        </button>
+        {onShare && (
+          <button
+            type="button"
+            onClick={onShare}
+            aria-label="Share code"
+            title="Share code"
+            className={`flex shrink-0 items-center justify-center rounded-md border px-3 py-2 text-sm transition-all ${
+              shareCopied
+                ? "border-indigo-400 bg-indigo-50 text-indigo-700 dark:border-indigo-600 dark:bg-indigo-950/30 dark:text-indigo-400"
+                : "border-zinc-300 text-zinc-500 dark:border-zinc-700 dark:text-zinc-400"
+            }`}
+          >
+            {shareCopied ? "✓" : SHARE_ICON}
+          </button>
+        )}
       </div>
     );
   }
@@ -89,18 +93,20 @@ export function EditorToolbar({
       </select>
       {extraLeft}
       {children}
-      <button
-        type="button"
-        onClick={onShare}
-        title="Share your code — copies a link to clipboard"
-        className={`ml-auto flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-sm transition-all ${
-          shareCopied
-            ? "border-indigo-400 bg-indigo-50 text-indigo-700 dark:border-indigo-600 dark:bg-indigo-950/30 dark:text-indigo-400"
-            : "border-zinc-300 text-zinc-500 hover:border-zinc-400 hover:text-zinc-800 dark:border-zinc-700 dark:text-zinc-400 dark:hover:border-zinc-600 dark:hover:text-zinc-200"
-        }`}
-      >
-        {shareCopied ? <>✓ Link copied!</> : <>{SHARE_ICON} Share</>}
-      </button>
+      {onShare && (
+        <button
+          type="button"
+          onClick={onShare}
+          title="Share your code — copies a link to clipboard"
+          className={`ml-auto flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-sm transition-all ${
+            shareCopied
+              ? "border-indigo-400 bg-indigo-50 text-indigo-700 dark:border-indigo-600 dark:bg-indigo-950/30 dark:text-indigo-400"
+              : "border-zinc-300 text-zinc-500 hover:border-zinc-400 hover:text-zinc-800 dark:border-zinc-700 dark:text-zinc-400 dark:hover:border-zinc-600 dark:hover:text-zinc-200"
+          }`}
+        >
+          {shareCopied ? <>✓ Link copied!</> : <>{SHARE_ICON} Share</>}
+        </button>
+      )}
     </div>
   );
 }

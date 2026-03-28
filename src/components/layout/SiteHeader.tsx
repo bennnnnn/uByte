@@ -12,6 +12,7 @@ export default function SiteHeader() {
         {/* Logo */}
         <Link
           href="/"
+          aria-label="uByte — home"
           className="flex shrink-0 items-center gap-2 text-zinc-900 dark:text-white"
         >
           <span className="flex h-7 w-7 items-center justify-center rounded-md bg-indigo-600 text-xs font-bold text-white shadow-sm">

@@ -44,6 +44,8 @@ export interface JudgeHarness {
   go?: string;
   python?: string;
   javascript?: string;
+  /** TypeScript harness. Falls back to the javascript harness if not set. */
+  typescript?: string;
   cpp?: string;
   java?: string;
   rust?: string;

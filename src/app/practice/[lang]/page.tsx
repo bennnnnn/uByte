@@ -7,13 +7,12 @@ import {
   getPracticeCategories,
   sortProblemsByCategoryAndDifficulty,
 } from "@/lib/practice/problems";
-import { isSupportedLanguage, LANGUAGES, ALL_LANGUAGE_KEYS } from "@/lib/languages/registry";
+import { isSupportedLanguage, LANGUAGES, ALL_LANGUAGE_KEYS, PRACTICE_LANGUAGE_KEYS } from "@/lib/languages/registry";
 import type { SupportedLanguage } from "@/lib/languages/types";
 import type { Difficulty, ProblemCategory } from "@/lib/practice/types";
 import { getCurrentUser } from "@/lib/auth";
 import { getPracticeAttempts, getUserById } from "@/lib/db";
 import type { PracticeAttemptStatus } from "@/lib/db/practice-attempts";
-import { getDripStatus } from "@/lib/db/practice-unlocks";
 import { hasPaidAccess } from "@/lib/plans";
 import { PracticeListClient } from "@/components/practice/PracticeListClient";
 import { absoluteUrl, SITE_KEYWORDS } from "@/lib/seo";
@@ -68,13 +67,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export async function generateStaticParams() {
-  return ALL_LANGUAGE_KEYS.map((lang) => ({ lang }));
+  return PRACTICE_LANGUAGE_KEYS.map((lang) => ({ lang }));
 }
 
 export default async function PracticeLangPage({ params, searchParams }: Props) {
   const { lang } = await params;
   const sp = await searchParams;
-  if (!isSupportedLanguage(lang)) notFound();
+  if (!isSupportedLanguage(lang) || !PRACTICE_LANGUAGE_KEYS.includes(lang as SupportedLanguage)) notFound();
 
   const l = lang as SupportedLanguage;
   const allProblems = getAllPracticeProblems();
@@ -87,9 +86,6 @@ export default async function PracticeLangPage({ params, searchParams }: Props) 
   ]);
   const solvedCount = Object.values(attempts).filter((s) => s === "solved").length;
   const isPro = hasPaidAccess(profile?.plan);
-  const drip = user && !isPro
-    ? await getDripStatus(user.userId, profile?.created_at ?? new Date())
-    : null;
 
   const categoryFilter = sp.category && categories.includes(sp.category as ProblemCategory)
     ? (sp.category as ProblemCategory)
@@ -154,10 +150,6 @@ export default async function PracticeLangPage({ params, searchParams }: Props) 
         isPro={isPro}
         solvedCount={solvedCount}
         allProblemsLength={allProblems.length}
-        unlockedSlugs={drip?.unlockedSlugs ?? []}
-        unlockedCount={drip?.unlockedCount ?? 0}
-        allowance={drip?.allowance ?? 0}
-        maxFree={drip?.maxFree ?? 10}
       />
 
       {/* Server-rendered content for search engine crawlers */}

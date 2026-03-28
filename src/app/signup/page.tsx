@@ -3,8 +3,9 @@ import { Suspense } from "react";
 import AuthPage from "@/components/auth/AuthPage";
 
 export const metadata: Metadata = {
-  title: "Create your account — uByte",
+  title: "Create your free account — uByte",
   description: "Join uByte for free. Learn programming through interactive tutorials, sharpen your skills with coding challenges, and earn verified certifications.",
+  robots: { index: true, follow: true },
 };
 
 export default function SignupPage() {

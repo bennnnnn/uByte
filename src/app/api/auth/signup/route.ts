@@ -55,7 +55,7 @@ export const POST = withErrorHandling("POST /api/auth/signup", async (request: N
     "success",
     "Welcome to uByte! 🎉",
     "Your account is ready. Start with a tutorial, tackle an interview problem, or take a free certification exam.",
-    "/tutorial/go"
+    "/dashboard"
   ).catch(() => {});
 
   // Attribute referral if the new user came via an invite link

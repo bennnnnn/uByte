@@ -143,7 +143,7 @@ export default function SiteFooter() {
 
         <div className="flex flex-col gap-1 border-t border-zinc-100 pt-4 text-xs text-zinc-500 dark:border-zinc-800 dark:text-zinc-400 sm:flex-row sm:items-center sm:justify-between sm:gap-2">
           <span suppressHydrationWarning>© {new Date().getFullYear()} uByte. Learn, practice, get certified.</span>
-          <span>Based in the cloud. Available worldwide.</span>
+
         </div>
       </div>
     </footer>

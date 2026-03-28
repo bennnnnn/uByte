@@ -14,7 +14,7 @@ function getTodaysProblem() {
 }
 
 export const metadata: Metadata = {
-  title: "Daily Coding Challenge — Free Problem Every Day | uByte",
+  title: "Daily Coding Challenge — Free Problem Every Day",
   description:
     "Solve a new coding challenge every day on uByte — completely free, no account required. Pick your language (Go, Python, JavaScript, Java, C++, Rust, C#), solve the problem in-browser, earn XP, and climb the leaderboard. Build a daily coding streak.",
   keywords: [
@@ -37,14 +37,14 @@ export const metadata: Metadata = {
   alternates: { canonical: absoluteUrl("/daily") },
   openGraph: {
     type: "website",
-    title: "Daily Coding Challenge — Free Problem Every Day | uByte",
+    title: "Daily Coding Challenge — Free Problem Every Day",
     description:
-      "A new coding problem every day — free for everyone. Solve it in Go, Python, JavaScript, Java, C++, Rust, or C#.",
+      "A new coding problem every day — free for everyone. Solve it in Go, Python, JavaScript, TypeScript, Java, C++, Rust, C#, or SQL.",
     url: absoluteUrl("/daily"),
     images: [
       {
         url: absoluteUrl(
-          "/api/og?title=Daily+Coding+Challenge&description=A+new+free+problem+every+day+in+7+languages"
+          "/api/og?title=Daily+Coding+Challenge&description=A+new+free+problem+every+day+in+9+languages"
         ),
         width: 1200,
         height: 630,
@@ -53,9 +53,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Daily Coding Challenge — Free Problem Every Day | uByte",
+    title: "Daily Coding Challenge — Free Problem Every Day",
     description:
-      "A new coding problem every day — free for everyone. Solve it in Go, Python, JavaScript, Java, C++, Rust, or C#.",
+      "A new coding problem every day — free for everyone. Solve it in Go, Python, JavaScript, TypeScript, Java, C++, Rust, C#, or SQL.",
   },
 };
 
@@ -76,7 +76,7 @@ export default function DailyPage() {
 
   return (
     <>
-      <script
+      <script async
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
@@ -114,7 +114,7 @@ export default function DailyPage() {
           <h2>How It Works</h2>
           <ol>
             <li>A new problem is selected each day from a pool of {totalProblems}+ challenges.</li>
-            <li>Choose your language: Go, Python, JavaScript, Java, C++, Rust, or C#.</li>
+            <li>Choose your language: Go, Python, JavaScript, TypeScript, Java, C++, Rust, C#, or SQL.</li>
             <li>Write and run your solution in the browser with instant test feedback.</li>
             <li>Earn XP and compete on the <Link href="/leaderboard">leaderboard</Link>.</li>
           </ol>

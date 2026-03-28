@@ -19,7 +19,7 @@ export const LANGUAGES: Record<SupportedLanguage, LanguageConfig> = {
     fileExtension: ".go",
     seo: {
       defaultTitle: "Learn Go Programming — Free Interactive Golang Tutorial",
-      defaultDescription: "Master Go (Golang) from the ground up with hands-on, interactive tutorials. Learn variables, functions, goroutines, channels, structs, interfaces, and APIs — write and run real Go code in your browser. Free beginner lessons included.",
+      defaultDescription: "Master Go (Golang) from the ground up with hands-on, interactive tutorials. Learn variables, functions, goroutines, channels, structs, interfaces, and APIs — write and run real Go code in your browser. All lessons free.",
       keywords: [
         "Go programming language",
         "Golang tutorial",
@@ -53,7 +53,7 @@ export const LANGUAGES: Record<SupportedLanguage, LanguageConfig> = {
     fileExtension: ".py",
     seo: {
       defaultTitle: "Learn Python Programming — Free Interactive Python Tutorial",
-      defaultDescription: "Learn Python step by step with interactive, hands-on tutorials. Cover variables, data types, loops, functions, classes, modules, error handling, and async — write and run real Python code in your browser. Free beginner lessons included.",
+      defaultDescription: "Learn Python step by step with interactive, hands-on tutorials. Cover variables, data types, loops, functions, classes, modules, error handling, and async — write and run real Python code in your browser. All lessons free.",
       keywords: [
         "Python programming",
         "Learn Python",
@@ -88,7 +88,7 @@ export const LANGUAGES: Record<SupportedLanguage, LanguageConfig> = {
     fileExtension: ".cpp",
     seo: {
       defaultTitle: "Learn C++ Programming — Free Interactive C++ Tutorial",
-      defaultDescription: "Learn C++ from scratch with interactive, hands-on tutorials. Cover variables, data types, loops, functions, pointers, classes, templates, and modern C++ patterns — compile and run real C++ code in your browser. Free beginner lessons included.",
+      defaultDescription: "Learn C++ from scratch with interactive, hands-on tutorials. Cover variables, data types, loops, functions, pointers, classes, templates, and modern C++ patterns — compile and run real C++ code in your browser. All lessons free.",
       keywords: [
         "C++ programming",
         "Learn C++",
@@ -122,7 +122,7 @@ export const LANGUAGES: Record<SupportedLanguage, LanguageConfig> = {
     fileExtension: ".js",
     seo: {
       defaultTitle: "Learn JavaScript — Free Interactive JavaScript Tutorial",
-      defaultDescription: "Learn JavaScript step by step with interactive, hands-on tutorials. Cover variables, functions, arrays, objects, DOM manipulation, async/await, and modules — write and run real JavaScript code in your browser. Free beginner lessons included.",
+      defaultDescription: "Learn JavaScript step by step with interactive, hands-on tutorials. Cover variables, functions, arrays, objects, DOM manipulation, async/await, and modules — write and run real JavaScript code in your browser. All lessons free.",
       keywords: [
         "JavaScript",
         "Learn JavaScript",
@@ -157,7 +157,7 @@ export const LANGUAGES: Record<SupportedLanguage, LanguageConfig> = {
     fileExtension: ".java",
     seo: {
       defaultTitle: "Learn Java Programming — Free Interactive Java Tutorial",
-      defaultDescription: "Learn Java step by step with interactive, hands-on tutorials. Cover variables, data types, loops, classes, inheritance, interfaces, collections, and concurrency — compile and run real Java code in your browser. Free beginner lessons included.",
+      defaultDescription: "Learn Java step by step with interactive, hands-on tutorials. Cover variables, data types, loops, classes, inheritance, interfaces, collections, and concurrency — compile and run real Java code in your browser. All lessons free.",
       keywords: [
         "Java programming",
         "Learn Java",
@@ -192,7 +192,7 @@ export const LANGUAGES: Record<SupportedLanguage, LanguageConfig> = {
     fileExtension: ".rs",
     seo: {
       defaultTitle: "Learn Rust Programming — Free Interactive Rust Tutorial",
-      defaultDescription: "Learn Rust from scratch with interactive, hands-on tutorials. Cover variables, ownership, borrowing, structs, enums, pattern matching, traits, error handling, and concurrency — compile and run real Rust code in your browser. Free beginner lessons included.",
+      defaultDescription: "Learn Rust from scratch with interactive, hands-on tutorials. Cover variables, ownership, borrowing, structs, enums, pattern matching, traits, error handling, and concurrency — compile and run real Rust code in your browser. All lessons free.",
       keywords: [
         "Rust programming",
         "Learn Rust",
@@ -227,7 +227,7 @@ export const LANGUAGES: Record<SupportedLanguage, LanguageConfig> = {
     fileExtension: ".cs",
     seo: {
       defaultTitle: "Learn C# Programming — Free Interactive C# Tutorial",
-      defaultDescription: "Learn C# step by step with interactive, hands-on tutorials. Cover variables, data types, classes, LINQ, async/await, interfaces, and .NET patterns — compile and run real C# code in your browser. Free beginner lessons included.",
+      defaultDescription: "Learn C# step by step with interactive, hands-on tutorials. Cover variables, data types, classes, LINQ, async/await, interfaces, and .NET patterns — compile and run real C# code in your browser. All lessons free.",
       keywords: [
         "C# programming", "Learn C#", "C# tutorial", "C# for beginners", "free C# course",
         "interactive C# tutorial", "C# classes tutorial", "C# LINQ tutorial", "C# async await tutorial",
@@ -244,12 +244,28 @@ export const LANGUAGES: Record<SupportedLanguage, LanguageConfig> = {
     fileExtension: ".ts",
     seo: {
       defaultTitle: "Learn TypeScript — Free Interactive TypeScript Tutorial",
-      defaultDescription: "Master TypeScript from scratch with hands-on, interactive tutorials. Learn static types, interfaces, generics, decorators, and advanced type patterns — write and run real TypeScript code in your browser. Free beginner lessons included.",
+      defaultDescription: "Master TypeScript from scratch with hands-on, interactive tutorials. Learn static types, interfaces, generics, decorators, and advanced type patterns — write and run real TypeScript code in your browser. All lessons free.",
       keywords: [
-        "TypeScript tutorial", "Learn TypeScript", "TypeScript for beginners", "free TypeScript course",
-        "TypeScript types", "TypeScript interfaces", "TypeScript generics", "TypeScript online course free",
-        "learn TypeScript online free", "TypeScript interview prep", "TypeScript certification",
-        "TypeScript vs JavaScript", "TypeScript exercises online", "uByte",
+        "TypeScript tutorial",
+        "Learn TypeScript",
+        "TypeScript for beginners",
+        "free TypeScript course",
+        "interactive TypeScript tutorial",
+        "TypeScript types tutorial",
+        "TypeScript interfaces tutorial",
+        "TypeScript generics tutorial",
+        "TypeScript online course free",
+        "learn TypeScript online free",
+        "TypeScript programming for beginners",
+        "TypeScript vs JavaScript",
+        "TypeScript exercises online",
+        "TypeScript coding practice",
+        "TypeScript interview prep",
+        "TypeScript certification",
+        "TypeScript React tutorial",
+        "TypeScript Node.js tutorial",
+        "TypeScript utility types",
+        "uByte",
       ],
     },
   },
@@ -262,7 +278,7 @@ export const LANGUAGES: Record<SupportedLanguage, LanguageConfig> = {
     fileExtension: ".sql",
     seo: {
       defaultTitle: "Learn SQL — Free Interactive SQL Tutorial",
-      defaultDescription: "Learn SQL from scratch with hands-on, interactive tutorials. Master SELECT queries, JOINs, aggregates, subqueries, indexes, and transactions — write and run real SQL in your browser. Free beginner lessons included.",
+      defaultDescription: "Learn SQL from scratch with hands-on, interactive tutorials. Master SELECT queries, JOINs, aggregates, subqueries, indexes, and transactions — write and run real SQL in your browser. All lessons free.",
       keywords: [
         "SQL tutorial", "Learn SQL", "SQL for beginners", "free SQL course",
         "SQL SELECT tutorial", "SQL JOIN tutorial", "SQL aggregate functions", "SQL subqueries",
@@ -317,6 +333,20 @@ export function resolveLanguage(lang: unknown): SupportedLanguage {
 /** Ordered list of all supported language keys. Use this instead of hardcoding arrays. */
 export const ALL_LANGUAGE_KEYS: SupportedLanguage[] = Object.keys(LANGUAGES) as SupportedLanguage[];
 
+/**
+ * Languages that work for algorithmic practice problems and the daily challenge.
+ * SQL is tutorial-only — it's a query language and cannot solve data-structure/
+ * algorithm problems.
+ */
+export const PRACTICE_LANGUAGE_KEYS: SupportedLanguage[] = ALL_LANGUAGE_KEYS.filter(
+  (k) => k !== "sql"
+);
+
 export function getAllLanguageSlugs(): string[] {
   return Object.values(LANGUAGES).map((l) => l.slug);
+}
+
+/** Language slugs valid for practice/daily (excludes SQL). */
+export function getPracticeLanguageSlugs(): string[] {
+  return PRACTICE_LANGUAGE_KEYS.map((k) => LANGUAGES[k].slug);
 }

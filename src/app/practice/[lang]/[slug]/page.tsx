@@ -2,14 +2,11 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import type { Metadata } from "next";
 import { getPracticeProblemBySlug, getAllPracticeProblems, getPracticeCategories } from "@/lib/practice/problems";
-import { isSupportedLanguage, LANGUAGES, ALL_LANGUAGE_KEYS } from "@/lib/languages/registry";
+import { isSupportedLanguage, LANGUAGES, ALL_LANGUAGE_KEYS, PRACTICE_LANGUAGE_KEYS } from "@/lib/languages/registry";
 import type { SupportedLanguage } from "@/lib/languages/types";
 import type { ProblemCategory } from "@/lib/practice/types";
 import { PracticeIDE } from "./PracticeIDE";
 import { getCurrentUser } from "@/lib/auth";
-import { getUserById } from "@/lib/db";
-import { hasPaidAccess } from "@/lib/plans";
-import { tryUnlockProblem } from "@/lib/db/practice-unlocks";
 import UpgradeWall from "@/components/UpgradeWall";
 import { absoluteUrl, SITE_KEYWORDS } from "@/lib/seo";
 import { APP_NAME, BASE_URL } from "@/lib/constants";
@@ -26,7 +23,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { lang, slug } = await params;
   const problem = getPracticeProblemBySlug(slug);
   const langName = isSupportedLanguage(lang) ? LANGUAGES[lang as SupportedLanguage]?.name : lang;
-  if (!problem) return { title: "Not found" };
+  if (!problem || !PRACTICE_LANGUAGE_KEYS.includes(lang as SupportedLanguage)) return { title: "Not found" };
   const canonical = absoluteUrl(`/practice/${lang}/${slug}`);
   const title = `${problem.title} — ${langName} ${problem.difficulty.charAt(0).toUpperCase() + problem.difficulty.slice(1)} Coding Problem`;
   const description = `Solve "${problem.title}" in ${langName}. ${problem.description.slice(0, 120)} Practice this ${problem.difficulty} ${problem.category} problem with instant test feedback on uByte.`;
@@ -62,7 +59,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export async function generateStaticParams() {
   const problems = getAllPracticeProblems();
-  return ALL_LANGUAGE_KEYS.flatMap((lang) =>
+  return PRACTICE_LANGUAGE_KEYS.flatMap((lang) =>
     problems.map((p) => ({ lang, slug: p.slug }))
   );
 }
@@ -70,11 +67,15 @@ export async function generateStaticParams() {
 export default async function PracticeProblemPage({ params, searchParams }: Props) {
   const { lang, slug } = await params;
   const sp = await searchParams;
-  if (!isSupportedLanguage(lang)) notFound();
+  if (!isSupportedLanguage(lang) || !PRACTICE_LANGUAGE_KEYS.includes(lang as SupportedLanguage)) notFound();
   const problem = getPracticeProblemBySlug(slug);
   if (!problem) notFound();
 
   const user = await getCurrentUser();
+  const { getUserById } = await import("@/lib/db");
+  const { hasPaidAccess } = await import("@/lib/plans");
+  const dbUser = user ? await getUserById(user.userId) : null;
+  const isPro = hasPaidAccess(dbUser?.plan);
 
   // Daily challenge is always free — verify the slug matches today's actual daily problem.
   const isDailyChallenge = sp.daily === "1" && (() => {
@@ -83,29 +84,12 @@ export default async function PracticeProblemPage({ params, searchParams }: Prop
     return all.length > 0 && all[epochDay % all.length]?.slug === slug;
   })();
 
-  let canAccess = isDailyChallenge; // daily challenge bypasses the paywall
-  let dripMessage = "";
-
-  if (!isDailyChallenge && !user) {
-    canAccess = false;
-    dripMessage = "Sign up free to start solving problems. The daily challenge is always free — no account needed.";
-  } else if (!isDailyChallenge && user) {
-    const profile = await getUserById(user.userId);
-    if (hasPaidAccess(profile?.plan)) {
-      canAccess = true;
-    } else if (profile) {
-      const result = await tryUnlockProblem(user.userId, slug, profile.created_at);
-      canAccess = result.allowed;
-      if (!canAccess) {
-        const remaining = result.allowance - result.unlockedCount;
-        if (remaining <= 0 && result.unlockedCount >= 10) {
-          dripMessage = `You've unlocked all ${result.unlockedCount} free problems. Upgrade to Pro for unlimited access.`;
-        } else {
-          dripMessage = `You've used today's free problems. Come back tomorrow for ${Math.min(2, 10 - result.unlockedCount)} more, or upgrade now for instant access.`;
-        }
-      }
-    }
-  }
+  // All logged-in users (free and Pro) can access all problems.
+  // Guests are prompted to sign up for free.
+  let canAccess = isDailyChallenge || !!user;
+  const dripMessage = !user
+    ? "Create a free account to solve all problems."
+    : "";
 
   if (!canAccess) {
     const backQuery = new URLSearchParams();
@@ -172,7 +156,7 @@ export default async function PracticeProblemPage({ params, searchParams }: Prop
 
   return (
     <>
-      <script
+      <script async
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
@@ -186,6 +170,7 @@ export default async function PracticeProblemPage({ params, searchParams }: Prop
         initialCode={sharedCode}
         interviewMode={interviewMode}
         interviewDeadline={interviewDeadline}
+        isPro={isPro}
       />
 
       {/* Server-rendered content for search engine crawlers */}

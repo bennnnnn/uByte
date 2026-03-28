@@ -2,9 +2,9 @@
 
 import { Suspense, useEffect, useState, useCallback, startTransition } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import Link from "next/link";
 import { useAuth } from "@/components/AuthProvider";
 import PlanTab from "@/components/profile/PlanTab";
+import AccountShell from "@/components/profile/AccountShell";
 import type { Profile } from "@/components/profile/types";
 
 function BillingSkeleton() {
@@ -69,37 +69,14 @@ function BillingPage() {
   if (!profile) return <BillingSkeleton />;
 
   return (
-    <div className="min-h-0 flex-1 overflow-y-auto">
-      <div className="mx-auto max-w-2xl px-4 py-10 sm:px-6">
-
-        {/* Breadcrumb */}
-        <div className="mb-6">
-          <Link
-            href="/dashboard"
-            className="inline-flex items-center gap-1.5 text-sm text-zinc-400 transition-colors hover:text-zinc-600 dark:hover:text-zinc-300"
-          >
-            <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
-            </svg>
-            Dashboard
-          </Link>
-        </div>
-
+    <AccountShell>
+      <div className="max-w-2xl">
         {/* Page title */}
-        <div className="mb-8 flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100">Plan &amp; Billing</h1>
-            <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
-              View and manage your current subscription.
-            </p>
-          </div>
-          <Link
-            href="/referral"
-            className="inline-flex items-center gap-1.5 rounded-xl border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm font-medium text-zinc-600 transition-colors hover:border-zinc-300 hover:bg-zinc-100 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700"
-          >
-            <span>🎁</span>
-            Refer &amp; Earn
-          </Link>
+        <div className="mb-8">
+          <h1 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100">Plan &amp; Billing</h1>
+          <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
+            View and manage your current subscription.
+          </p>
         </div>
 
         {/* Plan success banner */}
@@ -114,6 +91,6 @@ function BillingPage() {
 
         <div className="h-12" />
       </div>
-    </div>
+    </AccountShell>
   );
 }

@@ -1,36 +1,59 @@
+import type { Metadata } from "next";
 import Link from "next/link";
-import { absoluteUrl } from "@/lib/seo";
+import { absoluteUrl, SITE_KEYWORDS } from "@/lib/seo";
 import { APP_NAME, BASE_URL } from "@/lib/constants";
+
+export const metadata: Metadata = {
+  title: "Pricing — Free & Pro Plans",
+  description:
+    "uByte is free — all tutorials, all interview prep problems, and all certification exams across 9 languages. Upgrade to Pro for AI hints, code review, and interview debriefs.",
+  keywords: [...SITE_KEYWORDS, "coding course pricing", "programming subscription", "uByte pro", "learn to code free"],
+  alternates: { canonical: absoluteUrl("/pricing") },
+  openGraph: {
+    type: "website",
+    url: absoluteUrl("/pricing"),
+    title: "uByte Pricing — Free & Pro Plans",
+    description:
+      "All tutorials, all problems, and certifications are free. Upgrade to Pro for AI hints, code review, and interview debriefs across 9 languages.",
+    siteName: APP_NAME,
+    images: [{ url: absoluteUrl("/api/og?title=Pricing&description=Free+and+Pro+plans+for+interactive+coding+tutorials+and+certifications"), width: 1200, height: 630 }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "uByte Pricing — Free & Pro Plans",
+    description:
+      "Everything free — tutorials, problems, certs. Upgrade to Pro for AI hints and code review.",
+    images: [absoluteUrl("/api/og?title=Pricing&description=Free+and+Pro+plans+for+interactive+coding+tutorials+and+certifications")],
+  },
+};
 import {
-  FREE_TUTORIAL_LIMIT,
-  MAX_FREE_PROBLEMS,
   MONTHLY_PRICE_CENTS,
   YEARLY_PRICE_CENTS,
 } from "@/lib/plans";
 import PricingClient from "./PricingClient";
 
 const FREE_FEATURES = [
-  `${FREE_TUTORIAL_LIMIT} tutorials per language`,
-  `${MAX_FREE_PROBLEMS} interview prep problems (2/day)`,
+  "All tutorials — every language, every topic",
+  "All interview prep problems — no limits",
+  "Certification exams — free for everyone",
+  "Verifiable digital certificates",
   "Built-in code editor",
-  "7 programming languages",
+  "9 programming languages",
   "Progress tracking",
 ];
 
 const PRO_FEATURES = [
-  "Unlimited tutorials — all languages",
-  "Unlimited interview prep problems",
-  "AI code feedback on every step",
-  "Certification exams with certificates",
-  "Verifiable digital certificates",
-  "Add certs to LinkedIn & resume",
-  "New content as it ships",
+  "AI hints when stuck on a tutorial step",
+  "AI code review on every practice submission",
+  "Interview simulator with AI debrief",
+  "Priority support",
+  "New AI features as they ship",
 ];
 
 const FAQ_SEO = [
   {
     q: "What's included in Pro?",
-    a: "Unlimited tutorials in all 7 languages, unlimited interview prep problems, AI code feedback on every step, and timed certification exams with shareable certificates.",
+    a: "AI hints when you're stuck on a tutorial step, AI code review on every practice submission, and an interview simulator with AI debrief. All tutorials, problems, and certifications remain free.",
   },
   {
     q: "Can I cancel anytime?",
@@ -38,15 +61,15 @@ const FAQ_SEO = [
   },
   {
     q: "How does the free plan work?",
-    a: `You get ${FREE_TUTORIAL_LIMIT} tutorials per language and ${MAX_FREE_PROBLEMS} interview prep problems (2 new ones unlock daily). Upgrade whenever you're ready for unlimited access and certifications.`,
+    a: "Everything is free — all tutorials, all interview prep problems, and all certification exams. Create a free account and start immediately. Upgrade to Pro for AI-powered hints, code review, and interview debriefs.",
   },
   {
     q: "Do I get a certificate?",
-    a: "Yes. Pro members can take timed certification exams. Pass and you earn a verifiable digital certificate with a unique ID that you can add to your LinkedIn, resume, or portfolio.",
+    a: "Yes — and it's free for everyone. Any user can take timed certification exams. Pass and you earn a verifiable digital certificate with a unique ID you can add to your LinkedIn, resume, or portfolio.",
   },
   {
     q: "Is there a refund policy?",
-    a: "If you're not satisfied within the first 7 days, contact us and we'll work it out. We want you to be happy.",
+    a: "If you're not satisfied, contact us within 7 days of subscribing for a full refund. No questions asked.",
   },
 ];
 
@@ -63,7 +86,7 @@ export default function PricingPage() {
       "@type": "Product",
       name: "uByte Pro",
       description:
-        "Unlimited coding tutorials, interview prep, AI hints, and certification exams across 7 languages.",
+        "Unlimited coding tutorials, interview prep, AI hints, and certification exams across 9 languages.",
       offers: [
         {
           "@type": "Offer",
@@ -95,11 +118,11 @@ export default function PricingPage() {
 
   return (
     <>
-      <script
+      <script async
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <script
+      <script async
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
       />
@@ -110,15 +133,15 @@ export default function PricingPage() {
       <article className="sr-only" aria-hidden="true">
         <h1>uByte Pricing — Free and Pro Plans</h1>
         <p>
-          uByte offers interactive coding tutorials, interview prep, and
-          certification exams across Go, Python, JavaScript, Java, C++, Rust,
-          and C#. Start for free and upgrade to Pro when you&apos;re ready for
-          unlimited access.
+          uByte offers interactive coding tutorials, interview prep problems, and
+          free certification exams across all 9 languages: Go, Python, JavaScript,
+          TypeScript, Java, Rust, C++, C#, and SQL. All content is free for every user.
+          Upgrade to Pro for AI hints, AI code review, and interview debriefs.
         </p>
 
         <section>
           <h2>Free Plan</h2>
-          <p>Get started at no cost. No credit card required.</p>
+          <p>Get started at no cost. Free forever.</p>
           <ul>
             {FREE_FEATURES.map((f) => (
               <li key={f}>{f}</li>

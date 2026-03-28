@@ -8,10 +8,24 @@ import { absoluteUrl } from "@/lib/seo";
 import type { SupportedLanguage } from "@/lib/languages/types";
 
 export const metadata: Metadata = {
-  title: "Tutorials — uByte",
+  title: "Coding Tutorials — Learn Go, Python, JavaScript & More",
   description:
-    "Interactive coding tutorials for Go, Python, TypeScript, JavaScript, Java, Rust, C++, C# and SQL. Step-by-step lessons with real code running in your browser.",
+    "Interactive coding tutorials for Go, Python, TypeScript, JavaScript, Java, Rust, C++, C# and SQL. Step-by-step lessons with real code running in your browser. No installs needed.",
   alternates: { canonical: absoluteUrl("/tutorial") },
+  openGraph: {
+    type: "website",
+    url: absoluteUrl("/tutorial"),
+    title: "Interactive Coding Tutorials",
+    description:
+      "Learn Go, Python, JavaScript, TypeScript, Java, Rust, C++, C# and SQL with hands-on tutorials. Write real code in your browser — no setup required.",
+    images: [{ url: absoluteUrl("/api/og?title=Coding+Tutorials&description=Interactive+lessons+in+9+languages+right+in+your+browser"), width: 1200, height: 630 }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Interactive Coding Tutorials",
+    description: "Step-by-step tutorials in 9 languages. Write real code in your browser — no installs needed.",
+    images: [absoluteUrl("/api/og?title=Coding+Tutorials&description=Interactive+lessons+in+9+languages+right+in+your+browser")],
+  },
 };
 
 // Difficulty label and style per language — editable as the platform grows
@@ -48,25 +62,25 @@ export default function TutorialsPage() {
       <div className="border-b border-zinc-100 dark:border-zinc-800">
         <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-16">
           <p className="mb-3 text-xs font-bold uppercase tracking-widest text-indigo-600 dark:text-indigo-400">
-            Interactive tutorials
+            9 languages · runs in your browser · free certifications
           </p>
           <h1 className="text-3xl font-black tracking-tight text-zinc-900 sm:text-4xl dark:text-white">
-            Learn a language.{" "}
+            Learn by doing.{" "}
             <span className="bg-gradient-to-r from-indigo-600 to-violet-500 bg-clip-text text-transparent dark:from-indigo-400 dark:to-violet-400">
-              Get certified.
+              Get certified free.
             </span>
           </h1>
           <p className="mt-3 max-w-2xl text-base text-zinc-500 dark:text-zinc-400">
-            Every tutorial runs live in your browser — write real code, see real output, no installs needed.
-            Finish a track and take a free certification to prove your skills.
+            Write real code in your browser from step one — no installs, no setup. Finish a track and earn
+            a free certificate you can share on LinkedIn or your résumé.
           </p>
 
           {/* Quick stats */}
           <div className="mt-8 flex flex-wrap gap-6">
             {[
-              { value: `${langs.length}`, label: "Languages" },
-              { value: `${langs.reduce((s, l) => s + l.topicCount, 0)}`, label: "Topics" },
-              { value: `${langs.reduce((s, l) => s + l.lessons, 0)}+`, label: "Lessons" },
+              { value: `${langs.length}`, label: "languages" },
+              { value: `${langs.reduce((s, l) => s + l.topicCount, 0)}`, label: "topics" },
+              { value: `${langs.reduce((s, l) => s + l.lessons, 0)}+`, label: "lessons" },
             ].map(s => (
               <div key={s.label} className="flex items-baseline gap-1.5">
                 <span className="text-2xl font-black text-zinc-900 dark:text-zinc-100">{s.value}</span>
@@ -83,6 +97,30 @@ export default function TutorialsPage() {
         <LanguageGroup title="Start here" langs={beginner} />
         <LanguageGroup title="Level up" langs={intermediate} />
         <LanguageGroup title="Master level" langs={advanced} />
+
+        {/* ── Bottom CTA ───────────────────────────────────────────────── */}
+        <div className="mt-4 rounded-2xl border border-indigo-100 bg-indigo-50 px-6 py-8 text-center dark:border-indigo-900/50 dark:bg-indigo-950/30">
+          <p className="text-lg font-bold text-zinc-900 dark:text-zinc-100">
+            Not sure where to start?
+          </p>
+          <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
+            Go and Python are the most beginner-friendly picks. You can switch languages any time.
+          </p>
+          <div className="mt-5 flex flex-wrap justify-center gap-3">
+            <Link
+              href="/tutorial/go"
+              className="rounded-lg bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-indigo-500"
+            >
+              Start with Go →
+            </Link>
+            <Link
+              href="/tutorial/python"
+              className="rounded-lg border border-zinc-300 bg-white px-5 py-2.5 text-sm font-semibold text-zinc-700 shadow-sm transition-colors hover:border-zinc-400 hover:text-zinc-900 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:border-zinc-600"
+            >
+              Start with Python →
+            </Link>
+          </div>
+        </div>
 
       </div>
     </div>

@@ -45,6 +45,9 @@ export default function AuthPage({ variant }: { variant: AuthPageMode }) {
   const [submitting, setSubmitting] = useState(false);
   const [forgotDone, setForgotDone] = useState(false);
   const firstInputRef = useRef<HTMLInputElement>(null);
+  // Prevents the "already logged in" useEffect redirect from firing mid-submission.
+  // Once the form is submitted, handleSubmit owns all navigation.
+  const handlingSubmitRef = useRef(false);
 
   const nextPath = getSafeNextPath(searchParams.get("next"));
   const loginHref = buildAuthPageHref("login", nextPath);
@@ -59,7 +62,7 @@ export default function AuthPage({ variant }: { variant: AuthPageMode }) {
   }, [mode]);
 
   useEffect(() => {
-    if (!user) return;
+    if (!user || handlingSubmitRef.current) return;
     router.replace(nextPath);
   }, [nextPath, router, user]);
 
@@ -80,6 +83,7 @@ export default function AuthPage({ variant }: { variant: AuthPageMode }) {
     event.preventDefault();
     setError("");
     setSubmitting(true);
+    handlingSubmitRef.current = true;
 
     if (mode === "forgot") {
       const result = await requestPasswordReset(email);

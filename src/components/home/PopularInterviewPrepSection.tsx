@@ -69,7 +69,7 @@ export default function PopularInterviewPrepSection({ problems }: Props) {
             <Link
               key={p.slug}
               href={`/practice/go/${p.slug}`}
-              className="group flex flex-col gap-3 rounded-xl border border-[#E5E7EB] bg-[#F7F8FF] p-5 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md dark:border-zinc-700 dark:bg-zinc-800/80"
+              className="group flex flex-col gap-3 rounded-xl border border-zinc-200 bg-white p-5 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md dark:border-zinc-700 dark:bg-zinc-900"
             >
               {/* Top: difficulty dot + badge + category */}
               <div className="flex flex-wrap items-center gap-2">
@@ -97,11 +97,8 @@ export default function PopularInterviewPrepSection({ problems }: Props) {
               {/* Spacer keeps card height consistent */}
               <div className="flex-1" />
 
-              {/* Footer: language support + CTA */}
-              <div className="mt-auto flex items-center justify-between border-t border-zinc-100 pt-3 dark:border-zinc-800">
-                <span className="text-[10px] font-medium text-zinc-500 dark:text-zinc-400">
-                  Go · Python · JS · Java · C++ · Rust · C#
-                </span>
+              {/* Footer: CTA */}
+              <div className="mt-auto flex items-center justify-end border-t border-zinc-100 pt-3 dark:border-zinc-800">
                 <span className="flex items-center gap-1 text-xs font-semibold text-indigo-600 transition-[gap] group-hover:gap-1.5 dark:text-indigo-400">
                   Solve
                   <span>→</span>

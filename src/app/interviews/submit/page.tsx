@@ -1,5 +1,27 @@
+import type { Metadata } from "next";
 import Link from "next/link";
+import { absoluteUrl } from "@/lib/seo";
+import { APP_NAME } from "@/lib/constants";
 import SubmitClient from "./SubmitClient";
+
+export const metadata: Metadata = {
+  title: "Share Your Interview Experience",
+  description:
+    "Help other developers prepare by sharing your tech interview experience anonymously. Tell us about the company, role, difficulty, questions asked, and outcome.",
+  alternates: { canonical: absoluteUrl("/interviews/submit") },
+  openGraph: {
+    type: "website",
+    url: absoluteUrl("/interviews/submit"),
+    title: "Share Your Tech Interview Experience",
+    description: "Share your anonymous interview experience to help other developers prepare. Company, role, difficulty, questions, and outcome.",
+    siteName: APP_NAME,
+  },
+  twitter: {
+    card: "summary",
+    title: "Share Your Tech Interview Experience",
+    description: "Help other developers prepare by sharing your anonymous interview experience.",
+  },
+};
 
 export default function SubmitInterviewPage() {
   return (

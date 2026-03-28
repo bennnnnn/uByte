@@ -1,14 +1,12 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { useRouter } from "next/navigation";
 import type { TutorialStep } from "@/lib/tutorial-steps";
 import type { CodeCheck } from "@/lib/tutorial-steps/types";
 import type { AiFeedbackSchema } from "@/lib/ai/feedback-client";
 import { useAuth } from "@/components/AuthProvider";
 import { parseErrorLines } from "./useCodeEditor";
 import { apiFetch } from "@/lib/api-client";
-import { tutorialUrl } from "@/lib/urls";
 import { trackConversion } from "@/lib/analytics";
 import { celebrate } from "@/lib/celebrate";
 
@@ -112,7 +110,6 @@ export interface StepProgressState {
   requestHint: (code: string) => void;
   tutorialDone: boolean;
   setTutorialDone: (v: boolean) => void;
-  countdown: number;
   showHint: boolean;
   setShowHint: (v: boolean) => void;
   goToStep: (idx: number) => void;
@@ -131,7 +128,6 @@ export function useStepProgress(
   userId?: number
 ): StepProgressState {
   const { toggleProgress, incrementStepCount } = useAuth();
-  const router = useRouter();
 
   const [stepIndex, setStepIndex] = useState(0);
   const [completedSteps, setCompletedSteps] = useState<Set<number>>(new Set());
@@ -154,7 +150,6 @@ export function useStepProgress(
   const pendingAutoHintRef = useRef<{ code: string; output: string; isError: boolean; stepIndex: number } | null>(null);
   const [showInlineChat, setShowInlineChat] = useState(false);
   const [tutorialDone, setTutorialDone] = useState(false);
-  const [countdown, setCountdown] = useState(3);
   const [showHint, setShowHint] = useState(false);
   const markedRef = useRef(false);
 
@@ -245,40 +240,11 @@ export function useStepProgress(
     }
   }, [completedSteps, steps.length, tutorialSlug, toggleProgress, lang]);
 
-  // ── Auto-advance countdown + confetti ──
+  // ── Confetti when tutorial is complete ──
   useEffect(() => {
     if (!tutorialDone) return;
-    setCountdown(2);
     import("canvas-confetti").then((mod) => mod.default({ particleCount: 120, spread: 80, origin: { y: 0.6 } }));
-    const id = setInterval(() => setCountdown((c) => c - 1), 1000);
-    return () => clearInterval(id);
   }, [tutorialDone]);
-
-  useEffect(() => {
-    if (!tutorialDone || countdown > 0) return;
-    router.push(next ? tutorialUrl(lang, next.slug) : "/");
-    // router is stable (Next.js guarantees it). next, lang, and tutorialUrl are props/constants
-    // that don't change during a session — including them would add noise without value.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [countdown, tutorialDone]);
-
-  // ── Auto-advance to next step after passing ──
-  useEffect(() => {
-    if (status !== "passed" || stepIndex >= steps.length - 1) return;
-    const id = setTimeout(() => {
-      const next = stepIndex + 1;
-      setStepIndex(next);
-      setCode(steps[next].starter);
-      setOutput(null);
-      setStatus("idle");
-      setShowHint(false);
-      setShowInlineChat(false);
-    }, 2000);
-    return () => clearTimeout(id);
-    // steps is a stable prop (content array from JSON, never mutated).
-    // State setters (setStepIndex, setCode, etc.) are guaranteed stable by React.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [status, stepIndex]);
 
   function skipStep() {
     setSkippedSteps((prev) => new Set([...prev, stepIndex]));
@@ -536,7 +502,6 @@ export function useStepProgress(
     requestHint,
     tutorialDone,
     setTutorialDone,
-    countdown,
     showHint,
     setShowHint,
     goToStep,

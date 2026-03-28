@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
-import { savePracticeAttempt, getPracticeAttempts, addXp, getUserById, updateStreak } from "@/lib/db";
-import { hasPaidAccess } from "@/lib/plans";
-import { getUnlockedSlugs } from "@/lib/db/practice-unlocks";
+import { savePracticeAttempt, getPracticeAttempts, addXp, updateStreak } from "@/lib/db";
 import { withErrorHandling } from "@/lib/api-utils";
 import { verifyCsrf } from "@/lib/csrf";
 import { PRACTICE_PROBLEMS } from "@/lib/practice/problems";
@@ -31,14 +29,7 @@ export const POST = withErrorHandling("POST /api/practice-attempt", async (reque
     return NextResponse.json({ error: "slug required" }, { status: 400 });
   }
 
-  const profile = await getUserById(user.userId);
-  if (!hasPaidAccess(profile?.plan)) {
-    const unlocked = await getUnlockedSlugs(user.userId);
-    if (!unlocked.includes(slug)) {
-      return NextResponse.json({ error: "Problem not unlocked. Upgrade to Pro for unlimited access." }, { status: 403 });
-    }
-  }
-
+  // All problems are free for signed-in users — no access check needed.
   if (status !== "solved" && status !== "failed") {
     return NextResponse.json({ error: "status must be 'solved' or 'failed'" }, { status: 400 });
   }

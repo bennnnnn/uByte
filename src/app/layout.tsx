@@ -82,7 +82,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "uByte - Interactive Coding Tutorials and Interview Prep",
     description:
-      "Interactive programming tutorials, interview prep, and certification exams across 7 languages.",
+      "Interactive programming tutorials, interview prep, and certification exams across 9 languages.",
     images: [`${BASE_URL}/api/og`],
   },
   alternates: {
@@ -111,14 +111,16 @@ export default async function RootLayout({
 
   return (
     <html lang="en" suppressHydrationWarning>
-      {/* beforeInteractive places this in <head>, running before any JS hydration.
-          Prevents FOUC for dark mode and does NOT block <body> rendering the way
-          a raw <script> tag inside <body> does. */}
-      <Script
-        id="theme-init"
-        strategy="beforeInteractive"
-        dangerouslySetInnerHTML={{ __html: `(function(){try{var t=localStorage.getItem('theme'),d=window.matchMedia('(prefers-color-scheme: dark)').matches;document.documentElement.classList.add(t==='light'||t==='dark'?t:d?'dark':'light')}catch(e){}})()` }}
-      />
+      <head>
+        {/* beforeInteractive places this in <head>, running before any JS hydration.
+            Prevents FOUC for dark mode and does NOT block <body> rendering the way
+            a raw <script> tag inside <body> does. */}
+        <Script
+          id="theme-init"
+          strategy="beforeInteractive"
+          dangerouslySetInnerHTML={{ __html: `(function(){try{var t=localStorage.getItem('theme'),d=window.matchMedia('(prefers-color-scheme: dark)').matches;document.documentElement.classList.add(t==='light'||t==='dark'?t:d?'dark':'light')}catch(e){}})()` }}
+        />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >

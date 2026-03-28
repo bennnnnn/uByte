@@ -91,16 +91,16 @@ export default function GrowthTab({ data }: Props) {
       <SectionCard title="Conversion funnel" description="From signup to paid subscriber.">
         <div className="space-y-3">
           {funnel.map((step) => (
-            <div key={step.label} className="flex items-center gap-4">
-              <span className="w-40 shrink-0 text-sm text-zinc-600 dark:text-zinc-400">{step.label}</span>
+            <div key={step.label} className="flex items-center gap-2 sm:gap-4">
+              <span className="w-24 shrink-0 text-xs sm:w-40 sm:text-sm text-zinc-600 dark:text-zinc-400">{step.label}</span>
               <div className="flex-1 overflow-hidden rounded-full bg-zinc-100 dark:bg-zinc-800">
                 <div
                   className={`h-3 rounded-full transition-all ${step.color}`}
                   style={{ width: Math.max(step.pct, step.count > 0 ? 2 : 0) + "%" }}
                 />
               </div>
-              <span className="w-24 text-right text-sm font-semibold text-zinc-900 dark:text-zinc-100">
-                {step.count.toLocaleString()} <span className="text-xs font-normal text-zinc-400">({step.pct}%)</span>
+              <span className="w-20 shrink-0 text-right text-xs font-semibold sm:w-24 sm:text-sm text-zinc-900 dark:text-zinc-100">
+                {step.count.toLocaleString()} <span className="font-normal text-zinc-400">({step.pct}%)</span>
               </span>
             </div>
           ))}

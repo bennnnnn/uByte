@@ -130,7 +130,7 @@ export default async function BlogPostPage({ params, searchParams }: Props) {
   return (
     <div className="min-h-full">
       <ScrollToTop />
-      <script
+      <script async
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />

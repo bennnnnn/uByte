@@ -5,16 +5,18 @@ import Link from "next/link";
 import { apiFetch } from "@/lib/api-client";
 import { useAuth } from "@/components/AuthProvider";
 import Avatar from "@/components/Avatar";
-import { getAllLanguageSlugs, LANGUAGES } from "@/lib/languages/registry";
+import { getPracticeLanguageSlugs, PRACTICE_LANGUAGE_KEYS, LANGUAGES } from "@/lib/languages/registry";
 import type { LeaderboardEntry } from "@/lib/db/types";
 
 const LANG_ICONS: Record<string, string> = {
-  go: "🐹", python: "🐍", javascript: "🟨", java: "☕", rust: "🦀", cpp: "⚙️", csharp: "💜",
+  go: "🐹", python: "🐍", javascript: "🟨", typescript: "🔷", java: "☕", rust: "🦀", cpp: "⚙️", csharp: "💜", sql: "🗄️",
 };
 
 function getPreferredLanguage(): string {
   if (typeof window === "undefined") return "go";
-  return localStorage.getItem("preferred_lang") ?? "go";
+  const stored = localStorage.getItem("preferred_lang") ?? "go";
+  // Validate — stored value may be a language that was removed from practice (e.g. "sql")
+  return (PRACTICE_LANGUAGE_KEYS as string[]).includes(stored) ? stored : "go";
 }
 
 function savePreferredLanguage(lang: string): void {
@@ -28,6 +30,7 @@ interface DailyData {
   title: string;
   difficulty: "easy" | "medium" | "hard";
   category: string;
+  descriptionPreview: string;
   solvedToday: number;
   userSolvedToday: boolean;
   date: string;
@@ -48,7 +51,7 @@ export default function DailyChallengePage() {
   const [retryKey, setRetryKey] = useState(0);
   const [selectedLang, setSelectedLang] = useState("go");
 
-  const languageSlugs = getAllLanguageSlugs();
+  const languageSlugs = getPracticeLanguageSlugs();
 
   // Initialise preferred language from localStorage (client-only)
   useEffect(() => {
@@ -134,11 +137,25 @@ export default function DailyChallengePage() {
         </div>
 
         <div className="px-6 py-5">
+          {/* Problem description preview */}
+          {daily.descriptionPreview && (
+            <p className="mb-4 text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
+              {daily.descriptionPreview}
+            </p>
+          )}
+
           <div className="flex items-center gap-4 text-sm">
-            <div className="flex items-center gap-1.5 text-zinc-500 dark:text-zinc-400">
-              <span>👥</span>
-              <span><strong className="text-zinc-800 dark:text-zinc-200">{daily.solvedToday}</strong> solved today</span>
-            </div>
+            {daily.solvedToday > 0 ? (
+              <div className="flex items-center gap-1.5 text-zinc-500 dark:text-zinc-400">
+                <span>👥</span>
+                <span><strong className="text-zinc-800 dark:text-zinc-200">{daily.solvedToday}</strong> solved today</span>
+              </div>
+            ) : (
+              <div className="flex items-center gap-1.5 text-indigo-500 dark:text-indigo-400">
+                <span>⚡</span>
+                <span className="font-medium">Be the first to solve it today!</span>
+              </div>
+            )}
             {daily.userSolvedToday && (
               <div className="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400">
                 <span>✅</span>

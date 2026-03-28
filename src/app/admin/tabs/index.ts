@@ -15,3 +15,4 @@ export { default as MessagesTab }     from "./MessagesTab";
 export { default as InterviewsTab }   from "./InterviewsTab";
 export { default as AdminsTab }       from "./AdminsTab";
 export { default as SiteSettingsTab } from "./SiteSettingsTab";
+export { default as ReportsTab }      from "./ReportsTab";

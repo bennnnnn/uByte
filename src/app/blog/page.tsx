@@ -67,7 +67,7 @@ export default async function BlogPage() {
 
   return (
     <div className="min-h-full overflow-y-auto">
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <script async type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <div className="mx-auto max-w-4xl px-6 py-14">
 
         <section className="mb-12">

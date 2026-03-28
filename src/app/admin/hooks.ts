@@ -308,8 +308,8 @@ export function useAdminData() {
         body: JSON.stringify({
           enabled: bannerData.enabled,
           message: bannerData.message,
-          linkUrl: bannerData.linkUrl || "/",
-          linkText: bannerData.linkText || "Sign up",
+          linkUrl: bannerData.linkUrl.trim(),
+          linkText: bannerData.linkText.trim(),
         }),
       });
       const data = await res.json();

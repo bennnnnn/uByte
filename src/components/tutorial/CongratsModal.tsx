@@ -9,7 +9,6 @@ interface Props {
   lang: string;
   tutorialSlug: string;
   next: { slug: string; title: string } | null;
-  countdown: number;
   onDismiss: () => void;
 }
 
@@ -18,7 +17,6 @@ export default function CongratsModal({
   lang,
   tutorialSlug,
   next,
-  countdown,
   onDismiss,
 }: Props) {
   return (
@@ -33,14 +31,9 @@ export default function CongratsModal({
         <h2 id="congrats-title" className="mb-2 text-2xl font-bold text-zinc-900 dark:text-zinc-100">
           Tutorial Complete!
         </h2>
-        <p className="mb-2 text-zinc-500 dark:text-zinc-400">
+        <p className="mb-6 text-zinc-500 dark:text-zinc-400">
           You finished{" "}
           <span className="font-medium text-zinc-800 dark:text-zinc-200">{tutorialTitle}</span>. Great work!
-        </p>
-        <p className="mb-6 text-xs text-zinc-400 dark:text-zinc-500">
-          {next
-            ? `Continuing to "${next.title}" in ${countdown}…`
-            : `Returning home in ${countdown}…`}
         </p>
         <div className="flex flex-wrap justify-center gap-3">
           <button

@@ -16,7 +16,7 @@ import { useAuth } from "@/components/AuthProvider";
 import { apiFetch } from "@/lib/api-client";
 import { trackConversion } from "@/lib/analytics";
 import { useIsMobile } from "@/hooks/useIsMobile";
-import { ALL_LANGUAGE_KEYS } from "@/lib/languages/registry";
+import { PRACTICE_LANGUAGE_KEYS } from "@/lib/languages/registry";
 import GuestConversionPrompt from "@/components/GuestConversionPrompt";
 import { CodeEditor } from "@/components/editor/CodeEditor";
 import { EditorToolbar } from "@/components/editor/EditorToolbar";
@@ -25,7 +25,7 @@ import { useShareCode } from "@/hooks/useShareCode";
 import { useEditorKeyDown } from "@/hooks/useEditorKeyDown";
 import DiscussionThread from "./DiscussionThread";
 
-const LANG_ORDER = ALL_LANGUAGE_KEYS;
+const LANG_ORDER = PRACTICE_LANGUAGE_KEYS;
 
 interface Props {
   problem: PracticeProblem;
@@ -44,9 +44,11 @@ interface Props {
   interviewMode?: boolean;
   /** Unix timestamp (ms) when the interview session expires. */
   interviewDeadline?: number;
+  /** Whether the current user has a paid plan (used to gate AI follow-up chat). */
+  isPro?: boolean;
 }
 
-export function PracticeIDE({ problem, initialLang, initialCode, categoryFilter = null, listPage = 1, listStatus, listDifficulty, interviewMode = false, interviewDeadline }: Props) {
+export function PracticeIDE({ problem, initialLang, initialCode, categoryFilter = null, listPage = 1, listStatus, listDifficulty, interviewMode = false, interviewDeadline, isPro = false }: Props) {
   const allProblems = useMemo(() => getAllPracticeProblems(), []);
   const categories = useMemo(() => getPracticeCategories(), []);
   const sidebarProblems = useMemo(() =>
@@ -74,15 +76,15 @@ export function PracticeIDE({ problem, initialLang, initialCode, categoryFilter 
   const bookmarked = bookmarkId !== null;
 
   // Notes (per-problem, persisted in localStorage)
-  const [descTab, setDescTab] = useState<"desc" | "notes" | "discuss">("desc");
+  const [descTab, setDescTab] = useState<"desc" | "discuss">("desc");
   const [notes, setNotes] = useState<string>("");
   const notesKey = `practice-notes-${problem.slug}`;
   const [noteSaved, setNoteSaved] = useState(false);
-  const [noteCollapsed, setNoteCollapsed] = useState(false);
+  const [notesOpen, setNotesOpen] = useState(false);
 
-  // Reset collapsed state when navigating to a different problem
+  // Close notes panel when navigating to a different problem
   useEffect(() => {
-    setNoteCollapsed(false);
+    setNotesOpen(false);
   }, [problem.slug]);
 
   // Manual save — cancels the debounce timer, saves immediately, then collapses the field
@@ -679,7 +681,7 @@ export function PracticeIDE({ problem, initialLang, initialCode, categoryFilter 
                 : "text-zinc-500 dark:text-zinc-400"
             }`}
           >
-            {tab === "desc" ? "Description" : "Code Editor"}
+            {tab === "desc" ? "Instructions" : "Code Editor"}
           </button>
         ))}
       </div>
@@ -715,9 +717,9 @@ export function PracticeIDE({ problem, initialLang, initialCode, categoryFilter 
           style={isMobile ? undefined : { width: leftWidth }}
           suppressHydrationWarning
         >
-          {/* Tab strip: Description | Notes | Discuss */}
+          {/* Tab strip: Description | Discuss */}
           <div className="flex shrink-0 border-b border-zinc-200 dark:border-zinc-800">
-            {(["desc", "notes", "discuss"] as const).map((tab) => (
+            {(["desc", "discuss"] as const).map((tab) => (
               <button
                 key={tab}
                 type="button"
@@ -728,7 +730,7 @@ export function PracticeIDE({ problem, initialLang, initialCode, categoryFilter 
                     : "text-zinc-400 hover:text-zinc-700 dark:text-zinc-500 dark:hover:text-zinc-300"
                 }`}
               >
-                {tab === "desc" ? "Description" : tab === "notes" ? "Notes" : "Discuss"}
+                {tab === "desc" ? "Instructions" : "Discuss"}
               </button>
             ))}
           </div>
@@ -793,57 +795,7 @@ export function PracticeIDE({ problem, initialLang, initialCode, categoryFilter 
                   );
                 })()}
               </div>
-            </div>
-          )}
 
-          {/* Notes tab */}
-          {descTab === "notes" && (
-            <div className="flex min-w-0 flex-1 flex-col p-4 md:p-5">
-              {noteCollapsed ? (
-                /* Collapsed summary — click anywhere to expand */
-                <button
-                  type="button"
-                  onClick={() => setNoteCollapsed(false)}
-                  className="flex w-full items-start gap-3 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-left transition-colors hover:bg-emerald-100 dark:border-emerald-800 dark:bg-emerald-950/30 dark:hover:bg-emerald-950/50"
-                >
-                  <span className="mt-0.5 text-emerald-500">✓</span>
-                  <div className="min-w-0 flex-1">
-                    <p className="text-xs font-semibold text-emerald-700 dark:text-emerald-400">Note saved</p>
-                    <p className="mt-0.5 line-clamp-2 text-xs text-zinc-500 dark:text-zinc-400">
-                      {notes.trim() || "No content yet."}
-                    </p>
-                  </div>
-                  <span className="shrink-0 text-xs text-zinc-400 dark:text-zinc-500">Edit ›</span>
-                </button>
-              ) : (
-                /* Expanded editor */
-                <>
-                  <div className="mb-2 flex items-center justify-between gap-2">
-                    <p className="text-xs text-zinc-400 dark:text-zinc-500">
-                      {user ? "Auto-saved as you type." : "Sign in to save notes to your account."}
-                    </p>
-                    <button
-                      type="button"
-                      onClick={saveNotesNow}
-                      className={`flex items-center gap-1 rounded-md border px-2.5 py-1 text-xs font-semibold transition-all ${
-                        noteSaved
-                          ? "border-emerald-400 bg-emerald-50 text-emerald-700 dark:border-emerald-600 dark:bg-emerald-950/40 dark:text-emerald-400"
-                          : "border-zinc-300 text-zinc-500 hover:border-indigo-400 hover:bg-indigo-50 hover:text-indigo-700 dark:border-zinc-600 dark:text-zinc-400 dark:hover:border-indigo-600 dark:hover:text-indigo-400"
-                      }`}
-                    >
-                      {noteSaved ? "✓ Saved" : "Save"}
-                    </button>
-                  </div>
-                  <textarea
-                    id="practice-notes"
-                    name="notes"
-                    value={notes}
-                    onChange={(e) => { setNotes(e.target.value); setNoteSaved(false); }}
-                    placeholder="Write your approach, observations, or ideas here…"
-                    className="flex-1 resize-none rounded-lg border border-zinc-200 bg-white p-3 text-sm text-zinc-800 placeholder-zinc-400 focus:border-indigo-400 focus:outline-none focus:ring-1 focus:ring-indigo-400 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-200 dark:placeholder-zinc-500 dark:focus:border-indigo-600"
-                  />
-                </>
-              )}
             </div>
           )}
 
@@ -866,7 +818,7 @@ export function PracticeIDE({ problem, initialLang, initialCode, categoryFilter 
         </div>
 
         {/* ── Right panel: editor + toolbar + output ───────────────── */}
-        <div className={`flex-col overflow-hidden ${mobileTab === "code" ? "flex" : "hidden"} md:flex flex-1`}>
+        <div className={`relative flex-col overflow-hidden ${mobileTab === "code" ? "flex" : "hidden"} md:flex flex-1`}>
 
           {/* Shared code editor surface */}
           <CodeEditor editor={editor} onKeyDown={handleKeyDown} />
@@ -876,8 +828,6 @@ export function PracticeIDE({ problem, initialLang, initialCode, categoryFilter 
             lang={lang}
             onLangChange={setLang}
             langOptions={LANG_ORDER}
-            shareCopied={shareCopied}
-            onShare={handleShare}
           >
             <button
               type="button"
@@ -911,7 +861,80 @@ export function PracticeIDE({ problem, initialLang, initialCode, categoryFilter 
             >
               {resetPending ? "Confirm?" : "Reset"}
             </button>
+            {/* Notes button — ml-auto pushes it to the right, where Share was */}
+            <button
+              type="button"
+              onClick={() => setNotesOpen((v) => !v)}
+              title="My notes for this problem"
+              className={`ml-auto flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-sm transition-all ${
+                notesOpen
+                  ? "border-amber-400 bg-amber-50 text-amber-700 dark:border-amber-600 dark:bg-amber-950/30 dark:text-amber-400"
+                  : "border-zinc-300 text-zinc-500 hover:border-zinc-400 hover:text-zinc-800 dark:border-zinc-700 dark:text-zinc-400 dark:hover:border-zinc-600 dark:hover:text-zinc-200"
+              }`}
+            >
+              <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+              </svg>
+              Notes
+            </button>
           </EditorToolbar>
+
+          {/* Notes drawer — vertical side panel overlaying the editor column */}
+          {notesOpen && (
+            <>
+              {/* Backdrop — click to close */}
+              <div
+                className="absolute inset-0 z-20 bg-black/20 dark:bg-black/40"
+                onClick={() => setNotesOpen(false)}
+              />
+              {/* Drawer */}
+              <div className="absolute inset-y-0 right-0 z-30 flex w-72 flex-col border-l border-zinc-200 bg-white shadow-2xl dark:border-zinc-700 dark:bg-zinc-900">
+                {/* Header */}
+                <div className="flex items-center justify-between border-b border-zinc-100 px-4 py-3 dark:border-zinc-800">
+                  <div className="flex items-center gap-2">
+                    <svg className="h-4 w-4 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                    </svg>
+                    <p className="text-sm font-semibold text-zinc-800 dark:text-zinc-100">My Notes</p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setNotesOpen(false)}
+                    className="rounded-md p-1 text-zinc-400 hover:bg-zinc-100 hover:text-zinc-700 dark:hover:bg-zinc-800 dark:hover:text-zinc-200"
+                    title="Close notes"
+                  >
+                    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+
+                {/* Textarea — grows to fill remaining space */}
+                <textarea
+                  id="practice-notes"
+                  name="notes"
+                  value={notes}
+                  onChange={(e) => { setNotes(e.target.value); setNoteSaved(false); }}
+                  placeholder="Write your approach, observations, or ideas here…"
+                  className="flex-1 resize-none bg-transparent px-4 py-3 text-sm text-zinc-800 placeholder-zinc-400 focus:outline-none dark:text-zinc-200 dark:placeholder-zinc-500"
+                />
+
+                {/* Footer */}
+                <div className="flex items-center justify-between border-t border-zinc-100 px-4 py-3 dark:border-zinc-800">
+                  <p className="text-xs text-zinc-400 dark:text-zinc-500">
+                    {user ? "Saved per problem." : "Sign in to sync notes."}
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => { saveNotesNow(); setNotesOpen(false); }}
+                    className="flex items-center gap-1.5 rounded-md bg-indigo-600 px-4 py-1.5 text-sm font-semibold text-white transition-colors hover:bg-indigo-500"
+                  >
+                    Save &amp; Close
+                  </button>
+                </div>
+              </div>
+            </>
+          )}
 
           {/* Vertical resize handle — touch-friendly on mobile */}
           <div
@@ -939,6 +962,7 @@ export function PracticeIDE({ problem, initialLang, initialCode, categoryFilter 
             aiFeedback={aiFeedback}
             onRequestAI={() => requestAiFeedback()}
             onClearAI={() => { setAiFeedback(null); setAiError(null); setAiUpgradeRequired(false); setAiLoginRequired(false); }}
+            isPro={isPro}
             codeReview={codeReview}
             codeReviewLoading={codeReviewLoading}
             codeReviewUpgrade={codeReviewUpgrade}
@@ -955,8 +979,6 @@ export function PracticeIDE({ problem, initialLang, initialCode, categoryFilter 
           lang={lang}
           onLangChange={setLang}
           langOptions={LANG_ORDER}
-          shareCopied={shareCopied}
-          onShare={handleShare}
           mobile
         >
           <button
@@ -987,6 +1009,20 @@ export function PracticeIDE({ problem, initialLang, initialCode, categoryFilter 
             }`}
           >
             {resetPending ? "Confirm?" : "Reset"}
+          </button>
+          <button
+            type="button"
+            onClick={() => setNotesOpen((v) => !v)}
+            className={`flex shrink-0 items-center justify-center gap-1 rounded-md border px-3 py-2 text-sm transition-all ${
+              notesOpen
+                ? "border-amber-400 bg-amber-50 text-amber-700 dark:border-amber-600 dark:bg-amber-950/30 dark:text-amber-400"
+                : "border-zinc-300 text-zinc-500 dark:border-zinc-700 dark:text-zinc-400"
+            }`}
+          >
+            <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+            </svg>
+            Notes
           </button>
         </EditorToolbar>
       )}

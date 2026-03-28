@@ -8,7 +8,6 @@ import InteractiveTutorial from "@/components/InteractiveTutorial";
 import TutorialRating from "@/components/TutorialRating";
 import TutorialDiscussion from "@/components/TutorialDiscussion";
 import { getSteps, getAllStepsForLanguage } from "@/lib/tutorial-steps";
-import { FREE_TUTORIAL_LIMIT } from "@/lib/plans";
 import { getLanguageConfig, isSupportedLanguage, ALL_LANGUAGE_KEYS } from "@/lib/languages/registry";
 import { BASE_URL, APP_NAME } from "@/lib/constants";
 import { tutorialCanonicalUrl } from "@/lib/urls";
@@ -162,7 +161,7 @@ export default async function TutorialPage({
 
   return (
     <>
-      <script
+      <script async
         type="application/ld+json"
         dangerouslySetInnerHTML={{
           __html: JSON.stringify([jsonLd, breadcrumbJsonLd]),
@@ -176,7 +175,6 @@ export default async function TutorialPage({
         allTutorials={allTutorials}
         allTutorialSteps={allTutorialSteps}
         next={next ? { slug: next.slug, title: next.title } : null}
-        isFree={tutorial.order <= FREE_TUTORIAL_LIMIT}
       />
 
       {/* Server-rendered SEO content — crawlable by Google, visible below the IDE */}

@@ -52,11 +52,21 @@ export const GET = withErrorHandling("GET /api/daily-challenge", async (request:
     // DB stats are non-critical — continue with defaults (0 solvers, not solved)
   }
 
+  // Strip markdown for the short preview (remove **, *, `, backtick fences)
+  const plainDesc = problem.description
+    .replace(/```[\s\S]*?```/g, "")
+    .replace(/`[^`]*`/g, (m) => m.slice(1, -1))
+    .replace(/\*\*([^*]+)\*\*/g, "$1")
+    .replace(/\*([^*]+)\*/g, "$1")
+    .trim();
+  const descriptionPreview = plainDesc.slice(0, 180).trimEnd() + (plainDesc.length > 180 ? "…" : "");
+
   return NextResponse.json({
     slug: problem.slug,
     title: problem.title,
     difficulty: problem.difficulty,
     category: problem.category,
+    descriptionPreview,
     solvedToday,
     userSolvedToday,
     date: today,

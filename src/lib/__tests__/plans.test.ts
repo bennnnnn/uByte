@@ -1,7 +1,6 @@
 import { describe, it, expect } from "vitest";
 import {
   hasPaidAccess,
-  isTrialPlan,
   isActiveSubscriber,
   MONTHLY_PRICE_CENTS,
   YEARLY_PRICE_CENTS,
@@ -9,7 +8,6 @@ import {
   YEARLY_IF_MONTHLY_CENTS,
   YEARLY_SAVINGS_CENTS,
   YEARLY_DISCOUNT_PERCENT,
-  FREE_TUTORIAL_LIMIT,
 } from "../plans";
 
 describe("hasPaidAccess", () => {
@@ -24,12 +22,6 @@ describe("hasPaidAccess", () => {
   });
   it("grants access to canceling plan (still within billing period)", () => {
     expect(hasPaidAccess("canceling")).toBe(true);
-  });
-  it("grants access to monthly trial", () => {
-    expect(hasPaidAccess("trial")).toBe(true);
-  });
-  it("grants access to yearly trial", () => {
-    expect(hasPaidAccess("trial_yearly")).toBe(true);
   });
   it("denies access to free plan", () => {
     expect(hasPaidAccess("free")).toBe(false);
@@ -49,24 +41,6 @@ describe("hasPaidAccess", () => {
   });
 });
 
-describe("isTrialPlan", () => {
-  it("identifies monthly trial", () => {
-    expect(isTrialPlan("trial")).toBe(true);
-  });
-  it("identifies yearly trial", () => {
-    expect(isTrialPlan("trial_yearly")).toBe(true);
-  });
-  it("does not identify paid plans as trial", () => {
-    expect(isTrialPlan("monthly")).toBe(false);
-    expect(isTrialPlan("yearly")).toBe(false);
-    expect(isTrialPlan("pro")).toBe(false);
-  });
-  it("does not identify free as trial", () => {
-    expect(isTrialPlan("free")).toBe(false);
-    expect(isTrialPlan(undefined)).toBe(false);
-  });
-});
-
 describe("isActiveSubscriber", () => {
   it("identifies active yearly subscriber", () => {
     expect(isActiveSubscriber("yearly")).toBe(true);
@@ -76,10 +50,6 @@ describe("isActiveSubscriber", () => {
   });
   it("identifies legacy pro subscriber", () => {
     expect(isActiveSubscriber("pro")).toBe(true);
-  });
-  it("does not identify trial as active subscriber", () => {
-    expect(isActiveSubscriber("trial")).toBe(false);
-    expect(isActiveSubscriber("trial_yearly")).toBe(false);
   });
   it("does not identify canceling as active subscriber", () => {
     expect(isActiveSubscriber("canceling")).toBe(false);
@@ -97,7 +67,7 @@ describe("pricing constants", () => {
   it("yearly price is $49.99", () => {
     expect(YEARLY_PRICE_CENTS).toBe(4999);
   });
-  it("monthly equivalent rounds to $4.17", () => {
+  it("monthly equivalent rounds correctly", () => {
     expect(MONTHLY_EQUIVALENT_CENTS).toBe(Math.round(4999 / 12));
   });
   it("yearly savings is correct", () => {
@@ -109,8 +79,5 @@ describe("pricing constants", () => {
   it("yearly discount percent is between 40-60%", () => {
     expect(YEARLY_DISCOUNT_PERCENT).toBeGreaterThan(40);
     expect(YEARLY_DISCOUNT_PERCENT).toBeLessThan(60);
-  });
-  it("free tutorial limit is positive", () => {
-    expect(FREE_TUTORIAL_LIMIT).toBeGreaterThan(0);
   });
 });

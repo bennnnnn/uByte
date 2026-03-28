@@ -28,7 +28,7 @@ const PopularInterviewPrepSection = dynamic(() => import("@/components/home/Popu
 export const metadata: Metadata = {
   title: "uByte — Interactive Coding Tutorials, Interview Prep & Free Certifications",
   description:
-    "Master Go, Python, TypeScript, SQL, Java, Rust, C++ and C# with interactive tutorials. Practice with 114+ interview problems. Take free certification exams. Write and run real code in your browser.",
+    "Master Go, Python, TypeScript, SQL, Java, Rust, C++ and C# with interactive tutorials. Practice with 114+ interview problems. Earn free certification exams. Write and run real code in your browser — zero setup.",
   keywords: [
     ...SITE_KEYWORDS,
     "coding bootcamp alternative",
@@ -41,14 +41,31 @@ export const metadata: Metadata = {
     "free coding certification",
     "learn typescript online",
     "learn sql online",
+    "free programming certificate",
+    "coding interview practice",
   ],
   alternates: { canonical: absoluteUrl("/") },
   openGraph: {
-    title: "uByte — Interactive Coding Tutorials, Interview Prep & Free Certifications",
+    title: "uByte — Learn to Code, Get Certified Free, Get Interview-Ready",
     description:
-      "Interactive tutorials for Go, Python, TypeScript, SQL and more. 114+ practice problems. Free certification exams. Zero setup — code in your browser.",
+      "Step-by-step coding tutorials, real interview problems, and free certifications — all in your browser. 9 languages. Zero setup.",
     type: "website",
     url: absoluteUrl("/"),
+    images: [
+      {
+        url: absoluteUrl("/opengraph-image"),
+        width: 1200,
+        height: 630,
+        alt: "uByte — Interactive Coding Tutorials, Interview Prep & Free Certifications",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "uByte — Learn to Code, Get Certified Free, Get Interview-Ready",
+    description:
+      "Step-by-step coding tutorials, real interview problems, and free certifications — all in your browser. 9 languages. Zero setup.",
+    images: [absoluteUrl("/opengraph-image")],
   },
 };
 
@@ -137,7 +154,7 @@ export default async function Home() {
 
   return (
     <div className="min-h-0 flex-1 overflow-y-auto">
-      <script
+      <script async
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify([websiteJsonLd, orgJsonLd]) }}
       />

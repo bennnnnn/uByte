@@ -31,6 +31,7 @@ interface OutputPanelProps {
   aiFeedback: { friendly_one_liner: string; hint: string; next_step: string; minimal_patch?: string } | null;
   onRequestAI: () => void;
   onClearAI: () => void;
+  isPro: boolean;
   codeReview: CodeReviewSchema | null;
   codeReviewLoading: boolean;
   codeReviewUpgrade: boolean;
@@ -52,6 +53,7 @@ export function OutputPanel({
   aiFeedback,
   onRequestAI,
   onClearAI,
+  isPro,
   codeReview,
   codeReviewLoading,
   codeReviewUpgrade,
@@ -426,7 +428,12 @@ export function OutputPanel({
         )}
         {aiFeedback && (
           <div className="border-t border-indigo-200 bg-indigo-50/60 px-4 py-3 dark:border-indigo-800 dark:bg-indigo-950/30">
-            <AiFeedbackCard feedback={aiFeedback} onClear={onClearAI} />
+            <AiFeedbackCard
+              feedback={aiFeedback}
+              onClear={onClearAI}
+              submissionId={verdict?.submissionId}
+              isPro={isPro}
+            />
           </div>
         )}
 

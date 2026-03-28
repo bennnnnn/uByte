@@ -287,7 +287,7 @@ function GuestHero({
 
             {/* Badge */}
             <p className="mb-5 inline-flex items-center gap-2 rounded-full bg-indigo-50 px-4 py-1.5 text-sm font-semibold text-indigo-700 ring-1 ring-indigo-100 dark:bg-indigo-950/50 dark:text-indigo-300 dark:ring-indigo-800/60">
-              🎓 Free certifications
+              ✓ Tutorials · interview prep · certifications — all free
             </p>
 
             {/* Headline */}
@@ -296,17 +296,17 @@ function GuestHero({
               <span
                 className="bg-gradient-to-r from-indigo-600 to-violet-500 bg-clip-text text-transparent dark:from-indigo-400 dark:to-violet-400"
               >
-                Get certified.
+                Get certified free.
               </span>
               <br />
-              Actually get hired.
+              Get interview-ready.
             </h1>
 
             {/* Sub-headline */}
             <p className="mx-auto mt-5 max-w-xl text-lg leading-relaxed text-zinc-500 lg:mx-0 dark:text-zinc-400">
               Step-by-step tutorials, real interview problems, and{" "}
               <span className="font-semibold text-zinc-700 dark:text-zinc-300">
-                free certifications
+                free certifications you can share on LinkedIn
               </span>{" "}
               — all running live in your browser. Zero setup.
             </p>
@@ -323,12 +323,12 @@ function GuestHero({
                 href="/certifications"
                 className="rounded-xl border border-zinc-200 bg-white px-7 py-3 text-base font-bold text-zinc-700 shadow-sm transition-all hover:border-indigo-200 hover:text-indigo-600 dark:border-zinc-700 dark:bg-zinc-800/80 dark:text-zinc-200 dark:hover:border-indigo-700 dark:hover:text-indigo-400"
               >
-                See certifications
+                Get a free certification →
               </Link>
             </div>
 
             <p className="mt-4 text-xs text-zinc-400">
-              Get certified for free
+              Tutorials, interview prep, and certifications are free for everyone
             </p>
 
             {/* Stats */}
@@ -337,7 +337,7 @@ function GuestHero({
                 { value: "9",                  label: "Languages"          },
                 { value: `${totalLessons}+`,   label: "Lessons"            },
                 { value: `${problemCount}+`,   label: "Interview problems" },
-                { value: `${certCount}`,       label: "Free certs"         },
+                { value: `${certCount}`,       label: "Certs, all free"    },
               ].map(stat => (
                 <div key={stat.label} className="text-center lg:text-left">
                   <p className="text-2xl font-black text-zinc-900 dark:text-zinc-100">{stat.value}</p>
@@ -378,9 +378,9 @@ function GuestHero({
         <div className="mx-auto max-w-6xl px-4 py-5 sm:px-6">
           <div className="grid grid-cols-1 divide-y divide-zinc-100 sm:grid-cols-3 sm:divide-x sm:divide-y-0 dark:divide-zinc-800">
             {[
-              { icon: "💻", title: "Runs in your browser",     desc: "No installs. Start coding in seconds." },
-              { icon: "🧩", title: "Learn → Practice → Certify", desc: "A clear path from beginner to certified." },
-              { icon: "🎓", title: "Free certifications",       desc: "Prove your skills with a timed certification. Pass and earn a credential." },
+              { icon: "💻", title: "Runs in your browser",     desc: "No installs, no setup. Start writing real code in seconds." },
+              { icon: "🧩", title: "Learn · Practice · Certify", desc: "A structured path from first line of code to job-ready." },
+              { icon: "🎓", title: "Free certifications",       desc: "Pass a timed exam and earn a shareable certificate — always free." },
             ].map(item => (
               <div key={item.title} className="flex items-center gap-3 px-4 py-3 sm:px-6">
                 <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-white text-lg shadow-sm ring-1 ring-zinc-200 dark:bg-zinc-800 dark:ring-zinc-700">

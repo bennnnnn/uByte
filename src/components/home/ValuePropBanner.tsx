@@ -3,7 +3,7 @@ import Link from "next/link";
 const PILLARS = [
   {
     title: "Interactive Tutorials",
-    desc: "Write and run real code in your browser. Step-by-step lessons with instant AI-powered feedback — no installs, no setup.",
+    desc: "Write and run real code right in your browser. Step-by-step lessons with AI feedback — no installs, no environment setup, no excuses.",
     icon: (
       <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.75}>
         <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
@@ -21,7 +21,7 @@ const PILLARS = [
   },
   {
     title: "Certifications",
-    desc: "Prove your skills with a timed assessment and earn a free, shareable certification — proof that you actually know the language.",
+    desc: "Pass a timed exam and earn a free, shareable certificate. Add it to your LinkedIn profile or résumé — proof that you actually know your stuff.",
     icon: (
       <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.75}>
         <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
@@ -51,10 +51,10 @@ export default function ValuePropBanner() {
           id="value-prop-heading"
           className="text-2xl font-black tracking-tight text-white sm:text-3xl"
         >
-          From beginner to hire-ready.
+          Everything you need. One platform.
         </h2>
         <p className="mt-2 text-sm text-indigo-200/70 sm:text-base">
-          Three tools that work together. Zero context-switching, zero extra platforms.
+          Three tools that work together — no juggling subscriptions, tabs, or platforms.
         </p>
       </div>
 
@@ -82,7 +82,7 @@ export default function ValuePropBanner() {
           href="/signup"
           className="inline-flex items-center justify-center gap-2 rounded-xl bg-white px-7 py-3 text-sm font-bold text-indigo-900 shadow-md transition-all hover:-translate-y-0.5 hover:bg-indigo-50"
         >
-          Start learning free
+          Start for free
           <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
           </svg>
@@ -91,7 +91,7 @@ export default function ValuePropBanner() {
           href="/certifications"
           className="text-sm font-semibold text-indigo-300 underline-offset-2 transition-colors hover:text-white hover:underline"
         >
-          See free certifications →
+          Try a free certification exam →
         </Link>
       </div>
     </section>

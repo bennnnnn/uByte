@@ -28,17 +28,20 @@ export async function getApprovedExperiences(opts: {
   company?: string;
   difficulty?: Difficulty;
   outcome?: Outcome;
+  search?: string;
   limit?: number;
   offset?: number;
   userId?: number | null;
   visitorId?: string | null;
 }): Promise<InterviewExperience[]> {
   const sql = getSql();
-  const { company, difficulty, outcome, limit = 30, offset = 0, userId = null, visitorId = null } = opts;
+  const { company, difficulty, outcome, search, limit = 30, offset = 0, userId = null, visitorId = null } = opts;
 
   const companyVal    = company    ?? null;
   const difficultyVal = difficulty ?? null;
   const outcomeVal    = outcome    ?? null;
+  // search matches company or role (case-insensitive, prefix-friendly)
+  const searchVal     = search ? `%${search}%` : null;
 
   const rows = await sql`
     SELECT
@@ -63,9 +66,10 @@ export async function getApprovedExperiences(opts: {
      AND ${visitorId}::text IS NOT NULL
      AND mv_vis.visitor_id = ${visitorId}::text
     WHERE e.approved = true
-      AND (${companyVal}::text    IS NULL OR lower(e.company) = lower(${companyVal}::text))
-      AND (${difficultyVal}::text IS NULL OR e.difficulty     = ${difficultyVal}::text)
-      AND (${outcomeVal}::text    IS NULL OR e.outcome        = ${outcomeVal}::text)
+      AND (${companyVal}::text    IS NULL OR lower(e.company)    = lower(${companyVal}::text))
+      AND (${difficultyVal}::text IS NULL OR e.difficulty        = ${difficultyVal}::text)
+      AND (${outcomeVal}::text    IS NULL OR e.outcome           = ${outcomeVal}::text)
+      AND (${searchVal}::text     IS NULL OR e.company ILIKE ${searchVal}::text OR e.role ILIKE ${searchVal}::text)
     GROUP BY e.id, u.name
     ORDER BY vote_score DESC, e.created_at DESC
     LIMIT ${limit} OFFSET ${offset}
@@ -78,22 +82,37 @@ export async function countApprovedExperiences(opts: {
   company?: string;
   difficulty?: Difficulty;
   outcome?: Outcome;
+  search?: string;
 }): Promise<number> {
   const sql = getSql();
-  const { company, difficulty, outcome } = opts;
+  const { company, difficulty, outcome, search } = opts;
   const companyVal    = company    ?? null;
   const difficultyVal = difficulty ?? null;
   const outcomeVal    = outcome    ?? null;
+  const searchVal     = search ? `%${search}%` : null;
 
   const rows = await sql`
     SELECT COUNT(*)::int AS n
     FROM interview_experiences e
     WHERE e.approved = true
-      AND (${companyVal}::text    IS NULL OR lower(e.company) = lower(${companyVal}::text))
-      AND (${difficultyVal}::text IS NULL OR e.difficulty     = ${difficultyVal}::text)
-      AND (${outcomeVal}::text    IS NULL OR e.outcome        = ${outcomeVal}::text)
+      AND (${companyVal}::text    IS NULL OR lower(e.company)    = lower(${companyVal}::text))
+      AND (${difficultyVal}::text IS NULL OR e.difficulty        = ${difficultyVal}::text)
+      AND (${outcomeVal}::text    IS NULL OR e.outcome           = ${outcomeVal}::text)
+      AND (${searchVal}::text     IS NULL OR e.company ILIKE ${searchVal}::text OR e.role ILIKE ${searchVal}::text)
   `;
   return (rows[0] as { n: number }).n;
+}
+
+/** Distinct companies that have at least one approved experience (for filter dropdown). */
+export async function getDistinctCompanies(): Promise<string[]> {
+  const sql = getSql();
+  const rows = await sql`
+    SELECT DISTINCT company
+    FROM interview_experiences
+    WHERE approved = true
+    ORDER BY company ASC
+  `;
+  return (rows as { company: string }[]).map((r) => r.company);
 }
 
 /** Submit a new experience (starts unapproved). Returns new id. */

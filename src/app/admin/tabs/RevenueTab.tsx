@@ -55,8 +55,11 @@ export default function RevenueTab({ data }: Props) {
                 );
               })}
             </div>
-            <p className="mt-3 text-xs text-zinc-400">
-              Est. MRR: {formatCents(Math.round(mrr))} · Pro: {revenue.proSubscribers} · Monthly: {revenue.monthlySubscribers} · Yearly: {revenue.yearlySubscribers}
+            <p className="mt-3 flex flex-wrap gap-x-3 gap-y-1 text-xs text-zinc-400">
+              <span>Est. MRR: {formatCents(Math.round(mrr))}</span>
+              <span>Pro: {revenue.proSubscribers}</span>
+              <span>Monthly: {revenue.monthlySubscribers}</span>
+              <span>Yearly: {revenue.yearlySubscribers}</span>
             </p>
           </>
         ) : (

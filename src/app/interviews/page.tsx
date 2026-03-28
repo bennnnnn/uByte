@@ -1,15 +1,37 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
-import { getApprovedExperiences, countApprovedExperiences } from "@/lib/db/interview-experiences";
+import { unstable_cache } from "next/cache";
+import { getApprovedExperiences, countApprovedExperiences, getDistinctCompanies } from "@/lib/db/interview-experiences";
 import type { Difficulty, Outcome } from "@/lib/db/interview-experiences";
 import { getCurrentUser } from "@/lib/auth";
 import VoteButton from "./VoteButton";
+import ExpandableText from "./ExpandableText";
+import InterviewFilters from "./InterviewFilters";
 import { absoluteUrl, SITE_KEYWORDS } from "@/lib/seo";
 import { APP_NAME } from "@/lib/constants";
 
+// Cache the total count (and company list) for 5 minutes to avoid full scans on every page load.
+const getCachedTotal = unstable_cache(
+  async (company: string | undefined, difficulty: string | undefined, outcome: string | undefined, search: string | undefined) =>
+    countApprovedExperiences({
+      company,
+      difficulty: difficulty as Difficulty | undefined,
+      outcome: outcome as Outcome | undefined,
+      search,
+    }),
+  ["interview-experiences-count"],
+  { revalidate: 300, tags: ["interview-experiences"] }
+);
+
+const getCachedCompanies = unstable_cache(
+  () => getDistinctCompanies(),
+  ["interview-experiences-companies"],
+  { revalidate: 300, tags: ["interview-experiences"] }
+);
+
 export const metadata: Metadata = {
-  title: "Developer Interview Experiences — Real Stories from FAANG & Top Companies | uByte",
+  title: "Developer Interview Experiences — Real Stories from FAANG & Top Companies",
   description:
     "Read real, anonymous developer interview experiences from Google, Meta, Amazon, Apple, Microsoft, Netflix, Stripe, and 20+ top tech companies. See what coding questions get asked, the difficulty level, and whether candidates passed. Filter by company, difficulty, and outcome.",
   keywords: [
@@ -39,7 +61,7 @@ export const metadata: Metadata = {
   alternates: { canonical: absoluteUrl("/interviews") },
   openGraph: {
     type: "website",
-    title: "Developer Interview Experiences — Real FAANG Stories | uByte",
+    title: "Developer Interview Experiences — Real FAANG Stories",
     description:
       "Anonymous interview stories from developers at Google, Meta, Amazon, Apple, Microsoft, and 20+ top companies. See what to expect.",
     url: absoluteUrl("/interviews"),
@@ -49,20 +71,11 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Developer Interview Experiences | uByte",
+    title: "Developer Interview Experiences",
     description:
       "Real anonymous interview stories from developers at Google, Meta, Amazon, and 20+ top companies. Filter by company, difficulty, and outcome.",
   },
 };
-
-const COMPANIES = [
-  "Google", "Meta", "Amazon", "Apple", "Microsoft", "Netflix",
-  "Stripe", "Airbnb", "Uber", "Lyft", "LinkedIn", "Salesforce",
-  "Adobe", "Oracle", "IBM", "Palantir", "Coinbase", "Shopify",
-  "Atlassian", "Dropbox", "Snap", "DoorDash", "Instacart", "Robinhood",
-  "Block", "Twilio", "Datadog", "MongoDB", "Cloudflare", "Figma",
-  "Notion", "Vercel", "GitHub", "GitLab", "Spotify", "Twitter / X",
-];
 
 /* ── Constants ──────────────────────────────────────────────────────────── */
 const DIFFICULTY_LABEL: Record<Difficulty, string> = { easy: "Easy", medium: "Medium", hard: "Hard" };
@@ -82,29 +95,29 @@ const OUTCOME_COLOR: Record<Outcome, string> = {
 const PAGE_SIZE = 20;
 
 interface Props {
-  searchParams: Promise<{ company?: string; difficulty?: string; outcome?: string; page?: string }>;
+  searchParams: Promise<{ company?: string; difficulty?: string; outcome?: string; search?: string; page?: string }>;
 }
 
 export default async function InterviewsPage({ searchParams }: Props) {
   const params = await searchParams;
-  // Treat empty strings (from "All …" select options) as no filter
   const company    = params.company?.trim()    || undefined;
   const difficulty = (params.difficulty?.trim() || undefined) as Difficulty | undefined;
   const outcome    = (params.outcome?.trim()    || undefined) as Outcome    | undefined;
+  const search     = params.search?.trim()     || undefined;
   const page       = Math.max(1, parseInt(params.page ?? "1", 10));
 
-  // Resolve current user and visitor cookie so my_vote can be returned
   const [user, cookieStore] = await Promise.all([getCurrentUser(), cookies()]);
   const userId    = user?.userId ?? null;
   const visitorId = cookieStore.get("vid")?.value ?? null;
 
-  const [experiences, total] = await Promise.all([
-    getApprovedExperiences({ company, difficulty, outcome, limit: PAGE_SIZE, offset: (page - 1) * PAGE_SIZE, userId, visitorId }),
-    countApprovedExperiences({ company, difficulty, outcome }),
+  const [experiences, total, companies] = await Promise.all([
+    getApprovedExperiences({ company, difficulty, outcome, search, limit: PAGE_SIZE, offset: (page - 1) * PAGE_SIZE, userId, visitorId }),
+    getCachedTotal(company, difficulty, outcome, search),
+    getCachedCompanies(),
   ]);
 
   const totalPages = Math.ceil(total / PAGE_SIZE);
-  const hasFilters = !!(company || difficulty || outcome);
+  const hasFilters = !!(company || difficulty || outcome || search);
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -126,7 +139,7 @@ export default async function InterviewsPage({ searchParams }: Props) {
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6">
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <script async type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
 
       {/* Header */}
       <div className="mb-8">
@@ -145,63 +158,13 @@ export default async function InterviewsPage({ searchParams }: Props) {
       </div>
 
       {/* Filters */}
-      <form method="GET" className="mb-6 grid gap-3 sm:grid-cols-4">
-        {/* Company */}
-        <select
-          name="company"
-          defaultValue={company ?? ""}
-          className="rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-700 focus:border-indigo-300 focus:outline-none dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300"
-        >
-          <option value="">All companies</option>
-          {COMPANIES.map((c) => (
-            <option key={c} value={c}>{c}</option>
-          ))}
-        </select>
-
-        {/* Difficulty */}
-        <select
-          name="difficulty"
-          defaultValue={difficulty ?? ""}
-          className="rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-700 focus:border-indigo-300 focus:outline-none dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300"
-        >
-          <option value="">All difficulties</option>
-          <option value="easy">Easy</option>
-          <option value="medium">Medium</option>
-          <option value="hard">Hard</option>
-        </select>
-
-        {/* Outcome */}
-        <select
-          name="outcome"
-          defaultValue={outcome ?? ""}
-          className="rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-700 focus:border-indigo-300 focus:outline-none dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300"
-        >
-          <option value="">All outcomes</option>
-          <option value="offer">Got offer</option>
-          <option value="rejection">Rejected</option>
-          <option value="ongoing">Ongoing</option>
-          <option value="ghosted">Ghosted</option>
-        </select>
-
-        {/* Actions */}
-        <div className="flex gap-2">
-          <button
-            type="submit"
-            className="flex-1 rounded-lg bg-zinc-900 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-zinc-700 dark:bg-zinc-100 dark:text-zinc-900"
-          >
-            Filter
-          </button>
-          {hasFilters && (
-            <Link
-              href="/interviews"
-              className="flex items-center rounded-lg border border-zinc-200 px-3 py-2 text-sm text-zinc-500 hover:text-zinc-700 dark:border-zinc-700 dark:hover:text-zinc-300"
-              title="Clear filters"
-            >
-              ✕
-            </Link>
-          )}
-        </div>
-      </form>
+      <InterviewFilters
+        companies={companies}
+        currentCompany={company ?? ""}
+        currentDifficulty={difficulty ?? ""}
+        currentOutcome={outcome ?? ""}
+        currentSearch={search ?? ""}
+      />
 
       {/* Experience cards */}
       {experiences.length === 0 ? (
@@ -246,14 +209,22 @@ export default async function InterviewsPage({ searchParams }: Props) {
               {/* Rounds */}
               <div className="mb-3">
                 <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-zinc-400">Interview Rounds</p>
-                <p className="whitespace-pre-wrap text-sm leading-relaxed text-zinc-700 dark:text-zinc-300">{exp.rounds}</p>
+                <ExpandableText
+                  text={exp.rounds}
+                  className="text-zinc-700 dark:text-zinc-300"
+                  labelClassName="text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200"
+                />
               </div>
 
               {/* Tips */}
               {exp.tips && (
                 <div className="mt-3 rounded-lg bg-indigo-50 px-4 py-3 dark:bg-indigo-950/40">
                   <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-indigo-500">Tips</p>
-                  <p className="whitespace-pre-wrap text-sm leading-relaxed text-indigo-800 dark:text-indigo-300">{exp.tips}</p>
+                  <ExpandableText
+                    text={exp.tips}
+                    className="text-indigo-800 dark:text-indigo-300"
+                    labelClassName="text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-200"
+                  />
                 </div>
               )}
 

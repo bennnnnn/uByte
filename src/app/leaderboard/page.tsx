@@ -1,7 +1,30 @@
+import type { Metadata } from "next";
 import Link from "next/link";
-import { absoluteUrl } from "@/lib/seo";
+import { absoluteUrl, SITE_KEYWORDS } from "@/lib/seo";
 import { APP_NAME, BASE_URL } from "@/lib/constants";
 import LeaderboardClient from "./LeaderboardClient";
+
+export const metadata: Metadata = {
+  title: "Coding Leaderboard — Top Learners",
+  description:
+    "See the top uByte learners ranked by XP. Earn experience points by completing coding tutorials, solving interview prep problems, and maintaining daily streaks.",
+  keywords: [...SITE_KEYWORDS, "coding leaderboard", "programming xp", "learn to code ranking"],
+  alternates: { canonical: absoluteUrl("/leaderboard") },
+  openGraph: {
+    type: "website",
+    url: absoluteUrl("/leaderboard"),
+    title: "uByte Coding Leaderboard",
+    description: "See the top learners ranked by XP. Complete tutorials, solve problems, and climb the leaderboard.",
+    siteName: APP_NAME,
+    images: [{ url: absoluteUrl("/api/og?title=Leaderboard&description=Top+uByte+learners+ranked+by+XP+and+problems+solved"), width: 1200, height: 630 }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "uByte Coding Leaderboard",
+    description: "See the top learners ranked by XP. Complete tutorials and solve problems to climb the board.",
+    images: [absoluteUrl("/api/og?title=Leaderboard&description=Top+uByte+learners+ranked+by+XP+and+problems+solved")],
+  },
+};
 
 export default function LeaderboardPage() {
   const jsonLd = {
@@ -16,7 +39,7 @@ export default function LeaderboardPage() {
 
   return (
     <>
-      <script
+      <script async
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />

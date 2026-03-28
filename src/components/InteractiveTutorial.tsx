@@ -6,8 +6,6 @@ import type { TutorialStep } from "@/lib/tutorial-steps";
 import { useAuth } from "@/components/AuthProvider";
 import ThemeToggle from "@/components/ThemeToggle";
 import AuthButtons from "@/components/AuthButtons";
-import UpgradeWall from "@/components/UpgradeWall";
-import { hasPaidAccess } from "@/lib/plans";
 import { useCodeEditor } from "@/hooks/useCodeEditor";
 import { useStepProgress } from "@/hooks/useStepProgress";
 import { usePanelResize } from "@/hooks/usePanelResize";
@@ -22,7 +20,6 @@ import GuestConversionPrompt from "@/components/GuestConversionPrompt";
 import GuestTopBanner from "@/components/GuestTopBanner";
 import { CodeEditor } from "@/components/editor/CodeEditor";
 import { EditorToolbar } from "@/components/editor/EditorToolbar";
-import { useShareCode } from "@/hooks/useShareCode";
 import { useEditorKeyDown } from "@/hooks/useEditorKeyDown";
 import { tryDecodeShareCode } from "@/lib/share-code";
 import DiscussionThread from "@/app/practice/[lang]/[slug]/DiscussionThread";
@@ -39,7 +36,6 @@ interface Props {
   allTutorials: { slug: string; title: string; order: number; difficulty: string; estimatedMinutes: number }[];
   allTutorialSteps: Record<string, { index: number; title: string }[]>;
   next: { slug: string; title: string } | null;
-  isFree: boolean;
 }
 
 export default function InteractiveTutorial({
@@ -50,7 +46,6 @@ export default function InteractiveTutorial({
   allTutorials,
   allTutorialSteps,
   next,
-  isFree,
 }: Props) {
   const { user, profile, loading, progressByLang } = useAuth();
 
@@ -66,7 +61,22 @@ export default function InteractiveTutorial({
 
   const [expandedSlug, setExpandedSlug] = useState(tutorialSlug);
   const [showSnapshots, setShowSnapshots] = useState(false);
-  const { shareCopied, handleShare } = useShareCode(() => editor.code);
+
+  // Notes (per-tutorial, persisted in localStorage)
+  const [notesOpen, setNotesOpen] = useState(false);
+  const [notes, setNotes] = useState<string>("");
+  const notesKey = `tutorial-notes-${lang}-${tutorialSlug}`;
+  const [noteSaved, setNoteSaved] = useState(false);
+
+  useEffect(() => {
+    try { setNotes(localStorage.getItem(notesKey) ?? ""); } catch { /* ignore */ }
+  }, [notesKey]);
+
+  function saveNotesNow() {
+    try { localStorage.setItem(notesKey, notes); } catch { /* ignore */ }
+    setNoteSaved(true);
+    setTimeout(() => setNoteSaved(false), 2000);
+  }
   const [fontSize, setFontSize] = useState<14 | 16 | 18>(14);
   useEffect(() => {
     try {
@@ -102,6 +112,8 @@ export default function InteractiveTutorial({
   // firing before the real draft arrives and accidentally overwriting it with starter code.
   const draftLoadingRef = useRef(false);
   const saveDraftTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [resetDone, setResetDone] = useState(false);
+  const resetTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   /**
    * Load the saved draft for (tutorialSlug, stepIndex, lang) from the DB.
@@ -190,17 +202,9 @@ export default function InteractiveTutorial({
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  /** Reset to starter and delete the saved draft for the current step. */
+  /** Reset to starter immediately and show brief confirmation. */
   function handleReset() {
-    // Ask for confirmation — user may have written code they didn't mean to lose.
-    const confirmed = window.confirm(
-      "This will restore the original starter code and delete your current changes for this step.\n\nAre you sure?"
-    );
-    if (!confirmed) return;
-
-    // Cancel any in-flight save so it doesn't undo the delete
     if (saveDraftTimerRef.current) clearTimeout(saveDraftTimerRef.current);
-    // Delete the user's saved draft from DB (starter code never lives in the DB)
     if (user) {
       const safeIndex = Math.min(stepProgress.stepIndex, currentSteps.length - 1);
       apiFetch("/api/code-drafts", {
@@ -210,6 +214,9 @@ export default function InteractiveTutorial({
       }).catch(() => {});
     }
     stepProgress.handleReset(currentStep, editor.setCode, editor.setErrorLines);
+    setResetDone(true);
+    if (resetTimerRef.current) clearTimeout(resetTimerRef.current);
+    resetTimerRef.current = setTimeout(() => setResetDone(false), 2000);
   }
 
   const handleKeyDown = useEditorKeyDown({
@@ -224,10 +231,6 @@ export default function InteractiveTutorial({
         No steps found for this tutorial.
       </div>
     );
-  }
-
-  if (!isFree && !loading && !hasPaidAccess(profile?.plan)) {
-    return <UpgradeWall tutorialTitle={tutorialTitle} />;
   }
 
   // Show conversion prompt to guests after completing their very first step
@@ -361,7 +364,7 @@ export default function InteractiveTutorial({
         </div>
 
         {/* Right panel */}
-        <div className={`flex-col overflow-hidden ${mobileTab === "code" ? "flex" : "hidden"} md:flex flex-1`}>
+        <div className={`relative flex-col overflow-hidden ${mobileTab === "code" ? "flex" : "hidden"} md:flex flex-1`}>
           {/* Shared code editor surface */}
           <CodeEditor editor={editor} onKeyDown={handleKeyDown} fontSize={isMobile ? fontSize : undefined} />
 
@@ -370,8 +373,6 @@ export default function InteractiveTutorial({
             lang={ideLang}
             onLangChange={setIdeLang}
             langOptions={Object.keys(LANGUAGES) as SupportedLanguage[]}
-            shareCopied={shareCopied}
-            onShare={handleShare}
             extraLeft={stepsLoading ? <span className="text-xs text-zinc-500">Loading…</span> : undefined}
           >
             <button
@@ -395,12 +396,89 @@ export default function InteractiveTutorial({
             <button
               type="button"
               onClick={handleReset}
-              title="Restore the original starter code — your changes will be deleted"
-              className="rounded-md border border-zinc-300 px-3 py-1.5 text-sm text-zinc-500 transition-colors hover:border-red-300 hover:text-red-600 dark:border-zinc-700 dark:text-zinc-400 dark:hover:border-red-700 dark:hover:text-red-400"
+              title="Restore the original starter code"
+              className={`rounded-md border px-3 py-1.5 text-sm transition-colors ${
+                resetDone
+                  ? "border-emerald-400 text-emerald-600 dark:border-emerald-600 dark:text-emerald-400"
+                  : "border-zinc-300 text-zinc-500 hover:border-red-300 hover:text-red-600 dark:border-zinc-700 dark:text-zinc-400 dark:hover:border-red-700 dark:hover:text-red-400"
+              }`}
             >
-              ↺ Reset starter
+              {resetDone ? "✓ Reset" : "↺ Reset"}
+            </button>
+            {/* Notes button — ml-auto pushes it to the right, where Share was */}
+            <button
+              type="button"
+              onClick={() => setNotesOpen((v) => !v)}
+              title="My notes for this tutorial"
+              className={`ml-auto flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-sm transition-all ${
+                notesOpen
+                  ? "border-amber-400 bg-amber-50 text-amber-700 dark:border-amber-600 dark:bg-amber-950/30 dark:text-amber-400"
+                  : "border-zinc-300 text-zinc-500 hover:border-zinc-400 hover:text-zinc-800 dark:border-zinc-700 dark:text-zinc-400 dark:hover:border-zinc-600 dark:hover:text-zinc-200"
+              }`}
+            >
+              <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+              </svg>
+              Notes
             </button>
           </EditorToolbar>
+
+          {/* Notes drawer — vertical side panel overlaying the editor column */}
+          {notesOpen && (
+            <>
+              {/* Backdrop — click to close */}
+              <div
+                className="absolute inset-0 z-20 bg-black/20 dark:bg-black/40"
+                onClick={() => setNotesOpen(false)}
+              />
+              {/* Drawer */}
+              <div className="absolute inset-y-0 right-0 z-30 flex w-72 flex-col border-l border-zinc-200 bg-white shadow-2xl dark:border-zinc-700 dark:bg-zinc-900">
+                {/* Header */}
+                <div className="flex items-center justify-between border-b border-zinc-100 px-4 py-3 dark:border-zinc-800">
+                  <div className="flex items-center gap-2">
+                    <svg className="h-4 w-4 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                    </svg>
+                    <p className="text-sm font-semibold text-zinc-800 dark:text-zinc-100">My Notes</p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setNotesOpen(false)}
+                    className="rounded-md p-1 text-zinc-400 hover:bg-zinc-100 hover:text-zinc-700 dark:hover:bg-zinc-800 dark:hover:text-zinc-200"
+                    title="Close notes"
+                  >
+                    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+
+                {/* Textarea — grows to fill remaining space */}
+                <textarea
+                  id="tutorial-notes"
+                  name="notes"
+                  value={notes}
+                  onChange={(e) => { setNotes(e.target.value); setNoteSaved(false); }}
+                  placeholder="Write your observations, questions, or ideas here…"
+                  className="flex-1 resize-none bg-transparent px-4 py-3 text-sm text-zinc-800 placeholder-zinc-400 focus:outline-none dark:text-zinc-200 dark:placeholder-zinc-500"
+                />
+
+                {/* Footer */}
+                <div className="flex items-center justify-between border-t border-zinc-100 px-4 py-3 dark:border-zinc-800">
+                  <p className="text-xs text-zinc-400 dark:text-zinc-500">
+                    {user ? "Saved per tutorial." : "Sign in to sync notes."}
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => { saveNotesNow(); setNotesOpen(false); }}
+                    className="flex items-center gap-1.5 rounded-md bg-indigo-600 px-4 py-1.5 text-sm font-semibold text-white transition-colors hover:bg-indigo-500"
+                  >
+                    Save &amp; Close
+                  </button>
+                </div>
+              </div>
+            </>
+          )}
 
           {/* Vertical resize handle — touch-friendly on mobile */}
           <div
@@ -431,8 +509,6 @@ export default function InteractiveTutorial({
           lang={ideLang}
           onLangChange={setIdeLang}
           langOptions={Object.keys(LANGUAGES) as SupportedLanguage[]}
-          shareCopied={shareCopied}
-          onShare={handleShare}
           mobile
         >
           <button
@@ -457,9 +533,28 @@ export default function InteractiveTutorial({
             type="button"
             onClick={handleReset}
             aria-label="Reset to original starter code"
-            className="flex shrink-0 items-center justify-center rounded-md border border-zinc-300 px-3 py-2 text-sm text-zinc-500 dark:border-zinc-700 dark:text-zinc-400"
+            className={`flex shrink-0 items-center justify-center rounded-md border px-3 py-2 text-sm transition-colors ${
+              resetDone
+                ? "border-emerald-400 text-emerald-600 dark:border-emerald-600 dark:text-emerald-400"
+                : "border-zinc-300 text-zinc-500 dark:border-zinc-700 dark:text-zinc-400"
+            }`}
           >
-            ↺
+            {resetDone ? "✓" : "↺"}
+          </button>
+          <button
+            type="button"
+            onClick={() => setNotesOpen((v) => !v)}
+            aria-label="My notes"
+            className={`flex shrink-0 items-center justify-center gap-1 rounded-md border px-3 py-2 text-sm transition-all ${
+              notesOpen
+                ? "border-amber-400 bg-amber-50 text-amber-700 dark:border-amber-600 dark:bg-amber-950/30 dark:text-amber-400"
+                : "border-zinc-300 text-zinc-500 dark:border-zinc-700 dark:text-zinc-400"
+            }`}
+          >
+            <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+            </svg>
+            Notes
           </button>
         </EditorToolbar>
       )}
@@ -481,7 +576,6 @@ export default function InteractiveTutorial({
           lang={lang}
           tutorialSlug={tutorialSlug}
           next={next}
-          countdown={stepProgress.countdown}
           onDismiss={() => stepProgress.setTutorialDone(false)}
         />
       )}

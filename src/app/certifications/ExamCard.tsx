@@ -38,18 +38,18 @@ export default function ExamCard({ slug, examConfig, stats, publicStats, isLogge
   const hasData   = totalAttempts > 0;
   const difficulty = getDifficultyFromPassRate(passRate, hasData);
 
-  const ctaLabel = tryAgain ? "Try again →" : isPassed ? "View cert →" : "Take certification →";
+  const ctaLabel = tryAgain ? "Try again →" : isPassed ? "View cert →" : "Take free exam →";
 
   return (
     <Link
       href={`/certifications/${slug}`}
       aria-label={`${config.name} certification exam — difficulty: ${difficulty.label}`}
-      className="group relative flex flex-col overflow-hidden rounded-2xl border border-zinc-200 bg-surface-card shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/40 dark:border-zinc-700"
+      className="group relative flex flex-col overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/40 dark:border-zinc-700 dark:bg-zinc-900"
     >
       <div className="flex flex-1 flex-col gap-5 p-6">
         {/* Top row: icon + name + difficulty + status */}
         <div className="flex items-center gap-3">
-          <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-zinc-100 bg-zinc-50 text-2xl dark:border-zinc-700/60 dark:bg-zinc-800">
+          <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-zinc-200 bg-zinc-100 text-2xl dark:border-zinc-700/60 dark:bg-zinc-800">
             {getLangIcon(slug)}
           </span>
           <div className="min-w-0 flex-1">
@@ -73,17 +73,17 @@ export default function ExamCard({ slug, examConfig, stats, publicStats, isLogge
         {/* Exam info + stats */}
         <div className="grid grid-cols-2 gap-x-4 gap-y-3">
           <div>
-            <p className="text-xs text-zinc-600 dark:text-zinc-400">Questions</p>
+            <p className="text-xs text-zinc-500 dark:text-zinc-400">Questions</p>
             <p className="mt-0.5 text-lg font-bold tabular-nums text-zinc-900 dark:text-zinc-100">{examConfig.examSize}</p>
           </div>
           <div>
-            <p className="text-xs text-zinc-600 dark:text-zinc-400">Time limit</p>
+            <p className="text-xs text-zinc-500 dark:text-zinc-400">Time limit</p>
             <p className="mt-0.5 text-lg font-bold tabular-nums text-zinc-900 dark:text-zinc-100">
-              {examConfig.examDurationMinutes}<span className="ml-0.5 text-sm font-normal text-zinc-600 dark:text-zinc-400">min</span>
+              {examConfig.examDurationMinutes}<span className="ml-0.5 text-sm font-normal text-zinc-500 dark:text-zinc-400">min</span>
             </p>
           </div>
           <div>
-            <p className="text-xs text-zinc-600 dark:text-zinc-400">Attempts</p>
+            <p className="text-xs text-zinc-500 dark:text-zinc-400">Attempts</p>
             <p className="mt-0.5 text-lg font-bold tabular-nums text-zinc-900 dark:text-zinc-100">
               {totalAttempts > 0 ? totalAttempts.toLocaleString() : "0"}
             </p>
@@ -91,7 +91,7 @@ export default function ExamCard({ slug, examConfig, stats, publicStats, isLogge
           {/* Show user's best score if they've failed before; otherwise show community pass rate */}
           {isLoggedIn && tryAgain && stats?.bestScore != null ? (
             <div>
-              <p className="text-xs text-zinc-600 dark:text-zinc-400">Your best</p>
+              <p className="text-xs text-zinc-500 dark:text-zinc-400">Your best</p>
               {/* amber-700 on white: ~5.0:1 — passes WCAG AA */}
               <p className="mt-0.5 text-lg font-bold tabular-nums text-amber-700 dark:text-amber-400">
                 {stats.bestScore}%
@@ -99,7 +99,7 @@ export default function ExamCard({ slug, examConfig, stats, publicStats, isLogge
             </div>
           ) : (
             <div>
-              <p className="text-xs text-zinc-600 dark:text-zinc-400">Pass rate</p>
+              <p className="text-xs text-zinc-500 dark:text-zinc-400">Pass rate</p>
               <p className={`mt-0.5 text-lg font-bold tabular-nums ${
                 !hasData ? "text-zinc-500 dark:text-zinc-400" : passRate >= 60 ? "text-emerald-700 dark:text-emerald-400" : "text-amber-700 dark:text-amber-400"
               }`}>

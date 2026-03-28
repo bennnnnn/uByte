@@ -12,7 +12,7 @@ import { LANG_ICONS } from "@/lib/languages/icons";
 import type { SupportedLanguage } from "@/lib/languages/types";
 import type { Metadata } from "next";
 
-import { BASE_URL } from "@/lib/constants";
+import { APP_NAME, BASE_URL } from "@/lib/constants";
 import { absoluteUrl, buildBreadcrumbJsonLd } from "@/lib/seo";
 
 export async function generateMetadata({ params }: { params: Promise<{ userId: string }> }): Promise<Metadata> {
@@ -20,15 +20,26 @@ export async function generateMetadata({ params }: { params: Promise<{ userId: s
   const profile = await getPublicProfile(parseInt(userId, 10));
   if (!profile) return { title: "User not found" };
   const canonical = absoluteUrl(`/u/${userId}`);
+  const title = `${profile.name}'s Coding Profile | uByte`;
+  const description = `${profile.name} has earned ${profile.xp} XP on uByte — interactive coding tutorials, interview prep, and programming certifications.`;
+  const ogImage = absoluteUrl(`/api/og?title=${encodeURIComponent(profile.name)}&description=${encodeURIComponent(`${profile.xp} XP · uByte learner`)}`);
   return {
-    title: `${profile.name}'s Profile | uByte`,
-    description: `${profile.name} has ${profile.xp} XP on uByte.`,
+    title,
+    description,
     alternates: { canonical },
     openGraph: {
-      title: `${profile.name} on uByte`,
-      description: `${profile.name}'s public learning profile on uByte.`,
+      title,
+      description,
       url: canonical,
       type: "profile",
+      siteName: APP_NAME,
+      images: [{ url: ogImage, width: 1200, height: 630 }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [ogImage],
     },
   };
 }
@@ -82,7 +93,7 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
 
   return (
     <div className="mx-auto max-w-3xl px-6 py-12">
-      <script
+      <script async
         type="application/ld+json"
         dangerouslySetInnerHTML={{
           __html: JSON.stringify([personJsonLd, breadcrumbJsonLd]).replace(/</g, "\\u003c"),

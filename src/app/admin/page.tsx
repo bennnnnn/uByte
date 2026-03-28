@@ -14,7 +14,7 @@ import { useAdminData } from "./hooks";
 import { Spinner, TabIcon } from "./components";
 import { TAB_LABELS, LIMITED_ADMIN_TABS } from "./types";
 import type { Tab } from "./types";
-import { UsersTab, AnalyticsTab, RevenueTab, GrowthTab, ExamsTab, BannerTab, AuditTab, BlogTab, MessagesTab, InterviewsTab, AdminsTab, SiteSettingsTab } from "./tabs";
+import { UsersTab, AnalyticsTab, RevenueTab, GrowthTab, ExamsTab, BannerTab, AuditTab, BlogTab, MessagesTab, InterviewsTab, ReportsTab, AdminsTab, SiteSettingsTab } from "./tabs";
 
 /* ── Tab header subtitles (concise one-liners per tab) ───────────────────── */
 const TAB_SUBTITLES: Record<Tab, string> = {
@@ -28,6 +28,7 @@ const TAB_SUBTITLES: Record<Tab, string> = {
   blog:            "Create and edit blog posts without touching the repo",
   messages:        "Contact form submissions from users",
   interviews:      "Moderate user-submitted interview experiences",
+  reports:         "Flagged discussion comments awaiting review",
   admins:          "Manage admin access and roles",
   "site-settings": "Global site configuration",
 };
@@ -36,7 +37,7 @@ const TAB_SUBTITLES: Record<Tab, string> = {
 const ALL_SIDEBAR_SECTIONS: { label: string; tabs: Tab[] }[] = [
   { label: "Overview", tabs: ["users", "analytics", "revenue", "growth"] },
   { label: "Manage",   tabs: ["exams", "banner", "blog", "interviews"] },
-  { label: "Inbox",    tabs: ["messages"] },
+  { label: "Inbox",    tabs: ["messages", "reports"] },
   { label: "History",  tabs: ["audit"] },
   { label: "Admin",    tabs: ["admins", "site-settings"] },
 ];
@@ -47,7 +48,7 @@ const defaultCls = "text-zinc-600 hover:bg-zinc-50 hover:text-zinc-900 dark:text
 
 export default function AdminPage() {
   const data = useAdminData();
-  const { user, loading, fetching, error, router, tab, setTab, query, setQuery, users, revenue, revenuePeriod, setRevenuePeriod, exportRevenueCSV, printRevenuePDF, exportUsersCSV, printRef, currentAdminRole } = data;
+  const { user, loading, fetching, error, router, tab, setTab, users, revenue, revenuePeriod, setRevenuePeriod, exportRevenueCSV, printRevenuePDF, exportUsersCSV, printRef, currentAdminRole } = data;
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const isSuperAdmin = !currentAdminRole || currentAdminRole === "super";
 
@@ -152,7 +153,7 @@ export default function AdminPage() {
 
   /* ── Dashboard layout ─────────────────────────────────────────────────── */
   return (
-    <div className="flex h-full bg-surface-card">
+    <div className="flex h-screen bg-surface-card">
 
       {/* ── Desktop sidebar (hidden on mobile) ──────────────────────────── */}
       <aside className="hidden w-60 shrink-0 flex-col border-r border-zinc-200 bg-white md:flex dark:border-zinc-800 dark:bg-zinc-900">
@@ -201,10 +202,6 @@ export default function AdminPage() {
             {/* Tab-specific controls */}
             {tab === "users" && (
               <div className="flex shrink-0 items-center gap-2">
-                <div className="relative hidden sm:block">
-                  <svg className="absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
-                  <input id="admin-search-desktop" name="search" type="search" value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search…" aria-label="Search users" className="w-40 rounded-lg border border-zinc-200 bg-zinc-50 py-1.5 pl-8 pr-3 text-sm text-zinc-900 placeholder-zinc-400 focus:border-indigo-300 focus:outline-none focus:ring-2 focus:ring-indigo-100 lg:w-48 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100 dark:focus:border-indigo-600 dark:focus:ring-indigo-900/30" />
-                </div>
                 <HeaderButton onClick={exportUsersCSV}>CSV</HeaderButton>
               </div>
             )}
@@ -222,15 +219,6 @@ export default function AdminPage() {
             )}
           </div>
 
-          {/* Mobile search — shown below header for users tab */}
-          {tab === "users" && (
-            <div className="mt-3 sm:hidden">
-              <div className="relative">
-                <svg className="absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
-                <input id="admin-search-mobile" name="search" type="search" value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search users…" aria-label="Search users" className="w-full rounded-lg border border-zinc-200 bg-zinc-50 py-2 pl-8 pr-3 text-sm text-zinc-900 placeholder-zinc-400 focus:border-indigo-300 focus:outline-none focus:ring-2 focus:ring-indigo-100 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100 dark:focus:border-indigo-600 dark:focus:ring-indigo-900/30" />
-              </div>
-            </div>
-          )}
         </header>
 
         {/* Active tab content */}
@@ -245,6 +233,7 @@ export default function AdminPage() {
           {tab === "blog"           && <BlogTab />}
           {tab === "messages"       && <MessagesTab />}
           {tab === "interviews"     && <InterviewsTab />}
+          {tab === "reports"        && <ReportsTab />}
           {tab === "admins"         && <AdminsTab       data={data} />}
           {tab === "site-settings"  && <SiteSettingsTab />}
         </div>

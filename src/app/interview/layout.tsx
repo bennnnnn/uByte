@@ -24,7 +24,7 @@ export const metadata: Metadata = {
   alternates: { canonical: absoluteUrl("/interview") },
   openGraph: {
     title: "Coding Interview Simulator — Timed Mock Interviews | uByte",
-    description: "Simulate real coding interviews with timed sessions in 7 languages. Practice under pressure and build confidence.",
+    description: "Simulate real coding interviews with timed sessions in 9 languages. Practice under pressure and build confidence.",
     url: absoluteUrl("/interview"),
     images: [{ url: absoluteUrl("/api/og?title=Interview+Simulator&description=Timed+mock+coding+interviews+in+7+languages"), width: 1200, height: 630 }],
   },

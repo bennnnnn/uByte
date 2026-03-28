@@ -9,7 +9,7 @@
  *   4. Optionally add testCases and judgeHarness for auto-grading
  *
  * All counts (total, per-category, per-difficulty) are dynamic.
- * The free drip system (src/lib/db/practice-unlocks.ts) gates access for free users.
+ * All problems are free for signed-in users.
  */
 import type { PracticeProblem, ProblemCategory, Difficulty } from "./types";
 import type { SupportedLanguage } from "@/lib/languages/types";
@@ -60,6 +60,7 @@ int main() {
 }`;
 
 const DEFAULT_JS = `// Your code here\nconsole.log("Hello, World!");`;
+const DEFAULT_TS = `// Your TypeScript code here\nconst result: unknown = null;\nconsole.log(result);`;
 const DEFAULT_JAVA = `public class Main {\n    public static void main(String[] args) {\n        // Your code here\n    }\n}`;
 const DEFAULT_RUST = `fn main() {\n    // Your code here\n    println!("Hello, World!");\n}`;
 const DEFAULT_CSHARP = `using System;\n\nclass Program {\n    static void Main() {\n        // Your code here\n    }\n}`;
@@ -174,6 +175,7 @@ export function getStarterForLanguage(
     case "python":     return DEFAULT_PYTHON;
     case "cpp":        return DEFAULT_CPP;
     case "javascript": return DEFAULT_JS;
+    case "typescript": return DEFAULT_TS;
     case "java":       return DEFAULT_JAVA;
     case "rust":       return DEFAULT_RUST;
     case "csharp":     return DEFAULT_CSHARP;

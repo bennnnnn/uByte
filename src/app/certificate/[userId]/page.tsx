@@ -112,7 +112,7 @@ export default async function CertificatePage({ params }: { params: Promise<{ us
 
   return (
     <div className="flex min-h-[80vh] items-center justify-center px-4 py-12">
-      <script
+      <script async
         type="application/ld+json"
         dangerouslySetInnerHTML={{
           __html: JSON.stringify([credentialJsonLd, breadcrumbJsonLd]).replace(/</g, "\\u003c"),

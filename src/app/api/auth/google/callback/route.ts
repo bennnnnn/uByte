@@ -105,8 +105,8 @@ export const GET = withErrorHandling("GET /api/auth/google/callback", async (req
         user.id,
         "success",
         "Welcome to uByte! 🎉",
-        "Your account is ready. Start with a tutorial, tackle an interview problem, or take a free certification exam.",
-        "/tutorial/go"
+    "Your account is ready. Start with a tutorial, tackle an interview problem, or take a free certification exam.",
+    "/dashboard"
       ).catch(() => {});
       // Track referral if user arrived via an invite link
       if (referralCode && /^[a-z0-9]{6,16}$/i.test(referralCode)) {

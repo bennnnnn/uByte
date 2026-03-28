@@ -163,6 +163,8 @@ export async function runJudge(
     lang === "go"         ? problem.judgeHarness?.go :
     lang === "python"     ? problem.judgeHarness?.python :
     lang === "javascript" ? problem.judgeHarness?.javascript :
+    // TypeScript is a superset of JS — fall back to the JS harness if no dedicated TS harness
+    lang === "typescript" ? (problem.judgeHarness?.typescript ?? problem.judgeHarness?.javascript) :
     lang === "cpp"        ? problem.judgeHarness?.cpp :
     lang === "java"       ? problem.judgeHarness?.java :
     lang === "csharp"     ? problem.judgeHarness?.csharp :
@@ -175,13 +177,15 @@ export async function runJudge(
   }
 
   const solution =
-    lang === "go"         ? extractGoSolution(code) :
-    lang === "python"     ? extractPythonSolution(code) :
-    lang === "javascript" ? extractJavaScriptSolution(code) :
-    lang === "cpp"        ? extractCppSolution(code) :
-    lang === "java"       ? extractJavaSolution(code) :
-    lang === "csharp"     ? extractCSharpSolution(code) :
-                            extractRustSolution(code);
+    lang === "go"                    ? extractGoSolution(code) :
+    lang === "python"                ? extractPythonSolution(code) :
+    lang === "javascript"            ? extractJavaScriptSolution(code) :
+    // TypeScript uses the same solution shape as JavaScript
+    lang === "typescript"            ? extractJavaScriptSolution(code) :
+    lang === "cpp"                   ? extractCppSolution(code) :
+    lang === "java"                  ? extractJavaSolution(code) :
+    lang === "csharp"                ? extractCSharpSolution(code) :
+                                       extractRustSolution(code);
 
   // C# harnesses call `new Solution()` — the user must define a `public class Solution`.
   // If the code only contains the old default `class Program` boilerplate (no Solution class),

@@ -1,5 +1,27 @@
+import type { Metadata } from "next";
 import Link from "next/link";
+import { absoluteUrl } from "@/lib/seo";
+import { APP_NAME } from "@/lib/constants";
 import ContactClient from "./ContactClient";
+
+export const metadata: Metadata = {
+  title: "Contact Us — uByte",
+  description:
+    "Get help with your uByte account, billing, certifications, or send feedback. We typically respond within one business day.",
+  alternates: { canonical: absoluteUrl("/contact") },
+  openGraph: {
+    type: "website",
+    url: absoluteUrl("/contact"),
+    title: "Contact uByte Support",
+    description: "Reach the uByte team for account help, billing questions, bug reports, or feature requests. We respond within one business day.",
+    siteName: APP_NAME,
+  },
+  twitter: {
+    card: "summary",
+    title: "Contact uByte Support",
+    description: "Reach the uByte team for account help, billing questions, or feature requests.",
+  },
+};
 
 export default function ContactPage() {
   return (

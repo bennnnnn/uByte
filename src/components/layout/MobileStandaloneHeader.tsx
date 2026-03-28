@@ -4,7 +4,7 @@ import { useState, Suspense } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import AuthButtons from "@/components/AuthButtons";
-import { LANGUAGES, getAllLanguageSlugs } from "@/lib/languages/registry";
+import { LANGUAGES, getAllLanguageSlugs, getPracticeLanguageSlugs } from "@/lib/languages/registry";
 import { useAuth } from "@/components/AuthProvider";
 import { hasPaidAccess } from "@/lib/plans";
 
@@ -16,7 +16,7 @@ function isStandalonePath(pathname: string): boolean {
 }
 
 const LANG_ICONS: Record<string, string> = {
-  go: "🐹", python: "🐍", javascript: "🟨", java: "☕", rust: "🦀", cpp: "⚙️", csharp: "💜",
+  go: "🐹", python: "🐍", javascript: "🟨", typescript: "🔷", java: "☕", rust: "🦀", cpp: "⚙️", csharp: "💜", sql: "🗄️",
 };
 
 function AccordionSection({
@@ -64,6 +64,7 @@ export default function MobileStandaloneHeader() {
   if (!isStandalonePath(pathname ?? "")) return null;
 
   const languageSlugs = getAllLanguageSlugs();
+  const practiceLanguageSlugs = getPracticeLanguageSlugs();
 
   const toggle = (section: string) => {
     setExpandedSection((prev) => (prev === section ? null : section));
@@ -77,7 +78,7 @@ export default function MobileStandaloneHeader() {
   return (
     <div className="sticky top-0 z-30 shrink-0 md:hidden">
       <div className="flex items-center justify-between border-b border-zinc-100 bg-white/90 px-4 py-3 shadow-sm backdrop-blur-md dark:border-zinc-800 dark:bg-zinc-950/90">
-        <Link href="/" className="flex items-center gap-2.5 text-zinc-900 dark:text-white">
+        <Link href="/" aria-label="uByte — home" className="flex items-center gap-2.5 text-zinc-900 dark:text-white">
           <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-indigo-600 text-sm font-bold text-white">U</span>
           <span className="text-lg font-bold">uByte</span>
         </Link>
@@ -153,7 +154,7 @@ export default function MobileStandaloneHeader() {
               <span className="text-base">⚡</span>
               Daily Challenge
             </Link>
-            {languageSlugs.map((slug) => {
+            {practiceLanguageSlugs.map((slug) => {
               const config = LANGUAGES[slug as keyof typeof LANGUAGES];
               if (!config) return null;
               return (

@@ -1,19 +1,18 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { getAllPracticeProblems, getPracticeCategories, getCategoryLabel } from "@/lib/practice/problems";
-import { LANGUAGES, getAllLanguageSlugs } from "@/lib/languages/registry";
+import { LANGUAGES, getPracticeLanguageSlugs } from "@/lib/languages/registry";
 import type { SupportedLanguage } from "@/lib/languages/types";
 import { DIFFICULTY_BADGE } from "@/lib/practice/types";
-import { MAX_FREE_PROBLEMS } from "@/lib/plans";
 import { getLangIcon } from "@/lib/languages/icons";
 import { absoluteUrl, SITE_KEYWORDS } from "@/lib/seo";
 
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Coding Interview Prep — Practice Problems in 7 Languages | uByte",
+  title: "Coding Interview Prep — Practice Problems in 8 Languages",
   description:
-    "Ace your coding interview with 200+ practice problems in Go, Python, JavaScript, Java, C++, Rust, and C#. Arrays, strings, trees, graphs, dynamic programming, and more — solve in-browser with instant test feedback. Free problems included.",
+    "Ace your coding interview with 200+ practice problems in Go, Python, TypeScript, JavaScript, Java, C++, Rust, and C#. Arrays, strings, trees, graphs, dynamic programming, and more — solve in-browser with instant test feedback. All problems free.",
   keywords: [
     ...SITE_KEYWORDS,
     "coding interview questions",
@@ -42,27 +41,41 @@ export const metadata: Metadata = {
   ],
   alternates: { canonical: absoluteUrl("/practice") },
   openGraph: {
-    title: "Coding Interview Prep — Practice Problems in 7 Languages | uByte",
+    title: "Coding Interview Prep — Practice Problems in 8 Languages",
     description:
-      "200+ coding interview problems across Go, Python, JavaScript, Java, C++, Rust, and C#. Write real code in the browser and get instant test feedback.",
+      "200+ coding interview problems across Go, Python, TypeScript, JavaScript, Java, C++, Rust, and C#. Write real code in the browser and get instant test feedback. All problems free.",
     type: "website",
     url: absoluteUrl("/practice"),
     images: [{ url: absoluteUrl("/api/og?title=Interview+Prep&description=200%2B+coding+problems+in+7+languages+with+instant+feedback"), width: 1200, height: 630 }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Coding Interview Prep — Practice Problems in 7 Languages | uByte",
-    description: "200+ LeetCode-style problems in Go, Python, JavaScript, Java, Rust, C++, and C#. Solve in-browser with instant test feedback.",
+    title: "Coding Interview Prep — Practice Problems in 8 Languages",
+    description: "200+ LeetCode-style problems in Go, Python, TypeScript, JavaScript, Java, Rust, C++, and C#. Solve in-browser with instant test feedback. All problems free.",
   },
 };
 
-export default async function PracticePage() {
+const PAGE_SIZE = 40;
+
+export default async function PracticePage({
+  searchParams,
+}: {
+  searchParams?: Promise<{ page?: string }>;
+}) {
+  const resolved = await (searchParams ?? Promise.resolve({}));
+  const currentPage = Math.max(1, parseInt(resolved.page ?? "1", 10) || 1);
+
   const problems = getAllPracticeProblems();
   const categories = getPracticeCategories();
   const easy   = problems.filter((p) => p.difficulty === "easy").length;
   const medium = problems.filter((p) => p.difficulty === "medium").length;
   const hard   = problems.filter((p) => p.difficulty === "hard").length;
-  const langSlugs = getAllLanguageSlugs() as SupportedLanguage[];
+  const langSlugs = getPracticeLanguageSlugs() as SupportedLanguage[];
+
+  const totalPages = Math.ceil(problems.length / PAGE_SIZE);
+  const safePage = Math.min(currentPage, totalPages);
+  const pageStart = (safePage - 1) * PAGE_SIZE;
+  const pageProblems = problems.slice(pageStart, pageStart + PAGE_SIZE);
 
   const defaultLang = langSlugs[0] ?? "go";
 
@@ -80,7 +93,7 @@ export default async function PracticePage() {
 
   return (
     <div className="min-h-full bg-surface-page">
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <script async type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
 
       {/* ── Hero ─────────────────────────────────────────────────────────── */}
       <div className="border-b border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-950">
@@ -108,7 +121,7 @@ export default async function PracticePage() {
             </span>
             <span className="text-xs text-zinc-400">·</span>
             <span className="text-xs font-medium text-zinc-500 dark:text-zinc-400">
-              {MAX_FREE_PROBLEMS} free to start
+              All free
             </span>
             <span className="text-xs text-zinc-400">·</span>
             <span className="text-xs font-medium text-zinc-500 dark:text-zinc-400">
@@ -167,32 +180,18 @@ export default async function PracticePage() {
             </p>
           </div>
           <ul className="divide-y divide-zinc-100 dark:divide-zinc-800">
-            {problems.map((p, i) => (
-              <li key={p.slug} className="flex items-start gap-3 px-5 py-3.5">
-                <span className="mt-0.5 w-7 shrink-0 text-right text-xs tabular-nums text-zinc-300 dark:text-zinc-600">
-                  {i + 1}
+            {pageProblems.map((p, i) => (
+              <li key={p.slug} className="flex items-center gap-3 px-5 py-3.5">
+                <span className="w-7 shrink-0 text-right text-xs tabular-nums text-zinc-300 dark:text-zinc-600">
+                  {pageStart + i + 1}
                 </span>
-                <div className="min-w-0 flex-1">
-                  <Link
-                    href={`/practice/${defaultLang}/${p.slug}`}
-                    className="block truncate text-sm font-semibold text-zinc-800 transition-colors hover:text-indigo-700 dark:text-zinc-200 dark:hover:text-indigo-400"
-                  >
-                    {p.title}
-                  </Link>
-                  {/* Per-language solve links */}
-                  <div className="mt-1 flex flex-wrap gap-x-2 gap-y-0.5">
-                    {langSlugs.map((slug) => (
-                      <Link
-                        key={slug}
-                        href={`/practice/${slug}/${p.slug}`}
-                        className="text-[10px] font-medium text-zinc-400 transition-colors hover:text-indigo-600 dark:text-zinc-500 dark:hover:text-indigo-400"
-                      >
-                        {getLangIcon(slug)} {LANGUAGES[slug]?.name ?? slug}
-                      </Link>
-                    ))}
-                  </div>
-                </div>
-                <div className="flex shrink-0 items-center gap-2 pt-0.5">
+                <Link
+                  href={`/practice/${defaultLang}/${p.slug}`}
+                  className="min-w-0 flex-1 truncate text-sm font-semibold text-zinc-800 transition-colors hover:text-indigo-700 dark:text-zinc-200 dark:hover:text-indigo-400"
+                >
+                  {p.title}
+                </Link>
+                <div className="flex shrink-0 items-center gap-2">
                   {p.category && (
                     <span className="hidden rounded-full bg-zinc-100 px-2.5 py-0.5 text-[10px] font-semibold text-zinc-500 sm:inline dark:bg-zinc-800 dark:text-zinc-400">
                       {getCategoryLabel(p.category)}
@@ -205,13 +204,69 @@ export default async function PracticePage() {
               </li>
             ))}
           </ul>
+
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div className="flex flex-wrap items-center justify-between gap-4 border-t border-zinc-100 px-5 py-4 dark:border-zinc-800">
+              <p className="text-sm text-zinc-500 dark:text-zinc-400">
+                Page {safePage} of {totalPages} · {problems.length} problems
+              </p>
+              <nav className="flex items-center gap-1" aria-label="Pagination">
+                {safePage > 1 ? (
+                  <Link
+                    href={`/practice?page=${safePage - 1}`}
+                    className="inline-flex items-center gap-1 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm font-medium text-zinc-700 hover:bg-zinc-50 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700"
+                  >
+                    ← Prev
+                  </Link>
+                ) : (
+                  <span className="inline-flex cursor-not-allowed items-center rounded-lg border border-zinc-100 bg-zinc-50 px-3 py-2 text-sm font-medium text-zinc-400 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-500">
+                    ← Prev
+                  </span>
+                )}
+                <div className="flex items-center gap-1 px-1">
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) =>
+                    p === safePage ? (
+                      <span
+                        key={p}
+                        className="flex h-9 w-9 items-center justify-center rounded-lg bg-indigo-600 text-sm font-bold text-white"
+                        aria-current="page"
+                      >
+                        {p}
+                      </span>
+                    ) : (
+                      <Link
+                        key={p}
+                        href={`/practice?page=${p}`}
+                        className="flex h-9 w-9 items-center justify-center rounded-lg border border-zinc-200 bg-white text-sm font-medium text-zinc-700 hover:bg-zinc-50 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700"
+                      >
+                        {p}
+                      </Link>
+                    )
+                  )}
+                </div>
+                {safePage < totalPages ? (
+                  <Link
+                    href={`/practice?page=${safePage + 1}`}
+                    className="inline-flex items-center gap-1 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm font-medium text-zinc-700 hover:bg-zinc-50 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700"
+                  >
+                    Next →
+                  </Link>
+                ) : (
+                  <span className="inline-flex cursor-not-allowed items-center rounded-lg border border-zinc-100 bg-zinc-50 px-3 py-2 text-sm font-medium text-zinc-400 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-500">
+                    Next →
+                  </span>
+                )}
+              </nav>
+            </div>
+          )}
         </div>
 
         {/* Bottom CTA */}
         <div className="mt-8 rounded-2xl border border-indigo-200/70 bg-gradient-to-br from-indigo-600 to-violet-700 p-6 text-center text-white shadow-lg shadow-indigo-500/20 dark:border-indigo-700/50">
           <p className="mb-1 text-lg font-bold">Ready to start?</p>
           <p className="mb-5 text-sm text-indigo-200">
-            Pick your language and start solving. First {MAX_FREE_PROBLEMS} problems are free.
+            Pick your language and start solving. All problems are free.
           </p>
           <div className="flex flex-wrap justify-center gap-2">
             {langSlugs.slice(0, 4).map((slug) => (

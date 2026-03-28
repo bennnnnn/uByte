@@ -28,20 +28,6 @@
  * The plan is stored in users.plan as a string: "free" | "pro" | "yearly" | "monthly" | "trial"
  * The Paddle customer ID is stored in users.paddle_customer_id.
  */
-import { DAILY_DRIP, MAX_FREE_PROBLEMS } from "@/lib/db/practice-unlocks";
-
-// ─── Free tier limits ─────────────────────────────────────────────────────────
-
-export const FREE_TUTORIAL_LIMIT = 5; // tutorials with order <= 5 are free
-
-/**
- * @deprecated Use drip-based access via `tryUnlockProblem` instead.
- * Kept for backward compatibility in non-critical display code.
- */
-export const FREE_PRACTICE_LIMIT = MAX_FREE_PROBLEMS;
-
-// Re-export drip constants so UI code can import from one place
-export { DAILY_DRIP, MAX_FREE_PROBLEMS };
 
 // ─── Plan helpers ─────────────────────────────────────────────────────────────
 
@@ -49,24 +35,15 @@ export type BillingPlan = "monthly" | "yearly";
 
 /**
  * Returns true for any plan that grants paid feature access.
- * "canceling"     — user has cancelled but is still within their billing period.
- * "trial"         — active 7-day free trial (monthly price).
- * "trial_yearly"  — active 7-day free trial (yearly price).
+ * "canceling" — user has cancelled but is still within their billing period.
  */
 export function hasPaidAccess(plan?: string | null): boolean {
   return (
     plan === "yearly" ||
     plan === "pro" ||
     plan === "monthly" ||
-    plan === "canceling" ||
-    plan === "trial" ||
-    plan === "trial_yearly"
+    plan === "canceling"
   );
-}
-
-/** Returns true if the user is on a free trial (has access but hasn't paid yet). */
-export function isTrialPlan(plan?: string | null): boolean {
-  return plan === "trial" || plan === "trial_yearly";
 }
 
 /**
@@ -120,12 +97,3 @@ export const BILLING_CONFIG: Record<
 export const YEARLY_PRICE_ID = process.env.NEXT_PUBLIC_PADDLE_YEARLY_PRICE_ID ?? "";
 export const MONTHLY_PRICE_ID = process.env.NEXT_PUBLIC_PADDLE_PRO_PRICE_ID ?? "";
 
-// ─── Practice helpers ────────────────────────────────────────────────────────
-
-/**
- * @deprecated Use drip-based gating. This is only kept for the practice list
- * client display when no user context is available.
- */
-export function isPracticeProblemFree(_slug: string): boolean {
-  return false;
-}

@@ -565,7 +565,7 @@ export async function sendDay30WinBackEmail(to: string, name: string): Promise<v
           <div style="background:#fff;border:1px solid #e5e7eb;border-radius:10px;padding:20px;margin:20px 0">
             <p style="margin:0 0 8px;font-weight:700">What you're missing:</p>
             <table style="width:100%;border-collapse:collapse;font-size:14px;color:#6b7280">
-              <tr><td style="padding:6px 0;border-bottom:1px solid #f3f4f6">📖 Interactive coding lessons in 7 languages</td></tr>
+              <tr><td style="padding:6px 0;border-bottom:1px solid #f3f4f6">📖 Interactive coding lessons in 9 languages</td></tr>
               <tr><td style="padding:6px 0;border-bottom:1px solid #f3f4f6">💼 Real interview questions with AI hints</td></tr>
               <tr><td style="padding:6px 0">🏅 Certifications to add to your LinkedIn</td></tr>
             </table>
@@ -619,7 +619,7 @@ export async function sendTrialEndingEmail(
           <div style="background:#fff;border:2px solid ${isUrgent ? "#b45309" : "#4f46e5"};border-radius:10px;padding:20px;margin:20px 0">
             <p style="margin:0 0 4px;font-weight:700;color:${isUrgent ? "#b45309" : "#4f46e5"}">What you'll keep with a subscription:</p>
             <table style="width:100%;border-collapse:collapse;margin:12px 0;font-size:14px;color:#6b7280">
-              <tr><td style="padding:6px 0;border-bottom:1px solid #f3f4f6">📖 Unlimited tutorials in all 7 languages</td></tr>
+              <tr><td style="padding:6px 0;border-bottom:1px solid #f3f4f6">📖 Unlimited tutorials in all 9 languages</td></tr>
               <tr><td style="padding:6px 0;border-bottom:1px solid #f3f4f6">💼 All 70+ interview practice problems + AI hints</td></tr>
               <tr><td style="padding:6px 0">🏅 Certification exams + shareable certificates</td></tr>
             </table>

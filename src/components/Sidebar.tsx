@@ -5,7 +5,6 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useNavState } from "@/hooks/useNavState";
 import { useAuth } from "@/components/AuthProvider";
-import { FREE_TUTORIAL_LIMIT, hasPaidAccess } from "@/lib/plans";
 import { tutorialUrl } from "@/lib/urls";
 
 interface SearchResult {
@@ -32,9 +31,8 @@ interface SidebarItem {
 
 export default function Sidebar({ lang, tutorials }: { lang: string; tutorials: SidebarItem[] }) {
   const { pathname, expanded, activeHash, toggleExpand } = useNavState(tutorials, lang);
-  const { progressByLang, profile } = useAuth();
+  const { progressByLang } = useAuth();
   const progress = progressByLang[lang] ?? [];
-  const userHasPaidAccess = hasPaidAccess(profile?.plan);
   const [query, setQuery] = useState("");
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
   const [showDropdown, setShowDropdown] = useState(false);
@@ -143,7 +141,6 @@ export default function Sidebar({ lang, tutorials }: { lang: string; tutorials: 
               const isOnThisPage = pathname === href;
               const isExpanded = expanded === tutorial.slug;
               const isCompleted = progress.includes(tutorial.slug);
-              const isLocked = tutorial.order > FREE_TUTORIAL_LIMIT && !userHasPaidAccess;
 
               return (
                 <li key={tutorial.slug}>
@@ -159,12 +156,8 @@ export default function Sidebar({ lang, tutorials }: { lang: string; tutorials: 
                         : "font-medium text-zinc-800 hover:bg-zinc-200/70 hover:text-zinc-900 dark:text-zinc-200 dark:hover:bg-zinc-800 dark:hover:text-white"
                     }`}
                   >
-                    <span className={`flex-1 leading-snug ${isLocked ? "text-zinc-500 dark:text-zinc-400" : ""}`}>{tutorial.title}</span>
-                    {isLocked ? (
-                      <svg className="h-3.5 w-3.5 shrink-0 text-zinc-400 dark:text-zinc-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                      </svg>
-                    ) : isCompleted && !isOnThisPage ? (
+                    <span className="flex-1 leading-snug">{tutorial.title}</span>
+                    {isCompleted && !isOnThisPage ? (
                       <svg className="mr-1 h-3.5 w-3.5 shrink-0 text-emerald-500 dark:text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
                       </svg>

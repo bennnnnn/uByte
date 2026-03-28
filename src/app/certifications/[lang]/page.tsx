@@ -143,7 +143,7 @@ export default async function PracticeExamLangPage({ params }: Props) {
 
   return (
     <div className="min-h-full overflow-y-auto">
-      <script
+      <script async
         type="application/ld+json"
         dangerouslySetInnerHTML={{
           __html: JSON.stringify([examJsonLd, faqJsonLd, breadcrumbJsonLd]),
@@ -174,10 +174,15 @@ export default async function PracticeExamLangPage({ params }: Props) {
                     `${examConfig.examDurationMinutes} min`,
                     `${passMin} correct to pass (${EXAM_PASS_PERCENT}%)`,
                     "Certificate on pass",
+                    "100% Free",
                   ].map((label) => (
                     <span
                       key={label}
-                      className="inline-flex items-center rounded-full border border-zinc-200 bg-white px-3 py-1 text-sm font-medium text-zinc-700 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300"
+                      className={`inline-flex items-center rounded-full border px-3 py-1 text-sm font-medium ${
+                        label === "100% Free"
+                          ? "border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-800/50 dark:bg-emerald-950/30 dark:text-emerald-400"
+                          : "border-zinc-200 bg-white text-zinc-700 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300"
+                      }`}
                     >
                       {label}
                     </span>

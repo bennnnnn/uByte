@@ -20,7 +20,7 @@ export * from "./ai-feedback-cache";
 export * from "./ai-feedback-responses";
 export * from "./ai-usage";
 export * from "./practice-attempts";
-export * from "./practice-unlocks";
+
 export * from "./practice-notes";
 export * from "./practice-code-drafts";
 export * from "./last-activity";

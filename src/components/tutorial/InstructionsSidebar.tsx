@@ -1,10 +1,8 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import Link from "next/link";
 import TutorialRating from "@/components/TutorialRating";
-import { useAuth } from "@/components/AuthProvider";
-import { apiFetch } from "@/lib/api-client";
 import { tutorialUrl } from "@/lib/urls";
 import type { TutorialStep } from "@/lib/tutorial-steps";
 import type { StepProgressState } from "@/hooks/useStepProgress";
@@ -44,57 +42,13 @@ export default function InstructionsSidebar({
   nextTutorial,
 }: Props) {
   const { stepIndex, status, showHint, failCount, completedSteps, skippedSteps, tutorialDone } = progress;
-  const { user } = useAuth();
   const dotsRef = useRef<HTMLDivElement>(null);
-  const [showNote, setShowNote] = useState(false);
-  const [note, setNote] = useState("");
-  const [savingNote, setSavingNote] = useState(false);
-  const [noteSaved, setNoteSaved] = useState(false);
-  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const savedTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  // Load note when user/step changes
-  useEffect(() => {
-    if (!user) return;
-    fetch(`/api/notes?slug=${encodeURIComponent(tutorialSlug)}&stepIndex=${stepIndex}`, { credentials: "same-origin" })
-      .then((r) => r.json())
-      .then((d) => setNote(d.note ?? ""))
-      .catch(() => {});
-  }, [user, tutorialSlug, stepIndex]);
 
   // Scroll active step dot into view when step or done-state changes
   useEffect(() => {
     const el = dotsRef.current?.querySelector('[aria-selected="true"]') ?? dotsRef.current?.firstElementChild;
     el?.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
   }, [stepIndex, tutorialDone]);
-
-  useEffect(() => () => {
-    if (debounceRef.current) clearTimeout(debounceRef.current);
-    if (savedTimeoutRef.current) clearTimeout(savedTimeoutRef.current);
-  }, []);
-
-  async function saveNote(value: string) {
-    if (!user) return;
-    setSavingNote(true);
-    try {
-      await apiFetch("/api/notes", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ slug: tutorialSlug, stepIndex, note: value }),
-      });
-      setNoteSaved(true);
-      if (savedTimeoutRef.current) clearTimeout(savedTimeoutRef.current);
-      savedTimeoutRef.current = setTimeout(() => setNoteSaved(false), 2500);
-    } finally {
-      setSavingNote(false);
-    }
-  }
-
-  function handleNoteChange(val: string) {
-    setNote(val);
-    if (debounceRef.current) clearTimeout(debounceRef.current);
-    debounceRef.current = setTimeout(() => saveNote(val), 800);
-  }
 
   return (
     <>
@@ -128,64 +82,30 @@ export default function InstructionsSidebar({
           </div>
         )}
 
-        {user && (
-          <div className="mt-6">
-            <button
-              onClick={() => setShowNote((v) => !v)}
-              className="flex items-center gap-1.5 text-sm text-zinc-500 transition-colors hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200"
-            >
-              <span>{showNote ? "▾" : "▸"}</span>
-              📝 {showNote ? "Hide note" : "Note for this step"}
-            </button>
-            {showNote && (
-              <div className="mt-2 space-y-2">
-                <textarea
-                  id="step-note"
-                  name="note"
-                  value={note}
-                  onChange={(e) => handleNoteChange(e.target.value)}
-                  onBlur={() => note.trim() && saveNote(note)}
-                  placeholder="Write a note for this step (saved per question)…"
-                  maxLength={2000}
-                  rows={4}
-                  className="w-full resize-none rounded-lg border border-zinc-200 bg-zinc-50 p-2.5 text-sm text-zinc-700 placeholder-zinc-400 focus:border-indigo-400 focus:outline-none dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300 dark:placeholder-zinc-500"
-                />
-                <div className="flex items-center justify-between">
-                  <span className="text-xs text-zinc-400 dark:text-zinc-500">{note.length}/2000</span>
-                  <button
-                    type="button"
-                    onClick={() => saveNote(note)}
-                    disabled={savingNote}
-                    className="rounded-md bg-indigo-600 px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-indigo-700 disabled:opacity-50"
-                  >
-                    {savingNote ? "Saving…" : noteSaved ? "Saved ✓" : "Save note"}
-                  </button>
-                </div>
-              </div>
-            )}
-          </div>
-        )}
-
         {status === "passed" && (
           <div className="mt-6 rounded-lg border border-emerald-300 bg-emerald-50 p-4 dark:border-emerald-800 dark:bg-emerald-950/40">
             {step.successMessage ? (
-              // Custom per-step success message from steps.json
               step.successMessage.split("\n").map((line, i) => (
                 <p key={i} className={`text-sm text-emerald-700 dark:text-emerald-400 ${i === 0 ? "font-semibold" : "mt-1"}`}>
                   {line}
                 </p>
               ))
             ) : (
-              <>
-                <p className="text-sm font-semibold text-emerald-700 dark:text-emerald-400">
-                  🎉 Excellent work!
-                </p>
-                <p className="mt-1 text-xs text-emerald-600 dark:text-emerald-500">
-                  {stepIndex < steps.length - 1
-                    ? "Moving to the next step…"
-                    : "You nailed it! Tutorial complete!"}
-                </p>
-              </>
+              <p className="text-sm font-semibold text-emerald-700 dark:text-emerald-400">
+                {stepIndex < steps.length - 1 ? "🎉 Excellent work!" : "🎉 You nailed it!"}
+              </p>
+            )}
+            {stepIndex < steps.length - 1 && (
+              <button
+                type="button"
+                onClick={() => progress.goToStep(stepIndex + 1)}
+                className="mt-3 flex w-full items-center justify-center gap-2 rounded-lg bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-emerald-500"
+              >
+                Next Step
+                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                </svg>
+              </button>
             )}
           </div>
         )}

@@ -6,12 +6,10 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/components/AuthProvider";
 import {
   BILLING_CONFIG, MONTHLY_PRICE_ID, YEARLY_PRICE_ID, hasPaidAccess,
-  FREE_TUTORIAL_LIMIT, MAX_FREE_PROBLEMS,
   MONTHLY_EQUIVALENT_CENTS, YEARLY_IF_MONTHLY_CENTS, YEARLY_DISCOUNT_PERCENT,
   MONTHLY_PRICE_CENTS, YEARLY_PRICE_CENTS,
 } from "@/lib/plans";
 import { trackConversion } from "@/lib/analytics";
-import { absoluteUrl } from "@/lib/seo";
 import { buildAuthPageHref } from "@/lib/auth-redirect";
 import { Button, Card, CheckIcon, Eyebrow, GradientText } from "@/components/ui";
 import { apiFetch } from "@/lib/api-client";
@@ -21,56 +19,39 @@ import PricingComparisonTable from "./PricingComparisonTable";
 const CLIENT_TOKEN     = process.env.NEXT_PUBLIC_PADDLE_CLIENT_TOKEN ?? "";
 
 const FREE_FEATURES = [
-  `${FREE_TUTORIAL_LIMIT} tutorials per language`,
-  `${MAX_FREE_PROBLEMS} interview prep problems (2/day)`,
+  "All tutorials — every language, every topic",
+  "All interview prep problems — no daily cap",
+  "Certification exams — free for everyone",
+  "Verifiable certificates for LinkedIn & resume",
   "Built-in code editor",
-  "7 programming languages",
   "Progress tracking",
 ];
 
 const PRO_FEATURES = [
-  "Unlimited tutorials — all languages",
-  "Unlimited interview prep problems",
-  "AI code feedback on every step",
-  "Certification exams with certificates",
-  "Verifiable digital certificates",
-  "Add certs to LinkedIn & resume",
-  "New content as it ships",
+  "AI hints when you're stuck on a tutorial step",
+  "AI code review on every practice submission",
+  "Interview simulator with AI debrief",
+  "Priority support",
+  "New AI features as they ship",
 ];
 
 const COMPARISON_FEATURES: { name: string; free: string; pro: string }[] = [
-  { name: "Tutorials", free: `${FREE_TUTORIAL_LIMIT} per language`, pro: "Unlimited" },
-  { name: "Interview prep problems", free: `${MAX_FREE_PROBLEMS} total (2/day)`, pro: "Unlimited" },
-  { name: "Languages", free: "7", pro: "7" },
+  { name: "Tutorials", free: "✓ Unlimited", pro: "✓ Unlimited" },
+  { name: "Interview prep problems", free: "✓ Unlimited", pro: "✓ Unlimited" },
+  { name: "Languages", free: "9", pro: "9" },
+  { name: "Certification exams", free: "✓ Free", pro: "✓ Free" },
+  { name: "Verifiable certificates", free: "✓", pro: "✓" },
   { name: "Code editor", free: "✓", pro: "✓" },
   { name: "Progress tracking", free: "✓", pro: "✓" },
-  { name: "AI code feedback", free: "—", pro: "✓" },
-  { name: "Certification exams", free: "—", pro: "Unlimited" },
-  { name: "Verifiable certificates", free: "—", pro: "✓" },
-];
-
-const TESTIMONIALS = [
-  {
-    quote: "I passed my Go certification on the first try. The timed exam format is exactly like a real assessment — I actually felt prepared.",
-    name: "Amir K.",
-    role: "Backend Engineer",
-  },
-  {
-    quote: "Finally a platform where I can practice Python interview questions without copying solutions from YouTube. The AI feedback is genuinely useful.",
-    name: "Priya S.",
-    role: "Software Developer",
-  },
-  {
-    quote: "Added my Rust certificate to LinkedIn within an hour of passing. Three recruiters reached out that week.",
-    name: "James T.",
-    role: "Systems Programmer",
-  },
+  { name: "AI hints on tutorial steps", free: "—", pro: "✓" },
+  { name: "AI code review on submissions", free: "—", pro: "✓" },
+  { name: "Interview simulator AI debrief", free: "—", pro: "✓" },
 ];
 
 const FAQ_ITEMS = [
   {
     q: "What's included in Pro?",
-    a: "Unlimited tutorials in all 7 languages, unlimited interview prep problems, AI code feedback on every step, and timed certification exams with shareable certificates.",
+    a: "Unlimited tutorials in all 9 languages, unlimited interview prep problems, AI code feedback on every step, and timed certification exams with shareable certificates.",
   },
   {
     q: "Can I cancel anytime?",
@@ -78,11 +59,11 @@ const FAQ_ITEMS = [
   },
   {
     q: "How does the free plan work?",
-    a: `You get ${FREE_TUTORIAL_LIMIT} tutorials per language and ${MAX_FREE_PROBLEMS} interview prep problems (2 new ones unlock daily). Upgrade whenever you're ready for unlimited access and certifications.`,
+    a: "Everything is free — all tutorials, all interview prep problems, and all certification exams. Create a free account and start immediately. Upgrade to Pro for AI-powered hints, code review, and interview debriefs.",
   },
   {
     q: "Do I get a certificate?",
-    a: "Yes. Pro members can take timed certification exams. Pass and you earn a verifiable digital certificate with a unique ID that you can add to your LinkedIn, resume, or portfolio.",
+    a: "Yes — and it's free. Any user can take timed certification exams. Pass and you earn a verifiable digital certificate with a unique ID you can add to your LinkedIn, resume, or portfolio.",
   },
   {
     q: "Who processes payments?",
@@ -90,7 +71,7 @@ const FAQ_ITEMS = [
   },
   {
     q: "Is there a refund policy?",
-    a: "If you're not satisfied within the first 7 days, contact us and we'll work it out. We want you to be happy.",
+    a: "If you're not satisfied, contact us within 7 days of subscribing and we'll issue a full refund. No questions asked.",
   },
 ];
 
@@ -211,61 +192,8 @@ function PricingContent() {
   const onOtherPlan       = billing === "yearly" ? isMonthly : isYearly;
   const authNextPath = `/pricing?plan=${billing}`;
   const signupHref = buildAuthPageHref("signup", authNextPath);
-  const pricingJsonLd = {
-    "@context": "https://schema.org",
-    "@type": "Product",
-    name: "uByte Pro",
-    description:
-      "Full access to coding tutorials, interview prep, and certification-style exams.",
-    brand: { "@type": "Brand", name: "uByte" },
-    offers: [
-      {
-        "@type": "Offer",
-        url: absoluteUrl("/pricing"),
-        priceCurrency: "USD",
-        price: (MONTHLY_PRICE_CENTS / 100).toFixed(2),
-        priceSpecification: {
-          "@type": "UnitPriceSpecification",
-          priceCurrency: "USD",
-          price: (MONTHLY_PRICE_CENTS / 100).toFixed(2),
-          billingDuration: "P1M",
-        },
-      },
-      {
-        "@type": "Offer",
-        url: absoluteUrl("/pricing"),
-        priceCurrency: "USD",
-        price: (YEARLY_PRICE_CENTS / 100).toFixed(2),
-        priceSpecification: {
-          "@type": "UnitPriceSpecification",
-          priceCurrency: "USD",
-          price: (YEARLY_PRICE_CENTS / 100).toFixed(2),
-          billingDuration: "P1Y",
-        },
-      },
-    ],
-  };
-  const faqJsonLd = {
-    "@context": "https://schema.org",
-    "@type": "FAQPage",
-    mainEntity: FAQ_ITEMS.map((faq) => ({
-      "@type": "Question",
-      name: faq.q,
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: faq.a,
-      },
-    })),
-  };
-
   return (
     <div className="min-h-0 flex-1 overflow-y-auto">
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify([pricingJsonLd, faqJsonLd]),
-        }}
-      />
       {/* px-4 on mobile prevents content touching screen edges on small phones */}
       <div className="px-4 pb-20 pt-8 sm:px-6 sm:pt-10">
 
@@ -284,13 +212,14 @@ function PricingContent() {
         {/* ── Header (compact) ────────────────────────────── */}
         <div className="mx-auto max-w-2xl text-center">
           <h1 className="text-2xl font-black tracking-tight text-zinc-900 dark:text-white sm:text-3xl">
-            Invest in your skills.{" "}
+            Everything free.{" "}
             <GradientText>
-              Get certified.
+              AI makes it faster.
             </GradientText>
           </h1>
           <p className="mt-2 text-sm text-zinc-500 dark:text-zinc-400 sm:text-base">
-            Tutorials, interview prep, and verifiable certificates — all in one plan.
+            All tutorials, all problems, and certifications are free for every user.
+            <span className="ml-1 font-medium text-indigo-600 dark:text-indigo-400">Upgrade for AI hints, code review, and interview debriefs.</span>
           </p>
         </div>
 
@@ -304,8 +233,8 @@ function PricingContent() {
           </span>
           <span className="hidden text-zinc-300 dark:text-zinc-700 sm:block">·</span>
           <span className="flex items-center gap-1.5 text-sm font-medium text-zinc-600 dark:text-zinc-400">
-            <span className="text-base">🏅</span>
-            Verifiable certificates
+            <span className="text-base">🤖</span>
+            AI code feedback
           </span>
           <span className="hidden text-zinc-300 dark:text-zinc-700 sm:block">·</span>
           <span className="flex items-center gap-1.5 text-sm font-medium text-zinc-600 dark:text-zinc-400">
@@ -359,7 +288,7 @@ function PricingContent() {
                 <span className="text-zinc-400 dark:text-zinc-500">forever</span>
               </div>
               <p className="mt-2 text-sm text-zinc-500 dark:text-zinc-400">
-                Explore tutorials and interview prep problems for free.
+                All tutorials, all problems, all certifications — free forever.
               </p>
             </div>
 
@@ -417,9 +346,6 @@ function PricingContent() {
                     </span>
                     <span className="text-zinc-500 dark:text-zinc-400">/month</span>
                   </div>
-                  <p className="mt-1.5 text-sm font-semibold text-indigo-600 dark:text-indigo-400">
-                    7-day free trial included
-                  </p>
                   <p className="mt-0.5 text-xs text-zinc-500 dark:text-zinc-400">
                     {BILLING_CONFIG.monthly.subLabel}. Switch to yearly to save {YEARLY_DISCOUNT_PERCENT}%.
                   </p>
@@ -430,9 +356,6 @@ function PricingContent() {
                     <span className="text-4xl font-black text-zinc-900 dark:text-white">${(MONTHLY_EQUIVALENT_CENTS / 100).toFixed(2)}</span>
                     <span className="text-zinc-500 dark:text-zinc-400">/month</span>
                   </div>
-                  <p className="mt-1.5 text-sm font-semibold text-indigo-600 dark:text-indigo-400">
-                    7-day free trial included
-                  </p>
                   <p className="mt-0.5 text-sm">
                     <span className="font-semibold text-emerald-600 dark:text-emerald-400">
                       {BILLING_CONFIG.yearly.priceText.replace("/year", " billed yearly")}
@@ -463,7 +386,7 @@ function PricingContent() {
                   href={signupHref}
                   className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-indigo-600 px-5 py-3.5 text-center text-sm font-bold text-white shadow-md shadow-indigo-500/20 transition-all hover:-translate-y-0.5 hover:bg-indigo-500"
                 >
-                  Start 7-day free trial
+                  Get Pro
                 </Link>
               ) : !selectedPriceId ? (
                 <div className="rounded-xl bg-zinc-100 py-3.5 text-center text-sm text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400">
@@ -493,11 +416,11 @@ function PricingContent() {
                     className="w-full py-3.5"
                   >
                     {billing === "yearly"
-                      ? `Start 7-day trial — ${BILLING_CONFIG.yearly.priceText.replace("/year", "/yr")} after`
-                      : `Start 7-day trial — ${BILLING_CONFIG.monthly.priceText.replace("/month", "/mo")} after`}
+                      ? `Subscribe — ${BILLING_CONFIG.yearly.priceText.replace("/year", "/yr")}`
+                      : `Subscribe — ${BILLING_CONFIG.monthly.priceText.replace("/month", "/mo")}`}
                   </Button>
                   <p className="text-center text-[11px] text-zinc-400 dark:text-zinc-500">
-                    No charge for 7 days · Cancel anytime
+                    Cancel anytime
                   </p>
                 </div>
               )}
@@ -522,57 +445,40 @@ function PricingContent() {
           </div>
         </div>
 
-        {/* ── What you get with Pro (visual) ──────────────── */}
-        <div className="mx-auto mt-16 max-w-3xl">
-          <h2 className="mb-2 text-center text-lg font-bold text-zinc-900 dark:text-zinc-100">
-            Everything you need to level up
-          </h2>
-          <p className="mb-8 text-center text-sm text-zinc-500 dark:text-zinc-400">
-            One plan, all languages, unlimited access.
-          </p>
-          <div className="grid gap-4 sm:grid-cols-3">
-            {[
-              { icon: "📖", title: "Learn", body: "Interactive tutorials in Go, Python, JavaScript, Java, Rust, C++, and C#. Bite-sized lessons with built-in code editor." },
-              { icon: "💪", title: "Interview Prep", body: "Hundreds of coding challenges across all languages. AI feedback helps you understand mistakes and improve." },
-              { icon: "🏆", title: "Get certified", body: "Timed exams with real scoring. Pass and earn a verifiable digital certificate for your LinkedIn and resume." },
-            ].map(({ icon, title, body }) => (
-              <Card key={title} className="p-5">
-                <span className="text-2xl">{icon}</span>
-                <h3 className="mt-3 font-semibold text-zinc-900 dark:text-zinc-100">{title}</h3>
-                <p className="mt-1.5 text-sm text-zinc-500 dark:text-zinc-400">{body}</p>
-              </Card>
-            ))}
-          </div>
-        </div>
-
-        {/* ── Testimonials ─────────────────────────────────── */}
-        <div className="mx-auto mt-16 max-w-3xl">
-          <h2 className="mb-6 text-center text-lg font-bold text-zinc-900 dark:text-zinc-100">
-            What developers say
-          </h2>
-          <div className="grid gap-4 sm:grid-cols-3">
-            {TESTIMONIALS.map((t) => (
-              <figure
-                key={t.name}
-                className="flex flex-col justify-between rounded-2xl border border-zinc-200 bg-surface-card p-5 shadow-sm dark:border-zinc-800"
-              >
-                <blockquote className="text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
-                  &ldquo;{t.quote}&rdquo;
-                </blockquote>
-                <figcaption className="mt-4">
-                  <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">{t.name}</p>
-                  <p className="text-xs text-zinc-500 dark:text-zinc-500">{t.role}</p>
-                </figcaption>
-              </figure>
-            ))}
-          </div>
-        </div>
-
         {/* ── Feature comparison table ─────────────────────── */}
         <PricingComparisonTable rows={COMPARISON_FEATURES} />
 
         {/* ── FAQ (accordion) ─────────────────────────────── */}
         <PricingFAQ items={FAQ_ITEMS} />
+
+        {/* ── Bottom CTA ─────────────────────────────────── */}
+        <div className="mx-auto mt-10 max-w-xl rounded-2xl border-2 border-indigo-200 bg-indigo-50 p-8 text-center dark:border-indigo-800/50 dark:bg-indigo-950/20">
+          <p className="text-xl font-black text-zinc-900 dark:text-zinc-100">
+            Ready to go unlimited?
+          </p>
+          <p className="mx-auto mt-2 max-w-sm text-sm text-zinc-500 dark:text-zinc-400">
+            Cancel anytime. 7-day refund if you're not happy.
+          </p>
+          <div className="mt-6">
+            {!user ? (
+              <Link
+                href={signupHref}
+                className="inline-flex items-center justify-center gap-2 rounded-xl bg-indigo-600 px-8 py-3.5 text-sm font-bold text-white shadow-md shadow-indigo-500/20 transition-all hover:-translate-y-0.5 hover:bg-indigo-500"
+              >
+                Get Pro →
+              </Link>
+            ) : !isPaid && selectedPriceId ? (
+              <Button
+                type="button"
+                onClick={() => openCheckout(selectedPriceId)}
+                size="lg"
+                className="px-8 py-3.5"
+              >
+                Subscribe to Pro →
+              </Button>
+            ) : null}
+          </div>
+        </div>
 
         {/* ── Trust strip ────────────────────────────────── */}
         <div className="mx-auto mt-14 max-w-2xl">

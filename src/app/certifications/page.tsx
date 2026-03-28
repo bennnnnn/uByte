@@ -15,9 +15,9 @@ import ScrollToTop from "@/components/ScrollToTop";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Programming Certification Exams — Get Certified in 7 Languages | uByte",
+  title: "Free Programming Certification Exams — Get Certified in 7 Languages",
   description:
-    "Prove your programming skills with timed certification exams. Take exams in Go, Python, JavaScript, Java, C++, Rust, and C# — earn verifiable certificates you can add to your LinkedIn and resume. Free practice, Pro for full exams.",
+    "Prove your programming skills with free timed certification exams. Take exams in Go, Python, JavaScript, Java, C++, Rust, and C# — earn verifiable certificates you can add to your LinkedIn and resume. Free for everyone.",
   keywords: [
     ...SITE_KEYWORDS,
     "programming certification exams",
@@ -42,17 +42,17 @@ export const metadata: Metadata = {
   ],
   alternates: { canonical: absoluteUrl("/certifications") },
   openGraph: {
-    title: "Programming Certification Exams — Get Certified in 7 Languages | uByte",
+    title: "Free Programming Certification Exams — Get Certified in 7 Languages",
     description:
-      "Timed certification exams in Go, Python, JavaScript, Java, C++, Rust, and C#. Pass to earn verifiable certificates for your resume.",
+      "Free timed certification exams in Go, Python, JavaScript, Java, C++, Rust, and C#. Pass to earn verifiable certificates for your LinkedIn and resume.",
     type: "website",
     url: absoluteUrl("/certifications"),
     images: [{ url: absoluteUrl("/api/og?title=Certifications&description=Prove+your+skills+with+timed+exams+in+7+languages"), width: 1200, height: 630 }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Programming Certification Exams | uByte",
-    description: "Timed certification exams in Go, Python, JavaScript, Java, Rust, C++, and C#. Earn verifiable certificates for your LinkedIn and resume.",
+    title: "Programming Certification Exams",
+    description: "Free timed certification exams in Go, Python, JavaScript, Java, Rust, C++, and C#. Earn verifiable certificates for your LinkedIn and resume.",
   },
 };
 
@@ -173,7 +173,7 @@ export default async function PracticeExamsPage() {
   return (
     <div className="min-h-full">
       <ScrollToTop />
-      <script
+      <script async
         type="application/ld+json"
         dangerouslySetInnerHTML={{
           __html: JSON.stringify([collectionJsonLd, faqJsonLd, breadcrumbJsonLd]),
@@ -185,11 +185,14 @@ export default async function PracticeExamsPage() {
         <div className="mx-auto max-w-5xl px-4 py-12 sm:px-6 sm:py-16">
           <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
             <div className="max-w-xl">
+              <p className="mb-2 text-xs font-bold uppercase tracking-widest text-indigo-600 dark:text-indigo-400">
+                🎓 100% Free
+              </p>
               <h1 className="text-4xl font-extrabold tracking-tight text-zinc-900 dark:text-zinc-100 sm:text-5xl">
-                Programming Certifications
+                Prove your skills.<br className="hidden sm:block" /> Earn free certificates.
               </h1>
               <p className="mt-3 text-lg text-zinc-500 dark:text-zinc-400">
-                Timed exams by language. Pass to earn a verifiable certificate that proves you know your stuff.
+                Timed, hard exams in {EXAM_LANGS.length} languages. Pass and get a verifiable certificate with a public URL — sharable on LinkedIn and your resume. Free to take, always.
               </p>
             </div>
 
@@ -260,17 +263,17 @@ export default async function PracticeExamsPage() {
             )}
           </div>
 
-          {/* Trust bar — only show stats with real data */}
+          {/* Trust bar */}
           {(() => {
             const trustItems: { value: string; label: string }[] = [
               { value: String(EXAM_LANGS.length), label: "Languages" },
+              { value: "100% Free", label: "Always free" },
             ];
             if (totalAttempts > 0) trustItems.push({ value: totalAttempts.toLocaleString(), label: "Exams taken" });
             if (totalCertificates > 0) trustItems.push({ value: totalCertificates.toLocaleString(), label: "Certificates issued" });
+            const cols = trustItems.length >= 4 ? "grid-cols-2 sm:grid-cols-4" : trustItems.length === 3 ? "grid-cols-3" : "grid-cols-2";
             return (
-              <div className={`mt-10 grid gap-4 border-t border-zinc-100 pt-8 dark:border-zinc-800 ${
-                trustItems.length === 3 ? "grid-cols-3" : trustItems.length === 2 ? "grid-cols-2" : "grid-cols-1"
-              }`}>
+              <div className={`mt-10 grid gap-4 border-t border-zinc-100 pt-8 dark:border-zinc-800 ${cols}`}>
                 {trustItems.map((item) => (
                   <div key={item.label}>
                     <p className="text-2xl font-bold text-zinc-900 dark:text-zinc-100">{item.value}</p>
@@ -500,7 +503,7 @@ export default async function PracticeExamsPage() {
           <div className="mt-16 rounded-2xl border border-indigo-100 bg-indigo-50 p-8 text-center dark:border-indigo-900/40 dark:bg-indigo-950/20">
             <h2 className="text-xl font-bold text-zinc-900 dark:text-zinc-100">Ready to prove your skills?</h2>
             <p className="mx-auto mt-2 max-w-md text-sm text-zinc-500 dark:text-zinc-400">
-              Create a free account and start taking certification exams — no subscription, no credit card.
+              Create a free account and start taking certification exams.
             </p>
             <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
               <Link

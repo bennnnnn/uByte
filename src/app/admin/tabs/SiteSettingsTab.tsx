@@ -93,7 +93,7 @@ export default function SiteSettingsTab() {
       {/* ── Certifications ────────────────────────────────────────────────── */}
       <Section
         title="Certifications"
-        description="Global defaults for certification exams. Per-language settings in the Certifications tab override these values."
+        description="Global defaults for certification exams. Per-language settings in the Exams tab override these values."
       >
         <FormRow
           label="Default pass percentage"
