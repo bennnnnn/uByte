@@ -58,14 +58,10 @@ export default function TrendingSection({ languages, compact = false }: Props) {
                     <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-zinc-50 text-2xl dark:bg-zinc-700">
                       {getLangIcon(lang.slug)}
                     </span>
-                    <div>
-                      <p className="text-lg font-bold text-zinc-900 group-hover:text-indigo-600 dark:text-zinc-100 dark:group-hover:text-indigo-400">
-                        {lang.name}
-                      </p>
-                      <span className="text-xs font-medium text-zinc-400 dark:text-zinc-500">
-                        {lessons} lessons
-                      </span>
-                    </div>
+                    <p className="text-lg font-bold text-zinc-900 group-hover:text-indigo-600 dark:text-zinc-100 dark:group-hover:text-indigo-400">
+                      {lang.name}{" "}
+                      <span className="text-sm font-normal text-zinc-400 dark:text-zinc-500">{lessons} lessons</span>
+                    </p>
                   </div>
 
                   {/* Learner count */}
@@ -115,20 +111,16 @@ export default function TrendingSection({ languages, compact = false }: Props) {
                 href={tutorialLangUrl(lang.slug)}
                 className="group flex min-h-[120px] flex-col rounded-xl border border-zinc-200 bg-white p-5 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-indigo-200 hover:shadow-md dark:border-zinc-700/60 dark:bg-zinc-800/80 dark:hover:border-indigo-700"
               >
-                {/* Icon + name */}
+                {/* Icon + name + lesson count inline */}
                 <div className="flex items-center gap-2.5">
                   <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-zinc-50 text-lg dark:bg-zinc-700">
                     {getLangIcon(lang.slug)}
                   </span>
                   <p className="text-sm font-bold leading-tight text-zinc-900 group-hover:text-indigo-600 dark:text-zinc-100 dark:group-hover:text-indigo-400">
-                    {lang.name}
+                    {lang.name}{" "}
+                    <span className="font-normal text-zinc-400 dark:text-zinc-500">{lessons} lessons</span>
                   </p>
                 </div>
-
-                {/* Lesson count pill */}
-                <span className="mt-2 text-[11px] font-medium text-zinc-400 dark:text-zinc-500">
-                  {lessons} lessons
-                </span>
 
                 {/* Learner count + CTA row */}
                 <div className="mt-auto flex items-center justify-between pt-4">

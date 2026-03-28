@@ -45,14 +45,10 @@ export default function PopularTutorialsSection({ languages }: Props) {
                 <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-white text-2xl dark:bg-zinc-700">
                   {getLangIcon(lang.slug)}
                 </span>
-                <div>
-                  <p className="text-base font-bold text-zinc-900 group-hover:text-indigo-600 dark:text-zinc-100 dark:group-hover:text-indigo-400">
-                    {lang.name}
-                  </p>
-                  <span className="text-xs font-medium text-zinc-400 dark:text-zinc-500">
-                    {lessonCount} lessons
-                  </span>
-                </div>
+                <p className="text-base font-bold text-zinc-900 group-hover:text-indigo-600 dark:text-zinc-100 dark:group-hover:text-indigo-400">
+                  {lang.name}{" "}
+                  <span className="text-sm font-normal text-zinc-400 dark:text-zinc-500">{lessonCount} lessons</span>
+                </p>
               </div>
 
               {/* Learner count + CTA row */}
