@@ -45,9 +45,9 @@ export default function PopularTutorialsSection({ languages }: Props) {
                 <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-white text-2xl dark:bg-zinc-700">
                   {getLangIcon(lang.slug)}
                 </span>
-                {lang.completionCount > 0 && (
+                {lang.learnerCount >= 50 && (
                   <span className="rounded-full bg-indigo-50 px-2.5 py-0.5 text-[10px] font-bold text-indigo-600 dark:bg-indigo-950/50 dark:text-indigo-400">
-                    {lang.completionCount.toLocaleString()} learners
+                    {lang.learnerCount.toLocaleString()} learners
                   </span>
                 )}
               </div>

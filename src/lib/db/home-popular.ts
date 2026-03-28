@@ -13,7 +13,8 @@ const LIMIT_PRACTICE = 6;
 export interface PopularLanguage {
   slug: string;
   name: string;
-  completionCount: number;
+  /** Distinct users who have at least one progress row for this language */
+  learnerCount: number;
 }
 
 export interface PopularTutorial {
@@ -35,7 +36,7 @@ export const getPopularLanguages = unstable_cache(
     const sql = getSql();
     try {
       const rows = await sql`
-        SELECT language AS lang, COUNT(*)::int AS c
+        SELECT language AS lang, COUNT(DISTINCT user_id)::int AS c
         FROM progress
         WHERE language IS NOT NULL AND language != ''
         GROUP BY language
@@ -52,7 +53,7 @@ export const getPopularLanguages = unstable_cache(
             result.push({
               slug: lang,
               name: config.name,
-              completionCount: (r.c as number) ?? 0,
+              learnerCount: (r.c as number) ?? 0,
             });
         }
       }
@@ -159,7 +160,7 @@ export function getFallbackPopularLanguages(): PopularLanguage[] {
   return getAllLanguageSlugs()
     .map((slug) => ({ slug, config: getLanguageConfig(slug) }))
     .filter((e): e is { slug: string; config: NonNullable<ReturnType<typeof getLanguageConfig>> } => !!e.config)
-    .map(({ slug, config }) => ({ slug, name: config.name, completionCount: 0 }));
+    .map(({ slug, config }) => ({ slug, name: config.name, learnerCount: 0 }));
 }
 
 export function getFallbackPopularPracticeProblems(): PopularPracticeProblem[] {

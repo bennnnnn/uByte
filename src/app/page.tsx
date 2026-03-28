@@ -127,7 +127,7 @@ export default async function Home() {
   // so popular ones sort to the top, but no language is ever hidden.
   const popularLangs = getFallbackPopularLanguages()
     .map(lang => popularLanguages.find(p => p.slug === lang.slug) ?? lang)
-    .sort((a, b) => b.completionCount - a.completionCount);
+    .sort((a, b) => b.learnerCount - a.learnerCount);
   const popularPracticeProbs = popularProblems.length > 0 ? popularProblems : getFallbackPopularPracticeProblems();
 
   const websiteJsonLd = buildSiteSearchJsonLd();

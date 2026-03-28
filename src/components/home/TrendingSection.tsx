@@ -14,10 +14,12 @@ interface Props {
 export default function TrendingSection({ languages, compact = false }: Props) {
   if (languages.length === 0) return null;
 
-  // Languages with real learner data, sorted highest first
+  const MIN_LEARNERS = 50;
+
+  // Languages with enough real learner data to show publicly
   const withLearners = languages
-    .filter(l => l.completionCount > 0)
-    .sort((a, b) => b.completionCount - a.completionCount)
+    .filter(l => l.learnerCount >= MIN_LEARNERS)
+    .sort((a, b) => b.learnerCount - a.learnerCount)
     .slice(0, 3);
 
   const showPopular = !compact && withLearners.length > 0;
@@ -63,7 +65,7 @@ export default function TrendingSection({ languages, compact = false }: Props) {
                   <div className="mt-auto flex items-center justify-between">
                     <span className="flex items-center gap-1.5 text-xs font-semibold text-emerald-600 dark:text-emerald-400">
                       <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-                      {lang.completionCount.toLocaleString()} learners
+                      {lang.learnerCount.toLocaleString()} learners
                     </span>
                     <span className="text-xs font-semibold text-indigo-600 transition-[gap] group-hover:gap-2 dark:text-indigo-400">
                       Start learning →
@@ -117,9 +119,9 @@ export default function TrendingSection({ languages, compact = false }: Props) {
                     {lessons} lessons
                   </p>
                 </div>
-                {lang.completionCount > 0 && (
+                {lang.learnerCount >= MIN_LEARNERS && (
                   <p className="text-[11px] font-semibold text-emerald-600 dark:text-emerald-400">
-                    {lang.completionCount.toLocaleString()} learners
+                    {lang.learnerCount.toLocaleString()} learners
                   </p>
                 )}
                 <p className="text-xs font-semibold text-indigo-600 dark:text-indigo-400">
