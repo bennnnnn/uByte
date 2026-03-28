@@ -100,7 +100,7 @@ export function PracticeIDE({ problem, initialLang, initialCode, categoryFilter 
       try { localStorage.setItem(notesKey, notes); } catch { /* ignore */ }
     }
     setNoteSaved(true);
-    setNoteCollapsed(true);
+    setNotesOpen(false);
     setTimeout(() => setNoteSaved(false), 2000);
   }
 
