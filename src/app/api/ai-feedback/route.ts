@@ -75,21 +75,20 @@ export const POST = withErrorHandling("POST /api/ai-feedback", async (request: N
     hintLevel,
     modelName: MODEL_NAME,
   };
-  const cached = await getCachedAiResponse(cacheKey);
-  if (cached) {
-    return NextResponse.json(cached);
-  }
-
-  // Free-plan lifetime limit check
+  // Plan check — before cache hit so free users are always gated.
   const dbUser = await getUserById(user.userId);
   if (!hasPaidAccess(dbUser?.plan)) {
     const lifetimeUsed = await getLifetimeAiHintCount(user.userId);
-    if (lifetimeUsed >= FREE_HINT_LIMIT) {
-      return NextResponse.json(
-        { error: "upgrade_required", hintsUsed: lifetimeUsed, limit: FREE_HINT_LIMIT },
-        { status: 402 }
-      );
-    }
+    return NextResponse.json(
+      { error: "upgrade_required", hintsUsed: lifetimeUsed, limit: FREE_HINT_LIMIT },
+      { status: 402 }
+    );
+  }
+
+  // Cache hit — Pro users only.
+  const cached = await getCachedAiResponse(cacheKey);
+  if (cached) {
+    return NextResponse.json(cached);
   }
 
   // Quota

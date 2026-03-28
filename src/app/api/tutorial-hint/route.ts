@@ -60,21 +60,19 @@ export const POST = withErrorHandling("POST /api/tutorial-hint", async (request:
     modelName: MODEL_NAME,
   };
 
-  // Cache hit — return immediately at no cost
-  const cached = await getCachedAiResponse(cacheKey);
-  if (cached) return NextResponse.json(cached);
-
-  // Free-plan lifetime limit check
+  // Plan check — must come before cache hit so free users never get hints regardless of cache.
   const dbUser = await getUserById(user.userId);
   if (!hasPaidAccess(dbUser?.plan)) {
     const lifetimeUsed = await getLifetimeAiHintCount(user.userId);
-    if (lifetimeUsed >= FREE_HINT_LIMIT) {
-      return NextResponse.json(
-        { error: "upgrade_required", hintsUsed: lifetimeUsed, limit: FREE_HINT_LIMIT },
-        { status: 402 }
-      );
-    }
+    return NextResponse.json(
+      { error: "upgrade_required", hintsUsed: lifetimeUsed, limit: FREE_HINT_LIMIT },
+      { status: 402 }
+    );
   }
+
+  // Cache hit — return immediately at no cost (Pro users only reach this point)
+  const cached = await getCachedAiResponse(cacheKey);
+  if (cached) return NextResponse.json(cached);
 
   // Daily quota check (Pro users)
   const { allowed, used, limit } = await canMakeAiCall(user.userId);

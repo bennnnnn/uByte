@@ -5,6 +5,7 @@ import type { TutorialStep } from "@/lib/tutorial-steps";
 import type { CodeCheck } from "@/lib/tutorial-steps/types";
 import type { AiFeedbackSchema } from "@/lib/ai/feedback-client";
 import { useAuth } from "@/components/AuthProvider";
+import { hasPaidAccess } from "@/lib/plans";
 import { parseErrorLines } from "./useCodeEditor";
 import { apiFetch } from "@/lib/api-client";
 import { trackConversion } from "@/lib/analytics";
@@ -127,7 +128,8 @@ export function useStepProgress(
   setCode: (c: string) => void,
   userId?: number
 ): StepProgressState {
-  const { toggleProgress, incrementStepCount } = useAuth();
+  const { toggleProgress, incrementStepCount, profile } = useAuth();
+  const isPro = hasPaidAccess(profile?.plan);
 
   const [stepIndex, setStepIndex] = useState(0);
   const [completedSteps, setCompletedSteps] = useState<Set<number>>(new Set());
@@ -283,6 +285,12 @@ export function useStepProgress(
     // Guest users — show a sign-in prompt instead of calling the API.
     if (userId == null) {
       setAiFeedbackLoginRequired(true);
+      hintInflightRef.current = false;
+      return;
+    }
+    // Free users — show upgrade prompt immediately, no API call needed.
+    if (!isPro) {
+      setAiFeedbackUpgrade(true);
       hintInflightRef.current = false;
       return;
     }

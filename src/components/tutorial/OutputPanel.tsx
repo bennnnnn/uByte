@@ -121,14 +121,14 @@ export default function OutputPanel({
             </div>
           )}
 
-          {/* Upgrade prompt — shown inline when free hint limit is reached */}
+          {/* Upgrade prompt — shown for free users trying to use a hint */}
           {!aiFeedbackLoading && aiFeedbackUpgrade && (
             <div className="space-y-1.5">
               <p className="text-xs font-semibold text-indigo-700 dark:text-indigo-300">
-                💡 You&apos;ve used your 5 free AI hints
+                💡 AI hints are a Pro feature
               </p>
               <p className="text-xs text-zinc-600 dark:text-zinc-400">
-                Upgrade to Pro for unlimited AI hints on every tutorial and interview problem.
+                Upgrade to Pro to get AI-powered hints when you&apos;re stuck on any tutorial step or interview problem.
               </p>
               <Link
                 href="/pricing"

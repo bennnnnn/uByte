@@ -36,16 +36,14 @@ export const POST = withErrorHandling("POST /api/code-review", async (request: N
     return NextResponse.json({ error: "Unsupported language" }, { status: 400 });
   }
 
-  // Free-plan limit — shares the same AI hint quota
+  // AI code review is Pro-only — free users see the upgrade prompt.
   const dbUser = await getUserById(user.userId);
   if (!hasPaidAccess(dbUser?.plan)) {
     const lifetimeUsed = await getLifetimeAiHintCount(user.userId);
-    if (lifetimeUsed >= FREE_HINT_LIMIT) {
-      return NextResponse.json(
-        { error: "upgrade_required", hintsUsed: lifetimeUsed, limit: FREE_HINT_LIMIT },
-        { status: 402 }
-      );
-    }
+    return NextResponse.json(
+      { error: "upgrade_required", hintsUsed: lifetimeUsed, limit: FREE_HINT_LIMIT },
+      { status: 402 }
+    );
   }
 
   const { allowed, used, limit } = await canMakeAiCall(user.userId);
