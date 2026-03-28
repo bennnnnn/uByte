@@ -125,15 +125,15 @@ export default function ReportsTab() {
                     by <span className="font-medium">{r.author_name ?? "deleted user"}</span>
                     {r.author_email && <span className="ml-1 text-zinc-400">({r.author_email})</span>}
                     {" · "}
-                    {r.lang && r.problem_slug && (
+                    {r.problem_slug && (
                       <a
-                        href={`/practice/${r.lang}/${r.problem_slug}`}
+                        href={`/practice?search=${encodeURIComponent(r.problem_slug)}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         onClick={(e) => e.stopPropagation()}
                         className="text-indigo-600 hover:underline dark:text-indigo-400"
                       >
-                        {r.lang}/{r.problem_slug}
+                        {r.problem_slug}
                       </a>
                     )}
                     {" · "}

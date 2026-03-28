@@ -29,17 +29,17 @@ export const GET = withErrorHandling("GET /api/admin/reports", async () => {
   const rows = await sql`
     SELECT
       dp.id          AS post_id,
-      dp.content     AS post_content,
+      dp.body        AS post_content,
       dp.created_at  AS post_created_at,
       dp.deleted     AS post_deleted,
       u.name         AS author_name,
       u.email        AS author_email,
-      dp.problem_slug,
-      dp.lang,
-      COUNT(dr.id)::int            AS report_count,
-      array_agg(DISTINCT dr.reason) AS reasons,
-      MIN(dr.created_at)           AS first_reported_at,
-      MAX(dr.created_at)           AS last_reported_at
+      dp.slug        AS problem_slug,
+      NULL::text     AS lang,
+      COUNT(dr.id)::int              AS report_count,
+      array_agg(DISTINCT dr.reason)  AS reasons,
+      MIN(dr.created_at)             AS first_reported_at,
+      MAX(dr.created_at)             AS last_reported_at
     FROM discussion_reports dr
     JOIN discussion_posts dp ON dp.id = dr.post_id
     LEFT JOIN users u ON u.id = dp.user_id
