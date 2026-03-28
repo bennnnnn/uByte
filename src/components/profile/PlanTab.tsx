@@ -104,7 +104,6 @@ export default function PlanTab({ plan, expiresAtProp }: Props & { expiresAtProp
   const isYearly = currentPlan === "yearly";
   const isMonthly = currentPlan === "pro";
   const isCanceling = currentPlan === "canceling";
-  const isTrial = currentPlan === "trial";
   const paddleReady = useRef(false);
   const [coupon, setCoupon] = useState("");
 
@@ -224,14 +223,10 @@ export default function PlanTab({ plan, expiresAtProp }: Props & { expiresAtProp
                 {isPaid && (
                   <span
                     className={`rounded-full px-2.5 py-0.5 text-xs font-semibold text-white ${
-                      isTrial
-                        ? "bg-violet-500"
-                        : isCanceling
-                          ? "bg-amber-500"
-                          : "bg-emerald-500"
+                      isCanceling ? "bg-amber-500" : "bg-emerald-500"
                     }`}
                   >
-                    {isTrial ? "Trial" : isCanceling ? "Cancelling" : "Active"}
+                    {isCanceling ? "Cancelling" : "Active"}
                   </span>
                 )}
               </div>
