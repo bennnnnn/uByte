@@ -17,6 +17,9 @@ import { verifyCsrf } from "@/lib/csrf";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 import { MAX_USER_MESSAGE_LENGTH, MAX_SESSION_TURNS } from "@/lib/ai/chat-constants";
 
+// Maximum number of history messages accepted in a single request (safety cap on payload size)
+const MAX_HISTORY_MESSAGES = 100;
+
 /** POST /api/ai-chat — interactive follow-up chat scoped to a single submission. */
 export const POST = withErrorHandling("POST /api/ai-chat", async (request: NextRequest) => {
   const user = await getCurrentUser();
@@ -55,8 +58,8 @@ export const POST = withErrorHandling("POST /api/ai-chat", async (request: NextR
       { status: 400 },
     );
   }
-  if (history.length > MAX_SESSION_TURNS * 2) {
-    return NextResponse.json({ error: "session_limit" }, { status: 400 });
+  if (history.length > MAX_HISTORY_MESSAGES) {
+    return NextResponse.json({ error: "History too long" }, { status: 400 });
   }
 
   const submission = await getSubmissionById(submissionId);

@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { apiFetch } from "@/lib/api-client";
-import { MAX_USER_MESSAGE_LENGTH, MAX_SESSION_TURNS } from "@/lib/ai/chat-constants";
+import { MAX_USER_MESSAGE_LENGTH } from "@/lib/ai/chat-constants";
 
 interface Message {
   role: "user" | "assistant";
@@ -42,7 +42,6 @@ export default function AiFollowUpChat({ submissionId, isPro }: Props) {
   const bottomRef = useRef<HTMLDivElement>(null);
 
   const charsLeft = MAX_USER_MESSAGE_LENGTH - input.length;
-  const isMaxed = messages.filter((m) => m.role === "user").length >= MAX_SESSION_TURNS;
 
   useEffect(() => {
     if (open) {
@@ -56,7 +55,7 @@ export default function AiFollowUpChat({ submissionId, isPro }: Props) {
 
   async function handleSend() {
     const text = input.trim();
-    if (!text || sending || isMaxed) return;
+    if (!text || sending) return;
     setInput("");
     setError(null);
     setSending(true);
@@ -76,8 +75,8 @@ export default function AiFollowUpChat({ submissionId, isPro }: Props) {
       });
       const data = await res.json();
       if (!res.ok) {
-        if (data.error === "session_limit") {
-          setError("Session limit reached. Start a new attempt to continue.");
+        if (res.status === 429) {
+          setError(data.error ?? "Daily AI limit reached. Try again tomorrow.");
         } else {
           setError(data.error ?? "Something went wrong.");
         }
@@ -137,9 +136,7 @@ export default function AiFollowUpChat({ submissionId, isPro }: Props) {
             <span className="text-xs font-semibold text-indigo-700 dark:text-indigo-300">
               Ask a follow-up
             </span>
-            <span className="text-[10px] text-zinc-400">
-              {MAX_SESSION_TURNS - messages.filter((m) => m.role === "user").length} questions left
-            </span>
+            <span className="text-[10px] text-zinc-400">Pro · fair use applies</span>
           </div>
 
           {/* Messages */}
@@ -184,41 +181,35 @@ export default function AiFollowUpChat({ submissionId, isPro }: Props) {
 
           {/* Input */}
           <div className="p-2">
-            {isMaxed ? (
-              <p className="text-center text-[11px] text-zinc-400">
-                Session limit reached ({MAX_SESSION_TURNS} questions).
-              </p>
-            ) : (
-              <div className="flex gap-1.5">
-                <div className="relative flex-1">
-                  <textarea
-                    ref={inputRef}
-                    value={input}
-                    onChange={(e) => setInput(e.target.value.slice(0, MAX_USER_MESSAGE_LENGTH))}
-                    onKeyDown={handleKeyDown}
-                    placeholder="Ask about this problem… (Enter to send)"
-                    rows={1}
-                    disabled={sending}
-                    className="w-full resize-none rounded-lg border border-zinc-200 bg-zinc-50 px-2.5 py-1.5 text-xs text-zinc-900 placeholder-zinc-400 outline-none focus:border-indigo-400 focus:ring-1 focus:ring-indigo-400 disabled:opacity-50 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100 dark:placeholder-zinc-500"
-                  />
-                  {input.length > MAX_USER_MESSAGE_LENGTH * 0.8 && (
-                    <span className={`absolute bottom-1 right-2 text-[9px] ${charsLeft < 20 ? "text-red-400" : "text-zinc-400"}`}>
-                      {charsLeft}
-                    </span>
-                  )}
-                </div>
-                <button
-                  onClick={handleSend}
-                  disabled={!input.trim() || sending}
-                  className="self-end rounded-lg bg-indigo-600 px-2 py-1.5 text-white transition-colors hover:bg-indigo-700 disabled:opacity-40"
-                  aria-label="Send"
-                >
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <line x1="22" y1="2" x2="11" y2="13" /><polygon points="22 2 15 22 11 13 2 9 22 2" />
-                  </svg>
-                </button>
+            <div className="flex gap-1.5">
+              <div className="relative flex-1">
+                <textarea
+                  ref={inputRef}
+                  value={input}
+                  onChange={(e) => setInput(e.target.value.slice(0, MAX_USER_MESSAGE_LENGTH))}
+                  onKeyDown={handleKeyDown}
+                  placeholder="Ask about this problem… (Enter to send)"
+                  rows={1}
+                  disabled={sending}
+                  className="w-full resize-none rounded-lg border border-zinc-200 bg-zinc-50 px-2.5 py-1.5 text-xs text-zinc-900 placeholder-zinc-400 outline-none focus:border-indigo-400 focus:ring-1 focus:ring-indigo-400 disabled:opacity-50 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100 dark:placeholder-zinc-500"
+                />
+                {input.length > MAX_USER_MESSAGE_LENGTH * 0.8 && (
+                  <span className={`absolute bottom-1 right-2 text-[9px] ${charsLeft < 20 ? "text-red-400" : "text-zinc-400"}`}>
+                    {charsLeft}
+                  </span>
+                )}
               </div>
-            )}
+              <button
+                onClick={handleSend}
+                disabled={!input.trim() || sending}
+                className="self-end rounded-lg bg-indigo-600 px-2 py-1.5 text-white transition-colors hover:bg-indigo-700 disabled:opacity-40"
+                aria-label="Send"
+              >
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="22" y1="2" x2="11" y2="13" /><polygon points="22 2 15 22 11 13 2 9 22 2" />
+                </svg>
+              </button>
+            </div>
           </div>
         </div>
       )}
