@@ -10,9 +10,9 @@ import { absoluteUrl, SITE_KEYWORDS } from "@/lib/seo";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Coding Interview Prep — Practice Problems in 8 Languages",
+  title: "Coding Interview Prep — Practice Problems in Multiple Languages",
   description:
-    "Ace your coding interview with 200+ practice problems in Go, Python, TypeScript, JavaScript, Java, C++, Rust, and C#. Arrays, strings, trees, graphs, dynamic programming, and more — solve in-browser with instant test feedback. All problems free.",
+    "Ace your coding interview with 200+ practice problems in Go, Python, TypeScript, JavaScript, Java, C++, Rust, C#, and more. Arrays, strings, trees, graphs, dynamic programming — solve in-browser with instant test feedback. All problems free.",
   keywords: [
     ...SITE_KEYWORDS,
     "coding interview questions",
@@ -41,17 +41,17 @@ export const metadata: Metadata = {
   ],
   alternates: { canonical: absoluteUrl("/practice") },
   openGraph: {
-    title: "Coding Interview Prep — Practice Problems in 8 Languages",
+    title: "Coding Interview Prep — Practice Problems in Multiple Languages",
     description:
-      "200+ coding interview problems across Go, Python, TypeScript, JavaScript, Java, C++, Rust, and C#. Write real code in the browser and get instant test feedback. All problems free.",
+      "200+ coding interview problems across Go, Python, TypeScript, JavaScript, Java, C++, Rust, C#, and more. Write real code in the browser and get instant test feedback. All problems free.",
     type: "website",
     url: absoluteUrl("/practice"),
-    images: [{ url: absoluteUrl("/api/og?title=Interview+Prep&description=200%2B+coding+problems+in+7+languages+with+instant+feedback"), width: 1200, height: 630 }],
+    images: [{ url: absoluteUrl("/api/og?title=Interview+Prep&description=200%2B+coding+problems+in+multiple+languages+with+instant+feedback"), width: 1200, height: 630 }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Coding Interview Prep — Practice Problems in 8 Languages",
-    description: "200+ LeetCode-style problems in Go, Python, TypeScript, JavaScript, Java, Rust, C++, and C#. Solve in-browser with instant test feedback. All problems free.",
+    title: "Coding Interview Prep — Practice Problems in Multiple Languages",
+    description: "200+ LeetCode-style problems in Go, Python, TypeScript, JavaScript, Java, Rust, C++, C#, and more. Solve in-browser with instant test feedback. All problems free.",
   },
 };
 
@@ -125,17 +125,17 @@ export default async function PracticePage({
             </span>
             <span className="text-xs text-zinc-400">·</span>
             <span className="text-xs font-medium text-zinc-500 dark:text-zinc-400">
-              {langSlugs.length} languages
+              Multiple languages
             </span>
           </div>
 
-          {/* Language pills */}
-          <div className="flex flex-wrap items-center gap-2">
+          {/* Language pills — scrollable on mobile, wrapping on sm+ */}
+          <div className="flex gap-2 overflow-x-auto pb-1 sm:flex-wrap sm:overflow-visible sm:pb-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             {langSlugs.map((slug) => (
               <Link
                 key={slug}
                 href={`/practice/${slug}`}
-                className="inline-flex items-center gap-1.5 rounded-full border border-zinc-200 bg-zinc-50 px-3 py-1.5 text-xs font-semibold text-zinc-600 transition-colors hover:border-indigo-300 hover:bg-indigo-50 hover:text-indigo-700 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-400 dark:hover:border-indigo-700 dark:hover:bg-indigo-950/30 dark:hover:text-indigo-400"
+                className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-zinc-200 bg-zinc-50 px-3 py-1.5 text-xs font-semibold text-zinc-600 transition-colors hover:border-indigo-300 hover:bg-indigo-50 hover:text-indigo-700 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-400 dark:hover:border-indigo-700 dark:hover:bg-indigo-950/30 dark:hover:text-indigo-400"
               >
                 <span>{getLangIcon(slug)}</span>
                 {LANGUAGES[slug]?.name ?? slug}
@@ -143,7 +143,7 @@ export default async function PracticePage({
             ))}
             <Link
               href={`/practice/${defaultLang}`}
-              className="inline-flex items-center gap-2 rounded-full bg-indigo-600 px-4 py-1.5 text-xs font-bold text-white transition-all hover:bg-indigo-500"
+              className="inline-flex shrink-0 items-center gap-2 rounded-full bg-indigo-600 px-4 py-1.5 text-xs font-bold text-white transition-all hover:bg-indigo-500"
             >
               Start solving →
             </Link>
@@ -282,12 +282,12 @@ export default async function PracticePage({
           <p className="mb-5 text-sm text-indigo-200">
             Pick your language and start solving. All problems are free.
           </p>
-          <div className="flex flex-wrap justify-center gap-2">
-            {langSlugs.slice(0, 4).map((slug) => (
+          <div className="flex gap-2 overflow-x-auto pb-1 sm:flex-wrap sm:justify-center sm:overflow-visible sm:pb-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            {langSlugs.map((slug) => (
               <Link
                 key={slug}
                 href={`/practice/${slug}`}
-                className="inline-flex items-center gap-1.5 rounded-xl bg-white/15 px-4 py-2 text-sm font-semibold text-white backdrop-blur-sm transition-all hover:bg-white/25"
+                className="inline-flex shrink-0 items-center gap-1.5 rounded-xl bg-white/15 px-4 py-2 text-sm font-semibold text-white backdrop-blur-sm transition-all hover:bg-white/25"
               >
                 <span>{getLangIcon(slug)}</span>
                 {LANGUAGES[slug]?.name}
