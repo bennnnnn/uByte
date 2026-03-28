@@ -23,7 +23,6 @@ import CertificationsHighlight   from "@/components/home/CertificationsHighlight
 import ContinueBanner            from "@/components/ContinueBanner";
 import GoogleOAuthError          from "@/components/GoogleOAuthError";
 import ReferralPromptBanner      from "@/components/ReferralPromptBanner";
-import TestimonialsStripDeferred from "@/components/home/TestimonialsStripDeferred";
 const PopularInterviewPrepSection = dynamic(() => import("@/components/home/PopularInterviewPrepSection"));
 
 export const metadata: Metadata = {
@@ -224,12 +223,9 @@ export default async function Home() {
             {/* 2. Popular languages — shows breadth */}
             <TrendingSection languages={popularLangs} />
 
-            {/* 3. Testimonials — social proof before the hard sell */}
-            <TestimonialsStripDeferred />
-
           </div>
 
-          {/* 4. Dark value-prop break — mid-page visual anchor */}
+          {/* 3. Dark value-prop break — mid-page visual anchor */}
           <div className="px-4 sm:px-6 lg:px-8">
             <div className="mx-auto max-w-6xl">
               <ValuePropBanner />
@@ -238,10 +234,10 @@ export default async function Home() {
 
           <div className="mx-auto max-w-6xl space-y-20 px-4 py-16 sm:px-6 lg:px-8">
 
-            {/* 5. Certifications — the differentiator */}
+            {/* 4. Certifications — the differentiator */}
             {certSection}
 
-            {/* 6. Interview prep — proves depth */}
+            {/* 5. Interview prep — proves depth */}
             {interviewSection}
 
           </div>
