@@ -138,7 +138,7 @@ export default function AiFollowUpChat({ submissionId, isPro }: Props) {
             <span className="text-xs font-semibold text-indigo-700 dark:text-indigo-300">
               Ask a follow-up
             </span>
-            <span className="text-[10px] text-zinc-400">Pro · fair use applies</span>
+            <span className="text-[10px] text-zinc-400">Pro · up to 200 questions/day</span>
           </div>
 
           {/* Messages */}
@@ -179,9 +179,9 @@ export default function AiFollowUpChat({ submissionId, isPro }: Props) {
           {/* Daily limit banner */}
           {dailyLimitHit && (
             <div className="mx-2 mb-1 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 dark:border-amber-800 dark:bg-amber-950/40">
-              <p className="text-[11px] font-semibold text-amber-800 dark:text-amber-300">Daily AI limit reached</p>
+              <p className="text-[11px] font-semibold text-amber-800 dark:text-amber-300">You&apos;ve reached today&apos;s AI limit</p>
               <p className="mt-0.5 text-[11px] text-amber-700 dark:text-amber-400">
-                Your 10 daily AI calls are shared across all problems, hints, and explanations — not per problem. Resets at midnight.
+                💡 <strong>Tip:</strong> try breaking the problem into smaller parts, trace through your code step by step, and check edge cases (empty input, single element, overflow). Your limit resets at midnight.
               </p>
             </div>
           )}

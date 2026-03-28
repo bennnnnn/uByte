@@ -20,7 +20,7 @@ async function ensureAiUsageTables(): Promise<void> {
   `;
 }
 
-const MAX_AI_CALLS_PER_DAY = 10;
+const MAX_AI_CALLS_PER_DAY = 200;
 const COOLDOWN_SECONDS = 10;
 
 export const AI_QUOTA_DAILY = MAX_AI_CALLS_PER_DAY;
