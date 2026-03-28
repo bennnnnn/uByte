@@ -49,9 +49,10 @@ export default function PopularTutorialsSection({ languages }: Props) {
                   <p className="text-base font-bold text-zinc-900 group-hover:text-indigo-600 dark:text-zinc-100 dark:group-hover:text-indigo-400">
                     {lang.name}
                   </p>
-                  <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                  {/* Lessons count pill */}
+                  <span className="mt-1 inline-flex items-center rounded-full bg-indigo-50 px-2.5 py-0.5 text-xs font-semibold text-indigo-600 dark:bg-indigo-950/50 dark:text-indigo-400">
                     {lessonCount} lessons
-                  </p>
+                  </span>
                 </div>
               </div>
 
@@ -62,9 +63,9 @@ export default function PopularTutorialsSection({ languages }: Props) {
                 </p>
               )}
 
-              {/* CTA — lower left, pill button */}
-              <div className="mt-auto pt-1">
-                <span className="inline-flex items-center gap-1 rounded-lg bg-indigo-50 px-3 py-1.5 text-xs font-bold text-indigo-600 transition-colors group-hover:bg-indigo-100 dark:bg-indigo-950/50 dark:text-indigo-400 dark:group-hover:bg-indigo-900/60">
+              {/* CTA — plain link, lower right */}
+              <div className="mt-auto flex justify-end pt-1">
+                <span className="text-xs font-semibold text-indigo-600 group-hover:underline dark:text-indigo-400">
                   Start learning →
                 </span>
               </div>

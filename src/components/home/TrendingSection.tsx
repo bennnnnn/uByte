@@ -62,9 +62,10 @@ export default function TrendingSection({ languages, compact = false }: Props) {
                       <p className="text-lg font-bold text-zinc-900 group-hover:text-indigo-600 dark:text-zinc-100 dark:group-hover:text-indigo-400">
                         {lang.name}
                       </p>
-                      <p className="text-sm text-zinc-400 dark:text-zinc-500">
+                      {/* Lessons count pill */}
+                      <span className="mt-1 inline-flex items-center rounded-full bg-indigo-50 px-2.5 py-0.5 text-xs font-semibold text-indigo-600 dark:bg-indigo-950/50 dark:text-indigo-400">
                         {lessons} lessons
-                      </p>
+                      </span>
                     </div>
                   </div>
 
@@ -74,9 +75,9 @@ export default function TrendingSection({ languages, compact = false }: Props) {
                     {lang.learnerCount.toLocaleString()} learners
                   </span>
 
-                  {/* CTA — lower left, pill button */}
-                  <div className="mt-auto">
-                    <span className="inline-flex items-center gap-1.5 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-bold text-white shadow-sm shadow-indigo-500/20 transition-colors group-hover:bg-indigo-500">
+                  {/* CTA — plain link, lower right */}
+                  <div className="mt-auto flex justify-end">
+                    <span className="text-sm font-semibold text-indigo-600 group-hover:underline dark:text-indigo-400">
                       Start learning →
                     </span>
                   </div>
@@ -127,10 +128,10 @@ export default function TrendingSection({ languages, compact = false }: Props) {
                   </p>
                 </div>
 
-                {/* Lesson count */}
-                <p className="text-xs text-zinc-400 dark:text-zinc-500">
+                {/* Lessons count pill */}
+                <span className="inline-flex items-center rounded-full bg-indigo-50 px-2.5 py-0.5 text-xs font-semibold text-indigo-600 dark:bg-indigo-950/50 dark:text-indigo-400">
                   {lessons} lessons
-                </p>
+                </span>
 
                 {/* Learner count (conditional) */}
                 {lang.learnerCount >= MIN_LEARNERS && (
@@ -139,9 +140,9 @@ export default function TrendingSection({ languages, compact = false }: Props) {
                   </p>
                 )}
 
-                {/* CTA — lower left, pill button */}
-                <div className="mt-auto pt-1">
-                  <span className="inline-flex items-center gap-1 rounded-lg bg-indigo-50 px-3 py-1.5 text-xs font-bold text-indigo-600 transition-colors group-hover:bg-indigo-100 dark:bg-indigo-950/50 dark:text-indigo-400 dark:group-hover:bg-indigo-900/60">
+                {/* CTA — plain link, lower right */}
+                <div className="mt-auto flex justify-end pt-1">
+                  <span className="text-xs font-semibold text-indigo-600 group-hover:underline dark:text-indigo-400">
                     Start learning →
                   </span>
                 </div>
