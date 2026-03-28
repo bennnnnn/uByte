@@ -37,6 +37,7 @@ export default function AiFollowUpChat({ submissionId, isPro }: Props) {
   const [input, setInput] = useState("");
   const [sending, setSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [dailyLimitHit, setDailyLimitHit] = useState(false);
   const [open, setOpen] = useState(false);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
@@ -58,6 +59,7 @@ export default function AiFollowUpChat({ submissionId, isPro }: Props) {
     if (!text || sending) return;
     setInput("");
     setError(null);
+    setDailyLimitHit(false);
     setSending(true);
 
     const newHistory: Message[] = [...messages, { role: "user", content: text }];
@@ -76,7 +78,7 @@ export default function AiFollowUpChat({ submissionId, isPro }: Props) {
       const data = await res.json();
       if (!res.ok) {
         if (res.status === 429) {
-          setError(data.error ?? "Daily AI limit reached. Try again tomorrow.");
+          setDailyLimitHit(true);
         } else {
           setError(data.error ?? "Something went wrong.");
         }
@@ -174,6 +176,16 @@ export default function AiFollowUpChat({ submissionId, isPro }: Props) {
             </div>
           )}
 
+          {/* Daily limit banner */}
+          {dailyLimitHit && (
+            <div className="mx-2 mb-1 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 dark:border-amber-800 dark:bg-amber-950/40">
+              <p className="text-[11px] font-semibold text-amber-800 dark:text-amber-300">Daily AI limit reached</p>
+              <p className="mt-0.5 text-[11px] text-amber-700 dark:text-amber-400">
+                Your 10 daily AI calls are shared across all problems, hints, and explanations — not per problem. Resets at midnight.
+              </p>
+            </div>
+          )}
+
           {/* Error */}
           {error && (
             <p className="px-3 pb-1 text-[11px] text-red-500 dark:text-red-400">{error}</p>
@@ -190,7 +202,7 @@ export default function AiFollowUpChat({ submissionId, isPro }: Props) {
                   onKeyDown={handleKeyDown}
                   placeholder="Ask about this problem… (Enter to send)"
                   rows={1}
-                  disabled={sending}
+                  disabled={sending || dailyLimitHit}
                   className="w-full resize-none rounded-lg border border-zinc-200 bg-zinc-50 px-2.5 py-1.5 text-xs text-zinc-900 placeholder-zinc-400 outline-none focus:border-indigo-400 focus:ring-1 focus:ring-indigo-400 disabled:opacity-50 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100 dark:placeholder-zinc-500"
                 />
                 {input.length > MAX_USER_MESSAGE_LENGTH * 0.8 && (
@@ -201,7 +213,7 @@ export default function AiFollowUpChat({ submissionId, isPro }: Props) {
               </div>
               <button
                 onClick={handleSend}
-                disabled={!input.trim() || sending}
+                disabled={!input.trim() || sending || dailyLimitHit}
                 className="self-end rounded-lg bg-indigo-600 px-2 py-1.5 text-white transition-colors hover:bg-indigo-700 disabled:opacity-40"
                 aria-label="Send"
               >
