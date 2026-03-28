@@ -83,23 +83,15 @@ export default function TrendingSection({ languages, compact = false }: Props) {
 
       {/* ── All tutorials grid ───────────────────────────────────────── */}
       <div>
-        <div className="mb-5 flex items-center justify-between">
-          <div>
-            {!compact && (
-              <p className="mb-0.5 text-xs font-bold uppercase tracking-widest text-zinc-400 dark:text-zinc-500">
-                All languages
-              </p>
-            )}
-            <h2 id="tutorials-heading" className="text-xl font-bold text-zinc-900 dark:text-zinc-100">
-              {compact ? "Trending this week" : "Browse tutorials"}
-            </h2>
-          </div>
-          <Link
-            href="/tutorial"
-            className="shrink-0 text-sm font-semibold text-indigo-600 hover:text-indigo-500 dark:text-indigo-400"
-          >
-            Browse all →
-          </Link>
+        <div className="mb-5">
+          {!compact && (
+            <p className="mb-0.5 text-xs font-bold uppercase tracking-widest text-zinc-400 dark:text-zinc-500">
+              All languages
+            </p>
+          )}
+          <h2 id="tutorials-heading" className="text-xl font-bold text-zinc-900 dark:text-zinc-100">
+            {compact ? "Trending this week" : "Browse tutorials"}
+          </h2>
         </div>
 
         <div className={`grid gap-4 ${compact ? "grid-cols-1 sm:grid-cols-3" : "grid-cols-2 sm:grid-cols-3 lg:grid-cols-4"}`}>
@@ -137,6 +129,17 @@ export default function TrendingSection({ languages, compact = false }: Props) {
             );
           })}
         </div>
+
+        {!compact && (
+          <div className="mt-6 text-center">
+            <Link
+              href="/tutorial"
+              className="inline-flex items-center gap-1.5 text-sm font-semibold text-indigo-600 hover:underline dark:text-indigo-400"
+            >
+              Browse all tutorials →
+            </Link>
+          </div>
+        )}
       </div>
 
     </section>
