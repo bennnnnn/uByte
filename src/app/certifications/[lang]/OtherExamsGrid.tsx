@@ -26,7 +26,7 @@ export default function OtherExamsGrid({
   if (others.length === 0) return null;
 
   return (
-    <section aria-labelledby="other-exams-heading" className="mt-16">
+    <section aria-labelledby="other-exams-heading" className="mt-8 sm:mt-16">
       <div className="mb-6 flex items-end justify-between">
         <Eyebrow id="other-exams-heading">
           Other certifications
@@ -39,7 +39,7 @@ export default function OtherExamsGrid({
         </Link>
       </div>
 
-      <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-3">
         {others.map((slug) => (
           <ExamCard
             key={slug}

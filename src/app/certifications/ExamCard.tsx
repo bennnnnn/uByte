@@ -44,22 +44,22 @@ export default function ExamCard({ slug, examConfig, stats, publicStats, isLogge
     <Link
       href={`/certifications/${slug}`}
       aria-label={`${config.name} certification exam — difficulty: ${difficulty.label}`}
-      className="group relative flex flex-col overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/40 dark:border-zinc-700 dark:bg-zinc-900"
+      className="group relative flex flex-col overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/40 dark:border-zinc-700 dark:bg-zinc-900 sm:rounded-2xl"
     >
-      <div className="flex flex-1 flex-col gap-5 p-6">
+      <div className="flex flex-1 flex-col gap-3 p-3 sm:gap-5 sm:p-6">
         {/* Top row: icon + name + difficulty + status */}
-        <div className="flex items-center gap-3">
-          <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-zinc-200 bg-zinc-100 text-2xl dark:border-zinc-700/60 dark:bg-zinc-800">
+        <div className="flex items-center gap-2 sm:gap-3">
+          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-zinc-200 bg-zinc-100 text-lg dark:border-zinc-700/60 dark:bg-zinc-800 sm:h-12 sm:w-12 sm:rounded-2xl sm:text-2xl">
             {getLangIcon(slug)}
           </span>
           <div className="min-w-0 flex-1">
-            <div className="flex flex-wrap items-center gap-2">
-              <h3 className="font-semibold text-zinc-900 dark:text-zinc-100">{config.name}</h3>
-              <span className={`rounded-full px-2 py-0.5 text-[11px] font-semibold ${difficulty.color}`}>
+            <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 sm:text-base">{config.name}</h3>
+            <div className="mt-1 flex flex-wrap items-center gap-1.5">
+              <span className={`rounded-full px-1.5 py-0.5 text-[10px] font-semibold sm:px-2 sm:text-[11px] ${difficulty.color}`}>
                 {difficulty.label}
               </span>
               {isPassed && (
-                <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[11px] font-semibold text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300">
+                <span className="rounded-full bg-emerald-100 px-1.5 py-0.5 text-[10px] font-semibold text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300 sm:px-2 sm:text-[11px]">
                   ✓ Certified
                 </span>
               )}
@@ -71,36 +71,34 @@ export default function ExamCard({ slug, examConfig, stats, publicStats, isLogge
         <div className="h-px bg-zinc-100 dark:bg-zinc-800" />
 
         {/* Exam info + stats */}
-        <div className="grid grid-cols-2 gap-x-4 gap-y-3">
+        <div className="grid grid-cols-2 gap-x-2 gap-y-2 sm:gap-x-4 sm:gap-y-3">
           <div>
-            <p className="text-xs text-zinc-500 dark:text-zinc-400">Questions</p>
-            <p className="mt-0.5 text-lg font-bold tabular-nums text-zinc-900 dark:text-zinc-100">{examConfig.examSize}</p>
+            <p className="text-[10px] text-zinc-500 dark:text-zinc-400 sm:text-xs">Questions</p>
+            <p className="mt-0.5 text-sm font-bold tabular-nums text-zinc-900 dark:text-zinc-100 sm:text-lg">{examConfig.examSize}</p>
           </div>
           <div>
-            <p className="text-xs text-zinc-500 dark:text-zinc-400">Time limit</p>
-            <p className="mt-0.5 text-lg font-bold tabular-nums text-zinc-900 dark:text-zinc-100">
-              {examConfig.examDurationMinutes}<span className="ml-0.5 text-sm font-normal text-zinc-500 dark:text-zinc-400">min</span>
+            <p className="text-[10px] text-zinc-500 dark:text-zinc-400 sm:text-xs">Time limit</p>
+            <p className="mt-0.5 text-sm font-bold tabular-nums text-zinc-900 dark:text-zinc-100 sm:text-lg">
+              {examConfig.examDurationMinutes}<span className="ml-0.5 text-xs font-normal text-zinc-500 dark:text-zinc-400 sm:text-sm">min</span>
             </p>
           </div>
           <div>
-            <p className="text-xs text-zinc-500 dark:text-zinc-400">Attempts</p>
-            <p className="mt-0.5 text-lg font-bold tabular-nums text-zinc-900 dark:text-zinc-100">
+            <p className="text-[10px] text-zinc-500 dark:text-zinc-400 sm:text-xs">Attempts</p>
+            <p className="mt-0.5 text-sm font-bold tabular-nums text-zinc-900 dark:text-zinc-100 sm:text-lg">
               {totalAttempts > 0 ? totalAttempts.toLocaleString() : "0"}
             </p>
           </div>
-          {/* Show user's best score if they've failed before; otherwise show community pass rate */}
           {isLoggedIn && tryAgain && stats?.bestScore != null ? (
             <div>
-              <p className="text-xs text-zinc-500 dark:text-zinc-400">Your best</p>
-              {/* amber-700 on white: ~5.0:1 — passes WCAG AA */}
-              <p className="mt-0.5 text-lg font-bold tabular-nums text-amber-700 dark:text-amber-400">
+              <p className="text-[10px] text-zinc-500 dark:text-zinc-400 sm:text-xs">Your best</p>
+              <p className="mt-0.5 text-sm font-bold tabular-nums text-amber-700 dark:text-amber-400 sm:text-lg">
                 {stats.bestScore}%
               </p>
             </div>
           ) : (
             <div>
-              <p className="text-xs text-zinc-500 dark:text-zinc-400">Pass rate</p>
-              <p className={`mt-0.5 text-lg font-bold tabular-nums ${
+              <p className="text-[10px] text-zinc-500 dark:text-zinc-400 sm:text-xs">Pass rate</p>
+              <p className={`mt-0.5 text-sm font-bold tabular-nums sm:text-lg ${
                 !hasData ? "text-zinc-500 dark:text-zinc-400" : passRate >= 60 ? "text-emerald-700 dark:text-emerald-400" : "text-amber-700 dark:text-amber-400"
               }`}>
                 {hasData ? `${passRate}%` : "—"}
@@ -110,7 +108,7 @@ export default function ExamCard({ slug, examConfig, stats, publicStats, isLogge
         </div>
 
         {/* CTA button */}
-        <span className="mt-auto flex w-full items-center justify-center rounded-xl bg-indigo-600 px-5 py-3 text-center text-sm font-bold text-white shadow-md shadow-indigo-500/20 transition-all group-hover:-translate-y-0.5 group-hover:bg-indigo-500">
+        <span className="mt-auto flex w-full items-center justify-center rounded-xl bg-indigo-600 px-3 py-2 text-center text-xs font-bold text-white shadow-sm shadow-indigo-500/20 transition-all group-hover:-translate-y-0.5 group-hover:bg-indigo-500 sm:px-5 sm:py-3 sm:text-sm sm:shadow-md">
           {ctaLabel}
         </span>
       </div>

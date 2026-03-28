@@ -152,11 +152,11 @@ export default async function PracticeExamLangPage({ params }: Props) {
 
       {/* ── Hero ──────────────────────────────────────────────────────────── */}
       <div className="border-b border-zinc-200 bg-surface-card dark:border-zinc-800">
-        <div className="mx-auto max-w-5xl px-4 py-10 sm:px-6 sm:py-14">
-          <div className="flex flex-col gap-8 sm:flex-row sm:items-start sm:justify-between">
+        <div className="mx-auto max-w-5xl px-4 py-7 sm:px-6 sm:py-14">
+          <div className="flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
             {/* Left: identity + tagline + stat chips */}
-            <div className="flex items-start gap-5">
-              <span className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl border border-zinc-100 bg-white text-3xl dark:border-zinc-700/60 dark:bg-zinc-800">
+            <div className="flex items-start gap-3 sm:gap-5">
+              <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-zinc-100 bg-white text-2xl dark:border-zinc-700/60 dark:bg-zinc-800 sm:h-16 sm:w-16 sm:rounded-2xl sm:text-3xl">
                 {getLangIcon(lang)}
               </span>
               <div>
@@ -168,7 +168,7 @@ export default async function PracticeExamLangPage({ params }: Props) {
                 </p>
 
                 {/* Quick stats chips */}
-                <div className="mt-5 flex flex-wrap gap-2">
+                <div className="mt-3 flex flex-wrap gap-1.5 sm:mt-5 sm:gap-2">
                   {[
                     `${examConfig.examSize} questions`,
                     `${examConfig.examDurationMinutes} min`,
@@ -178,7 +178,7 @@ export default async function PracticeExamLangPage({ params }: Props) {
                   ].map((label) => (
                     <span
                       key={label}
-                      className={`inline-flex items-center rounded-full border px-3 py-1 text-sm font-medium ${
+                      className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-medium sm:px-3 sm:py-1 sm:text-sm ${
                         label === "100% Free"
                           ? "border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-800/50 dark:bg-emerald-950/30 dark:text-emerald-400"
                           : "border-zinc-200 bg-white text-zinc-700 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300"
@@ -228,7 +228,7 @@ export default async function PracticeExamLangPage({ params }: Props) {
 
       {/* ── Tutorial suggestion (non-blocking) ────────────────────────── */}
       {user && !hasStartedTutorials && totalTopics > 0 && (
-        <div className="mx-auto max-w-5xl px-6 pt-6">
+        <div className="mx-auto max-w-5xl px-4 pt-4 sm:px-6 sm:pt-6">
           <div className="flex items-start gap-3 rounded-xl border border-amber-200 bg-amber-50 px-5 py-4 dark:border-amber-800/50 dark:bg-amber-950/20">
             <span className="mt-0.5 text-lg">💡</span>
             <div className="flex-1">
@@ -251,7 +251,7 @@ export default async function PracticeExamLangPage({ params }: Props) {
 
       {/* ── Tutorial progress (partially completed) ────────────────────── */}
       {user && hasStartedTutorials && completedTutorials < totalTopics && (
-        <div className="mx-auto max-w-5xl px-6 pt-6">
+        <div className="mx-auto max-w-5xl px-4 pt-4 sm:px-6 sm:pt-6">
           <div className="flex items-center gap-3 rounded-xl border border-zinc-200 bg-surface-card px-5 py-4 dark:border-zinc-700">
             <span className="text-lg">📚</span>
             <div className="flex-1">
@@ -276,11 +276,11 @@ export default async function PracticeExamLangPage({ params }: Props) {
       )}
 
       {/* ── Body: main content + sticky sidebar ─────────────────────────── */}
-      <div className="mx-auto max-w-5xl px-6 py-10 sm:py-14">
-        <div className="grid gap-8 lg:grid-cols-[1fr_300px] lg:items-start">
+      <div className="mx-auto max-w-5xl px-4 py-6 sm:px-6 sm:py-14">
+        <div className="grid gap-6 sm:gap-8 lg:grid-cols-[1fr_300px] lg:items-start">
 
           {/* ── Left: tabs (overview, topics, FAQ) ──────────────────────── */}
-          <div className="min-w-0">
+          <div className="order-2 min-w-0 lg:order-1">
             <ExamDetailTabs
               langName={name}
               content={content}
@@ -291,7 +291,7 @@ export default async function PracticeExamLangPage({ params }: Props) {
           </div>
 
           {/* ── Right: sticky CTA card ───────────────────────────────────── */}
-          <aside className="lg:sticky lg:top-6">
+          <aside className="order-1 lg:order-2 lg:sticky lg:top-6">
             <Card className="overflow-hidden">
               {/* Card top accent */}
               <div className="h-1 w-full bg-gradient-to-r from-indigo-500 to-violet-400" />

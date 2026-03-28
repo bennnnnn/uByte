@@ -75,7 +75,7 @@ function ExamCardGrid({
   cols?: 2 | 3;
 }) {
   return (
-    <div className={`grid gap-5 sm:grid-cols-2 ${cols === 3 ? "lg:grid-cols-3" : ""}`}>
+    <div className={`grid grid-cols-2 gap-3 sm:gap-5 ${cols === 3 ? "lg:grid-cols-3" : ""}`}>
       {langs.map((lang) => (
         <ExamCard
           key={lang}
@@ -182,16 +182,16 @@ export default async function PracticeExamsPage() {
 
       {/* ── Hero ─────────────────────────────────────────────────────────── */}
       <div className="border-b border-zinc-200 bg-surface-card dark:border-zinc-800">
-        <div className="mx-auto max-w-5xl px-4 py-12 sm:px-6 sm:py-16">
+        <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 sm:py-16">
           <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
             <div className="max-w-xl">
               <p className="mb-2 text-xs font-bold uppercase tracking-widest text-indigo-600 dark:text-indigo-400">
                 🎓 100% Free
               </p>
-              <h1 className="text-4xl font-extrabold tracking-tight text-zinc-900 dark:text-zinc-100 sm:text-5xl">
+              <h1 className="text-3xl font-extrabold tracking-tight text-zinc-900 dark:text-zinc-100 sm:text-4xl lg:text-5xl">
                 Prove your skills.<br className="hidden sm:block" /> Earn free certificates.
               </h1>
-              <p className="mt-3 text-lg text-zinc-500 dark:text-zinc-400">
+              <p className="mt-3 text-base text-zinc-500 dark:text-zinc-400 sm:text-lg">
                 Timed, hard exams in {EXAM_LANGS.length} languages. Pass and get a verifiable certificate with a public URL — sharable on LinkedIn and your resume. Free to take, always.
               </p>
             </div>
@@ -273,7 +273,7 @@ export default async function PracticeExamsPage() {
             if (totalCertificates > 0) trustItems.push({ value: totalCertificates.toLocaleString(), label: "Certificates issued" });
             const cols = trustItems.length >= 4 ? "grid-cols-2 sm:grid-cols-4" : trustItems.length === 3 ? "grid-cols-2 sm:grid-cols-3" : "grid-cols-2";
             return (
-              <div className={`mt-10 grid gap-4 border-t border-zinc-100 pt-8 dark:border-zinc-800 ${cols}`}>
+              <div className={`mt-6 grid gap-3 border-t border-zinc-100 pt-6 dark:border-zinc-800 sm:mt-10 sm:gap-4 sm:pt-8 ${cols}`}>
                 {trustItems.map((item) => (
                   <div key={item.label}>
                     <p className="text-2xl font-bold text-zinc-900 dark:text-zinc-100">{item.value}</p>
@@ -286,12 +286,12 @@ export default async function PracticeExamsPage() {
         </div>
       </div>
 
-      <div className="mx-auto max-w-5xl px-4 py-10 sm:px-6 sm:py-14">
+      <div className="mx-auto max-w-5xl px-4 py-6 sm:px-6 sm:py-14">
 
         {/* ── Learning journey OR progress dashboard ──────────────────────── */}
         {examStats.length > 0 ? (
           /* Progress dashboard for users with exam history */
-          <section className="mb-14">
+          <section className="mb-8 sm:mb-14">
             <Eyebrow className="mb-6">
               Your progress
             </Eyebrow>
@@ -316,7 +316,7 @@ export default async function PracticeExamsPage() {
                 />
               </div>
               {/* Per-language mini cards */}
-              <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
+              <div className="grid grid-cols-3 gap-2 sm:grid-cols-3 lg:grid-cols-6">
                 {EXAM_LANGS.map((lang) => {
                   const s = statsByLang[lang];
                   const passed = s?.hasCertificate;
@@ -352,7 +352,7 @@ export default async function PracticeExamsPage() {
           </section>
         ) : (
           /* Learning journey for visitors / free users / Pro with no attempts */
-          <section className="mb-14">
+          <section className="mb-8 sm:mb-14">
             <Eyebrow className="mb-6">
               Your path to certification
             </Eyebrow>
@@ -417,7 +417,7 @@ export default async function PracticeExamsPage() {
 
         {/* ── Popular certifications (only when real data exists) ───────────────────── */}
         {popularLangs.length > 0 && (
-          <section className="mb-14" aria-labelledby="popular-heading">
+          <section className="mb-8 sm:mb-14" aria-labelledby="popular-heading">
             <div className="mb-5 flex items-end justify-between">
               <Eyebrow id="popular-heading">
                 Popular certifications
@@ -432,7 +432,7 @@ export default async function PracticeExamsPage() {
 
         {/* ── Try again (Pro user with failed attempts) ─────────────────────── */}
         {tryAgainLangs.length > 0 && (
-          <section className="mb-14" aria-labelledby="try-again-heading">
+          <section className="mb-8 sm:mb-14" aria-labelledby="try-again-heading">
             <Eyebrow id="try-again-heading" className="mb-5">
               Give it another shot
             </Eyebrow>
@@ -442,7 +442,7 @@ export default async function PracticeExamsPage() {
 
         {/* ── Passed langs ─────────────────────────────────────────────────── */}
         {passedLangs.length > 0 && (
-          <section className="mb-14" aria-labelledby="passed-heading">
+          <section className="mb-8 sm:mb-14" aria-labelledby="passed-heading">
             <Eyebrow id="passed-heading" className="mb-5">
               You passed
             </Eyebrow>
@@ -459,11 +459,11 @@ export default async function PracticeExamsPage() {
         </section>
 
         {/* ── Why get certified? ───────────────────────────────────── */}
-        <section className="mt-14 mb-0">
+        <section className="mt-8 mb-0 sm:mt-14">
           <Eyebrow className="mb-6">
             Why get certified?
           </Eyebrow>
-          <div className="grid gap-4 sm:grid-cols-3">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-3 sm:gap-4">
             {[
               {
                 icon: "🎯",
@@ -487,12 +487,14 @@ export default async function PracticeExamsPage() {
                 body: "Every certificate has a public verification page. Share the link with recruiters, teammates, or on social media.",
               },
             ].map(({ icon, accent, iconBg, title, body }) => (
-              <div key={title} className={`rounded-2xl border border-zinc-200 p-6 dark:border-zinc-700 ${accent}`}>
-                <span className={`inline-flex h-10 w-10 items-center justify-center rounded-xl text-xl ${iconBg}`}>
+              <div key={title} className={`flex items-start gap-4 rounded-2xl border border-zinc-200 p-4 dark:border-zinc-700 sm:flex-col sm:items-start sm:gap-0 sm:p-6 ${accent}`}>
+                <span className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-xl sm:mb-4 ${iconBg}`}>
                   {icon}
                 </span>
-                <h3 className="mt-4 font-semibold text-zinc-900 dark:text-zinc-100">{title}</h3>
-                <p className="mt-1.5 text-sm leading-relaxed text-zinc-500 dark:text-zinc-400">{body}</p>
+                <div>
+                  <h3 className="font-semibold text-zinc-900 dark:text-zinc-100">{title}</h3>
+                  <p className="mt-1 text-sm leading-relaxed text-zinc-500 dark:text-zinc-400">{body}</p>
+                </div>
               </div>
             ))}
           </div>
@@ -500,7 +502,7 @@ export default async function PracticeExamsPage() {
 
         {/* ── Bottom CTA ─────────────────────────────────────────────── */}
         {!user ? (
-          <div className="mt-16 rounded-2xl border border-indigo-100 bg-indigo-50 p-8 text-center dark:border-indigo-900/40 dark:bg-indigo-950/20">
+          <div className="mt-8 rounded-2xl border border-indigo-100 bg-indigo-50 p-6 text-center dark:border-indigo-900/40 dark:bg-indigo-950/20 sm:mt-16 sm:p-8">
             <h2 className="text-xl font-bold text-zinc-900 dark:text-zinc-100">Ready to prove your skills?</h2>
             <p className="mx-auto mt-2 max-w-md text-sm text-zinc-500 dark:text-zinc-400">
               Create a free account and start taking certification exams.
@@ -521,7 +523,7 @@ export default async function PracticeExamsPage() {
             </div>
           </div>
         ) : passedLangs.length < EXAM_LANGS.length ? (
-          <div className="mt-16 rounded-2xl border border-indigo-100 bg-indigo-50 p-8 text-center dark:border-indigo-900/40 dark:bg-indigo-950/20">
+          <div className="mt-8 rounded-2xl border border-indigo-100 bg-indigo-50 p-6 text-center dark:border-indigo-900/40 dark:bg-indigo-950/20 sm:mt-16 sm:p-8">
             <h2 className="text-xl font-bold text-zinc-900 dark:text-zinc-100">Certifications are free to take</h2>
             <p className="mx-auto mt-2 max-w-md text-sm text-zinc-500 dark:text-zinc-400">
               {passedLangs.length > 0
@@ -547,7 +549,7 @@ export default async function PracticeExamsPage() {
 
         {/* ── Footer nav ────────────────────────────────────────────────────── */}
         <nav
-          className="mt-14 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 border-t border-zinc-200 pt-8 text-sm dark:border-zinc-800"
+          className="mt-8 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 border-t border-zinc-200 pt-6 text-sm dark:border-zinc-800 sm:mt-14 sm:pt-8"
           aria-label="Quick links"
         >
           <Link href="/" className="font-medium text-zinc-500 transition-colors hover:text-indigo-600 dark:text-zinc-400 dark:hover:text-indigo-400">
