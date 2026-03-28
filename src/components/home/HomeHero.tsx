@@ -5,6 +5,7 @@ import { useAuth } from "@/components/AuthProvider";
 import type { SupportedLanguage } from "@/lib/languages/types";
 import { LANG_ICONS } from "@/lib/languages/icons";
 import { LANGUAGES } from "@/lib/languages/registry";
+import HeroIDEDeferred from "./HeroIDEDeferred";
 
 interface Props {
   totalLessons: number;
@@ -232,19 +233,6 @@ function LoggedInHero({
   );
 }
 
-// Language badges shown as a floating visual in the hero
-const LANG_BADGES = [
-  { icon: "🐹", label: "Go",         color: "bg-cyan-50    ring-cyan-100    dark:bg-cyan-950/40  dark:ring-cyan-800/50"   },
-  { icon: "🐍", label: "Python",     color: "bg-blue-50    ring-blue-100    dark:bg-blue-950/40  dark:ring-blue-800/50"   },
-  { icon: "🟨", label: "JavaScript", color: "bg-yellow-50  ring-yellow-100  dark:bg-yellow-950/40 dark:ring-yellow-800/50" },
-  { icon: "🔷", label: "TypeScript", color: "bg-indigo-50  ring-indigo-100  dark:bg-indigo-950/40 dark:ring-indigo-800/50" },
-  { icon: "☕", label: "Java",       color: "bg-orange-50  ring-orange-100  dark:bg-orange-950/40 dark:ring-orange-800/50" },
-  { icon: "🦀", label: "Rust",       color: "bg-red-50     ring-red-100     dark:bg-red-950/40   dark:ring-red-800/50"    },
-  { icon: "⚙️", label: "C++",        color: "bg-slate-50   ring-slate-100   dark:bg-slate-800/60 dark:ring-slate-700/50"  },
-  { icon: "💜", label: "C#",         color: "bg-violet-50  ring-violet-100  dark:bg-violet-950/40 dark:ring-violet-800/50"},
-  { icon: "🗄️", label: "SQL",        color: "bg-emerald-50 ring-emerald-100 dark:bg-emerald-950/40 dark:ring-emerald-800/50"},
-];
-
 // ─── Guest hero ───────────────────────────────────────────────────────────────
 
 function GuestHero({
@@ -328,7 +316,7 @@ function GuestHero({
             </div>
 
             <p className="mt-4 text-xs text-zinc-400">
-              Tutorials, interview prep, and certifications are free for everyone
+              No credit card required · Start writing code in under 30 seconds
             </p>
 
             {/* Stats */}
@@ -347,27 +335,9 @@ function GuestHero({
             </div>
           </div>
 
-          {/* Right: language badge cloud */}
-          <div className="hidden shrink-0 lg:block" aria-hidden="true">
-            <div className="relative h-72 w-64">
-              {LANG_BADGES.map((b, i) => {
-                // Arrange badges in a loose grid (3 cols × 3 rows)
-                const col = i % 3;
-                const row = Math.floor(i / 3);
-                const left = col * 80 + (row % 2 === 1 ? 38 : 0);
-                const top  = row * 86;
-                return (
-                  <div
-                    key={b.label}
-                    className={`absolute flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold text-zinc-700 shadow-sm ring-1 transition-transform hover:-translate-y-0.5 dark:text-zinc-200 ${b.color}`}
-                    style={{ left, top }}
-                  >
-                    <span className="text-base leading-none">{b.icon}</span>
-                    {b.label}
-                  </div>
-                );
-              })}
-            </div>
+          {/* Right: interactive IDE preview — shows the actual product */}
+          <div className="hidden w-full max-w-md shrink-0 lg:block">
+            <HeroIDEDeferred />
           </div>
 
         </div>
