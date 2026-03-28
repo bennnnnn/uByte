@@ -38,9 +38,9 @@ export default function PopularTutorialsSection({ languages }: Props) {
             <Link
               key={lang.slug}
               href={tutorialLangUrl(lang.slug)}
-              className="group flex flex-col gap-3 rounded-xl border border-[#E5E7EB] bg-[#F7F8FF] p-5 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md dark:border-zinc-700 dark:bg-zinc-800/80"
+              className="group flex flex-col rounded-xl border border-[#E5E7EB] bg-[#F7F8FF] p-5 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md dark:border-zinc-700 dark:bg-zinc-800/80"
             >
-              {/* Icon + name inline */}
+              {/* Icon + name */}
               <div className="flex items-center gap-3">
                 <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-white text-2xl dark:bg-zinc-700">
                   {getLangIcon(lang.slug)}
@@ -49,24 +49,21 @@ export default function PopularTutorialsSection({ languages }: Props) {
                   <p className="text-base font-bold text-zinc-900 group-hover:text-indigo-600 dark:text-zinc-100 dark:group-hover:text-indigo-400">
                     {lang.name}
                   </p>
-                  {/* Lessons count pill */}
-                  <span className="mt-1 inline-flex items-center rounded-full bg-indigo-50 px-2.5 py-0.5 text-xs font-semibold text-indigo-600 dark:bg-indigo-950/50 dark:text-indigo-400">
+                  <span className="inline-flex rounded-full bg-indigo-50 px-2.5 py-0.5 text-xs font-semibold text-indigo-600 dark:bg-indigo-950/50 dark:text-indigo-400">
                     {lessonCount} lessons
                   </span>
                 </div>
               </div>
 
-              {/* Learner count */}
-              {lang.learnerCount >= 50 && (
-                <p className="text-[11px] font-semibold text-emerald-600 dark:text-emerald-400">
-                  {lang.learnerCount.toLocaleString()} learners
-                </p>
-              )}
-
-              {/* CTA — plain link, lower right */}
-              <div className="mt-auto flex justify-end pt-1">
+              {/* Learner count + CTA row */}
+              <div className="mt-auto flex items-center justify-between pt-4">
+                {lang.learnerCount >= 50 ? (
+                  <span className="text-[11px] font-semibold text-emerald-600 dark:text-emerald-400">
+                    {lang.learnerCount.toLocaleString()} learners
+                  </span>
+                ) : <span />}
                 <span className="text-xs font-semibold text-indigo-600 group-hover:underline dark:text-indigo-400">
-                  Start learning →
+                  Start →
                 </span>
               </div>
             </Link>

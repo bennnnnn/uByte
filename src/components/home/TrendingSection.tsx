@@ -51,9 +51,9 @@ export default function TrendingSection({ languages, compact = false }: Props) {
                 <Link
                   key={lang.slug}
                   href={tutorialLangUrl(lang.slug)}
-                  className="group flex flex-col gap-4 rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-indigo-200 hover:shadow-md dark:border-zinc-700/60 dark:bg-zinc-800/80 dark:hover:border-indigo-700"
+                  className="group flex flex-col rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-indigo-200 hover:shadow-md dark:border-zinc-700/60 dark:bg-zinc-800/80 dark:hover:border-indigo-700"
                 >
-                  {/* Icon + name inline */}
+                  {/* Icon + name */}
                   <div className="flex items-center gap-3">
                     <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-zinc-50 text-2xl dark:bg-zinc-700">
                       {getLangIcon(lang.slug)}
@@ -62,25 +62,22 @@ export default function TrendingSection({ languages, compact = false }: Props) {
                       <p className="text-lg font-bold text-zinc-900 group-hover:text-indigo-600 dark:text-zinc-100 dark:group-hover:text-indigo-400">
                         {lang.name}
                       </p>
-                      {/* Lessons count pill */}
-                      <span className="mt-1 inline-flex items-center rounded-full bg-indigo-50 px-2.5 py-0.5 text-xs font-semibold text-indigo-600 dark:bg-indigo-950/50 dark:text-indigo-400">
+                      <span className="inline-flex rounded-full bg-indigo-50 px-2.5 py-0.5 text-xs font-semibold text-indigo-600 dark:bg-indigo-950/50 dark:text-indigo-400">
                         {lessons} lessons
                       </span>
                     </div>
                   </div>
 
                   {/* Learner count */}
-                  <span className="flex items-center gap-1.5 text-xs font-semibold text-emerald-600 dark:text-emerald-400">
+                  <p className="mt-4 flex items-center gap-1.5 text-xs font-semibold text-emerald-600 dark:text-emerald-400">
                     <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
                     {lang.learnerCount.toLocaleString()} learners
-                  </span>
+                  </p>
 
-                  {/* CTA — plain link, lower right */}
-                  <div className="mt-auto flex justify-end">
-                    <span className="text-sm font-semibold text-indigo-600 group-hover:underline dark:text-indigo-400">
-                      Start learning →
-                    </span>
-                  </div>
+                  {/* CTA */}
+                  <p className="mt-auto pt-5 text-right text-sm font-semibold text-indigo-600 group-hover:underline dark:text-indigo-400">
+                    Start learning →
+                  </p>
                 </Link>
               );
             })}
@@ -116,34 +113,32 @@ export default function TrendingSection({ languages, compact = false }: Props) {
               <Link
                 key={lang.slug}
                 href={tutorialLangUrl(lang.slug)}
-                className="group flex flex-col gap-3 rounded-xl border border-zinc-200 bg-white p-4 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-indigo-200 hover:shadow-md dark:border-zinc-700/60 dark:bg-zinc-800/80 dark:hover:border-indigo-700"
+                className="group flex flex-col rounded-xl border border-zinc-200 bg-white p-4 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-indigo-200 hover:shadow-md dark:border-zinc-700/60 dark:bg-zinc-800/80 dark:hover:border-indigo-700"
               >
-                {/* Icon + name inline */}
+                {/* Icon + name */}
                 <div className="flex items-center gap-2.5">
-                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-zinc-50 text-xl dark:bg-zinc-700">
+                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-zinc-50 text-lg dark:bg-zinc-700">
                     {getLangIcon(lang.slug)}
                   </span>
-                  <p className="text-sm font-bold text-zinc-900 group-hover:text-indigo-600 dark:text-zinc-100 dark:group-hover:text-indigo-400">
+                  <p className="text-sm font-bold leading-tight text-zinc-900 group-hover:text-indigo-600 dark:text-zinc-100 dark:group-hover:text-indigo-400">
                     {lang.name}
                   </p>
                 </div>
 
-                {/* Lessons count pill */}
-                <span className="inline-flex items-center rounded-full bg-indigo-50 px-2.5 py-0.5 text-xs font-semibold text-indigo-600 dark:bg-indigo-950/50 dark:text-indigo-400">
+                {/* Lesson count pill */}
+                <span className="mt-3 self-start rounded-full bg-indigo-50 px-2.5 py-0.5 text-[11px] font-semibold text-indigo-600 dark:bg-indigo-950/50 dark:text-indigo-400">
                   {lessons} lessons
                 </span>
 
-                {/* Learner count (conditional) */}
-                {lang.learnerCount >= MIN_LEARNERS && (
-                  <p className="text-[11px] font-semibold text-emerald-600 dark:text-emerald-400">
-                    {lang.learnerCount.toLocaleString()} learners
-                  </p>
-                )}
-
-                {/* CTA — plain link, lower right */}
-                <div className="mt-auto flex justify-end pt-1">
+                {/* Learner count + CTA row */}
+                <div className="mt-auto flex items-center justify-between pt-4">
+                  {lang.learnerCount >= MIN_LEARNERS ? (
+                    <span className="text-[11px] font-semibold text-emerald-600 dark:text-emerald-400">
+                      {lang.learnerCount.toLocaleString()} learners
+                    </span>
+                  ) : <span />}
                   <span className="text-xs font-semibold text-indigo-600 group-hover:underline dark:text-indigo-400">
-                    Start learning →
+                    Start →
                   </span>
                 </div>
               </Link>
