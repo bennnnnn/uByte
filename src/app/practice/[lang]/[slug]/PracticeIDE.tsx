@@ -68,7 +68,7 @@ export function PracticeIDE({ problem, initialLang, initialCode, categoryFilter 
 
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
-  const [mobileTab, setMobileTab]     = useState<"desc" | "code">("desc");
+  const [mobileTab, setMobileTab]     = useState<"instructions" | "discuss" | "code">("instructions");
   const isMobile = useIsMobile();
   // Bookmark — persistent toggle (load from DB on mount)
   const [bookmarkId, setBookmarkId] = useState<number | null>(null);
@@ -668,36 +668,27 @@ export function PracticeIDE({ problem, initialLang, initialCode, categoryFilter 
         </div>
       )}
 
-      {/* ── Mobile tab bar ───────────────────────────────────────────── */}
-      <div className="flex shrink-0 items-stretch border-b border-zinc-200 bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900 md:hidden">
-        <button
-          type="button"
-          onClick={() => setMobileTab("desc")}
-          className={`flex flex-1 flex-col items-center justify-center gap-0.5 py-2.5 text-[11px] font-semibold transition-colors ${
-            mobileTab === "desc"
-              ? "border-b-2 border-indigo-500 text-indigo-600 dark:text-indigo-400"
-              : "text-zinc-400 hover:text-zinc-600 dark:text-zinc-500 dark:hover:text-zinc-300"
-          }`}
-        >
-          <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-          </svg>
-          <span>Problem</span>
-        </button>
-        <button
-          type="button"
-          onClick={() => setMobileTab("code")}
-          className={`flex flex-1 flex-col items-center justify-center gap-0.5 py-2.5 text-[11px] font-semibold transition-colors ${
-            mobileTab === "code"
-              ? "border-b-2 border-indigo-500 text-indigo-600 dark:text-indigo-400"
-              : "text-zinc-400 hover:text-zinc-600 dark:text-zinc-500 dark:hover:text-zinc-300"
-          }`}
-        >
-          <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
-          </svg>
-          <span>Code</span>
-        </button>
+      {/* ── Mobile tab bar: Instructions | Discuss | Code ────────────── */}
+      <div className="flex shrink-0 border-b border-zinc-200 bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900 md:hidden">
+        {(["instructions", "discuss", "code"] as const).map((tab) => (
+          <button
+            key={tab}
+            type="button"
+            onClick={() => {
+              setMobileTab(tab);
+              // Keep descTab in sync so the panel's content switch logic works
+              if (tab === "discuss") setDescTab("discuss");
+              else if (tab === "instructions") setDescTab("desc");
+            }}
+            className={`flex-1 py-2.5 text-sm font-medium capitalize transition-colors ${
+              mobileTab === tab
+                ? "border-b-2 border-indigo-500 text-indigo-600 dark:text-indigo-400"
+                : "text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200"
+            }`}
+          >
+            {tab === "instructions" ? "Instructions" : tab === "discuss" ? "Discuss" : "Code"}
+          </button>
+        ))}
       </div>
 
       {/* ── Main split ───────────────────────────────────────────────── */}
@@ -726,13 +717,13 @@ export function PracticeIDE({ problem, initialLang, initialCode, categoryFilter 
         {/* Description panel (left) — same bg as InstructionsSidebar */}
         <aside
           className={`flex min-w-0 flex-col overflow-hidden bg-surface-card ${
-            mobileTab === "desc" ? "flex shrink" : "hidden"
+            mobileTab === "instructions" || mobileTab === "discuss" ? "flex shrink" : "hidden"
           } md:flex md:shrink-0`}
           style={isMobile ? undefined : { width: leftWidth }}
           suppressHydrationWarning
         >
-          {/* Tab strip: Description | Discuss */}
-          <div className="flex shrink-0 border-b border-zinc-200 dark:border-zinc-800">
+          {/* Tab strip: Description | Discuss — desktop only; mobile uses the top 3-tab bar */}
+          <div className="hidden shrink-0 border-b border-zinc-200 dark:border-zinc-800 md:flex">
             {(["desc", "discuss"] as const).map((tab) => (
               <button
                 key={tab}
@@ -833,7 +824,7 @@ export function PracticeIDE({ problem, initialLang, initialCode, categoryFilter 
 
         {/* ── Right panel: editor + toolbar + output ───────────────── */}
         {/* pb-[60px] on mobile gives breathing room above the fixed action bar */}
-        <div className={`relative flex-col overflow-hidden ${mobileTab === "code" ? "flex pb-[60px] md:pb-0" : "hidden"} md:flex flex-1`}>
+        <div className={`relative flex-col overflow-hidden ${mobileTab === "code" ? "flex pb-[60px] md:pb-0" : "hidden md:flex"} flex-1`}>
 
           {/* Shared code editor surface */}
           <CodeEditor editor={editor} onKeyDown={handleKeyDown} />
