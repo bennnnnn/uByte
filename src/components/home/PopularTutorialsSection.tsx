@@ -46,8 +46,8 @@ export default function PopularTutorialsSection({ languages }: Props) {
                   {getLangIcon(lang.slug)}
                 </span>
                 <p className="text-base font-bold text-zinc-900 group-hover:text-indigo-600 dark:text-zinc-100 dark:group-hover:text-indigo-400">
-                  {lang.name}{" "}
-                  <span className="text-sm font-normal text-zinc-400 dark:text-zinc-500">{lessonCount} lessons</span>
+                  {lang.name}
+                  <span className="ml-2 text-sm font-normal text-zinc-400 dark:text-zinc-500">{lessonCount} lessons</span>
                 </p>
               </div>
 
