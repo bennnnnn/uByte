@@ -49,7 +49,7 @@ export default function PopularTutorialsSection({ languages }: Props) {
                   <p className="text-base font-bold text-zinc-900 group-hover:text-indigo-600 dark:text-zinc-100 dark:group-hover:text-indigo-400">
                     {lang.name}
                   </p>
-                  <span className="inline-flex rounded-full bg-indigo-50 px-2.5 py-0.5 text-xs font-semibold text-indigo-600 dark:bg-indigo-950/50 dark:text-indigo-400">
+                  <span className="text-xs font-medium text-zinc-400 dark:text-zinc-500">
                     {lessonCount} lessons
                   </span>
                 </div>

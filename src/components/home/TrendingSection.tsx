@@ -62,7 +62,7 @@ export default function TrendingSection({ languages, compact = false }: Props) {
                       <p className="text-lg font-bold text-zinc-900 group-hover:text-indigo-600 dark:text-zinc-100 dark:group-hover:text-indigo-400">
                         {lang.name}
                       </p>
-                      <span className="inline-flex rounded-full bg-indigo-50 px-2.5 py-0.5 text-xs font-semibold text-indigo-600 dark:bg-indigo-950/50 dark:text-indigo-400">
+                      <span className="text-xs font-medium text-zinc-400 dark:text-zinc-500">
                         {lessons} lessons
                       </span>
                     </div>
@@ -126,7 +126,7 @@ export default function TrendingSection({ languages, compact = false }: Props) {
                 </div>
 
                 {/* Lesson count pill */}
-                <span className="mt-3 self-start rounded-full bg-indigo-50 px-2.5 py-0.5 text-[11px] font-semibold text-indigo-600 dark:bg-indigo-950/50 dark:text-indigo-400">
+                <span className="mt-2 text-[11px] font-medium text-zinc-400 dark:text-zinc-500">
                   {lessons} lessons
                 </span>
 
