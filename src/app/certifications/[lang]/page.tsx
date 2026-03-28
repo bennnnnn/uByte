@@ -167,26 +167,44 @@ export default async function PracticeExamLangPage({ params }: Props) {
                   {content?.tagline ?? `Prove your ${name} knowledge. Pass to earn a verifiable certificate for your resume and LinkedIn.`}
                 </p>
 
-                {/* Quick stats chips */}
-                <div className="mt-3 flex flex-wrap gap-1.5 sm:mt-5 sm:gap-2">
-                  {[
-                    `${examConfig.examSize} questions`,
-                    `${examConfig.examDurationMinutes} min`,
-                    `${passMin} correct to pass (${EXAM_PASS_PERCENT}%)`,
-                    "Certificate on pass",
-                    "100% Free",
-                  ].map((label) => (
-                    <span
-                      key={label}
-                      className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-medium sm:px-3 sm:py-1 sm:text-sm ${
-                        label === "100% Free"
-                          ? "border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-800/50 dark:bg-emerald-950/30 dark:text-emerald-400"
-                          : "border-zinc-200 bg-white text-zinc-700 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300"
-                      }`}
-                    >
-                      {label}
-                    </span>
-                  ))}
+                {/* Quick stats — compact icon+label rows on mobile, chips on desktop */}
+                <div className="mt-3 sm:mt-5">
+                  {/* Mobile: clean list */}
+                  <ul className="space-y-1.5 sm:hidden">
+                    {[
+                      { icon: "❓", text: `${examConfig.examSize} questions` },
+                      { icon: "⏱", text: `${examConfig.examDurationMinutes} min time limit` },
+                      { icon: "✅", text: `${passMin} correct to pass (${EXAM_PASS_PERCENT}%)` },
+                      { icon: "🏆", text: "Certificate on pass" },
+                      { icon: "🆓", text: "100% Free" },
+                    ].map(({ icon, text }) => (
+                      <li key={text} className="flex items-center gap-2 text-sm text-zinc-700 dark:text-zinc-300">
+                        <span className="w-5 text-center text-base leading-none">{icon}</span>
+                        {text}
+                      </li>
+                    ))}
+                  </ul>
+                  {/* Desktop: pill chips */}
+                  <div className="hidden flex-wrap gap-2 sm:flex">
+                    {[
+                      `${examConfig.examSize} questions`,
+                      `${examConfig.examDurationMinutes} min`,
+                      `${passMin} correct to pass (${EXAM_PASS_PERCENT}%)`,
+                      "Certificate on pass",
+                      "100% Free",
+                    ].map((label) => (
+                      <span
+                        key={label}
+                        className={`inline-flex items-center rounded-full border px-3 py-1 text-sm font-medium ${
+                          label === "100% Free"
+                            ? "border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-800/50 dark:bg-emerald-950/30 dark:text-emerald-400"
+                            : "border-zinc-200 bg-white text-zinc-700 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300"
+                        }`}
+                      >
+                        {label}
+                      </span>
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>

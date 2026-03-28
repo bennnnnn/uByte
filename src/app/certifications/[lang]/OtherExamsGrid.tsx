@@ -39,7 +39,7 @@ export default function OtherExamsGrid({
         </Link>
       </div>
 
-      <div className="grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-3">
+      <div className="grid gap-3 sm:grid-cols-2 sm:gap-5 lg:grid-cols-3">
         {others.map((slug) => (
           <ExamCard
             key={slug}

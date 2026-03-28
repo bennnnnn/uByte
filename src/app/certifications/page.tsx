@@ -75,7 +75,7 @@ function ExamCardGrid({
   cols?: 2 | 3;
 }) {
   return (
-    <div className={`grid grid-cols-2 gap-3 sm:gap-5 ${cols === 3 ? "lg:grid-cols-3" : ""}`}>
+    <div className={`grid gap-3 sm:grid-cols-2 sm:gap-5 ${cols === 3 ? "lg:grid-cols-3" : ""}`}>
       {langs.map((lang) => (
         <ExamCard
           key={lang}
