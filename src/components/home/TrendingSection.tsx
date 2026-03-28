@@ -53,23 +53,30 @@ export default function TrendingSection({ languages, compact = false }: Props) {
                   href={tutorialLangUrl(lang.slug)}
                   className="group flex flex-col gap-4 rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-indigo-200 hover:shadow-md dark:border-zinc-700/60 dark:bg-zinc-800/80 dark:hover:border-indigo-700"
                 >
-                  <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-zinc-50 text-2xl dark:bg-zinc-700">
-                    {getLangIcon(lang.slug)}
-                  </span>
-                  <div>
-                    <p className="text-lg font-bold text-zinc-900 group-hover:text-indigo-600 dark:text-zinc-100 dark:group-hover:text-indigo-400">
-                      {lang.name}
-                    </p>
-                    <p className="mt-0.5 text-sm text-zinc-400 dark:text-zinc-500">
-                      {lessons} lessons
-                    </p>
-                  </div>
-                  <div className="mt-auto flex items-center justify-between">
-                    <span className="flex items-center gap-1.5 text-xs font-semibold text-emerald-600 dark:text-emerald-400">
-                      <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-                      {lang.learnerCount.toLocaleString()} learners
+                  {/* Icon + name inline */}
+                  <div className="flex items-center gap-3">
+                    <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-zinc-50 text-2xl dark:bg-zinc-700">
+                      {getLangIcon(lang.slug)}
                     </span>
-                    <span className="text-xs font-semibold text-indigo-600 transition-[gap] group-hover:gap-2 dark:text-indigo-400">
+                    <div>
+                      <p className="text-lg font-bold text-zinc-900 group-hover:text-indigo-600 dark:text-zinc-100 dark:group-hover:text-indigo-400">
+                        {lang.name}
+                      </p>
+                      <p className="text-sm text-zinc-400 dark:text-zinc-500">
+                        {lessons} lessons
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Learner count */}
+                  <span className="flex items-center gap-1.5 text-xs font-semibold text-emerald-600 dark:text-emerald-400">
+                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                    {lang.learnerCount.toLocaleString()} learners
+                  </span>
+
+                  {/* CTA — lower left, pill button */}
+                  <div className="mt-auto">
+                    <span className="inline-flex items-center gap-1.5 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-bold text-white shadow-sm shadow-indigo-500/20 transition-colors group-hover:bg-indigo-500">
                       Start learning →
                     </span>
                   </div>
@@ -110,25 +117,34 @@ export default function TrendingSection({ languages, compact = false }: Props) {
                 href={tutorialLangUrl(lang.slug)}
                 className="group flex flex-col gap-3 rounded-xl border border-zinc-200 bg-white p-4 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-indigo-200 hover:shadow-md dark:border-zinc-700/60 dark:bg-zinc-800/80 dark:hover:border-indigo-700"
               >
-                <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-zinc-50 text-xl dark:bg-zinc-700">
-                  {getLangIcon(lang.slug)}
-                </span>
-                <div className="flex-1">
+                {/* Icon + name inline */}
+                <div className="flex items-center gap-2.5">
+                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-zinc-50 text-xl dark:bg-zinc-700">
+                    {getLangIcon(lang.slug)}
+                  </span>
                   <p className="text-sm font-bold text-zinc-900 group-hover:text-indigo-600 dark:text-zinc-100 dark:group-hover:text-indigo-400">
                     {lang.name}
                   </p>
-                  <p className="mt-0.5 text-xs text-zinc-400 dark:text-zinc-500">
-                    {lessons} lessons
-                  </p>
                 </div>
+
+                {/* Lesson count */}
+                <p className="text-xs text-zinc-400 dark:text-zinc-500">
+                  {lessons} lessons
+                </p>
+
+                {/* Learner count (conditional) */}
                 {lang.learnerCount >= MIN_LEARNERS && (
                   <p className="text-[11px] font-semibold text-emerald-600 dark:text-emerald-400">
                     {lang.learnerCount.toLocaleString()} learners
                   </p>
                 )}
-                <p className="text-xs font-semibold text-indigo-600 dark:text-indigo-400">
-                  Start learning →
-                </p>
+
+                {/* CTA — lower left, pill button */}
+                <div className="mt-auto pt-1">
+                  <span className="inline-flex items-center gap-1 rounded-lg bg-indigo-50 px-3 py-1.5 text-xs font-bold text-indigo-600 transition-colors group-hover:bg-indigo-100 dark:bg-indigo-950/50 dark:text-indigo-400 dark:group-hover:bg-indigo-900/60">
+                    Start learning →
+                  </span>
+                </div>
               </Link>
             );
           })}
