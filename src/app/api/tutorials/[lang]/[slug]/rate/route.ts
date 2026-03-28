@@ -4,11 +4,11 @@ import { rateTutorial } from "@/lib/db/tutorial-ratings";
 
 export const POST = withErrorHandling(
   "POST /api/tutorials/[lang]/[slug]/rate",
-  async (request: NextRequest, context: { params: Promise<{ lang: string; slug: string }> }) => {
+  async (request: NextRequest, ctx: unknown) => {
     const { user, response } = await requireAuth();
     if (!user) return response;
 
-    const { lang, slug } = await context.params;
+    const { lang, slug } = await (ctx as { params: Promise<{ lang: string; slug: string }> }).params;
     if (!lang || !slug) {
       return NextResponse.json({ error: "lang and slug required" }, { status: 400 });
     }
