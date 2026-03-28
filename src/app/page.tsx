@@ -23,6 +23,7 @@ import CertificationsHighlight   from "@/components/home/CertificationsHighlight
 import ContinueBanner            from "@/components/ContinueBanner";
 import GoogleOAuthError          from "@/components/GoogleOAuthError";
 import ReferralPromptBanner      from "@/components/ReferralPromptBanner";
+import FadeInSection             from "@/components/home/FadeInSection";
 const PopularInterviewPrepSection = dynamic(() => import("@/components/home/PopularInterviewPrepSection"));
 
 export const metadata: Metadata = {
@@ -168,6 +169,7 @@ export default async function Home() {
         totalLessons={totalLessonCount}
         problemCount={problemCount}
         certCount={certCount}
+        totalCertificates={totalCertificates}
         leftOff={leftOff}
         continueLang={continueLang}
         continueTutorials={continueTutorialList}
@@ -218,27 +220,37 @@ export default async function Home() {
           <div className="mx-auto max-w-6xl space-y-20 px-4 py-16 sm:px-6 lg:px-8">
 
             {/* 1. How it works — builds immediate trust */}
-            <StepsSection />
+            <FadeInSection>
+              <StepsSection />
+            </FadeInSection>
 
             {/* 2. Popular languages — shows breadth */}
-            <TrendingSection languages={popularLangs} />
+            <FadeInSection delay={100}>
+              <TrendingSection languages={popularLangs} />
+            </FadeInSection>
 
           </div>
 
           {/* 3. Dark value-prop break — mid-page visual anchor */}
-          <div className="px-4 sm:px-6 lg:px-8">
-            <div className="mx-auto max-w-6xl">
-              <ValuePropBanner />
+          <FadeInSection delay={50}>
+            <div className="px-4 sm:px-6 lg:px-8">
+              <div className="mx-auto max-w-6xl">
+                <ValuePropBanner />
+              </div>
             </div>
-          </div>
+          </FadeInSection>
 
           <div className="mx-auto max-w-6xl space-y-20 px-4 py-16 sm:px-6 lg:px-8">
 
             {/* 4. Certifications — the differentiator */}
-            {certSection}
+            <FadeInSection>
+              {certSection}
+            </FadeInSection>
 
             {/* 5. Interview prep — proves depth */}
-            {interviewSection}
+            <FadeInSection delay={100}>
+              {interviewSection}
+            </FadeInSection>
 
           </div>
         </>

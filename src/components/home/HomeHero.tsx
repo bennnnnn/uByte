@@ -11,6 +11,8 @@ interface Props {
   totalLessons: number;
   problemCount: number;
   certCount: number;
+  /** Real count of certificates issued — shown instead of certCount once ≥ threshold */
+  totalCertificates: number;
   /** Set server-side; avoids flash before client auth resolves */
   isLoggedInServer: boolean;
   /** Last activity link + label from the server */
@@ -233,17 +235,98 @@ function LoggedInHero({
   );
 }
 
+// ─── Mobile code preview (static, below-fold visual on phones) ───────────────
+
+function MobileCodePreview() {
+  return (
+    <div className="relative mx-auto mt-10 max-w-sm lg:hidden">
+      {/* Success badge */}
+      <div className="absolute -right-2 -top-3 z-10 flex items-center gap-1.5 rounded-xl border border-emerald-200 bg-white px-3 py-1.5 text-xs font-semibold text-emerald-700 shadow-md dark:border-emerald-800/60 dark:bg-zinc-900 dark:text-emerald-400">
+        <span className="flex h-4 w-4 items-center justify-center rounded-full bg-emerald-100 text-[9px] dark:bg-emerald-900/50">✓</span>
+        Step passed! +10 XP
+      </div>
+      {/* Streak badge */}
+      <div className="absolute -bottom-3 -left-2 z-10 flex items-center gap-1.5 rounded-xl border border-amber-200 bg-white px-3 py-1.5 text-xs font-semibold text-amber-700 shadow-md dark:border-amber-800/60 dark:bg-zinc-900 dark:text-amber-400">
+        <span className="text-sm">🔥</span>
+        3-day streak
+      </div>
+
+      <div className="overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-xl shadow-zinc-200/60 dark:border-zinc-700 dark:bg-zinc-900 dark:shadow-zinc-900/60">
+        {/* Window chrome */}
+        <div className="flex items-center gap-3 border-b border-zinc-100 px-4 py-2.5 dark:border-zinc-700/80">
+          <div className="flex gap-1.5">
+            <span className="h-2.5 w-2.5 rounded-full bg-red-400/80" />
+            <span className="h-2.5 w-2.5 rounded-full bg-yellow-400/80" />
+            <span className="h-2.5 w-2.5 rounded-full bg-emerald-400/80" />
+          </div>
+          <span className="text-[11px] font-semibold text-zinc-400">hello.go</span>
+        </div>
+
+        {/* Step banner */}
+        <div className="border-b border-zinc-100 bg-indigo-50/70 px-4 py-2.5 dark:border-zinc-700/80 dark:bg-indigo-950/40">
+          <div className="mb-1 flex items-center gap-2">
+            <span className="rounded-full bg-indigo-100 px-2 py-0.5 text-[9px] font-bold uppercase tracking-widest text-indigo-600 dark:bg-indigo-900/60 dark:text-indigo-400">
+              Step 1 / 5
+            </span>
+            <span className="text-[10px] text-zinc-400">Getting Started</span>
+          </div>
+          <p className="text-[11px] text-zinc-500 dark:text-zinc-400">
+            Use <code className="font-mono text-indigo-600 dark:text-indigo-400">fmt.Println()</code> to print &quot;Hello, World!&quot; to the console.
+          </p>
+        </div>
+
+        {/* Code */}
+        <div className="bg-white px-4 py-3 font-mono text-[12px] leading-[1.8] dark:bg-zinc-900">
+          <p><span className="text-violet-600 dark:text-violet-400">package</span><span className="text-zinc-700 dark:text-zinc-300"> main</span></p>
+          <p className="mt-0.5"><span className="text-violet-600 dark:text-violet-400">import </span><span className="text-emerald-600 dark:text-emerald-400">&quot;fmt&quot;</span></p>
+          <p className="mt-0.5"><span className="text-violet-600 dark:text-violet-400">func </span><span className="text-blue-600 dark:text-blue-400">main</span><span className="text-zinc-700 dark:text-zinc-300">() {"{"}</span></p>
+          <p className="ml-4"><span className="text-cyan-600 dark:text-cyan-400">fmt</span><span className="text-zinc-600 dark:text-zinc-400">.</span><span className="text-blue-600 dark:text-blue-400">Println</span><span className="text-emerald-600 dark:text-emerald-400">(&quot;Hello, World!&quot;)</span></p>
+          <p><span className="text-zinc-700 dark:text-zinc-300">{"}"}</span></p>
+        </div>
+
+        {/* Action bar */}
+        <div className="flex items-center gap-2 border-t border-zinc-100 px-4 py-2 dark:border-zinc-700/80">
+          <span className="flex items-center gap-1.5 rounded-lg bg-indigo-600 px-3.5 py-1.5 text-[11px] font-bold text-white shadow shadow-indigo-600/20">
+            ▶ Run
+          </span>
+          <span className="flex items-center gap-1.5 rounded-lg border border-emerald-200 bg-emerald-50 px-3.5 py-1.5 text-[11px] font-bold text-emerald-600 dark:border-emerald-800/60 dark:bg-emerald-950/40 dark:text-emerald-400">
+            ✓ Check
+          </span>
+        </div>
+
+        {/* Output */}
+        <div className="border-t border-zinc-100 bg-zinc-50/60 px-4 py-3 dark:border-zinc-700/80 dark:bg-zinc-800/40">
+          <p className="mb-1 text-[9px] font-bold uppercase tracking-[0.15em] text-zinc-400">Output</p>
+          <div className="flex items-center justify-between">
+            <span className="font-mono text-xs text-emerald-600 dark:text-emerald-400">Hello, World!</span>
+            <span className="flex items-center gap-1.5 text-[11px] font-bold text-emerald-600 dark:text-emerald-400">
+              <span className="flex h-4 w-4 items-center justify-center rounded-full bg-emerald-100 text-[9px] dark:bg-emerald-900/50">✓</span>
+              Correct!
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ─── Guest hero ───────────────────────────────────────────────────────────────
 
 function GuestHero({
   totalLessons,
   problemCount,
   certCount,
+  totalCertificates,
 }: {
   totalLessons: number;
   problemCount: number;
   certCount: number;
+  totalCertificates: number;
 }) {
+  const certStat = totalCertificates >= 10
+    ? { value: `${totalCertificates}+`, label: "Certificates earned" }
+    : { value: `${certCount}`,          label: "Certs, all free"     };
+
   return (
     <section className="relative overflow-hidden border-b border-zinc-100 dark:border-zinc-800">
 
@@ -260,8 +343,7 @@ function GuestHero({
       <div
         className="absolute inset-0 opacity-[0.35] dark:opacity-[0.15]"
         style={{
-          backgroundImage:
-            "radial-gradient(circle, #c7d2fe 1px, transparent 1px)",
+          backgroundImage: "radial-gradient(circle, #c7d2fe 1px, transparent 1px)",
           backgroundSize: "28px 28px",
         }}
       />
@@ -281,9 +363,7 @@ function GuestHero({
             {/* Headline */}
             <h1 className="text-4xl font-black tracking-tight text-zinc-900 sm:text-5xl lg:text-[3.25rem] lg:leading-[1.15] dark:text-white">
               Learn to code.{" "}
-              <span
-                className="bg-gradient-to-r from-indigo-600 to-violet-500 bg-clip-text text-transparent dark:from-indigo-400 dark:to-violet-400"
-              >
+              <span className="bg-gradient-to-r from-indigo-600 to-violet-500 bg-clip-text text-transparent dark:from-indigo-400 dark:to-violet-400">
                 Get certified free.
               </span>
               <br />
@@ -325,7 +405,7 @@ function GuestHero({
                 { value: "9",                  label: "Languages"          },
                 { value: `${totalLessons}+`,   label: "Lessons"            },
                 { value: `${problemCount}+`,   label: "Interview problems" },
-                { value: `${certCount}`,       label: "Certs, all free"    },
+                certStat,
               ].map(stat => (
                 <div key={stat.label} className="text-center lg:text-left">
                   <p className="text-2xl font-black text-zinc-900 dark:text-zinc-100">{stat.value}</p>
@@ -333,9 +413,12 @@ function GuestHero({
                 </div>
               ))}
             </div>
+
+            {/* Mobile product preview — desktop shows the interactive IDE on the right */}
+            <MobileCodePreview />
           </div>
 
-          {/* Right: interactive IDE preview — shows the actual product */}
+          {/* Right: interactive IDE preview — shows the actual product (desktop only) */}
           <div className="hidden w-full max-w-md shrink-0 lg:block">
             <HeroIDEDeferred />
           </div>
@@ -348,9 +431,9 @@ function GuestHero({
         <div className="mx-auto max-w-6xl px-4 py-5 sm:px-6">
           <div className="grid grid-cols-1 divide-y divide-zinc-100 sm:grid-cols-3 sm:divide-x sm:divide-y-0 dark:divide-zinc-800">
             {[
-              { icon: "💻", title: "Runs in your browser",     desc: "No installs, no setup. Start writing real code in seconds." },
+              { icon: "💻", title: "Runs in your browser",       desc: "No installs, no setup. Start writing real code in seconds." },
               { icon: "🧩", title: "Learn · Practice · Certify", desc: "A structured path from first line of code to job-ready." },
-              { icon: "🎓", title: "Free certifications",       desc: "Pass a timed exam and earn a shareable certificate — always free." },
+              { icon: "🎓", title: "Free certifications",         desc: "Pass a timed exam and earn a shareable certificate — always free." },
             ].map(item => (
               <div key={item.title} className="flex items-center gap-3 px-4 py-3 sm:px-6">
                 <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-white text-lg shadow-sm ring-1 ring-zinc-200 dark:bg-zinc-800 dark:ring-zinc-700">
@@ -376,6 +459,7 @@ export default function HomeHero({
   totalLessons,
   problemCount,
   certCount,
+  totalCertificates,
   isLoggedInServer,
   leftOff,
   continueLang,
@@ -411,6 +495,7 @@ export default function HomeHero({
       totalLessons={totalLessons}
       problemCount={problemCount}
       certCount={certCount}
+      totalCertificates={totalCertificates}
     />
   );
 }
