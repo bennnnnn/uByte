@@ -52,6 +52,11 @@ const LANG_SEO_INTRO: Record<string, { whyLearn: string; whatYoullLearn: string;
     whatYoullLearn: "This free, interactive TypeScript course covers type annotations, interfaces, type aliases, union and intersection types, generics, enums, classes, access modifiers, decorators, modules, utility types (Partial, Pick, Omit, Record), and strict null checking — all by writing and running real TypeScript code in your browser.",
     whoIsItFor: "JavaScript developers who want safer, more maintainable code, frontend engineers working with React or Angular, backend developers using Node.js, and anyone preparing for TypeScript coding interviews or full-stack roles.",
   },
+  sql: {
+    whyLearn: "SQL (Structured Query Language) is the universal language of data — every application that stores information uses it. Databases powered by SQL run at companies like Google, Amazon, Meta, and every bank, hospital, and e-commerce site on the planet. Knowing SQL is one of the most transferable skills in tech: it's required for software engineers, data analysts, data scientists, and product managers alike.",
+    whatYoullLearn: "This free, interactive SQL course covers SELECT queries, filtering with WHERE, sorting with ORDER BY, aggregate functions (COUNT, SUM, AVG, MIN, MAX), GROUP BY and HAVING, JOINs (INNER, LEFT, RIGHT, FULL), subqueries, CTEs, window functions, indexes, transactions, and database design — all by writing and running real SQL queries in your browser.",
+    whoIsItFor: "Complete beginners who want to learn how to query databases, developers who need to work with data in their applications, data analysts and data scientists, and engineers preparing for SQL coding interviews or data engineering roles.",
+  },
 };
 
 export async function generateStaticParams() {

@@ -49,11 +49,13 @@ export const metadata: Metadata = {
     template: "%s | uByte",
   },
   description:
-    "Interactive coding tutorials in Go, Python, C++, JavaScript, Java, Rust, and C#. Practice interview problems and certification-style exams in your browser.",
+    "Interactive coding tutorials in Go, Python, TypeScript, SQL, JavaScript, Java, Rust, C++, and C#. Practice interview problems and certification-style exams in your browser.",
   keywords: [
     ...SITE_KEYWORDS,
     "learn Go",
     "learn Python",
+    "learn TypeScript",
+    "learn SQL",
     "learn C++",
     "learn JavaScript",
     "learn Java",
@@ -74,7 +76,7 @@ export const metadata: Metadata = {
     locale: "en_US",
     title: "uByte - Interactive Coding Tutorials and Interview Prep",
     description:
-      "Learn Go, Python, C++, JavaScript, Java, Rust, and C# with interactive tutorials, interview prep, and certification-style exams.",
+      "Learn Go, Python, TypeScript, SQL, JavaScript, Java, Rust, C++, and C# with interactive tutorials, interview prep, and certification-style exams.",
     url: BASE_URL,
     images: [{ url: `${BASE_URL}/api/og`, width: 1200, height: 630, alt: "uByte — Interactive Coding Tutorials & Certifications" }],
   },
