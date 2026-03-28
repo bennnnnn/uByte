@@ -19,7 +19,7 @@ export const POST = withErrorHandling(
       return NextResponse.json({ error: "rating must be 1 or -1" }, { status: 400 });
     }
 
-    await rateTutorial(user.userId, lang, slug, rating);
+    await rateTutorial(String(user.userId), lang, slug, rating);
     return NextResponse.json({ ok: true });
   },
 );
