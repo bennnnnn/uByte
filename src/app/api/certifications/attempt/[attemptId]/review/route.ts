@@ -56,17 +56,19 @@ export const GET = withErrorHandling(
       `,
     ]);
 
-    const answerByQuestionId = new Map(userAnswers.map((a) => [a.question_id, a.chosen_index]));
+    // DB returns bigint columns as strings — normalise both sides to Number so map lookups work
+    const answerByQuestionId = new Map(userAnswers.map((a) => [Number(a.question_id), Number(a.chosen_index)]));
     const questionById = new Map(
-      (questionRows as { id: number; prompt: string; choices_json: string[] }[]).map((r) => [
-        r.id,
+      (questionRows as { id: number | string; prompt: string; choices_json: string[] }[]).map((r) => [
+        Number(r.id),
         { prompt: r.prompt, choices_json: r.choices_json },
       ])
     );
 
     const questions: QuestionReview[] = attempt.question_ids_json.map((qId, posIdx) => {
-      const row = questionById.get(qId);
-      const meta = metaBatch.get(qId);
+      const numQId = Number(qId);
+      const row = questionById.get(numQId);
+      const meta = metaBatch.get(numQId);
       const choiceOrder: number[] | undefined = attempt.choices_order_json[posIdx];
 
       // Build the displayed choices (in the order the user saw them)
@@ -82,7 +84,7 @@ export const GET = withErrorHandling(
         if (di !== -1) correctDisplayIdx = di;
       }
 
-      const userDisplayIdx = answerByQuestionId.get(qId) ?? null;
+      const userDisplayIdx = answerByQuestionId.has(numQId) ? answerByQuestionId.get(numQId)! : null;
       const isCorrect =
         userDisplayIdx !== null &&
         meta != null &&
@@ -91,7 +93,7 @@ export const GET = withErrorHandling(
           : userDisplayIdx === meta.correct_index);
 
       return {
-        questionId: qId,
+        questionId: numQId,
         prompt: row?.prompt ?? "",
         displayedChoices,
         userDisplayIdx,

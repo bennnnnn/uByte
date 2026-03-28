@@ -154,11 +154,14 @@ function QuestionCard({ q, index }: { q: QuestionReview; index: number }) {
           {q.displayedChoices.map((choice, ci) => {
             const isUserPick = q.userDisplayIdx === ci;
             const isCorrectChoice = q.correctDisplayIdx === ci;
+            const isWrongPick = isUserPick && !isCorrectChoice;
+            const isRightPick = isUserPick && isCorrectChoice;
+
             let cls = "rounded-xl border px-3 py-2.5 text-sm ";
-            if (isCorrectChoice) {
-              cls += "border-emerald-300 bg-emerald-50 text-emerald-800 dark:border-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-200";
-            } else if (isUserPick && !isCorrectChoice) {
+            if (isWrongPick) {
               cls += "border-red-300 bg-red-50 text-red-800 dark:border-red-700 dark:bg-red-950/30 dark:text-red-200";
+            } else if (isCorrectChoice) {
+              cls += "border-emerald-300 bg-emerald-50 text-emerald-800 dark:border-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-200";
             } else {
               cls += "border-zinc-100 bg-zinc-50 text-zinc-600 dark:border-zinc-800 dark:bg-zinc-800/50 dark:text-zinc-400";
             }
@@ -169,8 +172,18 @@ function QuestionCard({ q, index }: { q: QuestionReview; index: number }) {
                     {String.fromCharCode(65 + ci)}.
                   </span>
                   <span className="flex-1">{choice}</span>
-                  {isCorrectChoice && <span className="shrink-0 text-xs font-semibold text-emerald-600 dark:text-emerald-400">✓ correct</span>}
-                  {isUserPick && !isCorrectChoice && <span className="shrink-0 text-xs font-semibold text-red-500">✗ your answer</span>}
+                  <div className="shrink-0 flex items-center gap-1">
+                    {isUserPick && (
+                      <span className={`rounded-full px-1.5 py-0.5 text-[10px] font-bold ${isRightPick ? "bg-emerald-200 text-emerald-800 dark:bg-emerald-800 dark:text-emerald-200" : "bg-red-200 text-red-800 dark:bg-red-800 dark:text-red-200"}`}>
+                        your pick
+                      </span>
+                    )}
+                    {isCorrectChoice && (
+                      <span className="rounded-full bg-emerald-200 px-1.5 py-0.5 text-[10px] font-bold text-emerald-800 dark:bg-emerald-800 dark:text-emerald-200">
+                        ✓ correct
+                      </span>
+                    )}
+                  </div>
                 </div>
               </div>
             );
