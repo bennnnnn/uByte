@@ -106,14 +106,14 @@ export default function TrendingSection({ languages, compact = false }: Props) {
           </Link>
         </div>
 
-        <div className={`grid gap-3 ${compact ? "grid-cols-1 sm:grid-cols-3" : "grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5"}`}>
+        <div className={`grid gap-4 ${compact ? "grid-cols-1 sm:grid-cols-3" : "grid-cols-2 sm:grid-cols-3 lg:grid-cols-4"}`}>
           {allLangs.map(lang => {
             const lessons = getTotalLessonCount(lang.slug as SupportedLanguage);
             return (
               <Link
                 key={lang.slug}
                 href={tutorialLangUrl(lang.slug)}
-                className="group flex flex-col rounded-xl border border-zinc-200 bg-white p-4 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-indigo-200 hover:shadow-md dark:border-zinc-700/60 dark:bg-zinc-800/80 dark:hover:border-indigo-700"
+                className="group flex min-h-[120px] flex-col rounded-xl border border-zinc-200 bg-white p-5 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-indigo-200 hover:shadow-md dark:border-zinc-700/60 dark:bg-zinc-800/80 dark:hover:border-indigo-700"
               >
                 {/* Icon + name */}
                 <div className="flex items-center gap-2.5">
