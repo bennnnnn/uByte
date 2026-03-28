@@ -1,8 +1,6 @@
 import Link from "next/link";
 import { getLangIcon } from "@/lib/languages/icons";
-import { LANGUAGES } from "@/lib/languages/registry";
-
-const CERT_SLUGS = ["go", "python", "javascript", "java", "rust", "cpp", "csharp"];
+import { LANGUAGES, ALL_LANGUAGE_KEYS } from "@/lib/languages/registry";
 
 interface LangStats {
   attemptsSubmitted: number;
@@ -85,9 +83,9 @@ export default function CertificationsHighlight({
         </div>
       </div>
 
-      {/* Certification cards — one per language, full details */}
+      {/* Certification cards — one per configured language, derived from registry */}
       <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {CERT_SLUGS.map(slug => {
+        {ALL_LANGUAGE_KEYS.filter(slug => examConfigByLang[slug]).map(slug => {
           const config   = examConfigByLang[slug];
           const stats    = statsByLang[slug];
           const langName = LANGUAGES[slug as keyof typeof LANGUAGES]?.name ?? slug;
@@ -163,14 +161,14 @@ export default function CertificationsHighlight({
           );
         })}
 
-        {/* Browse all */}
+      </div>
+
+      <div className="mt-6 text-center">
         <Link
           href="/certifications"
-          className="group flex flex-col items-center justify-center gap-2 rounded-2xl border border-dashed border-indigo-200 bg-indigo-50/50 p-5 text-center transition-all hover:border-indigo-300 hover:bg-indigo-50 dark:border-indigo-800/50 dark:bg-indigo-950/20 dark:hover:border-indigo-700"
+          className="inline-flex items-center gap-1.5 text-sm font-semibold text-indigo-600 hover:underline dark:text-indigo-400"
         >
-          <span className="text-2xl">🎓</span>
-          <p className="text-sm font-bold text-indigo-600 dark:text-indigo-400">Browse all certifications</p>
-          <p className="text-xs text-indigo-400 dark:text-indigo-500">See every available language →</p>
+          Browse all certifications →
         </Link>
       </div>
 
