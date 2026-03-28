@@ -134,7 +134,7 @@ export default function NotificationPopover({ initialUnreadCount = 0, onCountCha
 
       {/* Dropdown */}
       {open && (
-        <div className="absolute right-0 top-full z-[200] mt-2 w-[360px] overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-xl dark:border-zinc-800 dark:bg-zinc-900">
+        <div className="fixed inset-x-3 top-14 z-[200] overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-xl dark:border-zinc-800 dark:bg-zinc-900 sm:absolute sm:inset-x-auto sm:right-0 sm:top-full sm:mt-2 sm:w-[360px]">
 
           {/* Header */}
           <div className="flex items-center justify-between border-b border-zinc-100 px-4 py-3 dark:border-zinc-800">

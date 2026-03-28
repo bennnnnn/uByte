@@ -3,6 +3,8 @@
 import { useEffect, useRef } from "react";
 import Link from "next/link";
 import TutorialRating from "@/components/TutorialRating";
+import { useAuth } from "@/components/AuthProvider";
+import { hasPaidAccess } from "@/lib/plans";
 import { tutorialUrl } from "@/lib/urls";
 import type { TutorialStep } from "@/lib/tutorial-steps";
 import type { StepProgressState } from "@/hooks/useStepProgress";
@@ -42,6 +44,8 @@ export default function InstructionsSidebar({
   nextTutorial,
 }: Props) {
   const { stepIndex, status, showHint, failCount, completedSteps, skippedSteps, tutorialDone } = progress;
+  const { profile } = useAuth();
+  const isPro = hasPaidAccess(profile?.plan);
   const dotsRef = useRef<HTMLDivElement>(null);
 
   // Scroll active step dot into view when step or done-state changes
@@ -115,17 +119,23 @@ export default function InstructionsSidebar({
         )}
 
         {status === "failed" && failCount >= 3 && (
-          <div className="mt-6 rounded-lg border border-amber-200 bg-amber-50 p-4 dark:border-amber-900 dark:bg-amber-950/30">
-            <p className="text-sm font-semibold text-amber-800 dark:text-amber-300">Still stuck?</p>
-            <p className="mt-1 text-xs text-amber-700 dark:text-amber-400">
-              No worries — check the hint above, or skip this step and come back later.
+          <div className="mt-6 rounded-lg border border-indigo-200 bg-indigo-50 p-4 dark:border-indigo-900 dark:bg-indigo-950/30">
+            <p className="text-sm font-semibold text-indigo-800 dark:text-indigo-300">Want a detailed explanation?</p>
+            <p className="mt-1 text-xs text-indigo-700 dark:text-indigo-400">
+              uByte AI gives you a step-by-step walkthrough of exactly where you went wrong and how to fix it.
             </p>
-            <button
-              onClick={progress.skipStep}
-              className="mt-3 rounded-md border border-amber-300 bg-white px-3 py-1.5 text-xs font-medium text-amber-700 transition-colors hover:bg-amber-100 dark:border-amber-800 dark:bg-zinc-900 dark:text-amber-400 dark:hover:bg-amber-950/50"
-            >
-              Skip this step →
-            </button>
+            {isPro ? (
+              <p className="mt-3 text-xs font-medium text-indigo-600 dark:text-indigo-400">
+                💡 Use the <strong>AI hint</strong> button in the output panel below.
+              </p>
+            ) : (
+              <Link
+                href="/pricing"
+                className="mt-3 inline-block rounded-md bg-indigo-600 px-3 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-indigo-500"
+              >
+                Go Pro for AI explanations →
+              </Link>
+            )}
           </div>
         )}
       </div>

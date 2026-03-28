@@ -269,8 +269,6 @@ export default function InteractiveTutorial({
         activeTab={mobileTab}
         onTabChange={setMobileTab}
         hasOutputError={!!(stepProgress.output && (stepProgress.outputIsError || stepProgress.status === "failed"))}
-        fontSize={fontSize}
-        onFontSizeChange={setFontSize}
       />
 
       {/* Main Split */}
@@ -432,7 +430,7 @@ export default function InteractiveTutorial({
                 onClick={() => setNotesOpen(false)}
               />
               {/* Drawer */}
-              <div className="absolute inset-y-0 right-0 z-30 flex w-72 flex-col border-l border-zinc-200 bg-white shadow-2xl dark:border-zinc-700 dark:bg-zinc-900">
+              <div className="absolute inset-y-0 right-0 z-30 flex w-72 flex-col border-l border-zinc-200 bg-white pb-[60px] shadow-2xl dark:border-zinc-700 dark:bg-zinc-900 md:pb-0">
                 {/* Header */}
                 <div className="flex items-center justify-between border-b border-zinc-100 px-4 py-3 dark:border-zinc-800">
                   <div className="flex items-center gap-2">

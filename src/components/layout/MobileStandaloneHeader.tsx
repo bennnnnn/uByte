@@ -31,11 +31,11 @@ function AccordionSection({
   children: React.ReactNode;
 }) {
   return (
-    <div>
+    <div className="overflow-hidden rounded-xl border border-zinc-100 dark:border-zinc-800">
       <button
         type="button"
         onClick={onToggle}
-        className="flex w-full items-center justify-between rounded-lg px-3 py-2.5 text-sm font-semibold text-zinc-800 transition-colors hover:bg-zinc-100 dark:text-zinc-200 dark:hover:bg-zinc-800"
+        className="flex w-full items-center justify-between bg-zinc-50 px-4 py-3 text-sm font-bold text-zinc-700 transition-colors hover:bg-zinc-100 dark:bg-zinc-800/60 dark:text-zinc-300 dark:hover:bg-zinc-800"
       >
         {label}
         <svg
@@ -46,7 +46,7 @@ function AccordionSection({
         </svg>
       </button>
       {expanded && (
-        <div className="mt-0.5 space-y-0.5 pb-1 pl-2">
+        <div className="space-y-0.5 border-t border-zinc-100 bg-white p-2 dark:border-zinc-800 dark:bg-zinc-900">
           {children}
         </div>
       )}
@@ -106,11 +106,19 @@ export default function MobileStandaloneHeader() {
 
       {open && (
         <nav
-          className="max-h-[70vh] overflow-y-auto border-b border-zinc-100 bg-surface-card px-3 py-2 dark:border-zinc-800"
+          className="max-h-[70vh] space-y-1.5 overflow-y-auto border-b border-zinc-100 bg-zinc-50 px-3 py-3 dark:border-zinc-800 dark:bg-zinc-950"
           aria-label="Main navigation"
         >
           {/* Tutorials accordion */}
           <AccordionSection label="Tutorials" expanded={expandedSection === "tutorials"} onToggle={() => toggle("tutorials")}>
+            <Link
+              href="/tutorial"
+              onClick={close}
+              className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-semibold text-indigo-600 transition-colors hover:bg-indigo-50 dark:text-indigo-400 dark:hover:bg-indigo-950/40"
+            >
+              <span className="text-base">📚</span>
+              All tutorials
+            </Link>
             {languageSlugs.map((slug) => {
               const config = LANGUAGES[slug as keyof typeof LANGUAGES];
               if (!config) return null;
@@ -133,7 +141,7 @@ export default function MobileStandaloneHeader() {
             <Link
               href="/practice"
               onClick={close}
-              className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium text-indigo-600 transition-colors hover:bg-indigo-50 dark:text-indigo-400 dark:hover:bg-indigo-950/40"
+              className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-semibold text-indigo-600 transition-colors hover:bg-indigo-50 dark:text-indigo-400 dark:hover:bg-indigo-950/40"
             >
               <span className="text-base">🎯</span>
               All problems
@@ -141,15 +149,23 @@ export default function MobileStandaloneHeader() {
             <Link
               href="/interview"
               onClick={close}
-              className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium text-indigo-600 transition-colors hover:bg-indigo-50 dark:text-indigo-400 dark:hover:bg-indigo-950/40"
+              className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-semibold text-indigo-600 transition-colors hover:bg-indigo-50 dark:text-indigo-400 dark:hover:bg-indigo-950/40"
             >
               <span className="text-base">🎤</span>
               Interview Simulator
             </Link>
             <Link
+              href="/interviews"
+              onClick={close}
+              className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-semibold text-indigo-600 transition-colors hover:bg-indigo-50 dark:text-indigo-400 dark:hover:bg-indigo-950/40"
+            >
+              <span className="text-base">💼</span>
+              Interview Experiences
+            </Link>
+            <Link
               href="/daily"
               onClick={close}
-              className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium text-indigo-600 transition-colors hover:bg-indigo-50 dark:text-indigo-400 dark:hover:bg-indigo-950/40"
+              className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-semibold text-indigo-600 transition-colors hover:bg-indigo-50 dark:text-indigo-400 dark:hover:bg-indigo-950/40"
             >
               <span className="text-base">⚡</span>
               Daily Challenge
@@ -176,7 +192,7 @@ export default function MobileStandaloneHeader() {
             <Link
               href="/certifications"
               onClick={close}
-              className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium text-indigo-600 transition-colors hover:bg-indigo-50 dark:text-indigo-400 dark:hover:bg-indigo-950/40"
+              className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-semibold text-indigo-600 transition-colors hover:bg-indigo-50 dark:text-indigo-400 dark:hover:bg-indigo-950/40"
             >
               <span className="text-base">📝</span>
               All certifications
@@ -200,15 +216,13 @@ export default function MobileStandaloneHeader() {
 
           {/* Standalone links — hide Pricing for Pro users */}
           {!(user && isPro) && (
-            <div className="mt-1 border-t border-zinc-100 pt-1 dark:border-zinc-800">
-              <Link
-                href="/pricing"
-                onClick={close}
-                className="flex items-center rounded-lg px-3 py-2.5 text-sm font-semibold text-zinc-800 transition-colors hover:bg-zinc-100 dark:text-zinc-200 dark:hover:bg-zinc-800"
-              >
-                Pricing
-              </Link>
-            </div>
+            <Link
+              href="/pricing"
+              onClick={close}
+              className="flex items-center rounded-xl border border-zinc-100 bg-white px-4 py-3 text-sm font-bold text-zinc-700 transition-colors hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:bg-zinc-800"
+            >
+              Pricing
+            </Link>
           )}
         </nav>
       )}

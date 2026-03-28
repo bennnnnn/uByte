@@ -30,16 +30,12 @@ interface Props {
   activeTab: MobileTab;
   onTabChange: (tab: MobileTab) => void;
   hasOutputError: boolean;
-  fontSize: 14 | 16 | 18;
-  onFontSizeChange: (size: 14 | 16 | 18) => void;
 }
 
 export default function MobileTabBar({
   activeTab,
   onTabChange,
   hasOutputError,
-  fontSize,
-  onFontSizeChange,
 }: Props) {
   return (
     <div className="flex shrink-0 items-stretch border-b border-zinc-200 bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900 md:hidden">
@@ -61,34 +57,6 @@ export default function MobileTabBar({
           )}
         </button>
       ))}
-
-      {/* Font-size controls — only shown on the Code tab */}
-      {activeTab === "code" && (
-        <div className="flex items-center gap-0.5 px-2">
-          <button
-            onClick={() => {
-              const s = fontSize === 18 ? 16 : 14;
-              onFontSizeChange(s);
-              try { localStorage.setItem("ide-font-size", String(s)); } catch { /* ignore */ }
-            }}
-            aria-label="Decrease font size"
-            className="flex h-8 w-8 items-center justify-center rounded-lg text-[11px] font-bold text-zinc-400 hover:bg-zinc-200 dark:hover:bg-zinc-800"
-          >
-            A<sup>−</sup>
-          </button>
-          <button
-            onClick={() => {
-              const s = fontSize === 14 ? 16 : 18;
-              onFontSizeChange(s);
-              try { localStorage.setItem("ide-font-size", String(s)); } catch { /* ignore */ }
-            }}
-            aria-label="Increase font size"
-            className="flex h-8 w-8 items-center justify-center rounded-lg text-[13px] font-bold text-zinc-400 hover:bg-zinc-200 dark:hover:bg-zinc-800"
-          >
-            A<sup>+</sup>
-          </button>
-        </div>
-      )}
     </div>
   );
 }
