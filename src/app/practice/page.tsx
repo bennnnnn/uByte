@@ -62,7 +62,7 @@ export default async function PracticePage({
 }: {
   searchParams?: Promise<{ page?: string }>;
 }) {
-  const resolved = await (searchParams ?? Promise.resolve({}));
+  const resolved = await (searchParams ?? Promise.resolve({} as { page?: string }));
   const currentPage = Math.max(1, parseInt(resolved.page ?? "1", 10) || 1);
 
   const problems = getAllPracticeProblems();
