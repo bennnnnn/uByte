@@ -142,22 +142,19 @@ export function OutputPanel({
             {aiLoginRequired ? (
               <div className="flex items-center gap-2 rounded-lg border border-indigo-200 bg-indigo-50 px-3 py-1.5 dark:border-indigo-800 dark:bg-indigo-950/40">
                 <span className="text-xs text-indigo-600 dark:text-indigo-400">
-                  💡 Sign in for AI hints —
+                  💡 Want a detailed hint?
                 </span>
                 <a href="/signup" className="text-xs font-bold text-indigo-700 underline underline-offset-2 hover:text-indigo-500 dark:text-indigo-300">
                   Sign up free →
                 </a>
-                <a href="/login" className="text-xs text-indigo-600 underline underline-offset-2 hover:text-indigo-500 dark:text-indigo-400">
-                  Log in
-                </a>
               </div>
             ) : aiUpgradeRequired ? (
-              <div className="flex items-center gap-2 rounded-lg border border-indigo-200 bg-indigo-50 px-3 py-1.5 dark:border-indigo-800 dark:bg-indigo-950/40">
-                <span className="text-xs text-indigo-600 dark:text-indigo-400">
-                  💡 5 free hints used —
+              <div className="flex items-center gap-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-1.5 dark:border-amber-800 dark:bg-amber-950/40">
+                <span className="text-xs text-amber-700 dark:text-amber-400">
+                  💡 Get a detailed hint & explanation —
                 </span>
-                <a href="/pricing" className="text-xs font-bold text-indigo-700 underline underline-offset-2 hover:text-indigo-500 dark:text-indigo-300">
-                  Upgrade for unlimited →
+                <a href="/pricing" className="text-xs font-bold text-amber-800 underline underline-offset-2 hover:text-amber-600 dark:text-amber-300">
+                  Go Pro →
                 </a>
               </div>
             ) : (
@@ -446,10 +443,10 @@ export function OutputPanel({
           </div>
         )}
         {codeReviewUpgrade && !codeReview && (
-          <div className="border-t border-violet-200 bg-violet-50/60 px-4 py-3 dark:border-violet-800 dark:bg-violet-950/20">
-            <p className="text-xs font-semibold text-violet-700 dark:text-violet-300">AI code review is a Pro feature</p>
-            <a href="/pricing" className="mt-1 inline-block text-xs font-bold text-violet-600 underline underline-offset-2 hover:text-violet-500 dark:text-violet-400">
-              Upgrade to Pro →
+          <div className="border-t border-amber-200 bg-amber-50/60 px-4 py-3 dark:border-amber-800 dark:bg-amber-950/20">
+            <p className="text-xs font-semibold text-amber-700 dark:text-amber-300">💡 Get a detailed code review & explanation</p>
+            <a href="/pricing" className="mt-1 inline-block text-xs font-bold text-amber-700 underline underline-offset-2 hover:text-amber-600 dark:text-amber-400">
+              Go Pro →
             </a>
           </div>
         )}
