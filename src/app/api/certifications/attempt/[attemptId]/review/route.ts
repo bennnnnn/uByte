@@ -6,6 +6,38 @@ import { getAttempt, getAnswers } from "@/lib/db/exam-attempts";
 import { getCorrectAndExplanationBatch } from "@/lib/db/exam-questions";
 import { getSql } from "@/lib/db/client";
 import { withErrorHandling } from "@/lib/api-utils";
+import { callGateway, HINTS_MODEL } from "@/lib/ai/gateway-client";
+
+/** Generate a short 1-2 sentence explanation for a wrong answer via AI. */
+async function generateExplanation(
+  prompt: string,
+  choices: string[],
+  correctIdx: number,
+  lang: string
+): Promise<string | null> {
+  const correctChoice = choices[correctIdx] ?? "";
+  const lettered = choices.map((c, i) => `${String.fromCharCode(65 + i)}. ${c}`).join("\n");
+  try {
+    const text = await callGateway({
+      model: HINTS_MODEL,
+      messages: [
+        {
+          role: "system",
+          content: `You are a concise ${lang} programming tutor. Explain exam answers in 1-2 sentences. Be direct and educational.`,
+        },
+        {
+          role: "user",
+          content: `Question: ${prompt}\n\nOptions:\n${lettered}\n\nCorrect answer: ${correctChoice}\n\nExplain in 1-2 sentences why "${correctChoice}" is correct.`,
+        },
+      ],
+      maxTokens: 120,
+      temperature: 0.3,
+    });
+    return text.trim() || null;
+  } catch {
+    return null;
+  }
+}
 
 export interface QuestionReview {
   questionId: number;
@@ -65,6 +97,7 @@ export const GET = withErrorHandling(
       ])
     );
 
+    // First pass: build the questions array
     const questions: QuestionReview[] = attempt.question_ids_json.map((qId, posIdx) => {
       const numQId = Number(qId);
       const row = questionById.get(numQId);
@@ -102,6 +135,29 @@ export const GET = withErrorHandling(
         explanation: meta?.explanation ?? null,
       };
     });
+
+    // Second pass: for wrong-answer questions with no DB explanation, generate AI ones in parallel.
+    // Cap at 8 questions to keep response time reasonable.
+    const needsAi = questions
+      .filter((q) => !q.isCorrect && !q.explanation && q.prompt)
+      .slice(0, 8);
+
+    if (needsAi.length > 0) {
+      const generated = await Promise.all(
+        needsAi.map((q) =>
+          generateExplanation(
+            q.prompt,
+            q.displayedChoices,
+            q.correctDisplayIdx,
+            attempt.lang
+          )
+        )
+      );
+      needsAi.forEach((q, i) => {
+        const match = questions.find((r) => r.questionId === q.questionId);
+        if (match && generated[i]) match.explanation = generated[i];
+      });
+    }
 
     return NextResponse.json({ questions } satisfies ReviewResponse);
   }

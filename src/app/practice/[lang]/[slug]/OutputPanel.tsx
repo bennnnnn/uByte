@@ -136,6 +136,26 @@ export function OutputPanel({
           </button>
         ))}
 
+        {/* Code review button — non-interview, accepted verdict, Pro, no review loaded yet */}
+        {!interviewMode && verdict?.type === "accepted" && !codeReview && !codeReviewLoading && (
+          <div className="ml-auto px-3">
+            {!isPro ? (
+              <div className="flex items-center gap-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-1.5 dark:border-amber-800 dark:bg-amber-950/40">
+                <span className="text-xs text-amber-700 dark:text-amber-400">💡 Get a detailed code review —</span>
+                <a href="/pricing" className="text-xs font-bold text-amber-800 underline underline-offset-2 hover:text-amber-600 dark:text-amber-300">Go Pro →</a>
+              </div>
+            ) : (
+              <button
+                type="button"
+                onClick={onRequestCodeReview}
+                className="flex items-center gap-1.5 rounded-lg border border-violet-300 bg-violet-50 px-3 py-1 text-xs font-semibold text-violet-700 transition-colors hover:bg-violet-100 dark:border-violet-700 dark:bg-violet-950/40 dark:text-violet-400 dark:hover:bg-violet-950/70"
+              >
+                🔍 Code review
+              </button>
+            )}
+          </div>
+        )}
+
         {/* AI hint button — hidden in interview mode (debrief replaces it) and while a hint is already visible */}
         {!interviewMode && verdict && verdict.type !== "accepted" && verdict.submissionId != null && !aiFeedback && (
           <div className="ml-auto px-3">
