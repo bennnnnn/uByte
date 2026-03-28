@@ -81,11 +81,14 @@ export default function ReportsTab() {
   }
 
   return (
-    <SectionCard title="Reported Comments" action={
-      <button onClick={load} className="rounded-lg border border-zinc-200 px-3 py-1.5 text-xs font-medium text-zinc-600 hover:bg-zinc-50 dark:border-zinc-700 dark:text-zinc-400 dark:hover:bg-zinc-800">
-        Refresh
-      </button>
-    }>
+    <SectionCard title="Reported Comments">
+      {/* Refresh */}
+      <div className="mb-4 flex justify-end">
+        <button onClick={load} className="rounded-lg border border-zinc-200 px-3 py-1.5 text-xs font-medium text-zinc-600 hover:bg-zinc-50 dark:border-zinc-700 dark:text-zinc-400 dark:hover:bg-zinc-800">
+          Refresh
+        </button>
+      </div>
+
       {/* Toast */}
       {toast && (
         <div className="mb-4 rounded-lg bg-emerald-50 px-4 py-2 text-sm font-medium text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400">
