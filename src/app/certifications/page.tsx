@@ -271,7 +271,7 @@ export default async function PracticeExamsPage() {
             ];
             if (totalAttempts > 0) trustItems.push({ value: totalAttempts.toLocaleString(), label: "Exams taken" });
             if (totalCertificates > 0) trustItems.push({ value: totalCertificates.toLocaleString(), label: "Certificates issued" });
-            const cols = trustItems.length >= 4 ? "grid-cols-2 sm:grid-cols-4" : trustItems.length === 3 ? "grid-cols-3" : "grid-cols-2";
+            const cols = trustItems.length >= 4 ? "grid-cols-2 sm:grid-cols-4" : trustItems.length === 3 ? "grid-cols-2 sm:grid-cols-3" : "grid-cols-2";
             return (
               <div className={`mt-10 grid gap-4 border-t border-zinc-100 pt-8 dark:border-zinc-800 ${cols}`}>
                 {trustItems.map((item) => (
@@ -286,7 +286,7 @@ export default async function PracticeExamsPage() {
         </div>
       </div>
 
-      <div className="mx-auto max-w-5xl px-6 py-12 sm:py-14">
+      <div className="mx-auto max-w-5xl px-4 py-10 sm:px-6 sm:py-14">
 
         {/* ── Learning journey OR progress dashboard ──────────────────────── */}
         {examStats.length > 0 ? (

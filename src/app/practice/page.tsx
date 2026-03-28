@@ -225,25 +225,39 @@ export default async function PracticePage({
                   </span>
                 )}
                 <div className="flex items-center gap-1 px-1">
-                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) =>
-                    p === safePage ? (
-                      <span
-                        key={p}
-                        className="flex h-9 w-9 items-center justify-center rounded-lg bg-indigo-600 text-sm font-bold text-white"
-                        aria-current="page"
-                      >
-                        {p}
-                      </span>
-                    ) : (
-                      <Link
-                        key={p}
-                        href={`/practice?page=${p}`}
-                        className="flex h-9 w-9 items-center justify-center rounded-lg border border-zinc-200 bg-white text-sm font-medium text-zinc-700 hover:bg-zinc-50 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700"
-                      >
-                        {p}
-                      </Link>
-                    )
-                  )}
+                  {Array.from({ length: totalPages }, (_, i) => i + 1)
+                    .filter((p) => {
+                      if (totalPages <= 7) return true;
+                      if (p === 1 || p === totalPages) return true;
+                      if (Math.abs(p - safePage) <= 1) return true;
+                      return false;
+                    })
+                    .reduce<(number | "…")[]>((acc, p, idx, arr) => {
+                      if (idx > 0 && typeof arr[idx - 1] === "number" && (p as number) - (arr[idx - 1] as number) > 1) acc.push("…");
+                      acc.push(p);
+                      return acc;
+                    }, [])
+                    .map((p, idx) =>
+                      p === "…" ? (
+                        <span key={`ellipsis-${idx}`} className="flex h-9 w-6 items-center justify-center text-sm text-zinc-400">…</span>
+                      ) : p === safePage ? (
+                        <span
+                          key={p}
+                          className="flex h-9 w-9 items-center justify-center rounded-lg bg-indigo-600 text-sm font-bold text-white"
+                          aria-current="page"
+                        >
+                          {p}
+                        </span>
+                      ) : (
+                        <Link
+                          key={p}
+                          href={`/practice?page=${p}`}
+                          className="flex h-9 w-9 items-center justify-center rounded-lg border border-zinc-200 bg-white text-sm font-medium text-zinc-700 hover:bg-zinc-50 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700"
+                        >
+                          {p}
+                        </Link>
+                      )
+                    )}
                 </div>
                 {safePage < totalPages ? (
                   <Link

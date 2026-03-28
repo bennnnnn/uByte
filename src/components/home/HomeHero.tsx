@@ -239,7 +239,7 @@ function LoggedInHero({
 
 function MobileCodePreview() {
   return (
-    <div className="relative mx-auto mt-10 max-w-sm lg:hidden">
+    <div className="relative mx-4 mt-10 max-w-sm sm:mx-auto lg:hidden">
       {/* Success badge */}
       <div className="absolute -right-2 -top-3 z-10 flex items-center gap-1.5 rounded-xl border border-emerald-200 bg-white px-3 py-1.5 text-xs font-semibold text-emerald-700 shadow-md dark:border-emerald-800/60 dark:bg-zinc-900 dark:text-emerald-400">
         <span className="flex h-4 w-4 items-center justify-center rounded-full bg-emerald-100 text-[9px] dark:bg-emerald-900/50">✓</span>
@@ -400,16 +400,19 @@ function GuestHero({
             </p>
 
             {/* Stats */}
-            <div className="mt-10 grid grid-cols-2 gap-x-6 gap-y-4 border-t border-zinc-100 pt-8 sm:grid-cols-4 dark:border-zinc-800">
+            <div className="mt-10 grid grid-cols-4 gap-x-3 gap-y-4 border-t border-zinc-100 pt-8 dark:border-zinc-800">
               {[
-                { value: "9",                  label: "Languages"          },
-                { value: `${totalLessons}+`,   label: "Lessons"            },
-                { value: `${problemCount}+`,   label: "Interview problems" },
-                certStat,
+                { value: "9",                  label: "Languages",        mobileLabel: "Languages"    },
+                { value: `${totalLessons}+`,   label: "Lessons",          mobileLabel: "Lessons"      },
+                { value: `${problemCount}+`,   label: "Interview problems", mobileLabel: "Problems"   },
+                { ...certStat,                 mobileLabel: "Certs free"  },
               ].map(stat => (
                 <div key={stat.label} className="text-center lg:text-left">
-                  <p className="text-2xl font-black text-zinc-900 dark:text-zinc-100">{stat.value}</p>
-                  <p className="mt-0.5 text-sm text-zinc-500 dark:text-zinc-400">{stat.label}</p>
+                  <p className="text-xl font-black text-zinc-900 sm:text-2xl dark:text-zinc-100">{stat.value}</p>
+                  <p className="mt-0.5 text-[11px] text-zinc-500 sm:text-sm dark:text-zinc-400">
+                    <span className="sm:hidden">{stat.mobileLabel}</span>
+                    <span className="hidden sm:inline">{stat.label}</span>
+                  </p>
                 </div>
               ))}
             </div>

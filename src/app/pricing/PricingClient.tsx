@@ -269,7 +269,7 @@ function PricingContent() {
         <div className="mx-auto mt-6 grid max-w-4xl gap-6 sm:grid-cols-2">
 
           {/* ── Free card ─────────────────────────────────── */}
-          <Card className="flex flex-col p-8">
+          <Card className="flex flex-col p-5 sm:p-8">
             <div>
               <Eyebrow as="p" className="mb-1">
                 Free
@@ -318,7 +318,7 @@ function PricingContent() {
           </Card>
 
           {/* ── Pro card ──────────────────────────────────── */}
-          <div className="relative flex flex-col rounded-2xl border-2 border-indigo-400 bg-gradient-to-b from-indigo-50 to-white p-8 shadow-lg shadow-indigo-100 dark:border-indigo-500/60 dark:from-indigo-950/50 dark:to-zinc-900 dark:shadow-indigo-900/20">
+          <div className="relative flex flex-col rounded-2xl border-2 border-indigo-400 bg-gradient-to-b from-indigo-50 to-white p-5 shadow-lg shadow-indigo-100 sm:p-8 dark:border-indigo-500/60 dark:from-indigo-950/50 dark:to-zinc-900 dark:shadow-indigo-900/20">
             <div className="absolute -top-3.5 left-1/2 -translate-x-1/2">
               <span className="rounded-full bg-indigo-600 px-4 py-1 text-xs font-bold text-white shadow shadow-indigo-600/30">
                 {billing === "yearly" ? "Best value" : "Most flexible"}

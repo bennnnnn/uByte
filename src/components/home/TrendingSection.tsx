@@ -94,7 +94,7 @@ export default function TrendingSection({ languages, compact = false }: Props) {
           </h2>
         </div>
 
-        <div className={`grid gap-4 ${compact ? "grid-cols-1 sm:grid-cols-3" : "grid-cols-2 sm:grid-cols-3 lg:grid-cols-4"}`}>
+        <div className={`grid gap-4 ${compact ? "grid-cols-1 sm:grid-cols-3" : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-4"}`}>
           {allLangs.map(lang => {
             const lessons = getTotalLessonCount(lang.slug as SupportedLanguage);
             return (

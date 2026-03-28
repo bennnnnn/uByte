@@ -6,9 +6,9 @@ interface SectionHeadingProps {
   className?: string;
 }
 
-export default function SectionHeading({ id, title, subtitle, eyebrow, className = "mb-8" }: SectionHeadingProps) {
+export default function SectionHeading({ id, title, subtitle, eyebrow, className = "mb-8 text-center" }: SectionHeadingProps) {
   return (
-    <div className={`text-center ${className}`}>
+    <div className={className}>
       {eyebrow && (
         <div className="mb-3 inline-flex items-center gap-1.5 rounded-full border border-indigo-200 bg-indigo-50 px-3.5 py-1 text-[11px] font-bold uppercase tracking-widest text-indigo-600 dark:border-indigo-800 dark:bg-indigo-950/50 dark:text-indigo-400">
           {eyebrow}

@@ -155,7 +155,7 @@ export default async function TutorialLangLandingPage({
   const intro = LANG_SEO_INTRO[lang];
 
   return (
-    <div className="mx-auto max-w-4xl px-6 py-14">
+    <div className="mx-auto max-w-4xl px-4 py-10 sm:px-6 sm:py-14">
       <script async
         type="application/ld+json"
         dangerouslySetInnerHTML={{

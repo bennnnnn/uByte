@@ -54,7 +54,7 @@ export default function StepsSection() {
         className="mb-12"
       />
 
-      <div className="relative grid grid-cols-2 gap-5 sm:grid-cols-4">
+      <div className="relative grid grid-cols-1 gap-5 sm:grid-cols-2 md:grid-cols-4">
         {/* Connecting line through the icon circles */}
         <div aria-hidden className="absolute left-5 right-5 top-5 hidden h-px bg-gradient-to-r from-transparent via-zinc-200 to-transparent dark:via-zinc-700 sm:block" />
 
