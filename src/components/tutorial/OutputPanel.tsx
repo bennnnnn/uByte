@@ -1,8 +1,11 @@
 "use client";
 
+import { useState, lazy, Suspense } from "react";
 import Link from "next/link";
 import AiFeedbackCard from "@/components/AiFeedbackCard";
 import type { StepProgressState } from "@/hooks/useStepProgress";
+
+const AuthModal = lazy(() => import("@/components/auth/AuthModal"));
 
 interface Props {
   progress: StepProgressState;
@@ -24,6 +27,8 @@ export default function OutputPanel({
 }: Props) {
   const { output, outputIsError, status, aiFeedback, setAiFeedback, aiFeedbackLoading, aiFeedbackUpgrade, aiFeedbackLoginRequired, stepIndex } = progress;
   const aiFeedbackUnavailable = aiFeedback?.confidence === 0 || aiFeedback?.root_cause === "ai_unavailable" || aiFeedback?.root_cause === "network_error";
+  const [authOpen, setAuthOpen] = useState(false);
+  const [authMode, setAuthMode] = useState<"signup" | "login">("signup");
 
   const labelColor =
     outputIsError || status === "failed"
@@ -108,18 +113,20 @@ export default function OutputPanel({
                 Create a free account. When you hit a wall, ask for a hint instead of switching tabs.
               </p>
               <div className="flex gap-2">
-                <Link
-                  href="/signup"
+                <button
+                  type="button"
+                  onClick={() => { setAuthMode("signup"); setAuthOpen(true); }}
                   className="inline-block rounded-lg bg-indigo-600 px-3 py-1.5 text-xs font-bold text-white transition hover:bg-indigo-500"
                 >
                   Sign up free →
-                </Link>
-                <Link
-                  href="/login"
+                </button>
+                <button
+                  type="button"
+                  onClick={() => { setAuthMode("login"); setAuthOpen(true); }}
                   className="inline-block rounded-lg border border-indigo-200 px-3 py-1.5 text-xs font-medium text-indigo-700 transition hover:bg-indigo-50 dark:border-indigo-700 dark:text-indigo-400 dark:hover:bg-indigo-950/40"
                 >
                   Log in
-                </Link>
+                </button>
               </div>
             </div>
           )}
@@ -167,6 +174,15 @@ export default function OutputPanel({
             </div>
           )}
         </div>
+      )}
+
+      {authOpen && (
+        <Suspense>
+          <AuthModal
+            initialMode={authMode}
+            onClose={() => setAuthOpen(false)}
+          />
+        </Suspense>
       )}
     </div>
   );
