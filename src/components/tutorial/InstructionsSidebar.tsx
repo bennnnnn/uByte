@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import Link from "next/link";
 import TutorialRating from "@/components/TutorialRating";
+import InlineRatingNudge from "@/components/tutorial/InlineRatingNudge";
 import { useAuth } from "@/components/AuthProvider";
 import { hasPaidAccess } from "@/lib/plans";
 import { tutorialUrl } from "@/lib/urls";
@@ -120,6 +121,13 @@ export default function InstructionsSidebar({
         {completedSteps.size === steps.length && steps.length > 0 && (
           <TutorialRating lang={lang} tutorialSlug={tutorialSlug} />
         )}
+
+        <InlineRatingNudge
+          lang={lang}
+          tutorialSlug={tutorialSlug}
+          completedCount={completedSteps.size}
+          isLoggedIn={!isGuest}
+        />
 
         {status === "failed" && failCount >= 3 && !isGuest && !aiHintActive && (
           <div className="mt-6 rounded-lg border border-indigo-200 bg-indigo-50 p-4 dark:border-indigo-900 dark:bg-indigo-950/30">

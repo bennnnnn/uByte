@@ -1,6 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
 import { withErrorHandling, requireAuth } from "@/lib/api-utils";
-import { rateTutorial } from "@/lib/db/tutorial-ratings";
+import { rateTutorial, getUserTutorialRating } from "@/lib/db/tutorial-ratings";
+
+export const GET = withErrorHandling(
+  "GET /api/tutorials/[lang]/[slug]/rate",
+  async (_request: NextRequest, ctx: unknown) => {
+    const { user, response } = await requireAuth();
+    if (!user) return response;
+    const { lang, slug } = await (ctx as { params: Promise<{ lang: string; slug: string }> }).params;
+    const rating = await getUserTutorialRating(String(user.userId), lang, slug);
+    return NextResponse.json({ rating });
+  },
+);
 
 export const POST = withErrorHandling(
   "POST /api/tutorials/[lang]/[slug]/rate",
