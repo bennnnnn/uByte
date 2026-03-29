@@ -5,7 +5,7 @@ import { notFound } from "next/navigation";
 import { LANGUAGES, getAllLanguageSlugs } from "@/lib/languages/registry";
 import type { SupportedLanguage } from "@/lib/languages/types";
 import { getCurrentUser } from "@/lib/auth";
-import { getExamConfigForLang, getExamConfigForAllLangs, getProgressCount, getUserExamStats, getExamPublicStatsByLang } from "@/lib/db";
+import { getExamConfigForLang, getExamConfigForAllLangs, getProgressCount, getUserExamStats, getExamPublicStatsByLang, getUserById } from "@/lib/db";
 import { getAllTutorials } from "@/lib/tutorials";
 import { getTotalLessonCount } from "@/lib/tutorial-steps";
 import { getLangIcon } from "@/lib/languages/icons";
@@ -90,8 +90,10 @@ export default async function PracticeExamLangPage({ params }: Props) {
     getExamConfigForAllLangs(),
     getExamPublicStatsByLang(),
   ]);
-  // Certifications are free — any logged-in user can take an exam
-  const canTakeExam = !!user;
+  const dbUser = user ? await getUserById(user.userId) : null;
+  const emailVerified = !!dbUser?.email_verified;
+  // Certifications require a verified email — ensures the certificate is tied to a real address
+  const canTakeExam = !!user && emailVerified;
 
   // totalLessons — individual steps, matches the number shown on LangCard / tutorial page.
   // totalTopics  — number of tutorial topics; getProgressCount also returns a topic count,
@@ -375,8 +377,28 @@ export default async function PracticeExamLangPage({ params }: Props) {
                       <StartExamButton lang={lang} langName={name} fullWidth />
                     </div>
                   </>
+                ) : user && !emailVerified ? (
+                  /* Logged in but email not verified */
+                  <>
+                    <p className="text-lg font-bold text-zinc-900 dark:text-zinc-100">One step away</p>
+                    <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
+                      Verify your email to start the exam. Your certificate needs to be tied to a real address so it&apos;s verifiable.
+                    </p>
+                    <div className="mt-5 rounded-xl border border-amber-200 bg-amber-50 p-4 dark:border-amber-800/50 dark:bg-amber-950/20">
+                      <p className="text-sm font-medium text-amber-800 dark:text-amber-300">Check your inbox</p>
+                      <p className="mt-1 text-xs text-amber-700/80 dark:text-amber-400/70">
+                        We sent a verification link to <span className="font-semibold">{dbUser?.email}</span>. Click it and then come back here.
+                      </p>
+                    </div>
+                    <p className="mt-4 text-center text-xs text-zinc-400 dark:text-zinc-500">
+                      Didn&apos;t get it?{" "}
+                      <Link href="/settings" className="font-medium text-indigo-600 hover:text-indigo-500 dark:text-indigo-400">
+                        Resend from settings
+                      </Link>
+                    </p>
+                  </>
                 ) : (
-                  /* Free / not logged in */
+                  /* Not logged in */
                   <>
                     <p className="text-lg font-bold text-zinc-900 dark:text-zinc-100">Earn your {name} certificate</p>
                     <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
@@ -391,22 +413,18 @@ export default async function PracticeExamLangPage({ params }: Props) {
                     ]} />
 
                     <div className="mt-6 flex flex-col gap-3">
-                      {!user ? (
-                        <>
-                          <Link
-                            href={`/signup?next=/certifications/${lang}`}
-                            className="inline-flex items-center justify-center gap-2 rounded-xl bg-indigo-600 px-5 py-3 text-sm font-bold text-white shadow-md shadow-indigo-500/20 transition-all hover:-translate-y-0.5 hover:bg-indigo-500"
-                          >
-                            Create free account
-                          </Link>
-                          <Link
-                            href={`/login?next=/certifications/${lang}`}
-                            className="inline-flex items-center justify-center gap-2 rounded-xl border border-zinc-300 bg-white px-5 py-2.5 text-sm font-semibold text-zinc-700 transition-all hover:border-zinc-400 hover:bg-zinc-50 dark:border-zinc-600 dark:bg-surface-card dark:text-zinc-200 dark:hover:border-zinc-500"
-                          >
-                            Log in
-                          </Link>
-                        </>
-                      ) : null}
+                      <Link
+                        href={`/signup?next=/certifications/${lang}`}
+                        className="inline-flex items-center justify-center gap-2 rounded-xl bg-indigo-600 px-5 py-3 text-sm font-bold text-white shadow-md shadow-indigo-500/20 transition-all hover:-translate-y-0.5 hover:bg-indigo-500"
+                      >
+                        Create free account
+                      </Link>
+                      <Link
+                        href={`/login?next=/certifications/${lang}`}
+                        className="inline-flex items-center justify-center gap-2 rounded-xl border border-zinc-300 bg-white px-5 py-2.5 text-sm font-semibold text-zinc-700 transition-all hover:border-zinc-400 hover:bg-zinc-50 dark:border-zinc-600 dark:bg-surface-card dark:text-zinc-200 dark:hover:border-zinc-500"
+                      >
+                        Log in
+                      </Link>
                     </div>
                   </>
                 )}

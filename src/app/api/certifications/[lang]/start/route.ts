@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
+import { getUserById } from "@/lib/db";
 import { getQuestionIdsByLang, getQuestionsByIds } from "@/lib/db/exam-questions";
 import { createAttempt } from "@/lib/db/exam-attempts";
 import { getExamConfigForLang } from "@/lib/db/exam-settings";
@@ -28,6 +29,8 @@ export const POST = withErrorHandling(
     if (limited) return NextResponse.json({ error: "Too many requests. Please wait before starting another exam." }, { status: 429 });
     const user = await getCurrentUser();
     if (!user) return NextResponse.json({ error: "Sign in to start an exam", code: "login_required" }, { status: 401 });
+    const dbUser = await getUserById(user.userId);
+    if (!dbUser?.email_verified) return NextResponse.json({ error: "Verify your email before taking an exam", code: "email_not_verified" }, { status: 403 });
 
     const { lang } = (context as { params?: Promise<{ lang: string }> }).params
       ? await (context as { params: Promise<{ lang: string }> }).params
