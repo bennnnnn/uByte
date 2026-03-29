@@ -65,20 +65,17 @@ const AuthFormFields = forwardRef<HTMLFormElement, AuthFormFieldsProps>(function
       <a
         href={googleHref}
         aria-label="Continue with Google"
-        className={`flex w-full items-center justify-center gap-3 rounded-xl bg-indigo-600 px-4 py-3.5 text-sm font-semibold text-white shadow-md shadow-indigo-500/20 transition-all hover:-translate-y-0.5 hover:bg-indigo-500 ${
+        className={`flex w-full items-center justify-center gap-3 rounded-xl border border-zinc-200 bg-white px-4 py-3 text-sm font-medium text-zinc-700 shadow-sm transition-colors hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-200 dark:hover:bg-zinc-700/80 ${
           submitting ? "pointer-events-none opacity-50" : ""
         }`}
       >
-        <GoogleIcon className="h-5 w-5 shrink-0 brightness-0 invert" />
+        <GoogleIcon className="h-5 w-5 shrink-0" />
         Continue with Google
       </a>
-      <p className="mt-1.5 text-center text-xs text-zinc-400 dark:text-zinc-500">
-        Fastest way — no fake email, no password to forget
-      </p>
 
-      <div className="flex items-center gap-3 py-3">
+      <div className="flex items-center gap-3 py-2">
         <div className="h-px flex-1 bg-zinc-200 dark:bg-zinc-700" />
-        <span className="text-xs font-medium text-zinc-400">or use email</span>
+        <span className="text-xs font-medium text-zinc-400">or</span>
         <div className="h-px flex-1 bg-zinc-200 dark:bg-zinc-700" />
       </div>
 
