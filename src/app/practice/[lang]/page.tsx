@@ -15,7 +15,7 @@ import { getPracticeAttempts, getUserById } from "@/lib/db";
 import type { PracticeAttemptStatus } from "@/lib/db/practice-attempts";
 import { hasPaidAccess } from "@/lib/plans";
 import { PracticeListClient } from "@/components/practice/PracticeListClient";
-import { absoluteUrl } from "@/lib/seo";
+import { absoluteUrl, SITE_KEYWORDS } from "@/lib/seo";
 
 const PROBLEMS_PER_PAGE = 35;
 
