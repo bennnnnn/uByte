@@ -7,7 +7,7 @@ import { useAuth } from "@/components/AuthProvider";
 import {
   BILLING_CONFIG, MONTHLY_PRICE_ID, YEARLY_PRICE_ID, hasPaidAccess,
   MONTHLY_EQUIVALENT_CENTS, YEARLY_IF_MONTHLY_CENTS, YEARLY_DISCOUNT_PERCENT,
-  MONTHLY_PRICE_CENTS, YEARLY_PRICE_CENTS,
+  YEARLY_PRICE_CENTS,
 } from "@/lib/plans";
 import { trackConversion } from "@/lib/analytics";
 import { buildAuthPageHref } from "@/lib/auth-redirect";
@@ -15,25 +15,9 @@ import { Button, Card, CheckIcon, Eyebrow, GradientText } from "@/components/ui"
 import { apiFetch } from "@/lib/api-client";
 import PricingFAQ from "./PricingFAQ";
 import PricingComparisonTable from "./PricingComparisonTable";
+import { FAQ_ITEMS, FREE_FEATURES, PRO_FEATURES } from "./content";
 
 const CLIENT_TOKEN     = process.env.NEXT_PUBLIC_PADDLE_CLIENT_TOKEN ?? "";
-
-const FREE_FEATURES = [
-  "All tutorials — every language, every topic",
-  "All interview prep problems — no limits",
-  "Certification exams — free for everyone",
-  "Verifiable certificates for LinkedIn & resume",
-  "Built-in code editor",
-  "Progress tracking",
-];
-
-const PRO_FEATURES = [
-  "Tutorial hints when you get stuck",
-  "Detailed feedback on every practice submission",
-  "Question-by-question certification exam review",
-  "Mock interview simulator with a personalized debrief",
-  "Priority support",
-];
 
 const COMPARISON_FEATURES: { name: string; free: string; pro: string }[] = [
   { name: "Tutorials", free: "✓ Unlimited", pro: "✓ Unlimited" },
@@ -47,37 +31,6 @@ const COMPARISON_FEATURES: { name: string; free: string; pro: string }[] = [
   { name: "Practice feedback on submissions", free: "—", pro: "✓" },
   { name: "Certification exam review", free: "Basic results", pro: "Detailed review" },
   { name: "Interview simulator", free: "Timed practice", pro: "Timed practice + debrief" },
-];
-
-const FAQ_ITEMS = [
-  {
-    q: "What does Pro actually give me?",
-    a: "Pro is the help layer. When you get stuck in a tutorial or practice problem, you can ask for a hint without leaving the page. After you submit code, you get detailed feedback on what to improve. After a certification exam, you can review every question with explanations. And in the interview simulator, you get a personalized debrief so you know exactly what to work on next.",
-  },
-  {
-    q: "Why do people upgrade if everything is already free?",
-    a: "Because the content is free, but time is not. Pro helps you stay in flow with hints, faster feedback, certification exam review, and interview breakdowns right where you're already practicing.",
-  },
-  {
-    q: "Can I cancel anytime?",
-    a: "Yes. Cancel from your account settings and you'll keep Pro until the end of your billing period. No questions asked.",
-  },
-  {
-    q: "How does the free plan work?",
-    a: "Everything is free — all tutorials across 9 languages, all interview prep problems, and all certification exams. Create a free account and start coding immediately. Upgrade only if you want the extra help layer.",
-  },
-  {
-    q: "Do I get a certificate?",
-    a: "Yes — and it's free. Any user can take timed certification exams. Pass and you earn a verifiable digital certificate with a unique ID you can add to your LinkedIn, resume, or portfolio.",
-  },
-  {
-    q: "Who processes payments?",
-    a: "Payments are processed securely by Paddle. Tax may be added based on your location.",
-  },
-  {
-    q: "Is there a refund policy?",
-    a: "If you're not satisfied, contact us within 7 days of subscribing and we'll issue a full refund. No questions asked.",
-  },
 ];
 
 function PricingContent() {
@@ -95,7 +48,7 @@ function PricingContent() {
     trackConversion("viewed_pricing");
   }, []);
 
-  // Preselect plan when coming from an upgrade wall (e.g. /pricing?plan=monthly|yearly).
+  // Preselect plan when coming from a pricing link (e.g. /pricing?plan=monthly|yearly).
   useEffect(() => {
     queueMicrotask(() => {
       if (planParam === "monthly") setBilling("monthly");

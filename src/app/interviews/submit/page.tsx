@@ -29,7 +29,7 @@ export default function SubmitInterviewPage() {
       <SubmitClient />
 
       {/* Server-rendered content for search engine crawlers */}
-      <article className="sr-only" aria-hidden="true">
+      <article className="sr-only">
         <h1>Share Your Tech Interview Experience</h1>
         <p>
           Help other developers prepare by sharing your interview experience

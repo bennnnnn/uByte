@@ -32,7 +32,7 @@ export default function CertificatePage() {
       <CertificateClient />
 
       {/* Server-rendered content for search engine crawlers */}
-      <article className="sr-only" aria-hidden="true">
+      <article className="sr-only">
         <h1>Programming Certificate — Verified by {APP_NAME}</h1>
         <p>
           This page displays a verified programming certificate issued by {APP_NAME}.

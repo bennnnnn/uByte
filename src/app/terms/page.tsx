@@ -1,10 +1,22 @@
 import type { Metadata } from "next";
+import { APP_NAME } from "@/lib/constants";
 import { absoluteUrl } from "@/lib/seo";
 
 export const metadata: Metadata = {
   title: "Terms of Service",
   description: "Terms and conditions for using uByte.",
   alternates: { canonical: absoluteUrl("/terms") },
+  openGraph: {
+    type: "website",
+    url: absoluteUrl("/terms"),
+    title: `Terms of Service | ${APP_NAME}`,
+    description: "Terms and conditions for using uByte.",
+  },
+  twitter: {
+    card: "summary",
+    title: `Terms of Service | ${APP_NAME}`,
+    description: "Terms and conditions for using uByte.",
+  },
 };
 
 const UPDATED = "3 March 2026";
@@ -38,7 +50,7 @@ export default function TermsPage() {
       </Section>
 
       <Section title="Plans, Payments, and Refunds">
-        <p><strong>Free tier</strong> — uByte offers a free tier with limited access to tutorials, interview prep problems, and features as described on the pricing page.</p>
+        <p><strong>Free access</strong> — tutorials, interview prep problems, and certification exams are available as described on the pricing page.</p>
         <p><strong>Pro subscription</strong> — paid subscriptions are billed monthly or annually through Paddle, our Merchant of Record. By subscribing, you agree to Paddle&apos;s <a href="https://www.paddle.com/legal/terms" target="_blank" rel="noopener noreferrer" className="text-indigo-600 hover:underline">Terms of Service</a>. Paddle handles all payment processing, invoicing, and sales tax/VAT.</p>
         <p><strong>Automatic renewal</strong> — subscriptions renew automatically at the end of each billing period unless cancelled. You can cancel at any time from your Paddle subscription management portal.</p>
         <p><strong>Refunds</strong> — if you are not satisfied with your Pro subscription, you may request a refund within 7 days of your initial purchase by contacting <a href="mailto:support@ubyte.dev" className="text-indigo-600 hover:underline">support@ubyte.dev</a>. Refunds are processed through Paddle. After the 7-day window, no refunds will be issued for the current billing period, but you may cancel to prevent future charges.</p>
@@ -64,7 +76,7 @@ export default function TermsPage() {
       </Section>
 
       <Section title="Certifications">
-        <p>Pro subscribers may take certification exams. Upon passing, you receive a verifiable digital certificate. Certificates attest only that you passed the exam at a given time; they do not represent an accredited qualification. We reserve the right to revoke certificates obtained through cheating or other violations of these Terms.</p>
+        <p>Users may take certification exams. Upon passing, you receive a verifiable digital certificate. Certificates attest only that you passed the exam at a given time; they do not represent an accredited qualification. We reserve the right to revoke certificates obtained through cheating or other violations of these Terms.</p>
       </Section>
 
       <Section title="Playground Snippets">
@@ -72,8 +84,8 @@ export default function TermsPage() {
         <p>You retain ownership of code you write. By sharing a snippet you grant us a non-exclusive licence to store and serve it. We may delete snippets that violate these Terms or after extended periods of inactivity.</p>
       </Section>
 
-      <Section title="AI Code Feedback">
-        <p>Pro users may receive AI-generated code feedback powered by third-party AI services. AI responses are informational and may contain errors. We are not liable for actions taken based on AI feedback.</p>
+      <Section title="Automated Code Feedback">
+        <p>Pro users may receive code feedback generated with third-party AI services. Those responses are informational and may contain errors. We are not liable for actions taken based on automated feedback.</p>
       </Section>
 
       <Section title="Leaderboard and Public Profile Data">

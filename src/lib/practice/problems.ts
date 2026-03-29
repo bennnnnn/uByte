@@ -89,6 +89,8 @@ export const PRACTICE_PROBLEMS: PracticeProblem[] = [
   ...HARD_PROBLEMS_6,
 ];
 
+export const PRACTICE_PROBLEM_COUNT = PRACTICE_PROBLEMS.length;
+
 // ─── Category helpers (derived from problem definitions) ─────────────────────
 
 const CATEGORY_LABELS: Record<ProblemCategory, string> = {

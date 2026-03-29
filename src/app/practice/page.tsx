@@ -1,6 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { getAllPracticeProblems, getPracticeCategories, getCategoryLabel } from "@/lib/practice/problems";
+import {
+  PRACTICE_PROBLEM_COUNT,
+  getAllPracticeProblems,
+  getPracticeCategories,
+  getCategoryLabel,
+} from "@/lib/practice/problems";
 import { LANGUAGES, getPracticeLanguageSlugs } from "@/lib/languages/registry";
 import type { SupportedLanguage } from "@/lib/languages/types";
 import { DIFFICULTY_BADGE } from "@/lib/practice/types";
@@ -12,7 +17,7 @@ export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
   title: "Coding Interview Prep — Practice Problems in Multiple Languages",
   description:
-    "Ace your coding interview with 200+ practice problems in Go, Python, TypeScript, JavaScript, Java, C++, Rust, C#, and more. Arrays, strings, trees, graphs, dynamic programming — solve in-browser with instant test feedback. All problems free.",
+    `Ace your coding interview with ${PRACTICE_PROBLEM_COUNT} practice problems in Go, Python, TypeScript, JavaScript, Java, C++, Rust, C#, and more. Arrays, strings, trees, graphs, dynamic programming — solve in-browser with instant test feedback. All problems free.`,
   keywords: [
     ...SITE_KEYWORDS,
     "coding interview questions",
@@ -43,15 +48,15 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Coding Interview Prep — Practice Problems in Multiple Languages",
     description:
-      "200+ coding interview problems across Go, Python, TypeScript, JavaScript, Java, C++, Rust, C#, and more. Write real code in the browser and get instant test feedback. All problems free.",
+      `${PRACTICE_PROBLEM_COUNT} coding interview problems across Go, Python, TypeScript, JavaScript, Java, C++, Rust, C#, and more. Write real code in the browser and get instant test feedback. All problems free.`,
     type: "website",
     url: absoluteUrl("/practice"),
-    images: [{ url: absoluteUrl("/api/og?title=Interview+Prep&description=200%2B+coding+problems+in+multiple+languages+with+instant+feedback"), width: 1200, height: 630 }],
+    images: [{ url: absoluteUrl(`/api/og?title=Interview+Prep&description=${encodeURIComponent(`${PRACTICE_PROBLEM_COUNT} coding problems in multiple languages with instant feedback`)}`), width: 1200, height: 630 }],
   },
   twitter: {
     card: "summary_large_image",
     title: "Coding Interview Prep — Practice Problems in Multiple Languages",
-    description: "200+ LeetCode-style problems in Go, Python, TypeScript, JavaScript, Java, Rust, C++, C#, and more. Solve in-browser with instant test feedback. All problems free.",
+    description: `${PRACTICE_PROBLEM_COUNT} LeetCode-style problems in Go, Python, TypeScript, JavaScript, Java, Rust, C++, C#, and more. Solve in-browser with instant test feedback. All problems free.`,
   },
 };
 
@@ -105,7 +110,7 @@ export default async function PracticePage({
             Ace your coding interview
           </h1>
           <p className="mb-6 max-w-2xl text-base leading-relaxed text-zinc-500 dark:text-zinc-400">
-            {problems.length} classic problems you'll face at top tech companies — write real code, run tests instantly, track your progress.
+            {problems.length} classic problems you&apos;ll face at top tech companies — write real code, run tests instantly, track your progress.
           </p>
 
           {/* Stats row */}

@@ -1,10 +1,22 @@
 import type { Metadata } from "next";
+import { APP_NAME } from "@/lib/constants";
 import { absoluteUrl } from "@/lib/seo";
 
 export const metadata: Metadata = {
   title: "Privacy Policy",
   description: "How uByte collects, uses, and protects your personal data.",
   alternates: { canonical: absoluteUrl("/privacy") },
+  openGraph: {
+    type: "website",
+    url: absoluteUrl("/privacy"),
+    title: `Privacy Policy | ${APP_NAME}`,
+    description: "How uByte collects, uses, and protects your personal data.",
+  },
+  twitter: {
+    card: "summary",
+    title: `Privacy Policy | ${APP_NAME}`,
+    description: "How uByte collects, uses, and protects your personal data.",
+  },
 };
 
 const UPDATED = "3 March 2026";
@@ -43,7 +55,7 @@ export default function PrivacyPage() {
         <p><strong>Code submissions</strong> — code you write and run in tutorials or interview prep is sent to third-party execution services (see &ldquo;Third-Party Services&rdquo; below) to produce output. We do not permanently store the code you run unless you explicitly share a snippet.</p>
         <p><strong>Shared snippets</strong> — if you click &ldquo;Share&rdquo; in the Playground, the snippet is stored on our servers and accessible via its unique link.</p>
         <p><strong>Payment data</strong> — subscriptions are processed by Paddle, our Merchant of Record. We never see or store your card details. We receive a Paddle customer ID and subscription status to activate your plan.</p>
-        <p><strong>AI feedback</strong> — Pro users may request AI-generated code feedback. Your code and the step context are sent to a third-party AI API to generate a response. We cache AI responses briefly to reduce API costs.</p>
+        <p><strong>Automated code feedback</strong> — Pro users may request code feedback generated with third-party AI services. Your code and the step context are sent to a third-party AI API to generate a response. We cache those responses briefly to reduce API costs.</p>
         <p><strong>Usage and analytics</strong> — we collect page views and conversion events via Vercel Analytics (privacy-friendly, no cross-site tracking, no cookies). Error reports are collected via Sentry.</p>
         <p><strong>Push notification subscriptions</strong> — if you consent to notifications, we store your browser push endpoint and encryption keys to deliver streak reminders.</p>
         <p><strong>Contact messages</strong> — if you contact us via the contact form or email, we retain your message to respond to it.</p>

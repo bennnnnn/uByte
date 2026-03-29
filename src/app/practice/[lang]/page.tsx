@@ -7,7 +7,7 @@ import {
   getPracticeCategories,
   sortProblemsByCategoryAndDifficulty,
 } from "@/lib/practice/problems";
-import { isSupportedLanguage, LANGUAGES, ALL_LANGUAGE_KEYS, PRACTICE_LANGUAGE_KEYS } from "@/lib/languages/registry";
+import { isSupportedLanguage, LANGUAGES, PRACTICE_LANGUAGE_KEYS } from "@/lib/languages/registry";
 import type { SupportedLanguage } from "@/lib/languages/types";
 import type { Difficulty, ProblemCategory } from "@/lib/practice/types";
 import { getCurrentUser } from "@/lib/auth";
@@ -15,7 +15,7 @@ import { getPracticeAttempts, getUserById } from "@/lib/db";
 import type { PracticeAttemptStatus } from "@/lib/db/practice-attempts";
 import { hasPaidAccess } from "@/lib/plans";
 import { PracticeListClient } from "@/components/practice/PracticeListClient";
-import { absoluteUrl, SITE_KEYWORDS } from "@/lib/seo";
+import { absoluteUrl } from "@/lib/seo";
 
 const PROBLEMS_PER_PAGE = 35;
 
@@ -153,7 +153,7 @@ export default async function PracticeLangPage({ params, searchParams }: Props) 
       />
 
       {/* Server-rendered content for search engine crawlers */}
-      <article className="sr-only" aria-hidden="true">
+      <article className="sr-only">
         <h1>{name} Interview Prep Problems</h1>
         <p>
           Practice {name} coding interview questions on uByte. {allProblems.length} problems

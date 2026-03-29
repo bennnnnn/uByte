@@ -56,7 +56,7 @@ export default function InterviewSimulatorPage() {
       <InterviewClient />
 
       {/* Server-rendered content for search engine crawlers */}
-      <article className="sr-only" aria-hidden="true">
+      <article className="sr-only">
         <h1>Coding Interview Simulator — Practice Mock Technical Interviews</h1>
         <p>
           Simulate a real coding interview on uByte. Pick your programming

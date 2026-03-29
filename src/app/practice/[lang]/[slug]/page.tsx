@@ -2,12 +2,12 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import type { Metadata } from "next";
 import { getPracticeProblemBySlug, getAllPracticeProblems, getPracticeCategories } from "@/lib/practice/problems";
-import { isSupportedLanguage, LANGUAGES, ALL_LANGUAGE_KEYS, PRACTICE_LANGUAGE_KEYS } from "@/lib/languages/registry";
+import { isSupportedLanguage, LANGUAGES, PRACTICE_LANGUAGE_KEYS } from "@/lib/languages/registry";
 import type { SupportedLanguage } from "@/lib/languages/types";
 import type { ProblemCategory } from "@/lib/practice/types";
 import { PracticeIDE } from "./PracticeIDE";
 import { getCurrentUser } from "@/lib/auth";
-import { absoluteUrl, SITE_KEYWORDS } from "@/lib/seo";
+import { absoluteUrl } from "@/lib/seo";
 import { APP_NAME, BASE_URL } from "@/lib/constants";
 import { tryDecodeShareCode } from "@/lib/share-code";
 
@@ -129,7 +129,7 @@ export default async function PracticeProblemPage({ params, searchParams }: Prop
       />
 
       {/* Server-rendered content for search engine crawlers */}
-      <article className="sr-only" aria-hidden="true">
+      <article className="sr-only">
         <h1>{problem.title} — {langName} Coding Problem</h1>
         <p>Difficulty: {problem.difficulty} | Category: {problem.category}</p>
         <section>

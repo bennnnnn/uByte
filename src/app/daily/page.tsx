@@ -92,7 +92,7 @@ export default function DailyPage() {
       </Suspense>
 
       {/* Server-rendered content for search engine crawlers */}
-      <article className="sr-only" aria-hidden="true">
+      <article className="sr-only">
         <h1>Daily Coding Challenge — uByte</h1>
         <p>
           Solve a brand-new coding challenge every day on uByte. The daily

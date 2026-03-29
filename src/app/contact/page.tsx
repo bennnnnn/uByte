@@ -29,7 +29,7 @@ export default function ContactPage() {
       <ContactClient />
 
       {/* Server-rendered content for search engine crawlers */}
-      <article className="sr-only" aria-hidden="true">
+      <article className="sr-only">
         <h1>Contact uByte — Support, Feedback, and Questions</h1>
         <p>
           Get in touch with the uByte team. We typically respond within one

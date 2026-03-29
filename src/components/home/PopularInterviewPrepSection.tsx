@@ -1,6 +1,5 @@
 import Link from "next/link";
-import { getPracticeProblemBySlug } from "@/lib/practice/problems";
-import { DIFFICULTY_BADGE } from "@/lib/practice/types";
+import { PRACTICE_PROBLEM_COUNT, getPracticeProblemBySlug } from "@/lib/practice/problems";
 import type { PopularPracticeProblem } from "@/lib/db/home-popular";
 import SectionHeading from "./SectionHeading";
 
@@ -46,7 +45,7 @@ export default function PopularInterviewPrepSection({ problems }: Props) {
           id="popular-prep-heading"
           eyebrow="Interview Prep"
           title="The problems companies actually ask"
-          subtitle="114+ real interview problems. Solve in any language, run against hidden test cases — free for everyone."
+          subtitle={`${PRACTICE_PROBLEM_COUNT} real interview problems. Solve in any language, run against hidden test cases — free for everyone.`}
           className="mb-0 text-left"
         />
         <Link
@@ -62,7 +61,6 @@ export default function PopularInterviewPrepSection({ problems }: Props) {
         {problems.map((p) => {
           const meta = getPracticeProblemBySlug(p.slug);
           const difficulty = meta?.difficulty ?? "easy";
-          const badgeCls = DIFFICULTY_BADGE[difficulty];
           const category = meta?.category ? (CATEGORY_LABEL[meta.category] ?? meta.category) : null;
 
           return (

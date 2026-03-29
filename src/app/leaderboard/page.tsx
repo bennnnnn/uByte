@@ -47,7 +47,7 @@ export default function LeaderboardPage() {
       <LeaderboardClient />
 
       {/* Server-rendered content for search engine crawlers */}
-      <article className="sr-only" aria-hidden="true">
+      <article className="sr-only">
         <h1>uByte Coding Leaderboard</h1>
         <p>
           See the top learners on uByte ranked by XP. Earn experience points by

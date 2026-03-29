@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import { getTotalLessonCount } from "@/lib/tutorial-steps";
 import { ALL_LANGUAGE_KEYS } from "@/lib/languages/registry";
-import { getAllPracticeProblems, getPracticeProblemBySlug } from "@/lib/practice/problems";
+import { PRACTICE_PROBLEM_COUNT, getPracticeProblemBySlug } from "@/lib/practice/problems";
 import { APP_NAME, BASE_URL } from "@/lib/constants";
 import { getExamConfigForAllLangs, getLastActivity, getExamPublicStatsByLang } from "@/lib/db";
 import { getPopularLanguages, getPopularPracticeProblems, getFallbackPopularLanguages, getFallbackPopularPracticeProblems } from "@/lib/db/home-popular";
@@ -29,7 +29,7 @@ const PopularInterviewPrepSection = dynamic(() => import("@/components/home/Popu
 export const metadata: Metadata = {
   title: "uByte — Interactive Coding Tutorials, Interview Prep & Free Certifications",
   description:
-    "Master Go, Python, TypeScript, SQL, Java, Rust, C++ and C# with interactive tutorials. Practice with 114+ interview problems. Earn free certification exams. Write and run real code in your browser — zero setup.",
+    `Master Go, Python, TypeScript, SQL, Java, Rust, C++ and C# with interactive tutorials. Practice with ${PRACTICE_PROBLEM_COUNT} interview problems. Earn free certification exams. Write and run real code in your browser — zero setup.`,
   keywords: [
     ...SITE_KEYWORDS,
     "coding bootcamp alternative",
@@ -71,7 +71,7 @@ export const metadata: Metadata = {
 };
 
 export default async function Home() {
-  const problemCount = getAllPracticeProblems().length;
+  const problemCount = PRACTICE_PROBLEM_COUNT;
 
   const [examConfigByLang, user, popularLanguages, popularProblems, publicExamStats] = await Promise.all([
     getExamConfigForAllLangs(),

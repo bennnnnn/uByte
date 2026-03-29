@@ -1,4 +1,5 @@
 import { ImageResponse } from "next/og";
+import { PRACTICE_PROBLEM_COUNT } from "@/lib/practice/problems";
 
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
@@ -83,7 +84,7 @@ export default function OgImage() {
           lineHeight: 1.4,
         }}
       >
-        9 languages · 100+ interview problems · Free certifications
+        {`9 languages · ${PRACTICE_PROBLEM_COUNT} interview problems · Free certifications`}
       </div>
 
       {/* Pill badges */}
