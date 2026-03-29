@@ -147,6 +147,9 @@ export function useStepProgress(
   // so subsequent auto-trigger checks always see the right value regardless of whether
   // React has re-rendered yet. Reset when the step changes or passes.
   const hintInflightRef = useRef(false);
+  // Tracks whether the URL already specified a ?step= param on mount.
+  // If it did, we respect it and skip the auto-resume-to-first-incomplete logic.
+  const urlHasStepRef = useRef(false);
   // Stores the last failed check's data so the auto-hint useEffect can fire fetchAiFeedback
   // outside of a state updater (React can re-invoke updaters in concurrent mode).
   const pendingAutoHintRef = useRef<{ code: string; output: string; isError: boolean; stepIndex: number } | null>(null);
@@ -178,6 +181,7 @@ export function useStepProgress(
     const sp = new URLSearchParams(window.location.search);
     const s = sp.get("step");
     if (s !== null) {
+      urlHasStepRef.current = true;
       const idx = parseInt(s, 10);
       if (!isNaN(idx) && idx >= 0 && idx < steps.length) {
         setStepIndex(idx);
@@ -223,10 +227,26 @@ export function useStepProgress(
         }
         setCompletedSteps((prev) => new Set([...prev, ...completed, ...skipped]));
         setSkippedSteps((prev) => new Set([...prev, ...skipped]));
+
+        // Auto-resume to the first incomplete step when the URL didn't specify ?step=.
+        // This means a user reopening /tutorial/python/functions always lands where they
+        // left off rather than back at step 0.
+        if (!urlHasStepRef.current && steps.length > 0) {
+          const doneSet = new Set([...completed, ...skipped]);
+          for (let i = 0; i < steps.length; i++) {
+            if (!doneSet.has(i)) {
+              if (i > 0) {
+                setStepIndex(i);
+                setCode(steps[i].starter);
+              }
+              break;
+            }
+          }
+        }
       })
       .catch(() => {});
     return () => controller.abort();
-  }, [userId, tutorialSlug, lang, steps.length]);
+  }, [userId, tutorialSlug, lang, steps.length]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── Chapter completion — fires once when the user passes the LAST step ──
   useEffect(() => {
