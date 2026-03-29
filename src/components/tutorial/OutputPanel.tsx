@@ -10,6 +10,7 @@ interface Props {
   stepsLength: number;
   onRequestHint: () => void;
   height: number;
+  staticHint?: string;
 }
 
 /** Output panel for the tutorial IDE — shows run output, hints, and pass/fail state. */
@@ -19,8 +20,10 @@ export default function OutputPanel({
   stepsLength,
   onRequestHint,
   height,
+  staticHint,
 }: Props) {
   const { output, outputIsError, status, aiFeedback, setAiFeedback, aiFeedbackLoading, aiFeedbackUpgrade, aiFeedbackLoginRequired, stepIndex } = progress;
+  const aiFeedbackUnavailable = aiFeedback?.confidence === 0 || aiFeedback?.root_cause === "ai_unavailable" || aiFeedback?.root_cause === "network_error";
 
   const labelColor =
     outputIsError || status === "failed"
@@ -154,6 +157,14 @@ export default function OutputPanel({
 
           {!aiFeedbackLoading && aiFeedback && (
             <AiFeedbackCard feedback={aiFeedback} onClear={() => setAiFeedback(null)} />
+          )}
+
+          {/* Static syntax nudge — shown as fallback when AI is busy/unavailable */}
+          {!aiFeedbackLoading && aiFeedback && aiFeedbackUnavailable && staticHint && (
+            <div className="mt-2 rounded-lg border border-indigo-100 bg-white/60 p-2.5 dark:border-indigo-900/50 dark:bg-zinc-900/40">
+              <p className="mb-1 text-[10px] font-semibold uppercase tracking-widest text-indigo-400 dark:text-indigo-600">Syntax nudge</p>
+              <code className="break-all text-xs text-indigo-700 dark:text-indigo-300">{staticHint}</code>
+            </div>
           )}
         </div>
       )}

@@ -69,14 +69,14 @@ export default function InstructionsSidebar({
           ))}
         </div>
 
-        {step.hint && (
+        {step.hint && failCount >= 1 && (
           <div className="mt-6">
             <button
               onClick={() => progress.setShowHint(!showHint)}
               className="flex items-center gap-1.5 text-sm text-indigo-600 transition-colors hover:text-indigo-500 dark:text-indigo-500 dark:hover:text-indigo-400"
             >
               <span>{showHint ? "▾" : "▸"}</span>
-              {showHint ? "Hide hint" : "Show hint"}
+              {showHint ? "Hide syntax nudge" : "Show syntax nudge"}
             </button>
             {showHint && (
               <div className="mt-2 rounded-lg border border-indigo-200 bg-indigo-50 p-3 dark:border-indigo-900 dark:bg-indigo-950/40">

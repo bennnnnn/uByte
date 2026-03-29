@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, Suspense } from "react";
 import Link from "next/link";
 import type { TutorialStep } from "@/lib/tutorial-steps";
 import { useAuth } from "@/components/AuthProvider";
+import { hasPaidAccess } from "@/lib/plans";
 import ThemeToggle from "@/components/ThemeToggle";
 import AuthButtons from "@/components/AuthButtons";
 import { useCodeEditor } from "@/hooks/useCodeEditor";
@@ -48,6 +49,7 @@ export default function InteractiveTutorial({
   next,
 }: Props) {
   const { user, profile, loading, progressByLang } = useAuth();
+  const isPro = hasPaidAccess(profile?.plan);
 
   const [ideLang, setIdeLang] = useState<SupportedLanguage>(lang as SupportedLanguage);
   const [stepsForLang, setStepsForLang] = useState<TutorialStep[] | null>(null);
@@ -497,6 +499,7 @@ export default function InteractiveTutorial({
             stepsLength={steps.length}
             onRequestHint={() => stepProgress.requestHint(editor.code)}
             height={outputHeight}
+            staticHint={currentStep.hint}
           />
         </div>
       </div>
@@ -616,6 +619,7 @@ export default function InteractiveTutorial({
           tutorialSlug={tutorialSlug}
           next={next}
           onDismiss={() => stepProgress.setTutorialDone(false)}
+          isPro={isPro}
         />
       )}
     </div>

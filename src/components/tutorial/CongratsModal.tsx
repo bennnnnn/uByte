@@ -11,6 +11,7 @@ interface Props {
   tutorialSlug: string;
   next: { slug: string; title: string } | null;
   onDismiss: () => void;
+  isPro: boolean;
 }
 
 export default function CongratsModal({
@@ -19,6 +20,7 @@ export default function CongratsModal({
   tutorialSlug,
   next,
   onDismiss,
+  isPro,
 }: Props) {
   const [rated, setRated] = useState<1 | -1 | null>(null);
 
@@ -108,6 +110,24 @@ export default function CongratsModal({
             </p>
           )}
         </div>
+
+        {/* Interview simulator nudge */}
+        {!isPro && (
+          <div className="mt-5 rounded-xl border border-indigo-100 bg-indigo-50/60 p-4 text-left dark:border-indigo-900/50 dark:bg-indigo-950/20">
+            <p className="text-sm font-semibold text-indigo-800 dark:text-indigo-200">
+              Ready to test yourself for real?
+            </p>
+            <p className="mt-1 text-xs text-indigo-700/80 dark:text-indigo-300/70">
+              Pro gives you a live interview simulator — solve a problem under time pressure, then get a detailed debrief on what you got right and where you could improve.
+            </p>
+            <Link
+              href="/interview"
+              className="mt-3 inline-flex items-center gap-1.5 rounded-lg bg-indigo-600 px-3 py-1.5 text-xs font-bold text-white transition-colors hover:bg-indigo-500"
+            >
+              Try interview simulator →
+            </Link>
+          </div>
+        )}
       </div>
     </div>
   );

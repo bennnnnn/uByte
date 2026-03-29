@@ -483,10 +483,16 @@ function PracticeExamResultPage() {
             <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-indigo-100 text-xl dark:bg-indigo-900/40">🔍</div>
             <div className="flex-1">
               <p className="font-bold text-zinc-900 dark:text-zinc-100">
-                {passed ? "See what you got right — and why" : `Understand your ${wrongCount} wrong answer${wrongCount !== 1 ? "s" : ""}`}
+                {passed && wrongCount === 0
+                  ? "Perfect score — see every answer explained"
+                  : passed && wrongCount > 0
+                  ? `You passed — but ${wrongCount} question${wrongCount !== 1 ? "s" : ""} tripped you up`
+                  : `Understand your ${wrongCount} wrong answer${wrongCount !== 1 ? "s" : ""}`}
               </p>
               <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
-                Get a detailed breakdown of every question — see the correct answer and an explanation for each one.
+                {passed && wrongCount > 0
+                  ? `You were ${wrongCount} question${wrongCount !== 1 ? "s" : ""} away from a perfect score. Find out which ones tripped you up before your next interview.`
+                  : "Get a detailed breakdown of every question — see the correct answer and an explanation for each one."}
               </p>
             </div>
           </div>
