@@ -72,7 +72,7 @@ export default function InstructionsSidebar({
           ))}
         </div>
 
-        {step.hint && failCount >= 2 && (
+        {step.hint && failCount >= 2 && !aiHintActive && (
           <div className="mt-6">
             <button
               onClick={() => progress.setShowHint(!showHint)}
