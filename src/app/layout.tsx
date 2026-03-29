@@ -120,7 +120,11 @@ export default async function RootLayout({
   const bypassMaintenance =
     pathname.startsWith("/admin") ||
     pathname.startsWith("/maintenance") ||
-    pathname.startsWith("/api/");
+    pathname.startsWith("/api/") ||
+    pathname.startsWith("/login") ||
+    pathname.startsWith("/signup") ||
+    pathname.startsWith("/forgot-password") ||
+    pathname.startsWith("/auth/");
 
   if (!bypassMaintenance) {
     const inMaintenance = await isFeatureEnabled("maintenance_mode");
