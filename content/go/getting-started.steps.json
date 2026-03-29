@@ -48,12 +48,12 @@
   },
   {
     "title": "The import line",
-    "instruction": "`import \"fmt\"` loads a built-in Go package called fmt.\n\nWithout it, `fmt.Println` does not exist.\n\nAdd two more `fmt.Println()` lines and run it.",
-    "hint": "Add two new fmt.Println(\"your text\") lines inside the curly braces.",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tfmt.Println(\"fmt lets you print things\")\n}",
+    "instruction": "`import \"fmt\"` loads a built-in Go package called fmt.\n\nWithout it, `fmt.Println` does not exist.\n\nYou already have two lines here. Add one more `fmt.Println()` and run it.",
+    "hint": "Add one more fmt.Println(\"your text\") line inside the curly braces.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tfmt.Println(\"fmt lets you print things\")\n\tfmt.Println(\"it comes from the import line above\")\n}",
     "expectedOutput": [],
     "codeChecks": [
-      { "pattern": "(fmt\\.Println\\()[\\s\\S]*(fmt\\.Println\\()[\\s\\S]*(fmt\\.Println\\()", "required": true, "flags": "m", "message": "Add two more fmt.Println() lines to your program." }
+      { "pattern": "(fmt\\.Println\\()[\\s\\S]*(fmt\\.Println\\()[\\s\\S]*(fmt\\.Println\\()", "required": true, "flags": "m", "message": "Add one more fmt.Println() line to your program." }
     ],
     "successMessage": "fmt is a tool. You just used it three times."
   },

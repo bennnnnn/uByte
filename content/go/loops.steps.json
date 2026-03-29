@@ -19,10 +19,10 @@
   },
   {
     "title": "Use the counter inside the loop",
-    "instruction": "`i` is just a variable. You can use it inside the loop body — multiply it, add to it, print it in a sentence.\n\nAdd a line inside the loop that prints: `\"2 x [i] = [result]\"`\n\nSo the output should look like:\n```\n2 x 1 = 2\n2 x 2 = 4\n2 x 3 = 6\n```",
+    "instruction": "`i` is just a variable. You can use it inside the loop body — multiply it, add to it, print it in a sentence.\n\nYou already changed this loop to count to 10. Now add a line inside the loop that prints: `\"2 x [i] = [result]\"`\n\nSo the output should look like:\n```\n2 x 1 = 2\n2 x 2 = 4\n...\n2 x 10 = 20\n```",
     "hint": "fmt.Printf(\"2 x %d = %d\\n\", i, 2*i)  — use the loop counter directly in the calculation.",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tfor i := 1; i <= 5; i++ {\n\t\t// TODO: print \"2 x i = result\" using Printf\n\t}\n}",
-    "expectedOutput": ["2 x 1 = 2", "2 x 2 = 4", "2 x 3 = 6", "2 x 4 = 8", "2 x 5 = 10"],
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tfor i := 1; i <= 10; i++ {\n\t\t// TODO: print \"2 x i = result\" using Printf\n\t}\n}",
+    "expectedOutput": ["2 x 1 = 2", "2 x 2 = 4", "2 x 3 = 6", "2 x 4 = 8", "2 x 5 = 10", "2 x 6 = 12", "2 x 7 = 14", "2 x 8 = 16", "2 x 9 = 18", "2 x 10 = 20"],
     "codeChecks": [
       { "pattern": "Printf\\(", "required": true, "message": "Use fmt.Printf to format the output." },
       { "pattern": "2\\s*\\*\\s*i|i\\s*\\*\\s*2", "required": true, "message": "Multiply i by 2 to get the result: 2*i" },
