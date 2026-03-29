@@ -20,7 +20,7 @@ const CLIENT_TOKEN     = process.env.NEXT_PUBLIC_PADDLE_CLIENT_TOKEN ?? "";
 
 const FREE_FEATURES = [
   "All tutorials — every language, every topic",
-  "All interview prep problems — no daily cap",
+  "All interview prep problems — no limits",
   "Certification exams — free for everyone",
   "Verifiable certificates for LinkedIn & resume",
   "Built-in code editor",
@@ -28,10 +28,10 @@ const FREE_FEATURES = [
 ];
 
 const PRO_FEATURES = [
-  "Hints when you're stuck on any tutorial step",
-  "Instant code feedback on every practice submission",
-  "Mock interview simulator with personalized debrief",
-  "Exam hints when you need a nudge on a question",
+  "Tutorial hints when you get stuck",
+  "Detailed feedback on every practice submission",
+  "Question-by-question certification exam review",
+  "Mock interview simulator with a personalized debrief",
   "Priority support",
 ];
 
@@ -43,16 +43,20 @@ const COMPARISON_FEATURES: { name: string; free: string; pro: string }[] = [
   { name: "Verifiable certificates", free: "✓", pro: "✓" },
   { name: "Code editor", free: "✓", pro: "✓" },
   { name: "Progress tracking", free: "✓", pro: "✓" },
-  { name: "Hints when stuck on a step", free: "—", pro: "✓" },
-  { name: "Code feedback on submissions", free: "—", pro: "✓" },
-  { name: "Mock interview with debrief", free: "—", pro: "✓" },
-  { name: "Exam hints when stuck", free: "—", pro: "✓" },
+  { name: "Tutorial hints when stuck", free: "—", pro: "✓" },
+  { name: "Practice feedback on submissions", free: "—", pro: "✓" },
+  { name: "Certification exam review", free: "Basic results", pro: "Detailed review" },
+  { name: "Interview simulator", free: "Timed practice", pro: "Timed practice + debrief" },
 ];
 
 const FAQ_ITEMS = [
   {
     q: "What does Pro actually give me?",
-    a: "When you hit a wall on a tutorial step or practice problem, Pro lets you ask for a hint so you can keep moving instead of spending an hour stuck. You also get code feedback after every practice submission, a mock interview simulator to practice under pressure, and hints on certification exam questions. It's everything that keeps your momentum going.",
+    a: "Pro is the help layer. When you get stuck in a tutorial or practice problem, you can ask for a hint without leaving the page. After you submit code, you get detailed feedback on what to improve. After a certification exam, you can review every question with explanations. And in the interview simulator, you get a personalized debrief so you know exactly what to work on next.",
+  },
+  {
+    q: "Why do people upgrade if everything is already free?",
+    a: "Because the content is free, but time is not. Pro helps you stay in flow with hints, faster feedback, certification exam review, and interview breakdowns right where you're already practicing.",
   },
   {
     q: "Can I cancel anytime?",
@@ -60,7 +64,7 @@ const FAQ_ITEMS = [
   },
   {
     q: "How does the free plan work?",
-    a: "Everything is free — all tutorials across 9 languages, all interview prep problems, and all certification exams. Create a free account and start coding immediately. Upgrade to Pro whenever you want the extra support.",
+    a: "Everything is free — all tutorials across 9 languages, all interview prep problems, and all certification exams. Create a free account and start coding immediately. Upgrade only if you want the extra help layer.",
   },
   {
     q: "Do I get a certificate?",
@@ -205,14 +209,14 @@ function PricingContent() {
         {/* ── Header (compact) ────────────────────────────── */}
         <div className="mx-auto max-w-2xl text-center">
           <h1 className="text-2xl font-black tracking-tight text-zinc-900 dark:text-white sm:text-3xl">
-            Free forever.{" "}
+            Everything free.{" "}
             <GradientText>
-              Never get stuck.
+              Help when you need it.
             </GradientText>
           </h1>
           <p className="mt-2 text-sm text-zinc-500 dark:text-zinc-400 sm:text-base">
-            All tutorials, problems, and certifications are free for everyone.
-            <span className="ml-1 font-medium text-indigo-600 dark:text-indigo-400">Upgrade to Pro when you want hints, code feedback, and mock interview practice to keep your momentum going.</span>
+            Every tutorial, interview prep problem, and certification exam is free.
+            <span className="ml-1 font-medium text-indigo-600 dark:text-indigo-400">Upgrade to Pro only when you want hints, code feedback, exam review, and interview debriefs that keep you moving.</span>
           </p>
         </div>
 
@@ -220,12 +224,12 @@ function PricingContent() {
         <div className="mx-auto mt-5 flex max-w-lg flex-wrap items-center justify-center gap-x-6 gap-y-2">
           <span className="flex items-center gap-1.5 text-sm font-medium text-zinc-600 dark:text-zinc-400">
             <span className="text-base">🎓</span>
-            Free certifications
+            All content free
           </span>
           <span className="hidden text-zinc-300 dark:text-zinc-700 sm:block">·</span>
           <span className="flex items-center gap-1.5 text-sm font-medium text-zinc-600 dark:text-zinc-400">
             <span className="text-base">💡</span>
-            Hints when stuck
+            Help when stuck
           </span>
           <span className="hidden text-zinc-300 dark:text-zinc-700 sm:block">·</span>
           <span className="flex items-center gap-1.5 text-sm font-medium text-zinc-600 dark:text-zinc-400">
@@ -279,7 +283,7 @@ function PricingContent() {
                 <span className="text-zinc-400 dark:text-zinc-500">forever</span>
               </div>
               <p className="mt-2 text-sm text-zinc-500 dark:text-zinc-400">
-                All tutorials, all problems, all certifications — free forever.
+                Every tutorial, interview prep problem, and certification exam is included.
               </p>
             </div>
 
@@ -445,10 +449,10 @@ function PricingContent() {
         {/* ── Bottom CTA ─────────────────────────────────── */}
         <div className="mx-auto mt-10 max-w-xl rounded-2xl border-2 border-indigo-200 bg-indigo-50 p-8 text-center dark:border-indigo-800/50 dark:bg-indigo-950/20">
           <p className="text-xl font-black text-zinc-900 dark:text-zinc-100">
-            Stop getting stuck. Keep moving.
+            Stay in flow. Improve faster.
           </p>
           <p className="mx-auto mt-2 max-w-sm text-sm text-zinc-500 dark:text-zinc-400">
-            Hints on demand, code feedback, mock interviews. Cancel anytime — 7-day refund if you change your mind.
+            Everything is free. Pro keeps help one click away when you need a hint, feedback, exam review, or interview debrief.
           </p>
           <div className="mt-6">
             {!user ? (

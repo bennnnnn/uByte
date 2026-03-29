@@ -18,10 +18,10 @@ const FREE_FEATURES = [
 ];
 
 const PRO_FEATURES = [
-  "Hints when you're stuck on any tutorial step",
+  "Tutorial hints when you get stuck",
   "Detailed code feedback on every practice submission",
-  "Mock interview simulator with personalized debrief",
-  "Hints on certification exam questions",
+  "Question-by-question certification exam review",
+  "Mock interview simulator with a personalized debrief",
 ];
 
 interface Props {
@@ -282,7 +282,7 @@ export default function PlanTab({ plan, expiresAtProp }: Props & { expiresAtProp
         {!isPaid && (
           <div className="border-t border-zinc-100 bg-surface-card px-6 py-4 dark:border-zinc-800">
             <p className="mb-2 text-sm font-medium text-zinc-700 dark:text-zinc-300">
-              Pro adds on-demand help
+              Pro adds the help layer
             </p>
             <ul className="space-y-1 text-xs text-zinc-500 dark:text-zinc-400">
               {PRO_FEATURES.filter((f) => !FREE_FEATURES.includes(f)).map((f) => (

@@ -6,7 +6,7 @@ import { APP_NAME, BASE_URL } from "@/lib/constants";
 export const metadata: Metadata = {
   title: "Pricing — Free & Pro Plans",
   description:
-    "uByte is free — all tutorials, all interview prep problems, and all certification exams across 9 languages. Upgrade to Pro for hints when you're stuck, code feedback, and mock interview practice.",
+    "Everything on uByte is free — tutorials, interview prep, and certification exams. Upgrade to Pro for tutorial hints, code feedback, certification exam review, and interview debriefs.",
   keywords: [...SITE_KEYWORDS, "coding course pricing", "programming subscription", "uByte pro", "learn to code free"],
   alternates: { canonical: absoluteUrl("/pricing") },
   openGraph: {
@@ -14,7 +14,7 @@ export const metadata: Metadata = {
     url: absoluteUrl("/pricing"),
     title: "uByte Pricing — Free & Pro Plans",
     description:
-      "All tutorials, all problems, and certifications are free. Upgrade to Pro for hints when stuck, code feedback, and mock interview practice.",
+      "Everything is free to learn. Upgrade to Pro for hints, code feedback, certification exam review, and interview debriefs.",
     siteName: APP_NAME,
     images: [{ url: absoluteUrl("/api/og?title=Pricing&description=Free+and+Pro+plans+for+interactive+coding+tutorials+and+certifications"), width: 1200, height: 630 }],
   },
@@ -22,7 +22,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "uByte Pricing — Free & Pro Plans",
     description:
-      "Everything free — tutorials, problems, certs. Upgrade to Pro for hints when stuck and code feedback.",
+      "Everything free — tutorials, problems, certs. Upgrade to Pro for in-context help and detailed feedback.",
     images: [absoluteUrl("/api/og?title=Pricing&description=Free+and+Pro+plans+for+interactive+coding+tutorials+and+certifications")],
   },
 };
@@ -43,17 +43,21 @@ const FREE_FEATURES = [
 ];
 
 const PRO_FEATURES = [
-  "Hints when you're stuck on any tutorial step",
-  "Instant code feedback on every practice submission",
-  "Mock interview simulator with personalized debrief",
-  "Exam hints when you need a nudge on a question",
+  "Tutorial hints when you get stuck",
+  "Detailed feedback on every practice submission",
+  "Question-by-question certification exam review",
+  "Mock interview simulator with a personalized debrief",
   "Priority support",
 ];
 
 const FAQ_SEO = [
   {
     q: "What does Pro actually give me?",
-    a: "When you hit a wall on a tutorial step or practice problem, Pro lets you ask for a hint so you can keep moving instead of spending an hour stuck. You also get code feedback after every practice submission, a mock interview simulator to practice under pressure, and hints on certification exam questions.",
+    a: "Pro is the help layer. When you get stuck in a tutorial or practice problem, you can ask for a hint without leaving the page. After you submit code, you get detailed feedback on what to improve. After a certification exam, you can review every question with explanations. And in the interview simulator, you get a personalized debrief so you know exactly what to work on next.",
+  },
+  {
+    q: "Why do people upgrade if everything is already free?",
+    a: "Because the content is free, but time is not. Pro helps you stay in flow with hints, faster feedback, certification exam review, and interview breakdowns right where you're already practicing.",
   },
   {
     q: "Can I cancel anytime?",
@@ -61,7 +65,7 @@ const FAQ_SEO = [
   },
   {
     q: "How does the free plan work?",
-    a: "Everything is free — all tutorials across 9 languages, all interview prep problems, and all certification exams. Create a free account and start coding immediately. Upgrade to Pro whenever you want the extra support.",
+    a: "Everything is free — all tutorials across 9 languages, all interview prep problems, and all certification exams. Create a free account and start coding immediately. Upgrade only if you want the extra help layer.",
   },
   {
     q: "Do I get a certificate?",
@@ -86,7 +90,7 @@ export default function PricingPage() {
       "@type": "Product",
       name: "uByte Pro",
       description:
-        "Hints when stuck, code feedback, mock interview practice, and certification exams across 9 languages.",
+        "Tutorial hints, detailed code feedback, certification exam review, and interview debriefs for developers who want help without leaving the lesson.",
       offers: [
         {
           "@type": "Offer",
@@ -136,7 +140,8 @@ export default function PricingPage() {
           uByte offers interactive coding tutorials, interview prep problems, and
           free certification exams across all 9 languages: Go, Python, JavaScript,
           TypeScript, Java, Rust, C++, C#, and SQL. All content is free for every user.
-          Upgrade to Pro for hints when stuck, code feedback, and mock interview practice.
+          Upgrade to Pro for tutorial hints, code feedback, certification exam review,
+          and interview debriefs when you want extra help.
         </p>
 
         <section>
