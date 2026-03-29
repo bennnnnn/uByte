@@ -46,6 +46,7 @@ export default function InstructionsSidebar({
   const { stepIndex, status, showHint, failCount, completedSteps, skippedSteps, tutorialDone } = progress;
   const { profile } = useAuth();
   const isPro = hasPaidAccess(profile?.plan);
+  const isGuest = !profile;
   const dotsRef = useRef<HTMLDivElement>(null);
 
   // Scroll active step dot into view when step or done-state changes
@@ -118,7 +119,7 @@ export default function InstructionsSidebar({
           <TutorialRating lang={lang} tutorialSlug={tutorialSlug} />
         )}
 
-        {status === "failed" && failCount >= 3 && (
+        {status === "failed" && failCount >= 3 && !isGuest && (
           <div className="mt-6 rounded-lg border border-indigo-200 bg-indigo-50 p-4 dark:border-indigo-900 dark:bg-indigo-950/30">
             <p className="text-sm font-semibold text-indigo-800 dark:text-indigo-300">Want a step-by-step walkthrough?</p>
             <p className="mt-1 text-xs text-indigo-700 dark:text-indigo-400">
