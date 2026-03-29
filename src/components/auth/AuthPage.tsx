@@ -89,15 +89,18 @@ export default function AuthPage({ variant }: { variant: AuthPageMode }) {
       const result = await requestPasswordReset(email);
       setSubmitting(false);
       if (!result.ok) {
+        handlingSubmitRef.current = false; // allow cross-tab redirect on failure
         setError(result.error);
         return;
       }
       setForgotDone(true);
+      handlingSubmitRef.current = false;
       return;
     }
 
     if (mode === "signup" && !isValidPassword(password)) {
       setSubmitting(false);
+      handlingSubmitRef.current = false;
       setError(PASSWORD_POLICY_MESSAGE);
       return;
     }
@@ -106,11 +109,13 @@ export default function AuthPage({ variant }: { variant: AuthPageMode }) {
     setSubmitting(false);
 
     if (authError) {
+      handlingSubmitRef.current = false; // allow cross-tab redirect on failure
       setError(authError);
       return;
     }
 
-    // New signups go through onboarding; logins go to their original destination.
+    // Success — keep handlingSubmitRef.current = true so the "already logged in"
+    // effect doesn't race with our intentional router.replace() below.
     if (mode === "signup") {
       const onboardingDest = nextPath && nextPath !== "/" ? `/onboarding?next=${encodeURIComponent(nextPath)}` : "/onboarding";
       router.replace(onboardingDest);

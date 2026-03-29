@@ -2,7 +2,7 @@
  * UsersTab — paginated, server-searched user management table.
  *
  * - Search by name or email (debounced 400 ms, server-side)
- * - Filter by plan (all / free / pro / trial / canceling)
+ * - Filter by plan (all / free / pro / monthly / yearly / canceling)
  * - 25 rows per page with full pagination controls
  * - Inline confirmation modal instead of browser alert/confirm
  * - Portal-rendered actions dropdown for correct z-index stacking
@@ -31,7 +31,6 @@ const PLAN_FILTERS = [
   { value: "pro",        label: "Pro" },
   { value: "monthly",    label: "Monthly" },
   { value: "yearly",     label: "Yearly" },
-  { value: "trial",      label: "Trial" },
   { value: "canceling",  label: "Canceling" },
 ] as const;
 
@@ -438,8 +437,6 @@ function PlanBadge({ plan }: { plan: string }) {
     plan === "yearly"    ? "bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-400" :
     plan === "pro"       ? "bg-indigo-100 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-400" :
     plan === "monthly"   ? "bg-violet-100 text-violet-700 dark:bg-violet-900/40 dark:text-violet-400" :
-    plan === "trial" || plan === "trial_yearly"
-                         ? "bg-cyan-100 text-cyan-700 dark:bg-cyan-900/40 dark:text-cyan-400" :
     plan === "canceling" ? "bg-orange-100 text-orange-700 dark:bg-orange-900/40 dark:text-orange-400" :
                            "bg-zinc-100 text-zinc-500 dark:bg-zinc-800 dark:text-zinc-500";
   return <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${cls}`}>{plan ?? "free"}</span>;

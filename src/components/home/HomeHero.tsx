@@ -6,6 +6,7 @@ import type { SupportedLanguage } from "@/lib/languages/types";
 import { LANG_ICONS } from "@/lib/languages/icons";
 import { LANGUAGES } from "@/lib/languages/registry";
 import HeroIDEDeferred from "./HeroIDEDeferred";
+import { hasPaidAccess } from "@/lib/plans";
 
 interface Props {
   totalLessons: number;
@@ -72,7 +73,7 @@ function LoggedInHero({
   const xpPct = Math.min(100, Math.round((xp / nextXp) * 100));
   const langIcon = LANG_ICONS[continueLang] ?? "📝";
   const langName = LANGUAGES[continueLang]?.name ?? continueLang;
-  const isPro = plan === "pro";
+  const isPro = hasPaidAccess(plan);
 
   return (
     <section className="border-b border-zinc-100 bg-white dark:border-zinc-800 dark:bg-zinc-950">

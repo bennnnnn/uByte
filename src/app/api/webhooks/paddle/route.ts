@@ -62,7 +62,6 @@ import { timingSafeEqual } from "crypto";
 import {
   updateUserPlan,
   cancelUserPlanGracefully,
-  setTrialExpiry,
   getUserByPaddleCustomerId,
   getUserById,
   getUserByEmail,
@@ -233,23 +232,22 @@ async function isDuplicateEvent(eventId: string, eventType: string): Promise<boo
 /**
  * Map a subscription status + price ID to a uByte plan string.
  * Used by subscription.updated to handle upgrades, downgrades, and pauses.
+ * Returns null = no-op (keep existing plan) for unknown or non-terminal statuses.
  */
 function planFromSubscription(status: string, priceId?: string): string | null {
-  if (status === "trialing") {
-    const yearlyPriceId = process.env.NEXT_PUBLIC_PADDLE_YEARLY_PRICE_ID;
-    return yearlyPriceId && priceId === yearlyPriceId ? "trial_yearly" : "trial";
-  }
   if (status === "active") {
     const yearlyPriceId = process.env.NEXT_PUBLIC_PADDLE_YEARLY_PRICE_ID;
     return yearlyPriceId && priceId === yearlyPriceId ? "yearly" : "monthly";
   }
-  // past_due / paused — keep existing plan (return null = no-op)
-  if (status === "past_due" || status === "paused") return null;
+  // past_due / paused / trialing — keep existing plan (return null = no-op)
+  if (status === "past_due" || status === "paused" || status === "trialing") return null;
   // canceled — let subscription.canceled handle this with graceful period-end logic.
   // Returning null here prevents subscription.updated from immediately downgrading
   // a user who should stay on "canceling" until their billing period ends.
   if (status === "canceled") return null;
-  return "free";
+  // Unknown status — no-op and log rather than silently downgrading.
+  console.warn("[paddle-webhook] planFromSubscription: unrecognised status, no-op:", status);
+  return null;
 }
 
 export const POST = withErrorHandling("POST /api/webhooks/paddle", async (request: NextRequest) => {
@@ -291,7 +289,10 @@ export const POST = withErrorHandling("POST /api/webhooks/paddle", async (reques
   const yearlyPriceId = process.env.NEXT_PUBLIC_PADDLE_YEARLY_PRICE_ID;
   const items = data["items"] as { price?: { id?: string } }[] | undefined;
   const purchasedPriceId = items?.[0]?.price?.id;
-  const activatedPlan = yearlyPriceId && purchasedPriceId === yearlyPriceId ? "yearly" : "pro";
+  const activatedPlan = yearlyPriceId && purchasedPriceId === yearlyPriceId ? "yearly" : "monthly";
+
+  // Track whether a critical failure occurred so we can return 5xx (triggers Paddle retry).
+  let criticalFailure = false;
 
   switch (event.event_type) {
     /**
@@ -326,7 +327,8 @@ export const POST = withErrorHandling("POST /api/webhooks/paddle", async (reques
           );
         }
       } else {
-        console.error("[paddle-webhook] transaction completed — could not resolve user");
+        console.error("[paddle-webhook] transaction completed — could not resolve user, will ask Paddle to retry");
+        criticalFailure = true;
       }
       break;
     }
@@ -334,54 +336,32 @@ export const POST = withErrorHandling("POST /api/webhooks/paddle", async (reques
     /**
      * BACKUP ACTIVATION TRIGGER
      * subscription.activated / subscription.created fire after the subscription
-     * is set up. Handles both trialing (free trial) and active (paid) states.
-     * custom_data may be absent here — resolveUserId falls back to email lookup.
+     * is set up. custom_data may be absent — resolveUserId falls back to email lookup.
      */
     case "subscription.activated":
     case "subscription.created": {
       const uid = await resolveUserId(paddleCustomerId, customData);
       if (uid) {
-        // Use planFromSubscription so trialing → "trial" / "trial_yearly" correctly
+        // Use planFromSubscription; fall back to activatedPlan for active subscriptions
         const subPlan = status ? (planFromSubscription(status, purchasedPriceId) ?? activatedPlan) : activatedPlan;
-        const isTrial = subPlan.startsWith("trial");
 
         await updateUserPlan(uid, subPlan, paddleCustomerId);
 
-        // For trials, store the period end date so the UI can show a countdown
-        if (isTrial) {
-          const billingPeriod = data["current_billing_period"] as { ends_at?: string } | undefined;
-          if (billingPeriod?.ends_at) {
-            await setTrialExpiry(uid, billingPeriod.ends_at).catch((err) =>
-              console.error("[paddle-webhook] setTrialExpiry failed:", err)
-            );
-          }
-        }
+        const planLabel = subPlan === "yearly" ? BILLING_CONFIG.yearly.label : BILLING_CONFIG.monthly.label;
+        await createNotification(
+          uid,
+          "plan",
+          `You're now on ${planLabel}!`,
+          "All tutorials and features are now unlocked. Enjoy!"
+        );
+        await recordReferralSubscription(uid).catch((err) =>
+          console.error("[paddle-webhook] recordReferralSubscription failed:", err)
+        );
+        await rewardReferrer(uid).catch((err) =>
+          console.error("[paddle-webhook] rewardReferrer failed:", err)
+        );
 
-        if (isTrial) {
-          await createNotification(
-            uid,
-            "plan",
-            "Your 7-day free trial has started! 🎉",
-            "You have full Pro access for 7 days. No charge until your trial ends."
-          );
-        } else {
-          const planLabel = subPlan === "yearly" ? BILLING_CONFIG.yearly.label : BILLING_CONFIG.monthly.label;
-          await createNotification(
-            uid,
-            "plan",
-            `You're now on ${planLabel}!`,
-            "All tutorials and features are now unlocked. Enjoy!"
-          );
-          // Only reward referrer + send upgrade email for real paid activations
-          await recordReferralSubscription(uid).catch((err) =>
-            console.error("[paddle-webhook] recordReferralSubscription failed:", err)
-          );
-          await rewardReferrer(uid).catch((err) =>
-            console.error("[paddle-webhook] rewardReferrer failed:", err)
-          );
-        }
-
-        const amountCents = isTrial ? 0 : (subPlan === "yearly" ? YEARLY_PRICE_CENTS : MONTHLY_PRICE_CENTS);
+        const amountCents = subPlan === "yearly" ? YEARLY_PRICE_CENTS : MONTHLY_PRICE_CENTS;
         await recordSubscriptionEvent(uid, subPlan, amountCents, "activated");
       }
       break;
@@ -390,7 +370,7 @@ export const POST = withErrorHandling("POST /api/webhooks/paddle", async (reques
     /**
      * PLAN CHANGES
      * Fires when a subscription is upgraded, downgraded, paused, or resumed.
-     * planFromSubscription() maps status + priceId → "yearly" | "monthly" | "free"
+     * planFromSubscription() maps status + priceId → "yearly" | "monthly" | null (no-op).
      *
      * FUTURE: if you add more plans (e.g. team, enterprise), update
      * planFromSubscription() and BILLING_CONFIG in src/lib/plans.ts.
@@ -401,27 +381,7 @@ export const POST = withErrorHandling("POST /api/webhooks/paddle", async (reques
         if (plan === null) break;
         const uid = await resolveUserId(paddleCustomerId, customData);
         if (uid) {
-          const prevUser = await getUserById(uid).catch(() => null);
-          const wasOnTrial = prevUser?.plan?.startsWith("trial");
-
           await updateUserPlan(uid, plan, paddleCustomerId);
-
-          // Trial → active conversion: fire upgrade email + referral rewards
-          if (wasOnTrial && plan !== "free" && !plan.startsWith("trial")) {
-            const amountCents = plan === "yearly" ? YEARLY_PRICE_CENTS : MONTHLY_PRICE_CENTS;
-            await recordSubscriptionEvent(uid, plan, amountCents, "activated");
-            await recordReferralSubscription(uid).catch((err) =>
-              console.error("[paddle-webhook] recordReferralSubscription failed:", err)
-            );
-            await rewardReferrer(uid).catch((err) =>
-              console.error("[paddle-webhook] rewardReferrer failed:", err)
-            );
-            if (prevUser?.email) {
-              sendUpgradeEmail(prevUser.email, prevUser.name, plan).catch((err) =>
-                console.error("[paddle-webhook] sendUpgradeEmail (trial→paid) failed:", err)
-              );
-            }
-          }
         }
       }
       break;
@@ -461,6 +421,10 @@ export const POST = withErrorHandling("POST /api/webhooks/paddle", async (reques
       break;
   }
 
-  // Always return 200 so Paddle doesn't keep retrying
+  // Return 5xx for critical failures (unresolvable user on a paid event) so
+  // Paddle retries delivery. All other events always return 200.
+  if (criticalFailure) {
+    return NextResponse.json({ error: "Could not resolve user — will retry" }, { status: 500 });
+  }
   return NextResponse.json({ received: true });
 });

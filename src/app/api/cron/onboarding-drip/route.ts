@@ -1,5 +1,5 @@
 /**
- * Onboarding + win-back + trial-ending email cron.
+ * Onboarding + win-back email cron.
  * Run daily at 10am UTC: "0 10 * * *"
  *
  * Sends:
@@ -8,13 +8,11 @@
  *   Day 7  — push certifications + Pro upsell
  *   Day 14 — win-back for inactive users (no activity in 7d)
  *   Day 30 — final win-back (last automated email)
- *   Trial expiry warnings — 2 days and 1 day before trial ends
  */
 import { NextRequest, NextResponse } from "next/server";
 import {
   getUsersForDrip,
   getUsersForWinBack,
-  getUsersForTrialEndingWarning,
   markDripEmailSent,
 } from "@/lib/db";
 import {
@@ -23,7 +21,6 @@ import {
   sendDay7Email,
   sendDay14WinBackEmail,
   sendDay30WinBackEmail,
-  sendTrialEndingEmail,
 } from "@/lib/email";
 import { withErrorHandling } from "@/lib/api-utils";
 
@@ -39,7 +36,6 @@ export const GET = withErrorHandling("GET /api/cron/onboarding-drip", async (req
 
   let day1Sent = 0, day3Sent = 0, day7Sent = 0;
   let day14Sent = 0, day30Sent = 0;
-  let trialWarningSent = 0;
 
   // ── Day 1 ────────────────────────────────────────────────────────────────
   for (const user of await getUsersForDrip(1, "day1")) {
@@ -86,22 +82,8 @@ export const GET = withErrorHandling("GET /api/cron/onboarding-drip", async (req
     } catch { /* skip */ }
   }
 
-  // ── Trial ending warnings (2 days out and 1 day out) ────────────────────
-  const trialWarnings2d = await getUsersForTrialEndingWarning(2, "trial_ending_2d");
-  const trialWarnings1d = await getUsersForTrialEndingWarning(1, "trial_ending_1d");
-
-  for (const user of [...trialWarnings2d, ...trialWarnings1d]) {
-    const emailType = user.daysLeft <= 1 ? "trial_ending_1d" : "trial_ending_2d";
-    const plan = (user.plan === "trial_yearly" ? "trial_yearly" : "trial") as "trial" | "trial_yearly";
-    try {
-      await sendTrialEndingEmail(user.email, user.name, user.daysLeft, plan);
-      await markDripEmailSent(user.id, emailType);
-      trialWarningSent++;
-    } catch { /* skip */ }
-  }
-
   return NextResponse.json({
     day1Sent, day3Sent, day7Sent,
-    day14Sent, day30Sent, trialWarningSent,
+    day14Sent, day30Sent,
   });
 });

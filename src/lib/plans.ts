@@ -25,7 +25,7 @@
  *
  * ─── DATABASE NOTE ──────────────────────────────────────────────────────────
  *
- * The plan is stored in users.plan as a string: "free" | "pro" | "yearly" | "monthly" | "trial"
+ * The plan is stored in users.plan as a string: "free" | "pro" | "yearly" | "monthly" | "canceling"
  * The Paddle customer ID is stored in users.paddle_customer_id.
  */
 

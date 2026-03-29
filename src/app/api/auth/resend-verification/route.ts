@@ -31,9 +31,12 @@ export const POST = withErrorHandling("POST /api/auth/resend-verification", asyn
   const token = crypto.randomBytes(32).toString("hex");
   await createEmailVerificationToken(user.id, token);
 
-  sendVerificationEmail(user.email, user.name, token).catch((err) => {
-    console.error("Failed to resend verification email:", err);
-  });
+  try {
+    await sendVerificationEmail(user.email, user.name, token);
+  } catch (err) {
+    console.error("[resend-verification] Failed to send verification email:", err);
+    return NextResponse.json({ error: "Could not send email. Please try again shortly." }, { status: 503 });
+  }
 
   return NextResponse.json({ message: "Verification email sent" });
 });

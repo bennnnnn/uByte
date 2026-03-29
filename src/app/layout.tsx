@@ -17,6 +17,11 @@ import { SITE_KEYWORDS } from "@/lib/seo";
 import Script from "next/script";
 import { getSiteBanner } from "@/lib/db/site-banner";
 import { unstable_cache } from "next/cache";
+import { headers } from "next/headers";
+import { redirect } from "next/navigation";
+import { isFeatureEnabled } from "@/lib/db/site-settings";
+import { getCurrentUser } from "@/lib/auth";
+import MaintenancePage from "./maintenance/page";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -108,6 +113,27 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // ── Maintenance mode gate ────────────────────────────────────────────────
+  // The middleware forwards x-pathname so we can skip admin / maintenance routes.
+  const hdrs = await headers();
+  const pathname = hdrs.get("x-pathname") ?? "/";
+  const bypassMaintenance =
+    pathname.startsWith("/admin") ||
+    pathname.startsWith("/maintenance") ||
+    pathname.startsWith("/api/");
+
+  if (!bypassMaintenance) {
+    const inMaintenance = await isFeatureEnabled("maintenance_mode");
+    if (inMaintenance) {
+      const user = await getCurrentUser();
+      if (!user?.isAdmin) {
+        // Redirect non-admins; render the page inline for admins so they
+        // can still reach the admin panel via the normal site shell.
+        redirect("/maintenance");
+      }
+    }
+  }
+
   // Fetch server-side so the banner is in the initial SSR HTML.
   // If disabled or errored, returns { enabled: false, ... } which SiteBanner ignores.
   const bannerData = await getCachedBanner();

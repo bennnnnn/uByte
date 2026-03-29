@@ -8,7 +8,6 @@
  */
 import dynamic from "next/dynamic";
 
-const TrialBanner          = dynamic(() => import("@/components/TrialBanner"),          { ssr: false, loading: () => null });
 const ReferralTracker      = dynamic(() => import("@/components/ReferralTracker"),       { ssr: false, loading: () => null });
 const PostHogProvider      = dynamic(() => import("@/components/PostHogProvider"),       { ssr: false, loading: () => null });
 const GoogleOneTap         = dynamic(() => import("@/components/GoogleOneTap"),          { ssr: false, loading: () => null });
@@ -18,7 +17,6 @@ const PushPermissionBanner = dynamic(() => import("@/components/PushPermissionBa
 export default function DeferredWidgets() {
   return (
     <>
-      <TrialBanner />
       <ReferralTracker />
       <PostHogProvider />
       <GoogleOneTap />

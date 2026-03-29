@@ -22,13 +22,17 @@ export const POST = withErrorHandling("POST /api/auth/signup", async (request: N
     );
   }
 
-  const { name, email, password, referralCode } = await request.json();
-  if (!name || !email || !password) {
+  const { name, email: rawEmail, password, referralCode } = await request.json();
+  if (!name || !rawEmail || !password) {
     return NextResponse.json({ error: "All fields are required" }, { status: 400 });
   }
-  if (typeof name !== "string" || name.length > 100 || typeof email !== "string" || email.length > 254 || typeof password !== "string" || password.length > 256) {
+  if (typeof name !== "string" || name.length > 100 || typeof rawEmail !== "string" || rawEmail.length > 254 || typeof password !== "string" || password.length > 256) {
     return NextResponse.json({ error: "Invalid input" }, { status: 400 });
   }
+
+  // Normalize email: trim and lowercase so "User@Example.com" and "user@example.com"
+  // are treated as the same account across all entry points.
+  const email = rawEmail.trim().toLowerCase();
 
   if (!isValidPassword(password)) {
     return NextResponse.json({ error: PASSWORD_POLICY_MESSAGE }, { status: 400 });

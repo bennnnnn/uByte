@@ -4,10 +4,12 @@ import { useEffect, useState, useCallback, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { apiFetch } from "@/lib/api-client";
+import { useAuth } from "@/components/AuthProvider";
 
 function VerifyEmailContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
+  const { user } = useAuth();
   const token = searchParams.get("token");
 
   const [status, setStatus] = useState<"loading" | "success" | "error">(
@@ -25,8 +27,11 @@ function VerifyEmailContent() {
       .then(async (res) => {
         if (res.ok) {
           setStatus("success");
-          // Redirect to onboarding — it auto-skips if the user already set a goal
-          setTimeout(() => router.push("/onboarding"), 3000);
+          // Only auto-redirect if the user is already signed in on this device.
+          // Opening the link on a different device leaves them logged out, so we
+          // show a manual "Continue" button instead of silently sending them to
+          // /onboarding while unauthenticated.
+          if (user) setTimeout(() => router.push("/onboarding"), 3000);
         } else {
           const data = await res.json();
           setStatus("error");
@@ -67,9 +72,23 @@ function VerifyEmailContent() {
               </svg>
             </div>
             <h1 className="mb-2 text-xl font-bold text-zinc-900 dark:text-zinc-100">Email verified!</h1>
-            <p className="text-sm text-zinc-500 dark:text-zinc-400">
-              Your email has been verified. Redirecting…
-            </p>
+            {user ? (
+              <p className="text-sm text-zinc-500 dark:text-zinc-400">
+                Your email has been verified. Redirecting…
+              </p>
+            ) : (
+              <>
+                <p className="mb-4 text-sm text-zinc-500 dark:text-zinc-400">
+                  Your email has been verified. Sign in to continue.
+                </p>
+                <Link
+                  href="/login"
+                  className="inline-block rounded-lg bg-indigo-600 px-6 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-indigo-700"
+                >
+                  Sign in
+                </Link>
+              </>
+            )}
           </>
         )}
 

@@ -36,6 +36,8 @@ export const DELETE = withErrorHandling("DELETE /api/push/subscribe", async (req
   if (csrfError) return NextResponse.json({ error: csrfError }, { status: 403 });
   const user = await getCurrentUser();
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const { limited } = await checkRateLimit(`push-unsubscribe:${getClientIp(req.headers)}:${user.userId}`, 10, 60_000);
+  if (limited) return NextResponse.json({ error: "Too many requests" }, { status: 429 });
 
   const { endpoint } = await req.json() as { endpoint?: string };
   if (!endpoint) return NextResponse.json({ error: "Missing endpoint" }, { status: 400 });

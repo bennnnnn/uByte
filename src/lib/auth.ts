@@ -55,7 +55,9 @@ export async function setAuthCookie(token: string): Promise<void> {
 
 export async function clearAuthCookie(): Promise<void> {
   const cookieStore = await cookies();
-  cookieStore.delete(COOKIE_NAME);
+  // Pass the same attributes used at set-time so the cookie is correctly cleared
+  // regardless of future path-narrowing changes.
+  cookieStore.delete({ name: COOKIE_NAME, path: "/" });
 }
 
 export async function getCurrentUser(): Promise<TokenPayload | null> {

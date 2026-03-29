@@ -10,7 +10,7 @@
  */
 import { NextResponse } from "next/server";
 import { withErrorHandling, requireAuth } from "@/lib/api-utils";
-import { getUserById, cancelUserPlanGracefully, updateUserPlan, setTrialExpiry } from "@/lib/db";
+import { getUserById, cancelUserPlanGracefully, updateUserPlan } from "@/lib/db";
 
 const PADDLE_API_KEY = process.env.PADDLE_API_KEY ?? "";
 const PADDLE_CLIENT_TOKEN = process.env.NEXT_PUBLIC_PADDLE_CLIENT_TOKEN ?? "";
@@ -51,13 +51,13 @@ export const GET = withErrorHandling("GET /api/billing/sync", async () => {
   const subData = (await subRes.json()) as { data?: PaddleSub[] };
   const subs = subData.data ?? [];
 
-  // Find the most relevant subscription: active or trialing first, then others
-  const active = subs.find((s) => ["active", "trialing"].includes(s.status));
+  // Find the most relevant subscription: active first, then others
+  const active = subs.find((s) => s.status === "active");
   const latest = active ?? subs[0];
 
   if (!latest) {
-    // No subscriptions at all — downgrade to free if still showing as paid/trial
-    const paidPlans = ["pro", "yearly", "canceling", "trial", "trial_yearly"];
+    // No subscriptions at all — downgrade to free if still showing as paid
+    const paidPlans = ["pro", "monthly", "yearly", "canceling"];
     if (paidPlans.includes(dbUser?.plan ?? "")) {
       await updateUserPlan(user.userId, "free");
     }
@@ -92,19 +92,6 @@ export const GET = withErrorHandling("GET /api/billing/sync", async () => {
       await updateUserPlan(user.userId, correctPlan, customerId);
     }
     return NextResponse.json({ synced: true, plan: correctPlan });
-  }
-
-  // Trialing — map to "trial" / "trial_yearly" and refresh the expiry date
-  if (latest.status === "trialing") {
-    const correctPlan = yearlyPriceId && priceId === yearlyPriceId ? "trial_yearly" : "trial";
-    if (dbUser?.plan !== correctPlan) {
-      await updateUserPlan(user.userId, correctPlan, customerId);
-    }
-    const trialEndsAt = latest.current_billing_period?.ends_at ?? null;
-    if (trialEndsAt) {
-      await setTrialExpiry(user.userId, trialEndsAt);
-    }
-    return NextResponse.json({ synced: true, plan: correctPlan, expiresAt: trialEndsAt });
   }
 
   // past_due — payment failed but subscription not yet cancelled; preserve access

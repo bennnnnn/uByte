@@ -49,24 +49,53 @@ export default function PushPermissionBanner() {
   const enable = async () => {
     if (!VAPID_PUBLIC_KEY) { dismiss(); return; }
     setStatus("loading");
+
+    /** Rejects after `ms` milliseconds — used to race against hanging promises. */
+    function timeout<T>(ms: number): Promise<T> {
+      return new Promise<T>((_, reject) =>
+        setTimeout(() => reject(new Error(`Timed out after ${ms}ms`)), ms)
+      );
+    }
+
     try {
-      const permission = await Notification.requestPermission();
+      // Prompt the browser's native permission dialog.
+      // Some browsers show this in the address bar — the user may miss it,
+      // so we race with a 30 s timeout to avoid hanging forever.
+      const permission = await Promise.race([
+        Notification.requestPermission(),
+        timeout<NotificationPermission>(30_000),
+      ]);
       if (permission !== "granted") { setStatus("denied"); dismiss(); return; }
 
-      const reg = await navigator.serviceWorker.ready;
-      const sub = await reg.pushManager.subscribe({
-        userVisibleOnly: true,
-        applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY),
-      });
-      const { endpoint, keys } = sub.toJSON() as {
-        endpoint: string;
-        keys: { p256dh: string; auth: string };
-      };
+      // Wait for an active service worker (required for push subscriptions).
+      // If the SW never activates (e.g. registration failed), this hangs —
+      // cap it at 10 s.
+      const reg = await Promise.race([
+        navigator.serviceWorker.ready,
+        timeout<ServiceWorkerRegistration>(10_000),
+      ]);
+
+      if (!reg.pushManager) throw new Error("Push not supported in this browser");
+
+      const sub = await Promise.race([
+        reg.pushManager.subscribe({
+          userVisibleOnly: true,
+          applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY),
+        }),
+        timeout<PushSubscription>(15_000),
+      ]);
+
+      const json = sub.toJSON() as { endpoint: string; keys: { p256dh: string; auth: string } };
+      if (!json.endpoint || !json.keys?.p256dh || !json.keys?.auth) {
+        throw new Error("Invalid push subscription");
+      }
+
       await apiFetch("/api/push/subscribe", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ endpoint, keys }),
+        body: JSON.stringify({ endpoint: json.endpoint, keys: json.keys }),
       });
+
       setStatus("granted");
       setTimeout(dismiss, 2000);
     } catch {
@@ -113,7 +142,7 @@ export default function PushPermissionBanner() {
               disabled={status === "loading"}
               className="flex-1 rounded-xl bg-indigo-600 py-2 text-sm font-semibold text-white transition hover:bg-indigo-500 disabled:opacity-60"
             >
-              {status === "loading" ? "Enabling…" : "Enable reminders"}
+              {status === "loading" ? "Check browser prompt…" : "Enable reminders"}
             </button>
             <button
               type="button"

@@ -42,7 +42,13 @@ export async function middleware(request: NextRequest) {
   }
 
   // ── CSRF cookie: set on every page navigation if missing ────────────────────
-  const response = NextResponse.next();
+  const response = NextResponse.next({
+    request: { headers: new Headers(request.headers) },
+  });
+  // Forward the pathname so server components (e.g. the root layout) can read
+  // it via headers() without re-parsing the URL from somewhere else.
+  response.headers.set("x-pathname", pathname);
+
   if (!request.cookies.get("csrf_token")?.value) {
     response.cookies.set("csrf_token", crypto.randomUUID(), {
       httpOnly: false,

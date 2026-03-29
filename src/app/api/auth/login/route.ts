@@ -25,13 +25,16 @@ export const POST = withErrorHandling("POST /api/auth/login", async (request: Ne
     );
   }
 
-  const { email, password } = await request.json();
-  if (!email || !password) {
+  const { email: rawEmail, password } = await request.json();
+  if (!rawEmail || !password) {
     return NextResponse.json({ error: "Email and password are required" }, { status: 400 });
   }
-  if (typeof email !== "string" || email.length > 254 || typeof password !== "string" || password.length > 256) {
+  if (typeof rawEmail !== "string" || rawEmail.length > 254 || typeof password !== "string" || password.length > 256) {
     return NextResponse.json({ error: "Invalid input" }, { status: 400 });
   }
+
+  // Normalize email to match how it was stored at signup.
+  const email = rawEmail.trim().toLowerCase();
 
   const user = await getUserByEmail(email);
   if (!user) {

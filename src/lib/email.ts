@@ -15,6 +15,16 @@ import { LANGUAGES } from "@/lib/languages/registry";
 import type { SupportedLanguage } from "@/lib/languages/types";
 const FROM = process.env.RESEND_FROM_EMAIL ?? "noreply@resend.dev";
 
+/** Escape user-supplied text before embedding in HTML to prevent injection. */
+function escapeHtml(str: string): string {
+  return str
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
 /** Standard unsubscribe footer for all marketing emails. */
 function unsubFooter(email: string): string {
   const url = makeUnsubscribeUrl(email);
@@ -39,6 +49,7 @@ export async function sendStreakReminderEmail(
   const resend = getResend();
   if (!resend) return;
 
+  const safeName = escapeHtml(name);
   await resend.emails.send({
     from: FROM,
     to,
@@ -46,7 +57,7 @@ export async function sendStreakReminderEmail(
     html: `
       <div style="font-family:sans-serif;max-width:480px;margin:auto">
         <h2 style="color:#0891b2">Your streak is at risk!</h2>
-        <p>Hi ${name},</p>
+        <p>Hi ${safeName},</p>
         <p>You have a <strong>${streakDays}-day</strong> streak on uByte — don't let it slip today!</p>
         <a href="${BASE_URL}" style="display:inline-block;margin:16px 0;padding:12px 24px;background:#0891b2;color:#fff;border-radius:8px;text-decoration:none;font-weight:600">Keep my streak 🔥</a>
         <p style="color:#6b7280;font-size:13px">Complete a tutorial step, solve a practice problem, or just log in — any activity counts.</p>
@@ -94,6 +105,7 @@ export async function sendVerificationEmail(
     return;
   }
 
+  const safeName = escapeHtml(name);
   const link = `${BASE_URL}/verify-email?token=${token}`;
   await resend.emails.send({
     from: FROM,
@@ -102,7 +114,7 @@ export async function sendVerificationEmail(
     html: `
       <div style="font-family:sans-serif;max-width:480px;margin:auto">
         <h2 style="color:#0891b2">Verify your email</h2>
-        <p>Hi ${name},</p>
+        <p>Hi ${safeName},</p>
         <p>Click the button below to verify your email address.</p>
         <a href="${link}" style="display:inline-block;margin:16px 0;padding:12px 24px;background:#0891b2;color:#fff;border-radius:8px;text-decoration:none;font-weight:600">Verify email</a>
         <p style="color:#6b7280;font-size:13px">If you didn't sign up for uByte, you can safely ignore this email.</p>
@@ -119,7 +131,7 @@ export async function sendWelcomeEmail(to: string, name: string): Promise<void> 
   const resend = getResend();
   if (!resend) return;
 
-  const firstName = name.split(" ")[0];
+  const firstName = escapeHtml(name.split(" ")[0]);
   await resend.emails.send({
     from: FROM,
     to,
@@ -161,7 +173,7 @@ export async function sendDay1Email(to: string, name: string): Promise<void> {
   const resend = getResend();
   if (!resend) return;
 
-  const firstName = name.split(" ")[0];
+  const firstName = escapeHtml(name.split(" ")[0]);
   await resend.emails.send({
     from: FROM,
     to,
@@ -207,8 +219,8 @@ export async function sendDay3Email(to: string, name: string): Promise<void> {
   const resend = getResend();
   if (!resend) return;
 
-  const firstName = name.split(" ")[0];
-  try { await resend.emails.send({
+  const firstName = escapeHtml(name.split(" ")[0]);
+  await resend.emails.send({
     from: FROM,
     to,
     subject: `${firstName}, ready for your first challenge? 🎯`,
@@ -232,7 +244,7 @@ export async function sendDay3Email(to: string, name: string): Promise<void> {
         </div>
       </div>
     `,
-  }); } catch (err) { console.error("[email] sendDay3Email failed:", err); }
+  });
 }
 
 /** Day 7 — celebrate one week, push certifications and Pro. */
@@ -240,8 +252,8 @@ export async function sendDay7Email(to: string, name: string): Promise<void> {
   const resend = getResend();
   if (!resend) return;
 
-  const firstName = name.split(" ")[0];
-  try { await resend.emails.send({
+  const firstName = escapeHtml(name.split(" ")[0]);
+  await resend.emails.send({
     from: FROM,
     to,
     subject: `One week on uByte 🎉 — ready to earn a certification?`,
@@ -268,7 +280,7 @@ export async function sendDay7Email(to: string, name: string): Promise<void> {
         </div>
       </div>
     `,
-  }); } catch (err) { console.error("[email] sendDay7Email failed:", err); }
+  });
 }
 
 /** Weekly progress digest — sent every Sunday to active users. */
@@ -284,7 +296,7 @@ export async function sendWeeklyDigestEmail(opts: {
   if (!resend) return;
 
   const { to, name, streakDays, xp, problemsThisWeek, tutorialsThisWeek } = opts;
-  const firstName = name.split(" ")[0];
+  const firstName = escapeHtml(name.split(" ")[0]);
   const totalActivity = problemsThisWeek + tutorialsThisWeek;
 
   // Motivational headline based on activity level
@@ -671,15 +683,6 @@ export async function sendPasswordResetEmail(
   });
 }
 
-/** Escape user-supplied text before embedding in HTML to prevent XSS. */
-function escapeHtml(str: string): string {
-  return str
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#39;");
-}
 
 /** Contact form submission — forwards user message to the support inbox. */
 export async function sendContactEmail(opts: {
@@ -725,7 +728,7 @@ export async function sendNotificationDigestEmail(opts: {
   if (!resend) return;
 
   const { to, name, notifications } = opts;
-  const firstName = name.split(" ")[0];
+  const firstName = escapeHtml(name.split(" ")[0]);
   const count = notifications.length;
   const subject =
     count === 1
@@ -737,8 +740,8 @@ export async function sendNotificationDigestEmail(opts: {
       (n) => `
         <tr>
           <td style="padding:12px 0;border-bottom:1px solid #f3f4f6">
-            <p style="margin:0 0 2px;font-size:14px;font-weight:600;color:#18181b">${n.title}</p>
-            <p style="margin:0;font-size:13px;color:#6b7280">${n.message}</p>
+            <p style="margin:0 0 2px;font-size:14px;font-weight:600;color:#18181b">${escapeHtml(n.title)}</p>
+            <p style="margin:0;font-size:13px;color:#6b7280">${escapeHtml(n.message)}</p>
           </td>
         </tr>`,
     )

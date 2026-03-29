@@ -268,10 +268,14 @@ export async function cancelUserPlanGracefully(
 }
 
 /**
- * Downgrade all "canceling" users whose billing period has now ended,
- * and all trial users whose trial period has expired (safety net for
- * missed Paddle webhooks — Paddle is the source of truth but this
- * ensures we never grant indefinite free Pro access).
+ * Downgrade users whose access has expired:
+ * - "canceling": billing period ended; revert to free.
+ * - "pro": referral-reward grants set plan='pro' + subscription_expires_at=+30d.
+ *   Real paying subscribers never have subscription_expires_at set (only set on
+ *   cancellation which flips the plan to 'canceling'), so including 'pro' here
+ *   only catches the referral case without touching real subscribers.
+ *
+ * Safety net for missed Paddle webhooks — Paddle is always the source of truth.
  */
 export async function downgradeExpiredCancelingUsers(): Promise<number> {
   const sql = getSql();
@@ -279,7 +283,7 @@ export async function downgradeExpiredCancelingUsers(): Promise<number> {
   const result = await sql`
     UPDATE users
     SET plan = 'free', subscription_expires_at = NULL
-    WHERE plan IN ('canceling', 'trial', 'trial_yearly')
+    WHERE plan IN ('canceling', 'pro')
       AND subscription_expires_at IS NOT NULL
       AND subscription_expires_at::timestamptz < NOW()
     RETURNING id

@@ -24,13 +24,17 @@ export const POST = withErrorHandling("POST /api/auth/forgot-password", async (r
     return NextResponse.json({ error: "Email is required." }, { status: 400 });
   }
 
-  // Always return 200 — don't reveal whether email exists
+  // Always return 200 — never reveal whether the email exists in our DB.
   const user = await getUserByEmail(email);
   if (user && !user.google_id) {
     const token = randomUUID();
     const expiresAt = new Date(Date.now() + 60 * 60 * 1000).toISOString(); // 1 hour
     await createPasswordResetToken(user.id, token, expiresAt);
-    await sendPasswordResetEmail(user.email, user.name, token);
+    // Wrap in try/catch: a Resend failure must not change the HTTP status and
+    // must not reveal that this email address exists in our DB.
+    sendPasswordResetEmail(user.email, user.name, token).catch((err) => {
+      console.error("[forgot-password] Failed to send password reset email:", err);
+    });
   }
 
   return NextResponse.json({ ok: true });

@@ -102,7 +102,9 @@ export default function PlanTab({ plan, expiresAtProp }: Props & { expiresAtProp
   const [expiresAt, setExpiresAt] = useState<string | null>(expiresAtProp ?? null);
   const isPaid = hasPaidAccess(currentPlan);
   const isYearly = currentPlan === "yearly";
-  const isMonthly = currentPlan === "pro";
+  // "pro" is the legacy plan value written by some webhook paths; "monthly" is the
+  // canonical value. Both mean the same thing — treat them identically.
+  const isMonthly = currentPlan === "pro" || currentPlan === "monthly";
   const isCanceling = currentPlan === "canceling";
   const paddleReady = useRef(false);
   const [coupon, setCoupon] = useState("");
@@ -112,6 +114,7 @@ export default function PlanTab({ plan, expiresAtProp }: Props & { expiresAtProp
 
   // When redirected back from Paddle checkout with ?plan=success,
   // poll the profile until the plan upgrades (webhook may take a few seconds).
+  // Stop as soon as we detect a paid plan — no need to keep polling.
   useEffect(() => {
     if (searchParams.get("plan") !== "success") return;
     let attempts = 0;
@@ -119,10 +122,12 @@ export default function PlanTab({ plan, expiresAtProp }: Props & { expiresAtProp
     const interval = setInterval(async () => {
       attempts++;
       await refreshProfile();
-      if (attempts >= maxAttempts) clearInterval(interval);
+      // hasPaidAccess is checked against the updated currentPlan via the useEffect below
+      if (hasPaidAccess(currentPlan) || attempts >= maxAttempts) clearInterval(interval);
     }, 2000);
     return () => clearInterval(interval);
-  }, [searchParams, refreshProfile]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams, refreshProfile]); // currentPlan intentionally omitted to avoid restart
 
   // Sync plan status from Paddle directly — called when user closes the portal popup
   async function syncPlan() {
