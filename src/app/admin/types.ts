@@ -10,10 +10,19 @@ export interface AdminUser {
   last_active_at: string | null;
   is_admin: number;
   admin_role: string | null;
+  admin_permissions: string | null;
   banned: boolean;
   completed_count: number;
   bookmark_count: number;
   plan: string;
+}
+
+export interface AdminMe {
+  id: number;
+  name: string;
+  email: string;
+  isSuperAdmin: boolean;
+  permissions: string[];
 }
 
 export interface TutorialAnalytics {
@@ -90,7 +99,7 @@ export const TAB_LABELS: Record<Tab, string> = {
   "site-settings": "Site settings",
 };
 
-/** Tabs accessible to limited admins. Super admins see everything. */
+/** @deprecated Use permission-constants.ts + AdminMe.permissions instead. */
 export const LIMITED_ADMIN_TABS: Tab[] = [
   "analytics", "banner", "blog", "interviews", "messages", "exams",
 ];

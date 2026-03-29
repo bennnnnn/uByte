@@ -46,6 +46,10 @@ export const GET = withErrorHandling("GET /api/admin/users", async (request: Nex
   }
 
   if (searchParams.get("export") === "csv") {
+    // CSV export contains PII — restrict to super admins only
+    if (admin.admin_role !== "super" && admin.admin_role !== null) {
+      return NextResponse.json({ error: "Forbidden — super admin only" }, { status: 403 });
+    }
     const users = await getAdminUsers();
     const header = "id,name,email,xp,streak_days,created_at,last_active_at,is_admin,banned,completed_count,bookmark_count,plan";
     const escape = (v: string | number | boolean | null | undefined) => {

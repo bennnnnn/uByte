@@ -1,10 +1,9 @@
 /**
- * SiteSettingsTab — edit global site-wide settings.
+ * SiteSettingsTab — control all site-wide feature flags and limits.
  *
- * Currently manages:
- *   • Default exam pass percentage (global fallback — per-language overrides take precedence)
- *
- * Only accessible to super admins.
+ * Super admins can toggle features on/off and adjust numeric limits.
+ * Settings are grouped into logical sections and saved independently.
+ * Limited admins can read settings but not change them.
  */
 
 "use client";
@@ -13,26 +12,198 @@ import { useState, useEffect, useCallback } from "react";
 import { apiFetch } from "@/lib/api-client";
 import { Spinner } from "../components";
 
-export default function SiteSettingsTab() {
-  const [settings, setSettings] = useState<Record<string, string>>({});
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
-  const [error, setError] = useState("");
-  const [message, setMessage] = useState("");
+/* ── Types ───────────────────────────────────────────────────────────────── */
 
-  // Local editable copies
-  const [passPercent, setPassPercent] = useState("70");
+interface Settings {
+  // Numeric
+  exam_pass_percent: string;
+  max_ai_calls_per_day: string;
+  // Feature flags ("1" = on, "0" = off)
+  registration_open: string;
+  maintenance_mode: string;
+  ai_enabled: string;
+  referral_enabled: string;
+  certifications_enabled: string;
+  interview_simulator_enabled: string;
+  pro_features_enabled: string;
+}
+
+const DEFAULTS: Settings = {
+  exam_pass_percent: "70",
+  max_ai_calls_per_day: "200",
+  registration_open: "1",
+  maintenance_mode: "0",
+  ai_enabled: "1",
+  referral_enabled: "1",
+  certifications_enabled: "1",
+  interview_simulator_enabled: "1",
+  pro_features_enabled: "1",
+};
+
+/* ── Primitive components ────────────────────────────────────────────────── */
+
+function Toggle({
+  id,
+  checked,
+  onChange,
+  disabled,
+}: {
+  id: string;
+  checked: boolean;
+  onChange: (v: boolean) => void;
+  disabled?: boolean;
+}) {
+  return (
+    <button
+      id={id}
+      type="button"
+      role="switch"
+      aria-checked={checked}
+      disabled={disabled}
+      onClick={() => !disabled && onChange(!checked)}
+      className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer items-center rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 ${
+        checked ? "bg-indigo-600" : "bg-zinc-200 dark:bg-zinc-700"
+      } ${disabled ? "cursor-not-allowed opacity-50" : ""}`}
+    >
+      <span
+        className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white shadow-sm transition-transform ${
+          checked ? "translate-x-[19px]" : "translate-x-[3px]"
+        }`}
+      />
+    </button>
+  );
+}
+
+function SettingRow({
+  label,
+  hint,
+  danger,
+  children,
+}: {
+  label: string;
+  hint: string;
+  danger?: boolean;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className={`flex items-start justify-between gap-4 py-3.5 ${danger ? "rounded-lg border border-red-100 bg-red-50/50 px-3 dark:border-red-900/30 dark:bg-red-950/10" : ""}`}>
+      <div className="flex-1">
+        <p className="text-sm font-medium text-zinc-800 dark:text-zinc-200">{label}</p>
+        <p className="mt-0.5 text-xs text-zinc-400 dark:text-zinc-500">{hint}</p>
+      </div>
+      <div className="shrink-0 pt-0.5">{children}</div>
+    </div>
+  );
+}
+
+function NumericInput({
+  id,
+  value,
+  onChange,
+  min,
+  max,
+  unit,
+  disabled,
+}: {
+  id: string;
+  value: string;
+  onChange: (v: string) => void;
+  min: number;
+  max: number;
+  unit?: string;
+  disabled?: boolean;
+}) {
+  return (
+    <div className="flex items-center gap-2">
+      <input
+        id={id}
+        name={id}
+        type="number"
+        min={min}
+        max={max}
+        value={value}
+        disabled={disabled}
+        onChange={(e) => onChange(e.target.value)}
+        className="w-24 rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-1.5 text-sm text-zinc-900 focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-100 disabled:cursor-not-allowed disabled:opacity-50 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"
+      />
+      {unit && <span className="text-xs text-zinc-400">{unit}</span>}
+    </div>
+  );
+}
+
+/* ── Section wrapper ─────────────────────────────────────────────────────── */
+
+function Section({
+  title,
+  description,
+  children,
+  onSave,
+  saving,
+  saved,
+  disabled,
+}: {
+  title: string;
+  description: string;
+  children: React.ReactNode;
+  onSave: () => void;
+  saving: boolean;
+  saved: boolean;
+  disabled?: boolean;
+}) {
+  return (
+    <div className="rounded-xl border border-zinc-200 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+      <div className="border-b border-zinc-100 px-5 py-4 dark:border-zinc-800">
+        <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">{title}</h2>
+        <p className="mt-0.5 text-xs text-zinc-400">{description}</p>
+      </div>
+      <div className="divide-y divide-zinc-100 px-5 dark:divide-zinc-800">{children}</div>
+      {!disabled && (
+        <div className="flex items-center gap-3 border-t border-zinc-100 px-5 py-3 dark:border-zinc-800">
+          <button
+            type="button"
+            onClick={onSave}
+            disabled={saving}
+            className="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-4 py-1.5 text-xs font-medium text-white transition-colors hover:bg-indigo-700 disabled:opacity-50"
+          >
+            {saving && <Spinner className="h-3 w-3" />}
+            Save
+          </button>
+          {saved && <span className="text-xs font-medium text-emerald-600 dark:text-emerald-400">✓ Saved</span>}
+        </div>
+      )}
+      {disabled && (
+        <div className="border-t border-zinc-100 px-5 py-3 dark:border-zinc-800">
+          <p className="text-xs text-zinc-400">Read-only — super admin access required to change settings.</p>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ── Main tab ────────────────────────────────────────────────────────────── */
+
+export default function SiteSettingsTab() {
+  const [settings, setSettings] = useState<Settings>(DEFAULTS);
+  const [draft, setDraft] = useState<Settings>(DEFAULTS);
+  const [loading, setLoading] = useState(true);
+  const [readOnly, setReadOnly] = useState(false);
+  const [error, setError] = useState("");
+
+  // Per-section save state
+  const [savingSection, setSavingSection] = useState<string | null>(null);
+  const [savedSection, setSavedSection] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     setLoading(true);
     setError("");
     try {
       const r = await fetch("/api/admin/site-settings", { credentials: "same-origin" });
-      if (r.status === 403) { setError("You need super admin access to edit site settings."); return; }
+      if (r.status === 403) { setReadOnly(true); setLoading(false); return; }
       const d = await r.json();
       if (!r.ok) throw new Error(d.error ?? "Failed to load");
-      setSettings(d);
-      setPassPercent(d.exam_pass_percent ?? "70");
+      const merged = { ...DEFAULTS, ...d } as Settings;
+      setSettings(merged);
+      setDraft(merged);
     } catch (e) {
       setError(String((e as Error).message ?? e));
     } finally {
@@ -40,36 +211,41 @@ export default function SiteSettingsTab() {
     }
   }, []);
 
-  useEffect(() => { load(); }, [load]);
+  useEffect(() => { void load(); }, [load]);
 
-  const save = useCallback(async () => {
-    setSaving(true);
-    setMessage("");
-    setError("");
-    const pct = parseInt(passPercent, 10);
-    if (isNaN(pct) || pct < 1 || pct > 100) {
-      setError("Pass percentage must be between 1 and 100.");
-      setSaving(false);
-      return;
+  const set = useCallback(<K extends keyof Settings>(key: K, value: Settings[K]) => {
+    setDraft((prev) => ({ ...prev, [key]: value }));
+  }, []);
+
+  const saveSection = useCallback(async (section: string, keys: (keyof Settings)[]) => {
+    setSavingSection(section);
+    setSavedSection(null);
+    const body: Record<string, unknown> = {};
+    for (const k of keys) {
+      const rule = ["exam_pass_percent", "max_ai_calls_per_day"].includes(k)
+        ? "number"
+        : "bool";
+      body[k] = rule === "bool" ? draft[k] === "1" : draft[k];
     }
     try {
       const res = await apiFetch("/api/admin/site-settings", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ exam_pass_percent: String(pct) }),
+        body: JSON.stringify(body),
       });
       const d = await res.json();
       if (!res.ok) { setError(d.error ?? "Save failed"); return; }
-      setSettings(d);
-      setPassPercent(d.exam_pass_percent ?? "70");
-      setMessage("Settings saved.");
-      setTimeout(() => setMessage(""), 3000);
+      const merged = { ...DEFAULTS, ...d } as Settings;
+      setSettings(merged);
+      setDraft(merged);
+      setSavedSection(section);
+      setTimeout(() => setSavedSection(null), 3000);
     } catch (e) {
       setError(String((e as Error).message ?? e));
     } finally {
-      setSaving(false);
+      setSavingSection(null);
     }
-  }, [passPercent]);
+  }, [draft]);
 
   if (loading) {
     return (
@@ -79,96 +255,155 @@ export default function SiteSettingsTab() {
     );
   }
 
-  if (error && Object.keys(settings).length === 0) {
+  if (error) {
     return (
-      <div className="rounded-xl border border-red-200 bg-red-50 p-6 text-sm text-red-700 dark:border-red-900/60 dark:bg-red-950/30 dark:text-red-400">
+      <div className="rounded-xl border border-red-200 bg-red-50 p-5 text-sm text-red-700 dark:border-red-900/60 dark:bg-red-950/30 dark:text-red-400">
         {error}
+        <button type="button" onClick={load} className="ml-3 underline hover:no-underline">Retry</button>
       </div>
     );
   }
 
+  const bool = (key: keyof Settings) => draft[key] === "1";
+  const setBool = (key: keyof Settings, v: boolean) => set(key, v ? "1" : "0");
+
   return (
-    <div className="mx-auto max-w-2xl space-y-6">
+    <div className="mx-auto max-w-2xl space-y-5">
 
-      {/* ── Certifications ────────────────────────────────────────────────── */}
+      {/* ── Platform ──────────────────────────────────────────────────────── */}
       <Section
-        title="Certifications"
-        description="Global defaults for certification exams. Per-language settings in the Exams tab override these values."
+        title="Platform"
+        description="Core platform availability settings."
+        onSave={() => saveSection("platform", ["registration_open", "maintenance_mode"])}
+        saving={savingSection === "platform"}
+        saved={savedSection === "platform"}
+        disabled={readOnly}
       >
-        <FormRow
-          label="Default pass percentage"
-          hint="Minimum score (%) required to earn a certificate when no per-language override is set."
+        <SettingRow
+          label="New user registration"
+          hint="When off, the sign-up form is disabled and new accounts cannot be created."
         >
-          <div className="flex items-center gap-3">
-            <input
-              id="default-pass-percent"
-              name="pass_percent"
-              type="number"
-              min={1}
-              max={100}
-              value={passPercent}
-              onChange={(e) => setPassPercent(e.target.value)}
-              className="w-24 rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm text-zinc-900 focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-100 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100 dark:focus:border-indigo-600 dark:focus:ring-indigo-900/30"
-            />
-            <span className="text-sm text-zinc-500">%</span>
-          </div>
-        </FormRow>
-
-        {/* Current values reference */}
-        <div className="rounded-lg bg-zinc-50 p-3 text-xs text-zinc-500 dark:bg-zinc-800/50 dark:text-zinc-400">
-          <p className="mb-1 font-medium text-zinc-600 dark:text-zinc-300">Stored values</p>
-          {Object.entries(settings).length === 0 ? (
-            <p className="italic">Using defaults</p>
-          ) : (
-            <ul className="space-y-0.5">
-              {Object.entries(settings).map(([k, v]) => (
-                <li key={k}><span className="font-mono">{k}</span> = <span className="font-mono font-semibold">{v}</span></li>
-              ))}
-            </ul>
-          )}
-        </div>
+          <Toggle
+            id="registration_open"
+            checked={bool("registration_open")}
+            onChange={(v) => setBool("registration_open", v)}
+            disabled={readOnly}
+          />
+        </SettingRow>
+        <SettingRow
+          label="Maintenance mode"
+          hint="When on, a maintenance banner is shown to all visitors. Admin panel remains accessible."
+          danger={bool("maintenance_mode")}
+        >
+          <Toggle
+            id="maintenance_mode"
+            checked={bool("maintenance_mode")}
+            onChange={(v) => setBool("maintenance_mode", v)}
+            disabled={readOnly}
+          />
+        </SettingRow>
       </Section>
 
-      {/* ── Save bar ──────────────────────────────────────────────────────── */}
-      <div className="flex items-center gap-3">
-        <button
-          type="button"
-          onClick={save}
-          disabled={saving}
-          className="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-indigo-700 disabled:opacity-50"
+      {/* ── Features ──────────────────────────────────────────────────────── */}
+      <Section
+        title="Features"
+        description="Toggle individual product features on or off site-wide."
+        onSave={() => saveSection("features", ["ai_enabled", "referral_enabled", "certifications_enabled", "interview_simulator_enabled", "pro_features_enabled"])}
+        saving={savingSection === "features"}
+        saved={savedSection === "features"}
+        disabled={readOnly}
+      >
+        <SettingRow
+          label="AI features"
+          hint="Master switch for all AI-powered features: hints, code reviews, interview debriefs, and AI chat."
         >
-          {saving && <Spinner className="h-3.5 w-3.5" />}
-          Save settings
-        </button>
-        {message && <p className="text-sm text-emerald-600 dark:text-emerald-400">{message}</p>}
-        {error && Object.keys(settings).length > 0 && <p className="text-sm text-red-600 dark:text-red-400">{error}</p>}
-      </div>
-    </div>
-  );
-}
+          <Toggle id="ai_enabled" checked={bool("ai_enabled")} onChange={(v) => setBool("ai_enabled", v)} disabled={readOnly} />
+        </SettingRow>
+        <SettingRow
+          label="Referral program"
+          hint="Users can share invite links to earn 30 free Pro days per successful referral."
+        >
+          <Toggle id="referral_enabled" checked={bool("referral_enabled")} onChange={(v) => setBool("referral_enabled", v)} disabled={readOnly} />
+        </SettingRow>
+        <SettingRow
+          label="Certifications & exams"
+          hint="Allow users to take certification exams and earn certificates."
+        >
+          <Toggle id="certifications_enabled" checked={bool("certifications_enabled")} onChange={(v) => setBool("certifications_enabled", v)} disabled={readOnly} />
+        </SettingRow>
+        <SettingRow
+          label="Interview simulator"
+          hint="Timed interview practice sessions with AI debrief (Pro feature)."
+        >
+          <Toggle id="interview_simulator_enabled" checked={bool("interview_simulator_enabled")} onChange={(v) => setBool("interview_simulator_enabled", v)} disabled={readOnly} />
+        </SettingRow>
+        <SettingRow
+          label="Pro features"
+          hint="When off, all Pro-gated features become accessible to everyone (free access override). Useful during testing."
+          danger={!bool("pro_features_enabled")}
+        >
+          <Toggle id="pro_features_enabled" checked={bool("pro_features_enabled")} onChange={(v) => setBool("pro_features_enabled", v)} disabled={readOnly} />
+        </SettingRow>
+      </Section>
 
-/* ── Layout helpers ──────────────────────────────────────────────────────── */
+      {/* ── Limits ────────────────────────────────────────────────────────── */}
+      <Section
+        title="Limits"
+        description="Numeric thresholds and defaults."
+        onSave={() => saveSection("limits", ["exam_pass_percent", "max_ai_calls_per_day"])}
+        saving={savingSection === "limits"}
+        saved={savedSection === "limits"}
+        disabled={readOnly}
+      >
+        <SettingRow
+          label="Default exam pass %"
+          hint="Minimum score to earn a certificate. Per-language overrides in the Certifications tab take precedence."
+        >
+          <NumericInput
+            id="exam_pass_percent"
+            value={draft.exam_pass_percent}
+            onChange={(v) => set("exam_pass_percent", v)}
+            min={1}
+            max={100}
+            unit="%"
+            disabled={readOnly}
+          />
+        </SettingRow>
+        <SettingRow
+          label="Max AI calls per day (Pro users)"
+          hint="How many AI requests a Pro user can make per calendar day across all AI features."
+        >
+          <NumericInput
+            id="max_ai_calls_per_day"
+            value={draft.max_ai_calls_per_day}
+            onChange={(v) => set("max_ai_calls_per_day", v)}
+            min={1}
+            max={10000}
+            unit="/ day"
+            disabled={readOnly}
+          />
+        </SettingRow>
+      </Section>
 
-function Section({ title, description, children }: { title: string; description: string; children: React.ReactNode }) {
-  return (
-    <div className="rounded-xl border border-zinc-200 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
-      <div className="border-b border-zinc-100 px-5 py-4 dark:border-zinc-800">
-        <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">{title}</h2>
-        <p className="mt-0.5 text-xs text-zinc-400 dark:text-zinc-500">{description}</p>
-      </div>
-      <div className="space-y-5 p-5">{children}</div>
-    </div>
-  );
-}
+      {/* ── Current stored values (debug reference) ───────────────────────── */}
+      <details className="rounded-xl border border-zinc-200 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+        <summary className="cursor-pointer px-5 py-3.5 text-xs font-semibold text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200">
+          Stored values (debug)
+        </summary>
+        <div className="border-t border-zinc-100 px-5 py-3 dark:border-zinc-800">
+          <table className="w-full text-xs">
+            <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800">
+              {Object.entries(settings).map(([k, v]) => (
+                <tr key={k}>
+                  <td className="py-1 font-mono text-zinc-500 dark:text-zinc-400">{k}</td>
+                  <td className="py-1 font-mono font-semibold text-zinc-800 dark:text-zinc-200">{v}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </details>
 
-function FormRow({ label, hint, children }: { label: string; hint?: string; children: React.ReactNode }) {
-  return (
-    <div className="flex flex-col gap-1.5 sm:flex-row sm:items-start sm:gap-4">
-      <div className="sm:w-52 sm:shrink-0">
-        <p className="text-sm font-medium text-zinc-700 dark:text-zinc-300">{label}</p>
-        {hint && <p className="mt-0.5 text-xs text-zinc-400 dark:text-zinc-500">{hint}</p>}
-      </div>
-      <div className="flex-1">{children}</div>
     </div>
   );
 }

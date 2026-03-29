@@ -126,8 +126,9 @@ export default function AnalyticsTab({ data }: Props) {
 /* ── Reusable table header cell ──────────────────────────────────────────── */
 
 function Th({ children, align = "right", last }: { children: React.ReactNode; align?: "left" | "right"; last?: boolean }) {
+  const alignCls = align === "left" ? "text-left" : "text-right";
   return (
-    <th className={`${last ? "px-5" : align === "left" ? "px-5" : "px-4"} py-2.5 text-${align} text-xs font-semibold uppercase tracking-wide text-zinc-400`}>
+    <th className={`${last ? "px-5" : align === "left" ? "px-5" : "px-4"} py-2.5 ${alignCls} text-xs font-semibold uppercase tracking-wide text-zinc-400`}>
       {children}
     </th>
   );

@@ -68,11 +68,11 @@ export function SectionCard({ title, description, children }: { title: string; d
 
 /* ── Save button ─────────────────────────────────────────────────────────── */
 /** Indigo button with an optional inline spinner while saving. */
-export function SaveButton({ saving, label = "Save", savingLabel = "Saving…", onClick }: { saving: boolean; label?: string; savingLabel?: string; onClick: () => void }) {
+export function SaveButton({ saving, label = "Save", savingLabel = "Saving…", onClick, disabled }: { saving: boolean; label?: string; savingLabel?: string; onClick: () => void; disabled?: boolean }) {
   return (
     <button
       type="button"
-      disabled={saving}
+      disabled={saving || disabled}
       onClick={onClick}
       className="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-indigo-700 disabled:opacity-50 dark:bg-indigo-500 dark:hover:bg-indigo-600"
     >

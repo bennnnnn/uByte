@@ -29,15 +29,20 @@ function formatDate(s: string): string {
 export default function MessagesTab() {
   const [messages, setMessages] = useState<ContactMessage[]>([]);
   const [loading, setLoading]   = useState(true);
+  const [error, setError]       = useState("");
   const [expanded, setExpanded] = useState<number | null>(null);
   const [busy, setBusy]         = useState(false);
 
   const load = useCallback(async () => {
     setLoading(true);
+    setError("");
     try {
       const res  = await apiFetch("/api/admin/messages");
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.json() as { messages: ContactMessage[] };
       setMessages(data.messages ?? []);
+    } catch (e) {
+      setError(String((e as Error).message ?? e));
     } finally {
       setLoading(false);
     }
@@ -60,6 +65,15 @@ export default function MessagesTab() {
   };
 
   const unreadCount = messages.filter((m) => !m.read).length;
+
+  if (error) {
+    return (
+      <div className="rounded-xl border border-red-200 bg-red-50 p-5 text-sm text-red-700 dark:border-red-900/60 dark:bg-red-950/30 dark:text-red-400">
+        {error}
+        <button type="button" onClick={load} className="ml-3 underline hover:no-underline">Retry</button>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-4">

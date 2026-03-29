@@ -232,8 +232,9 @@ function ChurnCard({ label, count, description, color }: {
 
 /* ── Table header ────────────────────────────────────────────────────────── */
 function Th({ children, align = "right", last }: { children: React.ReactNode; align?: "left" | "right"; last?: boolean }) {
+  const alignCls = align === "left" ? "text-left" : "text-right";
   return (
-    <th className={`${last ? "pr-0" : "pr-4"} py-2 text-${align} text-xs font-semibold uppercase tracking-wide text-zinc-400`}>
+    <th className={`${last ? "pr-0" : "pr-4"} py-2 ${alignCls} text-xs font-semibold uppercase tracking-wide text-zinc-400`}>
       {children}
     </th>
   );

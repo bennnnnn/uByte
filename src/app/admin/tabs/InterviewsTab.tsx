@@ -6,7 +6,7 @@
  * Pending submissions appear first. Admin can approve, reject, or delete.
  */
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, Fragment } from "react";
 import { apiFetch } from "@/lib/api-client";
 import { SectionCard, EmptyRow } from "../components";
 
@@ -46,15 +46,20 @@ function formatDate(s: string): string {
 export default function InterviewsTab() {
   const [items, setItems]       = useState<Experience[]>([]);
   const [loading, setLoading]   = useState(true);
+  const [error, setError]       = useState("");
   const [expanded, setExpanded] = useState<number | null>(null);
   const [busy, setBusy]         = useState<number | null>(null);
 
   const load = useCallback(async () => {
     setLoading(true);
+    setError("");
     try {
       const res  = await apiFetch("/api/admin/interviews");
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.json() as { experiences: Experience[] };
       setItems(data.experiences ?? []);
+    } catch (e) {
+      setError(String((e as Error).message ?? e));
     } finally {
       setLoading(false);
     }
@@ -93,9 +98,8 @@ export default function InterviewsTab() {
         </thead>
         <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800">
           {rows.map((exp) => (
-            <>
+            <Fragment key={exp.id}>
               <tr
-                key={exp.id}
                 className="cursor-pointer transition-colors hover:bg-zinc-50/80 dark:hover:bg-zinc-800/40"
                 onClick={() => setExpanded((e) => (e === exp.id ? null : exp.id))}
               >
@@ -161,13 +165,22 @@ export default function InterviewsTab() {
                   </td>
                 </tr>
               )}
-            </>
+            </Fragment>
           ))}
           {rows.length === 0 && <EmptyRow cols={5} text="None." />}
         </tbody>
       </table>
     </div>
   );
+
+  if (error) {
+    return (
+      <div className="rounded-xl border border-red-200 bg-red-50 p-5 text-sm text-red-700 dark:border-red-900/60 dark:bg-red-950/30 dark:text-red-400">
+        {error}
+        <button type="button" onClick={load} className="ml-3 underline hover:no-underline">Retry</button>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">

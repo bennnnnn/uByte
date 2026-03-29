@@ -12,8 +12,9 @@ import { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
 import { useAdminData } from "./hooks";
 import { Spinner, TabIcon } from "./components";
-import { TAB_LABELS, LIMITED_ADMIN_TABS } from "./types";
+import { TAB_LABELS } from "./types";
 import type { Tab } from "./types";
+import { TAB_PERMISSION } from "./permission-constants";
 import { UsersTab, AnalyticsTab, RevenueTab, GrowthTab, ExamsTab, BannerTab, AuditTab, BlogTab, MessagesTab, InterviewsTab, ReportsTab, AdminsTab, SiteSettingsTab } from "./tabs";
 
 /* ── Tab header subtitles (concise one-liners per tab) ───────────────────── */
@@ -48,17 +49,21 @@ const defaultCls = "text-zinc-600 hover:bg-zinc-50 hover:text-zinc-900 dark:text
 
 export default function AdminPage() {
   const data = useAdminData();
-  const { user, loading, fetching, error, router, tab, setTab, users, revenue, revenuePeriod, setRevenuePeriod, exportRevenueCSV, printRevenuePDF, exportUsersCSV, printRef, currentAdminRole } = data;
+  const { user, loading, fetching, error, router, tab, setTab, users, revenue, revenuePeriod, setRevenuePeriod, exportRevenueCSV, printRevenuePDF, exportUsersCSV, printRef, isSuperAdmin, hasPermission, currentAdminRole } = data;
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const isSuperAdmin = !currentAdminRole || currentAdminRole === "super";
 
-  // Filter sidebar sections based on role
+  // Filter sidebar sections to tabs the current admin has permission for
   const sidebarSections = useMemo(() => {
-    if (isSuperAdmin) return ALL_SIDEBAR_SECTIONS;
     return ALL_SIDEBAR_SECTIONS
-      .map((s) => ({ ...s, tabs: s.tabs.filter((t) => LIMITED_ADMIN_TABS.includes(t)) }))
+      .map((s) => ({
+        ...s,
+        tabs: s.tabs.filter((t) => {
+          const perm = TAB_PERMISSION[t];
+          return !perm || hasPermission(perm);
+        }),
+      }))
       .filter((s) => s.tabs.length > 0);
-  }, [isSuperAdmin]);
+  }, [hasPermission]);
 
   useEffect(() => {
     setSidebarOpen(false);
@@ -112,15 +117,13 @@ export default function AdminPage() {
 
       <nav className="flex-1 space-y-0.5 overflow-y-auto px-3 py-4">
         {/* Role badge */}
-        {currentAdminRole && (
-          <div className={`mx-3 mb-4 rounded-lg px-2.5 py-1.5 text-[11px] font-semibold ${
-            isSuperAdmin
-              ? "bg-violet-50 text-violet-700 dark:bg-violet-900/20 dark:text-violet-400"
-              : "bg-indigo-50 text-indigo-700 dark:bg-indigo-900/20 dark:text-indigo-400"
-          }`}>
-            {isSuperAdmin ? "⭐ Super admin" : "🔒 Limited admin"}
-          </div>
-        )}
+        <div className={`mx-3 mb-4 rounded-lg px-2.5 py-1.5 text-[11px] font-semibold ${
+          isSuperAdmin
+            ? "bg-violet-50 text-violet-700 dark:bg-violet-900/20 dark:text-violet-400"
+            : "bg-indigo-50 text-indigo-700 dark:bg-indigo-900/20 dark:text-indigo-400"
+        }`}>
+          {isSuperAdmin ? "⭐ Super admin" : "🔒 Sub-admin"}
+        </div>
         {sidebarSections.map((section, idx) => (
           <div key={section.label}>
             <p className={`${idx > 0 ? "mt-5 " : ""}mb-2 px-3 text-[10px] font-semibold uppercase tracking-widest text-zinc-400 dark:text-zinc-600`}>
@@ -200,7 +203,7 @@ export default function AdminPage() {
             </div>
 
             {/* Tab-specific controls */}
-            {tab === "users" && (
+            {tab === "users" && isSuperAdmin && (
               <div className="flex shrink-0 items-center gap-2">
                 <HeaderButton onClick={exportUsersCSV}>CSV</HeaderButton>
               </div>

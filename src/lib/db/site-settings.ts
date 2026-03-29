@@ -4,9 +4,22 @@ const CACHE_TTL_MS = 60_000;
 let _cache: Record<string, string> | null = null;
 let _cacheAt = 0;
 
-const DEFAULTS: Record<string, string> = {
-  exam_pass_percent: "70",
+export const SITE_SETTING_DEFAULTS: Record<string, string> = {
+  // Numeric
+  exam_pass_percent:   "70",
+  max_ai_calls_per_day: "200",
+  // Feature flags (1 = enabled, 0 = disabled)
+  registration_open:            "1",
+  maintenance_mode:             "0",
+  ai_enabled:                   "1",
+  referral_enabled:             "1",
+  certifications_enabled:       "1",
+  interview_simulator_enabled:  "1",
+  pro_features_enabled:         "1",
 };
+
+// Keep backward-compat alias
+const DEFAULTS = SITE_SETTING_DEFAULTS;
 
 async function loadAll(): Promise<Record<string, string>> {
   const now = Date.now();
@@ -64,4 +77,16 @@ export async function getExamPassPercent(): Promise<number> {
   const v = await getSiteSetting("exam_pass_percent");
   const n = parseInt(v, 10);
   return isNaN(n) || n < 1 || n > 100 ? 70 : n;
+}
+
+export async function getMaxAiCallsPerDay(): Promise<number> {
+  const v = await getSiteSetting("max_ai_calls_per_day");
+  const n = parseInt(v, 10);
+  return isNaN(n) || n < 1 ? 200 : n;
+}
+
+/** Returns true if the feature flag is enabled (value = "1"). */
+export async function isFeatureEnabled(key: string): Promise<boolean> {
+  const v = await getSiteSetting(key);
+  return v === "1";
 }

@@ -44,11 +44,11 @@ export default function ReportsTab() {
   const [loading, setLoading]   = useState(true);
   const [expanded, setExpanded] = useState<number | null>(null);
   const [busy, setBusy]         = useState<number | null>(null);
-  const [toast, setToast]       = useState<string | null>(null);
+  const [toast, setToast] = useState<{ msg: string; ok: boolean } | null>(null);
 
-  const showToast = (msg: string) => {
-    setToast(msg);
-    setTimeout(() => setToast(null), 3000);
+  const showToast = (msg: string, ok = true) => {
+    setToast({ msg, ok });
+    setTimeout(() => setToast(null), 3500);
   };
 
   const load = useCallback(async () => {
@@ -66,15 +66,25 @@ export default function ReportsTab() {
 
   async function act(postId: number, action: "dismiss" | "delete") {
     setBusy(postId);
+    // Snapshot for rollback
+    const snapshot = reports;
+    // Optimistic update
+    setReports((prev) => prev.filter((r) => r.post_id !== postId));
+    setExpanded(null);
     try {
-      await apiFetch("/api/admin/reports", {
+      const res = await apiFetch("/api/admin/reports", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ postId, action }),
       });
-      setReports((prev) => prev.filter((r) => r.post_id !== postId));
-      setExpanded(null);
-      showToast(action === "delete" ? "Post deleted." : "Reports dismissed.");
+      if (!res.ok) {
+        const d = await res.json().catch(() => ({})) as { error?: string };
+        throw new Error(d.error ?? `HTTP ${res.status}`);
+      }
+      showToast(action === "delete" ? "Post deleted." : "Reports dismissed.", true);
+    } catch (e) {
+      setReports(snapshot);
+      showToast(`Failed: ${(e as Error).message ?? "unknown error"}`, false);
     } finally {
       setBusy(null);
     }
@@ -91,8 +101,12 @@ export default function ReportsTab() {
 
       {/* Toast */}
       {toast && (
-        <div className="mb-4 rounded-lg bg-emerald-50 px-4 py-2 text-sm font-medium text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400">
-          {toast}
+        <div className={`mb-4 rounded-lg px-4 py-2 text-sm font-medium ${
+          toast.ok
+            ? "bg-emerald-50 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-400"
+            : "bg-red-50 text-red-700 dark:bg-red-950/30 dark:text-red-400"
+        }`}>
+          {toast.msg}
         </div>
       )}
 

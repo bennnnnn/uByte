@@ -23,6 +23,30 @@ async function ensureAdminRoleColumn(): Promise<void> {
   _adminRoleReady = true;
 }
 
+// Ensure admin_permissions column exists
+let _adminPermsReady = false;
+async function ensureAdminPermissionsColumn(): Promise<void> {
+  if (_adminPermsReady) return;
+  const sql = getSql();
+  await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS admin_permissions TEXT DEFAULT NULL`;
+  _adminPermsReady = true;
+}
+
+/** Set the granular permission list for a limited admin (JSON array). */
+export async function setAdminPermissions(userId: number, permissions: string[]): Promise<void> {
+  await ensureAdminPermissionsColumn();
+  const sql = getSql();
+  const json = JSON.stringify(permissions);
+  await sql`UPDATE users SET admin_permissions = ${json} WHERE id = ${userId}`;
+}
+
+/** Clear custom permissions so the user falls back to role-based defaults. */
+export async function clearAdminPermissions(userId: number): Promise<void> {
+  await ensureAdminPermissionsColumn();
+  const sql = getSql();
+  await sql`UPDATE users SET admin_permissions = NULL WHERE id = ${userId}`;
+}
+
 export async function getAdminUsers(): Promise<AdminUserRow[]> {
   await ensureAdminRoleColumn();
   const sql = getSql();
@@ -114,11 +138,12 @@ export async function getAdminUsersPaginated(
 
 export async function getAdminList(): Promise<AdminUserRow[]> {
   await ensureAdminRoleColumn();
+  await ensureAdminPermissionsColumn();
   const sql = getSql();
   const rows = await sql`
     SELECT
       u.id, u.name, u.email, u.xp, u.streak_days, u.created_at, u.last_active_at,
-      u.is_admin, u.admin_role, u.locked_until, COALESCE(u.plan, 'free') AS plan,
+      u.is_admin, u.admin_role, u.admin_permissions, u.locked_until, COALESCE(u.plan, 'free') AS plan,
       (SELECT COUNT(*)::int FROM progress WHERE user_id = u.id) AS completed_count,
       (SELECT COUNT(*)::int FROM bookmarks WHERE user_id = u.id) AS bookmark_count
     FROM users u
@@ -171,22 +196,35 @@ export async function adminResetUserProgress(userId: number): Promise<void> {
   return resetAllProgress(userId);
 }
 
-export async function setAdminStatus(userId: number, isAdmin: boolean, role: AdminRole = "limited"): Promise<void> {
+export async function setAdminStatus(
+  userId: number,
+  isAdmin: boolean,
+  role: AdminRole = "limited",
+  permissions?: string[],
+): Promise<void> {
   await ensureAdminRoleColumn();
+  await ensureAdminPermissionsColumn();
   const sql = getSql();
   if (isAdmin) {
-    await sql`UPDATE users SET is_admin = 1, admin_role = ${role} WHERE id = ${userId}`;
+    const permsJson = permissions ? JSON.stringify(permissions) : null;
+    await sql`UPDATE users SET is_admin = 1, admin_role = ${role}, admin_permissions = ${permsJson} WHERE id = ${userId}`;
   } else {
-    await sql`UPDATE users SET is_admin = 0, admin_role = NULL WHERE id = ${userId}`;
-    // Invalidate the demoted user's session immediately so their isAdmin JWT claim is rejected
+    await sql`UPDATE users SET is_admin = 0, admin_role = NULL, admin_permissions = NULL WHERE id = ${userId}`;
     await incrementTokenVersion(userId);
   }
 }
 
-export async function setAdminRole(userId: number, role: AdminRole): Promise<void> {
+export async function setAdminRole(userId: number, role: AdminRole, permissions?: string[]): Promise<void> {
   await ensureAdminRoleColumn();
+  await ensureAdminPermissionsColumn();
   const sql = getSql();
-  await sql`UPDATE users SET admin_role = ${role} WHERE id = ${userId} AND is_admin = 1`;
+  const permsJson = permissions ? JSON.stringify(permissions) : null;
+  // When setting super role, clear custom permissions (super always has full access)
+  if (role === "super") {
+    await sql`UPDATE users SET admin_role = 'super', admin_permissions = NULL WHERE id = ${userId} AND is_admin = 1`;
+  } else {
+    await sql`UPDATE users SET admin_role = ${role}, admin_permissions = ${permsJson} WHERE id = ${userId} AND is_admin = 1`;
+  }
 }
 
 // ─── Step Checks (pass/fail heatmap) ──────────────────

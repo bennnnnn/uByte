@@ -15,6 +15,7 @@ export interface User {
   created_at: string;
   is_admin: number;
   admin_role: string | null;
+  admin_permissions: string | null;
   email_verified: number;
   email_verification_token: string | null;
   email_verification_expires_at?: string | null;
@@ -104,6 +105,7 @@ export interface AdminUserRow {
   last_active_at: string | null;
   is_admin: number;
   admin_role: string | null;
+  admin_permissions: string | null;
   banned: boolean;
   completed_count: number;
   bookmark_count: number;

@@ -95,27 +95,34 @@ function renderMarkdown(md: string): string {
   }
 
   function safeHref(href: string): string {
-    const trimmed = href.trim().toLowerCase();
-    if (trimmed.startsWith("javascript:") || trimmed.startsWith("data:") || trimmed.startsWith("vbscript:")) {
+    // href is already HTML-entity-encoded (from the pre-escape in inline()).
+    // Decode entities only to check the real protocol, then return as-is.
+    const decoded = href.replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">");
+    const lower   = decoded.trim().toLowerCase();
+    if (lower.startsWith("javascript:") || lower.startsWith("data:") || lower.startsWith("vbscript:")) {
       return "#";
     }
-    return esc(href);
+    return href; // already entity-safe
   }
 
-  function inline(s: string): string {
+  function inline(raw: string): string {
+    // Pre-escape ALL HTML entities so bare < > & in the source text can never
+    // inject tags. Replacement callbacks emit trusted HTML tags directly;
+    // captured groups (text/alt/code) are already safe and need no further esc().
+    const s = esc(raw);
     return s
       .replace(/!\[([^\]]*)\]\(([^)]+)\)/g, (_, alt, src) =>
-        `<img src="${safeHref(src)}" alt="${esc(alt)}" class="max-w-full rounded my-2" />`)
+        `<img src="${safeHref(src)}" alt="${alt}" class="max-w-full rounded my-2" />`)
       .replace(/\[([^\]]+)\]\(([^)]+)\)/g, (_, text, href) =>
-        `<a href="${safeHref(href)}" target="_blank" rel="noopener noreferrer" class="text-indigo-600 underline dark:text-indigo-400">${esc(text)}</a>`)
+        `<a href="${safeHref(href)}" target="_blank" rel="noopener noreferrer" class="text-indigo-600 underline dark:text-indigo-400">${text}</a>`)
       .replace(/`([^`]+)`/g, (_, c) =>
-        `<code class="rounded bg-zinc-100 px-1.5 py-0.5 font-mono text-[0.8em] text-zinc-800 dark:bg-zinc-800 dark:text-zinc-200">${esc(c)}</code>`)
-      .replace(/~~(.+?)~~/g, (_, t) => `<del>${esc(t)}</del>`)
-      .replace(/\*\*\*(.+?)\*\*\*/g, (_, t) => `<strong><em>${esc(t)}</em></strong>`)
-      .replace(/\*\*(.+?)\*\*/g, (_, t) => `<strong>${esc(t)}</strong>`)
-      .replace(/__(.+?)__/g, (_, t) => `<strong>${esc(t)}</strong>`)
-      .replace(/\*(.+?)\*/g, (_, t) => `<em>${esc(t)}</em>`)
-      .replace(/_(.+?)_/g, (_, t) => `<em>${esc(t)}</em>`);
+        `<code class="rounded bg-zinc-100 px-1.5 py-0.5 font-mono text-[0.8em] text-zinc-800 dark:bg-zinc-800 dark:text-zinc-200">${c}</code>`)
+      .replace(/~~(.+?)~~/g, (_, t) => `<del>${t}</del>`)
+      .replace(/\*\*\*(.+?)\*\*\*/g, (_, t) => `<strong><em>${t}</em></strong>`)
+      .replace(/\*\*(.+?)\*\*/g, (_, t) => `<strong>${t}</strong>`)
+      .replace(/__(.+?)__/g, (_, t) => `<strong>${t}</strong>`)
+      .replace(/\*(.+?)\*/g, (_, t) => `<em>${t}</em>`)
+      .replace(/_(.+?)_/g, (_, t) => `<em>${t}</em>`);
   }
 
   for (const raw of lines) {

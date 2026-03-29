@@ -16,6 +16,7 @@ import { formatCents } from "./utils";
 import { MONTHLY_PRICE_CENTS, YEARLY_PRICE_CENTS } from "@/lib/plans";
 import type {
   AdminUser,
+  AdminMe,
   TutorialAnalytics,
   AuditEntry,
   StepStat,
@@ -26,6 +27,7 @@ import type {
   RevenuePeriod,
   AdminRevenueStats,
 } from "./types";
+import { TAB_PERMISSION } from "./permission-constants";
 
 /* ── Shared banner / site-settings shapes ───────────────────────────────── */
 
@@ -61,8 +63,11 @@ export function useAdminData() {
   const { user, loading } = useAuth();
   const router = useRouter();
 
+  /* ── State: current admin identity ──────────────────────────────────── */
+  const [adminMe, setAdminMe] = useState<AdminMe | null>(null);
+
   /* ── State: navigation ───────────────────────────────────────────────── */
-  const [tab, setTab] = useState<Tab>("users");
+  const [tab, setTab] = useState<Tab | null>(null);
   const [query, setQuery] = useState("");
 
   /* ── State: core data fetched on mount ───────────────────────────────── */
@@ -121,6 +126,12 @@ export function useAdminData() {
 
     let cancelled = false;
 
+    // Fetch current admin's identity and permissions first
+    const mePromise = fetch("/api/admin/me", { credentials: "same-origin" }).then(async (r) => {
+      if (!r.ok) throw new Error("Forbidden — not an admin");
+      return r.json() as Promise<AdminMe>;
+    });
+
     // Fetch users (may 403 for limited admins — that's expected)
     const usersPromise = fetch("/api/admin/users", { credentials: "same-origin" }).then(async (r) => {
       if (r.status === 403) return null; // limited admin — not an error
@@ -130,6 +141,7 @@ export function useAdminData() {
     });
 
     Promise.all([
+      mePromise,
       usersPromise,
       fetch("/api/admin/users?view=analytics", { credentials: "same-origin" }).then(async (r) => { const d = await r.json(); return r.ok ? d : { analytics: [] }; }),
       fetch("/api/admin/users?view=practice-stats", { credentials: "same-origin" }).then(async (r) => { const d = await r.json(); return r.ok ? d : { stats: [] }; }),
@@ -137,8 +149,17 @@ export function useAdminData() {
       fetch("/api/admin/audit-log", { credentials: "same-origin" }).then(async (r) => { const d = await r.json(); return r.ok ? d : { log: [] }; }),
       fetch("/api/admin/stats?view=subscription-events", { credentials: "same-origin" }).then(async (r) => r.ok ? r.json() : { events: [] }),
     ])
-      .then(([userData, analyticsData, practiceData, revenueData, auditData, eventsData]) => {
+      .then(([meData, userData, analyticsData, practiceData, revenueData, auditData, eventsData]) => {
         if (cancelled) return;
+        setAdminMe(meData);
+        // Default tab to first permitted tab
+        setTab((prev) => {
+          if (prev) return prev;
+          if (meData.isSuperAdmin) return "users";
+          const firstAllowed = meData.permissions[0];
+          const tabForPerm = Object.entries(TAB_PERMISSION).find(([, p]) => p === firstAllowed)?.[0] as Tab | undefined;
+          return tabForPerm ?? "analytics";
+        });
         if (userData) setUsers(userData.users ?? []);
         setAnalytics(analyticsData.analytics ?? []);
         setPracticeStats(practiceData?.stats ?? []);
@@ -374,17 +395,19 @@ export function useAdminData() {
   const totalCompletions = analytics.reduce((s, t) => s + t.completed_count, 0);
   const mrr = revenue ? (revenue.monthlySubscribers * MONTHLY_PRICE_CENTS + revenue.yearlySubscribers * YEARLY_PRICE_CENTS) / 12 : 0;
 
-  // Derive the current admin's role from the users list (null = super / legacy)
-  const currentAdminRow = users.find((u) => u.id === user?.id);
-  const currentAdminRole: string | null = currentAdminRow?.admin_role ?? null;
+  // Role/permissions derived from /api/admin/me (NOT from the user list)
+  const isSuperAdmin = adminMe?.isSuperAdmin ?? false;
+  const currentAdminRole: string | null = isSuperAdmin ? "super" : "limited";
+  const hasPermission = (permission: string): boolean =>
+    isSuperAdmin || (adminMe?.permissions.includes(permission) ?? false);
 
   return {
     /* auth */
     user, loading, router,
-    /* current admin role */
-    currentAdminRole,
+    /* current admin identity / permissions */
+    adminMe, isSuperAdmin, currentAdminRole, hasPermission,
     /* tab nav */
-    tab, setTab, query, setQuery,
+    tab: tab ?? "analytics", setTab, query, setQuery,
     /* core data */
     users, filtered, analytics, practiceStats,
     revenue, revenuePeriod, setRevenuePeriod, revenueSeries, subscriptionEvents,
