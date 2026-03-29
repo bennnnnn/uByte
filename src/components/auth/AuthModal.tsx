@@ -185,7 +185,7 @@ export default function AuthModal({ onClose, initialMode }: Props) {
 
   return createPortal(
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto p-4"
+      className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto p-4 pt-10 sm:items-center sm:pt-4"
       role="dialog"
       aria-modal="true"
       aria-labelledby="auth-modal-title"
@@ -199,7 +199,7 @@ export default function AuthModal({ onClose, initialMode }: Props) {
 
       {/* Card */}
       <Card ref={modalRef} className="relative w-full max-w-[400px] shadow-2xl shadow-zinc-900/10 dark:shadow-none">
-        <div className="p-8">
+        <div className="p-5 sm:p-8">
           <div className="mb-6 flex items-start justify-between gap-4">
             <div>
               <h2
