@@ -252,8 +252,9 @@ function OnboardingInner() {
                 Invite your friends 🎁
               </h1>
               <p className="mb-6 text-zinc-500 dark:text-zinc-400">
-                Refer a friend who goes Pro and you both win — you get{" "}
-                <span className="font-semibold text-zinc-700 dark:text-zinc-300">30 days of AI features free</span>.
+                Refer a friend who goes Pro and you get{" "}
+                <span className="font-semibold text-zinc-700 dark:text-zinc-300">30 days of Pro free</span>{" "}
+                — hints, code feedback, and interview coaching included.
               </p>
 
               <div className="rounded-xl border border-zinc-200 bg-zinc-50 p-5 dark:border-zinc-800 dark:bg-zinc-900">
@@ -296,7 +297,7 @@ function OnboardingInner() {
 
                     {referralData && (
                       <a
-                        href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(`I just joined uByte to level up my coding skills 🚀 — interactive tutorials, interview prep, and AI hints. Try it: ${referralData.shareUrl}`)}`}
+                        href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(`Just joined @ubyte_dev to level up my coding skills 🚀 — free tutorials, interview prep & certifications in 9 languages. Try it: ${referralData.shareUrl}`)}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="mt-3 flex items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700"

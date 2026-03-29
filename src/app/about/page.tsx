@@ -35,7 +35,7 @@ const VALUES = [
   },
   {
     title: "Free for everyone",
-    body: "All tutorials, all interview prep problems, and all certification exams are free. No paywalls on content. Pro unlocks AI-powered hints and code review for those who want to go further, faster.",
+    body: "All tutorials, all interview prep problems, and all certification exams are free. No paywalls on content. Pro adds on-demand hints, code feedback, and interview coaching for those who want to move faster.",
   },
   {
     title: "Proof that travels",

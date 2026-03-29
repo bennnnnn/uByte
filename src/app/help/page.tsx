@@ -17,7 +17,7 @@ const FAQ_ITEMS = [
   {
     question: "Is uByte really free?",
     answer:
-      "Yes. All tutorials, all interview prep problems, and all certification exams are free for every signed-in user — no time limit. Pro is an optional upgrade that adds AI-powered hints, AI code review on practice submissions, and interview simulator AI debrief.",
+      "Yes. All tutorials, all interview prep problems, and all certification exams are free for every signed-in user — no time limit. Pro is an optional upgrade that gives you on-demand hints when you're stuck, detailed code feedback on practice submissions, and a personalized performance debrief after the interview simulator.",
   },
   {
     question: "Do I need to create an account?",
@@ -57,9 +57,9 @@ const FAQ_ITEMS = [
       "The Daily Challenge is a single problem that rotates every day and is free without an account. Interview Prep is a full library of problems you can filter by language, category, and difficulty at any time.",
   },
   {
-    question: "What does AI code review do?",
+    question: "What does code feedback do?",
     answer:
-      "After you submit a solution, Pro users get an AI review that explains what you did well, points out edge cases you may have missed, and suggests a more optimal approach if one exists. It's specific to your code — not a generic solution walkthrough.",
+      "After you submit a solution, Pro users get a detailed code review that explains what you did well, points out edge cases you may have missed, and suggests a more optimal approach if one exists. It's specific to your actual code — not a generic solution walkthrough.",
   },
   // ── Certifications ────────────────────────────────────────────────────────
   {
@@ -81,7 +81,7 @@ const FAQ_ITEMS = [
   {
     question: "What does Pro include?",
     answer:
-      "Pro adds AI-powered hints when you're stuck on a tutorial step, AI code review on every practice submission, interactive AI follow-up chat on practice problems, and the AI debrief after the interview simulator. All content — tutorials, problems, certifications — remains free for everyone.",
+      "Pro adds on-demand hints when you're stuck on a tutorial step, detailed code feedback on every practice submission, the ability to ask follow-up questions after a hint, and a personalized performance debrief after the interview simulator. All content — tutorials, problems, certifications — remains free for everyone.",
   },
   {
     question: "What happens when I cancel Pro?",

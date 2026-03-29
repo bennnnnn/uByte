@@ -180,7 +180,7 @@ export default function UpgradeWall({
               ? subtitle
               : context === "practice"
               ? "Free account. All problems. Start solving now."
-              : "Upgrade to Pro for unlimited tutorials, unlimited interview prep, and AI feedback on every step."}
+              : "Upgrade to Pro for hints when you're stuck, detailed code feedback, and personalized interview coaching."}
           </p>
 
           {/* Plan toggle */}

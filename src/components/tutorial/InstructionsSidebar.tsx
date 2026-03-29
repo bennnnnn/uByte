@@ -120,20 +120,20 @@ export default function InstructionsSidebar({
 
         {status === "failed" && failCount >= 3 && (
           <div className="mt-6 rounded-lg border border-indigo-200 bg-indigo-50 p-4 dark:border-indigo-900 dark:bg-indigo-950/30">
-            <p className="text-sm font-semibold text-indigo-800 dark:text-indigo-300">Want a detailed explanation?</p>
+            <p className="text-sm font-semibold text-indigo-800 dark:text-indigo-300">Want a step-by-step walkthrough?</p>
             <p className="mt-1 text-xs text-indigo-700 dark:text-indigo-400">
-              uByte AI gives you a step-by-step walkthrough of exactly where you went wrong and how to fix it.
+              Pro gives you a detailed breakdown of exactly where you went wrong and how to fix it — no more switching to ChatGPT.
             </p>
             {isPro ? (
               <p className="mt-3 text-xs font-medium text-indigo-600 dark:text-indigo-400">
-                💡 Use the <strong>AI hint</strong> button in the output panel below.
+                💡 Use the <strong>hint</strong> button in the output panel below.
               </p>
             ) : (
               <Link
                 href="/pricing"
                 className="mt-3 inline-block rounded-md bg-indigo-600 px-3 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-indigo-500"
               >
-                Go Pro for AI explanations →
+                Get Pro for instant hints →
               </Link>
             )}
           </div>

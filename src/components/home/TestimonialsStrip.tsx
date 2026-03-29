@@ -9,7 +9,7 @@ const TESTIMONIALS = [
   },
   {
     quote:
-      "Every other platform felt like reading a textbook. Here I was writing real code in the first five minutes. The AI hints are scary good — it feels like having a senior dev next to you.",
+      "Every other platform felt like reading a textbook. Here I was writing real code in the first five minutes. When I got stuck, the hint was exactly what I needed — it feels like having a senior dev next to you.",
     name: "Priya S.",
     role: "Software Engineer",
     avatar: "PS",

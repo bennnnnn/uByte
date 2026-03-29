@@ -91,7 +91,7 @@ export default function InterviewClient() {
         <h1 className="text-3xl font-black text-zinc-900 dark:text-white">Interview Simulator</h1>
         <p className="mt-2 text-zinc-500 dark:text-zinc-400">
           Simulate a real technical interview. You&apos;ll get a random problem, a countdown timer,
-          and an AI debrief after you submit.
+          and a personalized performance debrief after you submit.
         </p>
       </div>
 
@@ -101,7 +101,7 @@ export default function InterviewClient() {
         <ul className="space-y-1 text-sm text-zinc-700 dark:text-zinc-300">
           <li className="flex items-start gap-2"><span className="mt-0.5 text-indigo-400">•</span> A random coding problem matching your chosen difficulty</li>
           <li className="flex items-start gap-2"><span className="mt-0.5 text-indigo-400">•</span> A visible countdown timer — just like a real interview</li>
-          <li className="flex items-start gap-2"><span className="mt-0.5 text-indigo-400">•</span> Full AI debrief after you submit: complexity, style, improvements</li>
+          <li className="flex items-start gap-2"><span className="mt-0.5 text-indigo-400">•</span> Personalized debrief after you submit: complexity, code quality, and specific tips</li>
         </ul>
       </div>
 

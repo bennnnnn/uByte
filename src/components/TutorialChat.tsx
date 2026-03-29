@@ -202,8 +202,8 @@ export default function TutorialChat({ chatSlug, lang, onClose, currentCode, inl
           </p>
         ) : !isPro ? (
           <div className="flex flex-col items-center gap-2 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-center dark:border-amber-800/50 dark:bg-amber-950/20">
-            <p className="text-xs font-semibold text-amber-800 dark:text-amber-300">AI chat is a Pro feature</p>
-            <p className="text-[11px] text-amber-700 dark:text-amber-400">Ask the AI anything about this tutorial step — get instant, context-aware answers.</p>
+            <p className="text-xs font-semibold text-amber-800 dark:text-amber-300">In-depth Q&amp;A is a Pro feature</p>
+            <p className="text-[11px] text-amber-700 dark:text-amber-400">Ask anything about this step and get a clear explanation tailored to exactly what you&apos;re working on.</p>
             <Link
               href="/pricing"
               className="mt-0.5 inline-flex items-center gap-1 rounded-lg bg-amber-600 px-3 py-1.5 text-xs font-bold text-white hover:bg-amber-700"

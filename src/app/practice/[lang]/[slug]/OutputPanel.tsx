@@ -141,7 +141,7 @@ export function OutputPanel({
           <div className="ml-auto px-3">
             {!isPro ? (
               <div className="flex items-center gap-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-1.5 dark:border-amber-800 dark:bg-amber-950/40">
-                <span className="text-xs text-amber-700 dark:text-amber-400">💡 Get a detailed code review —</span>
+                <span className="text-xs text-amber-700 dark:text-amber-400">💡 Get detailed feedback on your code —</span>
                 <a href="/pricing" className="text-xs font-bold text-amber-800 underline underline-offset-2 hover:text-amber-600 dark:text-amber-300">Go Pro →</a>
               </div>
             ) : (
@@ -171,7 +171,7 @@ export function OutputPanel({
             ) : aiUpgradeRequired ? (
               <div className="flex items-center gap-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-1.5 dark:border-amber-800 dark:bg-amber-950/40">
                 <span className="text-xs text-amber-700 dark:text-amber-400">
-                  💡 Get a detailed hint & explanation —
+                  💡 Get a hint to move forward —
                 </span>
                 <a href="/pricing" className="text-xs font-bold text-amber-800 underline underline-offset-2 hover:text-amber-600 dark:text-amber-300">
                   Go Pro →
@@ -462,7 +462,8 @@ export function OutputPanel({
         )}
         {!interviewMode && codeReviewUpgrade && !codeReview && (
           <div className="border-t border-amber-200 bg-amber-50/60 px-4 py-3 dark:border-amber-800 dark:bg-amber-950/20">
-            <p className="text-xs font-semibold text-amber-700 dark:text-amber-300">💡 Get a detailed code review & explanation</p>
+            <p className="text-xs font-semibold text-amber-700 dark:text-amber-300">💡 Get expert feedback on your solution</p>
+            <p className="mt-0.5 text-xs text-amber-600 dark:text-amber-400">See your time & space complexity, what you did well, and where you can improve.</p>
             <a href="/pricing" className="mt-1 inline-block text-xs font-bold text-amber-700 underline underline-offset-2 hover:text-amber-600 dark:text-amber-400">
               Go Pro →
             </a>
@@ -523,9 +524,9 @@ export function OutputPanel({
         {/* Pro upgrade prompt — shown in interview mode when user is not Pro */}
         {interviewMode && !isPro && codeReviewUpgrade && !codeReview && !codeReviewLoading && verdict && (
           <div className="border-t border-amber-200 bg-amber-50/60 px-4 py-4 dark:border-amber-800 dark:bg-amber-950/20">
-            <p className="text-sm font-bold text-amber-800 dark:text-amber-300">🎤 Unlock your interview debrief</p>
+            <p className="text-sm font-bold text-amber-800 dark:text-amber-300">🎤 Get your interview performance breakdown</p>
             <p className="mt-1 text-xs text-amber-700 dark:text-amber-400">
-              Get a HackerRank-style scorecard: hire recommendation, time management feedback, code quality grade, and specific interview tips.
+              Pro gives you a full scorecard: hire recommendation, time management, code quality, and specific tips to sharpen your interview skills.
             </p>
             <a href="/pricing" className="mt-2 inline-block rounded-lg bg-amber-600 px-3 py-1.5 text-xs font-bold text-white hover:bg-amber-700">
               Go Pro →

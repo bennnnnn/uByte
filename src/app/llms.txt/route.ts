@@ -10,7 +10,7 @@ export function GET() {
 
   const body = `# ${APP_NAME}
 
-> ${APP_NAME} is a free interactive coding education platform. All tutorials, interview prep problems, and certification exams are free for every user. Pro plan unlocks AI-powered hints, AI code review, and interview simulator AI debrief. Supports ${allLangs.map((l) => l.name).join(", ")}.
+> ${APP_NAME} is a free interactive coding education platform. All tutorials, interview prep problems, and certification exams are free for every user. Pro plan unlocks on-demand hints when stuck, detailed code feedback on submissions, and a personalized interview performance debrief. Supports ${allLangs.map((l) => l.name).join(", ")}.
 
 ## Site
 
@@ -38,9 +38,10 @@ ${examLangs.map((l) => `- [${l.name} Certification](${BASE_URL}/certifications/$
 
 ## Pro Features (paid)
 
-- AI hints when stuck on a tutorial step
-- AI code review on every practice submission
-- Interview simulator AI debrief
+- Instant hints when stuck on any tutorial step or practice problem
+- Detailed code feedback on every practice submission (complexity, strengths, improvements)
+- Personalized performance debrief after the interview simulator
+- Question-by-question walkthrough after certification exams
 
 ## Other
 

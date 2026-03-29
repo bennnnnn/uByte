@@ -151,7 +151,7 @@ export async function sendWelcomeEmail(to: string, name: string): Promise<void> 
             </td></tr>
             <tr><td style="padding:10px 0;border-bottom:1px solid #e5e7eb">
               <strong>💼 Interview Prep</strong><br>
-              <span style="color:#6b7280;font-size:14px">Solve real interview problems from arrays to dynamic programming. Get instant AI hints.</span>
+              <span style="color:#6b7280;font-size:14px">Solve real interview problems from arrays to dynamic programming — all free.</span>
             </td></tr>
             <tr><td style="padding:10px 0">
               <strong>🏅 Certifications</strong><br>
@@ -271,8 +271,8 @@ export async function sendDay7Email(to: string, name: string): Promise<void> {
             <a href="${BASE_URL}/certifications" style="display:inline-block;padding:12px 24px;background:#4f46e5;color:#fff;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px">Take a certification →</a>
           </div>
           <div style="background:#fff;border:1px solid #e5e7eb;border-radius:10px;padding:20px;margin:16px 0">
-            <p style="margin:0 0 4px;font-weight:700">⚡ Unlock everything with Pro</p>
-            <p style="color:#6b7280;margin:0 0 16px;font-size:14px">Get full access to all tutorials, unlimited interview problems, and AI-powered hints with a Pro subscription.</p>
+            <p style="margin:0 0 4px;font-weight:700">⚡ Get help when you need it — Pro</p>
+            <p style="color:#6b7280;margin:0 0 16px;font-size:14px">Pro gives you hints when you're stuck, detailed code feedback, and a personalized interview debrief. Everything you'd normally Google or ask ChatGPT for, right inside uByte.</p>
             <a href="${BASE_URL}/pricing" style="color:#4f46e5;font-size:14px;font-weight:600">See Pro plans →</a>
           </div>
           <hr style="border:none;border-top:1px solid #e5e7eb;margin:24px 0">
@@ -386,19 +386,23 @@ export async function sendUpgradeEmail(
         </div>
         <div style="background:#f9fafb;padding:32px;border-radius:0 0 12px 12px;border:1px solid #e5e7eb;border-top:none">
           <h2 style="margin:0 0 8px">You're officially Pro, ${firstName}! 🚀</h2>
-          <p style="color:#6b7280">Your <strong>${planLabel}</strong> is now active. Here's everything that's now unlocked:</p>
+          <p style="color:#6b7280">Your <strong>${planLabel}</strong> is now active. Here's what you just unlocked:</p>
           <table style="width:100%;border-collapse:collapse;margin:20px 0">
             <tr><td style="padding:10px 0;border-bottom:1px solid #e5e7eb">
-              <strong>📖 Unlimited tutorials</strong><br>
-              <span style="color:#6b7280;font-size:14px">All languages, all lessons — no limits.</span>
+              <strong>💡 Hints when you're stuck</strong><br>
+              <span style="color:#6b7280;font-size:14px">Hit a wall on any tutorial step or practice problem? Ask for a hint instead of switching tabs.</span>
             </td></tr>
             <tr><td style="padding:10px 0;border-bottom:1px solid #e5e7eb">
-              <strong>💼 Unlimited interview prep</strong><br>
-              <span style="color:#6b7280;font-size:14px">Every practice problem, with AI hints on demand.</span>
+              <strong>🔍 Detailed code feedback</strong><br>
+              <span style="color:#6b7280;font-size:14px">After every practice submission, get a breakdown of your time & space complexity, strengths, and improvements.</span>
+            </td></tr>
+            <tr><td style="padding:10px 0;border-bottom:1px solid #e5e7eb">
+              <strong>🎤 Interview performance debrief</strong><br>
+              <span style="color:#6b7280;font-size:14px">Use the interview simulator and get a full scorecard — hire recommendation, code quality, and interview tips.</span>
             </td></tr>
             <tr><td style="padding:10px 0">
-              <strong>🏅 Certification exams</strong><br>
-              <span style="color:#6b7280;font-size:14px">Take exams, earn verifiable certificates, add them to LinkedIn.</span>
+              <strong>📝 Exam question walkthroughs</strong><br>
+              <span style="color:#6b7280;font-size:14px">After a certification exam, review every question with a clear explanation of the correct answer.</span>
             </td></tr>
           </table>
           <div style="text-align:center;margin:24px 0">
@@ -578,7 +582,7 @@ export async function sendDay30WinBackEmail(to: string, name: string): Promise<v
             <p style="margin:0 0 8px;font-weight:700">What you're missing:</p>
             <table style="width:100%;border-collapse:collapse;font-size:14px;color:#6b7280">
               <tr><td style="padding:6px 0;border-bottom:1px solid #f3f4f6">📖 Interactive coding lessons in 9 languages</td></tr>
-              <tr><td style="padding:6px 0;border-bottom:1px solid #f3f4f6">💼 Real interview questions with AI hints</td></tr>
+              <tr><td style="padding:6px 0;border-bottom:1px solid #f3f4f6">💼 Real interview problems — free to solve</td></tr>
               <tr><td style="padding:6px 0">🏅 Certifications to add to your LinkedIn</td></tr>
             </table>
           </div>
@@ -632,7 +636,7 @@ export async function sendTrialEndingEmail(
             <p style="margin:0 0 4px;font-weight:700;color:${isUrgent ? "#b45309" : "#4f46e5"}">What you'll keep with a subscription:</p>
             <table style="width:100%;border-collapse:collapse;margin:12px 0;font-size:14px;color:#6b7280">
               <tr><td style="padding:6px 0;border-bottom:1px solid #f3f4f6">📖 Unlimited tutorials in all 9 languages</td></tr>
-              <tr><td style="padding:6px 0;border-bottom:1px solid #f3f4f6">💼 All 70+ interview practice problems + AI hints</td></tr>
+              <tr><td style="padding:6px 0;border-bottom:1px solid #f3f4f6">💼 All 70+ interview practice problems + hints when stuck</td></tr>
               <tr><td style="padding:6px 0">🏅 Certification exams + shareable certificates</td></tr>
             </table>
             <a href="${BASE_URL}/pricing" style="display:inline-block;padding:12px 24px;background:${isUrgent ? "#b45309" : "#4f46e5"};color:#fff;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px">

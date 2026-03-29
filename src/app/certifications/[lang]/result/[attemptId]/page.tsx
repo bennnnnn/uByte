@@ -511,8 +511,8 @@ function PracticeExamResultPage() {
             {reviewState === "upgrade" && (
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                  <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">Detailed review is a Pro feature</p>
-                  <p className="mt-0.5 text-xs text-zinc-500 dark:text-zinc-400">Go Pro to see every question, the correct answer, and an explanation of why.</p>
+                  <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">Question-by-question review is a Pro feature</p>
+                  <p className="mt-0.5 text-xs text-zinc-500 dark:text-zinc-400">Go Pro to see every question, the correct answer, and a clear explanation of why — so you actually learn from any mistakes.</p>
                 </div>
                 <Link href="/pricing"
                   className="shrink-0 inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-5 py-2.5 text-sm font-bold text-white shadow-md shadow-indigo-500/20 transition-all hover:-translate-y-0.5 hover:bg-indigo-500">

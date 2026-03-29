@@ -33,7 +33,7 @@ interface Props {
 const COPY: Record<ConversionContext, { headline: string; body: string }> = {
   practice: {
     headline: "Nice work — save your progress!",
-    body: "Create a free account to track solved problems, save your code, and unlock AI hints.",
+    body: "Create a free account to track solved problems, save your code, and get hints when you're stuck.",
   },
   tutorial: {
     headline: "You're on a roll! Keep it going.",

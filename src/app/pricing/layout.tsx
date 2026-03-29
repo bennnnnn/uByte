@@ -4,7 +4,7 @@ import { absoluteUrl, SITE_KEYWORDS } from "@/lib/seo";
 export const metadata: Metadata = {
   title: "uByte Pricing - Coding Tutorials and Interview Prep Plans",
   description:
-    "Upgrade to uByte Pro for unlimited tutorials, interview prep, AI hints, and more. Free and Pro plans available.",
+    "uByte is free — all tutorials, interview prep, and certifications. Upgrade to Pro for hints when you're stuck, detailed code feedback, and mock interview practice.",
   keywords: [
     ...SITE_KEYWORDS,
     "coding course pricing",
@@ -16,7 +16,7 @@ export const metadata: Metadata = {
     type: "website",
     title: "Pricing | uByte",
     description:
-      "Upgrade to uByte Pro for unlimited tutorials, interview prep, AI hints, and more.",
+      "Free to learn. Upgrade to Pro for hints when stuck, code feedback, and mock interview practice.",
     url: absoluteUrl("/pricing"),
     images: [{ url: absoluteUrl("/api/og?title=Pricing&description=Free+and+Pro+plans+for+coding+tutorials+and+certifications"), width: 1200, height: 630 }],
   },
@@ -24,7 +24,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Pricing | uByte",
     description:
-      "Upgrade to uByte Pro for unlimited tutorials, interview prep, AI hints, and more.",
+      "Free to learn. Upgrade to Pro for hints when stuck, code feedback, and mock interview practice.",
     images: [absoluteUrl("/api/og?title=Pricing&description=Free+and+Pro+plans+for+coding+tutorials+and+certifications")],
   },
 };

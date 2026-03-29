@@ -106,8 +106,8 @@ export default function AiFollowUpChat({ submissionId, isPro }: Props) {
     return (
       <div className="mt-2 flex items-center justify-between rounded-lg border border-indigo-100 bg-indigo-50/50 px-3 py-2 dark:border-indigo-900/40 dark:bg-indigo-950/20">
         <p className="text-xs text-zinc-600 dark:text-zinc-400">
-          <span className="font-semibold text-indigo-700 dark:text-indigo-300">Ask a follow-up</span>
-          {" — available on Pro."}
+          <span className="font-semibold text-indigo-700 dark:text-indigo-300">Still have questions?</span>
+          {" Ask a follow-up — Pro feature."}
         </p>
         <Link
           href="/pricing"
@@ -138,7 +138,7 @@ export default function AiFollowUpChat({ submissionId, isPro }: Props) {
             <span className="text-xs font-semibold text-indigo-700 dark:text-indigo-300">
               Ask a follow-up
             </span>
-            <span className="text-[10px] text-zinc-400">Pro · up to 200 questions/day</span>
+            <span className="text-[10px] text-zinc-400">Pro feature</span>
           </div>
 
           {/* Messages */}

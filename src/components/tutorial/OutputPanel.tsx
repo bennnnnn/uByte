@@ -12,7 +12,7 @@ interface Props {
   height: number;
 }
 
-/** Output panel for the tutorial IDE — shows run output, AI hints, and pass/fail state. */
+/** Output panel for the tutorial IDE — shows run output, hints, and pass/fail state. */
 export default function OutputPanel({
   progress,
   expectedOutput,
@@ -99,10 +99,10 @@ export default function OutputPanel({
           {!aiFeedbackLoading && aiFeedbackLoginRequired && !aiFeedbackUpgrade && !aiFeedback && (
             <div className="space-y-1.5">
               <p className="text-xs font-semibold text-indigo-700 dark:text-indigo-300">
-                💡 Sign in to use AI hints
+                💡 Sign in to get hints when you&apos;re stuck
               </p>
               <p className="text-xs text-zinc-600 dark:text-zinc-400">
-                Create a free account to get AI-powered hints when you&apos;re stuck.
+                Create a free account. When you hit a wall, ask for a hint instead of switching tabs.
               </p>
               <div className="flex gap-2">
                 <Link
@@ -125,10 +125,10 @@ export default function OutputPanel({
           {!aiFeedbackLoading && aiFeedbackUpgrade && (
             <div className="space-y-1.5">
               <p className="text-xs font-semibold text-indigo-700 dark:text-indigo-300">
-                💡 AI hints are a Pro feature
+                💡 Hints are a Pro feature
               </p>
               <p className="text-xs text-zinc-600 dark:text-zinc-400">
-                Upgrade to Pro to get AI-powered hints when you&apos;re stuck on any tutorial step or interview problem.
+                Upgrade to Pro for instant hints when you hit a wall — on any tutorial step or practice problem.
               </p>
               <Link
                 href="/pricing"

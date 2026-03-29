@@ -7,14 +7,14 @@ import InterviewClient from "./InterviewClient";
 export const metadata: Metadata = {
   title: "Coding Interview Simulator — Practice Mock Interviews",
   description:
-    "Simulate a real technical interview with a timed coding session in 9 languages. Get an AI-powered debrief on time complexity, code style, and improvement areas.",
+    "Simulate a real technical interview with a timed coding session in 9 languages. Get a personalized performance debrief on time complexity, code style, and improvement areas.",
   keywords: [
     ...SITE_KEYWORDS,
     "mock coding interview",
     "technical interview simulator",
     "coding interview practice",
     "timed coding challenge",
-    "AI code review",
+    "interview feedback",
     "interview prep simulator",
   ],
   alternates: { canonical: absoluteUrl("/interview") },
@@ -23,15 +23,15 @@ export const metadata: Metadata = {
     url: absoluteUrl("/interview"),
     title: "Coding Interview Simulator",
     description:
-      "Timed mock technical interviews in 9 languages. Solve a random problem under pressure, then get AI feedback on complexity, style, and improvements.",
+      "Timed mock technical interviews in 9 languages. Solve a random problem under pressure, then get a personalized debrief on complexity, style, and what to improve.",
     siteName: APP_NAME,
-    images: [{ url: absoluteUrl("/api/og?title=Interview+Simulator&description=Timed+mock+technical+interviews+with+AI+feedback"), width: 1200, height: 630 }],
+    images: [{ url: absoluteUrl("/api/og?title=Interview+Simulator&description=Timed+mock+technical+interviews+with+personalized+feedback"), width: 1200, height: 630 }],
   },
   twitter: {
     card: "summary_large_image",
     title: "Coding Interview Simulator",
-    description: "Timed mock technical interviews in 9 languages with AI feedback after submission.",
-    images: [absoluteUrl("/api/og?title=Interview+Simulator&description=Timed+mock+technical+interviews+with+AI+feedback")],
+    description: "Timed mock technical interviews in 9 languages with a personalized performance debrief.",
+    images: [absoluteUrl("/api/og?title=Interview+Simulator&description=Timed+mock+technical+interviews+with+personalized+feedback")],
   },
 };
 
@@ -62,8 +62,8 @@ export default function InterviewSimulatorPage() {
           Simulate a real coding interview on uByte. Pick your programming
           language, choose a difficulty level, set a time limit, and solve a
           random problem under pressure — just like a real technical interview.
-          After you submit, get an AI-powered debrief covering time complexity,
-          code style, and areas for improvement.
+          After you submit, get a personalized performance debrief covering time complexity,
+          code style, and specific areas for improvement.
         </p>
 
         <section>
@@ -73,7 +73,7 @@ export default function InterviewSimulatorPage() {
             <li>Pick a difficulty: Easy, Medium, or Hard</li>
             <li>Set a time limit: 20, 45, or 60 minutes</li>
             <li>Solve a randomly selected problem with a visible countdown timer</li>
-            <li>Submit your solution and receive an AI-powered code review and debrief</li>
+            <li>Submit your solution and receive a personalized performance debrief</li>
           </ol>
         </section>
 
@@ -82,7 +82,7 @@ export default function InterviewSimulatorPage() {
           <ul>
             <li>Real countdown timer that simulates interview pressure</li>
             <li>Random problem selection — you never know what you will get</li>
-            <li>AI debrief after submission: complexity analysis, style review, and improvement tips</li>
+            <li>Personalized debrief after submission: complexity analysis, style review, and improvement tips</li>
             <li>Practice in 9 programming languages with instant test feedback</li>
           </ul>
         </section>

@@ -72,10 +72,10 @@ export default function ReferralPromptBanner() {
           <span className="mt-0.5 shrink-0 text-2xl">🎁</span>
           <div>
             <p className="text-sm font-bold text-zinc-900 dark:text-zinc-100">
-              Invite a friend, get 1 month of AI features free
+              Invite a friend, get 1 month of Pro free
             </p>
             <p className="mt-0.5 text-xs text-zinc-600 dark:text-zinc-400">
-              Share your link. Every friend who goes Pro extends your access to AI hints, code reviews &amp; interview debriefs by 30 days — no limit.
+              Share your link. Every friend who goes Pro extends your Pro by 30 days — hints, code feedback &amp; interview coaching included. No limit.
             </p>
           </div>
         </div>
