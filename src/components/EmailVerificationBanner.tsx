@@ -39,10 +39,10 @@ export default function EmailVerificationBanner() {
   return (
     <div className="flex items-center justify-between gap-3 border-b border-amber-200 bg-amber-50 px-4 py-2.5 text-sm dark:border-amber-900/60 dark:bg-amber-950/40">
       <p className="text-amber-800 dark:text-amber-300">
-        Please verify your email address to unlock all features.{" "}
+        Verify your email to lock in your progress and appear on the leaderboard.{" "}
         {sent ? (
           <span className="font-medium text-amber-700 dark:text-amber-400">
-            Verification email sent — check your inbox.
+            Check your inbox — verification email sent.
           </span>
         ) : (
           <button

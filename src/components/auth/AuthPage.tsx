@@ -244,16 +244,19 @@ export default function AuthPage({ variant }: { variant: AuthPageMode }) {
               <>
                 <a
                   href={googleHref}
-                  className="mt-6 flex w-full items-center justify-center gap-3 rounded-2xl border border-zinc-200 bg-surface-card px-4 py-3 text-sm font-semibold text-zinc-800 transition-colors hover:border-zinc-300 hover:bg-white dark:border-zinc-800 dark:text-zinc-100 dark:hover:border-zinc-700"
+                  className="mt-6 flex w-full items-center justify-center gap-3 rounded-2xl bg-indigo-600 px-4 py-3.5 text-sm font-semibold text-white shadow-md shadow-indigo-500/20 transition-all hover:-translate-y-0.5 hover:bg-indigo-500"
                 >
-                  <GoogleIcon className="h-5 w-5 shrink-0" />
+                  <GoogleIcon className="h-5 w-5 shrink-0 brightness-0 invert" />
                   Continue with Google
                 </a>
+                <p className="mt-2 text-center text-xs text-zinc-400 dark:text-zinc-500">
+                  Fastest way — no fake email, no password to forget
+                </p>
 
                 <div className="my-5 flex items-center gap-3">
                   <div className="h-px flex-1 bg-zinc-200 dark:bg-zinc-800" />
                   <span className="text-xs font-bold uppercase tracking-[0.18em] text-zinc-400">
-                    OR
+                    or use email
                   </span>
                   <div className="h-px flex-1 bg-zinc-200 dark:bg-zinc-800" />
                 </div>
