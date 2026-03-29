@@ -396,3 +396,10 @@ export async function unsubscribeByEmail(email: string): Promise<boolean> {
   const rows = await sql`UPDATE users SET email_marketing = 0 WHERE email = ${email} RETURNING id`;
   return rows.length > 0;
 }
+
+/** Persist the ISO-3166-1 alpha-2 country code detected from the user's IP.
+ *  Only writes when the stored value differs, avoiding unnecessary DB writes. */
+export async function updateUserCountry(userId: number, country: string): Promise<void> {
+  const sql = getSql();
+  await sql`UPDATE users SET country = ${country} WHERE id = ${userId} AND (country IS NULL OR country != ${country})`;
+}

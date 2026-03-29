@@ -15,7 +15,7 @@ export async function getLeaderboard(limit = 20, period: LeaderboardPeriod = "al
 
   const rows = await sql`
     SELECT
-      u.id, u.name, u.avatar, u.xp, u.streak_days,
+      u.id, u.name, u.avatar, u.xp, u.streak_days, u.country,
       COALESCE(p.completed_count, 0)::int AS completed_count,
       COALESCE(pa.problems_solved, 0)::int AS problems_solved
     FROM users u

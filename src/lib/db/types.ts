@@ -39,6 +39,7 @@ export interface LeaderboardEntry {
   streak_days: number;
   completed_count: number;
   problems_solved: number;
+  country: string | null;
 }
 
 export interface Rating {

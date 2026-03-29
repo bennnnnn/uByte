@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import Avatar from "@/components/Avatar";
 import { Button } from "@/components/ui";
@@ -14,15 +14,23 @@ interface LeaderboardEntry {
   streak_days: number;
   completed_count: number;
   problems_solved: number;
+  country: string | null;
 }
 
 type Period = "all" | "week";
 
+/** Convert an ISO-3166-1 alpha-2 code to an emoji flag (works on macOS/iOS/Android; Windows 11+). */
+function countryFlag(code: string | null): string {
+  if (!code || code.length !== 2) return "";
+  const offset = 0x1F1E6 - 65; // regional indicator A starts at U+1F1E6
+  return String.fromCodePoint(code.charCodeAt(0) + offset, code.charCodeAt(1) + offset);
+}
+
 function Medal({ rank }: { rank: number }) {
-  if (rank === 1) return <span className="text-xl">🥇</span>;
-  if (rank === 2) return <span className="text-xl">🥈</span>;
-  if (rank === 3) return <span className="text-xl">🥉</span>;
-  return <span className="w-7 text-center text-sm font-mono text-zinc-400">{rank}</span>;
+  if (rank === 1) return <span className="text-xl leading-none">🥇</span>;
+  if (rank === 2) return <span className="text-xl leading-none">🥈</span>;
+  if (rank === 3) return <span className="text-xl leading-none">🥉</span>;
+  return <span className="w-6 text-center text-sm font-mono text-zinc-400">{rank}</span>;
 }
 
 export default function LeaderboardClient() {
@@ -32,28 +40,31 @@ export default function LeaderboardClient() {
   const [error, setError] = useState("");
   const [period, setPeriod] = useState<Period>("all");
 
-  useEffect(() => {
-    let cancelled = false;
-    queueMicrotask(() => { if (!cancelled) setLoading(true); });
-    const url = period === "week" ? "/api/leaderboard?period=week" : "/api/leaderboard";
+  const fetchLeaderboard = useCallback((p: Period) => {
+    setLoading(true);
+    setError("");
+    const url = p === "week" ? "/api/leaderboard?period=week" : "/api/leaderboard";
     fetch(url, { credentials: "same-origin" })
       .then(async (res) => {
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data = await res.json();
-        if (!cancelled) setUsers(data.users ?? []);
+        setUsers(data.users ?? []);
       })
-      .catch((err) => { if (!cancelled) setError(err.message); })
-      .finally(() => { if (!cancelled) setLoading(false); });
-    return () => { cancelled = true; };
-  }, [period]);
+      .catch((err: unknown) => setError(err instanceof Error ? err.message : String(err)))
+      .finally(() => setLoading(false));
+  }, []);
+
+  useEffect(() => {
+    fetchLeaderboard(period);
+  }, [period, fetchLeaderboard]);
 
   if (loading) {
     return (
-      <div className="mx-auto max-w-3xl animate-pulse px-4 py-12 sm:px-6">
-        <div className="mb-6 h-8 w-48 rounded bg-zinc-200 dark:bg-zinc-800" />
-        <div className="space-y-3">
+      <div className="mx-auto max-w-2xl animate-pulse px-4 py-10 sm:px-6">
+        <div className="mb-6 h-7 w-40 rounded bg-zinc-200 dark:bg-zinc-800" />
+        <div className="space-y-2">
           {[...Array(10)].map((_, i) => (
-            <div key={i} className="h-16 rounded-xl bg-zinc-100 dark:bg-zinc-900" />
+            <div key={i} className="h-14 rounded-xl bg-zinc-100 dark:bg-zinc-900" />
           ))}
         </div>
       </div>
@@ -65,23 +76,7 @@ export default function LeaderboardClient() {
       <div className="flex min-h-[50vh] flex-col items-center justify-center gap-4 px-4">
         <p className="text-sm text-red-500 dark:text-red-400">{error}</p>
         <div className="flex flex-wrap justify-center gap-3">
-          <Button
-            type="button"
-            size="lg"
-            onClick={() => {
-              setError("");
-              setLoading(true);
-              const u = period === "week" ? "/api/leaderboard?period=week" : "/api/leaderboard";
-            fetch(u, { credentials: "same-origin" })
-                .then(async (res) => {
-                  if (!res.ok) throw new Error(`HTTP ${res.status}`);
-                  const data = await res.json();
-                  setUsers(data.users ?? []);
-                })
-                .catch((err) => setError(err.message))
-                .finally(() => setLoading(false));
-            }}
-          >
+          <Button type="button" size="lg" onClick={() => fetchLeaderboard(period)}>
             Retry
           </Button>
           <Link
@@ -96,36 +91,34 @@ export default function LeaderboardClient() {
   }
 
   return (
-    <div className="mx-auto max-w-3xl px-4 py-12 sm:px-6">
-      <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
+    <div className="mx-auto max-w-2xl px-3 py-8 sm:px-6 sm:py-12">
+      {/* Header */}
+      <div className="mb-5 flex flex-wrap items-start justify-between gap-3 sm:items-center">
         <div>
-          <h1 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100">Leaderboard</h1>
-          <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
-            Top 20 learners by XP · earn XP completing tutorials and solving interview prep problems
+          <h1 className="text-xl font-bold text-zinc-900 sm:text-2xl dark:text-zinc-100">Leaderboard</h1>
+          <p className="mt-0.5 text-xs text-zinc-500 sm:text-sm dark:text-zinc-400">
+            Top 20 learners by XP
           </p>
         </div>
         <div className="flex rounded-lg border border-zinc-200 bg-zinc-50 p-0.5 dark:border-zinc-700 dark:bg-zinc-800">
-          <button
-            type="button"
-            onClick={() => setPeriod("all")}
-            className={`rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
-              period === "all" ? "bg-white text-zinc-900 shadow dark:bg-zinc-700 dark:text-zinc-100" : "text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-200"
-            }`}
-          >
-            All time
-          </button>
-          <button
-            type="button"
-            onClick={() => setPeriod("week")}
-            className={`rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
-              period === "week" ? "bg-white text-zinc-900 shadow dark:bg-zinc-700 dark:text-zinc-100" : "text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-200"
-            }`}
-          >
-            This week
-          </button>
+          {(["all", "week"] as Period[]).map((p) => (
+            <button
+              key={p}
+              type="button"
+              onClick={() => setPeriod(p)}
+              className={`rounded-md px-3 py-1.5 text-xs font-medium transition-colors sm:text-sm ${
+                period === p
+                  ? "bg-white text-zinc-900 shadow dark:bg-zinc-700 dark:text-zinc-100"
+                  : "text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-200"
+              }`}
+            >
+              {p === "all" ? "All time" : "This week"}
+            </button>
+          ))}
         </div>
       </div>
 
+      {/* Table */}
       <div className="overflow-hidden rounded-xl border border-zinc-200 dark:border-zinc-800">
         {users.length === 0 ? (
           <p className="px-6 py-12 text-center text-sm text-zinc-400">
@@ -135,38 +128,63 @@ export default function LeaderboardClient() {
           <ul className="divide-y divide-zinc-100 dark:divide-zinc-800">
             {users.map((u, i) => {
               const isYou = user && u.id === user.id;
+              const flag = countryFlag(u.country);
               return (
                 <li
                   key={u.id}
-                  className={`flex items-center gap-4 px-4 py-3 transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-900 ${
-                    isYou ? "bg-indigo-50/80 dark:bg-indigo-950/30 ring-inset ring-1 ring-indigo-200 dark:ring-indigo-800" : ""
+                  className={`flex items-center gap-2 px-3 py-3 transition-colors hover:bg-zinc-50 sm:gap-4 sm:px-4 dark:hover:bg-zinc-900/60 ${
+                    isYou ? "bg-indigo-50/80 ring-inset ring-1 ring-indigo-200 dark:bg-indigo-950/30 dark:ring-indigo-800" : ""
                   }`}
                 >
-                  <div className="flex w-7 items-center justify-center">
+                  {/* Rank */}
+                  <div className="flex w-6 shrink-0 items-center justify-center sm:w-7">
                     <Medal rank={i + 1} />
                   </div>
 
-                  <Avatar avatarKey={u.avatar || "gopher"} size="sm" />
+                  {/* Avatar */}
+                  <div className="shrink-0">
+                    <Avatar avatarKey={u.avatar || "gopher"} size="sm" />
+                  </div>
 
+                  {/* Name + stats */}
                   <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-2">
-                      <Link href={`/u/${u.id}`} className="truncate font-medium text-zinc-900 hover:text-indigo-600 dark:text-zinc-100 dark:hover:text-indigo-400" title={u.name}>{u.name}</Link>
+                    <div className="flex flex-wrap items-center gap-x-1.5 gap-y-0.5">
+                      <Link
+                        href={`/u/${u.id}`}
+                        className="truncate font-medium text-zinc-900 hover:text-indigo-600 dark:text-zinc-100 dark:hover:text-indigo-400"
+                        title={u.name}
+                      >
+                        {u.name}
+                      </Link>
+                      {flag && (
+                        <span className="text-base leading-none" title={u.country ?? undefined} aria-label={`From ${u.country}`}>
+                          {flag}
+                        </span>
+                      )}
                       {isYou && (
                         <span className="shrink-0 rounded bg-indigo-100 px-1.5 py-0.5 text-[10px] font-semibold text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-300">
                           You
                         </span>
                       )}
                     </div>
-                    <p className="text-xs text-zinc-400">
-                      {u.completed_count} tutorial{u.completed_count !== 1 ? "s" : ""} ·{" "}
-                      {u.problems_solved ?? 0} problem{(u.problems_solved ?? 0) !== 1 ? "s" : ""} solved ·{" "}
-                      {u.streak_days}d streak
+                    {/* Stats — abbreviated on mobile */}
+                    <p className="mt-0.5 text-[11px] text-zinc-400 sm:text-xs">
+                      <span className="sm:hidden">
+                        {u.completed_count}t · {u.problems_solved ?? 0}p · {u.streak_days}d
+                      </span>
+                      <span className="hidden sm:inline">
+                        {u.completed_count} tutorial{u.completed_count !== 1 ? "s" : ""} ·{" "}
+                        {u.problems_solved ?? 0} problem{(u.problems_solved ?? 0) !== 1 ? "s" : ""} solved ·{" "}
+                        {u.streak_days}d streak
+                      </span>
                     </p>
                   </div>
 
-                  <div className="text-right">
-                    <p className="font-mono font-semibold text-indigo-600 dark:text-indigo-400">
-                      {u.xp.toLocaleString()} XP
+                  {/* XP */}
+                  <div className="shrink-0 text-right">
+                    <p className="font-mono text-sm font-semibold text-indigo-600 sm:text-base dark:text-indigo-400">
+                      {u.xp.toLocaleString()}
+                      <span className="ml-0.5 text-[10px] font-normal text-zinc-400 sm:text-xs"> XP</span>
                     </p>
                   </div>
                 </li>
@@ -176,10 +194,9 @@ export default function LeaderboardClient() {
         )}
       </div>
 
-      {/* "Not on the list" nudge — shown when user is logged in but not in the top results.
-          Helps new users understand how to appear here instead of wondering why they're absent. */}
+      {/* Not on the list nudge */}
       {user && users.length > 0 && !users.some((u) => u.id === user.id) && (
-        <div className="mt-4 rounded-xl border border-dashed border-zinc-200 px-5 py-4 text-center dark:border-zinc-700">
+        <div className="mt-4 rounded-xl border border-dashed border-zinc-200 px-4 py-4 text-center dark:border-zinc-700">
           <p className="text-sm font-medium text-zinc-600 dark:text-zinc-400">
             You&apos;re not on the leaderboard yet.
           </p>
