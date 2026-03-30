@@ -350,7 +350,7 @@ export default function InteractiveTutorial({
           {(isMobile ? mobileTab === "discuss" : leftTab === "discuss") && (
             <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
               <DiscussionThread
-                slug={`tutorial:${lang}:${tutorialSlug}`}
+                slug={`tutorial:${lang}:${tutorialSlug}:${stepProgress.stepIndex}`}
                 currentUserId={user?.id ?? null}
                 isSignedIn={!!user}
               />
