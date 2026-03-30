@@ -71,3 +71,39 @@ export async function getTutorialRating(
     user_vote: userVote,
   };
 }
+
+/**
+ * Returns a slug → {thumbs_up, thumbs_down} map for all tutorials in a language.
+ * Merges both the legacy `ratings` table and the newer `tutorial_ratings` table.
+ * Used by the tutorial listing page to show satisfaction scores on cards.
+ */
+export async function getTutorialRatingsByLang(
+  lang: string,
+): Promise<Record<string, { thumbs_up: number; thumbs_down: number }>> {
+  await ensureRatingsSchema();
+  const sql = getSql();
+  const rows = await sql`
+    SELECT tutorial_slug,
+      SUM(CASE WHEN value = 1  THEN 1 ELSE 0 END)::int AS thumbs_up,
+      SUM(CASE WHEN value = -1 THEN 1 ELSE 0 END)::int AS thumbs_down
+    FROM ratings
+    WHERE language = ${lang}
+    GROUP BY tutorial_slug
+    UNION ALL
+    SELECT tutorial_slug,
+      SUM(CASE WHEN rating = 1  THEN 1 ELSE 0 END)::int AS thumbs_up,
+      SUM(CASE WHEN rating = -1 THEN 1 ELSE 0 END)::int AS thumbs_down
+    FROM tutorial_ratings
+    WHERE lang = ${lang}
+    GROUP BY tutorial_slug
+  `;
+
+  const map: Record<string, { thumbs_up: number; thumbs_down: number }> = {};
+  for (const row of rows) {
+    const slug = row.tutorial_slug as string;
+    if (!map[slug]) map[slug] = { thumbs_up: 0, thumbs_down: 0 };
+    map[slug].thumbs_up  += (row.thumbs_up  as number) ?? 0;
+    map[slug].thumbs_down += (row.thumbs_down as number) ?? 0;
+  }
+  return map;
+}

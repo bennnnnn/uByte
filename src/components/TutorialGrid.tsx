@@ -27,12 +27,15 @@ export default function TutorialGrid({
   tutorials,
   stepCountBySlug = {},
   totalLessons,
+  ratingsBySlug = {},
 }: {
   lang: string;
   tutorials: Tutorial[];
   stepCountBySlug?: Record<string, number>;
   /** Pre-computed total from getTotalLessonCount — must match the LangCard badge. */
   totalLessons?: number;
+  /** Aggregate thumbs ratings keyed by tutorial slug (server-fetched). */
+  ratingsBySlug?: Record<string, { thumbs_up: number; thumbs_down: number }>;
 }) {
   const { user, progressByLang, stepCountByLang } = useAuth();
 
@@ -157,10 +160,31 @@ export default function TutorialGrid({
                 <p className="text-sm leading-relaxed text-zinc-600 dark:text-zinc-300">
                   {tutorial.description}
                 </p>
-                <div className="mt-3 flex items-center gap-2">
+                <div className="mt-3 flex items-center gap-2 flex-wrap">
                   <span className={`rounded-full px-2.5 py-0.5 text-xs font-medium capitalize ${DIFFICULTY_STYLES[tutorial.difficulty]}`}>
                     {tutorial.difficulty}
                   </span>
+                  {(() => {
+                    const r = ratingsBySlug[tutorial.slug];
+                    if (!r) return null;
+                    const total = r.thumbs_up + r.thumbs_down;
+                    if (total < 3) return null; // not enough votes to show
+                    const pct = Math.round((r.thumbs_up / total) * 100);
+                    return (
+                      <span
+                        title={`${r.thumbs_up} helpful · ${r.thumbs_down} not helpful`}
+                        className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${
+                          pct >= 75
+                            ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-400"
+                            : pct >= 50
+                            ? "bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-400"
+                            : "bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-400"
+                        }`}
+                      >
+                        👍 {pct}%
+                      </span>
+                    );
+                  })()}
                 </div>
               </Link>
             );

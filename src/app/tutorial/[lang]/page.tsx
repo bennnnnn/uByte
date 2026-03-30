@@ -10,6 +10,7 @@ import { absoluteUrl, buildBreadcrumbJsonLd } from "@/lib/seo";
 import TutorialGrid from "@/components/TutorialGrid";
 import TutorialLangHero from "@/components/tutorial/TutorialLangHero";
 import type { SupportedLanguage } from "@/lib/languages/types";
+import { getTutorialRatingsByLang } from "@/lib/db/ratings";
 
 const LANG_SEO_INTRO: Record<string, { whyLearn: string; whatYoullLearn: string; whoIsItFor: string }> = {
   go: {
@@ -123,6 +124,13 @@ export default async function TutorialLangLandingPage({
   const stepCountBySlug = Object.fromEntries(
     tutorials.map((t) => [t.slug, getSteps(lang as SupportedLanguage, t.slug).length])
   );
+
+  // Fetch aggregate ratings for all tutorials in this language (best-effort)
+  let ratingsBySlug: Record<string, { thumbs_up: number; thumbs_down: number }> = {};
+  try {
+    ratingsBySlug = await getTutorialRatingsByLang(lang);
+  } catch { /* non-critical — show cards without ratings */ }
+
   const canonical = absoluteUrl(tutorialLangUrl(lang));
   const courseJsonLd = {
     "@context": "https://schema.org",
@@ -170,7 +178,7 @@ export default async function TutorialLangLandingPage({
           <h2 className="mb-5 text-xl font-semibold text-zinc-900 dark:text-zinc-100">
             All Tutorials
           </h2>
-          <TutorialGrid lang={lang} tutorials={tutorials} stepCountBySlug={stepCountBySlug} totalLessons={totalLessons} />
+          <TutorialGrid lang={lang} tutorials={tutorials} stepCountBySlug={stepCountBySlug} totalLessons={totalLessons} ratingsBySlug={ratingsBySlug} />
         </>
       ) : (
         <div className="rounded-2xl border border-zinc-200 bg-zinc-50/50 px-8 py-12 text-center dark:border-zinc-800 dark:bg-zinc-900/50">

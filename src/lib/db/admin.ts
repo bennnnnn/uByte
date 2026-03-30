@@ -178,15 +178,38 @@ export async function adminUnbanUser(userId: number): Promise<void> {
 
 export async function getAdminTutorialAnalytics(): Promise<AdminTutorialRow[]> {
   const sql = getSql();
+  // Union both rating tables so votes from InlineRatingNudge/CongratsModal
+  // (tutorial_ratings) and the sidebar widget (ratings) are both counted.
   const rows = await sql`
     SELECT
-      p.tutorial_slug AS slug,
-      COUNT(p.user_id)::int AS completed_count,
-      COALESCE(SUM(CASE WHEN r.vote = 1 THEN 1 ELSE 0 END)::int, 0) AS thumbs_up,
-      COALESCE(SUM(CASE WHEN r.vote = -1 THEN 1 ELSE 0 END)::int, 0) AS thumbs_down
-    FROM progress p
-    LEFT JOIN ratings r ON r.tutorial_slug = p.tutorial_slug AND r.user_id = p.user_id
-    GROUP BY p.tutorial_slug
+      slug,
+      MAX(completed_count)::int AS completed_count,
+      SUM(thumbs_up)::int      AS thumbs_up,
+      SUM(thumbs_down)::int    AS thumbs_down
+    FROM (
+      -- Legacy ratings table (sidebar TutorialRating widget)
+      SELECT
+        p.tutorial_slug AS slug,
+        COUNT(DISTINCT p.user_id)::int AS completed_count,
+        COALESCE(SUM(CASE WHEN r.value = 1  THEN 1 ELSE 0 END), 0)::int AS thumbs_up,
+        COALESCE(SUM(CASE WHEN r.value = -1 THEN 1 ELSE 0 END), 0)::int AS thumbs_down
+      FROM progress p
+      LEFT JOIN ratings r
+        ON r.tutorial_slug = p.tutorial_slug AND r.user_id = p.user_id
+      GROUP BY p.tutorial_slug
+
+      UNION ALL
+
+      -- Newer tutorial_ratings table (InlineRatingNudge + CongratsModal)
+      SELECT
+        tutorial_slug AS slug,
+        0::int AS completed_count,
+        SUM(CASE WHEN rating = 1  THEN 1 ELSE 0 END)::int AS thumbs_up,
+        SUM(CASE WHEN rating = -1 THEN 1 ELSE 0 END)::int AS thumbs_down
+      FROM tutorial_ratings
+      GROUP BY tutorial_slug
+    ) combined
+    GROUP BY slug
     ORDER BY completed_count DESC
   `;
   return rows as AdminTutorialRow[];
