@@ -343,7 +343,7 @@ export default function InteractiveTutorial({
               steps={currentSteps}
               progress={stepProgress}
               tutorialSlug={tutorialSlug}
-              nextTutorial={next ? { slug: next.slug, steps: allTutorialSteps[next.slug] ?? [] } : null}
+              nextTutorial={next ? { slug: next.slug, title: next.title, steps: allTutorialSteps[next.slug] ?? [] } : null}
             />
           )}
 
