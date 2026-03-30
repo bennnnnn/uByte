@@ -12,6 +12,7 @@ import {
   createPost,
   getPostById,
   findUsersByNames,
+  getThreadParticipants,
 } from "@/lib/db/discussion";
 import { createNotification } from "@/lib/db/notifications";
 import { getCurrentUser } from "@/lib/auth";
@@ -113,15 +114,35 @@ export const POST = withErrorHandling(
       await Promise.all(
         mentioned
           .filter((m) => m.id !== user.userId && !alreadyNotified.has(m.id))
-          .map((m) =>
-            createNotification(
+          .map((m) => {
+            alreadyNotified.add(m.id);
+            return createNotification(
               m.id,
               "mention",
               `${authorName} mentioned you`,
               `On "${problemTitle}": "${preview}"`,
               pageUrl,
-            )
-          )
+            );
+          })
+      );
+    }
+
+    // 3. Thread participant notifications — anyone else who posted/replied in the same thread
+    if (parentId) {
+      const participants = await getThreadParticipants(parentId, user.userId);
+      await Promise.all(
+        participants
+          .filter((p) => !alreadyNotified.has(p.id))
+          .map((p) => {
+            alreadyNotified.add(p.id);
+            return createNotification(
+              p.id,
+              "reply",
+              `${authorName} also replied in a thread you're in`,
+              `On "${problemTitle}": "${preview}"`,
+              pageUrl,
+            );
+          })
       );
     }
 

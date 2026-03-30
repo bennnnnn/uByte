@@ -11,6 +11,7 @@ interface Post {
   parent_id: number | null;
   body: string;
   created_at: string;
+  updated_at?: string | null;
   author_name: string | null;
   reply_count: number;
   replies?: Post[];
@@ -253,6 +254,7 @@ function PostCard({
   rootPostId,
   onReplySubmit,
   onDelete,
+  onEdit,
   onToggleReplies,
   onLoadReplies,
 }: {
@@ -264,6 +266,7 @@ function PostCard({
   rootPostId?: number;
   onReplySubmit: (parentId: number, text: string, replyToUserId?: number | null) => Promise<void>;
   onDelete: (postId: number) => void;
+  onEdit: (postId: number, newBody: string) => Promise<void>;
   onToggleReplies: (postId: number) => void;
   onLoadReplies: (postId: number) => Promise<void>;
 }) {
@@ -272,8 +275,13 @@ function PostCard({
   const [replyToUserId, setReplyToUserId] = useState<number | null>(null);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [reporting, setReporting] = useState(false);
+  const [editing, setEditing] = useState(false);
+  const [editText, setEditText] = useState(post.body);
+  const [editBusy, setEditBusy] = useState(false);
+  const [editErr, setEditErr] = useState("");
 
   const canDelete = currentUserId && post.user_id === currentUserId;
+  const isOwnPost = currentUserId !== null && post.user_id === currentUserId;
   // The effective parent for new replies
   const replyParentId = isReply ? (rootPostId ?? post.id) : post.id;
 
@@ -321,15 +329,57 @@ function PostCard({
           <span className="text-[10px] text-zinc-400">{timeAgo(post.created_at)}</span>
         </div>
 
-        {/* Body */}
-        <p className="whitespace-pre-wrap break-words text-sm leading-relaxed text-zinc-700 dark:text-zinc-300">
-          <BodyText text={post.body} />
-        </p>
+        {/* Body / inline editor */}
+        {editing ? (
+          <div className="space-y-2">
+            <textarea
+              value={editText}
+              onChange={(e) => setEditText(e.target.value)}
+              rows={3}
+              maxLength={2000}
+              autoFocus
+              className="w-full resize-none rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm leading-relaxed text-zinc-900 placeholder-zinc-400 focus:border-indigo-300 focus:outline-none focus:ring-2 focus:ring-indigo-100 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
+            />
+            {editErr && <p className="text-xs text-red-500">{editErr}</p>}
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                disabled={editBusy || !editText.trim()}
+                onClick={async () => {
+                  setEditBusy(true); setEditErr("");
+                  try {
+                    await onEdit(post.id, editText.trim());
+                    setEditing(false);
+                  } catch (e: unknown) {
+                    setEditErr(e instanceof Error ? e.message : "Failed to save.");
+                  } finally { setEditBusy(false); }
+                }}
+                className="rounded-lg bg-indigo-600 px-4 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-indigo-700 disabled:opacity-50"
+              >
+                {editBusy ? "Saving…" : "Save"}
+              </button>
+              <button
+                type="button"
+                onClick={() => { setEditing(false); setEditText(post.body); setEditErr(""); }}
+                className="rounded-lg px-3 py-1.5 text-xs text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        ) : (
+          <p className="whitespace-pre-wrap break-words text-sm leading-relaxed text-zinc-700 dark:text-zinc-300">
+            <BodyText text={post.body} />
+            {post.updated_at && (
+              <span className="ml-1.5 text-[10px] text-zinc-400">(edited)</span>
+            )}
+          </p>
+        )}
 
         {/* Actions */}
         <div className="mt-1.5 flex flex-wrap items-center gap-3">
-          {/* Reply button — available on all posts (including replies) */}
-          {isSignedIn && (
+          {/* Reply button — only shown to other users, not the post's own author */}
+          {isSignedIn && !isOwnPost && (
             <button
               type="button"
               onClick={() => {
@@ -382,22 +432,31 @@ function PostCard({
             <ReportPicker postId={post.id} onClose={() => setReporting(false)} />
           )}
 
-          {canDelete && !reporting && (
-            confirmDelete ? (
-              <span className="flex items-center gap-1.5 text-[11px]">
-                <span className="text-zinc-400">Delete?</span>
-                <button type="button" onClick={() => onDelete(post.id)} className="font-medium text-red-500 hover:text-red-700">Yes</button>
-                <button type="button" onClick={() => setConfirmDelete(false)} className="text-zinc-400 hover:text-zinc-600">No</button>
-              </span>
-            ) : (
+          {canDelete && !reporting && !editing && (
+            <>
               <button
                 type="button"
-                onClick={() => setConfirmDelete(true)}
-                className="text-[11px] text-zinc-300 transition-colors hover:text-red-500 dark:text-zinc-600"
+                onClick={() => { setEditing(true); setEditText(post.body); }}
+                className="text-[11px] text-zinc-300 transition-colors hover:text-indigo-500 dark:text-zinc-600"
               >
-                Delete
+                Edit
               </button>
-            )
+              {confirmDelete ? (
+                <span className="flex items-center gap-1.5 text-[11px]">
+                  <span className="text-zinc-400">Delete?</span>
+                  <button type="button" onClick={() => onDelete(post.id)} className="font-medium text-red-500 hover:text-red-700">Yes</button>
+                  <button type="button" onClick={() => setConfirmDelete(false)} className="text-zinc-400 hover:text-zinc-600">No</button>
+                </span>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => setConfirmDelete(true)}
+                  className="text-[11px] text-zinc-300 transition-colors hover:text-red-500 dark:text-zinc-600"
+                >
+                  Delete
+                </button>
+              )}
+            </>
           )}
         </div>
 
@@ -436,6 +495,7 @@ function PostCard({
                   rootPostId={post.id}
                   onReplyTo={handleReplyToReply}
                   onDelete={onDelete}
+                  onEdit={onEdit}
                 />
               ))
             )}
@@ -454,6 +514,7 @@ function ReplyCard({
   rootPostId,
   onReplyTo,
   onDelete,
+  onEdit,
 }: {
   post: Post;
   currentUserId: number | null;
@@ -462,10 +523,16 @@ function ReplyCard({
   /** Called when the user clicks "Reply" — parent PostCard handles the compose */
   onReplyTo: (authorName: string, authorId: number | null) => void;
   onDelete: (postId: number) => void;
+  onEdit: (postId: number, newBody: string) => Promise<void>;
 }) {
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [reporting, setReporting] = useState(false);
+  const [editing, setEditing] = useState(false);
+  const [editText, setEditText] = useState(post.body);
+  const [editBusy, setEditBusy] = useState(false);
+  const [editErr, setEditErr] = useState("");
   const canDelete = currentUserId && post.user_id === currentUserId;
+  const isOwnPost = currentUserId !== null && post.user_id === currentUserId;
   const authorHref = post.user_id ? `/u/${post.user_id}` : null;
 
   void rootPostId; // used by parent for submit routing
@@ -496,12 +563,55 @@ function ReplyCard({
           <span className="text-[10px] text-zinc-400">{timeAgo(post.created_at)}</span>
         </div>
 
-        <p className="whitespace-pre-wrap break-words text-sm leading-relaxed text-zinc-700 dark:text-zinc-300">
-          <BodyText text={post.body} />
-        </p>
+        {editing ? (
+          <div className="space-y-2">
+            <textarea
+              value={editText}
+              onChange={(e) => setEditText(e.target.value)}
+              rows={3}
+              maxLength={2000}
+              autoFocus
+              className="w-full resize-none rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm leading-relaxed text-zinc-900 placeholder-zinc-400 focus:border-indigo-300 focus:outline-none focus:ring-2 focus:ring-indigo-100 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
+            />
+            {editErr && <p className="text-xs text-red-500">{editErr}</p>}
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                disabled={editBusy || !editText.trim()}
+                onClick={async () => {
+                  setEditBusy(true); setEditErr("");
+                  try {
+                    await onEdit(post.id, editText.trim());
+                    setEditing(false);
+                  } catch (e: unknown) {
+                    setEditErr(e instanceof Error ? e.message : "Failed to save.");
+                  } finally { setEditBusy(false); }
+                }}
+                className="rounded-lg bg-indigo-600 px-4 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-indigo-700 disabled:opacity-50"
+              >
+                {editBusy ? "Saving…" : "Save"}
+              </button>
+              <button
+                type="button"
+                onClick={() => { setEditing(false); setEditText(post.body); setEditErr(""); }}
+                className="rounded-lg px-3 py-1.5 text-xs text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        ) : (
+          <p className="whitespace-pre-wrap break-words text-sm leading-relaxed text-zinc-700 dark:text-zinc-300">
+            <BodyText text={post.body} />
+            {post.updated_at && (
+              <span className="ml-1.5 text-[10px] text-zinc-400">(edited)</span>
+            )}
+          </p>
+        )}
 
         <div className="mt-1 flex flex-wrap items-center gap-3">
-          {isSignedIn && (
+          {/* Reply — only shown to other users, not the reply's own author */}
+          {isSignedIn && !isOwnPost && (
             <button
               type="button"
               onClick={() => onReplyTo(post.author_name ?? "user", post.user_id)}
@@ -529,22 +639,31 @@ function ReplyCard({
             <ReportPicker postId={post.id} onClose={() => setReporting(false)} />
           )}
 
-          {canDelete && !reporting && (
-            confirmDelete ? (
-              <span className="flex items-center gap-1.5 text-[11px]">
-                <span className="text-zinc-400">Delete?</span>
-                <button type="button" onClick={() => onDelete(post.id)} className="font-medium text-red-500 hover:text-red-700">Yes</button>
-                <button type="button" onClick={() => setConfirmDelete(false)} className="text-zinc-400 hover:text-zinc-600">No</button>
-              </span>
-            ) : (
+          {canDelete && !reporting && !editing && (
+            <>
               <button
                 type="button"
-                onClick={() => setConfirmDelete(true)}
-                className="text-[11px] text-zinc-300 transition-colors hover:text-red-500 dark:text-zinc-600"
+                onClick={() => { setEditing(true); setEditText(post.body); }}
+                className="text-[11px] text-zinc-300 transition-colors hover:text-indigo-500 dark:text-zinc-600"
               >
-                Delete
+                Edit
               </button>
-            )
+              {confirmDelete ? (
+                <span className="flex items-center gap-1.5 text-[11px]">
+                  <span className="text-zinc-400">Delete?</span>
+                  <button type="button" onClick={() => onDelete(post.id)} className="font-medium text-red-500 hover:text-red-700">Yes</button>
+                  <button type="button" onClick={() => setConfirmDelete(false)} className="text-zinc-400 hover:text-zinc-600">No</button>
+                </span>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => setConfirmDelete(true)}
+                  className="text-[11px] text-zinc-300 transition-colors hover:text-red-500 dark:text-zinc-600"
+                >
+                  Delete
+                </button>
+              )}
+            </>
           )}
         </div>
       </div>
@@ -652,6 +771,31 @@ export default function DiscussionThread({ slug, currentUserId, isSignedIn }: Pr
     );
   }, []);
 
+  /* ── Edit post ──────────────────────────────────────────────────────── */
+  const editPost = useCallback(async (id: number, newBody: string) => {
+    const res = await apiFetch(`/api/discussion/post/${id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ body: newBody }),
+    });
+    if (!res.ok) {
+      const data = await res.json() as { error?: string };
+      throw new Error(data.error ?? "Failed to save.");
+    }
+    const now = new Date().toISOString();
+    setPosts((prev) =>
+      prev.map((p) => {
+        if (p.id === id) return { ...p, body: newBody, updated_at: now };
+        return {
+          ...p,
+          replies: p.replies?.map((r) =>
+            r.id === id ? { ...r, body: newBody, updated_at: now } : r,
+          ),
+        };
+      }),
+    );
+  }, []);
+
   /* ── Render ─────────────────────────────────────────────────────────── */
   return (
     <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
@@ -714,6 +858,7 @@ export default function DiscussionThread({ slug, currentUserId, isSignedIn }: Pr
                 isReply={false}
                 onReplySubmit={submitReply}
                 onDelete={(id) => void deletePost(id)}
+                onEdit={editPost}
                 onToggleReplies={toggleReplies}
                 onLoadReplies={loadReplies}
               />

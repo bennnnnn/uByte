@@ -8,6 +8,7 @@ export interface DiscussionPost {
   body: string;
   deleted: boolean;
   created_at: string;
+  updated_at: string | null;
   author_name: string | null;
   reply_count: number;
 }
@@ -94,6 +95,39 @@ export async function softDeletePost(
     ? await sql`UPDATE discussion_posts SET deleted = true WHERE id = ${id} RETURNING id`
     : await sql`UPDATE discussion_posts SET deleted = true WHERE id = ${id} AND user_id = ${requesterId} RETURNING id`;
   return rows.length > 0;
+}
+
+/** Update a post's body. Only the owner can edit. Returns true if updated. */
+export async function updatePost(
+  id: number,
+  userId: number,
+  body: string,
+): Promise<boolean> {
+  const sql = getSql();
+  const rows = await sql`
+    UPDATE discussion_posts
+    SET body = ${body}, updated_at = NOW()
+    WHERE id = ${id} AND user_id = ${userId} AND deleted = false
+    RETURNING id
+  `;
+  return rows.length > 0;
+}
+
+/** Return all unique participant user_ids in a thread (top-level post + all replies). */
+export async function getThreadParticipants(
+  rootPostId: number,
+  excludeUserId: number,
+): Promise<{ id: number }[]> {
+  const sql = getSql();
+  const rows = await sql`
+    SELECT DISTINCT user_id AS id
+    FROM discussion_posts
+    WHERE (id = ${rootPostId} OR parent_id = ${rootPostId})
+      AND user_id IS NOT NULL
+      AND user_id != ${excludeUserId}
+      AND deleted = false
+  `;
+  return rows as { id: number }[];
 }
 
 /** Find users by name for @mention notifications (case-insensitive). */
