@@ -207,6 +207,26 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
     fetchUser();
   }, [fetchUser]);
 
+  // ── Cross-tab auth sync ──
+  // When the user logs in or out in another tab, localStorage fires a "storage"
+  // event in every OTHER tab on the same origin. We listen for that and re-fetch
+  // so all tabs immediately reflect the correct session instead of showing a
+  // stale user or showing "logged in" when they've actually been logged out.
+  useEffect(() => {
+    function onStorageChange(e: StorageEvent) {
+      if (e.key === "ubyte_auth_changed") fetchUser();
+    }
+    window.addEventListener("storage", onStorageChange);
+    return () => window.removeEventListener("storage", onStorageChange);
+  }, [fetchUser]);
+
+  // Notify other tabs that auth state changed so they re-fetch immediately.
+  // The storage event only fires in OTHER tabs (not the current one), which
+  // is exactly what we want — the current tab already has fresh state.
+  const broadcastAuthChange = useCallback(() => {
+    try { localStorage.setItem("ubyte_auth_changed", String(Date.now())); } catch { /* ignore */ }
+  }, []);
+
   // ── Shared post-auth hydration (used by login, loginWithGoogle, signup) ──
   const hydrateAfterAuth = useCallback(async (userData: User) => {
     setUser(userData);
@@ -275,9 +295,10 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
       await hydrateAfterAuth(data.user);
       trackConversion("signup");
       try { localStorage.setItem("ubyte_has_account", "1"); } catch { /* noop */ }
+      broadcastAuthChange();
     }
     return null;
-  }, [hydrateAfterAuth]);
+  }, [hydrateAfterAuth, broadcastAuthChange]);
 
   const login = useCallback(async (email: string, password: string): Promise<string | null> => {
     const res = await apiFetch("/api/auth/login", {
@@ -294,9 +315,10 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
       await hydrateAfterAuth(data.user);
       trackConversion("login", { method: "email" });
       try { localStorage.setItem("ubyte_has_account", "1"); } catch { /* noop */ }
+      broadcastAuthChange();
     }
     return null;
-  }, [hydrateAfterAuth]);
+  }, [hydrateAfterAuth, broadcastAuthChange]);
 
   const loginWithGoogle = useCallback(async (credential: string): Promise<{ error: string | null; isNewUser: boolean }> => {
     const res = await apiFetch("/api/auth/google-id-token", {
@@ -313,9 +335,10 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
       await hydrateAfterAuth(data.user);
       trackConversion("login", { method: "google" });
       try { localStorage.setItem("ubyte_has_account", "1"); } catch { /* noop */ }
+      broadcastAuthChange();
     }
     return { error: null, isNewUser: data.isNewUser ?? false };
-  }, [hydrateAfterAuth]);
+  }, [hydrateAfterAuth, broadcastAuthChange]);
 
   const logout = useCallback(async () => {
     await apiFetch("/api/auth/logout", { method: "POST" });
@@ -323,7 +346,8 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
     setProgressByLang({});
     setStepCountByLang({});
     setProfile(null);
-  }, []);
+    broadcastAuthChange();
+  }, [broadcastAuthChange]);
 
   const logoutAll = useCallback(async () => {
     await apiFetch("/api/auth/logout-all", { method: "POST" });
@@ -331,7 +355,8 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
     setProgressByLang({});
     setStepCountByLang({});
     setProfile(null);
-  }, []);
+    broadcastAuthChange();
+  }, [broadcastAuthChange]);
 
   // ── Data actions ──
   const recordView = useCallback(async (slug: string) => {
