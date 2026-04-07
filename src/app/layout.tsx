@@ -18,9 +18,9 @@ import Script from "next/script";
 import { getSiteBanner } from "@/lib/db/site-banner";
 import { unstable_cache } from "next/cache";
 import { headers } from "next/headers";
-import { redirect } from "next/navigation";
 import { getMaintenanceModeStatus } from "@/lib/db/site-settings";
 import { getCurrentUser } from "@/lib/auth";
+import MaintenancePage from "@/app/maintenance/page";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -119,7 +119,6 @@ export default async function RootLayout({
   const bypassMaintenance =
     pathname.startsWith("/admin") ||
     pathname.startsWith("/a/") ||      // personal admin slug routes
-    pathname.startsWith("/maintenance") ||
     pathname.startsWith("/api/") ||
     pathname.startsWith("/login") ||
     pathname.startsWith("/signup") ||
@@ -131,9 +130,16 @@ export default async function RootLayout({
     if (inMaintenance) {
       const user = await getCurrentUser();
       if (!user?.isAdmin) {
-        // Redirect non-admins; render the page inline for admins so they
-        // can still reach the admin panel via the normal site shell.
-        redirect("/maintenance");
+        // Render a completely standalone maintenance screen — no SiteHeader,
+        // no SiteFooter, no nav — so non-admins cannot click through to other
+        // pages and bypass maintenance mode.
+        return (
+          <html lang="en" suppressHydrationWarning>
+            <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+              <MaintenancePage />
+            </body>
+          </html>
+        );
       }
     }
   }
