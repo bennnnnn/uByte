@@ -98,6 +98,111 @@ class Program {
     }
 }`,
     },
+    testCases: [
+      { stdin: "3", expectedOutput: "1 2 Fizz" },
+      { stdin: "5", expectedOutput: "1 2 Fizz 4 Buzz" },
+      { stdin: "15", expectedOutput: "1 2 Fizz 4 Buzz Fizz 7 8 Fizz Buzz 11 Fizz 13 14 FizzBuzz" },
+      { stdin: "1", expectedOutput: "1" },
+    ],
+    judgeHarness: {
+      go: `package main
+
+import (
+\t"bufio"
+\t"fmt"
+\t"os"
+\t"strconv"
+\t"strings"
+)
+
+{{SOLUTION}}
+
+func main() {
+\tscanner := bufio.NewScanner(os.Stdin)
+\tfor scanner.Scan() {
+\t\tline := scanner.Text()
+\t\tif line == "" {
+\t\t\tcontinue
+\t\t}
+\t\tn, _ := strconv.Atoi(strings.TrimSpace(line))
+\t\tresult := fizzBuzz(n)
+\t\tfmt.Println(strings.Join(result, " "))
+\t}
+}`,
+      python: `import sys
+
+{{SOLUTION}}
+
+for line in sys.stdin:
+    line = line.strip()
+    if not line:
+        continue
+    n = int(line)
+    print(" ".join(fizz_buzz(n)))
+`,
+      javascript: `const fs = require("fs");
+
+{{SOLUTION}}
+
+const lines = fs.readFileSync(0, "utf8").trimEnd().split(/\r?\n/);
+for (const lineRaw of lines) {
+  const line = lineRaw.trim();
+  if (!line) continue;
+  const n = Number(line);
+  console.log(fizzBuzz(n).join(" "));
+}`,
+      java: `import java.io.*;
+import java.util.*;
+public class Main {
+{{SOLUTION}}
+  public static void main(String[] args) throws Exception {
+    BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+    String line;
+    while ((line = br.readLine()) != null) {
+      line = line.trim();
+      if (line.isEmpty()) continue;
+      int n = Integer.parseInt(line);
+      List<String> result = fizzBuzz(n);
+      System.out.println(String.join(" ", result));
+    }
+  }
+}`,
+      rust: `use std::io::{self, BufRead};
+
+{{SOLUTION}}
+
+fn main() {
+    let stdin = io::stdin();
+    for line in stdin.lock().lines() {
+        let line = line.unwrap();
+        let line = line.trim();
+        if line.is_empty() { continue; }
+        let n: i32 = line.parse().unwrap();
+        let result = fizz_buzz(n);
+        println!("{}", result.join(" "));
+    }
+}`,
+      cpp: `#include <bits/stdc++.h>
+using namespace std;
+
+{{SOLUTION}}
+
+int main() {
+  ios::sync_with_stdio(false); cin.tie(nullptr);
+  string line;
+  while (getline(cin, line)) {
+    if (line.empty()) continue;
+    int n = stoi(line);
+    auto result = fizzBuzz(n);
+    for (int i = 0; i < (int)result.size(); i++) {
+      if (i > 0) cout << " ";
+      cout << result[i];
+    }
+    cout << "\n";
+  }
+  return 0;
+}`,
+    },
   },
 
   {
@@ -190,6 +295,100 @@ class Program {
         Console.WriteLine(IsPalindrome(121));   // True
         Console.WriteLine(IsPalindrome(-121));  // False
     }
+}`,
+    },
+    testCases: [
+      { stdin: "121", expectedOutput: "true" },
+      { stdin: "-121", expectedOutput: "false" },
+      { stdin: "10", expectedOutput: "false" },
+      { stdin: "0", expectedOutput: "true" },
+    ],
+    judgeHarness: {
+      go: `package main
+
+import (
+\t"bufio"
+\t"fmt"
+\t"os"
+\t"strconv"
+\t"strings"
+)
+
+{{SOLUTION}}
+
+func main() {
+\tscanner := bufio.NewScanner(os.Stdin)
+\tfor scanner.Scan() {
+\t\tline := scanner.Text()
+\t\tif line == "" {
+\t\t\tcontinue
+\t\t}
+\t\tx, _ := strconv.Atoi(strings.TrimSpace(line))
+\t\tfmt.Println(isPalindrome(x))
+\t}
+}`,
+      python: `import sys
+
+{{SOLUTION}}
+
+for line in sys.stdin:
+    line = line.strip()
+    if not line:
+        continue
+    print(str(is_palindrome(int(line))).lower())
+`,
+      javascript: `const fs = require("fs");
+
+{{SOLUTION}}
+
+const lines = fs.readFileSync(0, "utf8").trimEnd().split(/\r?\n/);
+for (const lineRaw of lines) {
+  const line = lineRaw.trim();
+  if (!line) continue;
+  console.log(String(isPalindrome(Number(line))));
+}`,
+      java: `import java.io.*;
+import java.util.*;
+public class Main {
+{{SOLUTION}}
+  public static void main(String[] args) throws Exception {
+    BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+    String line;
+    while ((line = br.readLine()) != null) {
+      line = line.trim();
+      if (line.isEmpty()) continue;
+      System.out.println(isPalindrome(Integer.parseInt(line)));
+    }
+  }
+}`,
+      rust: `use std::io::{self, BufRead};
+
+{{SOLUTION}}
+
+fn main() {
+    let stdin = io::stdin();
+    for line in stdin.lock().lines() {
+        let line = line.unwrap();
+        let line = line.trim();
+        if line.is_empty() { continue; }
+        let x: i32 = line.parse().unwrap();
+        println!("{}", is_palindrome(x));
+    }
+}`,
+      cpp: `#include <bits/stdc++.h>
+using namespace std;
+
+{{SOLUTION}}
+
+int main() {
+  ios::sync_with_stdio(false); cin.tie(nullptr);
+  string line;
+  while (getline(cin, line)) {
+    if (line.empty()) continue;
+    int x = stoi(line);
+    cout << (isPalindrome(x) ? "true" : "false") << "\n";
+  }
+  return 0;
 }`,
     },
   },
@@ -320,6 +519,100 @@ class Program {
     }
 }`,
     },
+    testCases: [
+      { stdin: "19", expectedOutput: "true" },
+      { stdin: "2", expectedOutput: "false" },
+      { stdin: "1", expectedOutput: "true" },
+      { stdin: "7", expectedOutput: "true" },
+    ],
+    judgeHarness: {
+      go: `package main
+
+import (
+\t"bufio"
+\t"fmt"
+\t"os"
+\t"strconv"
+\t"strings"
+)
+
+{{SOLUTION}}
+
+func main() {
+\tscanner := bufio.NewScanner(os.Stdin)
+\tfor scanner.Scan() {
+\t\tline := scanner.Text()
+\t\tif line == "" {
+\t\t\tcontinue
+\t\t}
+\t\tn, _ := strconv.Atoi(strings.TrimSpace(line))
+\t\tfmt.Println(isHappy(n))
+\t}
+}`,
+      python: `import sys
+
+{{SOLUTION}}
+
+for line in sys.stdin:
+    line = line.strip()
+    if not line:
+        continue
+    print(str(is_happy(int(line))).lower())
+`,
+      javascript: `const fs = require("fs");
+
+{{SOLUTION}}
+
+const lines = fs.readFileSync(0, "utf8").trimEnd().split(/\r?\n/);
+for (const lineRaw of lines) {
+  const line = lineRaw.trim();
+  if (!line) continue;
+  console.log(String(isHappy(Number(line))));
+}`,
+      java: `import java.io.*;
+import java.util.*;
+public class Main {
+{{SOLUTION}}
+  public static void main(String[] args) throws Exception {
+    BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+    String line;
+    while ((line = br.readLine()) != null) {
+      line = line.trim();
+      if (line.isEmpty()) continue;
+      System.out.println(isHappy(Integer.parseInt(line)));
+    }
+  }
+}`,
+      rust: `use std::io::{self, BufRead};
+
+{{SOLUTION}}
+
+fn main() {
+    let stdin = io::stdin();
+    for line in stdin.lock().lines() {
+        let line = line.unwrap();
+        let line = line.trim();
+        if line.is_empty() { continue; }
+        let n: u32 = line.parse().unwrap();
+        println!("{}", is_happy(n));
+    }
+}`,
+      cpp: `#include <bits/stdc++.h>
+using namespace std;
+
+{{SOLUTION}}
+
+int main() {
+  ios::sync_with_stdio(false); cin.tie(nullptr);
+  string line;
+  while (getline(cin, line)) {
+    if (line.empty()) continue;
+    int n = stoi(line);
+    cout << (isHappy(n) ? "true" : "false") << "\n";
+  }
+  return 0;
+}`,
+    },
   },
 
   {
@@ -435,6 +728,100 @@ class Program {
         Console.WriteLine(MySqrt(4));  // 2
         Console.WriteLine(MySqrt(8));  // 2
     }
+}`,
+    },
+    testCases: [
+      { stdin: "4", expectedOutput: "2" },
+      { stdin: "8", expectedOutput: "2" },
+      { stdin: "0", expectedOutput: "0" },
+      { stdin: "16", expectedOutput: "4" },
+    ],
+    judgeHarness: {
+      go: `package main
+
+import (
+\t"bufio"
+\t"fmt"
+\t"os"
+\t"strconv"
+\t"strings"
+)
+
+{{SOLUTION}}
+
+func main() {
+\tscanner := bufio.NewScanner(os.Stdin)
+\tfor scanner.Scan() {
+\t\tline := scanner.Text()
+\t\tif line == "" {
+\t\t\tcontinue
+\t\t}
+\t\tx, _ := strconv.Atoi(strings.TrimSpace(line))
+\t\tfmt.Println(mySqrt(x))
+\t}
+}`,
+      python: `import sys
+
+{{SOLUTION}}
+
+for line in sys.stdin:
+    line = line.strip()
+    if not line:
+        continue
+    print(my_sqrt(int(line)))
+`,
+      javascript: `const fs = require("fs");
+
+{{SOLUTION}}
+
+const lines = fs.readFileSync(0, "utf8").trimEnd().split(/\r?\n/);
+for (const lineRaw of lines) {
+  const line = lineRaw.trim();
+  if (!line) continue;
+  console.log(mySqrt(Number(line)));
+}`,
+      java: `import java.io.*;
+import java.util.*;
+public class Main {
+{{SOLUTION}}
+  public static void main(String[] args) throws Exception {
+    BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+    String line;
+    while ((line = br.readLine()) != null) {
+      line = line.trim();
+      if (line.isEmpty()) continue;
+      System.out.println(mySqrt(Integer.parseInt(line)));
+    }
+  }
+}`,
+      rust: `use std::io::{self, BufRead};
+
+{{SOLUTION}}
+
+fn main() {
+    let stdin = io::stdin();
+    for line in stdin.lock().lines() {
+        let line = line.unwrap();
+        let line = line.trim();
+        if line.is_empty() { continue; }
+        let x: u64 = line.parse().unwrap();
+        println!("{}", my_sqrt(x));
+    }
+}`,
+      cpp: `#include <bits/stdc++.h>
+using namespace std;
+
+{{SOLUTION}}
+
+int main() {
+  ios::sync_with_stdio(false); cin.tie(nullptr);
+  string line;
+  while (getline(cin, line)) {
+    if (line.empty()) continue;
+    int x = stoi(line);
+    cout << mySqrt(x) << "\n";
+  }
+  return 0;
 }`,
     },
   },
@@ -576,6 +963,136 @@ class Program {
     }
 }`,
     },
+    testCases: [
+      { stdin: "1", expectedOutput: "1" },
+      { stdin: "3", expectedOutput: "1\n1 1\n1 2 1" },
+      { stdin: "5", expectedOutput: "1\n1 1\n1 2 1\n1 3 3 1\n1 4 6 4 1" },
+      { stdin: "2", expectedOutput: "1\n1 1" },
+    ],
+    judgeHarness: {
+      go: `package main
+
+import (
+\t"bufio"
+\t"fmt"
+\t"os"
+\t"strconv"
+\t"strings"
+)
+
+{{SOLUTION}}
+
+func main() {
+\tscanner := bufio.NewScanner(os.Stdin)
+\tfor scanner.Scan() {
+\t\tline := scanner.Text()
+\t\tif line == "" {
+\t\t\tcontinue
+\t\t}
+\t\tn, _ := strconv.Atoi(strings.TrimSpace(line))
+\t\ttriangle := generate(n)
+\t\trows := make([]string, len(triangle))
+\t\tfor i, row := range triangle {
+\t\t\tparts := make([]string, len(row))
+\t\t\tfor j, v := range row {
+\t\t\t\tparts[j] = strconv.Itoa(v)
+\t\t\t}
+\t\t\trows[i] = strings.Join(parts, " ")
+\t\t}
+\t\tfmt.Print(strings.Join(rows, "\n"))
+\t\tfmt.Println()
+\t}
+}`,
+      python: `import sys
+
+{{SOLUTION}}
+
+for line in sys.stdin:
+    line = line.strip()
+    if not line:
+        continue
+    n = int(line)
+    triangle = generate(n)
+    print("\n".join(" ".join(map(str, row)) for row in triangle))
+`,
+      javascript: `const fs = require("fs");
+
+{{SOLUTION}}
+
+const lines = fs.readFileSync(0, "utf8").trimEnd().split(/\r?\n/);
+for (const lineRaw of lines) {
+  const line = lineRaw.trim();
+  if (!line) continue;
+  const triangle = generate(Number(line));
+  console.log(triangle.map(row => row.join(" ")).join("\n"));
+}`,
+      java: `import java.io.*;
+import java.util.*;
+public class Main {
+{{SOLUTION}}
+  public static void main(String[] args) throws Exception {
+    BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+    String line;
+    while ((line = br.readLine()) != null) {
+      line = line.trim();
+      if (line.isEmpty()) continue;
+      int n = Integer.parseInt(line);
+      List<List<Integer>> triangle = generate(n);
+      StringBuilder sb = new StringBuilder();
+      for (int i = 0; i < triangle.size(); i++) {
+        List<Integer> row = triangle.get(i);
+        for (int j = 0; j < row.size(); j++) {
+          if (j > 0) sb.append(" ");
+          sb.append(row.get(j));
+        }
+        if (i < triangle.size() - 1) sb.append("\n");
+      }
+      System.out.println(sb.toString());
+    }
+  }
+}`,
+      rust: `use std::io::{self, BufRead};
+
+{{SOLUTION}}
+
+fn main() {
+    let stdin = io::stdin();
+    for line in stdin.lock().lines() {
+        let line = line.unwrap();
+        let line = line.trim();
+        if line.is_empty() { continue; }
+        let n: usize = line.parse().unwrap();
+        let triangle = generate(n);
+        let rows: Vec<String> = triangle.iter()
+            .map(|row| row.iter().map(|v| v.to_string()).collect::<Vec<_>>().join(" "))
+            .collect();
+        println!("{}", rows.join("\n"));
+    }
+}`,
+      cpp: `#include <bits/stdc++.h>
+using namespace std;
+
+{{SOLUTION}}
+
+int main() {
+  ios::sync_with_stdio(false); cin.tie(nullptr);
+  string line;
+  while (getline(cin, line)) {
+    if (line.empty()) continue;
+    int n = stoi(line);
+    auto triangle = generate(n);
+    for (int i = 0; i < (int)triangle.size(); i++) {
+      for (int j = 0; j < (int)triangle[i].size(); j++) {
+        if (j > 0) cout << " ";
+        cout << triangle[i][j];
+      }
+      if (i < (int)triangle.size() - 1) cout << "\n";
+    }
+    cout << "\n";
+  }
+  return 0;
+}`,
+    },
   },
 
   {
@@ -711,6 +1228,107 @@ class Program {
     }
 }`,
     },
+    testCases: [
+      { stdin: "egg|add", expectedOutput: "true" },
+      { stdin: "foo|bar", expectedOutput: "false" },
+      { stdin: "paper|title", expectedOutput: "true" },
+      { stdin: "ab|aa", expectedOutput: "false" },
+    ],
+    judgeHarness: {
+      go: `package main
+
+import (
+\t"bufio"
+\t"fmt"
+\t"os"
+\t"strings"
+)
+
+{{SOLUTION}}
+
+func main() {
+\tscanner := bufio.NewScanner(os.Stdin)
+\tfor scanner.Scan() {
+\t\tline := scanner.Text()
+\t\tif line == "" {
+\t\t\tcontinue
+\t\t}
+\t\tparts := strings.SplitN(line, "|", 2)
+\t\ts, t := parts[0], parts[1]
+\t\tfmt.Println(isIsomorphic(s, t))
+\t}
+}`,
+      python: `import sys
+
+{{SOLUTION}}
+
+for line in sys.stdin:
+    line = line.strip()
+    if not line:
+        continue
+    s, t = line.split("|", 1)
+    print(str(is_isomorphic(s, t)).lower())
+`,
+      javascript: `const fs = require("fs");
+
+{{SOLUTION}}
+
+const lines = fs.readFileSync(0, "utf8").trimEnd().split(/\r?\n/);
+for (const lineRaw of lines) {
+  const line = lineRaw.trim();
+  if (!line) continue;
+  const [s, t] = line.split("|");
+  console.log(String(isIsomorphic(s, t)));
+}`,
+      java: `import java.io.*;
+import java.util.*;
+public class Main {
+{{SOLUTION}}
+  public static void main(String[] args) throws Exception {
+    BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+    String line;
+    while ((line = br.readLine()) != null) {
+      line = line.trim();
+      if (line.isEmpty()) continue;
+      String[] parts = line.split("\\|", 2);
+      System.out.println(isIsomorphic(parts[0], parts[1]));
+    }
+  }
+}`,
+      rust: `use std::io::{self, BufRead};
+
+{{SOLUTION}}
+
+fn main() {
+    let stdin = io::stdin();
+    for line in stdin.lock().lines() {
+        let line = line.unwrap();
+        let line = line.trim();
+        if line.is_empty() { continue; }
+        let mut parts = line.splitn(2, '|');
+        let s = parts.next().unwrap();
+        let t = parts.next().unwrap();
+        println!("{}", is_isomorphic(s, t));
+    }
+}`,
+      cpp: `#include <bits/stdc++.h>
+using namespace std;
+
+{{SOLUTION}}
+
+int main() {
+  ios::sync_with_stdio(false); cin.tie(nullptr);
+  string line;
+  while (getline(cin, line)) {
+    if (line.empty()) continue;
+    auto pos = line.find('|');
+    string s = line.substr(0, pos);
+    string t = line.substr(pos + 1);
+    cout << (isIsomorphic(s, t) ? "true" : "false") << "\n";
+  }
+  return 0;
+}`,
+    },
   },
 
   {
@@ -838,6 +1456,106 @@ class Program {
         Console.WriteLine(CanConstruct("a", "b"));    // False
         Console.WriteLine(CanConstruct("aa", "aab")); // True
     }
+}`,
+    },
+    testCases: [
+      { stdin: "a|b", expectedOutput: "false" },
+      { stdin: "aa|ab", expectedOutput: "false" },
+      { stdin: "aa|aab", expectedOutput: "true" },
+      { stdin: "bg|efjbdfbdgifghc", expectedOutput: "true" },
+    ],
+    judgeHarness: {
+      go: `package main
+
+import (
+\t"bufio"
+\t"fmt"
+\t"os"
+\t"strings"
+)
+
+{{SOLUTION}}
+
+func main() {
+\tscanner := bufio.NewScanner(os.Stdin)
+\tfor scanner.Scan() {
+\t\tline := scanner.Text()
+\t\tif line == "" {
+\t\t\tcontinue
+\t\t}
+\t\tparts := strings.SplitN(line, "|", 2)
+\t\tfmt.Println(canConstruct(parts[0], parts[1]))
+\t}
+}`,
+      python: `import sys
+
+{{SOLUTION}}
+
+for line in sys.stdin:
+    line = line.strip()
+    if not line:
+        continue
+    ransom, magazine = line.split("|", 1)
+    print(str(can_construct(ransom, magazine)).lower())
+`,
+      javascript: `const fs = require("fs");
+
+{{SOLUTION}}
+
+const lines = fs.readFileSync(0, "utf8").trimEnd().split(/\r?\n/);
+for (const lineRaw of lines) {
+  const line = lineRaw.trim();
+  if (!line) continue;
+  const [ransomNote, magazine] = line.split("|");
+  console.log(String(canConstruct(ransomNote, magazine)));
+}`,
+      java: `import java.io.*;
+import java.util.*;
+public class Main {
+{{SOLUTION}}
+  public static void main(String[] args) throws Exception {
+    BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+    String line;
+    while ((line = br.readLine()) != null) {
+      line = line.trim();
+      if (line.isEmpty()) continue;
+      String[] parts = line.split("\\|", 2);
+      System.out.println(canConstruct(parts[0], parts[1]));
+    }
+  }
+}`,
+      rust: `use std::io::{self, BufRead};
+
+{{SOLUTION}}
+
+fn main() {
+    let stdin = io::stdin();
+    for line in stdin.lock().lines() {
+        let line = line.unwrap();
+        let line = line.trim();
+        if line.is_empty() { continue; }
+        let mut parts = line.splitn(2, '|');
+        let ransom = parts.next().unwrap();
+        let magazine = parts.next().unwrap();
+        println!("{}", can_construct(ransom, magazine));
+    }
+}`,
+      cpp: `#include <bits/stdc++.h>
+using namespace std;
+
+{{SOLUTION}}
+
+int main() {
+  ios::sync_with_stdio(false); cin.tie(nullptr);
+  string line;
+  while (getline(cin, line)) {
+    if (line.empty()) continue;
+    auto pos = line.find('|');
+    string ransom = line.substr(0, pos);
+    string magazine = line.substr(pos + 1);
+    cout << (canConstruct(ransom, magazine) ? "true" : "false") << "\n";
+  }
+  return 0;
 }`,
     },
   },
@@ -1001,6 +1719,111 @@ class Program {
     }
 }`,
     },
+    testCases: [
+      { stdin: "abba|dog cat cat dog", expectedOutput: "true" },
+      { stdin: "abba|dog cat cat fish", expectedOutput: "false" },
+      { stdin: "aaaa|dog cat cat dog", expectedOutput: "false" },
+      { stdin: "ab|dog dog", expectedOutput: "false" },
+    ],
+    judgeHarness: {
+      go: `package main
+
+import (
+\t"bufio"
+\t"fmt"
+\t"os"
+\t"strings"
+)
+
+{{SOLUTION}}
+
+func main() {
+\tscanner := bufio.NewScanner(os.Stdin)
+\tfor scanner.Scan() {
+\t\tline := scanner.Text()
+\t\tif line == "" {
+\t\t\tcontinue
+\t\t}
+\t\tparts := strings.SplitN(line, "|", 2)
+\t\tpattern, s := parts[0], parts[1]
+\t\tfmt.Println(wordPattern(pattern, s))
+\t}
+}`,
+      python: `import sys
+
+{{SOLUTION}}
+
+for line in sys.stdin:
+    line = line.strip()
+    if not line:
+        continue
+    pattern, s = line.split("|", 1)
+    print(str(word_pattern(pattern, s)).lower())
+`,
+      javascript: `const fs = require("fs");
+
+{{SOLUTION}}
+
+const lines = fs.readFileSync(0, "utf8").trimEnd().split(/\r?\n/);
+for (const lineRaw of lines) {
+  const line = lineRaw.trim();
+  if (!line) continue;
+  const idx = line.indexOf("|");
+  const pattern = line.slice(0, idx);
+  const s = line.slice(idx + 1);
+  console.log(String(wordPattern(pattern, s)));
+}`,
+      java: `import java.io.*;
+import java.util.*;
+public class Main {
+{{SOLUTION}}
+  public static void main(String[] args) throws Exception {
+    BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+    String line;
+    while ((line = br.readLine()) != null) {
+      line = line.trim();
+      if (line.isEmpty()) continue;
+      int idx = line.indexOf('|');
+      String pattern = line.substring(0, idx);
+      String s = line.substring(idx + 1);
+      System.out.println(wordPattern(pattern, s));
+    }
+  }
+}`,
+      rust: `use std::io::{self, BufRead};
+
+{{SOLUTION}}
+
+fn main() {
+    let stdin = io::stdin();
+    for line in stdin.lock().lines() {
+        let line = line.unwrap();
+        let line = line.trim();
+        if line.is_empty() { continue; }
+        let mut parts = line.splitn(2, '|');
+        let pattern = parts.next().unwrap();
+        let s = parts.next().unwrap();
+        println!("{}", word_pattern(pattern, s));
+    }
+}`,
+      cpp: `#include <bits/stdc++.h>
+using namespace std;
+
+{{SOLUTION}}
+
+int main() {
+  ios::sync_with_stdio(false); cin.tie(nullptr);
+  string line;
+  while (getline(cin, line)) {
+    if (line.empty()) continue;
+    auto pos = line.find('|');
+    string pattern = line.substr(0, pos);
+    string s = line.substr(pos + 1);
+    cout << (wordPattern(pattern, s) ? "true" : "false") << "\n";
+  }
+  return 0;
+}`,
+    },
   },
 
   {
@@ -1126,6 +1949,161 @@ class Program {
     }
 }`,
     },
+    testCases: [
+      { stdin: "1 2 2 1|2 2", expectedOutput: "2" },
+      { stdin: "4 9 5|9 4 9 8 4", expectedOutput: "4 9" },
+      { stdin: "1 2 3|4 5 6", expectedOutput: "" },
+      { stdin: "1 2 3 4|3 4 5 6", expectedOutput: "3 4" },
+    ],
+    judgeHarness: {
+      go: `package main
+
+import (
+\t"bufio"
+\t"fmt"
+\t"os"
+\t"sort"
+\t"strconv"
+\t"strings"
+)
+
+{{SOLUTION}}
+
+func main() {
+\tscanner := bufio.NewScanner(os.Stdin)
+\tfor scanner.Scan() {
+\t\tline := scanner.Text()
+\t\tif line == "" {
+\t\t\tcontinue
+\t\t}
+\t\tparts := strings.SplitN(line, "|", 2)
+\t\tparse := func(s string) []int {
+\t\t\tvar result []int
+\t\t\tfor _, p := range strings.Fields(s) {
+\t\t\t\tn, _ := strconv.Atoi(p)
+\t\t\t\tresult = append(result, n)
+\t\t\t}
+\t\t\treturn result
+\t\t}
+\t\tnums1 := parse(parts[0])
+\t\tnums2 := parse(parts[1])
+\t\tres := intersection(nums1, nums2)
+\t\tsort.Ints(res)
+\t\tstrs := make([]string, len(res))
+\t\tfor i, v := range res {
+\t\t\tstrs[i] = strconv.Itoa(v)
+\t\t}
+\t\tfmt.Println(strings.Join(strs, " "))
+\t}
+}`,
+      python: `import sys
+
+{{SOLUTION}}
+
+for line in sys.stdin:
+    line = line.strip()
+    if not line:
+        continue
+    left, right = line.split("|", 1)
+    nums1 = list(map(int, left.split()))
+    nums2 = list(map(int, right.split()))
+    result = sorted(intersection(nums1, nums2))
+    print(" ".join(map(str, result)))
+`,
+      javascript: `const fs = require("fs");
+
+{{SOLUTION}}
+
+const lines = fs.readFileSync(0, "utf8").trimEnd().split(/\r?\n/);
+for (const lineRaw of lines) {
+  const line = lineRaw.trim();
+  if (!line) continue;
+  const [left, right] = line.split("|");
+  const nums1 = left.trim().split(/\s+/).map(Number);
+  const nums2 = right.trim().split(/\s+/).map(Number);
+  const result = intersection(nums1, nums2).sort((a, b) => a - b);
+  console.log(result.join(" "));
+}`,
+      java: `import java.io.*;
+import java.util.*;
+public class Main {
+{{SOLUTION}}
+  public static void main(String[] args) throws Exception {
+    BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+    String line;
+    while ((line = br.readLine()) != null) {
+      line = line.trim();
+      if (line.isEmpty()) continue;
+      String[] halves = line.split("\\|", 2);
+      String[] p1 = halves[0].trim().split("\\s+");
+      String[] p2 = halves[1].trim().split("\\s+");
+      int[] nums1 = Arrays.stream(p1).mapToInt(Integer::parseInt).toArray();
+      int[] nums2 = Arrays.stream(p2).mapToInt(Integer::parseInt).toArray();
+      int[] res = intersection(nums1, nums2);
+      Arrays.sort(res);
+      StringBuilder sb = new StringBuilder();
+      for (int i = 0; i < res.length; i++) {
+        if (i > 0) sb.append(" ");
+        sb.append(res[i]);
+      }
+      System.out.println(sb.toString());
+    }
+  }
+}`,
+      rust: `use std::io::{self, BufRead};
+
+{{SOLUTION}}
+
+fn main() {
+    let stdin = io::stdin();
+    for line in stdin.lock().lines() {
+        let line = line.unwrap();
+        let line = line.trim();
+        if line.is_empty() { continue; }
+        let mut parts = line.splitn(2, '|');
+        let left = parts.next().unwrap();
+        let right = parts.next().unwrap();
+        let nums1: Vec<i32> = left.split_whitespace().map(|s| s.parse().unwrap()).collect();
+        let nums2: Vec<i32> = right.split_whitespace().map(|s| s.parse().unwrap()).collect();
+        let mut res = intersection(nums1, nums2);
+        res.sort();
+        let strs: Vec<String> = res.iter().map(|v| v.to_string()).collect();
+        println!("{}", strs.join(" "));
+    }
+}`,
+      cpp: `#include <bits/stdc++.h>
+using namespace std;
+
+{{SOLUTION}}
+
+int main() {
+  ios::sync_with_stdio(false); cin.tie(nullptr);
+  string line;
+  while (getline(cin, line)) {
+    if (line.empty()) continue;
+    auto pos = line.find('|');
+    string left = line.substr(0, pos);
+    string right = line.substr(pos + 1);
+    auto parse = [](const string& s) {
+      vector<int> v;
+      istringstream iss(s);
+      int x;
+      while (iss >> x) v.push_back(x);
+      return v;
+    };
+    vector<int> nums1 = parse(left);
+    vector<int> nums2 = parse(right);
+    vector<int> res = intersection(nums1, nums2);
+    sort(res.begin(), res.end());
+    for (int i = 0; i < (int)res.size(); i++) {
+      if (i > 0) cout << " ";
+      cout << res[i];
+    }
+    cout << "\n";
+  }
+  return 0;
+}`,
+    },
   },
 
   {
@@ -1230,6 +2208,100 @@ class Program {
         Console.WriteLine(IsPerfectSquare(16));  // True
         Console.WriteLine(IsPerfectSquare(14));  // False
     }
+}`,
+    },
+    testCases: [
+      { stdin: "16", expectedOutput: "true" },
+      { stdin: "14", expectedOutput: "false" },
+      { stdin: "1", expectedOutput: "true" },
+      { stdin: "25", expectedOutput: "true" },
+    ],
+    judgeHarness: {
+      go: `package main
+
+import (
+\t"bufio"
+\t"fmt"
+\t"os"
+\t"strconv"
+\t"strings"
+)
+
+{{SOLUTION}}
+
+func main() {
+\tscanner := bufio.NewScanner(os.Stdin)
+\tfor scanner.Scan() {
+\t\tline := scanner.Text()
+\t\tif line == "" {
+\t\t\tcontinue
+\t\t}
+\t\tn, _ := strconv.Atoi(strings.TrimSpace(line))
+\t\tfmt.Println(isPerfectSquare(n))
+\t}
+}`,
+      python: `import sys
+
+{{SOLUTION}}
+
+for line in sys.stdin:
+    line = line.strip()
+    if not line:
+        continue
+    print(str(is_perfect_square(int(line))).lower())
+`,
+      javascript: `const fs = require("fs");
+
+{{SOLUTION}}
+
+const lines = fs.readFileSync(0, "utf8").trimEnd().split(/\r?\n/);
+for (const lineRaw of lines) {
+  const line = lineRaw.trim();
+  if (!line) continue;
+  console.log(String(isPerfectSquare(Number(line))));
+}`,
+      java: `import java.io.*;
+import java.util.*;
+public class Main {
+{{SOLUTION}}
+  public static void main(String[] args) throws Exception {
+    BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+    String line;
+    while ((line = br.readLine()) != null) {
+      line = line.trim();
+      if (line.isEmpty()) continue;
+      System.out.println(isPerfectSquare(Integer.parseInt(line)));
+    }
+  }
+}`,
+      rust: `use std::io::{self, BufRead};
+
+{{SOLUTION}}
+
+fn main() {
+    let stdin = io::stdin();
+    for line in stdin.lock().lines() {
+        let line = line.unwrap();
+        let line = line.trim();
+        if line.is_empty() { continue; }
+        let n: u64 = line.parse().unwrap();
+        println!("{}", is_perfect_square(n));
+    }
+}`,
+      cpp: `#include <bits/stdc++.h>
+using namespace std;
+
+{{SOLUTION}}
+
+int main() {
+  ios::sync_with_stdio(false); cin.tie(nullptr);
+  string line;
+  while (getline(cin, line)) {
+    if (line.empty()) continue;
+    int n = stoi(line);
+    cout << (isPerfectSquare(n) ? "true" : "false") << "\n";
+  }
+  return 0;
 }`,
     },
   },

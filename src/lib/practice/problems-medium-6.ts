@@ -221,6 +221,178 @@ class Program {
     }
 }`,
     },
+    testCases: [
+      { stdin: "1 2 3 null 5 null 4", expectedOutput: "1 3 4" },
+      { stdin: "1 null 3", expectedOutput: "1 3" },
+      { stdin: "1 2 3 4 null null 5", expectedOutput: "1 3 5" },
+      { stdin: "1", expectedOutput: "1" },
+    ],
+    judgeHarness: {
+      go: `package main
+import (
+\t"bufio"
+\t"fmt"
+\t"os"
+\t"strconv"
+\t"strings"
+)
+{{SOLUTION}}
+type TreeNode struct { Val int; Left, Right *TreeNode }
+func buildTree(vals []string) *TreeNode {
+\tif len(vals) == 0 || vals[0] == "null" { return nil }
+\troot := &TreeNode{}
+\troot.Val, _ = strconv.Atoi(vals[0])
+\tqueue := []*TreeNode{root}
+\ti := 1
+\tfor len(queue) > 0 && i < len(vals) {
+\t\tnode := queue[0]; queue = queue[1:]
+\t\tif i < len(vals) && vals[i] != "null" { node.Left = &TreeNode{}; node.Left.Val, _ = strconv.Atoi(vals[i]); queue = append(queue, node.Left) }; i++
+\t\tif i < len(vals) && vals[i] != "null" { node.Right = &TreeNode{}; node.Right.Val, _ = strconv.Atoi(vals[i]); queue = append(queue, node.Right) }; i++
+\t}
+\treturn root
+}
+func main() {
+\tscanner := bufio.NewScanner(os.Stdin)
+\tfor scanner.Scan() {
+\t\tline := scanner.Text()
+\t\tif line == "" { continue }
+\t\tvals := strings.Fields(line)
+\t\troot := buildTree(vals)
+\t\tres := rightSideView(root)
+\t\tstrs := make([]string, len(res))
+\t\tfor i, v := range res { strs[i] = strconv.Itoa(v) }
+\t\tfmt.Println(strings.Join(strs, " "))
+\t}
+}`,
+      python: `import sys
+from collections import deque
+{{SOLUTION}}
+def build_tree(vals):
+    if not vals or vals[0] == "null": return None
+    root = TreeNode(int(vals[0]))
+    queue = deque([root]); i = 1
+    while queue and i < len(vals):
+        node = queue.popleft()
+        if i < len(vals) and vals[i] != "null":
+            node.left = TreeNode(int(vals[i])); queue.append(node.left)
+        i += 1
+        if i < len(vals) and vals[i] != "null":
+            node.right = TreeNode(int(vals[i])); queue.append(node.right)
+        i += 1
+    return root
+for line in sys.stdin:
+    line = line.strip()
+    if not line: continue
+    root = build_tree(line.split())
+    print(" ".join(str(v) for v in right_side_view(root)))
+`,
+      javascript: `const fs = require("fs");
+{{SOLUTION}}
+class TreeNode { constructor(val, left=null, right=null){this.val=val;this.left=left;this.right=right;} }
+function buildTree(vals) {
+  if (!vals.length || vals[0]==="null") return null;
+  const root = new TreeNode(parseInt(vals[0]));
+  const queue = [root]; let i = 1;
+  while (queue.length && i < vals.length) {
+    const node = queue.shift();
+    if (i < vals.length && vals[i]!=="null") { node.left=new TreeNode(parseInt(vals[i])); queue.push(node.left); } i++;
+    if (i < vals.length && vals[i]!=="null") { node.right=new TreeNode(parseInt(vals[i])); queue.push(node.right); } i++;
+  }
+  return root;
+}
+const lines = fs.readFileSync(0,"utf8").trimEnd().split(/\r?\n/);
+for (const raw of lines) {
+  const line = raw.trim(); if (!line) continue;
+  const root = buildTree(line.split(/\s+/));
+  console.log(rightSideView(root).join(" "));
+}
+`,
+      java: `import java.io.*;
+import java.util.*;
+public class Main {
+{{SOLUTION}}
+  static class TreeNode { int val; TreeNode left, right; TreeNode(int v){val=v;} }
+  static TreeNode buildTree(String[] vals) {
+    if (vals.length==0||vals[0].equals("null")) return null;
+    TreeNode root=new TreeNode(Integer.parseInt(vals[0]));
+    Queue<TreeNode> q=new LinkedList<>(); q.offer(root); int i=1;
+    while(!q.isEmpty()&&i<vals.length){
+      TreeNode nd=q.poll();
+      if(i<vals.length&&!vals[i].equals("null")){nd.left=new TreeNode(Integer.parseInt(vals[i]));q.offer(nd.left);}i++;
+      if(i<vals.length&&!vals[i].equals("null")){nd.right=new TreeNode(Integer.parseInt(vals[i]));q.offer(nd.right);}i++;
+    }
+    return root;
+  }
+  public static void main(String[] args) throws Exception {
+    BufferedReader br=new BufferedReader(new InputStreamReader(System.in));
+    String line;
+    while((line=br.readLine())!=null){
+      line=line.trim(); if(line.isEmpty()) continue;
+      TreeNode root=buildTree(line.split("\\\\s+"));
+      List<Integer> res=rightSideView(root);
+      StringBuilder sb=new StringBuilder();
+      for(int i=0;i<res.size();i++){if(i>0)sb.append(' ');sb.append(res.get(i));}
+      System.out.println(sb);
+    }
+  }
+}`,
+      cpp: `#include <bits/stdc++.h>
+using namespace std;
+{{SOLUTION}}
+struct TreeNode { int val; TreeNode *left,*right; TreeNode(int v):val(v),left(nullptr),right(nullptr){} };
+TreeNode* buildTree(vector<string>& vals) {
+  if(vals.empty()||vals[0]=="null") return nullptr;
+  TreeNode* root=new TreeNode(stoi(vals[0]));
+  queue<TreeNode*> q; q.push(root); int i=1;
+  while(!q.empty()&&i<(int)vals.size()){
+    TreeNode* nd=q.front();q.pop();
+    if(i<(int)vals.size()&&vals[i]!="null"){nd->left=new TreeNode(stoi(vals[i]));q.push(nd->left);}i++;
+    if(i<(int)vals.size()&&vals[i]!="null"){nd->right=new TreeNode(stoi(vals[i]));q.push(nd->right);}i++;
+  }
+  return root;
+}
+int main(){
+  ios::sync_with_stdio(false);cin.tie(nullptr);
+  string line;
+  while(getline(cin,line)){
+    if(line.empty()) continue;
+    istringstream iss(line); vector<string> vals; string tok;
+    while(iss>>tok) vals.push_back(tok);
+    TreeNode* root=buildTree(vals);
+    vector<int> res=rightSideView(root);
+    for(int i=0;i<(int)res.size();i++){if(i)cout<<' ';cout<<res[i];}cout<<"\\n";
+  }
+}`,
+      rust: `use std::io::{self,BufRead};
+use std::collections::VecDeque;
+use std::rc::Rc;
+use std::cell::RefCell;
+{{SOLUTION}}
+type Node=Option<Rc<RefCell<TreeNode>>>;
+struct TreeNode{val:i32,left:Node,right:Node}
+fn build(vals:&[&str])->Node{
+  if vals.is_empty()||vals[0]=="null"{return None;}
+  let root=Rc::new(RefCell::new(TreeNode{val:vals[0].parse().unwrap(),left:None,right:None}));
+  let mut q:VecDeque<Rc<RefCell<TreeNode>>>=VecDeque::new();
+  q.push_back(root.clone()); let mut i=1;
+  while let Some(nd)=q.pop_front(){
+    if i<vals.len()&&vals[i]!="null"{let c=Rc::new(RefCell::new(TreeNode{val:vals[i].parse().unwrap(),left:None,right:None}));nd.borrow_mut().left=Some(c.clone());q.push_back(c);}i+=1;
+    if i<vals.len()&&vals[i]!="null"{let c=Rc::new(RefCell::new(TreeNode{val:vals[i].parse().unwrap(),left:None,right:None}));nd.borrow_mut().right=Some(c.clone());q.push_back(c);}i+=1;
+  }
+  Some(root)
+}
+fn main(){
+  let stdin=io::stdin();
+  for line in stdin.lock().lines(){
+    let line=line.unwrap(); let line=line.trim();
+    if line.is_empty(){continue;}
+    let vals:Vec<&str>=line.split_whitespace().collect();
+    let root=build(&vals);
+    let res=right_side_view(root);
+    println!("{}",res.iter().map(|v|v.to_string()).collect::<Vec<_>>().join(" "));
+  }
+}`,
+    },
   },
 
   {
@@ -349,6 +521,173 @@ class Program {
         return null;
     }
     static void Main() { Console.WriteLine("Implement BST LCA"); }
+}`,
+    },
+    // stdin: "tree_bfs|p|q"  e.g. "6 2 8 0 4 7 9|2|8"
+    testCases: [
+      { stdin: "6 2 8 0 4 7 9|2|8", expectedOutput: "6" },
+      { stdin: "6 2 8 0 4 7 9|2|4", expectedOutput: "2" },
+      { stdin: "6 2 8 0 4 7 9|8|9", expectedOutput: "8" },
+      { stdin: "6 2 8 0 4 7 9|0|5", expectedOutput: "2" },
+    ],
+    judgeHarness: {
+      go: `package main
+import (
+\t"bufio"
+\t"fmt"
+\t"os"
+\t"strconv"
+\t"strings"
+)
+{{SOLUTION}}
+type TreeNode struct { Val int; Left, Right *TreeNode }
+func buildBST(vals []string) *TreeNode {
+\tif len(vals)==0||vals[0]=="null"{return nil}
+\troot:=&TreeNode{}; root.Val,_=strconv.Atoi(vals[0])
+\tqueue:=[]*TreeNode{root}; i:=1
+\tfor len(queue)>0&&i<len(vals){
+\t\tnode:=queue[0];queue=queue[1:]
+\t\tif i<len(vals)&&vals[i]!="null"{node.Left=&TreeNode{};node.Left.Val,_=strconv.Atoi(vals[i]);queue=append(queue,node.Left)};i++
+\t\tif i<len(vals)&&vals[i]!="null"{node.Right=&TreeNode{};node.Right.Val,_=strconv.Atoi(vals[i]);queue=append(queue,node.Right)};i++
+\t}
+\treturn root
+}
+func findNode(root *TreeNode, val int) *TreeNode {
+\tfor root!=nil{if val==root.Val{return root}else if val<root.Val{root=root.Left}else{root=root.Right}};return nil
+}
+func main() {
+\tscanner:=bufio.NewScanner(os.Stdin)
+\tfor scanner.Scan(){
+\t\tline:=scanner.Text(); if line==""{continue}
+\t\tparts:=strings.Split(line,"|")
+\t\troot:=buildBST(strings.Fields(parts[0]))
+\t\tpVal,_:=strconv.Atoi(strings.TrimSpace(parts[1]))
+\t\tqVal,_:=strconv.Atoi(strings.TrimSpace(parts[2]))
+\t\tp:=findNode(root,pVal); q:=findNode(root,qVal)
+\t\tfmt.Println(lowestCommonAncestor(root,p,q).Val)
+\t}
+}`,
+      python: `import sys
+from collections import deque
+{{SOLUTION}}
+def build_bst(vals):
+    if not vals or vals[0]=="null": return None
+    root=TreeNode(int(vals[0])); queue=deque([root]); i=1
+    while queue and i<len(vals):
+        node=queue.popleft()
+        if i<len(vals) and vals[i]!="null": node.left=TreeNode(int(vals[i])); queue.append(node.left)
+        i+=1
+        if i<len(vals) and vals[i]!="null": node.right=TreeNode(int(vals[i])); queue.append(node.right)
+        i+=1
+    return root
+def find_node(root, val):
+    while root:
+        if val==root.val: return root
+        elif val<root.val: root=root.left
+        else: root=root.right
+    return None
+for line in sys.stdin:
+    line=line.strip()
+    if not line: continue
+    parts=line.split("|")
+    root=build_bst(parts[0].split())
+    p=find_node(root,int(parts[1])); q=find_node(root,int(parts[2]))
+    print(lowest_common_ancestor(root,p,q).val)
+`,
+      javascript: `const fs = require("fs");
+{{SOLUTION}}
+class TreeNode{constructor(val,left=null,right=null){this.val=val;this.left=left;this.right=right;}}
+function buildBST(vals){
+  if(!vals.length||vals[0]==="null")return null;
+  const root=new TreeNode(parseInt(vals[0]));const queue=[root];let i=1;
+  while(queue.length&&i<vals.length){
+    const nd=queue.shift();
+    if(i<vals.length&&vals[i]!=="null"){nd.left=new TreeNode(parseInt(vals[i]));queue.push(nd.left);}i++;
+    if(i<vals.length&&vals[i]!=="null"){nd.right=new TreeNode(parseInt(vals[i]));queue.push(nd.right);}i++;
+  }
+  return root;
+}
+function findNode(root,val){while(root){if(val===root.val)return root;else if(val<root.val)root=root.left;else root=root.right;}return null;}
+const lines=fs.readFileSync(0,"utf8").trimEnd().split(/\r?\n/);
+for(const raw of lines){
+  const line=raw.trim();if(!line)continue;
+  const parts=line.split("|");
+  const root=buildBST(parts[0].trim().split(/\s+/));
+  const p=findNode(root,parseInt(parts[1]));const q=findNode(root,parseInt(parts[2]));
+  console.log(lowestCommonAncestor(root,p,q).val);
+}`,
+      java: `import java.io.*;
+import java.util.*;
+public class Main {
+{{SOLUTION}}
+  static class TreeNode{int val;TreeNode left,right;TreeNode(int v){val=v;}}
+  static TreeNode buildBST(String[] vals){
+    if(vals.length==0||vals[0].equals("null"))return null;
+    TreeNode root=new TreeNode(Integer.parseInt(vals[0]));Queue<TreeNode> q=new LinkedList<>();q.offer(root);int i=1;
+    while(!q.isEmpty()&&i<vals.length){TreeNode nd=q.poll();
+      if(i<vals.length&&!vals[i].equals("null")){nd.left=new TreeNode(Integer.parseInt(vals[i]));q.offer(nd.left);}i++;
+      if(i<vals.length&&!vals[i].equals("null")){nd.right=new TreeNode(Integer.parseInt(vals[i]));q.offer(nd.right);}i++;
+    }return root;
+  }
+  static TreeNode findNode(TreeNode root,int val){while(root!=null){if(val==root.val)return root;else if(val<root.val)root=root.left;else root=root.right;}return null;}
+  public static void main(String[] args) throws Exception {
+    BufferedReader br=new BufferedReader(new InputStreamReader(System.in));String line;
+    while((line=br.readLine())!=null){line=line.trim();if(line.isEmpty())continue;
+      String[] parts=line.split("\\\\|");
+      TreeNode root=buildBST(parts[0].trim().split("\\\\s+"));
+      TreeNode p=findNode(root,Integer.parseInt(parts[1].trim()));
+      TreeNode q=findNode(root,Integer.parseInt(parts[2].trim()));
+      System.out.println(lowestCommonAncestor(root,p,q).val);
+    }
+  }
+}`,
+      cpp: `#include <bits/stdc++.h>
+using namespace std;
+{{SOLUTION}}
+struct TreeNode{int val;TreeNode*left,*right;TreeNode(int v):val(v),left(nullptr),right(nullptr){}};
+TreeNode* buildBST(vector<string>& vals){
+  if(vals.empty()||vals[0]=="null")return nullptr;
+  TreeNode* root=new TreeNode(stoi(vals[0]));queue<TreeNode*>q;q.push(root);int i=1;
+  while(!q.empty()&&i<(int)vals.size()){TreeNode* nd=q.front();q.pop();
+    if(i<(int)vals.size()&&vals[i]!="null"){nd->left=new TreeNode(stoi(vals[i]));q.push(nd->left);}i++;
+    if(i<(int)vals.size()&&vals[i]!="null"){nd->right=new TreeNode(stoi(vals[i]));q.push(nd->right);}i++;
+  }return root;
+}
+TreeNode* findNode(TreeNode* root,int val){while(root){if(val==root->val)return root;else if(val<root->val)root=root->left;else root=root->right;}return nullptr;}
+int main(){ios::sync_with_stdio(false);cin.tie(nullptr);string line;
+  while(getline(cin,line)){if(line.empty())continue;
+    auto p1=line.find('|'),p2=line.find('|',p1+1);
+    string treeStr=line.substr(0,p1);int pv=stoi(line.substr(p1+1,p2-p1-1)),qv=stoi(line.substr(p2+1));
+    istringstream iss(treeStr);vector<string> vals;string tok;while(iss>>tok)vals.push_back(tok);
+    TreeNode* root=buildBST(vals);
+    TreeNode* p=findNode(root,pv);TreeNode* q=findNode(root,qv);
+    cout<<lowestCommonAncestor(root,p,q)->val<<"\\n";
+  }
+}`,
+      rust: `use std::io::{self,BufRead};
+{{SOLUTION}}
+struct TreeNode{val:i32,left:Option<Box<TreeNode>>,right:Option<Box<TreeNode>>}
+fn build_bst(vals:&[&str])->Option<Box<TreeNode>>{
+  if vals.is_empty()||vals[0]=="null"{return None;}
+  fn insert(root:&mut Option<Box<TreeNode>>,v:i32){
+    match root{None=>{*root=Some(Box::new(TreeNode{val:v,left:None,right:None}));}
+    Some(nd)=>{if v<nd.val{insert(&mut nd.left,v);}else{insert(&mut nd.right,v);}}}
+  }
+  let mut root=None;for v in vals{if *v!="null"{insert(&mut root,v.parse().unwrap());}}root
+}
+fn find_node(root:&Option<Box<TreeNode>>,val:i32)->i32{
+  match root{None=>val,Some(nd)=>{if val==nd.val{val}else if val<nd.val{find_node(&nd.left,val)}else{find_node(&nd.right,val)}}}
+}
+fn main(){
+  let stdin=io::stdin();
+  for line in stdin.lock().lines(){
+    let line=line.unwrap();let line=line.trim();if line.is_empty(){continue;}
+    let parts:Vec<&str>=line.splitn(3,'|').collect();
+    let vals:Vec<&str>=parts[0].split_whitespace().collect();
+    let root=build_bst(&vals);
+    let pv:i32=parts[1].trim().parse().unwrap();let qv:i32=parts[2].trim().parse().unwrap();
+    println!("{}",lowest_common_ancestor(&root,pv,qv));
+  }
 }`,
     },
   },
@@ -550,6 +889,143 @@ class Program {
     }
 }`,
     },
+    // stdin: "numCourses|prereq pairs" where pairs are "a b" separated by comma
+    // e.g. "2|1 0" → true,  "2|1 0,0 1" → false,  "3|1 0,2 1" → true
+    testCases: [
+      { stdin: "2|1 0", expectedOutput: "true" },
+      { stdin: "2|1 0,0 1", expectedOutput: "false" },
+      { stdin: "3|1 0,2 1", expectedOutput: "true" },
+      { stdin: "4|1 0,2 1,3 2,1 3", expectedOutput: "false" },
+    ],
+    judgeHarness: {
+      go: `package main
+import (
+\t"bufio"
+\t"fmt"
+\t"os"
+\t"strconv"
+\t"strings"
+)
+{{SOLUTION}}
+func main() {
+\tscanner := bufio.NewScanner(os.Stdin)
+\tfor scanner.Scan() {
+\t\tline := scanner.Text(); if line == "" { continue }
+\t\tparts := strings.SplitN(line, "|", 2)
+\t\tnumCourses, _ := strconv.Atoi(strings.TrimSpace(parts[0]))
+\t\tprereqs := [][]int{}
+\t\tif len(parts) > 1 && strings.TrimSpace(parts[1]) != "" {
+\t\t\tfor _, pair := range strings.Split(strings.TrimSpace(parts[1]), ",") {
+\t\t\t\tfs := strings.Fields(pair)
+\t\t\t\ta, _ := strconv.Atoi(fs[0]); b, _ := strconv.Atoi(fs[1])
+\t\t\t\tprereqs = append(prereqs, []int{a, b})
+\t\t\t}
+\t\t}
+\t\tif canFinish(numCourses, prereqs) { fmt.Println("true") } else { fmt.Println("false") }
+\t}
+}`,
+      python: `import sys
+{{SOLUTION}}
+for line in sys.stdin:
+    line = line.strip()
+    if not line: continue
+    parts = line.split("|", 1)
+    num_courses = int(parts[0].strip())
+    prereqs = []
+    if len(parts) > 1 and parts[1].strip():
+        for pair in parts[1].strip().split(","):
+            a, b = pair.split(); prereqs.append([int(a), int(b)])
+    print(str(can_finish(num_courses, prereqs)).lower())
+`,
+      javascript: `const fs = require("fs");
+{{SOLUTION}}
+const lines = fs.readFileSync(0,"utf8").trimEnd().split(/\r?\n/);
+for (const raw of lines) {
+  const line = raw.trim(); if (!line) continue;
+  const [nc, rest] = line.split("|");
+  const numCourses = parseInt(nc.trim(), 10);
+  const prerequisites = [];
+  if (rest && rest.trim()) {
+    for (const pair of rest.trim().split(",")) {
+      const [a,b] = pair.trim().split(/\s+/).map(Number);
+      prerequisites.push([a,b]);
+    }
+  }
+  console.log(String(canFinish(numCourses, prerequisites)));
+}`,
+      java: `import java.io.*;
+import java.util.*;
+public class Main {
+{{SOLUTION}}
+  public static void main(String[] args) throws Exception {
+    BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+    String line;
+    while ((line = br.readLine()) != null) {
+      line = line.trim(); if (line.isEmpty()) continue;
+      String[] parts = line.split("\\\\|", 2);
+      int numCourses = Integer.parseInt(parts[0].trim());
+      int[][] prereqs = new int[0][];
+      if (parts.length > 1 && !parts[1].trim().isEmpty()) {
+        String[] pairs = parts[1].trim().split(",");
+        prereqs = new int[pairs.length][2];
+        for (int i = 0; i < pairs.length; i++) {
+          String[] f = pairs[i].trim().split("\\\\s+");
+          prereqs[i][0] = Integer.parseInt(f[0]); prereqs[i][1] = Integer.parseInt(f[1]);
+        }
+      }
+      System.out.println(canFinish(numCourses, prereqs));
+    }
+  }
+}`,
+      cpp: `#include <bits/stdc++.h>
+using namespace std;
+{{SOLUTION}}
+int main() {
+  ios::sync_with_stdio(false); cin.tie(nullptr);
+  string line;
+  while (getline(cin, line)) {
+    if (line.empty()) continue;
+    auto bar = line.find('|');
+    int numCourses = stoi(line.substr(0, bar));
+    vector<vector<int>> prereqs;
+    if (bar != string::npos) {
+      string rest = line.substr(bar+1);
+      if (!rest.empty()) {
+        stringstream ss(rest); string pair;
+        while (getline(ss, pair, ',')) {
+          istringstream ps(pair); int a, b; ps >> a >> b;
+          prereqs.push_back({a, b});
+        }
+      }
+    }
+    cout << (canFinish(numCourses, prereqs) ? "true" : "false") << "\\n";
+  }
+}`,
+      rust: `use std::io::{self,BufRead};
+{{SOLUTION}}
+fn main() {
+  let stdin = io::stdin();
+  for line in stdin.lock().lines() {
+    let line = line.unwrap(); let line = line.trim();
+    if line.is_empty() { continue; }
+    let mut it = line.splitn(2, '|');
+    let num_courses: usize = it.next().unwrap_or("0").trim().parse().unwrap();
+    let mut prereqs: Vec<[usize;2]> = vec![];
+    if let Some(rest) = it.next() {
+      let rest = rest.trim();
+      if !rest.is_empty() {
+        for pair in rest.split(',') {
+          let mut ps = pair.split_whitespace();
+          let a: usize = ps.next().unwrap().parse().unwrap();
+          let b: usize = ps.next().unwrap().parse().unwrap();
+          prereqs.push([a, b]);
+        }
+      }
+    }
+    println!("{}", can_finish(num_courses, prereqs));
+  }
+}`,
+    },
   },
 
   // ── Stack ─────────────────────────────────────────────────────────────────
@@ -713,7 +1189,7 @@ class Program {
     static int EvalRPN(string[] tokens) {
         var stack = new Stack<int>();
         foreach (var t in tokens) {
-            if (t is "+" or "-" or "*" or "/") {
+            if (t == "+" || t == "-" || t == "*" || t == "/") {
                 int b = stack.Pop(), a = stack.Pop();
                 stack.Push(t switch { "+"=>a+b, "-"=>a-b, "*"=>a*b, _=>a/b });
             } else {
@@ -726,6 +1202,85 @@ class Program {
     static void Main() {
         Console.WriteLine(EvalRPN(new[]{"2","1","+","3","*"}));  // 9
     }
+}`,
+    },
+    // stdin: space-separated tokens, e.g. "2 1 + 3 *"
+    testCases: [
+      { stdin: "2 1 + 3 *", expectedOutput: "9" },
+      { stdin: "4 13 5 / +", expectedOutput: "6" },
+      { stdin: "10 6 9 3 + -11 * / * 17 + 5 +", expectedOutput: "22" },
+      { stdin: "3 4 - 2 *", expectedOutput: "-2" },
+    ],
+    judgeHarness: {
+      go: `package main
+import (
+\t"bufio"
+\t"fmt"
+\t"os"
+\t"strings"
+)
+{{SOLUTION}}
+func main() {
+\tscanner := bufio.NewScanner(os.Stdin)
+\tfor scanner.Scan() {
+\t\tline := scanner.Text(); if line == "" { continue }
+\t\ttokens := strings.Fields(line)
+\t\tfmt.Println(evalRPN(tokens))
+\t}
+}`,
+      python: `import sys
+{{SOLUTION}}
+for line in sys.stdin:
+    line = line.strip()
+    if not line: continue
+    tokens = line.split()
+    print(eval_rpn(tokens))
+`,
+      javascript: `const fs = require("fs");
+{{SOLUTION}}
+const lines = fs.readFileSync(0,"utf8").trimEnd().split(/\r?\n/);
+for (const raw of lines) {
+  const line = raw.trim(); if (!line) continue;
+  const tokens = line.split(/\s+/);
+  console.log(String(evalRPN(tokens)));
+}`,
+      java: `import java.io.*;
+import java.util.*;
+public class Main {
+{{SOLUTION}}
+  public static void main(String[] args) throws Exception {
+    BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+    String line;
+    while ((line = br.readLine()) != null) {
+      line = line.trim(); if (line.isEmpty()) continue;
+      String[] tokens = line.split("\\\\s+");
+      System.out.println(evalRPN(tokens));
+    }
+  }
+}`,
+      cpp: `#include <bits/stdc++.h>
+using namespace std;
+{{SOLUTION}}
+int main() {
+  ios::sync_with_stdio(false); cin.tie(nullptr);
+  string line;
+  while (getline(cin, line)) {
+    if (line.empty()) continue;
+    istringstream iss(line); vector<string> tokens; string tok;
+    while (iss >> tok) tokens.push_back(tok);
+    cout << evalRPN(tokens) << "\\n";
+  }
+}`,
+      rust: `use std::io::{self,BufRead};
+{{SOLUTION}}
+fn main() {
+  let stdin = io::stdin();
+  for line in stdin.lock().lines() {
+    let line = line.unwrap(); let line = line.trim();
+    if line.is_empty() { continue; }
+    let tokens: Vec<&str> = line.split_whitespace().collect();
+    println!("{}", eval_rpn(tokens));
+  }
 }`,
     },
   },
@@ -885,6 +1440,98 @@ class Program {
     static void Main() {
         Console.WriteLine(string.Join(", ", DailyTemperatures(new[]{73,74,75,71,69,72,76,73})));
     }
+}`,
+    },
+    // stdin: space-separated temperatures
+    testCases: [
+      { stdin: "73 74 75 71 69 72 76 73", expectedOutput: "1 1 4 2 1 1 0 0" },
+      { stdin: "30 40 50 60", expectedOutput: "1 1 1 0" },
+      { stdin: "30 60 90", expectedOutput: "1 1 0" },
+      { stdin: "89 62 70 58 47 47 46 76 100 70", expectedOutput: "8 1 5 4 3 2 1 1 0 0" },
+    ],
+    judgeHarness: {
+      go: `package main
+import (
+\t"bufio"
+\t"fmt"
+\t"os"
+\t"strconv"
+\t"strings"
+)
+{{SOLUTION}}
+func main() {
+\tscanner := bufio.NewScanner(os.Stdin)
+\tfor scanner.Scan() {
+\t\tline := scanner.Text(); if line == "" { continue }
+\t\tfields := strings.Fields(line)
+\t\ttemps := make([]int, len(fields))
+\t\tfor i, s := range fields { temps[i], _ = strconv.Atoi(s) }
+\t\tres := dailyTemperatures(temps)
+\t\tstrs := make([]string, len(res))
+\t\tfor i, v := range res { strs[i] = strconv.Itoa(v) }
+\t\tfmt.Println(strings.Join(strs, " "))
+\t}
+}`,
+      python: `import sys
+{{SOLUTION}}
+for line in sys.stdin:
+    line = line.strip()
+    if not line: continue
+    temps = list(map(int, line.split()))
+    print(" ".join(map(str, daily_temperatures(temps))))
+`,
+      javascript: `const fs = require("fs");
+{{SOLUTION}}
+const lines = fs.readFileSync(0,"utf8").trimEnd().split(/\r?\n/);
+for (const raw of lines) {
+  const line = raw.trim(); if (!line) continue;
+  const temps = line.split(/\s+/).map(Number);
+  console.log(dailyTemperatures(temps).join(" "));
+}`,
+      java: `import java.io.*;
+import java.util.*;
+public class Main {
+{{SOLUTION}}
+  public static void main(String[] args) throws Exception {
+    BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+    String line;
+    while ((line = br.readLine()) != null) {
+      line = line.trim(); if (line.isEmpty()) continue;
+      String[] tokens = line.split("\\\\s+");
+      int[] temps = new int[tokens.length];
+      for (int i = 0; i < tokens.length; i++) temps[i] = Integer.parseInt(tokens[i]);
+      int[] res = dailyTemperatures(temps);
+      StringBuilder sb = new StringBuilder();
+      for (int i = 0; i < res.length; i++) { if (i > 0) sb.append(' '); sb.append(res[i]); }
+      System.out.println(sb);
+    }
+  }
+}`,
+      cpp: `#include <bits/stdc++.h>
+using namespace std;
+{{SOLUTION}}
+int main() {
+  ios::sync_with_stdio(false); cin.tie(nullptr);
+  string line;
+  while (getline(cin, line)) {
+    if (line.empty()) continue;
+    istringstream iss(line); vector<int> temps; int x;
+    while (iss >> x) temps.push_back(x);
+    auto res = dailyTemperatures(temps);
+    for (int i = 0; i < (int)res.size(); i++) { if (i) cout << ' '; cout << res[i]; } cout << "\\n";
+  }
+}`,
+      rust: `use std::io::{self,BufRead};
+{{SOLUTION}}
+fn main() {
+  let stdin = io::stdin();
+  for line in stdin.lock().lines() {
+    let line = line.unwrap(); let line = line.trim();
+    if line.is_empty() { continue; }
+    let temps: Vec<i32> = line.split_whitespace().map(|s| s.parse().unwrap()).collect();
+    let res = daily_temperatures(temps);
+    println!("{}", res.iter().map(|v| v.to_string()).collect::<Vec<_>>().join(" "));
+  }
 }`,
     },
   },
@@ -1094,6 +1741,78 @@ class Program {
     }
 }`,
     },
+    // stdin: encoded string directly, e.g. "3[a]2[bc]"
+    testCases: [
+      { stdin: "3[a]2[bc]", expectedOutput: "aaabcbc" },
+      { stdin: "3[a2[c]]", expectedOutput: "accaccacc" },
+      { stdin: "2[abc]3[cd]ef", expectedOutput: "abcabccdcdcdef" },
+      { stdin: "10[a]", expectedOutput: "aaaaaaaaaa" },
+    ],
+    judgeHarness: {
+      go: `package main
+import (
+\t"bufio"
+\t"fmt"
+\t"os"
+\t"strings"
+)
+{{SOLUTION}}
+func main() {
+\tscanner := bufio.NewScanner(os.Stdin)
+\tfor scanner.Scan() {
+\t\tline := scanner.Text(); if line == "" { continue }
+\t\tfmt.Println(decodeString(strings.TrimSpace(line)))
+\t}
+}`,
+      python: `import sys
+{{SOLUTION}}
+for line in sys.stdin:
+    line = line.strip()
+    if not line: continue
+    print(decode_string(line))
+`,
+      javascript: `const fs = require("fs");
+{{SOLUTION}}
+const lines = fs.readFileSync(0,"utf8").trimEnd().split(/\r?\n/);
+for (const raw of lines) {
+  const line = raw.trim(); if (!line) continue;
+  console.log(decodeString(line));
+}`,
+      java: `import java.io.*;
+import java.util.*;
+public class Main {
+{{SOLUTION}}
+  public static void main(String[] args) throws Exception {
+    BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+    String line;
+    while ((line = br.readLine()) != null) {
+      line = line.trim(); if (line.isEmpty()) continue;
+      System.out.println(decodeString(line));
+    }
+  }
+}`,
+      cpp: `#include <bits/stdc++.h>
+using namespace std;
+{{SOLUTION}}
+int main() {
+  ios::sync_with_stdio(false); cin.tie(nullptr);
+  string line;
+  while (getline(cin, line)) {
+    if (line.empty()) continue;
+    cout << decodeString(line) << "\\n";
+  }
+}`,
+      rust: `use std::io::{self,BufRead};
+{{SOLUTION}}
+fn main() {
+  let stdin = io::stdin();
+  for line in stdin.lock().lines() {
+    let line = line.unwrap(); let line = line.trim();
+    if line.is_empty() { continue; }
+    println!("{}", decode_string(line));
+  }
+}`,
+    },
   },
 
   // ── Backtracking ──────────────────────────────────────────────────────────
@@ -1243,6 +1962,97 @@ class Program {
     static void Main() {
         Console.WriteLine(string.Join(", ", GenerateParenthesis(3)));
     }
+}`,
+    },
+    // stdin: integer n. Output: sorted combos space-joined on one line.
+    // n=3 → "((()))  (()())  (())()  ()(())  ()()()"  sorted
+    testCases: [
+      { stdin: "1", expectedOutput: "()" },
+      { stdin: "2", expectedOutput: "(())  ()()" },
+      { stdin: "3", expectedOutput: "((()))  (()())  (())()  ()(())  ()()()" },
+    ],
+    judgeHarness: {
+      go: `package main
+import (
+\t"bufio"
+\t"fmt"
+\t"os"
+\t"sort"
+\t"strconv"
+\t"strings"
+)
+{{SOLUTION}}
+func main() {
+\tscanner := bufio.NewScanner(os.Stdin)
+\tfor scanner.Scan() {
+\t\tline := scanner.Text(); if line == "" { continue }
+\t\tn, _ := strconv.Atoi(strings.TrimSpace(line))
+\t\tres := generateParenthesis(n)
+\t\tsort.Strings(res)
+\t\t// Join with double-space so parentheses strings are visually distinct
+\t\tfmt.Println(strings.Join(res, "  "))
+\t}
+}`,
+      python: `import sys
+{{SOLUTION}}
+for line in sys.stdin:
+    line = line.strip()
+    if not line: continue
+    n = int(line)
+    res = sorted(generate_parenthesis(n))
+    print("  ".join(res))
+`,
+      javascript: `const fs = require("fs");
+{{SOLUTION}}
+const lines = fs.readFileSync(0,"utf8").trimEnd().split(/\r?\n/);
+for (const raw of lines) {
+  const line = raw.trim(); if (!line) continue;
+  const n = parseInt(line, 10);
+  const res = generateParenthesis(n).sort();
+  console.log(res.join("  "));
+}`,
+      java: `import java.io.*;
+import java.util.*;
+public class Main {
+{{SOLUTION}}
+  public static void main(String[] args) throws Exception {
+    BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+    String line;
+    while ((line = br.readLine()) != null) {
+      line = line.trim(); if (line.isEmpty()) continue;
+      int n = Integer.parseInt(line);
+      List<String> res = generateParenthesis(n);
+      Collections.sort(res);
+      System.out.println(String.join("  ", res));
+    }
+  }
+}`,
+      cpp: `#include <bits/stdc++.h>
+using namespace std;
+{{SOLUTION}}
+int main() {
+  ios::sync_with_stdio(false); cin.tie(nullptr);
+  string line;
+  while (getline(cin, line)) {
+    if (line.empty()) continue;
+    int n = stoi(line);
+    auto res = generateParenthesis(n);
+    sort(res.begin(), res.end());
+    for (int i = 0; i < (int)res.size(); i++) { if (i) cout << "  "; cout << res[i]; } cout << "\\n";
+  }
+}`,
+      rust: `use std::io::{self,BufRead};
+{{SOLUTION}}
+fn main() {
+  let stdin = io::stdin();
+  for line in stdin.lock().lines() {
+    let line = line.unwrap(); let line = line.trim();
+    if line.is_empty() { continue; }
+    let n: usize = line.parse().unwrap();
+    let mut res = generate_parenthesis(n);
+    res.sort();
+    println!("{}", res.join("  "));
+  }
 }`,
     },
   },
@@ -1406,6 +2216,129 @@ class Program {
     }
 }`,
     },
+    // stdin: space-separated nums. Output: subsets sorted lexicographically, joined by "|".
+    // empty subset is represented as empty string (leading "|")
+    testCases: [
+      { stdin: "1 2 3", expectedOutput: "|1|1 2|1 2 3|1 3|2|2 3|3" },
+      { stdin: "0", expectedOutput: "|0" },
+      { stdin: "1 2", expectedOutput: "|1|1 2|2" },
+    ],
+    judgeHarness: {
+      go: `package main
+import (
+\t"bufio"
+\t"fmt"
+\t"os"
+\t"sort"
+\t"strconv"
+\t"strings"
+)
+{{SOLUTION}}
+func main() {
+\tscanner := bufio.NewScanner(os.Stdin)
+\tfor scanner.Scan() {
+\t\tline := scanner.Text(); if line == "" { continue }
+\t\tfields := strings.Fields(line)
+\t\tnums := make([]int, len(fields))
+\t\tfor i, s := range fields { nums[i], _ = strconv.Atoi(s) }
+\t\tall := subsets(nums)
+\t\tstrs := make([]string, len(all))
+\t\tfor i, sub := range all {
+\t\t\tsort.Ints(sub)
+\t\t\tss := make([]string, len(sub))
+\t\t\tfor j, v := range sub { ss[j] = strconv.Itoa(v) }
+\t\t\tstrs[i] = strings.Join(ss, " ")
+\t\t}
+\t\tsort.Strings(strs)
+\t\tfmt.Println(strings.Join(strs, "|"))
+\t}
+}`,
+      python: `import sys
+{{SOLUTION}}
+for line in sys.stdin:
+    line = line.strip()
+    if not line: continue
+    nums = list(map(int, line.split()))
+    all_subsets = subsets(nums)
+    strs = [" ".join(map(str, sorted(s))) for s in all_subsets]
+    strs.sort()
+    print("|".join(strs))
+`,
+      javascript: `const fs = require("fs");
+{{SOLUTION}}
+const lines = fs.readFileSync(0,"utf8").trimEnd().split(/\r?\n/);
+for (const raw of lines) {
+  const line = raw.trim(); if (!line) continue;
+  const nums = line.split(/\s+/).map(Number);
+  const all = subsets(nums);
+  const strs = all.map(s => [...s].sort((a,b)=>a-b).join(" "));
+  strs.sort();
+  console.log(strs.join("|"));
+}`,
+      java: `import java.io.*;
+import java.util.*;
+public class Main {
+{{SOLUTION}}
+  public static void main(String[] args) throws Exception {
+    BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+    String line;
+    while ((line = br.readLine()) != null) {
+      line = line.trim(); if (line.isEmpty()) continue;
+      String[] tokens = line.split("\\\\s+");
+      int[] nums = new int[tokens.length];
+      for (int i = 0; i < tokens.length; i++) nums[i] = Integer.parseInt(tokens[i]);
+      List<List<Integer>> all = subsets(nums);
+      List<String> strs = new ArrayList<>();
+      for (List<Integer> s : all) {
+        List<Integer> sorted = new ArrayList<>(s); Collections.sort(sorted);
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < sorted.size(); i++) { if (i > 0) sb.append(' '); sb.append(sorted.get(i)); }
+        strs.add(sb.toString());
+      }
+      Collections.sort(strs);
+      System.out.println(String.join("|", strs));
+    }
+  }
+}`,
+      cpp: `#include <bits/stdc++.h>
+using namespace std;
+{{SOLUTION}}
+int main() {
+  ios::sync_with_stdio(false); cin.tie(nullptr);
+  string line;
+  while (getline(cin, line)) {
+    if (line.empty()) continue;
+    istringstream iss(line); vector<int> nums; int x;
+    while (iss >> x) nums.push_back(x);
+    auto all = subsets(nums);
+    vector<string> strs;
+    for (auto s : all) {
+      sort(s.begin(), s.end());
+      string t; for (int i = 0; i < (int)s.size(); i++) { if (i) t+=' '; t+=to_string(s[i]); }
+      strs.push_back(t);
+    }
+    sort(strs.begin(), strs.end());
+    for (int i = 0; i < (int)strs.size(); i++) { if (i) cout << '|'; cout << strs[i]; } cout << "\\n";
+  }
+}`,
+      rust: `use std::io::{self,BufRead};
+{{SOLUTION}}
+fn main() {
+  let stdin = io::stdin();
+  for line in stdin.lock().lines() {
+    let line = line.unwrap(); let line = line.trim();
+    if line.is_empty() { continue; }
+    let nums: Vec<i32> = line.split_whitespace().map(|s| s.parse().unwrap()).collect();
+    let all = subsets(nums);
+    let mut strs: Vec<String> = all.iter().map(|s| {
+      let mut v = s.clone(); v.sort();
+      v.iter().map(|x| x.to_string()).collect::<Vec<_>>().join(" ")
+    }).collect();
+    strs.sort();
+    println!("{}", strs.join("|"));
+  }
+}`,
+    },
   },
 
   // ── Array ─────────────────────────────────────────────────────────────────
@@ -1563,6 +2496,100 @@ class Program {
     }
 }`,
     },
+    // stdin: space-separated nums; output: space-separated result array
+    testCases: [
+      { stdin: "1 2 3", expectedOutput: "1 3 2" },
+      { stdin: "3 2 1", expectedOutput: "1 2 3" },
+      { stdin: "1 1 5", expectedOutput: "1 5 1" },
+      { stdin: "1 3 2", expectedOutput: "2 1 3" },
+    ],
+    judgeHarness: {
+      go: `package main
+import (
+\t"bufio"
+\t"fmt"
+\t"os"
+\t"strconv"
+\t"strings"
+)
+{{SOLUTION}}
+func main() {
+\tscanner := bufio.NewScanner(os.Stdin)
+\tfor scanner.Scan() {
+\t\tline := scanner.Text(); if line == "" { continue }
+\t\tfields := strings.Fields(line)
+\t\tnums := make([]int, len(fields))
+\t\tfor i, s := range fields { nums[i], _ = strconv.Atoi(s) }
+\t\tnextPermutation(nums)
+\t\tstrs := make([]string, len(nums))
+\t\tfor i, v := range nums { strs[i] = strconv.Itoa(v) }
+\t\tfmt.Println(strings.Join(strs, " "))
+\t}
+}`,
+      python: `import sys
+{{SOLUTION}}
+for line in sys.stdin:
+    line = line.strip()
+    if not line: continue
+    nums = list(map(int, line.split()))
+    next_permutation(nums)
+    print(" ".join(map(str, nums)))
+`,
+      javascript: `const fs = require("fs");
+{{SOLUTION}}
+const lines = fs.readFileSync(0,"utf8").trimEnd().split(/\r?\n/);
+for (const raw of lines) {
+  const line = raw.trim(); if (!line) continue;
+  const nums = line.split(/\s+/).map(Number);
+  nextPermutation(nums);
+  console.log(nums.join(" "));
+}`,
+      java: `import java.io.*;
+import java.util.*;
+public class Main {
+{{SOLUTION}}
+  public static void main(String[] args) throws Exception {
+    BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+    String line;
+    while ((line = br.readLine()) != null) {
+      line = line.trim(); if (line.isEmpty()) continue;
+      String[] tokens = line.split("\\\\s+");
+      int[] nums = new int[tokens.length];
+      for (int i = 0; i < tokens.length; i++) nums[i] = Integer.parseInt(tokens[i]);
+      nextPermutation(nums);
+      StringBuilder sb = new StringBuilder();
+      for (int i = 0; i < nums.length; i++) { if (i > 0) sb.append(' '); sb.append(nums[i]); }
+      System.out.println(sb);
+    }
+  }
+}`,
+      cpp: `#include <bits/stdc++.h>
+using namespace std;
+{{SOLUTION}}
+int main() {
+  ios::sync_with_stdio(false); cin.tie(nullptr);
+  string line;
+  while (getline(cin, line)) {
+    if (line.empty()) continue;
+    istringstream iss(line); vector<int> nums; int x;
+    while (iss >> x) nums.push_back(x);
+    nextPermutation(nums);
+    for (int i = 0; i < (int)nums.size(); i++) { if (i) cout << ' '; cout << nums[i]; } cout << "\\n";
+  }
+}`,
+      rust: `use std::io::{self,BufRead};
+{{SOLUTION}}
+fn main() {
+  let stdin = io::stdin();
+  for line in stdin.lock().lines() {
+    let line = line.unwrap(); let line = line.trim();
+    if line.is_empty() { continue; }
+    let mut nums: Vec<i32> = line.split_whitespace().map(|s| s.parse().unwrap()).collect();
+    next_permutation(&mut nums);
+    println!("{}", nums.iter().map(|v| v.to_string()).collect::<Vec<_>>().join(" "));
+  }
+}`,
+    },
   },
 
   // ── Dynamic Programming ───────────────────────────────────────────────────
@@ -1694,6 +2721,105 @@ class Program {
     static void Main() {
         Console.WriteLine(MinPathSum(new[]{new[]{1,3,1},new[]{1,5,1},new[]{4,2,1}}));  // 7
     }
+}`,
+    },
+    // stdin: rows separated by "|", cells space-separated. e.g. "1 3 1|1 5 1|4 2 1"
+    testCases: [
+      { stdin: "1 3 1|1 5 1|4 2 1", expectedOutput: "7" },
+      { stdin: "1 2 3|4 5 6", expectedOutput: "12" },
+      { stdin: "1 2|5 6|1 1", expectedOutput: "8" },
+      { stdin: "5", expectedOutput: "5" },
+    ],
+    judgeHarness: {
+      go: `package main
+import (
+\t"bufio"
+\t"fmt"
+\t"os"
+\t"strconv"
+\t"strings"
+)
+{{SOLUTION}}
+func main() {
+\tscanner := bufio.NewScanner(os.Stdin)
+\tfor scanner.Scan() {
+\t\tline := scanner.Text(); if line == "" { continue }
+\t\trows := strings.Split(line, "|")
+\t\tgrid := make([][]int, len(rows))
+\t\tfor i, r := range rows {
+\t\t\tfs := strings.Fields(r)
+\t\t\tgrid[i] = make([]int, len(fs))
+\t\t\tfor j, s := range fs { grid[i][j], _ = strconv.Atoi(s) }
+\t\t}
+\t\tfmt.Println(minPathSum(grid))
+\t}
+}`,
+      python: `import sys
+{{SOLUTION}}
+for line in sys.stdin:
+    line = line.strip()
+    if not line: continue
+    grid = [[int(x) for x in r.split()] for r in line.split("|")]
+    print(min_path_sum(grid))
+`,
+      javascript: `const fs = require("fs");
+{{SOLUTION}}
+const lines = fs.readFileSync(0,"utf8").trimEnd().split(/\r?\n/);
+for (const raw of lines) {
+  const line = raw.trim(); if (!line) continue;
+  const grid = line.split("|").map(r => r.trim().split(/\s+/).map(Number));
+  console.log(String(minPathSum(grid)));
+}`,
+      java: `import java.io.*;
+import java.util.*;
+public class Main {
+{{SOLUTION}}
+  public static void main(String[] args) throws Exception {
+    BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+    String line;
+    while ((line = br.readLine()) != null) {
+      line = line.trim(); if (line.isEmpty()) continue;
+      String[] rows = line.split("\\\\|");
+      int[][] grid = new int[rows.length][];
+      for (int i = 0; i < rows.length; i++) {
+        String[] cells = rows[i].trim().split("\\\\s+");
+        grid[i] = new int[cells.length];
+        for (int j = 0; j < cells.length; j++) grid[i][j] = Integer.parseInt(cells[j]);
+      }
+      System.out.println(minPathSum(grid));
+    }
+  }
+}`,
+      cpp: `#include <bits/stdc++.h>
+using namespace std;
+{{SOLUTION}}
+int main() {
+  ios::sync_with_stdio(false); cin.tie(nullptr);
+  string line;
+  while (getline(cin, line)) {
+    if (line.empty()) continue;
+    vector<vector<int>> grid;
+    stringstream ss(line); string row;
+    while (getline(ss, row, '|')) {
+      istringstream rs(row); vector<int> r; int x;
+      while (rs >> x) r.push_back(x);
+      grid.push_back(r);
+    }
+    cout << minPathSum(grid) << "\\n";
+  }
+}`,
+      rust: `use std::io::{self,BufRead};
+{{SOLUTION}}
+fn main() {
+  let stdin = io::stdin();
+  for line in stdin.lock().lines() {
+    let line = line.unwrap(); let line = line.trim();
+    if line.is_empty() { continue; }
+    let grid: Vec<Vec<i32>> = line.split('|').map(|r|
+      r.split_whitespace().map(|s| s.parse().unwrap()).collect()
+    ).collect();
+    println!("{}", min_path_sum(grid));
+  }
 }`,
     },
   },
@@ -1844,6 +2970,89 @@ class Program {
         Console.WriteLine(CanPartition(new[]{1,5,11,5}));  // True
         Console.WriteLine(CanPartition(new[]{1,2,3,5}));   // False
     }
+}`,
+    },
+    testCases: [
+      { stdin: "1 5 11 5", expectedOutput: "true" },
+      { stdin: "1 2 3 5", expectedOutput: "false" },
+      { stdin: "1 2 3 4 5 6 7", expectedOutput: "true" },
+      { stdin: "3 3 3 4 5", expectedOutput: "false" },
+    ],
+    judgeHarness: {
+      go: `package main
+import (
+\t"bufio"
+\t"fmt"
+\t"os"
+\t"strconv"
+\t"strings"
+)
+{{SOLUTION}}
+func main() {
+\tscanner := bufio.NewScanner(os.Stdin)
+\tfor scanner.Scan() {
+\t\tline := scanner.Text(); if line == "" { continue }
+\t\tfields := strings.Fields(line)
+\t\tnums := make([]int, len(fields))
+\t\tfor i, s := range fields { nums[i], _ = strconv.Atoi(s) }
+\t\tif canPartition(nums) { fmt.Println("true") } else { fmt.Println("false") }
+\t}
+}`,
+      python: `import sys
+{{SOLUTION}}
+for line in sys.stdin:
+    line = line.strip()
+    if not line: continue
+    nums = list(map(int, line.split()))
+    print(str(can_partition(nums)).lower())
+`,
+      javascript: `const fs = require("fs");
+{{SOLUTION}}
+const lines = fs.readFileSync(0,"utf8").trimEnd().split(/\r?\n/);
+for (const raw of lines) {
+  const line = raw.trim(); if (!line) continue;
+  const nums = line.split(/\s+/).map(Number);
+  console.log(String(canPartition(nums)));
+}`,
+      java: `import java.io.*;
+import java.util.*;
+public class Main {
+{{SOLUTION}}
+  public static void main(String[] args) throws Exception {
+    BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+    String line;
+    while ((line = br.readLine()) != null) {
+      line = line.trim(); if (line.isEmpty()) continue;
+      String[] tokens = line.split("\\\\s+");
+      int[] nums = new int[tokens.length];
+      for (int i = 0; i < tokens.length; i++) nums[i] = Integer.parseInt(tokens[i]);
+      System.out.println(canPartition(nums));
+    }
+  }
+}`,
+      cpp: `#include <bits/stdc++.h>
+using namespace std;
+{{SOLUTION}}
+int main() {
+  ios::sync_with_stdio(false); cin.tie(nullptr);
+  string line;
+  while (getline(cin, line)) {
+    if (line.empty()) continue;
+    istringstream iss(line); vector<int> nums; int x;
+    while (iss >> x) nums.push_back(x);
+    cout << (canPartition(nums) ? "true" : "false") << "\\n";
+  }
+}`,
+      rust: `use std::io::{self,BufRead};
+{{SOLUTION}}
+fn main() {
+  let stdin = io::stdin();
+  for line in stdin.lock().lines() {
+    let line = line.unwrap(); let line = line.trim();
+    if line.is_empty() { continue; }
+    let nums: Vec<i32> = line.split_whitespace().map(|s| s.parse().unwrap()).collect();
+    println!("{}", can_partition(nums));
+  }
 }`,
     },
   },
@@ -2012,6 +3221,108 @@ class Program {
     static void Main() {
         Console.WriteLine(string.Join(", ", SearchRange(new[]{5,7,7,8,8,10}, 8)));  // 3, 4
     }
+}`,
+    },
+    // stdin: "nums|target" e.g. "5 7 7 8 8 10|8"
+    testCases: [
+      { stdin: "5 7 7 8 8 10|8", expectedOutput: "3 4" },
+      { stdin: "5 7 7 8 8 10|6", expectedOutput: "-1 -1" },
+      { stdin: "1|1", expectedOutput: "0 0" },
+      { stdin: "1 2 3 3 3 4 5|3", expectedOutput: "2 4" },
+    ],
+    judgeHarness: {
+      go: `package main
+import (
+\t"bufio"
+\t"fmt"
+\t"os"
+\t"strconv"
+\t"strings"
+)
+{{SOLUTION}}
+func main() {
+\tscanner := bufio.NewScanner(os.Stdin)
+\tfor scanner.Scan() {
+\t\tline := scanner.Text(); if line == "" { continue }
+\t\tparts := strings.SplitN(line, "|", 2)
+\t\tfields := strings.Fields(parts[0])
+\t\tnums := make([]int, len(fields))
+\t\tfor i, s := range fields { nums[i], _ = strconv.Atoi(s) }
+\t\ttarget, _ := strconv.Atoi(strings.TrimSpace(parts[1]))
+\t\tres := searchRange(nums, target)
+\t\tfmt.Println(strconv.Itoa(res[0]) + " " + strconv.Itoa(res[1]))
+\t}
+}`,
+      python: `import sys
+{{SOLUTION}}
+for line in sys.stdin:
+    line = line.strip()
+    if not line: continue
+    a, _, b = line.partition("|")
+    nums = list(map(int, a.split()))
+    target = int(b.strip())
+    res = search_range(nums, target)
+    print(str(res[0]) + " " + str(res[1]))
+`,
+      javascript: `const fs = require("fs");
+{{SOLUTION}}
+const lines = fs.readFileSync(0,"utf8").trimEnd().split(/\r?\n/);
+for (const raw of lines) {
+  const line = raw.trim(); if (!line) continue;
+  const [a, b] = line.split("|");
+  const nums = a.trim().split(/\s+/).map(Number);
+  const target = parseInt(b.trim(), 10);
+  const res = searchRange(nums, target);
+  console.log(res[0] + " " + res[1]);
+}`,
+      java: `import java.io.*;
+import java.util.*;
+public class Main {
+{{SOLUTION}}
+  public static void main(String[] args) throws Exception {
+    BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+    String line;
+    while ((line = br.readLine()) != null) {
+      line = line.trim(); if (line.isEmpty()) continue;
+      String[] parts = line.split("\\\\|", 2);
+      String[] tokens = parts[0].trim().split("\\\\s+");
+      int[] nums = new int[tokens.length];
+      for (int i = 0; i < tokens.length; i++) nums[i] = Integer.parseInt(tokens[i]);
+      int target = Integer.parseInt(parts[1].trim());
+      int[] res = searchRange(nums, target);
+      System.out.println(res[0] + " " + res[1]);
+    }
+  }
+}`,
+      cpp: `#include <bits/stdc++.h>
+using namespace std;
+{{SOLUTION}}
+int main() {
+  ios::sync_with_stdio(false); cin.tie(nullptr);
+  string line;
+  while (getline(cin, line)) {
+    if (line.empty()) continue;
+    auto bar = line.find('|');
+    istringstream iss(line.substr(0, bar)); vector<int> nums; int x;
+    while (iss >> x) nums.push_back(x);
+    int target = stoi(line.substr(bar+1));
+    auto res = searchRange(nums, target);
+    cout << res[0] << " " << res[1] << "\\n";
+  }
+}`,
+      rust: `use std::io::{self,BufRead};
+{{SOLUTION}}
+fn main() {
+  let stdin = io::stdin();
+  for line in stdin.lock().lines() {
+    let line = line.unwrap(); let line = line.trim();
+    if line.is_empty() { continue; }
+    let mut it = line.splitn(2, '|');
+    let nums: Vec<i32> = it.next().unwrap_or("").split_whitespace().map(|s| s.parse().unwrap()).collect();
+    let target: i32 = it.next().unwrap_or("0").trim().parse().unwrap();
+    let res = search_range(nums, target);
+    println!("{} {}", res[0], res[1]);
+  }
 }`,
     },
   },

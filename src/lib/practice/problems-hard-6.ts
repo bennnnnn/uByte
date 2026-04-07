@@ -153,6 +153,132 @@ class Program {
     }
 }`,
     },
+    testCases: [
+      { stdin: "1 3 -1 -3 5 3 6 7\n3", expectedOutput: "[3 3 5 5 6 7]" },
+      { stdin: "1\n1", expectedOutput: "[1]" },
+      { stdin: "9 11\n2", expectedOutput: "[11 11]" },
+    ],
+    judgeHarness: {
+      go: `package main
+
+import (
+\t"bufio"
+\t"fmt"
+\t"os"
+\t"strconv"
+\t"strings"
+)
+
+{{SOLUTION}}
+
+func main() {
+\tscanner := bufio.NewScanner(os.Stdin)
+\tscanner.Buffer(make([]byte, 1024*1024), 1024*1024)
+\tscanner.Scan()
+\tparts := strings.Fields(scanner.Text())
+\tnums := make([]int, len(parts))
+\tfor i, p := range parts {
+\t\tnums[i], _ = strconv.Atoi(p)
+\t}
+\tscanner.Scan()
+\tk, _ := strconv.Atoi(strings.TrimSpace(scanner.Text()))
+\tres := maxSlidingWindow(nums, k)
+\tstrs := make([]string, len(res))
+\tfor i, v := range res {
+\t\tstrs[i] = strconv.Itoa(v)
+\t}
+\tfmt.Printf("[%s]\\n", strings.Join(strs, " "))
+}`,
+      python: `import sys
+input = sys.stdin.readline
+
+{{SOLUTION}}
+
+def main():
+    nums = list(map(int, input().split()))
+    k = int(input().strip())
+    res = max_sliding_window(nums, k)
+    print("[" + " ".join(map(str, res)) + "]")
+
+main()`,
+      javascript: `const lines = require('fs').readFileSync('/dev/stdin','utf8').trim().split('\\n');
+let idx = 0;
+
+{{SOLUTION}}
+
+const nums = lines[idx++].split(' ').map(Number);
+const k = parseInt(lines[idx++]);
+const res = maxSlidingWindow(nums, k);
+console.log('[' + res.join(' ') + ']');`,
+      java: `import java.util.*;
+import java.io.*;
+
+public class Main {
+{{SOLUTION}}
+
+    public static void main(String[] args) throws Exception {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        String[] parts = br.readLine().trim().split("\\\\s+");
+        int[] nums = new int[parts.length];
+        for (int i = 0; i < parts.length; i++) nums[i] = Integer.parseInt(parts[i]);
+        int k = Integer.parseInt(br.readLine().trim());
+        int[] res = maxSlidingWindow(nums, k);
+        StringBuilder sb = new StringBuilder("[");
+        for (int i = 0; i < res.length; i++) { if (i > 0) sb.append(" "); sb.append(res[i]); }
+        sb.append("]");
+        System.out.println(sb);
+    }
+}`,
+      rust: `use std::io::{self, BufRead};
+
+{{SOLUTION}}
+
+fn main() {
+    let stdin = io::stdin();
+    let mut lines = stdin.lock().lines();
+    let nums: Vec<i32> = lines.next().unwrap().unwrap()
+        .split_whitespace().map(|x| x.parse().unwrap()).collect();
+    let k: usize = lines.next().unwrap().unwrap().trim().parse().unwrap();
+    let res = max_sliding_window(nums, k);
+    let strs: Vec<String> = res.iter().map(|v| v.to_string()).collect();
+    println!("[{}]", strs.join(" "));
+}`,
+      cpp: `#include <iostream>
+#include <vector>
+#include <deque>
+#include <sstream>
+#include <string>
+using namespace std;
+
+{{SOLUTION}}
+
+int main() {
+    string line;
+    getline(cin, line);
+    istringstream iss(line);
+    vector<int> nums; int x;
+    while (iss >> x) nums.push_back(x);
+    int k; cin >> k;
+    auto res = maxSlidingWindow(nums, k);
+    cout << "[";
+    for (int i = 0; i < (int)res.size(); i++) { if (i) cout << " "; cout << res[i]; }
+    cout << "]" << endl;
+}`,
+      csharp: `using System;
+using System.Collections.Generic;
+using System.Linq;
+
+class Program {
+{{SOLUTION}}
+
+    static void Main() {
+        int[] nums = Console.ReadLine().Trim().Split(' ').Select(int.Parse).ToArray();
+        int k = int.Parse(Console.ReadLine().Trim());
+        int[] res = MaxSlidingWindow(nums, k);
+        Console.WriteLine("[" + string.Join(" ", res) + "]");
+    }
+}`,
+    },
   },
 
   {
@@ -372,6 +498,117 @@ class Program {
     }
 }`,
     },
+    testCases: [
+      { stdin: "hit\ncog\nhot dot dog lot log cog", expectedOutput: "5" },
+      { stdin: "hit\ncog\nhot dot dog lot log", expectedOutput: "0" },
+      { stdin: "a\nc\na b c", expectedOutput: "2" },
+    ],
+    judgeHarness: {
+      go: `package main
+
+import (
+\t"bufio"
+\t"fmt"
+\t"os"
+\t"strings"
+)
+
+{{SOLUTION}}
+
+func main() {
+\tscanner := bufio.NewScanner(os.Stdin)
+\tscanner.Buffer(make([]byte, 1024*1024), 1024*1024)
+\tscanner.Scan()
+\tbeginWord := strings.TrimSpace(scanner.Text())
+\tscanner.Scan()
+\tendWord := strings.TrimSpace(scanner.Text())
+\tscanner.Scan()
+\twordList := strings.Fields(scanner.Text())
+\tfmt.Println(ladderLength(beginWord, endWord, wordList))
+}`,
+      python: `import sys
+input = sys.stdin.readline
+
+{{SOLUTION}}
+
+def main():
+    begin_word = input().strip()
+    end_word = input().strip()
+    word_list = input().split()
+    print(ladder_length(begin_word, end_word, word_list))
+
+main()`,
+      javascript: `const lines = require('fs').readFileSync('/dev/stdin','utf8').trim().split('\\n');
+let idx = 0;
+
+{{SOLUTION}}
+
+const beginWord = lines[idx++].trim();
+const endWord = lines[idx++].trim();
+const wordList = lines[idx++].trim().split(' ');
+console.log(ladderLength(beginWord, endWord, wordList));`,
+      java: `import java.util.*;
+import java.io.*;
+
+public class Main {
+{{SOLUTION}}
+
+    public static void main(String[] args) throws Exception {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        String beginWord = br.readLine().trim();
+        String endWord = br.readLine().trim();
+        List<String> wordList = Arrays.asList(br.readLine().trim().split("\\\\s+"));
+        System.out.println(ladderLength(beginWord, endWord, wordList));
+    }
+}`,
+      rust: `use std::io::{self, BufRead};
+
+{{SOLUTION}}
+
+fn main() {
+    let stdin = io::stdin();
+    let mut lines = stdin.lock().lines();
+    let begin_word = lines.next().unwrap().unwrap().trim().to_string();
+    let end_word = lines.next().unwrap().unwrap().trim().to_string();
+    let word_line = lines.next().unwrap().unwrap();
+    let word_list: Vec<&str> = word_line.split_whitespace().collect();
+    println!("{}", ladder_length(&begin_word, &end_word, word_list));
+}`,
+      cpp: `#include <iostream>
+#include <queue>
+#include <unordered_set>
+#include <vector>
+#include <string>
+#include <sstream>
+using namespace std;
+
+{{SOLUTION}}
+
+int main() {
+    string beginWord, endWord, wordLine;
+    getline(cin, beginWord);
+    getline(cin, endWord);
+    getline(cin, wordLine);
+    istringstream iss(wordLine);
+    vector<string> wordList;
+    string w;
+    while (iss >> w) wordList.push_back(w);
+    cout << ladderLength(beginWord, endWord, wordList) << endl;
+}`,
+      csharp: `using System;
+using System.Collections.Generic;
+
+class Program {
+{{SOLUTION}}
+
+    static void Main() {
+        string beginWord = Console.ReadLine().Trim();
+        string endWord = Console.ReadLine().Trim();
+        string[] wordList = Console.ReadLine().Trim().Split(' ');
+        Console.WriteLine(LadderLength(beginWord, endWord, new List<string>(wordList)));
+    }
+}`,
+    },
   },
 
   {
@@ -511,6 +748,105 @@ class Program {
         return dp[m,n];
     }
     static void Main(){ Console.WriteLine(IsMatch("aa","a")); Console.WriteLine(IsMatch("aa","*")); }
+}`,
+    },
+    testCases: [
+      { stdin: "aa\na", expectedOutput: "false" },
+      { stdin: "aa\n*", expectedOutput: "true" },
+      { stdin: "cb\n?a", expectedOutput: "false" },
+      { stdin: "adceb\n*a*b", expectedOutput: "true" },
+    ],
+    judgeHarness: {
+      go: `package main
+
+import (
+\t"bufio"
+\t"fmt"
+\t"os"
+\t"strings"
+)
+
+{{SOLUTION}}
+
+func main() {
+\tscanner := bufio.NewScanner(os.Stdin)
+\tscanner.Buffer(make([]byte, 1024*1024), 1024*1024)
+\tscanner.Scan()
+\ts := strings.TrimSpace(scanner.Text())
+\tscanner.Scan()
+\tp := strings.TrimSpace(scanner.Text())
+\tif isMatch(s, p) {
+\t\tfmt.Println("true")
+\t} else {
+\t\tfmt.Println("false")
+\t}
+}`,
+      python: `import sys
+input = sys.stdin.readline
+
+{{SOLUTION}}
+
+def main():
+    s = input().strip()
+    p = input().strip()
+    print(str(is_match(s, p)).lower())
+
+main()`,
+      javascript: `const lines = require('fs').readFileSync('/dev/stdin','utf8').trim().split('\\n');
+let idx = 0;
+
+{{SOLUTION}}
+
+const s = lines[idx++].trim();
+const p = lines[idx++].trim();
+console.log(isMatch(s, p).toString());`,
+      java: `import java.util.*;
+import java.io.*;
+
+public class Main {
+{{SOLUTION}}
+
+    public static void main(String[] args) throws Exception {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        String s = br.readLine().trim();
+        String p = br.readLine().trim();
+        System.out.println(isMatch(s, p));
+    }
+}`,
+      rust: `use std::io::{self, BufRead};
+
+{{SOLUTION}}
+
+fn main() {
+    let stdin = io::stdin();
+    let mut lines = stdin.lock().lines();
+    let s = lines.next().unwrap().unwrap().trim().to_string();
+    let p = lines.next().unwrap().unwrap().trim().to_string();
+    println!("{}", is_match(&s, &p));
+}`,
+      cpp: `#include <iostream>
+#include <vector>
+#include <string>
+using namespace std;
+
+{{SOLUTION}}
+
+int main() {
+    string s, p;
+    getline(cin, s);
+    getline(cin, p);
+    cout << (isMatch(s, p) ? "true" : "false") << endl;
+}`,
+      csharp: `using System;
+
+class Program {
+{{SOLUTION}}
+
+    static void Main() {
+        string s = Console.ReadLine().Trim();
+        string p = Console.ReadLine().Trim();
+        Console.WriteLine(IsMatch(s, p).ToString().ToLower());
+    }
 }`,
     },
   },
@@ -743,6 +1079,190 @@ class Program {
     }
 }`,
     },
+    testCases: [
+      { stdin: "add 1\nadd 2\nmedian\nadd 3\nmedian", expectedOutput: "1.5\n2.0" },
+      { stdin: "add 5\nmedian\nadd 3\nmedian", expectedOutput: "5.0\n4.0" },
+    ],
+    judgeHarness: {
+      go: `package main
+
+import (
+\t"bufio"
+\t"fmt"
+\t"os"
+\t"strconv"
+\t"strings"
+\t"container/heap"
+)
+
+{{SOLUTION}}
+
+func main() {
+\tscanner := bufio.NewScanner(os.Stdin)
+\tscanner.Buffer(make([]byte, 1024*1024), 1024*1024)
+\tmf := newMedianFinder()
+\tfor scanner.Scan() {
+\t\tline := strings.TrimSpace(scanner.Text())
+\t\tif line == "" { continue }
+\t\tif line == "median" {
+\t\t\tv := mf.findMedian()
+\t\t\tif v == float64(int(v)) {
+\t\t\t\tfmt.Printf("%.1f\\n", v)
+\t\t\t} else {
+\t\t\t\tfmt.Printf("%.1f\\n", v)
+\t\t\t}
+\t\t} else {
+\t\t\tparts := strings.Fields(line)
+\t\t\tnum, _ := strconv.Atoi(parts[1])
+\t\t\tmf.addNum(num)
+\t\t}
+\t}
+}`,
+      python: `import sys
+input = sys.stdin.readline
+
+{{SOLUTION}}
+
+def main():
+    import sys
+    mf = MedianFinder()
+    for line in sys.stdin:
+        line = line.strip()
+        if not line:
+            continue
+        if line == "median":
+            v = mf.find_median()
+            print(f"{v:.1f}")
+        else:
+            _, num = line.split()
+            mf.add_num(int(num))
+
+main()`,
+      javascript: `const lines = require('fs').readFileSync('/dev/stdin','utf8').trim().split('\\n');
+let idx = 0;
+
+{{SOLUTION}}
+
+const mf = new MedianFinder();
+const out = [];
+for (const line of lines) {
+    const t = line.trim();
+    if (!t) continue;
+    if (t === 'median') {
+        const v = mf.findMedian();
+        out.push(Number.isInteger(v) ? v.toFixed(1) : v.toFixed(1));
+    } else {
+        const num = parseInt(t.split(' ')[1]);
+        mf.addNum(num);
+    }
+}
+console.log(out.join('\\n'));`,
+      java: `import java.util.*;
+import java.io.*;
+
+public class Main {
+{{SOLUTION}}
+
+    public static void main(String[] args) throws Exception {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        MedianFinder mf = new MedianFinder();
+        StringBuilder sb = new StringBuilder();
+        String line;
+        boolean first = true;
+        while ((line = br.readLine()) != null) {
+            line = line.trim();
+            if (line.isEmpty()) continue;
+            if (line.equals("median")) {
+                double v = mf.findMedian();
+                if (!first) sb.append("\\n");
+                sb.append(String.format("%.1f", v));
+                first = false;
+            } else {
+                int num = Integer.parseInt(line.split("\\\\s+")[1]);
+                mf.addNum(num);
+            }
+        }
+        System.out.println(sb);
+    }
+}`,
+      rust: `use std::io::{self, BufRead};
+use std::collections::BinaryHeap;
+use std::cmp::Reverse;
+
+{{SOLUTION}}
+
+fn main() {
+    let stdin = io::stdin();
+    let mut mf = MedianFinder::new();
+    let mut results = vec![];
+    for line in stdin.lock().lines() {
+        let line = line.unwrap();
+        let line = line.trim();
+        if line.is_empty() { continue; }
+        if line == "median" {
+            let v = mf.find_median();
+            results.push(format!("{:.1}", v));
+        } else {
+            let num: i32 = line.split_whitespace().nth(1).unwrap().parse().unwrap();
+            mf.add_num(num);
+        }
+    }
+    println!("{}", results.join("\\n"));
+}`,
+      cpp: `#include <iostream>
+#include <queue>
+#include <string>
+#include <sstream>
+#include <iomanip>
+using namespace std;
+
+{{SOLUTION}}
+
+int main() {
+    MedianFinder mf;
+    string line;
+    bool first = true;
+    while (getline(cin, line)) {
+        if (line.empty()) continue;
+        if (line == "median") {
+            double v = mf.findMedian();
+            if (!first) cout << "\\n";
+            cout << fixed << setprecision(1) << v;
+            first = false;
+        } else {
+            istringstream iss(line);
+            string op; int num;
+            iss >> op >> num;
+            mf.addNum(num);
+        }
+    }
+    if (!first) cout << endl;
+}`,
+      csharp: `using System;
+using System.Collections.Generic;
+
+{{SOLUTION}}
+
+class Program {
+    static void Main() {
+        var mf = new MedianFinder();
+        var results = new List<string>();
+        string line;
+        while ((line = Console.ReadLine()) != null) {
+            line = line.Trim();
+            if (line == "") continue;
+            if (line == "median") {
+                double v = mf.FindMedian();
+                results.Add(v.ToString("F1"));
+            } else {
+                int num = int.Parse(line.Split(' ')[1]);
+                mf.AddNum(num);
+            }
+        }
+        Console.WriteLine(string.Join("\\n", results));
+    }
+}`,
+    },
   },
 
   {
@@ -934,6 +1454,103 @@ class Program {
     static void Main(){ Console.WriteLine(MinWindow("ADOBECODEBANC","ABC")); }
 }`,
     },
+    testCases: [
+      { stdin: "ADOBECODEBANC\nABC", expectedOutput: "BANC" },
+      { stdin: "a\na", expectedOutput: "a" },
+      { stdin: "a\naa", expectedOutput: "" },
+    ],
+    judgeHarness: {
+      go: `package main
+
+import (
+\t"bufio"
+\t"fmt"
+\t"os"
+\t"strings"
+)
+
+{{SOLUTION}}
+
+func main() {
+\tscanner := bufio.NewScanner(os.Stdin)
+\tscanner.Buffer(make([]byte, 1024*1024), 1024*1024)
+\tscanner.Scan()
+\ts := strings.TrimSpace(scanner.Text())
+\tscanner.Scan()
+\tt := strings.TrimSpace(scanner.Text())
+\tfmt.Println(minWindow(s, t))
+}`,
+      python: `import sys
+input = sys.stdin.readline
+
+{{SOLUTION}}
+
+def main():
+    s = input().strip()
+    t = input().strip()
+    print(min_window(s, t))
+
+main()`,
+      javascript: `const lines = require('fs').readFileSync('/dev/stdin','utf8').trim().split('\\n');
+let idx = 0;
+
+{{SOLUTION}}
+
+const s = lines[idx++].trim();
+const t = lines[idx++].trim();
+console.log(minWindow(s, t));`,
+      java: `import java.util.*;
+import java.io.*;
+
+public class Main {
+{{SOLUTION}}
+
+    public static void main(String[] args) throws Exception {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        String s = br.readLine().trim();
+        String t = br.readLine().trim();
+        System.out.println(minWindow(s, t));
+    }
+}`,
+      rust: `use std::io::{self, BufRead};
+use std::collections::HashMap;
+
+{{SOLUTION}}
+
+fn main() {
+    let stdin = io::stdin();
+    let mut lines = stdin.lock().lines();
+    let s = lines.next().unwrap().unwrap().trim().to_string();
+    let t = lines.next().unwrap().unwrap().trim().to_string();
+    println!("{}", min_window(&s, &t));
+}`,
+      cpp: `#include <iostream>
+#include <unordered_map>
+#include <string>
+#include <climits>
+using namespace std;
+
+{{SOLUTION}}
+
+int main() {
+    string s, t;
+    getline(cin, s);
+    getline(cin, t);
+    cout << minWindow(s, t) << endl;
+}`,
+      csharp: `using System;
+using System.Collections.Generic;
+
+class Program {
+{{SOLUTION}}
+
+    static void Main() {
+        string s = Console.ReadLine().Trim();
+        string t = Console.ReadLine().Trim();
+        Console.WriteLine(MinWindow(s, t));
+    }
+}`,
+    },
   },
 
   {
@@ -1061,6 +1678,94 @@ class Program {
         return dp[n-1];
     }
     static void Main(){ Console.WriteLine(MinCut("aab")); }
+}`,
+    },
+    testCases: [
+      { stdin: "aab", expectedOutput: "1" },
+      { stdin: "a", expectedOutput: "0" },
+      { stdin: "ab", expectedOutput: "1" },
+      { stdin: "aaabaa", expectedOutput: "1" },
+    ],
+    judgeHarness: {
+      go: `package main
+
+import (
+\t"bufio"
+\t"fmt"
+\t"os"
+\t"strings"
+)
+
+{{SOLUTION}}
+
+func main() {
+\tscanner := bufio.NewScanner(os.Stdin)
+\tscanner.Buffer(make([]byte, 1024*1024), 1024*1024)
+\tscanner.Scan()
+\ts := strings.TrimSpace(scanner.Text())
+\tfmt.Println(minCut(s))
+}`,
+      python: `import sys
+input = sys.stdin.readline
+
+{{SOLUTION}}
+
+def main():
+    s = input().strip()
+    print(min_cut(s))
+
+main()`,
+      javascript: `const lines = require('fs').readFileSync('/dev/stdin','utf8').trim().split('\\n');
+let idx = 0;
+
+{{SOLUTION}}
+
+const s = lines[idx++].trim();
+console.log(minCut(s));`,
+      java: `import java.util.*;
+import java.io.*;
+
+public class Main {
+{{SOLUTION}}
+
+    public static void main(String[] args) throws Exception {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        String s = br.readLine().trim();
+        System.out.println(minCut(s));
+    }
+}`,
+      rust: `use std::io::{self, BufRead};
+
+{{SOLUTION}}
+
+fn main() {
+    let stdin = io::stdin();
+    let mut lines = stdin.lock().lines();
+    let s = lines.next().unwrap().unwrap().trim().to_string();
+    println!("{}", min_cut(&s));
+}`,
+      cpp: `#include <iostream>
+#include <vector>
+#include <string>
+#include <algorithm>
+using namespace std;
+
+{{SOLUTION}}
+
+int main() {
+    string s;
+    getline(cin, s);
+    cout << minCut(s) << endl;
+}`,
+      csharp: `using System;
+
+class Program {
+{{SOLUTION}}
+
+    static void Main() {
+        string s = Console.ReadLine().Trim();
+        Console.WriteLine(MinCut(s));
+    }
 }`,
     },
   },
@@ -1192,6 +1897,120 @@ class Program {
         return false;
     }
     static void Main(){Console.WriteLine(CanReach(new[]{4,2,3,0,3,1,2},5));}
+}`,
+    },
+    testCases: [
+      { stdin: "4 2 3 0 3 1 2\n5", expectedOutput: "true" },
+      { stdin: "3 0 2 1 2\n2", expectedOutput: "false" },
+    ],
+    judgeHarness: {
+      go: `package main
+
+import (
+\t"bufio"
+\t"fmt"
+\t"os"
+\t"strconv"
+\t"strings"
+)
+
+{{SOLUTION}}
+
+func main() {
+\tscanner := bufio.NewScanner(os.Stdin)
+\tscanner.Buffer(make([]byte, 1024*1024), 1024*1024)
+\tscanner.Scan()
+\tparts := strings.Fields(scanner.Text())
+\tarr := make([]int, len(parts))
+\tfor i, p := range parts {
+\t\tarr[i], _ = strconv.Atoi(p)
+\t}
+\tscanner.Scan()
+\tstart, _ := strconv.Atoi(strings.TrimSpace(scanner.Text()))
+\tif canReach(arr, start) {
+\t\tfmt.Println("true")
+\t} else {
+\t\tfmt.Println("false")
+\t}
+}`,
+      python: `import sys
+input = sys.stdin.readline
+
+{{SOLUTION}}
+
+def main():
+    arr = list(map(int, input().split()))
+    start = int(input().strip())
+    print(str(can_reach(arr, start)).lower())
+
+main()`,
+      javascript: `const lines = require('fs').readFileSync('/dev/stdin','utf8').trim().split('\\n');
+let idx = 0;
+
+{{SOLUTION}}
+
+const arr = lines[idx++].split(' ').map(Number);
+const start = parseInt(lines[idx++]);
+console.log(canReach(arr, start).toString());`,
+      java: `import java.util.*;
+import java.io.*;
+
+public class Main {
+{{SOLUTION}}
+
+    public static void main(String[] args) throws Exception {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        String[] parts = br.readLine().trim().split("\\\\s+");
+        int[] arr = new int[parts.length];
+        for (int i = 0; i < parts.length; i++) arr[i] = Integer.parseInt(parts[i]);
+        int start = Integer.parseInt(br.readLine().trim());
+        System.out.println(canReach(arr, start));
+    }
+}`,
+      rust: `use std::io::{self, BufRead};
+use std::collections::{HashSet, VecDeque};
+
+{{SOLUTION}}
+
+fn main() {
+    let stdin = io::stdin();
+    let mut lines = stdin.lock().lines();
+    let arr: Vec<usize> = lines.next().unwrap().unwrap()
+        .split_whitespace().map(|x| x.parse().unwrap()).collect();
+    let start: usize = lines.next().unwrap().unwrap().trim().parse().unwrap();
+    println!("{}", can_reach(&arr, start));
+}`,
+      cpp: `#include <iostream>
+#include <vector>
+#include <queue>
+#include <unordered_set>
+#include <sstream>
+#include <string>
+using namespace std;
+
+{{SOLUTION}}
+
+int main() {
+    string line;
+    getline(cin, line);
+    istringstream iss(line);
+    vector<int> arr; int x;
+    while (iss >> x) arr.push_back(x);
+    int start; cin >> start;
+    cout << (canReach(arr, start) ? "true" : "false") << endl;
+}`,
+      csharp: `using System;
+using System.Collections.Generic;
+using System.Linq;
+
+class Program {
+{{SOLUTION}}
+
+    static void Main() {
+        int[] arr = Console.ReadLine().Trim().Split(' ').Select(int.Parse).ToArray();
+        int start = int.Parse(Console.ReadLine().Trim());
+        Console.WriteLine(CanReach(arr, start).ToString().ToLower());
+    }
 }`,
     },
   },

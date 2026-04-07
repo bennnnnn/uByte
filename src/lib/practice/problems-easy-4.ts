@@ -92,6 +92,91 @@ class Program {
       { stdin: "rhythm", expectedOutput: "0" },
       { stdin: "AEIOU", expectedOutput: "5" },
     ],
+    judgeHarness: {
+      go: `package main
+
+import (
+\t"bufio"
+\t"fmt"
+\t"os"
+\t"strings"
+)
+
+{{SOLUTION}}
+
+func main() {
+\tscanner := bufio.NewScanner(os.Stdin)
+\tfor scanner.Scan() {
+\t\tline := scanner.Text()
+\t\tif line == "" {
+\t\t\tcontinue
+\t\t}
+\t\t_ = strings.ToLower
+\t\tfmt.Println(countVowels(line))
+\t}
+}`,
+      python: `import sys
+
+{{SOLUTION}}
+
+for line in sys.stdin:
+    line = line.strip()
+    if not line:
+        continue
+    print(count_vowels(line))
+`,
+      javascript: `const fs = require("fs");
+
+{{SOLUTION}}
+
+const lines = fs.readFileSync(0, "utf8").trimEnd().split(/\r?\n/);
+for (const lineRaw of lines) {
+  const line = lineRaw.trim();
+  if (!line) continue;
+  console.log(countVowels(line));
+}`,
+      java: `import java.io.*;
+import java.util.*;
+public class Main {
+{{SOLUTION}}
+  public static void main(String[] args) throws Exception {
+    BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+    String line;
+    while ((line = br.readLine()) != null) {
+      line = line.trim();
+      if (line.isEmpty()) continue;
+      System.out.println(countVowels(line));
+    }
+  }
+}`,
+      rust: `use std::io::{self, BufRead};
+
+{{SOLUTION}}
+
+fn main() {
+    let stdin = io::stdin();
+    for line in stdin.lock().lines() {
+        let line = line.unwrap();
+        let line = line.trim();
+        if line.is_empty() { continue; }
+        println!("{}", count_vowels(line));
+    }
+}`,
+      cpp: `#include <bits/stdc++.h>
+using namespace std;
+
+{{SOLUTION}}
+
+int main() {
+  ios::sync_with_stdio(false); cin.tie(nullptr);
+  string line;
+  while (getline(cin, line)) {
+    if (line.empty()) continue;
+    cout << countVowels(line) << "\n";
+  }
+  return 0;
+}`,
+    },
   },
   {
     slug: "sum-of-digits",
@@ -178,6 +263,93 @@ class Program {
       { stdin: "0", expectedOutput: "0" },
       { stdin: "1000", expectedOutput: "1" },
     ],
+    judgeHarness: {
+      go: `package main
+
+import (
+\t"bufio"
+\t"fmt"
+\t"os"
+\t"strconv"
+)
+
+{{SOLUTION}}
+
+func main() {
+\tscanner := bufio.NewScanner(os.Stdin)
+\tfor scanner.Scan() {
+\t\tline := scanner.Text()
+\t\tif line == "" {
+\t\t\tcontinue
+\t\t}
+\t\tn, _ := strconv.Atoi(line)
+\t\tfmt.Println(sumOfDigits(n))
+\t}
+}`,
+      python: `import sys
+
+{{SOLUTION}}
+
+for line in sys.stdin:
+    line = line.strip()
+    if not line:
+        continue
+    print(sum_of_digits(int(line)))
+`,
+      javascript: `const fs = require("fs");
+
+{{SOLUTION}}
+
+const lines = fs.readFileSync(0, "utf8").trimEnd().split(/\r?\n/);
+for (const lineRaw of lines) {
+  const line = lineRaw.trim();
+  if (!line) continue;
+  console.log(sumOfDigits(Number(line)));
+}`,
+      java: `import java.io.*;
+import java.util.*;
+public class Main {
+{{SOLUTION}}
+  public static void main(String[] args) throws Exception {
+    BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+    String line;
+    while ((line = br.readLine()) != null) {
+      line = line.trim();
+      if (line.isEmpty()) continue;
+      System.out.println(sumOfDigits(Integer.parseInt(line)));
+    }
+  }
+}`,
+      rust: `use std::io::{self, BufRead};
+
+{{SOLUTION}}
+
+fn main() {
+    let stdin = io::stdin();
+    for line in stdin.lock().lines() {
+        let line = line.unwrap();
+        let line = line.trim();
+        if line.is_empty() { continue; }
+        let n: u64 = line.parse().unwrap();
+        println!("{}", sum_of_digits(n));
+    }
+}`,
+      cpp: `#include <bits/stdc++.h>
+using namespace std;
+
+{{SOLUTION}}
+
+int main() {
+  ios::sync_with_stdio(false); cin.tie(nullptr);
+  string line;
+  while (getline(cin, line)) {
+    if (line.empty()) continue;
+    int n = stoi(line);
+    cout << sumOfDigits(n) << "\n";
+  }
+  return 0;
+}`,
+    },
   },
   {
     slug: "check-armstrong-number",
@@ -266,6 +438,93 @@ class Program {
       { stdin: "9474", expectedOutput: "true" },
       { stdin: "123", expectedOutput: "false" },
     ],
+    judgeHarness: {
+      go: `package main
+
+import (
+\t"bufio"
+\t"fmt"
+\t"os"
+\t"strconv"
+)
+
+{{SOLUTION}}
+
+func main() {
+\tscanner := bufio.NewScanner(os.Stdin)
+\tfor scanner.Scan() {
+\t\tline := scanner.Text()
+\t\tif line == "" {
+\t\t\tcontinue
+\t\t}
+\t\tn, _ := strconv.Atoi(line)
+\t\tfmt.Println(isArmstrong(n))
+\t}
+}`,
+      python: `import sys
+
+{{SOLUTION}}
+
+for line in sys.stdin:
+    line = line.strip()
+    if not line:
+        continue
+    print(str(is_armstrong(int(line))).lower())
+`,
+      javascript: `const fs = require("fs");
+
+{{SOLUTION}}
+
+const lines = fs.readFileSync(0, "utf8").trimEnd().split(/\r?\n/);
+for (const lineRaw of lines) {
+  const line = lineRaw.trim();
+  if (!line) continue;
+  console.log(String(isArmstrong(Number(line))));
+}`,
+      java: `import java.io.*;
+import java.util.*;
+public class Main {
+{{SOLUTION}}
+  public static void main(String[] args) throws Exception {
+    BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+    String line;
+    while ((line = br.readLine()) != null) {
+      line = line.trim();
+      if (line.isEmpty()) continue;
+      System.out.println(isArmstrong(Integer.parseInt(line)));
+    }
+  }
+}`,
+      rust: `use std::io::{self, BufRead};
+
+{{SOLUTION}}
+
+fn main() {
+    let stdin = io::stdin();
+    for line in stdin.lock().lines() {
+        let line = line.unwrap();
+        let line = line.trim();
+        if line.is_empty() { continue; }
+        let n: u64 = line.parse().unwrap();
+        println!("{}", is_armstrong(n));
+    }
+}`,
+      cpp: `#include <bits/stdc++.h>
+using namespace std;
+
+{{SOLUTION}}
+
+int main() {
+  ios::sync_with_stdio(false); cin.tie(nullptr);
+  string line;
+  while (getline(cin, line)) {
+    if (line.empty()) continue;
+    int n = stoi(line);
+    cout << (isArmstrong(n) ? "true" : "false") << "\n";
+  }
+  return 0;
+}`,
+    },
   },
   {
     slug: "find-second-largest",
@@ -355,6 +614,128 @@ class Program {
       { stdin: "[10, 5]", expectedOutput: "5" },
       { stdin: "[42]", expectedOutput: "-1" },
     ],
+    judgeHarness: {
+      go: `package main
+
+import (
+\t"bufio"
+\t"fmt"
+\t"os"
+\t"strconv"
+\t"strings"
+)
+
+{{SOLUTION}}
+
+func parseIntArray(s string) []int {
+\ts = strings.TrimSpace(s)
+\ts = strings.Trim(s, "[]")
+\tparts := strings.Split(s, ",")
+\tresult := []int{}
+\tfor _, p := range parts {
+\t\tp = strings.TrimSpace(p)
+\t\tif p == "" {
+\t\t\tcontinue
+\t\t}
+\t\tn, _ := strconv.Atoi(p)
+\t\tresult = append(result, n)
+\t}
+\treturn result
+}
+
+func main() {
+\tscanner := bufio.NewScanner(os.Stdin)
+\tfor scanner.Scan() {
+\t\tline := scanner.Text()
+\t\tif line == "" {
+\t\t\tcontinue
+\t\t}
+\t\tnums := parseIntArray(line)
+\t\tfmt.Println(secondLargest(nums))
+\t}
+}`,
+      python: `import sys
+
+{{SOLUTION}}
+
+for line in sys.stdin:
+    line = line.strip()
+    if not line:
+        continue
+    nums = list(map(int, line.strip("[]").split(",")))
+    print(second_largest(nums))
+`,
+      javascript: `const fs = require("fs");
+
+{{SOLUTION}}
+
+const lines = fs.readFileSync(0, "utf8").trimEnd().split(/\r?\n/);
+for (const lineRaw of lines) {
+  const line = lineRaw.trim();
+  if (!line) continue;
+  const nums = JSON.parse(line.replace(/\s+/g, ""));
+  console.log(secondLargest(nums));
+}`,
+      java: `import java.io.*;
+import java.util.*;
+public class Main {
+{{SOLUTION}}
+  public static void main(String[] args) throws Exception {
+    BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+    String line;
+    while ((line = br.readLine()) != null) {
+      line = line.trim();
+      if (line.isEmpty()) continue;
+      line = line.replaceAll("[\\[\\]\\s]", "");
+      String[] parts = line.split(",");
+      int[] nums = new int[parts.length];
+      for (int i = 0; i < parts.length; i++) nums[i] = Integer.parseInt(parts[i]);
+      System.out.println(secondLargest(nums));
+    }
+  }
+}`,
+      rust: `use std::io::{self, BufRead};
+
+{{SOLUTION}}
+
+fn main() {
+    let stdin = io::stdin();
+    for line in stdin.lock().lines() {
+        let line = line.unwrap();
+        let line = line.trim();
+        if line.is_empty() { continue; }
+        let cleaned = line.trim_matches(|c| c == '[' || c == ']');
+        let nums: Vec<i64> = cleaned.split(',')
+            .map(|s| s.trim().parse().unwrap())
+            .collect();
+        println!("{}", second_largest(&nums));
+    }
+}`,
+      cpp: `#include <bits/stdc++.h>
+using namespace std;
+
+{{SOLUTION}}
+
+int main() {
+  ios::sync_with_stdio(false); cin.tie(nullptr);
+  string line;
+  while (getline(cin, line)) {
+    if (line.empty()) continue;
+    vector<int> nums;
+    string s = line;
+    s.erase(remove(s.begin(), s.end(), '['), s.end());
+    s.erase(remove(s.begin(), s.end(), ']'), s.end());
+    stringstream ss(s);
+    string token;
+    while (getline(ss, token, ',')) {
+      token.erase(remove_if(token.begin(), token.end(), ::isspace), token.end());
+      if (!token.empty()) nums.push_back(stoi(token));
+    }
+    cout << secondLargest(nums) << "\n";
+  }
+  return 0;
+}`,
+    },
   },
   {
     slug: "count-words",
@@ -447,5 +828,79 @@ class Program {
       { stdin: "", expectedOutput: "0" },
       { stdin: "   ", expectedOutput: "0" },
     ],
+    judgeHarness: {
+      go: `package main
+
+import (
+\t"bufio"
+\t"fmt"
+\t"os"
+\t"strings"
+)
+
+{{SOLUTION}}
+
+func main() {
+\tscanner := bufio.NewScanner(os.Stdin)
+\tfor scanner.Scan() {
+\t\tline := scanner.Text()
+\t\t_ = strings.Fields
+\t\tfmt.Println(countWords(line))
+\t}
+}`,
+      python: `import sys
+
+{{SOLUTION}}
+
+for line in sys.stdin:
+    line = line.rstrip("\n")
+    print(count_words(line))
+`,
+      javascript: `const fs = require("fs");
+
+{{SOLUTION}}
+
+const lines = fs.readFileSync(0, "utf8").split(/\r?\n/);
+// remove trailing empty line caused by final newline
+if (lines.length > 0 && lines[lines.length - 1] === "") lines.pop();
+for (const line of lines) {
+  console.log(countWords(line));
+}`,
+      java: `import java.io.*;
+import java.util.*;
+public class Main {
+{{SOLUTION}}
+  public static void main(String[] args) throws Exception {
+    BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+    String line;
+    while ((line = br.readLine()) != null) {
+      System.out.println(countWords(line));
+    }
+  }
+}`,
+      rust: `use std::io::{self, BufRead};
+
+{{SOLUTION}}
+
+fn main() {
+    let stdin = io::stdin();
+    for line in stdin.lock().lines() {
+        let line = line.unwrap();
+        println!("{}", count_words(&line));
+    }
+}`,
+      cpp: `#include <bits/stdc++.h>
+using namespace std;
+
+{{SOLUTION}}
+
+int main() {
+  string line;
+  while (getline(cin, line)) {
+    cout << countWords(line) << "\n";
+  }
+  return 0;
+}`,
+    },
   },
 ];

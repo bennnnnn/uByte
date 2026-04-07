@@ -122,6 +122,123 @@ class Program {
     }
 }`,
     },
+    testCases: [
+      { stdin: "5|4", expectedOutput: "4" },
+      { stdin: "1|1", expectedOutput: "1" },
+      { stdin: "10|7", expectedOutput: "7" },
+      { stdin: "100|1", expectedOutput: "1" },
+    ],
+    judgeHarness: {
+      go: `package main
+import (
+\t"bufio"
+\t"fmt"
+\t"os"
+\t"strconv"
+\t"strings"
+)
+{{SOLUTION}}
+func main() {
+\tsc := bufio.NewScanner(os.Stdin)
+\tfor sc.Scan() {
+\t\tl := sc.Text(); if l == "" { continue }
+\t\tp := strings.SplitN(l, "|", 2)
+\t\tn, _ := strconv.Atoi(p[0])
+\t\tbad, _ = strconv.Atoi(p[1])
+\t\tfmt.Println(firstBadVersion(n))
+\t}
+}`,
+      python: `import sys
+{{SOLUTION}}
+for line in sys.stdin:
+    line = line.strip()
+    if not line: continue
+    parts = line.split("|")
+    n = int(parts[0])
+    _bad = int(parts[1])
+    def isBadVersion(v, b=_bad): return v >= b
+    print(first_bad_version(n))
+`,
+      javascript: `const fs = require("fs");
+{{SOLUTION}}
+const lines = fs.readFileSync(0, "utf8").trimEnd().split(/\r?\n/);
+for (const raw of lines) {
+  const l = raw.trim(); if (!l) continue;
+  const [nStr, badStr] = l.split("|");
+  const n = parseInt(nStr), badVal = parseInt(badStr);
+  const isBadVersion = v => v >= badVal;
+  const fn = solution(isBadVersion);
+  console.log(fn(n));
+}`,
+      cpp: `#include <bits/stdc++.h>
+using namespace std;
+int bad_val;
+bool isBadVersion(int v) { return v >= bad_val; }
+{{SOLUTION}}
+int main() {
+  ios::sync_with_stdio(false); cin.tie(nullptr);
+  string line;
+  while(getline(cin, line)) {
+    if(line.empty()) continue;
+    auto pos = line.find('|');
+    int n = stoi(line.substr(0, pos));
+    bad_val = stoi(line.substr(pos+1));
+    cout << firstBadVersion(n) << "\\n";
+  }
+}`,
+      java: `import java.io.*;
+import java.util.*;
+public class Main {
+  static int badVal;
+  static boolean isBadVersion(int v) { return v >= badVal; }
+{{SOLUTION}}
+  public static void main(String[] args) throws Exception {
+    BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+    String line;
+    while((line=br.readLine())!=null) {
+      line=line.trim(); if(line.isEmpty()) continue;
+      String[] p = line.split("\\\\|");
+      int n = Integer.parseInt(p[0]);
+      badVal = Integer.parseInt(p[1]);
+      System.out.println(firstBadVersion(n));
+    }
+  }
+}`,
+      rust: `use std::io::{self, BufRead};
+static mut BAD_VAL: i32 = 0;
+fn is_bad_version(v: i32) -> bool { unsafe { v >= BAD_VAL } }
+{{SOLUTION}}
+fn main() {
+  let stdin = io::stdin();
+  for line in stdin.lock().lines() {
+    let line = line.unwrap();
+    let line = line.trim();
+    if line.is_empty() { continue; }
+    let mut parts = line.splitn(2, '|');
+    let n: i32 = parts.next().unwrap().parse().unwrap();
+    let bad: i32 = parts.next().unwrap().parse().unwrap();
+    unsafe { BAD_VAL = bad; }
+    println!("{}", first_bad_version(n));
+  }
+}`,
+      csharp: `using System;
+public class Main {
+  static int badVal;
+  static bool IsBadVersion(int v) => v >= badVal;
+{{SOLUTION}}
+  static void Run() {
+    string line;
+    while((line=Console.ReadLine())!=null) {
+      line=line.Trim(); if(line.Length==0) continue;
+      var p = line.Split('|');
+      int n = int.Parse(p[0]);
+      badVal = int.Parse(p[1]);
+      Console.WriteLine(FirstBadVersion(n));
+    }
+  }
+  static void Main() { Run(); }
+}`,
+    },
   },
 
   {
@@ -236,6 +353,91 @@ class Program {
         Console.WriteLine(Reverse(123));   // 321
         Console.WriteLine(Reverse(-123));  // -321
     }
+}`,
+    },
+    testCases: [
+      { stdin: "123", expectedOutput: "321" },
+      { stdin: "-123", expectedOutput: "-321" },
+      { stdin: "120", expectedOutput: "21" },
+      { stdin: "1534236469", expectedOutput: "0" },
+    ],
+    judgeHarness: {
+      go: `package main
+import (
+\t"bufio"
+\t"fmt"
+\t"os"
+\t"strconv"
+)
+{{SOLUTION}}
+func main() {
+\tsc := bufio.NewScanner(os.Stdin)
+\tfor sc.Scan() {
+\t\tl := sc.Text(); if l == "" { continue }
+\t\tx, _ := strconv.Atoi(l)
+\t\tfmt.Println(reverse(x))
+\t}
+}`,
+      python: `import sys
+{{SOLUTION}}
+for line in sys.stdin:
+    line = line.strip()
+    if not line: continue
+    print(reverse(int(line)))
+`,
+      javascript: `const fs = require("fs");
+{{SOLUTION}}
+const lines = fs.readFileSync(0, "utf8").trimEnd().split(/\r?\n/);
+for (const raw of lines) {
+  const l = raw.trim(); if (!l) continue;
+  console.log(reverse(parseInt(l)));
+}`,
+      cpp: `#include <bits/stdc++.h>
+using namespace std;
+{{SOLUTION}}
+int main() {
+  ios::sync_with_stdio(false); cin.tie(nullptr);
+  string line;
+  while(getline(cin, line)) {
+    if(line.empty()) continue;
+    cout << reverse(stoi(line)) << "\\n";
+  }
+}`,
+      java: `import java.io.*;
+import java.util.*;
+public class Main {
+{{SOLUTION}}
+  public static void main(String[] args) throws Exception {
+    BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+    String line;
+    while((line=br.readLine())!=null) {
+      line=line.trim(); if(line.isEmpty()) continue;
+      System.out.println(reverse(Integer.parseInt(line)));
+    }
+  }
+}`,
+      rust: `use std::io::{self, BufRead};
+{{SOLUTION}}
+fn main() {
+  let stdin = io::stdin();
+  for line in stdin.lock().lines() {
+    let line = line.unwrap();
+    let line = line.trim();
+    if line.is_empty() { continue; }
+    let x: i32 = line.parse().unwrap();
+    println!("{}", reverse(x));
+  }
+}`,
+      csharp: `using System;
+public class Main {
+{{SOLUTION}}
+  static void Main() {
+    string line;
+    while((line=Console.ReadLine())!=null) {
+      line=line.Trim(); if(line.Length==0) continue;
+      Console.WriteLine(Reverse(int.Parse(line)));
+    }
+  }
 }`,
     },
   },
@@ -382,6 +584,118 @@ class Program {
     static void Main() {
         Console.WriteLine(string.Join(", ", FindDisappearedNumbers(new[]{4,3,2,7,8,2,3,1})));
     }
+}`,
+    },
+    testCases: [
+      { stdin: "4 3 2 7 8 2 3 1", expectedOutput: "5 6" },
+      { stdin: "1 1", expectedOutput: "2" },
+      { stdin: "2 2", expectedOutput: "1" },
+      { stdin: "1 2 3 4", expectedOutput: "" },
+    ],
+    judgeHarness: {
+      go: `package main
+import (
+\t"bufio"
+\t"fmt"
+\t"os"
+\t"strconv"
+\t"strings"
+)
+{{SOLUTION}}
+func main() {
+\tsc := bufio.NewScanner(os.Stdin)
+\tfor sc.Scan() {
+\t\tl := sc.Text(); if l == "" { continue }
+\t\tparts := strings.Fields(l)
+\t\tnums := make([]int, len(parts))
+\t\tfor i, s := range parts { nums[i], _ = strconv.Atoi(s) }
+\t\tres := findDisappearedNumbers(nums)
+\t\tstrs := make([]string, len(res))
+\t\tfor i, v := range res { strs[i] = strconv.Itoa(v) }
+\t\tfmt.Println(strings.Join(strs, " "))
+\t}
+}`,
+      python: `import sys
+{{SOLUTION}}
+for line in sys.stdin:
+    line = line.strip()
+    if not line: continue
+    nums = list(map(int, line.split()))
+    res = find_disappeared_numbers(nums)
+    print(" ".join(map(str, res)))
+`,
+      javascript: `const fs = require("fs");
+{{SOLUTION}}
+const lines = fs.readFileSync(0, "utf8").trimEnd().split(/\r?\n/);
+for (const raw of lines) {
+  const l = raw.trim(); if (!l) continue;
+  const nums = l.split(/\s+/).map(Number);
+  const res = findDisappearedNumbers(nums);
+  console.log(res.join(" "));
+}`,
+      cpp: `#include <bits/stdc++.h>
+using namespace std;
+{{SOLUTION}}
+int main() {
+  ios::sync_with_stdio(false); cin.tie(nullptr);
+  string line;
+  while(getline(cin, line)) {
+    if(line.empty()) continue;
+    istringstream iss(line);
+    vector<int> nums; int x;
+    while(iss >> x) nums.push_back(x);
+    auto res = findDisappearedNumbers(nums);
+    for(int i=0;i<(int)res.size();i++) { if(i) cout<<" "; cout<<res[i]; }
+    cout<<"\\n";
+  }
+}`,
+      java: `import java.io.*;
+import java.util.*;
+public class Main {
+{{SOLUTION}}
+  public static void main(String[] args) throws Exception {
+    BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+    String line;
+    while((line=br.readLine())!=null) {
+      line=line.trim(); if(line.isEmpty()) continue;
+      String[] p = line.split("\\\\s+");
+      int[] nums = new int[p.length];
+      for(int i=0;i<p.length;i++) nums[i]=Integer.parseInt(p[i]);
+      List<Integer> res = findDisappearedNumbers(nums);
+      StringBuilder sb = new StringBuilder();
+      for(int i=0;i<res.size();i++){if(i>0)sb.append(' ');sb.append(res.get(i));}
+      System.out.println(sb);
+    }
+  }
+}`,
+      rust: `use std::io::{self, BufRead};
+{{SOLUTION}}
+fn main() {
+  let stdin = io::stdin();
+  for line in stdin.lock().lines() {
+    let line = line.unwrap();
+    let line = line.trim();
+    if line.is_empty() { continue; }
+    let nums: Vec<i32> = line.split_whitespace().map(|s| s.parse().unwrap()).collect();
+    let res = find_disappeared_numbers(nums);
+    let out: Vec<String> = res.iter().map(|v| v.to_string()).collect();
+    println!("{}", out.join(" "));
+  }
+}`,
+      csharp: `using System;
+using System.Collections.Generic;
+using System.Linq;
+public class Main {
+{{SOLUTION}}
+  static void Main() {
+    string line;
+    while((line=Console.ReadLine())!=null) {
+      line=line.Trim(); if(line.Length==0) continue;
+      var nums = line.Split(' ').Select(int.Parse).ToArray();
+      var res = FindDisappearedNumbers(nums);
+      Console.WriteLine(string.Join(" ", res));
+    }
+  }
 }`,
     },
   },
@@ -534,6 +848,89 @@ class Program {
     }
 }`,
     },
+    testCases: [
+      { stdin: "abccccdd", expectedOutput: "7" },
+      { stdin: "a", expectedOutput: "1" },
+      { stdin: "aabbcc", expectedOutput: "6" },
+      { stdin: "Aa", expectedOutput: "1" },
+    ],
+    judgeHarness: {
+      go: `package main
+import (
+\t"bufio"
+\t"fmt"
+\t"os"
+)
+{{SOLUTION}}
+func main() {
+\tsc := bufio.NewScanner(os.Stdin)
+\tfor sc.Scan() {
+\t\tl := sc.Text(); if l == "" { continue }
+\t\tfmt.Println(longestPalindrome(l))
+\t}
+}`,
+      python: `import sys
+{{SOLUTION}}
+for line in sys.stdin:
+    line = line.strip()
+    if not line: continue
+    print(longest_palindrome(line))
+`,
+      javascript: `const fs = require("fs");
+{{SOLUTION}}
+const lines = fs.readFileSync(0, "utf8").trimEnd().split(/\r?\n/);
+for (const raw of lines) {
+  const l = raw.trim(); if (!l) continue;
+  console.log(longestPalindrome(l));
+}`,
+      cpp: `#include <bits/stdc++.h>
+using namespace std;
+{{SOLUTION}}
+int main() {
+  ios::sync_with_stdio(false); cin.tie(nullptr);
+  string line;
+  while(getline(cin, line)) {
+    if(line.empty()) continue;
+    cout << longestPalindrome(line) << "\\n";
+  }
+}`,
+      java: `import java.io.*;
+import java.util.*;
+public class Main {
+{{SOLUTION}}
+  public static void main(String[] args) throws Exception {
+    BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+    String line;
+    while((line=br.readLine())!=null) {
+      line=line.trim(); if(line.isEmpty()) continue;
+      System.out.println(longestPalindrome(line));
+    }
+  }
+}`,
+      rust: `use std::io::{self, BufRead};
+{{SOLUTION}}
+fn main() {
+  let stdin = io::stdin();
+  for line in stdin.lock().lines() {
+    let line = line.unwrap();
+    let line = line.trim();
+    if line.is_empty() { continue; }
+    println!("{}", longest_palindrome(line));
+  }
+}`,
+      csharp: `using System;
+using System.Collections.Generic;
+public class Main {
+{{SOLUTION}}
+  static void Main() {
+    string line;
+    while((line=Console.ReadLine())!=null) {
+      line=line.Trim(); if(line.Length==0) continue;
+      Console.WriteLine(LongestPalindrome(line));
+    }
+  }
+}`,
+    },
   },
 
   {
@@ -634,6 +1031,89 @@ class Program {
         Console.WriteLine(CheckIfPangram("thequickbrownfoxjumpsoverthelazydog"));  // True
         Console.WriteLine(CheckIfPangram("leetcode"));                               // False
     }
+}`,
+    },
+    testCases: [
+      { stdin: "thequickbrownfoxjumpsoverthelazydog", expectedOutput: "true" },
+      { stdin: "leetcode", expectedOutput: "false" },
+      { stdin: "hello", expectedOutput: "false" },
+      { stdin: "abcdefghijklmnopqrstuvwxyz", expectedOutput: "true" },
+    ],
+    judgeHarness: {
+      go: `package main
+import (
+\t"bufio"
+\t"fmt"
+\t"os"
+)
+{{SOLUTION}}
+func main() {
+\tsc := bufio.NewScanner(os.Stdin)
+\tfor sc.Scan() {
+\t\tl := sc.Text(); if l == "" { continue }
+\t\tif checkIfPangram(l) { fmt.Println("true") } else { fmt.Println("false") }
+\t}
+}`,
+      python: `import sys
+{{SOLUTION}}
+for line in sys.stdin:
+    line = line.strip()
+    if not line: continue
+    print(str(check_if_pangram(line)).lower())
+`,
+      javascript: `const fs = require("fs");
+{{SOLUTION}}
+const lines = fs.readFileSync(0, "utf8").trimEnd().split(/\r?\n/);
+for (const raw of lines) {
+  const l = raw.trim(); if (!l) continue;
+  console.log(checkIfPangram(l) ? "true" : "false");
+}`,
+      cpp: `#include <bits/stdc++.h>
+using namespace std;
+{{SOLUTION}}
+int main() {
+  ios::sync_with_stdio(false); cin.tie(nullptr);
+  string line;
+  while(getline(cin, line)) {
+    if(line.empty()) continue;
+    cout << (checkIfPangram(line) ? "true" : "false") << "\\n";
+  }
+}`,
+      java: `import java.io.*;
+import java.util.*;
+public class Main {
+{{SOLUTION}}
+  public static void main(String[] args) throws Exception {
+    BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+    String line;
+    while((line=br.readLine())!=null) {
+      line=line.trim(); if(line.isEmpty()) continue;
+      System.out.println(checkIfPangram(line) ? "true" : "false");
+    }
+  }
+}`,
+      rust: `use std::io::{self, BufRead};
+{{SOLUTION}}
+fn main() {
+  let stdin = io::stdin();
+  for line in stdin.lock().lines() {
+    let line = line.unwrap();
+    let line = line.trim();
+    if line.is_empty() { continue; }
+    println!("{}", check_if_pangram(line));
+  }
+}`,
+      csharp: `using System;
+using System.Collections.Generic;
+public class Main {
+{{SOLUTION}}
+  static void Main() {
+    string line;
+    while((line=Console.ReadLine())!=null) {
+      line=line.Trim(); if(line.Length==0) continue;
+      Console.WriteLine(CheckIfPangram(line) ? "true" : "false");
+    }
+  }
 }`,
     },
   },
@@ -739,6 +1219,91 @@ class Program {
         Console.WriteLine(FindComplement(5));  // 2
         Console.WriteLine(FindComplement(1));  // 0
     }
+}`,
+    },
+    testCases: [
+      { stdin: "5", expectedOutput: "2" },
+      { stdin: "1", expectedOutput: "0" },
+      { stdin: "7", expectedOutput: "0" },
+      { stdin: "10", expectedOutput: "5" },
+    ],
+    judgeHarness: {
+      go: `package main
+import (
+\t"bufio"
+\t"fmt"
+\t"os"
+\t"strconv"
+)
+{{SOLUTION}}
+func main() {
+\tsc := bufio.NewScanner(os.Stdin)
+\tfor sc.Scan() {
+\t\tl := sc.Text(); if l == "" { continue }
+\t\tnum, _ := strconv.Atoi(l)
+\t\tfmt.Println(findComplement(num))
+\t}
+}`,
+      python: `import sys
+{{SOLUTION}}
+for line in sys.stdin:
+    line = line.strip()
+    if not line: continue
+    print(find_complement(int(line)))
+`,
+      javascript: `const fs = require("fs");
+{{SOLUTION}}
+const lines = fs.readFileSync(0, "utf8").trimEnd().split(/\r?\n/);
+for (const raw of lines) {
+  const l = raw.trim(); if (!l) continue;
+  console.log(findComplement(parseInt(l)));
+}`,
+      cpp: `#include <bits/stdc++.h>
+using namespace std;
+{{SOLUTION}}
+int main() {
+  ios::sync_with_stdio(false); cin.tie(nullptr);
+  string line;
+  while(getline(cin, line)) {
+    if(line.empty()) continue;
+    cout << findComplement(stoi(line)) << "\\n";
+  }
+}`,
+      java: `import java.io.*;
+import java.util.*;
+public class Main {
+{{SOLUTION}}
+  public static void main(String[] args) throws Exception {
+    BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+    String line;
+    while((line=br.readLine())!=null) {
+      line=line.trim(); if(line.isEmpty()) continue;
+      System.out.println(findComplement(Integer.parseInt(line)));
+    }
+  }
+}`,
+      rust: `use std::io::{self, BufRead};
+{{SOLUTION}}
+fn main() {
+  let stdin = io::stdin();
+  for line in stdin.lock().lines() {
+    let line = line.unwrap();
+    let line = line.trim();
+    if line.is_empty() { continue; }
+    let num: u32 = line.parse().unwrap();
+    println!("{}", find_complement(num));
+  }
+}`,
+      csharp: `using System;
+public class Main {
+{{SOLUTION}}
+  static void Main() {
+    string line;
+    while((line=Console.ReadLine())!=null) {
+      line=line.Trim(); if(line.Length==0) continue;
+      Console.WriteLine(FindComplement(int.Parse(line)));
+    }
+  }
 }`,
     },
   },
@@ -891,6 +1456,104 @@ class Program {
     }
 }`,
     },
+    testCases: [
+      { stdin: "1 0 1 1 0", expectedOutput: "4" },
+      { stdin: "1 0 1 1 0 1", expectedOutput: "4" },
+      { stdin: "1 1 1", expectedOutput: "3" },
+      { stdin: "0 0 0", expectedOutput: "1" },
+    ],
+    judgeHarness: {
+      go: `package main
+import (
+\t"bufio"
+\t"fmt"
+\t"os"
+\t"strconv"
+\t"strings"
+)
+{{SOLUTION}}
+func main() {
+\tsc := bufio.NewScanner(os.Stdin)
+\tfor sc.Scan() {
+\t\tl := sc.Text(); if l == "" { continue }
+\t\tparts := strings.Fields(l)
+\t\tnums := make([]int, len(parts))
+\t\tfor i, s := range parts { nums[i], _ = strconv.Atoi(s) }
+\t\tfmt.Println(findMaxConsecutiveOnes(nums))
+\t}
+}`,
+      python: `import sys
+{{SOLUTION}}
+for line in sys.stdin:
+    line = line.strip()
+    if not line: continue
+    nums = list(map(int, line.split()))
+    print(find_max_consecutive_ones(nums))
+`,
+      javascript: `const fs = require("fs");
+{{SOLUTION}}
+const lines = fs.readFileSync(0, "utf8").trimEnd().split(/\r?\n/);
+for (const raw of lines) {
+  const l = raw.trim(); if (!l) continue;
+  const nums = l.split(/\s+/).map(Number);
+  console.log(findMaxConsecutiveOnes(nums));
+}`,
+      cpp: `#include <bits/stdc++.h>
+using namespace std;
+{{SOLUTION}}
+int main() {
+  ios::sync_with_stdio(false); cin.tie(nullptr);
+  string line;
+  while(getline(cin, line)) {
+    if(line.empty()) continue;
+    istringstream iss(line);
+    vector<int> nums; int x;
+    while(iss >> x) nums.push_back(x);
+    cout << findMaxConsecutiveOnes(nums) << "\\n";
+  }
+}`,
+      java: `import java.io.*;
+import java.util.*;
+public class Main {
+{{SOLUTION}}
+  public static void main(String[] args) throws Exception {
+    BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+    String line;
+    while((line=br.readLine())!=null) {
+      line=line.trim(); if(line.isEmpty()) continue;
+      String[] p = line.split("\\\\s+");
+      int[] nums = new int[p.length];
+      for(int i=0;i<p.length;i++) nums[i]=Integer.parseInt(p[i]);
+      System.out.println(findMaxConsecutiveOnes(nums));
+    }
+  }
+}`,
+      rust: `use std::io::{self, BufRead};
+{{SOLUTION}}
+fn main() {
+  let stdin = io::stdin();
+  for line in stdin.lock().lines() {
+    let line = line.unwrap();
+    let line = line.trim();
+    if line.is_empty() { continue; }
+    let nums: Vec<i32> = line.split_whitespace().map(|s| s.parse().unwrap()).collect();
+    println!("{}", find_max_consecutive_ones(&nums));
+  }
+}`,
+      csharp: `using System;
+using System.Linq;
+public class Main {
+{{SOLUTION}}
+  static void Main() {
+    string line;
+    while((line=Console.ReadLine())!=null) {
+      line=line.Trim(); if(line.Length==0) continue;
+      var nums = line.Split(' ').Select(int.Parse).ToArray();
+      Console.WriteLine(FindMaxConsecutiveOnes(nums));
+    }
+  }
+}`,
+    },
   },
 
   {
@@ -1005,6 +1668,104 @@ class Program {
         Console.WriteLine(MaxProfit(new[]{7,1,5,3,6,4}));  // 7
         Console.WriteLine(MaxProfit(new[]{1,2,3,4,5}));    // 4
     }
+}`,
+    },
+    testCases: [
+      { stdin: "7 1 5 3 6 4", expectedOutput: "7" },
+      { stdin: "1 2 3 4 5", expectedOutput: "4" },
+      { stdin: "7 6 4 3 1", expectedOutput: "0" },
+      { stdin: "1 2", expectedOutput: "1" },
+    ],
+    judgeHarness: {
+      go: `package main
+import (
+\t"bufio"
+\t"fmt"
+\t"os"
+\t"strconv"
+\t"strings"
+)
+{{SOLUTION}}
+func main() {
+\tsc := bufio.NewScanner(os.Stdin)
+\tfor sc.Scan() {
+\t\tl := sc.Text(); if l == "" { continue }
+\t\tparts := strings.Fields(l)
+\t\tprices := make([]int, len(parts))
+\t\tfor i, s := range parts { prices[i], _ = strconv.Atoi(s) }
+\t\tfmt.Println(maxProfit(prices))
+\t}
+}`,
+      python: `import sys
+{{SOLUTION}}
+for line in sys.stdin:
+    line = line.strip()
+    if not line: continue
+    prices = list(map(int, line.split()))
+    print(max_profit(prices))
+`,
+      javascript: `const fs = require("fs");
+{{SOLUTION}}
+const lines = fs.readFileSync(0, "utf8").trimEnd().split(/\r?\n/);
+for (const raw of lines) {
+  const l = raw.trim(); if (!l) continue;
+  const prices = l.split(/\s+/).map(Number);
+  console.log(maxProfit(prices));
+}`,
+      cpp: `#include <bits/stdc++.h>
+using namespace std;
+{{SOLUTION}}
+int main() {
+  ios::sync_with_stdio(false); cin.tie(nullptr);
+  string line;
+  while(getline(cin, line)) {
+    if(line.empty()) continue;
+    istringstream iss(line);
+    vector<int> prices; int x;
+    while(iss >> x) prices.push_back(x);
+    cout << maxProfit(prices) << "\\n";
+  }
+}`,
+      java: `import java.io.*;
+import java.util.*;
+public class Main {
+{{SOLUTION}}
+  public static void main(String[] args) throws Exception {
+    BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+    String line;
+    while((line=br.readLine())!=null) {
+      line=line.trim(); if(line.isEmpty()) continue;
+      String[] p = line.split("\\\\s+");
+      int[] prices = new int[p.length];
+      for(int i=0;i<p.length;i++) prices[i]=Integer.parseInt(p[i]);
+      System.out.println(maxProfit(prices));
+    }
+  }
+}`,
+      rust: `use std::io::{self, BufRead};
+{{SOLUTION}}
+fn main() {
+  let stdin = io::stdin();
+  for line in stdin.lock().lines() {
+    let line = line.unwrap();
+    let line = line.trim();
+    if line.is_empty() { continue; }
+    let prices: Vec<i32> = line.split_whitespace().map(|s| s.parse().unwrap()).collect();
+    println!("{}", max_profit(&prices));
+  }
+}`,
+      csharp: `using System;
+using System.Linq;
+public class Main {
+{{SOLUTION}}
+  static void Main() {
+    string line;
+    while((line=Console.ReadLine())!=null) {
+      line=line.Trim(); if(line.Length==0) continue;
+      var prices = line.Split(' ').Select(int.Parse).ToArray();
+      Console.WriteLine(MaxProfit(prices));
+    }
+  }
 }`,
     },
   },
@@ -1166,6 +1927,112 @@ class Program {
     static void Main() {
         Console.WriteLine(string.Join(", ", SummaryRanges(new[]{0,1,2,4,5,7})));
     }
+}`,
+    },
+    testCases: [
+      { stdin: "0 1 2 4 5 7", expectedOutput: "0->2 4->5 7" },
+      { stdin: "0 2 3 4 6 8 9", expectedOutput: "0 2->4 6 8->9" },
+      { stdin: "1", expectedOutput: "1" },
+      { stdin: "-1 0 1", expectedOutput: "-1->1" },
+    ],
+    judgeHarness: {
+      go: `package main
+import (
+\t"bufio"
+\t"fmt"
+\t"os"
+\t"strconv"
+\t"strings"
+)
+{{SOLUTION}}
+func main() {
+\tsc := bufio.NewScanner(os.Stdin)
+\tfor sc.Scan() {
+\t\tl := sc.Text(); if l == "" { continue }
+\t\tparts := strings.Fields(l)
+\t\tnums := make([]int, len(parts))
+\t\tfor i, s := range parts { nums[i], _ = strconv.Atoi(s) }
+\t\tres := summaryRanges(nums)
+\t\tfmt.Println(strings.Join(res, " "))
+\t}
+}`,
+      python: `import sys
+{{SOLUTION}}
+for line in sys.stdin:
+    line = line.strip()
+    if not line: continue
+    nums = list(map(int, line.split()))
+    res = summary_ranges(nums)
+    print(" ".join(res))
+`,
+      javascript: `const fs = require("fs");
+{{SOLUTION}}
+const lines = fs.readFileSync(0, "utf8").trimEnd().split(/\r?\n/);
+for (const raw of lines) {
+  const l = raw.trim(); if (!l) continue;
+  const nums = l.split(/\s+/).map(Number);
+  console.log(summaryRanges(nums).join(" "));
+}`,
+      cpp: `#include <bits/stdc++.h>
+using namespace std;
+{{SOLUTION}}
+int main() {
+  ios::sync_with_stdio(false); cin.tie(nullptr);
+  string line;
+  while(getline(cin, line)) {
+    if(line.empty()) continue;
+    istringstream iss(line);
+    vector<int> nums; int x;
+    while(iss >> x) nums.push_back(x);
+    auto res = summaryRanges(nums);
+    for(int i=0;i<(int)res.size();i++){if(i)cout<<" ";cout<<res[i];}
+    cout<<"\\n";
+  }
+}`,
+      java: `import java.io.*;
+import java.util.*;
+public class Main {
+{{SOLUTION}}
+  public static void main(String[] args) throws Exception {
+    BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+    String line;
+    while((line=br.readLine())!=null) {
+      line=line.trim(); if(line.isEmpty()) continue;
+      String[] p = line.split("\\\\s+");
+      int[] nums = new int[p.length];
+      for(int i=0;i<p.length;i++) nums[i]=Integer.parseInt(p[i]);
+      List<String> res = summaryRanges(nums);
+      System.out.println(String.join(" ", res));
+    }
+  }
+}`,
+      rust: `use std::io::{self, BufRead};
+{{SOLUTION}}
+fn main() {
+  let stdin = io::stdin();
+  for line in stdin.lock().lines() {
+    let line = line.unwrap();
+    let line = line.trim();
+    if line.is_empty() { continue; }
+    let nums: Vec<i32> = line.split_whitespace().map(|s| s.parse().unwrap()).collect();
+    let res = summary_ranges(nums);
+    println!("{}", res.join(" "));
+  }
+}`,
+      csharp: `using System;
+using System.Collections.Generic;
+using System.Linq;
+public class Main {
+{{SOLUTION}}
+  static void Main() {
+    string line;
+    while((line=Console.ReadLine())!=null) {
+      line=line.Trim(); if(line.Length==0) continue;
+      var nums = line.Split(' ').Select(int.Parse).ToArray();
+      var res = SummaryRanges(nums);
+      Console.WriteLine(string.Join(" ", res));
+    }
+  }
 }`,
     },
   },
