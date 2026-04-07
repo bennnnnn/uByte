@@ -132,7 +132,7 @@ export async function getAdminUsersPaginated(
   type Row = Record<string, unknown>;
 
   // 8 explicit parameterized variants covering all filter combinations
-  const [rows, countRows] = await Promise.all<Row[], Array<{total: number}>>([
+  const [rows, countRows] = await Promise.all<[Row[], Array<{total: number}>]>([
     hasSearch && hasPlan && hasVerified
       ? sql`SELECT u.id,u.name,u.email,u.xp,u.streak_days,u.created_at,u.last_active_at,u.is_admin,u.admin_role,u.locked_until,COALESCE(u.plan,'free')AS plan,COALESCE(u.email_verified,0)AS email_verified,u.admin_slug,(SELECT COUNT(*)::int FROM progress WHERE user_id=u.id)AS completed_count,(SELECT COUNT(*)::int FROM bookmarks WHERE user_id=u.id)AS bookmark_count FROM users u WHERE(LOWER(u.email)LIKE ${pattern} OR LOWER(u.name)LIKE ${pattern})AND COALESCE(u.plan,'free')=${plan} AND COALESCE(u.email_verified,0)=${verifiedVal} ORDER BY u.created_at DESC LIMIT ${limit} OFFSET ${offset}`
     : hasSearch && hasPlan
