@@ -8,6 +8,7 @@ import { withErrorHandling } from "@/lib/api-utils";
 import { isExamLang } from "@/lib/exams/config";
 import { verifyCsrf } from "@/lib/csrf";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
+import { isFeatureEnabled } from "@/lib/db/site-settings";
 
 function shuffle<T>(arr: T[]): T[] {
   const out = [...arr];
@@ -27,6 +28,10 @@ export const POST = withErrorHandling(
     const ip = getClientIp(request.headers);
     const { limited } = await checkRateLimit(`exam-start:${ip}`, 10, 60_000);
     if (limited) return NextResponse.json({ error: "Too many requests. Please wait before starting another exam." }, { status: 429 });
+    if (!await isFeatureEnabled("certifications_enabled")) {
+      return NextResponse.json({ error: "Certifications are currently unavailable" }, { status: 503 });
+    }
+
     const user = await getCurrentUser();
     if (!user) return NextResponse.json({ error: "Sign in to start an exam", code: "login_required" }, { status: 401 });
     const dbUser = await getUserById(user.userId);

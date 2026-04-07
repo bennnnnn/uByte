@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
 import { getUserById } from "@/lib/db";
 import { hasPaidAccess } from "@/lib/plans";
+import { isFeatureEnabled } from "@/lib/db/site-settings";
 import { getSubmissionById } from "@/lib/db/submissions";
 import { getPracticeProblemBySlug } from "@/lib/practice/problems";
 import { callGateway, CHAT_MODEL } from "@/lib/ai/gateway-client";
@@ -39,6 +40,10 @@ export const POST = withErrorHandling("POST /api/ai-chat", async (request: NextR
     );
   }
 
+  if (!await isFeatureEnabled("ai_enabled")) {
+    return NextResponse.json({ error: "AI features are currently unavailable" }, { status: 503 });
+  }
+
   const body = await request.json();
   const submissionId = body?.submission_id != null ? Number(body.submission_id) : NaN;
   const userMessage: string = typeof body?.message === "string" ? body.message.trim() : "";
@@ -72,8 +77,8 @@ export const POST = withErrorHandling("POST /api/ai-chat", async (request: NextR
     return NextResponse.json({ error: "Problem not found" }, { status: 404 });
   }
 
-  const dbUser = await getUserById(user.userId);
-  if (!hasPaidAccess(dbUser?.plan)) {
+  const [dbUser, proFeaturesEnabled] = await Promise.all([getUserById(user.userId), isFeatureEnabled("pro_features_enabled")]);
+  if (proFeaturesEnabled && !hasPaidAccess(dbUser?.plan)) {
     return NextResponse.json({ error: "upgrade_required" }, { status: 402 });
   }
 

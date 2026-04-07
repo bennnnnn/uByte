@@ -5,6 +5,7 @@ import { getCachedAiResponse, setCachedAiResponse } from "@/lib/db/ai-feedback-r
 import { canMakeAiCall, getLifetimeAiHintCount, incrementTodayAiUsage, isInCooldown, setLastAiCallAt, AI_COOLDOWN_SECONDS, FREE_HINT_LIMIT } from "@/lib/db/ai-usage";
 import { getUserById } from "@/lib/db";
 import { hasPaidAccess } from "@/lib/plans";
+import { isFeatureEnabled } from "@/lib/db/site-settings";
 import { callAiFeedback } from "@/lib/ai/feedback-client";
 import { withErrorHandling } from "@/lib/api-utils";
 import { verifyCsrf } from "@/lib/csrf";
@@ -29,6 +30,10 @@ export const POST = withErrorHandling("POST /api/tutorial-hint", async (request:
   const { limited, retryAfter } = await checkRateLimit(`tutorial-hint:${ip}:${user.userId}`, 20, 60_000);
   if (limited) {
     return NextResponse.json({ error: "Too many requests" }, { status: 429, headers: { "Retry-After": String(retryAfter) } });
+  }
+
+  if (!await isFeatureEnabled("ai_enabled")) {
+    return NextResponse.json({ error: "AI features are currently unavailable" }, { status: 503 });
   }
 
   const body = await request.json();
@@ -61,8 +66,8 @@ export const POST = withErrorHandling("POST /api/tutorial-hint", async (request:
   };
 
   // Plan check — must come before cache hit so free users never get hints regardless of cache.
-  const dbUser = await getUserById(user.userId);
-  if (!hasPaidAccess(dbUser?.plan)) {
+  const [dbUser, proFeaturesEnabled] = await Promise.all([getUserById(user.userId), isFeatureEnabled("pro_features_enabled")]);
+  if (proFeaturesEnabled && !hasPaidAccess(dbUser?.plan)) {
     const lifetimeUsed = await getLifetimeAiHintCount(user.userId);
     return NextResponse.json(
       { error: "upgrade_required", hintsUsed: lifetimeUsed, limit: FREE_HINT_LIMIT },

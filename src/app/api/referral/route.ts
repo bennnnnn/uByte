@@ -7,8 +7,13 @@ import { getCurrentUser } from "@/lib/auth";
 import { getReferralStats } from "@/lib/db";
 import { BASE_URL } from "@/lib/constants";
 import { withErrorHandling } from "@/lib/api-utils";
+import { isFeatureEnabled } from "@/lib/db/site-settings";
 
 export const GET = withErrorHandling("GET /api/referral", async () => {
+  if (!await isFeatureEnabled("referral_enabled")) {
+    return NextResponse.json({ error: "Referral program is currently unavailable" }, { status: 503 });
+  }
+
   const user = await getCurrentUser();
   if (!user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

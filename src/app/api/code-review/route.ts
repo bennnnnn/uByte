@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
 import { getUserById } from "@/lib/db";
 import { hasPaidAccess } from "@/lib/plans";
+import { isFeatureEnabled } from "@/lib/db/site-settings";
 import { canMakeAiCall, getLifetimeAiHintCount, incrementTodayAiUsage, isInCooldown, setLastAiCallAt, AI_COOLDOWN_SECONDS, FREE_HINT_LIMIT } from "@/lib/db/ai-usage";
 import { getCachedAiResponse, setCachedAiResponse } from "@/lib/db/ai-feedback-responses";
 import { callCodeReview, callInterviewDebrief } from "@/lib/ai/code-review-client";
@@ -28,6 +29,10 @@ export const POST = withErrorHandling("POST /api/code-review", async (request: N
   const { limited } = await checkRateLimit(`review:${ip}`, 10, 60_000);
   if (limited) return NextResponse.json({ error: "Too many requests" }, { status: 429 });
 
+  if (!await isFeatureEnabled("ai_enabled")) {
+    return NextResponse.json({ error: "AI features are currently unavailable" }, { status: 503 });
+  }
+
   const body = await request.json();
   const {
     code,
@@ -51,8 +56,8 @@ export const POST = withErrorHandling("POST /api/code-review", async (request: N
   }
 
   // Pro-only feature
-  const dbUser = await getUserById(user.userId);
-  if (!hasPaidAccess(dbUser?.plan)) {
+  const [dbUser, proFeaturesEnabled] = await Promise.all([getUserById(user.userId), isFeatureEnabled("pro_features_enabled")]);
+  if (proFeaturesEnabled && !hasPaidAccess(dbUser?.plan)) {
     const lifetimeUsed = await getLifetimeAiHintCount(user.userId);
     return NextResponse.json(
       { error: "upgrade_required", hintsUsed: lifetimeUsed, limit: FREE_HINT_LIMIT },

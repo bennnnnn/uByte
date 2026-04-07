@@ -9,6 +9,7 @@ import { sendVerificationEmail, sendWelcomeEmail } from "@/lib/email";
 import crypto from "crypto";
 import { withErrorHandling } from "@/lib/api-utils";
 import { isValidPassword, PASSWORD_POLICY_MESSAGE } from "@/lib/password-policy";
+import { isFeatureEnabled } from "@/lib/db/site-settings";
 
 export const POST = withErrorHandling("POST /api/auth/signup", async (request: NextRequest) => {
   const csrfError = verifyCsrf(request);
@@ -20,6 +21,10 @@ export const POST = withErrorHandling("POST /api/auth/signup", async (request: N
       { error: "Too many signup attempts. Please try again later." },
       { status: 429, headers: { "Retry-After": String(retryAfter) } }
     );
+  }
+
+  if (!await isFeatureEnabled("registration_open")) {
+    return NextResponse.json({ error: "Registration is currently closed" }, { status: 503 });
   }
 
   const { name, email: rawEmail, password, referralCode } = await request.json();

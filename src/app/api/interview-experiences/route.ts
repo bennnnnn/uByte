@@ -14,6 +14,7 @@ import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 import { withErrorHandling } from "@/lib/api-utils";
 import { verifyCsrf } from "@/lib/csrf";
 import { getCurrentUser } from "@/lib/auth";
+import { isFeatureEnabled } from "@/lib/db/site-settings";
 
 const PAGE_SIZE = 20;
 
@@ -33,6 +34,10 @@ export const GET = withErrorHandling("GET /api/interview-experiences", async (re
 });
 
 export const POST = withErrorHandling("POST /api/interview-experiences", async (req: NextRequest) => {
+  if (!await isFeatureEnabled("interview_simulator_enabled")) {
+    return NextResponse.json({ error: "Interview simulator is currently unavailable" }, { status: 503 });
+  }
+
   const csrfError = verifyCsrf(req);
   if (csrfError) return NextResponse.json({ error: csrfError }, { status: 403 });
 
