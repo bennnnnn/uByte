@@ -92,12 +92,12 @@ export default function DangerZoneSection({ onDeleteAccount, onResetProgress, on
         <SettingsSectionHeader title="Danger Zone" titleClassName="text-red-600 dark:text-red-400" />
         <div className="space-y-3">
           {!resetConfirm ? (
-            <button onClick={() => setResetConfirm(true)} className="rounded-lg border border-orange-300 px-6 py-2.5 text-sm font-medium text-orange-600 hover:bg-orange-50 dark:border-orange-800 dark:hover:bg-orange-950">
+            <button onClick={() => setResetConfirm(true)} className="rounded-lg border border-amber-300 px-6 py-2.5 text-sm font-medium text-amber-600 hover:bg-amber-50 dark:border-amber-800 dark:hover:bg-amber-950">
               Reset All Progress
             </button>
           ) : (
-            <div className="rounded-xl border border-orange-300 bg-orange-50 p-4 dark:border-orange-800 dark:bg-orange-950">
-              <p className="mb-3 text-sm text-orange-700 dark:text-orange-400">This will permanently delete all your tutorial progress, badges, XP, and streaks. This cannot be undone.</p>
+            <div className="rounded-xl border border-amber-300 bg-amber-50 p-4 dark:border-amber-800 dark:bg-amber-950">
+              <p className="mb-3 text-sm text-amber-700 dark:text-amber-400">This will permanently delete all your tutorial progress, badges, XP, and streaks. This cannot be undone.</p>
               <div className="flex gap-3">
                 <Button variant="danger" onClick={handleResetProgress} disabled={resetting}>
                   {resetting ? "Resetting…" : "Yes, Reset Everything"}

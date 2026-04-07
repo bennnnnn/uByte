@@ -1,0 +1,57 @@
+[
+  {
+    "title": "Functions are values",
+    "instruction": "Before decorators make sense, you need to know one thing: in Python, functions are values. You can assign them to variables, pass them to other functions, and return them.\n\nThink of a function as a recipe card — you can hand it to someone, and they can follow it whenever they want.\n\nRun this — we pass `greet` (no parentheses!) as an argument.",
+    "starter": "def greet(name):\n    return f\"Hello, {name}!\"\n\ndef call_twice(func, arg):\n    print(func(arg))\n    print(func(arg))\n\ncall_twice(greet, \"Python\")",
+    "expectedOutput": ["Hello, Python!", "Hello, Python!"],
+    "successMessage": "You passed a function as an argument — no parentheses means \"the function itself\", not \"call the function\". This is the foundation of decorators."
+  },
+  {
+    "title": "A function that returns a function",
+    "instruction": "A function can also *create and return* a new function. The inner function remembers the outer function's variables — this is called a **closure**.\n\nThink of it as a factory: you give it a setting, it builds a customized tool for you.",
+    "starter": "def make_greeter(greeting):\n    def greeter(name):\n        return f\"{greeting}, {name}!\"\n    return greeter\n\nsay_hello = make_greeter(\"Hello\")\nsay_hi = make_greeter(\"Hi\")\n\nprint(say_hello(\"Alice\"))\nprint(say_hi(\"Bob\"))",
+    "expectedOutput": ["Hello, Alice!", "Hi, Bob!"],
+    "successMessage": "make_greeter returned two different functions, each remembering its own greeting. That's a closure — and it's exactly how decorators work under the hood."
+  },
+  {
+    "title": "Your first decorator",
+    "instruction": "A decorator wraps a function with extra behaviour — without changing the original function's code.\n\n`@loud` above a function is shorthand for `say_hello = loud(say_hello)`. It replaces the function with the wrapped version.\n\nRun this — the decorator adds `***` around the output.",
+    "starter": "def loud(func):\n    def wrapper(*args, **kwargs):\n        result = func(*args, **kwargs)\n        return f\"*** {result} ***\"\n    return wrapper\n\n@loud\ndef say_hello(name):\n    return f\"Hello, {name}\"\n\nprint(say_hello(\"Python\"))",
+    "expectedOutput": ["*** Hello, Python ***"],
+    "successMessage": "@loud wrapped say_hello. When you call say_hello(), it actually calls wrapper(), which calls the original say_hello() inside. Inception, but for functions."
+  },
+  {
+    "title": "Build a timer decorator ⏱️",
+    "instruction": "The most useful decorator in the real world: measure how long a function takes.\n\nFill in the `timer` decorator so it prints the elapsed time after the function runs.",
+    "hint": "Inside wrapper: start = time.time(), call func(), end = time.time(), print the difference.",
+    "starter": "import time\n\ndef timer(func):\n    def wrapper(*args, **kwargs):\n        start = time.time()\n        result = func(*args, **kwargs)\n        elapsed = time.time() - start\n        print(f\"{func.__name__} took {elapsed:.4f}s\")\n        return result\n    return wrapper\n\n@timer\ndef slow_add(a, b):\n    time.sleep(0.1)\n    return a + b\n\nresult = slow_add(3, 4)\nprint(f\"Result: {result}\")",
+    "expectedOutput": [],
+    "codeChecks": [
+      { "pattern": "time\\.time\\(\\)", "required": true, "message": "Use time.time() to capture start and end times." },
+      { "pattern": "func\\.__name__", "required": true, "message": "Use func.__name__ to print the function's name." }
+    ],
+    "successMessage": "Every Python profiling tool uses this pattern. Flask, Django, FastAPI — they all time their request handlers with decorators exactly like this."
+  },
+  {
+    "title": "Stacking decorators",
+    "instruction": "You can stack multiple decorators. They apply bottom-up: the closest one wraps first, then the next one wraps that.\n\n`@bold` wraps `@italic` wraps the function.\n\nRun this and see the layered output.",
+    "starter": "def bold(func):\n    def wrapper(*args, **kwargs):\n        return f\"<b>{func(*args, **kwargs)}</b>\"\n    return wrapper\n\ndef italic(func):\n    def wrapper(*args, **kwargs):\n        return f\"<i>{func(*args, **kwargs)}</i>\"\n    return wrapper\n\n@bold\n@italic\ndef greet(name):\n    return f\"Hello, {name}\"\n\nprint(greet(\"Python\"))",
+    "expectedOutput": ["<b><i>Hello, Python</i></b>"],
+    "successMessage": "italic wraps first (inner), then bold wraps that (outer). Read bottom-up: @italic → @bold. Stacking is how Flask routes add authentication + logging + caching."
+  },
+  {
+    "title": "The @property decorator",
+    "instruction": "Python's built-in `@property` decorator turns a method into something that looks like an attribute.\n\nInstead of `circle.area()` you write `circle.area` — cleaner, more natural.\n\nRun this — `area` and `circumference` behave like attributes but are computed on the fly.",
+    "starter": "class Circle:\n    def __init__(self, radius):\n        self.radius = radius\n\n    @property\n    def area(self):\n        return 3.14159 * self.radius ** 2\n\n    @property\n    def circumference(self):\n        return 2 * 3.14159 * self.radius\n\nc = Circle(5)\nprint(f\"Area: {c.area:.2f}\")\nprint(f\"Circumference: {c.circumference:.2f}\")",
+    "expectedOutput": ["Area: 78.54", "Circumference: 31.42"],
+    "successMessage": "No parentheses needed — c.area looks like accessing data, but it's actually calling a function. @property is used in every major Python library."
+  },
+  {
+    "title": "Build a retry decorator 🔄",
+    "instruction": "Build a `retry(times)` decorator that re-runs a function up to `times` attempts if it raises an exception.\n\nThis is a decorator *factory* — it takes a parameter and returns the actual decorator.\n\nThe simulated function fails twice then succeeds on the third try.",
+    "hint": "Three layers: retry(times) returns decorator, decorator(func) returns wrapper, wrapper retries the call.",
+    "starter": "import random\nrandom.seed(42)\n\ndef retry(times):\n    def decorator(func):\n        def wrapper(*args, **kwargs):\n            for attempt in range(1, times + 1):\n                try:\n                    return func(*args, **kwargs)\n                except Exception as e:\n                    print(f\"Attempt {attempt} failed: {e}\")\n                    if attempt == times:\n                        raise\n        return wrapper\n    return decorator\n\ncall_count = 0\n\n@retry(times=5)\ndef flaky_api():\n    global call_count\n    call_count += 1\n    if call_count < 3:\n        raise ConnectionError(\"Server timeout\")\n    return \"Success!\"\n\nresult = flaky_api()\nprint(result)",
+    "expectedOutput": ["Attempt 1 failed: Server timeout", "Attempt 2 failed: Server timeout", "Success!"],
+    "successMessage": "A retry decorator with a configurable attempt count. This exact pattern is used in production API clients, database connections, and job queues. You just built real infrastructure."
+  }
+]

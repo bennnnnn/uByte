@@ -210,7 +210,7 @@ function LoggedInHero({
                 <p className="mt-2 text-xs text-zinc-400">Keep going — {7 - streak} days to a week streak!</p>
               )}
               {streak >= 7 && (
-                <p className="mt-2 text-xs font-semibold text-orange-500">You&apos;re on fire! 🔥 Keep it going.</p>
+                <p className="mt-2 text-xs font-semibold text-amber-500">You&apos;re on fire! 🔥 Keep it going.</p>
               )}
             </div>
 

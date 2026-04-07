@@ -1,0 +1,90 @@
+[
+  {
+    "title": "Strings are arrays of characters",
+    "instruction": "Every string in Python is a sequence. You can grab any character by its position (index), starting at 0.\n\nThink of a string as a row of mailboxes — each one numbered, each holding one letter.\n\nRun this to see indexing in action.",
+    "starter": "greeting = \"Hello, Python!\"\n\nprint(greeting[0])\nprint(greeting[7])\nprint(greeting[-1])",
+    "expectedOutput": ["H", "P", "!"],
+    "successMessage": "Index 0 = first character. Index -1 = last character. Negative indexing counts from the end — super handy."
+  },
+  {
+    "title": "Slicing — grab a chunk",
+    "instruction": "Slicing lets you extract a piece of a string: `text[start:end]`.\n\nThe `start` is included, `end` is excluded. Think of it like cutting a cake: you start at one mark and stop *before* the other.\n\nExtract just the word `\"Python\"` from the string and print it.",
+    "hint": "\"Python\" starts at index 7 and ends at index 13. Use greeting[7:13].",
+    "starter": "greeting = \"Hello, Python!\"\n\n# Extract \"Python\" using slicing\nresult = greeting[0:5]  # This gets \"Hello\" — fix it\nprint(result)",
+    "expectedOutput": ["Python"],
+    "codeChecks": [
+      { "pattern": "greeting\\[7:13\\]", "required": true, "message": "Slice from index 7 to 13: greeting[7:13]" }
+    ],
+    "successMessage": "greeting[7:13] grabs characters at positions 7, 8, 9, 10, 11, 12 — not 13. The end is always excluded."
+  },
+  {
+    "title": "Useful string methods",
+    "instruction": "Python strings have dozens of built-in methods. The most common:\n\n- `.upper()` / `.lower()` — change case\n- `.strip()` — remove whitespace from edges\n- `.replace(old, new)` — swap text\n- `.startswith()` / `.endswith()` — check boundaries\n\nFix the messy user input below so it prints `\"hello world\"`.",
+    "hint": "Chain methods: text.strip().lower() removes whitespace then lowercases.",
+    "starter": "text = \"   Hello World   \"\n\n# Clean this up to print \"hello world\"\ncleaned = text  # Fix this line\nprint(cleaned)",
+    "expectedOutput": ["hello world"],
+    "codeChecks": [
+      { "pattern": "\\.strip\\(\\)", "required": true, "message": "Use .strip() to remove the extra spaces." },
+      { "pattern": "\\.lower\\(\\)", "required": true, "message": "Use .lower() to make it lowercase." }
+    ],
+    "successMessage": "Method chaining: text.strip().lower() — first trim, then lowercase. You'll use this pattern constantly when cleaning user input."
+  },
+  {
+    "title": "Find and count",
+    "instruction": "`.find(text)` returns the index where a substring first appears (-1 if not found).\n`.count(text)` counts how many times it appears.\n\nFind the position of `\"world\"` in the sentence, and count how many `\"o\"`s there are.",
+    "hint": "Use sentence.find(\"world\") and sentence.count(\"o\").",
+    "starter": "sentence = \"hello world, hello python\"\n\nposition = 0      # Fix: find \"world\"\ntotal_os = 0      # Fix: count \"o\"s\n\nprint(f\"'world' starts at index {position}\")\nprint(f\"There are {total_os} o's\")",
+    "expectedOutput": ["'world' starts at index 6", "There are 3 o's"],
+    "codeChecks": [
+      { "pattern": "\\.find\\(", "required": true, "message": "Use .find(\"world\") to locate the substring." },
+      { "pattern": "\\.count\\(", "required": true, "message": "Use .count(\"o\") to count occurrences." }
+    ],
+    "successMessage": "find() gives you the position, count() gives you the total. Both return integers you can use in your logic."
+  },
+  {
+    "title": "Split — break a string apart",
+    "instruction": "`.split(separator)` breaks a string into a list of pieces.\n\nThink of it like snapping a Kit-Kat bar — you choose where to break it.\n\nSplit the CSV data by commas and print each name on its own line.",
+    "hint": "Use data.split(\",\") to get a list, then loop with for name in names: print(name.strip())",
+    "starter": "data = \"Alice, Bob, Charlie, Diana\"\n\nnames = data.split(\",\")\nfor name in names:\n    print(name.strip())",
+    "expectedOutput": ["Alice", "Bob", "Charlie", "Diana"],
+    "successMessage": "CSV parsed in two lines. split() is how you process text data — log files, configs, API responses, user input."
+  },
+  {
+    "title": "Join — stitch a list back together",
+    "instruction": "`.join(list)` is the opposite of split — it glues a list of strings into one string.\n\nThe string you call `.join()` on becomes the separator. `\", \".join([\"a\",\"b\"])` → `\"a, b\"`.\n\nJoin the words into a sentence separated by spaces.",
+    "hint": "Use \" \".join(words) to combine with spaces between.",
+    "starter": "words = [\"Python\", \"is\", \"awesome\"]\n\nsentence = \"\"  # Fix: join with spaces\nprint(sentence)",
+    "expectedOutput": ["Python is awesome"],
+    "codeChecks": [
+      { "pattern": "\" \"\\.join\\(words\\)", "required": true, "message": "Use \" \".join(words) to combine the list." }
+    ],
+    "successMessage": "split() breaks apart, join() puts back together. They're a natural pair you'll use together all the time."
+  },
+  {
+    "title": "Replace",
+    "instruction": "`.replace(old, new)` swaps every occurrence of `old` with `new`.\n\nReplace all spaces with hyphens to create a URL-friendly slug.",
+    "starter": "title = \"My First Blog Post\"\n\nslug = title.lower().replace(\" \", \"-\")\nprint(slug)",
+    "expectedOutput": ["my-first-blog-post"],
+    "successMessage": "lower() + replace() — that's literally how every blog platform generates URL slugs. Real-world Python in two method calls."
+  },
+  {
+    "title": "The `in` operator",
+    "instruction": "The simplest way to check if text contains something: the `in` keyword.\n\n`\"py\" in \"python\"` → `True`\n\nNo method call, no index — just plain English. Check if the email contains `\"@\"` and print whether it's valid.",
+    "starter": "email = \"user@example.com\"\n\nif \"@\" in email:\n    print(\"Valid email\")\nelse:\n    print(\"Invalid email\")",
+    "expectedOutput": ["Valid email"],
+    "successMessage": "`in` reads like English: 'if @ is in email'. Python was designed to be readable, and this is a perfect example."
+  },
+  {
+    "title": "Build a text cleaner 🔧",
+    "instruction": "Build a function `clean_username(raw)` that:\n1. Strips whitespace\n2. Converts to lowercase\n3. Replaces spaces with underscores\n4. Removes any `@` symbols\n\nTest it with the messy inputs below.",
+    "hint": "Chain: raw.strip().lower().replace(\" \", \"_\").replace(\"@\", \"\")",
+    "starter": "def clean_username(raw):\n    # Your code here\n    return raw\n\nprint(clean_username(\"  John Doe  \"))\nprint(clean_username(\"@CoolUser123\"))\nprint(clean_username(\"  Jane Smith  \"))",
+    "expectedOutput": ["john_doe", "cooluser123", "jane_smith"],
+    "codeChecks": [
+      { "pattern": "\\.strip\\(\\)", "required": true, "message": "Use .strip() to remove whitespace." },
+      { "pattern": "\\.lower\\(\\)", "required": true, "message": "Use .lower() to lowercase." },
+      { "pattern": "\\.replace\\(", "required": true, "message": "Use .replace() to swap characters." }
+    ],
+    "successMessage": "A real utility function. Every web app has something like this in its user registration flow. You just built one."
+  }
+]

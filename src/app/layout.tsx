@@ -150,7 +150,7 @@ export default async function RootLayout({
         <Script
           id="theme-init"
           strategy="beforeInteractive"
-          dangerouslySetInnerHTML={{ __html: `(function(){try{var t=localStorage.getItem('theme'),d=window.matchMedia('(prefers-color-scheme: dark)').matches;document.documentElement.classList.add(t==='light'||t==='dark'?t:d?'dark':'light')}catch(e){}})()` }}
+          dangerouslySetInnerHTML={{ __html: `(function(){try{var p=location.pathname,t=localStorage.getItem('theme'),isTut=p.indexOf('/tutorial/')===0;if(isTut&&(t==='dark'||(t!=='light'&&matchMedia('(prefers-color-scheme:dark)').matches))){document.documentElement.classList.add('dark')}else{document.documentElement.classList.add('light')}}catch(e){document.documentElement.classList.add('light')}})()` }}
         />
       </head>
       <body

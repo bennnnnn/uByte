@@ -67,7 +67,7 @@ export default function OutputPanel({
           className={`whitespace-pre-wrap break-words text-xs ${
             outputIsError || status === "failed"
               ? "text-red-600 dark:text-red-400"
-              : "text-green-600 dark:text-green-400"
+              : "text-emerald-600 dark:text-emerald-400"
           }`}
         >
           {output}

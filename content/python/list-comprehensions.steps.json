@@ -1,0 +1,75 @@
+[
+  {
+    "title": "The old way vs the Python way",
+    "instruction": "Want to double every number in a list? Here's the traditional way — a loop, an empty list, and an append.\n\nRun this. It works, but it's 4 lines for something simple. Python has a one-liner for this.",
+    "starter": "numbers = [1, 2, 3, 4, 5]\n\ndoubled = []\nfor n in numbers:\n    doubled.append(n * 2)\n\nprint(doubled)",
+    "expectedOutput": ["[2, 4, 6, 8, 10]"],
+    "successMessage": "Works fine — but 4 lines for \"double each number\" feels heavy. Next step: the Pythonic way."
+  },
+  {
+    "title": "Your first list comprehension",
+    "instruction": "Same result, one line:\n\n`[expression for item in iterable]`\n\nRead it like English: \"give me `n * 2` for each `n` in `numbers`.\"\n\nReplace the loop with a list comprehension.",
+    "hint": "doubled = [n * 2 for n in numbers]",
+    "starter": "numbers = [1, 2, 3, 4, 5]\n\n# Replace this with a list comprehension\ndoubled = []  # Fix this line\n\nprint(doubled)",
+    "expectedOutput": ["[2, 4, 6, 8, 10]"],
+    "codeChecks": [
+      { "pattern": "\\[.*for.*in.*\\]", "required": true, "message": "Use a list comprehension: [n * 2 for n in numbers]" },
+      { "pattern": "\\.append", "required": false, "message": "Remove the loop — use a list comprehension instead." }
+    ],
+    "successMessage": "One line. Same result. This is why Python developers love comprehensions — they're concise and readable."
+  },
+  {
+    "title": "Filtering with if",
+    "instruction": "Add `if` at the end to filter: `[x for x in list if condition]`\n\nRead it: \"give me `x` for each `x` in `numbers` if `x` is even.\"\n\nExtract only the even numbers.",
+    "hint": "evens = [n for n in numbers if n % 2 == 0]",
+    "starter": "numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]\n\nevens = [n for n in numbers if n % 2 == 0]\nprint(evens)",
+    "expectedOutput": ["[2, 4, 6, 8, 10]"],
+    "successMessage": "Filter + transform in one line. No temporary variables, no append, no clutter."
+  },
+  {
+    "title": "Transform + filter together",
+    "instruction": "You can transform AND filter in one comprehension.\n\nSquare only the odd numbers from the list.",
+    "hint": "[n ** 2 for n in numbers if n % 2 != 0]",
+    "starter": "numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]\n\nodd_squares = []  # Fix: square only odd numbers\nprint(odd_squares)",
+    "expectedOutput": ["[1, 9, 25, 49, 81]"],
+    "codeChecks": [
+      { "pattern": "\\[.*\\*\\*.*for.*if.*\\]", "required": true, "message": "Use [n ** 2 for n in numbers if n % 2 != 0]" }
+    ],
+    "successMessage": "Transform (square) + filter (odd only) — one expression, one line, crystal clear intent."
+  },
+  {
+    "title": "Strings work too",
+    "instruction": "Comprehensions work on any iterable — including strings.\n\nExtract all the uppercase letters from the sentence.",
+    "hint": "[c for c in sentence if c.isupper()]",
+    "starter": "sentence = \"Hello World, Python Is Great\"\n\nuppers = [c for c in sentence if c.isupper()]\nprint(uppers)",
+    "expectedOutput": ["['H', 'W', 'P', 'I', 'G']"],
+    "successMessage": "A string is just a sequence of characters. Comprehensions loop through each one — same syntax, same power."
+  },
+  {
+    "title": "Dictionary comprehensions",
+    "instruction": "Same idea, but with `{key: value for ...}` — builds a dict instead of a list.\n\nCreate a dict mapping each word to its length.",
+    "hint": "{word: len(word) for word in words}",
+    "starter": "words = [\"python\", \"is\", \"awesome\"]\n\nword_lengths = {word: len(word) for word in words}\nprint(word_lengths)",
+    "expectedOutput": ["{'python': 6, 'is': 2, 'awesome': 7}"],
+    "successMessage": "Dict comprehensions are used everywhere — building lookups, transforming API data, counting things."
+  },
+  {
+    "title": "Set comprehensions",
+    "instruction": "Use `{expression for ...}` (no colon) for a set — a collection with no duplicates.\n\nExtract the unique first letters from the names.",
+    "starter": "names = [\"Alice\", \"Bob\", \"Anna\", \"Alex\", \"Brian\"]\n\nfirst_letters = {name[0] for name in names}\nprint(sorted(first_letters))",
+    "expectedOutput": ["['A', 'B']"],
+    "successMessage": "Three names start with A, but the set only keeps one. Automatic deduplication."
+  },
+  {
+    "title": "Build a grade filter 🎓",
+    "instruction": "Given a dict of student scores, use comprehensions to:\n1. Create a list of names with scores >= 70 (passing)\n2. Create a dict of only the failing students (score < 70)\n\nPrint both.",
+    "hint": "passing = [name for name, score in students.items() if score >= 70]",
+    "starter": "students = {\"Alice\": 85, \"Bob\": 62, \"Charlie\": 91, \"Diana\": 58, \"Eve\": 73}\n\npassing = []   # Fix: names of students with score >= 70\nfailing = {}   # Fix: dict of students with score < 70\n\nprint(passing)\nprint(failing)",
+    "expectedOutput": ["['Alice', 'Charlie', 'Eve']", "{'Bob': 62, 'Diana': 58}"],
+    "codeChecks": [
+      { "pattern": "\\[.*for.*in.*\\.items\\(\\).*if.*>=\\s*70\\]", "required": true, "message": "Use a list comprehension with .items() and >= 70 filter." },
+      { "pattern": "\\{.*:.*for.*in.*\\.items\\(\\).*if.*<\\s*70\\}", "required": true, "message": "Use a dict comprehension with .items() and < 70 filter." }
+    ],
+    "successMessage": "Two comprehensions, two data structures, zero loops. This is production Python — clean, expressive, and fast."
+  }
+]

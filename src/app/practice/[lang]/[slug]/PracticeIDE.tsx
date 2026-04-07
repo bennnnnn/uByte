@@ -847,7 +847,7 @@ export function PracticeIDE({ problem, initialLang, initialCode, categoryFilter 
               onClick={handleRun}
               disabled={running || submitting}
               title="Run code (Ctrl+Enter)"
-              className="flex items-center gap-1.5 rounded-md bg-green-100 px-3 py-1.5 text-sm font-medium text-green-800 transition-colors hover:bg-green-200 disabled:opacity-50 dark:bg-green-900/40 dark:text-green-300 dark:hover:bg-green-900/70"
+              className="flex items-center gap-1.5 rounded-md bg-emerald-100 px-3 py-1.5 text-sm font-medium text-emerald-800 transition-colors hover:bg-emerald-200 disabled:opacity-50 dark:bg-emerald-900/40 dark:text-emerald-300 dark:hover:bg-emerald-900/70"
             >
               {running ? "Running…" : "▶ Run"}
             </button>

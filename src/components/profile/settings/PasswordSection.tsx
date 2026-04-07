@@ -12,10 +12,10 @@ function passwordStrength(pw: string): { label: string; color: string; width: st
   const hasUpper = /[A-Z]/.test(pw);
   const hasNum = /[0-9]/.test(pw);
   const score = [hasLower, hasUpper, hasNum, pw.length >= 10].filter(Boolean).length;
-  if (!isValidPassword(pw)) return { label: "Weak", color: "bg-orange-500", width: "33%" };
+  if (!isValidPassword(pw)) return { label: "Weak", color: "bg-amber-500", width: "33%" };
   if (score <= 2) return { label: "Fair", color: "bg-yellow-500", width: "60%" };
-  if (score === 3) return { label: "Good", color: "bg-blue-500", width: "80%" };
-  return { label: "Strong", color: "bg-green-500", width: "100%" };
+  if (score === 3) return { label: "Good", color: "bg-indigo-500", width: "80%" };
+  return { label: "Strong", color: "bg-emerald-500", width: "100%" };
 }
 
 type ToastType = "success" | "error" | "info";

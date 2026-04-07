@@ -35,7 +35,7 @@ export default function HeroSection({
       <div className="pointer-events-none absolute inset-0 overflow-hidden [transform:translateZ(0)]">
         <div className="absolute -left-40 top-1/4 h-[700px] w-[700px] -translate-y-1/4 rounded-full bg-indigo-200/40 blur-[80px] dark:bg-indigo-500/15" />
         <div className="absolute -top-40 right-0 h-[600px] w-[600px] translate-x-1/3 rounded-full bg-violet-200/30 blur-[70px] dark:bg-violet-500/10" />
-        <div className="absolute bottom-0 left-1/2 h-[500px] w-[500px] -translate-x-1/2 translate-y-1/2 rounded-full bg-cyan-200/20 blur-[60px] dark:bg-cyan-500/10" />
+        <div className="absolute bottom-0 left-1/2 h-[500px] w-[500px] -translate-x-1/2 translate-y-1/2 rounded-full bg-violet-200/20 blur-[60px] dark:bg-violet-500/10" />
       </div>
 
       {/* Dot grid */}

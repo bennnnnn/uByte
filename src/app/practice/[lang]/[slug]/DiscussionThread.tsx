@@ -419,7 +419,7 @@ function PostCard({
               type="button"
               onClick={() => setReporting(true)}
               aria-label="Report post"
-              className="text-[11px] text-zinc-300 transition-colors hover:text-orange-500 dark:text-zinc-600 dark:hover:text-orange-400"
+              className="text-[11px] text-zinc-300 transition-colors hover:text-amber-500 dark:text-zinc-600 dark:hover:text-amber-400"
               title="Report"
             >
               <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
@@ -626,7 +626,7 @@ function ReplyCard({
               type="button"
               onClick={() => setReporting(true)}
               aria-label="Report post"
-              className="text-[11px] text-zinc-300 transition-colors hover:text-orange-500 dark:text-zinc-600 dark:hover:text-orange-400"
+              className="text-[11px] text-zinc-300 transition-colors hover:text-amber-500 dark:text-zinc-600 dark:hover:text-amber-400"
               title="Report"
             >
               <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">

@@ -25,7 +25,7 @@ const F = "text-blue-600 dark:text-blue-400";
 const C = "text-zinc-400 dark:text-zinc-500";
 const P = "text-cyan-600 dark:text-cyan-400";
 const D = "text-slate-800 dark:text-zinc-200";
-const N = "text-orange-600 dark:text-orange-400";
+const N = "text-amber-600 dark:text-amber-400";
 
 type T = { t: string; c?: string };
 

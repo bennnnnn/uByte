@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useAuth } from "@/components/AuthProvider";
 import { useToast } from "@/components/Toast";
 import { apiFetch } from "@/lib/api-client";
+import { applyTheme } from "@/lib/theme";
 import Avatar from "@/components/Avatar";
 import StatsRow from "@/components/profile/StatsRow";
 import OverviewTab from "@/components/profile/OverviewTab";
@@ -572,13 +573,4 @@ function DashboardPage() {
       </div>
     </div>
   );
-}
-
-function applyTheme(theme: string) {
-  if (typeof window === "undefined") return;
-  localStorage.setItem("theme", theme);
-  const html = document.documentElement;
-  html.classList.remove("light", "dark");
-  if (theme === "dark") html.classList.add("dark");
-  else if (theme === "light") html.classList.add("light");
 }

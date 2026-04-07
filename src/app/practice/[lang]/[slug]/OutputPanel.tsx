@@ -213,14 +213,14 @@ export function OutputPanel({
             ) : output !== null ? (
               <>
                 <div className="mb-2 flex items-center gap-2">
-                  <span className={`text-xs font-bold uppercase tracking-widest ${outputIsError ? "text-red-500" : "text-green-600 dark:text-green-400"}`}>
+                  <span className={`text-xs font-bold uppercase tracking-widest ${outputIsError ? "text-red-500" : "text-emerald-600 dark:text-emerald-400"}`}>
                     {outputIsError ? "Error" : "Console Output"}
                   </span>
                 </div>
                 <pre className={`whitespace-pre-wrap break-words rounded-lg p-3 text-xs ${
                   outputIsError
                     ? "bg-red-50 text-red-700 dark:bg-red-950/40 dark:text-red-300"
-                    : "bg-zinc-900 text-green-400 dark:bg-zinc-950"
+                    : "bg-zinc-900 text-emerald-400 dark:bg-zinc-950"
                 }`}>
                   {output === "(no output)" ? <span className="text-zinc-500">(no output)</span> : output}
                 </pre>

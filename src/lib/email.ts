@@ -56,10 +56,10 @@ export async function sendStreakReminderEmail(
     subject: `🔥 Keep your ${streakDays}-day streak alive — uByte`,
     html: `
       <div style="font-family:sans-serif;max-width:480px;margin:auto">
-        <h2 style="color:#0891b2">Your streak is at risk!</h2>
+        <h2 style="color:#4f46e5">Your streak is at risk!</h2>
         <p>Hi ${safeName},</p>
         <p>You have a <strong>${streakDays}-day</strong> streak on uByte — don't let it slip today!</p>
-        <a href="${BASE_URL}" style="display:inline-block;margin:16px 0;padding:12px 24px;background:#0891b2;color:#fff;border-radius:8px;text-decoration:none;font-weight:600">Keep my streak 🔥</a>
+        <a href="${BASE_URL}" style="display:inline-block;margin:16px 0;padding:12px 24px;background:#4f46e5;color:#fff;border-radius:8px;text-decoration:none;font-weight:600">Keep my streak 🔥</a>
         <p style="color:#6b7280;font-size:13px">Complete a tutorial step, solve a practice problem, or just log in — any activity counts.</p>
         ${unsubFooter(to)}
       </div>
@@ -81,7 +81,7 @@ export async function sendGoogleLinkedEmail(
     subject: "Google sign-in linked to your uByte account",
     html: `
       <div style="font-family:sans-serif;max-width:480px;margin:auto">
-        <h2 style="color:#0891b2">Google sign-in linked</h2>
+        <h2 style="color:#4f46e5">Google sign-in linked</h2>
         <p>Hi ${name},</p>
         <p>Google sign-in has been linked to your uByte account. You can now sign in with either your password or Google.</p>
         <p style="color:#dc2626;font-weight:600">If you didn't do this, your account may be compromised. Change your password immediately.</p>
@@ -113,10 +113,10 @@ export async function sendVerificationEmail(
     subject: "Verify your email — uByte",
     html: `
       <div style="font-family:sans-serif;max-width:480px;margin:auto">
-        <h2 style="color:#0891b2">Verify your email</h2>
+        <h2 style="color:#4f46e5">Verify your email</h2>
         <p>Hi ${safeName},</p>
         <p>Click the button below to verify your email address.</p>
-        <a href="${link}" style="display:inline-block;margin:16px 0;padding:12px 24px;background:#0891b2;color:#fff;border-radius:8px;text-decoration:none;font-weight:600">Verify email</a>
+        <a href="${link}" style="display:inline-block;margin:16px 0;padding:12px 24px;background:#4f46e5;color:#fff;border-radius:8px;text-decoration:none;font-weight:600">Verify email</a>
         <p style="color:#6b7280;font-size:13px">If you didn't sign up for uByte, you can safely ignore this email.</p>
         <p style="color:#6b7280;font-size:12px">Or copy this link: ${link}</p>
       </div>
@@ -159,7 +159,7 @@ export async function sendWelcomeEmail(to: string, name: string): Promise<void> 
             </td></tr>
           </table>
           <div style="text-align:center;margin:24px 0">
-            <a href="${BASE_URL}/tutorial/go/getting-started" style="display:inline-block;padding:14px 28px;background:#4f46e5;color:#fff;border-radius:8px;text-decoration:none;font-weight:700;font-size:15px">Start your first lesson →</a>
+            <a href="${BASE_URL}/tutorial" style="display:inline-block;padding:14px 28px;background:#4f46e5;color:#fff;border-radius:8px;text-decoration:none;font-weight:700;font-size:15px">Start your first lesson →</a>
           </div>
           ${unsubFooter(to)}
         </div>
@@ -190,11 +190,11 @@ export async function sendDay1Email(to: string, name: string): Promise<void> {
             <p style="margin:0 0 12px;font-weight:600">Pick where to start:</p>
             <table style="width:100%;border-collapse:collapse">
               <tr><td style="padding:8px 0;border-bottom:1px solid #f3f4f6">
-                <a href="${BASE_URL}/tutorial/go/getting-started" style="color:#4f46e5;font-weight:600;text-decoration:none">📖 Learn Go from scratch</a>
-                <span style="color:#9ca3af;font-size:13px;display:block">Interactive, step-by-step — great for beginners</span>
+                <a href="${BASE_URL}/tutorial" style="color:#4f46e5;font-weight:600;text-decoration:none">📖 Start a tutorial</a>
+                <span style="color:#9ca3af;font-size:13px;display:block">Interactive, step-by-step — 9 languages to choose from</span>
               </td></tr>
               <tr><td style="padding:8px 0;border-bottom:1px solid #f3f4f6">
-                <a href="${BASE_URL}/practice/go" style="color:#4f46e5;font-weight:600;text-decoration:none">💼 Solve an interview problem</a>
+                <a href="${BASE_URL}/practice" style="color:#4f46e5;font-weight:600;text-decoration:none">💼 Solve an interview problem</a>
                 <span style="color:#9ca3af;font-size:13px;display:block">Practice the coding questions that get you hired</span>
               </td></tr>
               <tr><td style="padding:8px 0">
@@ -311,7 +311,7 @@ export async function sendWeeklyDigestEmail(opts: {
     problemsThisWeek > 0 && `<tr><td style="padding:10px 0;border-bottom:1px solid #e5e7eb"><strong>💼 Problems solved</strong><span style="float:right;font-size:22px;font-weight:800;color:#4f46e5">${problemsThisWeek}</span></td></tr>`,
     tutorialsThisWeek > 0 && `<tr><td style="padding:10px 0;border-bottom:1px solid #e5e7eb"><strong>📖 Tutorial steps</strong><span style="float:right;font-size:22px;font-weight:800;color:#4f46e5">${tutorialsThisWeek}</span></td></tr>`,
     `<tr><td style="padding:10px 0;border-bottom:1px solid #e5e7eb"><strong>🔥 Current streak</strong><span style="float:right;font-size:22px;font-weight:800;color:#f59e0b">${streakDays} days</span></td></tr>`,
-    `<tr><td style="padding:10px 0"><strong>⭐ Total XP</strong><span style="float:right;font-size:22px;font-weight:800;color:#0891b2">${xp.toLocaleString()}</span></td></tr>`,
+    `<tr><td style="padding:10px 0"><strong>⭐ Total XP</strong><span style="float:right;font-size:22px;font-weight:800;color:#4f46e5">${xp.toLocaleString()}</span></td></tr>`,
   ].filter(Boolean).join("");
 
   await resend.emails.send({

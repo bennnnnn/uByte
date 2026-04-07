@@ -1,15 +1,29 @@
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
 
-/* Enable class-based dark mode so dark: classes respond to .dark on <html> */
+/* Enable class-based dark mode so dark: classes respond to .dark on <html>.
+   Dark mode is only applied on tutorial pages — JS controls the .dark class. */
 @variant dark (&:where(.dark, .dark *));
 
+/* ── Design tokens ────────────────────────────────────────────────────────── */
+
 :root {
+  /* Surfaces */
   --background: #ffffff;
   --foreground: #171717;
   --surface-page: #ffffff;
   --surface-card: #F7F8FF;
   --border-card: #E5E7EB;
+
+  /* Brand */
+  --primary: #4f46e5;       /* indigo-600 */
+  --primary-hover: #6366f1; /* indigo-500 */
+  --accent: #8b5cf6;        /* violet-500 */
+
+  /* Semantic */
+  --success: #10b981;       /* emerald-500 */
+  --warning: #f59e0b;       /* amber-500 */
+  --error: #ef4444;         /* red-500 */
 }
 
 @theme {
@@ -17,24 +31,33 @@
   --color-foreground: var(--foreground);
   --color-surface-page: var(--surface-page);
   --color-surface-card: var(--surface-card);
+  --color-border-card: var(--border-card);
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-accent: var(--accent);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-error: var(--error);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root:not(.light) {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-    --surface-page: #09090b; /* zinc-950 */
-    --surface-card: #18181b; /* zinc-900 */
-  }
-}
+/* Dark mode is restricted to tutorial pages only.
+   The .dark class is set/removed by JS based on the current route.
+   No @media (prefers-color-scheme: dark) auto-switching — JS handles it. */
 
 .dark {
   --background: #0a0a0a;
   --foreground: #ededed;
   --surface-page: #09090b;
   --surface-card: #18181b;
+  --border-card: #27272a;   /* zinc-800 */
+  --primary: #818cf8;       /* indigo-400 */
+  --primary-hover: #a5b4fc; /* indigo-300 */
+  --accent: #a78bfa;        /* violet-400 */
+  --success: #34d399;       /* emerald-400 */
+  --warning: #fbbf24;       /* amber-400 */
+  --error: #f87171;         /* red-400 */
 }
 
 .light {

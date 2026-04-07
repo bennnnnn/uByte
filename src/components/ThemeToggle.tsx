@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { usePathname } from "next/navigation";
 import { useAuth } from "@/components/AuthProvider";
 import { apiFetch } from "@/lib/api-client";
 import { applyTheme } from "@/lib/theme";
@@ -13,15 +14,25 @@ function getStoredTheme(): "light" | "dark" {
 }
 
 export default function ThemeToggle({ className }: { className?: string }) {
+  const pathname = usePathname();
+  const isTutorialPage = pathname.startsWith("/tutorial/");
+
   const [theme, setTheme] = useState<"light" | "dark">(() =>
-    typeof window !== "undefined" ? getStoredTheme() : "dark"
+    typeof window !== "undefined" ? getStoredTheme() : "light"
   );
   const { user } = useAuth();
 
   useEffect(() => {
     document.documentElement.classList.remove("light", "dark");
-    document.documentElement.classList.add(theme);
-  }, [theme]);
+    if (theme === "dark" && isTutorialPage) {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.add("light");
+    }
+  }, [theme, isTutorialPage]);
+
+  // Don't render the toggle outside tutorial pages
+  if (!isTutorialPage) return null;
 
   function toggle() {
     const next = theme === "dark" ? "light" : "dark";

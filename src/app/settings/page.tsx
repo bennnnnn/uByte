@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/components/AuthProvider";
 import { useToast } from "@/components/Toast";
 import { apiFetch } from "@/lib/api-client";
+import { applyTheme } from "@/lib/theme";
 import SettingsTab from "@/components/profile/SettingsTab";
 import DangerZoneSection from "@/components/profile/settings/DangerZoneSection";
 import AccountShell from "@/components/profile/AccountShell";
@@ -162,13 +163,4 @@ function SettingsPage() {
       </div>
     </AccountShell>
   );
-}
-
-function applyTheme(theme: string) {
-  if (typeof window === "undefined") return;
-  localStorage.setItem("theme", theme);
-  const html = document.documentElement;
-  html.classList.remove("light", "dark");
-  if (theme === "dark") html.classList.add("dark");
-  else if (theme === "light") html.classList.add("light");
 }

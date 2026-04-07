@@ -3,7 +3,7 @@ const AVATARS: Record<string, { emoji: string; bg: string }> = {
   cool:    { emoji: "😎", bg: "bg-yellow-100 dark:bg-yellow-950" },
   ninja:   { emoji: "🥷", bg: "bg-zinc-200 dark:bg-zinc-800" },
   party:   { emoji: "🥳", bg: "bg-pink-100 dark:bg-pink-950" },
-  robot:   { emoji: "🤖", bg: "bg-blue-100 dark:bg-blue-950" },
+  robot:   { emoji: "🤖", bg: "bg-indigo-100 dark:bg-indigo-950" },
   wizard:  { emoji: "🧙", bg: "bg-purple-100 dark:bg-purple-950" },
   astro:   { emoji: "🧑‍🚀", bg: "bg-indigo-100 dark:bg-indigo-950" },
   pirate:  { emoji: "🏴‍☠️", bg: "bg-red-100 dark:bg-red-950" },

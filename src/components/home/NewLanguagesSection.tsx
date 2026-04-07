@@ -15,7 +15,7 @@ const NEW_LANGUAGES: Array<{
     icon: "🔷",
     name: "TypeScript",
     tagline: "JavaScript with superpowers. Types, interfaces, and generics — master the language behind every major web framework.",
-    color: "from-blue-500/10 to-indigo-500/10 border-blue-200/60 dark:border-blue-800/40",
+    color: "from-indigo-500/10 to-indigo-500/10 border-indigo-200/60 dark:border-indigo-800/40",
   },
   {
     slug: "sql",

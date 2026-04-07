@@ -1,0 +1,53 @@
+[
+  {
+    "title": "Writing a file",
+    "instruction": "To create a file, open it in write mode (`\"w\"`) and call `.write()`.\n\nThink of it as opening a notebook, writing something, and closing it.\n\nRun this — it creates a file and confirms it worked.",
+    "starter": "with open(\"hello.txt\", \"w\") as f:\n    f.write(\"Hello from Python!\\n\")\n    f.write(\"This is line 2.\\n\")\n\nprint(\"File written successfully\")",
+    "expectedOutput": ["File written successfully"],
+    "successMessage": "You just created a file. The `with` statement automatically closes it when the block ends — no cleanup needed."
+  },
+  {
+    "title": "Reading a file",
+    "instruction": "`open(file, \"r\")` opens for reading. `.read()` gets the entire content as one string.\n\nFirst we write a file, then read it back. Run this.",
+    "starter": "# Write first\nwith open(\"data.txt\", \"w\") as f:\n    f.write(\"Python is great\\n\")\n    f.write(\"Files are easy\\n\")\n\n# Read it back\nwith open(\"data.txt\", \"r\") as f:\n    content = f.read()\n\nprint(content.strip())",
+    "expectedOutput": ["Python is great\nFiles are easy"],
+    "successMessage": "Write → close → open → read. The `with` block handles closing for both operations. Clean and safe."
+  },
+  {
+    "title": "Read line by line",
+    "instruction": "For large files, reading everything at once wastes memory. Instead, loop through the file — Python reads one line at a time.\n\nLike reading a book page by page instead of photocopying the whole thing.",
+    "starter": "# Create a file with numbered lines\nwith open(\"lines.txt\", \"w\") as f:\n    for i in range(1, 6):\n        f.write(f\"Line {i}\\n\")\n\n# Read line by line\nwith open(\"lines.txt\") as f:\n    for line in f:\n        print(line.strip())",
+    "expectedOutput": ["Line 1", "Line 2", "Line 3", "Line 4", "Line 5"],
+    "successMessage": "Looping over a file gives you one line at a time — memory-efficient even for gigabyte files. Always use this for large files."
+  },
+  {
+    "title": "Append mode — don't overwrite",
+    "instruction": "`\"w\"` mode erases the file first. `\"a\"` mode adds to the end — like writing in a journal.\n\nAppend two new entries to the log file.",
+    "hint": "Open with mode \"a\" and write two more lines.",
+    "starter": "# Create initial log\nwith open(\"log.txt\", \"w\") as f:\n    f.write(\"[INFO] App started\\n\")\n\n# Append to it (don't overwrite!)\nwith open(\"log.txt\", \"a\") as f:\n    f.write(\"[INFO] User logged in\\n\")\n    f.write(\"[INFO] Page loaded\\n\")\n\n# Read everything\nwith open(\"log.txt\") as f:\n    print(f.read().strip())",
+    "expectedOutput": ["[INFO] App started\n[INFO] User logged in\n[INFO] Page loaded"],
+    "successMessage": "Three entries, and the first one wasn't overwritten. \"a\" for append. This is exactly how log files work in production."
+  },
+  {
+    "title": "Why `with` matters",
+    "instruction": "What if your code crashes before you close the file? The data might not get saved.\n\n`with` guarantees the file closes — even if an error occurs. It's like a safety net.\n\nThe old way (dangerous) vs the new way (safe). Always use `with`.",
+    "starter": "# THE OLD WAY (don't do this)\n# f = open(\"data.txt\", \"w\")\n# f.write(\"hope nothing crashes...\")\n# f.close()  # what if we never reach this?\n\n# THE PYTHON WAY (always do this)\nwith open(\"safe.txt\", \"w\") as f:\n    f.write(\"This is always safe\\n\")\n    # Even if an error happens here,\n    # the file still closes properly.\n\nprint(\"File closed automatically\")",
+    "expectedOutput": ["File closed automatically"],
+    "successMessage": "The `with` statement is a context manager. You'll see it everywhere in Python — files, database connections, locks, HTTP requests. Always prefer it."
+  },
+  {
+    "title": "Process a CSV manually",
+    "instruction": "CSV files are just text with commas. You already know `.split()` — that's all you need.\n\nRead the CSV, parse each line, and print a formatted table.",
+    "starter": "# Create a simple CSV\nwith open(\"people.csv\", \"w\") as f:\n    f.write(\"name,age,city\\n\")\n    f.write(\"Alice,30,London\\n\")\n    f.write(\"Bob,25,Paris\\n\")\n    f.write(\"Charlie,35,Tokyo\\n\")\n\n# Read and parse it\nwith open(\"people.csv\") as f:\n    header = f.readline().strip()\n    print(header)\n    print(\"-\" * 25)\n    for line in f:\n        name, age, city = line.strip().split(\",\")\n        print(f\"{name:<10} {age:>3}  {city}\")",
+    "expectedOutput": ["name,age,city", "-------------------------", "Alice       30  London", "Bob         25  Paris", "Charlie     35  Tokyo"],
+    "successMessage": "You just built a CSV parser. No libraries, no imports — just file reading and string splitting. For production code you'd use the `csv` module, but now you understand what it does underneath."
+  },
+  {
+    "title": "Build a word counter 📊",
+    "instruction": "Write a program that:\n1. Creates a text file with a paragraph\n2. Reads it back\n3. Counts total words, unique words, and the most common word\n\nUse `.split()` and a dictionary.",
+    "hint": "Split text into words, loop through, count with a dict. Use max(counts, key=counts.get) for the most common.",
+    "starter": "# Write sample text\nwith open(\"article.txt\", \"w\") as f:\n    f.write(\"python is great and python is fun and python is everywhere\")\n\n# Read and analyze\nwith open(\"article.txt\") as f:\n    text = f.read()\n\nwords = text.split()\ncounts = {}\nfor word in words:\n    counts[word] = counts.get(word, 0) + 1\n\nprint(f\"Total words: {len(words)}\")\nprint(f\"Unique words: {len(counts)}\")\nprint(f\"Most common: {max(counts, key=counts.get)}\")",
+    "expectedOutput": ["Total words: 11", "Unique words: 5", "Most common: python"],
+    "successMessage": "File I/O + string processing + dictionaries — all working together. This is a simplified version of what search engines do to index web pages."
+  }
+]

@@ -31,7 +31,7 @@ export default function AchievementsTab({ badges, achievements }: Props) {
             <div className="flex items-center justify-between">
               <span className="text-xs text-indigo-600 dark:text-indigo-400">+{badge.xpReward} XP</span>
               {unlocked && (
-                <span className="text-xs font-medium text-green-600 dark:text-green-400">Unlocked ✓</span>
+                <span className="text-xs font-medium text-emerald-600 dark:text-emerald-400">Unlocked ✓</span>
               )}
             </div>
           </div>

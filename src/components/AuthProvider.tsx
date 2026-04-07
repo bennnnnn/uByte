@@ -1,8 +1,9 @@
 "use client";
 
 import { createContext, useContext, useState, useEffect, useCallback, useMemo } from "react";
+import { usePathname } from "next/navigation";
 import { apiFetch } from "@/lib/api-client";
-import { applyTheme } from "@/lib/theme";
+import { applyTheme, enforceThemeForRoute } from "@/lib/theme";
 import { trackConversion } from "@/lib/analytics";
 
 // ─── Types ───────────────────────────────────────────
@@ -145,6 +146,12 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
   const [profile, setProfile] = useState<ProfileData | null>(null);
   const [viewCount, setViewCount] = useState(0);
   const [limited, setLimited] = useState(false);
+  const pathname = usePathname();
+
+  // ── Enforce light mode outside tutorial pages on every navigation ──
+  useEffect(() => {
+    enforceThemeForRoute();
+  }, [pathname]);
 
   // ── Init: check auth + load data ──
   const fetchUser = useCallback(async () => {

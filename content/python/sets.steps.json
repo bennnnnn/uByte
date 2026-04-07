@@ -1,0 +1,65 @@
+[
+  {
+    "title": "What's a set?",
+    "instruction": "A set is like a bag of unique items — no duplicates allowed. Throw in 5 red balls and 3 blue balls, the bag only remembers \"red\" and \"blue.\"\n\nCreate a set with `{}` or `set()`. Run this and notice the duplicates vanish.",
+    "starter": "colors = {\"red\", \"blue\", \"red\", \"green\", \"blue\", \"red\"}\nprint(colors)\nprint(f\"Only {len(colors)} unique colors\")",
+    "expectedOutput": [],
+    "codeChecks": [],
+    "successMessage": "Three unique colors from six inputs. Sets automatically deduplicate. The order might vary — sets are unordered."
+  },
+  {
+    "title": "Remove duplicates from a list",
+    "instruction": "The most common use of sets: deduplication. Convert a list to a set, duplicates gone.\n\nRemove duplicates from the email list and print the count.",
+    "starter": "emails = [\"a@b.com\", \"c@d.com\", \"a@b.com\", \"e@f.com\", \"c@d.com\", \"a@b.com\"]\n\nunique = list(set(emails))\nprint(f\"{len(emails)} total, {len(unique)} unique\")",
+    "expectedOutput": ["6 total, 3 unique"],
+    "successMessage": "list → set → list. One line removes all duplicates. You'll use this pattern constantly when processing data."
+  },
+  {
+    "title": "Add and remove",
+    "instruction": "`.add(item)` adds one item. `.discard(item)` removes it (silently does nothing if missing). `.remove(item)` raises an error if missing.\n\nUse `.discard()` when you're not sure if the item exists — safer than `.remove()`.",
+    "starter": "skills = {\"python\", \"javascript\"}\n\nskills.add(\"go\")\nskills.add(\"python\")  # Already there — ignored\nskills.discard(\"javascript\")\n\nprint(sorted(skills))",
+    "expectedOutput": ["['go', 'python']"],
+    "successMessage": "add() is idempotent — adding something twice doesn't duplicate it. That's the whole point of a set."
+  },
+  {
+    "title": "Union — combine two groups",
+    "instruction": "Set operations are like Venn diagrams.\n\n`A | B` (union) = everything from both sets combined.\n\nCombine the frontend and backend skills.",
+    "starter": "frontend = {\"html\", \"css\", \"javascript\"}\nbackend = {\"python\", \"javascript\", \"sql\"}\n\nall_skills = frontend | backend\nprint(sorted(all_skills))",
+    "expectedOutput": ["['css', 'html', 'javascript', 'python', 'sql']"],
+    "successMessage": "Union merges both sets. JavaScript appeared in both but only shows once — sets can't have duplicates."
+  },
+  {
+    "title": "Intersection — what's in common",
+    "instruction": "`A & B` (intersection) = only items in BOTH sets.\n\nFind which skills the frontend and backend teams share.",
+    "starter": "frontend = {\"html\", \"css\", \"javascript\", \"react\"}\nbackend = {\"python\", \"javascript\", \"sql\", \"react\"}\n\nshared = frontend & backend\nprint(sorted(shared))",
+    "expectedOutput": ["['javascript', 'react']"],
+    "successMessage": "Intersection found the overlap. This is how recommendation engines find common interests between users."
+  },
+  {
+    "title": "Difference — what's unique to one",
+    "instruction": "`A - B` = items in A that are NOT in B.\n\nFind which skills are unique to the frontend team.",
+    "starter": "frontend = {\"html\", \"css\", \"javascript\", \"react\"}\nbackend = {\"python\", \"javascript\", \"sql\", \"react\"}\n\nfrontend_only = frontend - backend\nbackend_only = backend - frontend\n\nprint(f\"Frontend only: {sorted(frontend_only)}\")\nprint(f\"Backend only: {sorted(backend_only)}\")",
+    "expectedOutput": ["Frontend only: ['css', 'html']", "Backend only: ['python', 'sql']"],
+    "successMessage": "Difference is directional: A - B ≠ B - A. CSS is frontend-only, Python is backend-only. SQL interviews love this stuff."
+  },
+  {
+    "title": "Fast lookups — why sets matter",
+    "instruction": "Checking `item in set` is nearly instant — O(1), no matter how large the set. Checking `item in list` gets slower as the list grows — O(n).\n\nIf you're checking membership repeatedly, convert your list to a set first.",
+    "starter": "# Simulating a blocklist check\nblocklist = {\"spam@evil.com\", \"hack@bad.com\", \"phish@fake.com\"}\n\nincoming = [\"user@good.com\", \"spam@evil.com\", \"friend@nice.com\"]\n\nfor email in incoming:\n    if email in blocklist:\n        print(f\"BLOCKED: {email}\")\n    else:\n        print(f\"ALLOWED: {email}\")",
+    "expectedOutput": ["ALLOWED: user@good.com", "BLOCKED: spam@evil.com", "ALLOWED: friend@nice.com"],
+    "successMessage": "`in` on a set is O(1) — instant lookup regardless of size. Email servers, firewalls, and spam filters all use sets for exactly this reason."
+  },
+  {
+    "title": "Build a tag analyzer 🏷️",
+    "instruction": "Two blog posts have tags. Find:\n1. All unique tags across both posts\n2. Tags they share\n3. Tags unique to each post\n\nUse set operations — no loops needed.",
+    "hint": "Union: a | b, Intersection: a & b, Difference: a - b",
+    "starter": "post1_tags = {\"python\", \"tutorial\", \"beginner\", \"coding\"}\npost2_tags = {\"python\", \"advanced\", \"coding\", \"performance\"}\n\nall_tags = post1_tags | post2_tags\nshared = post1_tags & post2_tags\nonly_post1 = post1_tags - post2_tags\nonly_post2 = post2_tags - post1_tags\n\nprint(f\"All tags: {sorted(all_tags)}\")\nprint(f\"Shared: {sorted(shared)}\")\nprint(f\"Only in post 1: {sorted(only_post1)}\")\nprint(f\"Only in post 2: {sorted(only_post2)}\")",
+    "expectedOutput": [
+      "All tags: ['advanced', 'beginner', 'coding', 'performance', 'python', 'tutorial']",
+      "Shared: ['coding', 'python']",
+      "Only in post 1: ['beginner', 'tutorial']",
+      "Only in post 2: ['advanced', 'performance']"
+    ],
+    "successMessage": "Four operations, zero loops, instant results. Sets turn complex comparisons into one-liners. That's Python."
+  }
+]
