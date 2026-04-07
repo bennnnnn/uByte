@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { withErrorHandling, requireAdmin } from "@/lib/api-utils";
 import { getSiteBanner, setSiteBanner } from "@/lib/db/site-banner";
+import type { BannerType } from "@/lib/db/site-banner";
 import { verifyCsrf } from "@/lib/csrf";
 
 export const GET = withErrorHandling("GET /api/admin/banner", async () => {
@@ -16,17 +17,28 @@ export const PATCH = withErrorHandling("PATCH /api/admin/banner", async (req: Ne
 
   const { admin, response } = await requireAdmin();
   if (!admin) return response;
-  let body: { enabled?: boolean; message?: string; linkUrl?: string; linkText?: string } = {};
+
+  let body: {
+    enabled?: boolean;
+    message?: string;
+    linkUrl?: string;
+    linkText?: string;
+    bannerType?: BannerType;
+    bannerIcon?: string;
+  } = {};
   try {
     body = await req.json();
   } catch {
     return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
   }
+
   await setSiteBanner({
     enabled: body.enabled,
     message: body.message,
     linkUrl: body.linkUrl,
     linkText: body.linkText,
+    bannerType: body.bannerType,
+    bannerIcon: body.bannerIcon,
   });
   const banner = await getSiteBanner();
   return NextResponse.json(banner);

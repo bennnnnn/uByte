@@ -31,11 +31,15 @@ import { TAB_PERMISSION } from "./permission-constants";
 
 /* ── Shared banner / site-settings shapes ───────────────────────────────── */
 
+export type BannerType = "announcement" | "promo" | "sale" | "info";
+
 export interface BannerData {
   enabled: boolean;
   message: string;
   linkUrl: string;
   linkText: string;
+  bannerType: BannerType;
+  bannerIcon: string;
 }
 
 export interface ExamSettingsMap {
@@ -200,7 +204,7 @@ export function useAdminData() {
     setBannerData(null);
     let cancelled = false;
     fetch("/api/admin/banner", { credentials: "same-origin" }).then((r) => r.ok ? r.json() : null).then((data) => {
-      if (!cancelled && data) setBannerData({ enabled: !!data.enabled, message: data.message ?? "", linkUrl: data.linkUrl ?? "/", linkText: data.linkText ?? "Sign up" });
+      if (!cancelled && data) setBannerData({ enabled: !!data.enabled, message: data.message ?? "", linkUrl: data.linkUrl ?? "", linkText: data.linkText ?? "", bannerType: data.bannerType ?? "announcement", bannerIcon: data.bannerIcon ?? "" });
     });
     return () => { cancelled = true; };
   }, [tab]);
@@ -331,10 +335,12 @@ export function useAdminData() {
           message: bannerData.message,
           linkUrl: bannerData.linkUrl.trim(),
           linkText: bannerData.linkText.trim(),
+          bannerType: bannerData.bannerType,
+          bannerIcon: bannerData.bannerIcon.trim(),
         }),
       });
       const data = await res.json();
-      if (res.ok) { setBannerData({ enabled: !!data.enabled, message: data.message ?? "", linkUrl: data.linkUrl ?? "/", linkText: data.linkText ?? "Sign up" }); setBannerMessage("Saved."); setTimeout(() => setBannerMessage(null), 3000); }
+      if (res.ok) { setBannerData({ enabled: !!data.enabled, message: data.message ?? "", linkUrl: data.linkUrl ?? "", linkText: data.linkText ?? "", bannerType: data.bannerType ?? "announcement", bannerIcon: data.bannerIcon ?? "" }); setBannerMessage("Saved."); setTimeout(() => setBannerMessage(null), 3000); }
       else setBannerMessage(data.error ?? "Save failed");
     } catch (e) { setBannerMessage(String(e)); } finally { setBannerSaving(false); }
   }, [bannerData]);
