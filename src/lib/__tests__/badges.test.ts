@@ -36,7 +36,7 @@ beforeEach(() => {
 
 describe("BADGES", () => {
   it("has 8 badge definitions", () => {
-    expect(BADGES).toHaveLength(8);
+    expect(BADGES).toHaveLength(15); // 8 base + 7 language master badges
   });
 
   it("BADGE_MAP indexes by key", () => {
@@ -60,7 +60,9 @@ describe("checkBadges", () => {
   });
 
   it("unlocks all_done when all tutorials completed", async () => {
-    mockGetProgressCount.mockResolvedValue(5);
+    // getAllTutorials mock returns 5 items per language call.
+    // ALL_LANGUAGE_KEYS has 9 languages, so total = 9 * 5 = 45.
+    mockGetProgressCount.mockResolvedValue(45);
     const unlocked = await checkBadges(1);
     expect(unlocked).toContain("all_done");
   });

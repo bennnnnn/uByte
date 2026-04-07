@@ -56,14 +56,10 @@ export default function OnboardingChecklist() {
   const { user, loading, profile } = useAuth();
   const [status, setStatus] = useState<Status | null>(null);
   const [open, setOpen] = useState(true);
-  const [dismissed, setDismissed] = useState(false);
+  const [dismissed, setDismissed] = useState(
+    () => typeof window !== "undefined" && localStorage.getItem(DISMISSED_KEY) === "1"
+  );
   const [allDoneVisible, setAllDoneVisible] = useState(false);
-
-  useEffect(() => {
-    if (typeof window !== "undefined" && localStorage.getItem(DISMISSED_KEY) === "1") {
-      setDismissed(true);
-    }
-  }, []);
 
   const fetchStatus = useCallback(() => {
     if (!user || dismissed) return;

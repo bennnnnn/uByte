@@ -4,7 +4,7 @@
  */
 import { NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
-import { getOrCreateReferralCode, getReferralStats } from "@/lib/db";
+import { getReferralStats } from "@/lib/db";
 import { BASE_URL } from "@/lib/constants";
 import { withErrorHandling } from "@/lib/api-utils";
 

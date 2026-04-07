@@ -59,7 +59,8 @@ export function PracticeListClient({
   searchableProblems,
   attempts,
   hasUser,
-  isPro,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  isPro: _,
   solvedCount,
   allProblemsLength,
 }: Props) {

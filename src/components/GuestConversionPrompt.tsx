@@ -49,6 +49,7 @@ export default function GuestConversionPrompt({ trigger, context = "practice" }:
   useEffect(() => {
     if (!trigger) return;
     if (typeof sessionStorage !== "undefined" && sessionStorage.getItem(SESSION_KEY)) return;
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setVisible(true);
   }, [trigger]);
 

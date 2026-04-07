@@ -8,13 +8,12 @@ import UserMenuDropdown from "./auth/UserMenuDropdown";
 import NotificationPopover from "./auth/NotificationPopover";
 import { useIsMobile } from "@/hooks/useIsMobile";
 import { buildAuthPageHref } from "@/lib/auth-redirect";
-import { hasPaidAccess } from "@/lib/plans";
 
 const linkBase =
   "rounded-lg px-3 py-2 text-sm font-medium text-zinc-600 transition-colors hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-200";
 
 export default function AuthButtons() {
-  const { user, profile, loading } = useAuth();
+  const { user, loading } = useAuth();
   const isMobile = useIsMobile();
   const pathname = usePathname();
   const router = useRouter();
@@ -27,7 +26,6 @@ export default function AuthButtons() {
   const currentPath = `${pathname}${currentParams.toString() ? `?${currentParams.toString()}` : ""}`;
   const loginHref = buildAuthPageHref("login", currentPath);
   const signupHref = buildAuthPageHref("signup", currentPath);
-  const isPro = hasPaidAccess(profile?.plan);
 
   useEffect(() => {
     if (loading || user) return;

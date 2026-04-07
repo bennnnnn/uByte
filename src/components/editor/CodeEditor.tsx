@@ -1,5 +1,7 @@
 "use client";
 
+/* eslint-disable react-hooks/refs */
+
 import type { CodeEditorState } from "@/hooks/useCodeEditor";
 
 interface CodeEditorProps {

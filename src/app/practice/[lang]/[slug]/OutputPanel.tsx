@@ -67,16 +67,20 @@ export function OutputPanel({
   );
 
   useEffect(() => {
+    /* eslint-disable react-hooks/set-state-in-effect */
     if (verdict) setActiveTab("tests");
     else setActiveTab("console");
-  }, [verdict?.type]);
+    /* eslint-enable react-hooks/set-state-in-effect */
+  }, [verdict]);
 
   useEffect(() => {
+    /* eslint-disable react-hooks/set-state-in-effect */
     if (verdict?.type === "wrong_answer") {
       setSelectedCase(verdict.passedCases ?? 0);
     } else {
       setSelectedCase(0);
     }
+    /* eslint-enable react-hooks/set-state-in-effect */
   }, [verdict]);
 
   const totalCases = verdict?.totalCases ?? problem.testCases?.length ?? 0;

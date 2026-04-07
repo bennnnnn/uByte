@@ -4,6 +4,7 @@
 // global-error.tsx handles errors thrown by the root layout itself.
 
 import { useEffect } from "react";
+import Link from "next/link";
 import * as Sentry from "@sentry/nextjs";
 
 export default function Error({
@@ -56,12 +57,12 @@ export default function Error({
           Try again
         </button>
         {/* Fallback if retry doesn't help — give the user an escape route */}
-        <a
+        <Link
           href="/"
           className="rounded-xl border border-zinc-200 px-5 py-2.5 text-sm font-semibold text-zinc-700 transition-colors hover:bg-zinc-50 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800"
         >
           Go home
-        </a>
+        </Link>
       </div>
     </div>
   );

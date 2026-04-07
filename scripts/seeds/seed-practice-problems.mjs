@@ -12,7 +12,6 @@ import { readFileSync, existsSync } from "fs";
 import { fileURLToPath } from "url";
 import { dirname, join } from "path";
 import { neon } from "@neondatabase/serverless";
-import { createRequire } from "module";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const root = join(__dirname, "../..");

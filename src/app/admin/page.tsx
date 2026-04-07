@@ -49,7 +49,7 @@ const defaultCls = "text-zinc-600 hover:bg-zinc-50 hover:text-zinc-900 dark:text
 
 export default function AdminPage() {
   const data = useAdminData();
-  const { user, loading, fetching, error, router, tab, setTab, users, revenue, revenuePeriod, setRevenuePeriod, exportRevenueCSV, printRevenuePDF, exportUsersCSV, printRef, isSuperAdmin, hasPermission, currentAdminRole } = data;
+  const { user, loading, fetching, error, router, tab, setTab, users, revenue, revenuePeriod, setRevenuePeriod, exportRevenueCSV, printRevenuePDF, exportUsersCSV, printRef, isSuperAdmin, hasPermission } = data;
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   // Filter sidebar sections to tabs the current admin has permission for
@@ -66,6 +66,7 @@ export default function AdminPage() {
   }, [hasPermission]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setSidebarOpen(false);
   }, [tab]);
 

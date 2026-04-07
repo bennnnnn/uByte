@@ -1,9 +1,9 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { getUserById, getProgress, getAchievements, getBookmarks, getRecentActivity } from "@/lib/db";
 import { withErrorHandling, requireAuth } from "@/lib/api-utils";
 import { checkRateLimit } from "@/lib/rate-limit";
 
-export const GET = withErrorHandling("GET /api/profile/export", async (_req: NextRequest) => {
+export const GET = withErrorHandling("GET /api/profile/export", async () => {
   const { user, response } = await requireAuth();
   if (!user) return response;
 

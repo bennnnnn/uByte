@@ -11,7 +11,7 @@
 "use client";
 
 import { createPortal } from "react-dom";
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { apiFetch } from "@/lib/api-client";
 import { Spinner } from "../components";
 import { formatDate } from "../utils";
@@ -507,7 +507,8 @@ function ConfirmModal({ label, danger, onConfirm, onCancel }: {
 
 /** Actions dropdown rendered via portal to escape table overflow clipping. */
 function ActionsMenu({
-  userId, isMe, banned, isAdmin, plan, name, anchorRect, onAction,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  userId: _userId, isMe, banned, isAdmin, plan, name, anchorRect, onAction,
 }: {
   userId: number; isMe: boolean; banned: boolean; isAdmin: boolean; plan: string; name: string;
   anchorRect: DOMRect;

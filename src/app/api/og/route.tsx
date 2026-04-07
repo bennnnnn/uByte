@@ -7,7 +7,10 @@
  *   ?description=Some+description — override the sub-text
  *
  * Built with next/og (Vercel Edge runtime / @vercel/og) — no sharp required.
+ * @vercel/og / ImageResponse processes JSX server-side to produce images — not
+ * React rendering — so the react-hooks/error-boundaries rule does not apply here.
  */
+/* eslint-disable react-hooks/error-boundaries */
 import { ImageResponse } from "next/og";
 import { NextRequest, NextResponse } from "next/server";
 

@@ -21,7 +21,6 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { isFeatureEnabled } from "@/lib/db/site-settings";
 import { getCurrentUser } from "@/lib/auth";
-import MaintenancePage from "./maintenance/page";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",

@@ -49,16 +49,14 @@ export default function DailyChallengePage() {
   const [loading, setLoading] = useState(true);
   const [fetchError, setFetchError] = useState(false);
   const [retryKey, setRetryKey] = useState(0);
-  const [selectedLang, setSelectedLang] = useState("go");
+  const [selectedLang, setSelectedLang] = useState(
+    () => typeof window !== "undefined" ? getPreferredLanguage() : "go"
+  );
 
   const languageSlugs = getPracticeLanguageSlugs();
 
-  // Initialise preferred language from localStorage (client-only)
   useEffect(() => {
-    setSelectedLang(getPreferredLanguage());
-  }, []);
-
-  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setLoading(true);
     setFetchError(false);
     Promise.all([

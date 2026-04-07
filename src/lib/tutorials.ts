@@ -8,6 +8,12 @@ const _allCache = new Map<string, { data: TutorialMeta[]; ts: number }>();
 const _slugCache = new Map<string, { data: Tutorial | null; ts: number }>();
 const CACHE_TTL = 60_000;
 
+/** Clears all in-memory tutorial caches. Used in tests. */
+export function clearTutorialCaches() {
+  _allCache.clear();
+  _slugCache.clear();
+}
+
 export interface SubTopic {
   id: string;
   title: string;

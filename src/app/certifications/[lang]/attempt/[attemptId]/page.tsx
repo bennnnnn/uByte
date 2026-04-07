@@ -663,7 +663,7 @@ export default function PracticeExamAttemptPage() {
                       : `${totalQuestions - answeredCount} question${totalQuestions - answeredCount !== 1 ? "s" : ""} remaining`}
                   </p>
                   <p className="mb-5 text-xs text-zinc-400 dark:text-zinc-500">
-                    You can't change your answers after submitting.
+                    You can&apos;t change your answers after submitting.
                   </p>
                   <button
                     type="button"

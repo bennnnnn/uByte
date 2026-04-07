@@ -101,6 +101,7 @@ function LanguageProgressCard({
   // Fetch per-tutorial step breakdown the first time the card is expanded
   useEffect(() => {
     if (!expanded || tutorials.length > 0 || lp.completed === 0) return;
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setLoading(true);
     fetch(`/api/progress/steps/summary?lang=${lp.lang}`, { credentials: "same-origin" })
       .then((r) => r.json())

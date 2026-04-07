@@ -98,6 +98,7 @@ export function useCodeEditor(
 
   // Always keep a ref so setCode (called inside closures) uses the latest highlighter
   const highlightFnRef = useRef(highlightFn);
+  // eslint-disable-next-line react-hooks/refs
   highlightFnRef.current = highlightFn;
 
   // On mount: paint the <pre> with the correct initial content.

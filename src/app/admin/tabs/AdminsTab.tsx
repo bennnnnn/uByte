@@ -58,7 +58,8 @@ function PermissionPicker({
 }) {
   const toggle = (p: AdminPermission) => {
     const next = new Set(selected);
-    next.has(p) ? next.delete(p) : next.add(p);
+    if (next.has(p)) next.delete(p);
+    else next.add(p);
     onChange(next);
   };
 
@@ -386,7 +387,7 @@ export default function AdminsTab({ data }: Props) {
       <div className="rounded-xl border border-zinc-200 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
         <div className="border-b border-zinc-100 px-5 py-4 dark:border-zinc-800">
           <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">Add a new admin</h2>
-          <p className="mt-0.5 text-xs text-zinc-400">Enter the user's email then select exactly what they can do.</p>
+          <p className="mt-0.5 text-xs text-zinc-400">Enter the user&apos;s email then select exactly what they can do.</p>
         </div>
         <form onSubmit={handlePromote} className="space-y-5 p-5">
           {/* Email */}

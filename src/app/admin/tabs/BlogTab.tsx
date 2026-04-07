@@ -212,12 +212,6 @@ function renderMarkdown(md: string): string {
 
 // ─── Toolbar ──────────────────────────────────────────────────────────────────
 
-interface ToolbarBtn {
-  title: string;
-  icon: React.ReactNode;
-  action: string;
-  className?: string;
-}
 
 function ToolbarButton({ title, icon, onClick, active }: {
   title: string; icon: React.ReactNode; onClick: () => void; active?: boolean;
@@ -731,7 +725,7 @@ export default function BlogTab() {
         {loading ? (
           <p className="text-sm text-zinc-400">Loading…</p>
         ) : posts.length === 0 ? (
-          <p className="text-sm text-zinc-500 dark:text-zinc-400">No DB posts yet. Click "+ New post" to create one.</p>
+          <p className="text-sm text-zinc-500 dark:text-zinc-400">No DB posts yet. Click &quot;+ New post&quot; to create one.</p>
         ) : (
           <div className="divide-y divide-zinc-100 dark:divide-zinc-800">
             {posts.map((post) => (

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 
 export type ConsentChoice = "accepted" | "rejected";
@@ -14,11 +14,9 @@ export function getConsentChoice(): ConsentChoice | null {
 }
 
 export default function CookieConsent() {
-  const [visible, setVisible] = useState(false);
-
-  useEffect(() => {
-    if (!getConsentChoice()) setVisible(true);
-  }, []);
+  const [visible, setVisible] = useState(
+    () => typeof window !== "undefined" && !getConsentChoice()
+  );
 
   function choose(choice: ConsentChoice) {
     localStorage.setItem("cookie-consent", choice);

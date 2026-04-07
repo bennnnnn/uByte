@@ -7,9 +7,6 @@ interface Props {
 
 export default function CertShareButtons({ name, certUrl }: Props) {
   const encoded = encodeURIComponent(certUrl);
-  const linkedInText = encodeURIComponent(
-    `I just earned my ${name} certificate on uByte! 🎉`
-  );
   const twitterText = encodeURIComponent(
     `I just earned my ${name} programming certificate on @uByteDev 🎉 Check it out:`
   );

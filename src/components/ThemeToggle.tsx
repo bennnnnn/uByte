@@ -13,12 +13,10 @@ function getStoredTheme(): "light" | "dark" {
 }
 
 export default function ThemeToggle({ className }: { className?: string }) {
-  const [theme, setTheme] = useState<"light" | "dark">("dark");
+  const [theme, setTheme] = useState<"light" | "dark">(() =>
+    typeof window !== "undefined" ? getStoredTheme() : "dark"
+  );
   const { user } = useAuth();
-
-  useEffect(() => {
-    setTheme(getStoredTheme());
-  }, []);
 
   useEffect(() => {
     document.documentElement.classList.remove("light", "dark");

@@ -11,11 +11,11 @@ const Analytics = dynamic(
 );
 
 export default function LazyCookieConsentAndAnalytics() {
-  const [analyticsEnabled, setAnalyticsEnabled] = useState(false);
+  const [analyticsEnabled, setAnalyticsEnabled] = useState(
+    () => typeof window !== "undefined" && getConsentChoice() === "accepted"
+  );
 
   useEffect(() => {
-    if (getConsentChoice() === "accepted") setAnalyticsEnabled(true);
-
     function onConsentChange(e: Event) {
       const choice = (e as CustomEvent<string>).detail;
       setAnalyticsEnabled(choice === "accepted");

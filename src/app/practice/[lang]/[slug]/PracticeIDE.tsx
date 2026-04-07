@@ -4,7 +4,7 @@ import { useState, useCallback, useEffect, useRef, useMemo, Suspense } from "rea
 import Link from "next/link";
 import { DIFFICULTY_BADGE, type PracticeProblem, type ProblemCategory } from "@/lib/practice/types";
 import type { SupportedLanguage } from "@/lib/languages/types";
-import { getStarterForLanguage, getAllPracticeProblems, getCategoryForSlug, getPracticeCategories, sortProblemsByCategoryAndDifficulty } from "@/lib/practice/problems";
+import { getStarterForLanguage, getAllPracticeProblems } from "@/lib/practice/problems";
 import { useCodeEditor } from "@/hooks/useCodeEditor";
 import { usePanelResize } from "@/hooks/usePanelResize";
 import ThemeToggle from "@/components/ThemeToggle";
@@ -50,16 +50,6 @@ interface Props {
 
 export function PracticeIDE({ problem, initialLang, initialCode, categoryFilter = null, listPage = 1, listStatus, listDifficulty, interviewMode = false, interviewDeadline, isPro = false }: Props) {
   const allProblems = useMemo(() => getAllPracticeProblems(), []);
-  const categories = useMemo(() => getPracticeCategories(), []);
-  const sidebarProblems = useMemo(() =>
-    categoryFilter === null || categoryFilter === undefined
-      ? allProblems
-      : sortProblemsByCategoryAndDifficulty(
-          allProblems.filter((p) => getCategoryForSlug(p.slug) === categoryFilter),
-          categories
-        ),
-    [allProblems, categories, categoryFilter]
-  );
   const { user } = useAuth();
   const [lang, setLang] = useState<SupportedLanguage>(initialLang);
   const [output, setOutput]           = useState<string | null>(null);
@@ -79,7 +69,6 @@ export function PracticeIDE({ problem, initialLang, initialCode, categoryFilter 
   const [descTab, setDescTab] = useState<"desc" | "discuss">("desc");
   const [notes, setNotes] = useState<string>("");
   const notesKey = `practice-notes-${problem.slug}`;
-  const [noteSaved, setNoteSaved] = useState(false);
   const [notesOpen, setNotesOpen] = useState(false);
 
   // Close notes panel when navigating to a different problem
@@ -99,9 +88,7 @@ export function PracticeIDE({ problem, initialLang, initialCode, categoryFilter 
     } else {
       try { localStorage.setItem(notesKey, notes); } catch { /* ignore */ }
     }
-    setNoteSaved(true);
     setNotesOpen(false);
-    setTimeout(() => setNoteSaved(false), 2000);
   }
 
   const [statuses, setStatuses] = useState<Record<string, PracticeAttemptStatus>>({});
@@ -162,7 +149,6 @@ export function PracticeIDE({ problem, initialLang, initialCode, categoryFilter 
     return () => { if (codeTimerRef.current) clearTimeout(codeTimerRef.current); };
     // user omitted: accessed via userRef2 inside the timeout so it's always fresh
     // without needing to be a dep (which would reset the debounce timer on every auth event).
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [editor.code, problem.slug, lang]);
 
   // When language changes, load the saved draft for that lang (or fall back to starter)
@@ -313,6 +299,7 @@ export function PracticeIDE({ problem, initialLang, initialCode, categoryFilter 
     } finally {
       setRunning(false);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [editor.code, lang, problem.slug]);
 
   const handleSubmit = useCallback(async () => {
@@ -405,6 +392,7 @@ export function PracticeIDE({ problem, initialLang, initialCode, categoryFilter 
     } finally {
       setSubmitting(false);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [editor.code, lang, problem.slug, aiFeedback, aiLoading]);
 
   const requestAiFeedback = useCallback(async () => {
@@ -445,6 +433,7 @@ export function PracticeIDE({ problem, initialLang, initialCode, categoryFilter 
     } finally {
       setAiLoading(false);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [verdict?.submissionId]);
 
   const requestCodeReview = useCallback(async () => {
@@ -531,7 +520,7 @@ export function PracticeIDE({ problem, initialLang, initialCode, categoryFilter 
     finally { setBookmarkLoading(false); }
   }
 
-  const { shareCopied, handleShare } = useShareCode(() => editor.code);
+  useShareCode(() => editor.code);
 
   const [resetPending, setResetPending] = useState(false);
   const resetTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -938,7 +927,7 @@ export function PracticeIDE({ problem, initialLang, initialCode, categoryFilter 
                   id="practice-notes"
                   name="notes"
                   value={notes}
-                  onChange={(e) => { setNotes(e.target.value); setNoteSaved(false); }}
+                  onChange={(e) => { setNotes(e.target.value); }}
                   placeholder="Write your approach, observations, or ideas here…"
                   className="flex-1 resize-none bg-transparent px-4 py-3 text-sm text-zinc-800 placeholder-zinc-400 focus:outline-none dark:text-zinc-200 dark:placeholder-zinc-500"
                 />

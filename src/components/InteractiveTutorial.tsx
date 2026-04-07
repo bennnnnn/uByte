@@ -68,7 +68,6 @@ export default function InteractiveTutorial({
   const [notesOpen, setNotesOpen] = useState(false);
   const [notes, setNotes] = useState<string>("");
   const notesKey = `tutorial-notes-${lang}-${tutorialSlug}`;
-  const [noteSaved, setNoteSaved] = useState(false);
 
   useEffect(() => {
     try { setNotes(localStorage.getItem(notesKey) ?? ""); } catch { /* ignore */ }
@@ -76,8 +75,6 @@ export default function InteractiveTutorial({
 
   function saveNotesNow() {
     try { localStorage.setItem(notesKey, notes); } catch { /* ignore */ }
-    setNoteSaved(true);
-    setTimeout(() => setNoteSaved(false), 2000);
   }
   const [fontSize, setFontSize] = useState<14 | 16 | 18>(14);
   useEffect(() => {
@@ -458,7 +455,7 @@ export default function InteractiveTutorial({
                   id="tutorial-notes"
                   name="notes"
                   value={notes}
-                  onChange={(e) => { setNotes(e.target.value); setNoteSaved(false); }}
+                  onChange={(e) => { setNotes(e.target.value); }}
                   placeholder="Write your observations, questions, or ideas here…"
                   className="flex-1 resize-none bg-transparent px-4 py-3 text-sm text-zinc-800 placeholder-zinc-400 focus:outline-none dark:text-zinc-200 dark:placeholder-zinc-500"
                 />

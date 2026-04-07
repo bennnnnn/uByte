@@ -467,7 +467,6 @@ export default function HomeHero({
   isLoggedInServer,
   leftOff,
   continueLang,
-  continueTutorials: _continueTutorials,
 }: Props) {
   const { user, profile, stepCountByLang } = useAuth();
 

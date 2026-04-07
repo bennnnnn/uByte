@@ -7,14 +7,14 @@
  *   2. solvedPracticeProblem  — has any practice problem solved
  *   3. attemptedCert          — has attempted any certification exam
  */
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
 import { getSql } from "@/lib/db/client";
 import { withErrorHandling } from "@/lib/api-utils";
 
 const SHOW_FOR_DAYS = 21; // show checklist for first 3 weeks
 
-export const GET = withErrorHandling("GET /api/onboarding-status", async (_req: NextRequest) => {
+export const GET = withErrorHandling("GET /api/onboarding-status", async () => {
   const user = await getCurrentUser();
   if (!user) return NextResponse.json({ show: false });
 

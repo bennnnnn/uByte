@@ -26,6 +26,7 @@ export function useNavState(tutorials: NavItem[], lang: string = "go") {
     if (pathname !== prevPathRef.current) {
       prevPathRef.current = pathname;
       const active = tutorials.find((t) => pathname === tutorialUrl(lang, t.slug));
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       if (active) setExpanded(active.slug);
     }
   }, [pathname, tutorials, lang]);

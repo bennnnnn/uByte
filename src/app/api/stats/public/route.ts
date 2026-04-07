@@ -3,13 +3,13 @@
  * Returns user count, rounded to nearest hundred for a cleaner display.
  * No auth required; cached for 10 minutes on the CDN.
  */
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { getTotalUserCount } from "@/lib/db";
 import { withErrorHandling } from "@/lib/api-utils";
 
 export const revalidate = 600; // 10-min CDN cache
 
-export const GET = withErrorHandling("GET /api/stats/public", async (_req: NextRequest) => {
+export const GET = withErrorHandling("GET /api/stats/public", async () => {
   try {
     const count = await getTotalUserCount();
     // Round down to nearest 100 so the number never oversells

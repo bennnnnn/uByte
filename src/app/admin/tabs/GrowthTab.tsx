@@ -6,7 +6,7 @@
  * in a separate `teamStats` prop and render a TeamsSection below.
  */
 
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { StatCard, SectionCard } from "../components";
 import type { AdminData } from "../hooks";
 
@@ -16,6 +16,8 @@ interface Props {
 
 export default function GrowthTab({ data }: Props) {
   const { users } = data;
+  // Capture the current timestamp once at mount so churn cutoffs are stable
+  const [now] = useState(() => Date.now());
 
   /* ── Conversion funnel ─────────────────────────────────────────────────── */
   const funnel = useMemo(() => {
@@ -51,11 +53,11 @@ export default function GrowthTab({ data }: Props) {
 
   /* ── Churn signals ──────────────────────────────────────────────────────── */
   const churn = useMemo(() => {
-    const cutoff14   = Date.now() - 14 * 24 * 60 * 60 * 1000;
-    const cutoff7    = Date.now() -  7 * 24 * 60 * 60 * 1000;
+    const cutoff14   = now - 14 * 24 * 60 * 60 * 1000;
+    const cutoff7    = now -  7 * 24 * 60 * 60 * 1000;
 
     const neverStarted = users.filter((u) => {
-      const age = Date.now() - new Date(u.created_at).getTime();
+      const age = now - new Date(u.created_at).getTime();
       return age > 3 * 24 * 60 * 60 * 1000 && u.xp === 0 && u.completed_count === 0;
     });
 
@@ -72,7 +74,7 @@ export default function GrowthTab({ data }: Props) {
     });
 
     return { neverStarted, wentCold, atRiskPro };
-  }, [users]);
+  }, [users, now]);
 
   const maxBar = Math.max(...signupSeries.map((d) => d.count), 1);
 

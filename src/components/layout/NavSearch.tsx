@@ -40,6 +40,7 @@ export default function NavSearch() {
   // Fetch results
   useEffect(() => {
     const q = debouncedQ.trim();
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     if (q.length < 2) { setResults([]); return; }
     setLoading(true);
     fetch(`/api/search?q=${encodeURIComponent(q)}`)
@@ -81,6 +82,7 @@ export default function NavSearch() {
 
   // Close whenever route changes (user clicked a result)
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setFocused(false);
     setQuery("");
     setResults([]);

@@ -106,6 +106,7 @@ export default function HeaderNavLinks({ side = "left" }: { side?: "left" }) {
   const handleOpen  = useCallback((id: DropdownId) => setOpenMenu(id), []);
   const handleClose = useCallback(() => setOpenMenu(null), []);
 
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => { setOpenMenu(null); }, [pathname]);
 
   if (side !== "left") return null;

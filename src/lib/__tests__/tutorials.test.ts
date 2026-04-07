@@ -13,7 +13,7 @@ vi.mock("fs", () => ({
 }));
 
 import fs from "fs";
-import { getAllTutorials, getTutorialBySlug, getAdjacentTutorials } from "../tutorials";
+import { getAllTutorials, getTutorialBySlug, getAdjacentTutorials, clearTutorialCaches } from "../tutorials";
 
 const mockReaddirSync = vi.mocked(fs.readdirSync);
 const mockReadFileSync = vi.mocked(fs.readFileSync);
@@ -23,7 +23,8 @@ const makeMdx = (title: string, order: number, content = "") =>
   `---\ntitle: "${title}"\ndescription: "desc"\norder: ${order}\n---\n${content}`;
 
 beforeEach(() => {
-  vi.clearAllMocks();
+  vi.resetAllMocks();
+  clearTutorialCaches();
   // getAllTutorials/getTutorialBySlug check existsSync(contentDir) — must return true
   mockExistsSync.mockReturnValue(true);
 });

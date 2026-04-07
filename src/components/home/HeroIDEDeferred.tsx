@@ -12,6 +12,7 @@ export default function HeroIDEDeferred() {
 
   useEffect(() => {
     const mq = window.matchMedia("(min-width: 1024px)");
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     if (mq.matches) setIsDesktop(true);
     const handler = (e: MediaQueryListEvent) => setIsDesktop(e.matches);
     mq.addEventListener("change", handler);

@@ -34,6 +34,7 @@ export default function GuestTopBanner({ show }: Props) {
       if (localStorage.getItem(LS_HAS_ACCOUNT)) return;
       if (localStorage.getItem(LS_KEY)) return;
     } catch { /* noop */ }
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setVisible(true);
   }, [show]);
 

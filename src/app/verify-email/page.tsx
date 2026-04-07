@@ -42,7 +42,7 @@ function VerifyEmailContent() {
         setStatus("error");
         setMessage("Something went wrong. Please try again.");
       });
-  }, [token, router]);
+  }, [token, router, user]);
 
   const handleResend = useCallback(async () => {
     setResendStatus("sending");
