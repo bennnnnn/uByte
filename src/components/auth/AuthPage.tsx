@@ -53,8 +53,8 @@ export default function AuthPage({ variant }: { variant: AuthPageMode }) {
   const nextPath = getSafeNextPath(searchParams.get("next"));
   // Read referral code from localStorage so it survives the OAuth redirect
   const storedRef = typeof window !== "undefined" ? readStoredReferralCode() : null;
-  const googleHref = buildGoogleAuthHref(variant, nextPath, storedRef);
-  const isSignupPage = variant === "signup";
+  const googleHref = buildGoogleAuthHref(mode === "signup" ? "signup" : "login", nextPath, storedRef);
+  const isSignupPage = mode === "signup";
 
   useEffect(() => {
     firstInputRef.current?.focus();
@@ -163,7 +163,7 @@ export default function AuthPage({ variant }: { variant: AuthPageMode }) {
           </div>
         </section>
 
-        <section className="flex items-center justify-center">
+        <section className="flex items-start justify-center pt-2">
           <div className="w-full max-w-xl rounded-[30px] bg-surface-card p-7 shadow-[0_24px_70px_rgba(15,23,42,0.10)] xl:p-9 dark:shadow-[0_24px_70px_rgba(2,6,23,0.45)]">
             <div className="mb-6">
               <h2 className="text-3xl font-black tracking-tight text-zinc-950 dark:text-white">
