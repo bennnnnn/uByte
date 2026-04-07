@@ -51,8 +51,6 @@ export default function AuthPage({ variant }: { variant: AuthPageMode }) {
   const handlingSubmitRef = useRef(false);
 
   const nextPath = getSafeNextPath(searchParams.get("next"));
-  const loginHref = buildAuthPageHref("login", nextPath);
-  const signupHref = buildAuthPageHref("signup", nextPath);
   // Read referral code from localStorage so it survives the OAuth redirect
   const storedRef = typeof window !== "undefined" ? readStoredReferralCode() : null;
   const googleHref = buildGoogleAuthHref(variant, nextPath, storedRef);
@@ -136,7 +134,7 @@ export default function AuthPage({ variant }: { variant: AuthPageMode }) {
 
   return (
     <div className="min-h-[100svh] text-zinc-950 dark:text-zinc-50">
-      <div className="mx-auto grid min-h-[100svh] max-w-5xl gap-10 px-5 py-10 lg:grid-cols-[0.9fr_1.1fr] lg:px-8 lg:py-14">
+      <div className="mx-auto grid min-h-[100svh] max-w-5xl gap-10 px-5 py-6 lg:grid-cols-[0.9fr_1.1fr] lg:px-8 lg:py-10">
         <section className="px-1 py-3 sm:px-2">
           <div className="flex h-full flex-col">
             <div className="max-w-xl">
@@ -167,11 +165,8 @@ export default function AuthPage({ variant }: { variant: AuthPageMode }) {
 
         <section className="flex items-center justify-center">
           <div className="w-full max-w-xl rounded-[30px] bg-surface-card p-7 shadow-[0_24px_70px_rgba(15,23,42,0.10)] xl:p-9 dark:shadow-[0_24px_70px_rgba(2,6,23,0.45)]">
-            <div className="mb-8">
-              <p className="text-xs font-bold uppercase tracking-[0.22em] text-indigo-600 dark:text-indigo-400">
-                {mode === "forgot" ? "Password reset" : isSignupPage ? "Create account" : "Welcome back"}
-              </p>
-              <h2 className="mt-2 text-3xl font-black tracking-tight text-zinc-950 dark:text-white">
+            <div className="mb-6">
+              <h2 className="text-3xl font-black tracking-tight text-zinc-950 dark:text-white">
                 {mode === "forgot" ? "Reset your password" : isSignupPage ? "Sign up" : "Sign in"}
               </h2>
             </div>
@@ -354,12 +349,13 @@ export default function AuthPage({ variant }: { variant: AuthPageMode }) {
 
                 <p className="mt-4 text-sm text-zinc-600 dark:text-zinc-400">
                   {isSignupPage ? "Already have an account? " : "Don't have an account? "}
-                  <Link
-                    href={isSignupPage ? loginHref : signupHref}
+                  <button
+                    type="button"
+                    onClick={() => switchMode(isSignupPage ? "login" : "signup")}
                     className="font-semibold text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300"
                   >
                     {isSignupPage ? "Sign in" : "Sign up free"}
-                  </Link>
+                  </button>
                 </p>
               </>
             )}
