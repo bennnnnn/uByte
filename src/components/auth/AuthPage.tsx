@@ -12,7 +12,6 @@ import GoogleOAuthError from "@/components/GoogleOAuthError";
 import { requestPasswordReset, submitEmailAuth } from "@/lib/auth-client";
 import { MIN_PASSWORD_LENGTH, PASSWORD_POLICY_MESSAGE, isValidPassword } from "@/lib/password-policy";
 import {
-  buildAuthPageHref,
   buildGoogleAuthHref,
   getSafeNextPath,
   type AuthPageMode,
