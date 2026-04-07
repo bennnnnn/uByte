@@ -73,7 +73,7 @@ const AuthFormFields = forwardRef<HTMLFormElement, AuthFormFieldsProps>(function
       <a
         href={googleHref}
         aria-label="Continue with Google"
-        className={`flex w-full items-center justify-center gap-3 rounded-xl border border-zinc-200 bg-white px-4 py-3 text-sm font-semibold text-zinc-700 shadow-sm transition-colors hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-200 dark:hover:bg-zinc-700/80 ${
+        className={`flex w-full items-center justify-center gap-3 rounded-xl border border-zinc-200 bg-surface-page px-4 py-3 text-sm font-semibold text-zinc-700 shadow-sm transition-colors hover:bg-zinc-50 dark:border-zinc-700 dark:bg-surface-page dark:text-zinc-200 dark:hover:bg-zinc-800 ${
           submitting ? "pointer-events-none opacity-50" : ""
         }`}
       >
@@ -81,12 +81,19 @@ const AuthFormFields = forwardRef<HTMLFormElement, AuthFormFieldsProps>(function
         Continue with Google
       </a>
 
+      {/* OR divider */}
+      <div className="flex items-center gap-3 py-1">
+        <div className="h-px flex-1 bg-zinc-200 dark:bg-zinc-700" />
+        <span className="text-xs font-medium text-zinc-400">OR</span>
+        <div className="h-px flex-1 bg-zinc-200 dark:bg-zinc-700" />
+      </div>
+
       {/* Email — secondary CTA, reveals form on click */}
       {!emailOpen ? (
         <button
           type="button"
           onClick={() => setEmailOpen(true)}
-          className="mt-3 flex w-full items-center justify-center gap-2.5 rounded-xl border border-zinc-200 bg-zinc-50 px-4 py-3 text-sm font-medium text-zinc-600 transition-colors hover:bg-zinc-100 hover:text-zinc-800 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-200"
+          className="flex w-full items-center justify-center gap-2.5 rounded-xl border border-zinc-200 bg-surface-page px-4 py-3 text-sm font-medium text-zinc-600 transition-colors hover:bg-zinc-50 hover:text-zinc-800 dark:border-zinc-700 dark:bg-surface-page dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-200"
         >
           <svg className="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
@@ -95,12 +102,6 @@ const AuthFormFields = forwardRef<HTMLFormElement, AuthFormFieldsProps>(function
         </button>
       ) : (
         <>
-          <div className="my-4 flex items-center gap-3">
-            <div className="h-px flex-1 bg-zinc-200 dark:bg-zinc-700" />
-            <span className="text-xs font-medium text-zinc-400">or continue with email</span>
-            <div className="h-px flex-1 bg-zinc-200 dark:bg-zinc-700" />
-          </div>
-
           <div role="alert" aria-live="assertive" aria-atomic="true">
             {error && (
               <div className="mb-4 rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700 dark:bg-red-950/50 dark:text-red-300">

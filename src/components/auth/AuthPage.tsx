@@ -247,18 +247,25 @@ export default function AuthPage({ variant }: { variant: AuthPageMode }) {
                 {/* Google — primary CTA */}
                 <a
                   href={googleHref}
-                  className="mt-6 flex w-full items-center justify-center gap-3 rounded-2xl border border-zinc-200 bg-surface-card px-4 py-3.5 text-sm font-semibold text-zinc-800 shadow-sm transition-colors hover:border-zinc-300 hover:bg-white dark:border-zinc-800 dark:text-zinc-100 dark:hover:border-zinc-700"
+                  className="mt-6 flex w-full items-center justify-center gap-3 rounded-2xl border border-zinc-200 bg-surface-page px-4 py-3.5 text-sm font-semibold text-zinc-800 shadow-sm transition-colors hover:border-zinc-300 hover:bg-zinc-50 dark:border-zinc-800 dark:bg-surface-page dark:text-zinc-100 dark:hover:border-zinc-700 dark:hover:bg-zinc-800"
                 >
                   <GoogleIcon className="h-5 w-5 shrink-0" />
                   Continue with Google
                 </a>
+
+                {/* OR divider */}
+                <div className="my-4 flex items-center gap-3">
+                  <div className="h-px flex-1 bg-zinc-200 dark:bg-zinc-800" />
+                  <span className="text-xs font-bold uppercase tracking-[0.18em] text-zinc-400">OR</span>
+                  <div className="h-px flex-1 bg-zinc-200 dark:bg-zinc-800" />
+                </div>
 
                 {/* Email — secondary CTA, expands to form */}
                 {!emailOpen ? (
                   <button
                     type="button"
                     onClick={() => setEmailOpen(true)}
-                    className="mt-3 flex w-full items-center justify-center gap-2.5 rounded-2xl border border-zinc-200 bg-zinc-50 px-4 py-3.5 text-sm font-medium text-zinc-600 transition-colors hover:bg-zinc-100 hover:text-zinc-800 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-200"
+                    className="flex w-full items-center justify-center gap-2.5 rounded-2xl border border-zinc-200 bg-surface-page px-4 py-3.5 text-sm font-medium text-zinc-600 transition-colors hover:border-zinc-300 hover:bg-zinc-50 hover:text-zinc-800 dark:border-zinc-800 dark:bg-surface-page dark:text-zinc-400 dark:hover:border-zinc-700 dark:hover:bg-zinc-800 dark:hover:text-zinc-200"
                   >
                     <svg className="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
@@ -267,14 +274,6 @@ export default function AuthPage({ variant }: { variant: AuthPageMode }) {
                   </button>
                 ) : (
                   <>
-                    <div className="my-5 flex items-center gap-3">
-                      <div className="h-px flex-1 bg-zinc-200 dark:bg-zinc-800" />
-                      <span className="text-xs font-bold uppercase tracking-[0.18em] text-zinc-400">
-                        or email
-                      </span>
-                      <div className="h-px flex-1 bg-zinc-200 dark:bg-zinc-800" />
-                    </div>
-
                     <form onSubmit={handleSubmit} className="space-y-4">
                       {error && <FormError>{error}</FormError>}
 
