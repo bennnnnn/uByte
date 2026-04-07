@@ -19,7 +19,7 @@ import { getSiteBanner } from "@/lib/db/site-banner";
 import { unstable_cache } from "next/cache";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
-import { isFeatureEnabled } from "@/lib/db/site-settings";
+import { getMaintenanceModeStatus } from "@/lib/db/site-settings";
 import { getCurrentUser } from "@/lib/auth";
 
 const geistSans = Geist({
@@ -118,6 +118,7 @@ export default async function RootLayout({
   const pathname = hdrs.get("x-pathname") ?? "/";
   const bypassMaintenance =
     pathname.startsWith("/admin") ||
+    pathname.startsWith("/a/") ||      // personal admin slug routes
     pathname.startsWith("/maintenance") ||
     pathname.startsWith("/api/") ||
     pathname.startsWith("/login") ||
@@ -126,7 +127,7 @@ export default async function RootLayout({
     pathname.startsWith("/auth/");
 
   if (!bypassMaintenance) {
-    const inMaintenance = await isFeatureEnabled("maintenance_mode");
+    const inMaintenance = await getMaintenanceModeStatus();
     if (inMaintenance) {
       const user = await getCurrentUser();
       if (!user?.isAdmin) {

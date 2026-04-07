@@ -24,6 +24,91 @@ import {
 
 interface Props { data: AdminData }
 
+/* ── Personal admin URL manager ─────────────────────────────────────────────── */
+function MyAdminUrl({ adminSlug }: { adminSlug: string | null }) {
+  const [slug,     setSlug]     = useState(adminSlug ?? "");
+  const [saving,   setSaving]   = useState(false);
+  const [msg,      setMsg]      = useState<{ text: string; ok: boolean } | null>(null);
+  const origin = typeof window !== "undefined" ? window.location.origin : "";
+
+  const save = async () => {
+    setSaving(true);
+    setMsg(null);
+    try {
+      const res = await apiFetch("/api/admin/my-slug", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ slug: slug.trim() || null }),
+      });
+      const d = await res.json();
+      if (res.ok) {
+        setSlug(d.slug ?? "");
+        setMsg({ text: d.slug ? `Your URL: ${origin}/a/${d.slug}` : "Slug cleared.", ok: true });
+      } else {
+        setMsg({ text: d.error ?? "Failed to save", ok: false });
+      }
+    } catch {
+      setMsg({ text: "Request failed", ok: false });
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const currentUrl = slug.trim() ? `${origin}/a/${slug.trim()}` : null;
+
+  return (
+    <div className="rounded-xl border border-zinc-200 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+      <div className="border-b border-zinc-100 px-5 py-4 dark:border-zinc-800">
+        <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">Your private admin URL</h2>
+        <p className="mt-0.5 text-xs text-zinc-400">
+          Set a personal slug so you can access the admin panel via <code className="rounded bg-zinc-100 px-1 dark:bg-zinc-800">/a/your-slug</code> instead of the default <code className="rounded bg-zinc-100 px-1 dark:bg-zinc-800">/admin</code> path.
+        </p>
+      </div>
+      <div className="p-5">
+        <div className="flex max-w-sm items-center gap-2">
+          <div className="flex flex-1 items-center rounded-lg border border-zinc-200 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-800">
+            <span className="shrink-0 border-r border-zinc-200 px-3 py-2 text-xs text-zinc-400 dark:border-zinc-700">/a/</span>
+            <input
+              type="text"
+              value={slug}
+              onChange={(e) => setSlug(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ""))}
+              placeholder="your-slug"
+              maxLength={40}
+              className="flex-1 bg-transparent px-3 py-2 text-sm text-zinc-800 placeholder-zinc-400 focus:outline-none dark:text-zinc-100"
+            />
+          </div>
+          <button
+            type="button"
+            onClick={save}
+            disabled={saving}
+            className="inline-flex items-center gap-1.5 rounded-lg bg-indigo-600 px-4 py-2 text-xs font-medium text-white transition-colors hover:bg-indigo-700 disabled:opacity-50"
+          >
+            {saving && <Spinner className="h-3 w-3" />}
+            Save
+          </button>
+        </div>
+
+        {currentUrl && !msg && (
+          <p className="mt-2 text-xs text-zinc-500">
+            Current:{" "}
+            <a href={currentUrl} className="font-mono text-indigo-600 hover:underline dark:text-indigo-400">
+              {currentUrl}
+            </a>
+          </p>
+        )}
+        {msg && (
+          <p className={`mt-2 text-xs font-medium ${msg.ok ? "text-emerald-600 dark:text-emerald-400" : "text-red-600 dark:text-red-400"}`}>
+            {msg.ok ? "✓ " : "✗ "}{msg.text}
+          </p>
+        )}
+        <p className="mt-2 text-[11px] text-zinc-400">
+          Slug: 3–40 chars, lowercase letters, digits and hyphens only. Leave blank to disable.
+        </p>
+      </div>
+    </div>
+  );
+}
+
 interface AdminEntry {
   id: number;
   name: string;
@@ -260,7 +345,7 @@ function AdminRow({
 
 /* ── Main tab ────────────────────────────────────────────────────────────── */
 export default function AdminsTab({ data }: Props) {
-  const { user } = data;
+  const { user, adminMe } = data;
   const [admins, setAdmins] = useState<AdminEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -382,6 +467,9 @@ export default function AdminsTab({ data }: Props) {
 
   return (
     <div className="space-y-6">
+
+      {/* ── Personal admin URL ────────────────────────────────────────────── */}
+      <MyAdminUrl adminSlug={adminMe?.adminSlug ?? null} />
 
       {/* ── Promote form ──────────────────────────────────────────────────── */}
       <div className="rounded-xl border border-zinc-200 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-900">

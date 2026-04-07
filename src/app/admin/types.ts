@@ -15,6 +15,8 @@ export interface AdminUser {
   completed_count: number;
   bookmark_count: number;
   plan: string;
+  email_verified: number;
+  admin_slug: string | null;
 }
 
 export interface AdminMe {
@@ -23,6 +25,7 @@ export interface AdminMe {
   email: string;
   isSuperAdmin: boolean;
   permissions: string[];
+  adminSlug: string | null;
 }
 
 export interface TutorialAnalytics {

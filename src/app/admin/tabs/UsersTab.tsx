@@ -34,6 +34,12 @@ const PLAN_FILTERS = [
   { value: "canceling",  label: "Canceling" },
 ] as const;
 
+const VERIFIED_FILTERS = [
+  { value: "",         label: "All" },
+  { value: "verified",   label: "✓ Verified" },
+  { value: "unverified", label: "⚠ Unverified" },
+] as const;
+
 /* ── Main component ───────────────────────────────────────────────────────── */
 export default function UsersTab({ data }: Props) {
   const { user: adminUser, revenue, totalCompletions, exportUsersCSV } = data;
@@ -46,6 +52,7 @@ export default function UsersTab({ data }: Props) {
   const [search,      setSearch]      = useState("");
   const [debouncedQ,  setDebouncedQ]  = useState("");
   const [planFilter,  setPlanFilter]  = useState("");
+  const [verifiedFilter, setVerifiedFilter] = useState("");
   const [loading,     setLoading]     = useState(true);
   const [error,       setError]       = useState("");
 
@@ -72,13 +79,14 @@ export default function UsersTab({ data }: Props) {
   }, [search]);
 
   /* ── Fetch users ──────────────────────────────────────────────────────── */
-  const fetchUsers = useCallback(async (q: string, pg: number, plan: string) => {
+  const fetchUsers = useCallback(async (q: string, pg: number, plan: string, verified: string) => {
     setLoading(true);
     setError("");
     try {
       const params = new URLSearchParams({ page: String(pg), limit: String(PAGE_SIZE) });
       if (q.trim())   params.set("search", q.trim());
       if (plan)       params.set("plan", plan);
+      if (verified)   params.set("verified", verified);
       const res = await fetch(`/api/admin/users?${params}`, { credentials: "same-origin" });
       if (res.status === 403) { setUsers([]); setTotal(0); setTotalPages(1); return; }
       if (!res.ok) throw new Error("HTTP " + res.status);
@@ -94,8 +102,8 @@ export default function UsersTab({ data }: Props) {
   }, []);
 
   useEffect(() => {
-    fetchUsers(debouncedQ, page, planFilter);
-  }, [debouncedQ, page, planFilter, fetchUsers]);
+    fetchUsers(debouncedQ, page, planFilter, verifiedFilter);
+  }, [debouncedQ, page, planFilter, verifiedFilter, fetchUsers]);
 
   /* ── Action handler ───────────────────────────────────────────────────── */
   const doAction = useCallback(async (
@@ -207,6 +215,24 @@ export default function UsersTab({ data }: Props) {
             ))}
           </div>
 
+          {/* Email verified filter pills */}
+          <div className="flex gap-1 flex-wrap">
+            {VERIFIED_FILTERS.map((f) => (
+              <button
+                key={f.value}
+                type="button"
+                onClick={() => { setVerifiedFilter(f.value); setPage(1); }}
+                className={`rounded-full px-3 py-1 text-xs font-semibold transition-colors ${
+                  verifiedFilter === f.value
+                    ? "bg-emerald-600 text-white"
+                    : "bg-zinc-100 text-zinc-600 hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-400 dark:hover:bg-zinc-700"
+                }`}
+              >
+                {f.label}
+              </button>
+            ))}
+          </div>
+
           {/* Export */}
           <button
             type="button"
@@ -278,9 +304,12 @@ export default function UsersTab({ data }: Props) {
                             {u.banned  && <Badge color="red">banned</Badge>}
                             {isMe      && <Badge color="zinc">you</Badge>}
                           </div>
-                          <p className="mt-0.5 truncate text-xs text-zinc-400 dark:text-zinc-500" title={u.email}>
-                            {u.email}
-                          </p>
+                          <div className="mt-0.5 flex items-center gap-2">
+                            <p className="truncate text-xs text-zinc-400 dark:text-zinc-500" title={u.email}>
+                              {u.email}
+                            </p>
+                            <VerifiedBadge verified={u.email_verified === 1} />
+                          </div>
                         </td>
 
                         <td className="px-4 py-3 text-right font-mono text-sm tabular-nums text-zinc-700 dark:text-zinc-300">{u.xp.toLocaleString()}</td>
@@ -517,8 +546,14 @@ function ActionsMenu({
   const btn = "flex w-full items-center gap-2 px-3 py-2 text-left text-xs transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-800/60";
   const divider = <div className="my-1 border-t border-zinc-100 dark:border-zinc-800" />;
 
-  const left  = Math.max(8, Math.min(anchorRect.right - 180, (typeof window !== "undefined" ? window.innerWidth : 800) - 188));
-  const top   = anchorRect.bottom + 6;
+  const winW       = typeof window !== "undefined" ? window.innerWidth  : 800;
+  const winH       = typeof window !== "undefined" ? window.innerHeight : 600;
+  const menuHeight = 340; // approximate rendered height of this menu
+  const left       = Math.max(8, Math.min(anchorRect.right - 180, winW - 188));
+  const spaceBelow = winH - anchorRect.bottom;
+  const top        = spaceBelow < menuHeight + 10
+    ? Math.max(8, anchorRect.top - menuHeight - 6)
+    : anchorRect.bottom + 6;
 
   return (
     <div
@@ -589,6 +624,33 @@ function ActionsMenu({
       )}
       <div className="h-1" />
     </div>
+  );
+}
+
+function VerifiedBadge({ verified }: { verified: boolean }) {
+  if (verified) {
+    return (
+      <span
+        title="Email verified"
+        className="inline-flex items-center gap-0.5 rounded-full bg-emerald-100 px-1.5 py-0.5 text-[10px] font-semibold text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400"
+      >
+        <svg className="h-2.5 w-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+        </svg>
+        verified
+      </span>
+    );
+  }
+  return (
+    <span
+      title="Email not verified"
+      className="inline-flex items-center gap-0.5 rounded-full bg-amber-100 px-1.5 py-0.5 text-[10px] font-semibold text-amber-700 dark:bg-amber-900/30 dark:text-amber-400"
+    >
+      <svg className="h-2.5 w-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
+      </svg>
+      unverified
+    </span>
   );
 }
 

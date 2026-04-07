@@ -292,7 +292,7 @@ export default function SiteSettingsTab() {
         </SettingRow>
         <SettingRow
           label="Maintenance mode"
-          hint="When on, a maintenance banner is shown to all visitors. Admin panel remains accessible."
+          hint="When on, all non-admin visitors are redirected to the maintenance page immediately. Admin panel stays accessible. Changes apply instantly — no caching."
           danger={bool("maintenance_mode")}
         >
           <Toggle

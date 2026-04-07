@@ -111,6 +111,8 @@ export interface AdminUserRow {
   completed_count: number;
   bookmark_count: number;
   plan: string;
+  email_verified: number;
+  admin_slug: string | null;
 }
 
 export interface AdminTutorialRow {

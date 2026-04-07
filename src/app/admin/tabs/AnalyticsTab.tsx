@@ -16,10 +16,34 @@ interface Props {
 }
 
 export default function AnalyticsTab({ data }: Props) {
-  const { analytics, practiceStats, stepStats, heatmapSlug, loadStepStats } = data;
+  const { analytics, practiceStats, stepStats, heatmapSlug, loadStepStats, fetching } = data;
+
+  if (fetching) {
+    return (
+      <div className="flex justify-center py-16">
+        <div className="h-6 w-6 animate-spin rounded-full border-2 border-indigo-600 border-t-transparent" />
+      </div>
+    );
+  }
+
+  const totalCompletions = analytics.reduce((s, t) => s + t.completed_count, 0);
+  const totalVotes       = analytics.reduce((s, t) => s + t.thumbs_up + t.thumbs_down, 0);
+  const overallScore     = totalVotes > 0
+    ? Math.round((analytics.reduce((s, t) => s + t.thumbs_up, 0) / totalVotes) * 100)
+    : null;
+  const totalSolved      = practiceStats.reduce((s, p) => s + p.solved_count, 0);
+  const totalAttempts    = practiceStats.reduce((s, p) => s + p.attempt_count, 0);
 
   return (
     <div className="space-y-5">
+
+      {/* ── Summary stat cards ────────────────────────────────────────── */}
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+        <MiniStat label="Tutorials tracked"   value={String(analytics.length)} />
+        <MiniStat label="Total completions"   value={totalCompletions.toLocaleString()} />
+        <MiniStat label="Overall satisfaction" value={overallScore !== null ? overallScore + "%" : "—"} />
+        <MiniStat label="Problems attempted"  value={totalAttempts.toLocaleString()} sub={`${totalSolved.toLocaleString()} solved`} />
+      </div>
 
       {/* ── Tutorial completions & ratings ─────────────────────────────── */}
       <SectionCard title="Tutorial completions & ratings">
@@ -119,6 +143,18 @@ export default function AnalyticsTab({ data }: Props) {
           </div>
         )}
       </SectionCard>
+    </div>
+  );
+}
+
+/* ── Mini stat card ──────────────────────────────────────────────────────── */
+
+function MiniStat({ label, value, sub }: { label: string; value: string; sub?: string }) {
+  return (
+    <div className="rounded-xl border border-zinc-200 bg-white p-4 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+      <p className="text-xs font-medium uppercase tracking-wide text-zinc-400">{label}</p>
+      <p className="mt-1 text-2xl font-black tabular-nums text-zinc-900 dark:text-zinc-100">{value}</p>
+      {sub && <p className="mt-0.5 text-xs text-zinc-400">{sub}</p>}
     </div>
   );
 }

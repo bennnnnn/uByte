@@ -17,6 +17,7 @@
 import { NextResponse } from "next/server";
 import { withErrorHandling, requireAdmin } from "@/lib/api-utils";
 import { ALL_PERMISSIONS, DEFAULT_LIMITED_PERMISSIONS } from "@/app/admin/permission-constants";
+import { getAdminSlug } from "@/lib/db/admin";
 
 export const GET = withErrorHandling("GET /api/admin/me", async () => {
   const { admin, response } = await requireAdmin();
@@ -41,11 +42,14 @@ export const GET = withErrorHandling("GET /api/admin/me", async () => {
     permissions = [...DEFAULT_LIMITED_PERMISSIONS];
   }
 
+  const adminSlug = await getAdminSlug(admin.id).catch(() => null);
+
   return NextResponse.json({
     id: admin.id,
     name: admin.name,
     email: admin.email,
     isSuperAdmin,
     permissions,
+    adminSlug,
   });
 });
