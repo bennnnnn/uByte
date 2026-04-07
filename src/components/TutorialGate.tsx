@@ -4,94 +4,91 @@
  * TutorialGate — hard wall that blocks tutorial content.
  *
  * Two gates:
- * 1. Guest gate: after 3 unique tutorial pages, must sign up to continue.
- * 2. Email verification gate: after 5 unique tutorial pages, must verify email.
+ * 1. Guest gate: after GUEST_LESSON_LIMIT lessons completed, must sign up.
+ * 2. Email verification gate: after UNVERIFIED_LESSON_LIMIT lessons, must verify email.
  *
- * Uses localStorage to track unique tutorial slugs visited.
+ * Uses localStorage to accumulate lesson counts across sessions.
  * The gate is NOT dismissable — users must act to continue.
  */
 
-import { useState, useEffect, lazy, Suspense } from "react";
+import { useState, useEffect, useRef, lazy, Suspense } from "react";
 import Link from "next/link";
 import { useAuth } from "@/components/AuthProvider";
 
 const AuthModal = lazy(() => import("@/components/auth/AuthModal"));
 
-const LS_GUEST_TUTORIALS = "ubyte_guest_tutorials";
-const LS_UNVERIFIED_TUTORIALS = "ubyte_unverified_tutorials";
+const LS_GUEST_LESSONS = "ubyte_guest_lessons";
+const LS_UNVERIFIED_LESSONS = "ubyte_unverified_lessons";
 
-/** Number of free tutorials before guests must sign up. */
-const GUEST_TUTORIAL_LIMIT = 3;
-/** Number of tutorials before unverified users must verify email. */
-const UNVERIFIED_TUTORIAL_LIMIT = 5;
+/** Number of free lessons (steps passed) before guests must sign up. */
+const GUEST_LESSON_LIMIT = 5;
+/** Number of lessons before unverified users must verify email. */
+const UNVERIFIED_LESSON_LIMIT = 10;
 
-function getVisitedSlugs(key: string): string[] {
+function getStoredCount(key: string): number {
   try {
-    const raw = localStorage.getItem(key);
-    if (!raw) return [];
-    const parsed = JSON.parse(raw);
-    return Array.isArray(parsed) ? parsed : [];
+    return parseInt(localStorage.getItem(key) ?? "0", 10) || 0;
   } catch {
-    return [];
+    return 0;
   }
 }
 
-function recordVisit(key: string, slug: string): number {
-  const visited = getVisitedSlugs(key);
-  if (!visited.includes(slug)) {
-    visited.push(slug);
-    try {
-      localStorage.setItem(key, JSON.stringify(visited));
-    } catch { /* full storage — ignore */ }
-  }
-  return visited.length;
+function setStoredCount(key: string, value: number) {
+  try {
+    localStorage.setItem(key, String(value));
+  } catch { /* full storage — ignore */ }
 }
 
 interface Props {
   /** Current tutorial slug being viewed. */
   tutorialSlug: string;
+  /** Number of lessons (steps) completed in the current session for this tutorial. */
+  completedLessons: number;
   /** Only render content (children) when the gate is not active. */
   children: React.ReactNode;
 }
 
-export default function TutorialGate({ tutorialSlug, children }: Props) {
+export default function TutorialGate({ tutorialSlug, completedLessons, children }: Props) {
   const { user, profile, loading } = useAuth();
   const [gate, setGate] = useState<"none" | "signup" | "verify">("none");
   const [authOpen, setAuthOpen] = useState(false);
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
 
+  // Snapshot of the stored count at the start of this session — so adding
+  // completedLessons never double-counts across reloads.
+  const guestBaseRef = useRef<number | null>(null);
+  const unverifiedBaseRef = useRef<number | null>(null);
+
   useEffect(() => {
     if (loading) return;
 
     if (!user) {
-      // Guest: track tutorials visited and gate at limit
-      const count = recordVisit(LS_GUEST_TUTORIALS, tutorialSlug);
-      if (count > GUEST_TUTORIAL_LIMIT) {
-        setGate("signup");
-      }
+      if (guestBaseRef.current === null) guestBaseRef.current = getStoredCount(LS_GUEST_LESSONS);
+      const total = guestBaseRef.current + completedLessons;
+      setStoredCount(LS_GUEST_LESSONS, total); // keep localStorage up to date for next session
+      if (total > GUEST_LESSON_LIMIT) setGate("signup");
     } else if (profile && !profile.emailVerified) {
-      // Logged in but email not verified
-      const count = recordVisit(LS_UNVERIFIED_TUTORIALS, tutorialSlug);
-      if (count > UNVERIFIED_TUTORIAL_LIMIT) {
-        setGate("verify");
-      }
+      if (unverifiedBaseRef.current === null) unverifiedBaseRef.current = getStoredCount(LS_UNVERIFIED_LESSONS);
+      const total = unverifiedBaseRef.current + completedLessons;
+      setStoredCount(LS_UNVERIFIED_LESSONS, total);
+      if (total > UNVERIFIED_LESSON_LIMIT) setGate("verify");
     } else {
       setGate("none");
     }
-  }, [loading, user, profile, tutorialSlug]);
+  }, [loading, user, profile, completedLessons]);
 
-  // Clear guest tutorials when user logs in
+  // Clear counts when user logs in
   useEffect(() => {
     if (user) {
-      try { localStorage.removeItem(LS_GUEST_TUTORIALS); } catch { /* ignore */ }
+      try { localStorage.removeItem(LS_GUEST_LESSONS); } catch { /* ignore */ }
     }
   }, [user]);
 
-  // Clear unverified tutorials when email is verified
+  // Clear unverified count when email is verified
   useEffect(() => {
     if (profile?.emailVerified) {
-      try { localStorage.removeItem(LS_UNVERIFIED_TUTORIALS); } catch { /* ignore */ }
+      try { localStorage.removeItem(LS_UNVERIFIED_LESSONS); } catch { /* ignore */ }
       setGate("none");
     }
   }, [profile?.emailVerified]);
@@ -126,7 +123,7 @@ export default function TutorialGate({ tutorialSlug, children }: Props) {
               Create a free account to continue
             </h2>
             <p className="mb-6 text-sm leading-relaxed text-zinc-500 dark:text-zinc-400">
-              You&apos;ve explored {GUEST_TUTORIAL_LIMIT} tutorials — nice start!
+              You&apos;ve completed {GUEST_LESSON_LIMIT} free lessons — nice start!
               Sign up for free to unlock all tutorials, track your progress,
               earn XP, and get certified.
             </p>
@@ -187,7 +184,7 @@ export default function TutorialGate({ tutorialSlug, children }: Props) {
             Verify your email to continue
           </h2>
           <p className="mb-2 text-sm leading-relaxed text-zinc-500 dark:text-zinc-400">
-            You&apos;ve completed {UNVERIFIED_TUTORIAL_LIMIT} tutorials — great progress!
+            You&apos;ve completed {UNVERIFIED_LESSON_LIMIT} lessons — great progress!
             Verify your email to keep going, lock in your XP,
             and appear on the leaderboard.
           </p>

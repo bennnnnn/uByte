@@ -237,7 +237,7 @@ export default function InteractiveTutorial({
   const guestHasProgress = !user && !loading && stepProgress.completedSteps.size >= 1;
 
   return (
-    <TutorialGate tutorialSlug={tutorialSlug}>
+    <TutorialGate tutorialSlug={tutorialSlug} completedLessons={stepProgress.completedSteps.size}>
     <div className="fixed inset-0 z-50 flex flex-col bg-white text-zinc-900 dark:bg-zinc-950 dark:text-zinc-100">
       {/* Persistent top bar for guests — visible from step 0, before any code is run */}
       <GuestTopBanner show={!user && !loading} />
