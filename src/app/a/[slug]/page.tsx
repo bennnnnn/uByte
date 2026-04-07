@@ -30,7 +30,7 @@ export default async function CustomAdminPage({ params }: Props) {
   // Verify the currently logged-in user IS that admin (slug can't be used by
   // a different admin to impersonate another admin's URL).
   const me = await getCurrentUser();
-  if (!me || !me.isAdmin || me.id !== slugOwner.id) {
+  if (!me || !me.isAdmin || me.userId !== slugOwner.id) {
     redirect("/");
   }
 
