@@ -38,6 +38,7 @@ export default function AuthPage({ variant }: { variant: AuthPageMode }) {
   const searchParams = useSearchParams();
   const { user, login, signup } = useAuth();
   const [mode, setMode] = useState<Mode>(variant === "signup" ? "signup" : "login");
+  const [emailOpen, setEmailOpen] = useState(false);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -76,6 +77,7 @@ export default function AuthPage({ variant }: { variant: AuthPageMode }) {
 
   function switchMode(nextMode: Mode) {
     setMode(nextMode);
+    setEmailOpen(false);
     resetFields();
   }
 
@@ -242,105 +244,124 @@ export default function AuthPage({ variant }: { variant: AuthPageMode }) {
               )
             ) : (
               <>
+                {/* Google — primary CTA */}
                 <a
                   href={googleHref}
-                  className="mt-6 flex w-full items-center justify-center gap-3 rounded-2xl border border-zinc-200 bg-surface-card px-4 py-3 text-sm font-semibold text-zinc-800 transition-colors hover:border-zinc-300 hover:bg-white dark:border-zinc-800 dark:text-zinc-100 dark:hover:border-zinc-700"
+                  className="mt-6 flex w-full items-center justify-center gap-3 rounded-2xl border border-zinc-200 bg-surface-card px-4 py-3.5 text-sm font-semibold text-zinc-800 shadow-sm transition-colors hover:border-zinc-300 hover:bg-white dark:border-zinc-800 dark:text-zinc-100 dark:hover:border-zinc-700"
                 >
                   <GoogleIcon className="h-5 w-5 shrink-0" />
                   Continue with Google
                 </a>
 
-                <div className="my-5 flex items-center gap-3">
-                  <div className="h-px flex-1 bg-zinc-200 dark:bg-zinc-800" />
-                  <span className="text-xs font-bold uppercase tracking-[0.18em] text-zinc-400">
-                    OR
-                  </span>
-                  <div className="h-px flex-1 bg-zinc-200 dark:bg-zinc-800" />
-                </div>
-
-                <form onSubmit={handleSubmit} className="space-y-4">
-                  {error && <FormError>{error}</FormError>}
-
-                  {mode === "signup" && (
-                    <div>
-                      <label htmlFor="auth-name" className="mb-1.5 block text-sm font-semibold text-zinc-700 dark:text-zinc-300">
-                        Name
-                      </label>
-                      <Input
-                        ref={firstInputRef}
-                        id="auth-name"
-                        type="text"
-                        required
-                        value={name}
-                        onChange={(event) => setName(event.target.value)}
-                        placeholder="Your name"
-                        className="rounded-2xl border-zinc-200 bg-surface-card px-4 py-3 dark:border-zinc-800"
-                      />
-                    </div>
-                  )}
-
-                  <div>
-                    <label htmlFor="auth-email" className="mb-1.5 block text-sm font-semibold text-zinc-700 dark:text-zinc-300">
-                      Email
-                    </label>
-                    <Input
-                      ref={mode === "login" ? firstInputRef : undefined}
-                      id="auth-email"
-                      type="email"
-                      required
-                      value={email}
-                      onChange={(event) => setEmail(event.target.value)}
-                      placeholder="you@example.com"
-                      className="rounded-2xl border-zinc-200 bg-surface-card px-4 py-3 dark:border-zinc-800"
-                    />
-                  </div>
-
-                  <div>
-                    <div className="mb-1.5 flex items-center justify-between">
-                      <label htmlFor="auth-password" className="text-sm font-semibold text-zinc-700 dark:text-zinc-300">
-                        Password
-                      </label>
-                      {!isSignupPage && (
-                        <button
-                          type="button"
-                          onClick={() => switchMode("forgot")}
-                          className="text-xs font-semibold uppercase tracking-[0.14em] text-indigo-600 transition-colors hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300"
-                        >
-                          Forgot password?
-                        </button>
-                      )}
-                    </div>
-                    <Input
-                      id="auth-password"
-                      type="password"
-                      required
-                      minLength={MIN_PASSWORD_LENGTH}
-                      value={password}
-                      onChange={(event) => setPassword(event.target.value)}
-                      placeholder={isSignupPage ? "At least 6 characters" : "Your password"}
-                      className="rounded-2xl border-zinc-200 bg-surface-card px-4 py-3 dark:border-zinc-800"
-                    />
-                  </div>
-
-                  <Button
-                    type="submit"
-                    disabled={submitting}
-                    size="lg"
-                    className="w-full"
+                {/* Email — secondary CTA, expands to form */}
+                {!emailOpen ? (
+                  <button
+                    type="button"
+                    onClick={() => setEmailOpen(true)}
+                    className="mt-3 flex w-full items-center justify-center gap-2.5 rounded-2xl border border-zinc-200 bg-zinc-50 px-4 py-3.5 text-sm font-medium text-zinc-600 transition-colors hover:bg-zinc-100 hover:text-zinc-800 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-200"
                   >
-                    {submitting ? (isSignupPage ? "Creating account…" : "Signing in…") : isSignupPage ? "Create free account" : "Sign in"}
-                  </Button>
+                    <svg className="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
+                    </svg>
+                    Continue with Email
+                  </button>
+                ) : (
+                  <>
+                    <div className="my-5 flex items-center gap-3">
+                      <div className="h-px flex-1 bg-zinc-200 dark:bg-zinc-800" />
+                      <span className="text-xs font-bold uppercase tracking-[0.18em] text-zinc-400">
+                        or email
+                      </span>
+                      <div className="h-px flex-1 bg-zinc-200 dark:bg-zinc-800" />
+                    </div>
 
-                  <p className="text-sm text-zinc-600 dark:text-zinc-400">
-                    {isSignupPage ? "Already have an account? " : "Don't have an account? "}
-                    <Link
-                      href={isSignupPage ? loginHref : signupHref}
-                      className="font-semibold text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300"
-                    >
-                      {isSignupPage ? "Sign in" : "Sign up free"}
-                    </Link>
-                  </p>
-                </form>
+                    <form onSubmit={handleSubmit} className="space-y-4">
+                      {error && <FormError>{error}</FormError>}
+
+                      {mode === "signup" && (
+                        <div>
+                          <label htmlFor="auth-name" className="mb-1.5 block text-sm font-semibold text-zinc-700 dark:text-zinc-300">
+                            Name
+                          </label>
+                          <Input
+                            ref={firstInputRef}
+                            id="auth-name"
+                            type="text"
+                            autoFocus
+                            required
+                            value={name}
+                            onChange={(event) => setName(event.target.value)}
+                            placeholder="Your name"
+                            className="rounded-2xl border-zinc-200 bg-surface-card px-4 py-3 dark:border-zinc-800"
+                          />
+                        </div>
+                      )}
+
+                      <div>
+                        <label htmlFor="auth-email" className="mb-1.5 block text-sm font-semibold text-zinc-700 dark:text-zinc-300">
+                          Email
+                        </label>
+                        <Input
+                          ref={mode === "login" ? firstInputRef : undefined}
+                          id="auth-email"
+                          type="email"
+                          autoFocus={mode === "login"}
+                          required
+                          value={email}
+                          onChange={(event) => setEmail(event.target.value)}
+                          placeholder="you@example.com"
+                          className="rounded-2xl border-zinc-200 bg-surface-card px-4 py-3 dark:border-zinc-800"
+                        />
+                      </div>
+
+                      <div>
+                        <div className="mb-1.5 flex items-center justify-between">
+                          <label htmlFor="auth-password" className="text-sm font-semibold text-zinc-700 dark:text-zinc-300">
+                            Password
+                          </label>
+                          {!isSignupPage && (
+                            <button
+                              type="button"
+                              onClick={() => switchMode("forgot")}
+                              className="text-xs font-semibold uppercase tracking-[0.14em] text-indigo-600 transition-colors hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300"
+                            >
+                              Forgot password?
+                            </button>
+                          )}
+                        </div>
+                        <Input
+                          id="auth-password"
+                          type="password"
+                          required
+                          minLength={MIN_PASSWORD_LENGTH}
+                          value={password}
+                          onChange={(event) => setPassword(event.target.value)}
+                          placeholder={isSignupPage ? "At least 6 characters" : "Your password"}
+                          className="rounded-2xl border-zinc-200 bg-surface-card px-4 py-3 dark:border-zinc-800"
+                        />
+                      </div>
+
+                      <Button
+                        type="submit"
+                        disabled={submitting}
+                        size="lg"
+                        className="w-full"
+                      >
+                        {submitting ? (isSignupPage ? "Creating account…" : "Signing in…") : isSignupPage ? "Create free account" : "Sign in"}
+                      </Button>
+                    </form>
+                  </>
+                )}
+
+                <p className="mt-4 text-sm text-zinc-600 dark:text-zinc-400">
+                  {isSignupPage ? "Already have an account? " : "Don't have an account? "}
+                  <Link
+                    href={isSignupPage ? loginHref : signupHref}
+                    className="font-semibold text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300"
+                  >
+                    {isSignupPage ? "Sign in" : "Sign up free"}
+                  </Link>
+                </p>
               </>
             )}
 
