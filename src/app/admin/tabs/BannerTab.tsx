@@ -6,7 +6,7 @@
  */
 
 import { SectionCard, SaveButton, SaveFeedback, LoadingBlock } from "../components";
-import type { AdminData, BannerType } from "../hooks";
+import type { AdminData, BannerData, BannerType } from "../hooks";
 
 interface Props {
   data: AdminData;
@@ -100,7 +100,7 @@ export default function BannerTab({ data }: Props) {
     saveBanner();
   };
 
-  const set = <K extends keyof typeof bannerData>(key: K, value: (typeof bannerData)[K]) =>
+  const set = <K extends keyof BannerData>(key: K, value: BannerData[K]) =>
     setBannerData((b) => b ? { ...b, [key]: value } : b);
 
   return (
