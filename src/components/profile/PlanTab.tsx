@@ -11,17 +11,15 @@ import { apiFetch } from "@/lib/api-client";
 
 const FREE_FEATURES = [
   "All tutorials — every language, every topic",
-  "All interview prep problems",
-  "Certification exams & verifiable certificates",
   "Built-in code editor",
   "Progress tracking",
+  "Bookmarks and streaks",
 ];
 
 const PRO_FEATURES = [
   "Tutorial hints when you get stuck",
-  "Detailed code feedback on every practice submission",
-  "Question-by-question certification exam review",
-  "Mock interview simulator with a personalized debrief",
+  "Priority support",
+  "Extra help inside lessons",
 ];
 
 interface Props {
@@ -367,7 +365,7 @@ export default function PlanTab({ plan, expiresAtProp }: Props & { expiresAtProp
                   {expiryDisplay
                     ? `You have full Pro access until ${expiryDisplay}. After that your account reverts to free.`
                     : "You keep full Pro access until your current billing period ends, then your account reverts to free."}
-                  {" "}Your progress and certificates are never deleted.
+                  {" "}Your progress and bookmarks are never deleted.
                 </p>
               </div>
             </div>

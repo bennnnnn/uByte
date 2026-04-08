@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useState, useRef, useCallback, useEffect } from "react";
 import { usePathname } from "next/navigation";
 
-// All 9 languages — used in both Tutorials and Certifications dropdowns
+// All supported tutorial languages.
 const ALL_LANGS = [
   { slug: "go",         icon: "🐹", label: "Go"         },
   { slug: "python",     icon: "🐍", label: "Python"     },
@@ -23,7 +23,7 @@ const linkBase =
 const menuItemBase =
   "flex items-center justify-between rounded-lg px-3 py-2 text-sm font-semibold text-zinc-700 transition-colors hover:bg-zinc-50 hover:text-indigo-600 dark:text-zinc-300 dark:hover:bg-zinc-800 dark:hover:text-indigo-400";
 
-type DropdownId = "tutorials" | "interview" | "certifications";
+type DropdownId = "tutorials";
 
 // Click-only dropdown — no hover open/close
 function NavDropdown({
@@ -146,64 +146,21 @@ export default function HeaderNavLinks({ side = "left" }: { side?: "left" }) {
         </Link>
       </NavDropdown>
 
-      {/* ── Interview Prep ────────────────────────────────────────── */}
-      <NavDropdown
-        id="interview" label="Interview Prep"
-        open={openMenu === "interview"}
-        onOpen={handleOpen} onClose={handleClose}
-        menuId="nav-interview-menu"
+      <Link
+        href="/dashboard"
+        aria-current={pathname.startsWith("/dashboard") ? "page" : undefined}
+        className={linkBase}
       >
-        {[
-          { href: "/practice",   label: "All Problems"          },
-          { href: "/daily",      label: "Daily Challenge"       },
-          { href: "/interview",  label: "Interview Simulator"   },
-          { href: "/interviews", label: "Interview Experiences" },
-        ].map(item => (
-          <Link
-            key={item.href}
-            href={item.href}
-            role="menuitem"
-            onClick={handleClose}
-            aria-current={pathname === item.href ? "page" : undefined}
-            className={menuItemBase}
-          >
-            <span>{item.label}</span>
-            <span className="text-zinc-300 dark:text-zinc-600">›</span>
-          </Link>
-        ))}
-      </NavDropdown>
+        Dashboard
+      </Link>
 
-      {/* ── Certifications ────────────────────────────────────────── */}
-      <NavDropdown
-        id="certifications" label="Certifications"
-        open={openMenu === "certifications"}
-        onOpen={handleOpen} onClose={handleClose}
-        menuId="nav-certifications-menu"
+      <Link
+        href="/help"
+        aria-current={pathname.startsWith("/help") ? "page" : undefined}
+        className={linkBase}
       >
-        {ALL_LANGS.map((l) => (
-          <Link
-            key={l.slug}
-            href={`/certifications/${l.slug}`}
-            role="menuitem"
-            onClick={handleClose}
-            aria-current={pathname.startsWith(`/certifications/${l.slug}`) ? "page" : undefined}
-            className={menuItemBase}
-          >
-            <span>{l.label}</span>
-            <span className="text-zinc-300 dark:text-zinc-600">›</span>
-          </Link>
-        ))}
-        <div className="mx-3 my-1.5 border-t border-zinc-100 dark:border-zinc-800" />
-        <Link
-          href="/certifications"
-          role="menuitem"
-          onClick={handleClose}
-          aria-current={pathname === "/certifications" ? "page" : undefined}
-          className="block px-3 py-2 text-xs font-semibold text-indigo-600 hover:text-indigo-500 dark:text-indigo-400"
-        >
-          Browse all certifications →
-        </Link>
-      </NavDropdown>
+        Help
+      </Link>
 
     </nav>
   );

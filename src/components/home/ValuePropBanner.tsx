@@ -11,8 +11,8 @@ const PILLARS = [
     ),
   },
   {
-    title: "Interview Prep",
-    desc: "Coding challenges covering arrays, strings, dynamic programming, trees, and graphs. Hints available when you get stuck.",
+    title: "Guided Learning Flow",
+    desc: "Each topic is broken into small, focused steps so you keep moving instead of getting lost in giant lessons.",
     icon: (
       <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.75}>
         <path strokeLinecap="round" strokeLinejoin="round" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -20,8 +20,8 @@ const PILLARS = [
     ),
   },
   {
-    title: "Certifications",
-    desc: "Pass a timed exam and earn a free, shareable certificate. Add it to your LinkedIn profile or résumé — proof that you actually know your stuff.",
+    title: "Progress That Sticks",
+    desc: "Your completed steps, bookmarks, streaks, and active track stay with you so you can keep compounding skill.",
     icon: (
       <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.75}>
         <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
@@ -51,10 +51,10 @@ export default function ValuePropBanner() {
           id="value-prop-heading"
           className="text-2xl font-black tracking-tight text-white sm:text-3xl"
         >
-          Everything you need. One platform.
+          One focused product. One job.
         </h2>
         <p className="mt-2 text-sm text-indigo-200/70 sm:text-base">
-          Three tools that work together — no juggling subscriptions, tabs, or platforms.
+          Learn faster with a tutorial platform built to keep you writing code instead of context-switching.
         </p>
       </div>
 
@@ -88,10 +88,10 @@ export default function ValuePropBanner() {
           </svg>
         </Link>
         <Link
-          href="/certifications"
+          href="/tutorial"
           className="text-sm font-semibold text-indigo-300 underline-offset-2 transition-colors hover:text-white hover:underline"
         >
-          Try a free certification exam →
+          Browse all tutorials →
         </Link>
       </div>
     </section>

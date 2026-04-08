@@ -1,10 +1,45 @@
 import { NextRequest, NextResponse } from "next/server";
 import { jwtVerify } from "jose";
 
+const TUTORIAL_LANGS = new Set([
+  "go",
+  "python",
+  "javascript",
+  "typescript",
+  "java",
+  "rust",
+  "cpp",
+  "csharp",
+  "sql",
+]);
+
 function getSecret(): Uint8Array {
   const secret = process.env.JWT_SECRET;
   if (!secret) throw new Error("JWT_SECRET is required");
   return new TextEncoder().encode(secret);
+}
+
+function redirectLegacyProductRoute(request: NextRequest): NextResponse | null {
+  const { pathname } = request.nextUrl;
+  const segments = pathname.split("/").filter(Boolean);
+
+  if (pathname === "/daily" || pathname.startsWith("/interview") || pathname.startsWith("/interviews")) {
+    return NextResponse.redirect(new URL("/tutorial", request.url), 308);
+  }
+
+  if (pathname === "/practice" || pathname.startsWith("/practice/")) {
+    const lang = segments[1];
+    const destination = lang && TUTORIAL_LANGS.has(lang) ? `/tutorial/${lang}` : "/tutorial";
+    return NextResponse.redirect(new URL(destination, request.url), 308);
+  }
+
+  if (pathname === "/certifications" || pathname.startsWith("/certifications/")) {
+    const lang = segments[1];
+    const destination = lang && TUTORIAL_LANGS.has(lang) ? `/tutorial/${lang}` : "/tutorial";
+    return NextResponse.redirect(new URL(destination, request.url), 308);
+  }
+
+  return null;
 }
 
 /**
@@ -14,6 +49,9 @@ function getSecret(): Uint8Array {
  */
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
+
+  const legacyRedirect = redirectLegacyProductRoute(request);
+  if (legacyRedirect) return legacyRedirect;
 
   // ── Admin route protection ──────────────────────────────────────────────────
   // Covers both the default /admin route and personal slug routes /a/<slug>

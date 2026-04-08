@@ -50,11 +50,11 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   metadataBase: new URL(BASE_URL),
   title: {
-    default: "uByte - Interactive Coding Tutorials and Interview Prep",
+    default: "uByte - Interactive Coding Tutorials",
     template: "%s | uByte",
   },
   description:
-    "Interactive coding tutorials in Go, Python, TypeScript, SQL, JavaScript, Java, Rust, C++, and C#. Practice interview problems and certification-style exams in your browser.",
+    "Interactive coding tutorials in Go, Python, TypeScript, SQL, JavaScript, Java, Rust, C++, and C#. Write real code in your browser with zero setup.",
   keywords: [
     ...SITE_KEYWORDS,
     "learn Go",
@@ -65,8 +65,8 @@ export const metadata: Metadata = {
     "learn JavaScript",
     "learn Java",
     "learn Rust",
-    "coding certification exams",
-    "leetcode style practice",
+    "interactive coding lessons",
+    "learn programming online",
   ],
   authors: [{ name: APP_NAME }],
   creator: APP_NAME,
@@ -79,17 +79,17 @@ export const metadata: Metadata = {
     type: "website",
     siteName: APP_NAME,
     locale: "en_US",
-    title: "uByte - Interactive Coding Tutorials and Interview Prep",
+    title: "uByte - Interactive Coding Tutorials",
     description:
-      "Learn Go, Python, TypeScript, SQL, JavaScript, Java, Rust, C++, and C# with interactive tutorials, interview prep, and certification-style exams.",
+      "Learn Go, Python, TypeScript, SQL, JavaScript, Java, Rust, C++, and C# with interactive tutorials that run right in your browser.",
     url: BASE_URL,
-    images: [{ url: `${BASE_URL}/api/og`, width: 1200, height: 630, alt: "uByte — Interactive Coding Tutorials & Certifications" }],
+    images: [{ url: `${BASE_URL}/api/og`, width: 1200, height: 630, alt: "uByte — Interactive Coding Tutorials" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "uByte - Interactive Coding Tutorials and Interview Prep",
+    title: "uByte - Interactive Coding Tutorials",
     description:
-      "Interactive programming tutorials, interview prep, and certification exams across 9 languages.",
+      "Interactive programming tutorials across 9 languages with live code, saved progress, and zero setup.",
     images: [`${BASE_URL}/api/og`],
   },
   alternates: {
@@ -177,7 +177,7 @@ export default async function RootLayout({
             <SiteHeader />
             <MobileStandaloneHeader />
             <EmailVerificationBanner />
-            {/* Home / practice: just scrollable content. /tutorial/[lang]: sidebar + content from tutorial layout */}
+            {/* Home: scrollable content. /tutorial/[lang]: sidebar + content from tutorial layout */}
             <main id="main-content" className="flex min-h-0 flex-1 flex-col overflow-x-clip bg-surface-page">
               <ErrorBoundary>{children}</ErrorBoundary>
             </main>

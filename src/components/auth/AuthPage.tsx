@@ -21,15 +21,15 @@ import { readStoredReferralCode } from "@/components/ReferralTracker";
 type Mode = "login" | "signup" | "forgot";
 
 const SIGNUP_VALUE_POINTS = [
-  "Interactive tutorials in Go, Python, JavaScript, Java, Rust, and C++",
-  "Hundreds of interview prep problems with instant feedback",
-  "Timed certification exams with shareable certificates",
+  "Interactive tutorials across 9 languages",
+  "Live code execution right in your browser",
+  "Saved progress, bookmarks, and streaks",
 ];
 
 const LOGIN_VALUE_POINTS = [
   "Your XP, streaks, and completed lessons are waiting",
-  "Pick up the daily challenge or continue your tutorial",
-  "One login away from your next certification",
+  "Pick up your next tutorial exactly where you left off",
+  "One login away from your next lesson",
 ];
 
 export default function AuthPage({ variant }: { variant: AuthPageMode }) {
@@ -139,13 +139,13 @@ export default function AuthPage({ variant }: { variant: AuthPageMode }) {
             <div className="max-w-xl">
               <h1 className="mt-4 text-3xl font-black tracking-tight text-zinc-950 sm:text-4xl dark:text-white">
                 {isSignupPage
-                  ? "Learn to code. Get hired. Earn certifications."
+                  ? "Learn to code by writing real code."
                   : "Good to have you back."}
               </h1>
               <p className="mt-4 max-w-lg text-base leading-7 text-zinc-600 dark:text-zinc-400">
                 {isSignupPage
                   ? "Short, interactive lessons with a real code editor — no setup needed."
-                  : "Sign in to continue where you left off, track your streak, and unlock new challenges."}
+                  : "Sign in to continue where you left off, track your streak, and keep moving through your tutorials."}
               </p>
             </div>
 

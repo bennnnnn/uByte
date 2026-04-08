@@ -21,16 +21,12 @@ const CLIENT_TOKEN     = process.env.NEXT_PUBLIC_PADDLE_CLIENT_TOKEN ?? "";
 
 const COMPARISON_FEATURES: { name: string; free: string; pro: string }[] = [
   { name: "Tutorials", free: "✓ Unlimited", pro: "✓ Unlimited" },
-  { name: "Interview prep problems", free: "✓ Unlimited", pro: "✓ Unlimited" },
   { name: "Languages", free: "9", pro: "9" },
-  { name: "Certification exams", free: "✓ Free", pro: "✓ Free" },
-  { name: "Verifiable certificates", free: "✓", pro: "✓" },
   { name: "Code editor", free: "✓", pro: "✓" },
   { name: "Progress tracking", free: "✓", pro: "✓" },
+  { name: "Bookmarks and streaks", free: "✓", pro: "✓" },
   { name: "Tutorial hints when stuck", free: "—", pro: "✓" },
-  { name: "Practice feedback on submissions", free: "—", pro: "✓" },
-  { name: "Certification exam review", free: "Basic results", pro: "Detailed review" },
-  { name: "Interview simulator", free: "Timed practice", pro: "Timed practice + debrief" },
+  { name: "Priority support", free: "—", pro: "✓" },
 ];
 
 function PricingContent() {
@@ -168,16 +164,16 @@ function PricingContent() {
             </GradientText>
           </h1>
           <p className="mt-2 text-sm text-zinc-500 dark:text-zinc-400 sm:text-base">
-            Every tutorial, interview prep problem, and certification exam is free.
-            <span className="ml-1 font-medium text-indigo-600 dark:text-indigo-400">Upgrade to Pro only when you want hints, code feedback, exam review, and interview debriefs that keep you moving.</span>
+            Every tutorial is free.
+            <span className="ml-1 font-medium text-indigo-600 dark:text-indigo-400">Upgrade to Pro only when you want hints and extra support that keep you moving.</span>
           </p>
         </div>
 
         {/* ── Social proof bar ─────────────────────────────── */}
         <div className="mx-auto mt-5 flex max-w-lg flex-wrap items-center justify-center gap-x-6 gap-y-2">
           <span className="flex items-center gap-1.5 text-sm font-medium text-zinc-600 dark:text-zinc-400">
-            <span className="text-base">🎓</span>
-            All content free
+            <span className="text-base">📚</span>
+            All tutorials free
           </span>
           <span className="hidden text-zinc-300 dark:text-zinc-700 sm:block">·</span>
           <span className="flex items-center gap-1.5 text-sm font-medium text-zinc-600 dark:text-zinc-400">
@@ -236,7 +232,7 @@ function PricingContent() {
                 <span className="text-zinc-400 dark:text-zinc-500">forever</span>
               </div>
               <p className="mt-2 text-sm text-zinc-500 dark:text-zinc-400">
-                Every tutorial, interview prep problem, and certification exam is included.
+                Every tutorial is included.
               </p>
             </div>
 
@@ -405,7 +401,7 @@ function PricingContent() {
             Stay in flow. Improve faster.
           </p>
           <p className="mx-auto mt-2 max-w-sm text-sm text-zinc-500 dark:text-zinc-400">
-            Everything is free. Pro keeps help one click away when you need a hint, feedback, exam review, or interview debrief.
+            Everything is free. Pro keeps help one click away when you need a hint or extra support.
           </p>
           <div className="mt-6">
             {!user ? (

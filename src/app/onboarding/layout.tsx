@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Get started — uByte",
-  description: "Tell us your goal so we can personalise your learning path — tutorials, interview prep, or certification.",
+  description: "Choose a language and jump straight into your first tutorial track.",
   robots: { index: false, follow: false },
 };
 

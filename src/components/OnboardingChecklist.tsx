@@ -16,8 +16,6 @@ const POLL_INTERVAL = 30_000;
 interface Status {
   show: boolean;
   completedTutorialStep: boolean;
-  solvedPracticeProblem: boolean;
-  attemptedCert: boolean;
 }
 
 function buildSteps(lang: string) {
@@ -26,16 +24,6 @@ function buildSteps(lang: string) {
       label: "Complete your first tutorial step",
       key: "completedTutorialStep" as const,
       href: `/tutorial/${lang}/getting-started`,
-    },
-    {
-      label: "Solve a practice problem",
-      key: "solvedPracticeProblem" as const,
-      href: `/practice/${lang}`,
-    },
-    {
-      label: "Attempt a certification exam",
-      key: "attemptedCert" as const,
-      href: "/certifications",
     },
   ];
 }
@@ -67,11 +55,8 @@ export default function OnboardingChecklist() {
       .then((r) => r.json())
       .then((j: Status) => {
         setStatus((prev) => {
-          // If all 3 just became done, show a brief "all done" state before auto-dismissing
-          const allNowDone = j.completedTutorialStep && j.solvedPracticeProblem && j.attemptedCert;
-          const wasAllDoneBefore = prev
-            ? prev.completedTutorialStep && prev.solvedPracticeProblem && prev.attemptedCert
-            : false;
+          const allNowDone = j.completedTutorialStep;
+          const wasAllDoneBefore = prev ? prev.completedTutorialStep : false;
           if (allNowDone && !wasAllDoneBefore) {
             setAllDoneVisible(true);
             setTimeout(() => {
@@ -116,7 +101,7 @@ export default function OnboardingChecklist() {
 
   const lang = profile?.onboarding_lang ?? "go";
   const STEPS = buildSteps(lang);
-  const steps = STEPS.map((s) => ({ ...s, done: status ? status[s.key] : false }));
+  const steps = STEPS.map((s) => ({ ...s, done: status?.[s.key] ?? false }));
   const completedCount = steps.filter((s) => s.done).length;
 
   // All-done celebration state

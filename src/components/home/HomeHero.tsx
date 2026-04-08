@@ -10,10 +10,6 @@ import { hasPaidAccess } from "@/lib/plans";
 
 interface Props {
   totalLessons: number;
-  problemCount: number;
-  certCount: number;
-  /** Real count of certificates issued — shown instead of certCount once ≥ threshold */
-  totalCertificates: number;
   /** Set server-side; avoids flash before client auth resolves */
   isLoggedInServer: boolean;
   /** Last activity link + label from the server */
@@ -143,22 +139,16 @@ function LoggedInHero({
             {/* Secondary actions */}
             <div className="mt-4 flex flex-wrap gap-3">
               <Link
-                href="/certifications"
+                href="/tutorial"
                 className="flex items-center gap-2 rounded-xl border border-zinc-200 bg-white px-4 py-2.5 text-sm font-semibold text-zinc-700 shadow-sm transition-all hover:border-indigo-200 hover:text-indigo-600 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:border-indigo-700 dark:hover:text-indigo-400"
               >
-                🎓 Get certified
+                📚 Browse tutorials
               </Link>
               <Link
-                href="/practice"
+                href="/dashboard"
                 className="flex items-center gap-2 rounded-xl border border-zinc-200 bg-white px-4 py-2.5 text-sm font-semibold text-zinc-700 shadow-sm transition-all hover:border-indigo-200 hover:text-indigo-600 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:border-indigo-700 dark:hover:text-indigo-400"
               >
-                🧩 Practice problems
-              </Link>
-              <Link
-                href="/leaderboard"
-                className="flex items-center gap-2 rounded-xl border border-zinc-200 bg-white px-4 py-2.5 text-sm font-semibold text-zinc-700 shadow-sm transition-all hover:border-indigo-200 hover:text-indigo-600 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:border-indigo-700 dark:hover:text-indigo-400"
-              >
-                🏆 Leaderboard
+                📈 View dashboard
               </Link>
             </div>
           </div>
@@ -315,19 +305,9 @@ function MobileCodePreview() {
 
 function GuestHero({
   totalLessons,
-  problemCount,
-  certCount,
-  totalCertificates,
 }: {
   totalLessons: number;
-  problemCount: number;
-  certCount: number;
-  totalCertificates: number;
 }) {
-  const certStat = totalCertificates >= 10
-    ? { value: `${totalCertificates}+`, label: "Certificates earned" }
-    : { value: `${certCount}`,          label: "Certs, all free"     };
-
   return (
     <section className="relative overflow-hidden border-b border-zinc-100 dark:border-zinc-800">
 
@@ -358,24 +338,22 @@ function GuestHero({
 
             {/* Badge */}
             <p className="mb-5 inline-flex items-center gap-2 rounded-full bg-indigo-50 px-4 py-1.5 text-sm font-semibold text-indigo-700 ring-1 ring-indigo-100 dark:bg-indigo-950/50 dark:text-indigo-300 dark:ring-indigo-800/60">
-              ✓ Tutorials · interview prep · certifications — all free
+              ✓ Interactive tutorials in 9 languages
             </p>
 
             {/* Headline */}
             <h1 className="text-4xl font-black tracking-tight text-zinc-900 sm:text-5xl lg:text-[3.25rem] lg:leading-[1.15] dark:text-white">
               Learn to code.{" "}
               <span className="bg-gradient-to-r from-indigo-600 to-violet-500 bg-clip-text text-transparent dark:from-indigo-400 dark:to-violet-400">
-                Get certified free.
+                Stay in the editor.
               </span>
-              <br />
-              Get interview-ready.
             </h1>
 
             {/* Sub-headline */}
             <p className="mx-auto mt-5 max-w-xl text-lg leading-relaxed text-zinc-500 lg:mx-0 dark:text-zinc-400">
-              Step-by-step tutorials, real interview problems, and{" "}
+              Step-by-step tutorials with{" "}
               <span className="font-semibold text-zinc-700 dark:text-zinc-300">
-                free certifications you can share on LinkedIn
+                live code, instant feedback, and saved progress
               </span>{" "}
               — all running live in your browser. Zero setup.
             </p>
@@ -389,10 +367,10 @@ function GuestHero({
                 Start learning free →
               </Link>
               <Link
-                href="/certifications"
+                href="/tutorial"
                 className="rounded-xl border border-zinc-200 bg-white px-7 py-3 text-base font-bold text-zinc-700 shadow-sm transition-all hover:border-indigo-200 hover:text-indigo-600 dark:border-zinc-700 dark:bg-zinc-800/80 dark:text-zinc-200 dark:hover:border-indigo-700 dark:hover:text-indigo-400"
               >
-                Get a free certification →
+                Browse tutorials →
               </Link>
             </div>
 
@@ -403,10 +381,10 @@ function GuestHero({
             {/* Stats */}
             <div className="mt-10 grid grid-cols-4 gap-x-3 gap-y-4 border-t border-zinc-100 pt-8 dark:border-zinc-800">
               {[
-                { value: "9",                  label: "Languages",        mobileLabel: "Languages"    },
-                { value: `${totalLessons}+`,   label: "Lessons",          mobileLabel: "Lessons"      },
-                { value: `${problemCount}+`,   label: "Interview problems", mobileLabel: "Problems"   },
-                { ...certStat,                 mobileLabel: "Certs free"  },
+                { value: "9", label: "Languages", mobileLabel: "Languages" },
+                { value: `${totalLessons}+`, label: "Lessons", mobileLabel: "Lessons" },
+                { value: "Live", label: "Code execution", mobileLabel: "Runs live" },
+                { value: "0", label: "Setup required", mobileLabel: "No setup" },
               ].map(stat => (
                 <div key={stat.label} className="text-center lg:text-left">
                   <p className="text-xl font-black text-zinc-900 sm:text-2xl dark:text-zinc-100">{stat.value}</p>
@@ -436,8 +414,8 @@ function GuestHero({
           <div className="grid grid-cols-1 divide-y divide-zinc-100 sm:grid-cols-3 sm:divide-x sm:divide-y-0 dark:divide-zinc-800">
             {[
               { icon: "💻", title: "Runs in your browser",       desc: "No installs, no setup. Start writing real code in seconds." },
-              { icon: "🧩", title: "Learn · Practice · Certify", desc: "A structured path from first line of code to job-ready." },
-              { icon: "🎓", title: "Free certifications",         desc: "Pass a timed exam and earn a shareable certificate — always free." },
+              { icon: "📚", title: "Step-by-step lessons",       desc: "Short interactive lessons that build skill one concept at a time." },
+              { icon: "📈", title: "Progress that sticks",       desc: "Save your steps, bookmarks, streaks, and momentum across sessions." },
             ].map(item => (
               <div key={item.title} className="flex items-center gap-3 px-4 py-3 sm:px-6">
                 <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-white text-lg shadow-sm ring-1 ring-zinc-200 dark:bg-zinc-800 dark:ring-zinc-700">
@@ -461,9 +439,6 @@ function GuestHero({
 
 export default function HomeHero({
   totalLessons,
-  problemCount,
-  certCount,
-  totalCertificates,
   isLoggedInServer,
   leftOff,
   continueLang,
@@ -496,9 +471,6 @@ export default function HomeHero({
   return (
     <GuestHero
       totalLessons={totalLessons}
-      problemCount={problemCount}
-      certCount={certCount}
-      totalCertificates={totalCertificates}
     />
   );
 }

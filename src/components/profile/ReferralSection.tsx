@@ -30,7 +30,7 @@ export default function ReferralSection() {
 
   const tweetUrl = data
     ? `https://twitter.com/intent/tweet?text=${encodeURIComponent(
-        "Levelling up with interactive coding tutorials, interview prep & certifications on @ubyte_dev — all free 👇"
+        "Levelling up with interactive coding tutorials on @ubyte_dev 👇"
       )}&url=${encodeURIComponent(data.shareUrl)}`
     : "#";
 
@@ -48,12 +48,12 @@ export default function ReferralSection() {
         <span className="font-semibold text-indigo-600 dark:text-indigo-400">
           30 free days of Pro
         </span>
-        {" "}— so you always have a hint, detailed feedback, and interview coaching when you need it.
+        {" "}— so you always have a hint and extra lesson support when you need it.
       </p>
 
       {/* Pro feature reminder */}
       <div className="my-3 flex flex-wrap gap-2">
-        {["💡 Hints when stuck", "🔍 Code feedback", "🎤 Interview debrief", "📖 Step walkthroughs"].map((f) => (
+        {["💡 Hints when stuck", "📖 Step walkthroughs", "⚡ Faster help"].map((f) => (
           <span key={f} className="rounded-full bg-indigo-50 px-2.5 py-1 text-xs font-medium text-indigo-700 dark:bg-indigo-950/40 dark:text-indigo-300">{f}</span>
         ))}
       </div>

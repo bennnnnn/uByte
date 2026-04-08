@@ -3,149 +3,93 @@ import Link from "next/link";
 import { absoluteUrl, buildFaqJsonLd, SITE_KEYWORDS } from "@/lib/seo";
 
 const FAQ_ITEMS = [
-  // ── Getting started ───────────────────────────────────────────────────────
   {
     question: "Do I need to install anything to use uByte?",
     answer:
-      "No. Everything runs in your browser — tutorials, interview prep problems, and certification exams. Code is compiled and executed in the cloud, so there is nothing to download, install, or configure.",
+      "No. Tutorials run directly in your browser, so there is nothing to download, install, or configure.",
   },
   {
     question: "Which programming languages are supported?",
     answer:
-      "uByte currently supports Go, Python, JavaScript, TypeScript, Java, C++, Rust, C#, and SQL. Each language has its own tutorial track, interview prep problems, and certification exam.",
+      "uByte currently supports Go, Python, JavaScript, TypeScript, Java, C++, Rust, C#, and SQL. Each language has its own tutorial track.",
   },
   {
-    question: "Is uByte really free?",
+    question: "Is uByte free?",
     answer:
-      "Yes. All tutorials, all interview prep problems, and all certification exams are free for every signed-in user — no time limit. Pro is an optional upgrade that gives you on-demand hints when you're stuck, detailed code feedback on practice submissions, and a personalized performance debrief after the interview simulator.",
+      "Yes. Tutorials are free to use. Pro is an optional upgrade for extra help such as in-context hints and faster support.",
   },
   {
-    question: "Do I need to create an account?",
+    question: "Do I need an account?",
     answer:
-      "You can browse tutorials and try the daily challenge without an account. To save your progress, solve interview prep problems, and earn certifications you need a free account. Signing up takes under 30 seconds.",
+      "You can browse tutorials without an account. Create one if you want saved progress, bookmarks, streaks, and synced history across devices.",
   },
-  // ── Tutorials ─────────────────────────────────────────────────────────────
   {
     question: "How do tutorials work?",
     answer:
-      "Each tutorial is a hands-on lesson with a description on the left and a live code editor on the right. You write real code, run it, and get instant feedback. Complete all steps in a topic to mark it done and move to the next. There are no videos — just you and the code.",
+      "Each tutorial is broken into small interactive steps with a live code editor. You edit the code, run it, and get immediate feedback as you move through the lesson.",
   },
   {
     question: "Can I save my progress across devices?",
     answer:
-      "Yes. Create a free account and your tutorial progress, completed steps, and notes are synced automatically. You can pick up on your phone, laptop, or any browser right where you left off.",
+      "Yes. Signed-in users automatically sync completed steps, bookmarks, and active progress across devices.",
   },
   {
-    question: "What are the Notes for?",
+    question: "What are bookmarks for?",
     answer:
-      "Each tutorial and practice problem has a personal Notes panel — click the Notes button in the toolbar (top right of the editor). Use it to jot down key concepts, write your own summary, or bookmark things to revisit. Notes are saved to your account and persist across sessions.",
+      "Bookmarks let you save useful snippets and notes from a tutorial so you can revisit them later from your dashboard.",
   },
   {
     question: "What does the Reset button do?",
     answer:
-      "Reset restores the starter code for the current step — useful if you've made a mess and want a clean slate. Your notes are not affected by resetting.",
+      "Reset restores the starter code for the current step. It does not delete your saved bookmarks or account progress.",
   },
-  // ── Interview Prep ────────────────────────────────────────────────────────
-  {
-    question: "What is Interview Prep?",
-    answer:
-      "Interview Prep contains curated coding challenges modelled on real technical interviews — arrays, strings, trees, graphs, dynamic programming, sliding window, and more. You write and run code directly in the browser. All problems are free for signed-in users.",
-  },
-  {
-    question: "How is the Daily Challenge different from Interview Prep?",
-    answer:
-      "The Daily Challenge is a single problem that rotates every day and is free without an account. Interview Prep is a full library of problems you can filter by language, category, and difficulty at any time.",
-  },
-  {
-    question: "What does code feedback do?",
-    answer:
-      "After you submit a solution, Pro users get a detailed code review that explains what you did well, points out edge cases you may have missed, and suggests a more optimal approach if one exists. It's specific to your actual code — not a generic solution walkthrough.",
-  },
-  // ── Certifications ────────────────────────────────────────────────────────
-  {
-    question: "How do certifications work?",
-    answer:
-      "Each language has a timed certification exam. Pass it and you earn a certificate with a unique public ID that anyone can verify. You can add it to LinkedIn, your résumé, or your portfolio. Certifications are free for all signed-in users.",
-  },
-  {
-    question: "Can I retake a certification exam?",
-    answer:
-      "Yes. If you don't pass on your first attempt you can retake the exam. There is a short cooldown period between attempts to give you time to review the material.",
-  },
-  {
-    question: "How does someone verify my certificate?",
-    answer:
-      "Every certificate has a unique URL. Anyone who visits that link can see your name, the language, the date, and the score — no login required. You can share the link directly or add it to LinkedIn using the share button on your certificate page.",
-  },
-  // ── Billing ───────────────────────────────────────────────────────────────
   {
     question: "What does Pro include?",
     answer:
-      "Pro adds on-demand hints when you're stuck on a tutorial step, detailed code feedback on every practice submission, the ability to ask follow-up questions after a hint, and a personalized performance debrief after the interview simulator. All content — tutorials, problems, certifications — remains free for everyone.",
+      "Pro adds optional help on top of the free tutorials, including hints when you're stuck and account-level support benefits.",
   },
   {
     question: "What happens when I cancel Pro?",
     answer:
-      "You keep full Pro access until the end of your current billing period. After that your account reverts to the free plan. Your progress, notes, and certificates are never deleted.",
+      "You keep Pro access until the end of your billing period. After that your account returns to the free plan and your progress stays intact.",
   },
-  {
-    question: "Can I switch between monthly and yearly billing?",
-    answer:
-      "Yes. Go to your profile → Plan and choose the billing cycle that works for you. Upgrading to yearly saves you two months compared to monthly billing.",
-  },
-  {
-    question: "Is there a refund policy?",
-    answer:
-      "If you're not satisfied within 7 days of your first payment, email us at support@ubyte.dev and we'll issue a full refund — no questions asked.",
-  },
-  // ── Account ───────────────────────────────────────────────────────────────
   {
     question: "How do I verify my email?",
     answer:
-      "After signing up you'll receive a verification email. Click the link inside to verify. If it didn't arrive, check your spam folder or use the 'Resend verification email' option shown when you're logged in.",
-  },
-  {
-    question: "Can I sign in with Google?",
-    answer:
-      "Yes. Click 'Sign in with Google' on the login page. If you're not signed in, a Google One Tap prompt may also appear automatically.",
+      "After signing up you'll receive a verification email. Click the link inside it to verify your account. If it doesn't arrive, check spam or resend it from your account.",
   },
   {
     question: "How do I delete my account?",
     answer:
-      "Go to your profile → Settings → Danger Zone and click Delete Account. All your data is permanently removed immediately. If you need help, email support@ubyte.dev.",
+      "Go to your dashboard settings and use the Delete Account option in the danger zone. If you need help, contact support.",
   },
 ];
 
 export const metadata: Metadata = {
   title: "Help Center",
   description:
-    "Answers to common questions about uByte — free tutorials, interview prep, certifications, AI features, Pro billing, refunds, and account settings.",
+    "Answers to common questions about uByte tutorials, accounts, billing, and progress tracking.",
   keywords: [
     ...SITE_KEYWORDS,
     "uByte help",
     "uByte faq",
     "coding tutorials faq",
-    "free coding tutorials questions",
-    "programming certification help",
-    "interview prep faq",
+    "learn to code help center",
     "uByte pro billing",
-    "uByte refund policy",
     "uByte account support",
-    "how to verify certificate",
-    "coding platform help center",
   ],
   alternates: { canonical: absoluteUrl("/help") },
   openGraph: {
     type: "website",
     title: "uByte Help Center",
-    description: "Support articles and answers for tutorials, interview prep, and certification exams.",
+    description: "Support articles and answers for tutorials, accounts, and billing.",
     url: absoluteUrl("/help"),
-    images: [{ url: absoluteUrl("/api/og?title=Help+Center&description=FAQs+for+tutorials+interview+prep+and+certifications"), width: 1200, height: 630 }],
+    images: [{ url: absoluteUrl("/api/og?title=Help+Center&description=FAQs+for+tutorials+accounts+and+billing"), width: 1200, height: 630 }],
   },
   twitter: {
     card: "summary_large_image",
     title: "uByte Help Center",
-    description: "Support articles and answers for tutorials, interview prep, and certification exams.",
+    description: "Support articles and answers for tutorials, accounts, and billing.",
   },
 };
 
@@ -154,7 +98,8 @@ export default function HelpPage() {
 
   return (
     <div className="min-h-full overflow-y-auto">
-      <script async
+      <script
+        async
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
       />
@@ -164,19 +109,18 @@ export default function HelpPage() {
             Help Center
           </p>
           <h1 className="text-4xl font-black tracking-tight text-zinc-900 dark:text-zinc-100 sm:text-5xl">
-            Answers for learners and teams.
+            Answers for learners.
           </h1>
           <p className="mt-4 max-w-2xl text-base text-zinc-600 dark:text-zinc-400">
-            Quick guidance for tutorials, interview prep, certification exams, and account settings.
+            Quick guidance for tutorials, saved progress, account setup, and billing.
           </p>
         </section>
 
-        <section className="mb-10 grid gap-3 sm:grid-cols-4">
+        <section className="mb-10 grid gap-3 sm:grid-cols-3">
           {[
-            { href: "/tutorial", label: "Tutorials", hint: "Free lessons in 9 languages" },
-            { href: "/practice", label: "Interview Prep", hint: "All problems free" },
-            { href: "/certifications", label: "Certifications", hint: "Free verifiable certificates" },
-            { href: "/pricing", label: "Pro & AI features", hint: "What Pro adds on top" },
+            { href: "/tutorial", label: "Tutorials", hint: "Interactive lessons in 9 languages" },
+            { href: "/dashboard", label: "Dashboard", hint: "Progress, bookmarks, and streaks" },
+            { href: "/pricing", label: "Pricing", hint: "Free tutorials with optional Pro help" },
           ].map((item) => (
             <Link
               key={item.href}

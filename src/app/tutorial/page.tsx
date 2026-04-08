@@ -62,17 +62,17 @@ export default function TutorialsPage() {
       <div className="border-b border-zinc-100 dark:border-zinc-800">
         <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-16">
           <p className="mb-3 text-xs font-bold uppercase tracking-widest text-indigo-600 dark:text-indigo-400">
-            9 languages · runs in your browser · free certifications
+            9 languages · runs in your browser · zero setup
           </p>
           <h1 className="text-3xl font-black tracking-tight text-zinc-900 sm:text-4xl dark:text-white">
             Learn by doing.{" "}
             <span className="bg-gradient-to-r from-indigo-600 to-violet-500 bg-clip-text text-transparent dark:from-indigo-400 dark:to-violet-400">
-              Get certified free.
+              Stay in the code.
             </span>
           </h1>
           <p className="mt-3 max-w-2xl text-base text-zinc-500 dark:text-zinc-400">
-            Write real code in your browser from step one — no installs, no setup. Finish a track and earn
-            a free certificate you can share on LinkedIn or your résumé.
+            Write real code in your browser from step one. Move through focused lessons, save your progress,
+            and pick up exactly where you left off.
           </p>
 
           {/* Quick stats */}

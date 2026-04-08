@@ -6,7 +6,7 @@ import { APP_NAME, BASE_URL } from "@/lib/constants";
 export const metadata: Metadata = {
   title: "Pricing — Free & Pro Plans",
   description:
-    "Everything on uByte is free — tutorials, interview prep, and certification exams. Upgrade to Pro for tutorial hints, code feedback, certification exam review, and interview debriefs.",
+    "Everything on uByte tutorials is free. Upgrade to Pro for extra help like tutorial hints and faster support.",
   keywords: [...SITE_KEYWORDS, "coding course pricing", "programming subscription", "uByte pro", "learn to code free"],
   alternates: { canonical: absoluteUrl("/pricing") },
   openGraph: {
@@ -14,16 +14,16 @@ export const metadata: Metadata = {
     url: absoluteUrl("/pricing"),
     title: "uByte Pricing — Free & Pro Plans",
     description:
-      "Everything is free to learn. Upgrade to Pro for hints, code feedback, certification exam review, and interview debriefs.",
+      "Everything is free to learn. Upgrade to Pro for tutorial help when you need it.",
     siteName: APP_NAME,
-    images: [{ url: absoluteUrl("/api/og?title=Pricing&description=Free+and+Pro+plans+for+interactive+coding+tutorials+and+certifications"), width: 1200, height: 630 }],
+    images: [{ url: absoluteUrl("/api/og?title=Pricing&description=Free+and+Pro+plans+for+interactive+coding+tutorials"), width: 1200, height: 630 }],
   },
   twitter: {
     card: "summary_large_image",
     title: "uByte Pricing — Free & Pro Plans",
     description:
-      "Everything free — tutorials, problems, certs. Upgrade to Pro for in-context help and detailed feedback.",
-    images: [absoluteUrl("/api/og?title=Pricing&description=Free+and+Pro+plans+for+interactive+coding+tutorials+and+certifications")],
+      "Everything free — tutorials first. Upgrade to Pro for in-context help.",
+    images: [absoluteUrl("/api/og?title=Pricing&description=Free+and+Pro+plans+for+interactive+coding+tutorials")],
   },
 };
 import {
@@ -39,14 +39,14 @@ export default function PricingPage() {
     "@type": "WebPage",
     name: "Pricing — uByte",
     description:
-      "Compare free and Pro plans for uByte interactive coding tutorials, interview prep, and certifications.",
+      "Compare free and Pro plans for uByte interactive coding tutorials.",
     url: absoluteUrl("/pricing"),
     isPartOf: { "@type": "WebSite", name: APP_NAME, url: BASE_URL },
     mainEntity: {
       "@type": "Product",
       name: "uByte Pro",
       description:
-        "Tutorial hints, detailed code feedback, certification exam review, and interview debriefs for developers who want help without leaving the lesson.",
+        "Tutorial hints and premium help for developers who want support without leaving the lesson.",
       offers: [
         {
           "@type": "Offer",
@@ -93,11 +93,10 @@ export default function PricingPage() {
       <article className="sr-only">
         <h1>uByte Pricing — Free and Pro Plans</h1>
         <p>
-          uByte offers interactive coding tutorials, interview prep problems, and
-          free certification exams across all 9 languages: Go, Python, JavaScript,
-          TypeScript, Java, Rust, C++, C#, and SQL. All content is free for every user.
-          Upgrade to Pro for tutorial hints, code feedback, certification exam review,
-          and interview debriefs when you want extra help.
+          uByte offers interactive coding tutorials across 9 languages: Go, Python,
+          JavaScript, TypeScript, Java, Rust, C++, C#, and SQL. All tutorials are free
+          for every user. Upgrade to Pro for tutorial hints and extra help when you want
+          support without leaving the lesson.
         </p>
 
         <section>
@@ -138,9 +137,9 @@ export default function PricingPage() {
           <ul>
             <li><Link href="/tutorial/go">Go Tutorials</Link></li>
             <li><Link href="/tutorial/python">Python Tutorials</Link></li>
-            <li><Link href="/practice">Interview Prep</Link></li>
-            <li><Link href="/certifications">Certifications</Link></li>
-            <li><Link href="/daily">Daily Challenge</Link></li>
+            <li><Link href="/tutorial/javascript">JavaScript Tutorials</Link></li>
+            <li><Link href="/dashboard">Dashboard</Link></li>
+            <li><Link href="/help">Help Center</Link></li>
           </ul>
         </nav>
       </article>

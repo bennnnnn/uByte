@@ -36,21 +36,12 @@ interface Props {
   stats: Stats;
   badges: Badge[];
   achievements: Achievement[];
-  userId?: number;
 }
 
-export default function OverviewTab({ stats, badges, achievements, userId }: Props) {
+export default function OverviewTab({ stats, badges, achievements }: Props) {
   const [activity, setActivity] = useState<ActivityItem[]>([]);
   const [activityLoading, setActivityLoading] = useState(true);
   const [activityError, setActivityError] = useState(false);
-  const [examCerts, setExamCerts] = useState<
-    { id: string; lang: string; passed_at: string }[]
-  >([]);
-  const [examStats, setExamStats] = useState<
-    { lang: string; attemptCount: number; bestScore: number | null; lastPassed: boolean | null }[]
-  >([]);
-  const [certsLoading, setCertsLoading] = useState(!!userId);
-  const [certsError, setCertsError] = useState(false);
 
   const pct = stats.total_tutorials > 0
     ? Math.round((stats.completed_count / stats.total_tutorials) * 100)
@@ -65,22 +56,6 @@ export default function OverviewTab({ stats, badges, achievements, userId }: Pro
       .finally(() => { if (!cancelled) setActivityLoading(false); });
     return () => { cancelled = true; };
   }, []);
-
-  useEffect(() => {
-    if (!userId) return;
-    let cancelled = false;
-    fetch("/api/profile/exam-certificates", { credentials: "same-origin" })
-      .then((r) => r.json())
-      .then((d) => {
-        if (!cancelled) {
-          if (Array.isArray(d.certificates)) setExamCerts(d.certificates);
-          if (Array.isArray(d.examStats)) setExamStats(d.examStats);
-        }
-      })
-      .catch(() => { if (!cancelled) setCertsError(true); })
-      .finally(() => { if (!cancelled) setCertsLoading(false); });
-    return () => { cancelled = true; };
-  }, [userId]);
 
   return (
     <div className="space-y-8">
@@ -105,75 +80,6 @@ export default function OverviewTab({ stats, badges, achievements, userId }: Pro
           </Link>
         </div>
       </Card>
-
-      {/* Exam certificates */}
-      {certsLoading && (
-        <div className="h-20 animate-pulse rounded-2xl bg-zinc-100 dark:bg-zinc-800" />
-      )}
-      {!certsLoading && certsError && (
-        <p className="text-sm text-zinc-400">Could not load certificates.</p>
-      )}
-      {!certsLoading && !certsError && examCerts.length === 0 && (() => {
-        const attempted = examStats.filter((s) => s.attemptCount > 0);
-        const bestAttempt = attempted.sort((a, b) => (b.bestScore ?? 0) - (a.bestScore ?? 0))[0];
-        return (
-          <Card className="p-5">
-            <h2 className="mb-1 text-sm font-semibold text-zinc-900 dark:text-zinc-100">Exam certificates</h2>
-            {attempted.length === 0 ? (
-              <p className="text-sm text-zinc-400 dark:text-zinc-500">
-                No exams taken yet.{" "}
-                <Link href="/certifications" className="font-medium text-indigo-600 hover:underline dark:text-indigo-400">
-                  Take your first certification exam →
-                </Link>
-              </p>
-            ) : (
-              <div>
-                <p className="text-sm text-zinc-400 dark:text-zinc-500">
-                  No certificates earned yet — keep going!
-                  {bestAttempt?.bestScore != null && (
-                    <span className="ml-1">Best score: <span className="font-medium text-zinc-700 dark:text-zinc-300">{bestAttempt.bestScore}%</span>.</span>
-                  )}
-                </p>
-                <Link
-                  href="/certifications"
-                  className="mt-2 inline-block text-sm font-medium text-indigo-600 hover:underline dark:text-indigo-400"
-                >
-                  Retry exam →
-                </Link>
-              </div>
-            )}
-          </Card>
-        );
-      })()}
-      {!certsLoading && !certsError && examCerts.length > 0 && (
-        <Card className="p-5">
-          <div className="mb-3 flex items-center justify-between">
-            <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
-              Exam certificates
-            </h2>
-          </div>
-          <ul className="space-y-2">
-            {examCerts.slice(0, 3).map((c) => (
-              <li key={c.id} className="flex items-center justify-between text-sm">
-                <span className="text-zinc-700 dark:text-zinc-200">
-                  {c.lang.toUpperCase()} exam
-                </span>
-                <div className="flex items-center gap-2">
-                  <span className="text-xs text-zinc-400">
-                    {new Date(c.passed_at).toLocaleDateString()}
-                  </span>
-                  <TextLink
-                    href={`/certifications/certificate/${c.id}`}
-                    className="text-xs"
-                  >
-                    Download
-                  </TextLink>
-                </div>
-              </li>
-            ))}
-          </ul>
-        </Card>
-      )}
 
       {/* Recent achievements */}
       <div>

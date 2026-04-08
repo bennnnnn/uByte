@@ -10,14 +10,12 @@ const LEARN_LINKS = ALL_LANGUAGE_KEYS.map((slug) => ({
   label: `${LANGUAGES[slug].name} Tutorials`,
 }));
 
-const PRACTICE_LINKS = [
-  { href: "/practice", label: "Interview Prep" },
-  { href: "/daily", label: "Daily Challenge" },
+const PRODUCT_LINKS = [
+  { href: "/tutorial", label: "All Tutorials" },
+  { href: "/dashboard", label: "Dashboard" },
   { href: "/leaderboard", label: "Leaderboard" },
-  { href: "/interview", label: "Interview Simulator" },
-  { href: "/interviews", label: "Interview Experiences" },
-  { href: "/certifications", label: "Certifications" },
   { href: "/pricing", label: "Pricing" },
+  { href: "/help", label: "Help Center" },
 ];
 
 const COMPANY_LINKS = [
@@ -49,12 +47,7 @@ export default async function SiteFooter() {
   const hdrs = await headers();
   const pathname = hdrs.get("x-pathname") ?? "/";
   const isTutorialWorkspace = /^\/tutorial\/[^/]+\/[^/]+/.test(pathname);
-  const isPracticeWorkspace = /^\/practice\/[^/]+\/[^/]+/.test(pathname);
-  const isExamWorkspace =
-    pathname.includes("/attempt/") ||
-    pathname.includes("/result/") ||
-    pathname.includes("/start");
-  const isWorkspaceRoute = isTutorialWorkspace || isPracticeWorkspace || isExamWorkspace;
+  const isWorkspaceRoute = isTutorialWorkspace;
   const year = new Date().getFullYear();
 
   if (isWorkspaceRoute) {
@@ -63,7 +56,7 @@ export default async function SiteFooter() {
         <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-zinc-500 dark:text-zinc-400">
           <span>© {year} uByte</span>
           <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-            <FooterLink href="/pricing" label="Pricing" />
+            <FooterLink href="/dashboard" label="Dashboard" />
             <FooterLink href="/help" label="Help" />
             <FooterLink href="/privacy" label="Privacy" />
             <FooterLink href="/terms" label="Terms" />
@@ -90,7 +83,7 @@ export default async function SiteFooter() {
               <span className="text-lg font-bold text-zinc-900">uByte</span>
             </Link>
             <p className="mt-3 max-w-xs text-sm leading-relaxed text-zinc-600">
-              Interactive programming tutorials, interview prep, and certification-style exams for modern developers.
+              Interactive programming tutorials with real code, saved progress, and zero setup.
             </p>
           </div>
 
@@ -107,10 +100,10 @@ export default async function SiteFooter() {
 
           <div>
             <Eyebrow as="h3" className="mb-3">
-              Interview Prep
+              Product
             </Eyebrow>
             <div className="space-y-2">
-              {PRACTICE_LINKS.map((item) => (
+              {PRODUCT_LINKS.map((item) => (
                 <FooterLink key={item.href} href={item.href} label={item.label} />
               ))}
             </div>
@@ -140,7 +133,7 @@ export default async function SiteFooter() {
         </div>
 
         <div className="flex flex-col gap-1 border-t border-zinc-100 pt-4 text-xs text-zinc-500 sm:flex-row sm:items-center sm:justify-between sm:gap-2">
-          <span>© {year} uByte. Learn, practice, get certified.</span>
+          <span>© {year} uByte. Learn by writing real code.</span>
         </div>
       </div>
     </footer>

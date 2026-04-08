@@ -49,6 +49,7 @@ interface Props {
 }
 
 export default function TutorialGate({ tutorialSlug, completedLessons, children }: Props) {
+  void tutorialSlug;
   const { user, profile, loading } = useAuth();
   const [gate, setGate] = useState<"none" | "signup" | "verify">("none");
   const [authOpen, setAuthOpen] = useState(false);
@@ -126,7 +127,7 @@ export default function TutorialGate({ tutorialSlug, completedLessons, children 
             <p className="mb-6 text-sm leading-relaxed text-zinc-500 dark:text-zinc-400">
               You&apos;ve completed {GUEST_LESSON_LIMIT} free lessons — nice start!
               Sign up for free to unlock all tutorials, track your progress,
-              earn XP, and get certified.
+              save bookmarks, and keep your streak going.
             </p>
 
             <div className="flex flex-col gap-3 sm:flex-row sm:justify-center">
@@ -175,8 +176,8 @@ export default function TutorialGate({ tutorialSlug, completedLessons, children 
           </h2>
           <p className="mb-2 text-sm leading-relaxed text-zinc-500 dark:text-zinc-400">
             You&apos;ve completed {UNVERIFIED_LESSON_LIMIT} lessons — great progress!
-            Verify your email to keep going, lock in your XP,
-            and appear on the leaderboard.
+            Verify your email to keep going, lock in your progress,
+            and keep your account secure.
           </p>
           <p className="mb-6 text-sm font-medium text-zinc-700 dark:text-zinc-300">
             Check your inbox for a verification link from uByte.

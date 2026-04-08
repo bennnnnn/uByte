@@ -6,7 +6,7 @@ import { verifyCsrf } from "@/lib/csrf";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 import { isSupportedLanguage } from "@/lib/languages/registry";
 
-const VALID_GOALS = new Set(["get-job", "ace-interviews", "learn-language", "level-up"]);
+const VALID_GOALS = new Set(["learn-language"]);
 
 export const POST = withErrorHandling("POST /api/onboarding/goal", async (req: NextRequest) => {
   const user = await getCurrentUser();

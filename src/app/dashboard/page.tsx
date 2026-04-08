@@ -13,7 +13,6 @@ import OverviewTab from "@/components/profile/OverviewTab";
 import ProgressTab from "@/components/profile/ProgressTab";
 import AchievementsTab from "@/components/profile/AchievementsTab";
 import BookmarksTab from "@/components/profile/BookmarksTab";
-import CertificationsTab from "@/components/profile/CertificationsTab";
 import NotificationsTab from "@/components/profile/NotificationsTab";
 import PlanTab from "@/components/profile/PlanTab";
 import ReferralSection from "@/components/profile/ReferralSection";
@@ -63,7 +62,7 @@ export default function DashboardPageWrapper() {
 }
 
 /* ── Tab definitions ───────────────────────────────────────────────────── */
-const LEARNING_TABS = ["overview", "progress", "certifications", "achievements", "bookmarks"] as const;
+const LEARNING_TABS = ["overview", "progress", "achievements", "bookmarks"] as const;
 const ACCOUNT_TABS  = ["notifications", "billing", "referral", "settings"] as const;
 const VALID_TABS    = [...LEARNING_TABS, ...ACCOUNT_TABS] as const;
 type Tab = (typeof VALID_TABS)[number];
@@ -71,7 +70,6 @@ type Tab = (typeof VALID_TABS)[number];
 const TAB_LABELS: Record<Tab, string> = {
   overview:       "Overview",
   progress:       "Progress",
-  certifications: "Certifications",
   achievements:   "Achievements",
   bookmarks:      "Bookmarks",
   notifications:  "Notifications",
@@ -90,11 +88,6 @@ const TAB_ICONS: Record<Tab, () => React.JSX.Element> = {
   progress: () => (
     <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
       <path strokeLinecap="round" strokeLinejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-    </svg>
-  ),
-  certifications: () => (
-    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
-      <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
     </svg>
   ),
   achievements: () => (
@@ -520,10 +513,9 @@ function DashboardPage() {
 
             {/* Learning tabs */}
             {tab === "overview" && (
-              <OverviewTab stats={stats} badges={badges} achievements={achievements} userId={profile.id} />
+              <OverviewTab stats={stats} badges={badges} achievements={achievements} />
             )}
             {tab === "progress" && <ProgressTab stats={stats} userId={profile.id} />}
-            {tab === "certifications" && <CertificationsTab />}
             {tab === "achievements" && <AchievementsTab badges={badges} achievements={achievements} />}
             {tab === "bookmarks" && (
               <BookmarksTab
