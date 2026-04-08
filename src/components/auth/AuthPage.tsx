@@ -24,9 +24,9 @@ const SIGNUP_EYEBROW = "Tutorials first";
 const LOGIN_EYEBROW = "Welcome back";
 
 const SIGNUP_VALUE_POINTS = [
-  "Interactive tutorials across 9 languages",
+  "Free lessons across 9 languages",
   "Live code execution right in your browser",
-  "Saved progress, bookmarks, and streaks",
+  "Pay only when you want detailed hints",
 ];
 
 const LOGIN_VALUE_POINTS = [
@@ -171,7 +171,7 @@ export default function AuthPage({ variant }: { variant: AuthPageMode }) {
 
                 <p className="mt-4 max-w-lg text-base leading-7 text-zinc-600 dark:text-zinc-400">
                   {isSignupPage
-                    ? "Short, interactive lessons with real code, instant feedback, and a clean path into your first language."
+                    ? "Short, interactive lessons with real code, instant feedback, and a clean path into your first language. Every lesson is free."
                     : "Sign in to continue your lessons, keep your streak alive, and jump straight back into the next step."}
                 </p>
               </div>
@@ -232,7 +232,7 @@ export default function AuthPage({ variant }: { variant: AuthPageMode }) {
                 {isForgotPage
                   ? "Enter the email on your account and we’ll send you a reset link."
                   : isSignupPage
-                    ? "Start with Google or email. After signup, you’ll choose a language and jump straight into your first lesson."
+                    ? "Start with Google or email. After signup, you’ll choose a language and jump straight into your first free lesson."
                     : "Use Google or email to get back to your saved lessons, bookmarks, and streaks."}
               </p>
             </div>

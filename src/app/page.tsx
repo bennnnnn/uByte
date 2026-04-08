@@ -22,7 +22,7 @@ import FadeInSection from "@/components/home/FadeInSection";
 export const metadata: Metadata = {
   title: "uByte — Interactive Coding Tutorials",
   description:
-    "Master Go, Python, TypeScript, SQL, Java, Rust, C++ and C# with interactive tutorials. Write and run real code in your browser with zero setup.",
+    "Master Go, Python, TypeScript, SQL, Java, Rust, C++ and C# with interactive tutorials. Every lesson is free. Pay only when you want detailed hints.",
   keywords: [
     ...SITE_KEYWORDS,
     "coding bootcamp alternative",
@@ -37,7 +37,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "uByte — Learn to Code With Interactive Tutorials",
     description:
-      "Step-by-step coding tutorials that run in your browser. 9 languages. Zero setup.",
+      "Step-by-step coding tutorials that run in your browser. 9 languages. Free lessons. Optional paid hints.",
     type: "website",
     url: absoluteUrl("/"),
     images: [
@@ -53,7 +53,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "uByte — Learn to Code With Interactive Tutorials",
     description:
-      "Step-by-step coding tutorials that run in your browser. 9 languages. Zero setup.",
+      "Step-by-step coding tutorials that run in your browser. 9 languages. Free lessons. Optional paid hints.",
     images: [absoluteUrl("/opengraph-image")],
   },
 };

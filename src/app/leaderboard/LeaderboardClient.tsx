@@ -13,7 +13,6 @@ interface LeaderboardEntry {
   xp: number;
   streak_days: number;
   completed_count: number;
-  problems_solved: number;
   country: string | null;
 }
 
@@ -171,11 +170,10 @@ export default function LeaderboardClient() {
                     {/* Stats — abbreviated on mobile */}
                     <p className="mt-0.5 text-[11px] text-zinc-400 sm:text-xs">
                       <span className="sm:hidden">
-                        {u.completed_count}t · {u.problems_solved ?? 0}p · {u.streak_days}d
+                        {u.completed_count}t · {u.streak_days}d
                       </span>
                       <span className="hidden sm:inline">
                         {u.completed_count} tutorial{u.completed_count !== 1 ? "s" : ""} ·{" "}
-                        {u.problems_solved ?? 0} problem{(u.problems_solved ?? 0) !== 1 ? "s" : ""} solved ·{" "}
                         {u.streak_days}d streak
                       </span>
                     </p>
@@ -202,7 +200,7 @@ export default function LeaderboardClient() {
             You&apos;re not on the leaderboard yet.
           </p>
           <p className="mt-0.5 text-xs text-zinc-400 dark:text-zinc-500">
-            Complete tutorials and solve problems to earn XP and appear here.
+            Complete tutorials to earn XP and appear here.
           </p>
           <Link
             href="/tutorial/go"

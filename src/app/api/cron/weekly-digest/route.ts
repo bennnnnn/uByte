@@ -6,7 +6,7 @@
  * Sends a personalised weekly recap to every user who:
  *   - Has a verified email
  *   - Was active in the past 30 days
- *   - Solved at least 1 problem OR completed at least 1 tutorial step this week
+ *   - Completed at least 1 tutorial step this week
  *   - Has NOT received this email in the past 6 days (idempotent)
  *
  * Protected by CRON_SECRET header (same pattern as other crons).
@@ -39,7 +39,6 @@ export const GET = withErrorHandling(
           name: user.name,
           streakDays: user.streak_days,
           xp: user.xp,
-          problemsThisWeek: user.problems_this_week,
           tutorialsThisWeek: user.tutorials_this_week,
         });
         await markWeeklyDigestSent(user.id);

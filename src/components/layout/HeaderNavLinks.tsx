@@ -26,6 +26,31 @@ const menuItemBase =
 
 type DropdownId = "tutorials";
 
+function AppNavLink({
+  href,
+  label,
+  active,
+  className = linkBase,
+}: {
+  href: string;
+  label: string;
+  active: boolean;
+  className?: string;
+}) {
+  return (
+    <Link
+      href={href}
+      aria-current={active ? "page" : undefined}
+      onClick={(e) => {
+        if (active) e.preventDefault();
+      }}
+      className={className}
+    >
+      {label}
+    </Link>
+  );
+}
+
 // Click-only dropdown — no hover open/close
 function NavDropdown({
   id,
@@ -100,7 +125,7 @@ function NavDropdown({
   );
 }
 
-export default function HeaderNavLinks({ side = "left" }: { side?: "left" }) {
+export default function HeaderNavLinks({ side = "left" }: { side?: "left" | "right" }) {
   const [openMenu, setOpenMenu] = useState<DropdownId | null>(null);
   const pathname = usePathname();
   const { user } = useAuth();
@@ -111,7 +136,18 @@ export default function HeaderNavLinks({ side = "left" }: { side?: "left" }) {
   // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => { setOpenMenu(null); }, [pathname]);
 
-  if (side !== "left") return null;
+  if (side === "right") {
+    if (!user) return null;
+    return (
+      <nav className="flex items-center gap-1" aria-label="Account shortcuts">
+        <AppNavLink
+          href="/dashboard"
+          label="Dashboard"
+          active={pathname.startsWith("/dashboard")}
+        />
+      </nav>
+    );
+  }
 
   return (
     <nav className="flex items-center gap-1" aria-label="Main navigation">
@@ -148,23 +184,11 @@ export default function HeaderNavLinks({ side = "left" }: { side?: "left" }) {
         </Link>
       </NavDropdown>
 
-      <Link
+      <AppNavLink
         href="/leaderboard"
-        aria-current={pathname.startsWith("/leaderboard") ? "page" : undefined}
-        className={linkBase}
-      >
-        Leaderboard
-      </Link>
-
-      {user && (
-        <Link
-          href="/dashboard"
-          aria-current={pathname.startsWith("/dashboard") ? "page" : undefined}
-          className={linkBase}
-        >
-          Dashboard
-        </Link>
-      )}
+        label="Leaderboard"
+        active={pathname.startsWith("/leaderboard")}
+      />
 
     </nav>
   );

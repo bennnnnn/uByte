@@ -33,6 +33,9 @@ export default function SiteHeader() {
         {/* Search */}
         <NavSearch />
 
+        {/* Right-side account shortcut */}
+        <HeaderNavLinks side="right" />
+
         {/* Auth */}
         <Suspense fallback={<div className="h-8 w-44 animate-pulse rounded-lg bg-zinc-100 dark:bg-zinc-800" />}>
           <AuthButtons />

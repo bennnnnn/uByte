@@ -54,7 +54,7 @@ export default function ValuePropBanner() {
           One focused product. One job.
         </h2>
         <p className="mt-2 text-sm text-indigo-200/70 sm:text-base">
-          Learn faster with a tutorial platform built to keep you writing code instead of context-switching.
+          Learn faster with a tutorial platform where every lesson is free and detailed hints are there only when you want extra help.
         </p>
       </div>
 

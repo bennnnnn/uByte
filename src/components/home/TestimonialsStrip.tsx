@@ -1,7 +1,7 @@
 const TESTIMONIALS = [
   {
     quote:
-      "I landed my first developer job after spending three months with uByte. The Go certification was the first thing I mentioned in my interview — the interviewer had actually heard of it.",
+      "I stopped bouncing between docs and random videos. uByte gave me a clean path through Go, and I was writing working code on day one.",
     name: "Marcus T.",
     role: "Junior Go Developer",
     avatar: "MT",
@@ -17,7 +17,7 @@ const TESTIMONIALS = [
   },
   {
     quote:
-      "Finished the JavaScript track during my commute over four weeks. The interview prep problems hit exactly what I was asked at my Google screen. I'm not exaggerating.",
+      "Finished the JavaScript track during my commute over four weeks. The lessons were short enough to fit real life, and the paid hints saved me exactly when I got stuck.",
     name: "David L.",
     role: "Frontend Engineer",
     avatar: "DL",

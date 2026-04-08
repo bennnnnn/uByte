@@ -4,8 +4,8 @@ import AuthPage from "@/components/auth/AuthPage";
 
 export const metadata: Metadata = {
   title: "Create your free account — uByte",
-  description: "Join uByte for free and start learning through interactive tutorials with live code, saved progress, and zero setup.",
-  robots: { index: true, follow: true },
+  description: "Join uByte for free and start learning through interactive tutorials with live code, saved progress, and optional paid hints.",
+  robots: { index: false, follow: true },
 };
 
 export default function SignupPage() {

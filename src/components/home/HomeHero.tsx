@@ -355,7 +355,7 @@ function GuestHero({
               <span className="font-semibold text-zinc-700 dark:text-zinc-300">
                 live code, instant feedback, and saved progress
               </span>{" "}
-              — all running live in your browser. Zero setup.
+              — all running live in your browser. Every lesson is free, and you only pay if you want detailed hints.
             </p>
 
             {/* CTAs */}
@@ -375,7 +375,7 @@ function GuestHero({
             </div>
 
             <p className="mt-4 text-xs text-zinc-400">
-              No credit card required · Start writing code in under 30 seconds
+              No credit card required · Free lessons in every language · Start writing code in under 30 seconds
             </p>
 
             {/* Stats */}

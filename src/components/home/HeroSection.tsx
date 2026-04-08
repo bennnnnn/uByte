@@ -6,27 +6,22 @@ import HeroIDEDeferred from "./HeroIDEDeferred";
 
 const FEATURES = [
   "Write real code in your browser — zero setup, zero installs",
-  "Tutorials → Interview prep → Certification, all in one",
+  "Free tutorials across the languages you actually want to learn",
   "Instant feedback on every step — know if you're right immediately",
-  "Earn a certificate that proves your understanding",
+  "Pay only when you want detailed hints and extra guidance",
 ];
 
 interface HeroSectionProps {
   topicCount?: number;
   totalLessonCount?: number;
-  problemCount?: number;
   languageCount?: number;
-  certificationCount?: number;
 }
 
 export default function HeroSection({
   topicCount = 19,
   totalLessonCount = 0,
-  problemCount = 11,
   languageCount = 6,
-  certificationCount = 6,
 }: HeroSectionProps) {
-  const problemsLabel = problemCount >= 10 ? `${problemCount}+` : String(problemCount);
   const lessonsLabel = totalLessonCount > 0 ? `${totalLessonCount}+` : String(topicCount);
 
   return (
@@ -50,16 +45,16 @@ export default function HeroSection({
           <div>
             {/* Headline */}
             <h1 className="mb-4 text-[2.25rem] font-black leading-[1.08] tracking-tight text-zinc-900 dark:text-zinc-50 sm:text-[2.75rem] sm:leading-[1.04] lg:text-[3.25rem] xl:text-[3.75rem]">
-              Learn. Practice.
+              Learn with tutorials.
               <GradientText className="mt-1 block">
-                Get certified.
+                Stay in the editor.
               </GradientText>
             </h1>
 
             {/* Subtitle */}
             <p className="mb-7 max-w-[480px] text-base leading-relaxed text-zinc-500 dark:text-zinc-400 sm:text-lg">
-              The complete path from beginner to job-ready — interactive tutorials,
-              coding interview prep, and certification exams. All in one place, no installs needed.
+              Interactive coding tutorials with live code, instant feedback, and saved progress.
+              Every lesson is free, and you only pay if you want detailed hints.
             </p>
 
             {/* Feature list — hidden on mobile to keep hero compact */}
@@ -82,8 +77,8 @@ export default function HeroSection({
               {[
                 { n: String(languageCount),      label: "Languages",     color: "text-indigo-600 dark:text-indigo-400"  },
                 { n: lessonsLabel,               label: "Lessons",        color: "text-violet-600 dark:text-violet-400"  },
-                { n: problemsLabel,              label: "Interview Qs",   color: "text-cyan-600 dark:text-cyan-400"      },
-                { n: String(certificationCount), label: "Certs",          color: "text-amber-600 dark:text-amber-400"    },
+                { n: "Live",                     label: "Code Runs",      color: "text-cyan-600 dark:text-cyan-400"      },
+                { n: "Free",                     label: "Lessons First",  color: "text-amber-600 dark:text-amber-400"    },
               ].map(({ n, label, color }) => (
                 <div key={label}>
                   <p className={`text-xl font-black sm:text-2xl ${color}`}>{n}</p>

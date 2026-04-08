@@ -5,7 +5,7 @@
  * Sends:
  *   Day 1  — 24h nudge (first lesson prompt)
  *   Day 3  — re-engagement for users who haven't returned
- *   Day 7  — push certifications + Pro upsell
+ *   Day 7  — reinforce the tutorial habit + optional hints upsell
  *   Day 14 — win-back for inactive users (no activity in 7d)
  *   Day 30 — final win-back (last automated email)
  */

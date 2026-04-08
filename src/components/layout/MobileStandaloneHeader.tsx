@@ -54,6 +54,36 @@ function AccordionSection({
   );
 }
 
+function MobileNavLink({
+  href,
+  label,
+  active,
+  onClick,
+}: {
+  href: string;
+  label: string;
+  active: boolean;
+  onClick: () => void;
+}) {
+  return (
+    <Link
+      href={href}
+      onClick={(e) => {
+        if (active) {
+          e.preventDefault();
+          onClick();
+          return;
+        }
+        onClick();
+      }}
+      aria-current={active ? "page" : undefined}
+      className="flex items-center rounded-xl border border-zinc-100 bg-white px-4 py-3 text-sm font-bold text-zinc-700 transition-colors hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:bg-zinc-800"
+    >
+      {label}
+    </Link>
+  );
+}
+
 export default function MobileStandaloneHeader() {
   const pathname = usePathname();
   const { user, profile } = useAuth();
@@ -134,22 +164,20 @@ export default function MobileStandaloneHeader() {
             })}
           </AccordionSection>
 
-          <Link
+          <MobileNavLink
             href="/leaderboard"
+            label="Leaderboard"
+            active={pathname.startsWith("/leaderboard")}
             onClick={close}
-            className="flex items-center rounded-xl border border-zinc-100 bg-white px-4 py-3 text-sm font-bold text-zinc-700 transition-colors hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:bg-zinc-800"
-          >
-            Leaderboard
-          </Link>
+          />
 
           {user && (
-            <Link
+            <MobileNavLink
               href="/dashboard"
+              label="Dashboard"
+              active={pathname.startsWith("/dashboard")}
               onClick={close}
-              className="flex items-center rounded-xl border border-zinc-100 bg-white px-4 py-3 text-sm font-bold text-zinc-700 transition-colors hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:bg-zinc-800"
-            >
-              Dashboard
-            </Link>
+            />
           )}
 
           {/* Standalone links — hide Pricing for Pro users */}

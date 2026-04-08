@@ -5,14 +5,12 @@
  * Onboarding drip sequence (triggered by /api/cron/onboarding-drip):
  *   Day 0 (signup)  → sendWelcomeEmail         — immediate, sent from signup route
  *   Day 3           → sendDay3Email             — motivate, suggest first tutorial
- *   Day 7           → sendDay7Email             — one week in, push certifications
+ *   Day 7           → sendDay7Email             — one week in, reinforce the habit + hint upsell
  */
 import { Resend } from "resend";
 
 import { BASE_URL } from "@/lib/constants";
 import { makeUnsubscribeUrl } from "@/lib/unsubscribe";
-import { LANGUAGES } from "@/lib/languages/registry";
-import type { SupportedLanguage } from "@/lib/languages/types";
 const FROM = process.env.RESEND_FROM_EMAIL ?? "noreply@resend.dev";
 
 /** Escape user-supplied text before embedding in HTML to prevent injection. */
@@ -60,7 +58,7 @@ export async function sendStreakReminderEmail(
         <p>Hi ${safeName},</p>
         <p>You have a <strong>${streakDays}-day</strong> streak on uByte — don't let it slip today!</p>
         <a href="${BASE_URL}" style="display:inline-block;margin:16px 0;padding:12px 24px;background:#4f46e5;color:#fff;border-radius:8px;text-decoration:none;font-weight:600">Keep my streak 🔥</a>
-        <p style="color:#6b7280;font-size:13px">Complete a tutorial step, solve a practice problem, or just log in — any activity counts.</p>
+        <p style="color:#6b7280;font-size:13px">Complete a tutorial step or continue a lesson today — any learning activity counts.</p>
         ${unsubFooter(to)}
       </div>
     `,
@@ -135,7 +133,7 @@ export async function sendWelcomeEmail(to: string, name: string): Promise<void> 
   await resend.emails.send({
     from: FROM,
     to,
-    subject: `Welcome to uByte, ${firstName}! 🚀 Your coding journey starts now`,
+    subject: `Welcome to uByte, ${firstName}! 🚀 Your first lesson is free`,
     html: `
       <div style="font-family:sans-serif;max-width:520px;margin:auto;color:#18181b">
         <div style="background:#4f46e5;padding:32px;border-radius:12px 12px 0 0;text-align:center">
@@ -143,19 +141,19 @@ export async function sendWelcomeEmail(to: string, name: string): Promise<void> 
         </div>
         <div style="background:#f9fafb;padding:32px;border-radius:0 0 12px 12px;border:1px solid #e5e7eb;border-top:none">
           <h2 style="margin:0 0 8px">Hey ${firstName}, welcome aboard! 👋</h2>
-          <p style="color:#6b7280">You just joined thousands of developers levelling up their coding skills on uByte. Here's what you can do right now:</p>
+          <p style="color:#6b7280">You just joined uByte. Every lesson is free, runs in your browser, and is built to get you writing code fast.</p>
           <table style="width:100%;border-collapse:collapse;margin:20px 0">
             <tr><td style="padding:10px 0;border-bottom:1px solid #e5e7eb">
               <strong>📖 Interactive Tutorials</strong><br>
-              <span style="color:#6b7280;font-size:14px">Step-by-step lessons in Go, Python, JavaScript, C++, Java, Rust, and C# — with a live code editor.</span>
+              <span style="color:#6b7280;font-size:14px">Short, step-by-step lessons in 9 languages with live code and instant feedback.</span>
             </td></tr>
             <tr><td style="padding:10px 0;border-bottom:1px solid #e5e7eb">
-              <strong>💼 Interview Prep</strong><br>
-              <span style="color:#6b7280;font-size:14px">Solve real interview problems from arrays to dynamic programming — all free.</span>
+              <strong>💾 Progress That Sticks</strong><br>
+              <span style="color:#6b7280;font-size:14px">Save your steps, bookmarks, and streaks so you can continue exactly where you left off.</span>
             </td></tr>
             <tr><td style="padding:10px 0">
-              <strong>🏅 Certifications</strong><br>
-              <span style="color:#6b7280;font-size:14px">Prove your skills with language certifications you can share on LinkedIn.</span>
+              <strong>💡 Help When You Want It</strong><br>
+              <span style="color:#6b7280;font-size:14px">Need extra support? Detailed hints are available later as an optional paid upgrade.</span>
             </td></tr>
           </table>
           <div style="text-align:center;margin:24px 0">
@@ -194,12 +192,12 @@ export async function sendDay1Email(to: string, name: string): Promise<void> {
                 <span style="color:#9ca3af;font-size:13px;display:block">Interactive, step-by-step — 9 languages to choose from</span>
               </td></tr>
               <tr><td style="padding:8px 0;border-bottom:1px solid #f3f4f6">
-                <a href="${BASE_URL}/practice" style="color:#4f46e5;font-weight:600;text-decoration:none">💼 Solve an interview problem</a>
-                <span style="color:#9ca3af;font-size:13px;display:block">Practice the coding questions that get you hired</span>
+                <a href="${BASE_URL}/tutorial/go" style="color:#4f46e5;font-weight:600;text-decoration:none">🐹 Begin with Go</a>
+                <span style="color:#9ca3af;font-size:13px;display:block">A beginner-friendly way to experience the editor and lesson flow</span>
               </td></tr>
               <tr><td style="padding:8px 0">
-                <a href="${BASE_URL}/daily" style="color:#4f46e5;font-weight:600;text-decoration:none">⚡ Today's daily challenge</a>
-                <span style="color:#9ca3af;font-size:13px;display:block">One problem a day keeps interview rust away</span>
+                <a href="${BASE_URL}/pricing" style="color:#4f46e5;font-weight:600;text-decoration:none">💡 See how hints work</a>
+                <span style="color:#9ca3af;font-size:13px;display:block">Lessons are free. Upgrade only if you want detailed hints later on.</span>
               </td></tr>
             </table>
           </div>
@@ -223,7 +221,7 @@ export async function sendDay3Email(to: string, name: string): Promise<void> {
   await resend.emails.send({
     from: FROM,
     to,
-    subject: `${firstName}, ready for your first challenge? 🎯`,
+    subject: `${firstName}, ready for your next lesson? 🎯`,
     html: `
       <div style="font-family:sans-serif;max-width:520px;margin:auto;color:#18181b">
         <div style="background:#4f46e5;padding:24px 32px;border-radius:12px 12px 0 0">
@@ -237,8 +235,8 @@ export async function sendDay3Email(to: string, name: string): Promise<void> {
             <p style="color:#6b7280;margin:0 0 16px;font-size:14px">Pick a language, open the first tutorial step, and run your first piece of code. The feeling of seeing it work is addictive.</p>
             <a href="${BASE_URL}/tutorial/go" style="display:inline-block;padding:12px 24px;background:#4f46e5;color:#fff;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px">Open tutorials →</a>
           </div>
-          <p style="color:#6b7280;font-size:14px">Or jump straight into an interview prep problem:</p>
-          <a href="${BASE_URL}/practice" style="color:#4f46e5;font-size:14px">Browse interview questions →</a>
+          <p style="color:#6b7280;font-size:14px">Every lesson is free, and if you ever get stuck you can unlock detailed hints later without leaving the lesson.</p>
+          <a href="${BASE_URL}/pricing" style="color:#4f46e5;font-size:14px">See how hints work →</a>
           <hr style="border:none;border-top:1px solid #e5e7eb;margin:24px 0">
           ${unsubFooter(to)}
         </div>
@@ -247,7 +245,7 @@ export async function sendDay3Email(to: string, name: string): Promise<void> {
   });
 }
 
-/** Day 7 — celebrate one week, push certifications and Pro. */
+/** Day 7 — celebrate one week and reinforce the tutorial habit. */
 export async function sendDay7Email(to: string, name: string): Promise<void> {
   const resend = getResend();
   if (!resend) return;
@@ -256,7 +254,7 @@ export async function sendDay7Email(to: string, name: string): Promise<void> {
   await resend.emails.send({
     from: FROM,
     to,
-    subject: `One week on uByte 🎉 — ready to earn a certification?`,
+    subject: `One week on uByte 🎉 — you're building real momentum`,
     html: `
       <div style="font-family:sans-serif;max-width:520px;margin:auto;color:#18181b">
         <div style="background:#4f46e5;padding:24px 32px;border-radius:12px 12px 0 0">
@@ -264,16 +262,16 @@ export async function sendDay7Email(to: string, name: string): Promise<void> {
         </div>
         <div style="background:#f9fafb;padding:32px;border-radius:0 0 12px 12px;border:1px solid #e5e7eb;border-top:none">
           <h2 style="margin:0 0 8px">One week in, ${firstName}! 🎉</h2>
-          <p style="color:#6b7280">You've been on uByte for a week. Whether you've been grinding problems or just exploring, you're on the right track.</p>
+          <p style="color:#6b7280">You've been on uByte for a week. If you've written code, passed steps, or even just explored a new language, you're moving in the right direction.</p>
           <div style="background:#fff;border:2px solid #4f46e5;border-radius:10px;padding:20px;margin:20px 0">
-            <p style="margin:0 0 4px;font-weight:700;color:#4f46e5">🏅 Ready to certify?</p>
-            <p style="color:#6b7280;margin:0 0 16px;font-size:14px">Take a language certification and earn a shareable certificate. It's a great addition to your LinkedIn profile or resume.</p>
-            <a href="${BASE_URL}/certifications" style="display:inline-block;padding:12px 24px;background:#4f46e5;color:#fff;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px">Take a certification →</a>
+            <p style="margin:0 0 4px;font-weight:700;color:#4f46e5">📚 Keep the streak going</p>
+            <p style="color:#6b7280;margin:0 0 16px;font-size:14px">The fastest way to improve is still simple: open the next lesson, write code, and keep the habit alive.</p>
+            <a href="${BASE_URL}/tutorial" style="display:inline-block;padding:12px 24px;background:#4f46e5;color:#fff;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px">Continue learning →</a>
           </div>
           <div style="background:#fff;border:1px solid #e5e7eb;border-radius:10px;padding:20px;margin:16px 0">
-            <p style="margin:0 0 4px;font-weight:700">⚡ Get help when you need it — Pro</p>
-            <p style="color:#6b7280;margin:0 0 16px;font-size:14px">Pro gives you hints when you're stuck, detailed code feedback, and a personalized interview debrief. Everything you'd normally Google or ask ChatGPT for, right inside uByte.</p>
-            <a href="${BASE_URL}/pricing" style="color:#4f46e5;font-size:14px;font-weight:600">See Pro plans →</a>
+            <p style="margin:0 0 4px;font-weight:700">💡 Want extra help?</p>
+            <p style="color:#6b7280;margin:0 0 16px;font-size:14px">Lessons stay free. Pro is only for learners who want detailed hints and extra guidance without switching tabs.</p>
+            <a href="${BASE_URL}/pricing" style="color:#4f46e5;font-size:14px;font-weight:600">See hint pricing →</a>
           </div>
           <hr style="border:none;border-top:1px solid #e5e7eb;margin:24px 0">
           ${unsubFooter(to)}
@@ -289,15 +287,14 @@ export async function sendWeeklyDigestEmail(opts: {
   name: string;
   streakDays: number;
   xp: number;
-  problemsThisWeek: number;
   tutorialsThisWeek: number;
 }): Promise<void> {
   const resend = getResend();
   if (!resend) return;
 
-  const { to, name, streakDays, xp, problemsThisWeek, tutorialsThisWeek } = opts;
+  const { to, name, streakDays, xp, tutorialsThisWeek } = opts;
   const firstName = escapeHtml(name.split(" ")[0]);
-  const totalActivity = problemsThisWeek + tutorialsThisWeek;
+  const totalActivity = tutorialsThisWeek;
 
   // Motivational headline based on activity level
   const headline =
@@ -308,7 +305,6 @@ export async function sendWeeklyDigestEmail(opts: {
       : `Good start this week, ${firstName}! 🚀`;
 
   const activityRows = [
-    problemsThisWeek > 0 && `<tr><td style="padding:10px 0;border-bottom:1px solid #e5e7eb"><strong>💼 Problems solved</strong><span style="float:right;font-size:22px;font-weight:800;color:#4f46e5">${problemsThisWeek}</span></td></tr>`,
     tutorialsThisWeek > 0 && `<tr><td style="padding:10px 0;border-bottom:1px solid #e5e7eb"><strong>📖 Tutorial steps</strong><span style="float:right;font-size:22px;font-weight:800;color:#4f46e5">${tutorialsThisWeek}</span></td></tr>`,
     `<tr><td style="padding:10px 0;border-bottom:1px solid #e5e7eb"><strong>🔥 Current streak</strong><span style="float:right;font-size:22px;font-weight:800;color:#f59e0b">${streakDays} days</span></td></tr>`,
     `<tr><td style="padding:10px 0"><strong>⭐ Total XP</strong><span style="float:right;font-size:22px;font-weight:800;color:#4f46e5">${xp.toLocaleString()}</span></td></tr>`,
@@ -317,7 +313,7 @@ export async function sendWeeklyDigestEmail(opts: {
   await resend.emails.send({
     from: FROM,
     to,
-    subject: `Your uByte weekly recap — ${problemsThisWeek} problems, ${tutorialsThisWeek} lessons this week`,
+    subject: `Your uByte weekly recap — ${tutorialsThisWeek} lessons this week`,
     html: `
       <div style="font-family:sans-serif;max-width:520px;margin:auto;color:#18181b">
         <div style="background:#4f46e5;padding:32px;border-radius:12px 12px 0 0;text-align:center">
@@ -346,13 +342,13 @@ export async function sendWeeklyDigestEmail(opts: {
             <p style="margin:0 0 8px;font-size:13px;font-weight:600;color:#374151">This week on uByte:</p>
             <table style="width:100%;border-collapse:collapse;font-size:13px">
               <tr>
-                <td style="padding:4px 0"><a href="${BASE_URL}/daily" style="color:#4f46e5;text-decoration:none">⚡ Today's daily challenge</a></td>
+                <td style="padding:4px 0"><a href="${BASE_URL}/tutorial" style="color:#4f46e5;text-decoration:none">📖 Browse all tutorials</a></td>
               </tr>
               <tr>
-                <td style="padding:4px 0"><a href="${BASE_URL}/practice" style="color:#4f46e5;text-decoration:none">💼 Browse all interview problems</a></td>
+                <td style="padding:4px 0"><a href="${BASE_URL}/leaderboard" style="color:#4f46e5;text-decoration:none">🏆 See the leaderboard</a></td>
               </tr>
               <tr>
-                <td style="padding:4px 0"><a href="${BASE_URL}/certifications" style="color:#4f46e5;text-decoration:none">🏅 Take a certification exam</a></td>
+                <td style="padding:4px 0"><a href="${BASE_URL}/pricing" style="color:#4f46e5;text-decoration:none">💡 Learn how paid hints work</a></td>
               </tr>
             </table>
           </div>
@@ -390,19 +386,19 @@ export async function sendUpgradeEmail(
           <table style="width:100%;border-collapse:collapse;margin:20px 0">
             <tr><td style="padding:10px 0;border-bottom:1px solid #e5e7eb">
               <strong>💡 Hints when you're stuck</strong><br>
-              <span style="color:#6b7280;font-size:14px">Hit a wall on any tutorial step or practice problem? Ask for a hint instead of switching tabs.</span>
+              <span style="color:#6b7280;font-size:14px">Hit a wall in any lesson and ask for a detailed hint without leaving the page.</span>
             </td></tr>
             <tr><td style="padding:10px 0;border-bottom:1px solid #e5e7eb">
-              <strong>🔍 Detailed code feedback</strong><br>
-              <span style="color:#6b7280;font-size:14px">After every practice submission, get a breakdown of your time & space complexity, strengths, and improvements.</span>
+              <strong>🧭 Extra guidance inside lessons</strong><br>
+              <span style="color:#6b7280;font-size:14px">Get unstuck faster with more context while you work through the tutorial flow.</span>
             </td></tr>
             <tr><td style="padding:10px 0;border-bottom:1px solid #e5e7eb">
-              <strong>🎤 Interview performance debrief</strong><br>
-              <span style="color:#6b7280;font-size:14px">Use the interview simulator and get a full scorecard — hire recommendation, code quality, and interview tips.</span>
+              <strong>📚 All lessons still included</strong><br>
+              <span style="color:#6b7280;font-size:14px">Your upgrade adds help, not paywalls. Every tutorial stays available across all 9 languages.</span>
             </td></tr>
             <tr><td style="padding:10px 0">
-              <strong>📝 Exam question walkthroughs</strong><br>
-              <span style="color:#6b7280;font-size:14px">After a certification exam, review every question with a clear explanation of the correct answer.</span>
+              <strong>⚡ Faster momentum</strong><br>
+              <span style="color:#6b7280;font-size:14px">Spend less time stuck and more time finishing lessons, building streaks, and moving forward.</span>
             </td></tr>
           </table>
           <div style="text-align:center;margin:24px 0">
@@ -413,117 +409,6 @@ export async function sendUpgradeEmail(
       </div>
     `,
   });
-}
-
-/** Sent when a user earns a certification. */
-export async function sendCertificationEmail(
-  to: string,
-  name: string,
-  language: string,
-  certificateUrl: string
-): Promise<void> {
-  const resend = getResend();
-  if (!resend) return;
-
-  const firstName = name.split(" ")[0];
-  const langLabel = LANGUAGES[language as SupportedLanguage]?.name ?? language;
-  await resend.emails.send({
-    from: FROM,
-    to,
-    subject: `You passed the ${langLabel} certification! 🏅 — uByte`,
-    html: `
-      <div style="font-family:sans-serif;max-width:520px;margin:auto;color:#18181b">
-        <div style="background:#4f46e5;padding:32px;border-radius:12px 12px 0 0;text-align:center">
-          <span style="color:#fff;font-size:28px;font-weight:800;letter-spacing:-1px">uByte</span>
-        </div>
-        <div style="background:#f9fafb;padding:32px;border-radius:0 0 12px 12px;border:1px solid #e5e7eb;border-top:none">
-          <div style="text-align:center;margin-bottom:20px">
-            <span style="font-size:56px">🏅</span>
-          </div>
-          <h2 style="margin:0 0 8px;text-align:center">Congratulations, ${firstName}!</h2>
-          <p style="color:#6b7280;text-align:center">You've passed the <strong>${langLabel} certification</strong> on uByte. Your certificate is ready to view and share.</p>
-          <div style="background:#fff;border:2px solid #4f46e5;border-radius:10px;padding:20px;margin:20px 0;text-align:center">
-            <p style="margin:0 0 4px;font-weight:700;color:#4f46e5">Your ${langLabel} Certificate</p>
-            <p style="color:#6b7280;margin:0 0 16px;font-size:14px">Each certificate has a unique ID — share the link with anyone who wants to verify it.</p>
-            <a href="${certificateUrl}" style="display:inline-block;padding:12px 24px;background:#4f46e5;color:#fff;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px">View your certificate →</a>
-          </div>
-          <p style="color:#6b7280;font-size:14px;text-align:center">You earned it. Keep going — more certifications await.</p>
-          <hr style="border:none;border-top:1px solid #e5e7eb;margin:24px 0">
-          <p style="color:#9ca3af;font-size:12px;text-align:center">You're receiving this because you just earned a certificate on uByte. <a href="${BASE_URL}/settings" style="color:#9ca3af">Manage preferences</a>.</p>
-        </div>
-      </div>
-    `,
-  });
-}
-
-/** Sent when a user fails a certification exam — encourages a retake. */
-export async function sendExamFailedEmail(
-  to: string,
-  name: string,
-  language: string,
-  score: number,
-  correct: number,
-  total: number,
-  passPercent: number,
-  retakeUrl: string
-): Promise<void> {
-  const resend = getResend();
-  if (!resend) return;
-
-  const firstName = name.split(" ")[0];
-  const langLabel = LANGUAGES[language as SupportedLanguage]?.name ?? language;
-  const needed = Math.ceil((total * passPercent) / 100);
-  const gap = needed - correct;
-  // Only send if the user was reasonably close (within 20 percentage points) — avoid
-  // emailing users who scored very low, as it may feel discouraging rather than motivating.
-  const scoreDiff = passPercent - score;
-  if (scoreDiff > 20) return;
-
-  try { await resend.emails.send({
-    from: FROM,
-    to,
-    subject: `So close! Your ${langLabel} exam result — uByte`,
-    html: `
-      <div style="font-family:sans-serif;max-width:520px;margin:auto;color:#18181b">
-        <div style="background:#4f46e5;padding:32px;border-radius:12px 12px 0 0;text-align:center">
-          <span style="color:#fff;font-size:28px;font-weight:800;letter-spacing:-1px">uByte</span>
-        </div>
-        <div style="background:#f9fafb;padding:32px;border-radius:0 0 12px 12px;border:1px solid #e5e7eb;border-top:none">
-          <h2 style="margin:0 0 8px">Hi ${firstName} — you almost had it.</h2>
-          <p style="color:#6b7280;margin:0 0 24px">You scored <strong style="color:#18181b">${score}%</strong> on the ${langLabel} certification. You needed ${passPercent}% to pass. That's just ${gap} more question${gap === 1 ? "" : "s"} — you're very close.</p>
-
-          <div style="background:#fff;border:1px solid #e5e7eb;border-radius:10px;padding:20px;margin:0 0 24px">
-            <table style="width:100%;border-collapse:collapse">
-              <tr>
-                <td style="padding:8px 0;color:#6b7280;font-size:14px">Your score</td>
-                <td style="padding:8px 0;text-align:right;font-weight:700;color:#f59e0b;font-size:18px">${score}%</td>
-              </tr>
-              <tr style="border-top:1px solid #f3f4f6">
-                <td style="padding:8px 0;color:#6b7280;font-size:14px">Correct answers</td>
-                <td style="padding:8px 0;text-align:right;font-weight:700;color:#18181b">${correct} / ${total}</td>
-              </tr>
-              <tr style="border-top:1px solid #f3f4f6">
-                <td style="padding:8px 0;color:#6b7280;font-size:14px">Passing score</td>
-                <td style="padding:8px 0;text-align:right;font-weight:700;color:#18181b">${passPercent}%</td>
-              </tr>
-              <tr style="border-top:1px solid #f3f4f6">
-                <td style="padding:8px 0;color:#6b7280;font-size:14px">Needed to pass</td>
-                <td style="padding:8px 0;text-align:right;font-weight:700;color:#18181b">${needed} / ${total}</td>
-              </tr>
-            </table>
-          </div>
-
-          <div style="text-align:center;margin-bottom:24px">
-            <p style="color:#6b7280;font-size:14px;margin:0 0 16px">Review the topics you missed and give it another shot. You can retake it as many times as you need.</p>
-            <a href="${retakeUrl}" style="display:inline-block;padding:12px 24px;background:#4f46e5;color:#fff;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px">Retake the ${langLabel} exam →</a>
-          </div>
-
-          <hr style="border:none;border-top:1px solid #e5e7eb;margin:24px 0">
-          <p style="color:#9ca3af;font-size:12px;text-align:center">You're receiving this because you recently took a certification exam on uByte. <a href="${BASE_URL}/settings" style="color:#9ca3af">Manage preferences</a>.</p>
-        </div>
-      </div>
-    `,
-  }); } catch (err) { console.error("[email] sendExamFailedEmail failed:", err); }
 }
 
 /** Day 14 — win-back for users who haven't logged in since signup week. */
@@ -546,11 +431,11 @@ export async function sendDay14WinBackEmail(to: string, name: string): Promise<v
           <p style="color:#6b7280">It's been two weeks since you signed up. We know life gets busy — but your coding skills won't build themselves!</p>
           <div style="background:#fff;border:2px solid #4f46e5;border-radius:10px;padding:20px;margin:20px 0">
             <p style="margin:0 0 8px;font-weight:700;color:#4f46e5">Pick up right where you left off</p>
-            <p style="color:#6b7280;margin:0 0 16px;font-size:14px">Even 10 minutes a day adds up. Start with one lesson or one practice problem — that's all it takes to build momentum.</p>
+            <p style="color:#6b7280;margin:0 0 16px;font-size:14px">Even 10 minutes a day adds up. Start with one lesson — that's all it takes to build momentum again.</p>
             <a href="${BASE_URL}/tutorial/go" style="display:inline-block;padding:12px 24px;background:#4f46e5;color:#fff;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px">Resume my journey →</a>
           </div>
-          <p style="color:#6b7280;font-size:14px">Or try the daily challenge — a new problem every day, takes about 15 minutes:</p>
-          <a href="${BASE_URL}/daily" style="color:#4f46e5;font-size:14px;font-weight:600">⚡ Today's challenge →</a>
+          <p style="color:#6b7280;font-size:14px">Need a little help once you're back? Lessons stay free, and detailed hints are there if you want them.</p>
+          <a href="${BASE_URL}/pricing" style="color:#4f46e5;font-size:14px;font-weight:600">See hint pricing →</a>
           <hr style="border:none;border-top:1px solid #e5e7eb;margin:24px 0">
           ${unsubFooter(to)}
         </div>
@@ -582,8 +467,8 @@ export async function sendDay30WinBackEmail(to: string, name: string): Promise<v
             <p style="margin:0 0 8px;font-weight:700">What you're missing:</p>
             <table style="width:100%;border-collapse:collapse;font-size:14px;color:#6b7280">
               <tr><td style="padding:6px 0;border-bottom:1px solid #f3f4f6">📖 Interactive coding lessons in 9 languages</td></tr>
-              <tr><td style="padding:6px 0;border-bottom:1px solid #f3f4f6">💼 Real interview problems — free to solve</td></tr>
-              <tr><td style="padding:6px 0">🏅 Certifications to add to your LinkedIn</td></tr>
+              <tr><td style="padding:6px 0;border-bottom:1px solid #f3f4f6">💾 Saved progress, bookmarks, and streaks</td></tr>
+              <tr><td style="padding:6px 0">💡 Optional detailed hints when you want extra help</td></tr>
             </table>
           </div>
           <div style="text-align:center;margin:24px 0">
@@ -636,8 +521,8 @@ export async function sendTrialEndingEmail(
             <p style="margin:0 0 4px;font-weight:700;color:${isUrgent ? "#b45309" : "#4f46e5"}">What you'll keep with a subscription:</p>
             <table style="width:100%;border-collapse:collapse;margin:12px 0;font-size:14px;color:#6b7280">
               <tr><td style="padding:6px 0;border-bottom:1px solid #f3f4f6">📖 Unlimited tutorials in all 9 languages</td></tr>
-              <tr><td style="padding:6px 0;border-bottom:1px solid #f3f4f6">💼 All 70+ interview practice problems + hints when stuck</td></tr>
-              <tr><td style="padding:6px 0">🏅 Certification exams + shareable certificates</td></tr>
+              <tr><td style="padding:6px 0;border-bottom:1px solid #f3f4f6">💡 Detailed hints when you're stuck in a lesson</td></tr>
+              <tr><td style="padding:6px 0">🧭 Extra help that keeps you moving without leaving the editor</td></tr>
             </table>
             <a href="${BASE_URL}/pricing" style="display:inline-block;padding:12px 24px;background:${isUrgent ? "#b45309" : "#4f46e5"};color:#fff;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px">
               Subscribe to ${planType} Pro →
