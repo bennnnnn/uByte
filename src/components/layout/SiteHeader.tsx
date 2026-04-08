@@ -1,4 +1,3 @@
-import { Suspense } from "react";
 import Link from "next/link";
 import AuthButtons from "@/components/AuthButtons";
 import HeaderNavLinks from "@/components/layout/HeaderNavLinks";
@@ -37,9 +36,7 @@ export default function SiteHeader() {
         <HeaderNavLinks side="right" />
 
         {/* Auth */}
-        <Suspense fallback={<div className="h-8 w-44 animate-pulse rounded-lg bg-zinc-100 dark:bg-zinc-800" />}>
-          <AuthButtons />
-        </Suspense>
+        <AuthButtons />
 
       </div>
     </header>

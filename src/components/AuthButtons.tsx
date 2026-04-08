@@ -2,11 +2,10 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useAuth } from "./AuthProvider";
 import UserMenuDropdown from "./auth/UserMenuDropdown";
 import NotificationPopover from "./auth/NotificationPopover";
-import { useIsMobile } from "@/hooks/useIsMobile";
 import { buildAuthPageHref } from "@/lib/auth-redirect";
 
 const linkBase =
@@ -14,24 +13,24 @@ const linkBase =
 
 export default function AuthButtons() {
   const { user, loading } = useAuth();
-  const isMobile = useIsMobile();
   const pathname = usePathname();
   const router = useRouter();
-  const searchParams = useSearchParams();
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const [unreadCount, setUnreadCount] = useState(0);
-  const currentParams = new URLSearchParams(searchParams.toString());
-  currentParams.delete("signup");
-  const currentPath = `${pathname}${currentParams.toString() ? `?${currentParams.toString()}` : ""}`;
-  const loginHref = buildAuthPageHref("login", currentPath);
-  const signupHref = buildAuthPageHref("signup", currentPath);
+  const loginHref = buildAuthPageHref("login", pathname);
+  const signupHref = buildAuthPageHref("signup", pathname);
 
   useEffect(() => {
+    if (typeof window === "undefined") return;
+
     if (loading || user) return;
-    if (searchParams.get("signup") !== "1") return;
-    router.replace(signupHref);
-  }, [loading, router, searchParams, signupHref, user]);
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("signup") !== "1") return;
+    params.delete("signup");
+    const nextPath = `${pathname}${params.toString() ? `?${params.toString()}` : ""}`;
+    router.replace(buildAuthPageHref("signup", nextPath));
+  }, [loading, pathname, router, user]);
 
   useEffect(() => {
     if (!user) return;
@@ -79,9 +78,9 @@ export default function AuthButtons() {
     );
   }
 
-  if (isMobile) {
-    return (
-      <div className="relative" ref={menuRef}>
+  return (
+    <>
+      <div className="relative md:hidden" ref={menuRef}>
         <button
           type="button"
           onClick={() => setMenuOpen((open) => !open)}
@@ -113,27 +112,24 @@ export default function AuthButtons() {
           </div>
         )}
       </div>
-    );
-  }
 
-  return (
-    <div className="flex items-center gap-2">
-      <Link href="/pricing" className={linkBase}>
-        Pricing
-      </Link>
-      <Link
-        href={loginHref}
-        className="rounded-lg px-4 py-2 text-sm font-medium text-zinc-600 transition-colors hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-200"
-      >
-        Log in
-      </Link>
-      <Link
-        href={signupHref}
-        className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-indigo-500"
-      >
-        Sign up
-      </Link>
-    </div>
+      <div className="hidden items-center gap-2 md:flex">
+        <Link href="/pricing" className={linkBase}>
+          Pricing
+        </Link>
+        <Link
+          href={loginHref}
+          className="rounded-lg px-4 py-2 text-sm font-medium text-zinc-600 transition-colors hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-200"
+        >
+          Log in
+        </Link>
+        <Link
+          href={signupHref}
+          className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-indigo-500"
+        >
+          Sign up
+        </Link>
+      </div>
+    </>
   );
 }
-

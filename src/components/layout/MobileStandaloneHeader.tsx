@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, Suspense } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import AuthButtons from "@/components/AuthButtons";
@@ -111,9 +111,7 @@ export default function MobileStandaloneHeader() {
           <span className="text-lg font-bold">uByte</span>
         </Link>
         <div className="flex items-center gap-1">
-          <Suspense fallback={<div className="h-9 w-9 rounded-lg bg-zinc-200 dark:bg-zinc-800 animate-pulse" />}>
-            <AuthButtons />
-          </Suspense>
+          <AuthButtons />
           <button
             type="button"
             onClick={() => { setOpen(!open); if (open) setExpandedSection(null); }}
