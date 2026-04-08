@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useAuth } from "@/components/AuthProvider";
 import TutorialChat from "@/components/TutorialChat";
-import DiscussionThread from "@/app/practice/[lang]/[slug]/DiscussionThread";
+import DiscussionThread from "@/components/discussion/DiscussionThread";
 
 interface Props {
   lang: string;

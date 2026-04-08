@@ -95,7 +95,7 @@ export const POST = withErrorHandling("POST /api/auth/google-id-token", async (r
       user.id,
       "success",
       "Welcome to uByte! 🎉",
-      "Your account is ready. Start with a tutorial, tackle an interview problem, or take a free certification exam.",
+      "Your account is ready. Start with a tutorial and use paid hints only when you want extra help.",
       "/tutorial/go"
     ).catch(() => {});
     if (referralCode && /^[a-z0-9]{6,16}$/i.test(referralCode)) {

@@ -14,14 +14,13 @@ interface Props {
 }
 
 /** Build a correct href for a bookmark.
- *  - practice:two-sum  → /practice/go/two-sum
+ *  - practice:two-sum  → /tutorial/go
  *  - getting-started   → /tutorial/go/getting-started
  */
 function bookmarkHref(tutorialSlug: string, language: string): string {
   const lang = language || "go";
   if (tutorialSlug.startsWith("practice:")) {
-    const problemSlug = tutorialSlug.slice("practice:".length);
-    return `/practice/${lang}/${problemSlug}`;
+    return `/tutorial/${lang}`;
   }
   return `/tutorial/${lang}/${tutorialSlug}`;
 }
@@ -29,8 +28,7 @@ function bookmarkHref(tutorialSlug: string, language: string): string {
 /** Human-readable label for the bookmark link. */
 function bookmarkLabel(tutorialSlug: string): string {
   if (tutorialSlug.startsWith("practice:")) {
-    const slug = tutorialSlug.slice("practice:".length);
-    return slug.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+    return "Saved from the old practice section";
   }
   return tutorialSlug.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
 }
@@ -45,7 +43,7 @@ function BookmarkBadge({ tutorialSlug, language }: { tutorialSlug: string; langu
           ? "bg-violet-100 text-violet-700 dark:bg-violet-900/40 dark:text-violet-300"
           : "bg-indigo-100 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-300"
       }`}>
-        {isPractice ? "Interview Prep" : "Tutorial"}
+        {isPractice ? "Archived" : "Tutorial"}
       </span>
       <span className="rounded-full bg-zinc-100 px-2 py-0.5 text-[11px] font-medium capitalize text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400">
         {language || "go"}
@@ -76,7 +74,7 @@ export default function BookmarksTab({ bookmarks, hasMore, total, onDelete, onLo
       {total === 0 ? (
         <div className="rounded-xl border border-zinc-200 p-8 text-center dark:border-zinc-800">
           <p className="text-zinc-400">
-            No bookmarks yet. Click the bookmark icon on any tutorial code example or interview prep problem to save it.
+            No bookmarks yet. Click the bookmark icon on any tutorial code example to save it.
           </p>
         </div>
       ) : (

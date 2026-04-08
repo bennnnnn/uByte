@@ -7,7 +7,7 @@ import { BASE_URL, APP_NAME } from "@/lib/constants";
 export const metadata: Metadata = {
   title: "Blog — Programming Tutorials & Guides",
   description:
-    "Programming tutorials, interview prep guides, and language deep-dives from the uByte team. Go, Python, Rust, JavaScript, Java, and C++.",
+    "Programming tutorials, lesson guides, and language deep-dives from the uByte team. Go, Python, Rust, JavaScript, Java, and more.",
   keywords: [
     ...SITE_KEYWORDS,
     "programming blog",
@@ -22,14 +22,14 @@ export const metadata: Metadata = {
     type: "website",
     title: "uByte Blog — Programming Tutorials & Guides",
     description:
-      "In-depth programming tutorials, interview prep guides, and language comparisons from the uByte team.",
+      "In-depth programming tutorials, lesson guides, and language comparisons from the uByte team.",
     url: absoluteUrl("/blog"),
     images: [{ url: `${BASE_URL}/api/og?title=Blog&description=Programming+tutorials+%26+guides`, width: 1200, height: 630 }],
   },
   twitter: {
     card: "summary_large_image",
     title: "uByte Blog — Programming Tutorials & Guides",
-    description: "In-depth programming tutorials, interview prep guides, and language comparisons from the uByte team.",
+    description: "In-depth programming tutorials, lesson guides, and language comparisons from the uByte team.",
   },
 };
 
@@ -53,7 +53,7 @@ export default async function BlogPage() {
     "@context": "https://schema.org",
     "@type": "Blog",
     name: `${APP_NAME} Blog`,
-    description: "Programming tutorials, interview prep guides, and language deep-dives.",
+    description: "Programming tutorials, lesson guides, and language deep-dives.",
     url: absoluteUrl("/blog"),
     publisher: buildOrganizationJsonLd(),
     blogPost: posts.slice(0, 10).map((post) => ({
@@ -78,7 +78,7 @@ export default async function BlogPage() {
             Tutorials & Guides
           </h1>
           <p className="mt-4 max-w-2xl text-base text-zinc-600 dark:text-zinc-400">
-            In-depth programming tutorials, interview prep guides, and language deep-dives — with real code you can run in your browser.
+            In-depth programming tutorials, lesson guides, and language deep-dives — with real code you can run in your browser.
           </p>
         </section>
 

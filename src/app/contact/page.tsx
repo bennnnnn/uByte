@@ -7,7 +7,7 @@ import ContactClient from "./ContactClient";
 export const metadata: Metadata = {
   title: "Contact Us — uByte",
   description:
-    "Get help with your uByte account, billing, certifications, or send feedback. We typically respond within one business day.",
+    "Get help with your uByte account, billing, tutorials, or send feedback. We typically respond within one business day.",
   alternates: { canonical: absoluteUrl("/contact") },
   openGraph: {
     type: "website",
@@ -34,7 +34,7 @@ export default function ContactPage() {
         <p>
           Get in touch with the uByte team. We typically respond within one
           business day. You can reach us for general questions, billing and
-          subscription help, bug reports, feature requests, certificate or exam
+          subscription help, bug reports, feature requests, tutorial or lesson
           issues, account problems, privacy and data requests, or anything else.
         </p>
 
@@ -54,7 +54,7 @@ export default function ContactPage() {
             <li>Billing and subscription</li>
             <li>Bug report</li>
             <li>Feature request</li>
-            <li>Certificate or exam issue</li>
+            <li>Tutorial or lesson issue</li>
             <li>Account problem</li>
             <li>Privacy or data request</li>
           </ul>

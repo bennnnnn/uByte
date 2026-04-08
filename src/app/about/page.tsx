@@ -6,7 +6,7 @@ import { ALL_LANGUAGE_KEYS, LANGUAGES as LANG_REGISTRY } from "@/lib/languages/r
 export const metadata: Metadata = {
   title: "About",
   description:
-    "uByte is a free interactive coding platform — step-by-step tutorials, real interview prep problems, and verifiable certifications, all in your browser. No setup required.",
+    "uByte is a free interactive coding tutorial platform with step-by-step lessons that run in your browser. No setup required.",
   keywords: [...SITE_KEYWORDS, "about uByte", "coding education platform", "free coding tutorials"],
   alternates: { canonical: absoluteUrl("/about") },
   openGraph: {
@@ -14,13 +14,13 @@ export const metadata: Metadata = {
     title: "About uByte",
     description: "Learn why we built uByte and what we believe about learning to code.",
     url: absoluteUrl("/about"),
-    images: [{ url: absoluteUrl("/api/og?title=About+uByte&description=Free+interactive+coding+tutorials+and+certifications"), width: 1200, height: 630 }],
+    images: [{ url: absoluteUrl("/api/og?title=About+uByte&description=Free+interactive+coding+tutorials"), width: 1200, height: 630 }],
   },
   twitter: {
     card: "summary_large_image",
     title: "About uByte",
     description: "Learn why we built uByte and what we believe about learning to code.",
-    images: [absoluteUrl("/api/og?title=About+uByte&description=Free+interactive+coding+tutorials+and+certifications")],
+    images: [absoluteUrl("/api/og?title=About+uByte&description=Free+interactive+coding+tutorials")],
   },
 };
 
@@ -35,11 +35,11 @@ const VALUES = [
   },
   {
     title: "Free for everyone",
-    body: "All tutorials, all interview prep problems, and all certification exams are free. No paywalls on content. Pro adds on-demand hints, code feedback, and interview coaching for those who want to move faster.",
+    body: "Every lesson is free. No paywalls on content. Pro only adds detailed hints and extra guidance for learners who want help without leaving the lesson.",
   },
   {
-    title: "Proof that travels",
-    body: "A certificate you can't prove means nothing. Our certificates have unique IDs, are publicly verifiable, and link directly to LinkedIn — so your work actually shows up on your résumé.",
+    title: "Help when you want it",
+    body: "The core product stays simple: learn for free, then pay only if you want detailed hints at the exact point where you're stuck.",
   },
 ];
 
@@ -72,12 +72,12 @@ export default function AboutPage() {
             About uByte
           </p>
           <h1 className="text-4xl font-black tracking-tight text-zinc-900 dark:text-zinc-100 sm:text-5xl">
-            A free coding platform built for{" "}
+            A free tutorial platform built for{" "}
             <span className="text-indigo-600 dark:text-indigo-400">developers who ship.</span>
           </h1>
           <p className="mt-5 max-w-2xl text-lg text-zinc-600 dark:text-zinc-400">
-            uByte is a free, interactive learning platform with tutorials, interview prep, and certifications
-            across multiple languages. Every lesson runs in your browser. Every certificate is verifiable. No fluff.
+            uByte is a free, interactive learning platform focused on tutorials across multiple languages.
+            Every lesson runs in your browser. Pay only if you want detailed hints. No fluff.
           </p>
         </section>
 
@@ -94,8 +94,7 @@ export default function AboutPage() {
               the fastest path from zero to productive is hands on, in your browser, with immediate feedback.</strong>
             </p>
             <p>
-              That means live code execution, AI feedback on your specific solution, interview problems that actually
-              show up in hiring pipelines, and certification exams that produce credentials you can point to on LinkedIn.
+              That means live code execution, focused lessons, and optional paid hints right inside the tutorial.
               No setup required — open a browser, start writing code.
             </p>
           </div>
@@ -121,7 +120,7 @@ export default function AboutPage() {
         <section className="mb-14 rounded-3xl border border-zinc-200 bg-surface-card p-8 shadow-sm dark:border-zinc-800">
           <h2 className="mb-2 text-2xl font-bold text-zinc-900 dark:text-zinc-100">Multiple languages, done right</h2>
           <p className="mb-6 text-base text-zinc-600 dark:text-zinc-400">
-            Each language has a full tutorial track, curated interview prep problems, and a timed certification exam — all free.
+            Each language has a full tutorial track built around short, interactive lessons you can complete in the browser.
           </p>
           <div className="flex flex-wrap gap-3">
             {languages.map((lang) => (

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState, useRef, useCallback, useEffect } from "react";
 import { usePathname } from "next/navigation";
+import { useAuth } from "@/components/AuthProvider";
 
 // All supported tutorial languages.
 const ALL_LANGS = [
@@ -102,6 +103,7 @@ function NavDropdown({
 export default function HeaderNavLinks({ side = "left" }: { side?: "left" }) {
   const [openMenu, setOpenMenu] = useState<DropdownId | null>(null);
   const pathname = usePathname();
+  const { user } = useAuth();
 
   const handleOpen  = useCallback((id: DropdownId) => setOpenMenu(id), []);
   const handleClose = useCallback(() => setOpenMenu(null), []);
@@ -147,20 +149,22 @@ export default function HeaderNavLinks({ side = "left" }: { side?: "left" }) {
       </NavDropdown>
 
       <Link
-        href="/dashboard"
-        aria-current={pathname.startsWith("/dashboard") ? "page" : undefined}
+        href="/leaderboard"
+        aria-current={pathname.startsWith("/leaderboard") ? "page" : undefined}
         className={linkBase}
       >
-        Dashboard
+        Leaderboard
       </Link>
 
-      <Link
-        href="/help"
-        aria-current={pathname.startsWith("/help") ? "page" : undefined}
-        className={linkBase}
-      >
-        Help
-      </Link>
+      {user && (
+        <Link
+          href="/dashboard"
+          aria-current={pathname.startsWith("/dashboard") ? "page" : undefined}
+          className={linkBase}
+        >
+          Dashboard
+        </Link>
+      )}
 
     </nav>
   );

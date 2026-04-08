@@ -135,20 +135,22 @@ export default function MobileStandaloneHeader() {
           </AccordionSection>
 
           <Link
-            href="/dashboard"
+            href="/leaderboard"
             onClick={close}
             className="flex items-center rounded-xl border border-zinc-100 bg-white px-4 py-3 text-sm font-bold text-zinc-700 transition-colors hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:bg-zinc-800"
           >
-            Dashboard
+            Leaderboard
           </Link>
 
-          <Link
-            href="/help"
-            onClick={close}
-            className="flex items-center rounded-xl border border-zinc-100 bg-white px-4 py-3 text-sm font-bold text-zinc-700 transition-colors hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:bg-zinc-800"
-          >
-            Help
-          </Link>
+          {user && (
+            <Link
+              href="/dashboard"
+              onClick={close}
+              className="flex items-center rounded-xl border border-zinc-100 bg-white px-4 py-3 text-sm font-bold text-zinc-700 transition-colors hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:bg-zinc-800"
+            >
+              Dashboard
+            </Link>
+          )}
 
           {/* Standalone links — hide Pricing for Pro users */}
           {!(user && isPro) && (

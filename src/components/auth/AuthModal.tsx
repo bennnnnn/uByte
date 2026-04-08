@@ -216,7 +216,7 @@ export default function AuthModal({ onClose, initialMode }: Props) {
                 {mode === "forgot"
                   ? "We’ll email you a link to reset your password."
                   : mode === "signup"
-                    ? "Free tutorials, interview prep, and certifications."
+                    ? "Every lesson is free. Pay only if you want detailed hints."
                     : "Sign in to continue to uByte."}
               </p>
             </div>

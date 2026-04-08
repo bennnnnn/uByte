@@ -106,7 +106,7 @@ export default function CategoryBrowse() {
             Pick a language and start in 30 seconds
           </h2>
           <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
-            Every track includes tutorials, interview practice, and a free certification exam.
+            Every track is built around free interactive lessons. Pay only if you want detailed hints along the way.
           </p>
         </div>
         <Link

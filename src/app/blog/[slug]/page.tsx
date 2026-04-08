@@ -226,7 +226,7 @@ export default async function BlogPostPage({ params, searchParams }: Props) {
             Get new articles in your inbox
           </h2>
           <p className="mb-4 text-sm text-zinc-600 dark:text-zinc-400">
-            We write about Go, Python, interview prep, and software engineering careers. No spam — unsubscribe anytime.
+            We write about Go, Python, lesson design, and software engineering careers. No spam — unsubscribe anytime.
           </p>
           <Link
             href="/signup"
@@ -236,26 +236,26 @@ export default async function BlogPostPage({ params, searchParams }: Props) {
           </Link>
         </div>
 
-        {/* Practice CTA */}
+        {/* Tutorial CTA */}
         <div className="mt-6 rounded-2xl border border-indigo-100 bg-indigo-50/60 p-7 dark:border-indigo-900/40 dark:bg-indigo-950/30">
           <h2 className="mb-1 text-lg font-bold text-zinc-900 dark:text-zinc-100">
-            Practice what you just read
+            Keep learning in the tutorial app
           </h2>
           <p className="mb-5 text-sm text-zinc-600 dark:text-zinc-400">
-            uByte has interactive coding tutorials, curated interview problems, and timed certification exams — all in your browser.
+            uByte gives you interactive tutorials with free lessons in your browser. Pay only when you want detailed hints inside the lesson.
           </p>
           <div className="flex flex-wrap gap-3">
             <Link
-              href="/practice"
+              href="/tutorial"
               className="rounded-xl bg-indigo-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-indigo-700"
             >
-              Try Interview Prep →
+              Browse tutorials →
             </Link>
             <Link
-              href="/certifications"
+              href="/pricing"
               className="rounded-xl border border-indigo-200 bg-white px-4 py-2 text-sm font-semibold text-indigo-700 transition-colors hover:bg-indigo-50 dark:border-indigo-700 dark:bg-indigo-900/20 dark:text-indigo-300 dark:hover:bg-indigo-900/40"
             >
-              View Certifications
+              See hint pricing
             </Link>
           </div>
         </div>

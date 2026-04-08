@@ -138,7 +138,7 @@ export default function OutputPanel({
                 💡 Hints are a Pro feature
               </p>
               <p className="text-xs text-zinc-600 dark:text-zinc-400">
-                Upgrade to Pro for instant hints when you hit a wall — on any tutorial step or practice problem.
+                Upgrade to Pro for detailed hints when you hit a wall in any lesson.
               </p>
               <Link
                 href="/pricing"

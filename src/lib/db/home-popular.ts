@@ -2,12 +2,10 @@ import { unstable_cache } from "next/cache";
 import { getSql } from "./client";
 import { getAllLanguageSlugs, getLanguageConfig, isSupportedLanguage } from "@/lib/languages/registry";
 import { getAllTutorials } from "@/lib/tutorials";
-import { getAllPracticeProblems, getPracticeProblemBySlug } from "@/lib/practice/problems";
 import type { SupportedLanguage } from "@/lib/languages/types";
 
 const UNDEFINED_COLUMN = "42703";
 const LIMIT_TUTORIALS = 6;
-const LIMIT_PRACTICE = 6;
 
 export interface PopularLanguage {
   slug: string;
@@ -21,12 +19,6 @@ export interface PopularTutorial {
   slug: string;
   title: string;
   completionCount: number;
-}
-
-export interface PopularPracticeProblem {
-  slug: string;
-  title: string;
-  viewCount: number;
 }
 
 /** Popular languages by completion count (from progress table). */
@@ -108,61 +100,10 @@ export const getPopularTutorials = unstable_cache(
   { revalidate: 300, tags: ["home-popular"] }
 );
 
-/** Record an interview prep problem view (for popularity). */
-export async function recordPracticeView(viewerId: string, problemSlug: string): Promise<void> {
-  const sql = getSql();
-  try {
-    await sql`
-      INSERT INTO practice_views (viewer_id, problem_slug)
-      VALUES (${viewerId}, ${problemSlug})
-      ON CONFLICT (viewer_id, problem_slug) DO NOTHING
-    `;
-  } catch (err: unknown) {
-    if ((err as { code?: string })?.code === "42P01") return; /* table does not exist */
-    throw err;
-  }
-}
-
-/** Popular interview prep problems by view count (from practice_views table). */
-export const getPopularPracticeProblems = unstable_cache(
-  async (): Promise<PopularPracticeProblem[]> => {
-    const sql = getSql();
-    try {
-      const rows = await sql`
-        SELECT problem_slug AS slug, COUNT(*)::int AS c
-        FROM practice_views
-        GROUP BY problem_slug
-        ORDER BY c DESC
-        LIMIT ${LIMIT_PRACTICE}
-      `;
-      return rows.map((r) => {
-        const slug = r.slug as string;
-        const problem = getPracticeProblemBySlug(slug);
-        return {
-          slug,
-          title: problem?.title ?? slug,
-          viewCount: (r.c as number) ?? 0,
-        };
-      });
-    } catch (err: unknown) {
-      if ((err as { code?: string })?.code === "42P01") return []; /* table does not exist */
-      throw err;
-    }
-  },
-  ["popular-practice-problems"],
-  { revalidate: 300, tags: ["home-popular"] }
-);
-
-/** Fallback when DB has no data: return all languages and all interview prep problems. */
+/** Fallback when DB has no data: return all tutorial languages. */
 export function getFallbackPopularLanguages(): PopularLanguage[] {
   return getAllLanguageSlugs()
     .map((slug) => ({ slug, config: getLanguageConfig(slug) }))
     .filter((e): e is { slug: string; config: NonNullable<ReturnType<typeof getLanguageConfig>> } => !!e.config)
     .map(({ slug, config }) => ({ slug, name: config.name, learnerCount: 0 }));
-}
-
-export function getFallbackPopularPracticeProblems(): PopularPracticeProblem[] {
-  return getAllPracticeProblems()
-    .slice(0, LIMIT_PRACTICE)
-    .map((p) => ({ slug: p.slug, title: p.title, viewCount: 0 }));
 }

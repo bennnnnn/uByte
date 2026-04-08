@@ -109,7 +109,7 @@ export function SearchPageClient() {
                 No results for &ldquo;{query.trim()}&rdquo;
               </p>
               <p className="mt-2 text-sm text-zinc-500 dark:text-zinc-400">
-                Try different keywords or browse <TextLink href="/tutorial/go">tutorials</TextLink> and <TextLink href="/practice">interview prep</TextLink>.
+                Try different keywords or browse <TextLink href="/tutorial/go">tutorials</TextLink> and <TextLink href="/tutorial">language tracks</TextLink>.
               </p>
             </li>
           ) : (

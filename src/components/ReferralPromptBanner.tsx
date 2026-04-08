@@ -75,7 +75,7 @@ export default function ReferralPromptBanner() {
               Invite a friend, get 1 month of Pro free
             </p>
             <p className="mt-0.5 text-xs text-zinc-600 dark:text-zinc-400">
-              Share your link. Every friend who goes Pro extends your Pro by 30 days — hints, code feedback &amp; interview coaching included. No limit.
+              Share your link. Every friend who goes Pro extends your Pro by 30 days, so you can keep getting detailed hints and extra lesson help. No limit.
             </p>
           </div>
         </div>

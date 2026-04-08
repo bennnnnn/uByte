@@ -2,7 +2,7 @@
 
 /**
  * GuestConversionPrompt — shown to guests after they achieve something
- * meaningful (e.g., first accepted solution or 3 completed tutorial steps).
+ * meaningful (e.g., first 3 completed tutorial steps).
  *
  * Renders a slide-up banner anchored to the bottom of the screen.
  * Dismissed state is persisted in sessionStorage so it doesn't re-appear
@@ -11,7 +11,7 @@
  * Usage:
  *   <GuestConversionPrompt
  *     trigger={isGuest && didFirstSolve}
- *     context="practice"
+ *     context="tutorial"
  *   />
  */
 
@@ -21,7 +21,7 @@ const AuthModal = lazy(() => import("@/components/auth/AuthModal"));
 
 const SESSION_KEY = "ubyte_guest_prompt_dismissed";
 
-export type ConversionContext = "practice" | "tutorial";
+export type ConversionContext = "tutorial";
 
 interface Props {
   /** Show the prompt when this flips to true (and user is a guest). */
@@ -31,17 +31,13 @@ interface Props {
 }
 
 const COPY: Record<ConversionContext, { headline: string; body: string }> = {
-  practice: {
-    headline: "Nice work — save your progress!",
-    body: "Create a free account to track solved problems, save your code, and get hints when you're stuck.",
-  },
   tutorial: {
     headline: "You're on a roll! Keep it going.",
-    body: "Sign up for free to save your progress, earn XP, and build a learning streak.",
+    body: "Sign up for free to save your progress, earn XP, and come back exactly where you left off.",
   },
 };
 
-export default function GuestConversionPrompt({ trigger, context = "practice" }: Props) {
+export default function GuestConversionPrompt({ trigger, context = "tutorial" }: Props) {
   const [visible, setVisible] = useState(false);
   const [authOpen, setAuthOpen] = useState(false);
 

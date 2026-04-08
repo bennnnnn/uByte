@@ -20,6 +20,9 @@ import { readStoredReferralCode } from "@/components/ReferralTracker";
 
 type Mode = "login" | "signup" | "forgot";
 
+const SIGNUP_EYEBROW = "Tutorials first";
+const LOGIN_EYEBROW = "Welcome back";
+
 const SIGNUP_VALUE_POINTS = [
   "Interactive tutorials across 9 languages",
   "Live code execution right in your browser",
@@ -30,6 +33,18 @@ const LOGIN_VALUE_POINTS = [
   "Your XP, streaks, and completed lessons are waiting",
   "Pick up your next tutorial exactly where you left off",
   "One login away from your next lesson",
+];
+
+const SIGNUP_NEXT_STEPS = [
+  "Choose the language you want to start with",
+  "Open your first lesson immediately after signup",
+  "Keep your progress synced across devices",
+];
+
+const LOGIN_QUICK_FACTS = [
+  { value: "9", label: "languages ready" },
+  { value: "Live", label: "code execution" },
+  { value: "Saved", label: "progress & bookmarks" },
 ];
 
 export default function AuthPage({ variant }: { variant: AuthPageMode }) {
@@ -54,6 +69,7 @@ export default function AuthPage({ variant }: { variant: AuthPageMode }) {
   const storedRef = typeof window !== "undefined" ? readStoredReferralCode() : null;
   const googleHref = buildGoogleAuthHref(mode === "signup" ? "signup" : "login", nextPath, storedRef);
   const isSignupPage = mode === "signup";
+  const isForgotPage = mode === "forgot";
 
   useEffect(() => {
     firstInputRef.current?.focus();
@@ -133,31 +149,75 @@ export default function AuthPage({ variant }: { variant: AuthPageMode }) {
 
   return (
     <div className="min-h-[100svh] text-zinc-950 dark:text-zinc-50">
-      <div className="mx-auto grid min-h-[100svh] max-w-5xl gap-10 px-5 py-6 lg:grid-cols-[0.9fr_1.1fr] lg:px-8 lg:py-10">
+      <div className="mx-auto grid min-h-[100svh] max-w-6xl gap-8 px-5 py-6 lg:grid-cols-[1fr_1.05fr] lg:px-8 lg:py-10">
         <section className="px-1 py-3 sm:px-2">
-          <div className="flex h-full flex-col">
-            <div className="max-w-xl">
-              <h1 className="mt-4 text-3xl font-black tracking-tight text-zinc-950 sm:text-4xl dark:text-white">
-                {isSignupPage
-                  ? "Learn to code by writing real code."
-                  : "Good to have you back."}
-              </h1>
-              <p className="mt-4 max-w-lg text-base leading-7 text-zinc-600 dark:text-zinc-400">
-                {isSignupPage
-                  ? "Short, interactive lessons with a real code editor — no setup needed."
-                  : "Sign in to continue where you left off, track your streak, and keep moving through your tutorials."}
-              </p>
+          <div className="relative h-full overflow-hidden rounded-[32px] border border-zinc-200 bg-gradient-to-br from-white via-indigo-50/50 to-zinc-50 p-7 shadow-[0_24px_70px_rgba(15,23,42,0.06)] dark:border-zinc-800 dark:from-zinc-950 dark:via-indigo-950/20 dark:to-zinc-900">
+            <div className="pointer-events-none absolute inset-0 overflow-hidden">
+              <div className="absolute -right-16 top-0 h-48 w-48 rounded-full bg-indigo-200/35 blur-3xl dark:bg-indigo-700/15" />
+              <div className="absolute -left-10 bottom-0 h-40 w-40 rounded-full bg-sky-200/25 blur-3xl dark:bg-sky-700/10" />
             </div>
 
-            <div className="mt-8 space-y-3">
-              {(isSignupPage ? SIGNUP_VALUE_POINTS : LOGIN_VALUE_POINTS).map((point) => (
-                <div key={point} className="flex items-start gap-3 px-1 py-2">
-                  <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-indigo-600 text-[11px] font-black text-white">
-                    ✓
-                  </span>
-                  <p className="text-sm leading-6 text-zinc-700 dark:text-zinc-300">{point}</p>
+            <div className="relative flex h-full flex-col">
+              <div className="max-w-xl">
+                <p className="inline-flex items-center gap-2 rounded-full border border-indigo-200 bg-white/80 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.18em] text-indigo-700 dark:border-indigo-800 dark:bg-zinc-900/80 dark:text-indigo-300">
+                  {isSignupPage ? SIGNUP_EYEBROW : LOGIN_EYEBROW}
+                </p>
+
+                <h1 className="mt-5 text-3xl font-black tracking-tight text-zinc-950 sm:text-4xl dark:text-white">
+                  {isSignupPage
+                    ? "Start learning in the editor, not in setup."
+                    : "Your tutorial track is still here."}
+                </h1>
+
+                <p className="mt-4 max-w-lg text-base leading-7 text-zinc-600 dark:text-zinc-400">
+                  {isSignupPage
+                    ? "Short, interactive lessons with real code, instant feedback, and a clean path into your first language."
+                    : "Sign in to continue your lessons, keep your streak alive, and jump straight back into the next step."}
+                </p>
+              </div>
+
+              <div className="mt-8 space-y-3">
+                {(isSignupPage ? SIGNUP_VALUE_POINTS : LOGIN_VALUE_POINTS).map((point) => (
+                  <div key={point} className="flex items-start gap-3 rounded-2xl border border-white/70 bg-white/80 px-4 py-3 shadow-sm dark:border-zinc-800 dark:bg-zinc-900/70">
+                    <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-indigo-600 text-[11px] font-black text-white">
+                      ✓
+                    </span>
+                    <p className="text-sm leading-6 text-zinc-700 dark:text-zinc-300">{point}</p>
+                  </div>
+                ))}
+              </div>
+
+              {isSignupPage ? (
+                <div className="mt-8 rounded-[28px] border border-zinc-200 bg-white/85 p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-900/80">
+                  <p className="text-sm font-bold text-zinc-900 dark:text-zinc-100">
+                    What happens next
+                  </p>
+                  <div className="mt-4 space-y-3">
+                    {SIGNUP_NEXT_STEPS.map((step, index) => (
+                      <div key={step} className="flex items-start gap-3">
+                        <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-indigo-100 text-xs font-black text-indigo-700 dark:bg-indigo-950/60 dark:text-indigo-300">
+                          {index + 1}
+                        </span>
+                        <p className="text-sm text-zinc-600 dark:text-zinc-400">{step}</p>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              ))}
+              ) : (
+                <div className="mt-8 rounded-[28px] border border-zinc-200 bg-white/85 p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-900/80">
+                  <p className="text-sm font-bold text-zinc-900 dark:text-zinc-100">
+                    Back in flow
+                  </p>
+                  <div className="mt-4 grid grid-cols-3 gap-3">
+                    {LOGIN_QUICK_FACTS.map((fact) => (
+                      <div key={fact.label} className="rounded-2xl border border-zinc-200 bg-zinc-50/80 px-3 py-4 text-center dark:border-zinc-800 dark:bg-zinc-950/70">
+                        <p className="text-lg font-black text-zinc-900 dark:text-zinc-100">{fact.value}</p>
+                        <p className="mt-1 text-[11px] uppercase tracking-[0.14em] text-zinc-400">{fact.label}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </section>
@@ -166,15 +226,16 @@ export default function AuthPage({ variant }: { variant: AuthPageMode }) {
           <div className="w-full max-w-xl rounded-[30px] bg-surface-card p-7 shadow-[0_24px_70px_rgba(15,23,42,0.10)] xl:p-9 dark:shadow-[0_24px_70px_rgba(2,6,23,0.45)]">
             <div className="mb-6">
               <h2 className="text-3xl font-black tracking-tight text-zinc-950 dark:text-white">
-                {mode === "forgot" ? "Reset your password" : isSignupPage ? "Sign up" : "Sign in"}
+                {isForgotPage ? "Reset your password" : isSignupPage ? "Create your free account" : "Sign in to continue"}
               </h2>
-            </div>
-
-            {mode === "forgot" && (
-              <p className="text-sm leading-6 text-zinc-600 dark:text-zinc-400">
-                Enter the email on your account and we’ll send a reset link.
+              <p className="mt-2 text-sm leading-6 text-zinc-600 dark:text-zinc-400">
+                {isForgotPage
+                  ? "Enter the email on your account and we’ll send you a reset link."
+                  : isSignupPage
+                    ? "Start with Google or email. After signup, you’ll choose a language and jump straight into your first lesson."
+                    : "Use Google or email to get back to your saved lessons, bookmarks, and streaks."}
               </p>
-            )}
+            </div>
 
             <div className="mt-6">
               <Suspense>
@@ -244,7 +305,7 @@ export default function AuthPage({ variant }: { variant: AuthPageMode }) {
                   className="mt-6 flex w-full items-center justify-center gap-3 rounded-2xl border border-zinc-200 bg-surface-page px-4 py-3.5 text-sm font-semibold text-zinc-800 shadow-sm transition-colors hover:border-zinc-300 hover:bg-zinc-50 dark:border-zinc-800 dark:bg-surface-page dark:text-zinc-100 dark:hover:border-zinc-700 dark:hover:bg-zinc-800"
                 >
                   <GoogleIcon className="h-5 w-5 shrink-0" />
-                  Continue with Google
+                  {isSignupPage ? "Start with Google" : "Continue with Google"}
                 </a>
 
                 {/* OR divider */}
@@ -264,7 +325,7 @@ export default function AuthPage({ variant }: { variant: AuthPageMode }) {
                     <svg className="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
                     </svg>
-                    Continue with Email
+                    {isSignupPage ? "Use email instead" : "Continue with Email"}
                   </button>
                 ) : (
                   <>
@@ -340,7 +401,7 @@ export default function AuthPage({ variant }: { variant: AuthPageMode }) {
                         size="lg"
                         className="w-full"
                       >
-                        {submitting ? (isSignupPage ? "Creating account…" : "Signing in…") : isSignupPage ? "Create free account" : "Sign in"}
+                        {submitting ? (isSignupPage ? "Creating account…" : "Signing in…") : isSignupPage ? "Create account and start learning" : "Sign in and continue"}
                       </Button>
                     </form>
                   </>

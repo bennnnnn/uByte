@@ -24,7 +24,7 @@ import { CodeEditor } from "@/components/editor/CodeEditor";
 import { EditorToolbar } from "@/components/editor/EditorToolbar";
 import { useEditorKeyDown } from "@/hooks/useEditorKeyDown";
 import { tryDecodeShareCode } from "@/lib/share-code";
-import DiscussionThread from "@/app/practice/[lang]/[slug]/DiscussionThread";
+import DiscussionThread from "@/components/discussion/DiscussionThread";
 import { apiFetch } from "@/lib/api-client";
 import CongratsModal from "@/components/tutorial/CongratsModal";
 import MobileTabBar from "@/components/tutorial/MobileTabBar";

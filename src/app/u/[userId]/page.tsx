@@ -1,7 +1,5 @@
 import { notFound } from "next/navigation";
-import Link from "next/link";
-import { getPublicProfile, getCertificatesByUser } from "@/lib/db";
-import { getUserExamStats } from "@/lib/db/exam-attempts";
+import { getPublicProfile } from "@/lib/db";
 import { getTotalLessonCount } from "@/lib/tutorial-steps";
 import { getCompletedStepCountByLanguage } from "@/lib/db/step-progress";
 import Avatar from "@/components/Avatar";
@@ -20,8 +18,8 @@ export async function generateMetadata({ params }: { params: Promise<{ userId: s
   const profile = await getPublicProfile(parseInt(userId, 10));
   if (!profile) return { title: "User not found" };
   const canonical = absoluteUrl(`/u/${userId}`);
-  const title = `${profile.name}'s Coding Profile | uByte`;
-  const description = `${profile.name} has earned ${profile.xp} XP on uByte — interactive coding tutorials, interview prep, and programming certifications.`;
+  const title = `${profile.name}'s Learning Profile | uByte`;
+  const description = `${profile.name} has earned ${profile.xp} XP on uByte by working through interactive coding tutorials and lessons.`;
   const ogImage = absoluteUrl(`/api/og?title=${encodeURIComponent(profile.name)}&description=${encodeURIComponent(`${profile.xp} XP · uByte learner`)}`);
   return {
     title,
@@ -49,11 +47,7 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
   const id = parseInt(userId, 10);
   if (isNaN(id)) notFound();
 
-  const [profile, certificates, examStats] = await Promise.all([
-    getPublicProfile(id),
-    getCertificatesByUser(id),
-    getUserExamStats(id),
-  ]);
+  const profile = await getPublicProfile(id);
 
   if (!profile) notFound();
 
@@ -72,7 +66,19 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
 
   const pct = totalLessons > 0 ? Math.round((completedLessons / totalLessons) * 100) : 0;
   const joinDate = new Date(profile.created_at).toLocaleDateString("en-US", { month: "long", year: "numeric" });
-  const statsMap = new Map(examStats.map((s) => [s.lang, s]));
+  const startedLanguages = allLangs
+    .map((lang) => {
+      const steps = stepCountMap.get(lang) ?? 0;
+      return {
+        lang,
+        steps,
+        lessons: getTotalLessonCount(lang),
+        name: LANGUAGES[lang]?.name ?? lang,
+        icon: LANG_ICONS[lang] ?? "📘",
+      };
+    })
+    .filter((entry) => entry.steps > 0)
+    .sort((a, b) => b.steps - a.steps);
 
   const personJsonLd = {
     "@context": "https://schema.org",
@@ -119,13 +125,13 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
 
       {/* Stats */}
       <div className="mb-8 grid grid-cols-2 gap-3 sm:grid-cols-4">
-        {[
-          { label: "XP", value: profile.xp.toLocaleString(), icon: "⭐" },
-          { label: "Streak", value: `${profile.streak_days}d`, icon: "🔥", sub: `Best: ${profile.longest_streak}d` },
-          { label: "Lessons", value: `${completedLessons}/${totalLessons}`, icon: "📖" },
-          { label: "Certificates", value: String(certificates.length), icon: "🏆" },
-        ].map((s) => (
-          <Card key={s.label} className="p-4">
+          {[
+            { label: "XP", value: profile.xp.toLocaleString(), icon: "⭐" },
+            { label: "Streak", value: `${profile.streak_days}d`, icon: "🔥", sub: `Best: ${profile.longest_streak}d` },
+            { label: "Lessons", value: `${completedLessons}/${totalLessons}`, icon: "📖" },
+            { label: "Languages", value: String(startedLanguages.length), icon: "🌍" },
+          ].map((s) => (
+            <Card key={s.label} className="p-4">
             <div className="mb-1 flex items-center gap-2">
               <span className="text-lg">{s.icon}</span>
               <span className="text-xs font-medium uppercase tracking-wider text-zinc-400">{s.label}</span>
@@ -150,77 +156,36 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
         </p>
       </Card>
 
-      {/* Certifications */}
+      {/* Learning by language */}
       <section className="mb-8">
-        <h2 className="mb-4 text-lg font-bold text-zinc-900 dark:text-zinc-100">Certifications</h2>
-        {certificates.length > 0 ? (
+        <h2 className="mb-4 text-lg font-bold text-zinc-900 dark:text-zinc-100">Learning by language</h2>
+        {startedLanguages.length > 0 ? (
           <div className="grid gap-3 sm:grid-cols-2">
-            {certificates.map((cert) => {
-              const meta = { icon: LANG_ICONS[cert.lang as SupportedLanguage] ?? "📄", name: LANGUAGES[cert.lang as SupportedLanguage]?.name ?? cert.lang };
-              const stat = statsMap.get(cert.lang);
+            {startedLanguages.map((entry) => {
+              const completion = Math.round((entry.steps / Math.max(entry.lessons, 1)) * 100);
               return (
-                <Card key={cert.id} className="flex items-center gap-4 p-4">
+                <Card key={entry.lang} className="flex items-center gap-4 p-4">
                   <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-2xl dark:bg-emerald-950/40">
-                    {meta.icon}
+                    {entry.icon}
                   </span>
                   <div className="min-w-0 flex-1">
                     <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
-                      {meta.name} Certification
+                      {entry.name}
                     </p>
                     <p className="mt-0.5 text-xs text-zinc-500 dark:text-zinc-400">
-                      {stat?.bestScore != null ? `Score: ${stat.bestScore}%` : "Passed"}
-                      {cert.passed_at ? ` · ${new Date(cert.passed_at).toLocaleDateString()}` : ""}
+                      {entry.steps} of {entry.lessons} lessons completed · {completion}%
                     </p>
                   </div>
-                  <Link
-                    href={`/certifications/certificate/${cert.id}`}
-                    className="shrink-0 rounded-lg bg-indigo-600 px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-indigo-700"
-                  >
-                    View
-                  </Link>
                 </Card>
               );
             })}
           </div>
         ) : (
           <Card className="p-6 text-center">
-            <p className="text-sm text-zinc-500 dark:text-zinc-400">No certifications earned yet.</p>
+            <p className="text-sm text-zinc-500 dark:text-zinc-400">No public lesson progress yet.</p>
           </Card>
         )}
       </section>
-
-      {/* Exam activity (attempted but not certified) */}
-      {examStats.filter((s) => !s.hasCertificate && s.attemptCount > 0).length > 0 && (
-        <section className="mb-8">
-          <h2 className="mb-4 text-lg font-bold text-zinc-900 dark:text-zinc-100">Exam activity</h2>
-          <div className="grid gap-3 sm:grid-cols-2">
-            {examStats
-              .filter((s) => !s.hasCertificate && s.attemptCount > 0)
-              .map((stat) => {
-                const meta = { icon: LANG_ICONS[stat.lang as SupportedLanguage] ?? "📄", name: LANGUAGES[stat.lang as SupportedLanguage]?.name ?? stat.lang };
-                return (
-                  <Card key={stat.lang} className="flex items-center gap-4 p-4">
-                    <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-amber-50 text-2xl dark:bg-amber-950/40">
-                      {meta.icon}
-                    </span>
-                    <div className="min-w-0 flex-1">
-                      <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
-                        {meta.name}
-                      </p>
-                      <p className="mt-0.5 text-xs text-zinc-500 dark:text-zinc-400">
-                        {stat.attemptCount} attempt{stat.attemptCount > 1 ? "s" : ""}
-                        {stat.bestScore != null ? ` · Best: ${stat.bestScore}%` : ""}
-                      </p>
-                    </div>
-                    <span className="shrink-0 rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-bold uppercase text-amber-700 dark:bg-amber-950 dark:text-amber-300">
-                      In progress
-                    </span>
-                  </Card>
-                );
-              })}
-          </div>
-        </section>
-      )}
     </div>
   );
 }

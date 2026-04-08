@@ -1,5 +1,4 @@
 import { ImageResponse } from "next/og";
-import { PRACTICE_PROBLEM_COUNT } from "@/lib/practice/problems";
 
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
@@ -70,8 +69,8 @@ export default function OgImage() {
         }}
       >
         <span>Learn to code.</span>
-        <span style={{ color: "#a5b4fc" }}>Get certified free.</span>
-        <span>Get interview-ready.</span>
+        <span style={{ color: "#a5b4fc" }}>Every lesson is free.</span>
+        <span>Pay only for hints.</span>
       </div>
 
       {/* Sub-headline */}
@@ -84,7 +83,7 @@ export default function OgImage() {
           lineHeight: 1.4,
         }}
       >
-        {`9 languages · ${PRACTICE_PROBLEM_COUNT} interview problems · Free certifications`}
+        {"9 languages · interactive lessons · optional paid hints"}
       </div>
 
       {/* Pill badges */}

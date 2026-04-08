@@ -16,47 +16,47 @@ const LANG_SEO_INTRO: Record<string, { whyLearn: string; whatYoullLearn: string;
   go: {
     whyLearn: "Go (Golang), created by Google, is one of the fastest-growing programming languages for backend development, cloud infrastructure, and DevOps. Companies like Google, Uber, Dropbox, and Twitch use Go for its simplicity, blazing-fast compilation, and built-in concurrency. Whether you want to build web servers, microservices, CLI tools, or distributed systems, Go is an excellent choice.",
     whatYoullLearn: "This free, interactive Go course takes you from zero to production-ready. You'll master Go variables, data types, functions, control flow, structs, interfaces, pointers, goroutines, channels, error handling, JSON encoding, HTTP servers, testing, and packages — all by writing and running real Go code in your browser.",
-    whoIsItFor: "Complete beginners who want their first programming language, developers switching from Python or JavaScript to a compiled language, and backend engineers preparing for Go coding interviews.",
+    whoIsItFor: "Complete beginners who want their first programming language, developers switching from Python or JavaScript to a compiled language, and backend engineers who want a clear path into Go.",
   },
   python: {
     whyLearn: "Python is the world's most popular programming language — used in web development, data science, machine learning, automation, and scripting. Companies like Google, Netflix, Instagram, and Spotify rely on Python. Its clean syntax makes it the ideal first language, and its vast ecosystem means you can build almost anything.",
     whatYoullLearn: "This free, interactive Python course covers variables, data types, control flow, loops, functions, lists, dictionaries, tuples, classes, inheritance, encapsulation, dunder methods, dataclasses, generators, modules, error handling, JSON, HTTP requests, and async programming — all by writing and running real Python code in your browser.",
-    whoIsItFor: "Absolute beginners learning to code for the first time, developers who want to add Python to their toolkit, and anyone preparing for Python coding interviews or data science roles.",
+    whoIsItFor: "Absolute beginners learning to code for the first time, developers who want to add Python to their toolkit, and anyone building toward automation, backend, or data work.",
   },
   cpp: {
     whyLearn: "C++ powers game engines, operating systems, embedded systems, high-frequency trading, and performance-critical applications. Companies like Google, Microsoft, Apple, and Amazon use C++ for their most demanding systems. Learning C++ gives you deep understanding of how computers work — memory management, pointers, and low-level optimization.",
     whatYoullLearn: "This free, interactive C++ course covers variables, data types, control flow, loops, functions, arrays, pointers, classes, objects, inheritance, polymorphism, templates, error handling, and modern C++ patterns — all by compiling and running real C++ code in your browser.",
-    whoIsItFor: "Beginners who want to understand how programming really works at a low level, game developers, systems programmers, and engineers preparing for C++ coding interviews.",
+    whoIsItFor: "Beginners who want to understand how programming works at a low level, game developers, systems programmers, and engineers who care about performance.",
   },
   javascript: {
     whyLearn: "JavaScript is the language of the web — every website you visit runs JavaScript. It's the only language that works in both the browser and on the server (via Node.js). Companies like Meta, Google, Netflix, and Airbnb build their products with JavaScript. Learning JavaScript opens doors to frontend, backend, and full-stack development.",
     whatYoullLearn: "This free, interactive JavaScript course covers variables, data types, functions, arrays, objects, control flow, loops, DOM manipulation, async/await, promises, modules, error handling, JSON, and HTTP requests — all by writing and running real JavaScript code in your browser.",
-    whoIsItFor: "Anyone who wants to build websites and web apps, aspiring full-stack developers, and engineers preparing for JavaScript or frontend coding interviews.",
+    whoIsItFor: "Anyone who wants to build websites and web apps, aspiring full-stack developers, and engineers building modern frontend or Node.js skills.",
   },
   java: {
     whyLearn: "Java runs on billions of devices worldwide and is the backbone of enterprise software, Android apps, and large-scale distributed systems. Companies like Amazon, LinkedIn, Google, and major banks use Java for mission-critical applications. Java's strong type system and vast ecosystem make it one of the most in-demand languages in the job market.",
     whatYoullLearn: "This free, interactive Java course covers variables, data types, control flow, loops, functions, classes, objects, inheritance, interfaces, collections, error handling, JSON processing, and concurrency — all by compiling and running real Java code in your browser.",
-    whoIsItFor: "Beginners who want a rock-solid language for career development, Android developers, enterprise engineers, and anyone preparing for Java coding interviews.",
+    whoIsItFor: "Beginners who want a rock-solid language for career development, Android developers, enterprise engineers, and anyone growing into large-scale backend systems.",
   },
   rust: {
     whyLearn: "Rust is the most loved programming language seven years running. It combines the performance of C++ with memory safety guarantees — no garbage collector, no null pointer exceptions, no data races. Companies like Mozilla, Cloudflare, Discord, and AWS use Rust for systems programming, web infrastructure, and game engines.",
     whatYoullLearn: "This free, interactive Rust course covers variables, data types, ownership, borrowing, lifetimes, structs, enums, pattern matching, traits, error handling, generics, concurrency, and modules — all by compiling and running real Rust code in your browser.",
-    whoIsItFor: "Developers who want to write fast, safe, and reliable code, systems programmers moving away from C/C++, and engineers preparing for Rust coding interviews.",
+    whoIsItFor: "Developers who want to write fast, safe, and reliable code, systems programmers moving away from C/C++, and engineers who want stronger systems fundamentals.",
   },
   csharp: {
     whyLearn: "C# is Microsoft's flagship language, powering .NET web apps, Unity game development, desktop applications, and cloud services on Azure. Companies like Microsoft, Stack Overflow, and thousands of game studios use C#. Its modern features — LINQ, async/await, pattern matching — make it productive and enjoyable to write.",
     whatYoullLearn: "This free, interactive C# course covers variables, data types, control flow, loops, functions, classes, inheritance, interfaces, LINQ, async/await, error handling, and .NET patterns — all by compiling and running real C# code in your browser.",
-    whoIsItFor: "Aspiring game developers (Unity), .NET web developers, Windows application developers, and engineers preparing for C# coding interviews.",
+    whoIsItFor: "Aspiring game developers (Unity), .NET web developers, Windows application developers, and developers building on the Microsoft stack.",
   },
   typescript: {
     whyLearn: "TypeScript is JavaScript with superpowers — it adds static types, interfaces, and powerful tooling to the world's most popular language. Companies like Microsoft, Airbnb, Slack, and Stripe use TypeScript to build large-scale applications with fewer bugs and better developer experience. If you know JavaScript, TypeScript is the natural next step. If you're starting fresh, TypeScript sets you up with professional-grade habits from day one.",
     whatYoullLearn: "This free, interactive TypeScript course covers type annotations, interfaces, type aliases, union and intersection types, generics, enums, classes, access modifiers, decorators, modules, utility types (Partial, Pick, Omit, Record), and strict null checking — all by writing and running real TypeScript code in your browser.",
-    whoIsItFor: "JavaScript developers who want safer, more maintainable code, frontend engineers working with React or Angular, backend developers using Node.js, and anyone preparing for TypeScript coding interviews or full-stack roles.",
+    whoIsItFor: "JavaScript developers who want safer, more maintainable code, frontend engineers working with React or Angular, backend developers using Node.js, and anyone moving toward full-stack TypeScript.",
   },
   sql: {
     whyLearn: "SQL (Structured Query Language) is the universal language of data — every application that stores information uses it. Databases powered by SQL run at companies like Google, Amazon, Meta, and every bank, hospital, and e-commerce site on the planet. Knowing SQL is one of the most transferable skills in tech: it's required for software engineers, data analysts, data scientists, and product managers alike.",
     whatYoullLearn: "This free, interactive SQL course covers SELECT queries, filtering with WHERE, sorting with ORDER BY, aggregate functions (COUNT, SUM, AVG, MIN, MAX), GROUP BY and HAVING, JOINs (INNER, LEFT, RIGHT, FULL), subqueries, CTEs, window functions, indexes, transactions, and database design — all by writing and running real SQL queries in your browser.",
-    whoIsItFor: "Complete beginners who want to learn how to query databases, developers who need to work with data in their applications, data analysts and data scientists, and engineers preparing for SQL coding interviews or data engineering roles.",
+    whoIsItFor: "Complete beginners who want to learn how to query databases, developers who need to work with data in their applications, data analysts and data scientists, and engineers building stronger data skills.",
   },
 };
 
@@ -79,8 +79,6 @@ export async function generateMetadata({
     keywords: [
       ...config.seo.keywords,
       `${config.name} course`,
-      `${config.name} certification prep`,
-      `${config.name} interview prep`,
       `${config.name} coding tutorial`,
       `${config.name} w3schools alternative`,
       `${config.name} codecademy alternative`,
@@ -256,14 +254,14 @@ export default async function TutorialLangLandingPage({
           </section>
 
           <nav className="flex flex-wrap gap-3 border-t border-zinc-200 pt-6 dark:border-zinc-800" aria-label="Related resources">
-            <Link href={`/practice/${lang}`} className="rounded-lg bg-zinc-100 px-4 py-2 text-sm font-medium text-zinc-700 transition-colors hover:bg-indigo-100 hover:text-indigo-700 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-indigo-950 dark:hover:text-indigo-300">
-              {config.name} Interview Prep →
+            <Link href={tutorials[0] ? tutorialUrl(lang, tutorials[0].slug) : "/tutorial"} className="rounded-lg bg-zinc-100 px-4 py-2 text-sm font-medium text-zinc-700 transition-colors hover:bg-indigo-100 hover:text-indigo-700 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-indigo-950 dark:hover:text-indigo-300">
+              Start the first {config.name} lesson →
             </Link>
-            <Link href={`/certifications/${lang}`} className="rounded-lg bg-zinc-100 px-4 py-2 text-sm font-medium text-zinc-700 transition-colors hover:bg-indigo-100 hover:text-indigo-700 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-indigo-950 dark:hover:text-indigo-300">
-              {config.name} Certification →
+            <Link href="/pricing" className="rounded-lg bg-zinc-100 px-4 py-2 text-sm font-medium text-zinc-700 transition-colors hover:bg-indigo-100 hover:text-indigo-700 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-indigo-950 dark:hover:text-indigo-300">
+              Get detailed hints when needed →
             </Link>
-            <Link href="/daily" className="rounded-lg bg-zinc-100 px-4 py-2 text-sm font-medium text-zinc-700 transition-colors hover:bg-indigo-100 hover:text-indigo-700 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-indigo-950 dark:hover:text-indigo-300">
-              Daily Challenge →
+            <Link href="/leaderboard" className="rounded-lg bg-zinc-100 px-4 py-2 text-sm font-medium text-zinc-700 transition-colors hover:bg-indigo-100 hover:text-indigo-700 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-indigo-950 dark:hover:text-indigo-300">
+              See top learners →
             </Link>
           </nav>
         </article>

@@ -1,12 +1,10 @@
 import type { MetadataRoute } from "next";
 import { getAllTutorials } from "@/lib/tutorials";
-import { getAllLanguageSlugs, PRACTICE_LANGUAGE_KEYS } from "@/lib/languages/registry";
-import { getAllPracticeProblems } from "@/lib/practice/problems";
+import { getAllLanguageSlugs } from "@/lib/languages/registry";
 import { getMdxBlogSlugs } from "@/lib/blog";
 import { getAllDbBlogPosts } from "@/lib/db/blog-posts";
 import { BASE_URL } from "@/lib/constants";
 import { tutorialUrl, tutorialLangUrl } from "@/lib/urls";
-import { EXAM_LANGS } from "@/lib/exams/config";
 import type { SupportedLanguage } from "@/lib/languages/types";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
@@ -14,7 +12,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = BASE_URL.replace(/\/$/, "");
   const abs = (path: string) => `${baseUrl}${path === "/" ? "" : path}`;
   const languageSlugs = getAllLanguageSlugs();
-  const practiceProblems = getAllPracticeProblems();
 
   const allBlogSlugs = getMdxBlogSlugs();
   const dbPosts = await getAllDbBlogPosts().catch(() => []);
@@ -26,12 +23,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     // Core pages — highest priority
     { url: abs("/"), lastModified: now, changeFrequency: "weekly", priority: 1.0 },
     { url: abs("/tutorial"), lastModified: now, changeFrequency: "weekly", priority: 0.95 },
-    { url: abs("/practice"), lastModified: now, changeFrequency: "daily", priority: 0.95 },
-    { url: abs("/certifications"), lastModified: now, changeFrequency: "weekly", priority: 0.95 },
     { url: abs("/blog"), lastModified: now, changeFrequency: "weekly", priority: 0.90 },
-    { url: abs("/interview"), lastModified: now, changeFrequency: "weekly", priority: 0.88 },
-    { url: abs("/interviews"), lastModified: now, changeFrequency: "daily", priority: 0.85 },
-    { url: abs("/daily"), lastModified: now, changeFrequency: "daily", priority: 0.82 },
     { url: abs("/leaderboard"), lastModified: now, changeFrequency: "daily", priority: 0.75 },
     // Info pages
     { url: abs("/pricing"), lastModified: now, changeFrequency: "weekly", priority: 0.80 },
@@ -76,35 +68,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         priority: 0.8,
       });
     }
-  }
-
-  // Practice pages — only languages that support algorithmic problems (excludes SQL)
-  for (const lang of PRACTICE_LANGUAGE_KEYS) {
-    entries.push({
-      url: abs(`/practice/${lang}`),
-      lastModified: now,
-      changeFrequency: "daily",
-      priority: 0.85,
-    });
-
-    for (const problem of practiceProblems) {
-      entries.push({
-        url: abs(`/practice/${lang}/${problem.slug}`),
-        lastModified: now,
-        changeFrequency: "monthly",
-        priority: 0.75,
-      });
-    }
-  }
-
-  // Certification pages — only exam languages
-  for (const lang of EXAM_LANGS) {
-    entries.push({
-      url: abs(`/certifications/${lang}`),
-      lastModified: now,
-      changeFrequency: "weekly",
-      priority: 0.85,
-    });
   }
 
   return entries;

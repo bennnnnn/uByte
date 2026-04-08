@@ -13,14 +13,8 @@ export const SITE_KEYWORDS = [
   "learn to code",
   "learn to code online free",
   "programming languages",
-  "coding interview prep",
-  "technical interview prep",
-  "programming certification",
-  "developer certification",
-  "practice coding problems",
   "w3schools alternative",
   "codecademy alternative",
-  "leetcode alternative",
   "freecodecamp alternative",
   "interactive coding platform",
   "online coding course free",
@@ -84,7 +78,7 @@ export function buildOrganizationJsonLd() {
     logo: absoluteUrl("/icon.png"),
     sameAs: [],
     description:
-      "uByte offers interactive programming tutorials, LeetCode-style coding challenges, and certification exams for Go, Python, JavaScript, Java, Rust, C++, and C#.",
+      "uByte offers interactive programming tutorials with free lessons and optional paid hints for Go, Python, JavaScript, Java, Rust, C++, C#, TypeScript, and SQL.",
   };
 }
 

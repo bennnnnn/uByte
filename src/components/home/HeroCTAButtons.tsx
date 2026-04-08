@@ -12,10 +12,10 @@ export default function HeroCTAButtons() {
   // During `loading`, user=null/isPro=false → guest state renders immediately with no height
   // change once auth resolves. No placeholder needed, no CLS.
   const trustLine = isPro
-    ? "You have full access — tutorials, interview prep, certifications, and on-demand help."
+    ? "You have full access to every lesson plus detailed hints whenever you want them."
     : user
-    ? "Everything is free. Upgrade to Pro when you want hints, feedback, and coaching."
-    : "Free to learn. Upgrade to Pro when you want help along the way.";
+    ? "Every lesson is free. Upgrade only when you want detailed hints and extra support."
+    : "Start free. Pay only if you want detailed hints inside the lesson.";
 
   return (
     <>
@@ -32,10 +32,10 @@ export default function HeroCTAButtons() {
               </svg>
             </Link>
             <Link
-              href="/certifications"
+              href="/dashboard"
               className="inline-flex items-center gap-2 rounded-xl border border-zinc-200 bg-surface-card px-7 py-3 text-sm font-semibold text-zinc-700 transition-all hover:border-zinc-300 hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-300 dark:hover:border-zinc-600 dark:hover:bg-zinc-700"
             >
-              My certifications
+              View dashboard
             </Link>
           </>
         ) : !loading && user ? (
