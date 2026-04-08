@@ -185,7 +185,7 @@ export default function AuthModal({ onClose, initialMode }: Props) {
 
   return createPortal(
     <div
-      className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto p-4 pt-10 sm:items-center sm:pt-4"
+      className="fixed inset-0 z-[80] flex items-start justify-center overflow-y-auto p-4 pt-10 sm:items-center sm:pt-4"
       role="dialog"
       aria-modal="true"
       aria-labelledby="auth-modal-title"
