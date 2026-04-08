@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { absoluteUrl, SITE_KEYWORDS } from "@/lib/seo";
 import { APP_NAME, BASE_URL } from "@/lib/constants";
+import { getLeaderboard } from "@/lib/db";
 import LeaderboardClient from "./LeaderboardClient";
 
 export const metadata: Metadata = {
@@ -26,7 +27,9 @@ export const metadata: Metadata = {
   },
 };
 
-export default function LeaderboardPage() {
+export default async function LeaderboardPage() {
+  const initialUsers = await getLeaderboard(20, "all");
+
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "WebPage",
@@ -44,7 +47,7 @@ export default function LeaderboardPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
 
-      <LeaderboardClient />
+      <LeaderboardClient initialUsers={initialUsers} />
 
       {/* Server-rendered content for search engine crawlers */}
       <article className="sr-only">

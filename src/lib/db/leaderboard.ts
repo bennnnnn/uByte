@@ -10,7 +10,7 @@ export async function getLeaderboard(limit = 20, period: LeaderboardPeriod = "al
   const sql = getSql();
 
   const weekFilter = period === "week"
-    ? sql`WHERE u.last_active_at IS NOT NULL AND u.last_active_at::timestamptz >= NOW() - INTERVAL '7 days'`
+    ? sql` AND u.last_active_at IS NOT NULL AND u.last_active_at::timestamptz >= NOW() - INTERVAL '7 days'`
     : sql``;
 
   const rows = await sql`
@@ -30,7 +30,7 @@ export async function getLeaderboard(limit = 20, period: LeaderboardPeriod = "al
       WHERE status = 'solved'
       GROUP BY user_id
     ) pa ON pa.user_id = u.id
-    ${weekFilter}
+    WHERE u.xp > 0 ${weekFilter}
     ORDER BY u.xp DESC
     LIMIT ${limit}
   `;

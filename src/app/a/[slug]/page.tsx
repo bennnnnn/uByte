@@ -9,10 +9,16 @@
  *   2. This server component additionally checks that the slug belongs to THEM.
  *   3. If either check fails the visitor is sent to the home page.
  */
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth";
 import { getAdminBySlug } from "@/lib/db/admin";
 import AdminPage from "@/app/admin/page";
+
+export const metadata: Metadata = {
+  title: "Admin",
+  robots: { index: false, follow: false },
+};
 
 interface Props {
   params: Promise<{ slug: string }>;

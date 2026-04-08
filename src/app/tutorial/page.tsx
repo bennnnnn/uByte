@@ -4,7 +4,8 @@ import { ALL_LANGUAGE_KEYS, LANGUAGES } from "@/lib/languages/registry";
 import { getLangIcon } from "@/lib/languages/icons";
 import { getTotalLessonCount } from "@/lib/tutorial-steps/index";
 import { getAllTutorials } from "@/lib/tutorials";
-import { absoluteUrl } from "@/lib/seo";
+import { APP_NAME, BASE_URL } from "@/lib/constants";
+import { absoluteUrl, buildOrganizationJsonLd } from "@/lib/seo";
 import type { SupportedLanguage } from "@/lib/languages/types";
 
 export const metadata: Metadata = {
@@ -54,9 +55,34 @@ export default function TutorialsPage() {
   const beginner     = langs.filter(l => l.meta.difficulty === "Beginner-friendly");
   const intermediate = langs.filter(l => l.meta.difficulty === "Intermediate");
   const advanced     = langs.filter(l => l.meta.difficulty === "Advanced");
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    name: `${APP_NAME} Coding Tutorials`,
+    description:
+      "Interactive coding tutorials across 9 languages with live code, saved progress, and optional paid hints.",
+    url: absoluteUrl("/tutorial"),
+    isPartOf: { "@type": "WebSite", name: APP_NAME, url: BASE_URL },
+    about: buildOrganizationJsonLd(),
+    mainEntity: {
+      "@type": "ItemList",
+      itemListElement: langs.map((entry, index) => ({
+        "@type": "ListItem",
+        position: index + 1,
+        name: `${entry.config.name} Tutorials`,
+        description: entry.meta.tagline,
+        url: absoluteUrl(`/tutorial/${entry.lang}`),
+      })),
+    },
+  };
 
   return (
     <div className="min-h-screen bg-white dark:bg-zinc-950">
+      <script
+        async
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
 
       {/* ── Page header ─────────────────────────────────────────────────── */}
       <div className="border-b border-zinc-100 dark:border-zinc-800">

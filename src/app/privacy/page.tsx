@@ -11,11 +11,13 @@ export const metadata: Metadata = {
     url: absoluteUrl("/privacy"),
     title: `Privacy Policy | ${APP_NAME}`,
     description: "How uByte collects, uses, and protects your personal data.",
+    images: [{ url: absoluteUrl("/api/og?title=Privacy+Policy&description=How+uByte+handles+personal+data"), width: 1200, height: 630 }],
   },
   twitter: {
-    card: "summary",
+    card: "summary_large_image",
     title: `Privacy Policy | ${APP_NAME}`,
     description: "How uByte collects, uses, and protects your personal data.",
+    images: [absoluteUrl("/api/og?title=Privacy+Policy&description=How+uByte+handles+personal+data")],
   },
 };
 
@@ -40,7 +42,7 @@ export default function PrivacyPage() {
         <p>
           uByte (&ldquo;we&rdquo;, &ldquo;us&rdquo;, &ldquo;our&rdquo;) operates the website{" "}
           <strong>ubyte.dev</strong> — an online platform for learning programming through
-          interactive tutorials, interview preparation, and certification exams. Our contact
+          interactive tutorials. Our contact
           email is{" "}
           <a href="mailto:privacy@ubyte.dev" className="text-indigo-600 hover:underline">
             privacy@ubyte.dev
@@ -51,8 +53,8 @@ export default function PrivacyPage() {
 
       <Section title="Data We Collect">
         <p><strong>Account data</strong> — when you register, we collect your name, email address, and a hashed password (we never store your password in plain text). If you sign in with Google, we receive your name, email, and Google account ID.</p>
-        <p><strong>Learning progress</strong> — tutorial step completions, practice problem attempts, certification exam results, XP points, streaks, and achievements.</p>
-        <p><strong>Code submissions</strong> — code you write and run in tutorials or interview prep is sent to third-party execution services (see &ldquo;Third-Party Services&rdquo; below) to produce output. We do not permanently store the code you run unless you explicitly share a snippet.</p>
+        <p><strong>Learning progress</strong> — tutorial step completions, bookmarks, XP points, streaks, and achievements.</p>
+        <p><strong>Code submissions</strong> — code you write and run in tutorials is sent to third-party execution services (see &ldquo;Third-Party Services&rdquo; below) to produce output. We do not permanently store the code you run unless you explicitly share a snippet.</p>
         <p><strong>Shared snippets</strong> — if you click &ldquo;Share&rdquo; in the Playground, the snippet is stored on our servers and accessible via its unique link.</p>
         <p><strong>Payment data</strong> — subscriptions are processed by Paddle, our Merchant of Record. We never see or store your card details. We receive a Paddle customer ID and subscription status to activate your plan.</p>
         <p><strong>Automated code feedback</strong> — Pro users may request code feedback generated with third-party AI services. Your code and the step context are sent to a third-party AI API to generate a response. We cache those responses briefly to reduce API costs.</p>

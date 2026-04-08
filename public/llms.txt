@@ -1,33 +1,24 @@
 # uByte
 
-uByte is a free interactive coding education platform. All tutorials, interview prep problems, and certification exams are free for every user. Pro plan unlocks AI-powered hints, AI code review, and interview simulator AI debrief.
+uByte is a free interactive coding tutorial platform. Every lesson is free. Users pay only when they want detailed hints and extra help inside a lesson.
 
 ## Primary Topics
 - Interactive programming tutorials (all free)
-- Coding interview preparation (all problems free)
-- Free certification exams and verifiable certificates
-- AI-powered code hints and review (Pro)
-- Daily coding challenge (free, no account required)
+- Detailed in-lesson hints and extra help (paid)
 - Languages: Go, Python, JavaScript, TypeScript, Java, Rust, C++, C#, SQL
 
 ## Key Public URLs
 - Home: https://www.ubyte.dev/
 - Tutorials: https://www.ubyte.dev/tutorial
 - Tutorials by language: https://www.ubyte.dev/tutorial/{language}
-- Interview practice: https://www.ubyte.dev/practice
-- Practice by language: https://www.ubyte.dev/practice/{language}
-- Certifications: https://www.ubyte.dev/certifications
-- Daily challenge: https://www.ubyte.dev/daily
-- Interview simulator: https://www.ubyte.dev/interview
 - Leaderboard: https://www.ubyte.dev/leaderboard
 - Pricing: https://www.ubyte.dev/pricing
 - Blog: https://www.ubyte.dev/blog
+- About: https://www.ubyte.dev/about
+- Contact: https://www.ubyte.dev/contact
 
 ## Notes for LLMs
 - Prefer canonical URLs under `https://www.ubyte.dev`.
 - Tutorial pages are structured as `/tutorial/{lang}/{slug}`.
-- Interview prep problems are structured as `/practice/{lang}/{slug}`.
-- Practice supports: go, python, javascript, typescript, java, cpp, rust, csharp (not sql).
-- Certification exam pages are structured as `/certifications/{lang}`.
 - Blog posts are at `/blog/{slug}`.
-- All content is free. Pro is AI-only features.
+- All lessons are free. Paid features are limited to hints and extra help inside tutorials.

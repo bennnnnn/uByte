@@ -5,7 +5,7 @@ import { SearchPageClient } from "./SearchPageClient";
 export const metadata: Metadata = {
   title: "Search",
   description: "Search uByte tutorials and lessons.",
-  robots: "noindex,follow",
+  robots: { index: false, follow: false },
 };
 
 export default function SearchPage() {

@@ -15,17 +15,54 @@ export const metadata: Metadata = {
     title: "Contact uByte Support",
     description: "Reach the uByte team for account help, billing questions, bug reports, or feature requests. We respond within one business day.",
     siteName: APP_NAME,
+    images: [{ url: absoluteUrl("/api/og?title=Contact+uByte&description=Support+for+tutorials+accounts+and+billing"), width: 1200, height: 630 }],
   },
   twitter: {
-    card: "summary",
+    card: "summary_large_image",
     title: "Contact uByte Support",
     description: "Reach the uByte team for account help, billing questions, or feature requests.",
+    images: [absoluteUrl("/api/og?title=Contact+uByte&description=Support+for+tutorials+accounts+and+billing")],
   },
 };
 
 export default function ContactPage() {
+  const contactJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "ContactPage",
+    name: "Contact uByte",
+    description:
+      "Contact uByte for tutorial questions, account help, billing support, and product feedback.",
+    url: absoluteUrl("/contact"),
+    mainEntity: {
+      "@type": "Organization",
+      name: APP_NAME,
+      url: absoluteUrl("/"),
+      contactPoint: [
+        {
+          "@type": "ContactPoint",
+          contactType: "customer support",
+          email: "support@ubyte.dev",
+          url: absoluteUrl("/contact"),
+          availableLanguage: ["English"],
+        },
+        {
+          "@type": "ContactPoint",
+          contactType: "privacy support",
+          email: "privacy@ubyte.dev",
+          url: absoluteUrl("/contact"),
+          availableLanguage: ["English"],
+        },
+      ],
+    },
+  };
+
   return (
     <>
+      <script
+        async
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(contactJsonLd) }}
+      />
       <ContactClient />
 
       {/* Server-rendered content for search engine crawlers */}

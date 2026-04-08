@@ -90,6 +90,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "uByte Help Center",
     description: "Support articles and answers for tutorials, accounts, and billing.",
+    images: [absoluteUrl("/api/og?title=Help+Center&description=FAQs+for+tutorials+accounts+and+billing")],
   },
 };
 

@@ -5,7 +5,7 @@ import AuthPage from "@/components/auth/AuthPage";
 export const metadata: Metadata = {
   title: "Log in — uByte",
   description: "Sign in to your uByte account to continue your programming tutorials.",
-  robots: { index: false, follow: true },
+  robots: { index: false, follow: false },
 };
 
 export default function LoginPage() {

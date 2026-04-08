@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import Link from "next/link";
 import Avatar from "@/components/Avatar";
 import { Button } from "@/components/ui";
@@ -32,15 +32,21 @@ function Medal({ rank }: { rank: number }) {
   return <span className="w-6 text-center text-sm font-mono text-zinc-400">{rank}</span>;
 }
 
-export default function LeaderboardClient() {
+export default function LeaderboardClient({
+  initialUsers,
+}: {
+  initialUsers: LeaderboardEntry[];
+}) {
   const { user } = useAuth();
-  const [users, setUsers] = useState<LeaderboardEntry[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [users, setUsers] = useState<LeaderboardEntry[]>(initialUsers);
+  const [loading, setLoading] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState("");
   const [period, setPeriod] = useState<Period>("all");
 
   const fetchLeaderboard = useCallback((p: Period) => {
-    setLoading(true);
+    if (users.length === 0) setLoading(true);
+    else setRefreshing(true);
     setError("");
     const url = p === "week" ? "/api/leaderboard?period=week" : "/api/leaderboard";
     fetch(url, { credentials: "same-origin" })
@@ -50,13 +56,25 @@ export default function LeaderboardClient() {
         setUsers(data.users ?? []);
       })
       .catch((err: unknown) => setError(err instanceof Error ? err.message : String(err)))
-      .finally(() => setLoading(false));
-  }, []);
+      .finally(() => {
+        setLoading(false);
+        setRefreshing(false);
+      });
+  }, [users.length]);
 
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    fetchLeaderboard(period);
-  }, [period, fetchLeaderboard]);
+  const handlePeriodChange = (nextPeriod: Period) => {
+    if (nextPeriod === period) return;
+    setError("");
+    setPeriod(nextPeriod);
+
+    if (nextPeriod === "all") {
+      setRefreshing(false);
+      setUsers(initialUsers);
+      return;
+    }
+
+    fetchLeaderboard(nextPeriod);
+  };
 
   if (loading) {
     return (
@@ -97,24 +115,32 @@ export default function LeaderboardClient() {
         <div>
           <h1 className="text-xl font-bold text-zinc-900 sm:text-2xl dark:text-zinc-100">Leaderboard</h1>
           <p className="mt-0.5 text-xs text-zinc-500 sm:text-sm dark:text-zinc-400">
-            Top 20 learners by XP
+            Top learners by XP
           </p>
         </div>
-        <div className="flex rounded-lg border border-zinc-200 bg-zinc-50 p-0.5 dark:border-zinc-700 dark:bg-zinc-800">
-          {(["all", "week"] as Period[]).map((p) => (
-            <button
-              key={p}
-              type="button"
-              onClick={() => setPeriod(p)}
-              className={`rounded-md px-3 py-1.5 text-xs font-medium transition-colors sm:text-sm ${
-                period === p
-                  ? "bg-white text-zinc-900 shadow dark:bg-zinc-700 dark:text-zinc-100"
-                  : "text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-200"
-              }`}
-            >
-              {p === "all" ? "All time" : "This week"}
-            </button>
-          ))}
+        <div className="flex items-center gap-2">
+          {refreshing && (
+            <span className="inline-flex items-center gap-2 text-xs text-zinc-400 sm:text-sm">
+              <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-zinc-300 border-t-indigo-500" />
+              Updating
+            </span>
+          )}
+          <div className="flex rounded-lg border border-zinc-200 bg-zinc-50 p-0.5 dark:border-zinc-700 dark:bg-zinc-800">
+            {(["all", "week"] as Period[]).map((p) => (
+              <button
+                key={p}
+                type="button"
+                onClick={() => handlePeriodChange(p)}
+                className={`rounded-md px-3 py-1.5 text-xs font-medium transition-colors sm:text-sm ${
+                  period === p
+                    ? "bg-white text-zinc-900 shadow dark:bg-zinc-700 dark:text-zinc-100"
+                    : "text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-200"
+                }`}
+              >
+                {p === "all" ? "All time" : "This week"}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 

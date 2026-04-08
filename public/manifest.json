@@ -1,7 +1,7 @@
 {
-  "name": "uByte — Programming Tutorials, Interview Prep, and Certifications",
+  "name": "uByte — Free Interactive Coding Tutorials",
   "short_name": "uByte",
-  "description": "Interactive coding tutorials in Go, Python, C++, JavaScript, Java, and Rust. Practice for interviews. Write and run real code in your browser.",
+  "description": "Free interactive coding tutorials in Go, Python, TypeScript, SQL, JavaScript, Java, Rust, C++, and C#. Write and run real code in your browser.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#09090b",
@@ -24,14 +24,14 @@
   "categories": ["education", "developer tools"],
   "shortcuts": [
     {
-      "name": "Practice",
-      "url": "/practice",
-      "description": "Solve coding interview problems"
+      "name": "Tutorials",
+      "url": "/tutorial",
+      "description": "Browse all coding tutorials"
     },
     {
-      "name": "Certifications",
-      "url": "/certifications",
-      "description": "Take timed certification-style exams"
+      "name": "Go Tutorials",
+      "url": "/tutorial/go",
+      "description": "Start learning Go with interactive lessons"
     },
     {
       "name": "Leaderboard",

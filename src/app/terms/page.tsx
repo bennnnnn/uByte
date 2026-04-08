@@ -11,11 +11,13 @@ export const metadata: Metadata = {
     url: absoluteUrl("/terms"),
     title: `Terms of Service | ${APP_NAME}`,
     description: "Terms and conditions for using uByte.",
+    images: [{ url: absoluteUrl("/api/og?title=Terms+of+Service&description=Legal+terms+for+using+uByte"), width: 1200, height: 630 }],
   },
   twitter: {
-    card: "summary",
+    card: "summary_large_image",
     title: `Terms of Service | ${APP_NAME}`,
     description: "Terms and conditions for using uByte.",
+    images: [absoluteUrl("/api/og?title=Terms+of+Service&description=Legal+terms+for+using+uByte")],
   },
 };
 
@@ -50,7 +52,7 @@ export default function TermsPage() {
       </Section>
 
       <Section title="Plans, Payments, and Refunds">
-        <p><strong>Free access</strong> — tutorials, interview prep problems, and certification exams are available as described on the pricing page.</p>
+        <p><strong>Free access</strong> — all tutorials and lesson content are available for free as described on the pricing page.</p>
         <p><strong>Pro subscription</strong> — paid subscriptions are billed monthly or annually through Paddle, our Merchant of Record. By subscribing, you agree to Paddle&apos;s <a href="https://www.paddle.com/legal/terms" target="_blank" rel="noopener noreferrer" className="text-indigo-600 hover:underline">Terms of Service</a>. Paddle handles all payment processing, invoicing, and sales tax/VAT.</p>
         <p><strong>Automatic renewal</strong> — subscriptions renew automatically at the end of each billing period unless cancelled. You can cancel at any time from your Paddle subscription management portal.</p>
         <p><strong>Refunds</strong> — if you are not satisfied with your Pro subscription, you may request a refund within 7 days of your initial purchase by contacting <a href="mailto:support@ubyte.dev" className="text-indigo-600 hover:underline">support@ubyte.dev</a>. Refunds are processed through Paddle. After the 7-day window, no refunds will be issued for the current billing period, but you may cancel to prevent future charges.</p>
@@ -71,12 +73,8 @@ export default function TermsPage() {
       </Section>
 
       <Section title="Code Execution">
-        <p>Interactive tutorial steps and interview prep problems send your code to third-party execution services (Judge0 for Python, JavaScript, Java, C++, and Rust; Go Playground for Go) for compilation and execution. Do not submit secret keys, passwords, or personal information in code you run.</p>
+        <p>Interactive tutorial steps send your code to third-party execution services (Judge0 for Python, JavaScript, Java, C++, and Rust; Go Playground for Go) for compilation and execution. Do not submit secret keys, passwords, or personal information in code you run.</p>
         <p>Using the code execution service to attempt denial-of-service attacks, cryptocurrency mining, or network intrusion is strictly prohibited and may result in immediate account termination.</p>
-      </Section>
-
-      <Section title="Certifications">
-        <p>Users may take certification exams. Upon passing, you receive a verifiable digital certificate. Certificates attest only that you passed the exam at a given time; they do not represent an accredited qualification. We reserve the right to revoke certificates obtained through cheating or other violations of these Terms.</p>
       </Section>
 
       <Section title="Playground Snippets">
@@ -101,7 +99,7 @@ export default function TermsPage() {
         <ul className="list-disc pl-5 space-y-1">
           <li>The Service will be available at all times</li>
           <li>Tutorial content is free of errors</li>
-          <li>Completing tutorials or certifications will result in employment or specific skill outcomes</li>
+          <li>Completing tutorials will result in employment or specific skill outcomes</li>
         </ul>
       </Section>
 

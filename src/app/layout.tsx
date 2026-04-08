@@ -45,6 +45,9 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   metadataBase: new URL(BASE_URL),
+  applicationName: APP_NAME,
+  category: "education",
+  referrer: "origin-when-cross-origin",
   title: {
     default: "uByte - Interactive Coding Tutorials",
     template: "%s | uByte",

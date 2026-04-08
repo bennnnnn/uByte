@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { absoluteUrl, SITE_KEYWORDS } from "@/lib/seo";
+import { APP_NAME } from "@/lib/constants";
+import { absoluteUrl, SITE_KEYWORDS, buildOrganizationJsonLd } from "@/lib/seo";
 import { ALL_LANGUAGE_KEYS, LANGUAGES as LANG_REGISTRY } from "@/lib/languages/registry";
 
 export const metadata: Metadata = {
@@ -61,9 +62,23 @@ export default function AboutPage() {
     slug: LANG_REGISTRY[k].slug,
     emoji: LANG_EMOJIS[k] ?? "💻",
   }));
+  const aboutJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "AboutPage",
+    name: `About ${APP_NAME}`,
+    description:
+      "Learn why uByte focuses on free interactive coding tutorials with optional paid hints.",
+    url: absoluteUrl("/about"),
+    mainEntity: buildOrganizationJsonLd(),
+  };
 
   return (
     <div className="min-h-full overflow-y-auto">
+      <script
+        async
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(aboutJsonLd) }}
+      />
       <div className="mx-auto max-w-4xl px-6 py-14">
 
         {/* Hero */}

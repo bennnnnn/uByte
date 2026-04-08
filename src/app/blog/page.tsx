@@ -30,6 +30,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "uByte Blog — Programming Tutorials & Guides",
     description: "In-depth programming tutorials, lesson guides, and language comparisons from the uByte team.",
+    images: [absoluteUrl("/api/og?title=Blog&description=Programming+tutorials+%26+guides")],
   },
 };
 
