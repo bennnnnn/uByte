@@ -52,6 +52,7 @@ export default function TutorialGate({ tutorialSlug, completedLessons, children 
   const { user, profile, loading } = useAuth();
   const [gate, setGate] = useState<"none" | "signup" | "verify">("none");
   const [authOpen, setAuthOpen] = useState(false);
+  const [authMode, setAuthMode] = useState<"signup" | "login">("signup");
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
 
@@ -130,36 +131,25 @@ export default function TutorialGate({ tutorialSlug, completedLessons, children 
 
             <div className="flex flex-col gap-3 sm:flex-row sm:justify-center">
               <button
-                onClick={() => setAuthOpen(true)}
+                onClick={() => { setAuthMode("signup"); setAuthOpen(true); }}
                 className="rounded-xl bg-indigo-600 px-8 py-3 text-sm font-bold text-white shadow-md shadow-indigo-500/20 transition-all hover:-translate-y-0.5 hover:bg-indigo-500"
               >
                 Sign up free →
               </button>
               <button
-                onClick={() => setAuthOpen(true)}
+                onClick={() => { setAuthMode("login"); setAuthOpen(true); }}
                 className="rounded-xl border border-zinc-300 px-8 py-3 text-sm font-semibold text-zinc-700 transition-all hover:border-zinc-400 hover:bg-zinc-50 dark:border-zinc-600 dark:text-zinc-300"
               >
                 Log in
               </button>
             </div>
-
-            <p className="mt-4 text-xs text-zinc-400">
-              No credit card required · Takes 30 seconds
-            </p>
-
-            <Link
-              href="/"
-              className="mt-6 inline-block text-sm text-zinc-400 underline underline-offset-2 hover:text-zinc-600"
-            >
-              ← Back to home
-            </Link>
           </div>
         </div>
 
         {authOpen && (
           <Suspense>
             <AuthModal
-              initialMode="signup"
+              initialMode={authMode}
               onClose={() => setAuthOpen(false)}
             />
           </Suspense>
