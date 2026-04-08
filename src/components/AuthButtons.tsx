@@ -12,12 +12,11 @@ const linkBase =
   "rounded-lg px-3 py-2 text-sm font-medium text-zinc-600 transition-colors hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-200";
 
 export default function AuthButtons() {
-  const { user, loading } = useAuth();
+  const { user, loading, notificationUnreadCount, setNotificationUnreadCount } = useAuth();
   const pathname = usePathname();
   const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
-  const [unreadCount, setUnreadCount] = useState(0);
   const loginHref = buildAuthPageHref("login", pathname);
   const signupHref = buildAuthPageHref("signup", pathname);
 
@@ -31,25 +30,6 @@ export default function AuthButtons() {
     const nextPath = `${pathname}${params.toString() ? `?${params.toString()}` : ""}`;
     router.replace(buildAuthPageHref("signup", nextPath));
   }, [loading, pathname, router, user]);
-
-  useEffect(() => {
-    if (!user) return;
-
-    const fetchCount = () => {
-      fetch("/api/notifications", { credentials: "same-origin" })
-        .then((r) => r.json())
-        .then((data: unknown) => {
-          if (data && typeof data === "object" && "unreadCount" in data && typeof (data as { unreadCount: unknown }).unreadCount === "number") {
-            setUnreadCount((data as { unreadCount: number }).unreadCount);
-          }
-        })
-        .catch(() => {});
-    };
-
-    fetchCount();
-    const interval = setInterval(fetchCount, 30_000);
-    return () => clearInterval(interval);
-  }, [user]);
 
   useEffect(() => {
     if (!menuOpen) return;
@@ -70,8 +50,8 @@ export default function AuthButtons() {
     return (
       <div className="flex items-center gap-1.5">
         <NotificationPopover
-          initialUnreadCount={unreadCount}
-          onCountChange={setUnreadCount}
+          initialUnreadCount={notificationUnreadCount}
+          onCountChange={setNotificationUnreadCount}
         />
         <UserMenuDropdown />
       </div>

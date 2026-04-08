@@ -17,10 +17,6 @@ import { SITE_KEYWORDS } from "@/lib/seo";
 import Script from "next/script";
 import { getSiteBanner } from "@/lib/db/site-banner";
 import { unstable_cache } from "next/cache";
-import { headers } from "next/headers";
-import { getMaintenanceModeStatus } from "@/lib/db/site-settings";
-import { getCurrentUser } from "@/lib/auth";
-import MaintenancePage from "@/app/maintenance/page";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -112,38 +108,6 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  // ── Maintenance mode gate ────────────────────────────────────────────────
-  // The middleware forwards x-pathname so we can skip admin / maintenance routes.
-  const hdrs = await headers();
-  const pathname = hdrs.get("x-pathname") ?? "/";
-  const bypassMaintenance =
-    pathname.startsWith("/admin") ||
-    pathname.startsWith("/a/") ||      // personal admin slug routes
-    pathname.startsWith("/api/") ||
-    pathname.startsWith("/login") ||
-    pathname.startsWith("/signup") ||
-    pathname.startsWith("/forgot-password") ||
-    pathname.startsWith("/auth/");
-
-  if (!bypassMaintenance) {
-    const inMaintenance = await getMaintenanceModeStatus();
-    if (inMaintenance) {
-      const user = await getCurrentUser();
-      if (!user?.isAdmin) {
-        // Render a completely standalone maintenance screen — no SiteHeader,
-        // no SiteFooter, no nav — so non-admins cannot click through to other
-        // pages and bypass maintenance mode.
-        return (
-          <html lang="en" suppressHydrationWarning>
-            <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-              <MaintenancePage />
-            </body>
-          </html>
-        );
-      }
-    }
-  }
-
   // Fetch server-side so the banner is in the initial SSR HTML.
   // If disabled or errored, returns { enabled: false, ... } which SiteBanner ignores.
   const bannerData = await getCachedBanner();

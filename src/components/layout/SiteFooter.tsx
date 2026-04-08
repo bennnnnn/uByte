@@ -1,5 +1,7 @@
+"use client";
+
 import Link from "next/link";
-import { headers } from "next/headers";
+import { usePathname } from "next/navigation";
 import { Eyebrow } from "@/components/ui";
 import { ALL_LANGUAGE_KEYS, LANGUAGES } from "@/lib/languages/registry";
 
@@ -43,9 +45,8 @@ function FooterLink({ href, label }: { href: string; label: string }) {
   );
 }
 
-export default async function SiteFooter() {
-  const hdrs = await headers();
-  const pathname = hdrs.get("x-pathname") ?? "/";
+export default function SiteFooter() {
+  const pathname = usePathname();
   const isTutorialWorkspace = /^\/tutorial\/[^/]+\/[^/]+/.test(pathname);
   const isWorkspaceRoute = isTutorialWorkspace;
   const year = new Date().getFullYear();

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { jwtVerify } from "jose";
+import { getMaintenanceModeStatus } from "@/lib/db/site-settings";
 
 const TUTORIAL_LANGS = new Set([
   "go",
@@ -53,6 +54,35 @@ export async function middleware(request: NextRequest) {
   const legacyRedirect = redirectLegacyProductRoute(request);
   if (legacyRedirect) return legacyRedirect;
 
+  const bypassMaintenance =
+    pathname.startsWith("/admin") ||
+    pathname.startsWith("/a/") ||
+    pathname.startsWith("/api/") ||
+    pathname.startsWith("/login") ||
+    pathname.startsWith("/signup") ||
+    pathname.startsWith("/forgot-password") ||
+    pathname.startsWith("/auth/") ||
+    pathname.startsWith("/maintenance");
+
+  if (!bypassMaintenance) {
+    const inMaintenance = await getMaintenanceModeStatus();
+    if (inMaintenance) {
+      const token = request.cookies.get("auth_token")?.value;
+      if (!token) {
+        return NextResponse.redirect(new URL("/maintenance", request.url));
+      }
+
+      try {
+        const { payload } = await jwtVerify(token, getSecret());
+        if (!payload.isAdmin) {
+          return NextResponse.redirect(new URL("/maintenance", request.url));
+        }
+      } catch {
+        return NextResponse.redirect(new URL("/maintenance", request.url));
+      }
+    }
+  }
+
   // ── Admin route protection ──────────────────────────────────────────────────
   // Covers both the default /admin route and personal slug routes /a/<slug>
   if (pathname.startsWith("/api/admin") || pathname.startsWith("/admin") || pathname.startsWith("/a/")) {
@@ -84,9 +114,6 @@ export async function middleware(request: NextRequest) {
   const response = NextResponse.next({
     request: { headers: new Headers(request.headers) },
   });
-  // Forward the pathname so server components (e.g. the root layout) can read
-  // it via headers() without re-parsing the URL from somewhere else.
-  response.headers.set("x-pathname", pathname);
 
   if (!request.cookies.get("csrf_token")?.value) {
     response.cookies.set("csrf_token", crypto.randomUUID(), {

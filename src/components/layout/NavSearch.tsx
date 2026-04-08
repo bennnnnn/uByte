@@ -42,12 +42,20 @@ export default function NavSearch() {
     const q = debouncedQ.trim();
     // eslint-disable-next-line react-hooks/set-state-in-effect
     if (q.length < 2) { setResults([]); return; }
+    const controller = new AbortController();
     setLoading(true);
-    fetch(`/api/search?q=${encodeURIComponent(q)}`)
+    fetch(`/api/search?q=${encodeURIComponent(q)}`, { signal: controller.signal })
       .then(r => r.json())
       .then(d => setResults((d.results ?? []).slice(0, 7)))
-      .catch(() => setResults([]))
-      .finally(() => setLoading(false));
+      .catch((err: unknown) => {
+        if ((err as { name?: string })?.name !== "AbortError") setResults([]);
+      })
+      .finally(() => {
+        if (!controller.signal.aborted) setLoading(false);
+      });
+    return () => {
+      controller.abort();
+    };
   }, [debouncedQ]);
 
   // Close on outside click

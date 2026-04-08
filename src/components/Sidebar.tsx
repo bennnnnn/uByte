@@ -46,16 +46,24 @@ export default function Sidebar({ lang, tutorials }: { lang: string; tutorials: 
   useEffect(() => {
     if (debounceRef.current) clearTimeout(debounceRef.current);
     if (!queryLongEnough) return;
+    const controller = new AbortController();
     debounceRef.current = setTimeout(() => {
-      fetch(`/api/search?q=${encodeURIComponent(query.trim())}`)
+      fetch(`/api/search?q=${encodeURIComponent(query.trim())}`, { signal: controller.signal })
         .then((r) => r.json())
         .then((d) => {
           setSearchResults(d.results ?? []);
           setShowDropdown(true);
         })
-        .catch(() => {});
+        .catch((err: unknown) => {
+          if ((err as { name?: string })?.name !== "AbortError") {
+            setSearchResults([]);
+          }
+        });
     }, 300);
-    return () => { if (debounceRef.current) clearTimeout(debounceRef.current); };
+    return () => {
+      controller.abort();
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+    };
   }, [query, queryLongEnough]);
 
   return (

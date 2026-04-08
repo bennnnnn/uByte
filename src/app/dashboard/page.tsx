@@ -159,7 +159,7 @@ function SectionDivider({ label }: { label: string }) {
 
 /* ── Main page ─────────────────────────────────────────────────────────── */
 function DashboardPage() {
-  const { user, loading, logout, logoutAll } = useAuth();
+  const { user, loading, logout, logoutAll, setNotificationUnreadCount } = useAuth();
   const { toast } = useToast();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -277,6 +277,7 @@ function DashboardPage() {
   const markAllNotifsRead = async () => {
     await apiFetch("/api/notifications", { method: "PATCH" }).catch(() => {});
     setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
+    setNotificationUnreadCount(0);
   };
 
   // ── Settings helpers ─────────────────────────────────────────────────

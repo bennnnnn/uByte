@@ -75,12 +75,14 @@ interface AppDataContextType {
   /** Individual steps passed per language. Source of truth for all progress bars. */
   stepCountByLang: Record<string, number>;
   profile: ProfileData | null;
+  notificationUnreadCount: number;
   viewCount: number;
   limited: boolean;
   recordView: (slug: string) => Promise<void>;
   toggleProgress: (slug: string, lang?: string) => Promise<void>;
   /** Call when a step is passed (not skipped) to update the progress bar instantly. */
   incrementStepCount: (lang: string) => void;
+  setNotificationUnreadCount: (count: number) => void;
   refreshProfile: () => Promise<void>;
 }
 
@@ -89,11 +91,13 @@ const AppDataContext = createContext<AppDataContextType>({
   progress: [],
   stepCountByLang: {},
   profile: null,
+  notificationUnreadCount: 0,
   viewCount: 0,
   limited: false,
   recordView: async () => {},
   toggleProgress: async (slug: string, lang?: string) => { void slug; void lang; },
   incrementStepCount: () => {},
+  setNotificationUnreadCount: () => {},
   refreshProfile: async () => {},
 });
 
@@ -144,6 +148,7 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
   const [progressByLang, setProgressByLang] = useState<Record<string, string[]>>({});
   const [stepCountByLang, setStepCountByLang] = useState<Record<string, number>>({});
   const [profile, setProfile] = useState<ProfileData | null>(null);
+  const [notificationUnreadCount, setNotificationUnreadCount] = useState(0);
   const [viewCount, setViewCount] = useState(0);
   const [limited, setLimited] = useState(false);
   const pathname = usePathname();
@@ -153,60 +158,47 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
     enforceThemeForRoute();
   }, [pathname]);
 
+  const applyAppState = useCallback((data: {
+    user: User | null;
+    profile?: Record<string, unknown> | null;
+    progress?: Record<string, string[]>;
+    stepCounts?: Record<string, number>;
+    unreadCount?: number;
+    viewCount?: number;
+    limited?: boolean;
+  }) => {
+    setUser(data.user);
+    setProgressByLang(data.progress ?? {});
+    setStepCountByLang(data.stepCounts ?? {});
+    setProfile(extractProfile({ profile: data.profile ?? undefined }));
+    setNotificationUnreadCount(data.unreadCount ?? 0);
+    setViewCount(data.viewCount ?? 0);
+    setLimited(data.limited ?? false);
+
+    const nextTheme = typeof data.profile?.theme === "string" ? data.profile.theme : null;
+    if (nextTheme) applyTheme(nextTheme);
+  }, []);
+
   // ── Init: check auth + load data ──
   const fetchUser = useCallback(async () => {
     try {
-      const res = await fetch("/api/auth/me", { credentials: "same-origin" });
+      const res = await fetch("/api/app-state", { credentials: "same-origin" });
       const data = await res.json();
-      setUser(data.user);
-      if (data.user) {
-        const [progRes, profRes] = await Promise.all([
-          fetch("/api/progress/all", { credentials: "same-origin" }),
-          fetch("/api/profile", { credentials: "same-origin" }),
-        ]);
-        const profData = profRes.ok ? await profRes.json() : {};
-        // If /api/progress/all fails or returns empty, fall back to Go-only
-        // so the user doesn't see a blank dashboard.
-        let byLang: Record<string, string[]> = {};
-        let stepCounts: Record<string, number> = {};
-        if (progRes.ok) {
-          const progData = await progRes.json().catch(() => ({}));
-          byLang = (progData.progress && Object.keys(progData.progress).length > 0)
-            ? progData.progress
-            : {};
-          stepCounts = progData.stepCounts ?? {};
-        }
-        if (Object.keys(byLang).length === 0) {
-          // Fallback: load at least Go progress the old way
-          const goRes = await fetch("/api/progress?lang=go", { credentials: "same-origin" });
-          if (goRes.ok) {
-            const goData = await goRes.json().catch(() => ({}));
-            if (Array.isArray(goData.progress) && goData.progress.length > 0) {
-              byLang = { go: goData.progress };
-            }
-          }
-        }
-        setProgressByLang(byLang);
-        setStepCountByLang(stepCounts);
-        const prof = extractProfile(profData);
-        if (prof) {
-          setProfile(prof);
-          applyTheme(prof.theme);
-        }
-        setLimited(false);
-        setViewCount(0);
-      } else {
-        const viewRes = await fetch("/api/views");
-        const viewData = viewRes.ok ? await viewRes.json() : { viewCount: 0, limited: false };
-        setViewCount(viewData.viewCount);
-        setLimited(viewData.limited);
-      }
+      applyAppState(data);
     } catch {
-      setUser(null);
+      applyAppState({
+        user: null,
+        profile: null,
+        progress: {},
+        stepCounts: {},
+        unreadCount: 0,
+        viewCount: 0,
+        limited: false,
+      });
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [applyAppState]);
 
   useEffect(() => {
     const savedTheme = typeof window !== "undefined" ? localStorage.getItem("theme") : null;
@@ -240,40 +232,11 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
     setLimited(false);
     setViewCount(0);
     try {
-      const [progRes, profRes] = await Promise.all([
-        fetch("/api/progress/all", { credentials: "same-origin" }),
-        fetch("/api/profile", { credentials: "same-origin" }),
-      ]);
-      let byLang: Record<string, string[]> = {};
-      let stepCounts: Record<string, number> = {};
-      if (progRes.ok) {
-        const progData = await progRes.json().catch(() => ({}));
-        byLang = (progData.progress && Object.keys(progData.progress).length > 0)
-          ? progData.progress
-          : {};
-        stepCounts = progData.stepCounts ?? {};
-      }
-      if (Object.keys(byLang).length === 0) {
-        const goRes = await fetch("/api/progress?lang=go", { credentials: "same-origin" });
-        if (goRes.ok) {
-          const goData = await goRes.json().catch(() => ({}));
-          if (Array.isArray(goData.progress) && goData.progress.length > 0) {
-            byLang = { go: goData.progress };
-          }
-        }
-      }
-      setProgressByLang(byLang);
-      setStepCountByLang(stepCounts);
-      if (profRes.ok) {
-        const profData = await profRes.json();
-        const prof = extractProfile(profData);
-        if (prof) {
-          setProfile(prof);
-          applyTheme(prof.theme);
-        }
-      }
+      const res = await fetch("/api/app-state", { credentials: "same-origin" });
+      const data = await res.json().catch(() => null);
+      if (res.ok && data) applyAppState(data);
     } catch { /* ignore */ }
-  }, []);
+  }, [applyAppState]);
 
   // ── Auth actions ──
   const signup = useCallback(async (name: string, email: string, password: string): Promise<string | null> => {
@@ -425,14 +388,16 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
       progress: progressByLang["go"] ?? [],   // backward-compat alias
       stepCountByLang,
       profile,
+      notificationUnreadCount,
       viewCount,
       limited,
       recordView,
       toggleProgress,
       incrementStepCount,
+      setNotificationUnreadCount,
       refreshProfile,
     }),
-    [progressByLang, stepCountByLang, profile, viewCount, limited, recordView, toggleProgress, incrementStepCount, refreshProfile]
+    [progressByLang, stepCountByLang, profile, notificationUnreadCount, viewCount, limited, recordView, toggleProgress, incrementStepCount, refreshProfile]
   );
 
   return (
