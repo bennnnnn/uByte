@@ -346,6 +346,18 @@ export default function AuthPage({ variant }: { variant: AuthPageMode }) {
                   </>
                 )}
 
+                {mode === "login" && !emailOpen && (
+                  <div className="mt-3 text-center">
+                    <button
+                      type="button"
+                      onClick={() => switchMode("forgot")}
+                      className="text-xs font-medium text-zinc-400 transition-colors hover:text-indigo-600 dark:hover:text-indigo-400"
+                    >
+                      Forgot your password?
+                    </button>
+                  </div>
+                )}
+
                 <p className="mt-4 text-sm text-zinc-600 dark:text-zinc-400">
                   {isSignupPage ? "Already have an account? " : "Don't have an account? "}
                   <button

@@ -174,6 +174,18 @@ const AuthFormFields = forwardRef<HTMLFormElement, AuthFormFieldsProps>(function
         </>
       )}
 
+      {mode === "login" && !emailOpen && onForgot && (
+        <div className="mt-3 text-center">
+          <button
+            type="button"
+            onClick={onForgot}
+            className="text-xs font-medium text-zinc-400 transition-colors hover:text-indigo-600 dark:hover:text-indigo-400"
+          >
+            Forgot your password?
+          </button>
+        </div>
+      )}
+
       <p className="mt-3 text-center text-sm text-zinc-500 dark:text-zinc-400">
         {mode === "login" ? (
           <>
