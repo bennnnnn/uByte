@@ -86,7 +86,11 @@ export const GET = withErrorHandling("GET /api/auth/google/callback", async (req
       if (existing) {
         await linkGoogleId(existing.id, googleId);
         user = existing;
-        sendGoogleLinkedEmail(user.email, user.name).catch(() => {});
+        try {
+          await sendGoogleLinkedEmail(user.email, user.name);
+        } catch {
+          /* non-critical */
+        }
       } else {
         user = await createUserWithGoogle(
           name ?? email.split("@")[0],
@@ -98,10 +102,11 @@ export const GET = withErrorHandling("GET /api/auth/google/callback", async (req
     }
 
     if (isNewUser) {
-      // Day-0 welcome email — fire-and-forget
-      sendWelcomeEmail(user.email, user.name).catch((err) => {
+      try {
+        await sendWelcomeEmail(user.email, user.name);
+      } catch (err) {
         console.error("[google/callback] Welcome email failed:", err);
-      });
+      }
       // In-app welcome notification
       createNotification(
         user.id,

@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { randomUUID } from "crypto";
+import * as Sentry from "@sentry/nextjs";
 import { getUserByEmail, createPasswordResetToken, userHasPasswordLogin } from "@/lib/db";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 import { withErrorHandling } from "@/lib/api-utils";
-import { sendPasswordResetEmail } from "@/lib/email";
+import { sendPasswordResetEmail, sendPasswordResetGoogleOnlyEmail } from "@/lib/email";
 
 // No CSRF check: unauthenticated users sending their email address have no
 // session cookie and therefore no CSRF token. Rate limiting (3/min) is the
@@ -31,11 +32,20 @@ export const POST = withErrorHandling("POST /api/auth/forgot-password", async (r
     const token = randomUUID();
     const expiresAt = new Date(Date.now() + 60 * 60 * 1000).toISOString(); // 1 hour
     await createPasswordResetToken(user.id, token, expiresAt);
-    // Wrap in try/catch: a Resend failure must not change the HTTP status and
-    // must not reveal that this email address exists in our DB.
-    sendPasswordResetEmail(user.email, user.name, token).catch((err) => {
+    try {
+      await sendPasswordResetEmail(user.email, user.name, token);
+    } catch (err) {
       console.error("[forgot-password] Failed to send password reset email:", err);
-    });
+      Sentry.captureException(err, { tags: { route: "forgot-password" }, extra: { kind: "password-reset" } });
+    }
+  } else if (user) {
+    // Google-only: still send a clear explanation (otherwise users get "success" UI but zero email).
+    try {
+      await sendPasswordResetGoogleOnlyEmail(user.email, user.name);
+    } catch (err) {
+      console.error("[forgot-password] Failed to send Google-only notice email:", err);
+      Sentry.captureException(err, { tags: { route: "forgot-password" }, extra: { kind: "google-only-notice" } });
+    }
   }
 
   return NextResponse.json({ ok: true });

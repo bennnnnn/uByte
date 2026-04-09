@@ -52,13 +52,17 @@ export const POST = withErrorHandling("POST /api/auth/signup", async (request: N
 
   const verifyToken = crypto.randomBytes(32).toString("hex");
   await createEmailVerificationToken(user.id, verifyToken);
-  sendVerificationEmail(email, name, verifyToken).catch((err) => {
+  // Await sends so the serverless invocation does not freeze before Resend completes.
+  try {
+    await sendVerificationEmail(email, name, verifyToken);
+  } catch (err) {
     console.error("Failed to send verification email:", err);
-  });
-  // Day-0 welcome email — fire-and-forget, never blocks signup
-  sendWelcomeEmail(email, name).catch((err) => {
+  }
+  try {
+    await sendWelcomeEmail(email, name);
+  } catch (err) {
     console.error("[signup] Welcome email failed:", err);
-  });
+  }
   // In-app welcome notification
   createNotification(
     user.id,

@@ -82,7 +82,11 @@ export const POST = withErrorHandling("POST /api/auth/google-id-token", async (r
     if (existing) {
       await linkGoogleId(existing.id, googleId);
       user = existing;
-      sendGoogleLinkedEmail(user.email, user.name).catch(() => {});
+      try {
+        await sendGoogleLinkedEmail(user.email, user.name);
+      } catch {
+        /* non-critical */
+      }
     } else {
       user = await createUserWithGoogle(name, email, googleId);
       isNewUser = true;
@@ -90,9 +94,11 @@ export const POST = withErrorHandling("POST /api/auth/google-id-token", async (r
   }
 
   if (isNewUser) {
-    sendWelcomeEmail(user.email, user.name).catch((err) => {
+    try {
+      await sendWelcomeEmail(user.email, user.name);
+    } catch (err) {
       console.error("[google-id-token] Welcome email failed:", err);
-    });
+    }
     createNotification(
       user.id,
       "success",

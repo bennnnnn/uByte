@@ -1,18 +1,23 @@
 /**
- * Transactional email via Resend.
+ * Transactional email via Resend (Node.js SDK).
  * Degrades gracefully when RESEND_API_KEY is not set (dev / CI).
+ *
+ * Follows Resend’s `{ data, error }` response pattern — the SDK does not throw on API errors.
+ * @see https://resend.com/docs
  *
  * Onboarding drip sequence (triggered by /api/cron/onboarding-drip):
  *   Day 0 (signup)  → sendWelcomeEmail         — immediate, sent from signup route
  *   Day 3           → sendDay3Email             — motivate, suggest first tutorial
  *   Day 7           → sendDay7Email             — one week in, reinforce the habit + hint upsell
  */
+import { createHash } from "crypto";
 import { Resend } from "resend";
 
 import { BASE_URL } from "@/lib/constants";
 import { makeUnsubscribeUrl } from "@/lib/unsubscribe";
 
 type EmailPayload = Parameters<Resend["emails"]["send"]>[0];
+type EmailRequestOptions = NonNullable<Parameters<Resend["emails"]["send"]>[1]>;
 
 const FROM: string =
   process.env.RESEND_FROM_EMAIL?.trim() || "noreply@ubyte.dev";
@@ -44,42 +49,47 @@ function unsubFooter(email: string): string {
   }
 }
 
-function formatResendError(error: unknown): string {
-  if (error && typeof error === "object") {
-    const o = error as Record<string, unknown>;
-    const name = typeof o.name === "string" ? o.name : "error";
-    const message = typeof o.message === "string" ? o.message : null;
-    if (message) return `${name}: ${message}`;
-    try {
-      return JSON.stringify(error);
-    } catch {
-      return String(error);
-    }
-  }
-  return String(error);
+/** Idempotency keys must be ≤256 chars (Resend). */
+function idempotencyKey(prefix: string, seed: string): string {
+  const combined = `${prefix}/${seed}`;
+  if (combined.length <= 256) return combined;
+  return `${prefix}/${createHash("sha256").update(seed).digest("hex")}`;
 }
 
-function getResend(): { emails: { send: (payload: EmailPayload) => Promise<void> } } | null {
+function getResend(): Resend | null {
   const key = process.env.RESEND_API_KEY?.trim();
   if (!key) return null;
+  return new Resend(key);
+}
 
-  const resend = new Resend(key);
-  return {
-    emails: {
-      async send(payload: EmailPayload) {
-        const { from: ignoredFrom, ...rest } = payload as EmailPayload & { from?: string };
-        void ignoredFrom;
-        const { error } = await resend.emails.send({
-          from: FROM,
-          ...rest,
-        });
+type SendEmailMeta = {
+  /** For logs and Sentry — which high-level send this is */
+  context: string;
+  /** Safe retries without duplicate sends (expires after 24h on Resend’s side) */
+  idempotencyKey?: string;
+};
 
-        if (error) {
-          throw new Error(`Resend send failed: ${formatResendError(error)}`);
-        }
-      },
-    },
-  };
+/**
+ * Wraps `resend.emails.send`: checks both `data` and `error` per Resend Node SDK docs, then throws
+ * so API routes can still use try/catch for operational failures (network issues may still reject).
+ */
+async function sendEmail(resend: Resend, payload: EmailPayload, meta: SendEmailMeta): Promise<void> {
+  const { from: ignoredFrom, ...rest } = payload as EmailPayload & { from?: string };
+  void ignoredFrom;
+  const requestOptions: EmailRequestOptions | undefined = meta.idempotencyKey
+    ? { idempotencyKey: meta.idempotencyKey }
+    : undefined;
+
+  const { data, error } = await resend.emails.send({ from: FROM, ...rest } as EmailPayload, requestOptions);
+
+  if (error) {
+    const detail = `${error.name}: ${error.message}`;
+    console.error(`[email] ${meta.context}:`, detail);
+    throw new Error(`Resend send failed: ${detail}`);
+  }
+  if (process.env.NODE_ENV === "development" && data?.id) {
+    console.info(`[email] ${meta.context}: message id ${data.id}`);
+  }
 }
 
 function logMissingResendApiKey(context: string): void {
@@ -97,7 +107,7 @@ export async function sendStreakReminderEmail(
   if (!resend) return;
 
   const safeName = escapeHtml(name);
-  await resend.emails.send({
+  await sendEmail(resend, {
     from: FROM,
     to,
     subject: `🔥 Keep your ${streakDays}-day streak alive — uByte`,
@@ -111,7 +121,7 @@ export async function sendStreakReminderEmail(
         ${unsubFooter(to)}
       </div>
     `,
-  });
+  }, { context: "sendStreakReminderEmail" });
 }
 
 export async function sendGoogleLinkedEmail(
@@ -122,7 +132,7 @@ export async function sendGoogleLinkedEmail(
   if (!resend) return;
 
   const siteUrl = BASE_URL;
-  await resend.emails.send({
+  await sendEmail(resend, {
     from: FROM,
     to,
     subject: "Google sign-in linked to your uByte account",
@@ -136,7 +146,7 @@ export async function sendGoogleLinkedEmail(
         <p style="color:#6b7280;font-size:12px">You're receiving this because a Google account was linked to your uByte account.</p>
       </div>
     `,
-  });
+  }, { context: "sendGoogleLinkedEmail" });
 }
 
 export async function sendVerificationEmail(
@@ -155,7 +165,7 @@ export async function sendVerificationEmail(
 
   const safeName = escapeHtml(name);
   const link = `${BASE_URL}/verify-email?token=${token}`;
-  await resend.emails.send({
+  await sendEmail(resend, {
     from: FROM,
     to,
     subject: "Verify your email — uByte",
@@ -169,7 +179,7 @@ export async function sendVerificationEmail(
         <p style="color:#6b7280;font-size:12px">Or copy this link: ${link}</p>
       </div>
     `,
-  });
+  }, { context: "sendVerificationEmail", idempotencyKey: idempotencyKey("verify-email", token) });
 }
 
 // ─── Onboarding drip ────────────────────────────────────────────────────────
@@ -183,7 +193,7 @@ export async function sendWelcomeEmail(to: string, name: string): Promise<void> 
   }
 
   const firstName = escapeHtml(name.split(" ")[0]);
-  await resend.emails.send({
+  await sendEmail(resend, {
     from: FROM,
     to,
     subject: `Welcome to uByte, ${firstName}! 🚀 Your first lesson is free`,
@@ -216,7 +226,7 @@ export async function sendWelcomeEmail(to: string, name: string): Promise<void> 
         </div>
       </div>
     `,
-  });
+  }, { context: "sendWelcomeEmail", idempotencyKey: idempotencyKey("welcome", to) });
 }
 
 /** Day 1 — 24h check-in: reinforce the value and nudge to complete first lesson. */
@@ -225,7 +235,7 @@ export async function sendDay1Email(to: string, name: string): Promise<void> {
   if (!resend) return;
 
   const firstName = escapeHtml(name.split(" ")[0]);
-  await resend.emails.send({
+  await sendEmail(resend, {
     from: FROM,
     to,
     subject: `${firstName}, your first lesson is waiting 👩‍💻`,
@@ -262,7 +272,7 @@ export async function sendDay1Email(to: string, name: string): Promise<void> {
         </div>
       </div>
     `,
-  });
+  }, { context: "sendDay1Email" });
 }
 
 /** Day 3 — encourage users who may not have returned yet. */
@@ -271,7 +281,7 @@ export async function sendDay3Email(to: string, name: string): Promise<void> {
   if (!resend) return;
 
   const firstName = escapeHtml(name.split(" ")[0]);
-  await resend.emails.send({
+  await sendEmail(resend, {
     from: FROM,
     to,
     subject: `${firstName}, ready for your next lesson? 🎯`,
@@ -295,7 +305,7 @@ export async function sendDay3Email(to: string, name: string): Promise<void> {
         </div>
       </div>
     `,
-  });
+  }, { context: "sendDay3Email" });
 }
 
 /** Day 7 — celebrate one week and reinforce the tutorial habit. */
@@ -304,7 +314,7 @@ export async function sendDay7Email(to: string, name: string): Promise<void> {
   if (!resend) return;
 
   const firstName = escapeHtml(name.split(" ")[0]);
-  await resend.emails.send({
+  await sendEmail(resend, {
     from: FROM,
     to,
     subject: `One week on uByte 🎉 — you're building real momentum`,
@@ -331,7 +341,7 @@ export async function sendDay7Email(to: string, name: string): Promise<void> {
         </div>
       </div>
     `,
-  });
+  }, { context: "sendDay7Email" });
 }
 
 /** Weekly progress digest — sent every Sunday to active users. */
@@ -363,7 +373,7 @@ export async function sendWeeklyDigestEmail(opts: {
     `<tr><td style="padding:10px 0"><strong>⭐ Total XP</strong><span style="float:right;font-size:22px;font-weight:800;color:#4f46e5">${xp.toLocaleString()}</span></td></tr>`,
   ].filter(Boolean).join("");
 
-  await resend.emails.send({
+  await sendEmail(resend, {
     from: FROM,
     to,
     subject: `Your uByte weekly recap — ${tutorialsThisWeek} lessons this week`,
@@ -410,7 +420,7 @@ export async function sendWeeklyDigestEmail(opts: {
         </div>
       </div>
     `,
-  });
+  }, { context: "sendWeeklyDigestEmail" });
 }
 
 /** Sent after a user successfully upgrades to Pro or Yearly. */
@@ -424,7 +434,7 @@ export async function sendUpgradeEmail(
 
   const firstName = name.split(" ")[0];
   const planLabel = plan.includes("yearly") ? "Yearly Pro" : "Monthly Pro";
-  await resend.emails.send({
+  await sendEmail(resend, {
     from: FROM,
     to,
     subject: `Welcome to ${planLabel}, ${firstName}! 🎉 — uByte`,
@@ -461,7 +471,7 @@ export async function sendUpgradeEmail(
         </div>
       </div>
     `,
-  });
+  }, { context: "sendUpgradeEmail" });
 }
 
 /** Day 14 — win-back for users who haven't logged in since signup week. */
@@ -470,7 +480,7 @@ export async function sendDay14WinBackEmail(to: string, name: string): Promise<v
   if (!resend) return;
 
   const firstName = name.split(" ")[0];
-  await resend.emails.send({
+  await sendEmail(resend, {
     from: FROM,
     to,
     subject: `${firstName}, are you still there? 👋`,
@@ -494,7 +504,7 @@ export async function sendDay14WinBackEmail(to: string, name: string): Promise<v
         </div>
       </div>
     `,
-  });
+  }, { context: "sendDay14WinBackEmail" });
 }
 
 /** Day 30 — final win-back for churned users. */
@@ -503,7 +513,7 @@ export async function sendDay30WinBackEmail(to: string, name: string): Promise<v
   if (!resend) return;
 
   const firstName = name.split(" ")[0];
-  await resend.emails.send({
+  await sendEmail(resend, {
     from: FROM,
     to,
     subject: `Last chance to restart your coding habit, ${firstName}`,
@@ -533,7 +543,7 @@ export async function sendDay30WinBackEmail(to: string, name: string): Promise<v
         </div>
       </div>
     `,
-  });
+  }, { context: "sendDay30WinBackEmail" });
 }
 
 /** Trial ending soon — sent 2 days before trial expiry. */
@@ -550,7 +560,7 @@ export async function sendTrialEndingEmail(
   const planType = plan === "trial_yearly" ? "Yearly" : "Monthly";
   const isUrgent = daysLeft <= 1;
 
-  await resend.emails.send({
+  await sendEmail(resend, {
     from: FROM,
     to,
     subject: isUrgent
@@ -590,7 +600,7 @@ export async function sendTrialEndingEmail(
         </div>
       </div>
     `,
-  });
+  }, { context: "sendTrialEndingEmail" });
 }
 
 /** Password reset — sent when a user requests a password reset. */
@@ -609,7 +619,7 @@ export async function sendPasswordResetEmail(
   }
 
   const resetLink = `${BASE_URL}/reset-password?token=${resetToken}`;
-  await resend.emails.send({
+  await sendEmail(resend, {
     from: FROM,
     to,
     subject: "Reset your password — uByte",
@@ -623,6 +633,39 @@ export async function sendPasswordResetEmail(
         <p style="color:#6b7280;font-size:12px">Or copy this link: ${resetLink}</p>
       </div>
     `,
+  }, { context: "sendPasswordResetEmail", idempotencyKey: idempotencyKey("password-reset", resetToken) });
+}
+
+/**
+ * Forgot-password was requested but the account only has Google sign-in (no local password yet).
+ * Explains why no reset link was sent and how to sign in or add a password.
+ */
+export async function sendPasswordResetGoogleOnlyEmail(to: string, name: string): Promise<void> {
+  const resend = getResend();
+  if (!resend) {
+    logMissingResendApiKey("sendPasswordResetGoogleOnlyEmail");
+    return;
+  }
+
+  const safeName = escapeHtml(name);
+  await sendEmail(resend, {
+    from: FROM,
+    to,
+    subject: "Your uByte account uses Google sign-in",
+    html: `
+      <div style="font-family:sans-serif;max-width:480px;margin:auto">
+        <h2 style="color:#4f46e5">Password reset</h2>
+        <p>Hi ${safeName},</p>
+        <p>We received a request to reset the password for <strong>${escapeHtml(to)}</strong>.</p>
+        <p>This account was created with <strong>Google sign-in</strong> and does not have a separate uByte password yet, so there is no reset link to send.</p>
+        <p><strong>To sign in:</strong> use <strong>Continue with Google</strong> on the <a href="${BASE_URL}/login">login page</a>.</p>
+        <p>If you want to use email and password as well, sign in with Google, open <a href="${BASE_URL}/settings">Settings</a>, and add a password under Security.</p>
+        <p style="color:#6b7280;font-size:13px">If you did not request this, you can ignore this email.</p>
+      </div>
+    `,
+  }, {
+    context: "sendPasswordResetGoogleOnlyEmail",
+    idempotencyKey: idempotencyKey("forgot-password-google-only", to),
   });
 }
 
@@ -640,7 +683,7 @@ export async function sendContactEmail(opts: {
   const name    = escapeHtml(opts.fromName);
   const subject = escapeHtml(opts.subject);
   const message = escapeHtml(opts.message);
-  await resend.emails.send({
+  await sendEmail(resend, {
     from: FROM,
     to: SUPPORT,
     replyTo: opts.fromEmail,
@@ -658,7 +701,7 @@ export async function sendContactEmail(opts: {
         </p>
       </div>
     `,
-  });
+  }, { context: "sendContactEmail" });
 }
 
 /** Sent daily to users who have unread discussion reply/mention notifications. */
@@ -690,7 +733,7 @@ export async function sendNotificationDigestEmail(opts: {
     )
     .join("");
 
-  await resend.emails.send({
+  await sendEmail(resend, {
     from: FROM,
     to,
     subject,
@@ -721,5 +764,5 @@ export async function sendNotificationDigestEmail(opts: {
         </div>
       </div>
     `,
-  });
+  }, { context: "sendNotificationDigestEmail" });
 }

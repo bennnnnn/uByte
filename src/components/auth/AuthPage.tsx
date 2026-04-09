@@ -256,7 +256,7 @@ export default function AuthPage({ variant }: { variant: AuthPageMode }) {
               </h2>
               <p className="mt-2 text-sm leading-6 text-zinc-600 dark:text-zinc-400">
                 {isForgotPage
-                  ? "Enter the email on your account and we’ll send you a reset link."
+                  ? "For privacy we never confirm whether an email is registered. If an account exists for what you enter, we’ll email next steps."
                   : postSignupSignIn && isSignupPage
                     ? "Sign in with the email and password you just used. We also sent a verification link — you can confirm your email anytime."
                     : isSignupPage
@@ -275,9 +275,11 @@ export default function AuthPage({ variant }: { variant: AuthPageMode }) {
               forgotDone ? (
                 <div className="mt-6 rounded-[24px] border border-emerald-200 bg-emerald-50 px-5 py-6 text-center dark:border-emerald-900/50 dark:bg-emerald-950/30">
                   <div className="text-4xl">✉️</div>
-                  <h3 className="mt-3 text-lg font-semibold text-zinc-950 dark:text-white">Check your inbox</h3>
+                  <h3 className="mt-3 text-lg font-semibold text-zinc-950 dark:text-white">Request received</h3>
                   <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
-                    If that email matches an account, a reset link is on the way.
+                    If <strong className="break-all font-medium text-zinc-800 dark:text-zinc-200">{email}</strong> is
+                    registered, you’ll get an email within a few minutes — check spam. If nothing arrives, that address
+                    may not be on file, or you may need to use <strong>Continue with Google</strong> instead.
                   </p>
                   <button
                     type="button"
@@ -313,7 +315,7 @@ export default function AuthPage({ variant }: { variant: AuthPageMode }) {
                     size="lg"
                     className="w-full"
                   >
-                    {submitting ? "Sending…" : "Send reset link"}
+                    {submitting ? "Sending…" : "Request reset link"}
                   </Button>
 
                   <button

@@ -233,7 +233,7 @@ export default function AuthModal({ onClose, initialMode }: Props) {
               </h2>
               <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
                 {mode === "forgot"
-                  ? "We’ll email you a link to reset your password."
+                  ? "We never reveal whether an email is registered. If yours is on file, we’ll send instructions."
                   : mode === "signup"
                     ? signupAwaitingLogin
                       ? "Sign in with the same email and password to continue."
@@ -258,7 +258,8 @@ export default function AuthModal({ onClose, initialMode }: Props) {
               <div className="rounded-xl bg-emerald-50 p-5 text-center dark:bg-emerald-950/30">
                 <div className="mb-3 text-3xl">✉️</div>
                 <p className="text-sm text-zinc-700 dark:text-zinc-300">
-                  If that email has an account, you’ll receive a reset link shortly. Check your inbox.
+                  If <strong className="break-all font-medium">{email}</strong> is registered, look for an email soon
+                  (check spam). If nothing arrives, try Google sign-in or confirm the address you used.
                 </p>
                 <button
                   type="button"
@@ -297,7 +298,7 @@ export default function AuthModal({ onClose, initialMode }: Props) {
                     size="lg"
                     className="w-full"
                   >
-                    {submitting ? "Sending…" : "Send reset link"}
+                    {submitting ? "Sending…" : "Request reset link"}
                   </Button>
                 </form>
                 <button
