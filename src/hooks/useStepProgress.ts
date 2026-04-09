@@ -113,7 +113,7 @@ export interface StepProgressState {
   setTutorialDone: (v: boolean) => void;
   showHint: boolean;
   setShowHint: (v: boolean) => void;
-  goToStep: (idx: number) => void;
+  goToStep: (idx: number, opts?: { editorCode?: string }) => void;
   skipStep: () => void;
   handleCheck: (code: string, step: TutorialStep, setCode: (c: string) => void, setErrorLines: (l: Set<number>) => void) => Promise<void>;
   handleReset: (step: TutorialStep, setCode: (c: string) => void, setErrorLines: (l: Set<number>) => void) => void;
@@ -285,9 +285,14 @@ export function useStepProgress(
     }
   }
 
-  function goToStep(idx: number) {
+  function goToStep(idx: number, opts?: { editorCode?: string }) {
     setStepIndex(idx);
-    setCode(steps[idx].starter);
+    const nextStep = steps[idx];
+    const carry =
+      opts?.editorCode !== undefined &&
+      idx > 0 &&
+      nextStep?.carryForward === true;
+    setCode(carry ? opts.editorCode! : steps[idx].starter);
     setOutput(null);
     setStatus("idle");
     setShowHint(false);

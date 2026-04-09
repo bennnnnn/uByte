@@ -62,6 +62,7 @@ export function loadStepsFromContent(
       codeChecks: Array.isArray(item.codeChecks)
         ? (item.codeChecks as import("./types").CodeCheck[])
         : undefined,
+      carryForward: item.carryForward === true ? true : undefined,
     }));
 
     const result = steps.length > 0 ? steps : null;

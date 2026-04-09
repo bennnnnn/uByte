@@ -18,6 +18,7 @@ import { steps as testingBasics } from "./testing-basics";
 import { steps as httpBasics } from "./http-basics";
 import { steps as jsonEncoding } from "./json-encoding";
 import { steps as selectStatement } from "./select-statement";
+import { steps as miniProjectAge } from "./mini-project-age";
 
 export const goSteps: Record<string, TutorialStep[]> = {
   "getting-started": gettingStarted,
@@ -42,4 +43,5 @@ export const goSteps: Record<string, TutorialStep[]> = {
   "http-basics": httpBasics,
   "json-encoding": jsonEncoding,
   "select-statement": selectStatement,
+  "mini-project-age": miniProjectAge,
 };

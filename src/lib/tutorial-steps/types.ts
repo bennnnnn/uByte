@@ -21,6 +21,13 @@ export interface TutorialStep {
   successMessage?: string;
   hint?: string;
   starter: string;
+  /**
+   * When true and this is not the first step (index > 0), clicking **Next step** after a pass
+   * keeps the learner’s current editor code instead of swapping in `starter`.
+   * `starter` is still used for **Reset**, jumping via step dots, and cold resume without a draft.
+   * Use this for cumulative “mini project” lessons where each step builds on the last.
+   */
+  carryForward?: boolean;
   expectedOutput: string[];
   /**
    * Optional code-level validation rules applied before accepting a "passed" result.

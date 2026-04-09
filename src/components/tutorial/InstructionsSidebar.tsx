@@ -34,6 +34,8 @@ interface Props {
   progress: StepProgressState;
   tutorialSlug: string;
   nextTutorial: { slug: string; title: string; steps: { index: number; title: string }[] } | null;
+  /** After passing a step, advances and may carry code for cumulative (`carryForward`) lessons. */
+  onContinueAfterPass?: () => void;
 }
 
 export default function InstructionsSidebar({
@@ -43,6 +45,7 @@ export default function InstructionsSidebar({
   progress,
   tutorialSlug,
   nextTutorial,
+  onContinueAfterPass,
 }: Props) {
   const { stepIndex, status, showHint, failCount, completedSteps, skippedSteps, tutorialDone, aiFeedback, aiFeedbackLoading } = progress;
   const { profile } = useAuth();
@@ -106,7 +109,7 @@ export default function InstructionsSidebar({
             {stepIndex < steps.length - 1 ? (
               <button
                 type="button"
-                onClick={() => progress.goToStep(stepIndex + 1)}
+                onClick={() => (onContinueAfterPass ? onContinueAfterPass() : progress.goToStep(stepIndex + 1))}
                 className="mt-3 flex w-full items-center justify-center gap-2 rounded-lg bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-emerald-500"
               >
                 Next Step

@@ -111,6 +111,8 @@ export default function InteractiveTutorial({
   // True while an async draft-load is in flight — prevents the debounce-save from
   // firing before the real draft arrives and accidentally overwriting it with starter code.
   const draftLoadingRef = useRef(false);
+  /** After "Next step" with `carryForward`, skip one draft fetch so we do not overwrite carried code. */
+  const skipDraftLoadOnceRef = useRef(false);
   const saveDraftTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [resetDone, setResetDone] = useState(false);
   const resetTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -124,6 +126,10 @@ export default function InteractiveTutorial({
    */
   function loadDraft(stepIndex: number, langOverride?: SupportedLanguage) {
     if (currentSteps.length === 0) return;
+    if (skipDraftLoadOnceRef.current) {
+      skipDraftLoadOnceRef.current = false;
+      return;
+    }
     const targetLang = langOverride ?? ideLang;
     const safeIndex  = Math.min(stepIndex, currentSteps.length - 1);
     const starter    = currentSteps[safeIndex]?.starter ?? "";
@@ -223,6 +229,33 @@ export default function InteractiveTutorial({
     editor,
     onRun: () => stepProgress.handleCheck(editor.code, currentStep, editor.setCode, editor.setErrorLines),
   });
+
+  /** Advance after a passed step; carries editor code when the next step uses `carryForward`. */
+  function continueAfterPass() {
+    const idx = stepProgress.stepIndex;
+    const next = idx + 1;
+    if (next >= currentSteps.length) return;
+    const nextStep = currentSteps[next];
+    const code = editor.code;
+    if (next > 0 && nextStep?.carryForward) {
+      skipDraftLoadOnceRef.current = true;
+      if (user) {
+        apiFetch("/api/code-drafts", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            slug: tutorialSlug,
+            key: `step-${next}`,
+            code,
+            lang: ideLang,
+          }),
+        }).catch(() => {});
+      }
+      stepProgress.goToStep(next, { editorCode: code });
+    } else {
+      stepProgress.goToStep(next);
+    }
+  }
 
   if (!currentStep) {
     return (
@@ -342,6 +375,7 @@ export default function InteractiveTutorial({
               progress={stepProgress}
               tutorialSlug={tutorialSlug}
               nextTutorial={next ? { slug: next.slug, title: next.title, steps: allTutorialSteps[next.slug] ?? [] } : null}
+              onContinueAfterPass={continueAfterPass}
             />
           )}
 
