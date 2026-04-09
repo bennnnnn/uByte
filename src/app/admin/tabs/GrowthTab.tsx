@@ -9,6 +9,7 @@
 import { useMemo, useState } from "react";
 import { StatCard, SectionCard } from "../components";
 import type { AdminData } from "../hooks";
+import { formatAdminPlanLabel } from "../plan-labels";
 
 interface Props {
   data: AdminData;
@@ -181,8 +182,11 @@ export default function GrowthTab({ data }: Props) {
                       <td className="py-2 pr-4 text-zinc-500 dark:text-zinc-400">{u.email}</td>
                       <td className="py-2 pr-4 text-right text-zinc-400">{u.created_at?.slice(0, 10)}</td>
                       <td className="py-2 text-right">
-                        <span className="rounded-full bg-zinc-100 px-2 py-0.5 text-[10px] font-bold uppercase text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400">
-                          {u.plan || "free"}
+                        <span
+                          title={formatAdminPlanLabel(u.plan)}
+                          className="inline-block max-w-[10rem] truncate rounded-full bg-zinc-100 px-2 py-0.5 text-[10px] font-semibold text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300"
+                        >
+                          {formatAdminPlanLabel(u.plan)}
                         </span>
                       </td>
                     </tr>

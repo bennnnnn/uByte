@@ -19,7 +19,7 @@ import { UsersTab, AnalyticsTab, RevenueTab, GrowthTab, BannerTab, AuditTab, Blo
 
 /* ── Tab header subtitles (concise one-liners per tab) ───────────────────── */
 const TAB_SUBTITLES: Record<Tab, string> = {
-  users:           "Registered users",
+  users:           "Search, filters, and account actions (ban, plan, delete)",
   analytics:       "Tutorial performance and step heatmap",
   revenue:         "Income, subscribers & billing events",
   growth:          "Conversion funnel, signup trend & churn signals",

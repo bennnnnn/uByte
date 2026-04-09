@@ -25,7 +25,8 @@
  *
  * ─── DATABASE NOTE ──────────────────────────────────────────────────────────
  *
- * The plan is stored in users.plan as a string: "free" | "pro" | "yearly" | "monthly" | "canceling"
+ * The plan is stored in users.plan as a string (see formatAdminPlanLabel in src/app/admin/plan-labels.ts):
+ *   "free" | "monthly" | "yearly" (Paddle) | "pro" (legacy/referral) | "canceling" | optional "trial"*
  * The Paddle customer ID is stored in users.paddle_customer_id.
  */
 

@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { createUser, getUserByEmail, createEmailVerificationToken, getReferrerByCode, recordReferralSignup } from "@/lib/db";
 import { createNotification } from "@/lib/db/notifications";
-import { signToken, setAuthCookie } from "@/lib/auth";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 import { setCsrfCookie, verifyCsrf } from "@/lib/csrf";
 import { sendVerificationEmail, sendWelcomeEmail } from "@/lib/email";
@@ -80,15 +79,8 @@ export const POST = withErrorHandling("POST /api/auth/signup", async (request: N
       .catch(() => {}); // non-critical — never fail signup
   }
 
-  const token = await signToken({
-    userId: user.id,
-    email: user.email,
-    name: user.name,
-    tokenVersion: 0,
-  });
-  await setAuthCookie(token);
-
-  const res = NextResponse.json({ user: { id: user.id, name: user.name, email: user.email } });
+  // Do not set a session cookie — the client shows a success step and the user signs in explicitly.
+  const res = NextResponse.json({ ok: true as const, email: user.email, name: user.name });
   setCsrfCookie(res);
   return res;
 });

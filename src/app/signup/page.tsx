@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import AuthPage from "@/components/auth/AuthPage";
 
+/** Auth SEO: defined here only — `signup/layout.tsx` is a passthrough (single source of truth). */
 export const metadata: Metadata = {
   title: "Create your free account — uByte",
   description: "Join uByte for free and start learning through interactive tutorials with live code, saved progress, and optional paid hints.",

@@ -2,10 +2,11 @@
  * UsersTab — paginated, server-searched user management table.
  *
  * - Search by name or email (debounced 400 ms, server-side)
- * - Filter by plan (all / free / pro / monthly / yearly / canceling)
+ * - Filter by plan (see plan-labels.ts for meanings)
  * - 25 rows per page with full pagination controls
  * - Inline confirmation modal instead of browser alert/confirm
  * - Portal-rendered actions dropdown for correct z-index stacking
+ * - Mutations require “users” permission (super admin always allowed)
  */
 
 "use client";
@@ -17,22 +18,18 @@ import { Spinner } from "../components";
 import { formatDate } from "../utils";
 import type { AdminUser } from "../types";
 import type { AdminData } from "../hooks";
+import {
+  ADMIN_PLAN_FILTERS,
+  ADMIN_PLAN_HELP,
+  ADMIN_SET_PLAN_OPTIONS,
+  formatAdminPlanLabel,
+} from "../plan-labels";
 
 const PAGE_SIZE = 25;
 
 interface Props {
   data: AdminData;
 }
-
-/* ── Plan filter options ──────────────────────────────────────────────────── */
-const PLAN_FILTERS = [
-  { value: "",           label: "All plans" },
-  { value: "free",       label: "Free" },
-  { value: "pro",        label: "Pro" },
-  { value: "monthly",    label: "Monthly" },
-  { value: "yearly",     label: "Yearly" },
-  { value: "canceling",  label: "Canceling" },
-] as const;
 
 const VERIFIED_FILTERS = [
   { value: "",         label: "All" },
@@ -167,6 +164,10 @@ export default function UsersTab({ data }: Props) {
         <StatCard label="Showing"         value={loading ? "…" : `${users.length} / ${total}`} />
       </div>
 
+      <p className="rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2 text-xs leading-relaxed text-zinc-600 dark:border-zinc-700 dark:bg-zinc-800/50 dark:text-zinc-400">
+        {ADMIN_PLAN_HELP}
+      </p>
+
       {/* ── Toolbar ───────────────────────────────────────────────────── */}
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         {/* Search */}
@@ -199,7 +200,7 @@ export default function UsersTab({ data }: Props) {
         <div className="flex items-center gap-2 flex-wrap">
           {/* Plan filter pills */}
           <div className="flex gap-1 flex-wrap">
-            {PLAN_FILTERS.map((f) => (
+            {ADMIN_PLAN_FILTERS.map((f) => (
               <button
                 key={f.value}
                 type="button"
@@ -295,7 +296,7 @@ export default function UsersTab({ data }: Props) {
                         <td className="px-4 py-3">
                           <div className="flex flex-wrap items-center gap-1.5">
                             <span className="font-medium text-zinc-900 dark:text-zinc-100">{u.name}</span>
-                            <PlanBadge plan={u.plan} />
+                            <PlanBadge plan={u.plan ?? "free"} />
                             {u.is_admin === 1 && (
                               <Badge color={u.admin_role === "super" ? "violet" : "indigo"}>
                                 {u.admin_role === "super" ? "super admin" : "limited admin"}
@@ -462,13 +463,20 @@ function StatCard({ label, value, loading }: { label: string; value: string; loa
 }
 
 function PlanBadge({ plan }: { plan: string }) {
+  const p = plan.toLowerCase();
   const cls =
-    plan === "yearly"    ? "bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-400" :
-    plan === "pro"       ? "bg-indigo-100 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-400" :
-    plan === "monthly"   ? "bg-violet-100 text-violet-700 dark:bg-violet-900/40 dark:text-violet-400" :
-    plan === "canceling" ? "bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-400" :
-                           "bg-zinc-100 text-zinc-500 dark:bg-zinc-800 dark:text-zinc-500";
-  return <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${cls}`}>{plan ?? "free"}</span>;
+    p === "yearly" || p === "trial_yearly" ? "bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300" :
+    p === "pro"       ? "bg-indigo-100 text-indigo-800 dark:bg-indigo-900/40 dark:text-indigo-300" :
+    p === "monthly"   ? "bg-violet-100 text-violet-800 dark:bg-violet-900/40 dark:text-violet-300" :
+    p === "canceling" ? "bg-orange-100 text-orange-800 dark:bg-orange-900/40 dark:text-orange-300" :
+    p === "trial"     ? "bg-cyan-100 text-cyan-800 dark:bg-cyan-900/40 dark:text-cyan-300" :
+                        "bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400";
+  const label = formatAdminPlanLabel(plan);
+  return (
+    <span title={label} className={`max-w-[9rem] truncate rounded-full px-2 py-0.5 text-[10px] font-semibold ${cls}`}>
+      {label}
+    </span>
+  );
 }
 
 function Badge({ color, children }: { color: "violet" | "indigo" | "red" | "zinc"; children: React.ReactNode }) {
@@ -548,8 +556,8 @@ function ActionsMenu({
 
   const winW       = typeof window !== "undefined" ? window.innerWidth  : 800;
   const winH       = typeof window !== "undefined" ? window.innerHeight : 600;
-  const menuHeight = 340; // approximate rendered height of this menu
-  const left       = Math.max(8, Math.min(anchorRect.right - 180, winW - 188));
+  const menuHeight = 420; // approximate rendered height (plan options + actions)
+  const left       = Math.max(8, Math.min(anchorRect.right - 272, winW - 280));
   const spaceBelow = winH - anchorRect.bottom;
   const top        = spaceBelow < menuHeight + 10
     ? Math.max(8, anchorRect.top - menuHeight - 6)
@@ -558,7 +566,7 @@ function ActionsMenu({
   return (
     <div
       role="menu"
-      className="fixed z-50 w-48 overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-xl dark:border-zinc-700 dark:bg-zinc-900"
+      className="fixed z-50 w-[17rem] max-w-[calc(100vw-1rem)] overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-xl dark:border-zinc-700 dark:bg-zinc-900"
       style={{ left, top }}
     >
       {/* Status section */}
@@ -592,17 +600,23 @@ function ActionsMenu({
       <div className="px-3 pb-1">
         <p className="text-[10px] font-semibold uppercase tracking-wider text-zinc-400">Set plan</p>
       </div>
-      {(["free", "pro", "monthly", "yearly"] as const).map((p) => (
+      {ADMIN_SET_PLAN_OPTIONS.map((opt) => (
         <button
-          key={p}
+          key={opt.value}
           type="button"
-          disabled={plan === p}
-          onClick={() => onAction("set_plan", `Set ${name} to ${p} plan?`, { plan: p })}
-          className={`${btn} text-zinc-600 disabled:cursor-default disabled:opacity-40 dark:text-zinc-400`}
+          disabled={plan === opt.value}
+          title={opt.hint}
+          onClick={() =>
+            onAction("set_plan", `Set ${name} to “${opt.label}”? ${opt.hint}`, { plan: opt.value })
+          }
+          className="flex w-full flex-col gap-0.5 border-0 bg-transparent px-3 py-2.5 text-left text-xs text-zinc-600 transition-colors hover:bg-zinc-50 disabled:cursor-default disabled:opacity-40 dark:text-zinc-400 dark:hover:bg-zinc-800/60"
         >
-          <PlanDot plan={p} />
-          {p.charAt(0).toUpperCase() + p.slice(1)}
-          {plan === p && <span className="ml-auto text-[10px] text-zinc-400">current</span>}
+          <span className="flex w-full items-center gap-2">
+            <PlanDot plan={opt.value} />
+            <span className="font-semibold text-zinc-700 dark:text-zinc-200">{opt.label}</span>
+            {plan === opt.value && <span className="ml-auto shrink-0 text-[10px] text-zinc-400">current</span>}
+          </span>
+          <span className="pl-5 text-[10px] font-normal leading-snug text-zinc-400">{opt.hint}</span>
         </button>
       ))}
 
@@ -659,6 +673,7 @@ function PlanDot({ plan }: { plan: string }) {
     plan === "yearly"  ? "bg-amber-400" :
     plan === "pro"     ? "bg-indigo-500" :
     plan === "monthly" ? "bg-violet-500" :
+    plan === "free"    ? "bg-zinc-300 dark:bg-zinc-600" :
                          "bg-zinc-300 dark:bg-zinc-600";
-  return <span className={`h-2 w-2 rounded-full ${color}`} />;
+  return <span className={`mt-0.5 h-2 w-2 shrink-0 rounded-full ${color}`} />;
 }

@@ -297,12 +297,19 @@ function DashboardPage() {
   };
 
   const changePassword = async (currentPw: string, newPw: string): Promise<string | null> => {
+    const body: Record<string, string> = { newPassword: newPw };
+    if (currentPw) body.currentPassword = currentPw;
     const res = await apiFetch("/api/profile", {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ currentPassword: currentPw, newPassword: newPw }),
+      body: JSON.stringify(body),
     });
-    if (res.ok) return null;
+    if (res.ok) {
+      const json = await res.json() as { profile?: Profile };
+      if (json.profile) setProfile(json.profile);
+      else await fetchData();
+      return null;
+    }
     const data = await res.json() as { error?: string };
     return data.error ?? "Failed to change password";
   };

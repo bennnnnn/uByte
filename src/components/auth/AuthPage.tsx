@@ -37,7 +37,7 @@ const LOGIN_VALUE_POINTS = [
 
 const SIGNUP_NEXT_STEPS = [
   "Choose the language you want to start with",
-  "Open your first lesson immediately after signup",
+  "Sign in, then open your first lesson right away",
   "Keep your progress synced across devices",
 ];
 
@@ -59,6 +59,8 @@ export default function AuthPage({ variant }: { variant: AuthPageMode }) {
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [forgotDone, setForgotDone] = useState(false);
+  /** After email signup, account exists but user is not logged in — prompt explicit sign-in. */
+  const [postSignupSignIn, setPostSignupSignIn] = useState(false);
   const firstInputRef = useRef<HTMLInputElement>(null);
   // Prevents the "already logged in" useEffect redirect from firing mid-submission.
   // Once the form is submitted, handleSubmit owns all navigation.
@@ -86,6 +88,7 @@ export default function AuthPage({ variant }: { variant: AuthPageMode }) {
     setPassword("");
     setError("");
     setForgotDone(false);
+    setPostSignupSignIn(false);
   }
 
   function switchMode(nextMode: Mode) {
@@ -129,14 +132,31 @@ export default function AuthPage({ variant }: { variant: AuthPageMode }) {
       return;
     }
 
-    // Success — keep handlingSubmitRef.current = true so the "already logged in"
-    // effect doesn't race with our intentional router.replace() below.
     if (mode === "signup") {
-      const onboardingDest = nextPath && nextPath !== "/" ? `/onboarding?next=${encodeURIComponent(nextPath)}` : "/onboarding";
-      router.replace(onboardingDest);
-    } else {
-      router.replace(nextPath);
+      setPostSignupSignIn(true);
+      handlingSubmitRef.current = false;
+      return;
     }
+
+    // Login success — keep handlingSubmitRef.current = true so the "already logged in"
+    // effect doesn't race with our intentional router.replace() below.
+    router.replace(nextPath);
+  }
+
+  async function handlePostSignupLogin() {
+    setError("");
+    setSubmitting(true);
+    handlingSubmitRef.current = true;
+    const err = await login(email, password);
+    setSubmitting(false);
+    if (err) {
+      handlingSubmitRef.current = false;
+      setError(err);
+      return;
+    }
+    const onboardingDest =
+      nextPath && nextPath !== "/" ? `/onboarding?next=${encodeURIComponent(nextPath)}` : "/onboarding";
+    router.replace(onboardingDest);
   }
 
   if (user) {
@@ -226,14 +246,22 @@ export default function AuthPage({ variant }: { variant: AuthPageMode }) {
           <div className="w-full max-w-xl rounded-[30px] bg-surface-card p-7 shadow-[0_24px_70px_rgba(15,23,42,0.10)] xl:p-9 dark:shadow-[0_24px_70px_rgba(2,6,23,0.45)]">
             <div className="mb-6">
               <h2 className="text-3xl font-black tracking-tight text-zinc-950 dark:text-white">
-                {isForgotPage ? "Reset your password" : isSignupPage ? "Create your free account" : "Sign in to continue"}
+                {isForgotPage
+                  ? "Reset your password"
+                  : postSignupSignIn && isSignupPage
+                    ? "Account created"
+                    : isSignupPage
+                      ? "Create your free account"
+                      : "Sign in to continue"}
               </h2>
               <p className="mt-2 text-sm leading-6 text-zinc-600 dark:text-zinc-400">
                 {isForgotPage
                   ? "Enter the email on your account and we’ll send you a reset link."
-                  : isSignupPage
-                    ? "Start with Google or email. After signup, you’ll choose a language and jump straight into your first free lesson."
-                    : "Use Google or email to get back to your saved lessons, bookmarks, and streaks."}
+                  : postSignupSignIn && isSignupPage
+                    ? "Sign in with the email and password you just used. We also sent a verification link — you can confirm your email anytime."
+                    : isSignupPage
+                      ? "Start with Google or email. After you sign in, you’ll choose a language and jump into your first free lesson."
+                      : "Use Google or email to get back to your saved lessons, bookmarks, and streaks."}
               </p>
             </div>
 
@@ -297,6 +325,59 @@ export default function AuthPage({ variant }: { variant: AuthPageMode }) {
                   </button>
                 </form>
               )
+            ) : postSignupSignIn && isSignupPage ? (
+              <div className="mt-6 space-y-4">
+                <div className="rounded-[24px] border border-emerald-200 bg-emerald-50 px-5 py-4 text-center dark:border-emerald-900/50 dark:bg-emerald-950/25">
+                  <div className="text-3xl" aria-hidden>✓</div>
+                  <p className="mt-2 text-sm font-semibold text-emerald-900 dark:text-emerald-200">You&apos;re registered</p>
+                  <p className="mt-1 text-xs text-emerald-800/90 dark:text-emerald-300/90">
+                    Sign in below to continue — your password is filled in for you.
+                  </p>
+                </div>
+                {error && <FormError>{error}</FormError>}
+                <div>
+                  <label htmlFor="post-signup-email" className="mb-1.5 block text-sm font-semibold text-zinc-700 dark:text-zinc-300">
+                    Email
+                  </label>
+                  <Input
+                    id="post-signup-email"
+                    type="email"
+                    readOnly
+                    autoComplete="email"
+                    value={email}
+                    className="rounded-2xl border-zinc-200 bg-zinc-50 px-4 py-3 dark:border-zinc-800 dark:bg-zinc-900"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="post-signup-password" className="mb-1.5 block text-sm font-semibold text-zinc-700 dark:text-zinc-300">
+                    Password
+                  </label>
+                  <Input
+                    id="post-signup-password"
+                    type="password"
+                    autoComplete="current-password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="rounded-2xl border-zinc-200 bg-surface-card px-4 py-3 dark:border-zinc-800"
+                  />
+                </div>
+                <Button
+                  type="button"
+                  onClick={() => void handlePostSignupLogin()}
+                  disabled={submitting}
+                  size="lg"
+                  className="w-full"
+                >
+                  {submitting ? "Signing in…" : "Sign in and continue"}
+                </Button>
+                <button
+                  type="button"
+                  onClick={() => switchMode("login")}
+                  className="w-full text-center text-sm font-medium text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
+                >
+                  Use a different account
+                </button>
+              </div>
             ) : (
               <>
                 {/* Google — primary CTA */}

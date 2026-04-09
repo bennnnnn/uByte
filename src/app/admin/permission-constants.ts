@@ -19,6 +19,31 @@ export const ALL_PERMISSIONS = [
 
 export type AdminPermission = (typeof ALL_PERMISSIONS)[number];
 
+/**
+ * Effective permission list for an admin row (matches GET /api/admin/me).
+ * Super admins (role super or legacy null) get every permission.
+ */
+export function getEffectiveAdminPermissions(admin: {
+  admin_role: string | null;
+  admin_permissions: string | null;
+}): AdminPermission[] {
+  const isSuperAdmin = admin.admin_role === "super" || admin.admin_role === null;
+  if (isSuperAdmin) return [...ALL_PERMISSIONS];
+  if (admin.admin_permissions) {
+    try {
+      const parsed = JSON.parse(admin.admin_permissions) as unknown;
+      return Array.isArray(parsed)
+        ? (parsed as string[]).filter((p): p is AdminPermission =>
+            ALL_PERMISSIONS.includes(p as AdminPermission),
+          )
+        : [...DEFAULT_LIMITED_PERMISSIONS];
+    } catch {
+      return [...DEFAULT_LIMITED_PERMISSIONS];
+    }
+  }
+  return [...DEFAULT_LIMITED_PERMISSIONS];
+}
+
 /** Permissions available to limited admins when no custom list is set. */
 export const DEFAULT_LIMITED_PERMISSIONS: AdminPermission[] = [
   "analytics",

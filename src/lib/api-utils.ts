@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser, type TokenPayload } from "@/lib/auth";
 import { getUserById } from "@/lib/db";
 import type { User } from "@/lib/db";
+import { getEffectiveAdminPermissions } from "@/app/admin/permission-constants";
 import { verifyCsrf } from "@/lib/csrf";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 
@@ -62,6 +63,27 @@ export async function requireSuperAdmin(): Promise<
   // NULL admin_role means the user was promoted before roles existed — treat as super
   if (admin.admin_role !== null && admin.admin_role !== "super") {
     return { admin: null, response: NextResponse.json({ error: "Forbidden — requires super admin" }, { status: 403 }) };
+  }
+  return { admin, response: null };
+}
+
+/**
+ * Super admins, or limited admins whose effective permissions include "users"
+ * (ban, delete, change plan, etc.). Matches the Users tab visibility.
+ */
+export async function requireAdminUsersManagement(): Promise<
+  { admin: User; response: null } | { admin: null; response: NextResponse }
+> {
+  const { admin, response } = await requireAdmin();
+  if (!admin) return { admin: null, response: response! };
+  if (!getEffectiveAdminPermissions(admin).includes("users")) {
+    return {
+      admin: null,
+      response: NextResponse.json(
+        { error: "Forbidden — users management permission required" },
+        { status: 403 },
+      ),
+    };
   }
   return { admin, response: null };
 }

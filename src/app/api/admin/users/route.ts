@@ -13,7 +13,7 @@ import {
   updateUserPlan,
 } from "@/lib/db";
 import { verifyCsrf } from "@/lib/csrf";
-import { withErrorHandling, requireAdmin, requireSuperAdmin } from "@/lib/api-utils";
+import { withErrorHandling, requireAdmin, requireAdminUsersManagement } from "@/lib/api-utils";
 
 export const GET = withErrorHandling("GET /api/admin/users", async (request: NextRequest) => {
   const { admin, response } = await requireAdmin();
@@ -69,10 +69,10 @@ export const GET = withErrorHandling("GET /api/admin/users", async (request: Nex
 });
 
 export const POST = withErrorHandling("POST /api/admin/users", async (request: NextRequest) => {
-  const csrfError = await verifyCsrf(request);
-  if (csrfError) return NextResponse.json({ error: "Invalid CSRF token" }, { status: 403 });
+  const csrfError = verifyCsrf(request);
+  if (csrfError) return NextResponse.json({ error: csrfError }, { status: 403 });
 
-  const { admin, response } = await requireSuperAdmin();
+  const { admin, response } = await requireAdminUsersManagement();
   if (!admin) return response;
 
   const body = (await request.json()) as { action: string; userId: number; plan?: string };
@@ -122,7 +122,13 @@ export const POST = withErrorHandling("POST /api/admin/users", async (request: N
   if (action === "set_plan") {
     const allowed = ["free", "pro", "yearly", "monthly"];
     if (!plan || !allowed.includes(plan)) {
-      return NextResponse.json({ error: "Invalid plan. Use free, pro, yearly, or monthly." }, { status: 400 });
+      return NextResponse.json(
+        {
+          error:
+            "Invalid plan. Use: free | monthly | yearly (Paddle Pro billing) | pro (manual/referral grant).",
+        },
+        { status: 400 },
+      );
     }
     await updateUserPlan(userId, plan);
     await logAdminAction(admin.id, `set_plan:${plan}`, userId);

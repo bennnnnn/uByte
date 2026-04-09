@@ -49,6 +49,8 @@ export default function AuthModal({ onClose, initialMode }: Props) {
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [forgotDone, setForgotDone] = useState(false);
+  /** Email signup succeeded — user must sign in explicitly (no auto session). */
+  const [signupAwaitingLogin, setSignupAwaitingLogin] = useState(false);
   const gsiInitialized = useRef(false);
   const credentialHandlerRef = useRef<(credential: string) => Promise<void>>(async () => {});
   const firstInputRef = useRef<HTMLInputElement>(null);
@@ -102,6 +104,7 @@ export default function AuthModal({ onClose, initialMode }: Props) {
     setPassword("");
     setError("");
     setForgotDone(false);
+    setSignupAwaitingLogin(false);
   }
   function switchMode(m: ModalMode) {
     setMode(m);
@@ -177,10 +180,24 @@ export default function AuthModal({ onClose, initialMode }: Props) {
     setSubmitting(false);
     if (err) {
       setError(err);
+    } else if (mode === "signup") {
+      setSignupAwaitingLogin(true);
     } else {
       onClose();
-      if (mode === "signup") router.push("/onboarding");
     }
+  }
+
+  async function handlePostSignupLogin() {
+    setError("");
+    setSubmitting(true);
+    const err = await login(email, password);
+    setSubmitting(false);
+    if (err) {
+      setError(err);
+      return;
+    }
+    onClose();
+    router.push("/onboarding");
   }
 
   return createPortal(
@@ -209,14 +226,18 @@ export default function AuthModal({ onClose, initialMode }: Props) {
                 {mode === "login"
                   ? "Welcome back"
                   : mode === "signup"
-                    ? "Create account"
+                    ? signupAwaitingLogin
+                      ? "Account created"
+                      : "Create account"
                     : "Reset password"}
               </h2>
               <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
                 {mode === "forgot"
                   ? "We’ll email you a link to reset your password."
                   : mode === "signup"
-                    ? "Every lesson is free. Pay only if you want detailed hints."
+                    ? signupAwaitingLogin
+                      ? "Sign in with the same email and password to continue."
+                      : "Every lesson is free. Pay only if you want detailed hints."
                     : "Sign in to continue to uByte."}
               </p>
             </div>
@@ -288,6 +309,60 @@ export default function AuthModal({ onClose, initialMode }: Props) {
                 </button>
               </>
             )
+          ) : mode === "signup" && signupAwaitingLogin ? (
+            <div className="space-y-4">
+              <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-center dark:border-emerald-900/50 dark:bg-emerald-950/25">
+                <div className="text-2xl" aria-hidden>✓</div>
+                <p className="mt-2 text-sm font-medium text-emerald-900 dark:text-emerald-200">You&apos;re registered</p>
+              </div>
+              {error && (
+                <div role="alert" className="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700 dark:bg-red-950/50 dark:text-red-300">
+                  {error}
+                </div>
+              )}
+              <div>
+                <label htmlFor="modal-post-email" className="mb-1.5 block text-sm font-medium text-zinc-700 dark:text-zinc-300">
+                  Email
+                </label>
+                <Input
+                  id="modal-post-email"
+                  type="email"
+                  readOnly
+                  autoComplete="email"
+                  value={email}
+                  className="rounded-xl bg-zinc-100 dark:bg-zinc-900"
+                />
+              </div>
+              <div>
+                <label htmlFor="modal-post-password" className="mb-1.5 block text-sm font-medium text-zinc-700 dark:text-zinc-300">
+                  Password
+                </label>
+                <Input
+                  id="modal-post-password"
+                  type="password"
+                  autoComplete="current-password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="rounded-xl bg-zinc-50/80 dark:bg-zinc-800/80"
+                />
+              </div>
+              <Button
+                type="button"
+                onClick={() => void handlePostSignupLogin()}
+                disabled={submitting}
+                size="lg"
+                className="w-full"
+              >
+                {submitting ? "Signing in…" : "Sign in and continue"}
+              </Button>
+              <button
+                type="button"
+                onClick={() => switchMode("login")}
+                className="w-full text-center text-sm text-zinc-500 hover:text-zinc-700 dark:text-zinc-400"
+              >
+                Use a different account
+              </button>
+            </div>
           ) : (
             <>
               <AuthFormFields

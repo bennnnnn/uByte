@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { randomUUID } from "crypto";
-import { getUserByEmail, createPasswordResetToken } from "@/lib/db";
+import { getUserByEmail, createPasswordResetToken, userHasPasswordLogin } from "@/lib/db";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 import { withErrorHandling } from "@/lib/api-utils";
 import { sendPasswordResetEmail } from "@/lib/email";
@@ -26,7 +26,8 @@ export const POST = withErrorHandling("POST /api/auth/forgot-password", async (r
 
   // Always return 200 — never reveal whether the email exists in our DB.
   const user = await getUserByEmail(email);
-  if (user && !user.google_id) {
+  // Google-only accounts have no local password until they add one in Settings.
+  if (user && userHasPasswordLogin(user.password_hash)) {
     const token = randomUUID();
     const expiresAt = new Date(Date.now() + 60 * 60 * 1000).toISOString(); // 1 hour
     await createPasswordResetToken(user.id, token, expiresAt);

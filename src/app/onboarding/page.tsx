@@ -52,6 +52,8 @@ export default function OnboardingPage() {
       });
     } catch {
       // Non-fatal. The tutorial redirect below still gives the user a working path.
+    } finally {
+      setSaving(false);
     }
 
     const destination = nextPath ?? `/tutorial/${selectedLang}/getting-started`;
@@ -61,22 +63,22 @@ export default function OnboardingPage() {
   if (!user) return null;
 
   return (
-    <div className="flex min-h-[100svh] flex-col bg-white">
-      <header className="flex items-center justify-between border-b border-zinc-100 px-6 py-4">
+    <div className="flex min-h-[100svh] flex-col bg-white dark:bg-zinc-950">
+      <header className="flex items-center justify-between border-b border-zinc-100 px-6 py-4 dark:border-zinc-800">
         <Link href="/" className="flex items-center gap-2">
           <span className="flex h-7 w-7 items-center justify-center rounded-md bg-indigo-600 text-xs font-bold text-white">U</span>
-          <span className="text-base font-bold tracking-tight text-zinc-900">uByte</span>
+          <span className="text-base font-bold tracking-tight text-zinc-900 dark:text-zinc-100">uByte</span>
         </Link>
-        <span className="text-xs font-medium text-zinc-400">Getting started</span>
+        <span className="text-xs font-medium text-zinc-400 dark:text-zinc-500">Getting started</span>
       </header>
 
       <div className="flex flex-1 items-start justify-center px-4 py-10 sm:py-14">
         <div className="w-full max-w-3xl">
-          <p className="mb-1 text-sm font-semibold text-indigo-600">Welcome, {firstName} 👋</p>
-          <h1 className="mb-2 text-3xl font-black tracking-tight text-zinc-900 sm:text-4xl">
+          <p className="mb-1 text-sm font-semibold text-indigo-600 dark:text-indigo-400">Welcome, {firstName} 👋</p>
+          <h1 className="mb-2 text-3xl font-black tracking-tight text-zinc-900 sm:text-4xl dark:text-zinc-100">
             Pick the language you want to learn first.
           </h1>
-          <p className="mb-8 max-w-2xl text-base text-zinc-500">
+          <p className="mb-8 max-w-2xl text-base text-zinc-500 dark:text-zinc-400">
             We&apos;ll drop you straight into the tutorial track so you can start writing code immediately.
           </p>
 
@@ -90,12 +92,12 @@ export default function OnboardingPage() {
                   onClick={() => setSelectedLangOverride(lang.id)}
                   className={`relative rounded-2xl border p-5 text-left transition-all ${
                     selected
-                      ? "border-indigo-500 bg-indigo-50/80 ring-2 ring-indigo-500"
-                      : "border-zinc-200 bg-white hover:border-indigo-300 hover:shadow-sm"
+                      ? "border-indigo-500 bg-indigo-50/80 ring-2 ring-indigo-500 dark:border-indigo-400 dark:bg-indigo-950/40 dark:ring-indigo-400"
+                      : "border-zinc-200 bg-white hover:border-indigo-300 hover:shadow-sm dark:border-zinc-700 dark:bg-zinc-900 dark:hover:border-indigo-600"
                   }`}
                 >
                   <div className="mb-4 flex items-start justify-between gap-3">
-                    <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-zinc-100 text-2xl">
+                    <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-zinc-100 text-2xl dark:bg-zinc-800">
                       {lang.icon}
                     </span>
                     {lang.badge && (
@@ -104,8 +106,8 @@ export default function OnboardingPage() {
                       </span>
                     )}
                   </div>
-                  <p className="text-base font-bold text-zinc-900">{lang.name}</p>
-                  <p className="mt-1 text-sm text-zinc-500">Start with the getting started track</p>
+                  <p className="text-base font-bold text-zinc-900 dark:text-zinc-100">{lang.name}</p>
+                  <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">Start with the getting started track</p>
                 </button>
               );
             })}
@@ -122,7 +124,7 @@ export default function OnboardingPage() {
             </button>
             <Link
               href="/tutorial"
-              className="text-sm font-medium text-zinc-500 transition-colors hover:text-zinc-900"
+              className="text-sm font-medium text-zinc-500 transition-colors hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-200"
             >
               Browse all tutorials instead
             </Link>

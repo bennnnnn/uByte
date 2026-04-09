@@ -50,6 +50,14 @@ async function ensureEmailVerificationExpiryColumn(): Promise<void> {
   _emailVerifyExpiryReady = true;
 }
 
+/** Stored in `password_hash` for Google-only signups until the user sets a local password. */
+export const GOOGLE_PLACEHOLDER_PASSWORD_HASH = "GOOGLE_OAUTH";
+
+/** True if the user can sign in with email + password (has a real bcrypt hash). */
+export function userHasPasswordLogin(passwordHash: string): boolean {
+  return passwordHash !== GOOGLE_PLACEHOLDER_PASSWORD_HASH;
+}
+
 export async function createUser(name: string, email: string, passwordHash: string): Promise<User> {
   const sql = getSql();
   const [row] = await sql`
@@ -64,7 +72,7 @@ export async function createUserWithGoogle(name: string, email: string, googleId
   const sql = getSql();
   const [row] = await sql`
     INSERT INTO users (name, email, password_hash, google_id)
-    VALUES (${name}, ${email}, 'GOOGLE_OAUTH', ${googleId})
+    VALUES (${name}, ${email}, ${GOOGLE_PLACEHOLDER_PASSWORD_HASH}, ${googleId})
     RETURNING *
   `;
   return row as User;

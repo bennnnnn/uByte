@@ -226,7 +226,7 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
     try { localStorage.setItem("ubyte_auth_changed", String(Date.now())); } catch { /* ignore */ }
   }, []);
 
-  // ── Shared post-auth hydration (used by login, loginWithGoogle, signup) ──
+  // ── Shared post-auth hydration (used by login, loginWithGoogle — not email signup) ──
   const hydrateAfterAuth = useCallback(async (userData: User) => {
     setUser(userData);
     setLimited(false);
@@ -258,17 +258,15 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
     });
     const data = await res.json().catch(() => ({}));
     if (!res.ok) return data.error || "Signup failed";
-    if (data.user) {
-      // Use hydrateAfterAuth (same as login) so profile, progress, stepCounts
-      // and all derived state are loaded from the DB immediately — avoids stale
-      // data (e.g. wrong plan, missing XP) until the user manually refreshes.
-      await hydrateAfterAuth(data.user);
+    if (data.ok === true && typeof data.email === "string") {
       trackConversion("signup");
       try { localStorage.setItem("ubyte_has_account", "1"); } catch { /* noop */ }
-      broadcastAuthChange();
+      // No session — user signs in on the next step so they see a clear success → login flow.
+    } else {
+      return "Signup failed";
     }
     return null;
-  }, [hydrateAfterAuth, broadcastAuthChange]);
+  }, []);
 
   const login = useCallback(async (email: string, password: string): Promise<string | null> => {
     const res = await apiFetch("/api/auth/login", {

@@ -1,7 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { signToken, setAuthCookie, clearAuthCookie } from "@/lib/auth";
-import { User, getUserById, updateUserProfile, updateUserPassword, deleteUser, incrementTokenVersion } from "@/lib/db";
+import {
+  User,
+  getUserById,
+  updateUserProfile,
+  updateUserPassword,
+  deleteUser,
+  incrementTokenVersion,
+  userHasPasswordLogin,
+} from "@/lib/db";
 import { verifyCsrf } from "@/lib/csrf";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 import { withErrorHandling, requireAuth } from "@/lib/api-utils";
@@ -24,6 +32,7 @@ function buildProfile(user: User) {
     created_at: user.created_at,
     last_active_at: user.last_active_at,
     is_google: !!user.google_id,
+    has_password_login: userHasPasswordLogin(user.password_hash),
     is_admin: user.is_admin,
     email_verified: user.email_verified,
     plan: user.plan ?? "free",
@@ -64,20 +73,10 @@ export const PUT = withErrorHandling("PUT /api/profile", async (request: NextReq
 
   const body = await request.json();
 
-  // Password change
-  if (body.currentPassword && body.newPassword) {
+  // Password set (Google-only, first time) or change
+  if (body.newPassword !== undefined && body.newPassword !== null) {
     const user = await getUserById(tokenUser.userId);
     if (!user) return NextResponse.json({ error: "User not found" }, { status: 404 });
-
-    if (user.google_id) {
-      return NextResponse.json(
-        { error: "Google accounts don't use a password. Manage your password through Google." },
-        { status: 400 }
-      );
-    }
-
-    const valid = await bcrypt.compare(body.currentPassword, user.password_hash);
-    if (!valid) return NextResponse.json({ error: "Current password is incorrect" }, { status: 400 });
 
     if (typeof body.newPassword !== "string" || body.newPassword.length < MIN_PASSWORD_LENGTH) {
       return NextResponse.json({ error: PASSWORD_POLICY_MESSAGE }, { status: 400 });
@@ -86,10 +85,36 @@ export const PUT = withErrorHandling("PUT /api/profile", async (request: NextReq
       return NextResponse.json({ error: PASSWORD_POLICY_MESSAGE }, { status: 400 });
     }
 
+    const hasLogin = userHasPasswordLogin(user.password_hash);
+    const isGoogleFirstPassword = !!user.google_id && !hasLogin;
+
+    if (isGoogleFirstPassword) {
+      const hash = await bcrypt.hash(body.newPassword, 10);
+      await updateUserPassword(tokenUser.userId, hash);
+      const newVersion = await incrementTokenVersion(tokenUser.userId);
+      const newToken = await signToken({
+        userId: tokenUser.userId,
+        email: tokenUser.email,
+        name: tokenUser.name,
+        tokenVersion: newVersion,
+        isAdmin: tokenUser.isAdmin,
+      });
+      await setAuthCookie(newToken);
+      const fresh = await getUserById(tokenUser.userId);
+      return NextResponse.json({ ok: true, profile: fresh ? buildProfile(fresh) : undefined });
+    }
+
+    const currentPassword = body.currentPassword;
+    if (typeof currentPassword !== "string" || !currentPassword) {
+      return NextResponse.json({ error: "Current password is required" }, { status: 400 });
+    }
+
+    const valid = await bcrypt.compare(currentPassword, user.password_hash);
+    if (!valid) return NextResponse.json({ error: "Current password is incorrect" }, { status: 400 });
+
     const hash = await bcrypt.hash(body.newPassword, 10);
     await updateUserPassword(tokenUser.userId, hash);
 
-    // Invalidate all existing sessions, then re-sign for the current session
     const newVersion = await incrementTokenVersion(tokenUser.userId);
     const newToken = await signToken({
       userId: tokenUser.userId,
@@ -99,7 +124,8 @@ export const PUT = withErrorHandling("PUT /api/profile", async (request: NextReq
       isAdmin: tokenUser.isAdmin,
     });
     await setAuthCookie(newToken);
-    return NextResponse.json({ ok: true });
+    const fresh = await getUserById(tokenUser.userId);
+    return NextResponse.json({ ok: true, profile: fresh ? buildProfile(fresh) : undefined });
   }
 
   // Email marketing preference toggle (standalone — doesn't require other fields)

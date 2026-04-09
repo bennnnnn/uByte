@@ -11,6 +11,8 @@ export interface Profile {
   created_at: string;
   last_active_at: string | null;
   is_google: boolean;
+  /** False for Google-only accounts until they set a local password in Settings. */
+  has_password_login?: boolean;
   email_verified: number;
   is_admin: number;
   plan: string;

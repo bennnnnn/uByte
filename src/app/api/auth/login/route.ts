@@ -7,6 +7,7 @@ import {
   incrementLoginFailure,
   resetLoginFailures,
   isUserLocked,
+  userHasPasswordLogin,
 } from "@/lib/db";
 import { signToken, setAuthCookie } from "@/lib/auth";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
@@ -45,6 +46,16 @@ export const POST = withErrorHandling("POST /api/auth/login", async (request: Ne
     return NextResponse.json(
       { error: "Account temporarily locked due to too many failed attempts. Try again in 15 minutes." },
       { status: 423 }
+    );
+  }
+
+  if (!userHasPasswordLogin(user.password_hash)) {
+    return NextResponse.json(
+      {
+        error:
+          "This account uses Google sign-in only. Sign in with Google, or add a password in Settings.",
+      },
+      { status: 401 }
     );
   }
 
