@@ -5,6 +5,9 @@ import { APP_NAME, BASE_URL } from "@/lib/constants";
 import { getLeaderboard } from "@/lib/db";
 import LeaderboardClient from "./LeaderboardClient";
 
+/** Needs DB at request time — do not prerender at build (e.g. CI without DATABASE_URL). */
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "Coding Leaderboard — Top Learners",
   description:
