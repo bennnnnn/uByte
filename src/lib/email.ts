@@ -14,8 +14,8 @@ import { makeUnsubscribeUrl } from "@/lib/unsubscribe";
 
 type EmailPayload = Parameters<Resend["emails"]["send"]>[0];
 
-const FROM = process.env.RESEND_FROM_EMAIL?.trim() || undefined;
-const FALLBACK_FROM = "noreply@resend.dev";
+const FROM: string =
+  process.env.RESEND_FROM_EMAIL?.trim() || "noreply@ubyte.dev";
 
 /** Escape user-supplied text before embedding in HTML to prevent injection. */
 function escapeHtml(str: string): string {
@@ -45,12 +45,6 @@ function getResend(): { emails: { send: (payload: EmailPayload) => Promise<void>
   return {
     emails: {
       async send(payload: EmailPayload) {
-        if (!FROM) {
-          throw new Error(
-            `RESEND_FROM_EMAIL is not configured. Add a verified sender address such as hello@your-domain.com instead of relying on ${FALLBACK_FROM}.`
-          );
-        }
-
         const { from: ignoredFrom, ...rest } = payload as EmailPayload & { from?: string };
         void ignoredFrom;
         const { error } = await resend.emails.send({

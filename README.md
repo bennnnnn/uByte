@@ -85,7 +85,7 @@ JWT_SECRET                 # Random 32+ char secret
 GOOGLE_CLIENT_ID           # Google OAuth client ID
 GOOGLE_CLIENT_SECRET       # Google OAuth client secret
 RESEND_API_KEY             # Resend API key
-RESEND_FROM_EMAIL          # Verified sender address (e.g. hello@yourdomain.com)
+RESEND_FROM_EMAIL          # Verified sender in Resend (e.g. noreply@ubyte.dev)
 PADDLE_API_KEY             # Paddle v2 API key
 PADDLE_WEBHOOK_SECRET      # Paddle webhook secret
 PADDLE_ENVIRONMENT         # "production" or "sandbox"
