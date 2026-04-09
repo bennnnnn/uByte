@@ -39,6 +39,7 @@ const ENV_VARS: EnvVar[] = [
 
   // ── Email ────────────────────────────────────────────────────────────────────
   { key: "RESEND_API_KEY",        required: false, description: "Resend email API key (emails silently disabled when missing)" },
+  { key: "RESEND_FROM_EMAIL",     required: false, description: "Verified sender address used for Resend mail" },
 ];
 
 /** Minimum length for the JWT secret to provide adequate security. */
@@ -75,6 +76,14 @@ export function validateEnv(): void {
   if (jwtSecret && jwtSecret.length < JWT_MIN_LENGTH) {
     warnings.push(
       `  ! JWT_SECRET is only ${jwtSecret.length} chars — minimum ${JWT_MIN_LENGTH} recommended for security`
+    );
+  }
+
+  const hasResendKey = !!process.env.RESEND_API_KEY?.trim();
+  const hasResendFrom = !!process.env.RESEND_FROM_EMAIL?.trim();
+  if (hasResendKey && !hasResendFrom) {
+    warnings.push(
+      "  ! RESEND_FROM_EMAIL — RESEND_API_KEY is set, but no verified sender address is configured; email delivery will fail"
     );
   }
 

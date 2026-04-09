@@ -11,7 +11,11 @@ import { Resend } from "resend";
 
 import { BASE_URL } from "@/lib/constants";
 import { makeUnsubscribeUrl } from "@/lib/unsubscribe";
-const FROM = process.env.RESEND_FROM_EMAIL ?? "noreply@resend.dev";
+
+type EmailPayload = Parameters<Resend["emails"]["send"]>[0];
+
+const FROM = process.env.RESEND_FROM_EMAIL?.trim() || null;
+const FALLBACK_FROM = "noreply@resend.dev";
 
 /** Escape user-supplied text before embedding in HTML to prevent injection. */
 function escapeHtml(str: string): string {
@@ -33,10 +37,35 @@ function unsubFooter(email: string): string {
   </p>`;
 }
 
-function getResend(): Resend | null {
+function getResend(): { emails: { send: (payload: EmailPayload) => Promise<void> } } | null {
   const key = process.env.RESEND_API_KEY;
   if (!key) return null;
-  return new Resend(key);
+
+  const resend = new Resend(key);
+  return {
+    emails: {
+      async send(payload: EmailPayload) {
+        if (!FROM) {
+          throw new Error(
+            `RESEND_FROM_EMAIL is not configured. Add a verified sender address such as hello@your-domain.com instead of relying on ${FALLBACK_FROM}.`
+          );
+        }
+
+        const { from: ignoredFrom, ...rest } = payload as EmailPayload & { from?: string };
+        void ignoredFrom;
+        const { error } = await resend.emails.send({
+          from: FROM,
+          ...rest,
+        });
+
+        if (error) {
+          throw new Error(
+            `Resend send failed: ${error.name ?? "unknown_error"}${error.message ? ` - ${error.message}` : ""}`
+          );
+        }
+      },
+    },
+  };
 }
 
 export async function sendStreakReminderEmail(
