@@ -127,7 +127,7 @@ function ComposeBox({
     <div className="space-y-2">
       <textarea
         ref={ref}
-        id="discussion-reply"
+        id="ask-reply"
         name="reply"
         value={text}
         onChange={(e) => setText(e.target.value)}
@@ -686,7 +686,7 @@ export default function DiscussionThread({ slug, currentUserId, isSignedIn }: Pr
       const data = await res.json() as { posts: Post[] };
       setPosts(data.posts ?? []);
     } catch {
-      setError("Couldn't load discussion.");
+      setError("Couldn't load questions.");
     } finally {
       setLoading(false);
     }
@@ -802,7 +802,7 @@ export default function DiscussionThread({ slug, currentUserId, isSignedIn }: Pr
       {/* Header */}
       <div className="shrink-0 border-b border-zinc-100 px-4 py-3 dark:border-zinc-800">
         <p className="text-xs font-semibold text-zinc-500 dark:text-zinc-400">
-          {posts.length > 0 ? `${posts.length} comment${posts.length !== 1 ? "s" : ""}` : "Discussion"}
+          {posts.length > 0 ? `${posts.length} post${posts.length !== 1 ? "s" : ""}` : "Ask"}
         </p>
       </div>
 
@@ -821,7 +821,7 @@ export default function DiscussionThread({ slug, currentUserId, isSignedIn }: Pr
           <div className="mb-5 rounded-lg border border-zinc-200 bg-zinc-50 px-4 py-3 text-center dark:border-zinc-700 dark:bg-zinc-900">
             <p className="text-xs text-zinc-500 dark:text-zinc-400">
               <Link href="/login" className="font-semibold text-indigo-600 hover:text-indigo-500">Sign in</Link>{" "}
-              to join the discussion.
+              to ask a question or see answers.
             </p>
           </div>
         )}

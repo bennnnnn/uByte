@@ -3,18 +3,17 @@ import { Suspense } from "react";
 import { getTotalLessonCount } from "@/lib/tutorial-steps";
 import { ALL_LANGUAGE_KEYS } from "@/lib/languages/registry";
 import { APP_NAME, BASE_URL } from "@/lib/constants";
-import { getLastActivity } from "@/lib/db";
 import { getPopularLanguages, getFallbackPopularLanguages } from "@/lib/db/home-popular";
-import { tutorialUrl } from "@/lib/urls";
+import { resolveHomeContinue } from "@/lib/retention-home";
 import { absoluteUrl, SITE_KEYWORDS, buildSiteSearchJsonLd } from "@/lib/seo";
 import { getCurrentUser } from "@/lib/auth";
-import { getAllTutorials } from "@/lib/tutorials";
 import type { SupportedLanguage } from "@/lib/languages/types";
 import HomeHero from "@/components/home/HomeHero";
 import StepsSection from "@/components/home/StepsSection";
 import TrendingSection from "@/components/home/TrendingSection";
 import ValuePropBanner from "@/components/home/ValuePropBanner";
 import ContinueBanner from "@/components/ContinueBanner";
+import StrugglePracticeSection from "@/components/home/StrugglePracticeSection";
 import GoogleOAuthError from "@/components/GoogleOAuthError";
 import ReferralPromptBanner from "@/components/ReferralPromptBanner";
 import FadeInSection from "@/components/home/FadeInSection";
@@ -67,22 +66,14 @@ export default async function Home() {
   let leftOff: { href: string; label: string } | null = null;
   let continueLang: SupportedLanguage = "go";
   let continueTutorialList: { slug: string; title: string }[] = [];
+  let struggleCards: { href: string; langLabel: string; line1: string }[] = [];
 
   if (user) {
-    const last = await getLastActivity(user.userId);
-    if (last?.activity_type === "tutorial" && last.slug) {
-      continueLang = last.lang as SupportedLanguage;
-      const tutorials = getAllTutorials(continueLang);
-      const meta = tutorials.find((t) => t.slug === last.slug);
-      if (meta) {
-        const step = last.step != null ? last.step : undefined;
-        leftOff = {
-          href: tutorialUrl(last.lang, last.slug, step),
-          label: step != null ? `${meta.title} · Step ${step + 1}` : meta.title,
-        };
-      }
-      continueTutorialList = tutorials.map(({ slug, title }) => ({ slug, title }));
-    }
+    const resolved = await resolveHomeContinue(user.userId);
+    leftOff = resolved.leftOff;
+    continueLang = resolved.continueLang;
+    continueTutorialList = resolved.continueTutorialList;
+    struggleCards = resolved.struggleCards;
   }
 
   const totalLessonCount = ALL_LANGUAGE_KEYS.reduce(
@@ -126,6 +117,8 @@ export default async function Home() {
       {user ? (
         <div className="mx-auto max-w-6xl space-y-14 px-4 py-12 sm:px-6 lg:px-8">
           <ReferralPromptBanner />
+
+          {struggleCards.length > 0 && <StrugglePracticeSection cards={struggleCards} />}
 
           {leftOff && continueTutorialList.length > 0 && (
             <section>

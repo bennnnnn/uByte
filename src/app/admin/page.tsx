@@ -27,7 +27,7 @@ const TAB_SUBTITLES: Record<Tab, string> = {
   banner:          "Site-wide announcement banner",
   blog:            "Create and edit blog posts without touching the repo",
   messages:        "Contact form submissions from users",
-  reports:         "Flagged discussion comments awaiting review",
+  reports:         "Flagged Q&A posts awaiting review",
   admins:          "Manage admin access and roles",
   "site-settings": "Global site configuration",
 };

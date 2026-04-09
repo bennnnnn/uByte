@@ -24,6 +24,7 @@ export * from "./practice-attempts";
 export * from "./practice-notes";
 export * from "./practice-code-drafts";
 export * from "./last-activity";
+export * from "./user-step-attempts";
 export * from "./submissions";
 export * from "./onboarding-drip";
 export * from "./referrals";

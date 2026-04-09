@@ -14,7 +14,7 @@ export const ALL_PERMISSIONS = [
   "banner",       // Manage site-wide announcement banner
   "blog",         // Create and edit blog posts
   "messages",     // View contact messages
-  "reports",      // Moderate reported discussion comments
+  "reports",      // Moderate reported Q&A posts
 ] as const;
 
 export type AdminPermission = (typeof ALL_PERMISSIONS)[number];
@@ -65,7 +65,7 @@ export const PERMISSION_LABELS: Record<AdminPermission, string> = {
   banner:      "Site-wide banner",
   blog:        "Blog editor",
   messages:    "Contact messages",
-  reports:     "Discussion reports",
+  reports:     "Q&A / community reports",
 };
 
 /** Tab → permission mapping (what permission a tab requires). */

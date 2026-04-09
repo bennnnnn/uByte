@@ -2,7 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { withErrorHandling } from "@/lib/api-utils";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 import { verifyCsrf } from "@/lib/csrf";
-import { recordStepCheck } from "@/lib/db";
+import { getCurrentUser } from "@/lib/auth";
+import { recordStepCheck, recordUserStepAttempt } from "@/lib/db";
 import { getSteps } from "@/lib/tutorial-steps";
 import { isSupportedLanguage } from "@/lib/languages/registry";
 
@@ -29,5 +30,11 @@ export const POST = withErrorHandling("POST /api/step-check", async (request: Ne
   }
 
   await recordStepCheck(tutorialSlug, stepIndex, passed);
+
+  const authed = await getCurrentUser();
+  if (authed) {
+    recordUserStepAttempt(authed.userId, language, tutorialSlug, stepIndex, passed).catch(() => {});
+  }
+
   return NextResponse.json({ ok: true });
 });

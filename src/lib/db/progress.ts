@@ -18,6 +18,7 @@
  */
 import { getSql } from "./client";
 import { clearStepProgress } from "./step-progress";
+import { clearUserStepAttempts } from "./user-step-attempts";
 
 const DEFAULT_LANG = "go";
 
@@ -175,6 +176,7 @@ export async function resetAllProgress(userId: number): Promise<void> {
   const sql = getSql();
   await sql`DELETE FROM progress WHERE user_id = ${userId}`;
   await clearStepProgress(userId);
+  await clearUserStepAttempts(userId);
   await sql`DELETE FROM achievements WHERE user_id = ${userId}`;
   await sql`
     UPDATE users

@@ -85,8 +85,8 @@ export default function InteractiveTutorial({
       else if (s === "18") setFontSize(18);
     } catch { /* ignore */ }
   }, []);
-  const [mobileTab, setMobileTab] = useState<"instructions" | "discuss" | "code">("instructions");
-  const [leftTab, setLeftTab] = useState<"instructions" | "discuss" | "outline">("instructions");
+  const [mobileTab, setMobileTab] = useState<"instructions" | "ask" | "code">("instructions");
+  const [leftTab, setLeftTab] = useState<"instructions" | "ask" | "outline">("instructions");
   const isMobile = useIsMobile();
 
   const currentStep = currentSteps[stepProgress.stepIndex];
@@ -276,7 +276,7 @@ export default function InteractiveTutorial({
       <div className="flex flex-1 overflow-hidden">
         {/* Left panel */}
         <aside className={`min-w-0 flex-col overflow-hidden bg-surface-card ${mobileTab !== "code" ? "flex shrink" : "hidden"} md:flex md:shrink-0`} style={isMobile ? undefined : { width: leftWidth }} suppressHydrationWarning>
-          {/* Tab strip: ☰ hamburger | Instructions | Discuss — desktop only (mobile uses top tab bar) */}
+          {/* Tab strip: ☰ hamburger | Instructions | Ask — desktop only (mobile uses top tab bar) */}
           <div className="hidden shrink-0 items-stretch border-b border-zinc-200 dark:border-zinc-800 md:flex">
             {/* Hamburger toggle — expands/collapses the outline */}
             <button
@@ -301,8 +301,8 @@ export default function InteractiveTutorial({
               )}
             </button>
 
-            {/* Steps / Discuss tabs */}
-            {(["instructions", "discuss"] as const).map((tab) => (
+            {/* Steps / Ask tabs */}
+            {(["instructions", "ask"] as const).map((tab) => (
               <button
                 key={tab}
                 type="button"
@@ -313,7 +313,7 @@ export default function InteractiveTutorial({
                     : "text-zinc-400 hover:text-zinc-700 dark:text-zinc-500 dark:hover:text-zinc-300"
                 }`}
               >
-                {tab === "instructions" ? "Instructions" : "Discuss"}
+                {tab === "instructions" ? "Instructions" : "Ask"}
               </button>
             ))}
           </div>
@@ -346,7 +346,7 @@ export default function InteractiveTutorial({
             />
           )}
 
-          {(isMobile ? mobileTab === "discuss" : leftTab === "discuss") && (
+          {(isMobile ? mobileTab === "ask" : leftTab === "ask") && (
             <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
               <DiscussionThread
                 slug={`tutorial:${lang}:${tutorialSlug}:${stepProgress.stepIndex}`}

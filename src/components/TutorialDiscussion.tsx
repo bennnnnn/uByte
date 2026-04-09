@@ -36,12 +36,12 @@ export default function TutorialDiscussion({ lang, tutorialSlug }: Props) {
                 : "text-zinc-400 hover:text-zinc-700 dark:text-zinc-500 dark:hover:text-zinc-300"
             }`}
           >
-            {t === "community" ? "💬 Community" : "✨ Ask AI"}
+            {t === "community" ? "💬 Ask" : "✨ AI help"}
           </button>
         ))}
       </div>
 
-      {/* Community discussion */}
+      {/* Community Q&A (ask other learners) */}
       {tab === "community" && (
         <div className="min-h-[280px]">
           <DiscussionThread

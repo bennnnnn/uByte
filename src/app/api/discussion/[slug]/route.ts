@@ -51,7 +51,7 @@ export const POST = withErrorHandling(
     // Auth required
     const user = await getCurrentUser();
     if (!user) {
-      return NextResponse.json({ error: "Sign in to join the discussion." }, { status: 401 });
+      return NextResponse.json({ error: "Sign in to ask a question." }, { status: 401 });
     }
 
     // Rate limit: 10 posts per minute per user

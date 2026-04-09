@@ -161,3 +161,36 @@ export async function clearStepProgress(userId: number): Promise<void> {
   const sql = getSql();
   await sql`DELETE FROM step_progress WHERE user_id = ${userId}`;
 }
+
+/** Most recently touched tutorial (any step), for smart "continue" when last_activity is empty. */
+export async function getLastTouchedTutorial(
+  userId: number
+): Promise<{ language: string; tutorial_slug: string } | null> {
+  await ensureTable();
+  const sql = getSql();
+  const [row] = await sql`
+    SELECT language, tutorial_slug
+    FROM step_progress
+    WHERE user_id = ${userId}
+    ORDER BY completed_at DESC
+    LIMIT 1
+  `;
+  if (!row) return null;
+  return { language: row.language as string, tutorial_slug: row.tutorial_slug as string };
+}
+
+/** First incomplete step index, or last step if the chapter is finished. */
+export async function getSuggestedResumeStepIndex(
+  userId: number,
+  language: string,
+  tutorialSlug: string,
+  totalSteps: number
+): Promise<number> {
+  if (totalSteps <= 0) return 0;
+  const { completed, skipped } = await getCompletedStepIndices(userId, tutorialSlug, language);
+  const done = new Set([...completed, ...skipped]);
+  for (let i = 0; i < totalSteps; i++) {
+    if (!done.has(i)) return i;
+  }
+  return totalSteps - 1;
+}

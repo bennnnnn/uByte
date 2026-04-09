@@ -1,10 +1,10 @@
 "use client";
 
 /**
- * ReportsTab — moderate reported discussion comments.
+ * ReportsTab — moderate reported Q&A / community posts.
  *
  * Shows all posts that users have flagged. Admin can:
- *   - Delete the post (soft-delete, removes it from the discussion)
+ *   - Delete the post (soft-delete, removes it from the thread)
  *   - Dismiss all reports (clears flags, post stays visible)
  */
 
@@ -138,7 +138,7 @@ export default function ReportsTab() {
                   <p className="mt-0.5 text-xs text-zinc-500 dark:text-zinc-400">
                     by <span className="font-medium">{r.author_name ?? "deleted user"}</span>
                     {r.author_email && <span className="ml-1 text-zinc-400">({r.author_email})</span>}
-                    {r.problem_slug && <span>{" · discussion: "}{r.problem_slug}</span>}
+                    {r.problem_slug && <span>{" · thread: "}{r.problem_slug}</span>}
                     {" · "}
                     posted {formatDate(r.post_created_at)}
                   </p>

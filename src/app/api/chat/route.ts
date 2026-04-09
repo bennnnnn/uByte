@@ -91,7 +91,7 @@ export const POST = withErrorHandling("POST /api/chat", async (req: NextRequest)
   // Notify previous participants of a new community reply (fire-and-forget)
   getChatParticipants(slug, user.userId).then((participants) => {
     for (const uid of participants) {
-      createNotification(uid, "chat", `New reply in ${tutorialTitle}`, `${user.name} posted in the ${tutorialTitle} discussion.`).catch(() => {});
+      createNotification(uid, "chat", `New reply in ${tutorialTitle}`, `${user.name} replied in ${tutorialTitle}.`).catch(() => {});
     }
   }).catch(() => {});
 
