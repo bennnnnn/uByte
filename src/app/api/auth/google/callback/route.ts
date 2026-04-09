@@ -99,7 +99,9 @@ export const GET = withErrorHandling("GET /api/auth/google/callback", async (req
 
     if (isNewUser) {
       // Day-0 welcome email — fire-and-forget
-      sendWelcomeEmail(user.email, user.name).catch(() => {});
+      sendWelcomeEmail(user.email, user.name).catch((err) => {
+        console.error("[google/callback] Welcome email failed:", err);
+      });
       // In-app welcome notification
       createNotification(
         user.id,

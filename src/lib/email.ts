@@ -29,16 +29,38 @@ function escapeHtml(str: string): string {
 
 /** Standard unsubscribe footer for all marketing emails. */
 function unsubFooter(email: string): string {
-  const url = makeUnsubscribeUrl(email);
-  return `<p style="color:#9ca3af;font-size:11px;text-align:center;margin-top:16px">
+  try {
+    const url = makeUnsubscribeUrl(email);
+    return `<p style="color:#9ca3af;font-size:11px;text-align:center;margin-top:16px">
     You're receiving this because you have an account on uByte.<br>
     <a href="${url}" style="color:#9ca3af">Unsubscribe from marketing emails</a> ·
     <a href="${BASE_URL}/settings" style="color:#9ca3af">Manage preferences</a>
   </p>`;
+  } catch (err) {
+    console.error("[email] unsubFooter: missing JWT_SECRET/UNSUBSCRIBE_SECRET — using minimal footer", err);
+    return `<p style="color:#9ca3af;font-size:11px;text-align:center;margin-top:16px">
+    <a href="${BASE_URL}/settings" style="color:#9ca3af">Manage preferences</a>
+  </p>`;
+  }
+}
+
+function formatResendError(error: unknown): string {
+  if (error && typeof error === "object") {
+    const o = error as Record<string, unknown>;
+    const name = typeof o.name === "string" ? o.name : "error";
+    const message = typeof o.message === "string" ? o.message : null;
+    if (message) return `${name}: ${message}`;
+    try {
+      return JSON.stringify(error);
+    } catch {
+      return String(error);
+    }
+  }
+  return String(error);
 }
 
 function getResend(): { emails: { send: (payload: EmailPayload) => Promise<void> } } | null {
-  const key = process.env.RESEND_API_KEY;
+  const key = process.env.RESEND_API_KEY?.trim();
   if (!key) return null;
 
   const resend = new Resend(key);
@@ -53,13 +75,17 @@ function getResend(): { emails: { send: (payload: EmailPayload) => Promise<void>
         });
 
         if (error) {
-          throw new Error(
-            `Resend send failed: ${error.name ?? "unknown_error"}${error.message ? ` - ${error.message}` : ""}`
-          );
+          throw new Error(`Resend send failed: ${formatResendError(error)}`);
         }
       },
     },
   };
+}
+
+function logMissingResendApiKey(context: string): void {
+  console.error(
+    `[email] ${context}: RESEND_API_KEY is missing or blank — set it in Vercel (Production) and redeploy. No email was sent.`
+  );
 }
 
 export async function sendStreakReminderEmail(
@@ -120,6 +146,7 @@ export async function sendVerificationEmail(
 ): Promise<void> {
   const resend = getResend();
   if (!resend) {
+    logMissingResendApiKey("sendVerificationEmail");
     if (process.env.NODE_ENV !== "production") {
       console.info(`[email] verify-email token for ${to}: ${token}`);
     }
@@ -150,7 +177,10 @@ export async function sendVerificationEmail(
 /** Day 0 — sent immediately after successful signup. */
 export async function sendWelcomeEmail(to: string, name: string): Promise<void> {
   const resend = getResend();
-  if (!resend) return;
+  if (!resend) {
+    logMissingResendApiKey("sendWelcomeEmail");
+    return;
+  }
 
   const firstName = escapeHtml(name.split(" ")[0]);
   await resend.emails.send({
@@ -571,6 +601,7 @@ export async function sendPasswordResetEmail(
 ): Promise<void> {
   const resend = getResend();
   if (!resend) {
+    logMissingResendApiKey("sendPasswordResetEmail");
     if (process.env.NODE_ENV !== "production") {
       console.info(`[email] password-reset token for ${to}: ${resetToken}`);
     }

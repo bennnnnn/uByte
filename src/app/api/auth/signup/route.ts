@@ -57,7 +57,9 @@ export const POST = withErrorHandling("POST /api/auth/signup", async (request: N
     console.error("Failed to send verification email:", err);
   });
   // Day-0 welcome email — fire-and-forget, never blocks signup
-  sendWelcomeEmail(email, name).catch(() => {});
+  sendWelcomeEmail(email, name).catch((err) => {
+    console.error("[signup] Welcome email failed:", err);
+  });
   // In-app welcome notification
   createNotification(
     user.id,
