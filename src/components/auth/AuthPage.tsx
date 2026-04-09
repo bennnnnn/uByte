@@ -77,6 +77,17 @@ export default function AuthPage({ variant }: { variant: AuthPageMode }) {
     firstInputRef.current?.focus();
   }, [mode]);
 
+  /** On small viewports, open the email form immediately — no extra tap; marketing column is hidden. */
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 1023px)");
+    function openEmailIfNarrow() {
+      if (mq.matches) setEmailOpen(true);
+    }
+    openEmailIfNarrow();
+    mq.addEventListener("change", openEmailIfNarrow);
+    return () => mq.removeEventListener("change", openEmailIfNarrow);
+  }, []);
+
   useEffect(() => {
     if (!user || handlingSubmitRef.current) return;
     router.replace(nextPath);
@@ -169,8 +180,9 @@ export default function AuthPage({ variant }: { variant: AuthPageMode }) {
 
   return (
     <div className="min-h-[100svh] text-zinc-950 dark:text-zinc-50">
-      <div className="mx-auto grid min-h-[100svh] max-w-6xl gap-8 px-5 py-6 lg:grid-cols-[1fr_1.05fr] lg:px-8 lg:py-10">
-        <section className="px-1 py-3 sm:px-2">
+      <div className="mx-auto grid min-h-[100svh] max-w-6xl gap-6 px-4 py-4 sm:px-5 sm:py-6 lg:grid-cols-[1fr_1.05fr] lg:gap-8 lg:px-8 lg:py-10">
+        {/* Desktop / large tablet only — phones stay on the form column */}
+        <section className="hidden px-1 py-3 sm:px-2 lg:block">
           <div className="relative h-full overflow-hidden rounded-[32px] border border-zinc-200 bg-gradient-to-br from-white via-indigo-50/50 to-zinc-50 p-7 shadow-[0_24px_70px_rgba(15,23,42,0.06)] dark:border-zinc-800 dark:from-zinc-950 dark:via-indigo-950/20 dark:to-zinc-900">
             <div className="pointer-events-none absolute inset-0 overflow-hidden">
               <div className="absolute -right-16 top-0 h-48 w-48 rounded-full bg-indigo-200/35 blur-3xl dark:bg-indigo-700/15" />
@@ -242,26 +254,62 @@ export default function AuthPage({ variant }: { variant: AuthPageMode }) {
           </div>
         </section>
 
-        <section className="flex items-start justify-center pt-2">
-          <div className="w-full max-w-xl rounded-[30px] bg-surface-card p-7 shadow-[0_24px_70px_rgba(15,23,42,0.10)] xl:p-9 dark:shadow-[0_24px_70px_rgba(2,6,23,0.45)]">
-            <div className="mb-6">
-              <h2 className="text-3xl font-black tracking-tight text-zinc-950 dark:text-white">
-                {isForgotPage
-                  ? "Reset your password"
-                  : postSignupSignIn && isSignupPage
-                    ? "Account created"
-                    : isSignupPage
-                      ? "Create your free account"
-                      : "Sign in to continue"}
+        <section className="flex items-start justify-center pt-0 lg:pt-2">
+          <div className="w-full max-w-xl rounded-2xl bg-surface-card p-5 shadow-[0_24px_70px_rgba(15,23,42,0.10)] sm:rounded-[30px] sm:p-7 xl:p-9 dark:shadow-[0_24px_70px_rgba(2,6,23,0.45)]">
+            <div className="mb-4 sm:mb-6">
+              <h2 className="text-2xl font-black tracking-tight text-zinc-950 sm:text-3xl dark:text-white">
+                {isForgotPage ? (
+                  <>
+                    <span className="lg:hidden">Reset password</span>
+                    <span className="hidden lg:inline">Reset your password</span>
+                  </>
+                ) : postSignupSignIn && isSignupPage ? (
+                  "Account created"
+                ) : isSignupPage ? (
+                  <>
+                    <span className="lg:hidden">Sign up</span>
+                    <span className="hidden lg:inline">Create your free account</span>
+                  </>
+                ) : (
+                  <>
+                    <span className="lg:hidden">Sign in</span>
+                    <span className="hidden lg:inline">Sign in to continue</span>
+                  </>
+                )}
               </h2>
-              <p className="mt-2 text-sm leading-6 text-zinc-600 dark:text-zinc-400">
-                {isForgotPage
-                  ? "For privacy we never confirm whether an email is registered. If an account exists for what you enter, we’ll email next steps."
-                  : postSignupSignIn && isSignupPage
-                    ? "Sign in with the email and password you just used. We also sent a verification link — you can confirm your email anytime."
-                    : isSignupPage
-                      ? "Start with Google or email. After you sign in, you’ll choose a language and jump into your first free lesson."
-                      : "Use Google or email to get back to your saved lessons, bookmarks, and streaks."}
+              <p className="mt-1.5 text-sm leading-6 text-zinc-600 dark:text-zinc-400 lg:mt-2">
+                {isForgotPage ? (
+                  <>
+                    <span className="lg:hidden">We’ll email you if this address is on file.</span>
+                    <span className="hidden lg:inline">
+                      For privacy we never confirm whether an email is registered. If an account exists for what you enter,
+                      we’ll email next steps.
+                    </span>
+                  </>
+                ) : postSignupSignIn && isSignupPage ? (
+                  <>
+                    <span className="lg:hidden">Sign in below to continue.</span>
+                    <span className="hidden lg:inline">
+                      Sign in with the email and password you just used. We also sent a verification link — you can confirm
+                      your email anytime.
+                    </span>
+                  </>
+                ) : isSignupPage ? (
+                  <>
+                    <span className="lg:hidden">Free account — Google or email.</span>
+                    <span className="hidden lg:inline">
+                      Start with Google or email. After you sign in, you’ll choose a language and jump into your first free
+                      lesson.
+                    </span>
+                  </>
+                ) : (
+                  <>
+                    <span className="lg:hidden">Continue with Google or email.</span>
+                    <span className="hidden lg:inline">
+                      Use Google or email to get back to your saved lessons, bookmarks, and streaks.
+                    </span>
+                  </>
+                )}
               </p>
             </div>
 
@@ -332,12 +380,16 @@ export default function AuthPage({ variant }: { variant: AuthPageMode }) {
                 <div className="rounded-[24px] border border-emerald-200 bg-emerald-50 px-5 py-4 text-center dark:border-emerald-900/50 dark:bg-emerald-950/25">
                   <div className="text-3xl" aria-hidden>✓</div>
                   <p className="mt-2 text-sm font-semibold text-emerald-900 dark:text-emerald-200">You&apos;re registered</p>
-                  <p className="mt-1 text-xs text-emerald-800/90 dark:text-emerald-300/90">
+                  <p className="mt-1 text-xs text-emerald-800/90 dark:text-emerald-300/90 lg:hidden">Enter your password to continue.</p>
+                  <p className="mt-1 hidden text-xs text-emerald-800/90 dark:text-emerald-300/90 lg:block">
                     Sign in below to continue — your password is filled in for you.
                   </p>
                 </div>
                 {error && <FormError>{error}</FormError>}
-                <div>
+                <p className="mb-2 text-xs text-zinc-500 dark:text-zinc-400 lg:hidden">
+                  <span className="font-medium text-zinc-700 dark:text-zinc-300">{email}</span>
+                </p>
+                <div className="hidden lg:block">
                   <label htmlFor="post-signup-email" className="mb-1.5 block text-sm font-semibold text-zinc-700 dark:text-zinc-300">
                     Email
                   </label>
@@ -385,10 +437,11 @@ export default function AuthPage({ variant }: { variant: AuthPageMode }) {
                 {/* Google — primary CTA */}
                 <a
                   href={googleHref}
-                  className="mt-6 flex w-full items-center justify-center gap-3 rounded-2xl border border-zinc-200 bg-surface-page px-4 py-3.5 text-sm font-semibold text-zinc-800 shadow-sm transition-colors hover:border-zinc-300 hover:bg-zinc-50 dark:border-zinc-800 dark:bg-surface-page dark:text-zinc-100 dark:hover:border-zinc-700 dark:hover:bg-zinc-800"
+                  className="mt-4 flex w-full items-center justify-center gap-2.5 rounded-2xl border border-zinc-200 bg-surface-page px-4 py-3.5 text-sm font-semibold text-zinc-800 shadow-sm transition-colors hover:border-zinc-300 hover:bg-zinc-50 sm:mt-6 sm:gap-3 dark:border-zinc-800 dark:bg-surface-page dark:text-zinc-100 dark:hover:border-zinc-700 dark:hover:bg-zinc-800"
                 >
                   <GoogleIcon className="h-5 w-5 shrink-0" />
-                  {isSignupPage ? "Start with Google" : "Continue with Google"}
+                  <span className="lg:hidden">Google</span>
+                  <span className="hidden lg:inline">{isSignupPage ? "Start with Google" : "Continue with Google"}</span>
                 </a>
 
                 {/* OR divider */}
@@ -484,7 +537,19 @@ export default function AuthPage({ variant }: { variant: AuthPageMode }) {
                         size="lg"
                         className="w-full"
                       >
-                        {submitting ? (isSignupPage ? "Creating account…" : "Signing in…") : isSignupPage ? "Create account and start learning" : "Sign in and continue"}
+                        {submitting ? (
+                          isSignupPage ? "Creating account…" : "Signing in…"
+                        ) : isSignupPage ? (
+                          <>
+                            <span className="lg:hidden">Create account</span>
+                            <span className="hidden lg:inline">Create account and start learning</span>
+                          </>
+                        ) : (
+                          <>
+                            <span className="lg:hidden">Sign in</span>
+                            <span className="hidden lg:inline">Sign in and continue</span>
+                          </>
+                        )}
                       </Button>
                     </form>
                   </>

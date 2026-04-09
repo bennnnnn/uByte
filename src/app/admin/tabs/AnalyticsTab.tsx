@@ -11,15 +11,7 @@ interface Props {
 }
 
 export default function AnalyticsTab({ data }: Props) {
-  const { analytics, stepStats, heatmapSlug, loadStepStats, fetching } = data;
-
-  if (fetching) {
-    return (
-      <div className="flex justify-center py-16">
-        <div className="h-6 w-6 animate-spin rounded-full border-2 border-indigo-600 border-t-transparent" />
-      </div>
-    );
-  }
+  const { analytics, stepStats, heatmapSlug, loadStepStats } = data;
 
   const totalCompletions = analytics.reduce((s, t) => s + t.completed_count, 0);
   const totalVotes       = analytics.reduce((s, t) => s + t.thumbs_up + t.thumbs_down, 0);

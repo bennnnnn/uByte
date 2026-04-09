@@ -12,6 +12,12 @@
 import { getSql } from "./client";
 
 let _ready = false;
+
+/** Creates referral_codes / referral_conversions if missing (safe to call anytime). */
+export async function ensureReferralTables(): Promise<void> {
+  await ensureTables();
+}
+
 async function ensureTables(): Promise<void> {
   if (_ready) return;
   const sql = getSql();
@@ -26,7 +32,7 @@ async function ensureTables(): Promise<void> {
   await sql`
     CREATE TABLE IF NOT EXISTS referral_conversions (
       id               SERIAL PRIMARY KEY,
-      referrer_id      INTEGER NOT NULL REFERENCES users(id),
+      referrer_id      INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
       referred_user_id INTEGER NOT NULL UNIQUE REFERENCES users(id) ON DELETE CASCADE,
       signed_up_at     TEXT    DEFAULT (NOW()::text),
       subscribed_at    TEXT

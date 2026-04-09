@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser, type TokenPayload } from "@/lib/auth";
 import { getUserById } from "@/lib/db";
 import type { User } from "@/lib/db";
-import { getEffectiveAdminPermissions } from "@/app/admin/permission-constants";
+import { getEffectiveAdminPermissions, type AdminPermission } from "@/app/admin/permission-constants";
 import { verifyCsrf } from "@/lib/csrf";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 
@@ -54,7 +54,29 @@ export async function requireAdmin(): Promise<
   return { admin: user, response: null };
 }
 
-/** Same as requireAdmin but rejects limited admins — use for user mgmt, revenue, audit. */
+/**
+ * Super admins always pass. Limited admins pass only if their effective permissions
+ * include `permission` (matches sidebar tab visibility in the admin UI).
+ */
+export async function requireAdminPermission(
+  permission: AdminPermission,
+): Promise<{ admin: User; response: null } | { admin: null; response: NextResponse }> {
+  const { admin, response } = await requireAdmin();
+  if (!admin) return { admin: null, response: response! };
+  const perms = getEffectiveAdminPermissions(admin);
+  if (perms.includes(permission)) {
+    return { admin, response: null };
+  }
+  return {
+    admin: null,
+    response: NextResponse.json(
+      { error: `Forbidden — ${permission} permission required` },
+      { status: 403 },
+    ),
+  };
+}
+
+/** Same as requireAdmin but rejects limited admins — use for routes that must stay super-only. */
 export async function requireSuperAdmin(): Promise<
   { admin: User; response: null } | { admin: null; response: NextResponse }
 > {

@@ -1,9 +1,7 @@
 /**
  * GrowthTab — conversion funnel, signup trend, and churn signals.
  *
- * All metrics are derived client-side from the already-fetched users array,
- * so no extra API endpoints are needed. When team analytics are added, wire
- * in a separate `teamStats` prop and render a TeamsSection below.
+ * Metrics are derived client-side from the already-fetched users array.
  */
 
 import { useMemo, useState } from "react";
@@ -196,20 +194,6 @@ export default function GrowthTab({ data }: Props) {
             </div>
           </div>
         )}
-      </SectionCard>
-
-      {/* ── Teams placeholder ──────────────────────────────────────────────── */}
-      <SectionCard title="Team & company plans" description="Coming soon — multi-seat billing and team progress dashboards.">
-        <div className="flex items-start gap-4 rounded-xl border border-dashed border-zinc-300 bg-zinc-50/50 p-5 dark:border-zinc-700 dark:bg-zinc-800/30">
-          <span className="text-2xl">🏢</span>
-          <div>
-            <p className="font-semibold text-zinc-800 dark:text-zinc-200">Team analytics will live here</p>
-            <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
-              When team plans ship, this section will show per-team progress, seat usage, and billing overview.
-              The data model is designed for it — just add a <code className="rounded bg-zinc-200 px-1 dark:bg-zinc-700">team_id</code> foreign key and a teams table.
-            </p>
-          </div>
-        </div>
       </SectionCard>
     </div>
   );

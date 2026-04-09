@@ -56,12 +56,14 @@ export default function AdminPage() {
       .map((s) => ({
         ...s,
         tabs: s.tabs.filter((t) => {
+          // Admin roster API is super-admin-only; avoid a dead menu item for sub-admins.
+          if (t === "admins" && !isSuperAdmin) return false;
           const perm = TAB_PERMISSION[t];
           return !perm || hasPermission(perm);
         }),
       }))
       .filter((s) => s.tabs.length > 0);
-  }, [hasPermission]);
+  }, [hasPermission, isSuperAdmin]);
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
