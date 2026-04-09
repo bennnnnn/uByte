@@ -1,4 +1,4 @@
-import { getProgressCount, getAchievements, unlockAchievement, getBookmarkCount } from "./db";
+import { getProgressCount, getAchievements, unlockAchievement, getBookmarkTotal } from "./db";
 import { getAllTutorials } from "./tutorials";
 import type { SupportedLanguage } from "./languages/types";
 import { ALL_LANGUAGE_KEYS } from "./languages/registry";
@@ -71,7 +71,7 @@ export async function checkBadges(
   const [existingArr, totalCompletedCount, bookmarkCount] = await Promise.all([
     getAchievements(userId),
     getProgressCount(userId),
-    getBookmarkCount(userId),
+    getBookmarkTotal(userId), 
   ]);
 
   const existing = new Set(existingArr.map((a) => a.badge_key));

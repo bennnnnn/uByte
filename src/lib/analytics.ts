@@ -9,9 +9,8 @@
  *   NEXT_PUBLIC_POSTHOG_HOST  — optional, defaults to https://us.i.posthog.com
  *
  * Keep events minimal — only the core conversion funnel:
- *   signup, login, viewed_pricing, clicked_upgrade,
- *   checkout_completed, started_tutorial, completed_tutorial,
- *   problem_solved, exam_passed
+ *   signup, login, viewed_pricing, clicked_upgrade, checkout_completed,
+ *   started_tutorial, completed_tutorial
  */
 
 import type { PostHog } from "posthog-js";
@@ -26,9 +25,7 @@ export type ConversionEvent =
   | "started_tutorial"
   | "completed_tutorial"
   | "signup"
-  | "login"
-  | "problem_solved"
-  | "exam_passed";
+  | "login";
 
 declare global {
   interface Window {

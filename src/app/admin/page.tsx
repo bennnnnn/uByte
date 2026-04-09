@@ -47,7 +47,7 @@ const defaultCls = "text-zinc-600 hover:bg-zinc-50 hover:text-zinc-900 dark:text
 
 export default function AdminPage() {
   const data = useAdminData();
-  const { user, loading, fetching, error, router, tab, setTab, users, revenue, revenuePeriod, setRevenuePeriod, exportRevenueCSV, printRevenuePDF, exportUsersCSV, printRef, isSuperAdmin, hasPermission } = data;
+  const { user, loading, fetching, error, router, tab, setTab, revenue, revenuePeriod, setRevenuePeriod, exportRevenueCSV, printRevenuePDF, exportUsersCSV, printRef, isSuperAdmin, hasPermission } = data;
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   // Filter sidebar sections to tabs the current admin has permission for
@@ -199,7 +199,7 @@ export default function AdminPage() {
             <div className="min-w-0 flex-1">
               <h1 className="truncate text-base font-bold text-zinc-900 sm:text-lg dark:text-zinc-100">{TAB_LABELS[tab]}</h1>
               <p className="truncate text-xs text-zinc-400 dark:text-zinc-500">
-                {tab === "users" ? `${users.length} ${TAB_SUBTITLES["users"]}` : TAB_SUBTITLES[tab]}
+                {TAB_SUBTITLES[tab]}
               </p>
             </div>
 

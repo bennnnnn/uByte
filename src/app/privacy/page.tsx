@@ -65,7 +65,7 @@ export default function PrivacyPage() {
 
       <Section title="How We Use Your Data">
         <ul className="list-disc space-y-1 pl-5">
-          <li>Provide and personalise the Service (progress tracking, XP, streaks, certificates)</li>
+          <li>Provide and personalise the Service (progress tracking, XP, streaks, achievements)</li>
           <li>Process your subscription and activate Pro features</li>
           <li>Send transactional emails (email verification, welcome, streak reminders, receipt)</li>
           <li>Send push notifications if you have opted in (streak reminders only)</li>

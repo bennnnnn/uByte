@@ -39,7 +39,7 @@ const VERIFIED_FILTERS = [
 
 /* ── Main component ───────────────────────────────────────────────────────── */
 export default function UsersTab({ data }: Props) {
-  const { user: adminUser, revenue, totalCompletions, exportUsersCSV } = data;
+  const { user: adminUser, revenue, totalCompletions, exportUsersCSV, isSuperAdmin } = data;
 
   /* ── Local state ─────────────────────────────────────────────────────── */
   const [users,       setUsers]       = useState<AdminUser[]>([]);
@@ -343,6 +343,7 @@ export default function UsersTab({ data }: Props) {
                                 isMe={isMe}
                                 banned={u.banned}
                                 isAdmin={u.is_admin === 1}
+                                isSuperAdmin={isSuperAdmin}
                                 plan={u.plan ?? "free"}
                                 name={u.name}
                                 anchorRect={anchorRect}
@@ -545,9 +546,9 @@ function ConfirmModal({ label, danger, onConfirm, onCancel }: {
 /** Actions dropdown rendered via portal to escape table overflow clipping. */
 function ActionsMenu({
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  userId: _userId, isMe, banned, isAdmin, plan, name, anchorRect, onAction,
+  userId: _userId, isMe, banned, isAdmin, isSuperAdmin, plan, name, anchorRect, onAction,
 }: {
-  userId: number; isMe: boolean; banned: boolean; isAdmin: boolean; plan: string; name: string;
+  userId: number; isMe: boolean; banned: boolean; isAdmin: boolean; isSuperAdmin: boolean; plan: string; name: string;
   anchorRect: DOMRect;
   onAction: (action: string, label: string, extra?: { plan?: string }, danger?: boolean) => void;
 }) {
@@ -583,7 +584,7 @@ function ActionsMenu({
             Ban user
           </button>
       )}
-      {!isMe && (isAdmin
+      {!isMe && isSuperAdmin && (isAdmin
         ? <button type="button" onClick={() => onAction("remove_admin", `Remove admin from ${name}?`)} className={`${btn} text-zinc-600 dark:text-zinc-400`}>
             <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M13 7a4 4 0 11-8 0 4 4 0 018 0zM9 14a6 6 0 00-6 6v1h12v-1a6 6 0 00-6-6zM21 12h-6" /></svg>
             Remove admin

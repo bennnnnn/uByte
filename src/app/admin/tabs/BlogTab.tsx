@@ -43,7 +43,7 @@ const EMPTY: Omit<BlogPost, "id" | "created_at" | "updated_at"> = {
   author: "uByte Team", published: true, og_image: "",
 };
 
-const CATEGORIES = ["General", "Interview Prep", "Learning Guide", "Language Deep Dive", "Comparison", "Python", "JavaScript", "Go", "Java", "Rust", "C++", "C#", "News"];
+const CATEGORIES = ["General", "Learning Guide", "Language Deep Dive", "Comparison", "Python", "JavaScript", "Go", "Java", "Rust", "C++", "C#", "News"];
 const CODE_LANGUAGES = ["python", "javascript", "typescript", "go", "java", "rust", "cpp", "csharp", "bash", "sql", "json", "html", "css", "plaintext"];
 
 // ─── Markdown renderer (preview) ──────────────────────────────────────────────

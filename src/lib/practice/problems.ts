@@ -1,5 +1,6 @@
 /**
- * Interview prep problem registry.
+ * Practice problem definitions (legacy). Public /practice URLs redirect to tutorials;
+ * this registry remains for admin tooling, AI context, and discussion slugs.
  *
  * HOW TO ADD A NEW PROBLEM:
  *   1. Add it to problems-easy.ts, problems-medium.ts, or problems-hard.ts

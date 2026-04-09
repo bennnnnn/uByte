@@ -24,6 +24,7 @@ function redirectLegacyProductRoute(request: NextRequest): NextResponse | null {
   const { pathname } = request.nextUrl;
   const segments = pathname.split("/").filter(Boolean);
 
+  // Tutorials-only product: old interview simulator, interviews hub, and practice IDE → tutorial hub
   if (pathname === "/daily" || pathname.startsWith("/interview") || pathname.startsWith("/interviews")) {
     return NextResponse.redirect(new URL("/tutorial", request.url), 308);
   }

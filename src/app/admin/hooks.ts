@@ -25,7 +25,23 @@ import type {
   RevenuePeriod,
   AdminRevenueStats,
 } from "./types";
+import type { AdminGrowthSnapshot } from "@/lib/db/types";
 import { TAB_PERMISSION } from "./permission-constants";
+
+/** Sidebar order — first visible tab becomes the default for sub-admins. */
+const ADMIN_TAB_ORDER: Tab[] = [
+  "users",
+  "analytics",
+  "revenue",
+  "growth",
+  "banner",
+  "blog",
+  "messages",
+  "reports",
+  "audit",
+  "admins",
+  "site-settings",
+];
 
 /* ── Shared banner / site-settings shapes ───────────────────────────────── */
 
@@ -61,6 +77,7 @@ export function useAdminData() {
   const [revenueSeries, setRevenueSeries] = useState<{ date: string; revenue: number }[]>([]);
   const [subscriptionEvents, setSubscriptionEvents] = useState<SubscriptionEventRow[]>([]);
   const [auditLog, setAuditLog] = useState<AuditEntry[]>([]);
+  const [growthSnapshot, setGrowthSnapshot] = useState<AdminGrowthSnapshot | null>(null);
 
   /* ── State: analytics heatmap ────────────────────────────────────────── */
   const [stepStats, setStepStats] = useState<StepStat[]>([]);
@@ -90,47 +107,95 @@ export function useAdminData() {
 
     let cancelled = false;
 
-    // Fetch current admin's identity and permissions first
-    const mePromise = fetch("/api/admin/me", { credentials: "same-origin" }).then(async (r) => {
-      if (!r.ok) throw new Error("Forbidden — not an admin");
-      return r.json() as Promise<AdminMe>;
-    });
-
-    // Fetch users (may 403 for limited admins — that's expected)
-    const usersPromise = fetch("/api/admin/users", { credentials: "same-origin" }).then(async (r) => {
-      if (r.status === 403) return null; // limited admin — not an error
-      const data = await r.json();
-      if (!r.ok) throw new Error(data.error ?? "HTTP " + r.status);
-      return data;
-    });
-
-    Promise.all([
-      mePromise,
-      usersPromise,
-      fetch("/api/admin/users?view=analytics", { credentials: "same-origin" }).then(async (r) => { const d = await r.json(); return r.ok ? d : { analytics: [] }; }),
-      fetch("/api/admin/stats?period=7days", { credentials: "same-origin" }).then(async (r) => r.ok ? r.json() : null),
-      fetch("/api/admin/audit-log", { credentials: "same-origin" }).then(async (r) => { const d = await r.json(); return r.ok ? d : { log: [] }; }),
-      fetch("/api/admin/stats?view=subscription-events", { credentials: "same-origin" }).then(async (r) => r.ok ? r.json() : { events: [] }),
-    ])
-      .then(([meData, userData, analyticsData, revenueData, auditData, eventsData]) => {
+    (async () => {
+      try {
+        const meRes = await fetch("/api/admin/me", { credentials: "same-origin" });
+        if (!meRes.ok) throw new Error("Forbidden — not an admin");
+        const meData = (await meRes.json()) as AdminMe;
         if (cancelled) return;
+
         setAdminMe(meData);
-        // Default tab to first permitted tab
+
+        const perm = (p: string) => meData.isSuperAdmin || meData.permissions.includes(p);
+
         setTab((prev) => {
           if (prev) return prev;
-          if (meData.isSuperAdmin) return "users";
-          const firstAllowed = meData.permissions[0];
-          const tabForPerm = Object.entries(TAB_PERMISSION).find(([, p]) => p === firstAllowed)?.[0] as Tab | undefined;
-          return tabForPerm ?? "analytics";
+          for (const t of ADMIN_TAB_ORDER) {
+            if (t === "admins" && !meData.isSuperAdmin) continue;
+            const need = TAB_PERMISSION[t];
+            if (!need) continue;
+            if (meData.isSuperAdmin || meData.permissions.includes(need)) return t;
+          }
+          return "blog";
         });
-        if (userData) setUsers(userData.users ?? []);
-        setAnalytics(analyticsData.analytics ?? []);
-        if (revenueData) { setRevenue(revenueData); setRevenueSeries(revenueData.revenueByPeriod ?? revenueData.revenueByDay ?? []); }
-        setAuditLog(auditData.log ?? []);
-        setSubscriptionEvents(eventsData?.events ?? []);
-      })
-      .catch((err) => { if (!cancelled) setError(String(err.message ?? err)); })
-      .finally(() => { if (!cancelled) setFetching(false); });
+
+        const pulls: Promise<void>[] = [];
+
+        if (perm("users")) {
+          pulls.push(
+            fetch("/api/admin/users", { credentials: "same-origin" }).then(async (r) => {
+              if (cancelled || !r.ok) return;
+              const data = (await r.json()) as { users?: AdminUser[] };
+              setUsers(data.users ?? []);
+            }),
+          );
+        }
+
+        if (perm("analytics")) {
+          pulls.push(
+            fetch("/api/admin/users?view=analytics", { credentials: "same-origin" }).then(async (r) => {
+              if (cancelled || !r.ok) return;
+              const d = (await r.json()) as { analytics?: TutorialAnalytics[] };
+              setAnalytics(d.analytics ?? []);
+            }),
+          );
+        }
+
+        if (perm("revenue")) {
+          pulls.push(
+            fetch("/api/admin/stats?period=7days", { credentials: "same-origin" }).then(async (r) => {
+              if (cancelled || !r.ok) return;
+              const data = await r.json();
+              setRevenue(data);
+              setRevenueSeries(data.revenueByPeriod ?? data.revenueByDay ?? []);
+            }),
+          );
+          pulls.push(
+            fetch("/api/admin/stats?view=subscription-events", { credentials: "same-origin" }).then(async (r) => {
+              if (cancelled || !r.ok) return;
+              const d = (await r.json()) as { events?: SubscriptionEventRow[] };
+              setSubscriptionEvents(d.events ?? []);
+            }),
+          );
+        }
+
+        if (perm("audit")) {
+          pulls.push(
+            fetch("/api/admin/audit-log", { credentials: "same-origin" }).then(async (r) => {
+              if (cancelled || !r.ok) return;
+              const d = (await r.json()) as { log?: AuditEntry[] };
+              setAuditLog(d.log ?? []);
+            }),
+          );
+        }
+
+        if (perm("growth")) {
+          pulls.push(
+            fetch("/api/admin/stats?view=growth", { credentials: "same-origin" }).then(async (r) => {
+              if (cancelled || !r.ok) return;
+              const d = (await r.json()) as AdminGrowthSnapshot;
+              setGrowthSnapshot(d);
+            }),
+          );
+        }
+
+        await Promise.all(pulls);
+      } catch (err) {
+        if (!cancelled) setError(String((err as Error).message ?? err));
+      } finally {
+        if (!cancelled) setFetching(false);
+      }
+    })();
 
     return () => { cancelled = true; };
   }, [user, loading, router]);
@@ -284,6 +349,7 @@ export function useAdminData() {
     users, filtered, analytics,
     revenue, revenuePeriod, setRevenuePeriod, revenueSeries, subscriptionEvents,
     auditLog,
+    growthSnapshot,
     /* analytics heatmap */
     stepStats, heatmapSlug, loadStepStats,
     /* loading */

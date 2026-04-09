@@ -1,5 +1,5 @@
 import { getSql } from "./client";
-import { isExamLang } from "@/lib/exams/config";
+import { isExamLang } from "@/lib/exam-config";
 
 export interface ExamQuestionRow {
   id: number;

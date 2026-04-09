@@ -3,7 +3,7 @@
  * DELETE /api/admin/blog/[id]  — delete a blog post
  */
 import { NextRequest, NextResponse } from "next/server";
-import { withErrorHandling, requireAdmin } from "@/lib/api-utils";
+import { withErrorHandling, requireAdminPermission } from "@/lib/api-utils";
 import { verifyCsrf } from "@/lib/csrf";
 import { updateDbBlogPost, deleteDbBlogPost } from "@/lib/db/blog-posts";
 
@@ -15,7 +15,7 @@ export const PUT = withErrorHandling("PUT /api/admin/blog/[id]", async (request:
   const csrfError = verifyCsrf(request);
   if (csrfError) return NextResponse.json({ error: "Invalid CSRF token" }, { status: 403 });
 
-  const { admin, response } = await requireAdmin();
+  const { admin, response } = await requireAdminPermission("blog");
   if (!admin) return response;
 
   const { id: idStr } = await (ctx as Props).params;
@@ -56,7 +56,7 @@ export const DELETE = withErrorHandling("DELETE /api/admin/blog/[id]", async (re
   const csrfError = verifyCsrf(request);
   if (csrfError) return NextResponse.json({ error: "Invalid CSRF token" }, { status: 403 });
 
-  const { admin, response } = await requireAdmin();
+  const { admin, response } = await requireAdminPermission("blog");
   if (!admin) return response;
 
   const { id: idStr } = await (ctx as Props).params;

@@ -9,7 +9,7 @@ const SUBJECTS = [
   "Billing & subscription",
   "Bug report",
   "Feature request",
-  "Certificate / exam issue",
+  "Learning progress or content issue",
   "Account problem",
   "Privacy / data request",
   "Other",

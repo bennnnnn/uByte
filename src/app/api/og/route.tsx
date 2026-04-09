@@ -19,7 +19,7 @@ export const runtime = "edge";
 export async function GET(request: NextRequest) {
   try {
   const { searchParams } = new URL(request.url);
-  const title = searchParams.get("title") ?? "Interactive Coding Tutorials & Certifications";
+  const title = searchParams.get("title") ?? "Interactive Coding Tutorials";
   const description =
     searchParams.get("description") ??
     "Go · Python · JavaScript · C++ · Java · Rust";

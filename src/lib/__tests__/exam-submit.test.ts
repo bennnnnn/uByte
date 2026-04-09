@@ -5,7 +5,7 @@ import {
   getOriginalChoiceIndex,
   isDisplayedAnswerCorrect,
   EXAM_SUBMIT_GRACE_MS,
-} from "../exams/attempt-utils";
+} from "../exam-attempt-utils";
 
 const NOW = 1_700_000_000_000; // fixed timestamp for determinism
 

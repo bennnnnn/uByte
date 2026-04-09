@@ -86,13 +86,18 @@ export const TAB_PERMISSION: Record<string, AdminPermission> = {
 /** Pre-built permission presets for common sub-admin roles. */
 export const PERMISSION_PRESETS: { id: string; label: string; permissions: AdminPermission[] }[] = [
   {
+    id: "blog-only",
+    label: "Blog only",
+    permissions: ["blog"],
+  },
+  {
     id: "content",
     label: "Content editor",
     permissions: ["analytics", "banner", "blog", "messages", "reports"],
   },
   {
     id: "moderator",
-    label: "Moderator",
+    label: "Moderator (reports + inbox)",
     permissions: ["reports", "messages"],
   },
   {

@@ -8,7 +8,7 @@ import { LANGUAGES, getAllLanguageSlugs } from "@/lib/languages/registry";
 import { useAuth } from "@/components/AuthProvider";
 import { hasPaidAccess } from "@/lib/plans";
 
-const STANDALONE_PREFIXES = ["/", "/tutorial", "/search", "/pricing", "/privacy", "/terms", "/leaderboard", "/profile", "/dashboard", "/billing", "/referral", "/notifications", "/settings", "/reset-password", "/verify-email", "/certificate", "/admin", "/u", "/help", "/blog"];
+const STANDALONE_PREFIXES = ["/", "/tutorial", "/search", "/pricing", "/privacy", "/terms", "/leaderboard", "/profile", "/dashboard", "/billing", "/referral", "/notifications", "/settings", "/reset-password", "/verify-email", "/admin", "/u", "/help", "/blog"];
 
 function isStandalonePath(pathname: string): boolean {
   if (pathname === "/") return true;

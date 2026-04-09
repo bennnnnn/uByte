@@ -5,7 +5,7 @@ import {
   getOriginalChoiceIndex,
   hasAttemptExpired,
   isDisplayedAnswerCorrect,
-} from "../exams/attempt-utils";
+} from "../exam-attempt-utils";
 
 describe("exam attempt timing", () => {
   it("computes a deadline from the attempt start time", () => {

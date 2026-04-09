@@ -14,17 +14,30 @@ import {
 } from "@/lib/db";
 import { verifyCsrf } from "@/lib/csrf";
 import { withErrorHandling, requireAdmin, requireAdminUsersManagement } from "@/lib/api-utils";
+import { getEffectiveAdminPermissions } from "@/app/admin/permission-constants";
+
+function isSuperAdminUser(admin: { admin_role: string | null }): boolean {
+  return admin.admin_role === "super" || admin.admin_role === null;
+}
 
 export const GET = withErrorHandling("GET /api/admin/users", async (request: NextRequest) => {
   const { admin, response } = await requireAdmin();
   if (!admin) return response;
 
+  const perms = getEffectiveAdminPermissions(admin);
   const { searchParams } = new URL(request.url);
+
   if (searchParams.get("view") === "analytics") {
+    if (!perms.includes("analytics")) {
+      return NextResponse.json({ error: "Forbidden — analytics permission required" }, { status: 403 });
+    }
     const analytics = await getAdminTutorialAnalytics();
     return NextResponse.json({ analytics });
   }
   if (searchParams.get("view") === "step-stats") {
+    if (!perms.includes("analytics")) {
+      return NextResponse.json({ error: "Forbidden — analytics permission required" }, { status: 403 });
+    }
     const slug = searchParams.get("slug") ?? "";
     if (!slug) return NextResponse.json({ stats: [] });
     const stats = await getStepCheckStats(slug);
@@ -32,6 +45,9 @@ export const GET = withErrorHandling("GET /api/admin/users", async (request: Nex
   }
   // Paginated user list with optional search + plan + verified filter
   if (searchParams.has("page") || searchParams.has("search")) {
+    if (!perms.includes("users")) {
+      return NextResponse.json({ error: "Forbidden — users management permission required" }, { status: 403 });
+    }
     const search   = searchParams.get("search")   ?? "";
     const plan     = searchParams.get("plan")     ?? "";
     const verified = searchParams.get("verified") ?? "";
@@ -42,8 +58,11 @@ export const GET = withErrorHandling("GET /api/admin/users", async (request: Nex
   }
 
   if (searchParams.get("export") === "csv") {
+    if (!perms.includes("users")) {
+      return NextResponse.json({ error: "Forbidden — users management permission required" }, { status: 403 });
+    }
     // CSV export contains PII — restrict to super admins only
-    if (admin.admin_role !== "super" && admin.admin_role !== null) {
+    if (!isSuperAdminUser(admin)) {
       return NextResponse.json({ error: "Forbidden — super admin only" }, { status: 403 });
     }
     const users = await getAdminUsers();
@@ -64,6 +83,9 @@ export const GET = withErrorHandling("GET /api/admin/users", async (request: Nex
     });
   }
 
+  if (!perms.includes("users")) {
+    return NextResponse.json({ error: "Forbidden — users management permission required" }, { status: 403 });
+  }
   const users = await getAdminUsers();
   return NextResponse.json({ users });
 });
@@ -75,8 +97,10 @@ export const POST = withErrorHandling("POST /api/admin/users", async (request: N
   const { admin, response } = await requireAdminUsersManagement();
   if (!admin) return response;
 
-  const body = (await request.json()) as { action: string; userId: number; plan?: string };
-  const { action, userId, plan } = body;
+  const body = (await request.json()) as { action: string; userId: number | string; plan?: string };
+  const { action, plan } = body;
+  const userId =
+    typeof body.userId === "string" ? parseInt(body.userId, 10) : body.userId;
 
   if (!action || typeof action !== "string") {
     return NextResponse.json({ error: "Action is required" }, { status: 400 });
@@ -89,14 +113,21 @@ export const POST = withErrorHandling("POST /api/admin/users", async (request: N
     return NextResponse.json({ error: "Cannot perform this action on yourself" }, { status: 400 });
   }
 
+  if (action === "set_admin" || action === "remove_admin") {
+    if (!isSuperAdminUser(admin)) {
+      return NextResponse.json({ error: "Forbidden — super admin only" }, { status: 403 });
+    }
+  }
+
   if (action === "reset_progress") {
     await adminResetUserProgress(userId);
     await logAdminAction(admin.id, "reset_progress", userId);
     return NextResponse.json({ ok: true });
   }
   if (action === "delete_user") {
-    await adminDeleteUser(userId);
+    // Log while target_user_id still exists — FK references users(id).
     await logAdminAction(admin.id, "delete_user", userId);
+    await adminDeleteUser(userId);
     return NextResponse.json({ ok: true });
   }
   if (action === "ban_user") {

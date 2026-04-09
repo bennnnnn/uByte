@@ -25,7 +25,7 @@ const TESTIMONIALS = [
   },
   {
     quote:
-      "I've tried Codecademy, freeCodeCamp, and LeetCode. uByte is the only one where I actually finished a track instead of quitting after lesson three. The progression just makes sense.",
+      "I've tried Codecademy, freeCodeCamp, and a pile of video courses. uByte is the only one where I actually finished a track instead of quitting after lesson three. The progression just makes sense.",
     name: "Aiko N.",
     role: "Self-taught Developer",
     avatar: "AN",

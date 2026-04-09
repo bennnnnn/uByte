@@ -3,7 +3,7 @@
  * POST /api/admin/blog  — create a new blog post
  */
 import { NextRequest, NextResponse } from "next/server";
-import { withErrorHandling, requireAdmin } from "@/lib/api-utils";
+import { withErrorHandling, requireAdminPermission } from "@/lib/api-utils";
 import { verifyCsrf } from "@/lib/csrf";
 import { getAllDbBlogPosts, createDbBlogPost } from "@/lib/db/blog-posts";
 
@@ -18,7 +18,7 @@ function slugify(title: string): string {
 }
 
 export const GET = withErrorHandling("GET /api/admin/blog", async () => {
-  const { admin, response } = await requireAdmin();
+  const { admin, response } = await requireAdminPermission("blog");
   if (!admin) return response;
 
   const posts = await getAllDbBlogPosts();
@@ -29,7 +29,7 @@ export const POST = withErrorHandling("POST /api/admin/blog", async (request: Ne
   const csrfError = verifyCsrf(request);
   if (csrfError) return NextResponse.json({ error: "Invalid CSRF token" }, { status: 403 });
 
-  const { admin, response } = await requireAdmin();
+  const { admin, response } = await requireAdminPermission("blog");
   if (!admin) return response;
 
   const body = await request.json() as {

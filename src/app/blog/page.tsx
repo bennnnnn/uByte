@@ -35,7 +35,6 @@ export const metadata: Metadata = {
 };
 
 const CATEGORY_COLORS: Record<string, string> = {
-  "Interview Prep": "bg-violet-100 text-violet-700 dark:bg-violet-900/40 dark:text-violet-300",
   "Learning Guide": "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300",
   "Language Deep Dive": "bg-sky-100 text-sky-700 dark:bg-sky-900/40 dark:text-sky-300",
   "Comparison": "bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300",

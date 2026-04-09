@@ -4,12 +4,12 @@
  *   body: { postId, action: "dismiss" | "delete" }
  */
 import { NextRequest, NextResponse } from "next/server";
-import { requireAdmin, withErrorHandling } from "@/lib/api-utils";
+import { requireAdminPermission, withErrorHandling } from "@/lib/api-utils";
 import { verifyCsrf } from "@/lib/csrf";
 import { getSql } from "@/lib/db/client";
 
 export const GET = withErrorHandling("GET /api/admin/reports", async () => {
-  const { admin, response } = await requireAdmin();
+  const { admin, response } = await requireAdminPermission("reports");
   if (!admin) return response;
 
   const sql = getSql();
@@ -55,7 +55,7 @@ export const PATCH = withErrorHandling("PATCH /api/admin/reports", async (req: N
   const csrfError = verifyCsrf(req);
   if (csrfError) return NextResponse.json({ error: "Invalid CSRF token" }, { status: 403 });
 
-  const { admin, response } = await requireAdmin();
+  const { admin, response } = await requireAdminPermission("reports");
   if (!admin) return response;
 
   const body = await req.json() as { postId?: number; action?: string };

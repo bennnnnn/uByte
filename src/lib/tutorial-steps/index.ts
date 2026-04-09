@@ -24,10 +24,9 @@ import { getAllTutorials } from "../tutorials";
  *   6. Create content/<lang>/*.mdx tutorial files
  *   7. Create src/lib/tutorial-steps/<lang>/index.ts + step files
  *   8. Add the import and entry below in stepsByLanguage
- *   9. Add default starter in src/lib/practice/problems.ts (DEFAULT_X + switch case)
- *  10. Add exam content in src/lib/exams/content.ts (if certifications needed)
+ *   9. Add default starter in src/lib/practice/problems.ts if you extend practice data (optional)
  *
- * Everything else (profile stats, tutorial pages, practice pages, sitemap, nav)
+ * Everything else (profile stats, tutorial pages, sitemap, nav)
  * auto-updates from the registry and this map.
  */
 const stepsByLanguage: Record<SupportedLanguage, Record<string, TutorialStep[]>> = {

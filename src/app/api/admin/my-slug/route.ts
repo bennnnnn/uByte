@@ -8,14 +8,14 @@
  * Slug rules: 3–40 chars, letters / digits / hyphens only, unique across admins.
  */
 import { NextRequest, NextResponse } from "next/server";
-import { withErrorHandling, requireAdmin } from "@/lib/api-utils";
+import { withErrorHandling, requireSuperAdmin } from "@/lib/api-utils";
 import { getAdminSlug, setAdminSlug, getAdminBySlug } from "@/lib/db/admin";
 import { verifyCsrf } from "@/lib/csrf";
 
 const SLUG_RE = /^[a-z0-9-]{3,40}$/;
 
 export const GET = withErrorHandling("GET /api/admin/my-slug", async () => {
-  const { admin, response } = await requireAdmin();
+  const { admin, response } = await requireSuperAdmin();
   if (!admin) return response;
   const slug = await getAdminSlug(admin.id);
   return NextResponse.json({ slug });
@@ -25,7 +25,7 @@ export const PUT = withErrorHandling("PUT /api/admin/my-slug", async (req: NextR
   const csrfError = verifyCsrf(req);
   if (csrfError) return NextResponse.json({ error: "Invalid CSRF token" }, { status: 403 });
 
-  const { admin, response } = await requireAdmin();
+  const { admin, response } = await requireSuperAdmin();
   if (!admin) return response;
 
   let body: { slug?: string | null };

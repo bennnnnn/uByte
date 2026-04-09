@@ -1,12 +1,14 @@
 /**
  * GrowthTab — conversion funnel, signup trend, and churn signals.
  *
- * Metrics are derived client-side from the already-fetched users array.
+ * Data comes from GET /api/admin/stats?view=growth (requires `growth` permission)
+ * so sub-admins never need the full user list in the browser.
  */
 
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { StatCard, SectionCard } from "../components";
 import type { AdminData } from "../hooks";
+import type { AdminGrowthSnapshot } from "@/lib/db/types";
 import { formatAdminPlanLabel } from "../plan-labels";
 
 interface Props {
@@ -14,78 +16,58 @@ interface Props {
 }
 
 export default function GrowthTab({ data }: Props) {
-  const { users } = data;
-  // Capture the current timestamp once at mount so churn cutoffs are stable
-  const [now] = useState(() => Date.now());
+  const { growthSnapshot, hasPermission } = data;
 
-  /* ── Conversion funnel ─────────────────────────────────────────────────── */
   const funnel = useMemo(() => {
-    const total      = users.length;
-    const activated  = users.filter((u) => u.xp > 0 || u.completed_count > 0).length;
-    const engaged    = users.filter((u) => u.completed_count >= 5).length;
-    const pro        = users.filter((u) => u.plan && u.plan !== "free").length;
-
+    if (!growthSnapshot) {
+      return [
+        { label: "Signed up", count: 0, pct: 100, color: "bg-indigo-500" },
+        { label: "Activated", count: 0, pct: 0, color: "bg-indigo-400" },
+        { label: "Engaged (5+ lessons)", count: 0, pct: 0, color: "bg-violet-500" },
+        { label: "Pro subscriber", count: 0, pct: 0, color: "bg-emerald-500" },
+      ];
+    }
+    const total = growthSnapshot.total_users;
+    const activated = growthSnapshot.activated;
+    const engaged = growthSnapshot.engaged_5plus;
+    const pro = growthSnapshot.pro_subscribers;
     return [
-      { label: "Signed up",      count: total,      pct: 100,                                          color: "bg-indigo-500" },
-      { label: "Activated",      count: activated,  pct: total > 0 ? Math.round(activated / total * 100) : 0, color: "bg-indigo-400" },
-      { label: "Engaged (5+ lessons)", count: engaged, pct: total > 0 ? Math.round(engaged / total * 100) : 0,  color: "bg-violet-500" },
-      { label: "Pro subscriber", count: pro,         pct: total > 0 ? Math.round(pro / total * 100) : 0,      color: "bg-emerald-500" },
+      { label: "Signed up", count: total, pct: 100, color: "bg-indigo-500" },
+      { label: "Activated", count: activated, pct: total > 0 ? Math.round((activated / total) * 100) : 0, color: "bg-indigo-400" },
+      { label: "Engaged (5+ lessons)", count: engaged, pct: total > 0 ? Math.round((engaged / total) * 100) : 0, color: "bg-violet-500" },
+      { label: "Pro subscriber", count: pro, pct: total > 0 ? Math.round((pro / total) * 100) : 0, color: "bg-emerald-500" },
     ];
-  }, [users]);
+  }, [growthSnapshot]);
 
-  /* ── Daily signup trend (last 30 days) ─────────────────────────────────── */
-  const signupSeries = useMemo(() => {
-    const today = new Date();
-    const days: { date: string; count: number }[] = [];
-    for (let i = 29; i >= 0; i--) {
-      const d = new Date(today);
-      d.setDate(d.getDate() - i);
-      days.push({ date: d.toISOString().slice(0, 10), count: 0 });
-    }
-    const dateMap = new Map(days.map((d) => [d.date, d]));
-    for (const u of users) {
-      const day = u.created_at?.slice(0, 10);
-      if (day && dateMap.has(day)) { const entry = dateMap.get(day); if (entry) entry.count++; }
-    }
-    return days;
-  }, [users]);
-
-  /* ── Churn signals ──────────────────────────────────────────────────────── */
-  const churn = useMemo(() => {
-    const cutoff14   = now - 14 * 24 * 60 * 60 * 1000;
-    const cutoff7    = now -  7 * 24 * 60 * 60 * 1000;
-
-    const neverStarted = users.filter((u) => {
-      const age = now - new Date(u.created_at).getTime();
-      return age > 3 * 24 * 60 * 60 * 1000 && u.xp === 0 && u.completed_count === 0;
-    });
-
-    const wentCold = users.filter((u) => {
-      if (u.completed_count === 0) return false;
-      const lastActive = u.last_active_at ? new Date(u.last_active_at).getTime() : new Date(u.created_at).getTime();
-      return lastActive < cutoff14;
-    });
-
-    const atRiskPro = users.filter((u) => {
-      if (u.plan === "free" || !u.plan) return false;
-      const lastActive = u.last_active_at ? new Date(u.last_active_at).getTime() : new Date(u.created_at).getTime();
-      return lastActive < cutoff7;
-    });
-
-    return { neverStarted, wentCold, atRiskPro };
-  }, [users, now]);
-
+  const signupSeries = growthSnapshot?.signup_by_day ?? [];
   const maxBar = Math.max(...signupSeries.map((d) => d.count), 1);
+
+  const churn = growthSnapshot
+    ? {
+        neverStarted: growthSnapshot.never_started_count,
+        wentCold: growthSnapshot.went_cold_count,
+        atRiskPro: growthSnapshot.at_risk_pro_count,
+        neverStartedSample: growthSnapshot.never_started_sample,
+      }
+    : { neverStarted: 0, wentCold: 0, atRiskPro: 0, neverStartedSample: [] as AdminGrowthSnapshot["never_started_sample"] };
+
+  if (hasPermission("growth") && !growthSnapshot) {
+    return (
+      <div className="rounded-xl border border-zinc-200 bg-white p-8 text-center text-sm text-zinc-500 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-400">
+        Growth metrics could not be loaded. Refresh the page or check your network connection.
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-5">
 
       {/* ── Top-line growth cards ──────────────────────────────────────────── */}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <StatCard label="Total users"    value={String(users.length)} />
-        <StatCard label="Activated"      value={String(funnel[1].count)} sub={funnel[1].pct + "% of signups"} />
+        <StatCard label="Total users" value={String(growthSnapshot?.total_users ?? 0)} />
+        <StatCard label="Activated" value={String(funnel[1].count)} sub={funnel[1].pct + "% of signups"} />
         <StatCard label="Pro subscribers" value={String(funnel[3].count)} sub={funnel[3].pct + "% conversion"} />
-        <StatCard label="Never started"  value={String(churn.neverStarted.length)} sub="signed up, 0 XP" />
+        <StatCard label="Never started" value={String(churn.neverStarted)} sub="signed up, 0 XP" />
       </div>
 
       {/* ── Conversion funnel ─────────────────────────────────────────────── */}
@@ -131,7 +113,7 @@ export default function GrowthTab({ data }: Props) {
           })}
         </div>
         <div className="mt-1 flex justify-between text-[10px] text-zinc-400">
-          <span>{signupSeries[0]?.date.slice(5)}</span>
+          <span>{signupSeries[0]?.date.slice(5) ?? "—"}</span>
           <span>today</span>
         </div>
       </SectionCard>
@@ -141,26 +123,25 @@ export default function GrowthTab({ data }: Props) {
         <div className="grid gap-3 sm:grid-cols-3">
           <ChurnCard
             label="Never started"
-            count={churn.neverStarted.length}
+            count={churn.neverStarted}
             description="Signed up 3+ days ago, 0 XP earned"
             color="amber"
           />
           <ChurnCard
             label="Went cold"
-            count={churn.wentCold.length}
+            count={churn.wentCold}
             description="Had progress, inactive 14+ days"
             color="orange"
           />
           <ChurnCard
             label="At-risk Pro"
-            count={churn.atRiskPro.length}
+            count={churn.atRiskPro}
             description="Pro subscriber, inactive 7+ days"
             color="red"
           />
         </div>
 
-        {/* Top never-started users (to target for re-engagement) */}
-        {churn.neverStarted.length > 0 && (
+        {churn.neverStartedSample.length > 0 && (
           <div className="mt-4">
             <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-zinc-400">Never-started sample (newest first)</p>
             <div className="overflow-auto">
@@ -174,7 +155,7 @@ export default function GrowthTab({ data }: Props) {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800">
-                  {churn.neverStarted.slice(0, 10).map((u) => (
+                  {churn.neverStartedSample.map((u) => (
                     <tr key={u.id} className="hover:bg-zinc-50/80 dark:hover:bg-zinc-800/40">
                       <td className="py-2 pr-4 font-medium text-zinc-900 dark:text-zinc-100">{u.name}</td>
                       <td className="py-2 pr-4 text-zinc-500 dark:text-zinc-400">{u.email}</td>

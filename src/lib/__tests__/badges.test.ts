@@ -5,7 +5,7 @@ vi.mock("../db", () => ({
   getProgressCount: vi.fn(async () => 0),
   getAchievements: vi.fn(async () => []),
   unlockAchievement: vi.fn(async () => true),
-  getBookmarkCount: vi.fn(async () => 0),
+  getBookmarkTotal: vi.fn(async () => 0),
 }));
 
 vi.mock("../tutorials", () => ({
@@ -23,14 +23,14 @@ import * as db from "../db";
 
 const mockGetProgressCount = vi.mocked(db.getProgressCount);
 const mockGetAchievements = vi.mocked(db.getAchievements);
-const mockGetBookmarkCount = vi.mocked(db.getBookmarkCount);
+const mockGetBookmarkTotal = vi.mocked(db.getBookmarkTotal);
 const mockUnlockAchievement = vi.mocked(db.unlockAchievement);
 
 beforeEach(() => {
   vi.clearAllMocks();
   mockGetAchievements.mockResolvedValue([]);
   mockGetProgressCount.mockResolvedValue(0);
-  mockGetBookmarkCount.mockResolvedValue(0);
+  mockGetBookmarkTotal.mockResolvedValue(0);
   mockUnlockAchievement.mockResolvedValue(true);
 });
 
@@ -85,7 +85,7 @@ describe("checkBadges", () => {
   });
 
   it("unlocks bookworm when 5+ bookmarks", async () => {
-    mockGetBookmarkCount.mockResolvedValue(5);
+    mockGetBookmarkTotal.mockResolvedValue(5);
     const unlocked = await checkBadges(1);
     expect(unlocked).toContain("bookworm");
   });
@@ -105,7 +105,7 @@ describe("checkBadges", () => {
       BADGES.map((b) => ({ badge_key: b.key, unlocked_at: "2024-01-01" }))
     );
     mockGetProgressCount.mockResolvedValue(5);
-    mockGetBookmarkCount.mockResolvedValue(10);
+    mockGetBookmarkTotal.mockResolvedValue(10);
     const unlocked = await checkBadges(1, { streakDays: 30, speedster: true });
     expect(unlocked).toEqual([]);
   });

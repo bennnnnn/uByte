@@ -5,8 +5,8 @@ import {
   EXAM_SIZE as DEFAULT_EXAM_SIZE,
   EXAM_DURATION_MINUTES as DEFAULT_EXAM_DURATION_MINUTES,
   EXAM_PASS_PERCENT as DEFAULT_EXAM_PASS_PERCENT,
-} from "@/lib/exams/config";
-import type { ExamLang } from "@/lib/exams/config";
+} from "@/lib/exam-config";
+import type { ExamLang } from "@/lib/exam-config";
 
 export interface ExamConfig {
   examSize: number;

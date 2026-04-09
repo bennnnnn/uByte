@@ -14,8 +14,8 @@ interface Props {
 }
 
 /** Build a correct href for a bookmark.
- *  - practice:two-sum  → /tutorial/go
- *  - getting-started   → /tutorial/go/getting-started
+ *  - practice:* (legacy) → language tutorial hub
+ *  - getting-started      → /tutorial/go/getting-started
  */
 function bookmarkHref(tutorialSlug: string, language: string): string {
   const lang = language || "go";
@@ -28,7 +28,7 @@ function bookmarkHref(tutorialSlug: string, language: string): string {
 /** Human-readable label for the bookmark link. */
 function bookmarkLabel(tutorialSlug: string): string {
   if (tutorialSlug.startsWith("practice:")) {
-    return "Saved from the old practice section";
+    return "Legacy bookmark — opens your tutorial track";
   }
   return tutorialSlug.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
 }

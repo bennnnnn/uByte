@@ -1,5 +1,5 @@
 import { getSql } from "./client";
-import type { AdminUserRow, AdminTutorialRow, AdminRevenueStats } from "./types";
+import type { AdminUserRow, AdminTutorialRow, AdminRevenueStats, AdminGrowthSnapshot } from "./types";
 import { resetAllProgress } from "./progress";
 import { incrementTokenVersion } from "./users";
 import { ensureReferralTables } from "./referrals";
@@ -347,6 +347,87 @@ export async function getStepCheckStats(
     ORDER BY step_index
   `;
   return rows as { step_index: number; pass_count: number; fail_count: number }[];
+}
+
+/** Funnel + churn aggregates for admins with `growth` permission only (avoids exposing the full user list). */
+export async function getAdminGrowthSnapshot(): Promise<AdminGrowthSnapshot> {
+  const sql = getSql();
+
+  const [totals] = await sql`
+    SELECT
+      COUNT(*)::int AS total_users,
+      COUNT(*) FILTER (
+        WHERE u.xp > 0 OR EXISTS (SELECT 1 FROM progress p WHERE p.user_id = u.id)
+      )::int AS activated,
+      COUNT(*) FILTER (
+        WHERE (SELECT COUNT(*)::int FROM progress p WHERE p.user_id = u.id) >= 5
+      )::int AS engaged_5plus,
+      COUNT(*) FILTER (WHERE COALESCE(u.plan, 'free') <> 'free')::int AS pro_subscribers
+    FROM users u
+  `;
+
+  const [churn] = await sql`
+    SELECT
+      COUNT(*) FILTER (
+        WHERE u.created_at::timestamptz < NOW() - INTERVAL '3 days'
+          AND u.xp = 0
+          AND NOT EXISTS (SELECT 1 FROM progress p WHERE p.user_id = u.id)
+      )::int AS never_started_count,
+      COUNT(*) FILTER (
+        WHERE EXISTS (SELECT 1 FROM progress p WHERE p.user_id = u.id)
+          AND COALESCE(u.last_active_at::timestamptz, u.created_at::timestamptz) < NOW() - INTERVAL '14 days'
+      )::int AS went_cold_count,
+      COUNT(*) FILTER (
+        WHERE COALESCE(u.plan, 'free') <> 'free'
+          AND COALESCE(u.last_active_at::timestamptz, u.created_at::timestamptz) < NOW() - INTERVAL '7 days'
+      )::int AS at_risk_pro_count
+    FROM users u
+  `;
+
+  const signRows = await sql`
+    SELECT
+      to_char(date_trunc('day', u.created_at::timestamptz), 'YYYY-MM-DD') AS d,
+      COUNT(*)::int AS c
+    FROM users u
+    WHERE u.created_at::timestamptz >= date_trunc('day', NOW()) - INTERVAL '30 days'
+    GROUP BY 1
+    ORDER BY 1
+  `;
+
+  const byDay = new Map<string, number>();
+  for (const row of signRows as { d: string; c: number }[]) {
+    byDay.set(row.d, row.c);
+  }
+  const signup_by_day: { date: string; count: number }[] = [];
+  for (let i = 29; i >= 0; i--) {
+    const dt = new Date();
+    dt.setUTCHours(0, 0, 0, 0);
+    dt.setUTCDate(dt.getUTCDate() - i);
+    const key = dt.toISOString().slice(0, 10);
+    signup_by_day.push({ date: key, count: byDay.get(key) ?? 0 });
+  }
+
+  const sampleRows = await sql`
+    SELECT u.id, u.name, u.email, u.created_at, COALESCE(u.plan, 'free') AS plan
+    FROM users u
+    WHERE u.created_at::timestamptz < NOW() - INTERVAL '3 days'
+      AND u.xp = 0
+      AND NOT EXISTS (SELECT 1 FROM progress p WHERE p.user_id = u.id)
+    ORDER BY u.created_at DESC
+    LIMIT 10
+  `;
+
+  return {
+    total_users: (totals?.total_users as number) ?? 0,
+    activated: (totals?.activated as number) ?? 0,
+    engaged_5plus: (totals?.engaged_5plus as number) ?? 0,
+    pro_subscribers: (totals?.pro_subscribers as number) ?? 0,
+    signup_by_day,
+    never_started_count: (churn?.never_started_count as number) ?? 0,
+    went_cold_count: (churn?.went_cold_count as number) ?? 0,
+    at_risk_pro_count: (churn?.at_risk_pro_count as number) ?? 0,
+    never_started_sample: sampleRows as AdminGrowthSnapshot["never_started_sample"],
+  };
 }
 
 // ─── Admin Audit Log ──────────────────────────────────

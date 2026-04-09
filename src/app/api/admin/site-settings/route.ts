@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { withErrorHandling, requireAdmin, requireSuperAdmin } from "@/lib/api-utils";
+import { withErrorHandling, requireAdminPermission, requireSuperAdmin } from "@/lib/api-utils";
 import { getAllSiteSettings, setSiteSettings, SITE_SETTING_DEFAULTS } from "@/lib/db/site-settings";
 import { verifyCsrf } from "@/lib/csrf";
 import { logAdminAction } from "@/lib/db";
@@ -15,8 +15,7 @@ const SETTING_RULES: Record<string, { type: "number"; min: number; max: number }
 };
 
 export const GET = withErrorHandling("GET /api/admin/site-settings", async () => {
-  // All admins can read settings (needed to show current state in their dashboards)
-  const { admin, response } = await requireAdmin();
+  const { admin, response } = await requireAdminPermission("settings");
   if (!admin) return response;
 
   const settings = await getAllSiteSettings();

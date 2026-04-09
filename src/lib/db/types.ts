@@ -122,6 +122,25 @@ export interface AdminTutorialRow {
   thumbs_down: number;
 }
 
+/** Aggregates for the Growth admin tab (no full user list). */
+export interface AdminGrowthSnapshot {
+  total_users: number;
+  activated: number;
+  engaged_5plus: number;
+  pro_subscribers: number;
+  signup_by_day: { date: string; count: number }[];
+  never_started_count: number;
+  went_cold_count: number;
+  at_risk_pro_count: number;
+  never_started_sample: {
+    id: number;
+    name: string;
+    email: string;
+    created_at: string;
+    plan: string;
+  }[];
+}
+
 export interface TutorialMessage {
   id: number;
   tutorial_slug: string;
