@@ -14,7 +14,7 @@ import { makeUnsubscribeUrl } from "@/lib/unsubscribe";
 
 type EmailPayload = Parameters<Resend["emails"]["send"]>[0];
 
-const FROM = process.env.RESEND_FROM_EMAIL?.trim() || null;
+const FROM = process.env.RESEND_FROM_EMAIL?.trim() || undefined;
 const FALLBACK_FROM = "noreply@resend.dev";
 
 /** Escape user-supplied text before embedding in HTML to prevent injection. */
