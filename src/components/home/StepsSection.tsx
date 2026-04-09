@@ -48,9 +48,9 @@ export default function StepsSection() {
     <section aria-labelledby="how-heading">
       <SectionHeading
         id="how-heading"
-        eyebrow="How it works"
-        title="From zero to shipped code in four steps."
-        subtitle="One focused tutorial product. No tab juggling, no setup, no filler."
+        eyebrow="Learning Flow"
+        title="A guided path, not a pile of docs."
+        subtitle="Pick a language, work through short lessons, and keep moving without setup friction or dead ends."
         className="mb-12"
       />
 

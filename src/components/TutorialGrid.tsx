@@ -137,6 +137,11 @@ export default function TutorialGrid({
                 href={tutorialUrl(lang, tutorial.slug)}
                 className="group relative rounded-xl border border-zinc-200 p-5 transition-all hover:border-indigo-300 hover:shadow-md dark:border-zinc-800 dark:hover:border-indigo-800"
               >
+                {tutorial.slug === tutorials[0]?.slug && (
+                  <span className="mb-3 inline-flex rounded-full bg-indigo-50 px-2.5 py-1 text-[11px] font-bold uppercase tracking-widest text-indigo-700 dark:bg-indigo-950/40 dark:text-indigo-300">
+                    Recommended first
+                  </span>
+                )}
                 <div className="mb-2 flex items-center gap-3">
                   <span
                     className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-bold ${
@@ -164,6 +169,12 @@ export default function TutorialGrid({
                   <span className={`rounded-full px-2.5 py-0.5 text-xs font-medium capitalize ${DIFFICULTY_STYLES[tutorial.difficulty]}`}>
                     {tutorial.difficulty}
                   </span>
+                  <span className="rounded-full bg-zinc-100 px-2.5 py-0.5 text-xs font-medium text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300">
+                    {stepCountBySlug[tutorial.slug] ?? 0} lessons
+                  </span>
+                  <span className="rounded-full bg-zinc-100 px-2.5 py-0.5 text-xs font-medium text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300">
+                    ~{tutorial.estimatedMinutes} min
+                  </span>
                   {(() => {
                     const r = ratingsBySlug[tutorial.slug];
                     if (!r) return null;
@@ -186,6 +197,11 @@ export default function TutorialGrid({
                     );
                   })()}
                 </div>
+                <p className="mt-4 text-xs font-semibold uppercase tracking-widest text-zinc-400 dark:text-zinc-500">
+                  {tutorial.slug === tutorials[0]?.slug
+                    ? "Best first lesson in this track"
+                    : "Structured lesson in the track"}
+                </p>
               </Link>
             );
           })}

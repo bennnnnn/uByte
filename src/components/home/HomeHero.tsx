@@ -338,7 +338,7 @@ function GuestHero({
 
             {/* Badge */}
             <p className="mb-5 inline-flex items-center gap-2 rounded-full bg-indigo-50 px-4 py-1.5 text-sm font-semibold text-indigo-700 ring-1 ring-indigo-100 dark:bg-indigo-950/50 dark:text-indigo-300 dark:ring-indigo-800/60">
-              ✓ Interactive tutorials in 9 languages
+              ✓ Free interactive tutorials in 9 languages
             </p>
 
             {/* Headline */}
@@ -361,28 +361,34 @@ function GuestHero({
             {/* CTAs */}
             <div className="mt-8 flex flex-wrap items-center justify-center gap-3 lg:justify-start">
               <Link
-                href="/signup"
+                href="/tutorial/python"
                 className="rounded-xl bg-indigo-600 px-7 py-3 text-base font-bold text-white shadow-md shadow-indigo-500/20 transition-all hover:-translate-y-0.5 hover:bg-indigo-500 hover:shadow-lg hover:shadow-indigo-500/25"
               >
-                Start learning free →
+                Start with Python →
+              </Link>
+              <Link
+                href="/tutorial/go"
+                className="rounded-xl border border-zinc-200 bg-white px-7 py-3 text-base font-bold text-zinc-700 shadow-sm transition-all hover:border-indigo-200 hover:text-indigo-600 dark:border-zinc-700 dark:bg-zinc-800/80 dark:text-zinc-200 dark:hover:border-indigo-700 dark:hover:text-indigo-400"
+              >
+                Start with Go →
               </Link>
               <Link
                 href="/tutorial"
-                className="rounded-xl border border-zinc-200 bg-white px-7 py-3 text-base font-bold text-zinc-700 shadow-sm transition-all hover:border-indigo-200 hover:text-indigo-600 dark:border-zinc-700 dark:bg-zinc-800/80 dark:text-zinc-200 dark:hover:border-indigo-700 dark:hover:text-indigo-400"
+                className="text-sm font-semibold text-indigo-600 underline-offset-2 transition-colors hover:text-indigo-500 hover:underline dark:text-indigo-400 dark:hover:text-indigo-300"
               >
-                Browse tutorials →
+                Browse all tutorials
               </Link>
             </div>
 
             <p className="mt-4 text-xs text-zinc-400">
-              No credit card required · Free lessons in every language · Start writing code in under 30 seconds
+              No credit card required · Free lessons in every language · Save progress later when you want it
             </p>
 
             {/* Stats */}
             <div className="mt-10 grid grid-cols-4 gap-x-3 gap-y-4 border-t border-zinc-100 pt-8 dark:border-zinc-800">
               {[
                 { value: "9", label: "Languages", mobileLabel: "Languages" },
-                { value: `${totalLessons}+`, label: "Lessons", mobileLabel: "Lessons" },
+                { value: `${totalLessons}+`, label: "Free lessons", mobileLabel: "Lessons" },
                 { value: "Live", label: "Code execution", mobileLabel: "Runs live" },
                 { value: "0", label: "Setup required", mobileLabel: "No setup" },
               ].map(stat => (
@@ -414,8 +420,8 @@ function GuestHero({
           <div className="grid grid-cols-1 divide-y divide-zinc-100 sm:grid-cols-3 sm:divide-x sm:divide-y-0 dark:divide-zinc-800">
             {[
               { icon: "💻", title: "Runs in your browser",       desc: "No installs, no setup. Start writing real code in seconds." },
-              { icon: "📚", title: "Step-by-step lessons",       desc: "Short interactive lessons that build skill one concept at a time." },
-              { icon: "📈", title: "Progress that sticks",       desc: "Save your steps, bookmarks, streaks, and momentum across sessions." },
+              { icon: "🧭", title: "Start with a real track",    desc: "Choose a language, follow a clear path, and always know what comes next." },
+              { icon: "💡", title: "Hints only when needed",     desc: "Every lesson is free. Pay only if you want extra help at the exact step you're stuck on." },
             ].map(item => (
               <div key={item.title} className="flex items-center gap-3 px-4 py-3 sm:px-6">
                 <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-white text-lg shadow-sm ring-1 ring-zinc-200 dark:bg-zinc-800 dark:ring-zinc-700">

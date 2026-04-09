@@ -2,6 +2,7 @@ import Link from "next/link";
 import { getLangIcon } from "@/lib/languages/icons";
 import { getTotalLessonCount } from "@/lib/tutorial-steps";
 import { tutorialLangUrl } from "@/lib/urls";
+import { getAllTutorials } from "@/lib/tutorials";
 import type { PopularLanguage } from "@/lib/db/home-popular";
 import type { SupportedLanguage } from "@/lib/languages/types";
 
@@ -14,39 +15,50 @@ interface Props {
 export default function TrendingSection({ languages, compact = false }: Props) {
   if (languages.length === 0) return null;
 
-  const MIN_LEARNERS = 50;
-  // Show top ~30% of available languages in the popular row (at least 1)
-  const popularCount = Math.max(1, Math.round(languages.length * 0.3));
+  const featuredOrder: SupportedLanguage[] = ["python", "go", "javascript", "typescript", "sql", "java", "rust", "csharp", "cpp"];
+  const STARTER_LABELS: Partial<Record<SupportedLanguage, string>> = {
+    python: "Best for beginners",
+    go: "Best for backend basics",
+    javascript: "Best for web",
+    typescript: "Best for JavaScript developers",
+    sql: "Best for data fundamentals",
+    java: "Best for structured OOP",
+    rust: "Best for systems thinking",
+    csharp: "Best for .NET and Unity",
+    cpp: "Best for performance-focused learning",
+  };
 
-  // Languages with enough real learner data to show publicly
-  const withLearners = languages
-    .filter(l => l.learnerCount >= MIN_LEARNERS)
-    .sort((a, b) => b.learnerCount - a.learnerCount)
-    .slice(0, popularCount);
-
-  const showPopular = !compact && withLearners.length > 0;
-  const allLangs = languages.slice(0, compact ? 3 : 9);
+  const sorted = [...languages].sort((a, b) => {
+    const aRank = featuredOrder.indexOf(a.slug as SupportedLanguage);
+    const bRank = featuredOrder.indexOf(b.slug as SupportedLanguage);
+    return (aRank === -1 ? 99 : aRank) - (bRank === -1 ? 99 : bRank);
+  });
+  const featured = sorted.slice(0, 3);
+  const allLangs = sorted.slice(0, compact ? 3 : 9);
 
   return (
     <section aria-labelledby="tutorials-heading">
 
-      {/* ── Popular tutorials — top 3 by learner count ──────────────── */}
-      {showPopular && (
+      {!compact && (
         <div className="mb-10">
           <div className="mb-5 flex items-center justify-between">
             <div>
               <p className="mb-0.5 text-xs font-bold uppercase tracking-widest text-indigo-600 dark:text-indigo-400">
-                Most popular
+                Start here
               </p>
               <h2 className="text-xl font-bold text-zinc-900 dark:text-zinc-100">
-                Popular tutorials
+                Recommended first tracks
               </h2>
             </div>
           </div>
 
           <div className="grid gap-4 sm:grid-cols-3">
-            {withLearners.map(lang => {
-              const lessons = getTotalLessonCount(lang.slug as SupportedLanguage);
+            {featured.map(lang => {
+              const supportedLang = lang.slug as SupportedLanguage;
+              const lessons = getTotalLessonCount(supportedLang);
+              const tutorials = getAllTutorials(supportedLang);
+              const topicCount = tutorials.length;
+              const totalMinutes = tutorials.reduce((sum, tutorial) => sum + tutorial.estimatedMinutes, 0);
               return (
                 <Link
                   key={lang.slug}
@@ -60,19 +72,21 @@ export default function TrendingSection({ languages, compact = false }: Props) {
                     </span>
                     <p className="text-lg font-bold text-zinc-900 group-hover:text-indigo-600 dark:text-zinc-100 dark:group-hover:text-indigo-400">
                       {lang.name}
-                      <span className="ml-2 text-sm font-normal text-zinc-400 dark:text-zinc-500">{lessons} lessons</span>
                     </p>
                   </div>
 
-                  {/* Learner count */}
-                  <p className="mt-4 flex items-center gap-1.5 text-xs font-semibold text-emerald-600 dark:text-emerald-400">
-                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-                    {lang.learnerCount.toLocaleString()} learners
+                  <p className="mt-4 text-xs font-semibold uppercase tracking-widest text-indigo-500 dark:text-indigo-400">
+                    {STARTER_LABELS[supportedLang] ?? "Structured track"}
                   </p>
+                  <div className="mt-3 flex flex-wrap gap-2 text-xs text-zinc-500 dark:text-zinc-400">
+                    <span className="rounded-full bg-zinc-100 px-2.5 py-1 dark:bg-zinc-700/70">{topicCount} topics</span>
+                    <span className="rounded-full bg-zinc-100 px-2.5 py-1 dark:bg-zinc-700/70">{lessons} lessons</span>
+                    <span className="rounded-full bg-zinc-100 px-2.5 py-1 dark:bg-zinc-700/70">~{Math.max(1, Math.round(totalMinutes / 60))}h</span>
+                  </div>
 
                   {/* CTA */}
                   <p className="mt-auto pt-5 text-right text-sm font-semibold text-indigo-600 group-hover:underline dark:text-indigo-400">
-                    Start learning →
+                    Start track →
                   </p>
                 </Link>
               );
@@ -86,17 +100,20 @@ export default function TrendingSection({ languages, compact = false }: Props) {
         <div className="mb-5">
           {!compact && (
             <p className="mb-0.5 text-xs font-bold uppercase tracking-widest text-zinc-400 dark:text-zinc-500">
-              All languages
+              Full catalog
             </p>
           )}
           <h2 id="tutorials-heading" className="text-xl font-bold text-zinc-900 dark:text-zinc-100">
-            {compact ? "Trending this week" : "Browse tutorials"}
+            {compact ? "Other tracks to explore" : "Browse all languages"}
           </h2>
         </div>
 
         <div className={`grid gap-4 ${compact ? "grid-cols-1 sm:grid-cols-3" : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-4"}`}>
           {allLangs.map(lang => {
-            const lessons = getTotalLessonCount(lang.slug as SupportedLanguage);
+            const supportedLang = lang.slug as SupportedLanguage;
+            const lessons = getTotalLessonCount(supportedLang);
+            const tutorials = getAllTutorials(supportedLang);
+            const totalMinutes = tutorials.reduce((sum, tutorial) => sum + tutorial.estimatedMinutes, 0);
             return (
               <Link
                 key={lang.slug}
@@ -116,11 +133,9 @@ export default function TrendingSection({ languages, compact = false }: Props) {
 
                 {/* Learner count + CTA row */}
                 <div className="mt-auto flex items-center justify-between pt-4">
-                  {lang.learnerCount >= MIN_LEARNERS ? (
-                    <span className="text-[11px] font-semibold text-emerald-600 dark:text-emerald-400">
-                      {lang.learnerCount.toLocaleString()} learners
-                    </span>
-                  ) : <span />}
+                  <span className="text-[11px] font-semibold text-zinc-500 dark:text-zinc-400">
+                    {tutorials.length} topics · ~{Math.max(1, Math.round(totalMinutes / 60))}h
+                  </span>
                   <span className="text-xs font-semibold text-indigo-600 group-hover:underline dark:text-indigo-400">
                     Start →
                   </span>
