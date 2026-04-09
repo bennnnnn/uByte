@@ -221,8 +221,7 @@ export default function InteractiveTutorial({
 
   const handleKeyDown = useEditorKeyDown({
     editor,
-    onRun: () => stepProgress.handleRun(editor.code, editor.setErrorLines),
-    onCheck: () => stepProgress.handleCheck(editor.code, currentStep, editor.setCode, editor.setErrorLines),
+    onRun: () => stepProgress.handleCheck(editor.code, currentStep, editor.setCode, editor.setErrorLines),
   });
 
   if (!currentStep) {
@@ -376,21 +375,12 @@ export default function InteractiveTutorial({
           >
             <button
               type="button"
-              onClick={() => stepProgress.handleRun(editor.code, editor.setErrorLines)}
-              disabled={stepProgress.status === "running"}
-              title="Run code (Ctrl+Enter)"
-              className="flex items-center gap-1.5 rounded-md bg-emerald-100 px-3 py-1.5 text-sm font-medium text-emerald-800 transition-colors hover:bg-emerald-200 disabled:opacity-50 dark:bg-emerald-900/40 dark:text-emerald-300 dark:hover:bg-emerald-900/70"
-            >
-              {stepProgress.status === "running" ? "Running…" : "▶ Run"}
-            </button>
-            <button
-              type="button"
               onClick={() => stepProgress.handleCheck(editor.code, currentStep, editor.setCode, editor.setErrorLines)}
               disabled={stepProgress.status === "running"}
-              title="Check answer (Ctrl+Shift+Enter)"
+              title="Runs your code, then checks it against this step’s requirements. Ctrl+Enter (or Ctrl+Shift+Enter)"
               className="flex items-center gap-1.5 rounded-md bg-indigo-700 px-3 py-1.5 text-sm font-medium text-white transition-colors hover:bg-indigo-800 disabled:opacity-50"
             >
-              ✓ Check
+              {stepProgress.status === "running" ? "Running…" : "▶ Run & check"}
             </button>
             <button
               type="button"
@@ -504,9 +494,8 @@ export default function InteractiveTutorial({
       </div>
 
       {/* ── Mobile bottom action bar ─────────────────────────────────────────
-           Icon-only on mobile for breathing room and clean aesthetics.
-           The lang selector uses abbreviated display; all buttons are 44 px tall
-           for comfortable tap targets (Apple HIG minimum). ──────────────────── */}
+           Single primary action (run + check step). Lang selector + reset + notes.
+           Buttons are 44 px tall for comfortable tap targets (Apple HIG minimum). ──────────────────── */}
       {mobileTab === "code" && (
         <div className="fixed bottom-0 left-0 right-0 z-[54] flex items-center gap-2 border-t border-zinc-200 bg-zinc-50 px-3 py-2 md:hidden dark:border-zinc-800 dark:bg-zinc-900">
           {/* Language selector — compact, shows abbreviated name */}
@@ -523,39 +512,25 @@ export default function InteractiveTutorial({
             ))}
           </select>
 
-          {/* Run */}
-          <button
-            type="button"
-            onClick={() => stepProgress.handleRun(editor.code, editor.setErrorLines)}
-            disabled={stepProgress.status === "running"}
-            aria-label={stepProgress.status === "running" ? "Running…" : "Run code"}
-            title="Run (Ctrl+Enter)"
-            className="flex h-11 flex-1 items-center justify-center rounded-xl bg-emerald-500 text-white shadow-sm shadow-emerald-500/20 transition-colors hover:bg-emerald-600 disabled:opacity-50 dark:bg-emerald-600 dark:hover:bg-emerald-500"
-          >
-            {stepProgress.status === "running" ? (
-              <svg className="h-5 w-5 animate-spin" fill="none" viewBox="0 0 24 24">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" />
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4l3-3-3-3v4a10 10 0 100 10z" />
-              </svg>
-            ) : (
-              <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M8 5.14v14l11-7-11-7z" />
-              </svg>
-            )}
-          </button>
-
-          {/* Check */}
           <button
             type="button"
             onClick={() => stepProgress.handleCheck(editor.code, currentStep, editor.setCode, editor.setErrorLines)}
             disabled={stepProgress.status === "running"}
-            aria-label="Check answer"
-            title="Check (Ctrl+Shift+Enter)"
-            className="flex h-11 flex-1 items-center justify-center rounded-xl bg-indigo-600 text-white shadow-sm shadow-indigo-600/20 transition-colors hover:bg-indigo-700 disabled:opacity-50"
+            aria-label={stepProgress.status === "running" ? "Running…" : "Run and check this step"}
+            title="Run your code and check this step (Ctrl+Enter)"
+            className="flex h-11 min-w-0 flex-1 items-center justify-center gap-1.5 rounded-xl bg-indigo-600 px-2 text-white shadow-sm shadow-indigo-600/20 transition-colors hover:bg-indigo-700 disabled:opacity-50"
           >
-            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
+            {stepProgress.status === "running" ? (
+              <svg className="h-5 w-5 shrink-0 animate-spin" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" />
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4l3-3-3-3v4a10 10 0 100 10z" />
+              </svg>
+            ) : (
+              <svg className="h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M8 5.14v14l11-7-11-7z" />
+              </svg>
+            )}
+            <span className="truncate text-[11px] font-bold leading-tight">Run &amp; check</span>
           </button>
 
           {/* Reset */}

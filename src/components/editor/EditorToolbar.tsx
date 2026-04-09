@@ -19,7 +19,7 @@ interface EditorToolbarProps {
   shareCopied?: boolean;
   /** When omitted the Share button is hidden entirely */
   onShare?: () => void;
-  /** Action buttons (Run / Check or Submit / Reset) rendered between lang select and share */
+  /** Action buttons (e.g. Run & check / Reset) rendered between lang select and share */
   children?: ReactNode;
   /** Extra content after the lang selector, before children (e.g. "Loading…" spinner) */
   extraLeft?: ReactNode;

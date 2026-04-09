@@ -115,7 +115,6 @@ export interface StepProgressState {
   setShowHint: (v: boolean) => void;
   goToStep: (idx: number) => void;
   skipStep: () => void;
-  handleRun: (code: string, setErrorLines: (l: Set<number>) => void) => Promise<void>;
   handleCheck: (code: string, step: TutorialStep, setCode: (c: string) => void, setErrorLines: (l: Set<number>) => void) => Promise<void>;
   handleReset: (step: TutorialStep, setCode: (c: string) => void, setErrorLines: (l: Set<number>) => void) => void;
 }
@@ -345,7 +344,7 @@ export function useStepProgress(
             root_cause: "ai_unavailable",
             evidence: [],
             hint: "Compare your output with the expected output. Look for spacing, capitalisation, or missing characters.",
-            next_step: "Fix the difference and click Check again.",
+            next_step: "Fix the difference and run again.",
             confidence: 0,
           });
         }
@@ -357,7 +356,7 @@ export function useStepProgress(
           root_cause: "network_error",
           evidence: [],
           hint: "Review the expected output shown below the editor.",
-          next_step: "Fix the difference and click Check again.",
+          next_step: "Fix the difference and run again.",
           confidence: 0,
         });
       })
@@ -371,24 +370,6 @@ export function useStepProgress(
   function requestHint(code: string) {
     if (status !== "failed" || hintInflightRef.current || aiFeedbackLoading) return;
     fetchAiFeedback(code, output ?? "", outputIsError, stepIndex);
-  }
-
-  async function handleRun(code: string, setErrorLines: (l: Set<number>) => void) {
-    setStatus("running");
-    setOutput(null);
-    setErrorLines(new Set());
-    // Intentionally do NOT clear aiFeedback here — Run is a preview, the hint stays relevant.
-    try {
-      const { output: out, hasError } = await runCodeRequest(code, lang);
-      setOutputIsError(hasError);
-      setOutput(out || (hasError ? "Compilation error (see above)" : "(no output)"));
-      if (hasError) setErrorLines(parseErrorLines(out, lang));
-      setStatus("idle");
-    } catch {
-      setOutputIsError(true);
-      setOutput("Could not reach the compiler. Please try again.");
-      setStatus("idle");
-    }
   }
 
   async function handleCheck(
@@ -534,7 +515,6 @@ export function useStepProgress(
     setShowHint,
     goToStep,
     skipStep,
-    handleRun,
     handleCheck,
     handleReset,
   };

@@ -4,11 +4,10 @@ import type { CodeEditorState } from "@/hooks/useCodeEditor";
 
 interface EditorKeyDownOptions {
   editor: CodeEditorState;
-  /** Called on Ctrl/Cmd+Enter (without Shift). Typically "Run". */
+  /** Called on Ctrl/Cmd+Enter, and on Ctrl/Cmd+Shift+Enter when `onCheck` is omitted. */
   onRun: () => void;
   /**
-   * Called on Ctrl/Cmd+Shift+Enter.
-   * Tutorial uses this for "Check"; practice IDE omits it (same as onRun).
+   * Optional: Ctrl/Cmd+Shift+Enter. Practice IDE can omit this so both shortcuts call `onRun`.
    */
   onCheck?: () => void;
 }
@@ -27,8 +26,8 @@ const CLOSE_CHARS = new Set(["}", ")", "]"]);
  *                           level if the line ends with { ( [ :
  *                           If cursor sits between a matching open/close bracket pair,
  *                           split them onto three lines with the cursor in the middle.
- * - Ctrl/Cmd+Enter        → run
- * - Ctrl/Cmd+Shift+Enter  → check (tutorial only; falls back to run if omitted)
+ * - Ctrl/Cmd+Enter        → run (tutorial: run & check step)
+ * - Ctrl/Cmd+Shift+Enter  → onCheck if provided, else same as run
  */
 export function useEditorKeyDown({ editor, onRun, onCheck }: EditorKeyDownOptions) {
   function handleKeyDown(e: React.KeyboardEvent<HTMLTextAreaElement>) {

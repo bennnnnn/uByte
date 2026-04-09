@@ -54,7 +54,7 @@ export async function callAiFeedback(
       root_cause: "ai_unavailable",
       evidence: [],
       hint: "Compare your actual output with the expected output shown below the editor.",
-      next_step: "Fix the difference and click Check again.",
+      next_step: "Fix the difference and run again.",
       confidence: 0,
     };
   }

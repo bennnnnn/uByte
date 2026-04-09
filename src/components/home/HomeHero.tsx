@@ -278,10 +278,7 @@ function MobileCodePreview() {
         {/* Action bar */}
         <div className="flex items-center gap-2 border-t border-zinc-100 px-4 py-2 dark:border-zinc-700/80">
           <span className="flex items-center gap-1.5 rounded-lg bg-indigo-600 px-3.5 py-1.5 text-[11px] font-bold text-white shadow shadow-indigo-600/20">
-            ▶ Run
-          </span>
-          <span className="flex items-center gap-1.5 rounded-lg border border-emerald-200 bg-emerald-50 px-3.5 py-1.5 text-[11px] font-bold text-emerald-600 dark:border-emerald-800/60 dark:bg-emerald-950/40 dark:text-emerald-400">
-            ✓ Check
+            ▶ Run &amp; check
           </span>
         </div>
 

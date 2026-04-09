@@ -59,8 +59,11 @@ export default function OutputPanel({
 
       {/* Output text */}
       {output === null ? (
-        <p className="text-xs text-zinc-400 dark:text-zinc-600">
-          Click Run to execute, or Check to validate.
+        <p className="font-sans text-xs leading-relaxed text-zinc-500 dark:text-zinc-400">
+          <span className="font-semibold text-zinc-600 dark:text-zinc-300">Run &amp; check</span>
+          {
+            " runs your program, shows the output here, and checks it against this step’s requirements. Your code can run without errors and still need changes to pass the lesson — that feedback appears here."
+          }
         </p>
       ) : (
         <pre

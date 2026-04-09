@@ -15,6 +15,15 @@ function isStandalonePath(pathname: string): boolean {
   return STANDALONE_PREFIXES.some((p) => p !== "/" && pathname.startsWith(p));
 }
 
+/**
+ * `/tutorial/[lang]` and lesson URLs use `MobileNav` in the tutorial layout.
+ * Rendering the global mobile bar too stacks two identical top bars on small screens.
+ */
+function isTutorialLangSubpath(pathname: string): boolean {
+  const parts = pathname.split("/").filter(Boolean);
+  return parts.length >= 2 && parts[0] === "tutorial";
+}
+
 const LANG_ICONS: Record<string, string> = {
   go: "🐹", python: "🐍", javascript: "🟨", typescript: "🔷", java: "☕", rust: "🦀", cpp: "⚙️", csharp: "💜", sql: "🗄️",
 };
@@ -92,6 +101,7 @@ export default function MobileStandaloneHeader() {
   const [expandedSection, setExpandedSection] = useState<string | null>(null);
 
   if (!isStandalonePath(pathname ?? "")) return null;
+  if (isTutorialLangSubpath(pathname ?? "")) return null;
 
   const languageSlugs = getAllLanguageSlugs();
   const toggle = (section: string) => {
