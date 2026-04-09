@@ -21,8 +21,6 @@ import type {
   AuditEntry,
   StepStat,
   SubscriptionEventRow,
-  PracticeStat,
-  ExamStats,
   Tab,
   RevenuePeriod,
   AdminRevenueStats,
@@ -42,25 +40,6 @@ export interface BannerData {
   bannerIcon: string;
 }
 
-export interface ExamSettingsMap {
-  [lang: string]: { examSize: number; examDurationMinutes: number; passPercent: number };
-}
-
-export interface ExamUploadResult {
-  inserted: number;
-  errors: string[];
-}
-
-export interface ExamQuestionAdminRow {
-  id: number;
-  lang: string;
-  prompt: string;
-  choices_json: string[];
-  correct_index: number;
-  explanation: string | null;
-  created_at: string;
-}
-
 /* ── Hook ────────────────────────────────────────────────────────────────── */
 
 export function useAdminData() {
@@ -77,7 +56,6 @@ export function useAdminData() {
   /* ── State: core data fetched on mount ───────────────────────────────── */
   const [users, setUsers] = useState<AdminUser[]>([]);
   const [analytics, setAnalytics] = useState<TutorialAnalytics[]>([]);
-  const [practiceStats, setPracticeStats] = useState<PracticeStat[]>([]);
   const [revenue, setRevenue] = useState<AdminRevenueStats | null>(null);
   const [revenuePeriod, setRevenuePeriod] = useState<RevenuePeriod>("7days");
   const [revenueSeries, setRevenueSeries] = useState<{ date: string; revenue: number }[]>([]);
@@ -96,24 +74,6 @@ export function useAdminData() {
   const [pending, setPending] = useState<{ id: number; action: string } | null>(null);
   const [userActionsOpen, setUserActionsOpen] = useState<number | null>(null);
   const [actionAnchorRect, setActionAnchorRect] = useState<DOMRect | null>(null);
-
-  /* ── State: exams tab ────────────────────────────────────────────────── */
-  const [examStats, setExamStats] = useState<ExamStats | null>(null);
-  const [examStatsLoading, setExamStatsLoading] = useState(false);
-  const [examUploadFile, setExamUploadFile] = useState<File | null>(null);
-  const [examUploading, setExamUploading] = useState(false);
-  const [examUploadResult, setExamUploadResult] = useState<ExamUploadResult | null>(null);
-  const [examSettings, setExamSettings] = useState<ExamSettingsMap | null>(null);
-  const [examSettingsSaving, setExamSettingsSaving] = useState(false);
-  const [examSettingsMessage, setExamSettingsMessage] = useState<string | null>(null);
-  // Question browser
-  const [questionBrowserLang, setQuestionBrowserLang] = useState<string | null>(null);
-  const [questionBrowserRows, setQuestionBrowserRows] = useState<ExamQuestionAdminRow[]>([]);
-  const [questionBrowserTotal, setQuestionBrowserTotal] = useState(0);
-  const [questionBrowserPage, setQuestionBrowserPage] = useState(1);
-  const [questionBrowserLoading, setQuestionBrowserLoading] = useState(false);
-  const [clearLangConfirm, setClearLangConfirm] = useState<string | null>(null);
-  const [clearLangLoading, setClearLangLoading] = useState(false);
 
   /* ── State: banner tab ───────────────────────────────────────────────── */
   const [bannerData, setBannerData] = useState<BannerData | null>(null);
@@ -148,12 +108,11 @@ export function useAdminData() {
       mePromise,
       usersPromise,
       fetch("/api/admin/users?view=analytics", { credentials: "same-origin" }).then(async (r) => { const d = await r.json(); return r.ok ? d : { analytics: [] }; }),
-      fetch("/api/admin/users?view=practice-stats", { credentials: "same-origin" }).then(async (r) => { const d = await r.json(); return r.ok ? d : { stats: [] }; }),
       fetch("/api/admin/stats?period=7days", { credentials: "same-origin" }).then(async (r) => r.ok ? r.json() : null),
       fetch("/api/admin/audit-log", { credentials: "same-origin" }).then(async (r) => { const d = await r.json(); return r.ok ? d : { log: [] }; }),
       fetch("/api/admin/stats?view=subscription-events", { credentials: "same-origin" }).then(async (r) => r.ok ? r.json() : { events: [] }),
     ])
-      .then(([meData, userData, analyticsData, practiceData, revenueData, auditData, eventsData]) => {
+      .then(([meData, userData, analyticsData, revenueData, auditData, eventsData]) => {
         if (cancelled) return;
         setAdminMe(meData);
         // Default tab to first permitted tab
@@ -166,7 +125,6 @@ export function useAdminData() {
         });
         if (userData) setUsers(userData.users ?? []);
         setAnalytics(analyticsData.analytics ?? []);
-        setPracticeStats(practiceData?.stats ?? []);
         if (revenueData) { setRevenue(revenueData); setRevenueSeries(revenueData.revenueByPeriod ?? revenueData.revenueByDay ?? []); }
         setAuditLog(auditData.log ?? []);
         setSubscriptionEvents(eventsData?.events ?? []);
@@ -186,17 +144,6 @@ export function useAdminData() {
       .then((data) => { if (!cancelled && data?.revenueByPeriod) setRevenueSeries(data.revenueByPeriod); });
     return () => { cancelled = true; };
   }, [tab, revenuePeriod, revenue]);
-
-  /* ── Exam stats & settings (loaded when exams tab activates) ─────────── */
-  useEffect(() => {
-    if (tab !== "exams") return;
-    setExamStatsLoading(true);
-    setExamSettings(null);
-    let cancelled = false;
-    fetch("/api/admin/exam-stats", { credentials: "same-origin" }).then((r) => r.ok ? r.json() : null).then((data) => { if (!cancelled && data) setExamStats(data); }).finally(() => { if (!cancelled) setExamStatsLoading(false); });
-    fetch("/api/admin/exam-settings", { credentials: "same-origin" }).then((r) => r.ok ? r.json() : null).then((data) => { if (!cancelled && data && typeof data === "object") setExamSettings(data); });
-    return () => { cancelled = true; };
-  }, [tab]);
 
   /* ── Banner (loaded when banner tab activates) ───────────────────────── */
   useEffect(() => {
@@ -238,87 +185,6 @@ export function useAdminData() {
     const r = await fetch("/api/admin/users?view=step-stats&slug=" + encodeURIComponent(slug), { credentials: "same-origin" });
     const d = await r.json();
     setStepStats(d.stats ?? []);
-  }, []);
-
-  /* ── Exam settings save ──────────────────────────────────────────────── */
-  const saveExamSettings = useCallback(async () => {
-    if (!examSettings) return;
-    setExamSettingsSaving(true);
-    setExamSettingsMessage(null);
-    try {
-      const res = await apiFetch("/api/admin/exam-settings", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ settings: examSettings }),
-      });
-      const data = await res.json();
-      if (res.ok) { setExamSettings(data); setExamSettingsMessage("Saved."); setTimeout(() => setExamSettingsMessage(null), 3000); }
-      else setExamSettingsMessage(data.error ?? "Save failed");
-    } catch (e) { setExamSettingsMessage(String(e)); } finally { setExamSettingsSaving(false); }
-  }, [examSettings]);
-
-  /* ── Exam upload ─────────────────────────────────────────────────────── */
-  const uploadExamQuestions = useCallback(async () => {
-    if (!examUploadFile) return;
-    setExamUploading(true);
-    setExamUploadResult(null);
-    try {
-      const isJson = examUploadFile.name.toLowerCase().endsWith(".json");
-      const body = await examUploadFile.text();
-      const res = await apiFetch("/api/admin/exam-questions/upload", {
-        method: "POST",
-        headers: isJson ? { "Content-Type": "application/json" } : { "Content-Type": "text/csv" },
-        body: isJson ? JSON.stringify({ questions: (() => { try { const j = JSON.parse(body); return Array.isArray(j.questions) ? j.questions : Array.isArray(j) ? j : []; } catch { return []; } })() }) : body,
-      });
-      const data = await res.json();
-      if (res.ok) {
-        setExamUploadResult({ inserted: data.inserted ?? 0, errors: data.errors ?? [] });
-        setExamUploadFile(null);
-        if ((data.inserted ?? 0) > 0) { const st = await fetch("/api/admin/exam-stats", { credentials: "same-origin" }); if (st.ok) setExamStats(await st.json()); }
-      } else { setExamUploadResult({ inserted: 0, errors: [data.error ?? "Upload failed"] }); }
-    } catch (err) { setExamUploadResult({ inserted: 0, errors: [String(err)] }); } finally { setExamUploading(false); }
-  }, [examUploadFile]);
-
-  /* ── Question browser ────────────────────────────────────────────────── */
-  const loadQuestions = useCallback(async (lang: string, page = 1) => {
-    setQuestionBrowserLoading(true);
-    setQuestionBrowserLang(lang);
-    setQuestionBrowserPage(page);
-    try {
-      const res = await fetch(`/api/admin/exam-questions?lang=${encodeURIComponent(lang)}&page=${page}&limit=50`, { credentials: "same-origin" });
-      if (res.ok) {
-        const data = await res.json();
-        setQuestionBrowserRows(data.rows ?? []);
-        setQuestionBrowserTotal(data.total ?? 0);
-      }
-    } finally {
-      setQuestionBrowserLoading(false);
-    }
-  }, []);
-
-  const deleteQuestion = useCallback(async (id: number) => {
-    await apiFetch(`/api/admin/exam-questions/question/${id}`, { method: "DELETE" });
-    setQuestionBrowserRows((prev) => prev.filter((r) => r.id !== id));
-    setQuestionBrowserTotal((prev) => Math.max(0, prev - 1));
-    // Refresh stats
-    const st = await fetch("/api/admin/exam-stats", { credentials: "same-origin" });
-    if (st.ok) setExamStats(await st.json());
-  }, []);
-
-  const clearAllQuestionsForLang = useCallback(async (lang: string) => {
-    setClearLangLoading(true);
-    try {
-      const res = await apiFetch(`/api/admin/exam-questions/lang/${encodeURIComponent(lang)}`, { method: "DELETE" });
-      if (res.ok) {
-        setQuestionBrowserRows([]);
-        setQuestionBrowserTotal(0);
-        setClearLangConfirm(null);
-        const st = await fetch("/api/admin/exam-stats", { credentials: "same-origin" });
-        if (st.ok) setExamStats(await st.json());
-      }
-    } finally {
-      setClearLangLoading(false);
-    }
   }, []);
 
   /* ── Banner save ─────────────────────────────────────────────────────── */
@@ -415,7 +281,7 @@ export function useAdminData() {
     /* tab nav */
     tab: tab ?? "analytics", setTab, query, setQuery,
     /* core data */
-    users, filtered, analytics, practiceStats,
+    users, filtered, analytics,
     revenue, revenuePeriod, setRevenuePeriod, revenueSeries, subscriptionEvents,
     auditLog,
     /* analytics heatmap */
@@ -424,13 +290,6 @@ export function useAdminData() {
     fetching, error,
     /* user actions */
     pending, userActionsOpen, setUserActionsOpen, actionAnchorRect, setActionAnchorRect, doAction,
-    /* exams */
-    examStats, examStatsLoading, examUploadFile, setExamUploadFile, examUploading, examUploadResult, setExamUploadResult,
-    examSettings, setExamSettings, examSettingsSaving, examSettingsMessage, saveExamSettings, uploadExamQuestions,
-    /* question browser */
-    questionBrowserLang, questionBrowserRows, questionBrowserTotal, questionBrowserPage,
-    questionBrowserLoading, loadQuestions, deleteQuestion,
-    clearLangConfirm, setClearLangConfirm, clearLangLoading, clearAllQuestionsForLang,
     /* banner */
     bannerData, setBannerData, bannerSaving, bannerMessage, saveBanner,
     /* revenue helpers */

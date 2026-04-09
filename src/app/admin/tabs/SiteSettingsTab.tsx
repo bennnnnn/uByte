@@ -15,30 +15,34 @@ import { Spinner } from "../components";
 /* ── Types ───────────────────────────────────────────────────────────────── */
 
 interface Settings {
-  // Numeric
-  exam_pass_percent: string;
   max_ai_calls_per_day: string;
   // Feature flags ("1" = on, "0" = off)
   registration_open: string;
   maintenance_mode: string;
   ai_enabled: string;
   referral_enabled: string;
-  certifications_enabled: string;
-  interview_simulator_enabled: string;
   pro_features_enabled: string;
 }
 
 const DEFAULTS: Settings = {
-  exam_pass_percent: "70",
   max_ai_calls_per_day: "200",
   registration_open: "1",
   maintenance_mode: "0",
   ai_enabled: "1",
   referral_enabled: "1",
-  certifications_enabled: "1",
-  interview_simulator_enabled: "1",
   pro_features_enabled: "1",
 };
+
+function pickSettings(input: Record<string, unknown>): Settings {
+  return {
+    max_ai_calls_per_day: String(input.max_ai_calls_per_day ?? DEFAULTS.max_ai_calls_per_day),
+    registration_open: String(input.registration_open ?? DEFAULTS.registration_open),
+    maintenance_mode: String(input.maintenance_mode ?? DEFAULTS.maintenance_mode),
+    ai_enabled: String(input.ai_enabled ?? DEFAULTS.ai_enabled),
+    referral_enabled: String(input.referral_enabled ?? DEFAULTS.referral_enabled),
+    pro_features_enabled: String(input.pro_features_enabled ?? DEFAULTS.pro_features_enabled),
+  };
+}
 
 /* ── Primitive components ────────────────────────────────────────────────── */
 
@@ -201,7 +205,7 @@ export default function SiteSettingsTab() {
       if (r.status === 403) { setReadOnly(true); setLoading(false); return; }
       const d = await r.json();
       if (!r.ok) throw new Error(d.error ?? "Failed to load");
-      const merged = { ...DEFAULTS, ...d } as Settings;
+      const merged = pickSettings(d as Record<string, unknown>);
       setSettings(merged);
       setDraft(merged);
     } catch (e) {
@@ -222,7 +226,7 @@ export default function SiteSettingsTab() {
     setSavedSection(null);
     const body: Record<string, unknown> = {};
     for (const k of keys) {
-      const rule = ["exam_pass_percent", "max_ai_calls_per_day"].includes(k)
+      const rule = ["max_ai_calls_per_day"].includes(k)
         ? "number"
         : "bool";
       body[k] = rule === "bool" ? draft[k] === "1" : draft[k];
@@ -235,7 +239,7 @@ export default function SiteSettingsTab() {
       });
       const d = await res.json();
       if (!res.ok) { setError(d.error ?? "Save failed"); return; }
-      const merged = { ...DEFAULTS, ...d } as Settings;
+      const merged = pickSettings(d as Record<string, unknown>);
       setSettings(merged);
       setDraft(merged);
       setSavedSection(section);
@@ -308,14 +312,14 @@ export default function SiteSettingsTab() {
       <Section
         title="Features"
         description="Toggle individual product features on or off site-wide."
-        onSave={() => saveSection("features", ["ai_enabled", "referral_enabled", "certifications_enabled", "interview_simulator_enabled", "pro_features_enabled"])}
+        onSave={() => saveSection("features", ["ai_enabled", "referral_enabled", "pro_features_enabled"])}
         saving={savingSection === "features"}
         saved={savedSection === "features"}
         disabled={readOnly}
       >
         <SettingRow
           label="AI features"
-          hint="Master switch for all AI-powered features: hints, code reviews, interview debriefs, and AI chat."
+          hint="Master switch for AI-powered lesson help such as detailed hints and extra in-context guidance."
         >
           <Toggle id="ai_enabled" checked={bool("ai_enabled")} onChange={(v) => setBool("ai_enabled", v)} disabled={readOnly} />
         </SettingRow>
@@ -324,18 +328,6 @@ export default function SiteSettingsTab() {
           hint="Users can share invite links to earn 30 free Pro days per successful referral."
         >
           <Toggle id="referral_enabled" checked={bool("referral_enabled")} onChange={(v) => setBool("referral_enabled", v)} disabled={readOnly} />
-        </SettingRow>
-        <SettingRow
-          label="Certifications & exams"
-          hint="Allow users to take certification exams and earn certificates."
-        >
-          <Toggle id="certifications_enabled" checked={bool("certifications_enabled")} onChange={(v) => setBool("certifications_enabled", v)} disabled={readOnly} />
-        </SettingRow>
-        <SettingRow
-          label="Interview simulator"
-          hint="Timed interview practice sessions with AI debrief (Pro feature)."
-        >
-          <Toggle id="interview_simulator_enabled" checked={bool("interview_simulator_enabled")} onChange={(v) => setBool("interview_simulator_enabled", v)} disabled={readOnly} />
         </SettingRow>
         <SettingRow
           label="Pro features"
@@ -350,28 +342,14 @@ export default function SiteSettingsTab() {
       <Section
         title="Limits"
         description="Numeric thresholds and defaults."
-        onSave={() => saveSection("limits", ["exam_pass_percent", "max_ai_calls_per_day"])}
+        onSave={() => saveSection("limits", ["max_ai_calls_per_day"])}
         saving={savingSection === "limits"}
         saved={savedSection === "limits"}
         disabled={readOnly}
       >
         <SettingRow
-          label="Default exam pass %"
-          hint="Minimum score to earn a certificate. Per-language overrides in the Certifications tab take precedence."
-        >
-          <NumericInput
-            id="exam_pass_percent"
-            value={draft.exam_pass_percent}
-            onChange={(v) => set("exam_pass_percent", v)}
-            min={1}
-            max={100}
-            unit="%"
-            disabled={readOnly}
-          />
-        </SettingRow>
-        <SettingRow
           label="Max AI calls per day (Pro users)"
-          hint="How many AI requests a Pro user can make per calendar day across all AI features."
+          hint="How many AI hint/help requests a Pro user can make per calendar day."
         >
           <NumericInput
             id="max_ai_calls_per_day"

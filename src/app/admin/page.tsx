@@ -15,20 +15,18 @@ import { Spinner, TabIcon } from "./components";
 import { TAB_LABELS } from "./types";
 import type { Tab } from "./types";
 import { TAB_PERMISSION } from "./permission-constants";
-import { UsersTab, AnalyticsTab, RevenueTab, GrowthTab, ExamsTab, BannerTab, AuditTab, BlogTab, MessagesTab, InterviewsTab, ReportsTab, AdminsTab, SiteSettingsTab } from "./tabs";
+import { UsersTab, AnalyticsTab, RevenueTab, GrowthTab, BannerTab, AuditTab, BlogTab, MessagesTab, ReportsTab, AdminsTab, SiteSettingsTab } from "./tabs";
 
 /* ── Tab header subtitles (concise one-liners per tab) ───────────────────── */
 const TAB_SUBTITLES: Record<Tab, string> = {
   users:           "Registered users",
-  analytics:       "Tutorial completions & practice stats",
+  analytics:       "Tutorial performance and step heatmap",
   revenue:         "Income, subscribers & billing events",
   growth:          "Conversion funnel, signup trend & churn signals",
   audit:           "Admin action history",
-  exams:           "Questions, attempts, pass threshold, settings & upload",
   banner:          "Site-wide announcement banner",
   blog:            "Create and edit blog posts without touching the repo",
   messages:        "Contact form submissions from users",
-  interviews:      "Moderate user-submitted interview experiences",
   reports:         "Flagged discussion comments awaiting review",
   admins:          "Manage admin access and roles",
   "site-settings": "Global site configuration",
@@ -37,7 +35,7 @@ const TAB_SUBTITLES: Record<Tab, string> = {
 /* ── Full sidebar section definitions (super admin sees all) ─────────────── */
 const ALL_SIDEBAR_SECTIONS: { label: string; tabs: Tab[] }[] = [
   { label: "Overview", tabs: ["users", "analytics", "revenue", "growth"] },
-  { label: "Manage",   tabs: ["exams", "banner", "blog", "interviews"] },
+  { label: "Manage",   tabs: ["banner", "blog"] },
   { label: "Inbox",    tabs: ["messages", "reports"] },
   { label: "History",  tabs: ["audit"] },
   { label: "Admin",    tabs: ["admins", "site-settings"] },
@@ -231,12 +229,10 @@ export default function AdminPage() {
           {tab === "analytics"      && <AnalyticsTab    data={data} />}
           {tab === "revenue"        && <RevenueTab      data={data} />}
           {tab === "growth"         && <GrowthTab       data={data} />}
-          {tab === "exams"          && <ExamsTab        data={data} />}
           {tab === "banner"         && <BannerTab       data={data} />}
           {tab === "audit"          && <AuditTab        data={data} />}
           {tab === "blog"           && <BlogTab />}
           {tab === "messages"       && <MessagesTab />}
-          {tab === "interviews"     && <InterviewsTab />}
           {tab === "reports"        && <ReportsTab />}
           {tab === "admins"         && <AdminsTab       data={data} />}
           {tab === "site-settings"  && <SiteSettingsTab />}

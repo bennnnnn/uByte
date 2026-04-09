@@ -10,12 +10,10 @@ export const ALL_PERMISSIONS = [
   "audit",        // View admin audit log
   "admins",       // Manage admin access and permissions
   "settings",     // Change site settings
-  "analytics",    // View tutorial/practice analytics
-  "exams",        // Manage certifications and exam questions
+  "analytics",    // View tutorial analytics
   "banner",       // Manage site-wide announcement banner
   "blog",         // Create and edit blog posts
   "messages",     // View contact messages
-  "interviews",   // Moderate interview submissions
   "reports",      // Moderate reported discussion comments
 ] as const;
 
@@ -24,11 +22,10 @@ export type AdminPermission = (typeof ALL_PERMISSIONS)[number];
 /** Permissions available to limited admins when no custom list is set. */
 export const DEFAULT_LIMITED_PERMISSIONS: AdminPermission[] = [
   "analytics",
-  "exams",
   "banner",
   "blog",
   "messages",
-  "interviews",
+  "reports",
 ];
 
 /** Human-readable labels for each permission. */
@@ -39,12 +36,10 @@ export const PERMISSION_LABELS: Record<AdminPermission, string> = {
   audit:       "Audit log",
   admins:      "Admin management",
   settings:    "Site settings",
-  analytics:   "Tutorial & practice analytics",
-  exams:       "Certifications & exams",
+  analytics:   "Tutorial analytics",
   banner:      "Site-wide banner",
   blog:        "Blog editor",
   messages:    "Contact messages",
-  interviews:  "Interview submissions",
   reports:     "Discussion reports",
 };
 
@@ -55,11 +50,9 @@ export const TAB_PERMISSION: Record<string, AdminPermission> = {
   revenue:         "revenue",
   growth:          "growth",
   audit:           "audit",
-  exams:           "exams",
   banner:          "banner",
   blog:            "blog",
   messages:        "messages",
-  interviews:      "interviews",
   reports:         "reports",
   admins:          "admins",
   "site-settings": "settings",
@@ -70,12 +63,12 @@ export const PERMISSION_PRESETS: { id: string; label: string; permissions: Admin
   {
     id: "content",
     label: "Content editor",
-    permissions: ["analytics", "exams", "banner", "blog", "messages", "interviews"],
+    permissions: ["analytics", "banner", "blog", "messages", "reports"],
   },
   {
     id: "moderator",
     label: "Moderator",
-    permissions: ["reports", "interviews", "messages"],
+    permissions: ["reports", "messages"],
   },
   {
     id: "analyst",

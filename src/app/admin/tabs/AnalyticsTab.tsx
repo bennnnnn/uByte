@@ -1,10 +1,5 @@
 /**
- * AnalyticsTab — tutorial completions, interview prep problems, and step heatmap.
- *
- * Three section cards:
- *   1. Tutorial completion counts with thumbs up/down satisfaction scores.
- *   2. Interview prep problem solve rates.
- *   3. Per-step difficulty heatmap (lazy-loaded when a tutorial is selected).
+ * AnalyticsTab — tutorial completions, ratings, and step heatmap.
  */
 
 import { SectionCard, EmptyRow } from "../components";
@@ -16,7 +11,7 @@ interface Props {
 }
 
 export default function AnalyticsTab({ data }: Props) {
-  const { analytics, practiceStats, stepStats, heatmapSlug, loadStepStats, fetching } = data;
+  const { analytics, stepStats, heatmapSlug, loadStepStats, fetching } = data;
 
   if (fetching) {
     return (
@@ -31,8 +26,7 @@ export default function AnalyticsTab({ data }: Props) {
   const overallScore     = totalVotes > 0
     ? Math.round((analytics.reduce((s, t) => s + t.thumbs_up, 0) / totalVotes) * 100)
     : null;
-  const totalSolved      = practiceStats.reduce((s, p) => s + p.solved_count, 0);
-  const totalAttempts    = practiceStats.reduce((s, p) => s + p.attempt_count, 0);
+  const ratedTutorials   = analytics.filter((t) => t.thumbs_up + t.thumbs_down > 0).length;
 
   return (
     <div className="space-y-5">
@@ -42,7 +36,7 @@ export default function AnalyticsTab({ data }: Props) {
         <MiniStat label="Tutorials tracked"   value={String(analytics.length)} />
         <MiniStat label="Total completions"   value={totalCompletions.toLocaleString()} />
         <MiniStat label="Overall satisfaction" value={overallScore !== null ? overallScore + "%" : "—"} />
-        <MiniStat label="Problems attempted"  value={totalAttempts.toLocaleString()} sub={`${totalSolved.toLocaleString()} solved`} />
+        <MiniStat label="Rated tutorials" value={ratedTutorials.toLocaleString()} />
       </div>
 
       {/* ── Tutorial completions & ratings ─────────────────────────────── */}
@@ -80,33 +74,6 @@ export default function AnalyticsTab({ data }: Props) {
                 );
               })}
               {analytics.length === 0 && <EmptyRow cols={5} />}
-            </tbody>
-          </table>
-        </div>
-      </SectionCard>
-
-      {/* ── Interview prep problems ────────────────────────────────────── */}
-      <SectionCard title="Interview prep">
-        <div className="overflow-auto -mx-5 -mb-5">
-          <table className="w-full min-w-[480px] text-sm">
-            <thead className="sticky top-0 bg-surface-card">
-              <tr>
-                <Th align="left">Problem</Th>
-                <Th>Solved</Th>
-                <Th>Attempts</Th>
-                <Th last>Rate</Th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800">
-              {practiceStats.map((p) => (
-                <tr key={p.problem_slug} className="transition-colors hover:bg-zinc-50/80 dark:hover:bg-zinc-800/40">
-                  <td className="px-5 py-2.5 font-medium text-zinc-900 dark:text-zinc-100">{slugToTitle(p.problem_slug)}</td>
-                  <td className="px-4 py-2.5 text-right font-mono">{p.solved_count}</td>
-                  <td className="px-4 py-2.5 text-right font-mono">{p.attempt_count}</td>
-                  <td className="px-5 py-2.5 text-right">{p.attempt_count > 0 ? Math.round((p.solved_count / p.attempt_count) * 100) + "%" : "—"}</td>
-                </tr>
-              ))}
-              {practiceStats.length === 0 && <EmptyRow cols={4} />}
             </tbody>
           </table>
         </div>

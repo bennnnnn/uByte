@@ -11,7 +11,6 @@ import {
   logAdminAction,
   getStepCheckStats,
   updateUserPlan,
-  getPracticeProblemStats,
 } from "@/lib/db";
 import { verifyCsrf } from "@/lib/csrf";
 import { withErrorHandling, requireAdmin, requireSuperAdmin } from "@/lib/api-utils";
@@ -29,10 +28,6 @@ export const GET = withErrorHandling("GET /api/admin/users", async (request: Nex
     const slug = searchParams.get("slug") ?? "";
     if (!slug) return NextResponse.json({ stats: [] });
     const stats = await getStepCheckStats(slug);
-    return NextResponse.json({ stats });
-  }
-  if (searchParams.get("view") === "practice-stats") {
-    const stats = await getPracticeProblemStats();
     return NextResponse.json({ stats });
   }
   // Paginated user list with optional search + plan + verified filter

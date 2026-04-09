@@ -60,30 +60,7 @@ export interface SubscriptionEventRow {
   created_at: string;
 }
 
-export interface PracticeStat {
-  problem_slug: string;
-  solved_count: number;
-  attempt_count: number;
-}
-
-export interface ExamStatRow {
-  lang: string;
-  question_count: number;
-  attempt_count: number;
-  passed_count: number;
-  certificates_count: number;
-}
-
-export interface ExamStats {
-  questionsByLang: ExamStatRow[];
-  totalQuestions: number;
-  totalAttempts: number;
-  passedAttempts: number;
-  certificatesIssued: number;
-  passRatePercent: number;
-}
-
-export type Tab = "users" | "analytics" | "revenue" | "growth" | "audit" | "exams" | "banner" | "blog" | "messages" | "interviews" | "reports" | "admins" | "site-settings";
+export type Tab = "users" | "analytics" | "revenue" | "growth" | "audit" | "banner" | "blog" | "messages" | "reports" | "admins" | "site-settings";
 export type RevenuePeriod = "7days" | "month" | "year";
 
 export const TAB_LABELS: Record<Tab, string> = {
@@ -92,11 +69,9 @@ export const TAB_LABELS: Record<Tab, string> = {
   revenue:         "Revenue",
   growth:          "Growth",
   audit:           "Audit log",
-  exams:           "Certifications",
   banner:          "Site banner",
   blog:            "Blog editor",
   messages:        "Messages",
-  interviews:      "Interviews",
   reports:         "Reports",
   admins:          "Admins",
   "site-settings": "Site settings",
@@ -104,7 +79,7 @@ export const TAB_LABELS: Record<Tab, string> = {
 
 /** @deprecated Use permission-constants.ts + AdminMe.permissions instead. */
 export const LIMITED_ADMIN_TABS: Tab[] = [
-  "analytics", "banner", "blog", "interviews", "messages", "exams",
+  "analytics", "banner", "blog", "messages", "reports",
 ];
 
 export type { AdminRevenueStats };

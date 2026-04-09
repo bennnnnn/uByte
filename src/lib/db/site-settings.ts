@@ -6,15 +6,12 @@ let _cacheAt = 0;
 
 export const SITE_SETTING_DEFAULTS: Record<string, string> = {
   // Numeric
-  exam_pass_percent:   "70",
   max_ai_calls_per_day: "200",
   // Feature flags (1 = enabled, 0 = disabled)
   registration_open:            "1",
   maintenance_mode:             "0",
   ai_enabled:                   "1",
   referral_enabled:             "1",
-  certifications_enabled:       "1",
-  interview_simulator_enabled:  "1",
   pro_features_enabled:         "1",
 };
 
@@ -72,12 +69,6 @@ export async function setSiteSettings(
 }
 
 // ─── Typed helpers ──────────────────────────────────────────────────────────
-
-export async function getExamPassPercent(): Promise<number> {
-  const v = await getSiteSetting("exam_pass_percent");
-  const n = parseInt(v, 10);
-  return isNaN(n) || n < 1 || n > 100 ? 70 : n;
-}
 
 export async function getMaxAiCallsPerDay(): Promise<number> {
   const v = await getSiteSetting("max_ai_calls_per_day");

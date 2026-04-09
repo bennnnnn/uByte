@@ -6,14 +6,11 @@ import { logAdminAction } from "@/lib/db";
 
 /** Allowed keys with their validation rules. */
 const SETTING_RULES: Record<string, { type: "number"; min: number; max: number } | { type: "bool" }> = {
-  exam_pass_percent:           { type: "number", min: 1, max: 100 },
   max_ai_calls_per_day:        { type: "number", min: 1, max: 10_000 },
   registration_open:           { type: "bool" },
   maintenance_mode:            { type: "bool" },
   ai_enabled:                  { type: "bool" },
   referral_enabled:            { type: "bool" },
-  certifications_enabled:      { type: "bool" },
-  interview_simulator_enabled: { type: "bool" },
   pro_features_enabled:        { type: "bool" },
 };
 

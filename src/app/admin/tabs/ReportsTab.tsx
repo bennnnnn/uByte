@@ -138,18 +138,7 @@ export default function ReportsTab() {
                   <p className="mt-0.5 text-xs text-zinc-500 dark:text-zinc-400">
                     by <span className="font-medium">{r.author_name ?? "deleted user"}</span>
                     {r.author_email && <span className="ml-1 text-zinc-400">({r.author_email})</span>}
-                    {" · "}
-                    {r.problem_slug && (
-                      <a
-                        href={`/practice?search=${encodeURIComponent(r.problem_slug)}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        onClick={(e) => e.stopPropagation()}
-                        className="text-indigo-600 hover:underline dark:text-indigo-400"
-                      >
-                        {r.problem_slug}
-                      </a>
-                    )}
+                    {r.problem_slug && <span>{" · discussion: "}{r.problem_slug}</span>}
                     {" · "}
                     posted {formatDate(r.post_created_at)}
                   </p>
