@@ -19,7 +19,20 @@ import { getCurrentUser } from "@/lib/auth";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 import { withErrorHandling } from "@/lib/api-utils";
 import { verifyCsrf } from "@/lib/csrf";
-import { getPracticeProblemBySlug } from "@/lib/practice/problems";
+
+/** Human-readable label for notification copy (tutorial Q&A threads). */
+function discussionThreadLabel(slug: string): string {
+  if (!slug.startsWith("tutorial:")) return slug;
+  const rest = slug.slice("tutorial:".length);
+  const lastColon = rest.lastIndexOf(":");
+  if (lastColon === -1) return rest.replace(/:/g, " · ");
+  const tail = rest.slice(lastColon + 1);
+  const head = rest.slice(0, lastColon);
+  if (/^\d+$/.test(tail)) {
+    return `${head.replace(/:/g, " · ")} · step ${Number(tail) + 1}`;
+  }
+  return rest.replace(/:/g, " · ");
+}
 
 export const GET = withErrorHandling(
   "GET /api/discussion/[slug]",
@@ -73,8 +86,7 @@ export const POST = withErrorHandling(
     const post = await createPost(user.userId, slug, text, parentId);
 
     // ── Notifications ────────────────────────────────────────────────
-    const problem = getPracticeProblemBySlug(slug);
-    const problemTitle = problem?.title ?? slug;
+    const problemTitle = discussionThreadLabel(slug);
     const preview = text.length > 120 ? text.slice(0, 120) + "…" : text;
     const authorName = user.name || "Someone";
     // Track who already got a notification so we don't double-notify

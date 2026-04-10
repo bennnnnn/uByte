@@ -6,7 +6,8 @@
  * @see https://resend.com/docs
  *
  * Onboarding drip sequence (triggered by /api/cron/onboarding-drip):
- *   Day 0 (signup)  → sendWelcomeEmail         — immediate, sent from signup route
+ *   Day 0 (email signup) → sendWelcomeEmail(..., verifyToken) — one email: welcome + confirm link
+ *   Day 0 (Google)       → sendWelcomeEmail — welcome only (Google already verified the address)
  *   Day 3           → sendDay3Email             — motivate, suggest first tutorial
  *   Day 7           → sendDay7Email             — one week in, reinforce the habit + hint upsell
  */
@@ -184,25 +185,57 @@ export async function sendVerificationEmail(
 
 // ─── Onboarding drip ────────────────────────────────────────────────────────
 
-/** Day 0 — sent immediately after successful signup. */
-export async function sendWelcomeEmail(to: string, name: string): Promise<void> {
+/**
+ * Day 0 — sent immediately after successful signup.
+ * @param emailVerificationToken When set (email/password signup), the confirm link is included in this same email so a second Resend call cannot fail silently while the welcome still arrives.
+ */
+export async function sendWelcomeEmail(
+  to: string,
+  name: string,
+  emailVerificationToken?: string
+): Promise<void> {
   const resend = getResend();
   if (!resend) {
     logMissingResendApiKey("sendWelcomeEmail");
+    if (process.env.NODE_ENV !== "production" && emailVerificationToken) {
+      console.info(`[email] signup verify link for ${to}: ${BASE_URL}/verify-email?token=${emailVerificationToken}`);
+    }
     return;
   }
 
   const firstName = escapeHtml(name.split(" ")[0]);
+  const verifyLink = emailVerificationToken
+    ? `${BASE_URL}/verify-email?token=${emailVerificationToken}`
+    : "";
+  const verifyBlock =
+    emailVerificationToken && verifyLink
+      ? `
+          <div style="background:#eef2ff;border:1px solid #c7d2fe;border-radius:10px;padding:20px;margin-bottom:24px;text-align:center">
+            <p style="margin:0 0 8px;font-weight:700;color:#4338ca;font-size:15px">Confirm your email</p>
+            <p style="margin:0 0 16px;color:#64748b;font-size:14px;line-height:1.5">One tap so we know this inbox is yours. You can start lessons before or after — this just secures your account.</p>
+            <a href="${verifyLink}" style="display:inline-block;padding:12px 24px;background:#4f46e5;color:#fff;border-radius:8px;text-decoration:none;font-weight:600">Verify my email</a>
+            <p style="margin:14px 0 0;color:#94a3b8;font-size:11px;word-break:break-all">Or paste this link:<br>${escapeHtml(verifyLink)}</p>
+          </div>`
+      : "";
+
+  const idempotency =
+    emailVerificationToken != null && emailVerificationToken.length > 0
+      ? idempotencyKey("signup-welcome", emailVerificationToken)
+      : idempotencyKey("welcome", to);
+
   await sendEmail(resend, {
     from: FROM,
     to,
-    subject: `Welcome to uByte, ${firstName}! 🚀 Your first lesson is free`,
+    subject: emailVerificationToken
+      ? `Welcome to uByte, ${firstName}! — confirm your email 🚀`
+      : `Welcome to uByte, ${firstName}! 🚀 Your first lesson is free`,
     html: `
       <div style="font-family:sans-serif;max-width:520px;margin:auto;color:#18181b">
         <div style="background:#4f46e5;padding:32px;border-radius:12px 12px 0 0;text-align:center">
           <span style="color:#fff;font-size:28px;font-weight:800;letter-spacing:-1px">uByte</span>
         </div>
         <div style="background:#f9fafb;padding:32px;border-radius:0 0 12px 12px;border:1px solid #e5e7eb;border-top:none">
+          ${verifyBlock}
           <h2 style="margin:0 0 8px">Hey ${firstName}, welcome aboard! 👋</h2>
           <p style="color:#6b7280">You just joined uByte. Every lesson is free, runs in your browser, and is built to get you writing code fast.</p>
           <table style="width:100%;border-collapse:collapse;margin:20px 0">
@@ -226,7 +259,7 @@ export async function sendWelcomeEmail(to: string, name: string): Promise<void> 
         </div>
       </div>
     `,
-  }, { context: "sendWelcomeEmail", idempotencyKey: idempotencyKey("welcome", to) });
+  }, { context: "sendWelcomeEmail", idempotencyKey: idempotency });
 }
 
 /** Day 1 — 24h check-in: reinforce the value and nudge to complete first lesson. */

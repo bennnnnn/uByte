@@ -84,13 +84,17 @@ export default function SiteBanner({ initialData }: Props = {}) {
       .catch(() => {});
   }, [initialData]);
 
-  // Fade in after mount to avoid FOUC
+  // Fade in after mount to avoid FOUC (defer visibility reset so eslint doesn't flag sync setState in effect)
   useEffect(() => {
-    if (banner && !dismissed) {
-      const t = requestAnimationFrame(() => setVisible(true));
-      return () => cancelAnimationFrame(t);
+    if (!banner || dismissed) {
+      queueMicrotask(() => setVisible(false));
+      return;
     }
-    setVisible(false);
+    const t = requestAnimationFrame(() => setVisible(true));
+    return () => {
+      cancelAnimationFrame(t);
+      queueMicrotask(() => setVisible(false));
+    };
   }, [banner, dismissed]);
 
   if (!banner || dismissed) return null;

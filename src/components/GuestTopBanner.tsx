@@ -2,7 +2,7 @@
 
 /**
  * A thin, persistent "Save your progress — sign up free" bar shown to guests
- * at the top of the tutorial and practice IDEs.
+ * at the top of the tutorial IDE.
  *
  * Visible from the very first interaction (step 0, before any code is run).
  * Dismissed state stored in localStorage so it doesn't reappear once closed.

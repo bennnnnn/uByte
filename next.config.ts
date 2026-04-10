@@ -99,7 +99,17 @@ const nextConfig: NextConfig = {
   async redirects() {
     // Keep in sync with src/lib/languages/types.ts SupportedLanguage union.
     // next.config runs before app source is compiled, so we cannot import the registry here.
-    const tutorialLangs = ["go", "python", "cpp", "javascript", "java", "rust", "csharp"];
+    const tutorialLangs = [
+      "go",
+      "python",
+      "cpp",
+      "javascript",
+      "java",
+      "rust",
+      "csharp",
+      "typescript",
+      "sql",
+    ];
     const langRedirects = tutorialLangs.flatMap((lang) => [
       { source: `/${lang}`, destination: `/tutorial/${lang}`, permanent: true },
       { source: `/${lang}/:path*`, destination: `/tutorial/${lang}/:path*`, permanent: true },

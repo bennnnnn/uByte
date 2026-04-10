@@ -9,6 +9,7 @@ uByte is a free interactive coding tutorial platform. Every lesson is free. User
 
 ## Key Public URLs
 - Home: https://www.ubyte.dev/
+- Search: https://www.ubyte.dev/search
 - Tutorials: https://www.ubyte.dev/tutorial
 - Tutorials by language: https://www.ubyte.dev/tutorial/{language}
 - Leaderboard: https://www.ubyte.dev/leaderboard

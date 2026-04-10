@@ -1,6 +1,6 @@
 import type { SupportedLanguage } from "./types";
 
-/** Shared language icons (emoji) for cards, hero, practice, etc. */
+/** Shared language icons (emoji) for cards, hero, nav, etc. */
 export const LANG_ICONS: Record<SupportedLanguage, string> = {
   go: "🐹",
   python: "🐍",
@@ -13,8 +13,8 @@ export const LANG_ICONS: Record<SupportedLanguage, string> = {
   sql: "🗄️",
 };
 
-/** Short taglines for practice section per language */
-export const PRACTICE_TAGLINES: Record<SupportedLanguage, string> = {
+/** Short taglines for language cards / marketing copy */
+export const LANGUAGE_TAGLINES: Record<SupportedLanguage, string> = {
   go: "Arrays, hashmaps & goroutines",
   python: "Clean syntax, fast prototyping",
   javascript: "Closures, callbacks & async",

@@ -4,7 +4,8 @@ import { createUser, getUserByEmail, createEmailVerificationToken, getReferrerBy
 import { createNotification } from "@/lib/db/notifications";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 import { setCsrfCookie, verifyCsrf } from "@/lib/csrf";
-import { sendVerificationEmail, sendWelcomeEmail } from "@/lib/email";
+import * as Sentry from "@sentry/nextjs";
+import { sendWelcomeEmail } from "@/lib/email";
 import crypto from "crypto";
 import { withErrorHandling } from "@/lib/api-utils";
 import { isValidPassword, PASSWORD_POLICY_MESSAGE } from "@/lib/password-policy";
@@ -52,16 +53,12 @@ export const POST = withErrorHandling("POST /api/auth/signup", async (request: N
 
   const verifyToken = crypto.randomBytes(32).toString("hex");
   await createEmailVerificationToken(user.id, verifyToken);
-  // Await sends so the serverless invocation does not freeze before Resend completes.
+  // Single Resend send: welcome + verification link together (avoids silent failure on the first of two calls).
   try {
-    await sendVerificationEmail(email, name, verifyToken);
+    await sendWelcomeEmail(email, name, verifyToken);
   } catch (err) {
-    console.error("Failed to send verification email:", err);
-  }
-  try {
-    await sendWelcomeEmail(email, name);
-  } catch (err) {
-    console.error("[signup] Welcome email failed:", err);
+    console.error("[signup] Welcome / verification email failed:", err);
+    Sentry.captureException(err, { tags: { route: "signup" }, extra: { kind: "signup-welcome-email" } });
   }
   // In-app welcome notification
   createNotification(

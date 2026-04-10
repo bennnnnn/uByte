@@ -1,4 +1,4 @@
--- Key-value store for admin-configurable site settings (pricing, exam pass %, etc.)
+-- Key-value store for admin-configurable site settings (pricing, feature flags, etc.)
 -- Safe to run multiple times.
 
 CREATE TABLE IF NOT EXISTS site_settings (
@@ -9,7 +9,6 @@ CREATE TABLE IF NOT EXISTS site_settings (
 
 -- Seed defaults (only if not already set)
 INSERT INTO site_settings (key, value) VALUES
-  ('exam_pass_percent', '70'),
   ('monthly_price_cents', '999'),
   ('yearly_price_cents', '4999')
 ON CONFLICT (key) DO NOTHING;

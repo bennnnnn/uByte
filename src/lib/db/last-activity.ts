@@ -1,10 +1,8 @@
 import { getSql } from "./client";
 
-export type LastActivityType = "tutorial" | "practice";
-
 export interface LastActivity {
   user_id: number;
-  activity_type: LastActivityType;
+  activity_type: "tutorial";
   lang: string;
   slug: string | null;
   step: number | null;
@@ -16,7 +14,7 @@ export async function ensureLastActivityTable(): Promise<void> {
   await sql`
     CREATE TABLE IF NOT EXISTS user_last_activity (
       user_id       INTEGER      PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
-      activity_type TEXT         NOT NULL CHECK (activity_type IN ('tutorial', 'practice')),
+      activity_type TEXT         NOT NULL DEFAULT 'tutorial' CHECK (activity_type = 'tutorial'),
       lang          TEXT         NOT NULL,
       slug          TEXT,
       step          INTEGER,
@@ -26,7 +24,7 @@ export async function ensureLastActivityTable(): Promise<void> {
 }
 
 export interface SaveLastActivityInput {
-  type: LastActivityType;
+  type: "tutorial";
   lang: string;
   slug?: string | null;
   step?: number | null;
@@ -37,7 +35,7 @@ export async function saveLastActivity(userId: number, input: SaveLastActivityIn
   const sql = getSql();
   await sql`
     INSERT INTO user_last_activity (user_id, activity_type, lang, slug, step, updated_at)
-    VALUES (${userId}, ${input.type}, ${input.lang}, ${input.slug ?? null}, ${input.step ?? null}, NOW())
+    VALUES (${userId}, 'tutorial', ${input.lang}, ${input.slug ?? null}, ${input.step ?? null}, NOW())
     ON CONFLICT (user_id)
     DO UPDATE SET
       activity_type = EXCLUDED.activity_type,

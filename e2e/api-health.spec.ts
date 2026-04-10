@@ -47,10 +47,4 @@ test.describe("API health checks", () => {
     expect(res.status()).toBe(401);
   });
 
-  test("exam attempt submit requires auth", async ({ request }) => {
-    const res = await request.post("/api/certifications/attempt/999/submit", {
-      data: { answers: {} },
-    });
-    expect([401, 404]).toContain(res.status());
-  });
 });

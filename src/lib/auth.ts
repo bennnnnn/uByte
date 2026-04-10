@@ -36,7 +36,9 @@ export async function verifyToken(token: string): Promise<TokenPayload | null> {
     if (typeof userId !== "number" || typeof email !== "string" || typeof name !== "string") {
       return null;
     }
-    return { userId, email, name, tokenVersion: (tokenVersion as number) ?? 0, isAdmin: isAdmin === true };
+    const tv =
+      typeof tokenVersion === "number" && Number.isFinite(tokenVersion) ? Math.trunc(tokenVersion) : 0;
+    return { userId, email, name, tokenVersion: tv, isAdmin: isAdmin === true };
   } catch {
     return null;
   }

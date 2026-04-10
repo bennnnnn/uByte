@@ -37,8 +37,8 @@ export const POST = withErrorHandling("POST /api/run-code", async (request: Next
   // a realistic database without writing CREATE TABLE or INSERT themselves.
   let runCode = lang === "sql" ? SQL_PREAMBLE + code : code;
 
-  // C# practice starters use `public class Solution` with no Main().
-  // Inject a stub entry point so clicking Run produces a message instead of CS5001.
+  // C# tutorial starters may use `public class Solution` with no Main().
+  // Inject a stub entry point so Run produces output instead of CS5001.
   if (lang === "csharp" && !/\bstatic\s+(void|int)\s+Main\s*\(/.test(code)) {
     runCode = runCode +
       code +

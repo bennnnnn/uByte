@@ -16,9 +16,6 @@
     "lint": "eslint",
     "test": "vitest run",
     "migrate": "node scripts/run-migrate.mjs",
-    "seed:exams": "node scripts/seeds/run-exam-seed.mjs",
-    "seed:problems": "node scripts/seeds/seed-practice-problems.mjs",
-    "export:problems": "npx tsx scripts/seeds/export-practice-problems.ts",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
     "test:e2e:report": "playwright show-report"

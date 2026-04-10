@@ -14,7 +14,7 @@ const LEARN_LINKS = ALL_LANGUAGE_KEYS.map((slug) => ({
 
 const PRODUCT_LINKS = [
   { href: "/tutorial", label: "All Tutorials" },
-  { href: "/dashboard", label: "Dashboard" },
+  { href: "/search", label: "Search" },
   { href: "/leaderboard", label: "Leaderboard" },
   { href: "/pricing", label: "Pricing" },
   { href: "/help", label: "Help Center" },
@@ -57,7 +57,7 @@ export default function SiteFooter() {
         <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-zinc-500 dark:text-zinc-400">
           <span>© {year} uByte</span>
           <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-            <FooterLink href="/dashboard" label="Dashboard" />
+            <FooterLink href="/search" label="Search" />
             <FooterLink href="/help" label="Help" />
             <FooterLink href="/privacy" label="Privacy" />
             <FooterLink href="/terms" label="Terms" />

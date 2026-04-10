@@ -1,4 +1,4 @@
-/** Supported programming languages for tutorials and practice */
+/** Supported programming languages for tutorials */
 export type SupportedLanguage = "go" | "python" | "cpp" | "javascript" | "java" | "rust" | "csharp" | "typescript" | "sql";
 
 /** Configuration for a language's tutorials and code execution */

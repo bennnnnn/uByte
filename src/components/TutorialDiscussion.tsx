@@ -16,7 +16,7 @@ export default function TutorialDiscussion({ lang, tutorialSlug }: Props) {
   const { user } = useAuth();
   const [tab, setTab] = useState<Tab>("community");
 
-  // Namespaced slug so tutorial threads don't collide with practice problem threads
+  // Namespaced slug so tutorial threads stay unique per language + lesson
   const discussSlug = `tutorial:${lang}:${tutorialSlug}`;
   const chatSlug    = `${tutorialSlug}-general`;
 

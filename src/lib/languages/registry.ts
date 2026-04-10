@@ -319,20 +319,6 @@ export function resolveLanguage(lang: unknown): SupportedLanguage {
 /** Ordered list of all supported language keys. Use this instead of hardcoding arrays. */
 export const ALL_LANGUAGE_KEYS: SupportedLanguage[] = Object.keys(LANGUAGES) as SupportedLanguage[];
 
-/**
- * Languages that work for algorithmic practice problems and the daily challenge.
- * SQL is tutorial-only — it's a query language and cannot solve data-structure/
- * algorithm problems.
- */
-export const PRACTICE_LANGUAGE_KEYS: SupportedLanguage[] = ALL_LANGUAGE_KEYS.filter(
-  (k) => k !== "sql"
-);
-
 export function getAllLanguageSlugs(): string[] {
   return Object.values(LANGUAGES).map((l) => l.slug);
-}
-
-/** Language slugs valid for practice/daily (excludes SQL). */
-export function getPracticeLanguageSlugs(): string[] {
-  return PRACTICE_LANGUAGE_KEYS.map((k) => LANGUAGES[k].slug);
 }

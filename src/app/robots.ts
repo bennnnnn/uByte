@@ -1,5 +1,5 @@
 import type { MetadataRoute } from "next";
-import { BASE_URL } from "@/lib/constants";
+import { absoluteUrl, siteHost } from "@/lib/seo";
 
 export default function robots(): MetadataRoute.Robots {
   return {
@@ -24,10 +24,11 @@ export default function robots(): MetadataRoute.Robots {
           "/referral",
           "/maintenance",
           "/unsubscribed",
+          "/u/",
         ],
       },
     ],
-    sitemap: `${BASE_URL}/sitemap.xml`,
-    host: BASE_URL,
+    sitemap: absoluteUrl("/sitemap.xml"),
+    host: siteHost(),
   };
 }

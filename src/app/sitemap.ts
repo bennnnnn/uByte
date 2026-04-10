@@ -3,57 +3,65 @@ import { getAllTutorials } from "@/lib/tutorials";
 import { getAllLanguageSlugs } from "@/lib/languages/registry";
 import { getMdxBlogSlugs } from "@/lib/blog";
 import { getAllDbBlogPosts } from "@/lib/db/blog-posts";
-import { BASE_URL } from "@/lib/constants";
+import { absoluteUrl } from "@/lib/seo";
 import { tutorialUrl, tutorialLangUrl } from "@/lib/urls";
 import type { SupportedLanguage } from "@/lib/languages/types";
 
+function dedupeByUrl(entries: MetadataRoute.Sitemap): MetadataRoute.Sitemap {
+  const byUrl = new Map<string, MetadataRoute.Sitemap[number]>();
+  for (const e of entries) {
+    const prev = byUrl.get(e.url);
+    if (!prev) {
+      byUrl.set(e.url, e);
+      continue;
+    }
+    const prevT = prev.lastModified ? new Date(prev.lastModified).getTime() : 0;
+    const nextT = e.lastModified ? new Date(e.lastModified).getTime() : 0;
+    if (nextT >= prevT) byUrl.set(e.url, e);
+  }
+  return [...byUrl.values()].sort((a, b) => a.url.localeCompare(b.url));
+}
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date();
-  const baseUrl = BASE_URL.replace(/\/$/, "");
-  const abs = (path: string) => `${baseUrl}${path === "/" ? "" : path}`;
   const languageSlugs = getAllLanguageSlugs();
 
   const allBlogSlugs = getMdxBlogSlugs();
   const dbPosts = await getAllDbBlogPosts().catch(() => []);
-  // DB posts override MDX posts on slug collision — deduplicate
   const dbPublished = dbPosts.filter((p) => p.published);
   const dbSlugsSet = new Set(dbPublished.map((p) => p.slug));
   const blogSlugs = allBlogSlugs.filter((s) => !dbSlugsSet.has(s));
+
   const entries: MetadataRoute.Sitemap = [
-    // Core pages — highest priority
-    { url: abs("/"), lastModified: now, changeFrequency: "weekly", priority: 1.0 },
-    { url: abs("/tutorial"), lastModified: now, changeFrequency: "weekly", priority: 0.95 },
-    { url: abs("/blog"), lastModified: now, changeFrequency: "weekly", priority: 0.90 },
-    { url: abs("/leaderboard"), lastModified: now, changeFrequency: "daily", priority: 0.75 },
-    // Info pages
-    { url: abs("/pricing"), lastModified: now, changeFrequency: "weekly", priority: 0.80 },
-    { url: abs("/about"), lastModified: now, changeFrequency: "monthly", priority: 0.60 },
-    { url: abs("/contact"), lastModified: now, changeFrequency: "monthly", priority: 0.55 },
-    { url: abs("/help"), lastModified: now, changeFrequency: "weekly", priority: 0.65 },
-    { url: abs("/terms"), lastModified: now, changeFrequency: "yearly", priority: 0.30 },
-    { url: abs("/privacy"), lastModified: now, changeFrequency: "yearly", priority: 0.30 },
-    // MDX blog posts
+    { url: absoluteUrl("/"), lastModified: now, changeFrequency: "weekly", priority: 1.0 },
+    { url: absoluteUrl("/tutorial"), lastModified: now, changeFrequency: "weekly", priority: 0.95 },
+    { url: absoluteUrl("/blog"), lastModified: now, changeFrequency: "weekly", priority: 0.9 },
+    { url: absoluteUrl("/leaderboard"), lastModified: now, changeFrequency: "daily", priority: 0.75 },
+    { url: absoluteUrl("/pricing"), lastModified: now, changeFrequency: "weekly", priority: 0.8 },
+    { url: absoluteUrl("/about"), lastModified: now, changeFrequency: "monthly", priority: 0.6 },
+    { url: absoluteUrl("/contact"), lastModified: now, changeFrequency: "monthly", priority: 0.55 },
+    { url: absoluteUrl("/help"), lastModified: now, changeFrequency: "weekly", priority: 0.65 },
+    { url: absoluteUrl("/terms"), lastModified: now, changeFrequency: "yearly", priority: 0.3 },
+    { url: absoluteUrl("/privacy"), lastModified: now, changeFrequency: "yearly", priority: 0.3 },
     ...blogSlugs.map((slug) => ({
-      url: abs(`/blog/${slug}`),
+      url: absoluteUrl(`/blog/${slug}`),
       lastModified: now,
       changeFrequency: "monthly" as const,
       priority: 0.75,
     })),
-    // DB blog posts — published only (deduped with MDX above)
     ...dbPublished.map((p) => ({
-      url: abs(`/blog/${p.slug}`),
+      url: absoluteUrl(`/blog/${p.slug}`),
       lastModified: p.updated_at ? new Date(p.updated_at) : now,
       changeFrequency: "monthly" as const,
-      priority: 0.80,
+      priority: 0.8,
     })),
   ];
 
-  // Tutorial pages — all 9 languages
   for (const lang of languageSlugs) {
     const tutorials = getAllTutorials(lang as SupportedLanguage);
 
     entries.push({
-      url: abs(tutorialLangUrl(lang)),
+      url: absoluteUrl(tutorialLangUrl(lang)),
       lastModified: now,
       changeFrequency: "weekly",
       priority: 0.9,
@@ -61,7 +69,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
     for (const tutorial of tutorials) {
       entries.push({
-        url: abs(tutorialUrl(lang, tutorial.slug)),
+        url: absoluteUrl(tutorialUrl(lang, tutorial.slug)),
         lastModified: now,
         changeFrequency: "monthly",
         priority: 0.8,
@@ -69,5 +77,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }
   }
 
-  return entries;
+  return dedupeByUrl(entries);
 }

@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import AiFollowUpChat from "@/components/AiFollowUpChat";
 
 export interface AiFeedbackShape {
   friendly_one_liner: string;
@@ -13,20 +12,16 @@ export interface AiFeedbackShape {
 interface Props {
   feedback: AiFeedbackShape;
   onClear: () => void;
-  submissionId?: number;
-  isPro?: boolean;
 }
 
-/** Expandable AI hint card — shared between Practice IDE and Tutorial IDE. */
-export default function AiFeedbackCard({ feedback, onClear, submissionId, isPro }: Props) {
+/** Expandable AI hint card for the tutorial IDE. */
+export default function AiFeedbackCard({ feedback, onClear }: Props) {
   const [showMore, setShowMore] = useState(false);
   const hasMore = !!(feedback.next_step || feedback.minimal_patch);
 
   return (
-    <>
     <div className="flex items-start justify-between gap-2">
       <div className="min-w-0 flex-1 space-y-2">
-        {/* Always visible: one-liner + hint */}
         <p className="text-sm font-semibold text-indigo-800 dark:text-indigo-300">
           🤖 {feedback.friendly_one_liner}
         </p>
@@ -34,7 +29,6 @@ export default function AiFeedbackCard({ feedback, onClear, submissionId, isPro 
           {feedback.hint}
         </p>
 
-        {/* Expandable: next step + minimal patch */}
         {hasMore && (
           <>
             {showMore && (
@@ -63,7 +57,6 @@ export default function AiFeedbackCard({ feedback, onClear, submissionId, isPro 
         )}
       </div>
 
-      {/* Dismiss */}
       <button
         type="button"
         onClick={onClear}
@@ -73,11 +66,5 @@ export default function AiFeedbackCard({ feedback, onClear, submissionId, isPro 
         ✕
       </button>
     </div>
-
-    {/* Follow-up chat — only in practice context where submissionId is available */}
-    {submissionId != null && (
-      <AiFollowUpChat submissionId={submissionId} isPro={isPro ?? false} />
-    )}
-    </>
   );
 }

@@ -13,7 +13,7 @@ interface CodeEditorProps {
 
 /**
  * The raw code editor surface — line numbers, syntax-highlight overlay, and
- * the transparent textarea. Both the tutorial IDE and the practice IDE use
+ * the transparent textarea. Used by the interactive tutorial IDE.
  * this component so the editing experience is identical in both places.
  */
 export function CodeEditor({ editor, onKeyDown, fontSize }: CodeEditorProps) {

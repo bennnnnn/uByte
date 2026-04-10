@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import { getTotalLessonCount } from "@/lib/tutorial-steps";
 import { ALL_LANGUAGE_KEYS } from "@/lib/languages/registry";
-import { APP_NAME, BASE_URL } from "@/lib/constants";
+import { APP_NAME } from "@/lib/constants";
 import { getPopularLanguages, getFallbackPopularLanguages } from "@/lib/db/home-popular";
 import { resolveHomeContinue } from "@/lib/retention-home";
 import { absoluteUrl, SITE_KEYWORDS, buildSiteSearchJsonLd } from "@/lib/seo";
@@ -22,16 +22,7 @@ export const metadata: Metadata = {
   title: "uByte — Interactive Coding Tutorials",
   description:
     "Master Go, Python, TypeScript, SQL, Java, Rust, C++ and C# with interactive tutorials. Every lesson is free. Pay only when you want detailed hints.",
-  keywords: [
-    ...SITE_KEYWORDS,
-    "coding bootcamp alternative",
-    "best coding platform",
-    "coding website like w3schools",
-    "better than codecademy",
-    "learn typescript online",
-    "learn sql online",
-    "learn programming online",
-  ],
+  keywords: [...SITE_KEYWORDS],
   alternates: { canonical: absoluteUrl("/") },
   openGraph: {
     title: "uByte — Learn to Code With Interactive Tutorials",
@@ -90,8 +81,8 @@ export default async function Home() {
     "@context": "https://schema.org",
     "@type": "Organization",
     name: APP_NAME,
-    url: BASE_URL,
-    sameAs: [BASE_URL],
+    url: absoluteUrl("/"),
+    sameAs: [] as string[],
   };
 
   return (

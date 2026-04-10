@@ -20,8 +20,8 @@ export const POST = withErrorHandling("POST /api/last-activity", async (request:
   const body = await request.json();
   const type = body?.type;
   const lang = body?.lang;
-  if (type !== "tutorial" && type !== "practice") {
-    return NextResponse.json({ error: "type must be 'tutorial' or 'practice'" }, { status: 400 });
+  if (type !== "tutorial") {
+    return NextResponse.json({ error: "type must be 'tutorial'" }, { status: 400 });
   }
   if (!lang || typeof lang !== "string") {
     return NextResponse.json({ error: "lang required" }, { status: 400 });

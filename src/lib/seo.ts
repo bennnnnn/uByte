@@ -5,26 +5,51 @@ type FaqItem = { question: string; answer: string };
 
 const baseUrl = BASE_URL.replace(/\/$/, "");
 
+/**
+ * Concise, deduplicated keywords for `<meta name="keywords">`.
+ * Avoids repetitive or “comparison spam” phrases that add no crawl value.
+ */
 export const SITE_KEYWORDS = [
+  "uByte",
+  "interactive coding tutorials",
+  "learn to code online",
+  "learn programming free",
   "programming tutorials",
   "coding tutorials",
-  "interactive coding lessons",
-  "learn programming",
-  "learn to code",
-  "learn to code online free",
-  "programming languages",
-  "w3schools alternative",
-  "codecademy alternative",
-  "freecodecamp alternative",
-  "interactive coding platform",
-  "online coding course free",
-  "uByte",
+  "browser code editor",
+  "run code in browser",
+  "Go programming tutorial",
+  "Python tutorial online",
+  "JavaScript tutorial",
+  "TypeScript tutorial",
+  "Java tutorial",
+  "Rust tutorial",
+  "C++ tutorial",
+  "C# tutorial",
+  "SQL tutorial",
+  "interactive programming lessons",
+  "free coding lessons",
+  "online programming course",
 ];
 
 export function absoluteUrl(path = "/"): string {
   if (!path || path === "/") return baseUrl;
   if (path.startsWith("http://") || path.startsWith("https://")) return path;
   return `${baseUrl}${path.startsWith("/") ? path : `/${path}`}`;
+}
+
+/** Canonical site origin (no trailing slash), safe for `metadataBase`. */
+export function siteOrigin(): string {
+  return baseUrl;
+}
+
+/** Hostname only (e.g. `www.ubyte.dev`) for `robots.txt` `Host:` when supported. */
+export function siteHost(): string {
+  try {
+    return new URL(baseUrl).host;
+  } catch {
+    return "www.ubyte.dev";
+  }
 }
 
 export function buildBreadcrumbJsonLd(items: BreadcrumbItem[]) {

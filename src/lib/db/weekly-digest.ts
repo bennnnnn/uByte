@@ -24,9 +24,6 @@ async function ensureTable(): Promise<void> {
       sent_at    TIMESTAMPTZ NOT NULL DEFAULT NOW()
     )
   `;
-  // Expression-based unique constraints cannot live inside CREATE TABLE in
-  // PostgreSQL. Use a unique index instead — ON CONFLICT DO NOTHING will
-  // still honour it.
   await sql`
     CREATE UNIQUE INDEX IF NOT EXISTS idx_weekly_digest_user_week
     ON weekly_digest_log (user_id, (DATE_TRUNC('week', sent_at AT TIME ZONE 'UTC')))
@@ -40,9 +37,7 @@ export interface WeeklyDigestUser {
   email: string;
   streak_days: number;
   xp: number;
-  /** Problems solved in the past 7 days */
-  problems_this_week: number;
-  /** Tutorials completed in the past 7 days */
+  /** Tutorials (step completions) in the past 7 days */
   tutorials_this_week: number;
 }
 
@@ -61,27 +56,15 @@ export async function getUsersForWeeklyDigest(): Promise<WeeklyDigestUser[]> {
       u.email,
       u.streak_days,
       u.xp,
-      COALESCE(pa.problems_this_week, 0)  AS problems_this_week,
       COALESCE(sp.tutorials_this_week, 0) AS tutorials_this_week
     FROM users u
 
-    -- Only users active in the past 30 days
     INNER JOIN (
       SELECT DISTINCT user_id
       FROM activity_log
       WHERE created_at > NOW() - INTERVAL '30 days'
     ) active ON active.user_id = u.id
 
-    -- Count problems solved this week
-    LEFT JOIN (
-      SELECT user_id, COUNT(*) AS problems_this_week
-      FROM practice_attempts
-      WHERE status = 'accepted'
-        AND created_at > NOW() - INTERVAL '7 days'
-      GROUP BY user_id
-    ) pa ON pa.user_id = u.id
-
-    -- Count tutorial steps completed this week (step_progress)
     LEFT JOIN (
       SELECT user_id, COUNT(*) AS tutorials_this_week
       FROM step_progress
@@ -89,7 +72,6 @@ export async function getUsersForWeeklyDigest(): Promise<WeeklyDigestUser[]> {
       GROUP BY user_id
     ) sp ON sp.user_id = u.id
 
-    -- Not already sent this week
     WHERE u.email_verified = 1
       AND u.email IS NOT NULL
       AND COALESCE(u.email_marketing, 1) = 1
@@ -99,9 +81,7 @@ export async function getUsersForWeeklyDigest(): Promise<WeeklyDigestUser[]> {
           AND dl.sent_at > NOW() - INTERVAL '6 days'
       )
 
-    -- Only send to users who actually did something this week
-    -- (problems OR tutorial steps > 0)
-    AND (COALESCE(pa.problems_this_week, 0) + COALESCE(sp.tutorials_this_week, 0)) > 0
+    AND COALESCE(sp.tutorials_this_week, 0) > 0
 
     LIMIT 1000
   `;

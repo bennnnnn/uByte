@@ -12,8 +12,8 @@ import LazyCookieConsentAndAnalytics from "@/components/LazyCookieConsentAndAnal
 import SiteBanner from "@/components/SiteBanner";
 // "use client" wrapper that lazy-loads non-critical widgets with ssr:false
 import DeferredWidgets from "@/components/layout/DeferredWidgets";
-import { APP_NAME, BASE_URL } from "@/lib/constants";
-import { SITE_KEYWORDS } from "@/lib/seo";
+import { APP_NAME } from "@/lib/constants";
+import { SITE_KEYWORDS, absoluteUrl, siteOrigin } from "@/lib/seo";
 import Script from "next/script";
 import { getSiteBanner } from "@/lib/db/site-banner";
 import { unstable_cache } from "next/cache";
@@ -43,8 +43,10 @@ export const viewport: Viewport = {
   ],
 };
 
+const googleSiteVerification = process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION?.trim();
+
 export const metadata: Metadata = {
-  metadataBase: new URL(BASE_URL),
+  metadataBase: new URL(siteOrigin()),
   applicationName: APP_NAME,
   category: "education",
   referrer: "origin-when-cross-origin",
@@ -54,25 +56,16 @@ export const metadata: Metadata = {
   },
   description:
     "Interactive coding tutorials in Go, Python, TypeScript, SQL, JavaScript, Java, Rust, C++, and C#. Write real code in your browser with zero setup.",
-  keywords: [
-    ...SITE_KEYWORDS,
-    "learn Go",
-    "learn Python",
-    "learn TypeScript",
-    "learn SQL",
-    "learn C++",
-    "learn JavaScript",
-    "learn Java",
-    "learn Rust",
-    "interactive coding lessons",
-    "learn programming online",
-  ],
+  keywords: [...SITE_KEYWORDS],
   authors: [{ name: APP_NAME }],
   creator: APP_NAME,
+  ...(googleSiteVerification
+    ? { verification: { google: googleSiteVerification } }
+    : {}),
   robots: {
     index: true,
     follow: true,
-    googleBot: { index: true, follow: true },
+    googleBot: { index: true, follow: true, "max-image-preview": "large", "max-snippet": -1, "max-video-preview": -1 },
   },
   openGraph: {
     type: "website",
@@ -81,18 +74,14 @@ export const metadata: Metadata = {
     title: "uByte - Interactive Coding Tutorials",
     description:
       "Learn Go, Python, TypeScript, SQL, JavaScript, Java, Rust, C++, and C# with interactive tutorials that run right in your browser.",
-    url: BASE_URL,
-    images: [{ url: `${BASE_URL}/api/og`, width: 1200, height: 630, alt: "uByte — Interactive Coding Tutorials" }],
+    images: [{ url: "/api/og", width: 1200, height: 630, alt: "uByte — Interactive Coding Tutorials" }],
   },
   twitter: {
     card: "summary_large_image",
     title: "uByte - Interactive Coding Tutorials",
     description:
       "Interactive programming tutorials across 9 languages with live code, saved progress, and zero setup.",
-    images: [`${BASE_URL}/api/og`],
-  },
-  alternates: {
-    canonical: BASE_URL,
+    images: [absoluteUrl("/api/og")],
   },
   manifest: "/manifest.json",
   appleWebApp: {

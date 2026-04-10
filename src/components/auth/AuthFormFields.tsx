@@ -1,6 +1,6 @@
 "use client";
 
-import { forwardRef, useState, useEffect } from "react";
+import { forwardRef, useState } from "react";
 import { Button } from "@/components/ui";
 import Input from "@/components/ui/Input";
 import GoogleIcon from "@/components/auth/GoogleIcon";
@@ -57,11 +57,6 @@ const AuthFormFields = forwardRef<HTMLFormElement, AuthFormFieldsProps>(function
   ref
 ) {
   const [emailOpen, setEmailOpen] = useState(false);
-
-  // Collapse email form when switching modes (login ↔ signup)
-  useEffect(() => {
-    setEmailOpen(false);
-  }, [mode]);
 
   const labelClass = visibleLabels
     ? "mb-1.5 block text-sm font-medium text-zinc-700 dark:text-zinc-300"
@@ -192,7 +187,10 @@ const AuthFormFields = forwardRef<HTMLFormElement, AuthFormFieldsProps>(function
             No account?{" "}
             <button
               type="button"
-              onClick={() => onSwitchMode("signup")}
+              onClick={() => {
+                setEmailOpen(false);
+                onSwitchMode("signup");
+              }}
               className="font-semibold text-indigo-600 hover:text-indigo-700 dark:text-indigo-400"
             >
               Sign up
@@ -203,7 +201,10 @@ const AuthFormFields = forwardRef<HTMLFormElement, AuthFormFieldsProps>(function
             Already have an account?{" "}
             <button
               type="button"
-              onClick={() => onSwitchMode("login")}
+              onClick={() => {
+                setEmailOpen(false);
+                onSwitchMode("login");
+              }}
               className="font-semibold text-indigo-600 hover:text-indigo-700 dark:text-indigo-400"
             >
               Sign in

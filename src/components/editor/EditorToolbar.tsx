@@ -28,7 +28,7 @@ interface EditorToolbarProps {
 }
 
 /**
- * Shared toolbar used by the tutorial IDE and the practice IDE.
+ * Shared toolbar for the interactive tutorial IDE.
  * Renders the language selector, action buttons (via children), and share.
  */
 export function EditorToolbar({
