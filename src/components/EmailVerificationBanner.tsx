@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useAuth } from "./AuthProvider";
+import { apiFetch } from "@/lib/api-client";
 
 const DISMISS_KEY = "banner-dismissed-verify";
 const DISMISS_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours
@@ -29,8 +30,8 @@ export default function EmailVerificationBanner() {
   async function resend() {
     setSending(true);
     try {
-      await fetch("/api/auth/resend-verification", { method: "POST" });
-      setSent(true);
+      const res = await apiFetch("/api/auth/resend-verification", { method: "POST" });
+      if (res.ok) setSent(true);
     } finally {
       setSending(false);
     }

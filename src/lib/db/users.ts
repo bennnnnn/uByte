@@ -71,8 +71,8 @@ export async function createUser(name: string, email: string, passwordHash: stri
 export async function createUserWithGoogle(name: string, email: string, googleId: string): Promise<User> {
   const sql = getSql();
   const [row] = await sql`
-    INSERT INTO users (name, email, password_hash, google_id)
-    VALUES (${name}, ${email}, ${GOOGLE_PLACEHOLDER_PASSWORD_HASH}, ${googleId})
+    INSERT INTO users (name, email, password_hash, google_id, email_verified)
+    VALUES (${name}, ${email}, ${GOOGLE_PLACEHOLDER_PASSWORD_HASH}, ${googleId}, 1)
     RETURNING *
   `;
   return row as User;
