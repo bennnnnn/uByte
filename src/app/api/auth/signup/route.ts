@@ -5,7 +5,7 @@ import { createNotification } from "@/lib/db/notifications";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 import { setCsrfCookie, verifyCsrf } from "@/lib/csrf";
 import * as Sentry from "@sentry/nextjs";
-import { sendWelcomeEmail } from "@/lib/email";
+import { sendWelcomeEmail, sendVerificationEmail } from "@/lib/email";
 import crypto from "crypto";
 import { withErrorHandling } from "@/lib/api-utils";
 import { isValidPassword, PASSWORD_POLICY_MESSAGE } from "@/lib/password-policy";
@@ -53,12 +53,19 @@ export const POST = withErrorHandling("POST /api/auth/signup", async (request: N
 
   const verifyToken = crypto.randomBytes(32).toString("hex");
   await createEmailVerificationToken(user.id, verifyToken);
-  // Single Resend send: welcome + verification link together (avoids silent failure on the first of two calls).
+  // Send verification first — simple transactional email that reliably hits inbox.
+  // Welcome email is sent separately; if it lands in Promotions that's acceptable,
+  // but the verify link must arrive in the primary inbox.
   try {
-    await sendWelcomeEmail(email, name, verifyToken);
+    await sendVerificationEmail(email, name, verifyToken);
   } catch (err) {
-    console.error("[signup] Welcome / verification email failed:", err);
-    Sentry.captureException(err, { tags: { route: "signup" }, extra: { kind: "signup-welcome-email" } });
+    console.error("[signup] Verification email failed:", err);
+    Sentry.captureException(err, { tags: { route: "signup" }, extra: { kind: "signup-verify-email" } });
+  }
+  try {
+    await sendWelcomeEmail(email, name);
+  } catch (err) {
+    console.error("[signup] Welcome email failed:", err);
   }
   // In-app welcome notification
   createNotification(
