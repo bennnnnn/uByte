@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { getAllBlogPosts } from "@/lib/blog";
-import { absoluteUrl, SITE_KEYWORDS, buildOrganizationJsonLd } from "@/lib/seo";
+import { absoluteUrl, SITE_KEYWORDS, buildOrganizationJsonLd, buildBreadcrumbJsonLd } from "@/lib/seo";
 import { BASE_URL, APP_NAME } from "@/lib/constants";
 
 export const metadata: Metadata = {
@@ -55,6 +55,7 @@ export default async function BlogPage() {
     name: `${APP_NAME} Blog`,
     description: "Programming tutorials, lesson guides, and language deep-dives.",
     url: absoluteUrl("/blog"),
+    inLanguage: "en",
     publisher: buildOrganizationJsonLd(),
     blogPost: posts.slice(0, 10).map((post) => ({
       "@type": "BlogPosting",
@@ -65,9 +66,14 @@ export default async function BlogPage() {
     })),
   };
 
+  const breadcrumbJsonLd = buildBreadcrumbJsonLd([
+    { name: "Home", path: "/" },
+    { name: "Blog", path: "/blog" },
+  ]);
+
   return (
     <div className="min-h-full overflow-y-auto">
-      <script async type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <script async type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify([jsonLd, breadcrumbJsonLd]) }} />
       <div className="mx-auto max-w-4xl px-6 py-14">
 
         <section className="mb-12">

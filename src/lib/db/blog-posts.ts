@@ -134,3 +134,15 @@ export async function deleteDbBlogPost(id: number): Promise<boolean> {
   const rows = await sql`DELETE FROM blog_posts WHERE id = ${id} RETURNING id`;
   return rows.length > 0;
 }
+
+/** Count posts by author created on or after `sinceIso` (UTC). Used to cap automated AI posts per day. */
+export async function countDbBlogPostsByAuthorSince(author: string, sinceIso: string): Promise<number> {
+  await ensureTable();
+  const sql = getSql();
+  const rows = await sql`
+    SELECT COUNT(*)::int AS c FROM blog_posts
+    WHERE author = ${author} AND created_at >= ${sinceIso}::timestamptz
+  `;
+  const row = rows[0] as { c: number } | undefined;
+  return row?.c ?? 0;
+}

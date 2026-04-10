@@ -4,7 +4,10 @@ import Link from "next/link";
 import { compileMDX } from "next-mdx-remote/rsc";
 import rehypePrettyCode from "rehype-pretty-code";
 import { getMdxBlogSlugs, getBlogPost, getAllBlogPosts } from "@/lib/blog";
-import { absoluteUrl } from "@/lib/seo";
+import { absoluteUrl, buildBreadcrumbJsonLd } from "@/lib/seo";
+import { tutorialLanguagesFromTags } from "@/lib/blog/lang-from-tags";
+import { getLanguageConfig } from "@/lib/languages/registry";
+import { tutorialLangUrl } from "@/lib/urls";
 import { APP_NAME, BASE_URL } from "@/lib/constants";
 import { getCurrentUser } from "@/lib/auth";
 import { getUserById } from "@/lib/db";
@@ -107,16 +110,17 @@ export default async function BlogPostPage({ params, searchParams }: Props) {
     datePublished: post.date,
     dateModified: post.updatedAt ?? post.date,
     image: ogImageUrl,
+    inLanguage: "en",
     author: {
       "@type": "Organization",
       name: APP_NAME,
-      url: BASE_URL,
+      url: absoluteUrl("/"),
     },
     publisher: {
       "@type": "Organization",
       name: APP_NAME,
-      url: BASE_URL,
-      logo: { "@type": "ImageObject", url: `${BASE_URL}/icon.png` },
+      url: absoluteUrl("/"),
+      logo: { "@type": "ImageObject", url: absoluteUrl("/icon.png") },
     },
     mainEntityOfPage: {
       "@type": "WebPage",
@@ -125,14 +129,27 @@ export default async function BlogPostPage({ params, searchParams }: Props) {
     url: absoluteUrl(`/blog/${slug}`),
     keywords: post.tags.join(", "),
     articleSection: post.category,
+    isPartOf: {
+      "@type": "Blog",
+      name: `${APP_NAME} Blog`,
+      url: absoluteUrl("/blog"),
+    },
   };
+
+  const breadcrumbJsonLd = buildBreadcrumbJsonLd([
+    { name: "Home", path: "/" },
+    { name: "Blog", path: "/blog" },
+    { name: post.title, path: `/blog/${slug}` },
+  ]);
+
+  const langsForTutorials = tutorialLanguagesFromTags(post.tags);
 
   return (
     <div className="min-h-full">
       <ScrollToTop />
       <script async
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify([jsonLd, breadcrumbJsonLd]) }}
       />
 
       <div className="mx-auto max-w-3xl px-6 py-14">
@@ -193,6 +210,32 @@ export default async function BlogPostPage({ params, searchParams }: Props) {
         <article className="prose prose-zinc max-w-none dark:prose-invert prose-headings:font-bold prose-headings:tracking-tight prose-a:text-indigo-600 prose-a:no-underline hover:prose-a:underline dark:prose-a:text-indigo-400 prose-code:rounded prose-code:bg-zinc-100 prose-code:px-1.5 prose-code:py-0.5 prose-code:font-mono prose-code:text-sm prose-code:before:content-none prose-code:after:content-none dark:prose-code:bg-zinc-800 prose-pre:p-0">
           {content}
         </article>
+
+        {langsForTutorials.length > 0 && (
+          <div className="mt-10 rounded-2xl border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-900/40">
+            <h2 className="mb-1 text-lg font-bold text-zinc-900 dark:text-zinc-100">
+              Try it in interactive tutorials
+            </h2>
+            <p className="mb-4 text-sm text-zinc-600 dark:text-zinc-400">
+              Run real code in your browser — free lessons, optional paid hints when you want extra help.
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {langsForTutorials.map((lang) => {
+                const cfg = getLanguageConfig(lang);
+                if (!cfg) return null;
+                return (
+                  <Link
+                    key={lang}
+                    href={tutorialLangUrl(lang)}
+                    className="rounded-lg border border-indigo-200 bg-indigo-50 px-3 py-2 text-sm font-semibold text-indigo-800 transition-colors hover:bg-indigo-100 dark:border-indigo-800 dark:bg-indigo-950/50 dark:text-indigo-200 dark:hover:bg-indigo-900/40"
+                  >
+                    {cfg.name} tutorials →
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+        )}
 
         {/* Related posts */}
         {related.length > 0 && (

@@ -143,3 +143,15 @@ export function getMdxBlogSlugs(): string[] {
   if (!fs.existsSync(BLOG_DIR)) return [];
   return fs.readdirSync(BLOG_DIR).filter((f) => f.endsWith(".mdx")).map((f) => f.replace(".mdx", ""));
 }
+
+/** All slugs reserved by MDX files or any DB row (published or draft), for unique slug generation. */
+export async function getAllBlogSlugs(): Promise<Set<string>> {
+  const slugs = new Set(getMdxBlogSlugs());
+  try {
+    const rows = await getAllDbBlogPosts();
+    for (const r of rows) slugs.add(r.slug);
+  } catch {
+    /* DB unavailable */
+  }
+  return slugs;
+}
