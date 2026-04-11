@@ -1,0 +1,166 @@
+{
+  "info": {
+    "name": "uByte APIs",
+    "description": "Tests for the uByte production API. Covers health, public stats, auth, and app-state endpoints.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "https://ubyte.dev",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Home",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/",
+        "description": "Landing page — confirms the site is up."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 200', function () {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "pm.test('Response time is less than 4000ms', function () {",
+              "  pm.expect(pm.response.responseTime).to.be.below(4000);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Health Check",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/api/health",
+        "description": "Returns app health and DB status. No auth required."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 200', function () {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "pm.test('Response is JSON', function () {",
+              "  pm.response.to.be.json;",
+              "});",
+              "pm.test('Response contains status field', function () {",
+              "  const json = pm.response.json();",
+              "  pm.expect(json).to.have.property('status');",
+              "});",
+              "pm.test('DB is ok', function () {",
+              "  const json = pm.response.json();",
+              "  pm.expect(json.db).to.eql('ok');",
+              "});",
+              "pm.test('Response time is less than 3000ms', function () {",
+              "  pm.expect(pm.response.responseTime).to.be.below(3000);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Public Stats",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/api/stats/public",
+        "description": "Returns total user count (rounded). No auth required."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 200', function () {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "pm.test('Response is JSON', function () {",
+              "  pm.response.to.be.json;",
+              "});",
+              "pm.test('Response contains userCount', function () {",
+              "  const json = pm.response.json();",
+              "  pm.expect(json).to.have.property('userCount');",
+              "  pm.expect(json.userCount).to.be.a('number');",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Login — invalid credentials",
+      "request": {
+        "method": "POST",
+        "url": "{{baseUrl}}/api/auth/login",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"email\": \"nobody@example.com\", \"password\": \"wrongpassword\"}"
+        },
+        "description": "Login with bad credentials — expects 401."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 401', function () {",
+              "  pm.response.to.have.status(401);",
+              "});",
+              "pm.test('Response is JSON', function () {",
+              "  pm.response.to.be.json;",
+              "});",
+              "pm.test('Response contains error field', function () {",
+              "  const json = pm.response.json();",
+              "  pm.expect(json).to.have.property('error');",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "App State — unauthenticated",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/api/app-state",
+        "description": "Returns app state for unauthenticated visitor."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 200', function () {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "pm.test('Response is JSON', function () {",
+              "  pm.response.to.be.json;",
+              "});",
+              "pm.test('User is null for unauthenticated request', function () {",
+              "  const json = pm.response.json();",
+              "  pm.expect(json.user).to.be.null;",
+              "});",
+              "pm.test('Response does not contain error field', function () {",
+              "  const json = pm.response.json();",
+              "  pm.expect(json).to.not.have.property('error');",
+              "});"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}
