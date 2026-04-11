@@ -16,12 +16,12 @@ import { withErrorHandling } from "@/lib/api-utils";
  */
 export const GET = withErrorHandling("GET /api/certificate/[lang]", async (
   _request: NextRequest,
-  { params }: { params: Promise<{ lang: string }> }
+  ctx: unknown
 ) => {
   const user = await getCurrentUser();
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const { lang: rawLang } = await params;
+  const { lang: rawLang } = await (ctx as { params: Promise<{ lang: string }> }).params;
   const lang = resolveLanguage(rawLang);
   const langConfig = getLanguageConfig(lang);
 
