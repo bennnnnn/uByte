@@ -132,6 +132,33 @@
       ]
     },
     {
+      "name": "Certificate — unauthenticated",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/api/certificate/go",
+        "description": "Certificate endpoint requires auth — expects 401 without a session."
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 401', function () {",
+              "  pm.response.to.have.status(401);",
+              "});",
+              "pm.test('Response is JSON', function () {",
+              "  pm.response.to.be.json;",
+              "});",
+              "pm.test('Response contains error field', function () {",
+              "  const json = pm.response.json();",
+              "  pm.expect(json).to.have.property('error');",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
       "name": "App State — unauthenticated",
       "request": {
         "method": "GET",
