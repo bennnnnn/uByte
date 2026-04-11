@@ -3,6 +3,7 @@ import type { AdminUserRow, AdminTutorialRow, AdminRevenueStats, AdminGrowthSnap
 import { resetAllProgress } from "./progress";
 import { incrementTokenVersion } from "./users";
 import { ensureReferralTables } from "./referrals";
+import { ensureTutorialRatingsTable } from "./tutorial-ratings";
 
 export type AdminRole = "super" | "limited";
 
@@ -226,6 +227,7 @@ export async function adminUnbanUser(userId: number): Promise<void> {
 }
 
 export async function getAdminTutorialAnalytics(): Promise<AdminTutorialRow[]> {
+  await ensureTutorialRatingsTable();
   const sql = getSql();
   // Union both rating tables so votes from InlineRatingNudge/CongratsModal
   // (tutorial_ratings) and the sidebar widget (ratings) are both counted.

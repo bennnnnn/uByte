@@ -523,6 +523,8 @@ export default function InteractiveTutorial({
             onRequestHint={() => stepProgress.requestHint(editor.code)}
             height={outputHeight}
             staticHint={currentStep.hint}
+            onContinueAfterPass={continueAfterPass}
+            nextTutorialTitle={next?.title ?? null}
           />
         </div>
       </div>

@@ -14,6 +14,8 @@ interface Props {
   onRequestHint: () => void;
   height: number;
   staticHint?: string;
+  onContinueAfterPass?: () => void;
+  nextTutorialTitle?: string | null;
 }
 
 /** Output panel for the tutorial IDE — shows run output, hints, and pass/fail state. */
@@ -24,6 +26,8 @@ export default function OutputPanel({
   onRequestHint,
   height,
   staticHint,
+  onContinueAfterPass,
+  nextTutorialTitle,
 }: Props) {
   const { output, outputIsError, status, aiFeedback, setAiFeedback, aiFeedbackLoading, aiFeedbackUpgrade, aiFeedbackLoginRequired, stepIndex } = progress;
   const aiFeedbackUnavailable = aiFeedback?.confidence === 0 || aiFeedback?.root_cause === "ai_unavailable" || aiFeedback?.root_cause === "network_error";
@@ -70,14 +74,30 @@ export default function OutputPanel({
         </pre>
       )}
 
-      {/* Pass message */}
+      {/* Pass banner with action button */}
       {status === "passed" && (
-        <p className="mt-2 text-sm font-medium text-emerald-600 dark:text-emerald-400">
-          🎉{" "}
-          {stepIndex < stepsLength - 1
-            ? "Great job! Moving to the next step…"
-            : "Outstanding! Tutorial complete!"}
-        </p>
+        <div className="mt-3 rounded-lg border border-emerald-300 bg-emerald-50 p-3 dark:border-emerald-800 dark:bg-emerald-950/40">
+          <p className="text-sm font-semibold text-emerald-700 dark:text-emerald-400">
+            🎉{" "}
+            {stepIndex < stepsLength - 1 ? "Great job!" : "Outstanding! Tutorial complete!"}
+          </p>
+          {stepIndex < stepsLength - 1 ? (
+            <button
+              type="button"
+              onClick={onContinueAfterPass}
+              className="mt-2 flex w-full items-center justify-center gap-2 rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-emerald-500"
+            >
+              Next Step
+              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+              </svg>
+            </button>
+          ) : nextTutorialTitle ? (
+            <p className="mt-1 text-xs text-emerald-600 dark:text-emerald-500">
+              Check the sidebar to continue to the next tutorial.
+            </p>
+          ) : null}
+        </div>
       )}
 
       {/* Expected output hint */}
