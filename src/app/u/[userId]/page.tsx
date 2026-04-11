@@ -109,7 +109,7 @@ export default async function PublicProfilePage({ params }: { params: Promise<{ 
 
       {/* Header */}
       <div className="mb-8 flex items-start gap-5">
-        <Avatar avatarKey={profile.avatar || "gopher"} size="lg" />
+        <Avatar name={profile.name} size="lg" />
         <div className="min-w-0 flex-1">
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0">

@@ -169,7 +169,7 @@ export default function LeaderboardClient({
 
                   {/* Avatar */}
                   <div className="shrink-0">
-                    <Avatar avatarKey={u.avatar || "gopher"} size="sm" />
+                    <Avatar name={u.name} size="sm" />
                   </div>
 
                   {/* Name + stats */}

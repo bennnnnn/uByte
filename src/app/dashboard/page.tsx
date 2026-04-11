@@ -281,7 +281,7 @@ function DashboardPage() {
   };
 
   // ── Settings helpers ─────────────────────────────────────────────────
-  const saveProfile = async (data: { name: string; bio: string; avatar: string; theme: string }): Promise<boolean> => {
+  const saveProfile = async (data: { name: string; bio: string; theme: string }): Promise<boolean> => {
     const res = await apiFetch("/api/profile", {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
@@ -352,7 +352,7 @@ function DashboardPage() {
         {/* ── Hero ───────────────────────────────────────────────────── */}
         <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-4">
-            <Avatar avatarKey={profile.avatar} size="xl" />
+            <Avatar name={profile.name} size="xl" />
             <div>
               <div className="flex items-center gap-2.5">
                 <h1 className="text-xl font-bold text-zinc-900 dark:text-zinc-100">{profile.name}</h1>

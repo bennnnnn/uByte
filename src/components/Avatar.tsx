@@ -1,27 +1,45 @@
-const AVATARS: Record<string, { emoji: string; bg: string }> = {
-  gopher:  { emoji: "🐹", bg: "bg-indigo-100 dark:bg-indigo-950" },
-  cool:    { emoji: "😎", bg: "bg-yellow-100 dark:bg-yellow-950" },
-  ninja:   { emoji: "🥷", bg: "bg-zinc-200 dark:bg-zinc-800" },
-  party:   { emoji: "🥳", bg: "bg-pink-100 dark:bg-pink-950" },
-  robot:   { emoji: "🤖", bg: "bg-indigo-100 dark:bg-indigo-950" },
-  wizard:  { emoji: "🧙", bg: "bg-purple-100 dark:bg-purple-950" },
-  astro:   { emoji: "🧑‍🚀", bg: "bg-indigo-100 dark:bg-indigo-950" },
-  pirate:  { emoji: "🏴‍☠️", bg: "bg-red-100 dark:bg-red-950" },
-};
+const COLORS = [
+  { bg: "bg-indigo-500", text: "text-white" },
+  { bg: "bg-violet-500", text: "text-white" },
+  { bg: "bg-blue-500", text: "text-white" },
+  { bg: "bg-cyan-600", text: "text-white" },
+  { bg: "bg-teal-500", text: "text-white" },
+  { bg: "bg-emerald-500", text: "text-white" },
+  { bg: "bg-rose-500", text: "text-white" },
+  { bg: "bg-pink-500", text: "text-white" },
+  { bg: "bg-orange-500", text: "text-white" },
+  { bg: "bg-amber-500", text: "text-white" },
+];
 
-export const AVATAR_KEYS = Object.keys(AVATARS);
+/** First letter of first word + first letter of last word. Single-word names use first 2 chars. */
+export function getInitials(name: string): string {
+  const parts = name.trim().split(/\s+/).filter(Boolean);
+  if (parts.length === 0) return "?";
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+}
 
-export default function Avatar({ avatarKey, size = "md" }: { avatarKey: string; size?: "sm" | "md" | "lg" | "xl" }) {
-  const a = AVATARS[avatarKey] ?? AVATARS.gopher;
+/** Deterministic color from name — same name always gets the same color. */
+function colorFromName(name: string) {
+  let hash = 0;
+  for (let i = 0; i < name.length; i++) {
+    hash = name.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  return COLORS[Math.abs(hash) % COLORS.length];
+}
+
+export default function Avatar({ name, size = "md" }: { name: string; size?: "sm" | "md" | "lg" | "xl" }) {
+  const initials = getInitials(name);
+  const color = colorFromName(name);
   const sizeClasses = {
-    sm: "h-8 w-8 text-lg",
-    md: "h-10 w-10 text-xl",
-    lg: "h-16 w-16 text-3xl",
-    xl: "h-24 w-24 text-5xl",
+    sm: "h-8 w-8 text-[11px]",
+    md: "h-10 w-10 text-sm",
+    lg: "h-16 w-16 text-xl",
+    xl: "h-24 w-24 text-2xl",
   };
   return (
-    <div className={`flex items-center justify-center rounded-full ${a.bg} ${sizeClasses[size]}`}>
-      {a.emoji}
+    <div className={`flex shrink-0 items-center justify-center rounded-full font-bold ${color.bg} ${color.text} ${sizeClasses[size]}`}>
+      {initials}
     </div>
   );
 }

@@ -32,7 +32,7 @@ export default function ProfileHeader({ name, email, bio, avatar, createdAt, ema
         </div>
       )}
       <div className="flex items-start gap-6">
-        <Avatar avatarKey={avatar} size="xl" />
+        <Avatar name={name} size="xl" />
         <div className="flex-1">
           <h1 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100">{name}</h1>
           <p className="text-sm text-zinc-500 dark:text-zinc-400">{email}</p>

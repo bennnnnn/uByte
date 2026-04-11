@@ -73,7 +73,7 @@ function SettingsPage() {
     if (user) startTransition(() => { void fetchProfile(); });
   }, [user, loading, router, fetchProfile]);
 
-  const saveProfile = async (data: { name: string; bio: string; avatar: string; theme: string }): Promise<boolean> => {
+  const saveProfile = async (data: { name: string; bio: string; theme: string }): Promise<boolean> => {
     const res = await apiFetch("/api/profile", {
       method: "PUT",
       headers: { "Content-Type": "application/json" },

@@ -68,7 +68,7 @@ export default function UserMenuDropdown() {
         aria-label="Open profile menu"
         aria-expanded={open}
       >
-        <Avatar avatarKey={profile?.avatar ?? "gopher"} size="sm" />
+        <Avatar name={user?.name ?? ""} size="sm" />
         <svg
           className={`h-3.5 w-3.5 text-zinc-400 transition-transform ${open ? "rotate-180" : ""}`}
           fill="none" viewBox="0 0 24 24" stroke="currentColor"
@@ -82,7 +82,7 @@ export default function UserMenuDropdown() {
           {/* User info — clicking goes to dashboard */}
           <Link href="/dashboard" onClick={close} className="block border-b border-zinc-100 px-4 py-3 transition-colors hover:bg-zinc-50 dark:border-zinc-800 dark:hover:bg-zinc-800/50">
             <div className="flex items-center gap-3">
-              <Avatar avatarKey={profile?.avatar ?? "gopher"} size="sm" />
+              <Avatar name={user?.name ?? ""} size="sm" />
               <div className="min-w-0 flex-1">
                 <p className="truncate text-sm font-semibold text-zinc-900 dark:text-zinc-100">{user.name}</p>
                 <p className="truncate text-xs text-zinc-500 dark:text-zinc-400">{user.email}</p>
