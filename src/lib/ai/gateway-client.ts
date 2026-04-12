@@ -75,7 +75,7 @@ async function callGoogleDirect(opts: GatewayOptions, apiKey: string): Promise<s
         systemInstruction: systemMsg?.content,
         temperature: opts.temperature ?? 0.3,
         maxOutputTokens: opts.maxTokens ?? 512,
-        abortSignal: controller.signal,
+        httpOptions: { signal: controller.signal },
       },
     });
     return (response.text ?? "").trim();
