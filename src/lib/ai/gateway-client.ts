@@ -64,24 +64,18 @@ async function callGoogleDirect(opts: GatewayOptions, apiKey: string): Promise<s
   }));
 
   const timeoutMs = opts.timeoutMs ?? DEFAULT_TIMEOUT_MS;
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), timeoutMs);
 
-  try {
-    const response = await ai.models.generateContent({
-      model: opts.model,
-      contents,
-      config: {
-        systemInstruction: systemMsg?.content,
-        temperature: opts.temperature ?? 0.3,
-        maxOutputTokens: opts.maxTokens ?? 512,
-        httpOptions: { signal: controller.signal },
-      },
-    });
-    return (response.text ?? "").trim();
-  } finally {
-    clearTimeout(timer);
-  }
+  const response = await ai.models.generateContent({
+    model: opts.model,
+    contents,
+    config: {
+      systemInstruction: systemMsg?.content,
+      temperature: opts.temperature ?? 0.3,
+      maxOutputTokens: opts.maxTokens ?? 512,
+      httpOptions: { timeout: timeoutMs },
+    },
+  });
+  return (response.text ?? "").trim();
 }
 
 async function callOpenAIDirect(opts: GatewayOptions, apiKey: string): Promise<string> {
