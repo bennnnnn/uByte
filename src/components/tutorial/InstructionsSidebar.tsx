@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import Link from "next/link";
 import TutorialRating from "@/components/TutorialRating";
 import InlineRatingNudge from "@/components/tutorial/InlineRatingNudge";
+import TutorialHintPanel from "@/components/tutorial/TutorialHintPanel";
 import { useAuth } from "@/components/AuthProvider";
 import { hasPaidAccess } from "@/lib/plans";
 import { tutorialUrl } from "@/lib/urls";
@@ -36,6 +37,7 @@ interface Props {
   nextTutorial: { slug: string; title: string; steps: { index: number; title: string }[] } | null;
   /** After passing a step, advances and may carry code for cumulative (`carryForward`) lessons. */
   onContinueAfterPass?: () => void;
+  onRequestHint: () => void;
 }
 
 export default function InstructionsSidebar({
@@ -46,13 +48,13 @@ export default function InstructionsSidebar({
   tutorialSlug,
   nextTutorial,
   onContinueAfterPass,
+  onRequestHint,
 }: Props) {
-  const { stepIndex, status, showHint, failCount, completedSteps, skippedSteps, tutorialDone, aiFeedback, aiFeedbackLoading } = progress;
+  const { stepIndex, status, showHint, failCount, completedSteps, skippedSteps, tutorialDone, aiFeedback, aiFeedbackLoading, aiFeedbackUpgrade, aiFeedbackLoginRequired } = progress;
   const { profile } = useAuth();
   const isPro = hasPaidAccess(profile?.plan);
   const isGuest = !profile;
-  // Hide the Pro walkthrough nudge once the AI hint is already visible in the output panel
-  const aiHintActive = isPro && (aiFeedbackLoading || !!aiFeedback);
+  const aiHintActive = aiFeedbackLoading || !!aiFeedback || aiFeedbackUpgrade || aiFeedbackLoginRequired;
   const dotsRef = useRef<HTMLDivElement>(null);
 
   // Scroll active step dot into view when step or done-state changes
@@ -76,7 +78,9 @@ export default function InstructionsSidebar({
           ))}
         </div>
 
-        {step.hint && failCount >= 2 && !aiHintActive && (
+        <TutorialHintPanel progress={progress} onRequestHint={onRequestHint} />
+
+        {step.hint && failCount >= 2 && (
           <div className="mt-6">
             <button
               onClick={() => progress.setShowHint(!showHint)}
@@ -150,7 +154,7 @@ export default function InstructionsSidebar({
             </p>
             {isPro ? (
               <p className="mt-3 text-xs font-medium text-indigo-600 dark:text-indigo-400">
-                💡 Use the <strong>hint</strong> button in the output panel below.
+                💡 Use the <strong>Get hint</strong> section above.
               </p>
             ) : (
               <Link

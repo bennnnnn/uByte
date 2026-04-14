@@ -37,7 +37,7 @@ export const POST = withErrorHandling("POST /api/tutorial-hint", async (request:
   }
 
   const body = await request.json();
-  const { tutorialSlug, stepIndex, lang, code, actualOutput, isError } = body ?? {};
+  const { tutorialSlug, stepIndex, lang, code, actualOutput, isError, failureKind } = body ?? {};
 
   if (!tutorialSlug || !lang || typeof code !== "string" || typeof stepIndex !== "number") {
     return NextResponse.json({ error: "tutorialSlug, stepIndex, lang, and code required" }, { status: 400 });
@@ -50,7 +50,16 @@ export const POST = withErrorHandling("POST /api/tutorial-hint", async (request:
     return NextResponse.json({ error: "Step not found" }, { status: 404 });
   }
 
-  const verdict = isError ? "compile_error" : "wrong_output";
+  const normalizedFailureKind =
+    failureKind === "compile" || failureKind === "task" || failureKind === "output"
+      ? failureKind
+      : null;
+  const verdict =
+    isError || normalizedFailureKind === "compile"
+      ? "compile_error"
+      : normalizedFailureKind === "task"
+      ? "task_incomplete"
+      : "wrong_output";
   const codeHash = createHash("sha256").update(code.trim()).digest("hex");
   const outputSnippet = String(actualOutput ?? "").slice(0, 200);
   const failureSignature = `${verdict}:${outputSnippet}`;
@@ -100,24 +109,35 @@ export const POST = withErrorHandling("POST /api/tutorial-hint", async (request:
   const MAX = 1200;
   const MAX_CODE = 4000;   // ~100 lines — more than enough for a tutorial step
   const MAX_OUTPUT = 800;  // truncate runaway outputs before they inflate tokens
+  const safeOutput = String(actualOutput ?? "").slice(0, MAX_OUTPUT);
   const summary = [
     `Lesson: ${step.title}`,
     `Task: ${step.instruction}`,
-    step.expectedOutput.length > 0 ? `Expected output: ${step.expectedOutput.join(", ")}` : "",
+    verdict === "wrong_output" && step.expectedOutput.length > 0
+      ? `Expected output:\n${step.expectedOutput.join("\n")}`
+      : "",
+    verdict === "task_incomplete" && safeOutput
+      ? `Validation feedback: ${safeOutput}`
+      : "",
   ].filter(Boolean).join("\n");
 
   const truncatedCode = code.trim().replace(/\n{3,}/g, "\n\n");
   const safeCode = truncatedCode.length > MAX_CODE
     ? truncatedCode.slice(0, MAX_CODE) + "\n…(truncated)"
     : truncatedCode;
-  const safeOutput = String(actualOutput ?? "").slice(0, MAX_OUTPUT);
 
   const evidenceBundle = [
     "## Tutorial lesson\n" + (summary.length > MAX ? summary.slice(0, MAX) + "…" : summary),
     "\n## Language\n" + lang,
     "\n## User code\n```\n" + safeCode + "\n```",
     "\n## Verdict\n" + verdict,
-    safeOutput ? "\n## Actual output\n" + safeOutput : "",
+    safeOutput
+      ? verdict === "task_incomplete"
+        ? "\n## Validation feedback\n" + safeOutput
+        : verdict === "compile_error"
+        ? "\n## Compiler output\n" + safeOutput
+        : "\n## Actual output\n" + safeOutput
+      : "",
   ].filter(Boolean).join("\n");
 
   const firstName = user.name?.split(" ")[0] ?? undefined;

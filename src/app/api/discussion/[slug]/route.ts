@@ -19,19 +19,32 @@ import { getCurrentUser } from "@/lib/auth";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 import { withErrorHandling } from "@/lib/api-utils";
 import { verifyCsrf } from "@/lib/csrf";
+import { getPracticeProblemBySlug } from "@/lib/practice/problems";
+import { tutorialUrl } from "@/lib/urls";
 
-/** Human-readable label for notification copy (tutorial Q&A threads). */
-function discussionThreadLabel(slug: string): string {
-  if (!slug.startsWith("tutorial:")) return slug;
-  const rest = slug.slice("tutorial:".length);
-  const lastColon = rest.lastIndexOf(":");
-  if (lastColon === -1) return rest.replace(/:/g, " · ");
-  const tail = rest.slice(lastColon + 1);
-  const head = rest.slice(0, lastColon);
-  if (/^\d+$/.test(tail)) {
-    return `${head.replace(/:/g, " · ")} · step ${Number(tail) + 1}`;
+function getDiscussionLink(slug: string): string | null {
+  if (!slug.startsWith("tutorial:")) return null;
+
+  const [, lang, tutorialSlug, rawStep] = slug.split(":");
+  if (!lang || !tutorialSlug) return null;
+
+  if (rawStep == null) return tutorialUrl(lang, tutorialSlug);
+
+  const step = Number.parseInt(rawStep, 10);
+  return Number.isFinite(step) ? tutorialUrl(lang, tutorialSlug, step) : tutorialUrl(lang, tutorialSlug);
+}
+
+function getDiscussionTitle(slug: string): string {
+  if (slug.startsWith("tutorial:")) {
+    const [, lang, tutorialSlug, rawStep] = slug.split(":");
+    if (lang && tutorialSlug) {
+      const base = `${tutorialSlug.replace(/-/g, " ")} (${lang})`;
+      const step = Number.parseInt(rawStep ?? "", 10);
+      return Number.isFinite(step) ? `${base} · step ${step + 1}` : base;
+    }
   }
-  return rest.replace(/:/g, " · ");
+
+  return getPracticeProblemBySlug(slug)?.title ?? slug;
 }
 
 export const GET = withErrorHandling(
@@ -74,40 +87,51 @@ export const POST = withErrorHandling(
       return NextResponse.json({ error: "Slow down — too many posts." }, { status: 429 });
     }
 
-    const body = await req.json() as { body?: string; parentId?: number; replyToUserId?: number | null; pageUrl?: string };
+    const body = await req.json() as { body?: string; parentId?: number; replyToPostId?: number | null };
     const text = body.body?.trim() ?? "";
     if (!text) return NextResponse.json({ error: "Message cannot be empty." }, { status: 400 });
     if (text.length > 2000) return NextResponse.json({ error: "Message too long (max 2000 chars)." }, { status: 400 });
 
-    const parentId      = typeof body.parentId === "number" ? body.parentId : null;
-    const replyToUserId = typeof body.replyToUserId === "number" ? body.replyToUserId : null;
-    const pageUrl       = typeof body.pageUrl === "string" ? body.pageUrl : null;
+    const parentId = typeof body.parentId === "number" ? body.parentId : null;
+    const replyToPostId = typeof body.replyToPostId === "number" ? body.replyToPostId : null;
+    const pageUrl = getDiscussionLink(slug);
 
     const post = await createPost(user.userId, slug, text, parentId);
 
     // ── Notifications ────────────────────────────────────────────────
-    const problemTitle = discussionThreadLabel(slug);
+    const problemTitle = getDiscussionTitle(slug);
     const preview = text.length > 120 ? text.slice(0, 120) + "…" : text;
     const authorName = user.name || "Someone";
     // Track who already got a notification so we don't double-notify
     const alreadyNotified = new Set<number>();
 
-    // 1. Reply notification — notify the direct target (the specific reply's author when
-    //    replying to a nested reply, or the top-level post's author for a direct reply).
-    //    replyToUserId is sent by the client and always identifies the person being replied to.
-    if (replyToUserId && replyToUserId !== user.userId) {
+    // 1. Reply notification — derive the target from trusted post records instead of
+    //    accepting a raw user id from the client.
+    let replyTargetUserId: number | null = null;
+    if (replyToPostId) {
+      const replyTargetPost = await getPostById(replyToPostId);
+      const isValidReplyTarget =
+        replyTargetPost?.slug === slug &&
+        replyTargetPost.user_id != null &&
+        (replyTargetPost.id === parentId || replyTargetPost.parent_id === parentId);
+      if (isValidReplyTarget && replyTargetPost.user_id !== user.userId) {
+        replyTargetUserId = replyTargetPost.user_id;
+      }
+    }
+
+    if (replyTargetUserId != null) {
       await createNotification(
-        replyToUserId,
+        replyTargetUserId,
         "reply",
         `${authorName} replied to your comment`,
         `On "${problemTitle}": "${preview}"`,
         pageUrl,
       );
-      alreadyNotified.add(replyToUserId);
+      alreadyNotified.add(replyTargetUserId);
     } else if (parentId) {
-      // Fallback: look up the parent post's author (handles cases where replyToUserId was not sent)
+      // Fallback: notify the root post author for direct replies.
       const parent = await getPostById(parentId);
-      if (parent?.user_id && parent.user_id !== user.userId) {
+      if (parent?.slug === slug && parent.user_id && parent.user_id !== user.userId) {
         await createNotification(
           parent.user_id,
           "reply",

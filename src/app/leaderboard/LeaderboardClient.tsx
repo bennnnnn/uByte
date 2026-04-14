@@ -115,7 +115,7 @@ export default function LeaderboardClient({
         <div>
           <h1 className="text-xl font-bold text-zinc-900 sm:text-2xl dark:text-zinc-100">Leaderboard</h1>
           <p className="mt-0.5 text-xs text-zinc-500 sm:text-sm dark:text-zinc-400">
-            Top learners by XP
+            {period === "week" ? "Top learners by progress this week" : "Top learners by XP"}
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -209,7 +209,9 @@ export default function LeaderboardClient({
                   <div className="shrink-0 text-right">
                     <p className="font-mono text-sm font-semibold text-indigo-600 sm:text-base dark:text-indigo-400">
                       {u.xp.toLocaleString()}
-                      <span className="ml-0.5 text-[10px] font-normal text-zinc-400 sm:text-xs"> XP</span>
+                      <span className="ml-0.5 text-[10px] font-normal text-zinc-400 sm:text-xs">
+                        {period === "week" ? " pts" : " XP"}
+                      </span>
                     </p>
                   </div>
                 </li>

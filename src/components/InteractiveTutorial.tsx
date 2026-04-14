@@ -376,6 +376,7 @@ export default function InteractiveTutorial({
               tutorialSlug={tutorialSlug}
               nextTutorial={next ? { slug: next.slug, title: next.title, steps: allTutorialSteps[next.slug] ?? [] } : null}
               onContinueAfterPass={continueAfterPass}
+              onRequestHint={() => stepProgress.requestHint(editor.code)}
             />
           )}
 
@@ -519,12 +520,7 @@ export default function InteractiveTutorial({
           <OutputPanel
             progress={stepProgress}
             expectedOutput={currentStep.expectedOutput}
-            stepsLength={steps.length}
-            onRequestHint={() => stepProgress.requestHint(editor.code)}
             height={outputHeight}
-            staticHint={currentStep.hint}
-            onContinueAfterPass={continueAfterPass}
-            nextTutorialTitle={next?.title ?? null}
           />
         </div>
       </div>

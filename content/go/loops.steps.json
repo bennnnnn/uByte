@@ -21,7 +21,7 @@
     "title": "Use the counter inside the loop",
     "instruction": "`i` is just a variable. You can use it inside the loop body — multiply it, add to it, print it in a sentence.\n\nYou already changed this loop to count to 10. Now add a line inside the loop that prints: `\"2 x [i] = [result]\"`\n\nSo the output should look like:\n```\n2 x 1 = 2\n2 x 2 = 4\n...\n2 x 10 = 20\n```",
     "hint": "fmt.Printf(\"2 x %d = %d\\n\", i, 2*i)  — use the loop counter directly in the calculation.",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tfor i := 1; i <= 10; i++ {\n\t\t// TODO: print \"2 x i = result\" using Printf\n\t}\n}",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tfor i := 1; i <= 10; i++ {\n\t\t// TODO: Inside the loop, print \"2 x i = result\" with fmt.Printf\n\t}\n}",
     "expectedOutput": ["2 x 1 = 2", "2 x 2 = 4", "2 x 3 = 6", "2 x 4 = 8", "2 x 5 = 10", "2 x 6 = 12", "2 x 7 = 14", "2 x 8 = 16", "2 x 9 = 18", "2 x 10 = 20"],
     "codeChecks": [
       { "pattern": "Printf\\(", "required": true, "message": "Use fmt.Printf to format the output." },
@@ -54,7 +54,7 @@
     "title": "Infinite loop with break",
     "instruction": "`for { }` with no condition runs forever. That sounds terrifying, but it is actually useful — when you do not know in advance how many times to loop.\n\nYou control when it stops using `break`.\n\nThis loop counts up and breaks when it hits 5. Add a line that prints `\"Done\"` after the loop ends.",
     "hint": "Add fmt.Println(\"Done\") after the closing brace of the for loop — not inside it.",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\ti := 1\n\tfor {\n\t\tfmt.Println(i)\n\t\tif i == 5 {\n\t\t\tbreak\n\t\t}\n\t\ti++\n\t}\n\t// TODO: print \"Done\" after the loop\n}",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\ti := 1\n\tfor {\n\t\tfmt.Println(i)\n\t\tif i == 5 {\n\t\t\tbreak\n\t\t}\n\t\ti++\n\t}\n\t// TODO: After the loop ends, print \"Done\"\n}",
     "expectedOutput": ["1", "2", "3", "4", "5", "Done"],
     "codeChecks": [
       { "pattern": "Println\\(\"Done\"\\)", "required": true, "message": "Add fmt.Println(\"Done\") after the loop." },
@@ -122,7 +122,7 @@
     "title": "Build a countdown",
     "instruction": "No starter code.\n\nWrite a program that:\n1. Counts down from 10 to 1, printing each number\n2. Skips the number 5 using `continue`\n3. Prints `\"Liftoff!\"` after the loop ends",
     "hint": "for i := 10; i >= 1; i-- { if i == 5 { continue } fmt.Println(i) }  — then fmt.Println(\"Liftoff!\") after the loop.",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\t// Build your countdown here\n}",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\t// TODO: Build your countdown here\n}",
     "expectedOutput": ["10", "9", "8", "7", "6", "4", "3", "2", "1", "Liftoff!"],
     "codeChecks": [
       { "pattern": "i\\s*:=\\s*10", "required": true, "message": "Start your counter at 10." },

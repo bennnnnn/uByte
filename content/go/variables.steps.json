@@ -39,7 +39,7 @@
     "title": "Update a variable",
     "instruction": "Variables can change. That is literally what the word means.\n\nBut there is one rule:\n- `:=` creates a new variable. Use it once.\n- `=` updates an existing one. Use it after.\n\nThe score starts at 60. Update it to 95 and print both values.",
     "hint": "After fmt.Println(score), write: score = 95  then fmt.Println(score) again.",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tscore := 60\n\tfmt.Println(score)\n\t// TODO: update score to 95 using =\n\t// TODO: print score again\n}",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tscore := 60\n\tfmt.Println(score)\n\t// TODO: On the next line, update score to 95 using =\n\t// TODO: Then print score again on the line after that\n}",
     "expectedOutput": ["60", "95"],
     "codeChecks": [
       { "pattern": "score\\s*=\\s*95", "required": true, "message": "Update score using a single =  like this: score = 95" },
@@ -63,7 +63,7 @@
     "title": "Declare a group with var ()",
     "instruction": "When you have several variables, you can declare them as a group.\n\n```\nvar (\n    name string = \"Alex\"\n    age  int    = 25\n    city string = \"London\"\n)\n```\n\nClean, organized, easy to read.\n\nAdd a fourth variable called `country` with your country, then print all four.",
     "hint": "Add country string = \"YourCountry\" inside the var block. Then add fmt.Println(country) at the bottom.",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tvar (\n\t\tname string = \"Alex\"\n\t\tage  int    = 25\n\t\tcity string = \"London\"\n\t\t// TODO: add country here\n\t)\n\tfmt.Println(name)\n\tfmt.Println(age)\n\tfmt.Println(city)\n\t// TODO: print country\n}",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tvar (\n\t\tname string = \"Alex\"\n\t\tage  int    = 25\n\t\tcity string = \"London\"\n\t\t// TODO: Add country inside this var block\n\t)\n\tfmt.Println(name)\n\tfmt.Println(age)\n\tfmt.Println(city)\n\t// TODO: After the lines above, print country too\n}",
     "expectedOutput": [],
     "codeChecks": [
       { "pattern": "country\\s+string\\s*=\\s*\"\\S+\"", "required": true, "message": "Add country inside the var block: country string = \"YourCountry\"" },
@@ -94,7 +94,7 @@
     "title": "Build a profile from scratch",
     "instruction": "Everything you just learned — now use it all.\n\nBuild a short profile using these rules:\n- Use `:=` for name and age\n- Use `var` with a type for city\n- Declare score with var and assign it separately\n- Print all four\n\nNo starter code. Just you.",
     "hint": "name := \"...\", age := 25, var city string then city = \"...\", var score int then score = 100. Then four Println calls.",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\t// Build your profile here\n}",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\t// TODO: Build your profile here\n}",
     "expectedOutput": [],
     "codeChecks": [
       { "pattern": "name\\s*:=", "required": true, "message": "Declare name using :=" },

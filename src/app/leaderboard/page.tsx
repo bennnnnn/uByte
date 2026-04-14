@@ -75,7 +75,7 @@ export default async function LeaderboardPage() {
           <h2>Leaderboard Periods</h2>
           <p>
             View the all-time leaderboard to see cumulative rankings, or switch
-            to the weekly view to see who&apos;s been most active this week.
+            to the weekly view to see who&apos;s made the most progress this week.
           </p>
         </section>
 

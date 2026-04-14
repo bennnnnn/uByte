@@ -264,7 +264,7 @@ function PostCard({
   isReply: boolean;
   /** For replies: the id of the top-level parent post to attach new replies to */
   rootPostId?: number;
-  onReplySubmit: (parentId: number, text: string, replyToUserId?: number | null) => Promise<void>;
+  onReplySubmit: (parentId: number, text: string, replyToPostId?: number | null) => Promise<void>;
   onDelete: (postId: number) => void;
   onEdit: (postId: number, newBody: string) => Promise<void>;
   onToggleReplies: (postId: number) => void;
@@ -272,7 +272,7 @@ function PostCard({
 }) {
   const [replying, setReplying] = useState(false);
   const [replyPrefill, setReplyPrefill] = useState("");
-  const [replyToUserId, setReplyToUserId] = useState<number | null>(null);
+  const [replyToPostId, setReplyToPostId] = useState<number | null>(null);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [reporting, setReporting] = useState(false);
   const [editing, setEditing] = useState(false);
@@ -293,9 +293,9 @@ function PostCard({
   };
 
   // Called when "Reply" is clicked on a nested reply — opens parent compose with @name prefilled
-  const handleReplyToReply = (authorName: string, authorId: number | null) => {
+  const handleReplyToReply = (authorName: string, targetPostId: number) => {
     setReplyPrefill(`@${authorName} `);
-    setReplyToUserId(authorId);
+    setReplyToPostId(targetPostId);
     setReplying(true);
   };
 
@@ -384,7 +384,7 @@ function PostCard({
               type="button"
               onClick={() => {
                 setReplyPrefill("");
-                setReplyToUserId(post.user_id ?? null);
+                setReplyToPostId(post.id);
                 setReplying((r) => !r);
               }}
               className="text-[11px] font-medium text-zinc-400 transition-colors hover:text-indigo-600 dark:hover:text-indigo-400"
@@ -467,12 +467,12 @@ function PostCard({
               placeholder={replyPrefill ? `Replying… (use @name to mention)` : `Reply to ${post.author_name ?? "this comment"}… (use @name to mention)`}
               prefill={replyPrefill}
               autoFocus
-              onCancel={() => { setReplying(false); setReplyPrefill(""); setReplyToUserId(null); }}
+              onCancel={() => { setReplying(false); setReplyPrefill(""); setReplyToPostId(null); }}
               onSubmit={async (text) => {
-                await onReplySubmit(replyParentId, text, replyToUserId);
+                await onReplySubmit(replyParentId, text, replyToPostId);
                 setReplying(false);
                 setReplyPrefill("");
-                setReplyToUserId(null);
+                setReplyToPostId(null);
               }}
             />
           </div>
@@ -521,7 +521,7 @@ function ReplyCard({
   isSignedIn: boolean;
   rootPostId: number;
   /** Called when the user clicks "Reply" — parent PostCard handles the compose */
-  onReplyTo: (authorName: string, authorId: number | null) => void;
+  onReplyTo: (authorName: string, postId: number) => void;
   onDelete: (postId: number) => void;
   onEdit: (postId: number, newBody: string) => Promise<void>;
 }) {
@@ -614,7 +614,7 @@ function ReplyCard({
           {isSignedIn && !isOwnPost && (
             <button
               type="button"
-              onClick={() => onReplyTo(post.author_name ?? "user", post.user_id)}
+              onClick={() => onReplyTo(post.author_name ?? "user", post.id)}
               className="text-[11px] font-medium text-zinc-400 transition-colors hover:text-indigo-600 dark:hover:text-indigo-400"
             >
               Reply
@@ -722,7 +722,7 @@ export default function DiscussionThread({ slug, currentUserId, isSignedIn }: Pr
     const res  = await apiFetch(`/api/discussion/${slug}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ body: text, pageUrl: window.location.pathname }),
+      body: JSON.stringify({ body: text }),
     });
     if (!res.ok) {
       const data = await res.json() as { error?: string };
@@ -733,11 +733,11 @@ export default function DiscussionThread({ slug, currentUserId, isSignedIn }: Pr
   }, [slug]);
 
   /* ── Submit reply (or reply-to-reply, flat threading) ───────────────── */
-  const submitReply = useCallback(async (parentId: number, text: string, replyToUserId?: number | null) => {
+  const submitReply = useCallback(async (parentId: number, text: string, replyToPostId?: number | null) => {
     const res  = await apiFetch(`/api/discussion/${slug}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ body: text, parentId, replyToUserId: replyToUserId ?? null, pageUrl: window.location.pathname }),
+      body: JSON.stringify({ body: text, parentId, replyToPostId: replyToPostId ?? null }),
     });
     if (!res.ok) {
       const data = await res.json() as { error?: string };

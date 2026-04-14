@@ -13,7 +13,7 @@
     "title": "Checking an error — if err != nil",
     "instruction": "The most common pattern in all of Go:\n\n```\nresult, err := someFunction()\nif err != nil {\n    fmt.Println(\"Error:\", err)\n    return\n}\n// safe to use result here\n```\n\nAdd a check: if `strconv.Atoi` returns an error, print `\"Could not convert:\"` and the error. Otherwise print `\"Result:\"` and the number. Test with both `\"100\"` and `\"abc\"`.",
     "hint": "if err != nil { fmt.Println(\"Could not convert:\", err); return }  fmt.Println(\"Result:\", n)",
-    "starter": "package main\n\nimport (\n\t\"fmt\"\n\t\"strconv\"\n)\n\nfunc convert(s string) {\n\tn, err := strconv.Atoi(s)\n\t// TODO: if err != nil, print \"Could not convert:\" and err, then return\n\t// TODO: otherwise print \"Result:\" and n\n}\n\nfunc main() {\n\tconvert(\"100\")\n\tconvert(\"abc\")\n}",
+    "starter": "package main\n\nimport (\n\t\"fmt\"\n\t\"strconv\"\n)\n\nfunc convert(s string) {\n\tn, err := strconv.Atoi(s)\n\t// TODO: If err != nil, print \"Could not convert:\" and err, then return\n\t// TODO: Otherwise print \"Result:\" and n\n}\n\nfunc main() {\n\tconvert(\"100\")\n\tconvert(\"abc\")\n}",
     "expectedOutput": [
       "Result: 100",
       "Could not convert: strconv.Atoi: parsing \"abc\": invalid syntax"
@@ -46,7 +46,7 @@
     "title": "errors.New() — create your own error",
     "instruction": "You can create your own error values using `errors.New()`:\n\n`return 0, errors.New(\"cannot divide by zero\")`\n\nThe `errors` package is part of the standard library.\n\nAdd an error case to `divide`: if `b == 0`, return `0` and a new error `\"cannot divide by zero\"`. Otherwise return the result and `nil`.",
     "hint": "import \"errors\"  then: if b == 0 { return 0, errors.New(\"cannot divide by zero\") }  return a / b, nil",
-    "starter": "package main\n\nimport (\n\t\"errors\"\n\t\"fmt\"\n)\n\nfunc divide(a, b float64) (float64, error) {\n\t// TODO: if b == 0, return 0 and errors.New(\"cannot divide by zero\")\n\t// TODO: otherwise return a/b and nil\n}\n\nfunc main() {\n\tresult, err := divide(10, 2)\n\tif err != nil {\n\t\tfmt.Println(\"Error:\", err)\n\t} else {\n\t\tfmt.Println(result)\n\t}\n\n\t_, err = divide(10, 0)\n\tif err != nil {\n\t\tfmt.Println(\"Error:\", err)\n\t}\n}",
+    "starter": "package main\n\nimport (\n\t\"errors\"\n\t\"fmt\"\n)\n\nfunc divide(a, b float64) (float64, error) {\n\t// TODO: If b == 0, return 0 and errors.New(\"cannot divide by zero\")\n\t// TODO: Otherwise return a/b and nil\n}\n\nfunc main() {\n\tresult, err := divide(10, 2)\n\tif err != nil {\n\t\tfmt.Println(\"Error:\", err)\n\t} else {\n\t\tfmt.Println(result)\n\t}\n\n\t_, err = divide(10, 0)\n\tif err != nil {\n\t\tfmt.Println(\"Error:\", err)\n\t}\n}",
     "expectedOutput": [
       "5",
       "Error: cannot divide by zero"
@@ -79,7 +79,7 @@
     "title": "fmt.Errorf() — errors with context",
     "instruction": "`fmt.Errorf` creates an error with a formatted message — like `fmt.Sprintf` but returns an `error`.\n\n`return fmt.Errorf(\"age %d is invalid: must be between 0 and 120\", age)`\n\nThis lets you include the actual bad value in the error message, which makes debugging much easier.\n\nAdd the error case: if `age < 0` or `age > 120`, return a formatted error. Otherwise return `nil`.",
     "hint": "if age < 0 || age > 120 { return fmt.Errorf(\"invalid age %d: must be between 0 and 120\", age) }  return nil",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc validateAge(age int) error {\n\t// TODO: if age < 0 or age > 120, return fmt.Errorf with the age in the message\n\t// TODO: otherwise return nil\n}\n\nfunc main() {\n\tif err := validateAge(25); err != nil {\n\t\tfmt.Println(err)\n\t} else {\n\t\tfmt.Println(\"Age is valid\")\n\t}\n\n\tif err := validateAge(200); err != nil {\n\t\tfmt.Println(err)\n\t}\n}",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc validateAge(age int) error {\n\t// TODO: If age < 0 or age > 120, return fmt.Errorf with the age in the message\n\t// TODO: Otherwise return nil\n}\n\nfunc main() {\n\tif err := validateAge(25); err != nil {\n\t\tfmt.Println(err)\n\t} else {\n\t\tfmt.Println(\"Age is valid\")\n\t}\n\n\tif err := validateAge(200); err != nil {\n\t\tfmt.Println(err)\n\t}\n}",
     "expectedOutput": [
       "Age is valid",
       "invalid age 200: must be between 0 and 120"
@@ -135,7 +135,7 @@
     "title": "Multiple error checks in one function",
     "instruction": "A function can have multiple failure points. Check each one and return the first error you find.\n\n`validateUser` below checks three things: name, age, email. Fill in the missing checks.",
     "hint": "if name == \"\" { return errors.New(\"name cannot be empty\") }  if age < 18 { return fmt.Errorf(\"age %d is too young: must be 18+\", age) }",
-    "starter": "package main\n\nimport (\n\t\"errors\"\n\t\"fmt\"\n)\n\nfunc validateUser(name string, age int, email string) error {\n\t// TODO: if name is empty, return errors.New(\"name cannot be empty\")\n\t// TODO: if age < 18, return fmt.Errorf with the age in the message\n\tif email == \"\" {\n\t\treturn errors.New(\"email cannot be empty\")\n\t}\n\treturn nil\n}\n\nfunc main() {\n\tcheck := func(err error) {\n\t\tif err != nil {\n\t\t\tfmt.Println(\"Invalid:\", err)\n\t\t} else {\n\t\t\tfmt.Println(\"Valid\")\n\t\t}\n\t}\n\n\tcheck(validateUser(\"\", 25, \"a@b.com\"))\n\tcheck(validateUser(\"Alex\", 15, \"a@b.com\"))\n\tcheck(validateUser(\"Alex\", 25, \"\"))\n\tcheck(validateUser(\"Alex\", 25, \"a@b.com\"))\n}",
+    "starter": "package main\n\nimport (\n\t\"errors\"\n\t\"fmt\"\n)\n\nfunc validateUser(name string, age int, email string) error {\n\t// TODO: If name is empty, return errors.New(\"name cannot be empty\")\n\t// TODO: If age < 18, return fmt.Errorf with the age in the message\n\tif email == \"\" {\n\t\treturn errors.New(\"email cannot be empty\")\n\t}\n\treturn nil\n}\n\nfunc main() {\n\tcheck := func(err error) {\n\t\tif err != nil {\n\t\t\tfmt.Println(\"Invalid:\", err)\n\t\t} else {\n\t\t\tfmt.Println(\"Valid\")\n\t\t}\n\t}\n\n\tcheck(validateUser(\"\", 25, \"a@b.com\"))\n\tcheck(validateUser(\"Alex\", 15, \"a@b.com\"))\n\tcheck(validateUser(\"Alex\", 25, \"\"))\n\tcheck(validateUser(\"Alex\", 25, \"a@b.com\"))\n}",
     "expectedOutput": [
       "Invalid: name cannot be empty",
       "Invalid: age 15 is too young: must be 18+",
@@ -165,7 +165,7 @@
     "title": "Custom error types",
     "instruction": "Sometimes you need more than a message. You want a structured error you can inspect programmatically.\n\nCreate a custom error type by defining a struct with an `Error() string` method:\n\n```\ntype ValidationError struct {\n    Field   string\n    Message string\n}\n\nfunc (e ValidationError) Error() string {\n    return fmt.Sprintf(\"%s: %s\", e.Field, e.Message)\n}\n```\n\nRun this and see the custom error printed. Then add a second return that returns a `ValidationError` for the `\"email\"` field.",
     "hint": "return ValidationError{Field: \"email\", Message: \"cannot be empty\"}",
-    "starter": "package main\n\nimport \"fmt\"\n\ntype ValidationError struct {\n\tField   string\n\tMessage string\n}\n\nfunc (e ValidationError) Error() string {\n\treturn fmt.Sprintf(\"%s: %s\", e.Field, e.Message)\n}\n\nfunc validate(name, email string) error {\n\tif name == \"\" {\n\t\treturn ValidationError{Field: \"name\", Message: \"cannot be empty\"}\n\t}\n\t// TODO: return a ValidationError for email if it is empty\n\treturn nil\n}\n\nfunc main() {\n\tfmt.Println(validate(\"\", \"a@b.com\"))\n\tfmt.Println(validate(\"Alex\", \"\"))\n\tfmt.Println(validate(\"Alex\", \"a@b.com\"))\n}",
+    "starter": "package main\n\nimport \"fmt\"\n\ntype ValidationError struct {\n\tField   string\n\tMessage string\n}\n\nfunc (e ValidationError) Error() string {\n\treturn fmt.Sprintf(\"%s: %s\", e.Field, e.Message)\n}\n\nfunc validate(name, email string) error {\n\tif name == \"\" {\n\t\treturn ValidationError{Field: \"name\", Message: \"cannot be empty\"}\n\t}\n\t// TODO: Return a ValidationError for email when it is empty\n\treturn nil\n}\n\nfunc main() {\n\tfmt.Println(validate(\"\", \"a@b.com\"))\n\tfmt.Println(validate(\"Alex\", \"\"))\n\tfmt.Println(validate(\"Alex\", \"a@b.com\"))\n}",
     "expectedOutput": [
       "name: cannot be empty",
       "email: cannot be empty",
@@ -189,7 +189,7 @@
     "title": "errors.Is() — identify a specific error",
     "instruction": "When a function can return different errors, you sometimes need to know which one you got.\n\n`errors.Is(err, ErrNotFound)` checks if `err` matches a specific sentinel error.\n\nA sentinel error is a package-level variable: `var ErrNotFound = errors.New(\"not found\")`\n\nRun this. Then add a check for `ErrUnauthorized` and print a different message for it.",
     "hint": "} else if errors.Is(err, ErrUnauthorized) { fmt.Println(\"Access denied — please log in\") }",
-    "starter": "package main\n\nimport (\n\t\"errors\"\n\t\"fmt\"\n)\n\nvar ErrNotFound = errors.New(\"not found\")\nvar ErrUnauthorized = errors.New(\"unauthorized\")\n\nfunc getUser(id int) (string, error) {\n\tif id == 0 {\n\t\treturn \"\", ErrNotFound\n\t}\n\tif id < 0 {\n\t\treturn \"\", ErrUnauthorized\n\t}\n\treturn \"Alex\", nil\n}\n\nfunc main() {\n\tids := []int{1, 0, -1}\n\tfor _, id := range ids {\n\t\tname, err := getUser(id)\n\t\tif err == nil {\n\t\t\tfmt.Println(\"Found:\", name)\n\t\t} else if errors.Is(err, ErrNotFound) {\n\t\t\tfmt.Println(\"User not found\")\n\t\t\t// TODO: add check for ErrUnauthorized\n\t\t} else {\n\t\t\tfmt.Println(\"Unknown error:\", err)\n\t\t}\n\t}\n}",
+    "starter": "package main\n\nimport (\n\t\"errors\"\n\t\"fmt\"\n)\n\nvar ErrNotFound = errors.New(\"not found\")\nvar ErrUnauthorized = errors.New(\"unauthorized\")\n\nfunc getUser(id int) (string, error) {\n\tif id == 0 {\n\t\treturn \"\", ErrNotFound\n\t}\n\tif id < 0 {\n\t\treturn \"\", ErrUnauthorized\n\t}\n\treturn \"Alex\", nil\n}\n\nfunc main() {\n\tids := []int{1, 0, -1}\n\tfor _, id := range ids {\n\t\tname, err := getUser(id)\n\t\tif err == nil {\n\t\t\tfmt.Println(\"Found:\", name)\n\t\t} else if errors.Is(err, ErrNotFound) {\n\t\t\tfmt.Println(\"User not found\")\n\t\t\t// TODO: Add a separate check for ErrUnauthorized here\n\t\t} else {\n\t\t\tfmt.Println(\"Unknown error:\", err)\n\t\t}\n\t}\n}",
     "expectedOutput": [
       "Found: Alex",
       "User not found",

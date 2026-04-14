@@ -12,6 +12,7 @@ import { trackConversion } from "@/lib/analytics";
 import { celebrate } from "@/lib/celebrate";
 
 export type Status = "idle" | "running" | "passed" | "failed";
+export type FailureKind = "output" | "task" | "compile" | null;
 
 function checkOutput(output: string, expected: string[]): boolean {
   if (!output.trim()) return false;
@@ -66,10 +67,15 @@ function safeRegexTest(pattern: string, flags: string, input: string): boolean {
   }
 }
 
+function isPlaceholderRemovalCheck(check: CodeCheck): boolean {
+  return check.required === false && check.pattern.trim() === "TODO";
+}
+
 /** Validate per-step code rules. Returns the first failing message, or null. */
 function runCodeChecks(code: string, checks: CodeCheck[] | undefined): string | null {
   if (!checks?.length) return null;
   for (const { pattern, flags = "im", required = true, message } of checks) {
+    if (isPlaceholderRemovalCheck({ pattern, flags, required, message })) continue;
     const matches = safeRegexTest(pattern, flags, code);
     if (required && !matches) return message;
     if (!required && matches) return message;
@@ -100,6 +106,7 @@ export interface StepProgressState {
   status: Status;
   output: string | null;
   outputIsError: boolean;
+  failureKind: FailureKind;
   aiFeedback: AiFeedbackSchema | null;
   setAiFeedback: (v: AiFeedbackSchema | null) => void;
   aiFeedbackLoading: boolean;
@@ -136,6 +143,7 @@ export function useStepProgress(
   const [status, setStatus] = useState<Status>("idle");
   const [output, setOutput] = useState<string | null>(null);
   const [outputIsError, setOutputIsError] = useState(false);
+  const [failureKind, setFailureKind] = useState<FailureKind>(null);
   const [aiFeedback, setAiFeedback] = useState<AiFeedbackSchema | null>(null);
   const [aiFeedbackLoading, setAiFeedbackLoading] = useState(false);
   const [aiFeedbackUpgrade, setAiFeedbackUpgrade] = useState(false);
@@ -151,7 +159,7 @@ export function useStepProgress(
   const urlHasStepRef = useRef(false);
   // Stores the last failed check's data so the auto-hint useEffect can fire fetchAiFeedback
   // outside of a state updater (React can re-invoke updaters in concurrent mode).
-  const pendingAutoHintRef = useRef<{ code: string; output: string; isError: boolean; stepIndex: number } | null>(null);
+  const pendingAutoHintRef = useRef<{ code: string; output: string; isError: boolean; stepIndex: number; failureKind: FailureKind } | null>(null);
   const [showInlineChat, setShowInlineChat] = useState(false);
   const [tutorialDone, setTutorialDone] = useState(false);
   const [showHint, setShowHint] = useState(false);
@@ -160,9 +168,9 @@ export function useStepProgress(
   // ── Auto-hint after 2+ failures — runs as an effect, not inside a state updater ──
   useEffect(() => {
     if (failCount >= 2 && !hintInflightRef.current && pendingAutoHintRef.current) {
-      const { code, output, isError, stepIndex } = pendingAutoHintRef.current;
+      const { code, output, isError, stepIndex, failureKind } = pendingAutoHintRef.current;
       pendingAutoHintRef.current = null;
-      fetchAiFeedback(code, output, isError, stepIndex);
+      fetchAiFeedback(code, output, isError, stepIndex, failureKind);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [failCount]);
@@ -271,6 +279,7 @@ export function useStepProgress(
     setSkippedSteps((prev) => new Set([...prev, stepIndex]));
     setCompletedSteps((prev) => new Set([...prev, stepIndex]));
     setStatus("passed");
+    setFailureKind(null);
     setFailCount(0);
     setAiFeedbackLoginRequired(false);
     hintInflightRef.current = false;
@@ -295,6 +304,7 @@ export function useStepProgress(
     setCode(carry ? opts.editorCode! : steps[idx].starter);
     setOutput(null);
     setStatus("idle");
+    setFailureKind(null);
     setShowHint(false);
     setFailCount(0);
     setAiFeedback(null);
@@ -305,7 +315,34 @@ export function useStepProgress(
     setShowInlineChat(false);
   }
 
-  function fetchAiFeedback(userCode: string, actualOutput: string, isError: boolean, currentStepIndex: number) {
+  function getFallbackHint(kind: FailureKind): { hint: string; nextStep: string } {
+    switch (kind) {
+      case "compile":
+        return {
+          hint: "Read the compiler message above and fix the line it points to.",
+          nextStep: "Make one syntax or type fix, then click Check again.",
+        };
+      case "task":
+        return {
+          hint: "Keep the starter comments if they help, but add the code the task asks for where the placeholder points.",
+          nextStep: "Follow the validation message above and fill in the missing line or block.",
+        };
+      default:
+        return {
+          hint: "Compare your output with the expected output shown below the editor.",
+          nextStep: "Fix the difference and click Check again.",
+        };
+    }
+  }
+
+  function fetchAiFeedback(
+    userCode: string,
+    actualOutput: string,
+    isError: boolean,
+    currentStepIndex: number,
+    currentFailureKind: FailureKind
+  ) {
+    const fallback = getFallbackHint(currentFailureKind);
     // Guest users — show a sign-in prompt instead of calling the API.
     if (userId == null) {
       setAiFeedbackLoginRequired(true);
@@ -332,6 +369,7 @@ export function useStepProgress(
         code: userCode,
         actualOutput,
         isError,
+        failureKind: currentFailureKind,
       }),
     })
       .then(async (r) => {
@@ -348,8 +386,8 @@ export function useStepProgress(
             friendly_one_liner: "Hint is temporarily unavailable. Check the output above.",
             root_cause: "ai_unavailable",
             evidence: [],
-            hint: "Compare your output with the expected output. Look for spacing, capitalisation, or missing characters.",
-            next_step: "Fix the difference and run again.",
+            hint: fallback.hint,
+            next_step: fallback.nextStep,
             confidence: 0,
           });
         }
@@ -360,8 +398,8 @@ export function useStepProgress(
           friendly_one_liner: "Could not reach the hint service. Check your connection and try again.",
           root_cause: "network_error",
           evidence: [],
-          hint: "Review the expected output shown below the editor.",
-          next_step: "Fix the difference and run again.",
+          hint: fallback.hint,
+          next_step: fallback.nextStep,
           confidence: 0,
         });
       })
@@ -374,9 +412,8 @@ export function useStepProgress(
   /** Manual "Get hint" — can also be triggered automatically after 2 failures. */
   function requestHint(code: string) {
     if (status !== "failed" || hintInflightRef.current || aiFeedbackLoading) return;
-    fetchAiFeedback(code, output ?? "", outputIsError, stepIndex);
+    fetchAiFeedback(code, output ?? "", outputIsError, stepIndex, failureKind ?? (outputIsError ? "compile" : "output"));
   }
-
   async function handleCheck(
     code: string,
     step: TutorialStep,
@@ -385,6 +422,7 @@ export function useStepProgress(
   ) {
     setStatus("running");
     setOutput(null);
+    setFailureKind(null);
     // Intentionally do NOT clear aiFeedback here — keep the hint visible while re-checking.
     // It is only cleared on pass (step done) or when navigating away.
     setErrorLines(new Set());
@@ -413,10 +451,11 @@ export function useStepProgress(
       const { output: out, hasError } = await runCodeRequest(code, lang);
       setOutputIsError(hasError);
       setOutput(out || (hasError ? "Compilation error" : "(no output)"));
-        if (hasError) {
+      if (hasError) {
+        setFailureKind("compile");
         setErrorLines(parseErrorLines(out, lang));
         setStatus("failed");
-        pendingAutoHintRef.current = { code, output: out, isError: true, stepIndex };
+        pendingAutoHintRef.current = { code, output: out, isError: true, stepIndex, failureKind: "compile" };
         setFailCount((n) => n + 1);
         apiFetch("/api/step-check", {
           method: "POST",
@@ -430,14 +469,15 @@ export function useStepProgress(
         const codeCheckMsg = runCodeChecks(code, step.codeChecks);
         // Layer 2: universal starter-diff check (catches "just deleted the TODO" attempts)
         const notDoneMsg = !codeCheckMsg && todoNotCompleted(code, step.starter)
-          ? "Output is correct, but you haven't completed the task yet.\nReplace the TODO comment with your actual solution."
+          ? "Output is correct, but you haven't completed the task yet.\nAdd your solution where the placeholder comment points."
           : null;
         const failMsg = codeCheckMsg ?? notDoneMsg;
         if (failMsg) {
           setOutputIsError(false);
+          setFailureKind("task");
           setOutput(failMsg);
           setStatus("failed");
-          pendingAutoHintRef.current = { code, output: out, isError: false, stepIndex };
+          pendingAutoHintRef.current = { code, output: failMsg, isError: false, stepIndex, failureKind: "task" };
           setFailCount((n) => n + 1);
           apiFetch("/api/step-check", {
             method: "POST",
@@ -447,6 +487,7 @@ export function useStepProgress(
           return;
         }
         setStatus("passed");
+        setFailureKind(null);
         celebrate(); // Small confetti burst — fires on every correct step.
         setFailCount(0);
         setAiFeedback(null);          // Step done — clear hint so the next step starts fresh.
@@ -471,8 +512,9 @@ export function useStepProgress(
           }).catch(() => {});
         }
       } else {
+        setFailureKind("output");
         setStatus("failed");
-        pendingAutoHintRef.current = { code, output: out, isError: false, stepIndex };
+        pendingAutoHintRef.current = { code, output: out, isError: false, stepIndex, failureKind: "output" };
         setFailCount((n) => n + 1);
         apiFetch("/api/step-check", {
           method: "POST",
@@ -481,6 +523,7 @@ export function useStepProgress(
         }).catch(() => {});
       }
     } catch {
+      setFailureKind("compile");
       setOutput("Could not reach the compiler. Please try again.");
       setStatus("failed");
     }
@@ -490,6 +533,7 @@ export function useStepProgress(
     setCodeFn(step.starter);
     setOutput(null);
     setStatus("idle");
+    setFailureKind(null);
     setErrorLines(new Set());
     setAiFeedback(null);
     setAiFeedbackUpgrade(false);
@@ -505,6 +549,7 @@ export function useStepProgress(
     status,
     output,
     outputIsError,
+    failureKind,
     aiFeedback,
     setAiFeedback,
     aiFeedbackLoading,

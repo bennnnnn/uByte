@@ -1,5 +1,3 @@
-import { Ratelimit } from "@upstash/ratelimit";
-import { Redis } from "@upstash/redis";
 import { dbCheckRateLimit } from "@/lib/db";
 
 /**
@@ -18,29 +16,76 @@ import { dbCheckRateLimit } from "@/lib/db";
  *   - Works correctly across multiple Vercel serverless instances / regions
  */
 
-let redisClient: Redis | null = null;
-// Cache Ratelimit instances by key pattern to avoid re-creating them per request.
-const rlCache = new Map<string, Ratelimit>();
+type RedisClient = object;
+type RatelimitResult = { success: boolean; reset: number };
+type RatelimitInstance = { limit: (key: string) => Promise<RatelimitResult> };
+type UpstashModules = {
+  Redis: new (args: { url: string; token: string }) => RedisClient;
+  Ratelimit: {
+    new (args: { redis: RedisClient; limiter: unknown; analytics: boolean }): RatelimitInstance;
+    slidingWindow: (maxRequests: number, window: string) => unknown;
+  };
+};
 
-function getRedis(): Redis | null {
-  if (redisClient !== null) return redisClient;
+const dynamicImport = new Function(
+  "specifier",
+  "return import(specifier)"
+) as <T = unknown>(specifier: string) => Promise<T>;
+
+let modulesPromise: Promise<UpstashModules | null> | null = null;
+let redisClient: RedisClient | null | undefined;
+// Cache Ratelimit instances by key pattern to avoid re-creating them per request.
+const rlCache = new Map<string, RatelimitInstance>();
+
+async function loadUpstash(): Promise<UpstashModules | null> {
+  if (modulesPromise) return modulesPromise;
+  modulesPromise = Promise.all([
+    dynamicImport<{ Redis: UpstashModules["Redis"] }>("@upstash/redis"),
+    dynamicImport<{ Ratelimit: UpstashModules["Ratelimit"] }>("@upstash/ratelimit"),
+  ])
+    .then(([redisModule, ratelimitModule]) => ({
+      Redis: redisModule.Redis,
+      Ratelimit: ratelimitModule.Ratelimit,
+    }))
+    .catch((err) => {
+      console.warn("[rate-limit] Upstash packages unavailable, falling back to DB:", err);
+      return null;
+    });
+  return modulesPromise;
+}
+
+async function getRedis(): Promise<RedisClient | null> {
+  if (redisClient !== undefined) return redisClient;
   const url = process.env.UPSTASH_REDIS_REST_URL;
   const token = process.env.UPSTASH_REDIS_REST_TOKEN;
-  if (!url || !token) return null;
-  redisClient = new Redis({ url, token });
+  if (!url || !token) {
+    redisClient = null;
+    return null;
+  }
+
+  const modules = await loadUpstash();
+  if (!modules) {
+    redisClient = null;
+    return null;
+  }
+
+  redisClient = new modules.Redis({ url, token });
   return redisClient;
 }
 
-function getRatelimit(maxRequests: number, windowMs: number): Ratelimit | null {
-  const redis = getRedis();
+async function getRatelimit(maxRequests: number, windowMs: number): Promise<RatelimitInstance | null> {
+  const redis = await getRedis();
   if (!redis) return null;
 
   const cacheKey = `${maxRequests}:${windowMs}`;
   if (rlCache.has(cacheKey)) return rlCache.get(cacheKey)!;
 
-  const rl = new Ratelimit({
+  const modules = await loadUpstash();
+  if (!modules) return null;
+
+  const rl = new modules.Ratelimit({
     redis,
-    limiter: Ratelimit.slidingWindow(maxRequests, `${windowMs}ms`),
+    limiter: modules.Ratelimit.slidingWindow(maxRequests, `${windowMs}ms`),
     analytics: false,
   });
   rlCache.set(cacheKey, rl);
@@ -52,7 +97,7 @@ export async function checkRateLimit(
   maxRequests: number,
   windowMs: number
 ): Promise<{ limited: boolean; retryAfter: number }> {
-  const rl = getRatelimit(maxRequests, windowMs);
+  const rl = await getRatelimit(maxRequests, windowMs);
 
   if (rl) {
     try {
