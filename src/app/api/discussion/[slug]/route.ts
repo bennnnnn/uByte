@@ -19,7 +19,6 @@ import { getCurrentUser } from "@/lib/auth";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 import { withErrorHandling } from "@/lib/api-utils";
 import { verifyCsrf } from "@/lib/csrf";
-import { getPracticeProblemBySlug } from "@/lib/practice/problems";
 import { tutorialUrl } from "@/lib/urls";
 
 function getDiscussionLink(slug: string): string | null {
@@ -44,7 +43,11 @@ function getDiscussionTitle(slug: string): string {
     }
   }
 
-  return getPracticeProblemBySlug(slug)?.title ?? slug;
+  return slug
+    .split(/[-_:]/g)
+    .filter(Boolean)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(" ");
 }
 
 export const GET = withErrorHandling(
