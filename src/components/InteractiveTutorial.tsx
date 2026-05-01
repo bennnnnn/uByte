@@ -271,7 +271,7 @@ export default function InteractiveTutorial({
     <TutorialGate tutorialSlug={tutorialSlug} completedLessons={stepProgress.completedSteps.size}>
     <div className="fixed inset-0 z-50 flex flex-col bg-white text-zinc-900  ">
       {/* Persistent top bar for guests — visible from step 0, before any code is run */}
-      <GuestTopBanner show={!user && !loading} />
+      <GuestTopBanner show={guestHasProgress} />
       {/* Slide-up prompt after first completed step */}
       <GuestConversionPrompt trigger={guestHasProgress} context="tutorial" />
 
@@ -300,7 +300,7 @@ export default function InteractiveTutorial({
             </span>
           )}
           {/* XP/level indicator */}
-          {profile && profile.xp > 0 && (
+          {profile && (
             <span
               title={`${profile.xp.toLocaleString()} XP earned`}
               className="hidden items-center gap-1 rounded-full border border-indigo-200 bg-indigo-50 px-2 py-1 text-xs font-bold text-indigo-700    sm:inline-flex"
@@ -392,6 +392,7 @@ export default function InteractiveTutorial({
               steps={currentSteps}
               progress={stepProgress}
               tutorialSlug={tutorialSlug}
+              allTutorials={allTutorials}
               nextTutorial={next ? { slug: next.slug, title: next.title, steps: allTutorialSteps[next.slug] ?? [] } : null}
               onContinueAfterPass={continueAfterPass}
               onRequestHint={() => stepProgress.requestHint(editor.code)}
@@ -648,6 +649,7 @@ export default function InteractiveTutorial({
           totalSteps={stepProgress.completedSteps.size + stepProgress.skippedSteps.size}
           streakDays={profile?.streak_days ?? 0}
           totalXp={profile?.xp ?? 0}
+          allTutorials={allTutorials}
         />
       )}
     </div>

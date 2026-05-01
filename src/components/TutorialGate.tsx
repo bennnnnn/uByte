@@ -21,7 +21,7 @@ const LS_GUEST_LESSONS = "ubyte_guest_lessons";
 const LS_UNVERIFIED_LESSONS = "ubyte_unverified_lessons";
 
 /** Number of free lessons (steps passed) before guests must sign up. */
-const GUEST_LESSON_LIMIT = 5;
+const GUEST_LESSON_LIMIT = 12;
 /** Number of lessons before unverified users must verify email. */
 const UNVERIFIED_LESSON_LIMIT = 10;
 

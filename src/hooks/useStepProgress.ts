@@ -10,6 +10,7 @@ import { parseErrorLines } from "./useCodeEditor";
 import { apiFetch } from "@/lib/api-client";
 import { trackConversion } from "@/lib/analytics";
 import { celebrate } from "@/lib/celebrate";
+import { useToast } from "@/components/Toast";
 
 export type Status = "idle" | "running" | "passed" | "failed";
 export type FailureKind = "output" | "task" | "compile" | null;
@@ -136,6 +137,7 @@ export function useStepProgress(
 ): StepProgressState {
   const { toggleProgress, incrementStepCount, profile } = useAuth();
   const isPro = hasPaidAccess(profile?.plan);
+  const { toast } = useToast();
 
   const [stepIndex, setStepIndex] = useState(0);
   const [completedSteps, setCompletedSteps] = useState<Set<number>>(new Set());
@@ -488,7 +490,8 @@ export function useStepProgress(
         }
         setStatus("passed");
         setFailureKind(null);
-        celebrate(); // Small confetti burst — fires on every correct step.
+        celebrate(stepIndex === 0); // First step gets a bigger burst
+        toast("+10 XP", "success");
         setFailCount(0);
         setAiFeedback(null);          // Step done — clear hint so the next step starts fresh.
         setAiFeedbackUpgrade(false);

@@ -16,6 +16,7 @@ interface Props {
   totalSteps?: number;
   streakDays?: number;
   totalXp?: number;
+  allTutorials?: { slug: string; title: string }[];
 }
 
 export default function CongratsModal({
@@ -29,6 +30,7 @@ export default function CongratsModal({
   totalSteps = 0,
   streakDays = 0,
   totalXp = 0,
+  allTutorials = [],
 }: Props) {
   const [rated, setRated] = useState<1 | -1 | null>(null);
 
@@ -81,6 +83,18 @@ export default function CongratsModal({
           You finished{" "}
           <span className="font-medium text-zinc-800 ">{tutorialTitle}</span>.
         </p>
+
+        {/* Track progress badge */}
+        {allTutorials.length > 1 && (
+          <div className="mb-4 flex justify-center">
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-zinc-100 px-3 py-1 text-xs font-semibold text-zinc-600  ">
+              <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+              </svg>
+              Tutorial {allTutorials.findIndex(t => t.slug === tutorialSlug) + 1} of {allTutorials.length}
+            </span>
+          </div>
+        )}
 
         {/* Stats row */}
         {stepsDone > 0 && (
