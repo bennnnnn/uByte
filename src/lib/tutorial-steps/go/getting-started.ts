@@ -4,7 +4,7 @@ export const steps: TutorialStep[] = [
   {
     title: "Hello, Library!",
     instruction:
-      "The front door: `func main()`. Every Go program has one — it's where Go walks in and starts running whatever's inside the `{ }`. No `main` = no program. Go just stares at your code.\n\nThis program already works. Click **Run & check** and watch the door open.",
+      "The front door: `func main()`. Every Go program has one — it's where Go walks in and starts running.\n\nThis program already works. Click **Run & check** to see it in action.",
     starter: `package main
 
 import "fmt"

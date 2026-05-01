@@ -4,7 +4,7 @@ export const steps: TutorialStep[] = [
   {
     title: "Shelf Numbers (Basic for loop)",
     instruction:
-      "Print shelf numbers 1 through 5, one per line. I've set up `i := 1` — you just need to give me the condition and the increment so I know when to stop and how to count.",
+      "Print shelf numbers 1 through 5, one per line. The loop already starts at 1 — fill in the condition and the increment.",
     starter: `package main
 
 import "fmt"
