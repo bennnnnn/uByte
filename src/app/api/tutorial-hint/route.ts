@@ -74,14 +74,16 @@ export const POST = withErrorHandling("POST /api/tutorial-hint", async (request:
     modelName: MODEL_NAME,
   };
 
-  // Plan check — must come before cache hit so free users never get hints regardless of cache.
+  // Plan check — free users get FREE_HINT_LIMIT lifetime hints before upgrade is required.
   const [dbUser, proFeaturesEnabled] = await Promise.all([getUserById(user.userId), isFeatureEnabled("pro_features_enabled")]);
   if (proFeaturesEnabled && !hasPaidAccess(dbUser?.plan)) {
     const lifetimeUsed = await getLifetimeAiHintCount(user.userId);
-    return NextResponse.json(
-      { error: "upgrade_required", hintsUsed: lifetimeUsed, limit: FREE_HINT_LIMIT },
-      { status: 402 }
-    );
+    if (lifetimeUsed >= FREE_HINT_LIMIT) {
+      return NextResponse.json(
+        { error: "upgrade_required", hintsUsed: lifetimeUsed, limit: FREE_HINT_LIMIT },
+        { status: 402 }
+      );
+    }
   }
 
   // Cache hit — return immediately at no cost (Pro users only reach this point)

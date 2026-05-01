@@ -20,7 +20,7 @@ export default function OutputPanel({
     outputIsError || failureKind === "compile"
       ? "text-red-500 "
       : status === "failed" && failureKind === "task"
-      ? "text-amber-500 "
+      ? "text-red-500 "
       : status === "failed"
       ? "text-red-500 "
       : status === "passed"
@@ -42,7 +42,7 @@ export default function OutputPanel({
     outputIsError || failureKind === "compile"
       ? "text-red-600 "
       : status === "failed" && failureKind === "task"
-      ? "text-amber-700 "
+      ? "text-red-600 "
       : status === "failed"
       ? "text-red-600 "
       : "text-emerald-600 ";

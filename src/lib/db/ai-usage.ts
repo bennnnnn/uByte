@@ -26,8 +26,8 @@ const COOLDOWN_SECONDS = 10;
 export const AI_QUOTA_DAILY = MAX_AI_CALLS_PER_DAY;
 export const AI_COOLDOWN_SECONDS = COOLDOWN_SECONDS;
 
-/** AI hints are a Pro-only feature. FREE_HINT_LIMIT = 0 means free users get no hints. */
-export const FREE_HINT_LIMIT = 0;
+/** AI hints: free users get 5 lifetime hints, then they must upgrade to Pro. */
+export const FREE_HINT_LIMIT = 5;
 
 /** Get today's usage count for user. Returns 0 if no row or table missing. */
 export async function getTodayAiUsageCount(userId: number): Promise<number> {

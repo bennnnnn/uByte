@@ -22,7 +22,7 @@ export default function TutorialHintPanel({ progress, onRequestHint }: Props) {
   return (
     <div className="mt-6 rounded-lg border border-indigo-200 bg-indigo-50/70 p-4  ">
       <p className="mb-2 text-[11px] font-semibold uppercase tracking-widest text-indigo-500 ">
-        AI Hint
+        Hint
       </p>
 
       {aiFeedbackLoading && (
