@@ -156,7 +156,7 @@
     "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tbooks := []string{\"Dune\", \"1984\", \"Moby Dick\"}\n\tfmt.Println(\"Current collection:\", books)\n\t// TODO: append a 4th book and print\n\t// TODO: append a 5th book and print\n}",
     "expectedOutput": [],
     "codeChecks": [
-      { "pattern": "books\\\\s*=\\\\s*append\\\\(books,\", "required": true, "message": "Use append to add a new book: books = append(books, \"title\")" },
+      { "pattern": "books\\\\s*=\\\\s*append\\\\(books,", "required": true, "message": "Use append to add a new book: books = append(books, \"title\")" },
       { "pattern": "(books\\\\s*=\\\\s*append\\\\(books,.*\\n.*){2}|(books\\\\s*=\\\\s*append\\\\(books,){2}", "required": true, "flags": "s", "message": "Add two new books using two separate append calls." },
       { "pattern": "TODO", "required": false, "message": "Replace the TODO lines with your code." }
     ],

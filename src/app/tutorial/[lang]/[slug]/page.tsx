@@ -235,16 +235,16 @@ export default async function TutorialPage({
         )}
 
         <nav className="flex items-center justify-between border-t border-zinc-200 pt-6 dark:border-zinc-800" aria-label="Tutorial navigation">
-          {prevTutorial ? (
+          {prevTutorial && (
             <a href={`/tutorial/${lang}/${prevTutorial.slug}`} className="text-sm font-medium text-indigo-600 hover:underline dark:text-indigo-400">
               ← {prevTutorial.title}
             </a>
-          ) : <span />}
-          {nextTutorial ? (
+          )}
+          {nextTutorial && (
             <a href={`/tutorial/${lang}/${nextTutorial.slug}`} className="text-sm font-medium text-indigo-600 hover:underline dark:text-indigo-400">
               {nextTutorial.title} →
             </a>
-          ) : <span />}
+          )}
         </nav>
       </article>
 

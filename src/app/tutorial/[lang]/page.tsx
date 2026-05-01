@@ -386,27 +386,9 @@ export default async function TutorialLangLandingPage({
             <h2 className="mb-4 text-2xl font-bold text-zinc-900 dark:text-zinc-100">
               {config.name} tutorial topics
             </h2>
-            <ol className="grid gap-3 sm:grid-cols-2">
-              {tutorials.map((t, i) => (
-                <li key={t.slug}>
-                  <Link
-                    href={tutorialUrl(lang, t.slug)}
-                    className="flex items-start gap-3 rounded-xl border border-zinc-100 p-3 transition-colors hover:border-indigo-200 hover:bg-indigo-50/50 dark:border-zinc-800 dark:hover:border-indigo-900 dark:hover:bg-indigo-950/20"
-                  >
-                    <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-zinc-100 text-xs font-bold text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400">
-                      {i + 1}
-                    </span>
-                    <span>
-                      <span className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">{t.title}</span>
-                      <span className="mt-0.5 block text-xs text-zinc-500 dark:text-zinc-400">
-                        {t.description.slice(0, 80)}{t.description.length > 80 ? "…" : ""}
-                        {" · "}{stepCountBySlug[t.slug] ?? 0} lessons
-                      </span>
-                    </span>
-                  </Link>
-                </li>
-              ))}
-            </ol>
+            <p className="text-sm text-zinc-500 dark:text-zinc-400">
+              {tutorials.length} topics · {totalLessons} hands-on lessons · all levels
+            </p>
           </section>
 
           <section>

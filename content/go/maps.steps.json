@@ -1,146 +1,146 @@
 [
   {
     "title": "What is a map",
-    "instruction": "Think about a library card catalog.\\n\\nYou look up an ISBN like \\\"978-0-14-044913-6\\\" and find the book's title and author. You look up another ISBN and get that book's details. You do not search by shelf position — you search by ISBN.\\n\\nA map works the same way. You look up a key (ISBN) and get its value (book info) back.\\n\\nRun this. Then try looking up a different ISBN.",
-    "starter": "package main\\n\\nimport \\\"fmt\\\"\\n\\nfunc main() {\\n\\tcatalog := map[string]string{\\n\\t\\t\\\"978-0-14-044913-6\\\": \\\"The Odyssey\\\",\\n\\t\\t\\\"978-0-06-112008-4\\\": \\\"To Kill a Mockingbird\\\",\\n\\t\\t\\\"978-0-452-28423-4\\\": \\\"1984\\\",\\n\\t}\\n\\tfmt.Println(catalog[\\\"978-0-06-112008-4\\\"])\\n\\tfmt.Println(catalog[\\\"978-0-14-044913-6\\\"])\\n}\",
+    "instruction": "Think about a library card catalog.\n\nYou look up an ISBN like \"978-0-14-044913-6\" and find the book's title and author. You look up another ISBN and get that book's details. You do not search by shelf position — you search by ISBN.\n\nA map works the same way. You look up a key (ISBN) and get its value (book info) back.\n\nRun this. Then try looking up a different ISBN.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tcatalog := map[string]string{\n\t\t\"978-0-14-044913-6\": \"The Odyssey\",\n\t\t\"978-0-06-112008-4\": \"To Kill a Mockingbird\",\n\t\t\"978-0-452-28423-4\": \"1984\",\n\t}\n\tfmt.Println(catalog[\"978-0-06-112008-4\"])\n\tfmt.Println(catalog[\"978-0-14-044913-6\"])\n}",
     "expectedOutput": ["To Kill a Mockingbird", "The Odyssey"],
     "successMessage": "Look up by ISBN, get the book title. That is the entire concept of a map."
   },
   {
     "title": "Declare a map with make",
-    "instruction": "When you want an empty catalog to fill later, use `make`.\\n\\n`make(map[string]int)` creates an empty map where keys are ISBNs and values are available copies.\\n\\nThe key type goes first, value type second — both inside the brackets.\\n\\nAdd two books with their available copy counts and print both.",
-    "hint": "copies[\\\"978-0-14-044913-6\\\"] = 3  then copies[\\\"978-0-06-112008-4\\\"] = 5  then fmt.Println(copies)",
-    "starter": "package main\\n\\nimport \\\"fmt\\\"\\n\\nfunc main() {\\n\\tcopies := make(map[string]int)\\n\\t// TODO: Add first ISBN with 3 copies\\n\\t// TODO: Add second ISBN with 5 copies on the next line\\n\\t// TODO: Then print the map\\n}\",
+    "instruction": "When you want an empty catalog to fill later, use `make`.\n\n`make(map[string]int)` creates an empty map where keys are ISBNs and values are available copies.\n\nThe key type goes first, value type second — both inside the brackets.\n\nAdd two books with their available copy counts and print both.",
+    "hint": "copies[\"978-0-14-044913-6\"] = 3  then copies[\"978-0-06-112008-4\"] = 5  then fmt.Println(copies)",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tcopies := make(map[string]int)\n\t// TODO: Add first ISBN with 3 copies\n\t// TODO: Add second ISBN with 5 copies on the next line\n\t// TODO: Then print the map\n}",
     "expectedOutput": [],
     "codeChecks": [
-      { "pattern": "make\\\\(map\\\\[string\\\\]int\\\\)", "required": true, "message": "Keep the make(map[string]int) declaration." },
-      { "pattern": "copies\\\\[\\\"978-0-14-044913-6\\\"\\\\]\\\\s*=\\\\s*3", "required": true, "message": "Add The Odyssey: copies[\\\"978-0-14-044913-6\\\"] = 3" },
-      { "pattern": "copies\\\\[\\\"978-0-06-112008-4\\\"\\\\]\\\\s*=\\\\s*5", "required": true, "message": "Add Mockingbird: copies[\\\"978-0-06-112008-4\\\"] = 5" },
-      { "pattern": "Println\\\\(copies\\\\)", "required": true, "message": "Print the map: fmt.Println(copies)" },
+      { "pattern": "make\\(map\\[string\\]int\\)", "required": true, "message": "Keep the make(map[string]int) declaration." },
+      { "pattern": "copies\\[\"978-0-14-044913-6\"\\]\\s*=\\s*3", "required": true, "message": "Add The Odyssey: copies[\"978-0-14-044913-6\"] = 3" },
+      { "pattern": "copies\\[\"978-0-06-112008-4\"\\]\\s*=\\s*5", "required": true, "message": "Add Mockingbird: copies[\"978-0-06-112008-4\"] = 5" },
+      { "pattern": "Println\\(copies\\)", "required": true, "message": "Print the map: fmt.Println(copies)" },
       { "pattern": "TODO", "required": false, "message": "Replace the TODO lines with your code." }
     ],
     "successMessage": "make(map[keyType]valueType) — empty catalog, ready to fill. Same make you used for slices."
   },
   {
     "title": "Declare with values",
-    "instruction": "When you already have the catalog data, declare and fill in one shot.\\n\\n```\\ncopies := map[string]int{\\n    \\\"978-0-14-044913-6\\\": 3,\\n    \\\"978-0-06-112008-4\\\": 5,\\n}\\n```\\n\\nNote the comma after the last value — Go requires it when each entry is on its own line.\\n\\nAdd two more ISBNs with copy counts to the map literal and print it.",
+    "instruction": "When you already have the catalog data, declare and fill in one shot.\n\n```\ncopies := map[string]int{\n    \"978-0-14-044913-6\": 3,\n    \"978-0-06-112008-4\": 5,\n}\n```\n\nNote the comma after the last value — Go requires it when each entry is on its own line.\n\nAdd two more ISBNs with copy counts to the map literal and print it.",
     "hint": "Add two more entries inside the curly braces, each on its own line with a comma at the end.",
-    "starter": "package main\\n\\nimport \\\"fmt\\\"\\n\\nfunc main() {\\n\\tcopies := map[string]int{\\n\\t\\t\\\"978-0-14-044913-6\\\": 3,\\n\\t\\t\\\"978-0-06-112008-4\\\": 5,\\n\\t\\t// TODO: Add The Hobbit and Frankenstein inside this map literal\\n\\t}\\n\\tfmt.Println(copies)\\n}\",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tcopies := map[string]int{\n\t\t\"978-0-14-044913-6\": 3,\n\t\t\"978-0-06-112008-4\": 5,\n\t\t// TODO: Add The Hobbit and Frankenstein inside this map literal\n\t}\n\tfmt.Println(copies)\n}",
     "expectedOutput": [],
     "codeChecks": [
-      { "pattern": "\\\"978-0-618-00221-3\\\"\\\\s*:\\\\s*\\\\d+", "required": true, "message": "Add The Hobbit: \\\"978-0-618-00221-3\\\": 2," },
-      { "pattern": "\\\"978-0-14-243718-1\\\"\\\\s*:\\\\s*\\\\d+", "required": true, "message": "Add Frankenstein: \\\"978-0-14-243718-1\\\": 1," },
+      { "pattern": "\"978-0-618-00221-3\"\\s*:\\s*\\d+", "required": true, "message": "Add The Hobbit: \"978-0-618-00221-3\": 2," },
+      { "pattern": "\"978-0-14-243718-1\"\\s*:\\s*\\d+", "required": true, "message": "Add Frankenstein: \"978-0-14-243718-1\": 1," },
       { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your two entries." }
     ],
     "successMessage": "Map literal syntax. Key: value, — the comma at the end of each line is required in Go when closing brace is on its own line."
   },
   {
     "title": "Add and update a key",
-    "instruction": "Adding a new book and updating an existing book's copy count use the exact same syntax.\\n\\n`copies[\\\"978-0-452-28423-4\\\"] = 4` — if the ISBN does not exist, it is added. If it already exists, the value is replaced.\\n\\nGo does not distinguish between insert and update. It is always just assignment.\\n\\nAdd a new book, then update an existing book's copy count, then print the map.",
-    "hint": "copies[\\\"978-1-566-19005-5\\\"] = 6  then copies[\\\"978-0-14-044913-6\\\"] = 7  then fmt.Println(copies)",
-    "starter": "package main\\n\\nimport \\\"fmt\\\"\\n\\nfunc main() {\\n\\tcopies := map[string]int{\\n\\t\\t\\\"978-0-14-044913-6\\\": 3,\\n\\t\\t\\\"978-0-06-112008-4\\\": 5,\\n\\t}\\n\\tfmt.Println(copies)\\n\\t// TODO: Add new book ISBN 978-1-566-19005-5 with 6 copies\\n\\t// TODO: Then update The Odyssey (978-0-14-044913-6) to 7 copies\\n\\tfmt.Println(copies)\\n}\",
+    "instruction": "Adding a new book and updating an existing book's copy count use the exact same syntax.\n\n`copies[\"978-0-452-28423-4\"] = 4` — if the ISBN does not exist, it is added. If it already exists, the value is replaced.\n\nGo does not distinguish between insert and update. It is always just assignment.\n\nAdd a new book, then update an existing book's copy count, then print the map.",
+    "hint": "copies[\"978-1-566-19005-5\"] = 6  then copies[\"978-0-14-044913-6\"] = 7  then fmt.Println(copies)",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tcopies := map[string]int{\n\t\t\"978-0-14-044913-6\": 3,\n\t\t\"978-0-06-112008-4\": 5,\n\t}\n\tfmt.Println(copies)\n\t// TODO: Add new book ISBN 978-1-566-19005-5 with 6 copies\n\t// TODO: Then update The Odyssey (978-0-14-044913-6) to 7 copies\n\tfmt.Println(copies)\n}",
     "expectedOutput": [],
     "codeChecks": [
-      { "pattern": "copies\\\\[\\\"978-1-566-19005-5\\\"\\\\]\\\\s*=\\\\s*6", "required": true, "message": "Add new book: copies[\\\"978-1-566-19005-5\\\"] = 6" },
-      { "pattern": "copies\\\\[\\\"978-0-14-044913-6\\\"\\\\]\\\\s*=\\\\s*7", "required": true, "message": "Update Odyssey: copies[\\\"978-0-14-044913-6\\\"] = 7" },
+      { "pattern": "copies\\[\"978-1-566-19005-5\"\\]\\s*=\\s*6", "required": true, "message": "Add new book: copies[\"978-1-566-19005-5\"] = 6" },
+      { "pattern": "copies\\[\"978-0-14-044913-6\"\\]\\s*=\\s*7", "required": true, "message": "Update Odyssey: copies[\"978-0-14-044913-6\"] = 7" },
       { "pattern": "TODO", "required": false, "message": "Replace the TODO lines with your code." }
     ],
     "successMessage": "Same line adds and updates. If the ISBN exists, the count changes. If not, the entry is created. One syntax, two behaviours."
   },
   {
     "title": "Read a value",
-    "instruction": "Reading from a map returns the value — or the zero value if the key does not exist.\\n\\nFor `map[string]int`, a missing key returns `0`. For `map[string]string`, it returns `\\\"\\\"`.\\n\\nNo error. No crash. Just silently zero.\\n\\nRun this. Notice what prints for an ISBN that does not exist in the catalog.",
-    "starter": "package main\\n\\nimport \\\"fmt\\\"\\n\\nfunc main() {\\n\\tcopies := map[string]int{\\n\\t\\t\\\"978-0-14-044913-6\\\": 3,\\n\\t\\t\\\"978-0-06-112008-4\\\": 5,\\n\\t}\\n\\tfmt.Println(copies[\\\"978-0-14-044913-6\\\"])\\n\\tfmt.Println(copies[\\\"978-0-06-112008-4\\\"])\\n\\tfmt.Println(copies[\\\"978-0-99999999-9\\\"])\\n}\",
+    "instruction": "Reading from a map returns the value — or the zero value if the key does not exist.\n\nFor `map[string]int`, a missing key returns `0`. For `map[string]string`, it returns `\"\"`.\n\nNo error. No crash. Just silently zero.\n\nRun this. Notice what prints for an ISBN that does not exist in the catalog.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tcopies := map[string]int{\n\t\t\"978-0-14-044913-6\": 3,\n\t\t\"978-0-06-112008-4\": 5,\n\t}\n\tfmt.Println(copies[\"978-0-14-044913-6\"])\n\tfmt.Println(copies[\"978-0-06-112008-4\"])\n\tfmt.Println(copies[\"978-0-99999999-9\"])\n}",
     "expectedOutput": ["3", "5", "0"],
     "successMessage": "That unknown ISBN is not in the catalog — Go returned 0 instead of crashing. That is convenient but also dangerous: you cannot tell if the ISBN was missing or if the real count happened to be 0. That is what the next step fixes."
   },
   {
     "title": "Check if a key exists",
-    "instruction": "The two-value assignment solves the ambiguity from the last step.\\n\\n`count, ok := copies[\\\"978-0-99999999-9\\\"]`\\n\\n- `count` is the value (zero if key missing)\\n- `ok` is `true` if the ISBN exists, `false` if not\\n\\nThis is called the ok idiom. You will see it constantly in Go.\\n\\nAdd a check for an ISBN that exists and one that does not.",
-    "hint": "count, ok := copies[\\\"978-0-14-044913-6\\\"]  then fmt.Println(count, ok). Repeat for a missing ISBN.",
-    "starter": "package main\\n\\nimport \\\"fmt\\\"\\n\\nfunc main() {\\n\\tcopies := map[string]int{\\n\\t\\t\\\"978-0-14-044913-6\\\": 3,\\n\\t\\t\\\"978-0-06-112008-4\\\": 5,\\n\\t}\\n\\t// TODO: Check if The Odyssey ISBN exists, then print count and ok\\n\\t// TODO: On the next lines, do the same for a made-up ISBN\\n}\",
+    "instruction": "The two-value assignment solves the ambiguity from the last step.\n\n`count, ok := copies[\"978-0-99999999-9\"]`\n\n- `count` is the value (zero if key missing)\n- `ok` is `true` if the ISBN exists, `false` if not\n\nThis is called the ok idiom. You will see it constantly in Go.\n\nAdd a check for an ISBN that exists and one that does not.",
+    "hint": "count, ok := copies[\"978-0-14-044913-6\"]  then fmt.Println(count, ok). Repeat for a missing ISBN.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tcopies := map[string]int{\n\t\t\"978-0-14-044913-6\": 3,\n\t\t\"978-0-06-112008-4\": 5,\n\t}\n\t// TODO: Check if The Odyssey ISBN exists, then print count and ok\n\t// TODO: On the next lines, do the same for a made-up ISBN\n}",
     "expectedOutput": ["3 true", "0 false"],
     "codeChecks": [
-      { "pattern": "count\\\\s*,\\\\s*ok\\\\s*:=\\\\s*copies\\\\[\\\"978-0-14-044913-6\\\"\\\\]", "required": true, "message": "Use the two-value form: count, ok := copies[\\\"978-0-14-044913-6\\\"]" },
-      { "pattern": "copies\\\\[\\\"978-0-99999999-9\\\"\\\\]", "required": true, "message": "Also check for a missing ISBN: copies[\\\"978-0-99999999-9\\\"]" },
+      { "pattern": "count\\s*,\\s*ok\\s*:=\\s*copies\\[\"978-0-14-044913-6\"\\]", "required": true, "message": "Use the two-value form: count, ok := copies[\"978-0-14-044913-6\"]" },
+      { "pattern": "copies\\[\"978-0-99999999-9\"\\]", "required": true, "message": "Also check for a missing ISBN: copies[\"978-0-99999999-9\"]" },
       { "pattern": "TODO", "required": false, "message": "Replace the TODO lines with your code." }
     ],
     "successMessage": "count, ok — the ok idiom. It is Go's standard pattern for safe lookups. You will use this for maps, type assertions, channel reads, and more."
   },
   {
     "title": "Delete a key",
-    "instruction": "`delete(map, key)` removes a key-value pair entirely.\\n\\nIf the ISBN does not exist, nothing happens — no error.\\n\\nDelete two books from the catalog and print the result.",
-    "hint": "delete(copies, \\\"978-0-06-112008-4\\\")  then delete(copies, \\\"978-0-452-28423-4\\\")  then fmt.Println(copies)",
-    "starter": "package main\\n\\nimport \\\"fmt\\\"\\n\\nfunc main() {\\n\\tcopies := map[string]int{\\n\\t\\t\\\"978-0-14-044913-6\\\": 3,\\n\\t\\t\\\"978-0-06-112008-4\\\": 5,\\n\\t\\t\\\"978-0-452-28423-4\\\": 2,\\n\\t\\t\\\"978-0-618-00221-3\\\": 4,\\n\\t}\\n\\tfmt.Println(copies)\\n\\t// TODO: Delete Mockingbird and 1984 before the final print\\n\\tfmt.Println(copies)\\n}\",
+    "instruction": "`delete(map, key)` removes a key-value pair entirely.\n\nIf the ISBN does not exist, nothing happens — no error.\n\nDelete two books from the catalog and print the result.",
+    "hint": "delete(copies, \"978-0-06-112008-4\")  then delete(copies, \"978-0-452-28423-4\")  then fmt.Println(copies)",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tcopies := map[string]int{\n\t\t\"978-0-14-044913-6\": 3,\n\t\t\"978-0-06-112008-4\": 5,\n\t\t\"978-0-452-28423-4\": 2,\n\t\t\"978-0-618-00221-3\": 4,\n\t}\n\tfmt.Println(copies)\n\t// TODO: Delete Mockingbird and 1984 before the final print\n\tfmt.Println(copies)\n}",
     "expectedOutput": [],
     "codeChecks": [
-      { "pattern": "delete\\\\(copies,\\\\s*\\\"978-0-06-112008-4\\\"\\\\)", "required": true, "message": "Delete Mockingbird: delete(copies, \\\"978-0-06-112008-4\\\")" },
-      { "pattern": "delete\\\\(copies,\\\\s*\\\"978-0-452-28423-4\\\"\\\\)", "required": true, "message": "Delete 1984: delete(copies, \\\"978-0-452-28423-4\\\")" },
+      { "pattern": "delete\\(copies,\\s*\"978-0-06-112008-4\"\\)", "required": true, "message": "Delete Mockingbird: delete(copies, \"978-0-06-112008-4\")" },
+      { "pattern": "delete\\(copies,\\s*\"978-0-452-28423-4\"\\)", "required": true, "message": "Delete 1984: delete(copies, \"978-0-452-28423-4\")" },
       { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your delete calls." }
     ],
     "successMessage": "delete() takes the map and the key. Two books removed. The remaining two are unaffected."
   },
   {
     "title": "len on a map",
-    "instruction": "`len(map)` returns how many key-value pairs are in the map.\\n\\nAdd two books, delete one, and print the length after each operation.",
+    "instruction": "`len(map)` returns how many key-value pairs are in the map.\n\nAdd two books, delete one, and print the length after each operation.",
     "hint": "fmt.Println(len(catalog))  after each change.",
-    "starter": "package main\\n\\nimport \\\"fmt\\\"\\n\\nfunc main() {\\n\\tcatalog := map[string]int{\\n\\t\\t\\\"978-0-14-044913-6\\\": 3,\\n\\t\\t\\\"978-0-06-112008-4\\\": 5,\\n\\t}\\n\\tfmt.Println(len(catalog))\\n\\t// TODO: Add \\\"978-0-618-00221-3\\\": 8, then print the new length\\n\\t// TODO: Delete \\\"978-0-06-112008-4\\\", then print the length again\\n}\",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tcatalog := map[string]int{\n\t\t\"978-0-14-044913-6\": 3,\n\t\t\"978-0-06-112008-4\": 5,\n\t}\n\tfmt.Println(len(catalog))\n\t// TODO: Add \"978-0-618-00221-3\": 8, then print the new length\n\t// TODO: Delete \"978-0-06-112008-4\", then print the length again\n}",
     "expectedOutput": ["2", "3", "2"],
     "codeChecks": [
-      { "pattern": "catalog\\\\[\\\"978-0-618-00221-3\\\"\\\\]\\\\s*=\\\\s*8", "required": true, "message": "Add Hobbit: catalog[\\\"978-0-618-00221-3\\\"] = 8" },
-      { "pattern": "delete\\\\(catalog,\\\\s*\\\"978-0-06-112008-4\\\"\\\\)", "required": true, "message": "Delete Mockingbird: delete(catalog, \\\"978-0-06-112008-4\\\")" },
+      { "pattern": "catalog\\[\"978-0-618-00221-3\"\\]\\s*=\\s*8", "required": true, "message": "Add Hobbit: catalog[\"978-0-618-00221-3\"] = 8" },
+      { "pattern": "delete\\(catalog,\\s*\"978-0-06-112008-4\"\\)", "required": true, "message": "Delete Mockingbird: delete(catalog, \"978-0-06-112008-4\")" },
       { "pattern": "TODO", "required": false, "message": "Replace the TODO lines with your code." }
     ],
     "successMessage": "len works on maps just like slices. It tells you how many books are currently in the catalog."
   },
   {
     "title": "Loop over a map",
-    "instruction": "`for isbn, count := range myMap` iterates over every key-value pair.\\n\\nImportant: maps are unordered. Every time you loop, the books may come out in a different order. Go does this intentionally — do not rely on the order.\\n\\nLoop through the catalog and print each entry as `\\\"ISBN: count\\\"`.",
-    "hint": "for isbn, count := range catalog { fmt.Printf(\\\"%s: %d\\\\n\\\", isbn, count) }",
-    "starter": "package main\\n\\nimport \\\"fmt\\\"\\n\\nfunc main() {\\n\\tcatalog := map[string]int{\\n\\t\\t\\\"978-0-14-044913-6\\\": 3,\\n\\t\\t\\\"978-0-06-112008-4\\\": 5,\\n\\t\\t\\\"978-0-452-28423-4\\\": 2,\\n\\t}\\n\\t// TODO: Loop through the catalog and print each ISBN and its copy count\\n}\",
+    "instruction": "`for isbn, count := range myMap` iterates over every key-value pair.\n\nImportant: maps are unordered. Every time you loop, the books may come out in a different order. Go does this intentionally — do not rely on the order.\n\nLoop through the catalog and print each entry as `\"ISBN: count\"`.",
+    "hint": "for isbn, count := range catalog { fmt.Printf(\"%s: %d\\n\", isbn, count) }",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tcatalog := map[string]int{\n\t\t\"978-0-14-044913-6\": 3,\n\t\t\"978-0-06-112008-4\": 5,\n\t\t\"978-0-452-28423-4\": 2,\n\t}\n\t// TODO: Loop through the catalog and print each ISBN and its copy count\n}",
     "expectedOutput": [],
     "codeChecks": [
-      { "pattern": "range\\\\s+catalog", "required": true, "message": "Use range to loop: for isbn, count := range catalog" },
-      { "pattern": "Printf\\\\(\", "required": true, "message": "Use fmt.Printf to format the output." },
+      { "pattern": "range\\s+catalog", "required": true, "message": "Use range to loop: for isbn, count := range catalog" },
+      { "pattern": "Printf\\(\\\"", "required": true, "message": "Use fmt.Printf to format the output." },
       { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your loop." }
     ],
     "successMessage": "Looping works. But notice the output order may vary each run — maps have no guaranteed order. If you need sorted output, sort the keys first."
   },
   {
     "title": "Map with slice values",
-    "instruction": "A map's value can be any type — including a slice.\\n\\n`map[string][]string` maps a member ID to their list of checked-out books.\\n\\nThis is perfect for tracking who has borrowed which books.\\n\\nAdd a third member with two checked-out books, then loop and print all of them.",
-    "hint": "loans[\\\"M003\\\"] = []string{\\\"978-0-14-044913-6\\\", \\\"978-0-06-112008-4\\\"}  then loop and print.",
-    "starter": "package main\\n\\nimport \\\"fmt\\\"\\n\\nfunc main() {\\n\\tloans := map[string][]string{\\n\\t\\t\\\"M001\\\": {\\\"978-0-14-044913-6\\\", \\\"978-0-06-112008-4\\\", \\\"978-0-452-28423-4\\\"},\\n\\t\\t\\\"M002\\\": {\\\"978-0-618-00221-3\\\", \\\"978-0-14-243718-1\\\"},\\n\\t}\\n\\t// TODO: Add member M003 with two checked-out books before the loop below\\n\\tfor id, books := range loans {\\n\\t\\tfmt.Println(id, \\\":\\\", books)\\n\\t}\\n}\",
+    "instruction": "A map's value can be any type — including a slice.\n\n`map[string][]string` maps a member ID to their list of checked-out books.\n\nThis is perfect for tracking who has borrowed which books.\n\nAdd a third member with two checked-out books, then loop and print all of them.",
+    "hint": "loans[\"M003\"] = []string{\"978-0-14-044913-6\", \"978-0-06-112008-4\"}  then loop and print.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tloans := map[string][]string{\n\t\t\"M001\": {\"978-0-14-044913-6\", \"978-0-06-112008-4\", \"978-0-452-28423-4\"},\n\t\t\"M002\": {\"978-0-618-00221-3\", \"978-0-14-243718-1\"},\n\t}\n\t// TODO: Add member M003 with two checked-out books before the loop below\n\tfor id, books := range loans {\n\t\tfmt.Println(id, \":\", books)\n\t}\n}",
     "expectedOutput": [],
     "codeChecks": [
-      { "pattern": "loans\\\\[\\\"M003\\\"\\\\]\\\\s*=\\\\s*\\\\[\\\\]string\\\\{", "required": true, "message": "Add member: loans[\\\"M003\\\"] = []string{\\\"...\\\", \\\"...\\\"}" },
+      { "pattern": "loans\\[\"M003\"\\]\\s*=\\s*\\[\\]string\\{", "required": true, "message": "Add member: loans[\"M003\"] = []string{\"...\", \"...\"}" },
       { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your assignment." }
     ],
     "successMessage": "map[string][]string — a map where each value is a slice. One member ID, many borrowed books. You will see this pattern a lot."
   },
   {
     "title": "Nested maps",
-    "instruction": "A map can also hold other maps.\\n\\n`map[string]map[string]int` — library branch name maps to ISBN maps to available copies.\\n\\nUseful for hierarchical data: branch → ISBN → count.\\n\\nAdd a third branch with two ISBNs and their available counts, then print the count of one specific book at that branch.",
-    "hint": "branchCopies[\\\"South\\\"] = map[string]int{\\\"978-0-14-044913-6\\\": 4, \\\"978-0-06-112008-4\\\": 2}  then fmt.Println(branchCopies[\\\"South\\\"][\\\"978-0-14-044913-6\\\"])",
-    "starter": "package main\\n\\nimport \\\"fmt\\\"\\n\\nfunc main() {\\n\\tbranchCopies := map[string]map[string]int{\\n\\t\\t\\\"Downtown\\\": {\\\"978-0-14-044913-6\\\": 3, \\\"978-0-06-112008-4\\\": 5},\\n\\t\\t\\\"Westside\\\": {\\\"978-0-618-00221-3\\\": 2, \\\"978-0-452-28423-4\\\": 1},\\n\\t}\\n\\t// TODO: Add South branch with 4 copies of The Odyssey and 2 of Mockingbird\\n\\t// TODO: Then print the count of The Odyssey at the South branch\\n}\",
+    "instruction": "A map can also hold other maps.\n\n`map[string]map[string]int` — library branch name maps to ISBN maps to available copies.\n\nUseful for hierarchical data: branch → ISBN → count.\n\nAdd a third branch with two ISBNs and their available counts, then print the count of one specific book at that branch.",
+    "hint": "branchCopies[\"South\"] = map[string]int{\"978-0-14-044913-6\": 4, \"978-0-06-112008-4\": 2}  then fmt.Println(branchCopies[\"South\"][\"978-0-14-044913-6\"])",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tbranchCopies := map[string]map[string]int{\n\t\t\"Downtown\": {\"978-0-14-044913-6\": 3, \"978-0-06-112008-4\": 5},\n\t\t\"Westside\": {\"978-0-618-00221-3\": 2, \"978-0-452-28423-4\": 1},\n\t}\n\t// TODO: Add South branch with 4 copies of The Odyssey and 2 of Mockingbird\n\t// TODO: Then print the count of The Odyssey at the South branch\n}",
     "expectedOutput": [],
     "codeChecks": [
-      { "pattern": "branchCopies\\\\[\\\"South\\\"\\\\]\\\\s*=\\\\s*map\\\\[string\\\\]int\\\\{", "required": true, "message": "Add South branch: branchCopies[\\\"South\\\"] = map[string]int{\\\"ISBN\\\": number, ...}" },
-      { "pattern": "branchCopies\\\\[\\\"South\\\"\\\\]\\\\[\\\"978-0-14-044913-6\\\"\\\\]", "required": true, "message": "Access The Odyssey at South: branchCopies[\\\"South\\\"][\\\"978-0-14-044913-6\\\"]" },
+      { "pattern": "branchCopies\\[\"South\"\\]\\s*=\\s*map\\[string\\]int\\{", "required": true, "message": "Add South branch: branchCopies[\"South\"] = map[string]int{\"ISBN\": number, ...}" },
+      { "pattern": "branchCopies\\[\"South\"\\]\\[\"978-0-14-044913-6\"\\]", "required": true, "message": "Access The Odyssey at South: branchCopies[\"South\"][\"978-0-14-044913-6\"]" },
       { "pattern": "TODO", "required": false, "message": "Replace the TODO lines with your code." }
     ],
     "successMessage": "Nested maps. Access with double brackets: map[branch][isbn]. Useful for any hierarchical data like branch inventories."
   },
   {
     "title": "Build a genre counter",
-    "instruction": "Classic map use case: count how many books belong to each genre.\\n\\nLoop through the genres slice. For each genre, add 1 to its count in the map. If the genre is not in the map yet, Go returns 0 — so `genreCounts[genre] += 1` works perfectly on the first hit too.\\n\\nAdd the counting loop, then print the map.",
+    "instruction": "Classic map use case: count how many books belong to each genre.\n\nLoop through the genres slice. For each genre, add 1 to its count in the map. If the genre is not in the map yet, Go returns 0 — so `genreCounts[genre] += 1` works perfectly on the first hit too.\n\nAdd the counting loop, then print the map.",
     "hint": "for _, genre := range genres { genreCounts[genre]++ }  then fmt.Println(genreCounts)",
-    "starter": "package main\\n\\nimport \\\"fmt\\\"\\n\\nfunc main() {\\n\\tgenres := []string{\\\"fiction\\\", \\\"non-fiction\\\", \\\"fiction\\\", \\\"science\\\", \\\"fiction\\\", \\\"history\\\", \\\"science\\\"}\\n\\tgenreCounts := make(map[string]int)\\n\\t// TODO: Loop through genres and count each one\\n\\t// TODO: After the loop, print genreCounts\\n}\",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tgenres := []string{\"fiction\", \"non-fiction\", \"fiction\", \"science\", \"fiction\", \"history\", \"science\"}\n\tgenreCounts := make(map[string]int)\n\t// TODO: Loop through genres and count each one\n\t// TODO: After the loop, print genreCounts\n}",
     "expectedOutput": [],
     "codeChecks": [
-      { "pattern": "genreCounts\\\\[genre\\\\]\\\\+\\\\+|genreCounts\\\\[genre\\\\]\\\\s*\\\\+=\\\\s*1|genreCounts\\\\[genre\\\\]\\\\s*=\\\\s*genreCounts\\\\[genre\\\\]\\\\s*\\\\+\\\\s*1", "required": true, "message": "Increment the count for each genre: genreCounts[genre]++" },
-      { "pattern": "range\\\\s+genres", "required": true, "message": "Loop through the genres slice: for _, genre := range genres" },
-      { "pattern": "Println\\\\(genreCounts\\\\)", "required": true, "message": "Print genreCounts: fmt.Println(genreCounts)" },
+      { "pattern": "genreCounts\\[genre\\]\\+\\+|genreCounts\\[genre\\]\\s*\\+=\\s*1|genreCounts\\[genre\\]\\s*=\\s*genreCounts\\[genre\\]\\s*\\+\\s*1", "required": true, "message": "Increment the count for each genre: genreCounts[genre]++" },
+      { "pattern": "range\\s+genres", "required": true, "message": "Loop through the genres slice: for _, genre := range genres" },
+      { "pattern": "Println\\(genreCounts\\)", "required": true, "message": "Print genreCounts: fmt.Println(genreCounts)" },
       { "pattern": "TODO", "required": false, "message": "Replace the TODO lines with your code." }
     ],
     "successMessage": "Genre counter done. This exact pattern powers library analytics, collection management dashboards, and circulation reports. Maps make it trivial."
