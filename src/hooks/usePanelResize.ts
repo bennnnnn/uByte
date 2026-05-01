@@ -14,7 +14,7 @@ export interface PanelResizeState {
 }
 
 export function usePanelResize(): PanelResizeState {
-  const [leftWidth, setLeftWidth] = useState(320);
+  const [leftWidth, setLeftWidth] = useState(380);
   const [outputHeight, setOutputHeight] = useState(240);
   const [isDragging, setIsDragging] = useState<false | "h" | "v">(false);
 
