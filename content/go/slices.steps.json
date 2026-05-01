@@ -1,191 +1,107 @@
 [
   {
-    "title": "The problem with arrays",
-    "instruction": "Arrays are great when you know the size upfront. But what if you do not?\n\nYou are building a library catalog. You have no idea how many books the library will acquire. You cannot write `[5]string` when it might be 2 books or 50.\n\nThis is exactly the problem slices solve. Run this and see what happens when you try to add a 4th book to a 3-slot array.",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tbooks := [3]string{\"Dune\", \"1984\", \"Moby Dick\"}\n\tbooks[3] = \"Neuromancer\"\n\tfmt.Println(books)\n}",
-    "expectedOutput": ["Dune", "1984", "Moby Dick", "Neuromancer"],
-    "codeChecks": [
-      { "pattern": "\\\\[3\\\\]string", "required": false, "message": "Change [3]string to []string to make it a slice instead of an array." }
-    ],
-    "successMessage": "Index out of range. The array refused. A slice would have handled that without complaint. That is why slices exist."
-  },
-  {
     "title": "Declare an empty slice",
-    "instruction": "A slice looks almost identical to an array — but with no number in the brackets.\n\n`var books []string` — empty slice, ready to receive titles.\n\nAn empty slice is not nil. It is just... empty. Length zero, waiting.\n\nRun this and see what an empty slice looks like when printed.",
+    "instruction": "A slice is like an array but with no fixed size — the brackets are empty. Run this to see an empty slice ready to receive books.",
     "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tvar books []string\n\tvar pages []int\n\tfmt.Println(books)\n\tfmt.Println(pages)\n\tfmt.Println(len(books))\n\tfmt.Println(len(pages))\n}",
     "expectedOutput": ["[]", "[]", "0", "0"],
-    "successMessage": "Empty slices print as []. Length is 0. No panic, no error — just ready and waiting."
-  },
-  {
-    "title": "make() — create a slice with a known size",
-    "instruction": "When you know how many shelves you need upfront, use `make`.\n\n`make([]int, 5)` creates a slice of 5 integers, all set to zero.\n\nThis is more efficient than starting empty and appending one by one.\n\n`make([]string, 3)` creates 3 empty string slots.\n\nRun this. Then add a line that creates a `shelves` slice of 4 ints using make and prints it.",
-    "hint": "shelves := make([]int, 4)  then fmt.Println(shelves)",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tbooks := make([]string, 3)\n\tfmt.Println(books)\n\tfmt.Println(len(books))\n\t// TODO: create a shelves slice of 4 ints using make\n\t// TODO: print shelves\n}",
-    "expectedOutput": ["[ ]", "3", "[0 0 0 0]"],
-    "codeChecks": [
-      { "pattern": "make\\\\(\\\\[\\\\]int,\\\\s*4\\\\)", "required": true, "message": "Create a shelves slice: shelves := make([]int, 4)" },
-      { "pattern": "Println\\\\(shelves\\\\)", "required": true, "message": "Print shelves: fmt.Println(shelves)" },
-      { "pattern": "TODO", "required": false, "message": "Replace the TODO lines with your code." }
-    ],
-    "successMessage": "make creates a slice with a set size, all values at their zero. Use it when you know the size. Use var when you do not."
+    "successMessage": "Empty slices print as []. Length is 0. No panic, just ready and waiting.",
+    "carryForward": true
   },
   {
     "title": "Declare with values",
-    "instruction": "When you already have the titles, declare and fill in one shot.\n\n`books := []string{\"Dune\", \"1984\", \"Moby Dick\"}`\n\nNo size number needed — Go counts the values and sets the length automatically.\n\nCreate a `authors` slice with 4 author names and print it.",
-    "hint": "authors := []string{\"Herbert\", \"Orwell\", \"Melville\", \"Gibson\"}  then fmt.Println(authors)",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tbooks := []string{\"Dune\", \"1984\", \"Moby Dick\"}\n\tfmt.Println(books)\n\t// TODO: create a authors slice with 4 author names\n\t// TODO: print authors\n}",
+    "instruction": "`books := []string{\"Dune\", \"1984\", \"Moby Dick\"}` — no size number needed. Go counts for you. Create an `authors` slice with 4 names and print it.",
+    "hint": "authors := []string{\"Herbert\", \"Orwell\", \"Melville\", \"Gibson\"} then fmt.Println(authors)",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tbooks := []string{\"Dune\", \"1984\", \"Moby Dick\"}\n\tfmt.Println(books)\n\t// TODO: create an authors slice with 4 author names\n\t// TODO: print authors\n}",
     "expectedOutput": [],
     "codeChecks": [
-      { "pattern": "authors\\\\s*:=\\\\s*\\\\[\\\\]string\\\\{", "required": true, "message": "Create an authors slice: authors := []string{\"...\", ...}" },
-      { "pattern": "Println\\\\(authors\\\\)", "required": true, "message": "Print it: fmt.Println(authors)" },
+      { "pattern": "authors\\s*:=\\s*\\[\\]string\\{", "required": true, "message": "Create an authors slice: authors := []string{...}" },
+      { "pattern": "Println\\(authors\\)", "required": true, "message": "Print it: fmt.Println(authors)" },
       { "pattern": "TODO", "required": false, "message": "Replace the TODO lines with your code." }
     ],
     "successMessage": "[]type{values} — no size needed. Go counts for you."
   },
   {
     "title": "append — add to the end",
-    "instruction": "This is the most important slice operation.\n\n`append(slice, newValue)` returns a new slice with the value added.\n\nCritical rule: you must reassign the result back to the variable.\n\n`books = append(books, \"Neuromancer\")` ✓\n`append(books, \"Neuromancer\")` ✗ — the original is unchanged\n\nAdd three more books to the library using append, one at a time. Print after each.",
-    "hint": "books = append(books, \"Neuromancer\")  then fmt.Println(books). Repeat for two more.",
+    "instruction": "`books = append(books, \"Neuromancer\")` adds a book. Critical: you must reassign the result. Append three books one at a time, printing after each.",
+    "hint": "books = append(books, \"Neuromancer\") then fmt.Println(books). Repeat.",
     "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tbooks := []string{\"Dune\", \"1984\", \"Moby Dick\"}\n\tfmt.Println(books)\n\t// TODO: append \"Neuromancer\", print\n\t// TODO: append \"Fahrenheit 451\", print\n\t// TODO: append \"Brave New World\", print\n}",
     "expectedOutput": ["[Dune 1984 Moby Dick Neuromancer]", "[Dune 1984 Moby Dick Neuromancer Fahrenheit 451]", "[Dune 1984 Moby Dick Neuromancer Fahrenheit 451 Brave New World]"],
     "codeChecks": [
-      { "pattern": "books\\\\s*=\\\\s*append\\\\(books,\\\\s*\\\"Neuromancer\\\"\\\\)", "required": true, "message": "Append Neuromancer: books = append(books, \"Neuromancer\")" },
-      { "pattern": "books\\\\s*=\\\\s*append\\\\(books,\\\\s*\\\"Fahrenheit 451\\\"\\\\)", "required": true, "message": "Append Fahrenheit 451: books = append(books, \"Fahrenheit 451\")" },
-      { "pattern": "books\\\\s*=\\\\s*append\\\\(books,\\\\s*\\\"Brave New World\\\"\\\\)", "required": true, "message": "Append Brave New World: books = append(books, \"Brave New World\")" },
+      { "pattern": "books\\s*=\\s*append\\(books,\\s*\"Neuromancer\"\\)", "required": true, "message": "Append Neuromancer: books = append(books, \"Neuromancer\")" },
+      { "pattern": "books\\s*=\\s*append\\(books,\\s*\"Fahrenheit 451\"\\)", "required": true, "message": "Append Fahrenheit 451: books = append(books, \"Fahrenheit 451\")" },
+      { "pattern": "books\\s*=\\s*append\\(books,\\s*\"Brave New World\"\\)", "required": true, "message": "Append Brave New World: books = append(books, \"Brave New World\")" },
       { "pattern": "TODO", "required": false, "message": "Replace the TODO lines with your append calls." }
     ],
-    "successMessage": "append returns a new slice — always reassign. That is the one rule beginners forget."
+    "successMessage": "append returns a new slice — always reassign. That's the one rule beginners forget."
   },
   {
-    "title": "len and cap",
-    "instruction": "Every slice has two numbers:\n\n- `len(s)` — how many books are currently in the slice\n- `cap(s)` — how much shelf space Go has reserved in memory\n\nWhen you append and the slice runs out of capacity, Go automatically doubles the reserved space. You never manage this yourself — but understanding it explains why cap is sometimes bigger than len.\n\nRun this and watch len and cap change as you add books.",
+    "title": "len and cap 🤯",
+    "instruction": "Every slice has a length (`len`) and a capacity (`cap`). When you append and run out of space, Go doubles the capacity. Run this to watch them change.",
     "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tbooks := []string{}\n\tfmt.Printf(\"len=%d cap=%d\\n\", len(books), cap(books))\n\tbooks = append(books, \"Dune\")\n\tfmt.Printf(\"len=%d cap=%d\\n\", len(books), cap(books))\n\tbooks = append(books, \"1984\")\n\tfmt.Printf(\"len=%d cap=%d\\n\", len(books), cap(books))\n\tbooks = append(books, \"Moby Dick\")\n\tfmt.Printf(\"len=%d cap=%d\\n\", len(books), cap(books))\n\tbooks = append(books, \"Neuromancer\")\n\tfmt.Printf(\"len=%d cap=%d\\n\", len(books), cap(books))\n\tbooks = append(books, \"Fahrenheit 451\")\n\tfmt.Printf(\"len=%d cap=%d\\n\", len(books), cap(books))\n}",
     "expectedOutput": ["len=0 cap=0", "len=1 cap=1", "len=2 cap=2", "len=3 cap=4", "len=4 cap=4", "len=5 cap=8"],
-    "successMessage": "When the slice fills up, Go doubles the capacity. len is what you have. cap is what Go reserved. You use len — Go manages cap."
+    "successMessage": "When the slice fills up, Go doubles the capacity. len is what you have. cap is what Go reserved."
   },
   {
     "title": "Access and update by index",
-    "instruction": "Slices use the same index syntax as arrays. Zero-indexed. Read with `s[i]`. Write with `s[i] = value`.\n\nA patron returned a damaged book. Replace the book at index 2 with a new copy. Change it to `\"The Great Gatsby\"`, then print the whole collection.",
-    "hint": "books[2] = \"The Great Gatsby\"  then fmt.Println(books)",
+    "instruction": "Slices use the same zero-indexed syntax as arrays. A patron returned a damaged book — replace the book at index 2 with \"The Great Gatsby\".",
+    "hint": "books[2] = \"The Great Gatsby\" then fmt.Println(books)",
     "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tbooks := []string{\"Dune\", \"1984\", \"Moby Dick\", \"Neuromancer\"}\n\tfmt.Println(books)\n\t// TODO: change books[2] to \"The Great Gatsby\"\n\tfmt.Println(books)\n}",
     "expectedOutput": ["[Dune 1984 Moby Dick Neuromancer]", "[Dune 1984 The Great Gatsby Neuromancer]"],
     "codeChecks": [
-      { "pattern": "books\\\\[2\\\\]\\\\s*=\\\\s*\\\"The Great Gatsby\\\"", "required": true, "message": "Update index 2: books[2] = \"The Great Gatsby\"" },
+      { "pattern": "books\\[2\\]\\s*=\\s*\"The Great Gatsby\"", "required": true, "message": "Update index 2: books[2] = \"The Great Gatsby\"" },
       { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your assignment." }
     ],
-    "successMessage": "Reading and writing by index works exactly the same as arrays. The flexible part is the size — the access syntax is identical."
+    "successMessage": "Reading and writing by index works exactly like arrays. The flexible part is the size."
   },
   {
     "title": "Loop with range",
-    "instruction": "Looping over a slice works exactly like looping over an array.\n\n`for i, v := range books` gives you the index and value.\n`for _, v := range books` gives you just the value.\n\nLoop through the books and print each one formatted as `\"Book 1: Dune\"` (use the index + 1 as the number).",
+    "instruction": "`for i, v := range books` gives you index and value. Loop through and print each as `\"Book 1: Dune\"`, `\"Book 2: 1984\"`, etc.",
     "hint": "for i, v := range books { fmt.Printf(\"Book %d: %s\\n\", i+1, v) }",
     "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tbooks := []string{\"Dune\", \"1984\", \"Moby Dick\", \"Neuromancer\", \"Fahrenheit 451\"}\n\t// TODO: loop and print \"Book 1: Dune\", \"Book 2: 1984\" etc.\n}",
     "expectedOutput": ["Book 1: Dune", "Book 2: 1984", "Book 3: Moby Dick", "Book 4: Neuromancer", "Book 5: Fahrenheit 451"],
     "codeChecks": [
-      { "pattern": "range\\\\s+books", "required": true, "message": "Use range to loop: for i, v := range books" },
-      { "pattern": "i\\\\s*\\\\+\\\\s*1", "required": true, "message": "Use i+1 so the number starts at 1 not 0." },
+      { "pattern": "range\\s+books", "required": true, "message": "Use range to loop: for i, v := range books" },
+      { "pattern": "i\\s*\\+\\s*1", "required": true, "message": "Use i+1 so the number starts at 1 not 0." },
       { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your loop." }
     ],
-    "successMessage": "Same range syntax as arrays. Slices and arrays are nearly identical to work with — slices just do not have a fixed size."
+    "successMessage": "Same range syntax as arrays. Slices just don't have a fixed size."
   },
   {
     "title": "Slicing a slice",
-    "instruction": "You can cut out a portion of a slice using `[low:high]` syntax.\n\n`books[1:3]` gives you books at index 1 and 2 — the high end is exclusive.\n`books[:2]` means from the start up to (not including) index 2.\n`books[2:]` means from index 2 to the end.\n\nRun this. Then add a line that prints just the middle three books.",
-    "hint": "fmt.Println(books[1:4])  — index 1, 2, and 3.",
+    "instruction": "`books[1:3]` gives you indexes 1 and 2 (high end is exclusive). Print just the middle three books from the collection.",
+    "hint": "fmt.Println(books[1:4]) — indexes 1, 2, and 3.",
     "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tbooks := []string{\"Dune\", \"1984\", \"Moby Dick\", \"Neuromancer\", \"Fahrenheit 451\"}\n\tfmt.Println(books[:2])\n\tfmt.Println(books[3:])\n\t// TODO: print just the middle three books (index 1, 2, 3)\n}",
     "expectedOutput": ["[Dune 1984]", "[Neuromancer Fahrenheit 451]", "[1984 Moby Dick Neuromancer]"],
     "codeChecks": [
-      { "pattern": "books\\\\[1:4\\\\]", "required": true, "message": "Print the middle three with books[1:4] — index 1, 2, and 3." },
+      { "pattern": "books\\[1:4\\]", "required": true, "message": "Print the middle three with books[1:4] — index 1, 2, and 3." },
       { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your slice expression." }
     ],
-    "successMessage": "Low is inclusive, high is exclusive. books[1:4] gives you indexes 1, 2, 3. That rule applies everywhere in Go."
+    "successMessage": "Low is inclusive, high is exclusive. That rule applies everywhere in Go."
   },
   {
-    "title": "copy() — the real duplicate",
-    "instruction": "Here is a trap that catches almost everyone.\n\n`b := a` does NOT copy a slice. Both `a` and `b` point to the same data. Change one, and you change both.\n\n`copy(dst, src)` creates a genuine separate copy.\n\nRun this and see the trap. Then fix it by replacing `b := a` with a proper copy so the original shelf stays unchanged.",
-    "hint": "b := make([]string, len(a))  then  copy(b, a)  — two lines replace the one assignment.",
+    "title": "copy() — the real duplicate 🤯",
+    "instruction": "Here's a trap: `b := a` does NOT copy a slice. Both point to the same data. Use `copy(dst, src)` for a genuine separate copy. Fix the code so changing b doesn't change a.",
+    "hint": "b := make([]string, len(a)) then copy(b, a) — two lines replace the one assignment.",
     "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\ta := []string{\"Dune\", \"1984\", \"Moby Dick\"}\n\tb := a\n\tb[0] = \"Neuromancer\"\n\tfmt.Println(\"a:\", a)\n\tfmt.Println(\"b:\", b)\n}",
     "expectedOutput": ["a: [Dune 1984 Moby Dick]", "b: [Neuromancer 1984 Moby Dick]"],
     "codeChecks": [
-      { "pattern": "make\\\\(\\\\[\\\\]string,\\\\s*len\\\\(a\\\\)\\\\)", "required": true, "message": "Create b with make: b := make([]string, len(a))" },
-      { "pattern": "copy\\\\(b,\\\\s*a\\\\)", "required": true, "message": "Copy a into b: copy(b, a)" }
+      { "pattern": "make\\(\\[\\]string,\\s*len\\(a\\)\\)", "required": true, "message": "Create b with make: b := make([]string, len(a))" },
+      { "pattern": "copy\\(b,\\s*a\\)", "required": true, "message": "Copy a into b: copy(b, a)" }
     ],
-    "successMessage": "b := a shares the data. copy() separates it. This is one of the most important things to understand about slices in Go."
+    "successMessage": "b := a shares the data. copy() separates it. This is one of the most important slice concepts in Go."
   },
   {
-    "title": "Remove an element",
-    "instruction": "Go has no built-in remove function for slices. You build it yourself.\n\nTo remove the book at index `i`, stitch the slice back together without it:\n\n`books = append(books[:i], books[i+1:]...)`\n\nThe `...` spreads the second slice as individual arguments to append.\n\nRemove the book at index 2 from the collection and print the result.",
-    "hint": "books = append(books[:2], books[3:]...)  — this removes index 2.",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tbooks := []string{\"Dune\", \"1984\", \"Moby Dick\", \"Neuromancer\", \"Fahrenheit 451\"}\n\tfmt.Println(books)\n\t// TODO: remove the book at index 2 (Moby Dick)\n\tfmt.Println(books)\n}",
-    "expectedOutput": ["[Dune 1984 Moby Dick Neuromancer Fahrenheit 451]", "[Dune 1984 Neuromancer Fahrenheit 451]"],
-    "codeChecks": [
-      { "pattern": "append\\\\(books\\\\[:2\\\\],\\\\s*books\\\\[3:\\\\]", "required": true, "message": "Use append to remove index 2: books = append(books[:2], books[3:]...)" },
-      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your remove operation." }
-    ],
-    "successMessage": "Slice up to the element, then the rest. Stitch together with append. No built-in delete needed."
-  },
-  {
-    "title": "Slice of slices",
-    "instruction": "A slice can hold other slices. Each inner slice can be a different length — unlike a 2D array which must be rectangular.\n\nThis is useful for organizing books into genre sections where each genre has a different number of books.\n\nRun this. Then add a fourth genre section with two books.",
-    "hint": "append the new genre: library = append(library, []string{\"Foundation\", \"Hyperion\"})",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tlibrary := [][]string{\n\t\t{\"Dune\", \"Neuromancer\", \"Ender's Game\"},\n\t\t{\"1984\", \"Brave New World\"},\n\t\t{\"Moby Dick\", \"The Great Gatsby\", \"Catch-22\", \"Slaughterhouse-Five\"},\n\t}\n\t// TODO: append a new genre section with two books of your choice\n\tfor _, genre := range library {\n\t\tfmt.Println(genre)\n\t}\n}",
-    "expectedOutput": [],
-    "codeChecks": [
-      { "pattern": "append\\\\(library,\\\\s*\\\\[\\\\]string\\\\{", "required": true, "message": "Append a new genre section: library = append(library, []string{\"...\", \"...\"})" },
-      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your append." }
-    ],
-    "successMessage": "Slices of slices are flexible — sections can be different lengths. That is the key difference from a 2D array."
-  },
-  {
-    "title": "Book list — start",
-    "instruction": "Time to build something real.\n\nYou are managing a small library. Start by creating a slice with three books and printing the collection.",
-    "hint": "books := []string{\"Dune\", \"1984\", \"Moby Dick\"}  then fmt.Println(books)",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\t// TODO: create a books slice with 3 titles\n\t// TODO: print the collection\n}",
-    "expectedOutput": [],
-    "codeChecks": [
-      { "pattern": "books\\\\s*:=\\\\s*\\\\[\\\\]string\\\\{", "required": true, "message": "Create a books slice: books := []string{\"book1\", \"book2\", \"book3\"}" },
-      { "pattern": "Println\\\\(books\\\\)", "required": true, "message": "Print the collection: fmt.Println(books)" },
-      { "pattern": "TODO", "required": false, "message": "Replace the TODO lines with your code." }
-    ],
-    "successMessage": "Three books. The collection exists. Now let's make it do something."
-  },
-  {
-    "title": "Book list — add more books",
-    "instruction": "The library is getting new arrivals.\n\nAppend two more books to your collection. Print the list after each addition so you can see it grow.",
-    "hint": "books = append(books, \"Neuromancer\")  then fmt.Println(books). Repeat for a second book.",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tbooks := []string{\"Dune\", \"1984\", \"Moby Dick\"}\n\tfmt.Println(\"Current collection:\", books)\n\t// TODO: append a 4th book and print\n\t// TODO: append a 5th book and print\n}",
-    "expectedOutput": [],
-    "codeChecks": [
-      { "pattern": "books\\\\s*=\\\\s*append\\\\(books,", "required": true, "message": "Use append to add a new book: books = append(books, \"title\")" },
-      { "pattern": "(books\\\\s*=\\\\s*append\\\\(books,.*\\n.*){2}|(books\\\\s*=\\\\s*append\\\\(books,){2}", "required": true, "flags": "s", "message": "Add two new books using two separate append calls." },
-      { "pattern": "TODO", "required": false, "message": "Replace the TODO lines with your code." }
-    ],
-    "successMessage": "5 books now. Slices grow as your library grows. No upfront size required."
-  },
-  {
-    "title": "Book list — remove a book",
-    "instruction": "\"1984\" is being checked out permanently — time to remove it from the collection.\n\nIt is at index 1. Use the remove pattern to take it out and print the updated list.",
-    "hint": "books = append(books[:1], books[2:]...)  removes index 1.",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tbooks := []string{\"Dune\", \"1984\", \"Moby Dick\", \"Neuromancer\", \"Fahrenheit 451\"}\n\tfmt.Println(\"Before:\", books)\n\t// TODO: remove \"1984\" at index 1\n\tfmt.Println(\"After: \", books)\n}",
-    "expectedOutput": ["Before: [Dune 1984 Moby Dick Neuromancer Fahrenheit 451]", "After:  [Dune Moby Dick Neuromancer Fahrenheit 451]"],
-    "codeChecks": [
-      { "pattern": "append\\\\(books\\\\[:1\\\\],\\\\s*books\\\\[2:\\\\]", "required": true, "message": "Remove index 1: books = append(books[:1], books[2:]...)" },
-      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your remove." }
-    ],
-    "successMessage": "Book removed from the collection. One item shorter, just like a real library system."
-  },
-  {
-    "title": "Book list — final catalog",
-    "instruction": "A new arrival just came in: \"Brave New World\".\n\nAppend it, then print the complete numbered catalog:\n```\n1. Dune\n2. Moby Dick\n3. Neuromancer\n4. Fahrenheit 451\n5. Brave New World\n```",
-    "hint": "books = append(books, \"Brave New World\")  then loop: for i, b := range books { fmt.Printf(\"%d. %s\\n\", i+1, b) }",
+    "title": "Build a library catalog",
+    "instruction": "Start with 4 books, append \"Brave New World\", then print a numbered catalog from 1 to 5.",
+    "hint": "Append, then range loop with i+1.",
     "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tbooks := []string{\"Dune\", \"Moby Dick\", \"Neuromancer\", \"Fahrenheit 451\"}\n\t// TODO: append \"Brave New World\"\n\t// TODO: print the numbered catalog using a range loop\n}",
     "expectedOutput": ["1. Dune", "2. Moby Dick", "3. Neuromancer", "4. Fahrenheit 451", "5. Brave New World"],
     "codeChecks": [
-      { "pattern": "append\\\\(books,\\\\s*\\\"Brave New World\\\"\\\\)", "required": true, "message": "Append the new book: books = append(books, \"Brave New World\")" },
-      { "pattern": "range\\\\s+books", "required": true, "message": "Use range to loop through books." },
-      { "pattern": "i\\\\s*\\\\+\\\\s*1", "required": true, "message": "Use i+1 so the numbering starts at 1." },
+      { "pattern": "append\\(books,\\s*\"Brave New World\"\\)", "required": true, "message": "Append the new book: books = append(books, \"Brave New World\")" },
+      { "pattern": "range\\s+books", "required": true, "message": "Use range to loop through books." },
+      { "pattern": "i\\s*\\+\\s*1", "required": true, "message": "Use i+1 so the numbering starts at 1." },
       { "pattern": "TODO", "required": false, "message": "Replace the TODO lines with your code." }
     ],
-    "successMessage": "A working library catalog. You created it, added to it, removed from it, added again, and printed it cleanly. That is a real feature."
+    "successMessage": "A working library catalog. You created it, added to it, and printed it cleanly."
   }
 ]

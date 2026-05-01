@@ -1,15 +1,16 @@
 [
   {
     "title": "What is a struct",
-    "instruction": "Imagine a library catalog card. One card holds a book's title, its author, its ISBN — all related, all together.\n\nA struct is exactly that. It is a custom type that groups related fields under one name.\n\nRun this. A `Book` struct is defined with two fields: `Title` and `Pages`. Then we create one and print it.",
+    "instruction": "Imagine a library catalog card. One card holds a book's title, its author, its ISBN — all related, all together.\\nA struct is exactly that. It is a custom type that groups related fields under one name.\\nRun this. A `Book` struct is defined with two fields: `Title` and `Pages`. Then we create one and print it.",
     "starter": "package main\n\nimport \"fmt\"\n\ntype Book struct {\n\tTitle string\n\tPages int\n}\n\nfunc main() {\n\tb := Book{Title: \"The Go Programming Language\", Pages: 400}\n\tfmt.Println(b)\n}",
     "expectedOutput": ["{The Go Programming Language 400}"],
-    "successMessage": "One variable, two pieces of information. That is a struct. Notice Go prints it as {The Go Programming Language 400} — all fields together in curly braces."
+    "successMessage": "One variable, two pieces of information. That is a struct. Notice Go prints it as {The Go Programming Language 400} — all fields together in curly braces.",
+    "carryForward": true
   },
   {
     "title": "Define a struct",
-    "instruction": "The syntax for defining a struct is:\n\n```\ntype TypeName struct {\n    FieldName FieldType\n    FieldName FieldType\n}\n```\n\nField names start with a capital letter (so they are exported and accessible everywhere).\n\nDefine an `Author` struct with three fields: `Name` (string), `Nationality` (string), and `BirthYear` (int). Then create one and print it.",
-    "hint": "type Author struct { Name string; Nationality string; BirthYear int }  — then a := Author{Name: \"Margaret Atwood\", Nationality: \"Canadian\", BirthYear: 1939} and fmt.Println(a)",
+    "instruction": "Define an `Author` struct with three fields: `Name` (string), `Nationality` (string), and `BirthYear` (int). Then create one with your favourite author and print it.",
+    "hint": "type Author struct { Name string; Nationality string; BirthYear int } — then a := Author{Name: \"Margaret Atwood\", Nationality: \"Canadian\", BirthYear: 1939} and fmt.Println(a)",
     "starter": "package main\n\nimport \"fmt\"\n\n// TODO: define an Author struct with Name (string), Nationality (string), and BirthYear (int)\n\nfunc main() {\n\t// TODO: create an Author and print it\n}",
     "expectedOutput": [],
     "codeChecks": [
@@ -23,8 +24,8 @@
     "successMessage": "Your own custom type — defined, created, and printed. Every real Go application is full of types like this."
   },
   {
-    "title": "Access fields with dot notation",
-    "instruction": "To read a specific field, use a dot: `book.Title`, `book.Pages`.\n\nYou do not have to print the whole struct at once. Pull out exactly what you need.\n\nPrint `Title` and `Pages` on separate lines using dot notation.",
+    "title": "achha — dot notation accesses fields",
+    "instruction": "To read a specific field, use a dot: `book.Title`, `book.Pages`. You don't have to print the whole struct at once.\\nPrint `Title` and `Pages` on separate lines using dot notation.",
     "hint": "fmt.Println(b.Title)  fmt.Println(b.Pages)",
     "starter": "package main\n\nimport \"fmt\"\n\ntype Book struct {\n\tTitle string\n\tPages int\n}\n\nfunc main() {\n\tb := Book{Title: \"1984\", Pages: 328}\n\t// TODO: print b.Title on one line, then b.Pages on another\n}",
     "expectedOutput": ["1984", "328"],
@@ -37,7 +38,7 @@
   },
   {
     "title": "Update a field",
-    "instruction": "Fields work like variables. You can reassign them after creation.\n\n`b.Pages = 350` — updates the Pages field directly.\n\nUpdate `member.Active` to `true` and `member.FineBalance` to 0.0, then print the whole struct.",
+    "instruction": "Fields work like variables. You can reassign them after creation.\\n`b.Pages = 350` updates the Pages field directly.\\nUpdate `member.Active` to `true` and `member.FineBalance` to 0.0, then print the whole struct.",
     "hint": "member.Active = true  member.FineBalance = 0.0  fmt.Println(member)",
     "starter": "package main\n\nimport \"fmt\"\n\ntype Member struct {\n\tName        string\n\tActive      bool\n\tFineBalance float64\n}\n\nfunc main() {\n\tmember := Member{Name: \"Alice\", Active: false, FineBalance: 3.50}\n\t// TODO: update Active to true and FineBalance to 0.0, then print member\n}",
     "expectedOutput": ["{Alice true 0}"],
@@ -50,40 +51,28 @@
   },
   {
     "title": "Zero values in structs",
-    "instruction": "When you declare a struct without setting all fields, Go fills the rest with zero values — empty string for strings, 0 for ints, false for bools.\n\nRun this and see what an unfilled struct looks like. You will recognise the zero values from the Variables chapter.",
+    "instruction": "When you declare a struct without setting all fields, Go fills the rest with zero values — empty string for strings, 0 for ints, false for bools.\\nRun this and see what an unfilled struct looks like.",
     "starter": "package main\n\nimport \"fmt\"\n\ntype Book struct {\n\tTitle   string\n\tPages   int\n\tInStock bool\n\tRating  float64\n}\n\nfunc main() {\n\tvar b Book\n\tfmt.Println(b.Title)\n\tfmt.Println(b.Pages)\n\tfmt.Println(b.InStock)\n\tfmt.Println(b.Rating)\n}",
     "expectedOutput": ["", "0", "false", "0"],
     "successMessage": "Empty string, zero int, false bool, zero float. Every field gets its type's zero value. Safe and predictable — Go never leaves memory uninitialised."
   },
   {
-    "title": "Struct as a function parameter",
-    "instruction": "You can pass a struct into a function the same way you pass any value.\n\nWhen you do, Go makes a copy. Changing the struct inside the function does not affect the original.\n\nCall `printBook` with a book of your choice — your favourite title and page count.",
-    "hint": "printBook(Book{Title: \"Dune\", Pages: 688})",
-    "starter": "package main\n\nimport \"fmt\"\n\ntype Book struct {\n\tTitle string\n\tPages int\n}\n\nfunc printBook(b Book) {\n\tfmt.Printf(\"Title: %s, Pages: %d\\n\", b.Title, b.Pages)\n}\n\nfunc main() {\n\t// TODO: call printBook with your favourite book\n}",
+    "title": "Struct as function parameter and return value",
+    "instruction": "You can pass structs to functions and return them. When you pass a struct normally, Go makes a copy.\\nCall `printBook` with your favourite book. Then add a `newAuthor` function that takes a name and nationality and returns an `Author`, call it, and print the result.",
+    "hint": "printBook(Book{Title: \"Dune\", Pages: 688})  func newAuthor(name string, nationality string) Author { return Author{Name: name, Nationality: nationality} }",
+    "starter": "package main\n\nimport \"fmt\"\n\ntype Book struct {\n\tTitle string\n\tPages int\n}\n\ntype Author struct {\n\tName        string\n\tNationality string\n}\n\nfunc printBook(b Book) {\n\tfmt.Printf(\"Title: %s, Pages: %d\\n\", b.Title, b.Pages)\n}\n\n// TODO: define newAuthor(name string, nationality string) Author\n\nfunc main() {\n\t// TODO: call printBook with your favourite book\n\ta := newAuthor(\"Ursula K. Le Guin\", \"American\")\n\tfmt.Println(a.Name, a.Nationality)\n}",
     "expectedOutput": [],
     "codeChecks": [
       { "pattern": "printBook\\(", "required": true, "message": "Call printBook() with a Book value." },
-      { "pattern": "Book\\{Title:", "required": true, "message": "Create a Book struct with a Title field." },
-      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your call." }
-    ],
-    "successMessage": "Structs flow through functions just like ints and strings. Clean, readable, no globals required."
-  },
-  {
-    "title": "Struct as a return value",
-    "instruction": "Functions can return structs too.\n\nThis is how Go constructors work — a function that builds and returns a struct for you:\n\n`func newBook(title string, pages int) Book { return Book{Title: title, Pages: pages} }`\n\nAdd a `newAuthor` function that takes a name and nationality and returns an `Author`. Call it and print the result.",
-    "hint": "func newAuthor(name string, nationality string) Author { return Author{Name: name, Nationality: nationality} }",
-    "starter": "package main\n\nimport \"fmt\"\n\ntype Author struct {\n\tName        string\n\tNationality string\n}\n\n// TODO: define newAuthor(name string, nationality string) Author\n\nfunc main() {\n\ta := newAuthor(\"Ursula K. Le Guin\", \"American\")\n\tfmt.Println(a.Name, a.Nationality)\n}",
-    "expectedOutput": ["Ursula K. Le Guin American"],
-    "codeChecks": [
       { "pattern": "func\\s+newAuthor\\s*\\(", "required": true, "message": "Define a newAuthor function that returns an Author." },
       { "pattern": "return\\s+Author\\{", "required": true, "message": "Return an Author struct from newAuthor." },
-      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your function definition." }
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comments with your code." }
     ],
-    "successMessage": "Constructor pattern. One function, clean creation. This pattern is used everywhere in Go — especially in larger codebases."
+    "successMessage": "Structs flow through functions just like ints and strings. Constructor pattern — one function, clean creation."
   },
   {
-    "title": "Pointer to a struct",
-    "instruction": "When you pass a struct normally, Go copies it. Changes inside the function are lost.\n\nUse a pointer to pass the original — not a copy:\n\n`func addPages(b *Book) { b.Pages += 50 }`\n\nCreate a Book, call `addPages`, and see that Pages actually changed.",
+    "title": "Pointer to a struct (avoid copies)",
+    "instruction": "When you pass a struct normally, Go copies it. Use a pointer to pass the original.\\n`func addPages(b *Book) { b.Pages += 50 }` — the `*` means it receives the address, not a copy.\\nCreate a Book pointer, call `addPages`, and see that Pages actually changed.",
     "hint": "b := &Book{Title: \"Go in Action\", Pages: 300}  addPages(b)  fmt.Println(b.Pages)",
     "starter": "package main\n\nimport \"fmt\"\n\ntype Book struct {\n\tTitle string\n\tPages int\n}\n\nfunc addPages(b *Book) {\n\tb.Pages += 50\n}\n\nfunc main() {\n\t// TODO: create a Book pointer, call addPages, print the Pages\n}",
     "expectedOutput": ["350"],
@@ -97,7 +86,7 @@
   },
   {
     "title": "Nested structs",
-    "instruction": "A struct can contain another struct as a field.\n\nThis is how you model real-world relationships: a `Book` has an `Author`. A `Library` has `Books` and `Members`.\n\nRun this. Then update `b.Author.Nationality` to \"British\" and print the full author.",
+    "instruction": "A struct can contain another struct as a field. A `Book` has an `Author`.\\nRun this, then update `b.Author.Nationality` to \"British\" and print the full author.",
     "hint": "b.Author.Nationality = \"British\"  fmt.Println(b.Author)",
     "starter": "package main\n\nimport \"fmt\"\n\ntype Author struct {\n\tName        string\n\tNationality string\n}\n\ntype Book struct {\n\tTitle  string\n\tPages  int\n\tAuthor Author\n}\n\nfunc main() {\n\tb := Book{\n\t\tTitle: \"Harry Potter and the Philosopher's Stone\",\n\t\tPages: 309,\n\t\tAuthor: Author{\n\t\t\tName:        \"J.K. Rowling\",\n\t\t\tNationality: \"Unknown\",\n\t\t},\n\t}\n\tfmt.Println(b.Author.Nationality)\n\t// TODO: update b.Author.Nationality to \"British\" and print b.Author\n}",
     "expectedOutput": ["Unknown", "{J.K. Rowling British}"],
@@ -110,14 +99,14 @@
   },
   {
     "title": "Anonymous struct",
-    "instruction": "Sometimes you need a struct for one specific thing and do not need to reuse it. An anonymous struct has no type name — it is defined and used inline.\n\n```\nbook := struct {\n    Title string\n    Pages int\n}{Title: \"Brave New World\", Pages: 311}\n```\n\nRun this. Notice there is no `type Book struct` declaration anywhere — the struct is defined right where it is used.",
+    "instruction": "Sometimes you need a struct for one specific thing and don't need to reuse it. An anonymous struct has no type name — defined and used inline.\\n`book := struct { Title string; Pages int }{Title: \"Brave New World\", Pages: 311}`\\nRun this. Notice there is no `type Book struct` declaration anywhere.",
     "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tshelf := struct {\n\t\tSection string\n\t\tFloor   int\n\t}{Section: \"Fiction\", Floor: 2}\n\n\tfmt.Println(\"Section:\", shelf.Section)\n\tfmt.Println(\"Floor:\", shelf.Floor)\n}",
     "expectedOutput": ["Section: Fiction", "Floor: 2"],
-    "successMessage": "No type declaration needed. Anonymous structs are great for one-off groupings — shelf labels, config values, small response shapes. No name, no fuss."
+    "successMessage": "No type declaration needed. Anonymous structs are great for one-off groupings — shelf labels, config values, small response shapes."
   },
   {
     "title": "Slice of structs",
-    "instruction": "In real programs you rarely have just one struct. You have a list of them — a slice of structs.\n\n`books := []Book{{...}, {...}, {...}}`\n\nLoop through the slice and print each book's title and page count.",
+    "instruction": "In real programs you rarely have just one struct. You have a list of them — a slice of structs.\\n`books := []Book{{...}, {...}, {...}}`\\nLoop through the slice and print each book's title and page count.",
     "hint": "for _, b := range books { fmt.Printf(\"%s has %d pages\\n\", b.Title, b.Pages) }",
     "starter": "package main\n\nimport \"fmt\"\n\ntype Book struct {\n\tTitle string\n\tPages int\n}\n\nfunc main() {\n\tbooks := []Book{\n\t\t{Title: \"Dune\", Pages: 688},\n\t\t{Title: \"Neuromancer\", Pages: 271},\n\t\t{Title: \"Snow Crash\", Pages: 440},\n\t}\n\t// TODO: loop through books and print each title and page count\n}",
     "expectedOutput": ["Dune has 688 pages", "Neuromancer has 271 pages", "Snow Crash has 440 pages"],
@@ -127,58 +116,28 @@
       { "pattern": "b\\.Pages", "required": true, "message": "Access b.Pages inside the loop." },
       { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your loop." }
     ],
-    "successMessage": "Slice of structs — the backbone of almost every Go application. Book lists, author catalogs, member directories. All of these are slices of structs."
+    "successMessage": "Slice of structs — the backbone of almost every Go application. Book lists, author catalogs, member directories."
   },
   {
-    "title": "Methods",
-    "instruction": "A method is a function attached to a struct. Instead of `printBook(b)` you write `b.Print()`. \n\nThe receiver `(b Book)` before the function name links the method to the type:\n\n```\nfunc (b Book) Describe() {\n    fmt.Println(\"Book:\", b.Title, \"-\", b.Pages, \"pages\")\n}\n```\n\nAdd a `Summary()` method to `Member` that prints `\"Name: X, Status: active/inactive\"`. Then call it.",
-    "hint": "func (m Member) Summary() { status := \"inactive\"; if m.Active { status = \"active\" }; fmt.Printf(\"Name: %s, Status: %s\\n\", m.Name, status) }",
-    "starter": "package main\n\nimport \"fmt\"\n\ntype Member struct {\n\tName   string\n\tActive bool\n}\n\n// TODO: add a Summary() method to Member\n\nfunc main() {\n\tm := Member{Name: \"Bob\", Active: true}\n\tm.Summary()\n}",
-    "expectedOutput": ["Name: Bob, Status: active"],
-    "codeChecks": [
-      { "pattern": "func\\s*\\(\\s*\\w+\\s+Member\\s*\\)\\s*Summary\\s*\\(", "required": true, "message": "Add a method: func (m Member) Summary() { ... }" },
-      { "pattern": "m\\.Summary\\(\\)", "required": true, "message": "Call m.Summary() in main." },
-      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your method definition." }
-    ],
-    "successMessage": "Methods belong to a type. m.Summary() is cleaner than printMember(m). And it scales — add a dozen methods, everything stays organised."
-  },
-  {
-    "title": "Pointer receiver methods",
-    "instruction": "A method with a pointer receiver can modify the struct it is attached to.\n\n`func (b *Book) AddPages(n int) { b.Pages += n }`\n\nThe `*` makes it a pointer receiver — changes to `b` inside the method affect the original.\n\nCall `CheckOut` and print the `Active` status before and after.",
-    "hint": "fmt.Println(member.Active)  member.CheckOut()  fmt.Println(member.Active)",
-    "starter": "package main\n\nimport \"fmt\"\n\ntype Member struct {\n\tName   string\n\tActive bool\n}\n\nfunc (m *Member) CheckOut() {\n\tm.Active = false\n}\n\nfunc main() {\n\tmember := Member{Name: \"Charlie\", Active: true}\n\t// TODO: print member.Active, call member.CheckOut(), print member.Active again\n}",
-    "expectedOutput": ["true", "false"],
-    "codeChecks": [
-      { "pattern": "member\\.CheckOut\\(\\)", "required": true, "message": "Call member.CheckOut() on the struct." },
-      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
-    ],
-    "successMessage": "true before, false after. The pointer receiver method mutated the real struct, not a copy. Use pointer receivers whenever a method needs to change the struct."
-  },
-  {
-    "title": "Struct tags",
-    "instruction": "Struct tags are metadata attached to fields. They tell encoding libraries how to handle each field.\n\nThe most common use is JSON encoding:\n\n```\ntype Book struct {\n    Title string `json:\"title\"`\n    Pages int    `json:\"pages\"`\n}\n```\n\nThe tag `json:\"title\"` tells Go's JSON encoder to use `title` (lowercase) in the JSON output instead of `Title`.\n\nRun this and see the JSON output.",
+    "title": "Struct tags (JSON serialization)",
+    "instruction": "Struct tags are metadata attached to fields. They tell encoding libraries how to handle each field.\\n`type Book struct { Title string \\`json:\"title\"\\`; Pages int \\`json:\"pages\"\\` }`\\nThe tag tells Go's JSON encoder to use lowercase keys. Run this and see the JSON output.",
     "starter": "package main\n\nimport (\n\t\"encoding/json\"\n\t\"fmt\"\n)\n\ntype Book struct {\n\tTitle  string  `json:\"title\"`\n\tAuthor string  `json:\"author\"`\n\tPrice  float64 `json:\"price\"`\n}\n\nfunc main() {\n\tb := Book{Title: \"Clean Code\", Author: \"Robert C. Martin\", Price: 39.99}\n\tdata, _ := json.Marshal(b)\n\tfmt.Println(string(data))\n}",
     "expectedOutput": ["{\"title\":\"Clean Code\",\"author\":\"Robert C. Martin\",\"price\":39.99}"],
-    "successMessage": "The Go struct with capital letters became lowercase JSON keys. Struct tags control serialization — JSON, XML, database column names, form parsing. You'll use them in every real API."
+    "successMessage": "The Go struct with capital letters became lowercase JSON keys. Struct tags control serialization — JSON, XML, database column names, form parsing."
   },
   {
     "title": "Build a library catalog",
-    "instruction": "No starter code.\n\nBuild a library catalog from scratch:\n\n1. Define an `Author` struct with fields: `Name` (string), `Nationality` (string)\n2. Define a `Book` struct with fields: `Title` (string), `Pages` (int), `Author` (Author)\n3. Add a `Print()` method to `Book` that prints all three fields formatted\n4. Create a `[]Book` slice with at least 3 books\n5. Loop through and call `.Print()` on each one\n\nOutput format for each book:\n```\nTitle: Dune | Pages: 688 | Author: Frank Herbert (American)\n```",
-    "hint": "func (b Book) Print() { fmt.Printf(\"Title: %s | Pages: %d | Author: %s (%s)\\n\", b.Title, b.Pages, b.Author.Name, b.Author.Nationality) }",
+    "instruction": "No starter code. Build a library catalog from scratch:\\n1. Define an `Author` struct with `Name` (string), `Nationality` (string)\\n2. Define a `Book` struct with `Title` (string), `Pages` (int), `Author` (Author)\\n3. Create a `[]Book` slice with at least 3 books\\n4. Loop through and print each book: `Title: Dune | Pages: 688 | Author: Frank Herbert (American)`",
+    "hint": "Use nested struct access: b.Author.Name, b.Author.Nationality inside a loop.",
     "starter": "package main\n\nimport \"fmt\"\n\n// Your library catalog goes here\n\nfunc main() {\n}",
     "expectedOutput": [],
     "codeChecks": [
       { "pattern": "type\\s+Author\\s+struct\\s*\\{", "required": true, "message": "Define an Author struct." },
       { "pattern": "type\\s+Book\\s+struct\\s*\\{", "required": true, "message": "Define a Book struct." },
-      { "pattern": "Name\\s+string", "required": true, "message": "Add a Name string field to Author." },
-      { "pattern": "Nationality\\s+string", "required": true, "message": "Add a Nationality string field to Author." },
-      { "pattern": "Title\\s+string", "required": true, "message": "Add a Title string field to Book." },
       { "pattern": "Author\\s+Author", "required": true, "message": "Add an Author field (of type Author) to Book." },
-      { "pattern": "func\\s*\\(\\s*\\w+\\s+Book\\s*\\)\\s*Print\\s*\\(", "required": true, "message": "Add a Print() method to Book." },
       { "pattern": "\\[\\]Book\\{", "required": true, "message": "Create a slice of Books: books := []Book{...}" },
-      { "pattern": "range\\s+books", "required": true, "message": "Loop through books with range." },
-      { "pattern": "\\.Print\\(\\)", "required": true, "message": "Call .Print() on each book." }
+      { "pattern": "range\\s+books", "required": true, "message": "Loop through books with range." }
     ],
-    "successMessage": "A complete library catalog. Custom types, nested struct, method, slice, loop — all the pieces working together. This is how Go programs are built in the real world. You are ready."
+    "successMessage": "A complete library catalog. Custom types, nested struct, slice, loop — all the pieces working together. This is how Go programs are built in the real world."
   }
 ]

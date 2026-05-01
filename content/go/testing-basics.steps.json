@@ -1,16 +1,17 @@
 [
   {
     "title": "What is a test in Go",
-    "instruction": "A test is just a function that checks whether your code does what it should. Think of it as a quality inspector on a factory line — run the machine, check the output, flag problems.\n\nIn Go, tests follow one rule: `func TestXxx(t *testing.T)`. That's it. No test framework, no annotations, no magic.\n\nRun this and see a passing test.",
+    "instruction": "A test is just a function that checks whether your code does what it should. In Go, tests follow one rule: `func TestXxx(t *testing.T)`. Run this and see a passing test.",
     "starter": "package main\n\nimport (\n\t\"fmt\"\n\t\"testing\"\n)\n\ntype Book struct {\n\tTitle string\n\tISBN  string\n}\n\ntype Library struct {\n\tBooks []Book\n}\n\nfunc (l Library) countBooks() int {\n\treturn len(l.Books)\n}\n\nfunc TestCountBooks(t *testing.T) {\n\tlib := Library{Books: []Book{{\"Go 101\", \"123\"}, {\"Testing\", \"456\"}}}\n\tgot := lib.countBooks()\n\tif got != 2 {\n\t\tt.Errorf(\"countBooks() = %d, want 2\", got)\n\t}\n\tfmt.Println(\"TestCountBooks passed\")\n}\n\nfunc main() {\n\tTestCountBooks(&testing.T{})\n}",
     "expectedOutput": [
       "TestCountBooks passed"
     ],
-    "successMessage": "The test passed — `countBooks()` returned 2 as expected. In a real project, `go test` runs all tests in the package automatically."
+    "successMessage": "The test passed — `countBooks()` returned 2 as expected. In a real project, `go test` runs all tests in the package automatically.",
+    "carryForward": true
   },
   {
     "title": "t.Errorf — report a failure",
-    "instruction": "`t.Errorf` marks the test as failed and logs a message — but the test keeps running.\n\nThe message format is a convention: `\"functionName(inputs) = actual, want expected\"`\n\nAdd a second test case: create an empty library and verify `countBooks()` equals `0`. If it does not, use `t.Errorf` with the same format.",
+    "instruction": "`t.Errorf` marks the test as failed and logs a message but the test keeps running. Add a second test case: create an empty library and verify `countBooks()` equals 0.",
     "hint": "lib := Library{}  got := lib.countBooks()  if got != 0 { t.Errorf(\"countBooks() = %d, want 0\", got) }",
     "starter": "package main\n\nimport (\n\t\"fmt\"\n\t\"testing\"\n)\n\ntype Book struct {\n\tTitle string\n\tISBN  string\n}\n\ntype Library struct {\n\tBooks []Book\n}\n\nfunc (l Library) countBooks() int {\n\treturn len(l.Books)\n}\n\nfunc TestCountBooks(t *testing.T) {\n\tlib := Library{Books: []Book{{\"Go 101\", \"123\"}}}\n\tgot := lib.countBooks()\n\tif got != 1 {\n\t\tt.Errorf(\"countBooks() = %d, want 1\", got)\n\t}\n\t// TODO: test an empty library — count should be 0\n\tfmt.Println(\"Both cases checked\")\n}\n\nfunc main() {\n\tTestCountBooks(&testing.T{})\n}",
     "expectedOutput": [
@@ -33,23 +34,11 @@
         "message": "Replace the TODO comment with your test case."
       }
     ],
-    "successMessage": "Two cases, one test function. Both pass. t.Errorf is how you say \"this is wrong\" without stopping the whole test — other cases still run and you see all failures at once."
-  },
-  {
-    "title": "t.Fatal — stop on first failure",
-    "instruction": "Sometimes a failure makes the rest of the test pointless. Use `t.Fatalf` to stop immediately.\n\nFor example: if the library is nil, there is no point trying to count books.\n\nRun this. Notice that when `books` is nil, `t.Fatalf` stops — the second check never runs. Then change `nil` to an empty slice and see both checks pass.",
-    "hint": "Change books: nil to books: []Book{} in main's test call.",
-    "starter": "package main\n\nimport (\n\t\"fmt\"\n\t\"testing\"\n)\n\ntype Book struct {\n\tTitle string\n\tISBN  string\n}\n\ntype Library struct {\n\tBooks []Book\n}\n\nfunc (l Library) countBooks() int {\n\treturn len(l.Books)\n}\n\nfunc safeCount(l Library, t *testing.T) int {\n\tif l.Books == nil {\n\t\tt.Fatalf(\"Library.Books is nil — cannot count\")\n\t}\n\treturn l.countBooks()\n}\n\nfunc main() {\n\tt := &testing.T{}\n\tlib1 := Library{Books: nil}\n\tc1 := safeCount(lib1, t)\n\tfmt.Printf(\"count = %d\\n\", c1)\n\n\tlib2 := Library{Books: []Book{{\"A\", \"1\"}, {\"B\", \"2\"}}}\n\tc2 := safeCount(lib2, t)\n\tfmt.Printf(\"count = %d\\n\", c2)\n\tfmt.Println(\"All count tests passed\")\n}",
-    "expectedOutput": [
-      "count = 0",
-      "count = 2",
-      "All count tests passed"
-    ],
-    "successMessage": "t.Fatalf stops the test immediately — useful when a failure makes all subsequent assertions meaningless. t.Errorf continues — useful when you want to see all failures at once."
+    "successMessage": "Two cases, one test function. Both pass. t.Errorf reports failures without stopping the whole test."
   },
   {
     "title": "Table-driven tests",
-    "instruction": "The most common Go testing pattern: define a slice of test cases, loop through them.\n\n```\ntests := []struct {\n    input string\n    want  *Book\n}{\n    {\"978-123\", &Book{\"Go 101\", \"978-123\"}},\n    {\"missing\", nil},\n}\nfor _, tt := range tests {\n    got := lib.lookupByISBN(tt.input)\n    ...\n}\n```\n\nAdd two more test cases to the table: searching for `\"000-000\"` (which doesn't exist) and `\"978-789\"`.",
+    "instruction": "The most common Go testing pattern: define a slice of test cases, loop through them. Add two more cases: searching for \"000-000\" (not found) and \"978-789\" (found).",
     "hint": "Add {\"000-000\", nil} and {\"978-789\", &Book{\"Testing In Go\", \"978-789\"}} to the tests slice.",
     "starter": "package main\n\nimport (\n\t\"fmt\"\n\t\"testing\"\n)\n\ntype Book struct {\n\tTitle string\n\tISBN  string\n}\n\ntype Library struct {\n\tBooks []Book\n}\n\nfunc (l Library) lookupByISBN(isbn string) *Book {\n\tfor _, b := range l.Books {\n\t\tif b.ISBN == isbn {\n\t\t\treturn &b\n\t\t}\n\t}\n\treturn nil\n}\n\nfunc TestLookupByISBN(t *testing.T) {\n\tlib := Library{Books: []Book{\n\t\t{\"Go 101\", \"978-123\"},\n\t\t{\"Testing In Go\", \"978-789\"},\n\t}}\n\n\ttests := []struct {\n\t\tisbn string\n\t\twant *Book\n\t}{\n\t\t{\"978-123\", &Book{\"Go 101\", \"978-123\"}},\n\t\t// TODO: add {\"000-000\", nil} and {\"978-789\", &Book{\"Testing In Go\", \"978-789\"}}\n\t}\n\n\tpassed := 0\n\tfor _, tt := range tests {\n\t\tgot := lib.lookupByISBN(tt.isbn)\n\t\tif (got == nil) != (tt.want == nil) || (got != nil && got.ISBN != tt.want.ISBN) {\n\t\t\tt.Errorf(\"lookupByISBN(%q) = %v, want %v\", tt.isbn, got, tt.want)\n\t\t} else {\n\t\t\tpassed++\n\t\t}\n\t}\n\tfmt.Printf(\"%d/%d cases passed\\n\", passed, len(tests))\n}\n\nfunc main() {\n\tTestLookupByISBN(&testing.T{})\n}",
     "expectedOutput": [
@@ -72,33 +61,11 @@
         "message": "Replace the TODO comment with your two test cases."
       }
     ],
-    "successMessage": "4/4 passed. Table-driven tests are the gold standard in Go. Add a new case to the table, the loop handles it. No duplication, no copy-paste."
-  },
-  {
-    "title": "Testing error cases",
-    "instruction": "Your tests should cover failure paths too — not just the happy path.\n\nFor a function like `lookupByISBN`, test both:\n1. When the book exists — verify a non-nil book is returned with the right ISBN\n2. When the book does not exist — verify `nil` is returned\n\nAdd a test case for searching `\"999-999\"` which should return `nil`.",
-    "hint": "{isbn: \"999-999\", want: nil}  — in the loop: if tt.want == nil { if got != nil { t.Errorf(...) } } else { if got == nil || got.ISBN != tt.want.ISBN { t.Errorf(...) } }",
-    "starter": "package main\n\nimport (\n\t\"fmt\"\n\t\"testing\"\n)\n\ntype Book struct {\n\tTitle string\n\tISBN  string\n}\n\ntype Library struct {\n\tBooks []Book\n}\n\nfunc (l Library) lookupByISBN(isbn string) *Book {\n\tfor _, b := range l.Books {\n\t\tif b.ISBN == isbn {\n\t\t\treturn &b\n\t\t}\n\t}\n\treturn nil\n}\n\nfunc TestLookupByISBN(t *testing.T) {\n\tlib := Library{Books: []Book{\n\t\t{\"Go 101\", \"978-123\"},\n\t\t{\"Testing\", \"978-456\"},\n\t}}\n\n\ttests := []struct {\n\t\tisbn string\n\t\twant *Book\n\t}{\n\t\t{\"978-123\", &Book{\"Go 101\", \"978-123\"}},\n\t\t{\"978-456\", &Book{\"Testing\", \"978-456\"}},\n\t\t// TODO: add {\"999-999\", nil} — book not found\n\t}\n\n\tpassed := 0\n\tfor _, tt := range tests {\n\t\tgot := lib.lookupByISBN(tt.isbn)\n\t\tif tt.want == nil {\n\t\t\tif got != nil {\n\t\t\t\tt.Errorf(\"lookupByISBN(%q): expected nil, got %v\", tt.isbn, got)\n\t\t\t} else {\n\t\t\t\tpassed++\n\t\t\t}\n\t\t} else {\n\t\t\tif got == nil {\n\t\t\t\tt.Errorf(\"lookupByISBN(%q): expected book, got nil\", tt.isbn)\n\t\t\t} else if got.ISBN != tt.want.ISBN {\n\t\t\t\tt.Errorf(\"lookupByISBN(%q) = %v, want %v\", tt.isbn, got, tt.want)\n\t\t\t} else {\n\t\t\t\tpassed++\n\t\t\t}\n\t\t}\n\t}\n\tfmt.Printf(\"%d/%d cases passed\\n\", passed, len(tests))\n}\n\nfunc main() {\n\tTestLookupByISBN(&testing.T{})\n}",
-    "expectedOutput": [
-      "3/3 cases passed"
-    ],
-    "codeChecks": [
-      {
-        "pattern": "\"999-999\"",
-        "required": true,
-        "message": "Add the not-found case: {\"999-999\", nil}"
-      },
-      {
-        "pattern": "TODO",
-        "required": false,
-        "message": "Replace the TODO comment with the error test case."
-      }
-    ],
-    "successMessage": "3/3 passed — including the not-found case. Always test failure paths. The bugs that hurt most are the ones in code nobody thought to test."
+    "successMessage": "4/4 passed. Table-driven tests are the gold standard in Go — add a new case to the table, the loop handles it."
   },
   {
     "title": "t.Run — subtests with names",
-    "instruction": "`t.Run` gives each test case its own name. When a test fails, you see exactly which case broke — not just a line number.\n\n```\nt.Run(\"search for Go\", func(t *testing.T) {\n    // ...\n})\n```\n\nUpdate the loop to use `t.Run` with the format `\"lookupByISBN(isbn)\"` as the test name.",
+    "instruction": "`t.Run` gives each test case its own name. When a test fails, you see exactly which case broke. Wrap each case in `t.Run` with the format \"lookupByISBN(isbn)\".",
     "hint": "t.Run(fmt.Sprintf(\"lookupByISBN(%s)\", tt.isbn), func(t *testing.T) { ... })",
     "starter": "package main\n\nimport (\n\t\"fmt\"\n\t\"testing\"\n)\n\ntype Book struct {\n\tTitle string\n\tISBN  string\n}\n\ntype Library struct {\n\tBooks []Book\n}\n\nfunc (l Library) lookupByISBN(isbn string) *Book {\n\tfor _, b := range l.Books {\n\t\tif b.ISBN == isbn {\n\t\t\treturn &b\n\t\t}\n\t}\n\treturn nil\n}\n\nfunc TestLookupByISBN(t *testing.T) {\n\tlib := Library{Books: []Book{\n\t\t{\"Go 101\", \"978-123\"},\n\t\t{\"Testing\", \"978-456\"},\n\t}}\n\n\ttests := []struct {\n\t\tisbn string\n\t\twant *Book\n\t}{\n\t\t{\"978-123\", &Book{\"Go 101\", \"978-123\"}},\n\t\t{\"978-456\", &Book{\"Testing\", \"978-456\"}},\n\t\t{\"999-999\", nil},\n\t}\n\n\tpassed := 0\n\tfor _, tt := range tests {\n\t\t// TODO: wrap in t.Run(fmt.Sprintf(\"lookupByISBN(%s)\", tt.isbn), func(t *testing.T) { ... })\n\t\tgot := lib.lookupByISBN(tt.isbn)\n\t\tif tt.want == nil {\n\t\t\tif got != nil {\n\t\t\t\tt.Errorf(\"expected nil, got %v\", got)\n\t\t\t} else {\n\t\t\t\tpassed++\n\t\t\t\tfmt.Printf(\"lookupByISBN(%s) ✓\\n\", tt.isbn)\n\t\t\t}\n\t\t} else {\n\t\t\tif got == nil || got.ISBN != tt.want.ISBN {\n\t\t\t\tt.Errorf(\"got %v, want %v\", got, tt.want)\n\t\t\t} else {\n\t\t\t\tpassed++\n\t\t\t\tfmt.Printf(\"lookupByISBN(%s) ✓\\n\", tt.isbn)\n\t\t\t}\n\t\t}\n\t}\n\tfmt.Printf(\"%d/%d passed\\n\", passed, len(tests))\n}\n\nfunc main() {\n\tTestLookupByISBN(&testing.T{})\n}",
     "expectedOutput": [
@@ -124,32 +91,22 @@
         "message": "Replace the TODO comment with your t.Run call."
       }
     ],
-    "successMessage": "Named subtests. When this fails in a real project, Go reports exactly which subtest failed: TestLookupByISBN/lookupByISBN(999-999). No guessing which input broke."
+    "successMessage": "Named subtests. When this fails, Go reports exactly which subtest failed. No guessing which input broke."
   },
   {
     "title": "Testing with interfaces — mocking",
-    "instruction": "Real code often depends on external things: databases, APIs, ISBN lookup services. You cannot call those in tests.\n\nThe solution: define the dependency as an interface. In tests, swap in a fake implementation.\n\nRun this. `ISBNService` is an interface. `mockService` is a fake that returns a canned book instead of calling a real API. The test verifies `LookupBook` calls `FetchByISBN` with the right ISBN — no real lookup made.",
+    "instruction": "Define dependencies as interfaces so you can swap in fake implementations in tests. Run this — `mockService` returns a canned book instead of calling a real API.",
     "starter": "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"testing\"\n)\n\ntype Book struct {\n\tTitle string\n\tISBN  string\n}\n\ntype ISBNService interface {\n\tFetchByISBN(isbn string) (*Book, error)\n}\n\ntype mockService struct {\n\tcalledISBN string\n}\n\nfunc (m *mockService) FetchByISBN(isbn string) (*Book, error) {\n\tm.calledISBN = isbn\n\treturn &Book{Title: \"Mocked Book\", ISBN: isbn}, nil\n}\n\nfunc LookupBook(svc ISBNService, isbn string) (*Book, error) {\n\treturn svc.FetchByISBN(isbn)\n}\n\nfunc TestLookupBook(t *testing.T) {\n\tmock := &mockService{}\n\tbook, _ := LookupBook(mock, \"978-000\")\n\n\tif mock.calledISBN != \"978-000\" {\n\t\tt.Errorf(\"called with %s, want 978-000\", mock.calledISBN)\n\t}\n\tif !strings.Contains(book.Title, \"Mock\") {\n\t\tt.Errorf(\"book title %q does not contain Mock\", book.Title)\n\t}\n\tfmt.Println(\"ISBN mock test passed\")\n\tfmt.Println(\"ISBN queried:\", mock.calledISBN)\n\tfmt.Println(\"Book:\", book.Title)\n}\n\nfunc main() {\n\tTestLookupBook(&testing.T{})\n}",
     "expectedOutput": [
       "ISBN mock test passed",
       "ISBN queried: 978-000",
       "Book: Mocked Book"
     ],
-    "successMessage": "No real ISBN lookup made. The mock recorded the call, the test verified the behaviour. This pattern — interface + fake implementation — is how all professional Go testing works."
-  },
-  {
-    "title": "Benchmarks",
-    "instruction": "A benchmark measures how fast your code runs.\n\n```\nfunc BenchmarkLookup(b *testing.B) {\n    for i := 0; i < b.N; i++ {\n        lib.lookupByISBN(\"978-123\")\n    }\n}\n```\n\n`b.N` is set automatically by the testing framework — it runs enough iterations to get a stable measurement. Run with `go test -bench=.`\n\nRun this benchmark. It times two search approaches on a small library. Notice which is faster.",
-    "starter": "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"testing\"\n)\n\ntype Book struct {\n\tTitle string\n\tISBN  string\n}\n\ntype Library []Book\n\nfunc (lib Library) lookupLinear(isbn string) *Book {\n\tfor _, b := range lib {\n\t\tif b.ISBN == isbn {\n\t\t\treturn &b\n\t\t}\n\t}\n\treturn nil\n}\n\nfunc (lib Library) lookupMap(index map[string]*Book, isbn string) *Book {\n\treturn index[isbn]\n}\n\nfunc BenchmarkLinear(b *testing.B) {\n\tlib := Library{\n\t\t{\"A\", \"1\"}, {\"B\", \"2\"}, {\"C\", \"3\"}, {\"D\", \"4\"}, {\"E\", \"5\"},\n\t}\n\tfor i := 0; i < b.N; i++ {\n\t\tlib.lookupLinear(\"5\")\n\t}\n}\n\nfunc BenchmarkMapLookup(b *testing.B) {\n\tlib := Library{\n\t\t{\"A\", \"1\"}, {\"B\", \"2\"}, {\"C\", \"3\"}, {\"D\", \"4\"}, {\"E\", \"5\"},\n\t}\n\tindex := make(map[string]*Book)\n\tfor i := range lib {\n\t\tindex[lib[i].ISBN] = &lib[i]\n\t}\n\tfor i := 0; i < b.N; i++ {\n\t\tlib.lookupMap(index, \"5\")\n\t}\n}\n\nfunc main() {\n\t// Run a quick comparison manually\n\tfmt.Println(\"linear:\", len(Library{{\"A\", \"1\"}}), \"books\")\n\tfmt.Println(\"map:\", len(Library{{\"B\", \"2\"}}), \"books\")\n}",
-    "expectedOutput": [
-      "linear: 1 books",
-      "map: 1 books"
-    ],
-    "successMessage": "Both find the book but the map lookup is significantly faster for large libraries — O(1) vs O(n). Benchmarks reveal these differences."
+    "successMessage": "No real ISBN lookup made. The mock recorded the call and the test verified the behaviour. Interface + fake implementation is how professional Go testing works."
   },
   {
     "title": "Test helpers with t.Helper()",
-    "instruction": "When you have repeated assertion logic, extract it into a helper function and call `t.Helper()` inside it.\n\nThis tells Go: if this helper fails, report the line in the calling test — not the line inside the helper. Much easier to debug.\n\nRun this. The `assertFound` helper is used three times. Then add a fourth call that checks searching for `\"978-789\"` returns a book titled `\"Network Programming\"`.",
+    "instruction": "Extract repeated assertion logic into a helper function and call `t.Helper()` inside it. Add a fourth call that checks \"978-789\" returns a book titled \"Network Programming\".",
     "hint": "assertFound(t, lib, \"978-789\", \"Network Programming\")",
     "starter": "package main\n\nimport (\n\t\"fmt\"\n\t\"testing\"\n)\n\ntype Book struct {\n\tTitle string\n\tISBN  string\n}\n\ntype Library struct {\n\tBooks []Book\n}\n\nfunc (l Library) lookupByISBN(isbn string) *Book {\n\tfor _, b := range l.Books {\n\t\tif b.ISBN == isbn {\n\t\t\treturn &b\n\t\t}\n\t}\n\treturn nil\n}\n\nfunc assertFound(t *testing.T, lib Library, isbn, wantTitle string) {\n\tt.Helper()\n\tgot := lib.lookupByISBN(isbn)\n\tif got == nil {\n\t\tt.Errorf(\"lookupByISBN(%q) returned nil, want book with title %q\", isbn, wantTitle)\n\t} else if got.Title != wantTitle {\n\t\tt.Errorf(\"lookupByISBN(%q).Title = %q, want %q\", isbn, got.Title, wantTitle)\n\t}\n}\n\nfunc TestLookup(t *testing.T) {\n\tlib := Library{Books: []Book{\n\t\t{\"Go 101\", \"978-123\"},\n\t\t{\"Testing\", \"978-456\"},\n\t\t{\"Network Programming\", \"978-789\"},\n\t}}\n\tassertFound(t, lib, \"978-123\", \"Go 101\")\n\tassertFound(t, lib, \"978-456\", \"Testing\")\n\t// TODO: assert looking up \"978-789\" gives \"Network Programming\"\n\tfmt.Println(\"All lookup tests passed\")\n}\n\nfunc main() {\n\tTestLookup(&testing.T{})\n}",
     "expectedOutput": [
@@ -167,41 +124,11 @@
         "message": "Replace the TODO comment with your assertion."
       }
     ],
-    "successMessage": "t.Helper() is a small thing that makes debugging much easier. Without it, every failure points to a line inside assertFound. With it, Go points to the exact test line that failed."
-  },
-  {
-    "title": "Test a real function — searchCatalog",
-    "instruction": "Write tests for a function you define yourself.\n\n`searchCatalog(query string) []Book` searches the library's catalog for books whose title contains the query (case-insensitive).\n\n`\"go\"` → finds `[\"Go 101\", \"Network Programming in Go\"]`\n`\"python\"` → finds `[]`\n`\"network\"` → finds `[\"Network Programming in Go\"]`\n\nFirst implement `searchCatalog`. Then write a table-driven test with at least 5 cases.",
-    "hint": "strings.Contains(strings.ToLower(b.Title), strings.ToLower(query)) — iterate over l.Books, collect matches.",
-    "starter": "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n\t\"testing\"\n)\n\ntype Book struct {\n\tTitle string\n\tISBN  string\n}\n\ntype Library struct {\n\tBooks []Book\n}\n\n// TODO: implement searchCatalog(query string) []Book\n\nfunc TestSearchCatalog(t *testing.T) {\n\tlib := Library{Books: []Book{\n\t\t{\"Go 101\", \"978-001\"},\n\t\t{\"Testing in Go\", \"978-002\"},\n\t\t{\"Network Programming in Go\", \"978-003\"},\n\t\t{\"Data Science with Python\", \"978-004\"},\n\t}}\n\n\ttests := []struct {\n\t\tquery string\n\t\twant  int // number of results expected\n\t}{\n\t\t// TODO: add at least 5 test cases\n\t}\n\n\tpassed := 0\n\tfor _, tt := range tests {\n\t\tgot := lib.searchCatalog(tt.query)\n\t\tif len(got) != tt.want {\n\t\t\tt.Errorf(\"searchCatalog(%q) returned %d books, want %d\", tt.query, len(got), tt.want)\n\t\t} else {\n\t\t\tpassed++\n\t\t}\n\t}\n\tfmt.Printf(\"%d/%d cases passed\\n\", passed, len(tests))\n}\n\nfunc main() {\n\tTestSearchCatalog(&testing.T{})\n}",
-    "expectedOutput": [],
-    "codeChecks": [
-      {
-        "pattern": "func\\s+searchCatalog\\s*\\(",
-        "required": true,
-        "message": "Implement the searchCatalog function."
-      },
-      {
-        "pattern": "strings\\.Contains|ToLower",
-        "required": true,
-        "message": "Use strings.Contains and strings.ToLower for case-insensitive matching."
-      },
-      {
-        "pattern": "want",
-        "required": true,
-        "message": "Add at least 5 test cases with expected result counts."
-      },
-      {
-        "pattern": "TODO",
-        "required": false,
-        "message": "Replace both TODO comments with your implementation and test cases."
-      }
-    ],
-    "successMessage": "You implemented and tested a search function from scratch. The test is the specification. If someone breaks searchCatalog later, your tests catch it immediately."
+    "successMessage": "t.Helper() makes failures point to the exact test line, not the helper internals. A small thing that makes debugging much easier."
   },
   {
     "title": "Fix the failing test",
-    "instruction": "The test exists. The function is broken.\n\n`lookupByISBN(isbn string) *Book` should return the book with the matching ISBN, or `nil` if not found.\n\nBut the implementation is wrong. Fix `lookupByISBN` so all test cases pass.",
+    "instruction": "`lookupByISBN` is broken — it compares `Title` instead of `ISBN`. Fix it so all 4 test cases pass.",
     "hint": "for _, b := range l.Books { if b.ISBN == isbn { return &b } }  return nil",
     "starter": "package main\n\nimport (\n\t\"fmt\"\n\t\"testing\"\n)\n\ntype Book struct {\n\tTitle string\n\tISBN  string\n}\n\ntype Library struct {\n\tBooks []Book\n}\n\n// BUG: this implementation is wrong — fix it\nfunc (l Library) lookupByISBN(isbn string) *Book {\n\tfor _, b := range l.Books {\n\t\tif b.Title == isbn {\n\t\t\treturn &b\n\t\t}\n\t}\n\treturn nil\n}\n\nfunc TestLookupByISBN(t *testing.T) {\n\tlib := Library{Books: []Book{\n\t\t{\"Go 101\", \"978-123\"},\n\t\t{\"Testing\", \"978-456\"},\n\t\t{\"Network Programming\", \"978-789\"},\n\t}}\n\n\ttests := []struct {\n\t\tisbn string\n\t\twant string\n\t}{\n\t\t{\"978-123\", \"Go 101\"},\n\t\t{\"978-456\", \"Testing\"},\n\t\t{\"978-789\", \"Network Programming\"},\n\t\t{\"000-000\", \"\"},\n\t}\n\n\tpassed := 0\n\tfor _, tt := range tests {\n\t\tgot := lib.lookupByISBN(tt.isbn)\n\t\tif tt.want == \"\" {\n\t\t\tif got != nil {\n\t\t\t\tt.Errorf(\"lookupByISBN(%q) = %v, want nil\", tt.isbn, got)\n\t\t\t} else {\n\t\t\t\tpassed++\n\t\t\t}\n\t\t} else {\n\t\t\tif got == nil {\n\t\t\t\tt.Errorf(\"lookupByISBN(%q) = nil, want book titled %q\", tt.isbn, tt.want)\n\t\t\t} else if got.Title != tt.want {\n\t\t\t\tt.Errorf(\"lookupByISBN(%q).Title = %q, want %q\", tt.isbn, got.Title, tt.want)\n\t\t\t} else {\n\t\t\t\tpassed++\n\t\t\t}\n\t\t}\n\t}\n\tfmt.Printf(\"%d/%d cases passed\\n\", passed, len(tests))\n}\n\nfunc main() {\n\tTestLookupByISBN(&testing.T{})\n}",
     "expectedOutput": [
@@ -219,11 +146,11 @@
         "message": "Return nil if no book is found."
       }
     ],
-    "successMessage": "4/4 passed. The test was right — the function was wrong. That is the value of tests: they are the objective referee. Fix the code, run the tests, trust the result."
+    "successMessage": "4/4 passed. The test was right — the function was wrong. That is the value of tests: they are the objective referee."
   },
   {
     "title": "Build a tested library catalog",
-    "instruction": "No starter code.\n\nBuild a library catalog with full test coverage:\n\n1. Define `Book` and `Library` types\n2. Implement three functions: `addBook(title, isbn string)`, `findByISBN(isbn string) *Book`, `listBooks() []Book`\n3. Write a `TestCatalog` function with a table-driven test covering:\n   - Adding books to the library\n   - Finding books by ISBN (both found and not-found cases)\n   - Listing all books\n4. Use `t.Run` to name each subtest\n5. Print the pass count at the end\n\nExpected output ends with:\n```\n8/8 cases passed\n```\n(or more, depending on how many cases you add)",
+    "instruction": "Build a library catalog with full test coverage. Define `Book` and `Library`, implement `addBook`, `findByISBN`, `listBooks`. Write a table-driven test with `t.Run` covering adding, finding, and not-found cases.",
     "hint": "Define a Library struct with a Books slice and methods. Use a table with op string field to distinguish operations.",
     "starter": "package main\n\nimport (\n\t\"fmt\"\n\t\"testing\"\n)\n\n// Define your types and functions here\n\ntype Book struct {\n\tTitle string\n\tISBN  string\n}\n\ntype Library struct {\n\tBooks []Book\n}\n\n// Implement: addBook, findByISBN, listBooks\n\nfunc TestCatalog(t *testing.T) {\n\t// Table-driven test with t.Run covering add, find, and list\n}\n\nfunc main() {\n\tTestCatalog(&testing.T{})\n}",
     "expectedOutput": [],
@@ -259,6 +186,6 @@
         "message": "Print the pass count at the end."
       }
     ],
-    "successMessage": "A fully tested library catalog. Three methods, eight-plus test cases, named subtests, coverage for found and not-found cases. This is production-quality Go code. You now test like a professional."
+    "successMessage": "A fully tested library catalog. Three methods, named subtests, coverage for found and not-found cases. This is production-quality Go code."
   }
 ]

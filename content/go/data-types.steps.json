@@ -1,14 +1,15 @@
 [
   {
     "title": "What is a data type",
-    "instruction": "Think about a library.\n\nBooks are organized by section — fiction, non-fiction, reference. Each section serves a different purpose. You would not put a cookbook in the history aisle any more than you would put a DVD in the returns slot.\n\nData works the same way. A book title needs one kind of container. The number of copies needs another. Whether a book is checked out needs another.\n\nIn Go, these containers are called data types. Every variable has one.\n\nRun this and see three different types in action.",
+    "instruction": "Every variable has a type that determines what kind of data it holds — like different library shelves for different kinds of books. Run this and see three different types in action.",
     "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\ttitle := \"The Great Gatsby\"\n\tcopies := 12\n\tavailable := true\n\tfmt.Println(title)\n\tfmt.Println(copies)\n\tfmt.Println(available)\n}",
     "expectedOutput": ["The Great Gatsby", "12", "true"],
-    "successMessage": "Three variables, three types. Each one holds a different kind of data — just like different shelves hold different kinds of books."
+    "successMessage": "Three variables, three types. Each one holds a different kind of data — just like different shelves hold different kinds of books.",
+    "carryForward": true
   },
   {
-    "title": "string — text",
-    "instruction": "A `string` holds text. Any text. A book title, an author's name, an ISBN number stored as text, a genre description.\n\nYou always wrap it in double quotes. That is how Go knows it is text and not code.\n\nCreate a variable called `bookTitle` with any book title as a string. Then print it.",
+    "title": "string — text in quotes",
+    "instruction": "A `string` holds text — book titles, author names, ISBNs. Always wrapped in double quotes. Create a variable called `bookTitle` with any book title and print it.",
     "hint": "bookTitle := \"The Hobbit\"  — text always goes inside double quotes.",
     "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\t// TODO: create a string variable called bookTitle\n\t// TODO: print it\n}",
     "expectedOutput": [],
@@ -17,95 +18,48 @@
       { "pattern": "Println\\(bookTitle\\)", "required": true, "message": "Print it: fmt.Println(bookTitle)" },
       { "pattern": "TODO", "required": false, "message": "Replace the TODO lines with actual code." }
     ],
-    "successMessage": "Strings are the most common type you will use. Any text — book titles, author names, reviews — always in double quotes."
+    "successMessage": "Strings are the most common type you will use. Any text — always in double quotes."
   },
   {
-    "title": "int — whole numbers",
-    "instruction": "`int` holds whole numbers. No decimal point. ISBN counts, page numbers, publication years, number of copies on the shelf.\n\nWhen you just write a plain number without a decimal, Go gives it the type `int` by default.\n\n`int` adjusts to the computer it runs on — 64-bit on modern machines, 32-bit on older ones. For most programs, `int` is all you need.\n\nCreate a variable called `totalCopies` with the number 42. Print it.",
-    "hint": "totalCopies := 42  — no quotes, no decimal point.",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\t// TODO: create an int variable called totalCopies\n\t// TODO: print it\n}",
+    "title": "int and float64 — numbers",
+    "instruction": "`int` holds whole numbers (no decimal). `float64` holds numbers with decimals. Create `totalCopies` as int (42) and `bookPrice` as float64 (14.99). Print both.",
+    "hint": "totalCopies := 42  and  bookPrice := 14.99  — no quotes around numbers.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\t// TODO: create totalCopies as int (42)\n\t// TODO: create bookPrice as float64 (14.99)\n\t// TODO: print both\n}",
     "expectedOutput": [],
     "codeChecks": [
-      { "pattern": "totalCopies\\s*:=\\s*\\d+", "required": true, "message": "Create an int variable: totalCopies := 42" },
-      { "pattern": "Println\\(totalCopies\\)", "required": true, "message": "Print it: fmt.Println(totalCopies)" },
+      { "pattern": "totalCopies\\s*:=\\s*\\d+", "required": true, "message": "Create an int: totalCopies := 42" },
+      { "pattern": "bookPrice\\s*:=\\s*\\d+\\.\\d+", "required": true, "message": "Create a float64: bookPrice := 14.99" },
+      { "pattern": "Println\\(totalCopies\\)", "required": true, "message": "Print totalCopies." },
+      { "pattern": "Println\\(bookPrice\\)", "required": true, "message": "Print bookPrice." },
       { "pattern": "TODO", "required": false, "message": "Replace the TODO lines with actual code." }
     ],
-    "successMessage": "int is the default number type. It covers most use cases — like tracking copies on the shelf."
-  },
-  {
-    "title": "int8, int16, int32, int64 — sized integers",
-    "instruction": "Sometimes you need to control exactly how much memory a number uses. That is what sized integers are for.\n\nThe number after `int` is how many bits it uses — and bits determine the range:\n\n- `int8`  — 8 bits  — range: -128 to 127\n- `int16` — 16 bits — range: -32,768 to 32,767\n- `int32` — 32 bits — range: -2 billion to 2 billion\n- `int64` — 64 bits — range: very very large numbers\n\nSmaller types use less memory. Larger types hold bigger numbers. You pick based on what your data needs.\n\nRun this to see them all.",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tvar shelfCount   int8  = 20\n\tvar sectionCount int16 = 450\n\tvar patronCount  int32 = 1500000\n\tvar totalBooks   int64 = 9000000000\n\tfmt.Println(shelfCount)\n\tfmt.Println(sectionCount)\n\tfmt.Println(patronCount)\n\tfmt.Println(totalBooks)\n}",
-    "expectedOutput": ["20", "450", "1500000", "9000000000"],
-    "successMessage": "Same idea as int but with a specific size. Use the smallest one that fits your data — just like using the right shelf for the right book."
-  },
-  {
-    "title": "uint — unsigned integers",
-    "instruction": "Regular `int` can hold negative numbers. But sometimes your value can never be negative — a book's page count, the number of patrons, a library card ID.\n\nFor those, use `uint` (unsigned integer). It only holds zero and positive numbers, which means it can hold twice the positive range.\n\n- `uint8`  — 0 to 255\n- `uint16` — 0 to 65,535\n- `uint32` — 0 to 4 billion\n- `uint64` — 0 to very very large\n\nAdd a `var` declaration for `pageCount` as `uint16` with the value `384`, then print it.",
-    "hint": "var pageCount uint16 = 384",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tvar libraryID uint64 = 550000000\n\tfmt.Println(libraryID)\n\t// TODO: add pageCount as uint16 with value 384\n\t// TODO: print pageCount\n}",
-    "expectedOutput": ["550000000", "384"],
-    "codeChecks": [
-      { "pattern": "var\\s+pageCount\\s+uint16\\s*=\\s*384", "required": true, "message": "Declare pageCount as uint16: var pageCount uint16 = 384" },
-      { "pattern": "Println\\(pageCount\\)", "required": true, "message": "Print it: fmt.Println(pageCount)" },
-      { "pattern": "TODO", "required": false, "message": "Replace the TODO lines with actual code." }
-    ],
-    "successMessage": "uint is int without the negative side. Use it when your value can never go below zero — like a book's page count."
-  },
-  {
-    "title": "float32 and float64 — decimal numbers",
-    "instruction": "When a whole number is not precise enough, you need a float.\n\n- `float32` — 32 bits, about 7 decimal digits of precision\n- `float64` — 64 bits, about 15 decimal digits of precision\n\nAlways use `float64` unless you have a specific reason not to. It is more precise and it is what Go uses by default when it sees a decimal number.\n\nCreate a `bookPrice` variable as `float32` with value `14.99`, and a `lateFee` variable as `float64` with value `0.25`. Print both.",
-    "hint": "var bookPrice float32 = 14.99  and  var lateFee float64 = 0.25",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\t// TODO: create bookPrice as float32 = 14.99\n\t// TODO: create lateFee as float64 = 0.25\n\t// TODO: print both\n}",
-    "expectedOutput": [],
-    "codeChecks": [
-      { "pattern": "var\\s+bookPrice\\s+float32", "required": true, "message": "Declare bookPrice as float32: var bookPrice float32 = 14.99" },
-      { "pattern": "var\\s+lateFee\\s+float64", "required": true, "message": "Declare lateFee as float64: var lateFee float64 = 0.25" },
-      { "pattern": "Println\\(bookPrice\\)", "required": true, "message": "Print bookPrice: fmt.Println(bookPrice)" },
-      { "pattern": "Println\\(lateFee\\)", "required": true, "message": "Print lateFee: fmt.Println(lateFee)" },
-      { "pattern": "TODO", "required": false, "message": "Replace the TODO lines with actual code." }
-    ],
-    "successMessage": "float64 is the one you will use almost every time. More precision, same effort — essential for tracking book prices and fines."
+    "successMessage": "int for whole numbers, float64 for decimals. Go picks the right type automatically based on the value."
   },
   {
     "title": "bool — true or false",
-    "instruction": "A `bool` holds exactly one of two values: `true` or `false`.\n\nThat is it. Nothing else fits.\n\nNo quotes. `true` and `false` are keywords in Go — not text, not numbers.\n\nCreate two bool variables: `isCheckedOut` set to `true`, and `isReferenceOnly` set to `false`. Print both.",
+    "instruction": "A `bool` holds exactly one of two values: `true` or `false`. No quotes. Create `isCheckedOut := true` and `isReferenceOnly := false`. Print both.",
     "hint": "isCheckedOut := true  and  isReferenceOnly := false  — no quotes around true or false.",
     "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\t// TODO: create isCheckedOut (true) and isReferenceOnly (false)\n\t// TODO: print both\n}",
     "expectedOutput": ["true", "false"],
     "codeChecks": [
       { "pattern": "isCheckedOut\\s*:=\\s*true", "required": true, "message": "Create isCheckedOut: isCheckedOut := true  (no quotes)" },
       { "pattern": "isReferenceOnly\\s*:=\\s*false", "required": true, "message": "Create isReferenceOnly: isReferenceOnly := false  (no quotes)" },
-      { "pattern": "Println\\(isCheckedOut\\)", "required": true, "message": "Print isCheckedOut: fmt.Println(isCheckedOut)" },
-      { "pattern": "Println\\(isReferenceOnly\\)", "required": true, "message": "Print isReferenceOnly: fmt.Println(isReferenceOnly)" },
+      { "pattern": "Println\\(isCheckedOut\\)", "required": true, "message": "Print isCheckedOut." },
+      { "pattern": "Println\\(isReferenceOnly\\)", "required": true, "message": "Print isReferenceOnly." },
       { "pattern": "TODO", "required": false, "message": "Replace the TODO lines with actual code." }
     ],
-    "successMessage": "Bools power every decision in your program. Is the book available? Is the patron active? Every if, every condition — it all comes down to true or false."
-  },
-  {
-    "title": "byte — a single character as a number",
-    "instruction": "`byte` is an alias for `uint8`. It holds a number from 0 to 255.\n\nIts main job is representing a single character. Every character on your keyboard has a number assigned to it — that system is called ASCII.\n\n- `'A'` = 65\n- `'a'` = 97\n- `'0'` = 48\n\nNotice single quotes for a character, not double quotes.\n\nRun this and see what number the letter 'L' (for Library) maps to.",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tvar letter byte = 'L'\n\tfmt.Println(letter)\n}",
-    "expectedOutput": ["76"],
-    "successMessage": "'L' is 76 in ASCII. Every character your computer shows on screen is secretly a number — even the ones on a library catalogue."
-  },
-  {
-    "title": "rune — a Unicode character",
-    "instruction": "`rune` is an alias for `int32`. It holds a single Unicode character.\n\nThe difference from `byte`:\n- `byte` handles ASCII — basic English letters and symbols (0-255)\n- `rune` handles Unicode — every character in every language on earth (over 1 million possible values)\n\nIf your library catalogue will ever have books in non-English languages — Arabic, Chinese, Hebrew, emoji in reviews — you need `rune`.\n\nRun this and see the Unicode value of the character.",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tvar letter rune = '\\u0041'\n\tvar emoji  rune = '\\U0001F4DA'\n\tfmt.Println(letter)\n\tfmt.Println(emoji)\n}",
-    "expectedOutput": ["65", "128202"],
-    "successMessage": "rune handles the entire world's writing systems — and emoji too (📚 is 128202). byte handles the basics. Now you know the difference."
+    "successMessage": "Bools power every decision in your program. Every if, every condition — it all comes down to true or false."
   },
   {
     "title": "Type inference — Go figures it out",
-    "instruction": "You have been using `:=` without ever writing the type name. That is because Go looks at the value and figures out the type on its own.\n\nThis is called type inference.\n\n`title := \"The Great Gatsby\"` → Go sees quotes → `string`\n`copies := 12` → Go sees a whole number → `int`\n`price := 14.99` → Go sees a decimal → `float64`\n`available := true` → Go sees true/false → `bool`\n\nYou can print the actual type of any variable using `%T` in `fmt.Printf`.\n\nRun this and see the types Go assigned.",
+    "instruction": "You have been using `:=` without writing the type name. Go reads the value and picks the type automatically. Run this and see the types Go assigned using `%T` in `fmt.Printf`.",
     "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\ttitle     := \"The Great Gatsby\"\n\tcopies    := 12\n\tprice     := 14.99\n\tavailable := true\n\tfmt.Printf(\"%T\\n\", title)\n\tfmt.Printf(\"%T\\n\", copies)\n\tfmt.Printf(\"%T\\n\", price)\n\tfmt.Printf(\"%T\\n\", available)\n}",
     "expectedOutput": ["string", "int", "float64", "bool"],
     "successMessage": "Go reads your value and picks the right type automatically. You only need to be explicit when you want a specific sized type."
   },
   {
-    "title": "\"42\" is not 42",
-    "instruction": "This is a trap that catches a lot of beginners.\n\n`42` is a number. You can do math with it.\n`\"42\"` is a string — the characters 4 and 2. You cannot do math with it.\n\nThey look similar but Go treats them as completely different things.\n\nThis program is tracking how many books a patron has checked out. There is a bug because of this exact mistake. Fix it so both numbers add up correctly.",
+    "title": "\"42\" is not 42 — quotes matter",
+    "instruction": "`42` is a number you can do math with. `\"42\"` is a string — the characters 4 and 2. The code below tracks checked-out books but has a bug. Fix `b` so both numbers add up correctly.",
     "hint": "Remove the quotes around 42 on the second line. A number should never have quotes around it.",
     "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\ta := 10\n\tb := \"42\"\n\tfmt.Println(a + b)\n}",
     "expectedOutput": ["52"],
@@ -115,30 +69,19 @@
     "successMessage": "Quotes mean text. No quotes means number. Never mix them — your library's checkout counts depend on getting this right."
   },
   {
-    "title": "Type conversion — changing from one type to another",
-    "instruction": "Go will not automatically mix types. If you want to use an `int` where a `float64` is needed, you have to convert it yourself.\n\nThe syntax is simple: wrap the value with the type name.\n\n`float64(myInt)` converts an int to float64\n`int(myFloat)` converts a float64 to int (drops the decimal)\n`int64(myInt)` converts int to int64\n\nThe code below tries to add an `int` (number of books checked out) and a `float64` (late fee total) directly. Fix it by converting `booksOut` to `float64` before the addition.",
+    "title": "Type conversion — change types explicitly",
+    "instruction": "Go will not automatically mix types. Convert with `float64(myInt)` or `int(myFloat)`. Fix the code by converting `booksOut` to `float64` before adding it to `lateFee`.",
     "hint": "Change the Println line to: fmt.Println(float64(booksOut) + lateFee)",
     "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tbooksOut := 3\n\tlateFee  := 1.50\n\tfmt.Println(booksOut + lateFee)\n}",
     "expectedOutput": ["4.5"],
     "codeChecks": [
       { "pattern": "float64\\(booksOut\\)", "required": true, "message": "Convert booksOut to float64 before adding: float64(booksOut) + lateFee" }
     ],
-    "successMessage": "Go never converts types silently. You are always in control of when and how a conversion happens — like converting a count to a float for fee calculations."
-  },
-  {
-    "title": "Types do not change",
-    "instruction": "Once a variable has a type, it keeps that type forever.\n\nYou cannot store a string in an int variable. You cannot store a float in a bool variable. Go will refuse and give you an error.\n\nThis program tries to do exactly that. Read the error, understand why, then fix it by changing the second assignment to a valid int value.",
-    "hint": "availableCopies is an int. You cannot assign \"five\" (a string) to it. Change it to the number 5.",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tavailableCopies := 10\n\tfmt.Println(availableCopies)\n\tavailableCopies = \"five\"\n\tfmt.Println(availableCopies)\n}",
-    "expectedOutput": ["10", "5"],
-    "codeChecks": [
-      { "pattern": "availableCopies\\s*=\\s*\"five\"", "required": false, "message": "availableCopies is an int. Replace \"five\" with the number 5." }
-    ],
-    "successMessage": "Types are permanent. That rigidness is actually a feature — it catches a whole class of bugs before your program ever runs, like putting a book on the wrong shelf."
+    "successMessage": "Go never converts types silently. You are always in control of when and how a conversion happens."
   },
   {
     "title": "Use six types in one program",
-    "instruction": "No starter code this time.\n\nCreate six variables using six different types — all about the library:\n- `sectionName` — string (e.g., \"Fiction\")\n- `totalShelves` — int (e.g., 15)\n- `members` — int64 (e.g., 2500)\n- `lateFeeRate` — float64 (e.g., 0.50)\n- `isOpen` — bool (e.g., true)\n- `sectionCode` — byte (set it to `'F'` for Fiction)\n\nPrint all six.",
+    "instruction": "Create six variables using six different types: `sectionName` (string), `totalShelves` (int), `members` (int64), `lateFeeRate` (float64), `isOpen` (bool), `sectionCode` (byte = 'F'). Print all six.",
     "hint": "sectionName := \"Fiction\", totalShelves := 15, var members int64 = 2500, lateFeeRate := 0.50, isOpen := true, var sectionCode byte = 'F'",
     "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\t// Build your variables here\n}",
     "expectedOutput": [],

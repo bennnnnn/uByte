@@ -1,323 +1,127 @@
 [
   {
     "title": "What is an error in Go",
-    "instruction": "Most languages throw exceptions — they're like fire alarms that scream until someone handles them.\n\nGo is different. Functions return errors as regular values — like a librarian handing you a book *and* a note: \"Here's your book, and here's what went wrong (if anything).\"\n\nRun this. The second call returns an error because there is no book with ID 0.",
+    "instruction": "Most languages throw exceptions — like fire alarms that scream until someone handles them. Go is different: functions return errors as regular values.\\nRun this. The second call returns an error because \"hello\" is not a number.",
     "starter": "package main\n\nimport (\n\t\"fmt\"\n\t\"strconv\"\n)\n\nfunc main() {\n\tn, err := strconv.Atoi(\"42\")\n\tfmt.Println(n, err)\n\n\tm, err := strconv.Atoi(\"hello\")\n\tfmt.Println(m, err)\n}",
-    "expectedOutput": [
-      "42 <nil>",
-      "0 strconv.Atoi: parsing \"hello\": invalid syntax"
-    ],
-    "successMessage": "nil means \"nothing went wrong.\" A non-nil error means \"here's the problem.\" Two return values, always. That's Go's error philosophy."
+    "expectedOutput": ["42 <nil>", "0 strconv.Atoi: parsing \"hello\": invalid syntax"],
+    "successMessage": "nil means \"nothing went wrong.\" A non-nil error means \"here's the problem.\" Two return values, always. That's Go's error philosophy.",
+    "carryForward": true
   },
   {
     "title": "Checking an error — if err != nil",
-    "instruction": "The most common pattern in all of Go:\n\n```\nresult, err := someFunction()\nif err != nil {\n    fmt.Println(\"Error:\", err)\n    return\n}\n// safe to use result here\n```\n\nAdd a check: if `strconv.Atoi` returns an error, print `\"Invalid member ID:\"` and the error. Otherwise print `\"Member #:\"` and the number. Test with both `\"42\"` and `\"abc\"`.",
+    "instruction": "The most common pattern in all of Go: `if err != nil { ... }`.\\nAdd a check: if `strconv.Atoi` returns an error, print `\"Invalid member ID:\"` and the error. Otherwise print `\"Member #:\"` and the number. Test with both `\"42\"` and `\"abc\"`.",
     "hint": "if err != nil { fmt.Println(\"Invalid member ID:\", err); return }  fmt.Println(\"Member #:\", n)",
     "starter": "package main\n\nimport (\n\t\"fmt\"\n\t\"strconv\"\n)\n\nfunc lookupMember(s string) {\n\tn, err := strconv.Atoi(s)\n\t// TODO: If err != nil, print \"Invalid member ID:\" and err, then return\n\t// TODO: Otherwise print \"Member #:\" and n\n}\n\nfunc main() {\n\tlookupMember(\"42\")\n\tlookupMember(\"abc\")\n}",
-    "expectedOutput": [
-      "Member #: 42",
-      "Invalid member ID: strconv.Atoi: parsing \"abc\": invalid syntax"
-    ],
+    "expectedOutput": ["Member #: 42", "Invalid member ID: strconv.Atoi: parsing \"abc\": invalid syntax"],
     "codeChecks": [
-      {
-        "pattern": "err\\s*!=\\s*nil",
-        "required": true,
-        "message": "Check the error: if err != nil { ... }"
-      },
-      {
-        "pattern": "Invalid member ID",
-        "required": true,
-        "message": "Print \"Invalid member ID:\" when err != nil."
-      },
-      {
-        "pattern": "Member #",
-        "required": true,
-        "message": "Print \"Member #:\" and n when there is no error."
-      },
-      {
-        "pattern": "TODO",
-        "required": false,
-        "message": "Replace the TODO comments with your code."
-      }
+      { "pattern": "err\\s*!=\\s*nil", "required": true, "message": "Check the error: if err != nil { ... }" },
+      { "pattern": "Invalid member ID", "required": true, "message": "Print \"Invalid member ID:\" when err != nil." },
+      { "pattern": "Member #", "required": true, "message": "Print \"Member #:\" and n when there is no error." },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comments with your code." }
     ],
-    "successMessage": "if err != nil — you will type this hundreds of times in your Go career. It becomes muscle memory. And it means you never accidentally ignore a failure."
+    "successMessage": "if err != nil — you will type this hundreds of times in your Go career. It becomes muscle memory."
   },
   {
-    "title": "errors.New() — create your own error",
-    "instruction": "You can create your own error values using `errors.New()`:\n\n`return 0, errors.New(\"book not found\")`\n\nThe `errors` package is part of the standard library.\n\nAdd an error case to `findBook`: if `id < 1`, return `\"\"` and a new error `\"book not found\"`. Otherwise return the book title and `nil`.",
+    "title": "ahha — errors.New() creates your own errors",
+    "instruction": "You can create your own error values using `errors.New()`.\\n`return 0, errors.New(\"book not found\")`\\nAdd an error case to `findBook`: if `id < 1`, return `\"\"` and a new error `\"book not found\"`. Otherwise return the book title and `nil`.",
     "hint": "import \"errors\"  then: if id < 1 { return \"\", errors.New(\"book not found\") }  return \"The Go Programming Language\", nil",
     "starter": "package main\n\nimport (\n\t\"errors\"\n\t\"fmt\"\n)\n\nfunc findBook(id int) (string, error) {\n\t// TODO: If id < 1, return \"\" and errors.New(\"book not found\")\n\t// TODO: Otherwise return \"The Go Programming Language\" and nil\n}\n\nfunc main() {\n\ttitle, err := findBook(42)\n\tif err != nil {\n\t\tfmt.Println(\"Error:\", err)\n\t} else {\n\t\tfmt.Println(title)\n\t}\n\n\t_, err = findBook(0)\n\tif err != nil {\n\t\tfmt.Println(\"Error:\", err)\n\t}\n}",
-    "expectedOutput": [
-      "The Go Programming Language",
-      "Error: book not found"
-    ],
+    "expectedOutput": ["The Go Programming Language", "Error: book not found"],
     "codeChecks": [
-      {
-        "pattern": "errors\\.New\\(",
-        "required": true,
-        "message": "Use errors.New() to create the error."
-      },
-      {
-        "pattern": "book not found",
-        "required": true,
-        "message": "The error message should be \"book not found\"."
-      },
-      {
-        "pattern": "return.*nil",
-        "required": true,
-        "message": "Return the book title and nil when the id is valid."
-      },
-      {
-        "pattern": "TODO",
-        "required": false,
-        "message": "Replace the TODO comments with your code."
-      }
+      { "pattern": "errors\\.New\\(", "required": true, "message": "Use errors.New() to create the error." },
+      { "pattern": "book not found", "required": true, "message": "The error message should be \"book not found\"." },
+      { "pattern": "return.*nil", "required": true, "message": "Return the book title and nil when the id is valid." },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comments with your code." }
     ],
-    "successMessage": "Your own error, your own message. errors.New is the simplest way to create an error. Clean, readable, no setup required."
+    "successMessage": "Your own error, your own message. errors.New is the simplest way to create an error."
   },
   {
     "title": "fmt.Errorf() — errors with context",
-    "instruction": "`fmt.Errorf` creates an error with a formatted message — like `fmt.Sprintf` but returns an `error`.\n\n`return fmt.Errorf(\"book %q is not in our catalog\", title)`\n\nThis lets you include the actual bad value in the error message, which makes debugging much easier.\n\nAdd the error case: if `year < 1900` or `year > 2026`, return a formatted error. Otherwise return `nil`.",
+    "instruction": "`fmt.Errorf` creates an error with a formatted message — like `fmt.Sprintf` but returns an `error`.\\n`return fmt.Errorf(\"book %q is not in our catalog\", title)`\\nAdd the error case: if `year < 1900` or `year > 2026`, return a formatted error. Otherwise return `nil`.",
     "hint": "if year < 1900 || year > 2026 { return fmt.Errorf(\"invalid year %d: must be between 1900 and 2026\", year) }  return nil",
     "starter": "package main\n\nimport \"fmt\"\n\nfunc validateYear(year int) error {\n\t// TODO: If year < 1900 or year > 2026, return fmt.Errorf with the year in the message\n\t// TODO: Otherwise return nil\n}\n\nfunc main() {\n\tif err := validateYear(2020); err != nil {\n\t\tfmt.Println(err)\n\t} else {\n\t\tfmt.Println(\"Valid publication year\")\n\t}\n\n\tif err := validateYear(1800); err != nil {\n\t\tfmt.Println(err)\n\t}\n}",
-    "expectedOutput": [
-      "Valid publication year",
-      "invalid year 1800: must be between 1900 and 2026"
-    ],
+    "expectedOutput": ["Valid publication year", "invalid year 1800: must be between 1900 and 2026"],
     "codeChecks": [
-      {
-        "pattern": "fmt\\.Errorf\\(",
-        "required": true,
-        "message": "Use fmt.Errorf() to create the error with the year value."
-      },
-      {
-        "pattern": "%d",
-        "required": true,
-        "message": "Include the year value in the error message using %d."
-      },
-      {
-        "pattern": "return nil",
-        "required": true,
-        "message": "Return nil when the year is valid."
-      },
-      {
-        "pattern": "TODO",
-        "required": false,
-        "message": "Replace the TODO comments with your code."
-      }
+      { "pattern": "fmt\\.Errorf\\(", "required": true, "message": "Use fmt.Errorf() to create the error with the year value." },
+      { "pattern": "%d", "required": true, "message": "Include the year value in the error message using %d." },
+      { "pattern": "return nil", "required": true, "message": "Return nil when the year is valid." },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comments with your code." }
     ],
-    "successMessage": "\"invalid year 1800\" — the bad value is right there in the error. This is how professional Go code reports errors. Always include context."
-  },
-  {
-    "title": "Ignoring errors — the dangerous shortcut",
-    "instruction": "You can ignore the error return value with `_`. Go will not stop you.\n\n```\ntitle, _ := findBook(id)  // silently ignores any error\n```\n\nThis is the most common source of subtle bugs in Go. If the lookup fails, `title` will be `\"\"` — and you will never know why.\n\nRun this. Both IDs are processed — but the broken one silently produces an empty string. Then fix it by printing a message when the error is not nil.",
-    "hint": "Change title, _ := to title, err :=  then add: if err != nil { fmt.Println(\"skipping missing book:\", id); continue }",
-    "starter": "package main\n\nimport (\n\t\"errors\"\n\t\"fmt\"\n)\n\nfunc findBook(id int) (string, error) {\n\tif id < 1 {\n\t\treturn \"\", errors.New(\"not found\")\n\t}\n\treturn fmt.Sprintf(\"Book %d\", id), nil\n}\n\nfunc main() {\n\tids := []int{101, 0, 102}\n\tvar catalog []string\n\n\tfor _, id := range ids {\n\t\t// BUG: error is ignored — fix it\n\t\ttitle, _ := findBook(id)\n\t\tcatalog = append(catalog, title)\n\t}\n\n\tfmt.Println(\"Catalog:\", catalog)\n}",
-    "expectedOutput": [
-      "skipping missing book: 0",
-      "Catalog: [Book 101 Book 102]"
-    ],
-    "codeChecks": [
-      {
-        "pattern": "err\\s*!=\\s*nil",
-        "required": true,
-        "message": "Check the error instead of ignoring it with _."
-      },
-      {
-        "pattern": "skipping missing book",
-        "required": true,
-        "message": "Print a message when a missing book is found."
-      }
-    ],
-    "successMessage": "Catalog has [Book 101 Book 102] — correctly skipping the invalid ID with a visible message. Never ignore errors silently. Always handle or at least log them."
-  },
-  {
-    "title": "Multiple error checks in one function",
-    "instruction": "A function can have multiple failure points. Check each one and return the first error you find.\n\n`validateBook` below checks three things: title, ISBN, author. Fill in the missing checks.",
-    "hint": "if title == \"\" { return errors.New(\"title cannot be empty\") }  if len(isbn) != 13 { return fmt.Errorf(\"ISBN %s must be exactly 13 characters\", isbn) }",
-    "starter": "package main\n\nimport (\n\t\"errors\"\n\t\"fmt\"\n)\n\nfunc validateBook(title string, isbn string, author string) error {\n\t// TODO: If title is empty, return errors.New(\"title cannot be empty\")\n\t// TODO: If len(isbn) != 13, return fmt.Errorf with the isbn in the message\n\tif author == \"\" {\n\t\treturn errors.New(\"author cannot be empty\")\n\t}\n\treturn nil\n}\n\nfunc main() {\n\tcheck := func(err error) {\n\t\tif err != nil {\n\t\t\tfmt.Println(\"Invalid:\", err)\n\t\t} else {\n\t\t\tfmt.Println(\"Valid\")\n\t\t}\n\t}\n\n\tcheck(validateBook(\"\", \"978-0-123456\", \"Donovan\"))\n\tcheck(validateBook(\"Go Programming\", \"short\", \"Donovan\"))\n\tcheck(validateBook(\"Go Programming\", \"978-0-1234567890\", \"\"))\n\tcheck(validateBook(\"Go Programming\", \"978-0-1234567890\", \"Donovan\"))\n}",
-    "expectedOutput": [
-      "Invalid: title cannot be empty",
-      "Invalid: ISBN short must be exactly 13 characters",
-      "Invalid: author cannot be empty",
-      "Valid"
-    ],
-    "codeChecks": [
-      {
-        "pattern": "title\\s*==\\s*\"\"",
-        "required": true,
-        "message": "Check if title is empty."
-      },
-      {
-        "pattern": "len\\(isbn\\)\\s*!=\\s*13|len\\(isbn\\)\\s*!=\\\\s*13",
-        "required": true,
-        "message": "Check if ISBN length is not 13."
-      },
-      {
-        "pattern": "TODO",
-        "required": false,
-        "message": "Replace the TODO comments with your checks."
-      }
-    ],
-    "successMessage": "Four tests, four different outcomes. Each check returns early on the first failure. This is the standard Go validation pattern — return the first error found."
+    "successMessage": "\"invalid year 1800\" — the bad value is right there in the error. This is how professional Go code reports errors."
   },
   {
     "title": "Custom error types",
-    "instruction": "Sometimes you need more than a message. You want a structured error you can inspect programmatically.\n\nCreate a custom error type by defining a struct with an `Error() string` method:\n\n```\ntype LibraryError struct {\n    Code    string\n    Message string\n}\n\nfunc (e LibraryError) Error() string {\n    return fmt.Sprintf(\"[%s] %s\", e.Code, e.Message)\n}\n```\n\nRun this and see the custom error printed. Then add a second return that returns a `LibraryError` for the `\"OVERDUE\"` code.",
+    "instruction": "Sometimes you need more than a message — a structured error you can inspect programmatically.\\nDefine a struct with an `Error() string` method:\\n`type LibraryError struct { Code, Message string }`\\nRun this. Then add a second return that returns a `LibraryError` for the `\"OVERDUE\"` code.",
     "hint": "return LibraryError{Code: \"OVERDUE\", Message: \"book is overdue by 5 days\"}",
     "starter": "package main\n\nimport \"fmt\"\n\ntype LibraryError struct {\n\tCode    string\n\tMessage string\n}\n\nfunc (e LibraryError) Error() string {\n\treturn fmt.Sprintf(\"[%s] %s\", e.Code, e.Message)\n}\n\nfunc processBook(id int) error {\n\tif id == 0 {\n\t\treturn LibraryError{Code: \"NOT_FOUND\", Message: \"book does not exist\"}\n\t}\n\t// TODO: Return a LibraryError with Code \"OVERDUE\" when id < 0\n\treturn nil\n}\n\nfunc main() {\n\tfmt.Println(processBook(0))\n\tfmt.Println(processBook(-1))\n\tfmt.Println(processBook(42))\n}",
-    "expectedOutput": [
-      "[NOT_FOUND] book does not exist",
-      "[OVERDUE] book is overdue by 5 days",
-      "<nil>"
-    ],
+    "expectedOutput": ["[NOT_FOUND] book does not exist", "[OVERDUE] book is overdue by 5 days", "<nil>"],
     "codeChecks": [
-      {
-        "pattern": "LibraryError\\{Code:\\s*\"OVERDUE\"",
-        "required": true,
-        "message": "Return a LibraryError with Code: \"OVERDUE\"."
-      },
-      {
-        "pattern": "TODO",
-        "required": false,
-        "message": "Replace the TODO comment with your code."
-      }
+      { "pattern": "LibraryError\\{Code:\\s*\"OVERDUE\"", "required": true, "message": "Return a LibraryError with Code: \"OVERDUE\"." },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
     ],
-    "successMessage": "Structured errors with fields you can read programmatically. Not just a message — a type. Next step: check which type of error you got."
+    "successMessage": "Structured errors with fields you can read programmatically. Not just a message — a type."
   },
   {
     "title": "errors.Is() — identify a specific error",
-    "instruction": "When a function can return different errors, you sometimes need to know which one you got.\n\n`errors.Is(err, ErrBookNotFound)` checks if `err` matches a specific sentinel error.\n\nA sentinel error is a package-level variable: `var ErrBookNotFound = errors.New(\"book not found\")`\n\nRun this. Then add a check for `ErrBookOverdue` and print a different message for it.",
+    "instruction": "`errors.Is(err, ErrBookNotFound)` checks if `err` matches a specific sentinel error.\\nA sentinel error is a package-level variable: `var ErrBookNotFound = errors.New(\"book not found\")`\\nRun this. Then add a check for `ErrBookOverdue` and print a different message for it.",
     "hint": "} else if errors.Is(err, ErrBookOverdue) { fmt.Println(\"This book is overdue — please return it\") }",
     "starter": "package main\n\nimport (\n\t\"errors\"\n\t\"fmt\"\n)\n\nvar ErrBookNotFound = errors.New(\"book not found\")\nvar ErrBookOverdue = errors.New(\"book is overdue\")\n\nfunc checkBook(id int) (string, error) {\n\tif id == 0 {\n\t\treturn \"\", ErrBookNotFound\n\t}\n\tif id < 0 {\n\t\treturn \"\", ErrBookOverdue\n\t}\n\treturn \"The Go Programming Language\", nil\n}\n\nfunc main() {\n\tids := []int{1, 0, -1}\n\tfor _, id := range ids {\n\t\ttitle, err := checkBook(id)\n\t\tif err == nil {\n\t\t\tfmt.Println(\"Found:\", title)\n\t\t} else if errors.Is(err, ErrBookNotFound) {\n\t\t\tfmt.Println(\"Book not in catalog\")\n\t\t\t// TODO: Add a separate check for ErrBookOverdue here\n\t\t} else {\n\t\t\tfmt.Println(\"Unknown error:\", err)\n\t\t}\n\t}\n}",
-    "expectedOutput": [
-      "Found: The Go Programming Language",
-      "Book not in catalog",
-      "This book is overdue — please return it"
-    ],
+    "expectedOutput": ["Found: The Go Programming Language", "Book not in catalog", "This book is overdue — please return it"],
     "codeChecks": [
-      {
-        "pattern": "errors\\.Is\\(err,\\s*ErrBookOverdue\\)",
-        "required": true,
-        "message": "Use errors.Is(err, ErrBookOverdue) to check for the overdue error."
-      },
-      {
-        "pattern": "This book is overdue",
-        "required": true,
-        "message": "Print \"This book is overdue — please return it\" for the overdue case."
-      },
-      {
-        "pattern": "TODO",
-        "required": false,
-        "message": "Replace the TODO comment with your check."
-      }
+      { "pattern": "errors\\.Is\\(err,\\s*ErrBookOverdue\\)", "required": true, "message": "Use errors.Is(err, ErrBookOverdue) to check for the overdue error." },
+      { "pattern": "This book is overdue", "required": true, "message": "Print \"This book is overdue — please return it\" for the overdue case." },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your check." }
     ],
-    "successMessage": "Three IDs, three outcomes, zero crashes. errors.Is lets you handle each failure case differently without string comparison. This is the right way to check for specific errors."
+    "successMessage": "Three IDs, three outcomes, zero crashes. errors.Is lets you handle each failure case differently without string comparison."
   },
   {
     "title": "errors.As() — extract the error type",
-    "instruction": "`errors.As` checks if an error is a specific type and extracts it so you can read its fields.\n\n```\nvar le LibraryError\nif errors.As(err, &le) {\n    fmt.Println(\"Error code:\", le.Code)\n}\n```\n\nRun this. The error message alone tells you something went wrong. `errors.As` tells you exactly which code and message.",
+    "instruction": "`errors.As` checks if an error is a specific type and extracts it so you can read its fields.\\n`var le LibraryError; if errors.As(err, &le) { fmt.Println(\"Code:\", le.Code) }`\\nRun this. The error message alone tells you something went wrong. `errors.As` tells you exactly which code and message.",
     "starter": "package main\n\nimport (\n\t\"errors\"\n\t\"fmt\"\n)\n\ntype LibraryError struct {\n\tCode    string\n\tMessage string\n}\n\nfunc (e LibraryError) Error() string {\n\treturn fmt.Sprintf(\"[%s] %s\", e.Code, e.Message)\n}\n\nfunc checkShelf(shelfID int) error {\n\tif shelfID < 0 || shelfID > 99 {\n\t\treturn LibraryError{Code: \"INVALID_SHELF\", Message: fmt.Sprintf(\"shelf %d is out of range\", shelfID)}\n\t}\n\treturn nil\n}\n\nfunc main() {\n\terr := checkShelf(200)\n\tif err != nil {\n\t\tfmt.Println(\"Error:\", err)\n\n\t\tvar le LibraryError\n\t\tif errors.As(err, &le) {\n\t\t\tfmt.Println(\"Code:\", le.Code)\n\t\t\tfmt.Println(\"Details:\", le.Message)\n\t\t}\n\t}\n}",
-    "expectedOutput": [
-      "Error: [INVALID_SHELF] shelf 200 is out of range",
-      "Code: INVALID_SHELF",
-      "Details: shelf 200 is out of range"
-    ],
-    "successMessage": "errors.As extracted the full LibraryError — error code, message, everything. This is how you build rich error handling that does more than just print a string."
+    "expectedOutput": ["Error: [INVALID_SHELF] shelf 200 is out of range", "Code: INVALID_SHELF", "Details: shelf 200 is out of range"],
+    "successMessage": "errors.As extracted the full LibraryError — error code, message, everything. This is how you build rich error handling."
   },
   {
-    "title": "Wrapping errors — add context without losing the original",
-    "instruction": "When your function calls another function that fails, wrap the error to add context:\n\n`return fmt.Errorf(\"processBook: %w\", err)`\n\nThe `%w` verb wraps the original error. The caller gets the full context. `errors.Is` and `errors.As` still work through the wrap.\n\nRun this and see how the error grows as it travels up the call stack.",
+    "title": "Wrapping errors with %w",
+    "instruction": "When your function calls another function that fails, wrap the error to add context:\\n`return fmt.Errorf(\"processBook: %w\", err)`\\nThe `%w` verb wraps the original error. `errors.Is` and `errors.As` still work through the wrap.\\nRun this and see how the error grows as it travels up the call stack.",
     "starter": "package main\n\nimport (\n\t\"errors\"\n\t\"fmt\"\n)\n\nvar ErrDatabase = errors.New(\"catalog database unavailable\")\n\nfunc queryCatalog() error {\n\treturn ErrDatabase\n}\n\nfunc findBookByID(id int) error {\n\tif err := queryCatalog(); err != nil {\n\t\treturn fmt.Errorf(\"findBookByID(%d): %w\", id, err)\n\t}\n\treturn nil\n}\n\nfunc handleRequest() error {\n\tif err := findBookByID(42); err != nil {\n\t\treturn fmt.Errorf(\"handleBorrowRequest: %w\", err)\n\t}\n\treturn nil\n}\n\nfunc main() {\n\terr := handleRequest()\n\tfmt.Println(err)\n\tfmt.Println(\"Is ErrDatabase?\", errors.Is(err, ErrDatabase))\n}",
-    "expectedOutput": [
-      "handleBorrowRequest: findBookByID(42): catalog database unavailable",
-      "Is ErrDatabase? true"
-    ],
-    "successMessage": "The error message shows the full journey: handleBorrowRequest → findBookByID(42) → catalog database unavailable. errors.Is still finds ErrDatabase through all the wrapping. Context without losing the original."
+    "expectedOutput": ["handleBorrowRequest: findBookByID(42): catalog database unavailable", "Is ErrDatabase? true"],
+    "successMessage": "The error shows the full journey: handleBorrowRequest → findBookByID(42) → catalog database unavailable. errors.Is still finds ErrDatabase through all the wrapping."
   },
   {
     "title": "panic and recover",
-    "instruction": "`panic` stops normal execution immediately. Use it only for truly unrecoverable situations — programming bugs, impossible states.\n\n`recover` catches a panic inside a deferred function. It is Go's equivalent of a last-chance safety net.\n\nRun this. The `safeReturn` function uses `defer` + `recover` to catch the panic and return an empty string instead of crashing.",
+    "instruction": "`panic` stops normal execution immediately. Use it only for truly unrecoverable situations.\\n`recover` catches a panic inside a deferred function.\\nRun this. The `safeReturn` function uses `defer` + `recover` to catch the panic and return a fallback value instead of crashing.",
     "starter": "package main\n\nimport \"fmt\"\n\nfunc safeReturn(bookID int) (result string) {\n\tdefer func() {\n\t\tif r := recover(); r != nil {\n\t\t\tfmt.Println(\"Recovered from panic:\", r)\n\t\t\tresult = \"[unavailable]\"\n\t\t}\n\t}()\n\tif bookID < 1 {\n\t\tpanic(\"invalid book ID passed to system\")\n\t}\n\treturn fmt.Sprintf(\"Book #%d\", bookID)\n}\n\nfunc main() {\n\tfmt.Println(safeReturn(101))\n\tfmt.Println(safeReturn(0))\n\tfmt.Println(safeReturn(202))\n}",
-    "expectedOutput": [
-      "Book #101",
-      "Recovered from panic: invalid book ID passed to system",
-      "[unavailable]",
-      "Book #202"
-    ],
-    "successMessage": "The program did not crash. recover caught the panic, printed the message, and returned a fallback value. Use panic+recover sparingly — for most errors, return an error value instead."
+    "expectedOutput": ["Book #101", "Recovered from panic: invalid book ID passed to system", "[unavailable]", "Book #202"],
+    "successMessage": "The program did not crash. recover caught the panic, printed the message, and returned a fallback value. Use panic+recover sparingly."
   },
   {
     "title": "Fix the broken error check",
-    "instruction": "This program is supposed to look up a book by ID and show its title. But it ignores the error — so when the ID is invalid it silently shows an empty string and nobody knows why.\n\nFix it: check the error from `findBook`. If there is an error, print `\"Lookup failed:\"` and the error, then return. Otherwise print `\"Title:\"` and the result.",
+    "instruction": "This program ignores the error — so when the ID is invalid it silently shows an empty string.\\nFix it: check the error from `findBook`. If there is an error, print `\"Lookup failed:\"` and the error. Otherwise print `\"Title:\"` and the result.",
     "hint": "Change title, _ := findBook(id) to title, err := findBook(id) then add if err != nil { ... }",
     "starter": "package main\n\nimport (\n\t\"errors\"\n\t\"fmt\"\n)\n\nfunc findBook(id int) (string, error) {\n\tif id < 1 {\n\t\treturn \"\", errors.New(\"book not in catalog\")\n\t}\n\treturn fmt.Sprintf(\"The Art of Go (Vol. %d)\", id), nil\n}\n\nfunc displayBook(id int) {\n\t// BUG: error is ignored\n\ttitle, _ := findBook(id)\n\tfmt.Println(\"Title:\", title)\n}\n\nfunc main() {\n\tdisplayBook(1)\n\tdisplayBook(0)\n}",
-    "expectedOutput": [
-      "Title: The Art of Go (Vol. 1)",
-      "Lookup failed: book not in catalog"
-    ],
+    "expectedOutput": ["Title: The Art of Go (Vol. 1)", "Lookup failed: book not in catalog"],
     "codeChecks": [
-      {
-        "pattern": "title,\\s*err\\s*:=\\s*findBook",
-        "required": true,
-        "message": "Capture the error: title, err := findBook(id)"
-      },
-      {
-        "pattern": "err\\s*!=\\s*nil",
-        "required": true,
-        "message": "Check the error: if err != nil { ... }"
-      },
-      {
-        "pattern": "Lookup failed",
-        "required": true,
-        "message": "Print \"Lookup failed:\" when the error is not nil."
-      }
+      { "pattern": "title,\\s*err\\s*:=\\s*findBook", "required": true, "message": "Capture the error: title, err := findBook(id)" },
+      { "pattern": "err\\s*!=\\s*nil", "required": true, "message": "Check the error: if err != nil { ... }" },
+      { "pattern": "Lookup failed", "required": true, "message": "Print \"Lookup failed:\" when the error is not nil." }
     ],
-    "successMessage": "A proper title for valid input, a clear error message for invalid. No silent failures. This is the difference between code that is easy to debug and code that drives you crazy at 2am."
+    "successMessage": "A proper title for valid input, a clear error message for invalid. No silent failures."
   },
   {
     "title": "Build a library validator",
-    "instruction": "No starter code.\n\nBuild a library item validator with a custom error type:\n\n1. Define `CatalogError` with `Field` and `Message` string fields and an `Error() string` method\n2. Write `validateItem(title string, isbn string, copies int) error` that checks:\n   - `title` is not empty → `CatalogError{Field: \"title\", Message: \"cannot be empty\"}`\n   - `isbn` has exactly 13 characters → `CatalogError{Field: \"isbn\", Message: \"must be 13 characters\"}`\n   - `copies` is between 1 and 10 → `CatalogError{Field: \"copies\", Message: \"must be between 1 and 10\"}`\n3. Test with four items — one valid, three each with a different broken field\n\nExpected output:\n```\ntitle: cannot be empty\nisbn: must be 13 characters\ncopies: must be between 1 and 10\nGo Programming is valid\n```",
+    "instruction": "No starter code. Build a library item validator with a custom error type:\\n1. Define `CatalogError` with `Field` and `Message` string fields and `Error() string`\\n2. Write `validateItem(title, isbn string, copies int) error` checking:\\n   - title not empty → `CatalogError{Field: \"title\", Message: \"cannot be empty\"}`\\n   - len(isbn) != 13 → `CatalogError{Field: \"isbn\", Message: \"must be 13 characters\"}`\\n   - copies between 1 and 10 → `CatalogError{Field: \"copies\", Message: \"must be between 1 and 10\"}`\\n3. Test with four items — one valid, three each broken in a different field",
     "hint": "Use len(isbn) != 13 to check the ISBN length.",
     "starter": "package main\n\nimport (\n\t\"fmt\"\n)\n\n// Build your validator here\n\nfunc main() {\n}",
-    "expectedOutput": [
-      "title: cannot be empty",
-      "isbn: must be 13 characters",
-      "copies: must be between 1 and 10",
-      "Go Programming is valid"
-    ],
+    "expectedOutput": ["title: cannot be empty", "isbn: must be 13 characters", "copies: must be between 1 and 10", "Go Programming is valid"],
     "codeChecks": [
-      {
-        "pattern": "type\\s+CatalogError\\s+struct",
-        "required": true,
-        "message": "Define a CatalogError struct."
-      },
-      {
-        "pattern": "func\\s*\\(\\s*\\w+\\s+CatalogError\\s*\\)\\s*Error\\s*\\(\\s*\\)\\s*string",
-        "required": true,
-        "message": "Add Error() string method to CatalogError."
-      },
-      {
-        "pattern": "func\\s+validateItem\\s*\\(",
-        "required": true,
-        "message": "Define the validateItem function."
-      },
-      {
-        "pattern": "title\\s*==\\s*\"\"",
-        "required": true,
-        "message": "Check that title is not empty."
-      },
-      {
-        "pattern": "len\\(isbn\\)\\s*!=\\s*13",
-        "required": true,
-        "message": "Check that ISBN is exactly 13 characters."
-      },
-      {
-        "pattern": "copies\\s*<\\s*1|copies\\s*>\\s*10",
-        "required": true,
-        "message": "Check that copies is between 1 and 10."
-      }
+      { "pattern": "type\\s+CatalogError\\s+struct", "required": true, "message": "Define a CatalogError struct." },
+      { "pattern": "func\\s*\\(\\s*\\w+\\s+CatalogError\\s*\\)\\s*Error\\s*\\(\\s*\\)\\s*string", "required": true, "message": "Add Error() string method to CatalogError." },
+      { "pattern": "func\\s+validateItem\\s*\\(", "required": true, "message": "Define the validateItem function." },
+      { "pattern": "title\\s*==\\s*\"\"", "required": true, "message": "Check that title is not empty." },
+      { "pattern": "len\\(isbn\\)\\s*!=\\s*13", "required": true, "message": "Check that ISBN is exactly 13 characters." },
+      { "pattern": "copies\\s*<\\s*1|copies\\s*>\\s*10", "required": true, "message": "Check that copies is between 1 and 10." }
     ],
-    "successMessage": "A real library catalog validator with structured errors. You built it from scratch — custom type, method, three checks, four tests. This exact pattern runs inside production library systems every day."
+    "successMessage": "A real library catalog validator with structured errors. Custom type, method, three checks, four tests."
   }
 ]

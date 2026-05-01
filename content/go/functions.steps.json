@@ -1,168 +1,127 @@
 [
   {
     "title": "What is a function",
-    "instruction": "Think about a library. You walk up to the counter and ask the librarian for a book. You do not need to know how they find it — you just ask and they bring it.\\n\\nA function is the same idea. You give a chunk of code a name. Then you just call that name — and everything inside runs.\\n\\nRun this. The `sayHello` function is defined above main and called from inside it.",
+    "instruction": "Think about a library: you ask the librarian for a book and they bring it. You don't need to know how they find it.\n\nA function is the same idea — you give code a name, then just call that name and everything inside runs.\n\nRun this. The `sayHello` function is defined above main and called three times from inside it.",
     "starter": "package main\n\nimport \"fmt\"\n\nfunc sayHello() {\n\tfmt.Println(\"Hello from a function!\")\n}\n\nfunc main() {\n\tsayHello()\n\tsayHello()\n\tsayHello()\n}",
     "expectedOutput": ["Hello from a function!", "Hello from a function!", "Hello from a function!"],
-    "successMessage": "Three calls, one definition. Change the message inside sayHello and all three lines change. That is the point of functions."
+    "successMessage": "Three calls, same output. A function is a reusable recipe.",
+    "carryForward": true
   },
   {
-    "title": "Define and call your own function",
-    "instruction": "Now write one yourself.\\n\\nA function definition looks like this:\\n\\n```\\nfunc functionName() {\\n    // code here\\n}\\n```\\n\\nDefine a function called `printDivider` that prints `\\\"----------\\\"`. Then call it three times from main.",
-    "hint": "func printDivider() { fmt.Println(\\\"----------\\\") }  — put it above func main(), then call printDivider() three times inside main.",
-    "starter": "package main\n\nimport \"fmt\"\n\n// TODO: Define printDivider above main\n\nfunc main() {\n\t// TODO: Inside main, call printDivider() three times\n}",
-    "expectedOutput": ["----------", "----------", "----------"],
-    "codeChecks": [
-      { "pattern": "func\\s+printDivider\\s*\\(\\)", "required": true, "message": "Define the function: func printDivider() { ... }" },
-      { "pattern": "(printDivider\\(\\).*\\n.*){2}|printDivider\\(\\)[\\s\\S]*printDivider\\(\\)[\\s\\S]*printDivider\\(\\)", "required": true, "flags": "m", "message": "Call printDivider() three times inside main." },
-      { "pattern": "TODO", "required": false, "message": "Replace the TODO comments with your code." }
-    ],
-    "successMessage": "Your function, your name, your call. That is all there is to defining and using a function."
-  },
-  {
-    "title": "Parameters — give the function inputs",
-    "instruction": "A function with no parameters always does exactly the same thing. More useful is a function that accepts inputs and does something with them.\\n\\n`func greet(name string)` — this function takes one string and uses it.\\n\\nChange the name passed to `greet` to your own name and run it.",
-    "hint": "Change \\\"Alex\\\" to your name in the greet() call inside main.",
+    "title": "Parameters — make it flexible",
+    "instruction": "A function with no parameters always does the same thing. A function with a parameter can adapt.\n\n`greet(name string)` takes a name and prints it. Call it with your own name instead of \"Alex\".",
     "starter": "package main\n\nimport \"fmt\"\n\nfunc greet(name string) {\n\tfmt.Println(\"Hey\", name, \"— welcome to Go!\")\n}\n\nfunc main() {\n\tgreet(\"Alex\")\n}",
     "expectedOutput": [],
     "codeChecks": [
-      { "pattern": "greet\\(\"Alex\"\\)", "required": false, "message": "Change the name from \\\"Alex\\\" to your own name." }
+      { "pattern": "greet\\(\"Alex\"\\)", "required": false, "message": "Change the name from \"Alex\" to your own name." }
     ],
     "successMessage": "Parameters let you pass information into a function. Same function, different input, different result."
   },
   {
-    "title": "Multiple parameters",
-    "instruction": "Functions can take more than one parameter. Separate them with commas.\\n\\n`func add(a int, b int) int` — takes two ints.\\n\\nIf two parameters have the same type, you can shorten it: `func add(a, b int)`.\\n\\nAdd a call to `describe` with your own name and age, then run it.",
-    "hint": "describe(\\\"Alex\\\", 25)  — replace Alex and 25 with your own name and age.",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc describe(name string, age int) {\n\tfmt.Printf(\"%s is %d years old\\n\", name, age)\n}\n\nfunc main() {\n\tdescribe(\"Sam\", 30)\n\t// TODO: Add one more call with your own name and age\n}",
+    "title": "Multiple parameters and return values 🤯",
+    "instruction": "Functions can take multiple parameters and return values.\n\n`countBooks(shelves, booksPerShelf int) int` takes two ints and returns one. `findBook(category string, index int) (int, int)` returns two ints — Go's way of giving multiple results at once.\n\nCall both functions and print the results.",
+    "hint": "fmt.Println(countBooks(3, 10))  and  fmt.Println(findBook(\"fiction\", 2))",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc countBooks(shelves, booksPerShelf int) int {\n\treturn shelves * booksPerShelf\n}\n\nfunc findBook(category string, index int) (int, int) {\n\treturn index + 1, len(category)\n}\n\nfunc main() {\n\t// TODO: Call countBooks with 3 shelves, 10 books each\n\t// TODO: Call findBook with \"fiction\" and 2\n}",
     "expectedOutput": [],
     "codeChecks": [
-      { "pattern": "describe\\(\"[^\"]+\",\\s*\\d+\\)", "required": true, "message": "Call describe with a name and age: describe(\\\"YourName\\\", yourAge)" },
-      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your call." }
+      { "pattern": "countBooks\\(3, ?10\\)", "required": true, "message": "Call countBooks with 3 shelves and 10 books per shelf." },
+      { "pattern": "findBook\\(\"fiction\", ?2\\)", "required": true, "message": "Call findBook with \"fiction\" and 2." },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comments with your code." }
     ],
-    "successMessage": "Multiple parameters, one function. Order matters — the values you pass must match the parameter order."
-  },
-  {
-    "title": "Return a value",
-    "instruction": "Functions can give something back using `return`.\\n\\nYou declare the return type after the parameter list:\\n\\n`func double(n int) int { return n * 2 }`\\n\\nThe `int` after the closing parenthesis is the return type.\\n\\nCall `countBooks` with three different shelf sizes and print each result.",
-    "hint": "fmt.Println(countBooks(4))  fmt.Println(countBooks(7))  fmt.Println(countBooks(10))",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc countBooks(shelves int) int {\n\treturn shelves * 10\n}\n\nfunc main() {\n\t// TODO: Print countBooks(4), countBooks(7), and countBooks(10)\n}",
-    "expectedOutput": ["40", "70", "100"],
-    "codeChecks": [
-      { "pattern": "countBooks\\(4\\)", "required": true, "message": "Call countBooks(4) and print the result." },
-      { "pattern": "countBooks\\(7\\)", "required": true, "message": "Call countBooks(7) and print the result." },
-      { "pattern": "countBooks\\(10\\)", "required": true, "message": "Call countBooks(10) and print the result." },
-      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your three calls." }
-    ],
-    "successMessage": "Return sends a value back to wherever the function was called. You can use it directly in Println, assign it to a variable, or pass it to another function."
-  },
-  {
-    "title": "Multiple return values",
-    "instruction": "Go can return more than one value from a function. This is one of Go's most useful features.\\n\\n`func minMax(a, b int) (int, int)` — returns two ints.\\n\\nThis is how Go handles errors too: `result, err := doSomething()`.\\n\\nCall `findBook` and print both the section number and the shelf number.",
-    "hint": "section, shelf := findBook(\"Go\", 5)  then fmt.Println(section, shelf)",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc findBook(category string, index int) (int, int) {\n\treturn index / 3, index % 3\n}\n\nfunc main() {\n\t// TODO: Call findBook(\"Go\", 5), save both results, and print them\n}",
-    "expectedOutput": ["1 2"],
-    "codeChecks": [
-      { "pattern": "findBook\\(\"Go\",\\s*5\\)", "required": true, "message": "Call findBook(\\\"Go\\\", 5)" },
-      { "pattern": ":=\\s*findBook|findBook\\(\"Go\"", "required": true, "message": "Capture both return values: section, shelf := findBook(\\\"Go\\\", 5)" },
-      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
-    ],
-    "successMessage": "Section 1, shelf 2. Two values, one return. This pattern is everywhere in Go — especially for error handling."
+    "successMessage": "Two parameters input, two return values output. Go functions are explicit about what they take and give back."
   },
   {
     "title": "Named return values",
-    "instruction": "You can give return values names. This makes it clear what each one represents.\\n\\n```\\nfunc stats(nums []int) (min, max int) {\\n    min = nums[0]\\n    max = nums[0]\\n    // ...\\n    return  // naked return — returns min and max\\n}\\n```\\n\\nThe named variables are pre-declared. A bare `return` sends them back.\\n\\nRun this and see what it returns for the given shelf.",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc firstAndLast(books []string) (first, last string) {\n\tfirst = books[0]\n\tlast = books[len(books)-1]\n\treturn\n}\n\nfunc main() {\n\tf, l := firstAndLast([]string{\"Go in Action\", \"The Art of Programming\", \"Data Structures\", \"Clean Code\", \"Design Patterns\"})\n\tfmt.Println(\"First:\", f)\n\tfmt.Println(\"Last:\", l)\n}",
-    "expectedOutput": ["First: Go in Action", "Last: Design Patterns"],
-    "successMessage": "Named returns act like pre-declared variables inside the function. The naked return sends them back. Use named returns when the names make the code clearer."
-  },
-  {
-    "title": "Variadic functions",
-    "instruction": "A variadic function accepts any number of arguments.\\n\\n`func sum(nums ...int)` — the `...` means zero or more ints.\\n\\nInside the function, `nums` is a slice. You can loop it, pass it around, use `len()` on it.\\n\\nCall `checkMember` with different sets of book IDs and print each result.",
-    "hint": "fmt.Println(checkMember(101, 102, 103))  fmt.Println(checkMember(201, 202))  fmt.Println(checkMember(301))",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc checkMember(ids ...int) int {\n\ttotal := 0\n\tfor _, id := range ids {\n\t\ttotal += id\n\t}\n\treturn total\n}\n\nfunc main() {\n\t// TODO: Print checkMember(101, 102, 103), then checkMember(201, 202), then checkMember(301)\n}",
-    "expectedOutput": ["306", "403", "301"],
+    "instruction": "Go lets you name the return values in the function signature. When you do, a bare `return` returns them automatically.\n\nFill in the body of `bookInfo` so it returns the title and year using named returns.",
+    "hint": "Inside bookInfo, just set title and year then write return:\n\ttitle = \"Dune\"\n\tyear = 1965\n\treturn",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc bookInfo() (title string, year int) {\n\t// TODO: Set title to \"Dune\"\n\t// TODO: Set year to 1965\n\treturn\n}\n\nfunc main() {\n\tt, y := bookInfo()\n\tfmt.Println(t, y)\n}",
+    "expectedOutput": ["Dune 1965"],
     "codeChecks": [
-      { "pattern": "checkMember\\(101,\\s*102,\\s*103\\)", "required": true, "message": "Call checkMember(101, 102, 103)" },
-      { "pattern": "checkMember\\(201,\\s*202\\)", "required": true, "message": "Call checkMember(201, 202)" },
-      { "pattern": "checkMember\\(301\\)", "required": true, "message": "Call checkMember(301)" },
-      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your calls." }
+      { "pattern": "title\\s*=\\s*\"Dune\"", "required": true, "message": "Set title = \"Dune\"" },
+      { "pattern": "year\\s*=\\s*1965", "required": true, "message": "Set year = 1965" },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comments with your code." }
     ],
-    "successMessage": "Any number of book IDs. fmt.Println itself is variadic — that is how it handles fmt.Println(a, b, c) without complaining."
+    "successMessage": "Named returns make the function self-documenting. The return type tells you what you get back."
   },
   {
-    "title": "Functions as values",
-    "instruction": "In Go, functions are values. You can assign them to variables, store them in maps, pass them to other functions.\\n\\n`var double func(int) int = func(n int) int { return n * 2 }`\\n\\nOr shorter: `double := func(n int) int { return n * 2 }`\\n\\nRun this. Then add your own `triple` function variable that multiplies by 3 and call it.",
-    "hint": "triple := func(n int) int { return n * 3 }  then fmt.Println(triple(5))",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tdouble := func(n int) int {\n\t\treturn n * 2\n\t}\n\tfmt.Println(double(5))\n\t// TODO: Create a triple function variable, then call it with 5\n}",
-    "expectedOutput": ["10", "15"],
+    "title": "Variadic functions (any number of args)",
+    "instruction": "Sometimes you don't know how many arguments you'll get. `...int` means \"zero or more ints.\"\n\n`totalPages(...)` already sums page counts. Uncomment the second call to prove it works with any number of books.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc totalPages(pages ...int) int {\n\ttotal := 0\n\tfor _, p := range pages {\n\t\ttotal += p\n\t}\n\treturn total\n}\n\nfunc main() {\n\tfmt.Println(totalPages(200, 350))\n\t// fmt.Println(totalPages(150, 320, 480, 275))\n}",
+    "expectedOutput": ["550", "1225"],
+    "hint": "Remove the // before the second line to uncomment it.",
+    "successMessage": "One function, any number of arguments. Variadic params handle the rest."
+  },
+  {
+    "title": "Pass a slice to a variadic function",
+    "instruction": "What if you already have a slice of pages? Use `pages...` to expand the slice into individual arguments.\n\nFinish the code: create a `pageCounts` slice, then pass it to `totalPages` using the spread operator.",
+    "hint": "pageCounts := []int{120, 340, 560, 200, 180}\nfmt.Println(totalPages(pageCounts...))",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc totalPages(pages ...int) int {\n\ttotal := 0\n\tfor _, p := range pages {\n\t\ttotal += p\n\t}\n\treturn total\n}\n\nfunc main() {\n\t// TODO: Create a slice of page counts (5 books)\n\t// TODO: Print totalPages(slice...)\n}",
+    "expectedOutput": [],
     "codeChecks": [
-      { "pattern": "triple\\s*:=\\s*func", "required": true, "message": "Create a triple function variable: triple := func(n int) int { return n * 3 }" },
-      { "pattern": "triple\\(5\\)", "required": true, "message": "Call triple(5) and print the result." },
+      { "pattern": "totalPages\\([a-zA-Z]+\\.\\.\\.\\)", "required": true, "message": "Pass the slice to totalPages using slice... syntax." },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comments with your code." }
+    ],
+    "successMessage": "The spread operator (...) unpacks a slice into individual arguments. Slice meets variadic."
+  },
+  {
+    "title": "Func as a value 🤯",
+    "instruction": "In Go, functions are values. You can store a function in a variable and call it later.\n\nAssign a function that takes a title and returns its length to the `getLength` variable, then call it.",
+    "hint": "getLength = func(title string) int {\n\treturn len(title)\n}",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tvar getLength func(string) int\n\t// TODO: Assign a function to getLength that returns len(title)\n\tfmt.Println(getLength(\"Dune\"))\n\tfmt.Println(getLength(\"The Hobbit\"))\n}",
+    "expectedOutput": ["4", "9"],
+    "codeChecks": [
+      { "pattern": "getLength\\s*=\\s*func", "required": true, "message": "Assign a function to getLength using getLength = func..." },
       { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
     ],
-    "successMessage": "Functions are first-class values in Go. You can store them, pass them, return them. This unlocks patterns like callbacks and middleware."
+    "successMessage": "Functions as values — assign them, pass them, return them. Go treats functions like any other type."
   },
   {
-    "title": "Anonymous functions",
-    "instruction": "An anonymous function has no name. It is defined and used inline.\\n\\nUseful when you need a small function once and do not want to name it.\\n\\n```\\nresult := func(a, b int) int {\\n    return a + b\\n}(3, 4)  // called immediately\\n```\\n\\nRun this. Then add an anonymous function that counts books on two shelves and prints the result immediately.",
-    "hint": "fmt.Println(func(a, b int) int { return a * b }(6, 7))",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tresult := func(a, b int) int {\n\t\treturn a + b\n\t}(10, 5)\n\tfmt.Println(result)\n\t// TODO: Add an anonymous function that counts 6 shelves with 7 books each and prints the result right away\n}",
-    "expectedOutput": ["15", "42"],
+    "title": "Anonymous function (closure)",
+    "instruction": "You can define and use a function inline without naming it. This is called an anonymous function.\n\nCall `fmt.Println` with an anonymous function `func(s string) int { return len(s) }(\"Dune\")`.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\t// TODO: Print the result of an anonymous function that takes \"Dune\" and returns its length\n}",
+    "expectedOutput": ["4"],
+    "hint": "fmt.Println(func(s string) int { return len(s) }(\"Dune\"))",
     "codeChecks": [
-      { "pattern": "func\\s*\\(.*\\).*\\{[\\s\\S]*\\}\\s*\\(6,\\s*7\\)", "required": true, "flags": "m", "message": "Define and immediately call an anonymous function with (6, 7)." },
+      { "pattern": "func\\([a-z]+\\)[^}]*\\}", "required": true, "message": "Use func(s string) int { return len(s) }(\"Dune\")" },
       { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
     ],
-    "successMessage": "Define it. Use it. Done. No name needed for one-time-use logic."
+    "successMessage": "Anonymous functions: define, use, forget. Perfect for one-off logic."
   },
   {
-    "title": "Closures",
-    "instruction": "A closure is a function that remembers variables from the scope where it was created — even after that scope is gone.\\n\\nThe counter below remembers `count` between calls. Each call to `counter()` increments and returns it.\\n\\nRun it. Then create a second counter and verify the two counters are independent.",
-    "hint": "c2 := makeCounter()  then call c2() a couple of times and print. It starts at 1 independently.",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc makeCounter() func() int {\n\tcount := 0\n\treturn func() int {\n\t\tcount++\n\t\treturn count\n\t}\n}\n\nfunc main() {\n\tc1 := makeCounter()\n\tfmt.Println(c1())\n\tfmt.Println(c1())\n\tfmt.Println(c1())\n\t// TODO: Create c2 := makeCounter() and print two calls to c2()\n}",
-    "expectedOutput": ["1", "2", "3", "1", "2"],
+    "title": "Pass a function as an argument",
+    "instruction": "You can pass one function into another. `applyToBooks` takes a function that transforms a string.\n\nWrite a function that returns the number of characters in a title, and pass it to `applyToBooks`.",
+    "hint": "countFunc := func(title string) int { return len(title) }\nfmt.Println(applyToBooks(countFunc))",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc applyToBooks(fn func(string) int) {\n\tbooks := []string{\"Dune\", \"1984\", \"The Hobbit\"}\n\tfor _, b := range books {\n\t\tfmt.Println(fn(b))\n\t}\n}\n\nfunc main() {\n\t// TODO: Create a function that returns len(title) and pass it to applyToBooks\n}",
+    "expectedOutput": ["4", "4", "9"],
     "codeChecks": [
-      { "pattern": "c2\\s*:=\\s*makeCounter\\(\\)", "required": true, "message": "Create a second counter: c2 := makeCounter()" },
-      { "pattern": "c2\\(\\)", "required": true, "message": "Call c2() and print the result." },
+      { "pattern": "applyToBooks", "required": true, "message": "Pass your function to applyToBooks." },
       { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
     ],
-    "successMessage": "c1 and c2 each have their own count. They share the same function definition but have separate state. That is a closure."
+    "successMessage": "Functions accepting functions — the foundation of callbacks, middleware, and functional patterns in Go."
   },
   {
-    "title": "Recursion",
-    "instruction": "A recursive function calls itself.\\n\\nIt sounds circular, but it works as long as there is a base case — a condition where it stops calling itself.\\n\\n```\\nfunc countdown(n int) {\\n    if n == 0 { return }  // base case\\n    fmt.Println(n)\\n    countdown(n - 1)      // calls itself\\n}\\n```\\n\\nRun this function that calculates shelves needed. Then call it with 6 and print the result.",
-    "hint": "fmt.Println(shelvesNeeded(6))  — 6 shelves = 120 arrangements",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc shelvesNeeded(n int) int {\n\tif n == 0 {\n\t\treturn 1\n\t}\n\treturn n * shelvesNeeded(n-1)\n}\n\nfunc main() {\n\tfmt.Println(shelvesNeeded(5))\n\t// TODO: Add one more line to print shelvesNeeded(6)\n}",
-    "expectedOutput": ["120", "720"],
+    "title": "Recursion — a function that calls itself",
+    "instruction": "Some problems are best solved by a function that calls itself. This is recursion.\n\n`countdown` prints n, then calls itself with n-1. It stops when n reaches 0.\n\nFill in the recursive call: `countdown(n - 1)`.",
+    "hint": "countdown(n - 1)",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc countdown(n int) {\n\tif n <= 0 {\n\t\tfmt.Println(\"Done!\")\n\t\treturn\n\t}\n\tfmt.Println(n)\n\t// TODO: call countdown with n-1\n}\n\nfunc main() {\n\tcountdown(3)\n}",
+    "expectedOutput": ["3", "2", "1", "Done!"],
     "codeChecks": [
-      { "pattern": "shelvesNeeded\\(6\\)", "required": true, "message": "Call shelvesNeeded(6) and print the result." },
-      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your call." }
+      { "pattern": "countdown\\(n ?- ?1\\)", "required": true, "message": "Call countdown(n - 1) to make it recursive." },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with the recursive call." }
     ],
-    "successMessage": "5 shelves = 120. 6 shelves = 720. The function kept calling itself until it hit n == 0, then unwound back up. Recursion is elegant for tree traversal, file systems, and math."
+    "successMessage": "A function calling itself — recursion. Elegant when used right."
   },
   {
-    "title": "defer",
-    "instruction": "`defer` schedules a function call to run at the very end of the surrounding function — no matter what happens in between.\\n\\nCommon uses: closing a file, releasing a lock, returning a book to the shelf.\\n\\nRun this and notice the order of output. Deferred calls run last, in reverse order if there are multiple.",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tdefer fmt.Println(\"Library is now closed\")\n\tdefer fmt.Println(\"Returning all checked-out books...\")\n\tfmt.Println(\"Opening the library...\")\n\tfmt.Println(\"Processing new arrivals...\")\n}",
-    "expectedOutput": ["Opening the library...", "Processing new arrivals...", "Returning all checked-out books...", "Library is now closed"],
-    "successMessage": "defer runs after everything else, in reverse order (last deferred = first to run at cleanup). Think of it as a cleanup guarantee — even if the function panics, the deferred call still runs."
-  },
-  {
-    "title": "Build a library toolkit",
-    "instruction": "No starter code.\\n\\nWrite four functions:\\n- `countBooks(shelves int, booksPerShelf int) int` — returns shelves * booksPerShelf\\n- `findBook(category string, index int) (int, int)` — returns index / 3, index % 3\\n- `checkMember(ids ...int) int` — sums all the IDs\\n- `calculateFees(daysLate int, dailyRate float64) float64` — returns float64 of daysLate * dailyRate; return 0 if daysLate is 0\\n\\nThen call all four with the following values and print each result:\\n- countBooks(12, 8)\\n- findBook(\\\"Fiction\\\", 7)\\n- checkMember(401, 502, 603)\\n- calculateFees(5, 0.50)",
-    "hint": "Define each function above main. In main: fmt.Println(countBooks(12, 8)) etc.",
-    "starter": "package main\n\nimport \"fmt\"\n\n// TODO: Define your four functions above main\n\nfunc main() {\n\t// TODO: Call all four with the given values\n}",
-    "expectedOutput": ["96", "2 1", "1506", "2.50"],
+    "title": "Build your own library function",
+    "instruction": "Put it all together. Write a function `catalogBook(title string, pages int) string` that returns a formatted string: \"Title: Dune (200 pages)\".\n\nThen call it with \"Dune\" and 200 and print the result.",
+    "hint": "func catalogBook(title string, pages int) string {\n\treturn fmt.Sprintf(\"Title: %s (%d pages)\", title, pages)\n}",
+    "starter": "package main\n\nimport \"fmt\"\n\n// TODO: define catalogBook function here\n\nfunc main() {\n\t// TODO: call catalogBook and print the result\n}",
+    "expectedOutput": ["Title: Dune (200 pages)"],
     "codeChecks": [
-      { "pattern": "func\\s+countBooks\\s*\\(", "required": true, "message": "Define a countBooks function." },
-      { "pattern": "func\\s+findBook\\s*\\(", "required": true, "message": "Define a findBook function." },
-      { "pattern": "func\\s+checkMember\\s*\\(", "required": true, "message": "Define a checkMember function." },
-      { "pattern": "func\\s+calculateFees\\s*\\(", "required": true, "message": "Define a calculateFees function." },
-      { "pattern": "countBooks\\(12", "required": true, "message": "Call countBooks(12, 8) and print the result." },
-      { "pattern": "findBook\\(\"Fiction\"", "required": true, "message": "Call findBook(\\\"Fiction\\\", 7) and print the result." },
-      { "pattern": "checkMember\\(401", "required": true, "message": "Call checkMember(401, 502, 603) and print the result." },
-      { "pattern": "calculateFees\\(5", "required": true, "message": "Call calculateFees(5, 0.50) and print the result." }
+      { "pattern": "func catalogBook\\(title string, pages int\\) string", "required": true, "message": "Define catalogBook with the right signature." },
+      { "pattern": "Sprintf", "required": true, "message": "Use fmt.Sprintf to format the string." },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comments with your code." }
     ],
-    "successMessage": "Four library functions, one toolkit. countBooks, findBook, checkMember, calculateFees — every serious library system is just functions calling other functions. You now know how to build them all."
+    "successMessage": "You just built a real library function. Parameters, return value, formatting — all working together."
   }
 ]

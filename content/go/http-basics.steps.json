@@ -1,16 +1,17 @@
 [
   {
     "title": "Your first library endpoint",
-    "instruction": "A library needs an API. Let's start with a welcome endpoint.\n\nAn HTTP handler is just a function that takes a request (`r`) and writes a response (`w`).\n\nRun this — it creates a handler that writes \"Welcome to the Library API!\" to the response.",
+    "instruction": "An HTTP handler is just a function that takes a request and writes a response. Run this — it creates a handler that responds with \"Welcome to the Library API!\".",
     "starter": "package main\n\nimport (\n\t\"fmt\"\n\t\"net/http\"\n\t\"net/http/httptest\"\n)\n\nfunc welcomeHandler(w http.ResponseWriter, r *http.Request) {\n\tfmt.Fprintln(w, \"Welcome to the Library API!\")\n}\n\nfunc main() {\n\treq := httptest.NewRequest(\"GET\", \"/\", nil)\n\tw := httptest.NewRecorder()\n\twelcomeHandler(w, req)\n\tfmt.Print(w.Body.String())\n}",
     "expectedOutput": [
       "Welcome to the Library API!"
     ],
-    "successMessage": "That's a working HTTP handler for your library. In production you'd call `http.ListenAndServe(\":8080\", nil)` and it becomes a real API server."
+    "successMessage": "That's a working HTTP handler for your library. In production you'd register it with http.HandleFunc and serve it with http.ListenAndServe.",
+    "carryForward": true
   },
   {
     "title": "Writing a search response",
-    "instruction": "`http.ResponseWriter` is an `io.Writer` — you can use `fmt.Fprintln`, `fmt.Fprintf`, or `w.Write()` to send a response.\n\nYou can also set the status code and headers before writing:\n```\nw.WriteHeader(http.StatusOK)       // 200\nw.Header().Set(\"Content-Type\", \"text/plain\")\n```\n\nAdd a second handler `searchHandler` that sets the `Content-Type` to `text/plain` and responds with `\"Searching for: [query]\"` where `query` comes from the URL query parameter `q`. Then call it with q=\"Go programming\".",
+    "instruction": "Add a `searchHandler` that sets `Content-Type` to `text/plain` and responds with \"Searching for: [query]\" where the query comes from the URL parameter `q`. Call it with q=\"Go programming\".",
     "hint": "query := r.URL.Query().Get(\"q\")  fmt.Fprintf(w, \"Searching for: %s\", query)",
     "starter": "package main\n\nimport (\n\t\"fmt\"\n\t\"net/http\"\n\t\"net/http/httptest\"\n)\n\nfunc searchHandler(w http.ResponseWriter, r *http.Request) {\n\tw.Header().Set(\"Content-Type\", \"text/plain\")\n\t// TODO: get \"q\" from query params and respond with \"Searching for: [query]\"\n}\n\nfunc main() {\n\treq := httptest.NewRequest(\"GET\", \"/search?q=Go+programming\", nil)\n\tw := httptest.NewRecorder()\n\tsearchHandler(w, req)\n\tfmt.Print(w.Body.String())\n}",
     "expectedOutput": [
@@ -33,11 +34,11 @@
         "message": "Replace the TODO comment with your code."
       }
     ],
-    "successMessage": "Query parameters are read with r.URL.Query().Get(\"q\"). Headers are set before writing the body. This is how your library search endpoint works."
+    "successMessage": "Query parameters are read with r.URL.Query().Get(\"q\"). This is how your library search endpoint works."
   },
   {
     "title": "Status codes — book availability",
-    "instruction": "HTTP status codes tell the client what happened:\n- `200` — OK (book found)\n- `201` — Created (new book added)\n- `400` — Bad Request\n- `404` — Not Found (book not in catalog)\n- `500` — Internal Server Error\n\n`w.WriteHeader(http.StatusNotFound)` — use the named constants, not magic numbers.\n\nRun this. Two requests — one available book, one missing. Add the missing `404` case: if `isbn` is not `\"978-0141036144\"`, write a `404` status and `\"book not found\"` message.",
+    "instruction": "Use `w.WriteHeader(http.StatusNotFound)` for a 404 when a book is not found. The starter handles ISBN \"978-0141036144\" — add the 404 case for any other ISBN.",
     "hint": "w.WriteHeader(http.StatusNotFound)  fmt.Fprintln(w, \"book not found\")",
     "starter": "package main\n\nimport (\n\t\"fmt\"\n\t\"net/http\"\n\t\"net/http/httptest\"\n)\n\nfunc bookHandler(w http.ResponseWriter, r *http.Request) {\n\tisbn := r.URL.Query().Get(\"isbn\")\n\tif isbn == \"978-0141036144\" {\n\t\tw.WriteHeader(http.StatusOK)\n\t\tfmt.Fprintln(w, \"Found book: 1984 by George Orwell\")\n\t} else {\n\t\t// TODO: write 404 status and \"book not found\"\n\t}\n}\n\nfunc main() {\n\tfor _, isbn := range []string{\"978-0141036144\", \"978-0061120084\"} {\n\t\treq := httptest.NewRequest(\"GET\", \"/?isbn=\"+isbn, nil)\n\t\tw := httptest.NewRecorder()\n\t\tbookHandler(w, req)\n\t\tfmt.Printf(\"Status: %d | Body: %s\", w.Code, w.Body.String())\n\t}\n}",
     "expectedOutput": [
@@ -61,11 +62,11 @@
         "message": "Replace the TODO comment with your code."
       }
     ],
-    "successMessage": "200 for available books, 404 for missing ones. Always use http.StatusXxx constants — they are self-documenting and less error-prone than raw numbers."
+    "successMessage": "200 for available books, 404 for missing ones. Always use http.StatusXxx constants — they are self-documenting."
   },
   {
     "title": "Responding with JSON — book catalog",
-    "instruction": "Most library APIs respond with JSON. The pattern:\n1. Set `Content-Type: application/json`\n2. Use `json.NewEncoder(w).Encode(value)` to write JSON directly to the response\n\nAdd a second book to the `catalog` map (for isbn `\"978-0061120084\"`), then handle it in `bookHandler` and return JSON.",
+    "instruction": "Add a second book to the catalog map (ISBN \"978-0061120084\"), then handle it in `bookHandler` and return JSON with `json.NewEncoder(w).Encode(book)`.",
     "hint": "\"978-0061120084\": Book{ISBN: \"978-0061120084\", Title: \"To Kill a Mockingbird\", Author: \"Harper Lee\", Available: true}",
     "starter": "package main\n\nimport (\n\t\"encoding/json\"\n\t\"fmt\"\n\t\"net/http\"\n\t\"net/http/httptest\"\n)\n\ntype Book struct {\n\tISBN      string `json:\"isbn\"`\n\tTitle     string `json:\"title\"`\n\tAuthor    string `json:\"author\"`\n\tAvailable bool   `json:\"available\"`\n}\n\nvar catalog = map[string]Book{\n\t\"978-0141036144\": {ISBN: \"978-0141036144\", Title: \"1984\", Author: \"George Orwell\", Available: true},\n\t// TODO: add book with isbn \"978-0061120084\"\n}\n\nfunc bookHandler(w http.ResponseWriter, r *http.Request) {\n\tisbn := r.URL.Query().Get(\"isbn\")\n\tbook, ok := catalog[isbn]\n\tif !ok {\n\t\tw.WriteHeader(http.StatusNotFound)\n\t\tfmt.Fprintln(w, `{\"error\":\"book not found\"}`)\n\t\treturn\n\t}\n\tw.Header().Set(\"Content-Type\", \"application/json\")\n\tjson.NewEncoder(w).Encode(book)\n}\n\nfunc main() {\n\tfor _, isbn := range []string{\"978-0141036144\", \"978-0061120084\", \"978-9999999999\"} {\n\t\treq := httptest.NewRequest(\"GET\", \"/?isbn=\"+isbn, nil)\n\t\tw := httptest.NewRecorder()\n\t\tbookHandler(w, req)\n\t\tfmt.Printf(\"[%d] %s\", w.Code, w.Body.String())\n\t}\n}",
     "expectedOutput": [
@@ -85,26 +86,11 @@
         "message": "Replace the TODO comment with your book entry."
       }
     ],
-    "successMessage": "JSON responses, status codes, 404 handling — this is a real library API pattern. json.NewEncoder(w).Encode writes directly to the response without allocating an extra buffer."
-  },
-  {
-    "title": "Reading a request body — check out a book",
-    "instruction": "For POST requests, the client sends data in the request body to check out a book.\n\nDecode it with `json.NewDecoder(r.Body).Decode(&v)`.\n\nAlways close the body: `defer r.Body.Close()`\n\nRun this. The handler reads a JSON body and echoes back the member's name and the book title being checked out.",
-    "hint": "Change the body JSON from Alex to your own name.",
-    "starter": "package main\n\nimport (\n\t\"encoding/json\"\n\t\"fmt\"\n\t\"net/http\"\n\t\"net/http/httptest\"\n\t\"strings\"\n)\n\ntype CheckoutRequest struct {\n\tMemberName string `json:\"member_name\"`\n\tBookTitle  string `json:\"book_title\"`\n}\n\nfunc checkoutHandler(w http.ResponseWriter, r *http.Request) {\n\tdefer r.Body.Close()\n\n\tvar req CheckoutRequest\n\tif err := json.NewDecoder(r.Body).Decode(&req); err != nil {\n\t\tw.WriteHeader(http.StatusBadRequest)\n\t\tfmt.Fprintln(w, `{\"error\":\"invalid request body\"}`)\n\t\treturn\n\t}\n\n\tw.WriteHeader(http.StatusOK)\n\tfmt.Fprintf(w, \"Checked out '%s' for %s\\n\", req.BookTitle, req.MemberName)\n}\n\nfunc main() {\n\tbody := `{\"member_name\":\"Alex\",\"book_title\":\"1984\"}`\n\treq := httptest.NewRequest(\"POST\", \"/checkout\", strings.NewReader(body))\n\treq.Header.Set(\"Content-Type\", \"application/json\")\n\tw := httptest.NewRecorder()\n\tcheckoutHandler(w, req)\n\tfmt.Printf(\"Status: %d\\n\", w.Code)\n\tfmt.Print(w.Body.String())\n}",
-    "expectedOutput": [],
-    "codeChecks": [
-      {
-        "pattern": "\"member_name\":\"Alex\"",
-        "required": false,
-        "message": "Change the member_name in the body JSON to your own name."
-      }
-    ],
-    "successMessage": "POST body decoded in two lines. json.NewDecoder(r.Body).Decode(&req) handles everything — parsing, type conversion, error reporting."
+    "successMessage": "JSON responses and 404 handling — this is a real library API pattern. json.NewEncoder(w).Encode writes directly to the response."
   },
   {
     "title": "Multiple routes — library endpoints",
-    "instruction": "Register multiple routes with `http.HandleFunc`:\n\n```\nhttp.HandleFunc(\"/\", welcomeHandler)\nhttp.HandleFunc(\"/books\", booksHandler)\nhttp.HandleFunc(\"/health\", healthHandler)\n```\n\nAdd a third route `/members` that responds with `\"List of library members\"`.",
+    "instruction": "Register multiple routes with `http.HandleFunc` or a `http.ServeMux`. Add a `/members` route that responds with \"List of library members\".",
     "hint": "mux.HandleFunc(\"/members\", func(w http.ResponseWriter, r *http.Request) { fmt.Fprintln(w, \"List of library members\") })",
     "starter": "package main\n\nimport (\n\t\"fmt\"\n\t\"net/http\"\n\t\"net/http/httptest\"\n)\n\nfunc main() {\n\tmux := http.NewServeMux()\n\tmux.HandleFunc(\"/\", func(w http.ResponseWriter, r *http.Request) {\n\t\tfmt.Fprintln(w, \"Welcome to the Library API\")\n\t})\n\tmux.HandleFunc(\"/health\", func(w http.ResponseWriter, r *http.Request) {\n\t\tfmt.Fprintln(w, `{\"status\":\"ok\"}`)\n\t})\n\t// TODO: add /members route that responds with \"List of library members\"\n\n\tfor _, path := range []string{\"/\", \"/health\", \"/members\"} {\n\t\treq := httptest.NewRequest(\"GET\", path, nil)\n\t\tw := httptest.NewRecorder()\n\t\tmux.ServeHTTP(w, req)\n\t\tfmt.Printf(\"%s → %s\", path, w.Body.String())\n\t}\n}",
     "expectedOutput": [
@@ -129,11 +115,11 @@
         "message": "Replace the TODO comment with your route."
       }
     ],
-    "successMessage": "Three routes, three handlers. http.NewServeMux() is Go's built-in router. For simple library APIs it is all you need."
+    "successMessage": "Three routes, three handlers. http.NewServeMux() is Go's built-in router — for simple library APIs it is all you need."
   },
   {
     "title": "Method checking — GET vs POST for books",
-    "instruction": "REST APIs use different HTTP methods for different operations:\n- `GET` — list books\n- `POST` — add a new book\n- `PUT` / `PATCH` — update a book\n- `DELETE` — remove a book\n\nCheck the method with `r.Method`.\n\nAdd a `case http.MethodPost` that responds with `\"Adding a new book...\"` and status 201.",
+    "instruction": "REST APIs use different HTTP methods. Check `r.Method` with a switch — add `case http.MethodPost` that responds with \"Adding a new book...\" and status 201.",
     "hint": "case http.MethodPost:  w.WriteHeader(http.StatusCreated)  fmt.Fprintln(w, \"Adding a new book...\")",
     "starter": "package main\n\nimport (\n\t\"fmt\"\n\t\"net/http\"\n\t\"net/http/httptest\"\n)\n\nfunc booksHandler(w http.ResponseWriter, r *http.Request) {\n\tswitch r.Method {\n\tcase http.MethodGet:\n\t\tfmt.Fprintln(w, \"Listing all books...\")\n\t// TODO: add case http.MethodPost → 201 + \"Adding a new book...\"\n\tdefault:\n\t\tw.WriteHeader(http.StatusMethodNotAllowed)\n\t\tfmt.Fprintln(w, \"Method not allowed\")\n\t}\n}\n\nfunc main() {\n\tfor _, method := range []string{\"GET\", \"POST\", \"DELETE\"} {\n\t\treq := httptest.NewRequest(method, \"/books\", nil)\n\t\tw := httptest.NewRecorder()\n\t\tbooksHandler(w, req)\n\t\tfmt.Printf(\"%s [%d]: %s\", method, w.Code, w.Body.String())\n\t}\n}",
     "expectedOutput": [
@@ -166,8 +152,23 @@
     "successMessage": "GET lists books, POST adds books, DELETE gets 405. Method checking keeps your library API semantically correct."
   },
   {
+    "title": "Reading a request body — check out a book",
+    "instruction": "Decode a POST body with `json.NewDecoder(r.Body).Decode(&v)`. Always `defer r.Body.Close()`. Run this and change the member name from Alex to your own name.",
+    "hint": "Change the body JSON from Alex to your own name.",
+    "starter": "package main\n\nimport (\n\t\"encoding/json\"\n\t\"fmt\"\n\t\"net/http\"\n\t\"net/http/httptest\"\n\t\"strings\"\n)\n\ntype CheckoutRequest struct {\n\tMemberName string `json:\"member_name\"`\n\tBookTitle  string `json:\"book_title\"`\n}\n\nfunc checkoutHandler(w http.ResponseWriter, r *http.Request) {\n\tdefer r.Body.Close()\n\n\tvar req CheckoutRequest\n\tif err := json.NewDecoder(r.Body).Decode(&req); err != nil {\n\t\tw.WriteHeader(http.StatusBadRequest)\n\t\tfmt.Fprintln(w, `{\"error\":\"invalid request body\"}`)\n\t\treturn\n\t}\n\n\tw.WriteHeader(http.StatusOK)\n\tfmt.Fprintf(w, \"Checked out '%s' for %s\\n\", req.BookTitle, req.MemberName)\n}\n\nfunc main() {\n\tbody := `{\"member_name\":\"Alex\",\"book_title\":\"1984\"}`\n\treq := httptest.NewRequest(\"POST\", \"/checkout\", strings.NewReader(body))\n\treq.Header.Set(\"Content-Type\", \"application/json\")\n\tw := httptest.NewRecorder()\n\tcheckoutHandler(w, req)\n\tfmt.Printf(\"Status: %d\\n\", w.Code)\n\tfmt.Print(w.Body.String())\n}",
+    "expectedOutput": [],
+    "codeChecks": [
+      {
+        "pattern": "\"member_name\":\"Alex\"",
+        "required": false,
+        "message": "Change the member_name in the body JSON to your own name."
+      }
+    ],
+    "successMessage": "POST body decoded in two lines. json.NewDecoder(r.Body).Decode(&req) handles everything."
+  },
+  {
     "title": "Middleware — logging library requests",
-    "instruction": "Middleware is a function that wraps a handler — it runs before and/or after the handler.\n\nCommon uses: logging, authentication, CORS headers, timing.\n\n```\nfunc loggingMiddleware(next http.HandlerFunc) http.HandlerFunc {\n    return func(w http.ResponseWriter, r *http.Request) {\n        fmt.Println(\"Request:\", r.Method, r.URL.Path)\n        next(w, r)  // call the real handler\n    }\n}\n```\n\nRun this. Then add a `timingMiddleware` that prints `\"Response sent\"` after calling `next`.",
+    "instruction": "Middleware wraps a handler to run logic before and/or after it. Add a `timingMiddleware` that prints \"Response sent\" after calling the wrapped handler.",
     "hint": "func timingMiddleware(next http.HandlerFunc) http.HandlerFunc { return func(w http.ResponseWriter, r *http.Request) { next(w, r); fmt.Println(\"Response sent\") } }",
     "starter": "package main\n\nimport (\n\t\"fmt\"\n\t\"net/http\"\n\t\"net/http/httptest\"\n)\n\nfunc loggingMiddleware(next http.HandlerFunc) http.HandlerFunc {\n\treturn func(w http.ResponseWriter, r *http.Request) {\n\t\tfmt.Println(r.Method, r.URL.Path)\n\t\tnext(w, r)\n\t}\n}\n\n// TODO: define timingMiddleware that prints \"Response sent\" after next runs\n\nfunc booksHandler(w http.ResponseWriter, r *http.Request) {\n\tfmt.Fprintln(w, \"List of books\")\n}\n\nfunc main() {\n\t// TODO: wrap booksHandler with both middlewares\n\thandler := loggingMiddleware(booksHandler)\n\treq := httptest.NewRequest(\"GET\", \"/books\", nil)\n\tw := httptest.NewRecorder()\n\thandler(w, req)\n\tfmt.Print(w.Body.String())\n}",
     "expectedOutput": [
@@ -200,58 +201,8 @@
     "successMessage": "The middleware chain: logging → timing → handler → timing finishes. Middlewares are composable — stack as many as you need."
   },
   {
-    "title": "Making an HTTP GET request — fetch book data",
-    "instruction": "Go is not just a server — it is also a great HTTP client.\n\n`http.Get(url)` makes a GET request and returns a response.\n\nAlways close the body: `defer resp.Body.Close()`\n\nRead the body with `io.ReadAll(resp.Body)`.\n\nRun this — it calls a public JSON API (Open Library) and prints the status and first 100 characters of the response.",
-    "starter": "package main\n\nimport (\n\t\"fmt\"\n\t\"io\"\n\t\"net/http\"\n)\n\nfunc main() {\n\tresp, err := http.Get(\"https://openlibrary.org/books/OL7353617M.json\")\n\tif err != nil {\n\t\tfmt.Println(\"Error:\", err)\n\t\treturn\n\t}\n\tdefer resp.Body.Close()\n\n\tbody, err := io.ReadAll(resp.Body)\n\tif err != nil {\n\t\tfmt.Println(\"Read error:\", err)\n\t\treturn\n\t}\n\n\tfmt.Println(\"Status:\", resp.StatusCode)\n\tfmt.Println(\"Body preview:\", string(body[:100]))\n}",
-    "expectedOutput": [
-      "Status: 200"
-    ],
-    "successMessage": "http.Get, check the error, defer close, read the body. Three steps for every HTTP client call. The same pattern works for any library API."
-  },
-  {
-    "title": "Making an HTTP POST request — add a book",
-    "instruction": "`http.Post` sends a POST with a body:\n\n```\nresp, err := http.Post(url, \"application/json\", strings.NewReader(body))\n```\n\nFor more control (custom headers, timeouts), use `http.NewRequest` + `http.Client`.\n\nRun this. It POSTs JSON to a test API. Change the payload book title to your favorite book.",
-    "hint": "Change \"1984\" in the JSON payload to your favorite book title.",
-    "starter": "package main\n\nimport (\n\t\"fmt\"\n\t\"io\"\n\t\"net/http\"\n\t\"strings\"\n)\n\nfunc main() {\n\tpayload := `{\"title\":\"1984\",\"author\":\"George Orwell\"}`\n\tresp, err := http.Post(\n\t\t\"https://httpbin.org/post\",\n\t\t\"application/json\",\n\t\tstrings.NewReader(payload),\n\t)\n\tif err != nil {\n\t\tfmt.Println(\"Error:\", err)\n\t\treturn\n\t}\n\tdefer resp.Body.Close()\n\n\tbody, _ := io.ReadAll(resp.Body)\n\tfmt.Println(\"Status:\", resp.StatusCode)\n\t_ = body\n\tfmt.Println(\"Book added successfully\")\n}",
-    "expectedOutput": [
-      "Status: 200",
-      "Book added successfully"
-    ],
-    "codeChecks": [
-      {
-        "pattern": "\"title\":\"1984\"",
-        "required": false,
-        "message": "Change the title in the payload to your favorite book."
-      }
-    ],
-    "successMessage": "POST with a JSON body — the foundation of every API call you will make. http.Post for simple cases, http.NewRequest + http.Client when you need headers, timeouts, or retries."
-  },
-  {
-    "title": "Setting request headers — API key",
-    "instruction": "Many library APIs require headers — API keys, authentication tokens, content types.\n\nUse `http.NewRequest` to build a request with custom headers before sending it:\n\n```\nreq, _ := http.NewRequest(\"GET\", url, nil)\nreq.Header.Set(\"X-API-Key\", apiKey)\nclient := &http.Client{}\nresp, err := client.Do(req)\n```\n\nAdd a second header `X-Library-ID` with value `\"lib-42\"` to the request.",
-    "hint": "req.Header.Set(\"X-Library-ID\", \"lib-42\")",
-    "starter": "package main\n\nimport (\n\t\"fmt\"\n\t\"net/http\"\n\t\"net/http/httptest\"\n)\n\nfunc headerHandler(w http.ResponseWriter, r *http.Request) {\n\tfmt.Fprintln(w, \"API-Key:\", r.Header.Get(\"X-API-Key\"))\n\tfmt.Fprintln(w, \"Library-ID:\", r.Header.Get(\"X-Library-ID\"))\n}\n\nfunc main() {\n\treq := httptest.NewRequest(\"GET\", \"/\", nil)\n\treq.Header.Set(\"X-API-Key\", \"***\")\n\t// TODO: set X-Library-ID header to \"lib-42\"\n\n\tw := httptest.NewRecorder()\n\theaderHandler(w, req)\n\tfmt.Print(w.Body.String())\n}",
-    "expectedOutput": [
-      "API-Key: ***",
-      "Library-ID: lib-42"
-    ],
-    "codeChecks": [
-      {
-        "pattern": "req\\.Header\\.Set\\(\"X-Library-ID\",\\s*\"lib-42\"\\)",
-        "required": true,
-        "message": "Set the X-Library-ID header: req.Header.Set(\"X-Library-ID\", \"lib-42\")"
-      },
-      {
-        "pattern": "TODO",
-        "required": false,
-        "message": "Replace the TODO comment with your header."
-      }
-    ],
-    "successMessage": "Headers set, headers read. API keys, library IDs, authentication tokens — all follow the same pattern. r.Header.Get on the server, req.Header.Set on the client."
-  },
-  {
     "title": "Build a mini library REST API",
-    "instruction": "No starter code.\n\nBuild a mini REST API for a library catalog:\n\n1. Define a `Book` struct with `ISBN` string, `Title` string, `Author` string, `Available` bool (all JSON tagged)\n2. Create a `[]Book` slice with 2 initial books\n3. Write a `listHandler` that responds with all books as JSON\n4. Write an `addHandler` that reads a JSON body, appends a new Book, and responds with 201\n5. Route `GET /books` → listHandler, `POST /books` → addHandler (check `r.Method`)\n6. Test: GET first, then POST a new book, then GET again — the catalog should grow\n\nExpected final GET output includes all 3 books as JSON.",
+    "instruction": "Build a mini REST API for a library catalog. Define a `Book` struct, create a catalog slice, write `listHandler` and `addHandler`, route GET and POST. Test by listing, adding, and listing again.",
     "hint": "Use json.NewEncoder(w).Encode(books) to respond. Use json.NewDecoder(r.Body).Decode(&newBook) to read the body.",
     "starter": "package main\n\nimport (\n\t\"encoding/json\"\n\t\"fmt\"\n\t\"net/http\"\n\t\"net/http/httptest\"\n\t\"strings\"\n)\n\n// Build your library API here\n\nfunc main() {\n}",
     "expectedOutput": [],
@@ -297,6 +248,6 @@
         "message": "Return 201 Created for successful POST."
       }
     ],
-    "successMessage": "A working library REST API — list books, add books, check availability. GET returns JSON, POST reads JSON and appends, the catalog grows. This is how every Go library API is structured in production. You just built one."
+    "successMessage": "A working library REST API — list books, add books, GET returns JSON, POST reads JSON. This is how every Go library API is structured in production."
   }
 ]

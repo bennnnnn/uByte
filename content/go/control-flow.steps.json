@@ -1,116 +1,84 @@
 [
   {
     "title": "Your first decision",
-    "instruction": "Imagine a library. A child walks up to the counter and asks for a book from the adult section. The librarian checks their age. If they are old enough — they can borrow it. If not — they can't.\n\nThat is an `if` statement. It runs a block of code only when a condition is true.\n\n```\nif age >= 18 {\n    fmt.Println(\"Adult section access granted\")\n}\n```\n\nRun this. Then change the age to 15 and run it again. Notice what changes.",
+    "instruction": "An `if` statement runs code only when a condition is true. Run this, then change `age` to 15 and run again to see what changes.",
     "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tage := 20\n\tif age >= 18 {\n\t\tfmt.Println(\"Adult section access granted\")\n\t}\n\tfmt.Println(\"Done\")\n}",
     "expectedOutput": ["Adult section access granted", "Done"],
-    "successMessage": "When the condition is true, the code inside runs. When it's false, Go skips it completely. That is all an if statement does."
+    "successMessage": "When the condition is true, the code inside runs. When false, Go skips it entirely.",
+    "carryForward": true
   },
   {
     "title": "Comparison operators",
-    "instruction": "The condition inside an `if` uses comparison operators to check relationships between values.\n\n- `==` equal to\n- `!=` not equal to\n- `<`  less than\n- `>`  greater than\n- `<=` less than or equal to\n- `>=` greater than or equal to\n\nRun this. Then change `age` to different values and see which lines print.",
+    "instruction": "`==`, `!=`, `<`, `>`, `<=`, `>=` — six operators. Change `age` to different values and see which lines print.",
     "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tage := 12\n\tif age == 5 {\n\t\tfmt.Println(\"Storytime age\")\n\t}\n\tif age != 0 {\n\t\tfmt.Println(\"You have an age\")\n\t}\n\tif age >= 13 {\n\t\tfmt.Println(\"Teen section available\")\n\t}\n\tif age < 6 {\n\t\tfmt.Println(\"Preschool corner only\")\n\t}\n}",
     "expectedOutput": ["You have an age"],
-    "successMessage": "Six operators. Every condition you will ever write uses at least one of them."
+    "successMessage": "Six operators. Every condition you'll ever write uses at least one."
   },
   {
     "title": "if-else — two paths",
-    "instruction": "An `if` runs code when the condition is true. But what about when it is false?\n\nThat is what `else` is for. One or the other will always run — never both, never neither.\n\n```\nif age >= 18 {\n    fmt.Println(\"Can borrow adult books\")\n} else {\n    fmt.Println(\"Children's section only\")\n}\n```\n\nChange `age` to 10 and run it. Then change it to 25 and run it again.",
-    "hint": "Try age := 10 first, then age := 25. See which branch runs each time.",
+    "instruction": "`if` runs one path, `else` runs the other. Change `age` to 10, then to 25, and watch which branch runs each time.",
+    "hint": "Try age := 10 first, then age := 25.",
     "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tage := 10\n\tif age >= 18 {\n\t\tfmt.Println(\"Can borrow adult books\")\n\t} else {\n\t\tfmt.Println(\"Children's section only\")\n\t}\n}",
     "expectedOutput": ["Children's section only"],
     "successMessage": "Two paths. One condition. Go picks the right one every time."
   },
   {
     "title": "else if — more than two paths",
-    "instruction": "Sometimes two options are not enough. Libraries have different sections for different ages — picture books, middle grade, young adult, adult.\n\n`else if` adds more branches. Go checks each condition from top to bottom and runs the first one that is true. The rest are skipped.\n\nChange `age` to different values — try 4, 9, 14, 25 — and run each time.",
-    "hint": "Change the age value and hit Run. Each age should land in a different branch.",
+    "instruction": "`else if` adds more branches. Change `age` to 4, 9, 14, or 25 — each lands in a different library section.",
+    "hint": "Change the age value and hit Run. Each age lands in a different branch.",
     "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tage := 4\n\tif age <= 5 {\n\t\tfmt.Println(\"Section: Picture Books\")\n\t} else if age <= 12 {\n\t\tfmt.Println(\"Section: Middle Grade\")\n\t} else if age <= 17 {\n\t\tfmt.Println(\"Section: Young Adult\")\n\t} else {\n\t\tfmt.Println(\"Section: Adult\")\n\t}\n}",
     "expectedOutput": ["Section: Picture Books"],
-    "successMessage": "Go checks conditions in order and stops at the first true one. Order matters — always put the strictest condition first."
+    "successMessage": "Go checks conditions in order and stops at the first true one. Order matters."
   },
   {
     "title": "Logical operators — combine conditions",
-    "instruction": "Sometimes one condition is not enough. What if you need two things to be true at the same time?\n\n- `&&` AND — both must be true\n- `||` OR — at least one must be true\n- `!`  NOT — flips true to false and false to true\n\n```\nif age >= 18 && hasLibraryCard {\n    fmt.Println(\"Borrowing approved\")\n}\n```\n\nRun this. Then try changing `hasLibraryCard` to `false` and running again.",
+    "instruction": "`&&` means AND (both must be true), `||` means OR (at least one). Try changing `hasLibraryCard` to `false` and run again.",
     "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tage := 20\n\thasLibraryCard := true\n\tisStaff := false\n\n\tif age >= 18 && hasLibraryCard {\n\t\tfmt.Println(\"Borrowing approved\")\n\t}\n\tif age >= 18 || hasLibraryCard {\n\t\tfmt.Println(\"Meets one requirement\")\n\t}\n\tif !isStaff {\n\t\tfmt.Println(\"Visit the front desk for assistance\")\n\t}\n}",
     "expectedOutput": ["Borrowing approved", "Meets one requirement", "Visit the front desk for assistance"],
-    "successMessage": "&& needs both. || needs one. ! flips it. Three operators that make your conditions as precise as you need."
+    "successMessage": "&& needs both. || needs one. ! flips it."
   },
   {
     "title": "switch — membership tiers",
-    "instruction": "When you have one variable and many possible values, a long `else if` chain gets messy fast.\n\n`switch` is the cleaner version. It checks the variable against each `case` and runs the matching one.\n\n```\nswitch tier {\ncase \"Gold\":\n    fmt.Println(\"Unlimited books, no late fees\")\ncase \"Silver\":\n    fmt.Println(\"10 books at a time\")\n}\n```\n\nChange `tier` to different values — Gold, Silver, Bronze — and run each time.",
+    "instruction": "`switch` checks one variable against many cases. Change `tier` to \"Gold\", \"Silver\", or \"Bronze\" and run each time.",
     "hint": "Change the tier := value to see different cases run.",
     "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\ttier := \"Gold\"\n\tswitch tier {\n\tcase \"Gold\":\n\t\tfmt.Println(\"Unlimited books. No late fees.\")\n\tcase \"Silver\":\n\t\tfmt.Println(\"10 books at a time.\")\n\tcase \"Bronze\":\n\t\tfmt.Println(\"5 books at a time.\")\n\tdefault:\n\t\tfmt.Println(\"Basic membership — 2 books at a time.\")\n\t}\n}",
     "expectedOutput": ["Unlimited books. No late fees."],
-    "successMessage": "switch is if-else but readable. The default case catches anything that didn't match — like else at the end."
+    "successMessage": "switch is if-else but readable. The default case catches anything that didn't match."
   },
   {
     "title": "Multiple values in one case",
-    "instruction": "Sometimes several different genres should get the same treatment.\n\nInstead of writing the same code in three separate cases, you can combine them:\n\n`case \"Sci-Fi\", \"Fantasy\":`\n\nAdd a new case to the switch that matches both `\"Overdue\"` and `\"Lost\"` and prints `\"Fine applies — visit the front desk\"`",
-    "hint": "case \"Overdue\", \"Lost\":  — comma-separated values in one case line. Add it before the default case.",
+    "instruction": "Several values can share one case: `case \"Overdue\", \"Lost\":`. Add a case that matches both and prints a fine message.",
+    "hint": "case \"Overdue\", \"Lost\": — comma-separated values in one case line.",
     "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tstatus := \"Overdue\"\n\tswitch status {\n\tcase \"Available\", \"On Shelf\":\n\t\tfmt.Println(\"You can borrow this book\")\n\t// TODO: add a case for Overdue and Lost\n\tdefault:\n\t\tfmt.Println(\"Check with the librarian\")\n\t}\n}",
     "expectedOutput": ["Fine applies — visit the front desk"],
     "codeChecks": [
-      { "pattern": "case\\s+\"Overdue\",\\s*\"Lost\"", "required": true, "message": "Add a case that matches both \"Overdue\" and \"Lost\" using a comma: case \"Overdue\", \"Lost\":" },
-      { "pattern": "Fine", "required": true, "message": "Print something about a fine or fee in your new case." },
+      { "pattern": "case\\s+\"Overdue\",\\s*\"Lost\"", "required": true, "message": "Add a case that matches both \"Overdue\" and \"Lost\" using a comma." },
+      { "pattern": "Fine|fee", "required": true, "message": "Print something about a fine or fee in your new case." },
       { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your case." }
     ],
     "successMessage": "One case, multiple values. No repetition. Go is sensible like that."
   },
   {
-    "title": "switch with no condition",
-    "instruction": "A `switch` does not need a variable to compare. Without one, each case acts like an `if` condition.\n\nThis is cleaner than a long `else if` chain when each condition is different.\n\n```\nswitch {\ncase daysOverdue >= 30:\n    fmt.Println(\"Suspended borrowing privileges\")\ncase daysOverdue >= 14:\n    fmt.Println(\"Overdue notice sent\")\n}\n```\n\nRun this. Change `daysOverdue` to 7 and run again.",
-    "hint": "Change daysOverdue to 7 and see which case matches.",
+    "title": "switch with no condition 🤯",
+    "instruction": "A `switch` without a variable acts like a clean `if-else` chain. Run this, then try `daysOverdue := 7`.",
     "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tdaysOverdue := 45\n\tswitch {\n\tcase daysOverdue >= 30:\n\t\tfmt.Println(\"Suspended borrowing privileges\")\n\tcase daysOverdue >= 14:\n\t\tfmt.Println(\"Overdue notice sent\")\n\tcase daysOverdue >= 1:\n\t\tfmt.Println(\"Gentle reminder — please return soon\")\n\tdefault:\n\t\tfmt.Println(\"No overdue items. Thank you!\")\n\t}\n}",
     "expectedOutput": ["Suspended borrowing privileges"],
     "successMessage": "switch without a variable is just a cleaner if-else. Same logic, easier to read."
   },
   {
-    "title": "Short variable declaration in if",
-    "instruction": "Go lets you declare a variable right inside the `if` statement.\n\n```\nif maxBooks := 10 - booksOut; maxBooks > 0 {\n    fmt.Println(\"You can borrow more books\")\n}\n```\n\nThe variable is declared, then the condition checks it. It only exists inside the `if` block — nowhere else.\n\nAdd an `else` branch that prints `\"Borrowing limit reached\"` when the limit is not positive.",
-    "hint": "} else { fmt.Println(\"Borrowing limit reached\") }  — add this right after the closing brace of the if block.",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tbooksOut := 10\n\tmaxAllowed := 10\n\tif remaining := maxAllowed - booksOut; remaining > 0 {\n\t\tfmt.Println(\"You can borrow more books\")\n\t\t// TODO: add an else that prints \"Borrowing limit reached\"\n\t}\n}",
-    "expectedOutput": ["Borrowing limit reached"],
-    "codeChecks": [
-      { "pattern": "else\\s*\\{", "required": true, "message": "Add an else block after the if block." },
-      { "pattern": "Borrowing limit reached", "required": true, "message": "Print \"Borrowing limit reached\" inside the else block." },
-      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with an else block." }
-    ],
-    "successMessage": "Declare, check, use — all in one line. The variable stays scoped to the if block and does not pollute the rest of your function."
-  },
-  {
-    "title": "Nested if — a decision inside a decision",
-    "instruction": "Sometimes you need to check one thing, and only if that passes, check something else.\n\nYou can put an `if` inside another `if`. Just be careful — too many levels and the code becomes hard to read.\n\nRun this. Try different combinations of `isRegistered` and `hasOutstandingFines`.",
-    "hint": "Try isRegistered = false, then isRegistered = true and hasOutstandingFines = true, then both good.",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tisRegistered := true\n\thasOutstandingFines := false\n\n\tif isRegistered {\n\t\tfmt.Println(\"Welcome to the library\")\n\t\tif hasOutstandingFines {\n\t\t\tfmt.Println(\"Please clear your fines before borrowing\")\n\t\t} else {\n\t\t\tfmt.Println(\"No fines on your account — happy reading!\")\n\t\t}\n\t} else {\n\t\tfmt.Println(\"Please register at the front desk\")\n\t}\n}",
-    "expectedOutput": ["Welcome to the library", "No fines on your account — happy reading!"],
-    "successMessage": "Nested ifs work fine for 2 levels. Past that, consider combining conditions with && to keep it flat."
-  },
-  {
-    "title": "Fix the broken logic",
-    "instruction": "This program is supposed to check if someone can borrow a rare book from the library's special collection.\n\nRules: must be at least 18 AND have a valid membership card.\n\nBut the logic is wrong and the program gives incorrect results. Find the bug and fix it.",
-    "hint": "Check the operator. Should it be && or ||? And check the age threshold.",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tage := 14\n\thasCard := false\n\n\tif age >= 18 || hasCard {\n\t\tfmt.Println(\"Can borrow rare books\")\n\t} else {\n\t\tfmt.Println(\"Cannot borrow rare books\")\n\t}\n}",
-    "expectedOutput": ["Cannot borrow rare books"],
-    "codeChecks": [
-      { "pattern": "age\\s*>=\\s*18\\s*&&\\s*hasCard", "required": true, "message": "Both conditions must be true. Use && not ||." }
-    ],
-    "successMessage": "|| means either condition makes it true. && means both must be true. Mixing them up is one of the most common logic bugs — now you know to look for it."
-  },
-  {
     "title": "Build a decision machine",
-    "instruction": "No starter code.\n\nWrite a program that has three variables:\n- `age` (int) — set it to any value\n- `itemsBorrowed` (int) — set it to any value\n- `hasMembership` (bool)\n\nThen print:\n- `\"Premium\"` if itemsBorrowed >= 20 AND hasMembership is true\n- `\"Senior\"` if age >= 65\n- `\"Regular\"` if itemsBorrowed >= 5\n- `\"Newcomer\"` otherwise\n\nUse if, else if, and at least one &&.",
-    "hint": "Start with the strictest condition first (Premium requires both items AND membership). Then work down.",
+    "instruction": "Write a program with `age`, `itemsBorrowed`, and `hasMembership`. Print \"Premium\" if items >= 20 AND hasMembership, else \"Regular\" if items >= 5, else \"Newcomer\".",
+    "hint": "Start with the strictest condition first (Premium requires both items AND membership).",
     "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\t// Create your variables and decision logic here\n}",
     "expectedOutput": [],
     "codeChecks": [
       { "pattern": "age\\s*:=", "required": true, "message": "Create an age variable." },
       { "pattern": "itemsBorrowed\\s*:=", "required": true, "message": "Create an itemsBorrowed variable." },
-      { "pattern": "hasMembership\\s*:=", "required": true, "message": "Create an hasMembership bool variable." },
+      { "pattern": "hasMembership\\s*:=", "required": true, "message": "Create a hasMembership bool variable." },
       { "pattern": "&&", "required": true, "message": "Use && to combine two conditions." },
       { "pattern": "else if", "required": true, "message": "Use at least one else if." },
-      { "pattern": "Premium|Senior|Regular|Newcomer", "required": true, "message": "Print at least one of: Premium, Senior, Regular, or Newcomer." }
+      { "pattern": "Premium|Regular|Newcomer", "required": true, "message": "Print at least one of: Premium, Regular, or Newcomer." }
     ],
-    "successMessage": "You built a program that thinks. Every app you have ever used is full of logic exactly like this."
+    "successMessage": "You built a program that thinks. Every app you've ever used is full of logic like this."
   }
 ]

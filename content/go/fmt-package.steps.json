@@ -1,37 +1,30 @@
 [
   {
     "title": "Print vs Println — spot the difference",
-    "instruction": "You already know `fmt.Println` — it prints text and jumps to a new line.\n\nBut `fmt` has more tricks. `fmt.Print` prints text and stays on the same line — like typing without hitting Enter.\n\nRun this and watch how Print and Println behave differently.",
+    "instruction": "`fmt.Print` stays on the same line, `fmt.Println` jumps to a new line. Run this and watch how they behave differently.",
     "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tfmt.Print(\"Welcome \")\n\tfmt.Print(\"to the \")\n\tfmt.Print(\"library\")\n\tfmt.Println()\n\tfmt.Println(\"You have 3 books checked out\")\n}",
     "expectedOutput": [
       "Welcome to the library",
       "You have 3 books checked out"
     ],
-    "successMessage": "Print stays put, Println moves down. Two tools, same toolbox. You'll use both constantly."
+    "successMessage": "Print stays put, Println moves down. Two tools, same toolbox.",
+    "carryForward": true
   },
   {
-    "title": "Printf — your first format verb",
-    "instruction": "`fmt.Printf` lets you build output by mixing text with variables using format verbs.\n\nA format verb is a placeholder that starts with `%`. Go swaps it with the actual value.\n\n- `%s` → a string\n- `%d` → an integer\n- `%f` → a float\n\n`fmt.Printf(\"Book: %s has %d pages\\n\", title, pages)`\n\nChange the book title and page count to your own, then run it.",
-    "hint": "Replace \"The Great Gatsby\" with your book title and 180 with your page count. Leave the format string exactly as it is.",
+    "title": "Printf — format verbs",
+    "instruction": "`fmt.Printf` uses format verbs like `%s` (string) and `%d` (int). Change the book title and page count to your own and run it.",
+    "hint": "Change \"The Great Gatsby\" and 180 to your own values. Leave the format string as is.",
     "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\ttitle := \"The Great Gatsby\"\n\tpages := 180\n\tfmt.Printf(\"Book: %s has %d pages\\n\", title, pages)\n}",
     "expectedOutput": [],
     "codeChecks": [
-      {
-        "pattern": "Printf\\(\"Book: %s has %d pages\\\\n\",\\s*title,\\s*pages\\)",
-        "required": true,
-        "message": "Keep the Printf format string as is. Only change the title and pages values."
-      },
-      {
-        "pattern": "title\\s*:=\\s*\"The Great Gatsby\"",
-        "required": false,
-        "message": "Change the title from \"The Great Gatsby\" to your own book title."
-      }
+      { "pattern": "Printf\\(\"Book: %s has %d pages\\\\n\",\\s*title,\\s*pages\\)", "required": true, "message": "Keep the Printf format string as is. Only change the values." },
+      { "pattern": "title\\s*:=\\s*\"The Great Gatsby\"", "required": false, "message": "Change the title from \"The Great Gatsby\" to your own." }
     ],
-    "successMessage": "That is Printf. One line, multiple values, full control over how they appear."
+    "successMessage": "One line, multiple values, full control over how they appear."
   },
   {
-    "title": "More format verbs",
-    "instruction": "Go has a format verb for almost everything.\n\n- `%v` → the value in its default format (works on anything)\n- `%T` → the type of the variable\n- `%t` → a bool\n- `%b` → a number in binary\n- `%x` → a number in hexadecimal\n\nRun this. One number, printed five different ways.",
+    "title": "One number, many faces 🤯",
+    "instruction": "Go has a verb for everything: `%v` (value), `%T` (type), `%b` (binary), `%x` (hex). Run this — one number, five different ways.",
     "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tn := 42\n\tfmt.Printf(\"default:  %v\\n\", n)\n\tfmt.Printf(\"type:     %T\\n\", n)\n\tfmt.Printf(\"binary:   %b\\n\", n)\n\tfmt.Printf(\"hex:      %x\\n\", n)\n\tfmt.Printf(\"decimal:  %d\\n\", n)\n}",
     "expectedOutput": [
       "default:  42",
@@ -40,76 +33,52 @@
       "hex:      2a",
       "decimal:  42"
     ],
-    "successMessage": "42 in binary is 101010. 42 in hex is 2a. Same number, totally different faces. Computers are wild."
+    "successMessage": "42 in binary is 101010. In hex it's 2a. Same number, totally different faces. Computers are wild."
   },
   {
     "title": "Width and alignment",
-    "instruction": "You can tell Go exactly how wide a value should be when printed.\n\n`%10s` → right-align in 10 characters (pad with spaces on the left)\n`%-10s` → left-align in 10 characters (pad with spaces on the right)\n`%05d` → pad a number with zeros on the left until it is 5 digits wide\n\nRun this and see how things line up.",
+    "instruction": "`%10s` right-aligns in 10 spaces, `%-10s` left-aligns, `%05d` zero-pads. Run this to see columns line up.",
     "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tfmt.Printf(\"%10s | %-10s\\n\", \"Fiction\", \"Non-Fic\")\n\tfmt.Printf(\"%10s | %-10s\\n\", \"Sci-Fi\", \"History\")\n\tfmt.Printf(\"%10s | %-10s\\n\", \"Biog:\", \"042\")\n\tfmt.Printf(\"Book #%05d\\n\", 42)\n}",
     "expectedOutput": [
-      "Fiction | Non-Fic",
-      "Sci-Fi | History",
-      "Biog: | 042",
+      "    Fiction | Non-Fic   ",
+      "     Sci-Fi | History    ",
+      "      Biog: | 042       ",
       "Book #00042"
     ],
-    "successMessage": "Width and alignment make your output readable. Think receipts, tables, logs — anything that needs columns."
+    "successMessage": "Width and alignment make output readable. Think receipts, tables, logs."
   },
   {
     "title": "Decimal precision",
-    "instruction": "By default `%f` prints 6 decimal places, which is usually too many.\n\n`%.2f` → exactly 2 decimal places\n`%8.2f` → 8 characters wide, 2 decimal places\n\nA book costs $14.99, not $14.990000.\n\nChange the format strings to show price with 2 decimal places and discount with 1 decimal place.",
-    "hint": "Use %.2f for price and %.1f for discount. Run it and check the output.",
+    "instruction": "`%.2f` gives exactly 2 decimal places. A book costs $14.99, not $14.990000. Change `%f` to `%.2f` for price and `%.1f` for discount.",
+    "hint": "Use %.2f for price and %.1f for discount.",
     "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tprice := 14.99\n\tdiscount := 15.333333\n\tfmt.Printf(\"Price: $%f\\n\", price)\n\tfmt.Printf(\"Discount: %f%%\\n\", discount)\n}",
     "expectedOutput": [
       "Price: $14.99",
       "Discount: 15.3%"
     ],
     "codeChecks": [
-      {
-        "pattern": "%.2f",
-        "required": true,
-        "message": "Use %.2f to format the price to 2 decimal places."
-      },
-      {
-        "pattern": "%.1f",
-        "required": true,
-        "message": "Use %.1f to format the discount to 1 decimal place."
-      }
+      { "pattern": "%.2f", "required": true, "message": "Use %.2f to format the price to 2 decimal places." },
+      { "pattern": "%.1f", "required": true, "message": "Use %.1f to format the discount to 1 decimal place." }
     ],
     "successMessage": "Clean numbers. Nobody wants to see $14.990000 on a price tag."
   },
   {
     "title": "Sprintf — build a string, don't print it",
-    "instruction": "`fmt.Sprintf` works exactly like `Printf` but instead of printing, it returns the result as a string.\n\nWhy? Because sometimes you need to build a message and use it later — store it in a variable, pass it somewhere, log it.\n\n`label := fmt.Sprintf(\"Book #%d: %s\", id, title)`\n\nCreate a `message` variable using `Sprintf` that says `\"You returned \"[book title]\". It is due in 7 days.\"` — then print it.",
-    "hint": "message := fmt.Sprintf(\"You returned \\\"%s\\\". It is due in %d days.\\\", title, 7)  — then fmt.Println(message).",
+    "instruction": "`fmt.Sprintf` works like Printf but returns the result as a string. Build a message that says `\"You returned \\\"1984\\\". It is due in 7 days.\"` and print it.",
+    "hint": "message := fmt.Sprintf(\"You returned \\\"%s\\\". It is due in %d days.\", title, 7) — then fmt.Println(message).",
     "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\ttitle := \"1984\"\n\t// TODO: build message using Sprintf\n\t// TODO: print message\n}",
     "expectedOutput": [],
     "codeChecks": [
-      {
-        "pattern": "Sprintf\\(",
-        "required": true,
-        "message": "Use fmt.Sprintf to build the message string."
-      },
-      {
-        "pattern": "message\\s*:=",
-        "required": true,
-        "message": "Store the result in a variable called message."
-      },
-      {
-        "pattern": "Println\\(message\\)",
-        "required": true,
-        "message": "Print the message using fmt.Println(message)."
-      },
-      {
-        "pattern": "TODO",
-        "required": false,
-        "message": "Replace the TODO lines with actual code."
-      }
+      { "pattern": "Sprintf\\(", "required": true, "message": "Use fmt.Sprintf to build the message string." },
+      { "pattern": "message\\s*:=", "required": true, "message": "Store the result in a variable called message." },
+      { "pattern": "Println\\(message\\)", "required": true, "message": "Print the message using fmt.Println(message)." },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO lines with actual code." }
     ],
-    "successMessage": "Sprintf is Printf that hands you the result instead of printing it. You will use this constantly."
+    "successMessage": "Sprintf is Printf that hands you the result instead of printing it."
   },
   {
     "title": "Escape sequences",
-    "instruction": "Some characters cannot just be typed into a string. They need a special code called an escape sequence.\n\n- `\\n` → newline (go to the next line)\n- `\\t` → tab (big horizontal gap)\n- `\\\\` → a literal backslash\n- `\\\"` → a quote character inside a string\n\nRun this and see each one in action.",
+    "instruction": "`\\n` is a newline, `\\t` is a tab, `\\\\` is a backslash, `\\\"` is a quote inside a string. Run this to see each one in action.",
     "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tfmt.Println(\"Shelf A\\nShelf B\")\n\tfmt.Println(\"Genre:\\tFiction\")\n\tfmt.Println(\"Path: Library\\\\Archives\\\\Fiction\")\n\tfmt.Println(\"She said \\\"overdue\\\"\")\n}",
     "expectedOutput": [
       "Shelf A",
@@ -118,91 +87,6 @@
       "Path: Library\\Archives\\Fiction",
       "She said \"overdue\""
     ],
-    "successMessage": "Escape sequences let you put special characters inside strings. \\n and \\t are the ones you will use most."
-  },
-  {
-    "title": "Println with multiple arguments",
-    "instruction": "You already know `fmt.Println(oneValue)` — but it can take multiple values at once.\n\n`fmt.Println(a, b, c)` prints all of them on one line, separated by spaces. No format string needed.\n\nAdd `author` and `genre` variables, then print all four values — `title`, `pages`, `author`, `genre` — in a single `Println` call.",
-    "hint": "fmt.Println(title, pages, author, genre)  — all four in one call, separated by commas.",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\ttitle := \"Dune\"\n\tpages := 412\n\t// TODO: add author and genre variables\n\t// TODO: print all four in one Println call\n}",
-    "expectedOutput": [],
-    "codeChecks": [
-      {
-        "pattern": "author\\s*:=\\s*\"[^\"]+\"",
-        "required": true,
-        "message": "Create an author variable with your author's name."
-      },
-      {
-        "pattern": "genre\\s*:=\\s*\"[^\"]+\"",
-        "required": true,
-        "message": "Create a genre variable with your genre."
-      },
-      {
-        "pattern": "Println\\(title,\\s*pages,\\s*author,\\s*genre\\)",
-        "required": true,
-        "message": "Print all four in one Println call: fmt.Println(title, pages, author, genre)"
-      },
-      {
-        "pattern": "TODO",
-        "required": false,
-        "message": "Replace the TODO lines with actual code."
-      }
-    ],
-    "successMessage": "Println handles multiple values and inserts spaces automatically. Quick and clean."
-  },
-  {
-    "title": "Printf with multiple verbs",
-    "instruction": "A single `Printf` can hold as many format verbs as you need.\n\nThe values you pass after the format string fill in the verbs left to right. First value goes to the first verb, second to the second, and so on.\n\nRun this. Then add one more line that prints: `\"Library card: #1001, expires: 2026\"`",
-    "hint": "fmt.Printf(\"Library card: #%d, expires: %d\\n\", 1001, 2026)",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\ttitle := \"Dune\"\n\tpages := 412\n\trating := 4.8\n\tfmt.Printf(\"%s has %d pages with a rating of %.1f\\n\", title, pages, rating)\n\t// TODO: add a line: \"Library card: #1001, expires: 2026\"\n}",
-    "expectedOutput": [
-      "Dune has 412 pages with a rating of 4.8",
-      "Library card: #1001, expires: 2026"
-    ],
-    "codeChecks": [
-      {
-        "pattern": "Printf\\([^)]*1001[^)]*2026",
-        "required": true,
-        "message": "Add a Printf line that prints the library card number and expiry year."
-      },
-      {
-        "pattern": "TODO",
-        "required": false,
-        "message": "Replace the TODO line with actual code."
-      }
-    ],
-    "successMessage": "One format string, many values. The order of values matches the order of verbs — always."
-  },
-  {
-    "title": "Build a formatted library card",
-    "instruction": "No starter code.\n\nUsing only what you learned in this chapter, build a library card that outputs exactly this:\n\n```\n===== LIBRARY CARD =====\nTitle:    Dune\nPages:    412\nRating:   4.80\nChecked:  true\n========================\n```\n\nUse `Printf` with width formatting for the label column. Use `%.2f` for the rating.",
-    "hint": "fmt.Printf(\"%-10s%s\\n\", \"Title:\", title)  — %-10s left-aligns the label in 10 characters. Use %.2f for rating.",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\ttitle   := \"Dune\"\n\tpages   := 412\n\trating  := 4.8\n\tchecked := true\n\t// Build the library card here\n}",
-    "expectedOutput": [
-      "===== LIBRARY CARD =====",
-      "Title:",
-      "Pages:",
-      "Rating:",
-      "Checked:",
-      "========================"
-    ],
-    "codeChecks": [
-      {
-        "pattern": "Printf\\(",
-        "required": true,
-        "message": "Use fmt.Printf to format the output."
-      },
-      {
-        "pattern": "%.2f",
-        "required": true,
-        "message": "Use %.2f to format the rating to 2 decimal places."
-      },
-      {
-        "pattern": "=====",
-        "required": true,
-        "message": "Add the header and footer lines with ===== LIBRARY CARD ===== and ========================"
-      }
-    ],
-    "successMessage": "Clean, aligned, professional output. This is the difference between code that works and code that looks like it was made by someone who knows what they are doing."
+    "successMessage": "Escape sequences let you put special characters inside strings. \\n and \\t are the ones you'll use most."
   }
 ]

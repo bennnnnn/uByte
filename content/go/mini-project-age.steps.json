@@ -1,0 +1,143 @@
+[
+  {
+    "title": "Set up the Library CLI project",
+    "instruction": "A CLI app that managers a library catalog using everything you've learned. Define a `Book` struct with `Title`, `Author`, `ISBN`, and `Available` fields. Create an empty catalog in `main()` and print `\"Welcome to the Library CLI\"`.",
+    "starter": "package main\n\nimport \"fmt\"\n\n// TODO: define Book struct with Title, Author, ISBN, Available fields\n\nfunc main() {\n\t// TODO: create an empty catalog (map[string]Book) and welcome message\n}",
+    "expectedOutput": ["Welcome to the Library CLI"],
+    "codeChecks": [
+      { "pattern": "type\\s+Book\\s+struct", "required": true, "message": "Define a Book struct." },
+      { "pattern": "Title", "required": true, "message": "Add Title field to Book." },
+      { "pattern": "Author", "required": true, "message": "Add Author field to Book." },
+      { "pattern": "ISBN", "required": true, "message": "Add ISBN field to Book." },
+      { "pattern": "Available", "required": true, "message": "Add Available bool field to Book." },
+      { "pattern": "Welcome to the Library CLI", "required": true, "message": "Print a welcome message." }
+    ],
+    "successMessage": "Your Library CLI is set up with a Book struct and a catalog map ready to hold books.",
+    "carryForward": true
+  },
+  {
+    "title": "Add the addBook helper",
+    "instruction": "Write a function `addBook(catalog map[string]Book, title, author, isbn string, available bool)` that adds a Book to the catalog map keyed by ISBN. Add one book to the catalog and print it with `fmt.Printf(\"%+v\\n\", catalog[isbn])`.",
+    "hint": "func addBook(catalog map[string]Book, title, author, isbn string, available bool) { catalog[isbn] = Book{Title: title, Author: author, ISBN: isbn, Available: available} }",
+    "starter": "package main\n\nimport \"fmt\"\n\ntype Book struct {\n\tTitle     string\n\tAuthor    string\n\tISBN      string\n\tAvailable bool\n}\n\n// TODO: define the addBook function\n\nfunc main() {\n\tcatalog := make(map[string]Book)\n\t// TODO: call addBook with a book of your choice, then print it\n}",
+    "expectedOutput": [],
+    "codeChecks": [
+      { "pattern": "func\\s+addBook\\s*\\(", "required": true, "message": "Define the addBook function." },
+      { "pattern": "catalog\\[isbn\\]\\s*=", "required": true, "message": "Add the book to the catalog map keyed by ISBN." },
+      { "pattern": "fmt\\.Printf", "required": true, "message": "Print the added book using fmt.Printf." }
+    ],
+    "successMessage": "addBook stores a new book in the catalog by ISBN. Maps make lookups fast and easy."
+  },
+  {
+    "title": "Search books by title",
+    "instruction": "Write `searchBooks(catalog map[string]Book, query string) []Book` that returns all books whose title contains the query (case-insensitive using `strings.Contains` and `strings.ToLower`). Search for a book and print the result count.",
+    "hint": "func searchBooks(catalog map[string]Book, query string) []Book { var results []Book; for _, b := range catalog { if strings.Contains(strings.ToLower(b.Title), strings.ToLower(query)) { results = append(results, b) } }; return results }",
+    "starter": "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n)\n\ntype Book struct {\n\tTitle     string\n\tAuthor    string\n\tISBN      string\n\tAvailable bool\n}\n\nfunc addBook(catalog map[string]Book, title, author, isbn string, available bool) {\n\tcatalog[isbn] = Book{Title: title, Author: author, ISBN: isbn, Available: available}\n}\n\n// TODO: define searchBooks function\n\nfunc main() {\n\tcatalog := make(map[string]Book)\n\taddBook(catalog, \"The Go Programming Language\", \"Donovan & Kernighan\", \"978-0134190440\", true)\n\taddBook(catalog, \"Go in Action\", \"William Kennedy\", \"978-1617291784\", true)\n\taddBook(catalog, \"Learning Go\", \"Jon Bodner\", \"978-1492077213\", false)\n\n\t// TODO: search for \"Go\" and print the number of results\n}",
+    "expectedOutput": [],
+    "codeChecks": [
+      { "pattern": "func\\s+searchBooks\\s*\\(", "required": true, "message": "Define the searchBooks function." },
+      { "pattern": "strings\\.Contains", "required": true, "message": "Use strings.Contains for matching." },
+      { "pattern": "ToLower", "required": true, "message": "Use ToLower for case-insensitive search." },
+      { "pattern": "range", "required": true, "message": "Use range to iterate over the catalog." },
+      { "pattern": "append\\(results", "required": true, "message": "Use append to build the results slice." }
+    ],
+    "successMessage": "Your library can search books by title. Case-insensitive search makes it user-friendly."
+  },
+  {
+    "title": "List all books",
+    "instruction": "Write `listBooks(catalog map[string]Book)` that prints all books in a formatted table. Use `fmt.Printf(\"| %-30s | %-20s | %-15s | %-9s |\\n\", ...)` for alignment. Add 3 books and list them all.",
+    "hint": "fmt.Printf(\"| %-30s | %-20s | %-15s | %-9s |\\n\", b.Title, b.Author, b.ISBN, fmt.Sprint(b.Available))  — add a header row first.",
+    "starter": "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n)\n\ntype Book struct {\n\tTitle     string\n\tAuthor    string\n\tISBN      string\n\tAvailable bool\n}\n\nfunc addBook(catalog map[string]Book, title, author, isbn string, available bool) {\n\tcatalog[isbn] = Book{Title: title, Author: author, ISBN: isbn, Available: available}\n}\n\n// TODO: define listBooks function that prints a formatted table\n\nfunc main() {\n\tcatalog := make(map[string]Book)\n\taddBook(catalog, \"1984\", \"George Orwell\", \"978-0451524935\", true)\n\taddBook(catalog, \"Dune\", \"Frank Herbert\", \"978-0441172719\", true)\n\taddBook(catalog, \"The Catcher in the Rye\", \"J.D. Salinger\", \"978-0316769488\", false)\n\n\t// TODO: call listBooks\n}",
+    "expectedOutput": [],
+    "codeChecks": [
+      { "pattern": "func\\s+listBooks\\s*\\(", "required": true, "message": "Define the listBooks function." },
+      { "pattern": "Printf", "required": true, "message": "Use fmt.Printf for formatted output." },
+      { "pattern": "%-30s|%-20s|%-15s|%-9s|", "required": false, "message": "Use width specifiers for alignment." },
+      { "pattern": "range", "required": true, "message": "Use range to iterate over the catalog." }
+    ],
+    "successMessage": "A clean table of all books in the library. Formatting makes data readable at a glance."
+  },
+  {
+    "title": "Check out a book with error handling",
+    "instruction": "Write `checkout(catalog map[string]Book, isbn string) error` that marks a book as unavailable. Return an error if the ISBN is not found or if the book is already checked out. Use `errors.New` for custom errors. Test both cases.",
+    "hint": "book, ok := catalog[isbn]; if !ok { return errors.New(\"book not found\") }; if !book.Available { return errors.New(\"book already checked out\") }; book.Available = false; catalog[isbn] = book; return nil",
+    "starter": "package main\n\nimport (\n\t\"errors\"\n\t\"fmt\"\n)\n\ntype Book struct {\n\tTitle     string\n\tAuthor    string\n\tISBN      string\n\tAvailable bool\n}\n\nfunc addBook(catalog map[string]Book, title, author, isbn string, available bool) {\n\tcatalog[isbn] = Book{Title: title, Author: author, ISBN: isbn, Available: available}\n}\n\n// TODO: define checkout function\n\nfunc main() {\n\tcatalog := make(map[string]Book)\n\taddBook(catalog, \"1984\", \"George Orwell\", \"978-0451524935\", true)\n\n\t// TODO: check out the book, then try to check it out again\n\t// TODO: also try checking out a non-existent ISBN\n}",
+    "expectedOutput": [],
+    "codeChecks": [
+      { "pattern": "func\\s+checkout\\s*\\(", "required": true, "message": "Define the checkout function." },
+      { "pattern": "errors\\.New", "required": true, "message": "Use errors.New for custom error messages." },
+      { "pattern": "err\\s*!=\\s*nil", "required": true, "message": "Check the error from checkout." },
+      { "pattern": "book not found|already checked out", "required": true, "message": "Return descriptive error messages." }
+    ],
+    "successMessage": "Two error cases handled: missing books and double checkouts. Robust library software needs both."
+  },
+  {
+    "title": "Return a book with validation",
+    "instruction": "Write `returnBook(catalog map[string]Book, isbn string) error` that marks a checked-out book as available again. Return an error if the ISBN is not found or if the book was not checked out. Test returning an already-available book.",
+    "hint": "if book.Available { return errors.New(\"book was not checked out\") }; book.Available = true; catalog[isbn] = book; return nil",
+    "starter": "package main\n\nimport (\n\t\"errors\"\n\t\"fmt\"\n)\n\ntype Book struct {\n\tTitle     string\n\tAuthor    string\n\tISBN      string\n\tAvailable bool\n}\n\nfunc addBook(catalog map[string]Book, title, author, isbn string, available bool) {\n\tcatalog[isbn] = Book{Title: title, Author: author, ISBN: isbn, Available: available}\n}\n\nfunc checkout(catalog map[string]Book, isbn string) error {\n\tbook, ok := catalog[isbn]\n\tif !ok {\n\t\treturn errors.New(\"book not found\")\n\t}\n\tif !book.Available {\n\t\treturn errors.New(\"book already checked out\")\n\t}\n\tbook.Available = false\n\tcatalog[isbn] = book\n\treturn nil\n}\n\n// TODO: define returnBook function\n\nfunc main() {\n\tcatalog := make(map[string]Book)\n\taddBook(catalog, \"1984\", \"George Orwell\", \"978-0451524935\", true)\n\n\tcheckout(catalog, \"978-0451524935\")\n\t// TODO: return the book, then try returning it again (error case)\n}",
+    "expectedOutput": [],
+    "codeChecks": [
+      { "pattern": "func\\s+returnBook\\s*\\(", "required": true, "message": "Define the returnBook function." },
+      { "pattern": "errors\\.New", "required": true, "message": "Use errors.New for validation errors." },
+      { "pattern": "was not checked out", "required": true, "message": "Return a specific error when trying to return an available book." },
+      { "pattern": "Available\\s*=\\s*true", "required": true, "message": "Set Available to true when returning." }
+    ],
+    "successMessage": "Check out and return with full validation. Your library tracks exactly which books are in circulation."
+  },
+  {
+    "title": "Count books by availability",
+    "instruction": "Write `stats(catalog map[string]Book)` that prints: total books, available books, and checked out books. Use a loop with counters.",
+    "hint": "total := len(catalog); for _, b := range catalog { if b.Available { avail++ } else { out++ } }",
+    "starter": "package main\n\nimport \"fmt\"\n\ntype Book struct {\n\tTitle     string\n\tAuthor    string\n\tISBN      string\n\tAvailable bool\n}\n\nfunc addBook(catalog map[string]Book, title, author, isbn string, available bool) {\n\tcatalog[isbn] = Book{Title: title, Author: author, ISBN: isbn, Available: available}\n}\n\n// TODO: define stats function\n\nfunc main() {\n\tcatalog := make(map[string]Book)\n\taddBook(catalog, \"1984\", \"George Orwell\", \"978-0451524935\", true)\n\taddBook(catalog, \"Dune\", \"Frank Herbert\", \"978-0441172719\", false)\n\taddBook(catalog, \"Moby Dick\", \"Herman Melville\", \"978-0142437247\", true)\n\n\t// TODO: call stats\n}",
+    "expectedOutput": [],
+    "codeChecks": [
+      { "pattern": "func\\s+stats\\s*\\(", "required": true, "message": "Define the stats function." },
+      { "pattern": "len\\(catalog\\)", "required": true, "message": "Use len(catalog) for the total count." },
+      { "pattern": "Available", "required": true, "message": "Check the Available field in your loop." },
+      { "pattern": "Printf", "required": true, "message": "Print the stats with fmt.Printf." }
+    ],
+    "successMessage": "Stats give you a birds-eye view of the library. Total, available, and checked-out counts at a glance."
+  },
+  {
+    "title": "Load sample data",
+    "instruction": "Write `loadSampleData() map[string]Book` that creates a catalog with 5 pre-loaded books and returns it. Use `addBook` internally. Call it in main and list the books.",
+    "hint": "func loadSampleData() map[string]Book { catalog := make(map[string]Book); addBook(catalog, ...); return catalog }",
+    "starter": "package main\n\nimport (\n\t\"errors\"\n\t\"fmt\"\n\t\"strings\"\n)\n\ntype Book struct {\n\tTitle     string\n\tAuthor    string\n\tISBN      string\n\tAvailable bool\n}\n\nfunc addBook(catalog map[string]Book, title, author, isbn string, available bool) {\n\tcatalog[isbn] = Book{Title: title, Author: author, ISBN: isbn, Available: available}\n}\n\nfunc listBooks(catalog map[string]Book) {\n\tfmt.Println(\"| Title                          | Author               | ISBN             | Available |\")\n\tfmt.Println(\"|--------------------------------|----------------------|-----------------|-----------|\")\n\tfor _, b := range catalog {\n\t\tfmt.Printf(\"| %-30s | %-20s | %-15s | %-9t |\\n\", b.Title, b.Author, b.ISBN, b.Available)\n\t}\n}\n\n// TODO: define loadSampleData function with 5 books\n\nfunc main() {\n\t// TODO: load sample data and list books\n}",
+    "expectedOutput": [],
+    "codeChecks": [
+      { "pattern": "func\\s+loadSampleData\\s*\\(", "required": true, "message": "Define the loadSampleData function." },
+      { "pattern": "return\\s+catalog", "required": true, "message": "Return the catalog from loadSampleData." },
+      { "pattern": "listBooks\\(catalog\\)", "required": true, "message": "Call listBooks in main." }
+    ],
+    "successMessage": "Sample data lets you test and demonstrate the library without typing books by hand every time."
+  },
+  {
+    "title": "Interactive menu loop",
+    "instruction": "Build an interactive CLI menu using `fmt.Scanln` and a `for` loop. Print options: 1. List books, 2. Search, 3. Checkout, 4. Return, 5. Stats, 0. Exit. Read the user's choice and call the matching function. Run it and test listing books.",
+    "hint": "fmt.Print(\"\\nChoose: 1.List 2.Search 3.Checkout 4.Return 5.Stats 0.Exit: \"); fmt.Scanln(&choice); switch choice { ... }",
+    "starter": "package main\n\nimport (\n\t\"errors\"\n\t\"fmt\"\n\t\"strings\"\n)\n\ntype Book struct {\n\tTitle     string\n\tAuthor    string\n\tISBN      string\n\tAvailable bool\n}\n\nfunc addBook(catalog map[string]Book, title, author, isbn string, available bool) {\n\tcatalog[isbn] = Book{Title: title, Author: author, ISBN: isbn, Available: available}\n}\n\nfunc searchBooks(catalog map[string]Book, query string) []Book {\n\tvar results []Book\n\tfor _, b := range catalog {\n\t\tif strings.Contains(strings.ToLower(b.Title), strings.ToLower(query)) {\n\t\t\tresults = append(results, b)\n\t\t}\n\t}\n\treturn results\n}\n\nfunc listBooks(catalog map[string]Book) {\n\tfmt.Println(\"| Title                          | Author               | ISBN             | Available |\")\n\tfmt.Println(\"|--------------------------------|----------------------|-----------------|-----------|\")\n\tfor _, b := range catalog {\n\t\tfmt.Printf(\"| %-30s | %-20s | %-15s | %-9t |\\n\", b.Title, b.Author, b.ISBN, b.Available)\n\t}\n}\n\nfunc checkout(catalog map[string]Book, isbn string) error {\n\tbook, ok := catalog[isbn]\n\tif !ok {\n\t\treturn errors.New(\"book not found\")\n\t}\n\tif !book.Available {\n\t\treturn errors.New(\"book already checked out\")\n\t}\n\tbook.Available = false\n\tcatalog[isbn] = book\n\treturn nil\n}\n\nfunc returnBook(catalog map[string]Book, isbn string) error {\n\tbook, ok := catalog[isbn]\n\tif !ok {\n\t\treturn errors.New(\"book not found\")\n\t}\n\tif book.Available {\n\t\treturn errors.New(\"book was not checked out\")\n\t}\n\tbook.Available = true\n\tcatalog[isbn] = book\n\treturn nil\n}\n\nfunc stats(catalog map[string]Book) {\n\ttotal := len(catalog)\n\tavail := 0\n\tfor _, b := range catalog {\n\t\tif b.Available {\n\t\t\tavail++\n\t\t}\n\t}\n\tfmt.Printf(\"Total: %d, Available: %d, Checked out: %d\\n\", total, avail, total-avail)\n}\n\nfunc loadSampleData() map[string]Book {\n\tcatalog := make(map[string]Book)\n\taddBook(catalog, \"1984\", \"George Orwell\", \"978-0451524935\", true)\n\taddBook(catalog, \"Dune\", \"Frank Herbert\", \"978-0441172719\", true)\n\taddBook(catalog, \"Moby Dick\", \"Herman Melville\", \"978-0142437247\", false)\n\taddBook(catalog, \"The Great Gatsby\", \"F. Scott Fitzgerald\", \"978-0743273565\", true)\n\taddBook(catalog, \"Brave New World\", \"Aldous Huxley\", \"978-0060850524\", false)\n\treturn catalog\n}\n\nfunc main() {\n\tcatalog := loadSampleData()\n\tfmt.Println(\"=== Welcome to the Library CLI ===\")\n\tfmt.Println(\"All functions are ready. Now let's build the menu.\")\n\n\tfor {\n\t\tfmt.Print(\"\\n1. List books\\n2. Search\\n3. Checkout\\n4. Return\\n5. Stats\\n0. Exit\\nChoose: \")\n\t\tvar choice int\n\t\tfmt.Scanln(&choice)\n\n\t\tswitch choice {\n\t\tcase 1:\n\t\t\tlistBooks(catalog)\n\t\tcase 5:\n\t\t\tstats(catalog)\n\t\tcase 0:\n\t\t\tfmt.Println(\"Goodbye!\")\n\t\t\treturn\n\t\tdefault:\n\t\t\tfmt.Println(\"Unknown option\")\n\t\t}\n\t}\n}",
+    "expectedOutput": [],
+    "codeChecks": [
+      { "pattern": "Scanln", "required": true, "message": "Use fmt.Scanln to read user input." },
+      { "pattern": "switch\\s+choice", "required": true, "message": "Use a switch on the user's choice." },
+      { "pattern": "case\\s+0:", "required": true, "message": "Add an exit option (case 0)." },
+      { "pattern": "for\\s*\\{", "required": true, "message": "Use an infinite for loop for the menu." }
+    ],
+    "successMessage": "An interactive CLI menu! Users can list, search, checkout, return, and view stats — all from the terminal."
+  },
+  {
+    "title": "Complete the CLI with all operations",
+    "instruction": "Add the remaining menu options to the switch: `case 2` (Search — prompt for a query and print results), `case 3` (Checkout — prompt for ISBN), `case 4` (Return — prompt for ISBN). Test all operations by running the program.",
+    "hint": "case 2: var q string; fmt.Print(\"Search: \"); fmt.Scanln(&q); results := searchBooks(catalog, q); for _, b := range results { fmt.Printf(\"- %s by %s\\n\", b.Title, b.Author) }",
+    "starter": "package main\n\nimport (\n\t\"errors\"\n\t\"fmt\"\n\t\"strings\"\n)\n\ntype Book struct {\n\tTitle     string\n\tAuthor    string\n\tISBN      string\n\tAvailable bool\n}\n\nfunc addBook(catalog map[string]Book, title, author, isbn string, available bool) {\n\tcatalog[isbn] = Book{Title: title, Author: author, ISBN: isbn, Available: available}\n}\n\nfunc searchBooks(catalog map[string]Book, query string) []Book {\n\tvar results []Book\n\tfor _, b := range catalog {\n\t\tif strings.Contains(strings.ToLower(b.Title), strings.ToLower(query)) {\n\t\t\tresults = append(results, b)\n\t\t}\n\t}\n\treturn results\n}\n\nfunc listBooks(catalog map[string]Book) {\n\tfmt.Println(\"| Title                          | Author               | ISBN             | Available |\")\n\tfmt.Println(\"|--------------------------------|----------------------|-----------------|-----------|\")\n\tfor _, b := range catalog {\n\t\tfmt.Printf(\"| %-30s | %-20s | %-15s | %-9t |\\n\", b.Title, b.Author, b.ISBN, b.Available)\n\t}\n}\n\nfunc checkout(catalog map[string]Book, isbn string) error {\n\tbook, ok := catalog[isbn]\n\tif !ok {\n\t\treturn errors.New(\"book not found\")\n\t}\n\tif !book.Available {\n\t\treturn errors.New(\"book already checked out\")\n\t}\n\tbook.Available = false\n\tcatalog[isbn] = book\n\treturn nil\n}\n\nfunc returnBook(catalog map[string]Book, isbn string) error {\n\tbook, ok := catalog[isbn]\n\tif !ok {\n\t\treturn errors.New(\"book not found\")\n\t}\n\tif book.Available {\n\t\treturn errors.New(\"book was not checked out\")\n\t}\n\tbook.Available = true\n\tcatalog[isbn] = book\n\treturn nil\n}\n\nfunc stats(catalog map[string]Book) {\n\ttotal := len(catalog)\n\tavail := 0\n\tfor _, b := range catalog {\n\t\tif b.Available {\n\t\t\tavail++\n\t\t}\n\t}\n\tfmt.Printf(\"Total: %d, Available: %d, Checked out: %d\\n\", total, avail, total-avail)\n}\n\nfunc loadSampleData() map[string]Book {\n\tcatalog := make(map[string]Book)\n\taddBook(catalog, \"1984\", \"George Orwell\", \"978-0451524935\", true)\n\taddBook(catalog, \"Dune\", \"Frank Herbert\", \"978-0441172719\", true)\n\taddBook(catalog, \"Moby Dick\", \"Herman Melville\", \"978-0142437247\", false)\n\taddBook(catalog, \"The Great Gatsby\", \"F. Scott Fitzgerald\", \"978-0743273565\", true)\n\taddBook(catalog, \"Brave New World\", \"Aldous Huxley\", \"978-0060850524\", false)\n\treturn catalog\n}\n\nfunc main() {\n\tcatalog := loadSampleData()\n\tfmt.Println(\"=== Welcome to the Library CLI ===\")\n\n\tfor {\n\t\tfmt.Print(\"\\n1. List books\\n2. Search\\n3. Checkout\\n4. Return\\n5. Stats\\n0. Exit\\nChoose: \")\n\t\tvar choice int\n\t\tfmt.Scanln(&choice)\n\n\t\tswitch choice {\n\t\tcase 1:\n\t\t\tlistBooks(catalog)\n\t\tcase 2:\n\t\t\t// TODO: prompt for a search query and show results\n\t\tcase 3:\n\t\t\t// TODO: prompt for ISBN and try to check out\n\t\tcase 4:\n\t\t\t// TODO: prompt for ISBN and try to return\n\t\tcase 5:\n\t\t\tstats(catalog)\n\t\tcase 0:\n\t\t\tfmt.Println(\"Goodbye!\")\n\t\t\treturn\n\t\tdefault:\n\t\t\tfmt.Println(\"Unknown option\")\n\t\t}\n\t}\n}",
+    "expectedOutput": [],
+    "codeChecks": [
+      { "pattern": "case\\s+2:", "required": true, "message": "Add case 2 for search." },
+      { "pattern": "case\\s+3:", "required": true, "message": "Add case 3 for checkout." },
+      { "pattern": "case\\s+4:", "required": true, "message": "Add case 4 for return." },
+      { "pattern": "Scanln.*isbn|Scanln.*query", "required": true, "message": "Prompt the user and read input for search/checkout/return." }
+    ],
+    "successMessage": "Your Library CLI is complete! You built a working interactive CLI app using structs, maps, functions, error handling, and fmt — everything you've learned in this course."
+  }
+]

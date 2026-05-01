@@ -1,41 +1,42 @@
 [
   {
     "title": "Your first select",
-    "instruction": "`select` waits on multiple channels and runs whichever one is ready first. Two search channels return books from different library aisles. Send a book title to one channel, and select will pick whichever has data ready.",
+    "instruction": "`select` waits on multiple channels and runs whichever one is ready first. A fiction channel has \"Dune\" ready. Run this and see select pick the ready channel.",
     "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tfiction := make(chan string, 1)\n\tnonFiction := make(chan string, 1)\n\n\tfiction <- \"Dune\"\n\n\tselect {\n\tcase book := <-fiction:\n\t\tfmt.Println(\"Found in fiction:\", book)\n\tcase book := <-nonFiction:\n\t\tfmt.Println(\"Found in non-fiction:\", book)\n\t}\n}",
     "expectedOutput": ["Found in fiction: Dune"],
-    "successMessage": "Select picked fiction because it had data ready. Non-fiction was empty — so select ignored it."
+    "successMessage": "Select picked fiction because it had data ready. Non-fiction was empty — so select ignored it.",
+    "carryForward": true
   },
   {
     "title": "select with default — non-blocking",
-    "instruction": "Add a `default` case and select becomes non-blocking. If no channel has data, default runs immediately instead of waiting. The holds shelf is empty — add a default branch that prints \"No holds available\".",
+    "instruction": "Add a `default` case to make select non-blocking. If no channel has data, default runs immediately. The holds shelf is empty — add a default branch that prints \"No holds available\".",
     "hint": "Add default: fmt.Println(\"No holds available\") to the select block.",
     "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tholds := make(chan string, 1)\n\t// No books on the holds shelf\n\n\tselect {\n\tcase book := <-holds:\n\t\tfmt.Println(\"Pick up:\", book)\n\tdefault:\n\t\tfmt.Println(\"No holds available\")\n\t}\n}",
     "expectedOutput": ["No holds available"],
-    "successMessage": "The holds shelf was empty, so default ran immediately. Non-blocking checks are how you avoid freezing your program."
+    "successMessage": "The holds shelf was empty, so default ran immediately. Non-blocking checks prevent your program from freezing."
   },
   {
     "title": "Timeout — don't wait forever",
-    "instruction": "A catalog search can take time. `time.After(d)` returns a channel that fires after duration `d` — like setting a timer while you wait. The search takes 200ms but you only want to wait 50ms. Use select to timeout first.",
+    "instruction": "`time.After(d)` returns a channel that fires after duration `d`. The catalog search takes 200ms but you want to wait max 50ms. The timeout should fire first.",
     "hint": "Add case <-time.After(50 * time.Millisecond): fmt.Println(\"Search timed out\") — the timer wins before the search finishes.",
     "starter": "package main\n\nimport (\n\t\"fmt\"\n\t\"time\"\n)\n\nfunc searchCatalog() <-chan string {\n\tch := make(chan string, 1)\n\tgo func() {\n\t\ttime.Sleep(200 * time.Millisecond)\n\t\tch <- \"The Art of Computer Programming\"\n\t}()\n\treturn ch\n}\n\nfunc main() {\n\tresult := searchCatalog()\n\n\tselect {\n\tcase book := <-result:\n\t\tfmt.Println(\"Found:\", book)\n\tcase <-time.After(50 * time.Millisecond):\n\t\tfmt.Println(\"Search timed out — try again later\")\n\t}\n}",
     "expectedOutput": ["Search timed out"],
-    "successMessage": "50ms timer fired before the 200ms search finished. Timeouts are how you prevent your program from hanging forever."
+    "successMessage": "50ms timer fired before the 200ms search finished. Timeouts prevent your program from hanging forever."
   },
   {
     "title": "Done channel — stop gracefully",
-    "instruction": "A `done` channel signals a goroutine it's time to stop. The librarian goroutine returns books until the library closes. Sleep 100ms, then close the done channel to stop her.",
-    "hint": "Change time.Sleep(0) to time.Sleep(100 * time.Millisecond), then add close(done) on the next line.",
+    "instruction": "A `done` channel signals a goroutine to stop. The librarian processes returns until the library closes. Sleep 100ms, then `close(done)` to stop her gracefully.",
+    "hint": "Change time.Sleep(0) to time.Sleep(100 * time.Millisecond). Then add close(done) on the next line.",
     "starter": "package main\n\nimport (\n\t\"fmt\"\n\t\"time\"\n)\n\nfunc librarian(done <-chan struct{}) {\n\tfor i := 1; ; i++ {\n\t\tselect {\n\t\tcase <-done:\n\t\t\tfmt.Println(\"Librarian went home after processing\", i-1, \"returns\")\n\t\t\treturn\n\t\tdefault:\n\t\t\tfmt.Println(\"Processing return #\", i)\n\t\t\ttime.Sleep(30 * time.Millisecond)\n\t\t}\n\t}\n}\n\nfunc main() {\n\tdone := make(chan struct{})\n\tgo librarian(done)\n\ttime.Sleep(0)\n\ttime.Sleep(50 * time.Millisecond)\n\tfmt.Println(\"Library closed\")\n}",
     "expectedOutput": ["Processing return #", "Librarian went home", "Library closed"],
-    "successMessage": "The librarian processed books until done was closed, then exited gracefully. The done channel pattern is how you stop goroutines cleanly."
+    "successMessage": "The librarian processed books until done was closed, then exited gracefully. The done channel pattern stops goroutines cleanly."
   },
   {
     "title": "Fan-in — merge two catalog searches",
-    "instruction": "Fan-in merges multiple channels into one. Two catalog searches (fiction and non-fiction) return books on separate channels. Complete the `merge` function by launching goroutines that forward each catalog's results into a single output channel.",
+    "instruction": "Fan-in merges multiple channels into one. The `merge` function launches forwarding goroutines but they are missing. Add `go forward(fiction)` and `go forward(nonFiction)` inside merge before the wait goroutine.",
     "hint": "Add go forward(fiction) and go forward(nonFiction) inside merge, before the wait goroutine.",
     "starter": "package main\n\nimport (\n\t\"fmt\"\n\t\"sync\"\n)\n\nfunc merge(fiction, nonFiction <-chan string) <-chan string {\n\tout := make(chan string)\n\tvar wg sync.WaitGroup\n\n\tforward := func(ch <-chan string) {\n\t\tdefer wg.Done()\n\t\tfor v := range ch {\n\t\t\tout <- v\n\t\t}\n\t}\n\n\twg.Add(2)\n\tgo func() {\n\t\twg.Wait()\n\t\tclose(out)\n\t}()\n\n\treturn out\n}\n\nfunc catalog(vals ...string) <-chan string {\n\tch := make(chan string, len(vals))\n\tfor _, v := range vals {\n\t\tch <- v\n\t}\n\tclose(ch)\n\treturn ch\n}\n\nfunc main() {\n\tfiction := catalog(\"Dune\", \"1984\", \"Moby Dick\")\n\tnonFiction := catalog(\"Sapiens\", \"Homo Deus\", \"The Lean Startup\")\n\tmerged := merge(fiction, nonFiction)\n\n\tcount := 0\n\tfor book := range merged {\n\t\tfmt.Println(\"Merged:\", book)\n\t\tcount++\n\t}\n\tfmt.Println(\"Total books found:\", count)\n}",
     "expectedOutput": ["Merged:", "Total books found: 6"],
-    "successMessage": "Two catalog channels merged into one. Both forward goroutines dumped their results onto the same output channel. Fan-in lets you combine multiple data sources."
+    "successMessage": "Two catalog channels merged into one. Both forward goroutines dump their results onto the same output channel. Fan-in combines multiple data sources."
   }
 ]

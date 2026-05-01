@@ -1,323 +1,132 @@
 [
   {
     "title": "What is an interface",
-    "instruction": "An interface is like a library card catalog. It lists what you need to *do* — not who you need to *be*.\n\n\"Must be able to `Title() string`\" — any type that has that method qualifies. Book? Yes. Magazine? Yes. Audiobook? If it has `Title()`, sure.\n\nRun this — both Book and Magazine satisfy the `Media` interface because they both have `Title()`.",
+    "instruction": "An interface is like a library card catalog. It lists what you need to *do* — not who you need to *be*.\\n\"Must be able to `Title() string`\" — any type that has that method qualifies. Book? Yes. Magazine? Yes.\\nRun this — both Book and Magazine satisfy the `Media` interface because they both have `Title()`.",
     "starter": "package main\n\nimport \"fmt\"\n\ntype Media interface {\n\tTitle() string\n}\n\ntype Book struct{ Name string }\ntype Magazine struct{ Name string }\n\nfunc (b Book) Title() string    { return b.Name }\nfunc (m Magazine) Title() string { return m.Name }\n\nfunc printTitle(m Media) {\n\tfmt.Println(m.Title())\n}\n\nfunc main() {\n\tprintTitle(Book{Name: \"The Go Programming Language\"})\n\tprintTitle(Magazine{Name: \"ACM Queue\"})\n}",
-    "expectedOutput": [
-      "The Go Programming Language",
-      "ACM Queue"
-    ],
-    "successMessage": "Book says its title, Magazine says its title — but `printTitle()` didn't care which one it got. It just asked: \"Can you Title()?\" That's the power of interfaces."
+    "expectedOutput": ["The Go Programming Language", "ACM Queue"],
+    "successMessage": "Book says its title, Magazine says its title — but `printTitle()` didn't care which one it got. It just asked: \"Can you Title()?\" That's the power of interfaces.",
+    "carryForward": true
   },
   {
     "title": "Define and satisfy an interface",
-    "instruction": "Your turn. Define a `Media` interface that requires `Pages() int`.\n\nThen make both `Book` and `Audiobook` satisfy it by adding `Pages()` methods to each.\n\nIf it has `Pages()`, it's Media. Period.",
+    "instruction": "Your turn. Define a `Media` interface that requires `Pages() int`.\\nThen make both `Book` and `Audiobook` satisfy it by adding `Pages()` methods.\\nIf it has `Pages()`, it's Media. Period.",
     "hint": "type Media interface { Pages() int }  func (b Book) Pages() int { return b.PageCount }  func (a Audiobook) Pages() int { return a.LengthMinutes / 2 }",
     "starter": "package main\n\nimport \"fmt\"\n\n// TODO: define Media interface with Pages() int\n\ntype Book struct{ PageCount int }\ntype Audiobook struct{ LengthMinutes int }\n\n// TODO: add Pages() to Book\n// TODO: add Pages() to Audiobook\n\nfunc printPages(m Media) {\n\tfmt.Printf(\"Pages: %d\\n\", m.Pages())\n}\n\nfunc main() {\n\tprintPages(Book{PageCount: 320})\n\tprintPages(Audiobook{LengthMinutes: 720})\n}",
-    "expectedOutput": [
-      "Pages: 320",
-      "Pages: 360"
-    ],
+    "expectedOutput": ["Pages: 320", "Pages: 360"],
     "codeChecks": [
-      {
-        "pattern": "type\\s+Media\\s+interface\\s*\\{",
-        "required": true,
-        "message": "Define the Media interface: type Media interface { ... }"
-      },
-      {
-        "pattern": "Pages\\s*\\(\\s*\\)\\s*int",
-        "required": true,
-        "message": "The interface must require Pages() int."
-      },
-      {
-        "pattern": "func\\s*\\(\\s*\\w+\\s+Book\\s*\\)\\s*Pages",
-        "required": true,
-        "message": "Add Pages() method to Book."
-      },
-      {
-        "pattern": "func\\s*\\(\\s*\\w+\\s+Audiobook\\s*\\)\\s*Pages",
-        "required": true,
-        "message": "Add Pages() method to Audiobook."
-      },
-      {
-        "pattern": "TODO",
-        "required": false,
-        "message": "Replace the TODO comments with your code."
-      }
+      { "pattern": "type\\s+Media\\s+interface\\s*\\{", "required": true, "message": "Define the Media interface: type Media interface { ... }" },
+      { "pattern": "Pages\\s*\\(\\s*\\)\\s*int", "required": true, "message": "The interface must require Pages() int." },
+      { "pattern": "func\\s*\\(\\s*\\w+\\s+Book\\s*\\)\\s*Pages", "required": true, "message": "Add Pages() method to Book." },
+      { "pattern": "func\\s*\\(\\s*\\w+\\s+Audiobook\\s*\\)\\s*Pages", "required": true, "message": "Add Pages() method to Audiobook." },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comments with your code." }
     ],
     "successMessage": "Two different types, one interface. Go doesn't care about inheritance or class trees — just \"do you have the method?\""
   },
   {
-    "title": "Interfaces with multiple methods",
-    "instruction": "An interface can require any number of methods. A type must implement all of them to satisfy the interface.\n\nAdd `Author() string` to the `Media` interface. Then add `Author()` methods to both `Book` and `Magazine`. Update `describe` to print both.",
-    "hint": "func (b Book) Author() string { return b.Writer }  func (m Magazine) Author() string { return m.Editor }",
-    "starter": "package main\n\nimport \"fmt\"\n\ntype Media interface {\n\tTitle() string\n\t// TODO: add Author() string\n}\n\ntype Book struct{ TitleName, Writer string }\ntype Magazine struct{ TitleName, Editor string }\n\nfunc (b Book) Title() string    { return b.TitleName }\nfunc (m Magazine) Title() string { return m.TitleName }\n\n// TODO: add Author() to Book\n// TODO: add Author() to Magazine\n\nfunc describe(m Media) {\n\tfmt.Printf(\"\\\"%s\\\" by %s\\n\", m.Title(), m.Author())\n}\n\nfunc main() {\n\tdescribe(Book{TitleName: \"1984\", Writer: \"George Orwell\"})\n\tdescribe(Magazine{TitleName: \"The New Yorker\", Editor: \"David Remnick\"})\n}",
-    "expectedOutput": [
-      "\"1984\" by George Orwell",
-      "\"The New Yorker\" by David Remnick"
-    ],
-    "codeChecks": [
-      {
-        "pattern": "Author\\s*\\(\\s*\\)\\s*string",
-        "required": true,
-        "message": "Add Author() string to the Media interface."
-      },
-      {
-        "pattern": "func\\s*\\(\\s*\\w+\\s+Book\\s*\\)\\s*Author",
-        "required": true,
-        "message": "Add Author() to Book."
-      },
-      {
-        "pattern": "func\\s*\\(\\s*\\w+\\s+Magazine\\s*\\)\\s*Author",
-        "required": true,
-        "message": "Add Author() to Magazine."
-      },
-      {
-        "pattern": "TODO",
-        "required": false,
-        "message": "Replace the TODO comments with your code."
-      }
-    ],
-    "successMessage": "Both methods, both types. If you add a method to the interface but forget to add it to a type, the compiler tells you immediately — no runtime surprises."
-  },
-  {
-    "title": "A slice of interfaces",
-    "instruction": "Because all three media types satisfy `Media`, you can store them in a `[]Media` and treat them uniformly.\n\nAdd an `Audiobook` to the media slice, then loop through and call `describe` on each.",
+    "title": "ahha — a slice of interfaces treats everything the same",
+    "instruction": "Because all three media types satisfy `Media`, you can store them in a `[]Media` and treat them uniformly.\\nAdd an `Audiobook` to the media slice, then loop through and call `describe` on each.",
     "hint": "items := []Media{Book{...}, Magazine{...}, Audiobook{...}}",
     "starter": "package main\n\nimport \"fmt\"\n\ntype Media interface {\n\tTitle() string\n\tDuration() string\n}\n\ntype Book struct{ TitleName string }\ntype Magazine struct{ TitleName string }\ntype Audiobook struct{ TitleName string }\n\nfunc (b Book) Title() string     { return b.TitleName }\nfunc (m Magazine) Title() string  { return m.TitleName }\nfunc (a Audiobook) Title() string { return a.TitleName }\n\nfunc (b Book) Duration() string     { return \"6h read\" }\nfunc (m Magazine) Duration() string  { return \"30m read\" }\nfunc (a Audiobook) Duration() string { return \"4h listen\" }\n\nfunc describe(m Media) {\n\tfmt.Printf(\"%s — %s\\n\", m.Title(), m.Duration())\n}\n\nfunc main() {\n\titems := []Media{\n\t\tBook{TitleName: \"Go in Action\"},\n\t\tMagazine{TitleName: \"Nature\"},\n\t\t// TODO: add Audiobook{TitleName: \"Atomic Habits\"}\n\t}\n\tfor _, m := range items {\n\t\tdescribe(m)\n\t}\n}",
-    "expectedOutput": [
-      "Go in Action — 6h read",
-      "Nature — 30m read",
-      "Atomic Habits — 4h listen"
-    ],
+    "expectedOutput": ["Go in Action — 6h read", "Nature — 30m read", "Atomic Habits — 4h listen"],
     "codeChecks": [
-      {
-        "pattern": "Audiobook\\{TitleName:\\s*\"Atomic Habits\"\\}",
-        "required": true,
-        "message": "Add Audiobook{TitleName: \"Atomic Habits\"} to the media slice."
-      },
-      {
-        "pattern": "TODO",
-        "required": false,
-        "message": "Replace the TODO comment with your code."
-      }
+      { "pattern": "Audiobook\\{TitleName:\\s*\"Atomic Habits\"\\}", "required": true, "message": "Add Audiobook{TitleName: \"Atomic Habits\"} to the media slice." },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
     ],
-    "successMessage": "Three different types in one slice, one loop, one function. This is the power of interfaces — write the loop once, it works for every type that satisfies Media."
+    "successMessage": "Three different types in one slice, one loop, one function. This is the power of interfaces."
   },
   {
     "title": "The Stringer interface",
-    "instruction": "Remember `String()` from the Methods chapter? Surprise — that was an interface all along.\n\n`fmt.Stringer` requires one method: `String() string`. Any type with that method gets printed beautifully by `fmt.Println`.\n\nAdd `String()` to `Book` so it prints as `\"The Great Gatsby\" by F. Scott Fitzgerald` instead of `{The Great Gatsby F. Scott Fitzgerald}`.",
+    "instruction": "Remember `String()` from the Methods chapter? That was an interface all along.\\n`fmt.Stringer` requires one method: `String() string`. Any type with that method gets printed beautifully by `fmt.Println`.\\nAdd `String()` to `Book` so it prints as `\"The Great Gatsby\" by F. Scott Fitzgerald`.",
     "hint": "func (b Book) String() string { return fmt.Sprintf(\"\\\"%s\\\" by %s\", b.Title, b.Author) }",
     "starter": "package main\n\nimport \"fmt\"\n\ntype Book struct {\n\tTitle, Author string\n}\n\n// TODO: add String() string method to Book\n\nfunc main() {\n\tb := Book{Title: \"The Great Gatsby\", Author: \"F. Scott Fitzgerald\"}\n\tfmt.Println(b)\n}",
-    "expectedOutput": [
-      "\"The Great Gatsby\" by F. Scott Fitzgerald"
-    ],
+    "expectedOutput": ["\"The Great Gatsby\" by F. Scott Fitzgerald"],
     "codeChecks": [
-      {
-        "pattern": "func\\s*\\(\\s*\\w+\\s+Book\\s*\\)\\s*String\\s*\\(\\s*\\)\\s*string",
-        "required": true,
-        "message": "Add String() string method to Book."
-      },
-      {
-        "pattern": "Sprintf",
-        "required": true,
-        "message": "Use fmt.Sprintf inside String() to format the output."
-      },
-      {
-        "pattern": "TODO",
-        "required": false,
-        "message": "Replace the TODO comment with your method."
-      }
+      { "pattern": "func\\s*\\(\\s*\\w+\\s+Book\\s*\\)\\s*String\\s*\\(\\s*\\)\\s*string", "required": true, "message": "Add String() string method to Book." },
+      { "pattern": "Sprintf", "required": true, "message": "Use fmt.Sprintf inside String() to format the output." },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your method." }
     ],
-    "successMessage": "You satisfied an interface without even importing it. fmt just checked: \"Does this type have String()?\" Yes → use it. That's Go."
-  },
-  {
-    "title": "Interface as function parameter",
-    "instruction": "Interfaces shine when used as function parameters. The function does not care about the concrete type — only that it has the right methods.\n\n`io.Writer` is the most famous example. `fmt.Fprintf` takes any `io.Writer` — a file, a network connection, a buffer, anything.\n\nRun this. `checkOutMedia` accepts any `Media` type. We pass both a `Book` and a `Magazine`. The function works the same regardless of which type we give it.",
-    "starter": "package main\n\nimport \"fmt\"\n\ntype Media interface {\n\tBorrow() string\n}\n\ntype Book struct{ Title string }\ntype Magazine struct{ Title string }\n\nfunc (b Book) Borrow() string    { return \"Borrowed book: \\\"\" + b.Title + \"\\\" — due in 21 days\" }\nfunc (m Magazine) Borrow() string { return \"Checked out magazine: \\\"\" + m.Title + \"\\\" — due in 7 days\" }\n\nfunc checkOutMedia(m Media) {\n\tfmt.Println(m.Borrow())\n}\n\nfunc main() {\n\tcheckOutMedia(Book{Title: \"The Pragmatic Programmer\"})\n\tcheckOutMedia(Magazine{Title: \"Wired\"})\n}",
-    "expectedOutput": [
-      "Borrowed book: \"The Pragmatic Programmer\" — due in 21 days",
-      "Checked out magazine: \"Wired\" — due in 7 days"
-    ],
-    "successMessage": "checkOutMedia does not know if it is borrowing a book or a magazine. It just knows it has something with Borrow(). Add a new type later? The function does not change at all."
+    "successMessage": "You satisfied an interface without even importing it. fmt just checked: \"Does this type have String()?\" Yes → use it."
   },
   {
     "title": "Type assertion",
-    "instruction": "Sometimes you have an interface value and you need to access the concrete type underneath.\n\n`concrete, ok := interfaceVal.(ConcreteType)`\n\nIf the underlying type is `ConcreteType`, `ok` is `true` and `concrete` has the concrete value. If not, `ok` is `false` and `concrete` is the zero value.\n\nRun this. Then add a type assertion to check if `m` is an `Audiobook` and print its narrator if it is.",
+    "instruction": "Sometimes you have an interface value and you need the concrete type underneath.\\n`concrete, ok := interfaceVal.(ConcreteType)` — safe version with boolean check.\\nRun this. Then add a type assertion to check if `m` is an `Audiobook` and print its narrator.",
     "hint": "if a, ok := m.(Audiobook); ok { fmt.Println(\"Narrated by:\", a.Narrator) }",
     "starter": "package main\n\nimport \"fmt\"\n\ntype Media interface{ Title() string }\n\ntype Book struct{ TitleName string }\ntype Audiobook struct{ TitleName, Narrator string }\n\nfunc (b Book) Title() string       { return b.TitleName }\nfunc (a Audiobook) Title() string  { return a.TitleName }\n\nfunc inspect(m Media) {\n\tif b, ok := m.(Book); ok {\n\t\tfmt.Printf(\"Book: \\\"%s\\\"\\n\", b.TitleName)\n\t}\n\t// TODO: add type assertion for Audiobook and print its Narrator\n}\n\nfunc main() {\n\tinspect(Book{TitleName: \"Dune\"})\n\tinspect(Audiobook{TitleName: \"Dune\", Narrator: \"Scott Brick\"})\n}",
-    "expectedOutput": [
-      "Book: \"Dune\"",
-      "Narrated by: Scott Brick"
-    ],
+    "expectedOutput": ["Book: \"Dune\"", "Narrated by: Scott Brick"],
     "codeChecks": [
-      {
-        "pattern": "m\\.\\(Audiobook\\)",
-        "required": true,
-        "message": "Add a type assertion: if a, ok := m.(Audiobook); ok { ... }"
-      },
-      {
-        "pattern": "a\\.Narrator|Narrated by:",
-        "required": true,
-        "message": "Print the Audiobook's Narrator."
-      },
-      {
-        "pattern": "TODO",
-        "required": false,
-        "message": "Replace the TODO comment with your assertion."
-      }
+      { "pattern": "m\\.\\(Audiobook\\)", "required": true, "message": "Add a type assertion: if a, ok := m.(Audiobook); ok { ... }" },
+      { "pattern": "a\\.Narrator|Narrated by:", "required": true, "message": "Print the Audiobook's Narrator." },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your assertion." }
     ],
-    "successMessage": "The two-value assertion (value, ok) is the safe version. Never use the one-value version m.(Audiobook) without ok — it panics if the type is wrong."
+    "successMessage": "The two-value assertion (value, ok) is the safe version. Never use the one-value version without ok — it panics if the type is wrong."
   },
   {
     "title": "Type switch",
-    "instruction": "When you need to handle multiple concrete types from an interface, a type switch is cleaner than chaining type assertions.\n\n```\nswitch v := i.(type) {\ncase int:\n    fmt.Println(\"int:\", v)\ncase string:\n    fmt.Println(\"string:\", v)\ndefault:\n    fmt.Println(\"unknown\")\n}\n```\n\nAdd a `case Magazine` to the type switch that prints the issue number.",
+    "instruction": "When you need to handle multiple concrete types from an interface, a type switch is cleaner than chaining type assertions.\\n`switch v := i.(type) { case int: ... case string: ... }`\\nAdd a `case Magazine` to the type switch that prints the issue number.",
     "hint": "case Magazine: fmt.Printf(\"Magazine: issue #%d\\n\", v.Issue)",
     "starter": "package main\n\nimport \"fmt\"\n\ntype Media interface{ Title() string }\n\ntype Book struct{ TitleName string }\ntype Magazine struct{ TitleName string; Issue int }\ntype Audiobook struct{ TitleName, Narrator string }\n\nfunc (b Book) Title() string       { return b.TitleName }\nfunc (m Magazine) Title() string   { return m.TitleName }\nfunc (a Audiobook) Title() string  { return a.TitleName }\n\nfunc whatMedia(m Media) {\n\tswitch v := m.(type) {\n\tcase Book:\n\t\tfmt.Printf(\"Book: \\\"%s\\\"\\n\", v.TitleName)\n\t// TODO: add case Magazine\n\tcase Audiobook:\n\t\tfmt.Printf(\"Audiobook: \\\"%s\\\" narrated by %s\\n\", v.TitleName, v.Narrator)\n\tdefault:\n\t\tfmt.Println(\"Unknown media type\")\n\t}\n}\n\nfunc main() {\n\twhatMedia(Book{TitleName: \"Clean Code\"})\n\twhatMedia(Magazine{TitleName: \"Time\", Issue: 42})\n\twhatMedia(Audiobook{TitleName: \"The Hobbit\", Narrator: \"Andy Serkis\"})\n}",
-    "expectedOutput": [
-      "Book: \"Clean Code\"",
-      "Magazine: issue #42",
-      "Audiobook: \"The Hobbit\" narrated by Andy Serkis"
-    ],
+    "expectedOutput": ["Book: \"Clean Code\"", "Magazine: issue #42", "Audiobook: \"The Hobbit\" narrated by Andy Serkis"],
     "codeChecks": [
-      {
-        "pattern": "case\\s+Magazine:",
-        "required": true,
-        "message": "Add case Magazine: to the type switch."
-      },
-      {
-        "pattern": "v\\.Issue|issue #",
-        "required": true,
-        "message": "Print the Magazine's Issue number using v."
-      },
-      {
-        "pattern": "TODO",
-        "required": false,
-        "message": "Replace the TODO comment with your case."
-      }
+      { "pattern": "case\\s+Magazine:", "required": true, "message": "Add case Magazine: to the type switch." },
+      { "pattern": "v\\.Issue|issue #", "required": true, "message": "Print the Magazine's Issue number using v." },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your case." }
     ],
     "successMessage": "Type switch: one construct, multiple types, zero repetition. Much cleaner than three consecutive if-else type assertions."
   },
   {
-    "title": "The empty interface",
-    "instruction": "`interface{}` (or `any` in newer Go) has zero methods — which means *every* type satisfies it.\n\nThink of it as a box that accepts anything: ints, strings, bools, slices, your custom library types.\n\nUseful for generic containers, but use sparingly — you lose type safety.",
-    "hint": "checkIn([]interface{}{Book{...}, Magazine{...}})",
+    "title": "The empty interface (any)",
+    "instruction": "`interface{}` (or `any` in newer Go) has zero methods — which means *every* type satisfies it.\\nUseful for generic containers, but use sparingly — you lose type safety.\\nCall checkIn with `Book{Title: \"Go Syntax\"}` and see how `any` accepts it too.",
+    "hint": "checkIn(Book{Title: \"Go Syntax\"})",
     "starter": "package main\n\nimport \"fmt\"\n\ntype Book struct{ Title string }\ntype Magazine struct{ Title string }\n\nfunc checkIn(item any) {\n\tfmt.Printf(\"Returning: %T | %v\\n\", item, item)\n}\n\nfunc main() {\n\tcheckIn(42)\n\tcheckIn(\"library card\")\n\tcheckIn(true)\n\tcheckIn(3.14)\n\t// TODO: call checkIn with Book{Title: \"Go Syntax\"}\n}",
-    "expectedOutput": [
-      "Returning: int | 42",
-      "Returning: string | library card",
-      "Returning: bool | true",
-      "Returning: float64 | 3.14",
-      "Returning: main.Book | {Go Syntax}"
-    ],
+    "expectedOutput": ["Returning: int | 42", "Returning: string | library card", "Returning: bool | true", "Returning: float64 | 3.14", "Returning: main.Book | {Go Syntax}"],
     "codeChecks": [
-      {
-        "pattern": "checkIn\\(Book\\{Title:\\s*\"Go Syntax\"\\}\\)",
-        "required": true,
-        "message": "Call checkIn(Book{Title: \"Go Syntax\"})."
-      },
-      {
-        "pattern": "TODO",
-        "required": false,
-        "message": "Replace the TODO comment with your call."
-      }
+      { "pattern": "checkIn\\(Book\\{Title:\\s*\"Go Syntax\"\\}\\)", "required": true, "message": "Call checkIn(Book{Title: \"Go Syntax\"})." },
+      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your call." }
     ],
     "successMessage": "The empty interface accepts everything. Powerful, but it's like a shelf labeled \"miscellaneous\" — you'll need type assertions to figure out what's actually on it."
   },
   {
     "title": "Composing interfaces",
-    "instruction": "Interfaces can embed other interfaces. The composed interface requires all methods from all embedded interfaces.\n\n```\ntype ReadWriter interface {\n    Reader  // embeds Reader (requires Read)\n    Writer  // embeds Writer (requires Write)\n}\n```\n\nThis is how Go's standard library is built. `io.ReadWriter` is just `io.Reader` + `io.Writer`.\n\nRun this. `Borrowable` embeds both `Stockable` and `Returnable`. `LibraryItem` must implement all three methods.",
+    "instruction": "Interfaces can embed other interfaces. The composed interface requires all methods from all embedded interfaces.\\n`type ReadWriter interface { Reader; Writer }` — this is how Go's standard library is built.\\nRun this. `Borrowable` embeds both `Stockable` and `Returnable`. `LibraryItem` must implement all three methods.",
     "starter": "package main\n\nimport \"fmt\"\n\ntype Stockable interface {\n\tStock(count int)\n}\n\ntype Returnable interface {\n\tReturn() string\n}\n\ntype Borrowable interface {\n\tStockable\n\tReturnable\n}\n\ntype LibraryItem struct {\n\tTitle string\n\tstock int\n}\n\nfunc (l *LibraryItem) Stock(count int) {\n\tl.stock = count\n}\n\nfunc (l *LibraryItem) Return() string {\n\tl.stock++\n\treturn fmt.Sprintf(\"\\\"%s\\\" returned — %d copies available\", l.Title, l.stock)\n}\n\nfunc processBorrow(b Borrowable, title string) {\n\tb.Stock(3)\n\tfmt.Println(b.Return())\n}\n\nfunc main() {\n\titem := &LibraryItem{Title: \"The Art of War\"}\n\tprocessBorrow(item, \"The Art of War\")\n}",
-    "expectedOutput": [
-      "\"The Art of War\" returned — 4 copies available"
-    ],
-    "successMessage": "LibraryItem satisfies Borrowable by implementing both Stock and Return. Interface composition lets you build precise, minimal contracts — the Go standard library uses this pattern throughout."
+    "expectedOutput": ["\"The Art of War\" returned — 4 copies available"],
+    "successMessage": "LibraryItem satisfies Borrowable by implementing both Stock and Return. Interface composition lets you build precise, minimal contracts."
   },
   {
     "title": "Implicit satisfaction — no implements keyword",
-    "instruction": "This is the most important thing about Go interfaces.\n\nIn Java, you write `implements Speaker`. In Go, you just... have the method. No keyword. No declaration. If your type has `String()`, it *is* a Stringer.\n\nThis means you can satisfy interfaces from packages you've never imported. Run this — Book never mentions Stringer, but it works.",
+    "instruction": "This is the most important thing about Go interfaces. In Java, you write `implements Speaker`. In Go, you just... have the method.\\nNo keyword. No declaration. If your type has `String()`, it *is* a Stringer.\\nRun this — `LoudBook` never mentions Stringer, but it works.",
     "starter": "package main\n\nimport \"fmt\"\n\ntype LoudBook struct{ Title, Author string }\n\nfunc (b LoudBook) String() string {\n\treturn fmt.Sprintf(\"READ %s BY %s! IT IS THE BEST BOOK EVER!\", b.Title, b.Author)\n}\n\nfunc main() {\n\tbook := LoudBook{Title: \"The Hobbit\", Author: \"J.R.R. Tolkien\"}\n\tfmt.Println(book)\n\tfmt.Printf(\"The librarian says: %v\\n\", book)\n}",
-    "expectedOutput": [
-      "READ The Hobbit BY J.R.R. Tolkien! IT IS THE BEST BOOK EVER!",
-      "The librarian says: READ The Hobbit BY J.R.R. Tolkien! IT IS THE BEST BOOK EVER!"
-    ],
-    "successMessage": "No `implements`, no `extends`, no ceremony. Just methods. This is why Go interfaces are so flexible — any type can satisfy any interface, even one written years later by someone else."
+    "expectedOutput": ["READ The Hobbit BY J.R.R. Tolkien! IT IS THE BEST BOOK EVER!", "The librarian says: READ The Hobbit BY J.R.R. Tolkien! IT IS THE BEST BOOK EVER!"],
+    "successMessage": "No `implements`, no `extends`, no ceremony. Just methods. This is why Go interfaces are so flexible."
   },
   {
     "title": "Fix the broken interface",
-    "instruction": "Bug hunt time! The code tries to use `DVD` as a `Media`, but it won't compile.\n\nRead the error, figure out what's missing, and fix it.",
+    "instruction": "Bug hunt time! The code tries to use `DVD` as a `Media`, but it won't compile.\\nRead the error, figure out what's missing, and fix it.",
     "hint": "DVD needs a Title() string method. Add: func (d DVD) Title() string { return d.Name }",
     "starter": "package main\n\nimport \"fmt\"\n\ntype Media interface {\n\tTitle() string\n}\n\ntype Book struct{ Name string }\ntype DVD struct{ Name string }\n\nfunc (b Book) Title() string { return \"Book: \" + b.Name }\n\n// BUG: DVD does not implement Media — add the missing method\n\nfunc printShelf(m Media) {\n\tfmt.Println(m.Title())\n}\n\nfunc main() {\n\tprintShelf(Book{Name: \"The Alchemist\"})\n\tprintShelf(DVD{Name: \"Inception\"})\n}",
-    "expectedOutput": [
-      "Book: The Alchemist",
-      "DVD: Inception"
-    ],
+    "expectedOutput": ["Book: The Alchemist", "DVD: Inception"],
     "codeChecks": [
-      {
-        "pattern": "func\\s*\\(\\s*\\w+\\s+DVD\\s*\\)\\s*Title\\s*\\(\\s*\\)\\s*string",
-        "required": true,
-        "message": "Add Title() string method to DVD."
-      },
-      {
-        "pattern": "DVD:",
-        "required": true,
-        "message": "DVD's Title() should return a string starting with \"DVD:\"."
-      }
+      { "pattern": "func\\s*\\(\\s*\\w+\\s+DVD\\s*\\)\\s*Title\\s*\\(\\s*\\)\\s*string", "required": true, "message": "Add Title() string method to DVD." },
+      { "pattern": "DVD:", "required": true, "message": "DVD's Title() should return a string starting with \"DVD:\"." }
     ],
-    "successMessage": "DVD was missing the `Title()` method. No method = doesn't satisfy the interface. The compiler catches this for you — that's the safety net."
+    "successMessage": "DVD was missing the `Title()` method. No method = doesn't satisfy the interface. The compiler catches this for you."
   },
   {
     "title": "Build a library checkout system",
-    "instruction": "Build a library checkout system from scratch.\n\n1. Define a `LibraryItem` interface: `Checkout(cardNumber string) string`\n2. Create three types: `Book`, `Magazine`, `Audiobook`\n3. Each prints its own format (see expected output)\n4. Write a `processCheckouts()` function that takes `[]LibraryItem`, a card number, and calls Checkout on each\n\nThis is how real systems work — physical books, magazines, and digital media all behind one interface.",
+    "instruction": "No starter code. Build a library checkout system from scratch:\\n1. Define a `LibraryItem` interface: `Checkout(cardNumber string) string`\\n2. Create three types: `Book`, `Magazine`, `Audiobook`\\n3. Each prints its own format (see expected output)\\n4. Write a loop that calls Checkout on a `[]LibraryItem` with card number \"12345\"",
     "hint": "func (b Book) Checkout(card string) string { return fmt.Sprintf(\"Book \\\"%s\\\" checked out on card %s\", b.Title, card) }",
     "starter": "package main\n\nimport \"fmt\"\n\n// Build your library checkout system here\n\nfunc main() {\n}",
-    "expectedOutput": [
-      "Book \"Dune\" checked out on card 12345",
-      "Magazine \"NatGeo\" checked out on card 12345",
-      "Audiobook \"Atomic Habits\" checked out on card 12345"
-    ],
+    "expectedOutput": ["Book \"Dune\" checked out on card 12345", "Magazine \"NatGeo\" checked out on card 12345", "Audiobook \"Atomic Habits\" checked out on card 12345"],
     "codeChecks": [
-      {
-        "pattern": "type\\s+LibraryItem\\s+interface",
-        "required": true,
-        "message": "Define a LibraryItem interface."
-      },
-      {
-        "pattern": "Checkout\\s*\\(\\s*\\w+\\s+string\\s*\\)\\s*string",
-        "required": true,
-        "message": "The LibraryItem interface must have Checkout(cardNumber string) string."
-      },
-      {
-        "pattern": "type\\s+Book\\s+struct",
-        "required": true,
-        "message": "Define a Book struct."
-      },
-      {
-        "pattern": "type\\s+Magazine\\s+struct",
-        "required": true,
-        "message": "Define a Magazine struct."
-      },
-      {
-        "pattern": "type\\s+Audiobook\\s+struct",
-        "required": true,
-        "message": "Define an Audiobook struct."
-      },
-      {
-        "pattern": "\\[\\]LibraryItem",
-        "required": true,
-        "message": "Create a []LibraryItem slice."
-      },
-      {
-        "pattern": "range\\s+\\w+",
-        "required": true,
-        "message": "Loop through the LibraryItem slice with range."
-      },
-      {
-        "pattern": "\\.Checkout\\(\"12345\"\\)",
-        "required": true,
-        "message": "Call .Checkout(\"12345\") on each item."
-      }
+      { "pattern": "type\\s+LibraryItem\\s+interface", "required": true, "message": "Define a LibraryItem interface." },
+      { "pattern": "Checkout\\s*\\(\\s*\\w+\\s+string\\s*\\)\\s*string", "required": true, "message": "The LibraryItem interface must have Checkout(cardNumber string) string." },
+      { "pattern": "type\\s+Book\\s+struct", "required": true, "message": "Define a Book struct." },
+      { "pattern": "type\\s+Magazine\\s+struct", "required": true, "message": "Define a Magazine struct." },
+      { "pattern": "type\\s+Audiobook\\s+struct", "required": true, "message": "Define an Audiobook struct." },
+      { "pattern": "\\[\\]LibraryItem", "required": true, "message": "Create a []LibraryItem slice." },
+      { "pattern": "range\\s+\\w+", "required": true, "message": "Loop through the LibraryItem slice with range." },
+      { "pattern": "\\.Checkout\\(\"12345\"\\)", "required": true, "message": "Call .Checkout(\"12345\") on each item." }
     ],
-    "successMessage": "Three library item types, one interface, one function. Add a fourth type later? Just implement Checkout(). Nothing else changes. That's the beauty of interfaces."
+    "successMessage": "Three library item types, one interface, one loop. Add a fourth type later? Just implement Checkout(). Nothing else changes."
   }
 ]

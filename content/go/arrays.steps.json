@@ -1,149 +1,99 @@
 [
   {
     "title": "What is an array",
-    "instruction": "Imagine a library shelf with exactly 5 numbered slots: 0, 1, 2, 3, 4.\n\nEvery slot holds exactly one book. The number of slots never changes. All slots are the same size.\n\nAn array is that shelf \u2014 a fixed number of slots, all the same type, each with a number.\n\nRun this and see five slots, all starting at zero.",
+    "instruction": "An array is a shelf with a fixed number of slots, all the same type. Run this to see five slots all starting at zero.",
     "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tvar shelf [5]int\n\tfmt.Println(shelf)\n}",
     "expectedOutput": ["[0 0 0 0 0]"],
-    "successMessage": "Five slots, all zero. Go fills every slot with the zero value of the type when you declare an array without values."
+    "successMessage": "Five slots, all zero. Go fills every slot with the zero value of the type.",
+    "carryForward": true
   },
   {
-    "title": "Declare an array with values",
-    "instruction": "You can fill a shelf with books right when you create it.\n\n`books := [3]string{\"Dune\", \"Neuromancer\", \"Snow Crash\"}`\n\nThe number in brackets is the size. It must match exactly how many values you provide.\n\nChange the three book titles to your own favorites and run it.",
-    "hint": "Replace the three book titles inside the curly braces with your own. Keep the size [3] and the quotes.",
+    "title": "Declare with values",
+    "instruction": "Fill a shelf right when you create it: `books := [3]string{\"Dune\", \"Neuromancer\", \"Snow Crash\"}`. Change the titles to your own favorites.",
+    "hint": "Replace the three book titles inside the curly braces with your own. Keep the size [3].",
     "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tbooks := [3]string{\"Dune\", \"Neuromancer\", \"Snow Crash\"}\n\tfmt.Println(books)\n}",
     "expectedOutput": [],
     "codeChecks": [
-      { "pattern": "\\\\[3\\\\]string\\\\{\\\"[^\\\"]+\\\",\\\\s*\\\"[^\\\"]+\\\",\\\\s*\\\"[^\\\"]+\\\"\\\\}", "required": true, "message": "Keep the [3]string format and provide three string values in curly braces." },
-      { "pattern": "\\\"Dune\\\"", "required": false, "message": "Change the book titles to your own choices." }
+      { "pattern": "\\[3\\]string\\{", "required": true, "message": "Keep the [3]string format and provide three string values." },
+      { "pattern": "\"Dune\"", "required": false, "message": "Change the book titles to your own choices." }
     ],
-    "successMessage": "Size in brackets. Type after. Values inside curly braces. That is the full declaration syntax."
+    "successMessage": "Size in brackets. Type after. Values inside curly braces."
   },
   {
     "title": "Access by index",
-    "instruction": "Shelf slots are numbered starting at 0 \u2014 not 1.\n\nSo for a shelf of size 3:\n- `books[0]` is the first book\n- `books[1]` is the second\n- `books[2]` is the third \u2014 the last one\n\nThis trips up almost everyone at first. There is no slot 3 in a 3-slot shelf.\n\nPrint each book title on its own line using its index.",
-    "hint": "fmt.Println(books[0]), fmt.Println(books[1]), fmt.Println(books[2])  \u2014 three separate lines.",
+    "instruction": "Shelf slots start at 0, not 1. `books[0]` is the first, `books[2]` is the third. Print each title on its own line using its index.",
+    "hint": "fmt.Println(books[0]), fmt.Println(books[1]), fmt.Println(books[2])",
     "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tbooks := [3]string{\"Dune\", \"Neuromancer\", \"Snow Crash\"}\n\t// TODO: print each book using its index\n}",
     "expectedOutput": ["Dune", "Neuromancer", "Snow Crash"],
     "codeChecks": [
-      { "pattern": "books\\\\[0\\\\]", "required": true, "message": "Access the first book with books[0]" },
-      { "pattern": "books\\\\[1\\\\]", "required": true, "message": "Access the second book with books[1]" },
-      { "pattern": "books\\\\[2\\\\]", "required": true, "message": "Access the third book with books[2]" },
+      { "pattern": "books\\[0\\]", "required": true, "message": "Access the first book with books[0]" },
+      { "pattern": "books\\[1\\]", "required": true, "message": "Access the second book with books[1]" },
+      { "pattern": "books\\[2\\]", "required": true, "message": "Access the third book with books[2]" },
       { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
     ],
-    "successMessage": "Indexes start at 0. Always. In every programming language. You will get used to it."
+    "successMessage": "Indexes start at 0. Always. In every programming language."
   },
   {
     "title": "Update a value",
-    "instruction": "You can change any slot after the shelf is created. Use the same index syntax \u2014 but with `=` instead of just reading.\n\n`shelf[2] = 99`\n\nThis program prints the shelf before and after an update. Change slot `[1]` from its current value to `88` and run it.",
-    "hint": "shelf[1] = 88  \u2014 add this line between the two Println calls.",
+    "instruction": "Change any slot with `shelf[index] = value`. Change slot [1] from 65 to 88 and run it to see the before and after.",
+    "hint": "shelf[1] = 88 — add this line between the two Println calls.",
     "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tshelf := [4]int{70, 65, 80, 90}\n\tfmt.Println(shelf)\n\t// TODO: change shelf[1] to 88\n\tfmt.Println(shelf)\n}",
     "expectedOutput": ["[70 65 80 90]", "[70 88 80 90]"],
     "codeChecks": [
-      { "pattern": "shelf\\\\[1\\\\]\\\\s*=\\\\s*88", "required": true, "message": "Update slot 1: shelf[1] = 88" },
+      { "pattern": "shelf\\[1\\]\\s*=\\s*88", "required": true, "message": "Update slot 1: shelf[1] = 88" },
       { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your assignment." }
     ],
     "successMessage": "Read with brackets. Write with brackets and equals. The slot changes, everything else stays."
   },
   {
-    "title": "The length of an array",
-    "instruction": "`len()` tells you how many slots a shelf has.\n\nThis sounds obvious when you wrote the shelf yourself. But it matters when you are working with shelves you did not create \u2014 coming from a function, a file, a database.\n\nRun this. Then add a line that prints the length of the `books` shelf.",
-    "hint": "fmt.Println(len(books))  \u2014 len() works on any array.",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tshelf := [5]int{10, 20, 30, 40, 50}\n\tbooks  := [3]string{\"Dune\", \"Neuromancer\", \"Snow Crash\"}\n\tfmt.Println(len(shelf))\n\t// TODO: print the length of books\n}",
-    "expectedOutput": ["5", "3"],
-    "codeChecks": [
-      { "pattern": "len\\\\(books\\\\)", "required": true, "message": "Use len(books) to get the length of the books array." },
-      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your Println." }
-    ],
-    "successMessage": "len() is how you ask an array how big it is. You will use this constantly \u2014 especially inside loops."
-  },
-  {
     "title": "Loop through an array",
-    "instruction": "Now loops and shelves click together.\n\nInstead of printing `shelf[0]`, `shelf[1]`, `shelf[2]`... one by one, use a loop with `len()` to print every element automatically \u2014 no matter how big the shelf gets.\n\nAdd the loop to print all five shelf values.",
+    "instruction": "Use a `for` loop with `len()` to print every element automatically. Add the loop to print all five shelf values.",
     "hint": "for i := 0; i < len(shelf); i++ { fmt.Println(shelf[i]) }",
     "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tshelf := [5]int{82, 91, 74, 88, 95}\n\t// TODO: loop through shelf and print each one\n}",
     "expectedOutput": ["82", "91", "74", "88", "95"],
     "codeChecks": [
-      { "pattern": "for\\\\s+i\\\\s*:=\\\\s*0", "required": true, "message": "Start your loop at i := 0 since arrays are zero-indexed." },
-      { "pattern": "len\\\\(shelf\\\\)", "required": true, "message": "Use len(shelf) as the loop condition." },
-      { "pattern": "shelf\\\\[i\\\\]", "required": true, "message": "Access each element using shelf[i] inside the loop." },
+      { "pattern": "for\\s+i\\s*:=\\s*0", "required": true, "message": "Start your loop at i := 0 since arrays are zero-indexed." },
+      { "pattern": "len\\(shelf\\)", "required": true, "message": "Use len(shelf) as the loop condition." },
+      { "pattern": "shelf\\[i\\]", "required": true, "message": "Access each element using shelf[i] inside the loop." },
       { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your loop." }
     ],
-    "successMessage": "One loop, any size. This pattern \u2014 loop from 0 to len \u2014 is one of the most common things you will write in Go."
+    "successMessage": "One loop, any size. This pattern — loop from 0 to len — is one of the most common things in Go."
   },
   {
-    "title": "range \u2014 the cleaner loop",
-    "instruction": "`for i, v := range shelf` is a cleaner way to loop.\n\n- `i` is the index (0, 1, 2...)\n- `v` is the value at that index\n\nNo manual counter. No `len()`. Go handles it.\n\nChange the existing loop to use `range` instead.",
-    "hint": "for i, v := range books { fmt.Println(i, v) }  \u2014 replace the entire for loop.",
+    "title": "range — the cleaner loop",
+    "instruction": "`for i, v := range shelf` gives you index and value. No manual counter, no `len()`. Change this loop to use `range`.",
+    "hint": "for i, v := range books { fmt.Println(i, v) } — replace the entire for loop.",
     "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tbooks := [4]string{\"Dune\", \"Neuromancer\", \"Snow Crash\", \"Hyperion\"}\n\tfor i := 0; i < len(books); i++ {\n\t\tfmt.Println(i, books[i])\n\t}\n}",
     "expectedOutput": ["0 Dune", "1 Neuromancer", "2 Snow Crash", "3 Hyperion"],
     "codeChecks": [
-      { "pattern": "range\\\\s+books", "required": true, "message": "Use range to loop: for i, v := range books" },
-      { "pattern": "for\\\\s+i\\\\s*:=\\\\s*0", "required": false, "message": "Replace the old loop with a range loop." }
+      { "pattern": "range\\s+books", "required": true, "message": "Use range to loop: for i, v := range books" },
+      { "pattern": "for\\s+i\\s*:=\\s*0", "required": false, "message": "Replace the old loop with a range loop." }
     ],
-    "successMessage": "range gives you the index and value in one shot. Cleaner, less error-prone, more Go-like."
+    "successMessage": "range gives you the index and value in one shot. Cleaner, more Go-like."
   },
   {
-    "title": "The blank identifier _",
-    "instruction": "Sometimes you only want the value from `range`, not the index.\n\nBut Go requires you to use every variable you declare. If you declare `i` and never use it, Go refuses to compile.\n\nThe fix: use `_` (blank identifier) in place of the index. It tells Go: I know this exists, I am intentionally ignoring it.\n\n`for _, v := range books`\n\nChange the loop to use `_` and only print the book titles without the index number.",
-    "hint": "for _, book := range books { fmt.Println(book) }  \u2014 _ discards the index.",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tbooks := [4]string{\"Dune\", \"Neuromancer\", \"Snow Crash\", \"Hyperion\"}\n\tfor i, v := range books {\n\t\tfmt.Println(i, v)\n\t}\n}",
-    "expectedOutput": ["Dune", "Neuromancer", "Snow Crash", "Hyperion"],
-    "codeChecks": [
-      { "pattern": "_,", "required": true, "message": "Use _ to discard the index: for _, v := range books" },
-      { "pattern": "Println\\\\(i,", "required": false, "message": "Remove the index from the Println \u2014 only print the value." }
-    ],
-    "successMessage": "_ is Go's way of saying: I know there is something here, I just do not need it. You will see it everywhere."
-  },
-  {
-    "title": "Multi-dimensional array",
-    "instruction": "A shelf can hold other shelves. This creates a grid \u2014 rows and columns.\n\n`var bookcase [3][3]int` is a 3x3 bookcase of shelf slots.\n\nAccess a cell with two indexes: `bookcase[row][column]`\n\nRun this. Then change the value at row 1, column 2 to `99`.",
-    "hint": "bookcase[1][2] = 99  \u2014 add this line before the loop.",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tbookcase := [3][3]int{\n\t\t{1, 2, 3},\n\t\t{4, 5, 6},\n\t\t{7, 8, 9},\n\t}\n\t// TODO: change bookcase[1][2] to 99\n\tfor _, row := range bookcase {\n\t\tfmt.Println(row)\n\t}\n}",
-    "expectedOutput": ["[1 2 3]", "[4 5 99]", "[7 8 9]"],
-    "codeChecks": [
-      { "pattern": "bookcase\\\\[1\\\\]\\\\[2\\\\]\\\\s*=\\\\s*99", "required": true, "message": "Set bookcase[1][2] = 99 before the loop." },
-      { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your assignment." }
-    ],
-    "successMessage": "Row first, column second. bookcase[1][2] is row 1, column 2. Spreadsheets, game boards, image pixels \u2014 all multi-dimensional arrays."
-  },
-  {
-    "title": "Arrays are fixed size",
-    "instruction": "This is the one big limitation of arrays: the size is set when you create them and cannot change.\n\nThis program tries to create a shelf with 3 slots but give it 5 books.\n\nRun it. Read the error. Then fix it by either changing the size to 5 or removing the extra books.",
+    "title": "Arrays are fixed size 🤯",
+    "instruction": "This program tries to put 5 books in a 3-slot shelf. Run it, read the error, then fix it by changing `[3]` to `[5]`.",
     "hint": "Change [3]string to [5]string to fit all five book titles.",
     "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tbooks := [3]string{\"Dune\", \"Neuromancer\", \"Snow Crash\", \"Hyperion\", \"Altered Carbon\"}\n\tfmt.Println(books)\n}",
     "expectedOutput": ["[Dune Neuromancer Snow Crash Hyperion Altered Carbon]"],
     "codeChecks": [
-      { "pattern": "\\\\[5\\\\]string", "required": true, "message": "Change [3]string to [5]string to fit all five values." }
+      { "pattern": "\\[5\\]string", "required": true, "message": "Change [3]string to [5]string to fit all five values." }
     ],
-    "successMessage": "You cannot stretch an array. That rigidness is a feature \u2014 it guarantees the size is always known. When you need a list that can grow, that is what slices are for. Next chapter."
+    "successMessage": "You cannot stretch an array. That rigidness is a feature — it guarantees the size is always known. For flexible lists, that's what slices are for."
   },
   {
     "title": "Find the thickest book",
-    "instruction": "A classic loop pattern: go through every element and keep track of the largest one seen so far.\n\nStart by assuming the first book (by page count) is the thickest. Then check each subsequent book \u2014 if it is thicker, update your record.\n\nAdd the loop to find and print the highest page count.",
-    "hint": "Start with thickest := pages[0]. Then loop from index 1. If pages[i] > thickest, update thickest. Print thickest after the loop.",
+    "instruction": "Loop through page counts and track the largest. Start with `pages[0]` as the thickest, then update if you find a bigger one.",
+    "hint": "Start with thickest := pages[0]. Loop from index 1. If pages[i] > thickest, update it. Print thickest after the loop.",
     "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tpages := [6]int{320, 480, 750, 210, 398, 512}\n\t// TODO: find and print the highest page count\n}",
     "expectedOutput": ["750"],
     "codeChecks": [
-      { "pattern": "thickest\\\\s*:=\\\\s*pages\\\\[0\\\\]", "required": true, "message": "Start with thickest := pages[0] as your initial best guess." },
-      { "pattern": "pages\\\\[i\\\\]\\\\s*>\\\\s*thickest|thickest\\\\s*<\\\\s*pages\\\\[i\\\\]", "required": true, "message": "Compare each element: if pages[i] > thickest, update thickest." },
-      { "pattern": "Println\\\\(thickest\\\\)", "required": true, "message": "Print thickest after the loop ends." },
+      { "pattern": "thickest\\s*:=\\s*pages\\[0\\]", "required": true, "message": "Start with thickest := pages[0] as your initial best guess." },
+      { "pattern": "pages\\[i\\]\\s*>\\s*thickest|thickest\\s*<\\s*pages\\[i\\]", "required": true, "message": "Compare each element: if pages[i] > thickest, update it." },
+      { "pattern": "Println\\(thickest\\)", "required": true, "message": "Print thickest after the loop ends." },
       { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your loop." }
     ],
-    "successMessage": "Scanning for a max value is one of the most common things programs do. Search engines, leaderboards, analytics \u2014 all built on this pattern."
-  },
-  {
-    "title": "Build a reading list",
-    "instruction": "No starter code.\n\nCreate two arrays of size 5:\n- `titles` \u2014 five book titles (strings)\n- `pages`  \u2014 five page counts (ints)\n\nThen loop through both at the same time using the index, and print each line as:\n`\"1. Dune - 412\"`\n\nThe number at the start is the rank (index + 1).",
-    "hint": "for i := 0; i < len(titles); i++ { fmt.Printf(\"%d. %s - %d\\n\", i+1, titles[i], pages[i]) }",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\t// Create titles and pages arrays here\n\t// Then loop and print the reading list\n}",
-    "expectedOutput": [],
-    "codeChecks": [
-      { "pattern": "\\\\[5\\\\]string", "required": true, "message": "Create a titles array of type [5]string." },
-      { "pattern": "\\\\[5\\\\]int", "required": true, "message": "Create a pages array of type [5]int." },
-      { "pattern": "titles\\\\[i\\\\]", "required": true, "message": "Access book titles using titles[i] inside the loop." },
-      { "pattern": "pages\\\\[i\\\\]", "required": true, "message": "Access pages using pages[i] inside the loop." },
-      { "pattern": "i\\\\s*\\\\+\\\\s*1", "required": true, "message": "Use i+1 for the rank number so it starts at 1 not 0." }
-    ],
-    "successMessage": "A reading list from scratch. Two arrays, one loop, formatted output. That is a real feature in a real app."
+    "successMessage": "Scanning for a max value powers search engines, leaderboards, and analytics."
   }
 ]
