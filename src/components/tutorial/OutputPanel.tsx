@@ -6,6 +6,8 @@ interface Props {
   progress: StepProgressState;
   expectedOutput: string[];
   height: number;
+  /** The current step object — used for the hardcoded hint shown after 2+ failures. */
+  stepHint?: string;
 }
 
 /** Output panel for the tutorial IDE — shows run output and validation state. */
@@ -13,8 +15,9 @@ export default function OutputPanel({
   progress,
   expectedOutput,
   height,
+  stepHint,
 }: Props) {
-  const { output, outputIsError, failureKind, status } = progress;
+  const { output, outputIsError, failureKind, status, failCount, showHint, setShowHint } = progress;
 
   const labelColor =
     outputIsError || failureKind === "compile"
@@ -75,6 +78,23 @@ export default function OutputPanel({
           <pre className="whitespace-pre-wrap break-words text-xs text-zinc-500 ">
             {expectedOutput.join("\n")}
           </pre>
+        </div>
+      )}
+      {/* Hardcoded syntax nudge — shown after 2+ failures, below expected output */}
+      {stepHint && failCount >= 2 && (
+        <div className="mt-4">
+          <button
+            onClick={() => setShowHint(!showHint)}
+            className="flex items-center gap-1.5 text-xs text-indigo-600 transition-colors hover:text-indigo-500  :text-indigo-400"
+          >
+            <span>{showHint ? "▾" : "▸"}</span>
+            {showHint ? "Hide hint" : "Show hint"}
+          </button>
+          {showHint && (
+            <div className="mt-2 rounded-lg border border-indigo-200 bg-indigo-50 p-3  ">
+              <code className="break-all text-xs text-indigo-700 ">{stepHint}</code>
+            </div>
+          )}
         </div>
       )}
     </div>

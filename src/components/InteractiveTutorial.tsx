@@ -540,6 +540,7 @@ export default function InteractiveTutorial({
             progress={stepProgress}
             expectedOutput={currentStep.expectedOutput}
             height={outputHeight}
+            stepHint={currentStep.hint}
           />
         </div>
       </div>

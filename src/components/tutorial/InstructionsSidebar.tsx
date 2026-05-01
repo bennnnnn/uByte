@@ -53,7 +53,7 @@ export default function InstructionsSidebar({
   onContinueAfterPass,
   onRequestHint,
 }: Props) {
-  const { stepIndex, status, showHint, failCount, completedSteps, skippedSteps, tutorialDone, aiFeedback, aiFeedbackLoading, aiFeedbackUpgrade, aiFeedbackLoginRequired } = progress;
+  const { stepIndex, status, completedSteps, skippedSteps, tutorialDone, aiFeedback, aiFeedbackLoading, aiFeedbackUpgrade, aiFeedbackLoginRequired, failCount } = progress;
   const { profile } = useAuth();
   const isPro = hasPaidAccess(profile?.plan);
   const isGuest = !profile;
@@ -109,23 +109,6 @@ export default function InstructionsSidebar({
         </div>
 
         <TutorialHintPanel progress={progress} onRequestHint={onRequestHint} />
-
-        {step.hint && failCount >= 2 && !aiFeedbackLoading && !aiFeedback && (
-          <div className="mt-6">
-            <button
-              onClick={() => progress.setShowHint(!showHint)}
-              className="flex items-center gap-1.5 text-sm text-indigo-600 transition-colors hover:text-indigo-500  :text-indigo-400"
-            >
-              <span>{showHint ? "▾" : "▸"}</span>
-              {showHint ? "Hide syntax nudge" : "Show syntax nudge"}
-            </button>
-            {showHint && (
-              <div className="mt-2 rounded-lg border border-indigo-200 bg-indigo-50 p-3  ">
-                <code className="break-all text-xs text-indigo-700 ">{step.hint}</code>
-              </div>
-            )}
-          </div>
-        )}
 
         {status === "passed" && (
           <div className="mt-6 rounded-lg border border-emerald-300 bg-emerald-50 p-4  ">
