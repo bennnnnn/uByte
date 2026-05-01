@@ -5,7 +5,6 @@ import Link from "next/link";
 import type { TutorialStep } from "@/lib/tutorial-steps";
 import { useAuth } from "@/components/AuthProvider";
 import { hasPaidAccess } from "@/lib/plans";
-import ThemeToggle from "@/components/ThemeToggle";
 import AuthButtons from "@/components/AuthButtons";
 import { useCodeEditor } from "@/hooks/useCodeEditor";
 import { useStepProgress } from "@/hooks/useStepProgress";
@@ -259,7 +258,7 @@ export default function InteractiveTutorial({
 
   if (!currentStep) {
     return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-white text-zinc-700 dark:bg-zinc-950 dark:text-zinc-300">
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-white text-zinc-700  ">
         No steps found for this tutorial.
       </div>
     );
@@ -270,7 +269,7 @@ export default function InteractiveTutorial({
 
   return (
     <TutorialGate tutorialSlug={tutorialSlug} completedLessons={stepProgress.completedSteps.size}>
-    <div className="fixed inset-0 z-50 flex flex-col bg-white text-zinc-900 dark:bg-zinc-950 dark:text-zinc-100">
+    <div className="fixed inset-0 z-50 flex flex-col bg-white text-zinc-900  ">
       {/* Persistent top bar for guests — visible from step 0, before any code is run */}
       <GuestTopBanner show={!user && !loading} />
       {/* Slide-up prompt after first completed step */}
@@ -281,20 +280,20 @@ export default function InteractiveTutorial({
       )}
 
       {/* ── Top Bar ── */}
-      <header className="flex h-12 shrink-0 items-center justify-between border-b border-zinc-200 bg-zinc-50 px-2 dark:border-zinc-800 dark:bg-zinc-900 sm:px-4">
+      <header className="flex h-12 shrink-0 items-center justify-between border-b border-zinc-200 bg-zinc-50 px-2   sm:px-4">
         <div className="flex min-w-0 flex-1 items-center gap-2 md:flex-initial">
-          <Link href="/" className="flex items-center gap-2 rounded-md py-1 pr-2 transition-colors hover:bg-zinc-200 dark:hover:bg-zinc-800" aria-label="Back to home">
+          <Link href="/" className="flex items-center gap-2 rounded-md py-1 pr-2 transition-colors hover:bg-zinc-200 :bg-zinc-800" aria-label="Back to home">
             <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-indigo-600 text-xs font-bold text-white">U</span>
-            <span className="hidden text-sm font-bold text-zinc-800 dark:text-zinc-100 sm:block">uByte</span>
+            <span className="hidden text-sm font-bold text-zinc-800  sm:block">uByte</span>
           </Link>
         </div>
-        <h1 className="min-w-0 max-w-[35%] flex-1 truncate text-center text-sm font-semibold text-zinc-800 dark:text-zinc-100 md:max-w-[30%] md:flex-initial" title={tutorialTitle}>{tutorialTitle}</h1>
+        <h1 className="min-w-0 max-w-[35%] flex-1 truncate text-center text-sm font-semibold text-zinc-800  md:max-w-[30%] md:flex-initial" title={tutorialTitle}>{tutorialTitle}</h1>
         <div className="flex flex-1 items-center justify-end gap-2 md:flex-initial">
           {/* Streak indicator */}
           {profile && profile.streak_days > 0 && (
             <span
               title={`${profile.streak_days}-day streak`}
-              className="hidden items-center gap-1 rounded-full border border-amber-200 bg-amber-50 px-2 py-1 text-xs font-bold text-amber-700 dark:border-amber-800 dark:bg-amber-950/30 dark:text-amber-400 sm:inline-flex"
+              className="hidden items-center gap-1 rounded-full border border-amber-200 bg-amber-50 px-2 py-1 text-xs font-bold text-amber-700    sm:inline-flex"
             >
               <span className="text-sm">🔥</span>
               <span>{profile.streak_days}</span>
@@ -304,14 +303,13 @@ export default function InteractiveTutorial({
           {profile && profile.xp > 0 && (
             <span
               title={`${profile.xp.toLocaleString()} XP earned`}
-              className="hidden items-center gap-1 rounded-full border border-indigo-200 bg-indigo-50 px-2 py-1 text-xs font-bold text-indigo-700 dark:border-indigo-800 dark:bg-indigo-950/30 dark:text-indigo-400 sm:inline-flex"
+              className="hidden items-center gap-1 rounded-full border border-indigo-200 bg-indigo-50 px-2 py-1 text-xs font-bold text-indigo-700    sm:inline-flex"
             >
               <span className="text-sm">⚡</span>
               <span>{profile.xp.toLocaleString()}</span>
             </span>
           )}
-          <ThemeToggle className="hidden h-8 w-8 items-center justify-center rounded text-zinc-500 transition-colors hover:bg-zinc-200 hover:text-zinc-800 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-200 md:flex" />
-          <Suspense fallback={<div className="h-9 w-20 rounded-lg bg-zinc-200 dark:bg-zinc-800 animate-pulse" />}>
+           <Suspense fallback={<div className="h-9 w-20 rounded-lg bg-zinc-200 animate-pulse" />}>
             <AuthButtons />
           </Suspense>
         </div>
@@ -329,7 +327,7 @@ export default function InteractiveTutorial({
         {/* Left panel */}
         <aside className={`min-w-0 flex-col overflow-hidden bg-surface-card ${mobileTab !== "code" ? "flex shrink" : "hidden"} md:flex md:shrink-0`} style={isMobile ? undefined : { width: leftWidth }} suppressHydrationWarning>
           {/* Tab strip: ☰ hamburger | Instructions | Ask — desktop only (mobile uses top tab bar) */}
-          <div className="hidden shrink-0 items-stretch border-b border-zinc-200 dark:border-zinc-800 md:flex">
+          <div className="hidden shrink-0 items-stretch border-b border-zinc-200  md:flex">
             {/* Hamburger toggle — expands/collapses the outline */}
             <button
               type="button"
@@ -337,8 +335,8 @@ export default function InteractiveTutorial({
               aria-label={leftTab === "outline" ? "Close outline" : "Open course outline"}
               className={`flex w-10 shrink-0 items-center justify-center transition-colors ${
                 leftTab === "outline"
-                  ? "text-indigo-600 dark:text-indigo-400"
-                  : "text-zinc-400 hover:bg-zinc-100 hover:text-zinc-700 dark:text-zinc-500 dark:hover:bg-zinc-800 dark:hover:text-zinc-300"
+                  ? "text-indigo-600 "
+                  : "text-zinc-400 hover:bg-zinc-100 hover:text-zinc-700  :bg-zinc-800 :text-zinc-300"
               }`}
             >
               {leftTab === "outline" ? (
@@ -361,8 +359,8 @@ export default function InteractiveTutorial({
                 onClick={() => setLeftTab(tab)}
                 className={`flex-1 py-2 text-xs font-semibold uppercase tracking-wider transition-colors ${
                   leftTab === tab
-                    ? "border-b-2 border-indigo-500 text-indigo-600 dark:text-indigo-400"
-                    : "text-zinc-400 hover:text-zinc-700 dark:text-zinc-500 dark:hover:text-zinc-300"
+                    ? "border-b-2 border-indigo-500 text-indigo-600 "
+                    : "text-zinc-400 hover:text-zinc-700  :text-zinc-300"
                 }`}
               >
                 {tab === "instructions" ? "Instructions" : "Ask"}
@@ -412,7 +410,7 @@ export default function InteractiveTutorial({
         </aside>
 
         {/* Horizontal resize handle */}
-        <div onMouseDown={startDragH} className="group relative hidden w-1 shrink-0 cursor-col-resize bg-zinc-200 transition-colors hover:bg-indigo-400 dark:bg-zinc-800 dark:hover:bg-indigo-600 md:block">
+        <div onMouseDown={startDragH} className="group relative hidden w-1 shrink-0 cursor-col-resize bg-zinc-200 transition-colors hover:bg-indigo-400  :bg-indigo-600 md:block">
           <GripDots vertical />
         </div>
 
@@ -443,8 +441,8 @@ export default function InteractiveTutorial({
               title="Restore the original starter code"
               className={`rounded-md border px-3 py-1.5 text-sm transition-colors ${
                 resetDone
-                  ? "border-emerald-400 text-emerald-600 dark:border-emerald-600 dark:text-emerald-400"
-                  : "border-zinc-300 text-zinc-500 hover:border-red-300 hover:text-red-600 dark:border-zinc-700 dark:text-zinc-400 dark:hover:border-red-700 dark:hover:text-red-400"
+                  ? "border-emerald-400 text-emerald-600  "
+                  : "border-zinc-300 text-zinc-500 hover:border-red-300 hover:text-red-600   :border-red-700 :text-red-400"
               }`}
             >
               {resetDone ? "✓ Reset" : "↺ Reset"}
@@ -456,8 +454,8 @@ export default function InteractiveTutorial({
               title="My notes for this tutorial"
               className={`ml-auto flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-sm transition-all ${
                 notesOpen
-                  ? "border-amber-400 bg-amber-50 text-amber-700 dark:border-amber-600 dark:bg-amber-950/30 dark:text-amber-400"
-                  : "border-zinc-300 text-zinc-500 hover:border-zinc-400 hover:text-zinc-800 dark:border-zinc-700 dark:text-zinc-400 dark:hover:border-zinc-600 dark:hover:text-zinc-200"
+                  ? "border-amber-400 bg-amber-50 text-amber-700   "
+                  : "border-zinc-300 text-zinc-500 hover:border-zinc-400 hover:text-zinc-800   :border-zinc-600 :text-zinc-200"
               }`}
             >
               <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -472,23 +470,23 @@ export default function InteractiveTutorial({
             <>
               {/* Backdrop — click to close */}
               <div
-                className="absolute inset-0 z-20 bg-black/20 dark:bg-black/40"
+                className="absolute inset-0 z-20 bg-black/20 "
                 onClick={() => setNotesOpen(false)}
               />
               {/* Drawer */}
-              <div className="absolute inset-y-0 right-0 z-30 flex w-72 flex-col border-l border-zinc-200 bg-white pb-[60px] shadow-2xl dark:border-zinc-700 dark:bg-zinc-900 md:pb-0">
+              <div className="absolute inset-y-0 right-0 z-30 flex w-72 flex-col border-l border-zinc-200 bg-white pb-[60px] shadow-2xl   md:pb-0">
                 {/* Header */}
-                <div className="flex items-center justify-between border-b border-zinc-100 px-4 py-3 dark:border-zinc-800">
+                <div className="flex items-center justify-between border-b border-zinc-100 px-4 py-3 ">
                   <div className="flex items-center gap-2">
                     <svg className="h-4 w-4 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                     </svg>
-                    <p className="text-sm font-semibold text-zinc-800 dark:text-zinc-100">My Notes</p>
+                    <p className="text-sm font-semibold text-zinc-800 ">My Notes</p>
                   </div>
                   <button
                     type="button"
                     onClick={() => setNotesOpen(false)}
-                    className="rounded-md p-1 text-zinc-400 hover:bg-zinc-100 hover:text-zinc-700 dark:hover:bg-zinc-800 dark:hover:text-zinc-200"
+                    className="rounded-md p-1 text-zinc-400 hover:bg-zinc-100 hover:text-zinc-700 :bg-zinc-800 :text-zinc-200"
                     title="Close notes"
                   >
                     <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -504,12 +502,12 @@ export default function InteractiveTutorial({
                   value={notes}
                   onChange={(e) => { setNotes(e.target.value); }}
                   placeholder="Write your observations, questions, or ideas here…"
-                  className="flex-1 resize-none bg-transparent px-4 py-3 text-sm text-zinc-800 placeholder-zinc-400 focus:outline-none dark:text-zinc-200 dark:placeholder-zinc-500"
+                  className="flex-1 resize-none bg-transparent px-4 py-3 text-sm text-zinc-800 placeholder-zinc-400 focus:outline-none  "
                 />
 
                 {/* Footer */}
-                <div className="flex items-center justify-between border-t border-zinc-100 px-4 py-3 dark:border-zinc-800">
-                  <p className="text-xs text-zinc-400 dark:text-zinc-500">
+                <div className="flex items-center justify-between border-t border-zinc-100 px-4 py-3 ">
+                  <p className="text-xs text-zinc-400 ">
                     {user ? "Saved per tutorial." : "Sign in to sync notes."}
                   </p>
                   <button
@@ -528,7 +526,7 @@ export default function InteractiveTutorial({
           <div
             onMouseDown={startDragV}
             onTouchStart={startDragVTouch}
-            className="group relative shrink-0 cursor-row-resize touch-none bg-zinc-200 transition-colors hover:bg-indigo-400 dark:bg-zinc-800 dark:hover:bg-indigo-600"
+            className="group relative shrink-0 cursor-row-resize touch-none bg-zinc-200 transition-colors hover:bg-indigo-400  :bg-indigo-600"
             style={{ minHeight: 24 }}
             role="separator"
             aria-label="Resize output"
@@ -549,7 +547,7 @@ export default function InteractiveTutorial({
            Single primary action (run + check step). Lang selector + reset + notes.
            Buttons are 44 px tall for comfortable tap targets (Apple HIG minimum). ──────────────────── */}
       {mobileTab === "code" && (
-        <div className="fixed bottom-0 left-0 right-0 z-[54] flex items-center gap-2 border-t border-zinc-200 bg-zinc-50 px-3 py-2 md:hidden dark:border-zinc-800 dark:bg-zinc-900">
+        <div className="fixed bottom-0 left-0 right-0 z-[54] flex items-center gap-2 border-t border-zinc-200 bg-zinc-50 px-3 py-2 md:hidden  ">
           {/* Language selector — compact, shows abbreviated name */}
           <select
             id="mobile-lang-select"
@@ -557,7 +555,7 @@ export default function InteractiveTutorial({
             value={ideLang}
             onChange={(e) => setIdeLang(e.target.value as SupportedLanguage)}
             aria-label="Code language"
-            className="h-11 w-20 shrink-0 rounded-xl border border-zinc-300 bg-white px-2 text-xs font-medium text-zinc-700 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-200"
+            className="h-11 w-20 shrink-0 rounded-xl border border-zinc-300 bg-white px-2 text-xs font-medium text-zinc-700   "
           >
             {(Object.keys(LANGUAGES) as SupportedLanguage[]).map((l) => (
               <option key={l} value={l}>{LANGUAGES[l]?.name ?? l}</option>
@@ -593,8 +591,8 @@ export default function InteractiveTutorial({
             title="Reset to starter code"
             className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border transition-colors ${
               resetDone
-                ? "border-emerald-400 bg-emerald-50 text-emerald-600 dark:border-emerald-600 dark:bg-emerald-950/30 dark:text-emerald-400"
-                : "border-zinc-300 bg-white text-zinc-500 hover:border-zinc-400 hover:text-zinc-700 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-400 dark:hover:border-zinc-500"
+                ? "border-emerald-400 bg-emerald-50 text-emerald-600   "
+                : "border-zinc-300 bg-white text-zinc-500 hover:border-zinc-400 hover:text-zinc-700    :border-zinc-500"
             }`}
           >
             {resetDone ? (
@@ -616,8 +614,8 @@ export default function InteractiveTutorial({
             title="My notes"
             className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border transition-colors ${
               notesOpen
-                ? "border-amber-400 bg-amber-50 text-amber-600 dark:border-amber-600 dark:bg-amber-950/30 dark:text-amber-400"
-                : "border-zinc-300 bg-white text-zinc-500 hover:border-zinc-400 hover:text-zinc-700 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-400 dark:hover:border-zinc-500"
+                ? "border-amber-400 bg-amber-50 text-amber-600   "
+                : "border-zinc-300 bg-white text-zinc-500 hover:border-zinc-400 hover:text-zinc-700    :border-zinc-500"
             }`}
           >
             <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>

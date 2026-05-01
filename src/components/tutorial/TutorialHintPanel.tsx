@@ -20,23 +20,23 @@ export default function TutorialHintPanel({ progress, onRequestHint }: Props) {
   if (status !== "failed" || output === null) return null;
 
   return (
-    <div className="mt-6 rounded-lg border border-indigo-200 bg-indigo-50/70 p-4 dark:border-indigo-800/60 dark:bg-indigo-950/20">
-      <p className="mb-2 text-[11px] font-semibold uppercase tracking-widest text-indigo-500 dark:text-indigo-400">
+    <div className="mt-6 rounded-lg border border-indigo-200 bg-indigo-50/70 p-4  ">
+      <p className="mb-2 text-[11px] font-semibold uppercase tracking-widest text-indigo-500 ">
         AI Hint
       </p>
 
       {aiFeedbackLoading && (
-        <p className="text-sm text-indigo-600 animate-pulse dark:text-indigo-300">
+        <p className="text-sm text-indigo-600 animate-pulse ">
           Analyzing your code…
         </p>
       )}
 
       {!aiFeedbackLoading && aiFeedbackLoginRequired && !aiFeedbackUpgrade && !aiFeedback && (
         <div className="space-y-2">
-          <p className="text-sm font-semibold text-indigo-800 dark:text-indigo-200">
+          <p className="text-sm font-semibold text-indigo-800 ">
             Sign in to get hints when you&apos;re stuck
           </p>
-          <p className="text-xs text-zinc-700 dark:text-zinc-300">
+          <p className="text-xs text-zinc-700 ">
             Create a free account and ask for guided help without leaving the lesson.
           </p>
           <div className="flex gap-2">
@@ -50,7 +50,7 @@ export default function TutorialHintPanel({ progress, onRequestHint }: Props) {
             <button
               type="button"
               onClick={() => { setAuthMode("login"); setAuthOpen(true); }}
-              className="rounded-lg border border-indigo-200 px-3 py-1.5 text-xs font-medium text-indigo-700 transition hover:bg-indigo-50 dark:border-indigo-700 dark:text-indigo-300 dark:hover:bg-indigo-950/40"
+              className="rounded-lg border border-indigo-200 px-3 py-1.5 text-xs font-medium text-indigo-700 transition hover:bg-indigo-50   :bg-indigo-950/40"
             >
               Log in
             </button>
@@ -60,10 +60,10 @@ export default function TutorialHintPanel({ progress, onRequestHint }: Props) {
 
       {!aiFeedbackLoading && aiFeedbackUpgrade && (
         <div className="space-y-2">
-          <p className="text-sm font-semibold text-indigo-800 dark:text-indigo-200">
+          <p className="text-sm font-semibold text-indigo-800 ">
             Hints are a Pro feature
           </p>
-          <p className="text-xs text-zinc-700 dark:text-zinc-300">
+          <p className="text-xs text-zinc-700 ">
             Upgrade to Pro for detailed, step-by-step guidance in every lesson.
           </p>
           <Link
@@ -79,7 +79,7 @@ export default function TutorialHintPanel({ progress, onRequestHint }: Props) {
         <button
           type="button"
           onClick={onRequestHint}
-          className="text-sm font-medium text-indigo-700 transition hover:text-indigo-600 dark:text-indigo-300 dark:hover:text-indigo-200"
+          className="text-sm font-medium text-indigo-700 transition hover:text-indigo-600  :text-indigo-200"
         >
           Get hint
         </button>

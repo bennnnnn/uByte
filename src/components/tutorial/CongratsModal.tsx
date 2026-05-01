@@ -64,37 +64,37 @@ export default function CongratsModal({
       aria-modal="true"
       aria-labelledby="congrats-title"
     >
-      <div className="w-full max-w-md rounded-2xl border border-emerald-300 bg-white p-6 text-center shadow-2xl dark:border-emerald-800 dark:bg-zinc-900">
+      <div className="w-full max-w-md rounded-2xl border border-emerald-300 bg-white p-6 text-center shadow-2xl  ">
         {/* Big celebration */}
         <div className="relative mb-3">
           <div className="text-6xl">🎉</div>
           {streakDays > 0 && (
-            <div className="absolute -right-2 -top-2 flex items-center gap-1 rounded-full border border-amber-200 bg-amber-50 px-2.5 py-0.5 text-xs font-bold text-amber-700 dark:border-amber-800 dark:bg-amber-950/40 dark:text-amber-400">
+            <div className="absolute -right-2 -top-2 flex items-center gap-1 rounded-full border border-amber-200 bg-amber-50 px-2.5 py-0.5 text-xs font-bold text-amber-700   ">
               🔥 {streakDays}-day streak
             </div>
           )}
         </div>
-        <h2 id="congrats-title" className="mb-1 text-2xl font-bold text-zinc-900 dark:text-zinc-100">
+        <h2 id="congrats-title" className="mb-1 text-2xl font-bold text-zinc-900 ">
           Tutorial Complete!
         </h2>
-        <p className="mb-4 text-zinc-500 dark:text-zinc-400">
+        <p className="mb-4 text-zinc-500 ">
           You finished{" "}
-          <span className="font-medium text-zinc-800 dark:text-zinc-200">{tutorialTitle}</span>.
+          <span className="font-medium text-zinc-800 ">{tutorialTitle}</span>.
         </p>
 
         {/* Stats row */}
         {stepsDone > 0 && (
           <div className="mb-5 grid grid-cols-3 gap-3">
-            <div className="rounded-xl border border-zinc-100 bg-zinc-50 p-3 dark:border-zinc-800 dark:bg-zinc-800/50">
-              <p className="text-lg font-black text-zinc-900 dark:text-zinc-100">{stepsDone}</p>
+            <div className="rounded-xl border border-zinc-100 bg-zinc-50 p-3  ">
+              <p className="text-lg font-black text-zinc-900 ">{stepsDone}</p>
               <p className="text-[10px] font-semibold uppercase tracking-wider text-zinc-500">Steps</p>
             </div>
-            <div className="rounded-xl border border-zinc-100 bg-zinc-50 p-3 dark:border-zinc-800 dark:bg-zinc-800/50">
-              <p className="text-lg font-black text-zinc-900 dark:text-zinc-100">{totalXp.toLocaleString()}</p>
+            <div className="rounded-xl border border-zinc-100 bg-zinc-50 p-3  ">
+              <p className="text-lg font-black text-zinc-900 ">{totalXp.toLocaleString()}</p>
               <p className="text-[10px] font-semibold uppercase tracking-wider text-zinc-500">Total XP</p>
             </div>
-            <div className="rounded-xl border border-zinc-100 bg-zinc-50 p-3 dark:border-zinc-800 dark:bg-zinc-800/50">
-              <p className="text-lg font-black text-zinc-900 dark:text-zinc-100">Lv.{nextLevelAt.level}</p>
+            <div className="rounded-xl border border-zinc-100 bg-zinc-50 p-3  ">
+              <p className="text-lg font-black text-zinc-900 ">Lv.{nextLevelAt.level}</p>
               <p className="text-[10px] font-semibold uppercase tracking-wider text-zinc-500">{nextLevelAt.label}</p>
             </div>
           </div>
@@ -107,7 +107,7 @@ export default function CongratsModal({
               <span>{totalXp.toLocaleString()} XP</span>
               <span>{nextLevelAt.nextXp.toLocaleString()} XP</span>
             </div>
-            <div className="h-2 w-full overflow-hidden rounded-full bg-zinc-100 dark:bg-zinc-800">
+            <div className="h-2 w-full overflow-hidden rounded-full bg-zinc-100 ">
               <div
                 className="h-full rounded-full bg-gradient-to-r from-indigo-500 to-violet-500 transition-all"
                 style={{ width: `${nextLevelAt.xpProgress}%` }}
@@ -123,7 +123,7 @@ export default function CongratsModal({
         <div className="flex flex-wrap justify-center gap-3">
           <button
             onClick={onDismiss}
-            className="rounded-lg border border-zinc-300 px-4 py-2 text-sm text-zinc-600 transition-colors hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800"
+            className="rounded-lg border border-zinc-300 px-4 py-2 text-sm text-zinc-600 transition-colors hover:bg-zinc-100   :bg-zinc-800"
           >
             Review steps
           </button>
@@ -149,29 +149,29 @@ export default function CongratsModal({
         </div>
 
         {/* Thumbs rating */}
-        <div className="mt-5 border-t border-zinc-100 pt-4 dark:border-zinc-800">
+        <div className="mt-5 border-t border-zinc-100 pt-4 ">
           {rated === null ? (
             <>
-              <p className="mb-2 text-sm text-zinc-500 dark:text-zinc-400">
+              <p className="mb-2 text-sm text-zinc-500 ">
                 Was this tutorial helpful?
               </p>
               <div className="flex justify-center gap-3">
                 <button
                   onClick={() => submitRating(1)}
-                  className="flex items-center gap-2 rounded-lg border border-zinc-200 px-5 py-2 text-sm font-semibold text-zinc-600 transition-all hover:-translate-y-0.5 hover:border-emerald-300 hover:bg-emerald-50 hover:text-emerald-700 dark:border-zinc-700 dark:text-zinc-300 dark:hover:border-emerald-700 dark:hover:bg-emerald-950/30 dark:hover:text-emerald-400"
+                  className="flex items-center gap-2 rounded-lg border border-zinc-200 px-5 py-2 text-sm font-semibold text-zinc-600 transition-all hover:-translate-y-0.5 hover:border-emerald-300 hover:bg-emerald-50 hover:text-emerald-700   :border-emerald-700 :bg-emerald-950/30 :text-emerald-400"
                 >
                   👍 Yes
                 </button>
                 <button
                   onClick={() => submitRating(-1)}
-                  className="flex items-center gap-2 rounded-lg border border-zinc-200 px-5 py-2 text-sm font-semibold text-zinc-600 transition-all hover:-translate-y-0.5 hover:border-rose-300 hover:bg-rose-50 hover:text-rose-700 dark:border-zinc-700 dark:text-zinc-300 dark:hover:border-rose-700 dark:hover:bg-rose-950/30 dark:hover:text-rose-400"
+                  className="flex items-center gap-2 rounded-lg border border-zinc-200 px-5 py-2 text-sm font-semibold text-zinc-600 transition-all hover:-translate-y-0.5 hover:border-rose-300 hover:bg-rose-50 hover:text-rose-700   :border-rose-700 :bg-rose-950/30 :text-rose-400"
                 >
                   👎 No
                 </button>
               </div>
             </>
           ) : (
-            <p className="text-sm font-medium text-zinc-500 dark:text-zinc-400">
+            <p className="text-sm font-medium text-zinc-500 ">
               {rated === 1 ? "Thanks for the feedback! 🙏" : "Thanks — we'll work to improve it. 🙏"}
             </p>
           )}
@@ -179,11 +179,11 @@ export default function CongratsModal({
 
         {/* Hint upsell */}
         {!isPro && (
-          <div className="mt-4 rounded-xl border border-indigo-100 bg-indigo-50/60 p-4 text-left dark:border-indigo-900/50 dark:bg-indigo-950/20">
-            <p className="text-sm font-semibold text-indigo-800 dark:text-indigo-200">
+          <div className="mt-4 rounded-xl border border-indigo-100 bg-indigo-50/60 p-4 text-left  ">
+            <p className="text-sm font-semibold text-indigo-800 ">
               Want extra help on the next lesson?
             </p>
-            <p className="mt-1 text-xs text-indigo-700/80 dark:text-indigo-300/70">
+            <p className="mt-1 text-xs text-indigo-700/80 ">
               Lessons stay free. Upgrade only if you want detailed hints and extra guidance without leaving the tutorial.
             </p>
             <Link

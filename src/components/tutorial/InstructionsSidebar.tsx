@@ -17,7 +17,7 @@ function InstructionText({ text }: { text: string }) {
     <>
       {parts.map((part, i) =>
         part.startsWith("`") && part.endsWith("`") ? (
-          <code key={i} className="break-all rounded bg-zinc-200 px-1 py-0.5 text-xs font-mono text-indigo-700 dark:bg-zinc-800 dark:text-indigo-300">
+          <code key={i} className="break-all rounded bg-zinc-200 px-1 py-0.5 text-xs font-mono text-indigo-700  ">
             {part.slice(1, -1)}
           </code>
         ) : (
@@ -68,7 +68,7 @@ export default function InstructionsSidebar({
       <div className="min-w-0 flex-1 overflow-x-hidden overflow-y-auto p-4 break-words md:p-6">
         <div className="mb-4 flex items-center justify-between gap-2">
           <div className="flex items-center gap-2">
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-indigo-100 px-2.5 py-1 text-xs font-bold text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-300">
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-indigo-100 px-2.5 py-1 text-xs font-bold text-indigo-700  ">
               <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h7" />
               </svg>
@@ -79,15 +79,15 @@ export default function InstructionsSidebar({
             </span>
           </div>
           {completedSteps.size > 0 && (
-            <span className="text-xs text-emerald-600 dark:text-emerald-400 font-semibold">
+            <span className="text-xs text-emerald-600  font-semibold">
               ✅ {completedSteps.size} done
             </span>
           )}
         </div>
-        <h2 className="mb-4 break-words text-lg font-bold text-zinc-900 dark:text-zinc-100">
+        <h2 className="mb-4 break-words text-lg font-bold text-zinc-900 ">
           {step.title}
         </h2>
-        <div className="min-w-0 space-y-3 break-words text-sm leading-relaxed text-zinc-700 dark:text-zinc-300">
+        <div className="min-w-0 space-y-3 break-words text-sm leading-relaxed text-zinc-700 ">
           {step.instruction.split("\n").map((line, i) => (
             <p key={i} className="min-w-0 break-words"><InstructionText text={line} /></p>
           ))}
@@ -99,29 +99,29 @@ export default function InstructionsSidebar({
           <div className="mt-6">
             <button
               onClick={() => progress.setShowHint(!showHint)}
-              className="flex items-center gap-1.5 text-sm text-indigo-600 transition-colors hover:text-indigo-500 dark:text-indigo-500 dark:hover:text-indigo-400"
+              className="flex items-center gap-1.5 text-sm text-indigo-600 transition-colors hover:text-indigo-500  :text-indigo-400"
             >
               <span>{showHint ? "▾" : "▸"}</span>
               {showHint ? "Hide syntax nudge" : "Show syntax nudge"}
             </button>
             {showHint && (
-              <div className="mt-2 rounded-lg border border-indigo-200 bg-indigo-50 p-3 dark:border-indigo-900 dark:bg-indigo-950/40">
-                <code className="break-all text-xs text-indigo-700 dark:text-indigo-300">{step.hint}</code>
+              <div className="mt-2 rounded-lg border border-indigo-200 bg-indigo-50 p-3  ">
+                <code className="break-all text-xs text-indigo-700 ">{step.hint}</code>
               </div>
             )}
           </div>
         )}
 
         {status === "passed" && (
-          <div className="mt-6 rounded-lg border border-emerald-300 bg-emerald-50 p-4 dark:border-emerald-800 dark:bg-emerald-950/40">
+          <div className="mt-6 rounded-lg border border-emerald-300 bg-emerald-50 p-4  ">
             {step.successMessage ? (
               step.successMessage.split("\n").map((line, i) => (
-                <p key={i} className={`text-sm text-emerald-700 dark:text-emerald-400 ${i === 0 ? "font-semibold" : "mt-1"}`}>
+                <p key={i} className={`text-sm text-emerald-700  ${i === 0 ? "font-semibold" : "mt-1"}`}>
                   {line}
                 </p>
               ))
             ) : (
-              <p className="text-sm font-semibold text-emerald-700 dark:text-emerald-400">
+              <p className="text-sm font-semibold text-emerald-700 ">
                 {stepIndex < steps.length - 1 ? "🎉 Excellent work!" : "🎉 You nailed it!"}
               </p>
             )}
@@ -162,13 +162,13 @@ export default function InstructionsSidebar({
         />
 
         {status === "failed" && failCount >= 3 && !isGuest && !aiHintActive && (
-          <div className="mt-6 rounded-lg border border-indigo-200 bg-indigo-50 p-4 dark:border-indigo-900 dark:bg-indigo-950/30">
-            <p className="text-sm font-semibold text-indigo-800 dark:text-indigo-300">Want a step-by-step walkthrough?</p>
-            <p className="mt-1 text-xs text-indigo-700 dark:text-indigo-400">
+          <div className="mt-6 rounded-lg border border-indigo-200 bg-indigo-50 p-4  ">
+            <p className="text-sm font-semibold text-indigo-800 ">Want a step-by-step walkthrough?</p>
+            <p className="mt-1 text-xs text-indigo-700 ">
               Pro gives you a detailed breakdown of exactly where you went wrong and how to fix it — no more switching to ChatGPT.
             </p>
             {isPro ? (
-              <p className="mt-3 text-xs font-medium text-indigo-600 dark:text-indigo-400">
+              <p className="mt-3 text-xs font-medium text-indigo-600 ">
                 💡 Use the <strong>Get hint</strong> section above.
               </p>
             ) : (
@@ -184,7 +184,7 @@ export default function InstructionsSidebar({
       </div>
 
       {/* Step dots — shows current section's steps; switches to next section's steps when done */}
-      <div className="shrink-0 border-t border-zinc-200 p-4 dark:border-zinc-800">
+      <div className="shrink-0 border-t border-zinc-200 p-4 ">
         <div
           ref={dotsRef}
           className="flex items-center gap-1.5 overflow-x-auto [&::-webkit-scrollbar]:hidden"
@@ -201,7 +201,7 @@ export default function InstructionsSidebar({
                   aria-selected={false}
                   aria-label={`Next: ${s.title}`}
                   title={s.title}
-                  className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-zinc-300 transition-colors hover:bg-indigo-400 dark:bg-zinc-600 dark:hover:bg-indigo-500"
+                  className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-zinc-300 transition-colors hover:bg-indigo-400  :bg-indigo-500"
                 />
               ))
             : steps.map((s, i) => {
@@ -218,12 +218,12 @@ export default function InstructionsSidebar({
                     onClick={() => progress.goToStep(i)}
                     className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full transition-colors ${
                       isCurrent
-                        ? "bg-indigo-500 ring-2 ring-indigo-300 dark:ring-indigo-800"
+                        ? "bg-indigo-500 ring-2 ring-indigo-300 "
                         : isCompleted
                         ? "bg-emerald-500 text-white"
                         : isSkipped
-                        ? "bg-zinc-400 text-white dark:bg-zinc-500"
-                        : "bg-zinc-300 hover:bg-zinc-400 dark:bg-zinc-600 dark:hover:bg-zinc-400"
+                        ? "bg-zinc-400 text-white "
+                        : "bg-zinc-300 hover:bg-zinc-400  :bg-zinc-400"
                     }`}
                   >
                     {isCompleted && (

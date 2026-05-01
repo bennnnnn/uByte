@@ -44,15 +44,15 @@ export default function ShortcutsModal({ onClose }: Props) {
       aria-label="Keyboard shortcuts"
     >
       <div
-        className="w-full max-w-sm overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-2xl dark:border-zinc-800 dark:bg-zinc-900"
+        className="w-full max-w-sm overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-2xl  "
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between border-b border-zinc-200 px-5 py-4 dark:border-zinc-800">
-          <h2 className="font-semibold text-zinc-900 dark:text-zinc-100">Keyboard Shortcuts</h2>
+        <div className="flex items-center justify-between border-b border-zinc-200 px-5 py-4 ">
+          <h2 className="font-semibold text-zinc-900 ">Keyboard Shortcuts</h2>
           <button
             ref={closeRef}
             onClick={onClose}
-            className="rounded-lg p-1 text-zinc-400 transition-colors hover:bg-zinc-100 hover:text-zinc-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 dark:hover:bg-zinc-800 dark:hover:text-zinc-200"
+            className="rounded-lg p-1 text-zinc-400 transition-colors hover:bg-zinc-100 hover:text-zinc-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 :bg-zinc-800 :text-zinc-200"
             aria-label="Close"
           >
             <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -61,12 +61,12 @@ export default function ShortcutsModal({ onClose }: Props) {
           </button>
         </div>
         <table className="w-full text-sm">
-          <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800">
+          <tbody className="divide-y divide-zinc-100 ">
             {SHORTCUTS.map(({ keys, action }) => (
               <tr key={keys} className="flex items-center justify-between px-5 py-3">
-                <td className="text-zinc-500 dark:text-zinc-400">{action}</td>
+                <td className="text-zinc-500 ">{action}</td>
                 <td>
-                  <kbd className="rounded-md border border-zinc-200 bg-zinc-100 px-2 py-0.5 font-mono text-xs text-zinc-700 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">
+                  <kbd className="rounded-md border border-zinc-200 bg-zinc-100 px-2 py-0.5 font-mono text-xs text-zinc-700   ">
                     {keys}
                   </kbd>
                 </td>

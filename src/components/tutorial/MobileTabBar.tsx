@@ -38,7 +38,7 @@ export default function MobileTabBar({
   hasOutputError,
 }: Props) {
   return (
-    <div className="flex shrink-0 items-stretch border-b border-zinc-200 bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900 md:hidden">
+    <div className="flex shrink-0 items-stretch border-b border-zinc-200 bg-zinc-50   md:hidden">
       {(["instructions", "ask", "code"] as const).map((tab) => (
         <button
           key={tab}
@@ -46,8 +46,8 @@ export default function MobileTabBar({
           aria-label={TAB_LABELS[tab]}
           className={`relative flex flex-1 flex-col items-center justify-center gap-0.5 py-2.5 text-[11px] font-semibold transition-colors ${
             activeTab === tab
-              ? "border-b-2 border-indigo-500 text-indigo-600 dark:text-indigo-400"
-              : "text-zinc-400 hover:text-zinc-600 dark:text-zinc-500 dark:hover:text-zinc-300"
+              ? "border-b-2 border-indigo-500 text-indigo-600 "
+              : "text-zinc-400 hover:text-zinc-600  :text-zinc-300"
           }`}
         >
           {TAB_ICONS[tab]}

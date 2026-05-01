@@ -51,12 +51,12 @@ export default function SnapshotDrawer({ slug, stepIndex, lang = "go", onRestore
       />
 
       {/* Drawer */}
-      <div className="fixed inset-y-0 right-0 z-[56] flex w-80 flex-col border-l border-zinc-200 bg-white shadow-xl dark:border-zinc-800 dark:bg-zinc-900">
-        <div className="flex items-center justify-between border-b border-zinc-200 px-5 py-4 dark:border-zinc-800">
-          <h2 className="font-semibold text-zinc-900 dark:text-zinc-100">Code History</h2>
+      <div className="fixed inset-y-0 right-0 z-[56] flex w-80 flex-col border-l border-zinc-200 bg-white shadow-xl  ">
+        <div className="flex items-center justify-between border-b border-zinc-200 px-5 py-4 ">
+          <h2 className="font-semibold text-zinc-900 ">Code History</h2>
           <button
             onClick={onClose}
-            className="rounded p-1 text-zinc-400 hover:bg-zinc-100 hover:text-zinc-600 dark:hover:bg-zinc-800 dark:hover:text-zinc-200"
+            className="rounded p-1 text-zinc-400 hover:bg-zinc-100 hover:text-zinc-600 :bg-zinc-800 :text-zinc-200"
             aria-label="Close"
           >
             <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -69,7 +69,7 @@ export default function SnapshotDrawer({ slug, stepIndex, lang = "go", onRestore
           {loading ? (
             <div className="space-y-3">
               {[...Array(3)].map((_, i) => (
-                <div key={i} className="h-20 animate-pulse rounded-xl bg-zinc-100 dark:bg-zinc-800" />
+                <div key={i} className="h-20 animate-pulse rounded-xl bg-zinc-100 " />
               ))}
             </div>
           ) : snapshots.length === 0 ? (
@@ -77,17 +77,17 @@ export default function SnapshotDrawer({ slug, stepIndex, lang = "go", onRestore
           ) : (
             <div className="space-y-3">
               {snapshots.map((s) => (
-                <div key={s.id} className="rounded-xl border border-zinc-200 bg-zinc-50 p-3 dark:border-zinc-700 dark:bg-zinc-800">
+                <div key={s.id} className="rounded-xl border border-zinc-200 bg-zinc-50 p-3  ">
                   <div className="mb-2 flex items-center justify-between">
                     <span className="text-xs text-zinc-400">{timeAgo(s.saved_at)}</span>
                     <button
                       onClick={() => { onRestore(s.code); onClose(); }}
-                      className="rounded-md border border-indigo-300 px-2 py-0.5 text-xs font-medium text-indigo-600 transition-colors hover:bg-indigo-50 dark:border-indigo-700 dark:text-indigo-400 dark:hover:bg-indigo-950"
+                      className="rounded-md border border-indigo-300 px-2 py-0.5 text-xs font-medium text-indigo-600 transition-colors hover:bg-indigo-50   :bg-indigo-950"
                     >
                       Restore
                     </button>
                   </div>
-                  <pre className="overflow-hidden font-mono text-xs text-zinc-600 dark:text-zinc-400 line-clamp-2">
+                  <pre className="overflow-hidden font-mono text-xs text-zinc-600  line-clamp-2">
                     {s.code.split("\n").slice(0, 2).join("\n")}
                   </pre>
                 </div>

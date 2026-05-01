@@ -73,20 +73,20 @@ export default function InlineRatingNudge({ lang, tutorialSlug, completedCount, 
   if (!visible) return null;
 
   return (
-    <div className="mt-5 rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-3 dark:border-zinc-700 dark:bg-zinc-800/60">
+    <div className="mt-5 rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-3  ">
       {voted ? (
-        <p className="text-center text-xs font-medium text-emerald-600 dark:text-emerald-400">
+        <p className="text-center text-xs font-medium text-emerald-600 ">
           Thanks for the feedback! 🙏
         </p>
       ) : (
         <div className="flex items-center justify-between gap-3">
-          <p className="text-xs text-zinc-500 dark:text-zinc-400">Enjoying this tutorial?</p>
+          <p className="text-xs text-zinc-500 ">Enjoying this tutorial?</p>
           <div className="flex items-center gap-1.5">
             <button
               type="button"
               onClick={() => vote(1)}
               disabled={submitting}
-              className="flex items-center gap-1 rounded-md border border-zinc-200 px-2 py-1 text-xs font-medium text-zinc-600 transition-colors hover:border-emerald-300 hover:bg-emerald-50 hover:text-emerald-700 disabled:opacity-50 dark:border-zinc-600 dark:text-zinc-300 dark:hover:border-emerald-700 dark:hover:bg-emerald-950/30 dark:hover:text-emerald-400"
+              className="flex items-center gap-1 rounded-md border border-zinc-200 px-2 py-1 text-xs font-medium text-zinc-600 transition-colors hover:border-emerald-300 hover:bg-emerald-50 hover:text-emerald-700 disabled:opacity-50   :border-emerald-700 :bg-emerald-950/30 :text-emerald-400"
             >
               👍 Yes
             </button>
@@ -94,7 +94,7 @@ export default function InlineRatingNudge({ lang, tutorialSlug, completedCount, 
               type="button"
               onClick={() => vote(-1)}
               disabled={submitting}
-              className="flex items-center gap-1 rounded-md border border-zinc-200 px-2 py-1 text-xs font-medium text-zinc-600 transition-colors hover:border-rose-300 hover:bg-rose-50 hover:text-rose-700 disabled:opacity-50 dark:border-zinc-600 dark:text-zinc-300 dark:hover:border-rose-700 dark:hover:bg-rose-950/30 dark:hover:text-rose-400"
+              className="flex items-center gap-1 rounded-md border border-zinc-200 px-2 py-1 text-xs font-medium text-zinc-600 transition-colors hover:border-rose-300 hover:bg-rose-50 hover:text-rose-700 disabled:opacity-50   :border-rose-700 :bg-rose-950/30 :text-rose-400"
             >
               👎 No
             </button>
@@ -102,7 +102,7 @@ export default function InlineRatingNudge({ lang, tutorialSlug, completedCount, 
               type="button"
               onClick={dismiss}
               aria-label="Dismiss"
-              className="ml-1 rounded p-0.5 text-zinc-400 transition-colors hover:text-zinc-600 dark:hover:text-zinc-300"
+              className="ml-1 rounded p-0.5 text-zinc-400 transition-colors hover:text-zinc-600 :text-zinc-300"
             >
               <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />

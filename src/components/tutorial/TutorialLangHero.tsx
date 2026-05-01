@@ -22,28 +22,28 @@ export default function TutorialLangHero({
   intro,
 }: Props) {
   return (
-    <section className="mb-14 rounded-[32px] border border-zinc-200 bg-gradient-to-br from-white via-indigo-50/50 to-zinc-50 p-7 shadow-sm dark:border-zinc-800 dark:from-zinc-950 dark:via-indigo-950/20 dark:to-zinc-900">
-      <p className="inline-flex items-center gap-2 rounded-full border border-indigo-200 bg-white/80 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.18em] text-indigo-700 dark:border-indigo-800 dark:bg-zinc-900/80 dark:text-indigo-300">
+    <section className="mb-14 rounded-[32px] border border-zinc-200 bg-gradient-to-br from-white via-indigo-50/50 to-zinc-50 p-7 shadow-sm    ">
+      <p className="inline-flex items-center gap-2 rounded-full border border-indigo-200 bg-white/80 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.18em] text-indigo-700   ">
         {bestFor}
       </p>
-      <h1 className="mt-5 text-4xl font-black tracking-tight text-zinc-900 dark:text-zinc-100 sm:text-5xl">
+      <h1 className="mt-5 text-4xl font-black tracking-tight text-zinc-900  sm:text-5xl">
         Learn {config.name}
       </h1>
-      <p className="mt-4 max-w-3xl text-lg leading-relaxed text-zinc-600 dark:text-zinc-400">
+      <p className="mt-4 max-w-3xl text-lg leading-relaxed text-zinc-600 ">
         {intro}
       </p>
 
       <div className="mt-6 flex flex-wrap gap-2 text-sm">
-        <span className="rounded-full bg-zinc-100 px-3 py-1.5 font-medium text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">
+        <span className="rounded-full bg-zinc-100 px-3 py-1.5 font-medium text-zinc-700  ">
           {topicCount} topics
         </span>
-        <span className="rounded-full bg-zinc-100 px-3 py-1.5 font-medium text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">
+        <span className="rounded-full bg-zinc-100 px-3 py-1.5 font-medium text-zinc-700  ">
           {lessonCount} lessons
         </span>
-        <span className="rounded-full bg-zinc-100 px-3 py-1.5 font-medium text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">
+        <span className="rounded-full bg-zinc-100 px-3 py-1.5 font-medium text-zinc-700  ">
           Estimated {estimatedHours}h
         </span>
-        <span className="rounded-full bg-emerald-50 px-3 py-1.5 font-medium text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400">
+        <span className="rounded-full bg-emerald-50 px-3 py-1.5 font-medium text-emerald-700  ">
           Free lessons
         </span>
       </div>
@@ -58,7 +58,7 @@ export default function TutorialLangHero({
           </Link>
           <a
             href="#curriculum"
-            className="inline-flex items-center gap-2 rounded-xl border border-zinc-300 bg-white px-6 py-3 text-sm font-semibold text-zinc-700 shadow-sm transition-colors hover:border-indigo-200 hover:text-indigo-600 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:border-indigo-700 dark:hover:text-indigo-400"
+            className="inline-flex items-center gap-2 rounded-xl border border-zinc-300 bg-white px-6 py-3 text-sm font-semibold text-zinc-700 shadow-sm transition-colors hover:border-indigo-200 hover:text-indigo-600    :border-indigo-700 :text-indigo-400"
           >
             View curriculum
           </a>

@@ -18,14 +18,14 @@ export default function OutputPanel({
 
   const labelColor =
     outputIsError || failureKind === "compile"
-      ? "text-red-500 dark:text-red-400"
+      ? "text-red-500 "
       : status === "failed" && failureKind === "task"
-      ? "text-amber-500 dark:text-amber-400"
+      ? "text-amber-500 "
       : status === "failed"
-      ? "text-red-500 dark:text-red-400"
+      ? "text-red-500 "
       : status === "passed"
-      ? "text-emerald-500 dark:text-emerald-400"
-      : "text-zinc-400 dark:text-zinc-500";
+      ? "text-emerald-500 "
+      : "text-zinc-400 ";
 
   const outputLabel =
     outputIsError || failureKind === "compile"
@@ -40,16 +40,16 @@ export default function OutputPanel({
 
   const outputColor =
     outputIsError || failureKind === "compile"
-      ? "text-red-600 dark:text-red-400"
+      ? "text-red-600 "
       : status === "failed" && failureKind === "task"
-      ? "text-amber-700 dark:text-amber-300"
+      ? "text-amber-700 "
       : status === "failed"
-      ? "text-red-600 dark:text-red-400"
-      : "text-emerald-600 dark:text-emerald-400";
+      ? "text-red-600 "
+      : "text-emerald-600 ";
 
   return (
     <div
-      className="shrink-0 overflow-y-auto overflow-x-hidden bg-zinc-50 p-4 font-mono text-sm dark:bg-zinc-950"
+      className="shrink-0 overflow-y-auto overflow-x-hidden bg-zinc-50 p-4 font-mono text-sm "
       style={{ height }}
       suppressHydrationWarning
     >
@@ -69,10 +69,10 @@ export default function OutputPanel({
       {/* Expected output hint */}
       {status === "failed" && output !== null && failureKind === "output" && expectedOutput.length > 0 && (
         <div className="mt-2">
-          <p className="mb-1 text-[11px] font-semibold uppercase tracking-widest text-zinc-400 dark:text-zinc-500">
+          <p className="mb-1 text-[11px] font-semibold uppercase tracking-widest text-zinc-400 ">
             Expected Output
           </p>
-          <pre className="whitespace-pre-wrap break-words text-xs text-zinc-500 dark:text-zinc-400">
+          <pre className="whitespace-pre-wrap break-words text-xs text-zinc-500 ">
             {expectedOutput.join("\n")}
           </pre>
         </div>
