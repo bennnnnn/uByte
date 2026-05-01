@@ -21,9 +21,9 @@ export default async function TutorialLangLayout({
   return (
     <div className="flex flex-1 min-h-0 overflow-hidden">
       <Sidebar lang={lang} tutorials={tutorials} />
-      <div className="flex flex-1 flex-col min-h-0 overflow-hidden">
+      <div className="flex flex-1 flex-col min-h-0 overflow-hidden md:ml-72">
         <MobileNav lang={lang} tutorials={tutorials} />
-        <div className="flex-1 overflow-y-auto" style={{ height: '100vh' }}>
+        <div className="flex-1 overflow-y-auto">
           <ErrorBoundary>{children}</ErrorBoundary>
         </div>
       </div>
