@@ -110,7 +110,7 @@ export default function InstructionsSidebar({
 
         <TutorialHintPanel progress={progress} onRequestHint={onRequestHint} />
 
-        {step.hint && failCount >= 2 && (
+        {step.hint && failCount >= 2 && !aiFeedbackLoading && !aiFeedback && (
           <div className="mt-6">
             <button
               onClick={() => progress.setShowHint(!showHint)}
