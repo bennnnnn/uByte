@@ -7,7 +7,7 @@ interface Props {
 }
 
 const SHORTCUTS = [
-  { keys: "Ctrl + Enter · Ctrl + Shift + Enter", action: "Run & check this step" },
+  { keys: "Ctrl + Enter · Ctrl + Shift + Enter", action: "Run this step" },
   { keys: "Tab", action: "Indent (4 spaces)" },
   { keys: "Shift + Tab", action: "Dedent" },
   { keys: "?", action: "Toggle this overlay" },

@@ -434,7 +434,7 @@ export default function InteractiveTutorial({
               title="Runs your code, then checks it against this step’s requirements. Ctrl+Enter (or Ctrl+Shift+Enter)"
               className="flex items-center gap-1.5 rounded-md bg-indigo-700 px-3 py-1.5 text-sm font-medium text-white transition-colors hover:bg-indigo-800 disabled:opacity-50"
             >
-              {stepProgress.status === "running" ? "Running…" : "▶ Run & check"}
+              {stepProgress.status === "running" ? "Running…" : "▶ Run"}
             </button>
             <button
               type="button"
@@ -581,7 +581,7 @@ export default function InteractiveTutorial({
                 <path d="M8 5.14v14l11-7-11-7z" />
               </svg>
             )}
-            <span className="truncate text-[11px] font-bold leading-tight">Run &amp; check</span>
+            <span className="truncate text-[11px] font-bold leading-tight">Run</span>
           </button>
 
           {/* Reset */}

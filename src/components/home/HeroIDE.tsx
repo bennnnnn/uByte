@@ -213,7 +213,7 @@ export default function HeroIDE() {
             <svg className="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
               <path d="M6.3 2.84A1.5 1.5 0 004 4.11v11.78a1.5 1.5 0 002.3 1.27l9.344-5.891a1.5 1.5 0 000-2.538L6.3 2.84z" />
             </svg>
-            Run &amp; check
+Run
           </span>
           <span className="ml-auto text-[10px] text-zinc-300 dark:text-zinc-500">◉ Format</span>
         </div>

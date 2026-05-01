@@ -4,7 +4,7 @@ export const steps: TutorialStep[] = [
   {
     title: "Hello, Library!",
     instruction:
-      "The front door: `func main()`. Every Go program has one — it's where Go walks in and starts running.\n\nThis program already works. Click **Run & check** to see it in action.",
+      "The front door: `func main()`. Every Go program has one — it's where Go walks in and starts running.\n\nThis program already works. Click **Run** to see it in action.",
     starter: `package main
 
 import "fmt"
@@ -13,7 +13,7 @@ func main() {
 \tfmt.Println("Hello, Library!")
 }`,
     expectedOutput: ["Hello, Library!"],
-    hint: "The program is already complete — just click Run & check to see it work.",
+    hint: "The program is already complete — just click Run to see it work.",
   },
   {
     title: "Announce Your Library",
