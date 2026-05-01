@@ -1,37 +1,37 @@
 [
   {
     "title": "What is a method",
-    "instruction": "Think of a method as a skill that belongs to a specific type.\n\nA `Person` can `Greet()`. A `Car` can `Start()`. The skill doesn't float around — it's attached to the thing that does it.\n\nIn Go, you attach a function to a type by adding a *receiver* between `func` and the name. Run this, then change the greeting to include the person's age.",
-    "hint": "fmt.Printf(\"Hi, I'm %s and I'm %d years old\\n\", p.Name, p.Age)",
-    "starter": "package main\n\nimport \"fmt\"\n\ntype Person struct {\n\tName string\n\tAge  int\n}\n\nfunc (p Person) Greet() {\n\tfmt.Println(\"Hi, I'm\", p.Name)\n}\n\nfunc main() {\n\tp := Person{Name: \"Alex\", Age: 25}\n\tp.Greet()\n}",
+    "instruction": "Think of a method as a behaviour that belongs to a specific type.\n\nA `Book` can `Describe()`. A `Member` can `Greet()`. The behaviour doesn't float around — it's attached to the thing that does it.\n\nIn Go, you attach a function to a type by adding a *receiver* between `func` and the name. Run this, then change the greeting to include the member's name and library card number.",
+    "hint": "fmt.Printf(\"Hi, I'm %s and my card is %d\\n\", m.Name, m.CardNumber)",
+    "starter": "package main\n\nimport \"fmt\"\n\ntype Member struct {\n\tName       string\n\tCardNumber int\n}\n\nfunc (m Member) Greet() {\n\tfmt.Println(\"Hi, I'm\", m.Name)\n}\n\nfunc main() {\n\tm := Member{Name: \"Alice\", CardNumber: 1001}\n\tm.Greet()\n}",
     "expectedOutput": [],
     "codeChecks": [
       {
-        "pattern": "p\\.Age",
+        "pattern": "m\\.CardNumber",
         "required": true,
-        "message": "Include p.Age in the greeting."
+        "message": "Include m.CardNumber in the greeting."
       }
     ],
-    "successMessage": "`p.Greet()` — the Person greets itself. Clean, readable, and the method knows exactly who it belongs to."
+    "successMessage": "`m.Greet()` — the Member greets themselves. Clean, readable, and the method knows exactly who it belongs to."
   },
   {
     "title": "Define a method",
-    "instruction": "Write your own method.\n\nAdd a `Describe()` method to `Car` that prints: `\"2020 Toyota Camry\"`\n\nThe format is: `Year Make Model`.\n\nThen call it.",
-    "hint": "func (c Car) Describe() { fmt.Println(c.Year, c.Make, c.Model) }",
-    "starter": "package main\n\nimport \"fmt\"\n\ntype Car struct {\n\tMake  string\n\tModel string\n\tYear  int\n}\n\n// TODO: add a Describe() method to Car\n\nfunc main() {\n\tc := Car{Make: \"Toyota\", Model: \"Camry\", Year: 2020}\n\t// TODO: call c.Describe()\n}",
+    "instruction": "Write your own method.\n\nAdd a `Describe()` method to `Book` that prints: `\"The Great Gatsby by F. Scott Fitzgerald (1925)\"`\n\nThe format is: `Title by Author (Year)`.\n\nThen call it.",
+    "hint": "func (b Book) Describe() { fmt.Println(b.Title, \"by\", b.Author, \"(\" + strconv.Itoa(b.Year) + \")\") }",
+    "starter": "package main\n\nimport \"fmt\"\n\ntype Book struct {\n\tTitle  string\n\tAuthor string\n\tYear   int\n}\n\n// TODO: add a Describe() method to Book\n\nfunc main() {\n\tb := Book{Title: \"The Great Gatsby\", Author: \"F. Scott Fitzgerald\", Year: 1925}\n\t// TODO: call b.Describe()\n}",
     "expectedOutput": [
-      "2020 Toyota Camry"
+      "The Great Gatsby by F. Scott Fitzgerald (1925)"
     ],
     "codeChecks": [
       {
-        "pattern": "func\\s*\\(\\s*\\w+\\s+Car\\s*\\)\\s*Describe\\s*\\(",
+        "pattern": "func\\s*\\(\\s*\\w+\\s+Book\\s*\\)\\s*Describe\\s*\\(",
         "required": true,
-        "message": "Define a Describe() method on Car: func (c Car) Describe() { ... }"
+        "message": "Define a Describe() method on Book: func (b Book) Describe() { ... }"
       },
       {
-        "pattern": "c\\.Describe\\(\\)",
+        "pattern": "b\\.Describe\\(\\)",
         "required": true,
-        "message": "Call c.Describe() in main."
+        "message": "Call b.Describe() in main."
       },
       {
         "pattern": "TODO",
@@ -39,37 +39,37 @@
         "message": "Replace the TODO comments with your code."
       }
     ],
-    "successMessage": "Your method, your type, your call. The Car now knows how to describe itself."
+    "successMessage": "Your method, your type, your call. The Book now knows how to describe itself."
   },
   {
     "title": "Value receiver — reads but does not change",
-    "instruction": "A value receiver receives a copy of the struct. Changes inside the method do not affect the original.\n\nThis is fine when you are only reading — like printing, calculating, comparing.\n\nRun this. Notice that calling `tryRename` does not change `p.Name` — because it got a copy.",
-    "starter": "package main\n\nimport \"fmt\"\n\ntype Person struct {\n\tName string\n}\n\nfunc (p Person) tryRename(newName string) {\n\tp.Name = newName\n\tfmt.Println(\"Inside method:\", p.Name)\n}\n\nfunc main() {\n\tp := Person{Name: \"Alex\"}\n\tp.tryRename(\"Jordan\")\n\tfmt.Println(\"Outside method:\", p.Name)\n}",
+    "instruction": "A value receiver receives a copy of the struct. Changes inside the method do not affect the original.\n\nThis is fine when you are only reading — like printing, calculating, or checking availability.\n\nRun this. Notice that calling `tryRename` does not change `b.Title` — because it got a copy.",
+    "starter": "package main\n\nimport \"fmt\"\n\ntype Book struct {\n\tTitle string\n}\n\nfunc (b Book) tryRename(newTitle string) {\n\tb.Title = newTitle\n\tfmt.Println(\"Inside method:\", b.Title)\n}\n\nfunc main() {\n\tb := Book{Title: \"1984\"}\n\tb.tryRename(\"Brave New World\")\n\tfmt.Println(\"Outside method:\", b.Title)\n}",
     "expectedOutput": [
-      "Inside method: Jordan",
-      "Outside method: Alex"
+      "Inside method: Brave New World",
+      "Outside method: 1984"
     ],
-    "successMessage": "Jordan inside, Alex outside. The method changed its copy, not the original. Value receivers are safe for read-only operations — nothing unexpected can happen."
+    "successMessage": "Brave New World inside, 1984 outside. The method changed its copy, not the original. Value receivers are safe for read-only operations — nothing unexpected can happen."
   },
   {
     "title": "Pointer receiver — actually changes the struct",
-    "instruction": "To modify the original struct from a method, use a pointer receiver: `(p *Person)`.\n\nNow the method receives the address — not a copy — and changes stick.\n\nAdd a `Birthday()` method with a pointer receiver that increments `p.Age`. Call it and print the age before and after.",
-    "hint": "func (p *Person) Birthday() { p.Age++ }  then p.Birthday()",
-    "starter": "package main\n\nimport \"fmt\"\n\ntype Person struct {\n\tName string\n\tAge  int\n}\n\n// TODO: add a Birthday() method with a pointer receiver\n\nfunc main() {\n\tp := Person{Name: \"Sam\", Age: 29}\n\tfmt.Println(p.Age)\n\t// TODO: call p.Birthday() and print p.Age again\n}",
+    "instruction": "To modify the original struct from a method, use a pointer receiver: `(b *Book)`.\n\nNow the method receives the address — not a copy — and changes stick.\n\nAdd a `CheckOut()` method with a pointer receiver that sets `b.IsCheckedOut` to `true`. Call it and print the status before and after.",
+    "hint": "func (b *Book) CheckOut() { b.IsCheckedOut = true }  then b.CheckOut()",
+    "starter": "package main\n\nimport \"fmt\"\n\ntype Book struct {\n\tTitle         string\n\tIsCheckedOut  bool\n}\n\n// TODO: add a CheckOut() method with a pointer receiver\n\nfunc main() {\n\tb := Book{Title: \"Dune\"}\n\tfmt.Println(\"Checked out before:\", b.IsCheckedOut)\n\t// TODO: call b.CheckOut() and print status again\n}",
     "expectedOutput": [
-      "29",
-      "30"
+      "Checked out before: false",
+      "Checked out after: true"
     ],
     "codeChecks": [
       {
-        "pattern": "func\\s*\\(\\s*\\w+\\s+\\*Person\\s*\\)\\s*Birthday\\s*\\(",
+        "pattern": "func\\s*\\(\\s*\\w+\\s+\\*Book\\s*\\)\\s*CheckOut\\s*\\(",
         "required": true,
-        "message": "Define Birthday() with a pointer receiver: func (p *Person) Birthday() { p.Age++ }"
+        "message": "Define CheckOut() with a pointer receiver: func (b *Book) CheckOut() { b.IsCheckedOut = true }"
       },
       {
-        "pattern": "p\\.Birthday\\(\\)",
+        "pattern": "b\\.CheckOut\\(\\)",
         "required": true,
-        "message": "Call p.Birthday() and print p.Age after."
+        "message": "Call b.CheckOut() and print IsCheckedOut after."
       },
       {
         "pattern": "TODO",
@@ -77,31 +77,31 @@
         "message": "Replace the TODO comments with your code."
       }
     ],
-    "successMessage": "29 before, 30 after. The pointer receiver method reached into the original struct and changed it. Happy birthday, Sam."
+    "successMessage": "false before, true after. The pointer receiver method reached into the original struct and changed it. The book is now checked out."
   },
   {
     "title": "Value vs pointer receiver — side by side",
-    "instruction": "Rule of thumb:\n- **Reading only?** Use a value receiver\n- **Mutating the struct?** Use a pointer receiver\n- **Large struct?** Use a pointer receiver to avoid copying\n\nRun this. Both methods live on `Counter`. `Show()` reads, `Increment()` mutates.",
-    "starter": "package main\n\nimport \"fmt\"\n\ntype Counter struct {\n\tValue int\n}\n\nfunc (c Counter) Show() {\n\tfmt.Println(\"Count:\", c.Value)\n}\n\nfunc (c *Counter) Increment() {\n\tc.Value++\n}\n\nfunc main() {\n\tc := Counter{Value: 0}\n\tc.Show()\n\tc.Increment()\n\tc.Increment()\n\tc.Increment()\n\tc.Show()\n}",
+    "instruction": "Rule of thumb:\n- **Reading only?** Use a value receiver\n- **Mutating the struct?** Use a pointer receiver\n- **Large struct?** Use a pointer receiver to avoid copying\n\nRun this. Both methods live on `Book`. `Describe()` reads, `CheckOut()` mutates.",
+    "starter": "package main\n\nimport \"fmt\"\n\ntype Book struct {\n\tTitle         string\n\tIsCheckedOut  bool\n}\n\nfunc (b Book) Describe() {\n\tstatus := \"available\"\n\tif b.IsCheckedOut {\n\t\tstatus = \"checked out\"\n\t}\n\tfmt.Printf(\"%s is %s\\n\", b.Title, status)\n}\n\nfunc (b *Book) CheckOut() {\n\tb.IsCheckedOut = true\n}\n\nfunc main() {\n\tb := Book{Title: \"The Hobbit\"}\n\tb.Describe()\n\tb.CheckOut()\n\tb.Describe()\n}",
     "expectedOutput": [
-      "Count: 0",
-      "Count: 3"
+      "The Hobbit is available",
+      "The Hobbit is checked out"
     ],
-    "successMessage": "Show uses a value receiver — it only reads. Increment uses a pointer receiver — it mutates. Mix both on the same type freely, just follow the rule."
+    "successMessage": "Describe uses a value receiver — it only reads. CheckOut uses a pointer receiver — it mutates. Mix both on the same type freely, just follow the rule."
   },
   {
     "title": "Methods with parameters",
-    "instruction": "Methods can accept parameters just like regular functions.\n\n`func (r Rectangle) Scale(factor float64) Rectangle`\n\nThis takes a `factor`, scales the rectangle, and returns a new one.\n\nAdd a call that scales the rectangle by 2 and prints the new dimensions.",
-    "hint": "big := r.Scale(2)  fmt.Println(big.Width, big.Height)",
-    "starter": "package main\n\nimport \"fmt\"\n\ntype Rectangle struct {\n\tWidth  float64\n\tHeight float64\n}\n\nfunc (r Rectangle) Scale(factor float64) Rectangle {\n\treturn Rectangle{Width: r.Width * factor, Height: r.Height * factor}\n}\n\nfunc main() {\n\tr := Rectangle{Width: 5, Height: 3}\n\t// TODO: scale r by 2 and print the new Width and Height\n}",
+    "instruction": "Methods can accept parameters just like regular functions.\n\n`func (b *Book) CheckOutTo(memberName string)`\n\nThis takes a `memberName`, sets the book as checked out, and stores who borrowed it.\n\nAdd a call that checks the book out to \"Alice\" and prints the new CheckedOutTo field.",
+    "hint": "b.CheckOutTo(\"Alice\")  fmt.Println(b.CheckedOutTo)",
+    "starter": "package main\n\nimport \"fmt\"\n\ntype Book struct {\n\tTitle         string\n\tIsCheckedOut  bool\n\tCheckedOutTo  string\n}\n\nfunc (b *Book) CheckOutTo(memberName string) {\n\tb.IsCheckedOut = true\n\tb.CheckedOutTo = memberName\n}\n\nfunc main() {\n\tb := Book{Title: \"The Catcher in the Rye\"}\n\t// TODO: check the book out to \"Alice\" and print who it's checked out to\n}",
     "expectedOutput": [
-      "10 6"
+      "Alice"
     ],
     "codeChecks": [
       {
-        "pattern": "r\\.Scale\\(2\\)",
+        "pattern": "b\\.CheckOutTo\\(\"Alice\"\\)",
         "required": true,
-        "message": "Call r.Scale(2) to scale the rectangle."
+        "message": "Call b.CheckOutTo(\"Alice\") to check out the book."
       },
       {
         "pattern": "TODO",
@@ -109,27 +109,27 @@
         "message": "Replace the TODO comment with your code."
       }
     ],
-    "successMessage": "5×3 scaled by 2 becomes 10×6. Methods with parameters are just functions — same syntax, same rules, just attached to a type."
+    "successMessage": "Methods with parameters are just functions — same syntax, same rules, just attached to a type. Now the library knows who borrowed what."
   },
   {
     "title": "Methods with return values",
-    "instruction": "Methods return values the same way functions do.\n\nAdd two methods to `Rectangle`:\n- `Area() float64` — returns width × height\n- `Perimeter() float64` — returns 2 × (width + height)\n\nCall both and print the results.",
-    "hint": "func (r Rectangle) Area() float64 { return r.Width * r.Height }",
-    "starter": "package main\n\nimport \"fmt\"\n\ntype Rectangle struct {\n\tWidth  float64\n\tHeight float64\n}\n\n// TODO: add Area() float64 method\n// TODO: add Perimeter() float64 method\n\nfunc main() {\n\tr := Rectangle{Width: 6, Height: 4}\n\tfmt.Println(r.Area())\n\tfmt.Println(r.Perimeter())\n}",
+    "instruction": "Methods return values the same way functions do.\n\nAdd two methods to `Book`:\n- `IsAvailable() bool` — returns true if `IsCheckedOut == false`\n- `DaysOverdue(daysBorrowed int) int` — returns `daysBorrowed - 14` if positive, else 0\n\nCall both and print the results.",
+    "hint": "func (b Book) IsAvailable() bool { return !b.IsCheckedOut }",
+    "starter": "package main\n\nimport \"fmt\"\n\ntype Book struct {\n\tTitle        string\n\tIsCheckedOut bool\n}\n\n// TODO: add IsAvailable() bool method\n// TODO: add DaysOverdue(daysBorrowed int) int method\n\nfunc main() {\n\tb := Book{Title: \"Moby-Dick\", IsCheckedOut: true}\n\tfmt.Println(\"Available:\", b.IsAvailable())\n\tfmt.Println(\"Overdue days:\", b.DaysOverdue(20))\n}",
     "expectedOutput": [
-      "24",
-      "20"
+      "Available: false",
+      "Overdue days: 6"
     ],
     "codeChecks": [
       {
-        "pattern": "func\\s*\\(\\s*\\w+\\s+Rectangle\\s*\\)\\s*Area\\s*\\(\\s*\\)\\s*float64",
+        "pattern": "func\\s*\\(\\s*\\w+\\s+Book\\s*\\)\\s*IsAvailable\\s*\\(\\s*\\)\\s*bool",
         "required": true,
-        "message": "Add Area() float64 method to Rectangle."
+        "message": "Add IsAvailable() bool method to Book."
       },
       {
-        "pattern": "func\\s*\\(\\s*\\w+\\s+Rectangle\\s*\\)\\s*Perimeter\\s*\\(\\s*\\)\\s*float64",
+        "pattern": "func\\s*\\(\\s*\\w+\\s+Book\\s*\\)\\s*DaysOverdue\\s*\\(\\s*\\w+\\s+int\\s*\\)\\s*int",
         "required": true,
-        "message": "Add Perimeter() float64 method to Rectangle."
+        "message": "Add DaysOverdue(daysBorrowed int) int method to Book."
       },
       {
         "pattern": "TODO",
@@ -137,36 +137,26 @@
         "message": "Replace the TODO comments with your methods."
       }
     ],
-    "successMessage": "6×4 = area 24, perimeter 20. The Rectangle type now knows how to calculate its own properties. That is object-oriented thinking in Go."
+    "successMessage": "Moby-Dick is not available and is 6 days overdue. The Book type now knows how to answer real library questions."
   },
   {
     "title": "Multiple methods on one type",
-    "instruction": "A type can have as many methods as you need. They all live separately in code but belong to the same type.\n\nRun this. `Rectangle` now has `Area()`, `Perimeter()`, and `IsSquare()`. Then add a `Describe()` method that prints all three in one line.\n\nFormat: `\"6 x 4 | Area: 24.00 | Perimeter: 20.00 | Square: false\"`",
-    "hint": "func (r Rectangle) Describe() { fmt.Printf(\"%.0f x %.0f | Area: %.2f | Perimeter: %.2f | Square: %v\\n\", r.Width, r.Height, r.Area(), r.Perimeter(), r.IsSquare()) }",
-    "starter": "package main\n\nimport \"fmt\"\n\ntype Rectangle struct {\n\tWidth  float64\n\tHeight float64\n}\n\nfunc (r Rectangle) Area() float64      { return r.Width * r.Height }\nfunc (r Rectangle) Perimeter() float64 { return 2 * (r.Width + r.Height) }\nfunc (r Rectangle) IsSquare() bool     { return r.Width == r.Height }\n\n// TODO: add Describe() method that prints all three\n\nfunc main() {\n\tr := Rectangle{Width: 6, Height: 4}\n\tr.Describe()\n}",
+    "instruction": "A type can have as many methods as you need. They all live separately in code but belong to the same type.\n\nRun this. `Book` now has `IsAvailable()`, `DaysOverdue()`, and a new `Summary()` method that calls both. Then modify the `Summary()` method to also call `DaysOverdue()` with 30 days and include the result.\n\nFormat: `\"The Hobbit | Available: true | Overdue: 16 days\"`",
+    "hint": "func (b Book) Summary() { fmt.Printf(\"%s | Available: %v | Overdue: %d days\\n\", b.Title, b.IsAvailable(), b.DaysOverdue(30)) }",
+    "starter": "package main\n\nimport \"fmt\"\n\ntype Book struct {\n\tTitle        string\n\tIsCheckedOut bool\n}\n\nfunc (b Book) IsAvailable() bool { return !b.IsCheckedOut }\nfunc (b Book) DaysOverdue(daysBorrowed int) int {\n\tif daysBorrowed > 14 {\n\t\treturn daysBorrowed - 14\n\t}\n\treturn 0\n}\n\n// TODO: modify Summary() to also include DaysOverdue(30)\n\nfunc main() {\n\tb := Book{Title: \"The Hobbit\", IsCheckedOut: true}\n\tfmt.Printf(\"%s | Available: %v\\n\", b.Title, b.IsAvailable())\n}",
     "expectedOutput": [
-      "6 x 4 | Area: 24.00 | Perimeter: 20.00 | Square: false"
+      "The Hobbit | Available: false | Overdue: 16 days"
     ],
     "codeChecks": [
       {
-        "pattern": "func\\s*\\(\\s*\\w+\\s+Rectangle\\s*\\)\\s*Describe\\s*\\(",
+        "pattern": "b\\.Summary",
         "required": true,
-        "message": "Add a Describe() method to Rectangle."
+        "message": "Print using a Summary() method or direct print that includes DaysOverdue(30)."
       },
       {
-        "pattern": "r\\.Area\\(\\)",
+        "pattern": "DaysOverdue\\(30\\)",
         "required": true,
-        "message": "Call r.Area() inside Describe."
-      },
-      {
-        "pattern": "r\\.Perimeter\\(\\)",
-        "required": true,
-        "message": "Call r.Perimeter() inside Describe."
-      },
-      {
-        "pattern": "r\\.IsSquare\\(\\)",
-        "required": true,
-        "message": "Call r.IsSquare() inside Describe."
+        "message": "Call b.DaysOverdue(30) include the overdue info."
       },
       {
         "pattern": "TODO",
@@ -174,41 +164,41 @@
         "message": "Replace the TODO comment with your method."
       }
     ],
-    "successMessage": "One Describe() calls three other methods. Methods calling methods — this is how real programs are structured."
+    "successMessage": "One Summary() calls two other methods. Methods calling methods — this is how real library systems are structured."
   },
   {
     "title": "Return self for sequential calls",
-    "instruction": "Go does not have built-in method chaining. But if your method returns a pointer to the same type, you can call multiple methods in sequence.\n\n`b.SetTitle(\"Go\").SetPrice(29.99).Print()`\n\nRun this and see how each setter returns `*Book` to allow the next call.",
-    "starter": "package main\n\nimport \"fmt\"\n\ntype Book struct {\n\tTitle  string\n\tPrice  float64\n\tPages  int\n}\n\nfunc (b *Book) SetTitle(t string) *Book  { b.Title = t; return b }\nfunc (b *Book) SetPrice(p float64) *Book { b.Price = p; return b }\nfunc (b *Book) SetPages(n int) *Book     { b.Pages = n; return b }\nfunc (b *Book) Print() {\n\tfmt.Printf(\"%s — $%.2f — %d pages\\n\", b.Title, b.Price, b.Pages)\n}\n\nfunc main() {\n\tb := &Book{}\n\tb.SetTitle(\"Learning Go\").SetPrice(39.99).SetPages(350).Print()\n}",
+    "instruction": "Go does not have built-in method chaining. But if your method returns a pointer to the same type, you can call multiple methods in sequence.\n\n`b.CheckOut().SetDueDate(21).Print()`\n\nRun this and see how each method returns `*Book` to allow the next call.",
+    "starter": "package main\n\nimport \"fmt\"\n\ntype Book struct {\n\tTitle    string\n\tIsOut    bool\n\tDueDays  int\n}\n\nfunc (b *Book) CheckOut() *Book   { b.IsOut = true; return b }\nfunc (b *Book) SetDueDate(n int) *Book { b.DueDays = n; return b }\nfunc (b *Book) Print() {\n\tfmt.Printf(\"%s | Checked out: %v | Due in %d days\\n\", b.Title, b.IsOut, b.DueDays)\n}\n\nfunc main() {\n\tb := &Book{Title: \"Go Programming\"}\n\tb.CheckOut().SetDueDate(21).Print()\n}",
     "expectedOutput": [
-      "Learning Go — $39.99 — 350 pages"
+      "Go Programming | Checked out: true | Due in 21 days"
     ],
-    "successMessage": "Each setter returns the pointer to self, enabling the next call. You see this pattern in query builders, HTTP clients, and configuration APIs all over Go."
+    "successMessage": "Each method returns the pointer to self, enabling the next call. You see this pattern in query builders, HTTP clients, and configuration APIs all over Go."
   },
   {
     "title": "Methods on non-struct types",
-    "instruction": "You can add methods to any named type — not just structs.\n\n`type Celsius float64` is a named type based on `float64`. You can attach methods to it.\n\nAdd a `ToKelvin()` method to `Celsius` that returns `float64(c + 273.15)`. Call it and print the result.",
-    "hint": "func (c Celsius) ToKelvin() float64 { return float64(c + 273.15) }",
-    "starter": "package main\n\nimport \"fmt\"\n\ntype Celsius float64\n\nfunc (c Celsius) ToFahrenheit() float64 {\n\treturn float64(c*9/5 + 32)\n}\n\n// TODO: add ToKelvin() float64 method\n\nfunc main() {\n\ttemp := Celsius(100)\n\tfmt.Printf(\"%.2f°C = %.2f°F\\n\", temp, temp.ToFahrenheit())\n\t// TODO: print ToKelvin result\n}",
+    "instruction": "You can add methods to any named type — not just structs.\n\n`type ISBN string` is a named type based on `string`. You can attach methods to it.\n\nAdd a `IsValid() bool` method to `ISBN` that returns `true` if the length is 13. Call it and print the result.",
+    "hint": "func (i ISBN) IsValid() bool { return len(i) == 13 }",
+    "starter": "package main\n\nimport \"fmt\"\n\ntype ISBN string\n\nfunc (i ISBN) Prefix() string {\n\treturn string(i[:3])\n}\n\n// TODO: add IsValid() bool method\n\nfunc main() {\n\tisbn := ISBN(\"9780141036144\")\n\tfmt.Printf(\"ISBN: %s | Prefix: %s\\n\", isbn, isbn.Prefix())\n\t// TODO: print IsValid result\n}",
     "expectedOutput": [
-      "100.00°C = 212.00°F",
-      "100.00°C = 373.15K"
+      "ISBN: 9780141036144 | Prefix: 978",
+      "ISBN 9780141036144 is valid: true"
     ],
     "codeChecks": [
       {
-        "pattern": "func\\s*\\(\\s*\\w+\\s+Celsius\\s*\\)\\s*ToKelvin\\s*\\(",
+        "pattern": "func\\s*\\(\\s*\\w+\\s+ISBN\\s*\\)\\s*IsValid\\s*\\(\\s*\\)\\s*bool",
         "required": true,
-        "message": "Add a ToKelvin() float64 method to Celsius."
+        "message": "Add an IsValid() bool method to ISBN."
       },
       {
-        "pattern": "273\\.15",
+        "pattern": "len\\(i\\)\\s*==\\s*13",
         "required": true,
-        "message": "Add 273.15 to convert Celsius to Kelvin."
+        "message": "Check if len(i) == 13 to validate ISBN."
       },
       {
-        "pattern": "ToKelvin\\(\\)",
+        "pattern": "IsValid\\(\\)",
         "required": true,
-        "message": "Call temp.ToKelvin() and print the result."
+        "message": "Call isbn.IsValid() and print the result."
       },
       {
         "pattern": "TODO",
@@ -216,21 +206,21 @@
         "message": "Replace the TODO comments with your code."
       }
     ],
-    "successMessage": "Methods on a float64-based type. You just made numbers smarter. This pattern is used for units, currencies, IDs — any type where the underlying value has domain-specific behaviour."
+    "successMessage": "Methods on a string-based type. You just made ISBN numbers smarter. This pattern is used for units, currencies, IDs — any type where the underlying value has domain-specific behaviour."
   },
   {
     "title": "String() — fmt prints it automatically",
-    "instruction": "If you add a `String() string` method to your type, `fmt.Println` will call it automatically.\n\nThis is Go's way of letting your types control how they are printed — no special interface keyword needed yet, just the right method signature.\n\nAdd a `String() string` method to `Temperature` that returns `\"23.50°C\"`. Then just call `fmt.Println(t)` and see it use your method.",
-    "hint": "func (t Temperature) String() string { return fmt.Sprintf(\"%.2f°C\", t.Value) }",
-    "starter": "package main\n\nimport \"fmt\"\n\ntype Temperature struct {\n\tValue float64\n}\n\n// TODO: add String() string method that returns \"23.50°C\" format\n\nfunc main() {\n\tt := Temperature{Value: 23.5}\n\tfmt.Println(t)\n}",
+    "instruction": "If you add a `String() string` method to your type, `fmt.Println` will call it automatically.\n\nThis is Go's way of letting your types control how they are printed — no special interface keyword needed yet, just the right method signature.\n\nAdd a `String() string` method to `Member` that returns `\"Alice (Card: 1001)\"`. Then just call `fmt.Println(m)` and see it use your method.",
+    "hint": "func (m Member) String() string { return fmt.Sprintf(\"%s (Card: %d)\", m.Name, m.CardNumber) }",
+    "starter": "package main\n\nimport \"fmt\"\n\ntype Member struct {\n\tName       string\n\tCardNumber int\n}\n\n// TODO: add String() string method that returns \"Alice (Card: 1001)\" format\n\nfunc main() {\n\tm := Member{Name: \"Alice\", CardNumber: 1001}\n\tfmt.Println(m)\n}",
     "expectedOutput": [
-      "23.50°C"
+      "Alice (Card: 1001)"
     ],
     "codeChecks": [
       {
-        "pattern": "func\\s*\\(\\s*\\w+\\s+Temperature\\s*\\)\\s*String\\s*\\(\\s*\\)\\s*string",
+        "pattern": "func\\s*\\(\\s*\\w+\\s+Member\\s*\\)\\s*String\\s*\\(\\s*\\)\\s*string",
         "required": true,
-        "message": "Add String() string method to Temperature."
+        "message": "Add String() string method to Member."
       },
       {
         "pattern": "Sprintf|Printf",
@@ -247,72 +237,73 @@
   },
   {
     "title": "Fix the broken method",
-    "instruction": "The `Restock` method below is supposed to add items to a product's stock. But it does not work — the stock stays at 10 after the call.\n\nFind the bug and fix it.",
-    "hint": "The method uses a value receiver (p Product). Change it to a pointer receiver (p *Product) so it modifies the original.",
-    "starter": "package main\n\nimport \"fmt\"\n\ntype Product struct {\n\tName  string\n\tStock int\n}\n\n// BUG: this method does not modify the original\nfunc (p Product) Restock(amount int) {\n\tp.Stock += amount\n}\n\nfunc main() {\n\titem := Product{Name: \"Coffee\", Stock: 10}\n\titem.Restock(50)\n\tfmt.Println(item.Stock)\n}",
+    "instruction": "The `ReturnBook` method below is supposed to mark a book as returned and clear who checked it out. But it does not work — the book stays checked out after the call.\n\nFind the bug and fix it.",
+    "hint": "The method uses a value receiver (b Book). Change it to a pointer receiver (b *Book) so it modifies the original.",
+    "starter": "package main\n\nimport \"fmt\"\n\ntype Book struct {\n\tTitle         string\n\tIsCheckedOut  bool\n\tCheckedOutTo  string\n}\n\n// BUG: this method does not modify the original\nfunc (b Book) ReturnBook() {\n\tb.IsCheckedOut = false\n\tb.CheckedOutTo = \"\"\n}\n\nfunc main() {\n\tb := Book{Title: \"Dune\", IsCheckedOut: true, CheckedOutTo: \"Alice\"}\n\tb.ReturnBook()\n\tfmt.Println(\"Checked out:\", b.IsCheckedOut)\n\tfmt.Println(\"Checked out to:\", b.CheckedOutTo)\n}",
     "expectedOutput": [
-      "60"
+      "Checked out: false",
+      "Checked out to: "
     ],
     "codeChecks": [
       {
-        "pattern": "func\\s*\\(\\s*\\w+\\s+\\*Product\\s*\\)\\s*Restock\\s*\\(",
+        "pattern": "func\\s*\\(\\s*\\w+\\s+\\*Book\\s*\\)\\s*ReturnBook\\s*\\(",
         "required": true,
-        "message": "Change the receiver to *Product: func (p *Product) Restock(amount int)"
+        "message": "Change the receiver to *Book: func (b *Book) ReturnBook()"
       }
     ],
-    "successMessage": "One character change — (p Product) to (p *Product) — and it works. The most common method bug in Go. You will never forget this."
+    "successMessage": "One character change — (b Book) to (b *Book) — and it works. The most common method bug in Go. You will never forget this."
   },
   {
-    "title": "Build a shape calculator",
-    "instruction": "No starter code.\n\nBuild two types with their own methods:\n\n**Circle** (radius float64)\n- `Area() float64` → π × r²  (use 3.14159 for π)\n- `Perimeter() float64` → 2 × π × r\n- `Describe()` → prints `\"Circle | r=5.00 | Area: 78.54 | Perimeter: 31.42\"`\n\n**Rectangle** (Width, Height float64)\n- `Area() float64` → w × h\n- `Perimeter() float64` → 2 × (w + h)\n- `Describe()` → prints `\"Rectangle | 8.00 x 3.00 | Area: 24.00 | Perimeter: 22.00\"`\n\nCreate one of each and call Describe on both.",
-    "hint": "const pi = 3.14159  func (c Circle) Area() float64 { return pi * c.Radius * c.Radius }",
-    "starter": "package main\n\nimport \"fmt\"\n\n// Build your shapes here\n\nfunc main() {\n}",
+    "title": "Build a library system",
+    "instruction": "No starter code.\n\nBuild two types with their own methods:\n\n**Book** (Title, Author string, IsCheckedOut bool)\n- `CheckOut()` — sets IsCheckedOut to true\n- `Return()` — sets IsCheckedOut to false\n- `Describe()` — prints `\"The Hobbit by J.R.R. Tolkien | Available: false\"`\n\n**LibraryMember** (Name string, BooksBorrowed int)\n- `BorrowBook()` — increments BooksBorrowed by 1\n- `ReturnBook()` — decrements BooksBorrowed by 1 (not below 0)\n- `Describe()` — prints `\"Alice has borrowed 2 books this month\"`\n\nCreate one of each, perform some transactions, and call Describe on both.",
+    "hint": "Use pointer receivers for CheckOut/Return since they mutate; value receiver for Describe.",
+    "starter": "package main\n\nimport \"fmt\"\n\n// Build your types here\n\nfunc main() {\n}",
     "expectedOutput": [
-      "Circle | r=5.00 | Area: 78.54 | Perimeter: 31.42",
-      "Rectangle | 8.00 x 3.00 | Area: 24.00 | Perimeter: 22.00"
+      "The Hobbit by J.R.R. Tolkien | Available: true",
+      "Alice has borrowed 3 books this month"
     ],
     "codeChecks": [
       {
-        "pattern": "type\\s+Circle\\s+struct",
+        "pattern": "type\\s+Book\\s+struct",
         "required": true,
-        "message": "Define a Circle struct."
+        "message": "Define a Book struct."
       },
       {
-        "pattern": "type\\s+Rectangle\\s+struct",
+        "pattern": "type\\s+LibraryMember\\s+struct",
         "required": true,
-        "message": "Define a Rectangle struct."
+        "message": "Define a LibraryMember struct."
       },
       {
-        "pattern": "func\\s*\\(\\s*\\w+\\s+Circle\\s*\\)\\s*Area",
+        "pattern": "func\\s*\\(\\s*\\w+\\s+\\*?Book\\s*\\)\\s*CheckOut",
         "required": true,
-        "message": "Add an Area() method to Circle."
+        "message": "Add a CheckOut() method to Book."
       },
       {
-        "pattern": "func\\s*\\(\\s*\\w+\\s+Circle\\s*\\)\\s*Perimeter",
+        "pattern": "func\\s*\\(\\s*\\w+\\s+\\*?Book\\s*\\)\\s*Return",
         "required": true,
-        "message": "Add a Perimeter() method to Circle."
+        "message": "Add a Return() method to Book."
       },
       {
-        "pattern": "func\\s*\\(\\s*\\w+\\s+Circle\\s*\\)\\s*Describe",
+        "pattern": "func\\s*\\(\\s*\\w+\\s+Book\\s*\\)\\s*Describe",
         "required": true,
-        "message": "Add a Describe() method to Circle."
+        "message": "Add a Describe() method to Book."
       },
       {
-        "pattern": "func\\s*\\(\\s*\\w+\\s+Rectangle\\s*\\)\\s*Area",
+        "pattern": "func\\s*\\(\\s*\\w+\\s+\\*?LibraryMember\\s*\\)\\s*BorrowBook",
         "required": true,
-        "message": "Add an Area() method to Rectangle."
+        "message": "Add a BorrowBook() method to LibraryMember."
       },
       {
-        "pattern": "func\\s*\\(\\s*\\w+\\s+Rectangle\\s*\\)\\s*Perimeter",
+        "pattern": "func\\s*\\(\\s*\\w+\\s+\\*?LibraryMember\\s*\\)\\s*ReturnBook",
         "required": true,
-        "message": "Add a Perimeter() method to Rectangle."
+        "message": "Add a ReturnBook() method to LibraryMember."
       },
       {
-        "pattern": "func\\s*\\(\\s*\\w+\\s+Rectangle\\s*\\)\\s*Describe",
+        "pattern": "func\\s*\\(\\s*\\w+\\s+LibraryMember\\s*\\)\\s*Describe",
         "required": true,
-        "message": "Add a Describe() method to Rectangle."
+        "message": "Add a Describe() method to LibraryMember."
       }
     ],
-    "successMessage": "Two types. Six methods. One clean program. You just built a fully object-oriented shape calculator in Go — without a single class keyword. That is the Go way."
+    "successMessage": "Two types. Eight methods. One clean program. You just built a fully object-oriented library system in Go — without a single class keyword. That is the Go way."
   }
 ]

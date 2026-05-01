@@ -1,161 +1,161 @@
 [
   {
     "title": "What is a data type",
-    "instruction": "Think about a moving truck.\n\nYou would not put liquid in a cardboard box. You would not put a piano in a plastic bag. Different things need different containers.\n\nData works the same way. Text needs one kind of container. A whole number needs another. A yes/no answer needs another.\n\nIn Go, these containers are called data types. Every variable has one.\n\nRun this and see three different types in action.",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tname := \"Alex\"\n\tage := 25\n\tactive := true\n\tfmt.Println(name)\n\tfmt.Println(age)\n\tfmt.Println(active)\n}",
-    "expectedOutput": ["Alex", "25", "true"],
-    "successMessage": "Three variables, three types. Each one holds a different kind of data."
+    "instruction": "Think about a library.\n\nBooks are organized by section — fiction, non-fiction, reference. Each section serves a different purpose. You would not put a cookbook in the history aisle any more than you would put a DVD in the returns slot.\n\nData works the same way. A book title needs one kind of container. The number of copies needs another. Whether a book is checked out needs another.\n\nIn Go, these containers are called data types. Every variable has one.\n\nRun this and see three different types in action.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\ttitle := \"The Great Gatsby\"\n\tcopies := 12\n\tavailable := true\n\tfmt.Println(title)\n\tfmt.Println(copies)\n\tfmt.Println(available)\n}",
+    "expectedOutput": ["The Great Gatsby", "12", "true"],
+    "successMessage": "Three variables, three types. Each one holds a different kind of data — just like different shelves hold different kinds of books."
   },
   {
     "title": "string — text",
-    "instruction": "A `string` holds text. Any text. A single letter, a word, a sentence, an email address.\n\nYou always wrap it in double quotes. That is how Go knows it is text and not code.\n\nCreate a variable called `email` with any email address as a string. Then print it.",
-    "hint": "email := \"you@example.com\"  — text always goes inside double quotes.",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\t// TODO: create a string variable called email\n\t// TODO: print it\n}",
+    "instruction": "A `string` holds text. Any text. A book title, an author's name, an ISBN number stored as text, a genre description.\n\nYou always wrap it in double quotes. That is how Go knows it is text and not code.\n\nCreate a variable called `bookTitle` with any book title as a string. Then print it.",
+    "hint": "bookTitle := \"The Hobbit\"  — text always goes inside double quotes.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\t// TODO: create a string variable called bookTitle\n\t// TODO: print it\n}",
     "expectedOutput": [],
     "codeChecks": [
-      { "pattern": "email\\s*:=\\s*\"[^\"]+\"", "required": true, "message": "Create a string variable: email := \"you@example.com\"" },
-      { "pattern": "Println\\(email\\)", "required": true, "message": "Print it: fmt.Println(email)" },
+      { "pattern": "bookTitle\\s*:=\\s*\"[^\"]+\"", "required": true, "message": "Create a string variable: bookTitle := \"The Hobbit\"" },
+      { "pattern": "Println\\(bookTitle\\)", "required": true, "message": "Print it: fmt.Println(bookTitle)" },
       { "pattern": "TODO", "required": false, "message": "Replace the TODO lines with actual code." }
     ],
-    "successMessage": "Strings are the most common type you will use. Any text, always in double quotes."
+    "successMessage": "Strings are the most common type you will use. Any text — book titles, author names, reviews — always in double quotes."
   },
   {
     "title": "int — whole numbers",
-    "instruction": "`int` holds whole numbers. No decimal point. Ages, counts, scores, years.\n\nWhen you just write a plain number without a decimal, Go gives it the type `int` by default.\n\n`int` adjusts to the computer it runs on — 64-bit on modern machines, 32-bit on older ones. For most programs, `int` is all you need.\n\nCreate a variable called `year` with the current year. Print it.",
-    "hint": "year := 2025  — no quotes, no decimal point.",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\t// TODO: create an int variable called year\n\t// TODO: print it\n}",
+    "instruction": "`int` holds whole numbers. No decimal point. ISBN counts, page numbers, publication years, number of copies on the shelf.\n\nWhen you just write a plain number without a decimal, Go gives it the type `int` by default.\n\n`int` adjusts to the computer it runs on — 64-bit on modern machines, 32-bit on older ones. For most programs, `int` is all you need.\n\nCreate a variable called `totalCopies` with the number 42. Print it.",
+    "hint": "totalCopies := 42  — no quotes, no decimal point.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\t// TODO: create an int variable called totalCopies\n\t// TODO: print it\n}",
     "expectedOutput": [],
     "codeChecks": [
-      { "pattern": "year\\s*:=\\s*\\d+", "required": true, "message": "Create an int variable: year := 2025" },
-      { "pattern": "Println\\(year\\)", "required": true, "message": "Print it: fmt.Println(year)" },
+      { "pattern": "totalCopies\\s*:=\\s*\\d+", "required": true, "message": "Create an int variable: totalCopies := 42" },
+      { "pattern": "Println\\(totalCopies\\)", "required": true, "message": "Print it: fmt.Println(totalCopies)" },
       { "pattern": "TODO", "required": false, "message": "Replace the TODO lines with actual code." }
     ],
-    "successMessage": "int is the default number type. It covers most use cases."
+    "successMessage": "int is the default number type. It covers most use cases — like tracking copies on the shelf."
   },
   {
     "title": "int8, int16, int32, int64 — sized integers",
     "instruction": "Sometimes you need to control exactly how much memory a number uses. That is what sized integers are for.\n\nThe number after `int` is how many bits it uses — and bits determine the range:\n\n- `int8`  — 8 bits  — range: -128 to 127\n- `int16` — 16 bits — range: -32,768 to 32,767\n- `int32` — 32 bits — range: -2 billion to 2 billion\n- `int64` — 64 bits — range: very very large numbers\n\nSmaller types use less memory. Larger types hold bigger numbers. You pick based on what your data needs.\n\nRun this to see them all.",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tvar small  int8  = 100\n\tvar medium int16 = 30000\n\tvar large  int32 = 2000000000\n\tvar huge   int64 = 9000000000000\n\tfmt.Println(small)\n\tfmt.Println(medium)\n\tfmt.Println(large)\n\tfmt.Println(huge)\n}",
-    "expectedOutput": ["100", "30000", "2000000000", "9000000000000"],
-    "successMessage": "Same idea as int but with a specific size. Use the smallest one that fits your data."
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tvar shelfCount   int8  = 20\n\tvar sectionCount int16 = 450\n\tvar patronCount  int32 = 1500000\n\tvar totalBooks   int64 = 9000000000\n\tfmt.Println(shelfCount)\n\tfmt.Println(sectionCount)\n\tfmt.Println(patronCount)\n\tfmt.Println(totalBooks)\n}",
+    "expectedOutput": ["20", "450", "1500000", "9000000000"],
+    "successMessage": "Same idea as int but with a specific size. Use the smallest one that fits your data — just like using the right shelf for the right book."
   },
   {
     "title": "uint — unsigned integers",
-    "instruction": "Regular `int` can hold negative numbers. But sometimes your value can never be negative — a file size, a pixel count, an ID number.\n\nFor those, use `uint` (unsigned integer). It only holds zero and positive numbers, which means it can hold twice the positive range.\n\n- `uint8`  — 0 to 255\n- `uint16` — 0 to 65,535\n- `uint32` — 0 to 4 billion\n- `uint64` — 0 to very very large\n\nAdd a `var` declaration for `pixelCount` as `uint32` with the value `1920`, then print it.",
-    "hint": "var pixelCount uint32 = 1920",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tvar fileSize uint64 = 5000000\n\tfmt.Println(fileSize)\n\t// TODO: add pixelCount as uint32 with value 1920\n\t// TODO: print pixelCount\n}",
-    "expectedOutput": ["5000000", "1920"],
+    "instruction": "Regular `int` can hold negative numbers. But sometimes your value can never be negative — a book's page count, the number of patrons, a library card ID.\n\nFor those, use `uint` (unsigned integer). It only holds zero and positive numbers, which means it can hold twice the positive range.\n\n- `uint8`  — 0 to 255\n- `uint16` — 0 to 65,535\n- `uint32` — 0 to 4 billion\n- `uint64` — 0 to very very large\n\nAdd a `var` declaration for `pageCount` as `uint16` with the value `384`, then print it.",
+    "hint": "var pageCount uint16 = 384",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tvar libraryID uint64 = 550000000\n\tfmt.Println(libraryID)\n\t// TODO: add pageCount as uint16 with value 384\n\t// TODO: print pageCount\n}",
+    "expectedOutput": ["550000000", "384"],
     "codeChecks": [
-      { "pattern": "var\\s+pixelCount\\s+uint32\\s*=\\s*1920", "required": true, "message": "Declare pixelCount as uint32: var pixelCount uint32 = 1920" },
-      { "pattern": "Println\\(pixelCount\\)", "required": true, "message": "Print it: fmt.Println(pixelCount)" },
+      { "pattern": "var\\s+pageCount\\s+uint16\\s*=\\s*384", "required": true, "message": "Declare pageCount as uint16: var pageCount uint16 = 384" },
+      { "pattern": "Println\\(pageCount\\)", "required": true, "message": "Print it: fmt.Println(pageCount)" },
       { "pattern": "TODO", "required": false, "message": "Replace the TODO lines with actual code." }
     ],
-    "successMessage": "uint is int without the negative side. Use it when your value can never go below zero."
+    "successMessage": "uint is int without the negative side. Use it when your value can never go below zero — like a book's page count."
   },
   {
     "title": "float32 and float64 — decimal numbers",
-    "instruction": "When a whole number is not precise enough, you need a float.\n\n- `float32` — 32 bits, about 7 decimal digits of precision\n- `float64` — 64 bits, about 15 decimal digits of precision\n\nAlways use `float64` unless you have a specific reason not to. It is more precise and it is what Go uses by default when it sees a decimal number.\n\nCreate a `temperature` variable as `float32` with value `36.6`, and a `distance` variable as `float64` with value `12345.6789`. Print both.",
-    "hint": "var temperature float32 = 36.6  and  var distance float64 = 12345.6789",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\t// TODO: create temperature as float32 = 36.6\n\t// TODO: create distance as float64 = 12345.6789\n\t// TODO: print both\n}",
+    "instruction": "When a whole number is not precise enough, you need a float.\n\n- `float32` — 32 bits, about 7 decimal digits of precision\n- `float64` — 64 bits, about 15 decimal digits of precision\n\nAlways use `float64` unless you have a specific reason not to. It is more precise and it is what Go uses by default when it sees a decimal number.\n\nCreate a `bookPrice` variable as `float32` with value `14.99`, and a `lateFee` variable as `float64` with value `0.25`. Print both.",
+    "hint": "var bookPrice float32 = 14.99  and  var lateFee float64 = 0.25",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\t// TODO: create bookPrice as float32 = 14.99\n\t// TODO: create lateFee as float64 = 0.25\n\t// TODO: print both\n}",
     "expectedOutput": [],
     "codeChecks": [
-      { "pattern": "var\\s+temperature\\s+float32", "required": true, "message": "Declare temperature as float32: var temperature float32 = 36.6" },
-      { "pattern": "var\\s+distance\\s+float64", "required": true, "message": "Declare distance as float64: var distance float64 = 12345.6789" },
-      { "pattern": "Println\\(temperature\\)", "required": true, "message": "Print temperature: fmt.Println(temperature)" },
-      { "pattern": "Println\\(distance\\)", "required": true, "message": "Print distance: fmt.Println(distance)" },
+      { "pattern": "var\\s+bookPrice\\s+float32", "required": true, "message": "Declare bookPrice as float32: var bookPrice float32 = 14.99" },
+      { "pattern": "var\\s+lateFee\\s+float64", "required": true, "message": "Declare lateFee as float64: var lateFee float64 = 0.25" },
+      { "pattern": "Println\\(bookPrice\\)", "required": true, "message": "Print bookPrice: fmt.Println(bookPrice)" },
+      { "pattern": "Println\\(lateFee\\)", "required": true, "message": "Print lateFee: fmt.Println(lateFee)" },
       { "pattern": "TODO", "required": false, "message": "Replace the TODO lines with actual code." }
     ],
-    "successMessage": "float64 is the one you will use almost every time. More precision, same effort."
+    "successMessage": "float64 is the one you will use almost every time. More precision, same effort — essential for tracking book prices and fines."
   },
   {
     "title": "bool — true or false",
-    "instruction": "A `bool` holds exactly one of two values: `true` or `false`.\n\nThat is it. Nothing else fits.\n\nNo quotes. `true` and `false` are keywords in Go — not text, not numbers.\n\nCreate two bool variables: `isOnline` set to `true`, and `isPremium` set to `false`. Print both.",
-    "hint": "isOnline := true  and  isPremium := false  — no quotes around true or false.",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\t// TODO: create isOnline (true) and isPremium (false)\n\t// TODO: print both\n}",
+    "instruction": "A `bool` holds exactly one of two values: `true` or `false`.\n\nThat is it. Nothing else fits.\n\nNo quotes. `true` and `false` are keywords in Go — not text, not numbers.\n\nCreate two bool variables: `isCheckedOut` set to `true`, and `isReferenceOnly` set to `false`. Print both.",
+    "hint": "isCheckedOut := true  and  isReferenceOnly := false  — no quotes around true or false.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\t// TODO: create isCheckedOut (true) and isReferenceOnly (false)\n\t// TODO: print both\n}",
     "expectedOutput": ["true", "false"],
     "codeChecks": [
-      { "pattern": "isOnline\\s*:=\\s*true", "required": true, "message": "Create isOnline: isOnline := true  (no quotes)" },
-      { "pattern": "isPremium\\s*:=\\s*false", "required": true, "message": "Create isPremium: isPremium := false  (no quotes)" },
-      { "pattern": "Println\\(isOnline\\)", "required": true, "message": "Print isOnline: fmt.Println(isOnline)" },
-      { "pattern": "Println\\(isPremium\\)", "required": true, "message": "Print isPremium: fmt.Println(isPremium)" },
+      { "pattern": "isCheckedOut\\s*:=\\s*true", "required": true, "message": "Create isCheckedOut: isCheckedOut := true  (no quotes)" },
+      { "pattern": "isReferenceOnly\\s*:=\\s*false", "required": true, "message": "Create isReferenceOnly: isReferenceOnly := false  (no quotes)" },
+      { "pattern": "Println\\(isCheckedOut\\)", "required": true, "message": "Print isCheckedOut: fmt.Println(isCheckedOut)" },
+      { "pattern": "Println\\(isReferenceOnly\\)", "required": true, "message": "Print isReferenceOnly: fmt.Println(isReferenceOnly)" },
       { "pattern": "TODO", "required": false, "message": "Replace the TODO lines with actual code." }
     ],
-    "successMessage": "Bools power every decision in your program. Every if, every condition, every check — it all comes down to true or false."
+    "successMessage": "Bools power every decision in your program. Is the book available? Is the patron active? Every if, every condition — it all comes down to true or false."
   },
   {
     "title": "byte — a single character as a number",
-    "instruction": "`byte` is an alias for `uint8`. It holds a number from 0 to 255.\n\nIts main job is representing a single character. Every character on your keyboard has a number assigned to it — that system is called ASCII.\n\n- `'A'` = 65\n- `'a'` = 97\n- `'0'` = 48\n\nNotice single quotes for a character, not double quotes.\n\nRun this and see what number the letter 'G' maps to.",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tvar letter byte = 'G'\n\tfmt.Println(letter)\n}",
-    "expectedOutput": ["71"],
-    "successMessage": "'G' is 71 in ASCII. Every character your computer shows on screen is secretly a number."
+    "instruction": "`byte` is an alias for `uint8`. It holds a number from 0 to 255.\n\nIts main job is representing a single character. Every character on your keyboard has a number assigned to it — that system is called ASCII.\n\n- `'A'` = 65\n- `'a'` = 97\n- `'0'` = 48\n\nNotice single quotes for a character, not double quotes.\n\nRun this and see what number the letter 'L' (for Library) maps to.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tvar letter byte = 'L'\n\tfmt.Println(letter)\n}",
+    "expectedOutput": ["76"],
+    "successMessage": "'L' is 76 in ASCII. Every character your computer shows on screen is secretly a number — even the ones on a library catalogue."
   },
   {
     "title": "rune — a Unicode character",
-    "instruction": "`rune` is an alias for `int32`. It holds a single Unicode character.\n\nThe difference from `byte`:\n- `byte` handles ASCII — basic English letters and symbols (0-255)\n- `rune` handles Unicode — every character in every language on earth (over 1 million possible values)\n\nIf your program will ever work with non-English text — Arabic, Chinese, emoji — you need `rune`.\n\nRun this and see the Unicode value of the character.",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tvar letter rune = '\\u0041'\n\tvar emoji  rune = '\\U0001F600'\n\tfmt.Println(letter)\n\tfmt.Println(emoji)\n}",
-    "expectedOutput": ["65", "128512"],
-    "successMessage": "rune handles the entire world's writing systems. byte handles the basics. Now you know the difference."
+    "instruction": "`rune` is an alias for `int32`. It holds a single Unicode character.\n\nThe difference from `byte`:\n- `byte` handles ASCII — basic English letters and symbols (0-255)\n- `rune` handles Unicode — every character in every language on earth (over 1 million possible values)\n\nIf your library catalogue will ever have books in non-English languages — Arabic, Chinese, Hebrew, emoji in reviews — you need `rune`.\n\nRun this and see the Unicode value of the character.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tvar letter rune = '\\u0041'\n\tvar emoji  rune = '\\U0001F4DA'\n\tfmt.Println(letter)\n\tfmt.Println(emoji)\n}",
+    "expectedOutput": ["65", "128202"],
+    "successMessage": "rune handles the entire world's writing systems — and emoji too (📚 is 128202). byte handles the basics. Now you know the difference."
   },
   {
     "title": "Type inference — Go figures it out",
-    "instruction": "You have been using `:=` without ever writing the type name. That is because Go looks at the value and figures out the type on its own.\n\nThis is called type inference.\n\n`name := \"Alex\"` → Go sees quotes → `string`\n`age := 25` → Go sees a whole number → `int`\n`price := 4.99` → Go sees a decimal → `float64`\n`active := true` → Go sees true/false → `bool`\n\nYou can print the actual type of any variable using `%T` in `fmt.Printf`.\n\nRun this and see the types Go assigned.",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tname   := \"Alex\"\n\tage    := 25\n\tprice  := 4.99\n\tactive := true\n\tfmt.Printf(\"%T\\n\", name)\n\tfmt.Printf(\"%T\\n\", age)\n\tfmt.Printf(\"%T\\n\", price)\n\tfmt.Printf(\"%T\\n\", active)\n}",
+    "instruction": "You have been using `:=` without ever writing the type name. That is because Go looks at the value and figures out the type on its own.\n\nThis is called type inference.\n\n`title := \"The Great Gatsby\"` → Go sees quotes → `string`\n`copies := 12` → Go sees a whole number → `int`\n`price := 14.99` → Go sees a decimal → `float64`\n`available := true` → Go sees true/false → `bool`\n\nYou can print the actual type of any variable using `%T` in `fmt.Printf`.\n\nRun this and see the types Go assigned.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\ttitle     := \"The Great Gatsby\"\n\tcopies    := 12\n\tprice     := 14.99\n\tavailable := true\n\tfmt.Printf(\"%T\\n\", title)\n\tfmt.Printf(\"%T\\n\", copies)\n\tfmt.Printf(\"%T\\n\", price)\n\tfmt.Printf(\"%T\\n\", available)\n}",
     "expectedOutput": ["string", "int", "float64", "bool"],
     "successMessage": "Go reads your value and picks the right type automatically. You only need to be explicit when you want a specific sized type."
   },
   {
     "title": "\"42\" is not 42",
-    "instruction": "This is a trap that catches a lot of beginners.\n\n`42` is a number. You can do math with it.\n`\"42\"` is a string — the characters 4 and 2. You cannot do math with it.\n\nThey look similar but Go treats them as completely different things.\n\nThis program has a bug because of this exact mistake. Fix it so both numbers add up correctly.",
+    "instruction": "This is a trap that catches a lot of beginners.\n\n`42` is a number. You can do math with it.\n`\"42\"` is a string — the characters 4 and 2. You cannot do math with it.\n\nThey look similar but Go treats them as completely different things.\n\nThis program is tracking how many books a patron has checked out. There is a bug because of this exact mistake. Fix it so both numbers add up correctly.",
     "hint": "Remove the quotes around 42 on the second line. A number should never have quotes around it.",
     "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\ta := 10\n\tb := \"42\"\n\tfmt.Println(a + b)\n}",
     "expectedOutput": ["52"],
     "codeChecks": [
       { "pattern": "b\\s*:=\\s*\"42\"", "required": false, "message": "Remove the quotes from 42. It should be a number: b := 42" }
     ],
-    "successMessage": "Quotes mean text. No quotes means number. Never mix them."
+    "successMessage": "Quotes mean text. No quotes means number. Never mix them — your library's checkout counts depend on getting this right."
   },
   {
     "title": "Type conversion — changing from one type to another",
-    "instruction": "Go will not automatically mix types. If you want to use an `int` where a `float64` is needed, you have to convert it yourself.\n\nThe syntax is simple: wrap the value with the type name.\n\n`float64(myInt)` converts an int to float64\n`int(myFloat)` converts a float64 to int (drops the decimal)\n`int64(myInt)` converts int to int64\n\nThe code below tries to add an `int` and a `float64` directly. Fix it by converting `score` to `float64` before the addition.",
-    "hint": "Change the Println line to: fmt.Println(float64(score) + bonus)",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tscore := 95\n\tbonus := 4.5\n\tfmt.Println(score + bonus)\n}",
-    "expectedOutput": ["99.5"],
+    "instruction": "Go will not automatically mix types. If you want to use an `int` where a `float64` is needed, you have to convert it yourself.\n\nThe syntax is simple: wrap the value with the type name.\n\n`float64(myInt)` converts an int to float64\n`int(myFloat)` converts a float64 to int (drops the decimal)\n`int64(myInt)` converts int to int64\n\nThe code below tries to add an `int` (number of books checked out) and a `float64` (late fee total) directly. Fix it by converting `booksOut` to `float64` before the addition.",
+    "hint": "Change the Println line to: fmt.Println(float64(booksOut) + lateFee)",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tbooksOut := 3\n\tlateFee  := 1.50\n\tfmt.Println(booksOut + lateFee)\n}",
+    "expectedOutput": ["4.5"],
     "codeChecks": [
-      { "pattern": "float64\\(score\\)", "required": true, "message": "Convert score to float64 before adding: float64(score) + bonus" }
+      { "pattern": "float64\\(booksOut\\)", "required": true, "message": "Convert booksOut to float64 before adding: float64(booksOut) + lateFee" }
     ],
-    "successMessage": "Go never converts types silently. You are always in control of when and how a conversion happens."
+    "successMessage": "Go never converts types silently. You are always in control of when and how a conversion happens — like converting a count to a float for fee calculations."
   },
   {
     "title": "Types do not change",
     "instruction": "Once a variable has a type, it keeps that type forever.\n\nYou cannot store a string in an int variable. You cannot store a float in a bool variable. Go will refuse and give you an error.\n\nThis program tries to do exactly that. Read the error, understand why, then fix it by changing the second assignment to a valid int value.",
-    "hint": "score is an int. You cannot assign \"one hundred\" (a string) to it. Change it to the number 100.",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tscore := 95\n\tfmt.Println(score)\n\tscore = \"one hundred\"\n\tfmt.Println(score)\n}",
-    "expectedOutput": ["95", "100"],
+    "hint": "availableCopies is an int. You cannot assign \"five\" (a string) to it. Change it to the number 5.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tavailableCopies := 10\n\tfmt.Println(availableCopies)\n\tavailableCopies = \"five\"\n\tfmt.Println(availableCopies)\n}",
+    "expectedOutput": ["10", "5"],
     "codeChecks": [
-      { "pattern": "score\\s*=\\s*\"one hundred\"", "required": false, "message": "score is an int. Replace \"one hundred\" with the number 100." }
+      { "pattern": "availableCopies\\s*=\\s*\"five\"", "required": false, "message": "availableCopies is an int. Replace \"five\" with the number 5." }
     ],
-    "successMessage": "Types are permanent. That rigidness is actually a feature — it catches a whole class of bugs before your program ever runs."
+    "successMessage": "Types are permanent. That rigidness is actually a feature — it catches a whole class of bugs before your program ever runs, like putting a book on the wrong shelf."
   },
   {
     "title": "Use six types in one program",
-    "instruction": "No starter code this time.\n\nCreate six variables using six different types:\n- `username` — string\n- `level` — int\n- `score` — int64\n- `accuracy` — float64\n- `isActive` — bool\n- `grade` — byte (set it to `'A'`)\n\nPrint all six.",
-    "hint": "username := \"...\", level := 1, var score int64 = 1000, accuracy := 98.5, isActive := true, var grade byte = 'A'",
+    "instruction": "No starter code this time.\n\nCreate six variables using six different types — all about the library:\n- `sectionName` — string (e.g., \"Fiction\")\n- `totalShelves` — int (e.g., 15)\n- `members` — int64 (e.g., 2500)\n- `lateFeeRate` — float64 (e.g., 0.50)\n- `isOpen` — bool (e.g., true)\n- `sectionCode` — byte (set it to `'F'` for Fiction)\n\nPrint all six.",
+    "hint": "sectionName := \"Fiction\", totalShelves := 15, var members int64 = 2500, lateFeeRate := 0.50, isOpen := true, var sectionCode byte = 'F'",
     "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\t// Build your variables here\n}",
     "expectedOutput": [],
     "codeChecks": [
-      { "pattern": "username\\s*:=\\s*\"[^\"]+\"", "required": true, "message": "Create username as a string" },
-      { "pattern": "level\\s*:=\\s*\\d+", "required": true, "message": "Create level as an int" },
-      { "pattern": "int64", "required": true, "message": "Create score as int64 using the var keyword" },
-      { "pattern": "accuracy\\s*:=\\s*\\d+\\.\\d+", "required": true, "message": "Create accuracy as a float64 with a decimal value" },
-      { "pattern": "isActive\\s*:=\\s*(true|false)", "required": true, "message": "Create isActive as a bool" },
-      { "pattern": "byte\\s*=\\s*'[A-Z]'", "required": true, "message": "Create grade as a byte set to a letter like 'A'" },
-      { "pattern": "Println\\(username\\)", "required": true, "message": "Print username" },
-      { "pattern": "Println\\(level\\)", "required": true, "message": "Print level" },
-      { "pattern": "Println\\(score\\)", "required": true, "message": "Print score" },
-      { "pattern": "Println\\(accuracy\\)", "required": true, "message": "Print accuracy" },
-      { "pattern": "Println\\(isActive\\)", "required": true, "message": "Print isActive" },
-      { "pattern": "Println\\(grade\\)", "required": true, "message": "Print grade" }
+      { "pattern": "sectionName\\s*:=\\s*\"[^\"]+\"", "required": true, "message": "Create sectionName as a string" },
+      { "pattern": "totalShelves\\s*:=\\s*\\d+", "required": true, "message": "Create totalShelves as an int" },
+      { "pattern": "int64", "required": true, "message": "Create members as int64 using the var keyword" },
+      { "pattern": "lateFeeRate\\s*:=\\s*\\d+\\.\\d+", "required": true, "message": "Create lateFeeRate as a float64 with a decimal value" },
+      { "pattern": "isOpen\\s*:=\\s*(true|false)", "required": true, "message": "Create isOpen as a bool" },
+      { "pattern": "byte\\s*=\\s*'[A-Z]'", "required": true, "message": "Create sectionCode as a byte set to a letter like 'F'" },
+      { "pattern": "Println\\(sectionName\\)", "required": true, "message": "Print sectionName" },
+      { "pattern": "Println\\(totalShelves\\)", "required": true, "message": "Print totalShelves" },
+      { "pattern": "Println\\(members\\)", "required": true, "message": "Print members" },
+      { "pattern": "Println\\(lateFeeRate\\)", "required": true, "message": "Print lateFeeRate" },
+      { "pattern": "Println\\(isOpen\\)", "required": true, "message": "Print isOpen" },
+      { "pattern": "Println\\(sectionCode\\)", "required": true, "message": "Print sectionCode" }
     ],
-    "successMessage": "Six types, one program. You now know every basic data type in Go."
+    "successMessage": "Six types, one program. You now know every basic data type in Go — and how to track a whole library with them."
   }
 ]

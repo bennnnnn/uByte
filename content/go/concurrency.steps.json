@@ -1,33 +1,33 @@
 [
   {
     "title": "What is a goroutine",
-    "instruction": "Imagine you're cooking dinner. You put rice on the stove, then chop vegetables while it cooks. You're not cooking faster — you're using waiting time productively.\n\nThat's concurrency. A goroutine is a lightweight task Go runs alongside your main code. Start one with the `go` keyword.\n\nRun this — the letters and numbers print interleaved because they run at the same time.",
-    "starter": "package main\n\nimport (\n\t\"fmt\"\n\t\"time\"\n)\n\nfunc printNumbers() {\n\tfor i := 1; i <= 3; i++ {\n\t\tfmt.Println(\"Number:\", i)\n\t\ttime.Sleep(10 * time.Millisecond)\n\t}\n}\n\nfunc printLetters() {\n\tfor _, c := range []string{\"A\", \"B\", \"C\"} {\n\t\tfmt.Println(\"Letter:\", c)\n\t\ttime.Sleep(10 * time.Millisecond)\n\t}\n}\n\nfunc main() {\n\tgo printNumbers()\n\tgo printLetters()\n\ttime.Sleep(100 * time.Millisecond)\n\tfmt.Println(\"Done\")\n}",
+    "instruction": "Imagine a library with one librarian who can check out books and reshelve at the same time — while a patron is looking up a title, the librarian is already helping the next person. That's concurrency.\n\nA goroutine is a lightweight task Go runs alongside your main code. Start one with the `go` keyword.\n\nRun this — the search queries and patron names print interleaved because they run at the same time.",
+    "starter": "package main\n\nimport (\n\t\"fmt\"\n\t\"time\"\n)\n\nfunc searchBooks() {\n\tfor i := 1; i <= 3; i++ {\n\t\tfmt.Println(\"Searching book:\", i)\n\t\ttime.Sleep(10 * time.Millisecond)\n\t}\n}\n\nfunc checkInPatrons() {\n\tfor _, p := range []string{\"Alice\", \"Bob\", \"Carol\"} {\n\t\tfmt.Println(\"Patron:\", p)\n\t\ttime.Sleep(10 * time.Millisecond)\n\t}\n}\n\nfunc main() {\n\tgo searchBooks()\n\tgo checkInPatrons()\n\ttime.Sleep(100 * time.Millisecond)\n\tfmt.Println(\"Library closed\")\n}",
     "expectedOutput": [
-      "Done"
+      "Library closed"
     ],
-    "successMessage": "Letters and numbers mixed together — two functions running simultaneously. The `go` keyword is all it took. Goroutines are incredibly cheap — you can run millions of them."
+    "successMessage": "Searches and patrons mixed together — two functions running simultaneously. The `go` keyword is all it took. Goroutines are incredibly cheap — you can run millions of them."
   },
   {
     "title": "Channels — communicate between goroutines",
-    "instruction": "A channel is a pipe between goroutines. One goroutine sends a value, another receives it.\n\n```\nch := make(chan int)   // create a channel\nch <- 42              // send 42 into the channel\nvalue := <-ch         // receive from the channel\n```\n\nSending and receiving block until both sides are ready — a built-in synchronisation mechanism.\n\nRun this. The goroutine sends a result back through the channel. Main receives and prints it.",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc square(n int, ch chan int) {\n\tch <- n * n\n}\n\nfunc main() {\n\tch := make(chan int)\n\tgo square(7, ch)\n\tresult := <-ch\n\tfmt.Println(\"7 squared:\", result)\n}",
+    "instruction": "A channel is a pipe between goroutines. One goroutine sends a result, another receives it. Think of it as a book-drop slot between two library desks.\n\n```\nch := make(chan string)   // create a channel\nch <- \"The Go Programming Language\"  // send a title into the channel\nbook := <-ch              // receive from the channel\n```\n\nSending and receiving block until both sides are ready — a built-in synchronisation mechanism.\n\nRun this. A goroutine looks up a book and sends the result back through the channel. Main receives and prints it.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc findBook(isbn int, ch chan string) {\n\tch <- fmt.Sprintf(\"Found book with ISBN %d\", isbn)\n}\n\nfunc main() {\n\tch := make(chan string)\n\tgo findBook(978014, ch)\n\tresult := <-ch\n\tfmt.Println(result)\n}",
     "expectedOutput": [
-      "7 squared: 49"
+      "Found book with ISBN 978014"
     ],
-    "successMessage": "The goroutine computed 7² and sent it back through the channel. Main blocked on <-ch until the result arrived. No shared variables, no locks — just a channel."
+    "successMessage": "The goroutine looked up the ISBN and sent the result back through the channel. Main blocked on <-ch until the result arrived. No shared variables, no locks — just a channel."
   },
   {
     "title": "Send and receive multiple values",
-    "instruction": "A channel can send as many values as you need. The receiver collects them in order.\n\nStart three goroutines, each computing a square and sending the result back. Receive all three results and print them.\n\nAdd a third goroutine that sends `square(9, ch)` and receive its result.",
-    "hint": "go square(9, ch)  then result3 := <-ch  fmt.Println(\"9 squared:\", result3)",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc square(n int, ch chan int) {\n\tch <- n * n\n}\n\nfunc main() {\n\tch := make(chan int)\n\n\tgo square(3, ch)\n\tgo square(6, ch)\n\t// TODO: add go square(9, ch)\n\n\tresult1 := <-ch\n\tresult2 := <-ch\n\t// TODO: receive third result and print \"9 squared: X\"\n\n\tfmt.Println(\"3 squared:\", result1)\n\tfmt.Println(\"6 squared:\", result2)\n}",
+    "instruction": "A channel can send as many search results as you need. The receiver collects them in order.\n\nStart three goroutines, each finding a book by ISBN and sending its title back. Receive all three results and print them.\n\nAdd a third goroutine that looks up ISBN 978014 and receives its result.",
+    "hint": "go findBook(978014, ch)  then result3 := <-ch  fmt.Println(result3)",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc findBook(isbn int, ch chan string) {\n\tch <- fmt.Sprintf(\"Book with ISBN %d\", isbn)\n}\n\nfunc main() {\n\tch := make(chan string)\n\n\tgo findBook(978013, ch)\n\tgo findBook(978149, ch)\n\t// TODO: add go findBook(978014, ch)\n\n\tresult1 := <-ch\n\tresult2 := <-ch\n\t// TODO: receive third result and print it\n\n\tfmt.Println(result1)\n\tfmt.Println(result2)\n}",
     "expectedOutput": [],
     "codeChecks": [
       {
-        "pattern": "go\\s+square\\(9,\\s*ch\\)",
+        "pattern": "go\\s+findBook\\(978014,\\s*ch\\)",
         "required": true,
-        "message": "Add: go square(9, ch)"
+        "message": "Add: go findBook(978014, ch)"
       },
       {
         "pattern": "<-ch",
@@ -35,9 +35,9 @@
         "message": "Receive the third result from the channel."
       },
       {
-        "pattern": "9 squared:",
+        "pattern": "978014",
         "required": true,
-        "message": "Print \"9 squared:\" and the result."
+        "message": "Print the third book result containing ISBN 978014."
       },
       {
         "pattern": "TODO",
@@ -49,101 +49,101 @@
   },
   {
     "title": "WaitGroup — wait for goroutines to finish",
-    "instruction": "`sync.WaitGroup` lets you wait for a group of goroutines to complete.\n\n```\nvar wg sync.WaitGroup\nwg.Add(1)        // one goroutine to wait for\ngo func() {\n    defer wg.Done()  // signal when done\n    // ...\n}()\nwg.Wait()        // block until all Done() are called\n```\n\nRun this. Three goroutines each process a job. `wg.Wait()` blocks until all three call `wg.Done()`.",
-    "starter": "package main\n\nimport (\n\t\"fmt\"\n\t\"sync\"\n)\n\nfunc processJob(id int, wg *sync.WaitGroup) {\n\tdefer wg.Done()\n\tfmt.Printf(\"Job %d done\\n\", id)\n}\n\nfunc main() {\n\tvar wg sync.WaitGroup\n\n\tfor i := 1; i <= 3; i++ {\n\t\twg.Add(1)\n\t\tgo processJob(i, &wg)\n\t}\n\n\twg.Wait()\n\tfmt.Println(\"All jobs complete\")\n}",
+    "instruction": "`sync.WaitGroup` lets you wait for a group of goroutines to complete. Imagine telling a group of library volunteers, \"Don't close the library until everyone finishes reshelving.\"\n\n```\nvar wg sync.WaitGroup\nwg.Add(1)        // one volunteer to wait for\ngo func() {\n    defer wg.Done()  // signal when done\n    // ...\n}()\nwg.Wait()        // block until all Done() are called\n```\n\nRun this. Three volunteers each process a shelf section. `wg.Wait()` blocks until all three call `wg.Done()`.",
+    "starter": "package main\n\nimport (\n\t\"fmt\"\n\t\"sync\"\n)\n\nfunc reshelf(section string, wg *sync.WaitGroup) {\n\tdefer wg.Done()\n\tfmt.Printf(\"Section %s reshelved\\n\", section)\n}\n\nfunc main() {\n\tvar wg sync.WaitGroup\n\n\tfor _, s := range []string{\"A\", \"B\", \"C\"} {\n\t\twg.Add(1)\n\t\tgo reshelf(s, &wg)\n\t}\n\n\twg.Wait()\n\tfmt.Println(\"All sections complete — library ready\")\n}",
     "expectedOutput": [
-      "All jobs complete"
+      "All sections complete — library ready"
     ],
-    "successMessage": "wg.Wait() blocked until all three goroutines called wg.Done(). The \"All jobs complete\" line printed last — guaranteed. WaitGroup is the standard way to coordinate a group of goroutines."
+    "successMessage": "wg.Wait() blocked until all three goroutines called wg.Done(). The \"All sections complete\" line printed last — guaranteed. WaitGroup is the standard way to coordinate a group of goroutines."
   },
   {
     "title": "Buffered channels",
-    "instruction": "A regular channel blocks until the receiver is ready. A buffered channel has a queue — you can send without blocking until the buffer is full.\n\n`ch := make(chan int, 3)` — buffer of 3. Send up to 3 values before anyone receives.\n\nRun this. Values are sent without a matching receiver because the buffer holds them. Then they are drained one by one.",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tch := make(chan int, 3)\n\n\tch <- 10\n\tch <- 20\n\tch <- 30\n\n\tfmt.Println(<-ch)\n\tfmt.Println(<-ch)\n\tfmt.Println(<-ch)\n}",
+    "instruction": "A regular channel blocks until the receiver is ready. A buffered channel has a queue — you can drop off books without waiting until the shelf is empty.\n\n`ch := make(chan string, 3)` — buffer of 3. You can return up to 3 books before anyone picks them up.\n\nRun this. Three book titles are returned without a matching receiver because the buffer holds them. Then they are collected one by one.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tch := make(chan string, 3)\n\n\tch <- \"The Catcher in the Rye\"\n\tch <- \"1984\"\n\tch <- \"To Kill a Mockingbird\"\n\n\tfmt.Println(<-ch)\n\tfmt.Println(<-ch)\n\tfmt.Println(<-ch)\n}",
     "expectedOutput": [
-      "10",
-      "20",
-      "30"
+      "The Catcher in the Rye",
+      "1984",
+      "To Kill a Mockingbird"
     ],
-    "successMessage": "No goroutines needed — the buffer held all three values. Buffered channels decouple senders from receivers. Use them when you know the maximum number of pending values ahead of time."
+    "successMessage": "No goroutines needed — the buffer held all three books. Buffered channels decouple senders from receivers. Use them when you know the maximum number of pending items ahead of time."
   },
   {
     "title": "Range over a channel",
-    "instruction": "You can loop over a channel with `range` — it receives values until the channel is closed.\n\n`close(ch)` signals that no more values will be sent. The range loop exits automatically.\n\nRun this. The producer sends 5 values and closes the channel. The range loop receives all of them.",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc producer(ch chan int) {\n\tfor i := 1; i <= 5; i++ {\n\t\tch <- i\n\t}\n\tclose(ch)\n}\n\nfunc main() {\n\tch := make(chan int)\n\tgo producer(ch)\n\n\tfor v := range ch {\n\t\tfmt.Println(v)\n\t}\n\tfmt.Println(\"Channel closed, loop done\")\n}",
+    "instruction": "You can loop over a channel with `range` — it receives values until the channel is closed.\n\n`close(ch)` signals that no more search results will be sent. The range loop exits automatically.\n\nRun this. The catalog searcher sends 5 book titles and closes the channel. The range loop receives all of them.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc catalogSearch(ch chan string) {\n\ttitles := []string{\"Dune\", \"Neuromancer\", \"Snow Crash\", \"Hyperion\", \"Foundation\"}\n\tfor _, t := range titles {\n\t\tch <- t\n\t}\n\tclose(ch)\n}\n\nfunc main() {\n\tch := make(chan string)\n\tgo catalogSearch(ch)\n\n\tfor title := range ch {\n\t\tfmt.Println(\"Found:\", title)\n\t}\n\tfmt.Println(\"Catalog search complete\")\n}",
     "expectedOutput": [
-      "1",
-      "2",
-      "3",
-      "4",
-      "5",
-      "Channel closed, loop done"
+      "Found: Dune",
+      "Found: Neuromancer",
+      "Found: Snow Crash",
+      "Found: Hyperion",
+      "Found: Foundation",
+      "Catalog search complete"
     ],
     "successMessage": "range on a channel is clean and safe. The loop exits the moment the channel closes. Always close a channel from the sender side — closing a channel you are receiving from is a bug."
   },
   {
     "title": "select — handle multiple channels",
-    "instruction": "`select` is like a `switch` for channels. It waits for whichever channel is ready first:\n\n```\nselect {\ncase msg := <-ch1:\n    fmt.Println(\"from ch1:\", msg)\ncase msg := <-ch2:\n    fmt.Println(\"from ch2:\", msg)\n}\n```\n\nIf multiple channels are ready simultaneously, Go picks one at random.\n\nRun this. Two goroutines send at different speeds. `select` handles whichever arrives first.",
-    "starter": "package main\n\nimport (\n\t\"fmt\"\n\t\"time\"\n)\n\nfunc main() {\n\tfast := make(chan string)\n\tslow := make(chan string)\n\n\tgo func() {\n\t\ttime.Sleep(10 * time.Millisecond)\n\t\tfast <- \"fast result\"\n\t}()\n\n\tgo func() {\n\t\ttime.Sleep(50 * time.Millisecond)\n\t\tslow <- \"slow result\"\n\t}()\n\n\tfor i := 0; i < 2; i++ {\n\t\tselect {\n\t\tcase msg := <-fast:\n\t\t\tfmt.Println(\"Fast:\", msg)\n\t\tcase msg := <-slow:\n\t\t\tfmt.Println(\"Slow:\", msg)\n\t\t}\n\t}\n}",
+    "instruction": "`select` is like a `switch` for channels. It waits for whichever channel is ready first — like a librarian checking both the return desk and the request desk simultaneously.\n\n```\nselect {\ncase book := <-returnCh:\n    fmt.Println(\"returned:\", book)\ncase request := <-requestCh:\n    fmt.Println(\"requested:\", request)\n}\n```\n\nIf multiple channels are ready simultaneously, Go picks one at random.\n\nRun this. Two goroutines search at different speeds. `select` handles whichever arrives first.",
+    "starter": "package main\n\nimport (\n\t\"fmt\"\n\t\"time\"\n)\n\nfunc main() {\n\tfiction := make(chan string)\n\tnonfiction := make(chan string)\n\n\tgo func() {\n\t\ttime.Sleep(10 * time.Millisecond)\n\t\tfiction <- \"Dune (fiction)\"\n\t}()\n\n\tgo func() {\n\t\ttime.Sleep(50 * time.Millisecond)\n\t\tnonfiction <- \"Sapiens (non-fiction)\"\n\t}()\n\n\tfor i := 0; i < 2; i++ {\n\t\tselect {\n\t\tcase msg := <-fiction:\n\t\t\tfmt.Println(\"Fiction:\", msg)\n\t\tcase msg := <-nonfiction:\n\t\t\tfmt.Println(\"Non-fiction:\", msg)\n\t\t}\n\t}\n}",
     "expectedOutput": [
-      "Fast: fast result",
-      "Slow: slow result"
+      "Fiction: Dune (fiction)",
+      "Non-fiction: Sapiens (non-fiction)"
     ],
-    "successMessage": "Fast arrived first, slow second. select handles whichever channel is ready — no polling, no busy-waiting. This is how Go implements timeouts, cancellations, and fan-in patterns."
+    "successMessage": "Fiction arrived first, non-fiction second. select handles whichever channel is ready — no polling, no busy-waiting. This is how Go implements timeouts, cancellations, and fan-in patterns."
   },
   {
     "title": "select with default — non-blocking",
-    "instruction": "Add a `default` case to `select` to make it non-blocking. If no channel is ready, the default runs immediately.\n\n```\nselect {\ncase msg := <-ch:\n    fmt.Println(msg)\ndefault:\n    fmt.Println(\"nothing ready yet\")\n}\n```\n\nRun this. The channel has nothing yet — the default fires. Then a value is sent and the channel case fires.",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tch := make(chan string, 1)\n\n\tselect {\n\tcase msg := <-ch:\n\t\tfmt.Println(\"Received:\", msg)\n\tdefault:\n\t\tfmt.Println(\"Nothing ready\")\n\t}\n\n\tch <- \"hello\"\n\n\tselect {\n\tcase msg := <-ch:\n\t\tfmt.Println(\"Received:\", msg)\n\tdefault:\n\t\tfmt.Println(\"Nothing ready\")\n\t}\n}",
+    "instruction": "Add a `default` case to `select` to make it non-blocking. If no channel is ready, the default runs immediately — like checking the hold shelf and moving on if it's empty.\n\n```\nselect {\ncase book := <-holdCh:\n    fmt.Println(\"Book on hold:\", book)\ndefault:\n    fmt.Println(\"No holds waiting\")\n}\n```\n\nRun this. The hold shelf is empty at first — the default fires. Then a book is placed on hold and the channel case fires.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tholdCh := make(chan string, 1)\n\n\tselect {\n\tcase book := <-holdCh:\n\t\tfmt.Println(\"On hold:\", book)\n\tdefault:\n\t\tfmt.Println(\"No holds waiting\")\n\t}\n\n\tholdCh <- \"The Great Gatsby\"\n\n\tselect {\n\tcase book := <-holdCh:\n\t\tfmt.Println(\"On hold:\", book)\n\tdefault:\n\t\tfmt.Println(\"No holds waiting\")\n\t}\n}",
     "expectedOutput": [
-      "Nothing ready",
-      "Received: hello"
+      "No holds waiting",
+      "On hold: The Great Gatsby"
     ],
     "successMessage": "Non-blocking channel reads — perfect for checking queues, implementing try-locks, or polling without sleeping. The default case turns select into a non-blocking peek."
   },
   {
     "title": "Mutex — protect shared data",
-    "instruction": "When multiple goroutines access the same variable, you get a race condition — unpredictable results.\n\n`sync.Mutex` protects shared data with a lock:\n\n```\nvar mu sync.Mutex\nmu.Lock()\nsharedVar++\nmu.Unlock()\n```\n\nOr use `defer mu.Unlock()` right after `Lock()` to always unlock even if the function panics.\n\nRun this. A counter is incremented by 100 goroutines safely.",
-    "starter": "package main\n\nimport (\n\t\"fmt\"\n\t\"sync\"\n)\n\ntype SafeCounter struct {\n\tmu    sync.Mutex\n\tvalue int\n}\n\nfunc (c *SafeCounter) Increment() {\n\tc.mu.Lock()\n\tdefer c.mu.Unlock()\n\tc.value++\n}\n\nfunc (c *SafeCounter) Value() int {\n\tc.mu.Lock()\n\tdefer c.mu.Unlock()\n\treturn c.value\n}\n\nfunc main() {\n\tcounter := &SafeCounter{}\n\tvar wg sync.WaitGroup\n\n\tfor i := 0; i < 100; i++ {\n\t\twg.Add(1)\n\t\tgo func() {\n\t\t\tdefer wg.Done()\n\t\t\tcounter.Increment()\n\t\t}()\n\t}\n\n\twg.Wait()\n\tfmt.Println(\"Final count:\", counter.Value())\n}",
+    "instruction": "When multiple patrons browse the same shelf simultaneously, two of them might try to grab the last copy of a book — a race condition.\n\n`sync.Mutex` protects shared data with a lock:\n\n```\nvar mu sync.Mutex\nmu.Lock()\navailableCopies--\nmu.Unlock()\n```\n\nOr use `defer mu.Unlock()` right after `Lock()` to always unlock even if the function panics.\n\nRun this. A library counter is checked out by 100 patrons safely.",
+    "starter": "package main\n\nimport (\n\t\"fmt\"\n\t\"sync\"\n)\n\ntype LibraryCounter struct {\n\tmu    sync.Mutex\n\tcount int\n}\n\nfunc (c *LibraryCounter) CheckOut() {\n\tc.mu.Lock()\n\tdefer c.mu.Unlock()\n\tc.count++\n}\n\nfunc (c *LibraryCounter) Total() int {\n\tc.mu.Lock()\n\tdefer c.mu.Unlock()\n\treturn c.count\n}\n\nfunc main() {\n\tcounter := &LibraryCounter{}\n\tvar wg sync.WaitGroup\n\n\tfor i := 0; i < 100; i++ {\n\t\twg.Add(1)\n\t\tgo func() {\n\t\t\tdefer wg.Done()\n\t\t\tcounter.CheckOut()\n\t\t}()\n\t}\n\n\twg.Wait()\n\tfmt.Println(\"Total check-outs:\", counter.Total())\n}",
     "expectedOutput": [
-      "Final count: 100"
+      "Total check-outs: 100"
     ],
-    "successMessage": "100 goroutines, 100 increments, exactly 100 every time. Without the mutex you would get random results between 1 and 100. The mutex ensures only one goroutine touches value at a time."
+    "successMessage": "100 patrons, 100 check-outs, exactly 100 every time. Without the mutex you would get random results between 1 and 100. The mutex ensures only one patron updates the counter at a time."
   },
   {
     "title": "Done channel — signal cancellation",
-    "instruction": "A done channel signals goroutines to stop.\n\n`close(done)` broadcasts to everyone waiting on it — all goroutines reading from a closed channel receive the zero value immediately.\n\nRun this. The worker goroutine checks `<-done` via select. When main closes the channel, the worker exits cleanly.",
-    "starter": "package main\n\nimport (\n\t\"fmt\"\n\t\"time\"\n)\n\nfunc worker(done <-chan struct{}) {\n\tfor {\n\t\tselect {\n\t\tcase <-done:\n\t\t\tfmt.Println(\"Worker: shutting down\")\n\t\t\treturn\n\t\tdefault:\n\t\t\tfmt.Println(\"Worker: doing work...\")\n\t\t\ttime.Sleep(20 * time.Millisecond)\n\t\t}\n\t}\n}\n\nfunc main() {\n\tdone := make(chan struct{})\n\tgo worker(done)\n\ttime.Sleep(60 * time.Millisecond)\n\tclose(done)\n\ttime.Sleep(30 * time.Millisecond)\n\tfmt.Println(\"Main: done\")\n}",
+    "instruction": "A done channel signals goroutines to stop — like a \"Library closing in 5 minutes\" announcement.\n\n`close(done)` broadcasts to everyone waiting on it — all goroutines reading from a closed channel receive the zero value immediately.\n\nRun this. The shelving assistant goroutine checks `<-done` via select. When main closes the channel, the assistant exits cleanly.",
+    "starter": "package main\n\nimport (\n\t\"fmt\"\n\t\"time\"\n)\n\nfunc shelver(done <-chan struct{}) {\n\tfor {\n\t\tselect {\n\t\tcase <-done:\n\t\t\tfmt.Println(\"Shelver: heading home\")\n\t\t\treturn\n\t\tdefault:\n\t\t\tfmt.Println(\"Shelver: organizing shelves...\")\n\t\t\ttime.Sleep(20 * time.Millisecond)\n\t\t}\n\t}\n}\n\nfunc main() {\n\tdone := make(chan struct{})\n\tgo shelver(done)\n\ttime.Sleep(60 * time.Millisecond)\n\tclose(done)\n\ttime.Sleep(30 * time.Millisecond)\n\tfmt.Println(\"Main: library closed\")\n}",
     "expectedOutput": [
-      "Worker: doing work...",
-      "Worker: shutting down",
-      "Main: done"
+      "Shelver: organizing shelves...",
+      "Shelver: heading home",
+      "Main: library closed"
     ],
-    "successMessage": "close(done) broadcast the stop signal to the worker instantly. The empty struct{} channel uses zero memory — chan struct{} is the idiomatic Go signal channel. context.Context builds on this same idea."
+    "successMessage": "close(done) broadcast the stop signal to the shelver instantly. The empty struct{} channel uses zero memory — chan struct{} is the idiomatic Go signal channel. context.Context builds on this same idea."
   },
   {
     "title": "Worker pool",
-    "instruction": "A worker pool runs a fixed number of goroutines to process jobs from a queue channel.\n\nThis limits resource usage — instead of spawning 10,000 goroutines, you run 3 workers that each process many jobs.\n\nRun this. 3 workers process 9 jobs from the jobs channel. Add 3 more jobs to the queue.",
+    "instruction": "A worker pool runs a fixed number of goroutines to process jobs from a queue channel. Think of 3 librarians at a help desk — each handling one patron request at a time from a shared queue.\n\nThis limits resource usage — instead of spawning 10,000 goroutines, you run 3 workers that each process many jobs.\n\nRun this. 3 librarians process 9 patron queries from the jobs channel. Add 3 more queries to the queue.",
     "hint": "for i := 10; i <= 12; i++ { jobs <- i }  (add before close(jobs))",
-    "starter": "package main\n\nimport (\n\t\"fmt\"\n\t\"sync\"\n)\n\nfunc worker(id int, jobs <-chan int, results chan<- int, wg *sync.WaitGroup) {\n\tdefer wg.Done()\n\tfor j := range jobs {\n\t\tresults <- j * j\n\t\tfmt.Printf(\"Worker %d processed job %d\\n\", id, j)\n\t}\n}\n\nfunc main() {\n\tjobs := make(chan int, 12)\n\tresults := make(chan int, 12)\n\tvar wg sync.WaitGroup\n\n\tfor w := 1; w <= 3; w++ {\n\t\twg.Add(1)\n\t\tgo worker(w, jobs, results, &wg)\n\t}\n\n\tfor i := 1; i <= 9; i++ {\n\t\tjobs <- i\n\t}\n\t// TODO: add jobs 10, 11, 12\n\tclose(jobs)\n\n\twg.Wait()\n\tclose(results)\n\n\ttotal := 0\n\tfor r := range results {\n\t\ttotal += r\n\t}\n\tfmt.Println(\"Sum of squares:\", total)\n}",
+    "starter": "package main\n\nimport (\n\t\"fmt\"\n\t\"sync\"\n)\n\nfunc librarian(id int, jobs <-chan int, results chan<- int, wg *sync.WaitGroup) {\n\tdefer wg.Done()\n\tfor j := range jobs {\n\t\tresults <- j * j\n\t\tfmt.Printf(\"Librarian %d helped with query %d\\n\", id, j)\n\t}\n}\n\nfunc main() {\n\tjobs := make(chan int, 12)\n\tresults := make(chan int, 12)\n\tvar wg sync.WaitGroup\n\n\tfor w := 1; w <= 3; w++ {\n\t\twg.Add(1)\n\t\tgo librarian(w, jobs, results, &wg)\n\t}\n\n\tfor i := 1; i <= 9; i++ {\n\t\tjobs <- i\n\t}\n\t// TODO: add jobs 10, 11, 12\n\tclose(jobs)\n\n\twg.Wait()\n\tclose(results)\n\n\ttotal := 0\n\tfor r := range results {\n\t\ttotal += r\n\t}\n\tfmt.Println(\"Total queries answered:\", total)\n}",
     "expectedOutput": [
-      "Sum of squares: 650"
+      "Total queries answered: 650"
     ],
     "codeChecks": [
       {
         "pattern": "jobs\\s*<-\\s*10",
         "required": true,
-        "message": "Send job 10 to the jobs channel."
+        "message": "Send query 10 to the jobs channel."
       },
       {
         "pattern": "jobs\\s*<-\\s*11",
         "required": true,
-        "message": "Send job 11 to the jobs channel."
+        "message": "Send query 11 to the jobs channel."
       },
       {
         "pattern": "jobs\\s*<-\\s*12",
         "required": true,
-        "message": "Send job 12 to the jobs channel."
+        "message": "Send query 12 to the jobs channel."
       },
       {
         "pattern": "TODO",
@@ -151,15 +151,15 @@
         "message": "Replace the TODO comment with the three new jobs."
       }
     ],
-    "successMessage": "12 jobs, 3 workers, sum of 1²+2²+...+12² = 650. Worker pools are everywhere in Go — HTTP servers, background processors, batch pipelines. Fixed workers, unlimited jobs."
+    "successMessage": "12 queries, 3 librarians, total 1²+2²+...+12² = 650. Worker pools are everywhere in Go — HTTP servers, background processors, batch pipelines. Fixed workers, unlimited jobs."
   },
   {
     "title": "Race condition — spot and fix it",
-    "instruction": "A race condition happens when two goroutines access the same variable without synchronisation. The result is unpredictable.\n\nThe code below has a race condition on `count`. Run it a few times — the result varies.\n\nFix it by adding a `sync.Mutex` to protect `count`.",
+    "instruction": "A race condition happens when two goroutines access the same variable without synchronisation. The result is unpredictable — like two patrons trying to check out the last copy of a popular book at the same time.\n\nThe code below has a race condition on `count`. Run it a few times — the result varies.\n\nFix it by adding a `sync.Mutex` to protect `count`.",
     "hint": "Add var mu sync.Mutex above the loop. Inside the goroutine: mu.Lock(); count++; mu.Unlock() — or use defer.",
-    "starter": "package main\n\nimport (\n\t\"fmt\"\n\t\"sync\"\n)\n\nfunc main() {\n\tcount := 0\n\tvar wg sync.WaitGroup\n\t// BUG: count is accessed without a lock — add sync.Mutex\n\n\tfor i := 0; i < 50; i++ {\n\t\twg.Add(1)\n\t\tgo func() {\n\t\t\tdefer wg.Done()\n\t\t\tcount++\n\t\t}()\n\t}\n\n\twg.Wait()\n\tfmt.Println(\"Count:\", count)\n}",
+    "starter": "package main\n\nimport (\n\t\"fmt\"\n\t\"sync\"\n)\n\nfunc main() {\n\tcount := 0\n\tvar wg sync.WaitGroup\n\t// BUG: count is accessed without a lock — add sync.Mutex\n\n\tfor i := 0; i < 50; i++ {\n\t\twg.Add(1)\n\t\tgo func() {\n\t\t\tdefer wg.Done()\n\t\t\tcount++\n\t\t}()\n\t}\n\n\twg.Wait()\n\tfmt.Println(\"Check-outs:\", count)\n}",
     "expectedOutput": [
-      "Count: 50"
+      "Check-outs: 50"
     ],
     "codeChecks": [
       {
@@ -178,50 +178,49 @@
         "message": "Call mu.Unlock() after incrementing count."
       }
     ],
-    "successMessage": "Count: 50, every single time. The mutex serialises access to count — only one goroutine at a time. Run `go test -race` on your projects to catch race conditions automatically."
+    "successMessage": "Check-outs: 50, every single time. The mutex serialises access to count — only one goroutine at a time. Run `go test -race` on your projects to catch race conditions automatically."
   },
   {
     "title": "Goroutines are cheap",
-    "instruction": "A goroutine starts with about 2KB of stack memory (growing as needed). You can run thousands without issue.\n\nThis example launches 1,000 goroutines. Each increments a counter. In most languages this would be thousands of OS threads — each using megabytes. In Go it is lightweight and fast.\n\nRun this.",
-    "starter": "package main\n\nimport (\n\t\"fmt\"\n\t\"sync\"\n\t\"sync/atomic\"\n)\n\nfunc main() {\n\tvar count int64\n\tvar wg sync.WaitGroup\n\n\tfor i := 0; i < 1000; i++ {\n\t\twg.Add(1)\n\t\tgo func() {\n\t\t\tdefer wg.Done()\n\t\t\tatomic.AddInt64(&count, 1)\n\t\t}()\n\t}\n\n\twg.Wait()\n\tfmt.Println(\"Goroutines ran:\", count)\n}",
+    "instruction": "A goroutine starts with about 2KB of stack memory (growing as needed). You can run thousands without issue. Imagine 1,000 library patrons all browsing simultaneously — goroutines make that trivial.\n\nThis example launches 1,000 goroutines. Each increments a visit counter. In most languages this would be thousands of OS threads — each using megabytes. In Go it is lightweight and fast.\n\nRun this.",
+    "starter": "package main\n\nimport (\n\t\"fmt\"\n\t\"sync\"\n\t\"sync/atomic\"\n)\n\nfunc main() {\n\tvar visitors int64\n\tvar wg sync.WaitGroup\n\n\tfor i := 0; i < 1000; i++ {\n\t\twg.Add(1)\n\t\tgo func() {\n\t\t\tdefer wg.Done()\n\t\t\tatomic.AddInt64(&visitors, 1)\n\t\t}()\n\t}\n\n\twg.Wait()\n\tfmt.Println(\"Library visitors today:\", visitors)\n}",
     "expectedOutput": [
-      "Goroutines ran: 1000"
+      "Library visitors today: 1000"
     ],
     "successMessage": "1,000 goroutines, exact count, no locks needed (atomic operations). In real Go servers, tens of thousands of goroutines run concurrently — one per incoming request — without breaking a sweat."
   },
   {
     "title": "Build a concurrent pipeline",
-    "instruction": "No starter code.\n\nBuild a three-stage pipeline:\n\n1. `generate(nums ...int) <-chan int` — sends numbers into a channel, closes it when done\n2. `square(in <-chan int) <-chan int` — receives numbers, sends their squares\n3. `filter(in <-chan int, min int) <-chan int` — only passes through values ≥ min\n\nIn main: generate 1–10, square them, filter results ≥ 25, print each passing value.\n\nExpected output (squares of 5,6,7,8,9,10 that are ≥ 25):\n```\n25\n36\n49\n64\n81\n100\n```",
-    "hint": "Each stage: make a channel, start a goroutine that reads from in and writes to out, returns the out channel.",
+    "instruction": "No starter code.\n\nBuild a three-stage concurrent book processing pipeline:\n\n1. `findBooks(ids ...int) <-chan string` — sends formatted book titles (\"Book N\") into a channel, closes it when done\n2. `categorize(in <-chan string) <-chan string` — receives book strings, prepends genre (e.g., \"Fiction: Book N\")\n3. `head(in <-chan string, n int) <-chan string` — only passes through the first n titles, drops the rest\n\nIn main: find books for IDs 1–10, categorize them all as \"Fiction\", then display only the first 5.\n\nExpected output (first 5 fictionalized book titles):\n```\nFiction: Book 1\nFiction: Book 2\nFiction: Book 3\nFiction: Book 4\nFiction: Book 5\n```",
+    "hint": "Each stage: make a channel, start a goroutine that reads from in and writes to out, returns the out channel. The head stage should use a counter and close early.",
     "starter": "package main\n\nimport \"fmt\"\n\n// Build your pipeline here\n\nfunc main() {\n}",
     "expectedOutput": [
-      "25",
-      "36",
-      "49",
-      "64",
-      "81",
-      "100"
+      "Fiction: Book 1",
+      "Fiction: Book 2",
+      "Fiction: Book 3",
+      "Fiction: Book 4",
+      "Fiction: Book 5"
     ],
     "codeChecks": [
       {
-        "pattern": "func\\s+generate\\s*\\(",
+        "pattern": "func\\s+findBooks\\s*\\(",
         "required": true,
-        "message": "Define a generate function that returns a channel."
+        "message": "Define a findBooks function that returns a channel."
       },
       {
-        "pattern": "func\\s+square\\s*\\(",
+        "pattern": "func\\s+categorize\\s*\\(",
         "required": true,
-        "message": "Define a square function that squares values from a channel."
+        "message": "Define a categorize function that categorizes items from a channel."
       },
       {
-        "pattern": "func\\s+filter\\s*\\(",
+        "pattern": "func\\s+head\\s*\\(",
         "required": true,
-        "message": "Define a filter function that filters values from a channel."
+        "message": "Define a head function that limits items from a channel."
       },
       {
-        "pattern": "<-chan int",
+        "pattern": "<-chan string",
         "required": true,
-        "message": "Each stage should return a <-chan int (receive-only channel)."
+        "message": "Each stage should return a <-chan string (receive-only channel)."
       },
       {
         "pattern": "close\\(",
@@ -234,6 +233,6 @@
         "message": "Use range to read from channels in each stage."
       }
     ],
-    "successMessage": "A three-stage concurrent pipeline. Numbers flow through stages like water through pipes — generated, squared, filtered — each stage running concurrently. This is how Go handles data streaming at scale. You now know concurrency."
+    "successMessage": "A three-stage concurrent pipeline. Book IDs flow through stages like books on a conveyor belt — found, categorized, limited — each stage running concurrently. This is how Go handles data streaming at scale. You now know concurrency."
   }
 ]

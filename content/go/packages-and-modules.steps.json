@@ -1,33 +1,33 @@
 [
   {
     "title": "What is a package",
-    "instruction": "Every Go file starts with `package`. Think of it as the file's team jersey — it tells Go which group this file belongs to.\n\n`package main` is special: it's the team that runs the show. The `main` package is where `func main()` lives and the program starts.\n\nRun this — it imports `fmt` and `strings`, two built-in packages.",
-    "starter": "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n)\n\nfunc main() {\n\tname := \"  go programming  \"\n\tcleaned := strings.TrimSpace(name)\n\tupper := strings.ToUpper(cleaned)\n\tfmt.Println(upper)\n}",
+    "instruction": "Every Go file starts with `package`. Think of it as the file's team jersey — it tells Go which group this file belongs to.\n\n`package main` is special: it's the team that runs the show. The `main` package is where `func main()` lives and the program starts.\n\nRun this — it imports `fmt` and `strings`, two built-in packages. Imagine you're building a library catalog app: `fmt` prints your results, `strings` searches book titles.",
+    "starter": "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n)\n\nfunc main() {\n\ttitle := \"  the great gatsby  \"\n\tcleaned := strings.TrimSpace(title)\n\tupper := strings.ToUpper(cleaned)\n\tfmt.Println(upper)\n}",
     "expectedOutput": [
-      "GO PROGRAMMING"
+      "THE GREAT GATSBY"
     ],
-    "successMessage": "Two imports, two tools. `fmt` for printing, `strings` for text manipulation. Go's standard library has dozens of these built-in packages."
+    "successMessage": "Two imports, two tools. `fmt` for printing, `strings` for cleaning up book titles. Go's standard library has dozens of these built-in packages — including `math` for stats and `time` for due dates."
   },
   {
-    "title": "Importing standard library packages",
-    "instruction": "Go's standard library is huge. You do not install anything — it comes with Go.\n\nSome of the most useful packages:\n- `fmt` — formatted I/O\n- `strings` — string manipulation\n- `math` — mathematical functions\n- `time` — dates and durations\n- `os` — operating system interaction\n- `strconv` — string↔number conversion\n\nAdd two more `fmt.Println` lines that use `strings.Contains` to check if `sentence` contains `\"Go\"` and `strings.Count` to count how many times `\"o\"` appears.",
-    "hint": "fmt.Println(strings.Contains(sentence, \"Go\"))  fmt.Println(strings.Count(sentence, \"o\"))",
-    "starter": "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n)\n\nfunc main() {\n\tsentence := \"Go is the best language to learn\"\n\tfmt.Println(strings.ToUpper(sentence))\n\t// TODO: print whether sentence contains \"Go\"\n\t// TODO: print how many times \"o\" appears\n}",
+    "title": "Searching book titles with strings",
+    "instruction": "The `strings` package is your best friend when building a library catalog. You can search titles, count words, and clean up user input.\n\nUseful functions:\n- `strings.Contains(s, sub)` — does `s` contain `sub`?\n- `strings.Count(s, sub)` — how many times does `sub` appear?\n- `strings.ToUpper(s)` — uppercase\n- `strings.ToLower(s)` — lowercase\n\nAdd two `fmt.Println` lines: use `strings.Contains` to check if `title` contains \"Great\", and `strings.Count` to count how many times \"e\" appears in `title`.",
+    "hint": "fmt.Println(strings.Contains(title, \"Great\"))  fmt.Println(strings.Count(title, \"e\"))",
+    "starter": "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n)\n\nfunc main() {\n\ttitle := \"The Great Gatsby\"\n\tfmt.Println(strings.ToUpper(title))\n\t// TODO: print whether title contains \"Great\"\n\t// TODO: print how many times \"e\" appears\n}",
     "expectedOutput": [
-      "GO IS THE BEST LANGUAGE TO LEARN",
+      "THE GREAT GATSBY",
       "true",
       "3"
     ],
     "codeChecks": [
       {
-        "pattern": "strings\\.Contains\\s*\\(sentence,\\s*\"Go\"\\)",
+        "pattern": "strings\\.Contains\\s*\\(title,\\s*\"Great\"\\)",
         "required": true,
-        "message": "Use strings.Contains(sentence, \"Go\") to check if it contains \"Go\"."
+        "message": "Use strings.Contains(title, \"Great\") to check if it contains \"Great\"."
       },
       {
-        "pattern": "strings\\.Count\\s*\\(sentence,\\s*\"o\"\\)",
+        "pattern": "strings\\.Count\\s*\\(title,\\s*\"e\"\\)",
         "required": true,
-        "message": "Use strings.Count(sentence, \"o\") to count occurrences of \"o\"."
+        "message": "Use strings.Count(title, \"e\") to count occurrences of \"e\"."
       },
       {
         "pattern": "TODO",
@@ -35,27 +35,27 @@
         "message": "Replace the TODO comments with your code."
       }
     ],
-    "successMessage": "Contains → true. Count → 3 (language, to, Go). The strings package has 20+ functions like these. You never need to write string manipulation from scratch in Go."
+    "successMessage": "Contains → true. Count → 3 (twice in \"Great\", once in \"Gatsby\"). The strings package has 20+ functions like these — perfect for searching through a library catalog."
   },
   {
-    "title": "The strings package",
-    "instruction": "The `strings` package handles almost every text operation you will ever need.\n\nRun this to see six common functions in action. Then add one more line: use `strings.ReplaceAll` to replace every space in `sentence` with a `-` and print the result.",
-    "hint": "fmt.Println(strings.ReplaceAll(sentence, \" \", \"-\"))",
-    "starter": "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n)\n\nfunc main() {\n\tsentence := \"the quick brown fox\"\n\n\tfmt.Println(strings.ToUpper(sentence))\n\tfmt.Println(strings.Title(sentence))\n\tfmt.Println(strings.HasPrefix(sentence, \"the\"))\n\tfmt.Println(strings.HasSuffix(sentence, \"fox\"))\n\tfmt.Println(strings.Split(sentence, \" \"))\n\tfmt.Println(strings.TrimSpace(\"  hello  \"))\n\t// TODO: print sentence with spaces replaced by \"-\"\n}",
+    "title": "The strings package for book titles",
+    "instruction": "The `strings` package handles almost every text operation a librarian needs.\n\nRun this to see six common functions in action on book titles. Then add one more line: use `strings.ReplaceAll` to replace every space in `titles` with ` | ` and print the result.",
+    "hint": "fmt.Println(strings.ReplaceAll(titles, \" \", \" | \"))",
+    "starter": "package main\n\nimport (\n\t\"fmt\"\n\t\"strings\"\n)\n\nfunc main() {\n\ttitles := \"the great gatsby to kill a mockingbird 1984\"\n\n\tfmt.Println(strings.ToUpper(titles))\n\tfmt.Println(strings.Title(titles))\n\tfmt.Println(strings.HasPrefix(titles, \"the great\"))\n\tfmt.Println(strings.HasSuffix(titles, \"1984\"))\n\tfmt.Println(strings.Split(titles, \" \"))\n\tfmt.Println(strings.TrimSpace(\"  library catalog  \"))\n\t// TODO: print titles with spaces replaced by \" | \"\n}",
     "expectedOutput": [
-      "THE QUICK BROWN FOX",
-      "The Quick Brown Fox",
+      "THE GREAT GATSBY TO KILL A MOCKINGBIRD 1984",
+      "The Great Gatsby To Kill A Mockingbird 1984",
       "true",
       "true",
-      "[the quick brown fox]",
-      "hello",
-      "the-quick-brown-fox"
+      "[the great gatsby to kill a mockingbird 1984]",
+      "library catalog",
+      "the | great | gatsby | to | kill | a | mockingbird | 1984"
     ],
     "codeChecks": [
       {
-        "pattern": "strings\\.ReplaceAll\\s*\\(sentence,\\s*\" \",\\s*\"-\"\\)",
+        "pattern": "strings\\.ReplaceAll\\s*\\(titles,\\s*\" \",\\s*\" | \"\\)",
         "required": true,
-        "message": "Use strings.ReplaceAll(sentence, \" \", \"-\") to replace spaces."
+        "message": "Use strings.ReplaceAll(titles, \" \", \" | \") to replace spaces."
       },
       {
         "pattern": "TODO",
@@ -63,11 +63,11 @@
         "message": "Replace the TODO comment with your code."
       }
     ],
-    "successMessage": "Seven functions, zero manual loops. The strings package is one of the most used in all of Go. Keep it in your mental toolkit."
+    "successMessage": "Seven functions, zero manual loops. You just formatted book titles like a librarian. The strings package is one of the most used in all of Go — keep it in your mental toolkit."
   },
   {
-    "title": "The math package",
-    "instruction": "The `math` package gives you mathematical constants and functions.\n\n`math.Pi` — the value of π\n`math.Sqrt(x)` — square root\n`math.Pow(x, y)` — x to the power y\n`math.Abs(x)` — absolute value\n`math.Round(x)` — round to nearest integer\n\nAdd three lines: print the square root of 144, 2 to the power of 10, and the absolute value of -7.5.",
+    "title": "Library statistics with math",
+    "instruction": "The `math` package helps you calculate library stats — average pages, shelf space, membership growth.\n\n`math.Pi` — the value of π\n`math.Sqrt(x)` — square root\n`math.Pow(x, y)` — x to the power y\n`math.Abs(x)` — absolute value (negative differences)\n`math.Round(x)` — round to nearest integer\n\nAdd three lines: print the square root of 144 (total members), 2 to the power of 10 (book copies after 10 doublings), and the absolute value of -7.5 (difference in late fees).",
     "hint": "fmt.Println(math.Sqrt(144))  fmt.Println(math.Pow(2, 10))  fmt.Println(math.Abs(-7.5))",
     "starter": "package main\n\nimport (\n\t\"fmt\"\n\t\"math\"\n)\n\nfunc main() {\n\tfmt.Println(math.Pi)\n\tfmt.Println(math.Round(3.7))\n\t// TODO: print sqrt(144), 2^10, and abs(-7.5)\n}",
     "expectedOutput": [
@@ -99,13 +99,13 @@
         "message": "Replace the TODO comment with your code."
       }
     ],
-    "successMessage": "√144=12, 2¹⁰=1024, |-7.5|=7.5. The math package handles every standard mathematical operation. No need to implement these yourself."
+    "successMessage": "√144=12 members, 2¹⁰=1024 book copies, |-7.5|=7.5 fee difference. The math package handles every standard operation — great for crunching library numbers."
   },
   {
-    "title": "The time package",
-    "instruction": "The `time` package handles dates, times, durations, and formatting.\n\n`time.Now()` — current time\n`time.Since(t)` — how long since `t`\n`t.Format(\"2006-01-02\")` — format a time (Go uses a reference date, not strftime)\n\nRun this. The reference date `2006-01-02 15:04:05` is Go's fixed reference — always use those specific numbers for formatting.\n\nThen add a line that prints today's date in `DD/MM/YYYY` format.",
+    "title": "Managing due dates with time",
+    "instruction": "The `time` package handles everything a librarian needs: due dates, borrowing periods, and overdue calculations.\n\n`time.Now()` — current date/time\n`time.Since(t)` — how long since `t`\n`t.Format(\"2006-01-02\")` — format a date (Go uses a reference date, not strftime)\n`t.AddDate(y, m, d)` — add days to a date\n\nRun this. Then add a line that prints today's date in `DD/MM/YYYY` format — like a due-date slip.",
     "hint": "fmt.Println(now.Format(\"02/01/2006\"))",
-    "starter": "package main\n\nimport (\n\t\"fmt\"\n\t\"time\"\n)\n\nfunc main() {\n\tnow := time.Now()\n\tfmt.Println(now.Format(\"2006-01-02\"))\n\tfmt.Println(now.Format(\"15:04:05\"))\n\tfmt.Println(now.Year())\n\t// TODO: print today's date in DD/MM/YYYY format\n}",
+    "starter": "package main\n\nimport (\n\t\"fmt\"\n\t\"time\"\n)\n\nfunc main() {\n\tnow := time.Now()\n\tfmt.Println(now.Format(\"2006-01-02\"))\n\tfmt.Println(now.Format(\"15:04:05\"))\n\tfmt.Println(now.Year())\n\t// TODO: print today's date in DD/MM/YYYY format (like a due-date slip)\n}",
     "expectedOutput": [],
     "codeChecks": [
       {
@@ -119,13 +119,13 @@
         "message": "Replace the TODO comment with your code."
       }
     ],
-    "successMessage": "Go's time formatting is unique — instead of %d %m %Y, you use the reference date Jan 2 15:04:05 2006. Weird at first, but you will never forget 2006-01-02."
+    "successMessage": "Go's time formatting is unique — instead of %d %m %Y, you use the reference date Jan 2 15:04:05 2006. Weird at first, but you'll never forget it. Great for printing due-date slips!"
   },
   {
-    "title": "The os package",
-    "instruction": "The `os` package lets you interact with the operating system: environment variables, command-line arguments, file system, exit codes.\n\n`os.Getenv(\"KEY\")` — read an environment variable\n`os.Args` — command-line arguments slice\n`os.Exit(1)` — exit with a non-zero code (signals failure)\n\nRun this. It reads the `HOME` environment variable (or `USERPROFILE` on Windows). Then add a line that prints how many arguments are in `os.Args`.",
+    "title": "Library system info with os",
+    "instruction": "The `os` package lets your library system interact with the operating system: environment variables, command-line filters, file paths.\n\n`os.Getenv(\"KEY\")` — read an environment variable (e.g., `LIBRARY_PATH`)\n`os.Args` — command-line arguments (like search terms passed by the user)\n`os.Exit(1)` — exit with an error code\n\nRun this. It reads the `HOME` environment variable (where the library config lives). Then add a line that prints how many arguments are in `os.Args` — useful for knowing if a book search term was passed.",
     "hint": "fmt.Println(\"Args count:\", len(os.Args))",
-    "starter": "package main\n\nimport (\n\t\"fmt\"\n\t\"os\"\n)\n\nfunc main() {\n\thome := os.Getenv(\"HOME\")\n\tif home == \"\" {\n\t\thome = os.Getenv(\"USERPROFILE\")\n\t}\n\tfmt.Println(\"Home:\", home)\n\t// TODO: print how many arguments are in os.Args\n}",
+    "starter": "package main\n\nimport (\n\t\"fmt\"\n\t\"os\"\n)\n\nfunc main() {\n\thome := os.Getenv(\"HOME\")\n\tif home == \"\" {\n\t\thome = os.Getenv(\"USERPROFILE\")\n\t}\n\tfmt.Println(\"Library home:\", home)\n\t// TODO: print how many command-line arguments there are\n}",
     "expectedOutput": [],
     "codeChecks": [
       {
@@ -139,63 +139,63 @@
         "message": "Replace the TODO comment with your code."
       }
     ],
-    "successMessage": "os.Args[0] is always the program name itself — so even with no extra arguments, len(os.Args) is 1. The os package is your bridge between Go and the machine it runs on."
+    "successMessage": "os.Args[0] is always the program name itself — so even with no extra arguments, len(os.Args) is 1. The os package is your bridge between Go and the computer running your library system."
   },
   {
     "title": "Exported vs unexported",
-    "instruction": "In Go, whether something is public or private is decided by a single rule:\n\n**Capital first letter = exported (usable outside the package)**\n**Lowercase first letter = unexported (private to the package)**\n\nThis applies to functions, types, variables, and struct fields.\n\n`fmt.Println` is exported — `Println` starts with a capital P.\n`strings.toUpper` would be unexported — but Go named it `ToUpper`.\n\nRun this. Then fix the code by changing `greet` to `Greet` and `person` struct fields to start with capitals.",
-    "hint": "Change greet to Greet, name to Name, age to Age in both the struct definition and usage.",
-    "starter": "package main\n\nimport \"fmt\"\n\ntype person struct {\n\tname string\n\tage  int\n}\n\nfunc greet(p person) {\n\tfmt.Printf(\"Hello, %s! You are %d years old.\\n\", p.name, p.age)\n}\n\nfunc main() {\n\tp := person{name: \"Alex\", age: 25}\n\tgreet(p)\n}",
+    "instruction": "In Go, whether a function or type is public or private is decided by a single rule:\n\n**Capital first letter = exported (usable outside the package)**\n**Lowercase first letter = unexported (private to the package)**\n\nThis applies to functions, types, variables, and struct fields.\n\n`fmt.Println` is exported — `Println` starts with a capital P.\n`strings.toUpper` would be unexported — but Go named it `ToUpper`.\n\nRun this. Then fix the code by changing `book` to `Book` and struct fields to start with capitals — like any good library catalog entry.",
+    "hint": "Change book to Book, title to Title, pages to Pages in both the struct definition and usage.",
+    "starter": "package main\n\nimport \"fmt\"\n\ntype book struct {\n\ttitle string\n\tpages int\n}\n\nfunc display(b book) {\n\tfmt.Printf(\"\\\"%s\\\" — %d pages\\n\", b.title, b.pages)\n}\n\nfunc main() {\n\tb := book{title: \"The Great Gatsby\", pages: 180}\n\tdisplay(b)\n}",
     "expectedOutput": [
-      "Hello, Alex! You are 25 years old."
+      "\"The Great Gatsby\" — 180 pages"
     ],
     "codeChecks": [
       {
-        "pattern": "type\\s+Person\\s+struct",
+        "pattern": "type\\s+Book\\s+struct",
         "required": true,
-        "message": "Capitalise the type name: type Person struct"
+        "message": "Capitalise the type name: type Book struct"
       },
       {
-        "pattern": "Name\\s+string",
+        "pattern": "Title\\s+string",
         "required": true,
-        "message": "Capitalise the field: Name string"
+        "message": "Capitalise the field: Title string"
       },
       {
-        "pattern": "Age\\s+int",
+        "pattern": "Pages\\s+int",
         "required": true,
-        "message": "Capitalise the field: Age int"
+        "message": "Capitalise the field: Pages int"
       },
       {
-        "pattern": "func\\s+Greet\\s*\\(",
+        "pattern": "func\\s+Display\\s*\\(",
         "required": true,
-        "message": "Capitalise the function: func Greet(...)"
+        "message": "Capitalise the function: func Display(...)"
       }
     ],
-    "successMessage": "One rule, zero keywords. No public, no private, no protected — just the case of the first letter. Simple and consistent throughout every Go project ever written."
+    "successMessage": "One rule, zero keywords. No public, no private, no protected — just the case of the first letter. Simple and consistent throughout every Go project ever written, including library catalog systems."
   },
   {
     "title": "What is a module",
-    "instruction": "A module is a collection of Go packages with a shared identity and version.\n\nEvery Go project has a `go.mod` file that defines:\n- The module path (like `github.com/yourname/yourproject`)\n- The Go version\n- External dependencies\n\nYou create one with: `go mod init module-name`\n\nRun this. It reads `runtime.Version()` to show the Go version your code is running on — the same version recorded in go.mod.",
+    "instruction": "A module is a collection of Go packages with a shared identity and version — like a library's catalog system with multiple departments.\n\nEvery Go project has a `go.mod` file that defines:\n- The module path (like `github.com/yourname/library-catalog`)\n- The Go version\n- External dependencies\n\nYou create one with: `go mod init module-name`\n\nRun this. It reads `runtime.Version()` to show the Go version your code is running on — the same version recorded in go.mod.",
     "starter": "package main\n\nimport (\n\t\"fmt\"\n\t\"runtime\"\n)\n\nfunc main() {\n\tfmt.Println(\"Go version:\", runtime.Version())\n\tfmt.Println(\"OS:\", runtime.GOOS)\n\tfmt.Println(\"Architecture:\", runtime.GOARCH)\n}",
     "expectedOutput": [],
-    "successMessage": "Your program knows what runtime it is on. The runtime package exposes this and more — goroutine counts, memory stats, CPU cores. The module system ties it all together into a versioned, shareable project."
+    "successMessage": "Your program knows what runtime it is on. The runtime package exposes this and more — goroutine counts, memory stats, CPU cores. The module system ties it all together into a versioned, shareable library project."
   },
   {
     "title": "Using a third-party package",
-    "instruction": "Beyond the standard library, Go's ecosystem has thousands of packages at `pkg.go.dev`.\n\nYou add one with:\n```\ngo get github.com/some/package\n```\n\nThis updates `go.mod` and creates `go.sum` (a lockfile with checksums).\n\nFor this tutorial environment we can only use the standard library — but the pattern is identical. Here we use `encoding/json` (standard library) the same way you would use any external package: import, call, done.\n\nRun this. See how json.Marshal turns a Go struct into JSON bytes.",
-    "starter": "package main\n\nimport (\n\t\"encoding/json\"\n\t\"fmt\"\n)\n\ntype User struct {\n\tName  string `json:\"name\"`\n\tEmail string `json:\"email\"`\n\tAge   int    `json:\"age\"`\n}\n\nfunc main() {\n\tu := User{Name: \"Alex\", Email: \"alex@example.com\", Age: 25}\n\tdata, err := json.Marshal(u)\n\tif err != nil {\n\t\tfmt.Println(\"Error:\", err)\n\t\treturn\n\t}\n\tfmt.Println(string(data))\n}",
+    "instruction": "Beyond the standard library, Go's ecosystem has thousands of packages at `pkg.go.dev` — like ISBN lookup, barcode scanning, or PDF generation.\n\nYou add one with:\n```\ngo get github.com/some/package\n```\n\nThis updates `go.mod` and creates `go.sum` (a lockfile with checksums).\n\nFor this tutorial environment we can only use the standard library — but the pattern is identical. Here we use `encoding/json` (standard library) the same way you would use any external package: import, call, done.\n\nRun this. See how json.Marshal turns a Book struct into JSON — the same format a library API would return.",
+    "starter": "package main\n\nimport (\n\t\"encoding/json\"\n\t\"fmt\"\n)\n\ntype Book struct {\n\tTitle string `json:\"title\"`\n\tAuthor string `json:\"author\"`\n\tPages int    `json:\"pages\"`\n}\n\nfunc main() {\n\tb := Book{Title: \"The Great Gatsby\", Author: \"F. Scott Fitzgerald\", Pages: 180}\n\tdata, err := json.Marshal(b)\n\tif err != nil {\n\t\tfmt.Println(\"Error:\", err)\n\t\treturn\n\t}\n\tfmt.Println(string(data))\n}",
     "expectedOutput": [
-      "{\"name\":\"Alex\",\"email\":\"alex@example.com\",\"age\":25}"
+      "{\"title\":\"The Great Gatsby\",\"author\":\"F. Scott Fitzgerald\",\"pages\":180}"
     ],
-    "successMessage": "A Go struct became JSON in three lines. This is how every Go API serializes responses. The pattern — import, call, handle error — is identical whether it is a standard library package or a third-party one."
+    "successMessage": "A Go Book struct became JSON in three lines. This is how every library API serializes catalog data. The pattern — import, call, handle error — is identical whether it is a standard library package or a third-party one."
   },
   {
     "title": "Import aliases",
-    "instruction": "You can give an imported package a different name using an alias:\n\n```\nimport (\n    str \"strings\"\n    m   \"math\"\n)\n```\n\nThen use `str.ToUpper()` and `m.Sqrt()` instead of the full names.\n\nAliases are also used to resolve naming conflicts when two packages have the same last segment.\n\nRun this — it uses aliases for both `strings` and `math`. Then add a line using the `m` alias to print `math.Pi` rounded to 2 decimal places.",
+    "instruction": "You can give an imported package a different name using an alias:\n\n```\nimport (\n    str \"strings\"\n    m   \"math\"\n)\n```\n\nThen use `str.ToUpper()` and `m.Sqrt()` instead of the full names. Handy when building a library stats dashboard with multiple packages.\n\nAliases are also used to resolve naming conflicts when two packages have the same last segment.\n\nRun this — it uses aliases for both `strings` and `math`. Then add a line using the `m` alias to print `math.Pi` rounded to 2 decimal places (for calculating library shelf area).",
     "hint": "fmt.Printf(\"Pi ≈ %.2f\\n\", m.Pi)",
-    "starter": "package main\n\nimport (\n\tstr \"strings\"\n\tm   \"math\"\n\t\"fmt\"\n)\n\nfunc main() {\n\tfmt.Println(str.ToUpper(\"hello\"))\n\tfmt.Println(m.Sqrt(81))\n\t// TODO: print m.Pi formatted to 2 decimal places\n}",
+    "starter": "package main\n\nimport (\n\tstr \"strings\"\n\tm   \"math\"\n\t\"fmt\"\n)\n\nfunc main() {\n\tfmt.Println(str.ToUpper(\"library catalog\"))\n\tfmt.Println(m.Sqrt(81))\n\t// TODO: print m.Pi formatted to 2 decimal places\n}",
     "expectedOutput": [
-      "HELLO",
+      "LIBRARY CATALOG",
       "9",
       "Pi ≈ 3.14"
     ],
@@ -216,28 +216,28 @@
         "message": "Replace the TODO comment with your code."
       }
     ],
-    "successMessage": "Aliases keep imports readable when names get long or conflict. You will see them most often with database drivers and generated code."
+    "successMessage": "Aliases keep imports readable when names get long or conflict. In a library app with many dependencies, they make your code cleaner."
   },
   {
     "title": "Blank import",
-    "instruction": "Sometimes you import a package purely for its side effects — it registers something when it loads, but you never call its functions directly.\n\n`import _ \"some/package\"` — the blank identifier suppresses the \"imported and not used\" error.\n\nThe most common example: database drivers. `import _ \"github.com/lib/pq\"` registers PostgreSQL as a driver with `database/sql` without you calling anything from `pq` directly.\n\nRun this. The `image/png` package is blank-imported to register the PNG decoder.",
+    "instruction": "Sometimes you import a package purely for its side effects — it registers something when it loads, but you never call its functions directly.\n\n`import _ \"some/package\"` — the blank identifier suppresses the \"imported and not used\" error.\n\nThe most common example: database drivers. `import _ \"github.com/lib/pq\"` registers PostgreSQL as a driver with `database/sql` without you calling anything from `pq` directly.\n\nRun this. The `image/png` package is blank-imported to register the PNG decoder — like how a library might register a barcode scanner plugin.",
     "starter": "package main\n\nimport (\n\t\"fmt\"\n\t\"image\"\n\t_ \"image/png\"\n\t\"strings\"\n)\n\nfunc main() {\n\tformats := []string{}\n\timage.RegisterFormat(\"demo\", \"DEMO\", nil, nil)\n\n\t// Show that the blank import registered png support\n\tsupported := []string{\"png\", \"jpeg\", \"gif\"}\n\tfor _, f := range supported {\n\t\t_ = f\n\t}\n\tfmt.Println(\"PNG support registered via blank import\")\n\tfmt.Println(strings.Repeat(\"-\", 35))\n}",
     "expectedOutput": [
       "PNG support registered via blank import",
       "-----------------------------------"
     ],
-    "successMessage": "The blank import ran the png package's init() function — registering the PNG decoder — without polluting your code with unused identifiers. You will use this pattern with database drivers and image formats."
+    "successMessage": "The blank import ran the png package's init() function — registering the PNG decoder — without polluting your code with unused identifiers. You will use this pattern to register database drivers or image format decoders."
   },
   {
-    "title": "Build a string toolkit",
-    "instruction": "No starter code.\n\nBuild a small text analysis tool using `strings`, `fmt`, and `math`:\n\n1. Start with this sentence: `\"  the quick brown fox jumps over the lazy dog  \"`\n2. Trim the whitespace\n3. Print the trimmed sentence in UPPERCASE\n4. Split it into words and print the word count\n5. Print whether it contains `\"fox\"`\n6. Print the average word length rounded to 2 decimal places\n\nExpected output:\n```\nTHE QUICK BROWN FOX JUMPS OVER THE LAZY DOG\nWord count: 9\nContains fox: true\nAvg word length: 3.89\n```",
+    "title": "Build a library catalog tool",
+    "instruction": "No starter code.\n\nBuild a small library catalog tool using `strings`, `fmt`, and `math`:\n\n1. Start with this catalog entry: `\"  The Great Gatsby by F. Scott Fitzgerald, 1925  \"`\n2. Trim the whitespace\n3. Print the trimmed entry in UPPERCASE\n4. Split it into words and print the word count\n5. Print whether it contains `\"Gatsby\"`\n6. Print the average word length rounded to 2 decimal places\n\nExpected output:\n```\nTHE GREAT GATSBY BY F. SCOTT FITZGERALD, 1925\nWord count: 8\nContains Gatsby: true\nAvg word length: 4.38\n```",
     "hint": "For average length: loop through words, sum all len(word), divide by len(words). Use math.Round or %.2f for formatting.",
     "starter": "package main\n\nimport (\n\t\"fmt\"\n\t\"math\"\n\t\"strings\"\n)\n\nfunc main() {\n}",
     "expectedOutput": [
-      "THE QUICK BROWN FOX JUMPS OVER THE LAZY DOG",
-      "Word count: 9",
-      "Contains fox: true",
-      "Avg word length: 3.89"
+      "THE GREAT GATSBY BY F. SCOTT FITZGERALD, 1925",
+      "Word count: 8",
+      "Contains Gatsby: true",
+      "Avg word length: 4.38"
     ],
     "codeChecks": [
       {
@@ -258,7 +258,7 @@
       {
         "pattern": "strings\\.Contains",
         "required": true,
-        "message": "Use strings.Contains to check for \"fox\"."
+        "message": "Use strings.Contains to check for \"Gatsby\"."
       },
       {
         "pattern": "math\\.|%.2f",
@@ -266,6 +266,6 @@
         "message": "Use math package or %.2f to format the average to 2 decimal places."
       }
     ],
-    "successMessage": "Five packages worth of functionality in under 20 lines. Text trimmed, uppercased, split, searched, and analysed. The standard library does the heavy lifting — you just orchestrate it."
+    "successMessage": "Five packages worth of functionality in under 20 lines. Entry trimmed, uppercased, split, searched, and analysed. The standard library does the heavy lifting — you just orchestrate it, like a librarian organizing a catalog."
   }
 ]

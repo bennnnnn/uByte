@@ -1,110 +1,110 @@
 [
   {
     "title": "What is a variable",
-    "instruction": "Imagine a box with a label on it.\n\nYou write \"name\" on the outside. You put \"Alex\" inside. Whenever you need that name, you just say the label — and Go hands you what's inside.\n\nThat is a variable. A labeled box that holds a value.\n\nRun this program and see it in action.",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tname := \"Alex\"\n\tfmt.Println(name)\n}",
-    "expectedOutput": ["Alex"],
-    "successMessage": "You stored a value and retrieved it. That is what every variable in every program ever written does."
+    "instruction": "Imagine a labeled shelf slot in a library.\n\nYou write \"title\" on the slot label. You put \"The Hobbit\" on the shelf. Whenever you need that book, you just say the label — and Go hands you what's on that shelf.\n\nThat is a variable. A labeled slot that holds a value.\n\nRun this program and see it in action.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\ttitle := \"The Hobbit\"\n\tfmt.Println(title)\n}",
+    "expectedOutput": ["The Hobbit"],
+    "successMessage": "You stored a book title and retrieved it. That is what every variable in every library system ever written does."
   },
   {
     "title": "Create your own variable with :=",
-    "instruction": "`:=` is how you create a variable and give it a value at the same time.\n\nLeft side: the label. Right side: what goes inside the box.\n\nChange the name to yours and run it.",
-    "hint": "Replace \"Alex\" with your actual name. Keep the quotes.",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tname := \"Alex\"\n\tfmt.Println(name)\n}",
+    "instruction": "`:=` is how you create a variable and give it a value at the same time.\n\nLeft side: the shelf label. Right side: the book that goes on it.\n\nChange the title to your favorite book and run it.",
+    "hint": "Replace \"The Hobbit\" with your favorite book title. Keep the quotes.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\ttitle := \"The Hobbit\"\n\tfmt.Println(title)\n}",
     "expectedOutput": [],
     "codeChecks": [
-      { "pattern": "name\\s*:=\\s*\"Alex\"", "required": false, "message": "Change the value from \"Alex\" to your own name." }
+      { "pattern": "title\\s*:=\\s*\"The Hobbit\"", "required": false, "message": "Change the value from \"The Hobbit\" to your own favorite book title." }
     ],
-    "successMessage": "Your first original variable. := creates it and fills it in one shot."
+    "successMessage": "Your first original variable. := creates it and fills it in one shot, like shelving a new book."
   },
   {
     "title": "Declare first, assign later",
-    "instruction": "Sometimes you want to create the box first and fill it later.\n\n`var name string` creates an empty box labeled name.\n`name = \"Alex\"` puts something inside.\n\nNotice: filling later uses `=` not `:=`\n\nRun this.",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tvar name string\n\tname = \"Alex\"\n\tfmt.Println(name)\n}",
-    "expectedOutput": ["Alex"],
-    "successMessage": "Two separate steps: create the box, then fill it. This comes in handy when you do not have the value yet."
+    "instruction": "Sometimes you want to create the shelf slot first and place the book later.\n\n`var title string` creates an empty slot labeled title.\n`title = \"The Hobbit\"` puts a book on it.\n\nNotice: filling later uses `=` not `:=`\n\nRun this.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tvar title string\n\ttitle = \"The Hobbit\"\n\tfmt.Println(title)\n}",
+    "expectedOutput": ["The Hobbit"],
+    "successMessage": "Two separate steps: create the shelf slot, then put the book on it. This comes in handy when the book hasn't arrived yet."
   },
   {
     "title": "The var keyword with a value",
-    "instruction": "`var` can also declare and assign in one line — just like `:=` but more explicit.\n\n`var age int = 25`\n\nThis says: create a variable called age, it holds whole numbers, and it starts at 25.\n\nChange the age to your real age and run it.",
-    "hint": "Change the number 25 to your actual age. Keep everything else the same.",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tvar age int = 25\n\tfmt.Println(age)\n}",
+    "instruction": "`var` can also declare and assign in one line — just like `:=` but more explicit.\n\n`var copies int = 5`\n\nThis says: create a variable called copies, it holds whole numbers, and it starts at 5.\n\nChange the copy count to how many copies your library has and run it.",
+    "hint": "Change the number 5 to your actual copy count. Keep everything else the same.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tvar copies int = 5\n\tfmt.Println(copies)\n}",
     "expectedOutput": [],
     "codeChecks": [
-      { "pattern": "var\\s+age\\s+int\\s*=\\s*\\d+", "required": true, "message": "Keep the var keyword and int type. Just change the number." }
+      { "pattern": "var\\s+copies\\s+int\\s*=\\s*\\d+", "required": true, "message": "Keep the var keyword and int type. Just change the number." }
     ],
     "successMessage": "var is the longer form. := is the shortcut. Both work — use whichever feels clearer."
   },
   {
     "title": "Update a variable",
-    "instruction": "Variables can change. That is literally what the word means.\n\nBut there is one rule:\n- `:=` creates a new variable. Use it once.\n- `=` updates an existing one. Use it after.\n\nThe score starts at 60. Update it to 95 and print both values.",
-    "hint": "After fmt.Println(score), write: score = 95  then fmt.Println(score) again.",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tscore := 60\n\tfmt.Println(score)\n\t// TODO: On the next line, update score to 95 using =\n\t// TODO: Then print score again on the line after that\n}",
+    "instruction": "Variables can change. A book count might go up as new books arrive.\n\nBut there is one rule:\n- `:=` creates a new variable. Use it once.\n- `=` updates an existing one. Use it after.\n\nThe count starts at 60. A new shipment arrives — update it to 95 and print both values.",
+    "hint": "After fmt.Println(copies), write: copies = 95  then fmt.Println(copies) again.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tcopies := 60\n\tfmt.Println(copies)\n\t// TODO: On the next line, update copies to 95 using =\n\t// TODO: Then print copies again on the line after that\n}",
     "expectedOutput": ["60", "95"],
     "codeChecks": [
-      { "pattern": "score\\s*=\\s*95", "required": true, "message": "Update score using a single =  like this: score = 95" },
+      { "pattern": "copies\\s*=\\s*95", "required": true, "message": "Update copies using a single =  like this: copies = 95" },
       { "pattern": "TODO", "required": false, "message": "Replace the TODO lines with actual code." }
     ],
-    "successMessage": "Same box, new value. = refills. := creates. Never mix them up."
+    "successMessage": "Same shelf slot, new count. = refills. := creates. Never mix them up."
   },
   {
     "title": "Two variables in one line",
-    "instruction": "Go lets you declare and assign multiple variables at once.\n\n`first, last := \"Alex\", \"Rivera\"`\n\nLeft side: the labels. Right side: the values. Order matches.\n\nChange the names to yours and run it.",
-    "hint": "Replace \"Alex\" with your first name and \"Rivera\" with your last name.",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tfirst, last := \"Alex\", \"Rivera\"\n\tfmt.Println(first)\n\tfmt.Println(last)\n}",
+    "instruction": "Go lets you declare and assign multiple variables at once.\n\n`title, author := \"The Hobbit\", \"Tolkien\"`\n\nLeft side: the labels. Right side: the values. Order matches.\n\nChange the book and author to your own and run it.",
+    "hint": "Replace \"The Hobbit\" with your book title and \"Tolkien\" with its author.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\ttitle, author := \"The Hobbit\", \"Tolkien\"\n\tfmt.Println(title)\n\tfmt.Println(author)\n}",
     "expectedOutput": [],
     "codeChecks": [
-      { "pattern": "first,\\s*last\\s*:=", "required": true, "message": "Keep the multi-assignment format: first, last := ..." },
-      { "pattern": "first,\\s*last\\s*:=\\s*\"Alex\",", "required": false, "message": "Change the names from \"Alex\" and \"Rivera\" to your own." }
+      { "pattern": "title,\\s*author\\s*:=", "required": true, "message": "Keep the multi-assignment format: title, author := ..." },
+      { "pattern": "title,\\s*author\\s*:=\\s*\"The Hobbit\",", "required": false, "message": "Change the book title and author to your own." }
     ],
-    "successMessage": "One line, two variables. Go matches left to right: first gets the first value, last gets the second."
+    "successMessage": "One line, two variables. Go matches left to right: title gets the first value, author gets the second."
   },
   {
     "title": "Declare a group with var ()",
-    "instruction": "When you have several variables, you can declare them as a group.\n\n```\nvar (\n    name string = \"Alex\"\n    age  int    = 25\n    city string = \"London\"\n)\n```\n\nClean, organized, easy to read.\n\nAdd a fourth variable called `country` with your country, then print all four.",
-    "hint": "Add country string = \"YourCountry\" inside the var block. Then add fmt.Println(country) at the bottom.",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tvar (\n\t\tname string = \"Alex\"\n\t\tage  int    = 25\n\t\tcity string = \"London\"\n\t\t// TODO: Add country inside this var block\n\t)\n\tfmt.Println(name)\n\tfmt.Println(age)\n\tfmt.Println(city)\n\t// TODO: After the lines above, print country too\n}",
+    "instruction": "When you have several library details, you can declare them as a group.\n\n```\nvar (\n    title  string = \"The Hobbit\"\n    copies int    = 25\n    genre  string = \"Fantasy\"\n)\n```\n\nClean, organized, easy to read.\n\nAdd a fourth variable called `section` with your library section (like \"Fiction\" or \"Reference\"), then print all four.",
+    "hint": "Add section string = \"YourSection\" inside the var block. Then add fmt.Println(section) at the bottom.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tvar (\n\t\ttitle  string = \"The Hobbit\"\n\t\tcopies int    = 25\n\t\tgenre  string = \"Fantasy\"\n\t\t// TODO: Add section inside this var block\n\t)\n\tfmt.Println(title)\n\tfmt.Println(copies)\n\tfmt.Println(genre)\n\t// TODO: After the lines above, print section too\n}",
     "expectedOutput": [],
     "codeChecks": [
-      { "pattern": "country\\s+string\\s*=\\s*\"\\S+\"", "required": true, "message": "Add country inside the var block: country string = \"YourCountry\"" },
-      { "pattern": "Println\\(country\\)", "required": true, "message": "Print country using fmt.Println(country)" },
+      { "pattern": "section\\s+string\\s*=\\s*\"\\S+", "required": true, "message": "Add section inside the var block: section string = \"YourSection\"" },
+      { "pattern": "Println\\(section\\)", "required": true, "message": "Print section using fmt.Println(section)" },
       { "pattern": "TODO", "required": false, "message": "Replace the TODO lines with actual code." }
     ],
-    "successMessage": "The var block keeps all your declarations together. Much easier to scan than a pile of := lines."
+    "successMessage": "The var block keeps all your library catalog fields together. Much easier to scan than a pile of := lines."
   },
   {
     "title": "Zero values",
-    "instruction": "What happens if you create a variable but never put anything in it?\n\nGo does not leave it empty. It gives it a default value called a zero value.\n\n- `string` gets `\"\"`  (empty text)\n- `int` gets `0`\n- `bool` gets `false`\n\nRun this and see the zero values printed.",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tvar name string\n\tvar score int\n\tvar active bool\n\tfmt.Println(name)\n\tfmt.Println(score)\n\tfmt.Println(active)\n}",
+    "instruction": "What happens if you create a shelf slot but never put a book in it?\n\nGo does not leave it empty. It gives it a default value called a zero value.\n\n- `string` gets `\"\"`  (empty title)\n- `int` gets `0`\n- `bool` gets `false`\n\nRun this and see the zero values for your library data.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tvar title string\n\tvar copies int\n\tvar available bool\n\tfmt.Println(title)\n\tfmt.Println(copies)\n\tfmt.Println(available)\n}",
     "expectedOutput": ["", "0", "false"],
-    "successMessage": "No surprises in Go. Every variable always has a value, even before you assign one."
+    "successMessage": "No surprises in Go. Every variable always has a value, even before you catalog a single book."
   },
   {
     "title": "Fix the broken names",
-    "instruction": "Variable names have rules:\n\n- Start with a letter, not a number\n- No spaces — use camelCase instead\n- Case matters: `score` and `Score` are different variables\n\nThis code has three broken names. Fix them so the program runs.",
+    "instruction": "Variable names have rules:\n\n- Start with a letter, not a number\n- No spaces — use camelCase instead\n- Case matters: `copies` and `Copies` are different variables\n\nThis code has three broken names. Fix them so the program runs.",
     "hint": "1st name starts with a number. 2nd name has a space. 3rd is the wrong case when printed.",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\t1stPlace := \"Gold\"\n\tfull name := \"Alex Rivera\"\n\tUserScore := 99\n\tfmt.Println(1stPlace)\n\tfmt.Println(full name)\n\tfmt.Println(userScore)\n}",
-    "expectedOutput": ["Gold", "Alex Rivera", "99"],
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\t1stBook := \"Dune\"\n\tlibrary name := \"Central Library\"\n\tAvailableCopies := 15\n\tfmt.Println(1stBook)\n\tfmt.Println(library name)\n\tfmt.Println(availableCopies)\n}",
+    "expectedOutput": ["Dune", "Central Library", "15"],
     "codeChecks": [
-      { "pattern": "1stPlace|full name", "required": false, "message": "Fix the invalid variable names. No numbers at the start, no spaces — use camelCase." }
+      { "pattern": "1stBook|library name", "required": false, "message": "Fix the invalid variable names. No numbers at the start, no spaces — use camelCase." }
     ],
-    "successMessage": "Good eye. Valid names keep your code readable and error-free."
+    "successMessage": "Good eye. Valid names keep your library code readable and error-free."
   },
   {
-    "title": "Build a profile from scratch",
-    "instruction": "Everything you just learned — now use it all.\n\nBuild a short profile using these rules:\n- Use `:=` for name and age\n- Use `var` with a type for city\n- Declare score with var and assign it separately\n- Print all four\n\nNo starter code. Just you.",
-    "hint": "name := \"...\", age := 25, var city string then city = \"...\", var score int then score = 100. Then four Println calls.",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\t// TODO: Build your profile here\n}",
+    "title": "Build a library profile from scratch",
+    "instruction": "Everything you just learned — now use it all.\n\nBuild a short library profile using these rules:\n- Use `:=` for title and copies\n- Use `var` with a type for section\n- Declare available with var and assign it separately\n- Print all four\n\nNo starter code. Just you.",
+    "hint": "title := \"...\", copies := 10, var section string then section = \"...\", var available bool then available = true. Then four Println calls.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\t// TODO: Build your library profile here\n}",
     "expectedOutput": [],
     "codeChecks": [
-      { "pattern": "name\\s*:=", "required": true, "message": "Declare name using :=" },
-      { "pattern": "age\\s*:=", "required": true, "message": "Declare age using :=" },
-      { "pattern": "var\\s+city", "required": true, "message": "Declare city using the var keyword" },
-      { "pattern": "var\\s+score", "required": true, "message": "Declare score using the var keyword" },
-      { "pattern": "Println\\(name\\)", "required": true, "message": "Print name" },
-      { "pattern": "Println\\(age\\)", "required": true, "message": "Print age" },
-      { "pattern": "Println\\(city\\)", "required": true, "message": "Print city" },
-      { "pattern": "Println\\(score\\)", "required": true, "message": "Print score" }
+      { "pattern": "title\\s*:=", "required": true, "message": "Declare title using :=" },
+      { "pattern": "copies\\s*:=", "required": true, "message": "Declare copies using :=" },
+      { "pattern": "var\\s+section", "required": true, "message": "Declare section using the var keyword" },
+      { "pattern": "var\\s+available", "required": true, "message": "Declare available using the var keyword" },
+      { "pattern": "Println\\(title\\)", "required": true, "message": "Print title" },
+      { "pattern": "Println\\(copies\\)", "required": true, "message": "Print copies" },
+      { "pattern": "Println\\(section\\)", "required": true, "message": "Print section" },
+      { "pattern": "Println\\(available\\)", "required": true, "message": "Print available" }
     ],
     "successMessage": "You used every form of variable declaration in Go. Next up: the different kinds of data variables can hold."
   }

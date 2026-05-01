@@ -1,82 +1,82 @@
 [
   {
     "title": "What is a pointer",
-    "instruction": "Imagine a storage unit. You put your stuff inside. A pointer is not the stuff — it is the unit number written on a Post-it note. Give someone the note and they can find your stuff.\n\nIn Go:\n- `&x` gives you the address of `x` (the Post-it note)\n- `*p` reads the value at the address (looks inside the unit)\n\nRun this. Notice that printing `p` gives a memory address like `0xc0000b4008`. Printing `*p` gives the actual value.",
+    "instruction": "Imagine a library. Every book has a shelf location \u2014 a call number like 005.133.GO. A pointer is that call number written on a slip of paper. Hand someone the slip and they can find the exact book.\n\nIn Go:\n- `&x` gives you the address of `x` (the call-number slip)\n- `*p` reads the value at the address (retrieves the book from the shelf)\n\nRun this. Notice that printing `p` gives a memory address like `0xc0000b4008`. Printing `*p` gives the actual value \u2014 the book itself.",
     "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tx := 42\n\tp := &x\n\tfmt.Println(\"Value:\", x)\n\tfmt.Println(\"Address:\", p)\n\tfmt.Println(\"Value via pointer:\", *p)\n}",
     "expectedOutput": ["Value: 42", "Value via pointer: 42"],
     "codeChecks": [],
-    "successMessage": "The address will look different on every run — memory locations change. But *p always gives 42. The pointer remembers where to find it."
+    "successMessage": "The address will look different on every run \u2014 memory locations change like books being reshelved. But *p always gives 42. The pointer remembers where to find it."
   },
   {
     "title": "Declare a pointer",
-    "instruction": "The type of a pointer to an `int` is `*int`. A pointer to a `string` is `*string`.\n\n```\nvar p *int   // p is a pointer to an int\np = &num     // p now holds the address of num\n```\n\nDeclare a variable `score` with value `100`. Declare a pointer `sp` that points to it. Print both the address and the value via the pointer.",
-    "hint": "score := 100  sp := &score  fmt.Println(sp)  fmt.Println(*sp)",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\t// TODO: declare score = 100, pointer sp = &score\n\t// print sp (address) and *sp (value)\n}",
-    "expectedOutput": ["100"],
+    "instruction": "The type of a pointer to an `int` is `*int`. A pointer to a `string` is `*string`.\n\n```\nvar p *int   // p is a pointer to an int\np = &num     // p now holds the address of num\n```\n\nDeclare a variable `copies` with value `3` (the number of copies your library has). Declare a pointer `cp` that points to it. Print both the address (like a shelf tag) and the value via the pointer.",
+    "hint": "copies := 3  cp := &copies  fmt.Println(cp)  fmt.Println(*cp)",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\t// TODO: declare copies = 3, pointer cp = &copies\n\t// print cp (address) and *cp (value)\n}",
+    "expectedOutput": ["3"],
     "codeChecks": [
-      { "pattern": "score\\s*:=\\s*100", "required": true, "message": "Declare: score := 100" },
-      { "pattern": "sp\\s*:=\\s*&score", "required": true, "message": "Declare the pointer: sp := &score" },
-      { "pattern": "\\*sp", "required": true, "message": "Print the value via pointer: fmt.Println(*sp)" },
+      { "pattern": "copies\\s*:=\\s*3", "required": true, "message": "Declare: copies := 3" },
+      { "pattern": "cp\\s*:=\\s*&copies", "required": true, "message": "Declare the pointer: cp := &copies" },
+      { "pattern": "\\*cp", "required": true, "message": "Print the value via pointer: fmt.Println(*cp)" },
       { "pattern": "TODO", "required": false, "message": "Replace the TODO comments with your code." }
     ],
-    "successMessage": "sp holds an address, *sp holds the value at that address. Two different things — same data."
+    "successMessage": "cp holds a shelf location, *cp holds the book at that location. Two different things \u2014 same data."
   },
   {
     "title": "Change a value through a pointer",
-    "instruction": "This is where pointers become useful.\n\nIf you have a pointer `p` to a variable, you can change the variable's value by writing to `*p`:\n\n`*p = 99` — sets the value at that address to 99.\n\nRun this and notice that changing `*p` also changes `x` — because they point to the same place.",
+    "instruction": "This is where pointers become useful \u2014 like updating a book's catalog entry through the shelf tag.\n\nIf you have a pointer `p` to a variable, you can change the variable's value by writing to `*p`:\n\n`*p = 99` \u2014 sets the value at that address to 99.\n\nRun this and notice that changing `*p` also changes `x` \u2014 because they point to the same place, like two catalog cards referencing one book.",
     "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tx := 10\n\tp := &x\n\n\tfmt.Println(\"Before:\", x)\n\t*p = 99\n\tfmt.Println(\"After:\", x)\n}",
     "expectedOutput": ["Before: 10", "After: 99"],
-    "successMessage": "One change through the pointer, and x changed too. They are not two copies — they are the same memory location seen from two angles."
+    "successMessage": "One change through the pointer, and x changed too. They are not two copies \u2014 they are the same memory location seen from two angles, like two shelf markers for the same book."
   },
   {
     "title": "The nil pointer",
-    "instruction": "A pointer that has not been assigned an address has the value `nil`.\n\nUsing a nil pointer crashes your program — you are trying to read from address zero, which is invalid.\n\nRun this. It checks for nil before using the pointer. Add a line that assigns `p = &age` and prints `*p` after the check.",
-    "hint": "age := 25  p = &age  fmt.Println(*p)",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tvar p *int\n\tage := 25\n\n\tif p == nil {\n\t\tfmt.Println(\"p is nil — not safe to use yet\")\n\t}\n\n\t// TODO: assign p = &age, then print *p\n}",
-    "expectedOutput": ["p is nil — not safe to use yet", "25"],
+    "instruction": "A pointer that has not been assigned an address has the value `nil`.\n\nUsing a nil pointer crashes your program \u2014 you are trying to grab a book from a shelf that does not exist.\n\nRun this. It checks for nil before using the pointer. Add a line that assigns `p = &shelfCount` and prints `*p` after the check.",
+    "hint": "shelfCount := 25  p = &shelfCount  fmt.Println(*p)",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tvar p *int\n\tshelfCount := 25\n\n\tif p == nil {\n\t\tfmt.Println(\"p is nil \u2014 no shelf assigned yet\")\n\t}\n\n\t// TODO: assign p = &shelfCount, then print *p\n}",
+    "expectedOutput": ["p is nil \u2014 no shelf assigned yet", "25"],
     "codeChecks": [
-      { "pattern": "p\\s*=\\s*&age", "required": true, "message": "Assign p = &age to make p point to age." },
+      { "pattern": "p\\s*=\\s*&shelfCount", "required": true, "message": "Assign p = &shelfCount to make p point to shelfCount." },
       { "pattern": "\\*p", "required": true, "message": "Print *p after assigning the pointer." },
       { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
     ],
-    "successMessage": "Always check for nil before dereferencing an unknown pointer. This is how Go avoids the null pointer crashes that plague other languages."
+    "successMessage": "Always check for nil before dereferencing an unknown pointer \u2014 like checking that a shelf exists before reaching for a book. This habit prevents crashes."
   },
   {
-    "title": "Pointers and functions — the copy problem",
-    "instruction": "Here is the problem pointers solve.\n\nThis function tries to double a number. But it receives a copy — so the original never changes.\n\nRun it. Notice that `num` is still 5 after the call. The function doubled the copy, not the original.",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc double(n int) {\n\tn = n * 2\n}\n\nfunc main() {\n\tnum := 5\n\tdouble(num)\n\tfmt.Println(num)\n}",
+    "title": "Pointers and functions \u2014 the copy problem",
+    "instruction": "Here is the problem pointers solve.\n\nThis function tries to increase the number of book copies a library has. But it receives a copy \u2014 so the original count never changes.\n\nRun it. Notice that `copies` is still 5 after the call. The function doubled the copy, not the original \u2014 like telling one librarian to update a catalog while the other librarian holds the only record.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc doubleCopies(n int) {\n\tn = n * 2\n}\n\nfunc main() {\n\tcopies := 5\n\tdoubleCopies(copies)\n\tfmt.Println(copies)\n}",
     "expectedOutput": ["5"],
-    "successMessage": "Still 5. The function received a copy of 5, doubled the copy to 10, then threw the copy away. The original num never changed. This is pass-by-value in action."
+    "successMessage": "Still 5. The function received a copy of 5, doubled the copy to 10, then threw the copy away. The original copies field never changed. This is pass-by-value in action."
   },
   {
-    "title": "Pointers and functions — the fix",
-    "instruction": "Fix the `double` function so it actually modifies the original.\n\nChange the parameter to `*int` and pass `&num` when calling it.\n\nInside the function, write `*n = *n * 2` to update the value at the address.",
-    "hint": "func double(n *int) { *n = *n * 2 }  then call: double(&num)",
-    "starter": "package main\n\nimport \"fmt\"\n\n// TODO: fix double to accept *int and modify the value at the address\nfunc double(n int) {\n\tn = n * 2\n}\n\nfunc main() {\n\tnum := 5\n\tdouble(num) // TODO: pass &num\n\tfmt.Println(num)\n}",
+    "title": "Pointers and functions \u2014 the fix",
+    "instruction": "Fix the `doubleCopies` function so it actually modifies the original count.\n\nChange the parameter to `*int` and pass `&copies` when calling it.\n\nInside the function, write `*n = *n * 2` to update the value at the address \u2014 like walking to the correct shelf and physically changing the book.",
+    "hint": "func doubleCopies(n *int) { *n = *n * 2 }  then call: doubleCopies(&copies)",
+    "starter": "package main\n\nimport \"fmt\"\n\n// TODO: fix doubleCopies to accept *int and modify the value at the address\nfunc doubleCopies(n int) {\n\tn = n * 2\n}\n\nfunc main() {\n\tcopies := 5\n\tdoubleCopies(copies) // TODO: pass &copies\n\tfmt.Println(copies)\n}",
     "expectedOutput": ["10"],
     "codeChecks": [
-      { "pattern": "func\\s+double\\s*\\(\\s*\\w+\\s+\\*int\\s*\\)", "required": true, "message": "Change the parameter to *int: func double(n *int)" },
+      { "pattern": "func\\s+doubleCopies\\s*\\(\\s*\\w+\\s+\\*int\\s*\\)", "required": true, "message": "Change the parameter to *int: func doubleCopies(n *int)" },
       { "pattern": "\\*n\\s*=\\s*\\*n\\s*\\*\\s*2|\\*n\\s*\\*=\\s*2", "required": true, "message": "Update the value: *n = *n * 2" },
-      { "pattern": "double\\(&num\\)", "required": true, "message": "Pass the address: double(&num)" },
+      { "pattern": "doubleCopies\\(&copies\\)", "required": true, "message": "Pass the address: doubleCopies(&copies)" },
       { "pattern": "TODO", "required": false, "message": "Replace the TODO comments with your fixes." }
     ],
-    "successMessage": "Now it's 10. The function received the address of num, walked to that address, and doubled the value there. The original changed."
+    "successMessage": "Now it's 10. The function received the address of copies, walked to that address, and doubled the value there. The original changed \u2014 like updating the master catalog."
   },
   {
     "title": "Pointer to a struct",
-    "instruction": "You used pointer receivers in the Structs chapter. Here is what is happening under the hood.\n\nWhen you have a pointer to a struct, Go lets you use `.` to access fields directly — you do not need to write `(*p).Name` every time. Go figures it out.\n\nRun this. Then update `p.Score` to `95` through the pointer and print it.",
-    "hint": "p.Score = 95  fmt.Println(p.Score)",
-    "starter": "package main\n\nimport \"fmt\"\n\ntype Student struct {\n\tName  string\n\tScore int\n}\n\nfunc main() {\n\ts := Student{Name: \"Alex\", Score: 80}\n\tp := &s\n\n\tfmt.Println(p.Name)\n\tfmt.Println((*p).Score)\n\n\t// TODO: update p.Score to 95 and print it\n}",
-    "expectedOutput": ["Alex", "80", "95"],
+    "instruction": "You used pointer receivers in the Structs chapter. Here is what is happening under the hood.\n\nWhen you have a pointer to a struct, Go lets you use `.` to access fields directly \u2014 you do not need to write `(*book).Title` every time. Go auto-dereferences for you.\n\nRun this. Then update `p.Copies` to `15` through the pointer and print it.",
+    "hint": "p.Copies = 15  fmt.Println(p.Copies)",
+    "starter": "package main\n\nimport \"fmt\"\n\ntype Book struct {\n\tTitle  string\n\tCopies int\n}\n\nfunc main() {\n\tb := Book{Title: \"The Go Programming Language\", Copies: 8}\n\tp := &b\n\n\tfmt.Println(p.Title)\n\tfmt.Println((*p).Copies)\n\n\t// TODO: update p.Copies to 15 and print it\n}",
+    "expectedOutput": ["The Go Programming Language", "8", "15"],
     "codeChecks": [
-      { "pattern": "p\\.Score\\s*=\\s*95", "required": true, "message": "Update p.Score = 95 through the pointer." },
+      { "pattern": "p\\.Copies\\s*=\\s*15", "required": true, "message": "Update p.Copies = 15 through the pointer." },
       { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
     ],
-    "successMessage": "p.Name and (*p).Name are identical — Go auto-dereferences for you. The dot operator on a pointer is just syntactic sugar."
+    "successMessage": "p.Copies and (*p).Copies are identical \u2014 Go auto-dereferences for you. The dot operator on a pointer is syntactic sugar, like how a QR code on a book spine expands to full details."
   },
   {
-    "title": "new() — another way to create a pointer",
-    "instruction": "`new(T)` allocates memory for a value of type `T`, sets it to its zero value, and returns a pointer to it.\n\n`p := new(int)` — creates an int set to 0, returns a `*int`.\n\nIt is less common than `&x`, but useful when you want a pointer without first declaring a variable.\n\nRun this. Then use `new` to create a pointer to a `float64`, set it to `3.14`, and print it.",
+    "title": "new() \u2014 another way to create a pointer",
+    "instruction": "`new(T)` allocates memory for a value of type `T`, sets it to its zero value, and returns a pointer to it.\n\n`p := new(int)` \u2014 creates an int set to 0, returns a `*int`.\n\nThink of it like reserving an empty shelf slot before placing a book there.\n\nRun this. Then use `new` to create a pointer to a `float64`, set it to `3.14`, and print it.",
     "hint": "f := new(float64)  *f = 3.14  fmt.Println(*f)",
     "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tp := new(int)\n\tfmt.Println(*p)\n\t*p = 42\n\tfmt.Println(*p)\n\t// TODO: create a float64 pointer with new, set it to 3.14, print it\n}",
     "expectedOutput": ["0", "42", "3.14"],
@@ -85,53 +85,51 @@
       { "pattern": "3\\.14", "required": true, "message": "Set the value to 3.14 and print it." },
       { "pattern": "TODO", "required": false, "message": "Replace the TODO comment with your code." }
     ],
-    "successMessage": "new() allocates and zeroes. Then you fill it in. Less common than &var but good to know — you will see it in standard library code."
+    "successMessage": "new() allocates and zeroes \u2014 like a reserved shelf with a blank label. Then you fill it in. Less common than &var but good to know \u2014 you will see it in standard library code."
   },
   {
     "title": "When to use a pointer",
-    "instruction": "Three rules of thumb:\n\n1. **Mutation** — if a function needs to modify its argument, use a pointer\n2. **Large data** — if a struct is big, passing a pointer avoids copying all those bytes\n3. **Consistency** — if some methods on a type use pointer receivers, make them all pointer receivers\n\nRun this. Two functions — one receives a copy, one receives a pointer. See the difference.",
-    "starter": "package main\n\nimport \"fmt\"\n\ntype Config struct {\n\tDebug   bool\n\tTimeout int\n}\n\nfunc enableDebugCopy(c Config) {\n\tc.Debug = true\n}\n\nfunc enableDebugPointer(c *Config) {\n\tc.Debug = true\n}\n\nfunc main() {\n\tc1 := Config{Debug: false, Timeout: 30}\n\tenableDebugCopy(c1)\n\tfmt.Println(\"After copy:\", c1.Debug)\n\n\tc2 := Config{Debug: false, Timeout: 30}\n\tenableDebugPointer(&c2)\n\tfmt.Println(\"After pointer:\", c2.Debug)\n}",
-    "expectedOutput": ["After copy: false", "After pointer: true"],
-    "successMessage": "Copy: unchanged. Pointer: changed. Same function logic, different result based on how you pass the data. Now you know when to reach for the pointer."
+    "instruction": "Three rules of thumb:\n\n1. **Mutation** \u2014 if a function needs to modify its argument (like updating a book's catalog entry), use a pointer\n2. **Large data** \u2014 if a struct is big (like an entire library section), passing a pointer avoids copying all those bytes\n3. **Consistency** \u2014 if some methods on a type use pointer receivers, make them all pointer receivers\n\nRun this. Two functions \u2014 one receives a copy, one receives a pointer. See the difference when updating a book's availability.",
+    "starter": "package main\n\nimport \"fmt\"\n\ntype BookInfo struct {\n\tTitle         string\n\tIsCheckedOut  bool\n\tPageCount     int\n}\n\nfunc checkOutCopy(b BookInfo) {\n\tb.IsCheckedOut = true\n}\n\nfunc checkOutPointer(b *BookInfo) {\n\tb.IsCheckedOut = true\n}\n\nfunc main() {\n\tb1 := BookInfo{Title: \"Go in Action\", IsCheckedOut: false, PageCount: 350}\n\tcheckOutCopy(b1)\n\tfmt.Println(\"After copy - checked out?:\", b1.IsCheckedOut)\n\n\tb2 := BookInfo{Title: \"Go in Action\", IsCheckedOut: false, PageCount: 350}\n\tcheckOutPointer(&b2)\n\tfmt.Println(\"After pointer - checked out?:\", b2.IsCheckedOut)\n}",
+    "expectedOutput": ["After copy - checked out?: false", "After pointer - checked out?: true"],
+    "successMessage": "Copy: unchanged \u2014 the book stays on the shelf. Pointer: changed \u2014 the book is now checked out. Same function logic, different result based on how you pass the data. Now you know when to reach for the pointer."
   },
   {
-    "title": "Pointer gotcha — the loop variable trap",
-    "instruction": "This is a classic Go bug.\n\nWhen you take the address of a loop variable, all iterations share the same address — so after the loop, all pointers point to the same (final) value.\n\nRun this and see the bug. Then fix it by adding `v := v` inside the loop before taking its address.",
-    "hint": "Inside the loop, add: v := v  (this creates a new variable each iteration). Then take &v.",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tnums := []int{1, 2, 3}\n\tptrs := []*int{}\n\n\tfor _, v := range nums {\n\t\t// BUG: all pointers end up pointing to the same variable\n\t\tptrs = append(ptrs, &v)\n\t}\n\n\tfor _, p := range ptrs {\n\t\tfmt.Println(*p)\n\t}\n}",
-    "expectedOutput": ["1", "2", "3"],
+    "title": "Pointer gotcha \u2014 the loop variable trap",
+    "instruction": "This is a classic Go bug \u2014 like writing shelf tags that all point to the same book by mistake.\n\nWhen you take the address of a loop variable, all iterations share the same address \u2014 so after the loop, all pointers point to the same (final) value.\n\nRun this and see the bug. Then fix it by adding `v := v` inside the loop before taking its address.",
+    "hint": "Inside the loop, add: book := book  (this creates a new variable each iteration). Then take &book.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tbookTitles := []string{\"1984\", \"Brave New World\", \"Fahrenheit 451\"}\n\tptrs := []*string{}\n\n\tfor _, v := range bookTitles {\n\t\t// BUG: all pointers end up pointing to the same variable\n\t\tptrs = append(ptrs, &v)\n\t}\n\n\tfor _, p := range ptrs {\n\t\tfmt.Println(*p)\n\t}\n}",
+    "expectedOutput": ["1984", "Brave New World", "Fahrenheit 451"],
     "codeChecks": [
-      { "pattern": "v\\s*:=\\s*v", "required": true, "message": "Add v := v inside the loop to create a new copy each iteration, then use &v." }
+      { "pattern": "v\\s*:=\\s*v|book\\s*:=\\s*book", "required": true, "message": "Add v := v inside the loop to create a new copy each iteration, then use &v." }
     ],
-    "successMessage": "The v := v line creates a brand new variable each iteration. Now each pointer has its own address. This bug trips up experienced Go developers — you just fixed it."
+    "successMessage": "The v := v line creates a brand new variable each iteration \u2014 like writing a fresh shelf tag for each book. Now each pointer has its own address. This bug trips up experienced Go developers \u2014 you just fixed it."
   },
   {
     "title": "Fix the broken function",
-    "instruction": "The `resetScore` function below is supposed to set a student's score back to zero. But it does not work — the score stays at 88 after the call.\n\nFix it so that calling `resetScore` actually changes the original struct.",
-    "hint": "Change the parameter to *Student and update the function body: s.Score = 0. Then pass &student in main.",
-    "starter": "package main\n\nimport \"fmt\"\n\ntype Student struct {\n\tName  string\n\tScore int\n}\n\n// BUG: this receives a copy — fix it to use a pointer\nfunc resetScore(s Student) {\n\ts.Score = 0\n}\n\nfunc main() {\n\tstudent := Student{Name: \"Alex\", Score: 88}\n\tresetScore(student)\n\tfmt.Println(student.Score)\n}",
-    "expectedOutput": ["0"],
+    "instruction": "The `returnBook` function below is supposed to set a book's checked-out status back to false (return it to the library). But it does not work \u2014 the book stays checked out after the call.\n\nFix it so that calling `returnBook` actually changes the original struct.",
+    "hint": "Change the parameter to *Book and update the function body. Then pass &myBook in main.",
+    "starter": "package main\n\nimport \"fmt\"\n\ntype Book struct {\n\tTitle        string\n\tIsCheckedOut bool\n}\n\n// BUG: this receives a copy \u2014 fix it to use a pointer\nfunc returnBook(b Book) {\n\tb.IsCheckedOut = false\n}\n\nfunc main() {\n\tmyBook := Book{Title: \"The Art of Programming\", IsCheckedOut: true}\n\treturnBook(myBook)\n\tfmt.Println(myBook.IsCheckedOut)\n}",
+    "expectedOutput": ["false"],
     "codeChecks": [
-      { "pattern": "func\\s+resetScore\\s*\\(\\s*\\w+\\s+\\*Student\\s*\\)", "required": true, "message": "Change the parameter to *Student: func resetScore(s *Student)" },
-      { "pattern": "resetScore\\(&student\\)", "required": true, "message": "Pass the address: resetScore(&student)" }
+      { "pattern": "func\\s+returnBook\\s*\\(\\s*\\w+\\s+\\*Book\\s*\\)", "required": true, "message": "Change the parameter to *Book: func returnBook(b *Book)" },
+      { "pattern": "returnBook\\(&myBook\\)", "required": true, "message": "Pass the address: returnBook(&myBook)" }
     ],
-    "successMessage": "Score is now 0. You spotted the copy problem and fixed it with a pointer. This skill will save you hours of debugging in real Go projects."
+    "successMessage": "IsCheckedOut is now false \u2014 the book is back on the shelf. You spotted the copy problem and fixed it with a pointer. This skill will save you hours of debugging in real Go projects."
   },
   {
-    "title": "Build a bank account",
-    "instruction": "No starter code.\n\nBuild a bank account:\n\n1. Define an `Account` struct with `Owner` (string) and `Balance` (float64)\n2. Write a `Deposit(a *Account, amount float64)` function that adds to the balance\n3. Write a `Withdraw(a *Account, amount float64)` function that subtracts from the balance — but only if there are enough funds (print `\"Insufficient funds\"` if not)\n4. In main: create an account with balance 100.00, deposit 50, withdraw 30, try to withdraw 200, print the final balance\n\nExpected output:\n```\nBalance: 120.00\nInsufficient funds\nFinal balance: 120.00\n```",
-    "hint": "func Deposit(a *Account, amount float64) { a.Balance += amount }  Use a.Balance >= amount check in Withdraw.",
-    "starter": "package main\n\nimport \"fmt\"\n\n// Build your bank account here\n\nfunc main() {\n}",
-    "expectedOutput": ["Balance: 120.00", "Insufficient funds", "Final balance: 120.00"],
+    "title": "Build a library catalog",
+    "instruction": "No starter code.\n\nBuild a library catalog system:\n\n1. Define a `Book` struct with `Title` (string) and `Copies` (int)\n2. Write a `CheckOut(catalog *Book)` function that decreases copies by 1 \u2014 but only if there are copies available (print `\"No copies left\"` if not)\n3. Write a `Return(catalog *Book)` function that increases copies by 1\n4. In main: create a book with 2 copies, check out 1, return 1, check out 2 more times, print the final copies\n\nExpected output:\n```\nChecked out. Copies left: 1\nReturned. Copies left: 2\nChecked out. Copies left: 1\nNo copies left\nFinal copies: 0\n```",
+    "hint": "func CheckOut(c *Book) { if c.Copies > 0 { c.Copies--; fmt.Printf(...) } else { fmt.Println(\"No copies left\") } }",
+    "starter": "package main\n\nimport \"fmt\"\n\n// Build your library catalog here\n\nfunc main() {\n}",
+    "expectedOutput": ["Checked out. Copies left: 1", "Returned. Copies left: 2", "Checked out. Copies left: 1", "No copies left", "Final copies: 0"],
     "codeChecks": [
-      { "pattern": "type\\s+Account\\s+struct\\s*\\{", "required": true, "message": "Define an Account struct." },
-      { "pattern": "Balance\\s+float64", "required": true, "message": "Add a Balance float64 field to Account." },
-      { "pattern": "func\\s+Deposit\\s*\\(", "required": true, "message": "Define a Deposit function." },
-      { "pattern": "func\\s+Withdraw\\s*\\(", "required": true, "message": "Define a Withdraw function." },
-      { "pattern": "\\*Account", "required": true, "message": "Use a pointer receiver *Account so changes affect the original." },
-      { "pattern": "Insufficient funds", "required": true, "message": "Print \"Insufficient funds\" when balance is too low." },
-      { "pattern": "%.2f", "required": true, "message": "Format the balance to 2 decimal places with %.2f." }
+      { "pattern": "type\\s+Book\\s+struct\\s*\\{", "required": true, "message": "Define a Book struct." },
+      { "pattern": "Copies\\s+int", "required": true, "message": "Add a Copies int field to Book." },
+      { "pattern": "func\\s+CheckOut\\s*\\(\\w+\\s+\\*Book\\s*\\)", "required": true, "message": "Define a CheckOut function with *Book parameter." },
+      { "pattern": "func\\s+Return\\s*\\(\\w+\\s+\\*Book\\s*\\)", "required": true, "message": "Define a Return function with *Book parameter." },
+      { "pattern": "TODO", "required": false, "message": "Replace the starter comment with your code." }
     ],
-    "successMessage": "A real bank account built with pointers. Deposit and Withdraw modify the original balance because they receive the address — not a copy. You now understand pointers."
+    "successMessage": "A real library catalog built with pointers. CheckOut and Return modify the original book record because they receive the address \u2014 not a copy. You now understand pointers."
   }
 ]

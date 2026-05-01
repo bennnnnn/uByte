@@ -1,95 +1,44 @@
 [
   {
     "title": "Your first Go program 🐹",
-    "instruction": "Welcome! You just picked one of the fastest, most practical languages in tech.\n\nGo powers Docker, Kubernetes, Uber's backend, and Twitch. Companies love it because it's simple, fast, and just works.\n\nThe code below is already written — just press **Run** and watch what happens.",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tfmt.Println(\"Hello, World!\")\n}",
-    "expectedOutput": ["Hello, World!"],
-    "successMessage": "Boom — you just ran a Go program. That's it. No setup, no config files, no drama. Let's keep going."
+    "instruction": "The front door: `func main()`. Every Go program has one — it's where Go walks in and starts running.\n\nThis program already works. Click **Run & check** to see it in action.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tfmt.Println(\"Hello, Library!\")\n}",
+    "expectedOutput": ["Hello, Library!"],
+    "successMessage": "Boom — you just ran a Go program. That's it. No setup, no config files, no drama."
   },
   {
-    "title": "Make it personal",
-    "instruction": "See the text inside the quotes? That's what the computer says out loud.\n\nThink of `fmt.Println()` as a megaphone — whatever you put between the quotes, it shouts to the screen.\n\nChange `\"Hello, World!\"` to your name and run it.",
-    "hint": "Only change the text between the quotes. Leave everything else exactly as it is.",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tfmt.Println(\"Hello, World!\")\n}",
-    "expectedOutput": [],
+    "title": "Announce Your Library",
+    "instruction": "Now make it yours. Change the message from `\"Hello, Library!\"` to `\"Welcome to my library!\"`, then add a second `fmt.Println()` below it that prints the hours: `\"Open daily from 9 AM to 8 PM\"`.",
+    "hint": "Change the first line to fmt.Println(\"Welcome to my library!\") and add: fmt.Println(\"Open daily from 9 AM to 8 PM\")",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\t// Change what I say — put your library name here\n\tfmt.Println(\"Hello, Library!\")\n\t// TODO: add a second line showing the library hours\n}",
+    "expectedOutput": ["Welcome to my library!", "9 AM"],
+    "successMessage": "Your library has a name and hours. The computer reads your code top-to-bottom, like a recipe."
+  },
+  {
+    "title": "Print the Book Count",
+    "instruction": "The library has 1200 books. Use `:=` to create a variable named `books` with the value `1200`, then print a sentence like `\"We have 1200 books!\"` using that variable.",
+    "hint": "books := 1200 — then fmt.Println(\"We have\", books, \"books!\")",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\t// Store the number 1200 in a variable called \"books\"\n\t// Then tell me to print a sentence that includes the count.\n\t// TODO: create a variable books := 1200\n\t// TODO: print \"We have 1200 books!\"\n}",
+    "expectedOutput": ["1200"],
+    "successMessage": "A variable holds a value so you can reuse it. The box has a label ('books') and a number inside."
+  },
+  {
+    "title": "Meet the Librarian",
+    "instruction": "Create two variables: `name := \"Alice\"` (the librarian) and `books := 5000` (the total collection). Print them on separate lines — first her name, then the book count.",
+    "hint": "name := \"Alice\" — books := 5000 — fmt.Println(name) — fmt.Println(books)",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\t// Create a variable holding the librarian's name (a string)\n\t// Create another holding the book count (a number)\n\t// Then print them each on their own line.\n\t// TODO: create name := \"Alice\" and books := 5000\n\t// TODO: print name on one line, books on the next\n}",
+    "expectedOutput": ["Alice", "5000"],
+    "successMessage": "Two variables, two lines of output. Strings with quotes, numbers without. Go knows the difference."
+  },
+  {
+    "title": "Add a Comment",
+    "instruction": "Lines that start with `//` are comments — I skip them completely. They're notes for humans. Add a `//` comment above the `fmt.Println()` call. Write something like `// This line prints the time`. Then change the message to print `\"Tomorrow at 9 AM\"`.",
+    "hint": "// This line prints the time — or any // comment before the Println call.",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\t// I skip lines that start with // — they're just notes for humans.\n\t// Add a comment above the Println describing what it does.\n\t// TODO: add a comment describing the next line\n\t// TODO: change this to print \"Tomorrow at 9 AM\"\n\tfmt.Println(\"PLACEHOLDER\")\n}",
+    "expectedOutput": ["Tomorrow at 9 AM"],
     "codeChecks": [
-      { "pattern": "Println\\(\"Hello, World!\"\\)", "required": false, "message": "Replace \"Hello, World!\" with your name — keep the quotes!" }
+      { "pattern": "^\\s*//(?!\\s*TODO)", "flags": "m", "required": true, "message": "Add a // comment on its own line above the fmt.Println call." }
     ],
-    "successMessage": "Nice — the computer now knows your name. Well, sort of. It just does what you tell it. Which is the whole point."
-  },
-  {
-    "title": "Say more stuff",
-    "instruction": "One `fmt.Println()` = one line of output. Want two lines? Use two.\n\nThink of it like texting — each `Println` is a separate message bubble.\n\nAdd a second `fmt.Println(\"something\")` below the first one.",
-    "hint": "Add fmt.Println(\"something\") on a new line inside the curly braces, right after the first one.",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tfmt.Println(\"First line\")\n}",
-    "expectedOutput": [],
-    "codeChecks": [
-      { "pattern": "fmt\\.Println\\([^)]+\\)[\\s\\S]*fmt\\.Println\\(", "required": true, "flags": "m", "message": "Add a second fmt.Println() line below the first." }
-    ],
-    "successMessage": "Two messages, two lines. The computer reads your code top-to-bottom, like a recipe. First this, then that."
-  },
-  {
-    "title": "Go big — three lines",
-    "instruction": "Let's go bigger. Three `fmt.Println()` calls, three lines of output.\n\nMake each one say something different. Get creative — this is your program.",
-    "hint": "You need three separate fmt.Println() lines inside the curly braces.",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tfmt.Println(\"Line one\")\n\tfmt.Println(\"Line two\")\n}",
-    "expectedOutput": [],
-    "codeChecks": [
-      { "pattern": "(fmt\\.Println\\()[\\s\\S]*(fmt\\.Println\\()[\\s\\S]*(fmt\\.Println\\()", "required": true, "flags": "m", "message": "Add a third fmt.Println() line." }
-    ],
-    "successMessage": "Three instructions, executed in order. Every program you'll ever write works this way — step by step, top to bottom."
-  },
-  {
-    "title": "The front door: func main()",
-    "instruction": "Every Go program has a `func main()`. It's the front door — Go walks in, finds `main`, and starts running whatever's inside the `{ }`.\n\nNo `main` = no program. Go would just stare at your code and do nothing.\n\nRun this and watch the order of the output.",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tfmt.Println(\"Step 1: wake up\")\n\tfmt.Println(\"Step 2: coffee\")\n\tfmt.Println(\"Step 3: code\")\n}",
-    "expectedOutput": ["Step 1: wake up", "Step 2: coffee", "Step 3: code"],
-    "successMessage": "See how it runs in order? func main() is just saying: 'Start here, do these things.' Every Go program you write will have one."
-  },
-  {
-    "title": "The toolbox: import",
-    "instruction": "`import \"fmt\"` loads a built-in toolbox called **fmt** (short for \"format\").\n\nWithout it, `fmt.Println` doesn't exist — it's like trying to use a drill without plugging it in.\n\nYou already have two lines. Add a third `fmt.Println()` and run it.",
-    "hint": "Add fmt.Println(\"your text\") on a new line inside the curly braces.",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tfmt.Println(\"fmt is a toolbox\")\n\tfmt.Println(\"Println is one of its tools\")\n}",
-    "expectedOutput": [],
-    "codeChecks": [
-      { "pattern": "(fmt\\.Println\\()[\\s\\S]*(fmt\\.Println\\()[\\s\\S]*(fmt\\.Println\\()", "required": true, "flags": "m", "message": "Add one more fmt.Println() line." }
-    ],
-    "successMessage": "Go has dozens of built-in toolboxes — fmt, math, strings, net/http. You just used your first one."
-  },
-  {
-    "title": "Bug hunt: round 1 🔍",
-    "instruction": "Time to play detective. This code has a bug — it won't run.\n\nPress Run, read the error message (it's actually helpful!), then fix the code.\n\n*Hint: count the quote marks.*",
-    "hint": "The string is missing a closing quote. Add \" at the end of \"Go is great\".",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tfmt.Println(\"Go is great)\n}",
-    "expectedOutput": ["Go is great"],
-    "successMessage": "You just debugged your first program. Reading error messages and fixing things is 80% of a real developer's day. Seriously."
-  },
-  {
-    "title": "Bug hunt: round 2 🔍",
-    "instruction": "Another bug, different flavor.\n\nRun it, read the error, and fix it. Go is picky about something here...",
-    "hint": "Go is case-sensitive. `println` (lowercase p) is not the same as `Println` (uppercase P).",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tfmt.println(\"Hello\")\n}",
-    "expectedOutput": ["Hello"],
-    "successMessage": "Go is case-sensitive — `Println` works, `println` doesn't. In Go, if a name starts with a capital letter, it's \"exported\" (public). Lowercase = private. You'll see why this matters later."
-  },
-  {
-    "title": "Write it from scratch ✍️",
-    "instruction": "No training wheels this time. The `main` block is empty.\n\nWrite three `fmt.Println()` lines and make the program do something. Anything you want.",
-    "hint": "Type three fmt.Println(\"something\") lines between the curly braces.",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\n}",
-    "expectedOutput": [],
-    "codeChecks": [
-      { "pattern": "(fmt\\.Println\\()[\\s\\S]*(fmt\\.Println\\()[\\s\\S]*(fmt\\.Println\\()", "required": true, "flags": "m", "message": "Add three fmt.Println() lines inside the curly braces." }
-    ],
-    "successMessage": "You wrote a Go program from a blank canvas. That's the real thing — no copy-paste, no hand-holding. You're a programmer now."
-  },
-  {
-    "title": "Chapter 1 complete! 🎉",
-    "instruction": "Let's recap what you just learned:\n\n• Every Go program has `package main` and `func main()`\n• `import \"fmt\"` loads the printing toolbox\n• `fmt.Println()` prints text to the screen\n• Go runs code top-to-bottom\n• Go is case-sensitive (capital letters matter!)\n\nChange the message to `\"Chapter 1 complete\"` and run it to finish this tutorial.",
-    "hint": "Replace the text inside the quotes with exactly: Chapter 1 complete",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tfmt.Println(\"Almost there...\")\n}",
-    "expectedOutput": ["Chapter 1 complete"],
-    "successMessage": "You're officially a Go programmer. Next up: variables — where things get really interesting. Your programs are about to get a brain. 🧠"
+    "successMessage": "Comments are free text — Go ignores them, humans read them. Use them to explain why, not what."
   }
 ]

@@ -2,35 +2,35 @@
   {
     "title": "What is JSON",
     "instruction": "JSON is the universal language of web APIs — every app, every service, every database tool speaks it.\n\nGo makes it simple: `json.Marshal` turns a struct into JSON bytes. Think of it as packing a suitcase — your struct's fields become JSON keys.\n\nRun this and see a Go struct become JSON.",
-    "starter": "package main\n\nimport (\n\t\"encoding/json\"\n\t\"fmt\"\n)\n\ntype User struct {\n\tName   string\n\tEmail  string\n\tActive bool\n}\n\nfunc main() {\n\tu := User{Name: \"Alex\", Email: \"alex@example.com\", Active: true}\n\tdata, err := json.Marshal(u)\n\tif err != nil {\n\t\tfmt.Println(\"Error:\", err)\n\t\treturn\n\t}\n\tfmt.Println(string(data))\n}",
+    "starter": "package main\n\nimport (\n\t\"encoding/json\"\n\t\"fmt\"\n)\n\ntype Book struct {\n\tTitle  string\n\tAuthor string\n\tPages  int\n}\n\nfunc main() {\n\tb := Book{Title: \"The Go Programming Language\", Author: \"Donovan & Kernighan\", Pages: 356}\n\tdata, err := json.Marshal(b)\n\tif err != nil {\n\t\tfmt.Println(\"Error:\", err)\n\t\treturn\n\t}\n\tfmt.Println(string(data))\n}",
     "expectedOutput": [
-      "{\"Name\":\"Alex\",\"Email\":\"alex@example.com\",\"Active\":true}"
+      "{\"Title\":\"The Go Programming Language\",\"Author\":\"Donovan & Kernighan\",\"Pages\":356}"
     ],
     "successMessage": "A Go struct became JSON. Notice the keys match the field names exactly — capital letters and all. We'll fix that with struct tags next."
   },
   {
     "title": "Struct tags — control the JSON keys",
-    "instruction": "By default, JSON keys match Go field names exactly. To use lowercase keys (which APIs expect), add struct tags:\n\n```\ntype User struct {\n    Name string `json:\"name\"`\n    Age  int    `json:\"age\"`\n}\n```\n\nAdd `json:\"...\"` tags to all three fields of `Product` so the output uses lowercase keys.",
-    "hint": "Name string `json:\"name\"`  Price float64 `json:\"price\"`  InStock bool `json:\"in_stock\"`",
-    "starter": "package main\n\nimport (\n\t\"encoding/json\"\n\t\"fmt\"\n)\n\ntype Product struct {\n\tName    string  // TODO: add json:\"name\" tag\n\tPrice   float64 // TODO: add json:\"price\" tag\n\tInStock bool    // TODO: add json:\"in_stock\" tag\n}\n\nfunc main() {\n\tp := Product{Name: \"Laptop\", Price: 999.99, InStock: true}\n\tdata, _ := json.Marshal(p)\n\tfmt.Println(string(data))\n}",
+    "instruction": "By default, JSON keys match Go field names exactly. To use lowercase keys (which APIs expect), add struct tags:\n\n```\ntype Book struct {\n    Title  string `json:\"title\"`\n    Author string `json:\"author\"`\n    Pages  int    `json:\"pages\"`\n}\n```\n\nAdd `json:\"...\"` tags to all three fields of `Book` so the output uses lowercase keys.",
+    "hint": "Title string `json:\"title\"`  Author string `json:\"author\"`  Pages int `json:\"pages\"`",
+    "starter": "package main\n\nimport (\n\t\"encoding/json\"\n\t\"fmt\"\n)\n\ntype Book struct {\n\tTitle  string // TODO: add json:\"title\" tag\n\tAuthor string // TODO: add json:\"author\" tag\n\tISBN   string // TODO: add json:\"isbn\" tag\n}\n\nfunc main() {\n\tb := Book{Title: \"Dune\", Author: \"Frank Herbert\", ISBN: \"978-0441172719\"}\n\tdata, _ := json.Marshal(b)\n\tfmt.Println(string(data))\n}",
     "expectedOutput": [
-      "{\"name\":\"Laptop\",\"price\":999.99,\"in_stock\":true}"
+      "{\"title\":\"Dune\",\"author\":\"Frank Herbert\",\"isbn\":\"978-0441172719\"}"
     ],
     "codeChecks": [
       {
-        "pattern": "`json:\"name\"`",
+        "pattern": "`json:\"title\"`",
         "required": true,
-        "message": "Add json:\"name\" tag to the Name field."
+        "message": "Add json:\"title\" tag to the Title field."
       },
       {
-        "pattern": "`json:\"price\"`",
+        "pattern": "`json:\"author\"`",
         "required": true,
-        "message": "Add json:\"price\" tag to the Price field."
+        "message": "Add json:\"author\" tag to the Author field."
       },
       {
-        "pattern": "`json:\"in_stock\"`",
+        "pattern": "`json:\"isbn\"`",
         "required": true,
-        "message": "Add json:\"in_stock\" tag to the InStock field."
+        "message": "Add json:\"isbn\" tag to the ISBN field."
       },
       {
         "pattern": "TODO",
@@ -38,27 +38,27 @@
         "message": "Replace the TODO comments with your struct tags."
       }
     ],
-    "successMessage": "Lowercase keys, underscore separators — exactly what a REST API expects. Struct tags are how Go bridges the gap between Go naming conventions and JSON naming conventions."
+    "successMessage": "Lowercase keys — exactly what a REST API expects. Struct tags are how Go bridges the gap between Go naming conventions and JSON naming conventions."
   },
   {
-    "title": "omitempty — skip zero values",
-    "instruction": "`omitempty` tells the JSON encoder to skip a field if it is its zero value (empty string, 0, false, nil).\n\n```\nAge int `json:\"age,omitempty\"`\n```\n\nUseful for optional API fields — send them only when they have a value.\n\nAdd `omitempty` to the `Bio` and `Age` tags. Run both users and see which fields appear.",
-    "hint": "Bio string `json:\"bio,omitempty\"`  Age int `json:\"age,omitempty\"`",
-    "starter": "package main\n\nimport (\n\t\"encoding/json\"\n\t\"fmt\"\n)\n\ntype User struct {\n\tName string `json:\"name\"`\n\tAge  int    `json:\"age\"`  // TODO: add omitempty\n\tBio  string `json:\"bio\"`  // TODO: add omitempty\n}\n\nfunc main() {\n\tu1 := User{Name: \"Alex\", Age: 25, Bio: \"Go developer\"}\n\tu2 := User{Name: \"Jordan\"}\n\n\td1, _ := json.Marshal(u1)\n\td2, _ := json.Marshal(u2)\n\tfmt.Println(string(d1))\n\tfmt.Println(string(d2))\n}",
+    "title": "omitempty — skip missing fields",
+    "instruction": "`omitempty` tells the JSON encoder to skip a field if it is its zero value (empty string, 0, false, nil).\n\n```\nDescription string `json:\"description,omitempty\"`\n```\n\nUseful for optional fields in library catalogs — only include them when they have a value.\n\nAdd `omitempty` to the `Description` and `Edition` tags. Run and see what each book produces.",
+    "hint": "Description string `json:\"description,omitempty\"`  Edition int `json:\"edition,omitempty\"`",
+    "starter": "package main\n\nimport (\n\t\"encoding/json\"\n\t\"fmt\"\n)\n\ntype Book struct {\n\tTitle       string `json:\"title\"`\n\tDescription string `json:\"description\"`  // TODO: add omitempty\n\tEdition     int    `json:\"edition\"`      // TODO: add omitempty\n}\n\nfunc main() {\n\tb1 := Book{Title: \"Clean Code\", Description: \"A handbook of agile software craftsmanship\", Edition: 1}\n\tb2 := Book{Title: \"1984\"}\n\n\td1, _ := json.Marshal(b1)\n\td2, _ := json.Marshal(b2)\n\tfmt.Println(string(d1))\n\tfmt.Println(string(d2))\n}",
     "expectedOutput": [
-      "{\"name\":\"Alex\",\"age\":25,\"bio\":\"Go developer\"}",
-      "{\"name\":\"Jordan\"}"
+      "{\"title\":\"Clean Code\",\"description\":\"A handbook of agile software craftsmanship\",\"edition\":1}",
+      "{\"title\":\"1984\"}"
     ],
     "codeChecks": [
       {
-        "pattern": "`json:\"age,omitempty\"`",
+        "pattern": "`json:\"description,omitempty\"`",
         "required": true,
-        "message": "Add omitempty to the Age tag: json:\"age,omitempty\""
+        "message": "Add omitempty to the Description tag: json:\"description,omitempty\""
       },
       {
-        "pattern": "`json:\"bio,omitempty\"`",
+        "pattern": "`json:\"edition,omitempty\"`",
         "required": true,
-        "message": "Add omitempty to the Bio tag: json:\"bio,omitempty\""
+        "message": "Add omitempty to the Edition tag: json:\"edition,omitempty\""
       },
       {
         "pattern": "TODO",
@@ -66,24 +66,26 @@
         "message": "Replace the TODO comments with the updated tags."
       }
     ],
-    "successMessage": "Jordan's response has only name — age and bio are zero values so omitempty dropped them. Clean API responses with no unnecessary nulls."
+    "successMessage": "1984 has no description or edition in the output — omitempty dropped them. Clean catalog responses with no unnecessary nulls."
   },
   {
     "title": "Unmarshal — JSON to struct",
-    "instruction": "`json.Unmarshal` parses JSON bytes and fills a Go struct.\n\n```\nvar u User\nerr := json.Unmarshal([]byte(jsonStr), &u)\n```\n\nThe `&u` is a pointer — Unmarshal needs to write into your variable.\n\nUnmarshal the second JSON string into a `Product` and print its `Name` and `Price`.",
-    "hint": "var p Product  err := json.Unmarshal([]byte(jsonStr), &p)  fmt.Println(p.Name, p.Price)",
-    "starter": "package main\n\nimport (\n\t\"encoding/json\"\n\t\"fmt\"\n)\n\ntype Product struct {\n\tName  string  `json:\"name\"`\n\tPrice float64 `json:\"price\"`\n}\n\nfunc main() {\n\tjsonStr := `{\"name\":\"Keyboard\",\"price\":79.99}`\n\n\tvar p Product\n\terr := json.Unmarshal([]byte(jsonStr), &p)\n\tif err != nil {\n\t\tfmt.Println(\"Error:\", err)\n\t\treturn\n\t}\n\tfmt.Println(p.Name)\n\tfmt.Println(p.Price)\n\n\t// TODO: unmarshal this into a second Product and print its Name and Price\n\tjsonStr2 := `{\"name\":\"Mouse\",\"price\":49.99}`\n\t_ = jsonStr2\n}",
+    "instruction": "`json.Unmarshal` parses JSON bytes and fills a Go struct.\n\n```\nvar b Book\nerr := json.Unmarshal([]byte(jsonStr), &b)\n```\n\nThe `&b` is a pointer — Unmarshal needs to write into your variable.\n\nUnmarshal the second JSON string into a `Book` and print its `Title`, `Author`, and `Pages`.",
+    "hint": "var b Book  err := json.Unmarshal([]byte(jsonStr2), &b)  fmt.Println(b.Title, b.Author, b.Pages)",
+    "starter": "package main\n\nimport (\n\t\"encoding/json\"\n\t\"fmt\"\n)\n\ntype Book struct {\n\tTitle  string `json:\"title\"`\n\tAuthor string `json:\"author\"`\n\tPages  int    `json:\"pages\"`\n}\n\nfunc main() {\n\tjsonStr := `{\"title\":\"The Hobbit\",\"author\":\"J.R.R. Tolkien\",\"pages\":310}`\n\n\tvar b Book\n\terr := json.Unmarshal([]byte(jsonStr), &b)\n\tif err != nil {\n\t\tfmt.Println(\"Error:\", err)\n\t\treturn\n\t}\n\tfmt.Println(b.Title)\n\tfmt.Println(b.Author)\n\tfmt.Println(b.Pages)\n\n\t// TODO: unmarshal this into a second Book and print its Title, Author, and Pages\n\tjsonStr2 := `{\"title\":\"Neuromancer\",\"author\":\"William Gibson\",\"pages\":271}`\n\t_ = jsonStr2\n}",
     "expectedOutput": [
-      "Keyboard",
-      "79.99",
-      "Mouse",
-      "49.99"
+      "The Hobbit",
+      "J.R.R. Tolkien",
+      "310",
+      "Neuromancer",
+      "William Gibson",
+      "271"
     ],
     "codeChecks": [
       {
         "pattern": "json\\.Unmarshal\\(\\[\\]byte\\(jsonStr2\\)",
         "required": true,
-        "message": "Unmarshal jsonStr2 into a Product struct."
+        "message": "Unmarshal jsonStr2 into a Book struct."
       },
       {
         "pattern": "TODO",
@@ -91,41 +93,46 @@
         "message": "Replace the TODO comment with your unmarshal code."
       }
     ],
-    "successMessage": "JSON string → Go struct. The tags map \"name\" → Name and \"price\" → Price automatically. This is how every Go HTTP handler reads request bodies."
+    "successMessage": "JSON string → Go struct. The tags map \"title\" → Title, \"author\" → Author automatically. This is how every Go HTTP handler reads request bodies."
   },
   {
     "title": "Unknown fields are ignored",
-    "instruction": "When unmarshaling, Go silently ignores JSON keys that do not match any struct field. This is intentional — it lets you parse partial responses without crashing.\n\nRun this. The JSON has four keys but the struct only has two fields. Go fills what it can and ignores the rest.",
-    "starter": "package main\n\nimport (\n\t\"encoding/json\"\n\t\"fmt\"\n)\n\ntype User struct {\n\tName  string `json:\"name\"`\n\tEmail string `json:\"email\"`\n}\n\nfunc main() {\n\tjsonStr := `{\n\t\t\"name\": \"Alex\",\n\t\t\"email\": \"alex@example.com\",\n\t\t\"role\": \"admin\",\n\t\t\"created_at\": \"2024-01-15\"\n\t}`\n\n\tvar u User\n\terr := json.Unmarshal([]byte(jsonStr), &u)\n\tif err != nil {\n\t\tfmt.Println(\"Error:\", err)\n\t\treturn\n\t}\n\tfmt.Println(u.Name)\n\tfmt.Println(u.Email)\n}",
+    "instruction": "When unmarshaling, Go silently ignores JSON keys that do not match any struct field. This is intentional — it lets you parse partial responses without crashing.\n\nRun this. The JSON has five keys but the struct only has two fields. Go fills what it can and ignores the rest.",
+    "starter": "package main\n\nimport (\n\t\"encoding/json\"\n\t\"fmt\"\n)\n\ntype Book struct {\n\tTitle  string `json:\"title\"`\n\tAuthor string `json:\"author\"`\n}\n\nfunc main() {\n\tjsonStr := `{\n\t\t\"title\": \"Dune\",\n\t\t\"author\": \"Frank Herbert\",\n\t\t\"isbn\": \"978-0441172719\",\n\t\t\"pages\": 412,\n\t\t\"genre\": \"Science Fiction\"\n\t}`\n\n\tvar b Book\n\terr := json.Unmarshal([]byte(jsonStr), &b)\n\tif err != nil {\n\t\tfmt.Println(\"Error:\", err)\n\t\treturn\n\t}\n\tfmt.Println(b.Title)\n\tfmt.Println(b.Author)\n}",
     "expectedOutput": [
-      "Alex",
-      "alex@example.com"
+      "Dune",
+      "Frank Herbert"
     ],
-    "successMessage": "role and created_at were silently ignored. No crash, no error. This is perfect for consuming third-party APIs — you only map the fields you care about."
+    "successMessage": "isbn, pages, and genre were silently ignored. No crash, no error. This is perfect for consuming library catalog APIs — you only map the fields you care about."
   },
   {
-    "title": "Nested structs in JSON",
-    "instruction": "Nested Go structs become nested JSON objects automatically.\n\nAdd an `Address` struct with `Street`, `City`, and `Country` fields (all tagged). Nest it inside `User` as `address`. Marshal the user and see the nested JSON.",
-    "hint": "type Address struct { Street string `json:\"street\"`; City string `json:\"city\"`; Country string `json:\"country\"` }  User has Address Address `json:\"address\"`",
-    "starter": "package main\n\nimport (\n\t\"encoding/json\"\n\t\"fmt\"\n)\n\n// TODO: define Address struct with Street, City, Country fields and json tags\n\ntype User struct {\n\tName  string `json:\"name\"`\n\tEmail string `json:\"email\"`\n\t// TODO: add Address Address `json:\"address\"`\n}\n\nfunc main() {\n\tu := User{\n\t\tName:  \"Alex\",\n\t\tEmail: \"alex@example.com\",\n\t\t// TODO: Address: Address{Street: \"123 Main St\", City: \"Boston\", Country: \"USA\"},\n\t}\n\tdata, _ := json.Marshal(u)\n\tfmt.Println(string(data))\n}",
+    "title": "Nested structs — author details",
+    "instruction": "Nested Go structs become nested JSON objects automatically.\n\nAdd an `AuthorInfo` struct with `FirstName`, `LastName`, and `BirthYear` fields (all tagged). Nest it inside `Book` as `author`. Marshal the book and see the nested JSON.",
+    "hint": "type AuthorInfo struct { FirstName string `json:\"first_name\"`; LastName string `json:\"last_name\"`; BirthYear int `json:\"birth_year\"` }  Book has Author AuthorInfo `json:\"author\"`",
+    "starter": "package main\n\nimport (\n\t\"encoding/json\"\n\t\"fmt\"\n)\n\n// TODO: define AuthorInfo struct with FirstName, LastName, BirthYear fields and json tags\n\ntype Book struct {\n\tTitle  string `json:\"title\"`\n\tAuthor AuthorInfo `json:\"author\"`\n}\n\nfunc main() {\n\tb := Book{\n\t\tTitle: \"The Martian\",\n\t\tAuthor: AuthorInfo{\n\t\t\tFirstName: \"Andy\",\n\t\t\tLastName:  \"Weir\",\n\t\t\tBirthYear: 1972,\n\t\t},\n\t}\n\tdata, _ := json.Marshal(b)\n\tfmt.Println(string(data))\n}",
     "expectedOutput": [
-      "{\"name\":\"Alex\",\"email\":\"alex@example.com\",\"address\":{\"street\":\"123 Main St\",\"city\":\"Boston\",\"country\":\"USA\"}}"
+      "{\"title\":\"The Martian\",\"author\":{\"first_name\":\"Andy\",\"last_name\":\"Weir\",\"birth_year\":1972}}"
     ],
     "codeChecks": [
       {
-        "pattern": "type\\s+Address\\s+struct",
+        "pattern": "type\\s+AuthorInfo\\s+struct",
         "required": true,
-        "message": "Define an Address struct."
+        "message": "Define an AuthorInfo struct."
       },
       {
-        "pattern": "Address\\s+Address\\s+`json:\"address\"`",
+        "pattern": "FirstName",
         "required": true,
-        "message": "Add Address Address `json:\"address\"` field to User."
+        "message": "Add FirstName field to AuthorInfo."
       },
       {
-        "pattern": "123 Main St",
+        "pattern": "LastName",
         "required": true,
-        "message": "Set the Street to \"123 Main St\"."
+        "message": "Add LastName field to AuthorInfo."
+      },
+      {
+        "pattern": "BirthYear",
+        "required": true,
+        "message": "Add BirthYear field to AuthorInfo."
       },
       {
         "pattern": "TODO",
@@ -133,31 +140,31 @@
         "message": "Replace the TODO comments with your code."
       }
     ],
-    "successMessage": "Nested struct → nested JSON object. Unmarshal works the same way in reverse — Go fills both levels automatically."
+    "successMessage": "Nested struct → nested JSON object. The author info is cleanly grouped under its own key. Unmarshal works the same way in reverse — Go fills both levels automatically."
   },
   {
-    "title": "Arrays and slices in JSON",
-    "instruction": "Go slices become JSON arrays. JSON arrays become Go slices.\n\n`[]string{\"Go\", \"Python\"}` → `[\"Go\",\"Python\"]`\n\nRun this. Then add a `Tags []string \\`json:\"tags\"\\`` field to `Post`, populate it with two tags, and see them in the output.",
-    "hint": "Tags []string `json:\"tags\"`  then p.Tags = []string{\"tutorial\", \"beginner\"}",
-    "starter": "package main\n\nimport (\n\t\"encoding/json\"\n\t\"fmt\"\n)\n\ntype Post struct {\n\tTitle  string   `json:\"title\"`\n\tLikes  int      `json:\"likes\"`\n\t// TODO: add Tags []string with json:\"tags\" tag\n}\n\nfunc main() {\n\tp := Post{\n\t\tTitle: \"Learning Go\",\n\t\tLikes: 42,\n\t\t// TODO: Tags: []string{\"tutorial\", \"beginner\"},\n\t}\n\tdata, _ := json.Marshal(p)\n\tfmt.Println(string(data))\n}",
+    "title": "Slices — multiple authors",
+    "instruction": "Go slices become JSON arrays. JSON arrays become Go slices.\n\n`[]string{\"Frank Herbert\", \"Brian Herbert\"}` → `[\"Frank Herbert\",\"Brian Herbert\"]`\n\nRun this. Then add a `Tags []string \\`json:\"tags\"\\`` field to `Book`, populate it with two genre tags, and see them in the output.",
+    "hint": "Tags []string `json:\"tags\"`  then b.Tags = []string{\"fiction\", \"classic\"}",
+    "starter": "package main\n\nimport (\n\t\"encoding/json\"\n\t\"fmt\"\n)\n\ntype Book struct {\n\tTitle  string   `json:\"title\"`\n\tAuthor string   `json:\"author\"`\n\t// TODO: add Tags []string with json:\"tags\" tag\n}\n\nfunc main() {\n\tb := Book{\n\t\tTitle:  \"Foundation\",\n\t\tAuthor: \"Isaac Asimov\",\n\t\t// TODO: Tags: []string{\"fiction\", \"sci-fi\"},\n\t}\n\tdata, _ := json.Marshal(b)\n\tfmt.Println(string(data))\n}",
     "expectedOutput": [
-      "{\"title\":\"Learning Go\",\"likes\":42,\"tags\":[\"tutorial\",\"beginner\"]}"
+      "{\"title\":\"Foundation\",\"author\":\"Isaac Asimov\",\"tags\":[\"fiction\",\"sci-fi\"]}"
     ],
     "codeChecks": [
       {
         "pattern": "Tags\\s+\\[\\]string\\s+`json:\"tags\"`",
         "required": true,
-        "message": "Add Tags []string `json:\"tags\"` field to Post."
+        "message": "Add Tags []string `json:\"tags\"` field to Book."
       },
       {
-        "pattern": "\"tutorial\"",
+        "pattern": "\"fiction\"",
         "required": true,
-        "message": "Include \"tutorial\" in the Tags slice."
+        "message": "Include \"fiction\" in the Tags slice."
       },
       {
-        "pattern": "\"beginner\"",
+        "pattern": "\"sci-fi\"",
         "required": true,
-        "message": "Include \"beginner\" in the Tags slice."
+        "message": "Include \"sci-fi\" in the Tags slice."
       },
       {
         "pattern": "TODO",
@@ -165,21 +172,21 @@
         "message": "Replace the TODO comments with your code."
       }
     ],
-    "successMessage": "Slices become JSON arrays effortlessly. The same works for []int, []User, or any slice type — Go handles it all the same way."
+    "successMessage": "Slices become JSON arrays effortlessly. The same works for []int, []Book, or any slice type — Go handles it all the same way."
   },
   {
-    "title": "Maps in JSON",
-    "instruction": "`map[string]T` becomes a JSON object with dynamic keys.\n\nUseful when you do not know the field names ahead of time — like user metadata, settings, or arbitrary key-value stores.\n\nRun this. Then add an entry `\"theme\": \"dark\"` to the settings map and see it appear in the JSON.",
-    "hint": "settings[\"theme\"] = \"dark\"  (add this before Marshal)",
-    "starter": "package main\n\nimport (\n\t\"encoding/json\"\n\t\"fmt\"\n)\n\nfunc main() {\n\tsettings := map[string]string{\n\t\t\"language\": \"en\",\n\t\t\"timezone\": \"UTC\",\n\t}\n\t// TODO: add \"theme\": \"dark\" to settings\n\n\tdata, _ := json.Marshal(settings)\n\tfmt.Println(string(data))\n}",
+    "title": "Maps — dynamic catalog metadata",
+    "instruction": "`map[string]T` becomes a JSON object with dynamic keys.\n\nUseful when you do not know the field names ahead of time — like book metadata, translations, or arbitrary key-value stores.\n\nRun this. Then add an entry `\"language\": \"en\"` to the metadata map and see it appear in the JSON.",
+    "hint": "metadata[\"language\"] = \"en\"  (add this before Marshal)",
+    "starter": "package main\n\nimport (\n\t\"encoding/json\"\n\t\"fmt\"\n)\n\nfunc main() {\n\tmetadata := map[string]string{\n\t\t\"genre\":     \"fantasy\",\n\t\t\"publisher\": \"Del Rey\",\n\t}\n\t// TODO: add \"language\": \"en\" to metadata\n\n\tdata, _ := json.Marshal(metadata)\n\tfmt.Println(string(data))\n}",
     "expectedOutput": [
-      "{\"language\":\"en\",\"theme\":\"dark\",\"timezone\":\"UTC\"}"
+      "{\"genre\":\"fantasy\",\"language\":\"en\",\"publisher\":\"Del Rey\"}"
     ],
     "codeChecks": [
       {
-        "pattern": "settings\\[\"theme\"\\]\\s*=\\s*\"dark\"",
+        "pattern": "metadata\\[\"language\"\\]\\s*=\\s*\"en\"",
         "required": true,
-        "message": "Add settings[\"theme\"] = \"dark\" before marshaling."
+        "message": "Add metadata[\"language\"] = \"en\" before marshaling."
       },
       {
         "pattern": "TODO",
@@ -190,18 +197,18 @@
     "successMessage": "Maps become JSON objects with their keys as field names — sorted alphabetically by default. Perfect for dynamic data where you cannot define a struct upfront."
   },
   {
-    "title": "MarshalIndent — pretty print",
+    "title": "MarshalIndent — pretty print library inventory",
     "instruction": "`json.MarshalIndent` produces human-readable JSON with line breaks and indentation.\n\n`json.MarshalIndent(v, prefix, indent)`\n- prefix — added to the start of each line (usually `\"\"`)\n- indent — the indentation string (use `\"  \"` for two spaces or `\"\\t\"` for tabs)\n\nSwitch the marshal call from `json.Marshal` to `json.MarshalIndent` with two-space indentation.",
-    "hint": "data, err := json.MarshalIndent(u, \"\", \"  \")",
-    "starter": "package main\n\nimport (\n\t\"encoding/json\"\n\t\"fmt\"\n)\n\ntype User struct {\n\tName    string   `json:\"name\"`\n\tEmail   string   `json:\"email\"`\n\tAge     int      `json:\"age\"`\n\tHobbies []string `json:\"hobbies\"`\n}\n\nfunc main() {\n\tu := User{\n\t\tName:    \"Alex\",\n\t\tEmail:   \"alex@example.com\",\n\t\tAge:     25,\n\t\tHobbies: []string{\"coding\", \"hiking\"},\n\t}\n\t// TODO: use json.MarshalIndent with \"\" prefix and \"  \" indent\n\tdata, _ := json.Marshal(u)\n\tfmt.Println(string(data))\n}",
+    "hint": "data, err := json.MarshalIndent(lib, \"\", \"  \")",
+    "starter": "package main\n\nimport (\n\t\"encoding/json\"\n\t\"fmt\"\n)\n\ntype Book struct {\n\tTitle  string `json:\"title\"`\n\tAuthor string `json:\"author\"`\n\tPages  int    `json:\"pages\"`\n}\n\ntype Library struct {\n\tName  string `json:\"name\"`\n\tBooks []Book `json:\"books\"`\n}\n\nfunc main() {\n\tlib := Library{\n\t\tName: \"City Library\",\n\t\tBooks: []Book{\n\t\t\t{Title: \"1984\", Author: \"George Orwell\", Pages: 328},\n\t\t\t{Title: \"Brave New World\", Author: \"Aldous Huxley\", Pages: 311},\n\t\t},\n\t}\n\t// TODO: use json.MarshalIndent with \"\" prefix and \"  \" indent\n\tdata, _ := json.Marshal(lib)\n\tfmt.Println(string(data))\n}",
     "expectedOutput": [
-      "{\n  \"name\": \"Alex\",\n  \"email\": \"alex@example.com\",\n  \"age\": 25,\n  \"hobbies\": [\n    \"coding\",\n    \"hiking\"\n  ]\n}"
+      "{\n  \"name\": \"City Library\",\n  \"books\": [\n    {\n      \"title\": \"1984\",\n      \"author\": \"George Orwell\",\n      \"pages\": 328\n    },\n    {\n      \"title\": \"Brave New World\",\n      \"author\": \"Aldous Huxley\",\n      \"pages\": 311\n    }\n  ]\n}"
     ],
     "codeChecks": [
       {
-        "pattern": "json\\.MarshalIndent\\s*\\(u,\\s*\"\",\\s*\"\\s+\"\\)",
+        "pattern": "json\\.MarshalIndent\\s*\\(lib,\\s*\"\",\\s*\"\\s+\"\\)",
         "required": true,
-        "message": "Use json.MarshalIndent(u, \"\", \"  \") for pretty printing."
+        "message": "Use json.MarshalIndent(lib, \"\", \"  \") for pretty printing."
       },
       {
         "pattern": "TODO",
@@ -209,32 +216,21 @@
         "message": "Replace the TODO comment with your MarshalIndent call."
       }
     ],
-    "successMessage": "Readable, indented JSON. Use this for log files, config files, and debugging. Use json.Marshal for API responses where compact output is preferred."
+    "successMessage": "Readable, indented library inventory. Use this for log files, config files, and debugging. Use json.Marshal for API responses where compact output is preferred."
   },
   {
-    "title": "Decoding from a stream",
-    "instruction": "`json.NewDecoder` reads JSON from any `io.Reader` — an HTTP response body, a file, a string buffer.\n\nFor HTTP APIs this is the right approach: you stream the response directly into your struct without loading everything into memory first.\n\n`decoder.Decode(&v)` reads one JSON value from the stream.\n\nRun this. It decodes three JSON objects from a multi-line string (simulating an HTTP response stream).",
-    "starter": "package main\n\nimport (\n\t\"encoding/json\"\n\t\"fmt\"\n\t\"strings\"\n)\n\ntype Event struct {\n\tType    string `json:\"type\"`\n\tMessage string `json:\"message\"`\n}\n\nfunc main() {\n\tstream := `{\"type\":\"info\",\"message\":\"Server started\"}\n{\"type\":\"warn\",\"message\":\"High memory usage\"}\n{\"type\":\"error\",\"message\":\"Connection failed\"}`\n\n\tdecoder := json.NewDecoder(strings.NewReader(stream))\n\tfor decoder.More() {\n\t\tvar e Event\n\t\tif err := decoder.Decode(&e); err != nil {\n\t\t\tfmt.Println(\"Decode error:\", err)\n\t\t\tbreak\n\t\t}\n\t\tfmt.Printf(\"[%s] %s\\n\", e.Type, e.Message)\n\t}\n}",
+    "title": "Custom marshaling — hide sensitive book metadata",
+    "instruction": "Sometimes the default marshaling is not what you want. Implement `MarshalJSON() ([]byte, error)` on your type to take full control.\n\nCommon uses: hiding internal IDs, formatting dates differently, computing derived fields.\n\nRun this. `InternalID` is masked in the JSON output by the custom marshaler. Then change the mask from `\"***\"` to `\"[redacted]\"`.",
+    "hint": "Change \"***\" to \"[redacted]\" inside MarshalJSON.",
+    "starter": "package main\n\nimport (\n\t\"encoding/json\"\n\t\"fmt\"\n)\n\ntype Book struct {\n\tTitle      string\n\tAuthor     string\n\tInternalID string\n}\n\nfunc (b Book) MarshalJSON() ([]byte, error) {\n\ttype Alias struct {\n\t\tTitle      string `json:\"title\"`\n\t\tAuthor     string `json:\"author\"`\n\t\tInternalID string `json:\"internal_id\"`\n\t}\n\treturn json.Marshal(Alias{\n\t\tTitle:      b.Title,\n\t\tAuthor:     b.Author,\n\t\tInternalID: \"***\", // TODO: change to \"[redacted]\"\n\t})\n}\n\nfunc main() {\n\tb := Book{Title: \"Ender's Game\", Author: \"Orson Scott Card\", InternalID: \"LIB-0032-1985\"}\n\tdata, _ := json.Marshal(b)\n\tfmt.Println(string(data))\n}",
     "expectedOutput": [
-      "[info] Server started",
-      "[warn] High memory usage",
-      "[error] Connection failed"
-    ],
-    "successMessage": "Three JSON objects, one stream, one decoder. decoder.More() checks if there is more JSON to read. This is how Go HTTP clients decode API responses — efficient, zero extra allocations."
-  },
-  {
-    "title": "Custom marshaling",
-    "instruction": "Sometimes the default marshaling is not what you want. Implement `MarshalJSON() ([]byte, error)` on your type to take full control.\n\nCommon uses: formatting dates differently, hiding sensitive fields, combining multiple fields.\n\nRun this. `Password` is masked in the JSON output by the custom marshaler. Then change the mask from `\"***\"` to `\"[hidden]\"`.",
-    "hint": "Change \"***\" to \"[hidden]\" inside MarshalJSON.",
-    "starter": "package main\n\nimport (\n\t\"encoding/json\"\n\t\"fmt\"\n)\n\ntype User struct {\n\tName     string\n\tEmail    string\n\tPassword string\n}\n\nfunc (u User) MarshalJSON() ([]byte, error) {\n\ttype Alias struct {\n\t\tName     string `json:\"name\"`\n\t\tEmail    string `json:\"email\"`\n\t\tPassword string `json:\"password\"`\n\t}\n\treturn json.Marshal(Alias{\n\t\tName:     u.Name,\n\t\tEmail:    u.Email,\n\t\tPassword: \"***\", // TODO: change to \"[hidden]\"\n\t})\n}\n\nfunc main() {\n\tu := User{Name: \"Alex\", Email: \"alex@example.com\", Password: \"supersecret123\"}\n\tdata, _ := json.Marshal(u)\n\tfmt.Println(string(data))\n}",
-    "expectedOutput": [
-      "{\"name\":\"Alex\",\"email\":\"alex@example.com\",\"password\":\"[hidden]\"}"
+      "{\"title\":\"Ender's Game\",\"author\":\"Orson Scott Card\",\"internal_id\":\"[redacted]\"}"
     ],
     "codeChecks": [
       {
-        "pattern": "\"\\[hidden\\]\"",
+        "pattern": "\"\\[redacted\\]\"",
         "required": true,
-        "message": "Change the password mask to \"[hidden]\"."
+        "message": "Change the InternalID mask to \"[redacted]\"."
       },
       {
         "pattern": "TODO",
@@ -242,19 +238,19 @@
         "message": "Replace the TODO comment with your change."
       }
     ],
-    "successMessage": "The real password never appears in the JSON. Custom marshalers give you complete control — date formatting, field renaming, computed values, security masking. All without changing the struct."
+    "successMessage": "The real InternalID never appears in the JSON. Custom marshalers give you complete control — field hiding, computed values, formatting. All without changing the struct."
   },
   {
-    "title": "Build an API response builder",
-    "instruction": "No starter code.\n\nBuild a standard API response wrapper:\n\n1. Define an `APIResponse` struct with `Status` string (`json:\"status\"`), `Message` string (`json:\"message\",omitempty`), and `Data` interface{} (`json:\"data,omitempty\"`)\n2. Write a `success(data interface{}) string` function that returns a pretty-printed JSON string with `status: \"ok\"` and the given data\n3. Write an `fail(message string) string` function that returns `status: \"error\"` and the message (no data)\n4. Call both and print the results\n\nExpected output:\n```json\n{\n  \"status\": \"ok\",\n  \"data\": {\n    \"name\": \"Alex\",\n    \"email\": \"alex@example.com\"\n  }\n}\n{\n  \"status\": \"error\",\n  \"message\": \"user not found\"\n}\n```",
-    "hint": "func success(data interface{}) string { r := APIResponse{Status: \"ok\", Data: data}; b, _ := json.MarshalIndent(r, \"\", \"  \"); return string(b) }",
-    "starter": "package main\n\nimport (\n\t\"encoding/json\"\n\t\"fmt\"\n)\n\n// Build your API response builder here\n\nfunc main() {\n}",
+    "title": "Build a library catalog search response",
+    "instruction": "No starter code.\n\nBuild a standard library catalog response wrapper:\n\n1. Define a `CatalogResponse` struct with `Status` string (`json:\"status\"`), `Query` string (`json:\"query\"`), `Count` int (`json:\"count\"`), and `Books` interface{} (`json:\"books,omitempty\"`)\n2. Write a `found(query string, books interface{}) string` function that returns a pretty-printed JSON string with `status: \"ok\"` and the given books and count\n3. Write a `notFound(query string) string` function that returns `status: \"not_found\"` and the query (no books)\n4. Call both and print the results\n\nExpected output:\n```json\n{\n  \"status\": \"ok\",\n  \"query\": \"asimov\",\n  \"count\": 1,\n  \"books\": [\n    {\n      \"title\": \"Foundation\",\n      \"author\": \"Isaac Asimov\"\n    }\n  ]\n}\n{\n  \"status\": \"not_found\",\n  \"query\": \"nonexistent\"\n}\n```",
+    "hint": "func found(query string, books interface{}) string { r := CatalogResponse{Status: \"ok\", Query: query, Count: ...}; b, _ := json.MarshalIndent(r, \"\", \"  \"); return string(b) }",
+    "starter": "package main\n\nimport (\n\t\"encoding/json\"\n\t\"fmt\"\n)\n\n// Build your library catalog search response builder here\n\nfunc main() {\n}",
     "expectedOutput": [],
     "codeChecks": [
       {
-        "pattern": "type\\s+APIResponse\\s+struct",
+        "pattern": "type\\s+CatalogResponse\\s+struct",
         "required": true,
-        "message": "Define an APIResponse struct."
+        "message": "Define a CatalogResponse struct."
       },
       {
         "pattern": "`json:\"status\"`",
@@ -262,19 +258,24 @@
         "message": "Add json:\"status\" tag to the Status field."
       },
       {
+        "pattern": "`json:\"count\"`",
+        "required": true,
+        "message": "Add json:\"count\" tag to the Count field."
+      },
+      {
         "pattern": "omitempty",
         "required": true,
-        "message": "Use omitempty on Message and/or Data fields."
+        "message": "Use omitempty on the Books field."
       },
       {
-        "pattern": "func\\s+success\\s*\\(",
+        "pattern": "func\\s+found\\s*\\(",
         "required": true,
-        "message": "Define a success() function."
+        "message": "Define a found() function."
       },
       {
-        "pattern": "func\\s+fail\\s*\\(",
+        "pattern": "func\\s+notFound\\s*\\(",
         "required": true,
-        "message": "Define a fail() function."
+        "message": "Define a notFound() function."
       },
       {
         "pattern": "json\\.MarshalIndent",
@@ -284,14 +285,14 @@
       {
         "pattern": "\"ok\"",
         "required": true,
-        "message": "Set status to \"ok\" in the success function."
+        "message": "Set status to \"ok\" in the found function."
       },
       {
-        "pattern": "\"error\"",
+        "pattern": "\"not_found\"",
         "required": true,
-        "message": "Set status to \"error\" in the fail function."
+        "message": "Set status to \"not_found\" in the notFound function."
       }
     ],
-    "successMessage": "A reusable API response wrapper. Every production Go API uses a pattern like this — consistent shape, clean JSON, omitempty for optional fields. You just built the foundation of a web API."
+    "successMessage": "A reusable library catalog search response wrapper. Every production API uses a pattern like this — consistent shape, clean JSON, omitempty for optional fields. You just built the foundation of a library API."
   }
 ]
