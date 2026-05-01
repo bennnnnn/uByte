@@ -67,7 +67,7 @@ export default function Sidebar({ lang, tutorials }: { lang: string; tutorials: 
   }, [query, queryLongEnough]);
 
   return (
-    <aside className="hidden md:flex w-72 shrink-0 flex-col border-r border-zinc-100 bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-950 sticky top-14 self-start h-[calc(100vh-3.5rem)]">
+    <aside className="hidden md:flex w-72 shrink-0 flex-col border-r border-zinc-100 bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-950 sticky top-12 self-start h-[calc(100vh-3rem)]">
       <nav className="flex-1 overflow-y-auto px-3 py-4">
         {/* Search */}
         <div className="relative mb-3">
