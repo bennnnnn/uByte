@@ -4,7 +4,7 @@ export const steps: TutorialStep[] = [
   {
     title: "HTTP Handler Functions",
     instruction:
-      "An HTTP handler is a function with signature `func(w http.ResponseWriter, r *http.Request)`. `httptest.NewRecorder()` captures what the handler writes so you can inspect it without starting a real server. Complete `welcomeHandler` to write `Welcome to the Library!` to the response.",
+      "An HTTP handler has the signature `func(w http.ResponseWriter, r *http.Request)`. Use `httptest.NewRecorder()` to test it without a real server. Complete `welcomeHandler` to write `\"Welcome to the Library!\"` to the response using `fmt.Fprint(w, ...)`.",
     starter: `package main
 
 import (
@@ -27,12 +27,12 @@ func main() {
 \tfmt.Println("Body:", rec.Body.String())
 }`,
     expectedOutput: ["Status: 200", "Welcome to the Library!"],
-    hint: "Use `fmt.Fprint(w, \"Welcome to the Library!\")` inside welcomeHandler.",
+    hint: 'Use `fmt.Fprint(w, "Welcome to the Library!")` inside welcomeHandler.',
   },
   {
     title: "Parsing URLs",
     instruction:
-      "`url.Parse` breaks a URL into scheme, host, path and query. Parse `https://library.example.com/v1/books?author=asimov&genre=sci-fi` and print the scheme, host, path, and the value of the `author` query parameter.",
+      "`url.Parse` breaks a URL into parts. Parse `\"https://library.example.com/v1/books?author=asimov&genre=sci-fi\"` and print the scheme, host, path, and the `author` query parameter.",
     starter: `package main
 
 import (
@@ -62,7 +62,7 @@ func main() {
   {
     title: "Reading Query Parameters",
     instruction:
-      "Inside a handler, `r.URL.Query().Get(\"key\")` reads a query parameter. Write a `searchHandler` that reads the `title` param and writes `Searching for: {title}`. Default to `all books` if `title` is empty. Test with `?title=Dune`.",
+      "Inside a handler, `r.URL.Query().Get(\"key\")` reads a query parameter. Write a `searchHandler` that reads the `title` param and writes `\"Searching for: {title}\"`. Default to `\"all books\"` if `title` is empty. Test with `?title=Dune`.",
     starter: `package main
 
 import (
@@ -90,12 +90,12 @@ func main() {
 \tfmt.Println(rec2.Body.String())
 }`,
     expectedOutput: ["Searching for: Dune", "Searching for: all books"],
-    hint: "Use `if title == \"\" { title = \"all books\" }`, then `fmt.Fprintf(w, \"Searching for: %s\", title)`.",
+    hint: 'Use `if title == "" { title = "all books" }`, then `fmt.Fprintf(w, "Searching for: %s", title)`.',
   },
   {
     title: "HTTP Status Codes",
     instruction:
-      "`net/http` exports constants like `http.StatusOK` (200), `http.StatusNotFound` (404), `http.StatusBadRequest` (400). Call `w.WriteHeader(code)` before writing the body. Write a `findBookHandler` that returns 404 when `isbn=missing`, else 200.",
+      "Call `w.WriteHeader(code)` before writing the body to set the status code. Use `http.StatusOK` (200) and `http.StatusNotFound` (404). Write a `findBookHandler` that returns 404 when `isbn=missing`, else 200.",
     starter: `package main
 
 import (
@@ -123,12 +123,12 @@ func main() {
 \ttest("978-0451524935")
 }`,
     expectedOutput: ["status=404", "status=200", "book not found", "found book: 978-0451524935"],
-    hint: "Use a simple if/else: `if isbn == \"missing\" { w.WriteHeader(http.StatusNotFound); fmt.Fprint(w, \"book not found\") } else { ... }`",
+    hint: 'Use a simple if/else: `if isbn == "missing" { w.WriteHeader(http.StatusNotFound); fmt.Fprint(w, "book not found") } else { ... }`',
   },
   {
     title: "Building Query Strings",
     instruction:
-      "`url.Values` builds query strings safely — it handles URL-encoding for special characters. Create a `url.Values`, set `q` to `sci-fi classics` and `page` to `1`, then call `.Encode()` and print the result. Also add two `genre` values.",
+      "`url.Values` builds query strings and handles URL-encoding. Create a `url.Values`, set `q` to `\"sci-fi classics\"` and `page` to `\"1\"`, then add two `genre` values and print the encoded result.",
     starter: `package main
 
 import (
@@ -144,6 +144,6 @@ func main() {
 \tfmt.Println(v.Encode())
 }`,
     expectedOutput: ["sci-fi+classics", "page=1", "genre=fiction"],
-    hint: "Use `v.Set(\"q\", \"sci-fi classics\")`, `v.Set(\"page\", \"1\")`, `v.Add(\"genre\", \"fiction\")`, `v.Add(\"genre\", \"science\")`, then `v.Encode()`.",
+    hint: 'Use `v.Set("q", "sci-fi classics")`, `v.Set("page", "1")`, `v.Add("genre", "fiction")`, `v.Add("genre", "science")`, then `v.Encode()`.',
   },
 ];

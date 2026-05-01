@@ -4,7 +4,7 @@ export const steps: TutorialStep[] = [
   {
     title: "Value Receiver — Pages x2",
     instruction:
-      "A value receiver gets a copy of the struct. Define a `Book` struct with a `Pages int` field and a `DoublePages() int` method that returns `Pages * 2`. Create a 150-page book and print the doubled page count.",
+      "Methods attach behavior to your structs. Define a `Book` struct with a `Pages int` field, then attach `DoublePages() int` to it. A value receiver gets a copy — so I don't modify the original. Create a 150-page book and print what DoublePages returns.",
     starter: `package main
 
 import "fmt"
@@ -17,12 +17,12 @@ func main() {
 \tfmt.Println(b.DoublePages())
 }`,
     expectedOutput: ["300"],
-    hint: "func (b Book) DoublePages() int { return b.Pages * 2 }",
+    hint: 'func (b Book) DoublePages() int { return b.Pages * 2 }',
   },
   {
     title: "Pointer Receiver — Check Out",
     instruction:
-      "A pointer receiver lets a method modify the original struct. Define a `Library` struct with a `BorrowCount int` field and a `CheckOut()` method that increments `BorrowCount`. Create a library, check out a book three times, and print the borrow count.",
+      "A pointer receiver can modify the original struct. Define a `Library` struct with `BorrowCount int` and attach `CheckOut()` with a pointer receiver. Create a library, check out three times, and print the borrow count.",
     starter: `package main
 
 import "fmt"
@@ -42,7 +42,7 @@ func main() {
   {
     title: "Stringer — Book Summary",
     instruction:
-      "If a type implements `String() string`, `fmt.Println` calls it automatically. Define a `Book` struct with `Title string` and `Author string` fields, and a `String()` method that returns `\"<Title> by <Author>\"`. Print a Book and see the custom summary appear.",
+      "When a type has `String() string`, `fmt.Println` calls it automatically. Give a `Book` struct (with Title and Author) a `String()` method returning `\"<Title> by <Author>\"`. Print a Book and see the custom format.",
     starter: `package main
 
 import "fmt"
@@ -59,12 +59,12 @@ func main() {
 \tfmt.Println(b)
 }`,
     expectedOutput: ["The Go Programming Language by Donovan & Kernighan"],
-    hint: `func (b Book) String() string { return fmt.Sprintf("%s by %s", b.Title, b.Author) }`,
+    hint: 'func (b Book) String() string { return fmt.Sprintf("%s by %s", b.Title, b.Author) }',
   },
   {
     title: "Method Chaining — Book Description",
     instruction:
-      "Returning `*BookDesc` from each method allows chaining calls. A `BookDesc` with an `Add(s string) *BookDesc` method and a `Build() string` method is provided. Chain two `Add` calls to produce \"Moby Dick by Herman Melville\" then print it.",
+      "When methods return the struct pointer, you can chain them. A `BookDesc` with `Add(s string) *BookDesc` and `Build() string` is provided. Chain two Add calls to produce `\"Moby Dick by Herman Melville\"` then print Build().",
     starter: `package main
 
 import "fmt"
@@ -89,6 +89,6 @@ func main() {
 \t// TODO: chain .Add("Moby Dick").Add("by Herman Melville") and print Build()
 }`,
     expectedOutput: ["Moby Dick by Herman Melville"],
-    hint: `b := &BookDesc{} — fmt.Println(b.Add("Moby Dick").Add("by Herman Melville").Build())`,
+    hint: 'b := &BookDesc{} — fmt.Println(b.Add("Moby Dick").Add("by Herman Melville").Build())',
   },
 ];

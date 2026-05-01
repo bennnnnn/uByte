@@ -2,9 +2,9 @@ import type { TutorialStep } from "../types";
 
 export const steps: TutorialStep[] = [
   {
-    title: "Basic Select — Book Search Results",
+    title: "Basic Select — Two Search Channels",
     instruction:
-      "The `select` statement blocks until one of its channel cases is ready. Two librarians are searching for a book — each returns results on their own channel. Use `select` to receive from whichever channel has data first. Create two buffered channels, send a result to one, and print it.",
+      "`select` waits on multiple channels and runs whichever is ready first. Two channels are set up. Send `\"The Go Programming Language\"` to ch1, then select will pick ch1 since it has data ready and print the result.",
     starter: `package main
 
 import "fmt"
@@ -25,12 +25,12 @@ func main() {
 \t}
 }`,
     expectedOutput: ["found on shelf A: The Go Programming Language"],
-    hint: "Change `ch1 <- \"\"` to `ch1 <- \"The Go Programming Language\"`. The select picks ch1 because it has data ready.",
+    hint: 'Change `ch1 <- ""` to `ch1 <- "The Go Programming Language"`. Select picks ch1 because it has data ready.',
   },
   {
     title: "Non-Blocking with Default — Empty Catalog",
     instruction:
-      "Adding a `default` case makes `select` non-blocking. When no channel has data, `default` runs immediately — like checking an empty book catalog. Try receiving from an empty channel; the default case should print a message saying the catalog is empty.",
+      "Add a `default` case to `select` and it becomes non-blocking. The catalog channel is empty. Add a default branch that prints `\"catalog is empty\"` so select doesn't wait.",
     starter: `package main
 
 import "fmt"
@@ -46,12 +46,12 @@ func main() {
 \t}
 }`,
     expectedOutput: ["catalog is empty"],
-    hint: "Add `default: fmt.Println(\"catalog is empty\")` as a case in the select block.",
+    hint: 'Add `default: fmt.Println("catalog is empty")` to the select block.',
   },
   {
-    title: "Timeout Pattern — Slow Book Database",
+    title: "Timeout Pattern — Slow Database",
     instruction:
-      "`time.After(d)` returns a channel that fires after duration `d`. Use it with `select` to implement a timeout when querying a slow book database. The database takes 200ms to respond, but we only want to wait 50ms. The timeout should fire first.",
+      "`time.After(d)` returns a channel that fires after duration `d`. The `slowDatabase` function takes 200ms but you only want to wait 50ms. Use select with `time.After(50 * time.Millisecond)` so the timeout fires first.",
     starter: `package main
 
 import (
@@ -79,12 +79,12 @@ func main() {
 \t}
 }`,
     expectedOutput: ["timeout"],
-    hint: "Add `case <-time.After(50 * time.Millisecond): fmt.Println(\"timeout: database query took too long\")` to the select.",
+    hint: 'Add `case <-time.After(50 * time.Millisecond): fmt.Println("timeout: database query took too long")` — the timer wins before the database finishes.',
   },
   {
-    title: "Done Channel Pattern — Gracefully Stop the Librarian",
+    title: "Done Channel — Stop Gracefully",
     instruction:
-      "A `done` channel signals a goroutine to stop. The librarian goroutine uses `select` to either shelve a book (do work) or exit when `done` is closed. Start a goroutine that counts shelved books, then close `done` after a short delay to stop the librarian gracefully.",
+      "A `done` channel signals a goroutine to stop. The librarian goroutine shelves books until `done` is closed. Inside the loop, select decides: shelve another book or exit when `done` fires. Sleep 100ms, then `close(done)` to stop her.",
     starter: `package main
 
 import (
@@ -117,12 +117,12 @@ func main() {
 \tfmt.Println("library closed")
 }`,
     expectedOutput: ["shelved book #", "librarian stopped", "library closed"],
-    hint: "Change `time.Sleep(0)` to `time.Sleep(100 * time.Millisecond)` then add `close(done)` on the next line.",
+    hint: "Change `time.Sleep(0)` to `time.Sleep(100 * time.Millisecond)`, then add `close(done)` on the next line.",
   },
   {
-    title: "Fan-In: Merging Two Search Results",
+    title: "Fan-In — Merging Two Catalogs",
     instruction:
-      "Fan-in merges multiple input channels into one output channel. Two catalog searches return results on separate channels. Complete the `merge` function to combine them into a single channel using goroutines that forward each value. Print all received book titles and the total count.",
+      "Fan-in merges multiple input channels into one output. Two catalog searches return books on separate channels. Complete the `merge` function by launching goroutines that forward each catalog's results into a single output channel. Print every merged book and the total count.",
     starter: `package main
 
 import (

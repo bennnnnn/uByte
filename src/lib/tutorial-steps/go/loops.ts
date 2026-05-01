@@ -4,13 +4,16 @@ export const steps: TutorialStep[] = [
   {
     title: "Shelf Numbers (Basic for loop)",
     instruction:
-      "Use a basic `for` loop to print shelf numbers 1 through 5. Each shelf number must appear on its own line. The loop pattern is: `for init; condition; post { }`.",
+      "Print shelf numbers 1 through 5, one per line. I've set up `i := 1` — you just need to give me the condition and the increment so I know when to stop and how to count.",
     starter: `package main
 
 import "fmt"
 
 func main() {
-\t// TODO: print shelf numbers 1 to 5 using a for loop
+\t// I count shelves — tell me when to stop and what to do after each one
+\tfor i := 1; /* TODO: condition */; /* TODO: increment */ {
+\t\tfmt.Println(i)
+\t}
 }`,
     expectedOutput: ["1", "2", "3", "4", "5"],
     hint: "for i := 1; i <= 5; i++ { fmt.Println(i) }",
@@ -18,15 +21,20 @@ func main() {
   {
     title: "Overdue Countdown (While-style loop)",
     instruction:
-      "A book is 3 days overdue. Count down from 3 to 1 using a while-style `for` loop (omit init and post), then print \"Returned!\" after the loop. Print each number on its own line.",
+      "A book is 3 days overdue. Count down 3, 2, 1 using a while-style loop (just a condition, no init or post), then print `\"Returned!\"` after the loop.",
     starter: `package main
 
 import "fmt"
 
 func main() {
 \tdays := 3
-\t// TODO: loop while days > 0, print days, then decrement
-\t// TODO: after the loop, print "Returned!"
+\t// I keep going as long as days > 0 — print days, then subtract 1
+\t// TODO: write my loop header (just a condition, that's all I need)
+\t{
+\t\tfmt.Println(days)
+\t\tdays--
+\t}
+\t// TODO: tell me to announce we're done after the loop
 \t_ = days
 }`,
     expectedOutput: ["3", "2", "1", "Returned!"],
@@ -35,13 +43,14 @@ func main() {
   {
     title: "Book Titles (Range over slice)",
     instruction:
-      "Range over a slice of book titles and print each one. Use `for range` which gives you an index and a value. Print only the title (ignore the index).",
+      "I've got a list of books: Dune, Neuromancer, Snow Crash. Use `for range` to loop over them and print each title. I give you both an index and a value — you can ignore the index with `_`.",
     starter: `package main
 
 import "fmt"
 
 func main() {
 \tbooks := []string{"Dune", "Neuromancer", "Snow Crash"}
+\t// I'll give you each book one by one — tell me what to do with it
 \t// TODO: range over books and print each title
 \t_ = books
 }`,
@@ -51,14 +60,16 @@ func main() {
   {
     title: "Damaged Books (break and continue)",
     instruction:
-      "Scan shelves 1 through 6. Skip damaged shelves (even numbers) with `continue` and stop scanning at shelf 5 with `break`. Only print 1, 3, and 5 — the undamaged shelves.",
+      "Scan shelves 1 through 6. If a shelf number is even, skip it with `continue` — it's damaged. If it's greater than 5, stop entirely with `break`. Only print 1, 3, and 5.",
     starter: `package main
 
 import "fmt"
 
 func main() {
 \tfor shelf := 1; shelf <= 6; shelf++ {
-\t\t// TODO: if shelf is even, continue (damaged); if shelf > 5, break; else print shelf
+\t\t// TODO: tell me to skip even shelves (they're damaged)
+\t\t// TODO: tell me to stop when shelf > 5
+\t\t// TODO: otherwise print the shelf number
 \t}
 }`,
     expectedOutput: ["1", "3", "5"],
@@ -67,7 +78,7 @@ func main() {
   {
     title: "Total Pages (Sum with a loop)",
     instruction:
-      "Five books have page counts: 120, 340, 275, 190, 410. Sum them with a loop over a slice and print the total pages.",
+      "Five books have page counts: 120, 340, 275, 190, 410. Loop over the slice and add each page count to `total`, then print the total.",
     starter: `package main
 
 import "fmt"
@@ -75,7 +86,7 @@ import "fmt"
 func main() {
 \tpages := []int{120, 340, 275, 190, 410}
 \ttotal := 0
-\t// TODO: loop over pages and add each to total
+\t// TODO: loop over pages and add each one to total
 \tfmt.Println(total)
 }`,
     expectedOutput: ["1335"],

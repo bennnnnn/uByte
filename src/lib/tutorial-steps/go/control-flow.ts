@@ -4,7 +4,7 @@ export const steps: TutorialStep[] = [
   {
     title: "if Statement",
     instruction:
-      "An `if` statement runs a block of code only when a condition is true. A book in the library has 350 pages. Check if it has more than 200 pages. If it does, print \"Long book\".",
+      "A book has 350 pages. Use `if` to check: if it has more than 200 pages, print `\"Long book\"`. I only run the code inside the curly braces when the condition is true.",
     starter: `package main
 
 import "fmt"
@@ -20,7 +20,7 @@ func main() {
   {
     title: "if-else",
     instruction:
-      "An `if-else` block runs different code depending on the condition. A young reader wants to borrow a book. If their age is 12 or older, print \"Can borrow\", otherwise print \"Too young\".",
+      "A young reader wants to borrow a book. If they're 12 or older, print `\"Can borrow\"`. Otherwise print `\"Too young\"`.",
     starter: `package main
 
 import "fmt"
@@ -36,7 +36,7 @@ func main() {
   {
     title: "if with Init Statement",
     instruction:
-      "Go lets you run a short statement before the condition in an `if`. Look up the ISBN \"978-0-14-312774-1\" in a map of books. If the book exists, print \"Found book: <title>\", otherwise print \"Book not found\".",
+      "Go lets you run a short statement before the condition in an `if`. Look up the ISBN `\"978-0-14-312774-1\"` in the books map. If it exists, print `\"Found book: The Great Gatsby\"`. If not, print `\"Book not found\"`.",
     starter: `package main
 
 import "fmt"
@@ -55,7 +55,7 @@ func main() {
   {
     title: "switch Statement",
     instruction:
-      "A `switch` statement is a cleaner alternative to a chain of if-else. A library is open Monday through Saturday but closed on Sunday. Given `day := \"Saturday\"`, use a switch to print \"Open\" for Monday through Saturday and \"Closed\" for Sunday.",
+      "The library is open Monday through Saturday, closed on Sunday. Given `day := \"Saturday\"`, use a `switch` to print `\"Open\"` or `\"Closed\"`.",
     starter: `package main
 
 import "fmt"
@@ -71,7 +71,7 @@ func main() {
   {
     title: "FizzBuzz",
     instruction:
-      "Categorize books by page count! Loop from 1 to 15. For page counts divisible by 3 print \"Short\", for page counts divisible by 5 print \"Medium\", for page counts divisible by both print \"Long\", otherwise print the number. Check for Long (both) first!",
+      "March from 1 to 15. For numbers divisible by 3, print `\"Short\"`. For 5, print `\"Medium\"`. For both, print `\"Long\"`. Otherwise print the number. Check for both first!",
     starter: `package main
 
 import "fmt"
@@ -83,6 +83,6 @@ func main() {
 \t}
 }`,
     expectedOutput: ["Short", "Medium", "Long"],
-    hint: "Check i%15==0 first for Long, then i%3==0 for Short, then i%5==0 for Medium, else print i.",
+    hint: "Check i%3==0 && i%5==0 first for Long, then i%3==0 for Short, then i%5==0 for Medium, else print i.",
   },
 ];

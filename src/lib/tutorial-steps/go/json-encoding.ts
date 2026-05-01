@@ -2,9 +2,9 @@ import type { TutorialStep } from "../types";
 
 export const steps: TutorialStep[] = [
   {
-    title: "Marshaling a Book to JSON",
+    title: "Marshal a Book to JSON",
     instruction:
-      "`json.Marshal(v)` converts any Go value to a JSON byte slice. Struct fields are included if they are exported (capital letter). Add `json:\"title\"` and `json:\"author\"` tags to the `Book` struct so the JSON uses lowercase keys, then marshal and print.",
+      "JSON turns your Go structs into text any program can read. Add `json:\"title\"` and `json:\"author\"` tags to the Book struct so the JSON keys are lowercase, then call `json.Marshal(b)` and print the result.",
     starter: `package main
 
 import (
@@ -30,12 +30,12 @@ func main() {
 \tfmt.Println(string(data))
 }`,
     expectedOutput: ["The Go Programming Language", "Alan Donovan"],
-    hint: "Add backtick tags: `json:\"title\"` after Title and `json:\"author\"` after Author. Pass `b` (not nil) to json.Marshal.",
+    hint: 'Add backtick tags: `json:"title"` after Title and `json:"author"` after Author. Pass `b` (not nil) to json.Marshal.',
   },
   {
-    title: "Unmarshaling JSON into a Book",
+    title: "Unmarshal JSON into a Book",
     instruction:
-      "`json.Unmarshal(data, &v)` parses JSON bytes into a Go value. Always pass a pointer (`&v`) so the function can write into your variable. Unmarshal the provided JSON string into a `Book` and print its Title and Author.",
+      "`json.Unmarshal(data, &v)` parses JSON back into a struct. Always pass a pointer. Unmarshal the provided JSON string into a `Book` and print its Title and Author.",
     starter: `package main
 
 import (
@@ -68,7 +68,7 @@ func main() {
   {
     title: "omitempty for Optional Fields",
     instruction:
-      "The `omitempty` option skips a field when it has its zero value (empty string, 0, nil). Add it to the `ISBN` field with tag `json:\"isbn,omitempty\"`. Marshal two books — one with an ISBN and one without — and observe the difference.",
+      "Add `omitempty` to a JSON tag and I'll skip the field when it's empty. Tag `ISBN` with `json:\"isbn,omitempty\"`. Marshal two books — one with an ISBN and one without — and see the difference.",
     starter: `package main
 
 import (
@@ -90,15 +90,15 @@ func marshal(b Book) {
 
 func main() {
 \tmarshal(Book{Title: "Dune", Author: "Frank Herbert", ISBN: "978-0-441-17271-9"})
-\tmarshal(Book{Title: "Neuromancer", Author: "William Gibson"}) // ISBN is empty — should be omitted
+\tmarshal(Book{Title: "Neuromancer", Author: "William Gibson"}) // ISBN empty — should be omitted
 }`,
     expectedOutput: ["isbn", "978-0-441-17271-9", "Neuromancer"],
-    hint: "Change `ISBN string` to `ISBN string \\`json:\"isbn,omitempty\"\\``. When ISBN is empty, the field won't appear in the second line's output.",
+    hint: 'Change `ISBN string` to `ISBN string \`json:"isbn,omitempty"\``. When ISBN is empty, the field won\'t appear in the second line.',
   },
   {
-    title: "Marshaling Maps and Slices",
+    title: "Encode Maps and Slices",
     instruction:
-      "Any Go map or slice can be marshaled to JSON directly — no struct needed. Marshal a `map[string]int` of page counts and a `[]string` of genres, then print both as JSON.",
+      "Any Go map or slice can be marshaled directly — no struct wrapper needed. Marshal a `map[string]int` of page counts and a `[]string` of genres, then print both as JSON.",
     starter: `package main
 
 import (
@@ -125,9 +125,9 @@ func main() {
     hint: "Pass `pages` and `genres` to json.Marshal instead of nil.",
   },
   {
-    title: "Pretty Printing Library Data",
+    title: "Pretty Print with MarshalIndent",
     instruction:
-      "`json.MarshalIndent(v, prefix, indent)` adds whitespace for readability. Use `\"\"` as prefix and `\"  \"` (two spaces) as indent. Marshal a `Library` struct containing nested book data and print the indented result.",
+      "`json.MarshalIndent(v, prefix, indent)` adds whitespace so humans can read the structure. Use `\"\"` as prefix and `\"  \"` (two spaces) as indent. Marshal a nested `Library` struct and print the indented result.",
     starter: `package main
 
 import (
@@ -167,6 +167,6 @@ func main() {
 \tfmt.Println(string(data))
 }`,
     expectedOutput: ["  \"name\"", "Dune", "Central Library"],
-    hint: "Change `json.Marshal(lib)` to `json.MarshalIndent(lib, \"\", \"  \")`.",
+    hint: 'Change `json.Marshal(lib)` to `json.MarshalIndent(lib, "", "  ")`.',
   },
 ];

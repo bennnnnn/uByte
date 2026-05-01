@@ -1,84 +1,83 @@
 import type { TutorialStep } from "../types";
 
-/** TS fallback for the "arrays" tutorial — used when content/go/arrays.steps.json is inaccessible. */
 export const steps: TutorialStep[] = [
   {
-    title: "Declare a Shelf Array",
+    title: "I'm a fixed shelf with 3 spots",
     instruction:
-      "Declare an array of 3 strings named `shelf` to represent library shelf labels, then print the whole array. It should print the zero values (empty strings).",
+      "Declare an array of 3 strings — think of it as a shelf with 3 slots. Each slot starts empty (zero value). Print the whole array to see those empty slots.",
     starter: `package main
 
 import "fmt"
 
 func main() {
-\t// TODO: declare shelf as an array of 3 strings
-\t// TODO: print shelf
+\t// TODO: declare nums as an array of 3 ints
+\t// TODO: print nums
 }`,
-    expectedOutput: ["[  ]"],
-    hint: "Use `var shelf [3]string` and then `fmt.Println(shelf)`.",
+    expectedOutput: ["[0 0 0]"],
+    hint: "Use `var nums [3]int` and then `fmt.Println(nums)`.",
   },
   {
-    title: "Assign Books by Index",
+    title: "Put Books on My Shelves",
     instruction:
-      'Create an array of 3 strings named `books`. Set index 0 to `"Moby Dick"`, index 1 to `"1984"`, and index 2 to `"Pride"`. Print the whole array.',
+      "Create an array of 3 strings named `colors`. Set index 0 to `\"red\"`, index 1 to `\"green\"`, and index 2 to `\"blue\"`. Print the whole array.",
     starter: `package main
 
 import "fmt"
 
 func main() {
-\tvar books [3]string
-\t// TODO: assign books by index
-\tfmt.Println(books)
+\tvar colors [3]string
+\t// TODO: assign red, green, blue by index
+\tfmt.Println(colors)
 }`,
-    expectedOutput: ["[Moby Dick 1984 Pride]"],
-    hint: "Declare `var books [3]string`, then assign `books[0]`, `books[1]`, and `books[2]`.",
+    expectedOutput: ["[red green blue]"],
+    hint: "Declare `var colors [3]string`, then assign `colors[0]`, `colors[1]`, and `colors[2]`.",
   },
   {
-    title: "First and Last Book",
+    title: "Grab the First and Last Book",
     instruction:
-      "Create `shelf := [4]string{\"Dune\", \"Ender\", \"Hobbit\", \"Neuromancer\"}`. Print the first book, then print the last book.",
+      "Create `scores := [4]int{10, 20, 30, 40}`. Print the first value, then print the last value.",
     starter: `package main
 
 import "fmt"
 
 func main() {
-\tshelf := [4]string{"Dune", "Ender", "Hobbit", "Neuromancer"}
-\t// TODO: print the first book
-\t// TODO: print the last book
+\tscores := [4]int{10, 20, 30, 40}
+\t// TODO: print the first value
+\t// TODO: print the last value
 }`,
-    expectedOutput: ["Dune", "Neuromancer"],
-    hint: "The first value is `shelf[0]`. The last value is `shelf[len(shelf)-1]`.",
+    expectedOutput: ["10", "40"],
+    hint: "The first value is `scores[0]`. The last value is `scores[len(scores)-1]`.",
   },
   {
-    title: "Loop Through Book Shelves",
+    title: "Hand Me Each Book One by One",
     instruction:
-      "Loop through `[3]string{\"Fiction\", \"NonFiction\", \"Reference\"}` and print each shelf section on its own line.",
+      "Loop through `[3]int{2, 4, 6}` and print each number on its own line.",
     starter: `package main
 
 import "fmt"
 
 func main() {
-\tsections := [3]string{"Fiction", "NonFiction", "Reference"}
-\t// TODO: loop through sections and print each value
+\tnums := [3]int{2, 4, 6}
+\t// TODO: loop through nums and print each value
 }`,
-    expectedOutput: ["Fiction", "NonFiction", "Reference"],
-    hint: "Use `for i := 0; i < len(sections); i++ { fmt.Println(sections[i]) }`.",
+    expectedOutput: ["2", "4", "6"],
+    hint: "Use `for i := 0; i < len(nums); i++ { fmt.Println(nums[i]) }`.",
   },
   {
-    title: "Sum Book Pages",
+    title: "Add Up All My Page Counts",
     instruction:
-      "Sum the page counts in `[5]int{120, 340, 280, 150, 410}` and print the total pages.",
+      "Sum the values in `[5]int{1, 2, 3, 4, 5}` and print the total.",
     starter: `package main
 
 import "fmt"
 
 func main() {
-\tpages := [5]int{120, 340, 280, 150, 410}
-\ttotal := 0
-\t// TODO: add each page count to total
-\tfmt.Println(total)
+\tnums := [5]int{1, 2, 3, 4, 5}
+\tsum := 0
+\t// TODO: add each array element to sum
+\tfmt.Println(sum)
 }`,
-    expectedOutput: ["1300"],
-    hint: "Start with `total := 0`, then add each element inside a loop.",
+    expectedOutput: ["15"],
+    hint: "Start with `sum := 0`, then add each element inside a loop.",
   },
 ];

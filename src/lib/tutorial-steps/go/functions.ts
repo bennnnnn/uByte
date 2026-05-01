@@ -2,44 +2,43 @@ import type { TutorialStep } from "../types";
 
 export const steps: TutorialStep[] = [
   {
-    title: "Count Books — Simple Function",
+    title: "Simple Function — I Greet You",
     instruction:
-      "Define a function `countBooks(books []string) int` that returns `len(books)`. Then call it with `[\"Dune\", \"Neuromancer\", \"Snow Crash\"]` and print the result.",
+      "Functions let you write logic once and reuse it. Define `greet(name string) string` that returns `\"Hello, \" + name`. Call it with `\"Ada\"` and print the result.",
     starter: `package main
 
 import "fmt"
 
-// TODO: define countBooks(books []string) int
+// TODO: define greet(name string) string
 
 func main() {
-\tbooks := []string{"Dune", "Neuromancer", "Snow Crash"}
-\t// TODO: call countBooks(books) and print the result
+\t// TODO: call greet("Ada") and print the result
 }`,
-    expectedOutput: ["3"],
-    hint: "func countBooks(books []string) int { return len(books) }",
+    expectedOutput: ["Hello, Ada"],
+    hint: 'func greet(name string) string { return "Hello, " + name }',
   },
   {
-    title: "Find Book — Multiple Return Values",
+    title: "Multiple Return Values — Book and Status",
     instruction:
-      "Define `findBook(books []string, target string) (int, bool)` that returns the index of the target and `true` if found, or `-1` and `false` if not. Call it with `books` looking for \"Dune\" and print both results.",
+      "Go functions can return multiple values. Define `findBook(books []string, target string) (string, bool)` — return the book title and `true` if found, or `\"\"` and `false` if not. Search for `\"Dune\"` and print both results.",
     starter: `package main
 
 import "fmt"
 
-// TODO: define findBook(books []string, target string) (int, bool)
+// TODO: define findBook(books []string, target string) (string, bool)
 
 func main() {
 \tbooks := []string{"Dune", "Neuromancer", "Snow Crash"}
-\tidx, found := findBook(books, "Dune")
-\tfmt.Println(idx, found)
+\tbook, found := findBook(books, "Dune")
+\tfmt.Println(book, found)
 }`,
-    expectedOutput: ["0", "true"],
-    hint: "func findBook(books []string, target string) (int, bool) { for i, b := range books { if b == target { return i, true } }; return -1, false }",
+    expectedOutput: ["Dune", "true"],
+    hint: "func findBook(books []string, target string) (string, bool) { for _, b := range books { if b == target { return b, true } }; return \"\", false }",
   },
   {
-    title: "List Genres — Variadic Function",
+    title: "Variadic Function — Any Number of Genres",
     instruction:
-      "Define `listGenres(genres ...string) string` that joins all genre names into a single comma-separated string. Call it with \"Fiction\", \"Sci-Fi\", \"Fantasy\" and print the result.",
+      "A variadic function accepts any number of arguments using `...type`. Define `listGenres(genres ...string) string` that joins all genres with `\", \"` and returns the result. Call it with `\"Fiction\"`, `\"Sci-Fi\"`, `\"Fantasy\"` and print.",
     starter: `package main
 
 import "fmt"
@@ -53,9 +52,9 @@ func main() {
     hint: "func listGenres(genres ...string) string { result := \"\"; for i, g := range genres { if i > 0 { result += \", \" }; result += g }; return result }",
   },
   {
-    title: "Shelf Range — Named Return Values",
+    title: "Named Return Values — First and Last",
     instruction:
-      "Define `shelfRange(books []string) (first, last string)` that returns the first and last book using named return values and a bare `return`. Call it with `[\"Dune\", \"Neuromancer\", \"Snow Crash\"]` and print both.",
+      "You can name return values in the signature and use a bare `return`. Define `shelfRange(books []string) (first, last string)` that returns the first and last book. Call it with your books and print both.",
     starter: `package main
 
 import "fmt"
@@ -70,9 +69,9 @@ func main() {
     hint: "func shelfRange(books []string) (first, last string) { first, last = books[0], books[len(books)-1]; return }",
   },
   {
-    title: "Format Book — Functions as Values",
+    title: "Functions as Values — A Helper's Helper",
     instruction:
-      "Define `formatBook(f func(string) string, title string) string` that calls `f(title)` and returns the result. Call it with a function that wraps the title in stars and `\"Dune\"`, then print the result.",
+      "Functions are values — you can pass them as arguments. Define `formatBook(f func(string) string, title string) string` that calls `f(title)` and returns the result. Call it with a wrap-in-stars function and `\"Dune\"`, then print.",
     starter: `package main
 
 import "fmt"
@@ -87,9 +86,9 @@ func main() {
     hint: "func formatBook(f func(string) string, title string) string { return f(title) }",
   },
   {
-    title: "Book Counter — Closures",
+    title: "Closures — I Remember Things",
     instruction:
-      "Define `bookCounter() func() string` that returns a closure. Each call returns `\"Book N\"` where N increments starting from 1. Call it three times and print each result.",
+      "A closure captures variables from its surrounding scope. Define `bookCounter() func() string` that returns a closure. Each call returns `\"Book N\"` where N increments. Call it three times and print each result.",
     starter: `package main
 
 import "fmt"
