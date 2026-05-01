@@ -4,31 +4,29 @@ export const steps: TutorialStep[] = [
   {
     title: "Hello, Library!",
     instruction:
-      "See the text inside the quotes after `fmt.Println()`? That's what I say out loud. Change the message from `\"CHANGE_ME\"` to `\"Hello, Library!\"` — put your own library's name in there if you want. Then click **Run & check** to hear me say it.",
+      "The front door: `func main()`. Every Go program has one — it's where Go walks in and starts running whatever's inside the `{ }`. No `main` = no program. Go just stares at your code.\n\nThis program already works. Click **Run & check** and watch the door open.",
     starter: `package main
 
 import "fmt"
 
 func main() {
-\t// I'm fmt.Println — I print whatever's inside the quotes.
-\t// TODO: Change the message below to print "Hello, Library!"
-\tfmt.Println("CHANGE_ME")
+\tfmt.Println("Hello, Library!")
 }`,
     expectedOutput: ["Hello, Library!"],
-    hint: 'Just replace "CHANGE_ME" with "Hello, Library!" inside the quotes.',
+    hint: "The program is already complete — just click Run & check to see it work.",
   },
   {
     title: "Announce Your Library",
     instruction:
-      "Now make it yours. Change the first message to `\"Welcome to my library!\"`, then add a second `fmt.Println()` below it that prints the hours: `\"Open daily from 9 AM to 8 PM\"`.",
+      "Now change what I say. The text inside the quotes after `fmt.Println()` is what I shout to the screen. Replace `\"Hello, Library!\"` with `\"Welcome to my library!\"`, then add a second `fmt.Println()` below it that prints the hours: `\"Open daily from 9 AM to 8 PM\"`.",
     starter: `package main
 
 import "fmt"
 
 func main() {
-\t// Change the message below, then add another line for the library hours.
+\t// Change what I say — put your library name here
 \tfmt.Println("Hello, Library!")
-\t// TODO: add a second fmt.Println() showing the library hours
+\t// TODO: add a second line showing the library hours
 }`,
     expectedOutput: ["Welcome to my library!", "9 AM"],
     hint: 'Change the first line to fmt.Println("Welcome to my library!") and add: fmt.Println("Open daily from 9 AM to 8 PM")',
@@ -71,7 +69,7 @@ func main() {
   {
     title: "Add a Comment About Tomorrow",
     instruction:
-      "Lines that start with `//` are comments — I ignore them completely. They're notes for humans. Add a `//` comment on its own line above the `fmt.Println()` call. Write something like `// This line prints the time`. Then change the message to print `\"Tomorrow at 9 AM\"`.",
+      "Lines that start with `//` are comments — I skip them completely. They're notes for humans. Add a `//` comment on its own line above the `fmt.Println()` call. Write something like `// This line prints the time`. Then change the message to print `\"Tomorrow at 9 AM\"`.",
     starter: `package main
 
 import "fmt"
