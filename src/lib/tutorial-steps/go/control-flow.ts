@@ -4,82 +4,85 @@ export const steps: TutorialStep[] = [
   {
     title: "if Statement",
     instruction:
-      "An `if` statement runs a block of code only when a condition is true. Check if the variable `x` (set to 15) is greater than 10. If it is, print \"greater than 10\".",
+      "An `if` statement runs a block of code only when a condition is true. A book in the library has 350 pages. Check if it has more than 200 pages. If it does, print \"Long book\".",
     starter: `package main
 
 import "fmt"
 
 func main() {
-	x := 15
-	// TODO: if x > 10, print "greater than 10"
-	_ = x
+\tpages := 350
+\t// TODO: if pages > 200, print "Long book"
+\t_ = pages
 }`,
-    expectedOutput: ["greater than 10"],
-    hint: "if x > 10 { fmt.Println(\"greater than 10\") }",
+    expectedOutput: ["Long book"],
+    hint: 'if pages > 200 { fmt.Println("Long book") }',
   },
   {
     title: "if-else",
     instruction:
-      "An `if-else` block runs different code depending on the condition. A student scored 72. If the score is 60 or higher print \"Pass\", otherwise print \"Fail\".",
+      "An `if-else` block runs different code depending on the condition. A young reader wants to borrow a book. If their age is 12 or older, print \"Can borrow\", otherwise print \"Too young\".",
     starter: `package main
 
 import "fmt"
 
 func main() {
-	score := 72
-	// TODO: print "Pass" if score >= 60, else print "Fail"
-	_ = score
+\tage := 15
+\t// TODO: print "Can borrow" if age >= 12, else print "Too young"
+\t_ = age
 }`,
-    expectedOutput: ["Pass"],
-    hint: "if score >= 60 { fmt.Println(\"Pass\") } else { fmt.Println(\"Fail\") }",
+    expectedOutput: ["Can borrow"],
+    hint: 'if age >= 12 { fmt.Println("Can borrow") } else { fmt.Println("Too young") }',
   },
   {
     title: "if with Init Statement",
     instruction:
-      "Go lets you run a short statement before the condition in an `if`. Look up the key \"go\" in the map. If it exists, print \"found\". If not, print \"not found\".",
+      "Go lets you run a short statement before the condition in an `if`. Look up the ISBN \"978-0-14-312774-1\" in a map of books. If the book exists, print \"Found book: <title>\", otherwise print \"Book not found\".",
     starter: `package main
 
 import "fmt"
 
 func main() {
-	langs := map[string]int{"go": 2009, "python": 1991}
-	// TODO: use if v, ok := langs["go"]; ok { ... }
-	_ = langs
+\tbooks := map[string]string{
+\t\t"978-0-14-312774-1": "The Great Gatsby",
+\t\t"978-0-06-112008-4": "To Kill a Mockingbird",
+\t}
+\t// TODO: use if title, ok := books["978-0-14-312774-1"]; ok { ... }
+\t_ = books
 }`,
-    expectedOutput: ["found"],
-    hint: "if v, ok := langs[\"go\"]; ok { fmt.Println(\"found:\", v) } else { fmt.Println(\"not found\") }",
+    expectedOutput: ["found book: the great gatsby"],
+    hint: 'if title, ok := books["978-0-14-312774-1"]; ok { fmt.Println("Found book:", title) } else { fmt.Println("Book not found") }',
   },
   {
     title: "switch Statement",
     instruction:
-      "A `switch` statement is a cleaner alternative to a chain of if-else. Given `day := \"Monday\"`, use a switch to print \"Weekday\" for Monday through Friday and \"Weekend\" for Saturday and Sunday.",
+      "A `switch` statement is a cleaner alternative to a chain of if-else. A library is open Monday through Saturday but closed on Sunday. Given `day := \"Saturday\"`, use a switch to print \"Open\" for Monday through Saturday and \"Closed\" for Sunday.",
     starter: `package main
 
 import "fmt"
 
 func main() {
-	day := "Monday"
-	// TODO: switch on day, print "Weekday" or "Weekend"
-	_ = day
+\tday := "Saturday"
+\t// TODO: switch on day, print "Open" for Mon-Sat, "Closed" for Sun
+\t_ = day
 }`,
-    expectedOutput: ["Weekday"],
-    hint: "switch day { case \"Monday\", \"Tuesday\", ...: fmt.Println(\"Weekday\") case \"Saturday\", \"Sunday\": fmt.Println(\"Weekend\") }",
+    expectedOutput: ["Open"],
+    hint: 'switch day { case "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday": fmt.Println("Open") case "Sunday": fmt.Println("Closed") }',
   },
   {
     title: "FizzBuzz",
     instruction:
-      "Classic FizzBuzz: loop from 1 to 15. For multiples of 3 print \"Fizz\", for multiples of 5 print \"Buzz\", for multiples of both print \"FizzBuzz\", otherwise print the number. Check for FizzBuzz first!",
+      "Categorize books by page count! Loop from 1 to 15. For page counts divisible by 3 print \"Short\", for page counts divisible by 5 print \"Medium\", for page counts divisible by both print \"Long\", otherwise print the number. Check for Long (both) first!",
     starter: `package main
 
 import "fmt"
 
 func main() {
-	for i := 1; i <= 15; i++ {
-		// TODO: FizzBuzz logic
-		fmt.Println(i)
-	}
+\tfor i := 1; i <= 15; i++ {
+\t\t// TODO: print "Short" for multiples of 3, "Medium" for multiples of 5, "Long" for both, else i
+\t\tfmt.Println(i)
+\t}
 }`,
-    expectedOutput: ["Fizz", "Buzz", "FizzBuzz"],
-    hint: "Check i%15==0 first for FizzBuzz, then i%3==0 for Fizz, then i%5==0 for Buzz, else print i.",
+    expectedOutput: ["Short", "Medium", "Long"],
+    hint: "Check i%15==0 first for Long, then i%3==0 for Short, then i%5==0 for Medium, else print i.",
   },
 ];

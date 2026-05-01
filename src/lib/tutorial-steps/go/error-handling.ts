@@ -2,109 +2,115 @@ import type { TutorialStep } from "../types";
 
 export const steps: TutorialStep[] = [
   {
-    title: "Return an Error",
+    title: "Return an Error from findBook",
     instruction:
-      "In Go, errors are values returned like any other. Define `divide(a, b float64) (float64, error)`. When `b` is zero, return `0` and `fmt.Errorf(\"cannot divide by zero\")`. Otherwise return the result and `nil`.",
+      "In Go, errors are values returned like any other. Define `findBook(books []string, name string) (string, error)`. Loop through `books` — if a match is found, return it and `nil`. If no match is found, return an empty string and `fmt.Errorf(\"book \\\"%s\\\" not found\", name)`.",
     starter: `package main
 
 import (
-	"fmt"
+\t"fmt"
 )
 
-// TODO: define divide(a, b float64) (float64, error)
+// TODO: define findBook(books []string, name string) (string, error)
 
 func main() {
-	_, err := divide(10, 0)
-	fmt.Println(err)
+\tbooks := []string{"1984", "Brave New World", "Fahrenheit 451"}
+\t_, err := findBook(books, "Moby Dick")
+\tfmt.Println(err)
 }`,
-    expectedOutput: ["cannot divide by zero"],
-    hint: "func divide(a, b float64) (float64, error) { if b == 0 { return 0, fmt.Errorf(\"cannot divide by zero\") }; return a / b, nil }",
+    expectedOutput: ["not found"],
+    hint: "func findBook(books []string, name string) (string, error) { for _, b := range books { if b == name { return b, nil } }; return \"\", fmt.Errorf(\"book \\\"%s\\\" not found\", name) }",
   },
   {
-    title: "Check an Error",
+    title: "Check the Error Pattern",
     instruction:
-      "The `if err != nil` pattern is the standard way to handle errors in Go. Call `divide(10, 0)` and `divide(10, 2)`. For the zero case print the error; for the success case print \"success:\" followed by the result.",
+      "The `if err != nil` pattern is the standard way to handle errors in Go. Call `findBook` with a missing book and an existing book. For the missing case print the error. For the success case print \"found:\" followed by the book title.",
     starter: `package main
 
 import "fmt"
 
-func divide(a, b float64) (float64, error) {
-	if b == 0 {
-		return 0, fmt.Errorf("cannot divide by zero")
-	}
-	return a / b, nil
+func findBook(books []string, name string) (string, error) {
+\tfor _, b := range books {
+\t\tif b == name {
+\t\t\treturn b, nil
+\t\t}
+\t}
+\treturn "", fmt.Errorf("book \"%s\" not found", name)
 }
 
 func main() {
-	// TODO: call divide(10, 0), check err, print error message
-	// TODO: call divide(10, 2), check err, print "success:" and result
+\tbooks := []string{"1984", "Brave New World", "Fahrenheit 451"}
+\t// TODO: call findBook with "Moby Dick", check err, print error message
+\t// TODO: call findBook with "1984", check err, print "found:" and result
 }`,
-    expectedOutput: ["Error:", "success: 5"],
-    hint: "if err != nil { fmt.Println(\"Error:\", err) } — fmt.Println(\"success:\", result)",
+    expectedOutput: ["not found", "found: 1984"],
+    hint: "if err != nil { fmt.Println(err) } — fmt.Println(\"found:\", result)",
   },
   {
-    title: "Custom Error Type",
+    title: "Custom Error: InvalidISBN",
     instruction:
-      "A custom error type gives callers more information. Define a `ValidationError` struct with a `Field string` and implement the `Error() string` method returning `\"ValidationError: \" + e.Field`. Return one and print it.",
+      "A custom error type gives callers more information. Define an `InvalidISBN` struct with an `ISBN string` and implement the `Error() string` method returning `\"invalid ISBN: \" + e.ISBN`. Then write `checkISBN(isbn string) error` that returns `InvalidISBN{ISBN: isbn}` for empty or short ISBNs, and `nil` otherwise. Print the error.",
     starter: `package main
 
 import "fmt"
 
-// TODO: define ValidationError struct with Field string
+// TODO: define InvalidISBN struct with ISBN string
 // TODO: implement Error() string method
 
-func validate(name string) error {
-	if name == "" {
-		return ValidationError{Field: "name"}
-	}
-	return nil
+func checkISBN(isbn string) error {
+\tif len(isbn) < 10 {
+\t\treturn InvalidISBN{ISBN: isbn}
+\t}
+\treturn nil
 }
 
 func main() {
-	err := validate("")
-	fmt.Println(err)
+\terr := checkISBN("short")
+\tfmt.Println(err)
 }`,
-    expectedOutput: ["ValidationError"],
-    hint: "func (e ValidationError) Error() string { return \"ValidationError: \" + e.Field }",
+    expectedOutput: ["invalid ISBN: short"],
+    hint: "type InvalidISBN struct { ISBN string }; func (e InvalidISBN) Error() string { return \"invalid ISBN: \" + e.ISBN }",
   },
   {
     title: "Wrap Errors with %w",
     instruction:
-      "`fmt.Errorf` with `%w` wraps an existing error so callers can unwrap it. Create a base error, wrap it with `fmt.Errorf(\"wrapped: %w\", base)`, then print the wrapped error.",
+      "`fmt.Errorf` with `%w` wraps an existing error so callers can unwrap it. Create a base error for a missing book, then wrap it with additional context like `fmt.Errorf(\"shelf %d: %w\", shelfID, err)`. Print the wrapped error.",
     starter: `package main
 
 import (
-	"errors"
-	"fmt"
+\t"errors"
+\t"fmt"
 )
 
+var ErrBookMissing = errors.New("book not in catalog")
+
 func main() {
-	base := errors.New("connection refused")
-	// TODO: wrap base with fmt.Errorf("wrapped: %w", base) and print it
-	_ = base
+\tshelfID := 3
+\t// TODO: wrap ErrBookMissing with fmt.Errorf("shelf %d: %w", shelfID, ErrBookMissing) and print it
+\t_ = shelfID
 }`,
-    expectedOutput: ["wrapped:"],
-    hint: "wrapped := fmt.Errorf(\"wrapped: %w\", base) — fmt.Println(wrapped)",
+    expectedOutput: ["shelf 3: book not in catalog"],
+    hint: "wrapped := fmt.Errorf(\"shelf %d: %w\", shelfID, ErrBookMissing) — fmt.Println(wrapped)",
   },
   {
-    title: "errors.Is",
+    title: "errors.Is for Book Lookup",
     instruction:
-      "`errors.Is` checks if any error in the chain matches a target. Create a sentinel error `ErrNotFound`, wrap it with `fmt.Errorf`, then use `errors.Is` to confirm the original error is present and print `true`.",
+      "`errors.Is` checks if any error in the chain matches a target. Create a sentinel error `ErrBookNotFound`, wrap it with `fmt.Errorf` adding shelf context, then use `errors.Is` to confirm the original error is in the chain and print the boolean result.",
     starter: `package main
 
 import (
-	"errors"
-	"fmt"
+\t"errors"
+\t"fmt"
 )
 
-var ErrNotFound = errors.New("not found")
+var ErrBookNotFound = errors.New("book not found")
 
 func main() {
-	wrapped := fmt.Errorf("db: %w", ErrNotFound)
-	// TODO: use errors.Is to check if wrapped contains ErrNotFound and print true/false
-	_ = wrapped
+\twrapped := fmt.Errorf("aisle 7, shelf 3: %w", ErrBookNotFound)
+\t// TODO: use errors.Is to check if wrapped contains ErrBookNotFound and print true/false
+\t_ = wrapped
 }`,
     expectedOutput: ["true"],
-    hint: "fmt.Println(errors.Is(wrapped, ErrNotFound))",
+    hint: "fmt.Println(errors.Is(wrapped, ErrBookNotFound))",
   },
 ];

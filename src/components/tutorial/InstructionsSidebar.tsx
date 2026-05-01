@@ -66,9 +66,24 @@ export default function InstructionsSidebar({
   return (
     <>
       <div className="min-w-0 flex-1 overflow-x-hidden overflow-y-auto p-4 break-words md:p-6">
-        <p className="mb-1 text-xs font-semibold uppercase tracking-widest text-indigo-600 dark:text-indigo-500">
-          Step {stepIndex + 1} of {steps.length}
-        </p>
+        <div className="mb-4 flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2">
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-indigo-100 px-2.5 py-1 text-xs font-bold text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-300">
+              <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h7" />
+              </svg>
+              Step {stepIndex + 1}/{steps.length}
+            </span>
+            <span className="text-xs text-zinc-400">
+              {steps.length - stepIndex - 1} more
+            </span>
+          </div>
+          {completedSteps.size > 0 && (
+            <span className="text-xs text-emerald-600 dark:text-emerald-400 font-semibold">
+              ✅ {completedSteps.size} done
+            </span>
+          )}
+        </div>
         <h2 className="mb-4 break-words text-lg font-bold text-zinc-900 dark:text-zinc-100">
           {step.title}
         </h2>

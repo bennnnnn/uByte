@@ -2,89 +2,89 @@ import type { TutorialStep } from "../types";
 
 export const steps: TutorialStep[] = [
   {
-    title: "Create a Map",
+    title: "Create a Library Map",
     instruction:
-      "Maps store key-value pairs. Create a `map[string]int` with three entries: \"alice\" → 30, \"bob\" → 25, \"carol\" → 35. Then print alice's age.",
+      "Maps store key-value pairs. Create a `map[string]string` that maps ISBNs to book titles with three entries: \"978-0141439518\" → \"Pride and Prejudice\", \"978-0061120084\" → \"To Kill a Mockingbird\", \"978-0451524935\" → \"1984\". Then print the title for \"978-0141439518\".",
     starter: `package main
 
 import "fmt"
 
 func main() {
-	// TODO: create a map with alice=30, bob=25, carol=35
-	// TODO: print alice's age
+\t// TODO: create a map with isbn -> title for three books
+\t// TODO: print the title for ISBN "978-0141439518"
 }`,
-    expectedOutput: ["alice", "30"],
-    hint: "ages := map[string]int{\"alice\": 30, \"bob\": 25, \"carol\": 35} — fmt.Println(\"alice\", ages[\"alice\"])",
+    expectedOutput: ["978-0141439518", "Pride and Prejudice"],
+    hint: "books := map[string]string{\"978-0141439518\": \"Pride and Prejudice\", \"978-0061120084\": \"To Kill a Mockingbird\", \"978-0451524935\": \"1984\"} — fmt.Println(\"978-0141439518\", books[\"978-0141439518\"])",
   },
   {
-    title: "Check if a Key Exists",
+    title: "Check if a Book Exists",
     instruction:
-      "Map lookups return two values: the value and a boolean `ok`. If the key is missing, `ok` is false and the value is the zero value. Look up \"go\" in the langs map; if found print \"found\", otherwise print \"not found\".",
+      "Map lookups return two values: the value and a boolean `ok`. If the key is missing, `ok` is false and the value is the zero value. Look up \"978-0451524935\" in the library map; if found print \"found\", otherwise print \"not found\".",
     starter: `package main
 
 import "fmt"
 
 func main() {
-	langs := map[string]int{"go": 2009, "python": 1991}
-	// TODO: look up "go" using the two-value form and print "found" or "not found"
-	_ = langs
+\tlibrary := map[string]string{"978-0141439518": "Pride and Prejudice", "978-0451524935": "1984"}
+\t// TODO: look up "978-0451524935" using the two-value form and print "found" or "not found"
+\t_ = library
 }`,
     expectedOutput: ["found"],
-    hint: "if _, ok := langs[\"go\"]; ok { fmt.Println(\"found\") } else { fmt.Println(\"not found\") }",
+    hint: "if _, ok := library[\"978-0451524935\"]; ok { fmt.Println(\"found\") } else { fmt.Println(\"not found\") }",
   },
   {
-    title: "Delete a Key",
+    title: "Remove a Borrowed Book",
     instruction:
-      "Use the built-in `delete(map, key)` to remove an entry. Delete \"bob\" from the ages map, then try to look it up — print \"not found\" if the key is gone.",
+      "Use the built-in `delete(map, key)` to remove an entry. Delete \"978-0451524935\" from the library (it was borrowed), then try to look it up — print \"not available\" if the key is gone.",
     starter: `package main
 
 import "fmt"
 
 func main() {
-	ages := map[string]int{"alice": 30, "bob": 25}
-	// TODO: delete "bob" from ages
-	// TODO: check if "bob" still exists and print "not found" if it doesn't
-	_ = ages
+\tlibrary := map[string]string{"978-0141439518": "Pride and Prejudice", "978-0451524935": "1984"}
+\t// TODO: delete "978-0451524935" from library (it was borrowed)
+\t// TODO: check if "978-0451524935" still exists and print "not available" if it doesn't
+\t_ = library
 }`,
-    expectedOutput: ["not found"],
-    hint: "delete(ages, \"bob\") — then if _, ok := ages[\"bob\"]; !ok { fmt.Println(\"not found\") }",
+    expectedOutput: ["not available"],
+    hint: "delete(library, \"978-0451524935\") — then if _, ok := library[\"978-0451524935\"]; !ok { fmt.Println(\"not available\") }",
   },
   {
-    title: "Iterate over a Map",
+    title: "List All Books in the Library",
     instruction:
-      "`for range` on a map gives you each key and value. Loop over the scores map and print each player's name and score on one line (e.g. \"alice: 10\").",
+      "`for range` on a map gives you each key and value. Loop over the library map and print each book's ISBN and title on one line (e.g. \"978-0141439518: Pride and Prejudice\").",
     starter: `package main
 
 import "fmt"
 
 func main() {
-	scores := map[string]int{"alice": 10, "bob": 20, "carol": 30}
-	// TODO: range over scores and print each "name: score"
-	_ = scores
+\tlibrary := map[string]string{"978-0141439518": "Pride and Prejudice", "978-0061120084": "To Kill a Mockingbird", "978-0451524935": "1984"}
+\t// TODO: range over library and print each "isbn: title"
+\t_ = library
 }`,
-    expectedOutput: ["alice", "bob", "carol"],
-    hint: "for name, score := range scores { fmt.Printf(\"%s: %d\\n\", name, score) }",
+    expectedOutput: ["978-0141439518", "Pride and Prejudice", "To Kill a Mockingbird", "1984"],
+    hint: "for isbn, title := range library { fmt.Printf(\"%s: %s\\n\", isbn, title) }",
   },
   {
-    title: "Word Count",
+    title: "Count Books per Genre",
     instruction:
-      "Count how many times each word appears in a sentence. Split the string \"the cat sat on the mat\" by spaces, count each word, then print the count for \"the\".",
+      "Count how many books belong to each genre. Split the comma-separated genres string \"fiction,non-fiction,fiction,reference,fiction\" by commas, count each genre, then print the count for \"fiction\".",
     starter: `package main
 
 import (
-	"fmt"
-	"strings"
+\t"fmt"
+\t"strings"
 )
 
 func main() {
-	sentence := "the cat sat on the mat"
-	counts := map[string]int{}
-	// TODO: split sentence by " " and count each word
-	// TODO: print the count for "the"
-	_ = sentence
-	_ = counts
+\tgenres := "fiction,non-fiction,fiction,reference,fiction"
+\tcounts := map[string]int{}
+\t// TODO: split genres by "," and count each genre
+\t// TODO: print the count for "fiction"
+\t_ = genres
+\t_ = counts
 }`,
-    expectedOutput: ["the", "2"],
-    hint: "for _, w := range strings.Split(sentence, \" \") { counts[w]++ } — fmt.Println(\"the\", counts[\"the\"])",
+    expectedOutput: ["fiction", "3"],
+    hint: "for _, g := range strings.Split(genres, \",\") { counts[g]++ } — fmt.Println(\"fiction\", counts[\"fiction\"])",
   },
 ];

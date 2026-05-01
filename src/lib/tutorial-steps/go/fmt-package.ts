@@ -2,90 +2,92 @@ import type { TutorialStep } from "../types";
 
 export const steps: TutorialStep[] = [
   {
-    title: "Println Basics",
+    title: "Println — Library Book Titles",
     instruction:
-      "`fmt.Println()` adds a newline after each call and puts spaces between multiple arguments. Print \"Hello\" on one line and \"World\" on the next line using two Println calls.",
+      "`fmt.Println()` adds a newline after each call and spaces between arguments. You're building a library system. Print two book titles — each on its own line using separate Println calls: first \"Go Basics\" then \"Concurrency in Go\".",
     starter: `package main
 
 import "fmt"
 
 func main() {
-	// TODO: print "Hello" on one line
-	// TODO: print "World" on the next line
+\t// TODO: print "Go Basics" on one line
+\t// TODO: print "Concurrency in Go" on the next line
 }`,
-    expectedOutput: ["Hello", "World"],
-    hint: "Two separate fmt.Println() calls, each with one argument.",
+    expectedOutput: ["Go Basics", "Concurrency in Go"],
+    hint: "Two separate fmt.Println() calls, each with one string argument.",
   },
   {
-    title: "Printf with %s and %d",
+    title: "Printf — Book Info with %s and %d",
     instruction:
-      "`fmt.Printf()` formats output using verbs: `%s` for strings and `%d` for integers. Always end with `\\n` for a newline. Print the message \"Name: Alice, Age: 30\" using Printf.",
+      "`fmt.Printf()` formats output with verbs: `%s` for strings, `%d` for integers. Always end with `\\n` for a newline. Use Printf to print 'Book: Go Basics, 350 pages' using the variables provided.",
     starter: `package main
 
 import "fmt"
 
 func main() {
-	name := "Alice"
-	age := 30
-	// TODO: use Printf to print "Name: Alice, Age: 30"
-	_ = name
-	_ = age
+\tbookTitle := "Go Basics"
+\tpageCount := 350
+\t// TODO: use Printf to print "Book: Go Basics, 350 pages"
+\t_ = bookTitle
+\t_ = pageCount
 }`,
-    expectedOutput: ["Alice", "30"],
-    hint: "fmt.Printf(\"Name: %s, Age: %d\\n\", name, age)",
+    expectedOutput: ["Go Basics", "350"],
+    hint: "fmt.Printf(\"Book: %s, %d pages\\n\", bookTitle, pageCount)",
   },
   {
-    title: "Float Formatting",
+    title: "Float Formatting — Book Price",
     instruction:
-      "Use `%.2f` to print a float with exactly 2 decimal places. Print the value of Pi (3.14159) formatted to 2 decimal places, so the output shows \"3.14\".",
+      "Use `%.2f` to print a float with exactly 2 decimal places — perfect for prices. A book costs 29.9500 dollars. Print just the price formatted as 'Price: $29.95' using Printf.",
     starter: `package main
 
 import "fmt"
 
 func main() {
-	pi := 3.14159
-	// TODO: print pi with 2 decimal places using %.2f
-	_ = pi
+\tprice := 29.95
+\t// TODO: print price with 2 decimal places using %.2f
+\t_ = price
 }`,
-    expectedOutput: ["3.14"],
-    hint: "fmt.Printf(\"%.2f\\n\", pi) will output 3.14.",
+    expectedOutput: ["29.95"],
+    hint: "fmt.Printf(\"Price: $%.2f\\n\", price) will output Price: $29.95.",
   },
   {
-    title: "Build a URL with Sprintf",
+    title: "Sprintf — Library Card",
     instruction:
-      "`fmt.Sprintf()` returns a formatted string without printing. Use it to build the URL string `\"http://localhost:8080/api\"` from the variables `host` and `port`, store it, then print it.",
+      "`fmt.Sprintf()` returns a formatted string without printing — like building a library card label. Build the string 'Library Card: Go Basics - A. Donovan & B. Kernighan' from the variables, store it, then print it.",
     starter: `package main
 
 import "fmt"
 
 func main() {
-	host := "localhost"
-	port := 8080
-	// TODO: use Sprintf to build "http://localhost:8080/api"
-	url := ""
-	_ = host
-	_ = port
-	fmt.Println(url)
+\ttitle := "Go Basics"
+\tauthor1 := "A. Donovan"
+\tauthor2 := "B. Kernighan"
+\t// TODO: use Sprintf to build "Library Card: Go Basics - A. Donovan & B. Kernighan"
+\tcard := ""
+\t_ = title
+\t_ = author1
+\t_ = author2
+\tfmt.Println(card)
 }`,
-    expectedOutput: ["localhost:8080"],
-    hint: "url := fmt.Sprintf(\"http://%s:%d/api\", host, port)",
+    expectedOutput: ["Go Basics", "Donovan", "Kernighan"],
+    hint: "card := fmt.Sprintf(\"Library Card: %s - %s & %s\", title, author1, author2)",
   },
   {
-    title: "Any Type with %v and %T",
+    title: "Type Inspection with %v and %T",
     instruction:
-      "`%v` prints any value in its default format. `%T` prints the type name. Print the integer 42 and the string \"hello\" each on their own line, showing both the value and its type.",
+      "`%v` prints any value in default format. `%T` prints the type name. Your library has a book title (string) and a shelf number (int). Print each on its own line showing both value and type, like: 'Go Basics is of type string'.",
     starter: `package main
 
 import "fmt"
 
 func main() {
-	n := 42
-	s := "hello"
-	// TODO: for each, print: "<value> is of type <type>"
-	_ = n
-	_ = s
+\tbookTitle := "Go Basics"
+\tshelfNumber := 42
+\t// TODO: for each, print: "<value> is of type <type>"
+\t_ = bookTitle
+\t_ = shelfNumber
 }`,
-    expectedOutput: ["int", "string"],
-    hint: "fmt.Printf(\"%v is of type %T\\n\", n, n) — then do the same for s.",
+    expectedOutput: ["string", "int"],
+    hint: "fmt.Printf(\"%v is of type %T\\n\", bookTitle, bookTitle) — then do the same for shelfNumber.",
   },
 ];

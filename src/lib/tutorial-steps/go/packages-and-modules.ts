@@ -1,73 +1,70 @@
 import type { TutorialStep } from "../types";
 
 export const steps: TutorialStep[] = [
-  {
-    title: "Import Standard Library Packages",
-    instruction:
-      "Go's standard library is extensive. Import `strings` and `fmt`. Use `strings.ToUpper(\"hello\")` to get the uppercase version, print it, then print `len(\"hello\")` to confirm the length.",
-    starter: `package main
+	{
+		title: "Import the strings Package",
+		instruction:
+			"Go's standard library has a `strings` package for text manipulation. Import `strings` and use `strings.ToUpper(\"the great gatsby\")` to uppercase a book title, then `strings.ToLower(\"THE HOBBIT\")` to lowercase another title. Print both.",
+		starter: `package main
+
+import "strings"
+
+func main() {
+\t// TODO: print strings.ToUpper("the great gatsby")
+\t// TODO: print strings.ToLower("THE HOBBIT")
+}`,
+		expectedOutput: ["THE GREAT GATSBY", "the hobbit"],
+		hint: `fmt.Println(strings.ToUpper("the great gatsby")) — fmt.Println(strings.ToLower("THE HOBBIT"))`,
+	},
+	{
+		title: "Multiple Imports — fmt and math",
+		instruction:
+			"Load `fmt` and `math` together using a grouped import. Print `math.Sqrt(144)` (square root of 144) as a book-ID calculation, then print `math.Pi` formatted to 2 decimal places as a catalog constant.",
+		starter: `package main
 
 import (
-	"fmt"
-	"strings"
+\t"fmt"
+\t"math"
 )
 
 func main() {
-	// TODO: print strings.ToUpper("hello")
-	// TODO: print len("hello")
+\t// TODO: print math.Sqrt(144)
+\t// TODO: print math.Pi with 2 decimal places
 }`,
-    expectedOutput: ["HELLO", "5"],
-    hint: "fmt.Println(strings.ToUpper(\"hello\")) — fmt.Println(len(\"hello\"))",
-  },
-  {
-    title: "Multiple Imports — fmt and math",
-    instruction:
-      "Use both `fmt` and `math` in the same program. Print `math.Pi` formatted to 2 decimal places, and print `math.Sqrt(16)` (which should be 4).",
-    starter: `package main
-
-import (
-	"fmt"
-	"math"
-)
-
-func main() {
-	// TODO: print math.Pi with 2 decimal places
-	// TODO: print math.Sqrt(16)
-}`,
-    expectedOutput: ["3.14", "4"],
-    hint: "fmt.Printf(\"%.2f\\n\", math.Pi) — fmt.Println(math.Sqrt(16))",
-  },
-  {
-    title: "Package-Level Variables",
-    instruction:
-      "Variables declared at package level are initialized before `main` runs, like a lightweight form of initialization. A package-level variable `greeting` is already set to \"initialized\". Print it from `main`.",
-    starter: `package main
+		expectedOutput: ["12", "3.14"],
+		hint: `fmt.Println(math.Sqrt(144)) — fmt.Printf("%.2f\\n", math.Pi)`,
+	},
+	{
+		title: "Package-Level Variable — Library Config",
+		instruction:
+			"Variables declared at package level are initialized before `main`. Declare a package-level variable `maxCheckoutDays` set to `14` and print it from `main` so the library knows how long patrons can borrow books.",
+		starter: `package main
 
 import "fmt"
 
-var greeting = "initialized"
+var maxCheckoutDays = 14
 
 func main() {
-	// TODO: print the package-level greeting variable
+\t// TODO: print the package-level maxCheckoutDays variable
 }`,
-    expectedOutput: ["initialized"],
-    hint: "fmt.Println(greeting)",
-  },
-  {
-    title: "math/rand — Random Numbers",
-    instruction:
-      "The `math/rand` package generates pseudo-random numbers. Use `rand.Intn(100) + 1` to get a number between 1 and 100, store it in a variable, and print it. Any number 1-100 passes.",
-    starter: `package main
+		expectedOutput: ["14"],
+		hint: "fmt.Println(maxCheckoutDays)",
+	},
+	{
+		title: "math/rand — Random Book Suggestion",
+		instruction:
+			"The `math/rand` package can suggest a random book from the catalog. Use `rand.Intn(1000) + 1` to pick a random book ID between 1 and 1000, store it in a variable, and print the suggestion. Any number 1–1000 passes.",
+		starter: `package main
 
 import (
-	"fmt"
-	"math/rand"
+\t"fmt"
+\t"math/rand"
 )
 
 func main() {
-	// TODO: generate a random number 1-100 and print it
+\t// TODO: generate a random book ID (1-1000) and print it as a suggestion
 }`,
-    expectedOutput: [],
-    hint: "n := rand.Intn(100) + 1 — fmt.Println(n)",
-  },
+		expectedOutput: [],
+		hint: `bookID := rand.Intn(1000) + 1 — fmt.Println("Suggestion:", bookID)`,
+	},
 ];

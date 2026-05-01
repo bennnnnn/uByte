@@ -4,116 +4,135 @@ export const steps: TutorialStep[] = [
   {
     title: "Your First Test",
     instruction:
-      "Go tests are functions that check your code. In real projects they live in `_test.go` files. Here we simulate them in `main()`. Write an `add(a, b int) int` function that returns `a + b`, then call it and print `PASS` if the result is 5.",
+      "Go tests check your code against expectations. Here we simulate testing inside `main()`. Write a `countBooks(catalog []string) int` function that returns the number of books in a catalog slice, then call it and print `PASS` if the result is 3.",
     starter: `package main
 
 import "fmt"
 
-// TODO: write add(a, b int) int that returns a + b
-func add(a, b int) int {
+// TODO: write countBooks(catalog []string) int that returns len(catalog)
+func countBooks(catalog []string) int {
 	return 0
 }
 
 func main() {
-	result := add(2, 3)
-	if result == 5 {
-		fmt.Println("PASS: add(2, 3) = 5")
+	catalog := []string{"The Go Programming Language", "1984", "Brave New World"}
+	got := countBooks(catalog)
+	if got == 3 {
+		fmt.Println("PASS: countBooks returned 3")
 	} else {
-		fmt.Printf("FAIL: add(2, 3) = %d, want 5\\n", result)
+		fmt.Printf("FAIL: countBooks = %d, want 3\\n", got)
 	}
 }`,
     expectedOutput: ["PASS"],
-    hint: "Change `return 0` to `return a + b` in the add function.",
+    hint: "Change `return 0` to `return len(catalog)` in countBooks.",
   },
   {
     title: "Table-Driven Tests",
     instruction:
-      "The most common Go testing pattern: define a slice of `{input, expected}` cases and loop through them. Complete the `multiply` function and the test cases slice so that all four cases print PASS.",
+      "Table-driven tests let you test many inputs with a single loop. Complete the `lookupByISBN(catalog map[string]string, isbn string) string` function that returns the book title for a given ISBN, or empty string if not found. The table tests five lookups — all must print PASS.",
     starter: `package main
 
 import "fmt"
 
-// TODO: implement multiply so it returns a * b
-func multiply(a, b int) int {
-	return 0
+// TODO: implement lookupByISBN — return catalog[isbn]
+func lookupByISBN(catalog map[string]string, isbn string) string {
+	return ""
 }
 
 func main() {
+	catalog := map[string]string{
+		"978-0-14-081774-4": "The Go Programming Language",
+		"978-0-452-28423-4": "1984",
+		"978-0-06-112008-4": "Brave New World",
+	}
+
 	cases := []struct {
-		a, b int
-		want int
+		isbn string
+		want string
 	}{
-		{2, 3, 6},
-		{0, 5, 0},
-		{-1, 4, -4},
-		{7, 7, 49},
+		{"978-0-14-081774-4", "The Go Programming Language"},
+		{"978-0-452-28423-4", "1984"},
+		{"978-0-06-112008-4", "Brave New World"},
+		{"978-0-00-000000-0", ""},
+		{"", ""},
 	}
 
 	for _, tc := range cases {
-		got := multiply(tc.a, tc.b)
+		got := lookupByISBN(catalog, tc.isbn)
 		if got == tc.want {
-			fmt.Printf("PASS: multiply(%d, %d) = %d\\n", tc.a, tc.b, got)
+			fmt.Printf("PASS: lookupByISBN(%q)\\n", tc.isbn)
 		} else {
-			fmt.Printf("FAIL: multiply(%d, %d) = %d, want %d\\n", tc.a, tc.b, got, tc.want)
+			fmt.Printf("FAIL: lookupByISBN(%q) = %q, want %q\\n", tc.isbn, got, tc.want)
 		}
 	}
 }`,
-    expectedOutput: ["PASS: multiply(2, 3)", "PASS: multiply(7, 7)"],
-    hint: "Change `return 0` to `return a * b` in multiply.",
+    expectedOutput: [
+      "PASS: lookupByISBN(\"978-0-14-081774-4\")",
+      "PASS: lookupByISBN(\"978-0-452-28423-4\")",
+      "PASS: lookupByISBN(\"978-0-06-112008-4\")",
+      "PASS: lookupByISBN(\"978-0-00-000000-0\")",
+      "PASS: lookupByISBN(\"\")",
+    ],
+    hint: "Change `return \"\"` to `return catalog[isbn]` in lookupByISBN. Map lookups return the zero value (empty string) for missing keys automatically.",
   },
   {
     title: "Test Helper Functions",
     instruction:
-      "Extract repeated assertion logic into a helper. Write a `check(label string, got, want int)` function that prints `PASS [label]` or `FAIL [label]: got X want Y`. Then implement `subtract(a, b int) int` and test it using the helper.",
+      "Extract repeated book-field checks into a helper. Write a `checkBook(label, gotTitle, wantTitle string, gotPages, wantPages int)` function that prints `PASS [label]` if both fields match, or `FAIL [label]: ...` with details. Then complete `newBook(title string, pages int) (string, int)` and test it using the helper.",
     starter: `package main
 
 import "fmt"
 
-func subtract(a, b int) int {
-	// TODO: return a - b
-	return 0
+// TODO: return title and pages as a tuple
+func newBook(title string, pages int) (string, int) {
+	return "", 0
 }
 
-// TODO: write check(label string, got, want int) that prints PASS or FAIL
-func check(label string, got, want int) {
+// TODO: write checkBook that verifies both title and pages
+func checkBook(label, gotTitle, wantTitle string, gotPages, wantPages int) {
 }
 
 func main() {
-	check("10-3", subtract(10, 3), 7)
-	check("5-5", subtract(5, 5), 0)
-	check("1-9", subtract(1, 9), -8)
+	checkBook("book-1", newBook("The Go Programming Language", 450), "The Go Programming Language", 450)
+	checkBook("book-2", newBook("1984", 328), "1984", 328)
+	checkBook("book-3", newBook("Brave New World", 311), "Brave New World", 311)
 }`,
-    expectedOutput: ["PASS [10-3]", "PASS [5-5]", "PASS [1-9]"],
-    hint: "subtract returns a - b. check prints `PASS [label]` when got == want, else `FAIL [label]: got X want Y`.",
+    expectedOutput: ["PASS [book-1]", "PASS [book-2]", "PASS [book-3]"],
+    hint: "newBook returns (title, pages). checkBook: if both match print `PASS [label]`, else print `FAIL [label]: title got %q want %q or pages got %d want %d`.",
   },
   {
     title: "Testing Edge Cases",
     instruction:
-      "Good tests cover boundaries: below min, above max, and at the limits. Implement `clamp(val, min, max int) int` that keeps `val` within [min, max]. All 5 cases must print PASS.",
+      "Great tests exercise edge cases: an empty catalog, a missing book, and duplicate ISBNs. Implement `searchBook(catalog []string, isbn string) int` that returns the index of a book by ISBN in a catalog slice, or -1 if not found. All 5 cases must print PASS.",
     starter: `package main
 
 import "fmt"
 
-// TODO: implement clamp — return min if val < min, max if val > max, else val
-func clamp(val, min, max int) int {
-	return val
+// TODO: search for isbn in catalog slice, return index or -1 if not found
+func searchBook(catalog []string, isbn string) int {
+	return 0
 }
 
 func main() {
+	full := []string{"978-0-14-081774-4", "978-0-452-28423-4", "978-0-06-112008-4"}
+	empty := []string{}
+	missingFrom := []string{"978-0-452-28423-4", "978-0-06-112008-4"}
+
 	cases := []struct {
-		val, min, max int
-		want          int
-		label         string
+		catalog []string
+		isbn    string
+		want    int
+		label   string
 	}{
-		{5, 0, 10, 5, "in range"},
-		{-3, 0, 10, 0, "below min"},
-		{15, 0, 10, 10, "above max"},
-		{0, 0, 10, 0, "at min"},
-		{10, 0, 10, 10, "at max"},
+		{full, "978-0-14-081774-4", 0, "first book"},
+		{full, "978-0-06-112008-4", 2, "last book"},
+		{empty, "978-0-14-081774-4", -1, "empty catalog"},
+		{missingFrom, "978-0-14-081774-4", -1, "missing book"},
+		{full, "978-0-00-000000-0", -1, "unknown ISBN"},
 	}
 	passed := 0
 	for _, tc := range cases {
-		got := clamp(tc.val, tc.min, tc.max)
+		got := searchBook(tc.catalog, tc.isbn)
 		if got == tc.want {
 			fmt.Printf("PASS [%s]\\n", tc.label)
 			passed++
@@ -123,53 +142,77 @@ func main() {
 	}
 	fmt.Printf("%d/5 passed\\n", passed)
 }`,
-    expectedOutput: ["PASS [in range]", "PASS [below min]", "5/5 passed"],
-    hint: "clamp: if val < min return min; if val > max return max; else return val.",
+    expectedOutput: ["PASS [first book]", "PASS [last book]", "PASS [empty catalog]", "PASS [missing book]", "PASS [unknown ISBN]", "5/5 passed"],
+    hint: "searchBook: loop through catalog with `for i, v := range catalog`, return i if v == isbn. Return -1 after loop if not found.",
   },
   {
-    title: "Benchmark: Measuring Performance",
+    title: "Benchmark: Comparing Search Methods",
     instruction:
-      "Real Go benchmarks use `testing.B`, but you can measure performance manually with `time.Now()`. Compare string `+` concatenation versus `strings.Builder` by building a 500-char string 1000 times each. Print which method was faster.",
+      "Benchmarks measure which approach is faster. Compare two search strategies on a large book catalog: linear scan (O(n)) vs map lookup (O(1)). Build a 1000-book catalog, then measure how long each method takes to find 500 random ISBNs. Print which method was faster.",
     starter: `package main
 
 import (
 	"fmt"
-	"strings"
 	"time"
 )
 
-func buildWithPlus(n int) string {
-	// TODO: build a string of n 'x' characters using +=
-	result := ""
-	return result
+// TODO: search linearly through a catalog slice for an ISBN, return title
+func linearSearch(catalog []string, isbn string) string {
+	return ""
 }
 
-func buildWithBuilder(n int) string {
-	// TODO: build a string of n 'x' characters using strings.Builder
-	var sb strings.Builder
-	return sb.String()
+// TODO: look up a title by ISBN from a map
+func mapLookup(catalog map[string]string, isbn string) string {
+	return ""
 }
 
-func bench(name string, fn func(int) string) time.Duration {
+func benchLinear(catalog []string, isbns []string) time.Duration {
 	start := time.Now()
-	for i := 0; i < 1000; i++ {
-		fn(500)
+	for _, isbn := range isbns {
+		linearSearch(catalog, isbn)
+	}
+	return time.Since(start)
+}
+
+func benchMap(catalog map[string]string, isbns []string) time.Duration {
+	start := time.Now()
+	for _, isbn := range isbns {
+		mapLookup(catalog, isbn)
 	}
 	return time.Since(start)
 }
 
 func main() {
-	t1 := bench("plus", buildWithPlus)
-	t2 := bench("builder", buildWithBuilder)
-	fmt.Printf("string +:         %v\\n", t1)
-	fmt.Printf("strings.Builder:  %v\\n", t2)
+	// Build a 1000-book catalog
+	n := 1000
+	isbns := make([]string, n)
+	sliceCatalog := make([]string, n)
+	mapCatalog := make(map[string]string, n)
+	for i := 0; i < n; i++ {
+		isbn := fmt.Sprintf("978-0-00-%04d-0", i)
+		title := fmt.Sprintf("Book %d", i)
+		isbns[i] = isbn
+		sliceCatalog[i] = isbn
+		mapCatalog[isbn] = title
+	}
+
+	// Search for 500 random-ish ISBNs
+	searchKeys := make([]string, 500)
+	for i := 0; i < 500; i++ {
+		searchKeys[i] = isbns[i*2]
+	}
+
+	t1 := benchLinear(sliceCatalog, searchKeys)
+	t2 := benchMap(mapCatalog, searchKeys)
+	fmt.Printf("linear search:  %v\\n", t1)
+	fmt.Printf("map lookup:     %v\\n", t2)
 	if t2 < t1 {
-		fmt.Println("Winner: strings.Builder is faster!")
+		fmt.Println("Winner: map lookup is faster!")
 	} else {
-		fmt.Println("Winner: string + is faster!")
+		fmt.Println("Winner: linear search is faster!")
 	}
 }`,
-    expectedOutput: ["strings.Builder", "faster"],
-    hint: "buildWithPlus: use `result += \"x\"` in a for loop. buildWithBuilder: use `sb.WriteByte('x')` in a for loop, then return `sb.String()`.",
+    expectedOutput: ["map lookup", "faster"],
+    hint: "linearSearch: loop through catalog, return catalog[i] when matches. mapLookup: just return catalog[isbn]. Map lookup should be dramatically faster.",
   },
 ];

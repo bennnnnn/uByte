@@ -2,93 +2,93 @@ import type { TutorialStep } from "../types";
 
 export const steps: TutorialStep[] = [
   {
-    title: "Value Receiver — Area",
+    title: "Value Receiver — Pages x2",
     instruction:
-      "A value receiver gets a copy of the struct. Define a `Rectangle` struct with `Width` and `Height` fields and an `Area() int` method. Create a 5×10 rectangle and print its area.",
+      "A value receiver gets a copy of the struct. Define a `Book` struct with a `Pages int` field and a `DoublePages() int` method that returns `Pages * 2`. Create a 150-page book and print the doubled page count.",
     starter: `package main
 
 import "fmt"
 
-// TODO: define Rectangle struct with Width and Height
-// TODO: define Area() method on Rectangle
+// TODO: define Book struct with Pages field
+// TODO: define DoublePages() method on Book
 
 func main() {
-	r := Rectangle{Width: 5, Height: 10}
-	fmt.Println(r.Area())
+\tb := Book{Pages: 150}
+\tfmt.Println(b.DoublePages())
 }`,
-    expectedOutput: ["50"],
-    hint: "func (r Rectangle) Area() int { return r.Width * r.Height }",
+    expectedOutput: ["300"],
+    hint: "func (b Book) DoublePages() int { return b.Pages * 2 }",
   },
   {
-    title: "Pointer Receiver — Increment",
+    title: "Pointer Receiver — Check Out",
     instruction:
-      "A pointer receiver lets a method modify the original struct. Define a `Counter` struct with a `Count int` field and an `Increment()` method using a pointer receiver. Create a counter, call Increment three times, and print the count.",
+      "A pointer receiver lets a method modify the original struct. Define a `Library` struct with a `BorrowCount int` field and a `CheckOut()` method that increments `BorrowCount`. Create a library, check out a book three times, and print the borrow count.",
     starter: `package main
 
 import "fmt"
 
-// TODO: define Counter struct and Increment() method with pointer receiver
+// TODO: define Library struct and CheckOut() method with pointer receiver
 
 func main() {
-	c := Counter{}
-	c.Increment()
-	c.Increment()
-	c.Increment()
-	fmt.Println(c.Count)
+\tl := Library{}
+\tl.CheckOut()
+\tl.CheckOut()
+\tl.CheckOut()
+\tfmt.Println(l.BorrowCount)
 }`,
     expectedOutput: ["3"],
-    hint: "func (c *Counter) Increment() { c.Count++ }",
+    hint: "func (l *Library) CheckOut() { l.BorrowCount++ }",
   },
   {
-    title: "Stringer Interface",
+    title: "Stringer — Book Summary",
     instruction:
-      "If a type implements `String() string`, `fmt.Println` calls it automatically. Define a `Person` struct and a `String()` method that returns `\"<Name> (<Age>)\"`. Print a Person and see the custom format appear.",
+      "If a type implements `String() string`, `fmt.Println` calls it automatically. Define a `Book` struct with `Title string` and `Author string` fields, and a `String()` method that returns `\"<Title> by <Author>\"`. Print a Book and see the custom summary appear.",
     starter: `package main
 
 import "fmt"
 
-type Person struct {
-	Name string
-	Age  int
+type Book struct {
+\tTitle  string
+\tAuthor string
 }
 
-// TODO: define String() method on Person returning "<Name> (<Age>)"
+// TODO: define String() method on Book returning "<Title> by <Author>"
 
 func main() {
-	p := Person{Name: "Alice", Age: 30}
-	fmt.Println(p)
+\tb := Book{Title: "The Go Programming Language", Author: "Donovan & Kernighan"}
+\tfmt.Println(b)
 }`,
-    expectedOutput: ["Alice (30)"],
-    hint: "func (p Person) String() string { return fmt.Sprintf(\"%s (%d)\", p.Name, p.Age) }",
+    expectedOutput: ["The Go Programming Language by Donovan & Kernighan"],
+    hint: `func (b Book) String() string { return fmt.Sprintf("%s by %s", b.Title, b.Author) }`,
   },
   {
-    title: "Method Chaining (Builder)",
+    title: "Method Chaining — Book Description",
     instruction:
-      "Returning `*Builder` from each method allows chaining calls. A `Builder` with an `Add(s string) *Builder` method and a `Build() string` method is provided. Chain two `Add` calls to produce \"Hello World\" then print it.",
+      "Returning `*BookDesc` from each method allows chaining calls. A `BookDesc` with an `Add(s string) *BookDesc` method and a `Build() string` method is provided. Chain two `Add` calls to produce \"Moby Dick by Herman Melville\" then print it.",
     starter: `package main
 
 import "fmt"
 
-type Builder struct {
-	result string
+type BookDesc struct {
+\tresult string
 }
 
-func (b *Builder) Add(s string) *Builder {
-	if b.result != "" {
-		b.result += " "
-	}
-	b.result += s
-	return b
+func (b *BookDesc) Add(s string) *BookDesc {
+\tif b.result != "" {
+\t\tb.result += " "
+\t}
+\tb.result += s
+\treturn b
 }
 
-func (b *Builder) Build() string {
-	return b.result
+func (b *BookDesc) Build() string {
+\treturn b.result
 }
 
 func main() {
-	// TODO: chain .Add("Hello").Add("World") and print Build()
+\t// TODO: chain .Add("Moby Dick").Add("by Herman Melville") and print Build()
 }`,
-    expectedOutput: ["Hello World"],
-    hint: "b := &Builder{} — fmt.Println(b.Add(\"Hello\").Add(\"World\").Build())",
+    expectedOutput: ["Moby Dick by Herman Melville"],
+    hint: `b := &BookDesc{} — fmt.Println(b.Add("Moby Dick").Add("by Herman Melville").Build())`,
   },
 ];

@@ -2,179 +2,179 @@ import type { TutorialStep } from "../types";
 
 export const steps: TutorialStep[] = [
   {
-    title: "Basic Select",
+    title: "Basic Select — Book Search Results",
     instruction:
-      "`select` blocks until one of its channel cases is ready, then runs that case. If multiple are ready at once, it picks one at random. Create two buffered channels, send a value to one of them, then use `select` to receive from whichever is ready.",
+      "The `select` statement blocks until one of its channel cases is ready. Two librarians are searching for a book — each returns results on their own channel. Use `select` to receive from whichever channel has data first. Create two buffered channels, send a result to one, and print it.",
     starter: `package main
 
 import "fmt"
 
 func main() {
-	ch1 := make(chan string, 1)
-	ch2 := make(chan string, 1)
+\tch1 := make(chan string, 1)
+\tch2 := make(chan string, 1)
 
-	// TODO: send "one" to ch1
-	ch1 <- ""
+\t// TODO: send "The Go Programming Language" to ch1
+\tch1 <- ""
 
-	// TODO: use select to receive from ch1 or ch2 and print the result
-	select {
-	case msg := <-ch1:
-		fmt.Println("received from ch1:", msg)
-	case msg := <-ch2:
-		fmt.Println("received from ch2:", msg)
-	}
+\t// TODO: use select to receive from ch1 or ch2 and print the result
+\tselect {
+\tcase msg := <-ch1:
+\t\tfmt.Println("found on shelf A:", msg)
+\tcase msg := <-ch2:
+\t\tfmt.Println("found on shelf B:", msg)
+\t}
 }`,
-    expectedOutput: ["received from ch1: one"],
-    hint: "Change `ch1 <- \"\"` to `ch1 <- \"one\"`. The select will pick ch1 since it has data.",
+    expectedOutput: ["found on shelf A: The Go Programming Language"],
+    hint: "Change `ch1 <- \"\"` to `ch1 <- \"The Go Programming Language\"`. The select picks ch1 because it has data ready.",
   },
   {
-    title: "Non-Blocking with Default",
+    title: "Non-Blocking with Default — Empty Catalog",
     instruction:
-      "Adding a `default` case makes `select` non-blocking: if no channel is ready, `default` runs immediately. This is how you poll a channel without hanging. Try receiving from an empty channel — the default case should print `no data`.",
+      "Adding a `default` case makes `select` non-blocking. When no channel has data, `default` runs immediately — like checking an empty book catalog. Try receiving from an empty channel; the default case should print a message saying the catalog is empty.",
     starter: `package main
 
 import "fmt"
 
 func main() {
-	ch := make(chan int, 1)
-	// Note: we don't send anything to ch
+\tcatalog := make(chan string, 1)
+\t// Note: we don't send any books to the catalog
 
-	// TODO: use select with a case for <-ch and a default that prints "no data available"
-	select {
-	case v := <-ch:
-		fmt.Println("got:", v)
-	}
+\t// TODO: use select with a case for <-catalog and a default that prints "catalog is empty"
+\tselect {
+\tcase book := <-catalog:
+\t\tfmt.Println("checked out:", book)
+\t}
 }`,
-    expectedOutput: ["no data available"],
-    hint: "Add `default: fmt.Println(\"no data available\")` as a case in the select block.",
+    expectedOutput: ["catalog is empty"],
+    hint: "Add `default: fmt.Println(\"catalog is empty\")` as a case in the select block.",
   },
   {
-    title: "Timeout Pattern",
+    title: "Timeout Pattern — Slow Book Database",
     instruction:
-      "`time.After(d)` returns a channel that fires after duration `d`. Use it with `select` to implement a timeout: receive from a slow channel OR from `time.After(50 * time.Millisecond)`. The slow channel sends after 200ms, so the timeout should fire first.",
+      "`time.After(d)` returns a channel that fires after duration `d`. Use it with `select` to implement a timeout when querying a slow book database. The database takes 200ms to respond, but we only want to wait 50ms. The timeout should fire first.",
     starter: `package main
 
 import (
-	"fmt"
-	"time"
+\t"fmt"
+\t"time"
 )
 
-func slowOperation() <-chan string {
-	ch := make(chan string, 1)
-	go func() {
-		time.Sleep(200 * time.Millisecond)
-		ch <- "slow result"
-	}()
-	return ch
+func slowDatabase() <-chan string {
+\tch := make(chan string, 1)
+\tgo func() {
+\t\ttime.Sleep(200 * time.Millisecond)
+\t\tch <- "The Art of Computer Programming"
+\t}()
+\treturn ch
 }
 
 func main() {
-	result := slowOperation()
+\tresult := slowDatabase()
 
-	// TODO: use select to receive from result or time.After(50 * time.Millisecond)
-	// Print "got: <value>" or "timeout: operation took too long"
-	select {
-	case v := <-result:
-		fmt.Println("got:", v)
-	}
+\t// TODO: use select to receive from result or time.After(50 * time.Millisecond)
+\t// Print "found: <value>" or "timeout: database query took too long"
+\tselect {
+\tcase v := <-result:
+\t\tfmt.Println("found:", v)
+\t}
 }`,
     expectedOutput: ["timeout"],
-    hint: "Add `case <-time.After(50 * time.Millisecond): fmt.Println(\"timeout: operation took too long\")` to the select.",
+    hint: "Add `case <-time.After(50 * time.Millisecond): fmt.Println(\"timeout: database query took too long\")` to the select.",
   },
   {
-    title: "Done Channel Pattern",
+    title: "Done Channel Pattern — Gracefully Stop the Librarian",
     instruction:
-      "A `done` channel signals goroutines to stop. The goroutine uses `select` to either do work or exit when `done` is closed. Start a goroutine that counts up and prints each number, then close `done` after a short delay to stop it.",
+      "A `done` channel signals a goroutine to stop. The librarian goroutine uses `select` to either shelve a book (do work) or exit when `done` is closed. Start a goroutine that counts shelved books, then close `done` after a short delay to stop the librarian gracefully.",
     starter: `package main
 
 import (
-	"fmt"
-	"time"
+\t"fmt"
+\t"time"
 )
 
-func counter(done <-chan struct{}) {
-	for i := 1; ; i++ {
-		select {
-		case <-done:
-			fmt.Println("counter stopped at", i-1)
-			return
-		default:
-			fmt.Println("count:", i)
-			time.Sleep(30 * time.Millisecond)
-		}
-	}
+func librarian(done <-chan struct{}) {
+\tfor i := 1; ; i++ {
+\t\tselect {
+\t\tcase <-done:
+\t\t\tfmt.Println("librarian stopped after shelving", i-1, "books")
+\t\t\treturn
+\t\tdefault:
+\t\t\tfmt.Println("shelved book #", i)
+\t\t\ttime.Sleep(30 * time.Millisecond)
+\t\t}
+\t}
 }
 
 func main() {
-	done := make(chan struct{})
+\tdone := make(chan struct{})
 
-	go counter(done)
+\tgo librarian(done)
 
-	// TODO: sleep 100ms then close(done) to stop the goroutine
-	time.Sleep(0)
+\t// TODO: sleep 100ms then close(done) to stop the librarian goroutine
+\ttime.Sleep(0)
 
-	time.Sleep(50 * time.Millisecond) // wait for goroutine to print "stopped"
-	fmt.Println("main done")
+\ttime.Sleep(50 * time.Millisecond) // wait for librarian to print "stopped"
+\tfmt.Println("library closed")
 }`,
-    expectedOutput: ["count:", "counter stopped", "main done"],
-    hint: "Change `time.Sleep(0)` to `time.Sleep(100 * time.Millisecond)` followed by `close(done)`.",
+    expectedOutput: ["shelved book #", "librarian stopped", "library closed"],
+    hint: "Change `time.Sleep(0)` to `time.Sleep(100 * time.Millisecond)` then add `close(done)` on the next line.",
   },
   {
-    title: "Fan-In: Merging Channels",
+    title: "Fan-In: Merging Two Search Results",
     instruction:
-      "Fan-in merges multiple input channels into one output. Each input gets a goroutine that forwards values using `select`. Complete the `merge` function to combine `ch1` and `ch2` into a single output channel and print all received values.",
+      "Fan-in merges multiple input channels into one output channel. Two catalog searches return results on separate channels. Complete the `merge` function to combine them into a single channel using goroutines that forward each value. Print all received book titles and the total count.",
     starter: `package main
 
 import (
-	"fmt"
-	"sync"
+\t"fmt"
+\t"sync"
 )
 
-func merge(ch1, ch2 <-chan int) <-chan int {
-	out := make(chan int)
-	var wg sync.WaitGroup
+func merge(cat1, cat2 <-chan string) <-chan string {
+\tout := make(chan string)
+\tvar wg sync.WaitGroup
 
-	forward := func(ch <-chan int) {
-		defer wg.Done()
-		for v := range ch {
-			out <- v
-		}
-	}
+\tforward := func(ch <-chan string) {
+\t\tdefer wg.Done()
+\t\tfor v := range ch {
+\t\t\tout <- v
+\t\t}
+\t}
 
-	wg.Add(2)
-	// TODO: start two goroutines calling forward(ch1) and forward(ch2)
+\twg.Add(2)
+\t// TODO: start two goroutines calling forward(cat1) and forward(cat2)
 
-	// TODO: start a goroutine that waits for wg then closes out
-	go func() {
-		wg.Wait()
-		close(out)
-	}()
+\t// TODO: start a goroutine that waits for wg then closes out
+\tgo func() {
+\t\twg.Wait()
+\t\tclose(out)
+\t}()
 
-	return out
+\treturn out
 }
 
-func source(vals ...int) <-chan int {
-	ch := make(chan int, len(vals))
-	for _, v := range vals {
-		ch <- v
-	}
-	close(ch)
-	return ch
+func catalog(vals ...string) <-chan string {
+\tch := make(chan string, len(vals))
+\tfor _, v := range vals {
+\t\tch <- v
+\t}
+\tclose(ch)
+\treturn ch
 }
 
 func main() {
-	ch1 := source(1, 2, 3)
-	ch2 := source(4, 5, 6)
-	merged := merge(ch1, ch2)
+\tcat1 := catalog("Dune", "1984", "Moby Dick")
+\tcat2 := catalog("Brave New World", "Neuromancer", "The Hobbit")
+\tmerged := merge(cat1, cat2)
 
-	total := 0
-	for v := range merged {
-		fmt.Println("received:", v)
-		total += v
-	}
-	fmt.Println("total:", total)
+\tcount := 0
+\tfor book := range merged {
+\t\tfmt.Println("merged result:", book)
+\t\tcount++
+\t}
+\tfmt.Println("total books found:", count)
 }`,
-    expectedOutput: ["received:", "total: 21"],
-    hint: "Add `go forward(ch1)` and `go forward(ch2)` inside merge, before the wait goroutine.",
+    expectedOutput: ["merged result:", "total books found: 6"],
+    hint: "Add `go forward(cat1)` and `go forward(cat2)` inside merge, before the wait goroutine.",
   },
 ];

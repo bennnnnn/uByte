@@ -2,82 +2,83 @@ import type { TutorialStep } from "../types";
 
 export const steps: TutorialStep[] = [
   {
-    title: "Basic for Loop",
+    title: "Shelf Numbers (Basic for loop)",
     instruction:
-      "Go has only one loop keyword: `for`. The classic form is `for init; condition; post { }`. Write a loop that prints the numbers 1 through 5, each on its own line.",
+      "Use a basic `for` loop to print shelf numbers 1 through 5. Each shelf number must appear on its own line. The loop pattern is: `for init; condition; post { }`.",
     starter: `package main
 
 import "fmt"
 
 func main() {
-	// TODO: print numbers 1 to 5 using a for loop
+\t// TODO: print shelf numbers 1 to 5 using a for loop
 }`,
     expectedOutput: ["1", "2", "3", "4", "5"],
     hint: "for i := 1; i <= 5; i++ { fmt.Println(i) }",
   },
   {
-    title: "While-Style Loop",
+    title: "Overdue Countdown (While-style loop)",
     instruction:
-      "When you omit the init and post parts, `for` acts like a while loop. Use this style to count down from 3 to 1, printing each number, then print \"Liftoff!\" after the loop.",
+      "A book is 3 days overdue. Count down from 3 to 1 using a while-style `for` loop (omit init and post), then print \"Returned!\" after the loop. Print each number on its own line.",
     starter: `package main
 
 import "fmt"
 
 func main() {
-	n := 3
-	// TODO: loop while n > 0, print n, then decrement n
-	// TODO: after the loop, print "Liftoff!"
-	_ = n
+\tdays := 3
+\t// TODO: loop while days > 0, print days, then decrement
+\t// TODO: after the loop, print "Returned!"
+\t_ = days
 }`,
-    expectedOutput: ["3", "2", "1", "Liftoff!"],
-    hint: "for n > 0 { fmt.Println(n); n-- } — then fmt.Println(\"Liftoff!\")",
+    expectedOutput: ["3", "2", "1", "Returned!"],
+    hint: "for days > 0 { fmt.Println(days); days-- } — then fmt.Println(\"Returned!\")",
   },
   {
-    title: "Range over Slice",
+    title: "Book Titles (Range over slice)",
     instruction:
-      "`for range` iterates over a slice giving you the index and value. Loop over the fruits slice and print each fruit name on its own line.",
+      "Range over a slice of book titles and print each one. Use `for range` which gives you an index and a value. Print only the title (ignore the index).",
     starter: `package main
 
 import "fmt"
 
 func main() {
-	fruits := []string{"apple", "banana", "cherry"}
-	// TODO: range over fruits and print each fruit
-	_ = fruits
+\tbooks := []string{"Dune", "Neuromancer", "Snow Crash"}
+\t// TODO: range over books and print each title
+\t_ = books
 }`,
-    expectedOutput: ["apple", "banana", "cherry"],
-    hint: "for _, fruit := range fruits { fmt.Println(fruit) }",
+    expectedOutput: ["Dune", "Neuromancer", "Snow Crash"],
+    hint: "for _, title := range books { fmt.Println(title) }",
   },
   {
-    title: "break and continue",
+    title: "Damaged Books (break and continue)",
     instruction:
-      "`break` exits a loop immediately and `continue` skips to the next iteration. Loop from 1 to 6. Skip even numbers with `continue` and stop if the number exceeds 5 with `break`. You should print only 1, 3, and 5.",
+      "Scan shelves 1 through 6. Skip damaged shelves (even numbers) with `continue` and stop scanning at shelf 5 with `break`. Only print 1, 3, and 5 — the undamaged shelves.",
     starter: `package main
 
 import "fmt"
 
 func main() {
-	for i := 1; i <= 6; i++ {
-		// TODO: if i is even, continue; if i > 5, break; else print i
-	}
+\tfor shelf := 1; shelf <= 6; shelf++ {
+\t\t// TODO: if shelf is even, continue (damaged); if shelf > 5, break; else print shelf
+\t}
 }`,
     expectedOutput: ["1", "3", "5"],
-    hint: "if i%2 == 0 { continue } — if i > 5 { break } — fmt.Println(i)",
+    hint: "if shelf%2 == 0 { continue } — if shelf > 5 { break } — fmt.Println(shelf)",
   },
   {
-    title: "Sum with a Loop",
+    title: "Total Pages (Sum with a loop)",
     instruction:
-      "Accumulate a running total with a loop. Sum all integers from 1 to 10 and print the result. The answer should be 55.",
+      "Five books have page counts: 120, 340, 275, 190, 410. Sum them with a loop over a slice and print the total pages.",
     starter: `package main
 
 import "fmt"
 
 func main() {
-	sum := 0
-	// TODO: loop from 1 to 10 and add each value to sum
-	fmt.Println(sum)
+\tpages := []int{120, 340, 275, 190, 410}
+\ttotal := 0
+\t// TODO: loop over pages and add each to total
+\tfmt.Println(total)
 }`,
-    expectedOutput: ["55"],
-    hint: "for i := 1; i <= 10; i++ { sum += i }",
+    expectedOutput: ["1335"],
+    hint: "for _, p := range pages { total += p }",
   },
 ];

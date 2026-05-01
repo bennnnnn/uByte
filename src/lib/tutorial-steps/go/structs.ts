@@ -2,95 +2,101 @@ import type { TutorialStep } from "../types";
 
 export const steps: TutorialStep[] = [
   {
-    title: "Define a Struct",
+    title: "Define a Book Struct",
     instruction:
-      "A `struct` groups related fields together into a single type. Define a `Person` struct with `Name string` and `Age int` fields. Create a Person with name \"Alice\" and age 30, then print both fields on separate lines.",
+      "A `struct` groups related fields together into a single type. Define a `Book` struct with `Title string`, `Author string`, and `Pages int` fields. Create a Book with title \"The Go Programming Language\", author \"Donovan & Kernighan\", and 400 pages, then print both Title and Pages on separate lines.",
     starter: `package main
 
 import "fmt"
 
-// TODO: define Person struct with Name and Age
+// TODO: define Book struct with Title, Author, and Pages
 
 func main() {
-	// TODO: create a Person{Name: "Alice", Age: 30} and print Name then Age
+\t// TODO: create a Book and print Title then Pages
 }`,
-    expectedOutput: ["Alice", "30"],
-    hint: "type Person struct { Name string; Age int } — p := Person{Name: \"Alice\", Age: 30} — fmt.Println(p.Name)",
+    expectedOutput: ["The Go Programming Language", "400"],
+    hint: "type Book struct { Title string; Author string; Pages int } — b := Book{Title: \"The Go Programming Language\", Author: \"Donovan & Kernighan\", Pages: 400} — fmt.Println(b.Title); fmt.Println(b.Pages)",
   },
   {
-    title: "Struct Method (Value Receiver)",
+    title: "Struct Method (Value Receiver) — Describe",
     instruction:
-      "Methods are functions with a receiver. Define a `Greet()` method on `Person` that returns `\"Hi, \" + p.Name + \"!\"`. Create Alice and print the result of calling her `Greet()` method.",
+      "Methods are functions with a receiver. Define a `Describe()` method on `Book` that returns `\"\\\"\" + b.Title + \"\\\" by \" + b.Author + \" (\" + strconv.Itoa(b.Pages) + \" pages)\"`. Create a Book and print the result of calling its `Describe()` method.",
     starter: `package main
 
-import "fmt"
+import (
+\t"fmt"
+\t"strconv"
+)
 
-type Person struct {
-	Name string
-	Age  int
+type Book struct {
+\tTitle  string
+\tAuthor string
+\tPages  int
 }
 
-// TODO: define Greet() method on Person that returns "Hi, <Name>!"
+// TODO: define Describe() method on Book that returns formatted string
 
 func main() {
-	p := Person{Name: "Alice", Age: 30}
-	fmt.Println(p.Greet())
+\tb := Book{Title: "The Go Programming Language", Author: "Donovan & Kernighan", Pages: 400}
+\tfmt.Println(b.Describe())
 }`,
-    expectedOutput: ["Hi, Alice!"],
-    hint: "func (p Person) Greet() string { return \"Hi, \" + p.Name + \"!\" }",
+    expectedOutput: ["\"The Go Programming Language\" by Donovan & Kernighan (400 pages)"],
+    hint: `func (b Book) Describe() string { return "\"" + b.Title + "\" by " + b.Author + " (" + strconv.Itoa(b.Pages) + " pages)" }`,
   },
   {
-    title: "Nested Structs",
+    title: "Nested Structs — Author in Book",
     instruction:
-      "Structs can contain other structs as fields. Define an `Address` struct with a `City string` field, then add an `Address` field to `Person`. Create a Person in London and print the city.",
+      "Structs can contain other structs as fields. Define an `Author` struct with `Name string` and `Nationality string` fields, then replace the `Author string` field in `Book` with `Author Author`. Create a Book by J.K. Rowling (British) with 500 pages titled \"Harry Potter\" and print the author's nationality.",
     starter: `package main
 
 import "fmt"
 
-// TODO: define Address struct with City field
-// TODO: define Person struct with Name and Address fields
+// TODO: define Author struct with Name and Nationality
+// TODO: redefine Book with Author field as Author struct
 
 func main() {
-	p := Person{
-		Name:    "Alice",
-		Address: Address{City: "London"},
-	}
-	fmt.Println(p.Address.City)
+\tb := Book{
+\t\tTitle:  "Harry Potter",
+\t\tAuthor: Author{Name: "J.K. Rowling", Nationality: "British"},
+\t\tPages:  500,
+\t}
+\tfmt.Println(b.Author.Nationality)
 }`,
-    expectedOutput: ["London"],
-    hint: "type Address struct { City string } — type Person struct { Name string; Address Address }",
+    expectedOutput: ["British"],
+    hint: "type Author struct { Name string; Nationality string } — type Book struct { Title string; Author Author; Pages int }",
   },
   {
-    title: "Anonymous Struct",
+    title: "Anonymous Struct — Library Event",
     instruction:
-      "Sometimes you need a one-off struct without defining a named type. Create an anonymous struct inline with `Name` and `Score` fields, set them to \"Bob\" and 95, and print both.",
+      "Sometimes you need a one-off struct without defining a named type. Create an anonymous struct inline with `EventName` and `Attendees` fields, set them to \"Author Meetup\" and 42, and print both.",
     starter: `package main
 
 import "fmt"
 
 func main() {
-	// TODO: declare an anonymous struct with Name and Score, then print them
+\t// TODO: declare an anonymous struct with EventName and Attendees, then print them
 }`,
-    expectedOutput: ["Bob", "95"],
-    hint: "entry := struct{ Name string; Score int }{Name: \"Bob\", Score: 95} — fmt.Println(entry.Name, entry.Score)",
+    expectedOutput: ["Author Meetup", "42"],
+    hint: "event := struct{ EventName string; Attendees int }{EventName: \"Author Meetup\", Attendees: 42} — fmt.Println(event.EventName, event.Attendees)",
   },
   {
-    title: "Pointer to Struct",
+    title: "Pointer to Struct — Library Catalog",
     instruction:
-      "`new(T)` allocates a zeroed struct and returns a pointer to it. Use `new(Person)` to allocate a Person, set the Name field to \"Charlie\", then print the name.",
+      "`new(T)` allocates a zeroed struct and returns a pointer to it. Use `new(Book)` to allocate a Book, set the Title field to \"Clean Code\", then print the title.",
     starter: `package main
 
 import "fmt"
 
-type Person struct {
-	Name string
-	Age  int
+type Book struct {
+\tTitle  string
+\tAuthor string
+\tPages  int
 }
 
 func main() {
-	// TODO: use new(Person), set Name to "Charlie", print Name
+\t// TODO: use new(Book), set Title to "Clean Code", print Title
 }`,
-    expectedOutput: ["Charlie"],
-    hint: "p := new(Person) — p.Name = \"Charlie\" — fmt.Println(p.Name)",
+    expectedOutput: ["Clean Code"],
+    hint: "b := new(Book) — b.Title = \"Clean Code\" — fmt.Println(b.Title)",
   },
 ];

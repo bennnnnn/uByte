@@ -281,15 +281,35 @@ export default function InteractiveTutorial({
       )}
 
       {/* ── Top Bar ── */}
-      <header className="flex h-12 shrink-0 items-center justify-between border-b border-zinc-200 bg-zinc-50 px-4 dark:border-zinc-800 dark:bg-zinc-900">
+      <header className="flex h-12 shrink-0 items-center justify-between border-b border-zinc-200 bg-zinc-50 px-2 dark:border-zinc-800 dark:bg-zinc-900 sm:px-4">
         <div className="flex min-w-0 flex-1 items-center gap-2 md:flex-initial">
           <Link href="/" className="flex items-center gap-2 rounded-md py-1 pr-2 transition-colors hover:bg-zinc-200 dark:hover:bg-zinc-800" aria-label="Back to home">
             <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-indigo-600 text-xs font-bold text-white">U</span>
-            <span className="hidden text-sm font-bold text-zinc-800 dark:text-zinc-100 md:block">uByte</span>
+            <span className="hidden text-sm font-bold text-zinc-800 dark:text-zinc-100 sm:block">uByte</span>
           </Link>
         </div>
-        <h1 className="min-w-0 max-w-[45%] flex-1 truncate text-center text-sm font-semibold text-zinc-800 dark:text-zinc-100 md:max-w-[40%] md:flex-initial" title={tutorialTitle}>{tutorialTitle}</h1>
-        <div className="flex flex-1 justify-end gap-3 md:flex-initial">
+        <h1 className="min-w-0 max-w-[35%] flex-1 truncate text-center text-sm font-semibold text-zinc-800 dark:text-zinc-100 md:max-w-[30%] md:flex-initial" title={tutorialTitle}>{tutorialTitle}</h1>
+        <div className="flex flex-1 items-center justify-end gap-2 md:flex-initial">
+          {/* Streak indicator */}
+          {profile && profile.streak_days > 0 && (
+            <span
+              title={`${profile.streak_days}-day streak`}
+              className="hidden items-center gap-1 rounded-full border border-amber-200 bg-amber-50 px-2 py-1 text-xs font-bold text-amber-700 dark:border-amber-800 dark:bg-amber-950/30 dark:text-amber-400 sm:inline-flex"
+            >
+              <span className="text-sm">🔥</span>
+              <span>{profile.streak_days}</span>
+            </span>
+          )}
+          {/* XP/level indicator */}
+          {profile && profile.xp > 0 && (
+            <span
+              title={`${profile.xp.toLocaleString()} XP earned`}
+              className="hidden items-center gap-1 rounded-full border border-indigo-200 bg-indigo-50 px-2 py-1 text-xs font-bold text-indigo-700 dark:border-indigo-800 dark:bg-indigo-950/30 dark:text-indigo-400 sm:inline-flex"
+            >
+              <span className="text-sm">⚡</span>
+              <span>{profile.xp.toLocaleString()}</span>
+            </span>
+          )}
           <ThemeToggle className="hidden h-8 w-8 items-center justify-center rounded text-zinc-500 transition-colors hover:bg-zinc-200 hover:text-zinc-800 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-200 md:flex" />
           <Suspense fallback={<div className="h-9 w-20 rounded-lg bg-zinc-200 dark:bg-zinc-800 animate-pulse" />}>
             <AuthButtons />
@@ -626,6 +646,10 @@ export default function InteractiveTutorial({
           next={next}
           onDismiss={() => stepProgress.setTutorialDone(false)}
           isPro={isPro}
+          stepsDone={stepProgress.completedSteps.size}
+          totalSteps={stepProgress.completedSteps.size + stepProgress.skippedSteps.size}
+          streakDays={profile?.streak_days ?? 0}
+          totalXp={profile?.xp ?? 0}
         />
       )}
     </div>

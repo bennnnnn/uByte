@@ -12,6 +12,10 @@ interface Props {
   next: { slug: string; title: string } | null;
   onDismiss: () => void;
   isPro: boolean;
+  stepsDone?: number;
+  totalSteps?: number;
+  streakDays?: number;
+  totalXp?: number;
 }
 
 export default function CongratsModal({
@@ -21,6 +25,10 @@ export default function CongratsModal({
   next,
   onDismiss,
   isPro,
+  stepsDone = 0,
+  totalSteps = 0,
+  streakDays = 0,
+  totalXp = 0,
 }: Props) {
   const [rated, setRated] = useState<1 | -1 | null>(null);
 
@@ -37,6 +45,18 @@ export default function CongratsModal({
     }
   }
 
+  const nextLevelAt = (() => {
+    const thresholds = [0, 100, 300, 700, 1500, 3000, 6000, 12000, 25000, 50000];
+    const labels = ["Beginner", "Learner", "Coder", "Builder", "Developer",
+                    "Engineer", "Architect", "Expert", "Master", "Legend"];
+    let level = 0;
+    for (let i = thresholds.length - 1; i >= 0; i--) {
+      if (totalXp >= thresholds[i]) { level = i; break; }
+    }
+    const nextXp = thresholds[level + 1] ?? thresholds[thresholds.length - 1];
+    return { level: level + 1, label: labels[level] ?? "Legend", nextXp, xpProgress: Math.min(100, Math.round((totalXp / nextXp) * 100)) };
+  })();
+
   return (
     <div
       className="fixed inset-0 z-[60] flex items-center justify-center bg-black/75 backdrop-blur-sm"
@@ -44,16 +64,62 @@ export default function CongratsModal({
       aria-modal="true"
       aria-labelledby="congrats-title"
     >
-      <div className="w-full max-w-md rounded-2xl border border-emerald-300 bg-white p-8 text-center shadow-2xl dark:border-emerald-800 dark:bg-zinc-900">
-        <div className="mb-3 text-5xl">🎉</div>
-        <h2 id="congrats-title" className="mb-2 text-2xl font-bold text-zinc-900 dark:text-zinc-100">
+      <div className="w-full max-w-md rounded-2xl border border-emerald-300 bg-white p-6 text-center shadow-2xl dark:border-emerald-800 dark:bg-zinc-900">
+        {/* Big celebration */}
+        <div className="relative mb-3">
+          <div className="text-6xl">🎉</div>
+          {streakDays > 0 && (
+            <div className="absolute -right-2 -top-2 flex items-center gap-1 rounded-full border border-amber-200 bg-amber-50 px-2.5 py-0.5 text-xs font-bold text-amber-700 dark:border-amber-800 dark:bg-amber-950/40 dark:text-amber-400">
+              🔥 {streakDays}-day streak
+            </div>
+          )}
+        </div>
+        <h2 id="congrats-title" className="mb-1 text-2xl font-bold text-zinc-900 dark:text-zinc-100">
           Tutorial Complete!
         </h2>
-        <p className="mb-6 text-zinc-500 dark:text-zinc-400">
+        <p className="mb-4 text-zinc-500 dark:text-zinc-400">
           You finished{" "}
-          <span className="font-medium text-zinc-800 dark:text-zinc-200">{tutorialTitle}</span>. Great work!
+          <span className="font-medium text-zinc-800 dark:text-zinc-200">{tutorialTitle}</span>.
         </p>
 
+        {/* Stats row */}
+        {stepsDone > 0 && (
+          <div className="mb-5 grid grid-cols-3 gap-3">
+            <div className="rounded-xl border border-zinc-100 bg-zinc-50 p-3 dark:border-zinc-800 dark:bg-zinc-800/50">
+              <p className="text-lg font-black text-zinc-900 dark:text-zinc-100">{stepsDone}</p>
+              <p className="text-[10px] font-semibold uppercase tracking-wider text-zinc-500">Steps</p>
+            </div>
+            <div className="rounded-xl border border-zinc-100 bg-zinc-50 p-3 dark:border-zinc-800 dark:bg-zinc-800/50">
+              <p className="text-lg font-black text-zinc-900 dark:text-zinc-100">{totalXp.toLocaleString()}</p>
+              <p className="text-[10px] font-semibold uppercase tracking-wider text-zinc-500">Total XP</p>
+            </div>
+            <div className="rounded-xl border border-zinc-100 bg-zinc-50 p-3 dark:border-zinc-800 dark:bg-zinc-800/50">
+              <p className="text-lg font-black text-zinc-900 dark:text-zinc-100">Lv.{nextLevelAt.level}</p>
+              <p className="text-[10px] font-semibold uppercase tracking-wider text-zinc-500">{nextLevelAt.label}</p>
+            </div>
+          </div>
+        )}
+
+        {/* XP progress to next level */}
+        {totalXp > 0 && (
+          <div className="mb-5">
+            <div className="flex items-center justify-between text-xs text-zinc-400 mb-1">
+              <span>{totalXp.toLocaleString()} XP</span>
+              <span>{nextLevelAt.nextXp.toLocaleString()} XP</span>
+            </div>
+            <div className="h-2 w-full overflow-hidden rounded-full bg-zinc-100 dark:bg-zinc-800">
+              <div
+                className="h-full rounded-full bg-gradient-to-r from-indigo-500 to-violet-500 transition-all"
+                style={{ width: `${nextLevelAt.xpProgress}%` }}
+              />
+            </div>
+            <p className="mt-1 text-xs text-zinc-400">
+              {nextLevelAt.nextXp - totalXp} XP to {nextLevelAt.label === "Legend" ? "max level" : `${nextLevelAt.label}`}
+            </p>
+          </div>
+        )}
+
+        {/* Action buttons */}
         <div className="flex flex-wrap justify-center gap-3">
           <button
             onClick={onDismiss}
@@ -68,25 +134,25 @@ export default function CongratsModal({
           {next ? (
             <Link
               href={tutorialUrl(lang, next.slug)}
-              className="rounded-lg bg-indigo-700 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-indigo-800"
+              className="inline-flex items-center gap-1.5 rounded-lg bg-indigo-700 px-5 py-2 text-sm font-bold text-white shadow-md shadow-indigo-500/20 transition-all hover:-translate-y-0.5 hover:bg-indigo-600 hover:shadow-lg"
             >
               Next: {next.title} →
             </Link>
           ) : (
             <Link
               href="/"
-              className="rounded-lg bg-indigo-700 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-indigo-800"
+              className="inline-flex items-center gap-1.5 rounded-lg bg-indigo-700 px-5 py-2 text-sm font-bold text-white shadow-md shadow-indigo-500/20 transition-all hover:-translate-y-0.5 hover:bg-indigo-600"
             >
-              All Tutorials
+              🏁 All Tutorials
             </Link>
           )}
         </div>
 
         {/* Thumbs rating */}
-        <div className="mt-6 border-t border-zinc-100 pt-5 dark:border-zinc-800">
+        <div className="mt-5 border-t border-zinc-100 pt-4 dark:border-zinc-800">
           {rated === null ? (
             <>
-              <p className="mb-3 text-sm text-zinc-500 dark:text-zinc-400">
+              <p className="mb-2 text-sm text-zinc-500 dark:text-zinc-400">
                 Was this tutorial helpful?
               </p>
               <div className="flex justify-center gap-3">
@@ -113,7 +179,7 @@ export default function CongratsModal({
 
         {/* Hint upsell */}
         {!isPro && (
-          <div className="mt-5 rounded-xl border border-indigo-100 bg-indigo-50/60 p-4 text-left dark:border-indigo-900/50 dark:bg-indigo-950/20">
+          <div className="mt-4 rounded-xl border border-indigo-100 bg-indigo-50/60 p-4 text-left dark:border-indigo-900/50 dark:bg-indigo-950/20">
             <p className="text-sm font-semibold text-indigo-800 dark:text-indigo-200">
               Want extra help on the next lesson?
             </p>
