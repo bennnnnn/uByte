@@ -67,8 +67,8 @@ export default function Sidebar({ lang, tutorials }: { lang: string; tutorials: 
   }, [query, queryLongEnough]);
 
   return (
-    <aside className="hidden md:flex w-72 shrink-0 flex-col border-r border-zinc-100 bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-950 fixed left-0 top-0 h-dvh overflow-y-auto z-20 pt-14">
-      <div className="px-3 py-4">
+    <aside className="hidden md:flex w-72 shrink-0 flex-col border-r border-zinc-100 bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-950 sticky top-14 self-start h-[calc(100vh-3.5rem)]">
+      <nav className="flex-1 overflow-y-auto px-3 py-4">
         {/* Search */}
         <div className="relative mb-3">
           <svg className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -211,7 +211,7 @@ export default function Sidebar({ lang, tutorials }: { lang: string; tutorials: 
             });
           })()}
         </ul>
-      </div>
+      </nav>
     </aside>
   );
 }

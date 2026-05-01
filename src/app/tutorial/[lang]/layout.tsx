@@ -19,11 +19,11 @@ export default async function TutorialLangLayout({
   const tutorials = getAllTutorials(lang as SupportedLanguage);
 
   return (
-    <div className="flex flex-1 min-h-0 overflow-hidden">
+    <div className="flex flex-1 min-h-0">
       <Sidebar lang={lang} tutorials={tutorials} />
-      <div className="flex flex-1 flex-col min-h-0 overflow-hidden md:ml-72">
+      <div className="flex flex-1 flex-col min-h-0 overflow-hidden">
         <MobileNav lang={lang} tutorials={tutorials} />
-        <div className="flex-1 overflow-y-auto">
+        <div className="flex-1 overflow-y-auto h-[calc(100vh-3.5rem)]">
           <ErrorBoundary>{children}</ErrorBoundary>
         </div>
       </div>
