@@ -15,7 +15,6 @@ import { apiFetch } from "@/lib/api-client";
 import { formatCents } from "./utils";
 import { MONTHLY_PRICE_CENTS, YEARLY_PRICE_CENTS } from "@/lib/plans";
 import type {
-  AdminUser,
   AdminMe,
   TutorialAnalytics,
   AuditEntry,
@@ -67,10 +66,8 @@ export function useAdminData() {
 
   /* ── State: navigation ───────────────────────────────────────────────── */
   const [tab, setTab] = useState<Tab | null>(null);
-  const [query, setQuery] = useState("");
 
   /* ── State: core data fetched on mount ───────────────────────────────── */
-  const [users, setUsers] = useState<AdminUser[]>([]);
   const [analytics, setAnalytics] = useState<TutorialAnalytics[]>([]);
   const [revenue, setRevenue] = useState<AdminRevenueStats | null>(null);
   const [revenuePeriod, setRevenuePeriod] = useState<RevenuePeriod>("7days");
@@ -86,11 +83,6 @@ export function useAdminData() {
   /* ── State: loading / error ──────────────────────────────────────────── */
   const [fetching, setFetching] = useState(true);
   const [error, setError] = useState("");
-
-  /* ── State: user-actions dropdown ────────────────────────────────────── */
-  const [pending, setPending] = useState<{ id: number; action: string } | null>(null);
-  const [userActionsOpen, setUserActionsOpen] = useState<number | null>(null);
-  const [actionAnchorRect, setActionAnchorRect] = useState<DOMRect | null>(null);
 
   /* ── State: banner tab ───────────────────────────────────────────────── */
   const [bannerData, setBannerData] = useState<BannerData | null>(null);
@@ -211,28 +203,6 @@ export function useAdminData() {
     return () => { cancelled = true; };
   }, [tab]);
 
-  /* ── User actions (ban, promote, delete, etc.) ───────────────────────── */
-  const doAction = useCallback(async (userId: number, action: string, confirmMsg?: string, extra?: { plan?: string }) => {
-    if (confirmMsg && !confirm(confirmMsg)) return;
-    setUserActionsOpen(null);
-    setPending({ id: userId, action });
-    try {
-      const res = await apiFetch("/api/admin/users", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action, userId, ...extra }),
-      });
-      if (!res.ok) { const data = await res.json(); alert(data.error ?? "Action failed"); return; }
-      if (action === "delete_user") setUsers((p) => p.filter((u) => u.id !== userId));
-      else if (action === "reset_progress") setUsers((p) => p.map((u) => u.id === userId ? { ...u, completed_count: 0, xp: 0, streak_days: 0 } : u));
-      else if (action === "ban_user") setUsers((p) => p.map((u) => u.id === userId ? { ...u, banned: true } : u));
-      else if (action === "unban_user") setUsers((p) => p.map((u) => u.id === userId ? { ...u, banned: false } : u));
-      else if (action === "set_admin") setUsers((p) => p.map((u) => u.id === userId ? { ...u, is_admin: 1, admin_role: "limited" } : u));
-      else if (action === "remove_admin") setUsers((p) => p.map((u) => u.id === userId ? { ...u, is_admin: 0, admin_role: null } : u));
-      else if (action === "set_plan" && extra?.plan) setUsers((p) => p.map((u) => u.id === userId ? { ...u, plan: extra.plan! } : u));
-    } catch { alert("Action failed."); } finally { setPending(null); }
-  }, []);
-
   /* ── Heatmap step loader ─────────────────────────────────────────────── */
   const loadStepStats = useCallback(async (slug: string) => {
     setHeatmapSlug(slug);
@@ -315,10 +285,6 @@ export function useAdminData() {
   }, []);
 
   /* ── Computed / derived ──────────────────────────────────────────────── */
-  const filtered = query.trim()
-    ? users.filter((u) => u.name.toLowerCase().includes(query.toLowerCase()) || u.email.toLowerCase().includes(query.toLowerCase()))
-    : users;
-
   const totalCompletions = analytics.reduce((s, t) => s + t.completed_count, 0);
   const mrr = revenue ? (revenue.monthlySubscribers * MONTHLY_PRICE_CENTS + revenue.yearlySubscribers * YEARLY_PRICE_CENTS) / 12 : 0;
 
@@ -334,9 +300,9 @@ export function useAdminData() {
     /* current admin identity / permissions */
     adminMe, isSuperAdmin, currentAdminRole, hasPermission,
     /* tab nav */
-    tab: tab ?? "analytics", setTab, query, setQuery,
+    tab: tab ?? "analytics", setTab,
     /* core data */
-    users, filtered, analytics,
+    analytics,
     revenue, revenuePeriod, setRevenuePeriod, revenueSeries, subscriptionEvents,
     auditLog,
     growthSnapshot,
@@ -344,8 +310,6 @@ export function useAdminData() {
     stepStats, heatmapSlug, loadStepStats,
     /* loading */
     fetching, error,
-    /* user actions */
-    pending, userActionsOpen, setUserActionsOpen, actionAnchorRect, setActionAnchorRect, doAction,
     /* banner */
     bannerData, setBannerData, bannerSaving, bannerMessage, saveBanner,
     /* revenue helpers */
