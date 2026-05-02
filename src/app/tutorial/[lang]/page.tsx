@@ -231,105 +231,78 @@ export default async function TutorialLangLandingPage({
         intro={intro?.whatYoullLearn ?? config.seo.defaultDescription}
       />
 
-      <section className="mb-10 grid gap-4 lg:grid-cols-[1.3fr_0.9fr]">
+      <section className="mb-10 grid gap-4 lg:grid-cols-[1fr_1fr]">
         <div className="rounded-2xl border border-zinc-200 bg-surface-card p-6 shadow-sm dark:border-zinc-800">
           <p className="mb-2 text-xs font-bold uppercase tracking-widest text-indigo-600 dark:text-indigo-400">
-            Who this track is for
+            Who this is for
           </p>
-          <h2 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100">
+          <h2 className="text-xl font-bold text-zinc-900 dark:text-zinc-100">
             A clear path into {config.name}
           </h2>
-          <p className="mt-3 text-sm leading-7 text-zinc-600 dark:text-zinc-400">
+          <p className="mt-2 text-sm leading-6 text-zinc-600 dark:text-zinc-400">
             {intro?.whoIsItFor}
           </p>
-          <ul className="mt-4 grid gap-3 sm:grid-cols-2">
+          <ul className="mt-3 grid gap-2 sm:grid-cols-2">
             {trackMeta.audience.map((item) => (
-              <li key={item} className="rounded-xl bg-zinc-50 px-4 py-3 text-sm text-zinc-700 dark:bg-zinc-900 dark:text-zinc-300">
+              <li key={item} className="rounded-xl bg-zinc-50 px-3 py-2 text-xs text-zinc-700 dark:bg-zinc-900 dark:text-zinc-300">
                 {item}
               </li>
             ))}
           </ul>
         </div>
 
-        {firstTutorial && (
-          <div className="rounded-2xl border border-indigo-100 bg-indigo-50/70 p-6 shadow-sm dark:border-indigo-900/40 dark:bg-indigo-950/30">
-            <p className="mb-2 text-xs font-bold uppercase tracking-widest text-indigo-600 dark:text-indigo-400">
-              Start here
-            </p>
-            <h2 className="text-xl font-bold text-zinc-900 dark:text-zinc-100">
-              {firstTutorial.title}
-            </h2>
-            <p className="mt-2 text-sm leading-7 text-zinc-600 dark:text-zinc-400">
-              {firstTutorial.description}
-            </p>
-            <div className="mt-4 flex flex-wrap gap-2 text-xs text-zinc-600 dark:text-zinc-300">
-              <span className="rounded-full bg-white px-2.5 py-1 font-medium dark:bg-zinc-900">
-                {stepCountBySlug[firstTutorial.slug] ?? 0} lessons
-              </span>
-              <span className="rounded-full bg-white px-2.5 py-1 font-medium dark:bg-zinc-900">
-                ~{firstTutorial.estimatedMinutes} min
-              </span>
-              <span className="rounded-full bg-white px-2.5 py-1 font-medium capitalize dark:bg-zinc-900">
-                {firstTutorial.difficulty}
-              </span>
-            </div>
-            <Link
-              href={tutorialUrl(lang, firstTutorial.slug)}
-              className="mt-5 inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-5 py-3 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-indigo-700"
-            >
-              Start this lesson →
-            </Link>
-          </div>
-        )}
-      </section>
-
-      <section className="mb-10 grid gap-4 lg:grid-cols-[1.1fr_0.9fr]">
         <div className="rounded-2xl border border-zinc-200 bg-surface-card p-6 shadow-sm dark:border-zinc-800">
           <p className="mb-2 text-xs font-bold uppercase tracking-widest text-indigo-600 dark:text-indigo-400">
-            What you&apos;ll know by the end
+            What you&apos;ll build
           </p>
-          <h2 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100">
+          <h2 className="text-xl font-bold text-zinc-900 dark:text-zinc-100">
             Skills that stack into real momentum
           </h2>
-          <ul className="mt-4 grid gap-3 sm:grid-cols-2">
+          <ul className="mt-3 grid gap-2 sm:grid-cols-2">
             {trackMeta.outcomes.map((item) => (
-              <li key={item} className="flex items-start gap-3 rounded-xl bg-zinc-50 px-4 py-3 text-sm text-zinc-700 dark:bg-zinc-900 dark:text-zinc-300">
-                <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-[11px] font-black text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-400">
-                  ✓
-                </span>
+              <li key={item} className="flex items-start gap-2 rounded-xl bg-zinc-50 px-3 py-2 text-xs text-zinc-700 dark:bg-zinc-900 dark:text-zinc-300">
+                <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-[10px] font-black text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-400">✓</span>
                 <span>{item}</span>
               </li>
             ))}
           </ul>
         </div>
+      </section>
 
-        <div className="rounded-2xl border border-zinc-200 bg-surface-card p-6 shadow-sm dark:border-zinc-800">
-          <p className="mb-2 text-xs font-bold uppercase tracking-widest text-indigo-600 dark:text-indigo-400">
-            Track snapshot
-          </p>
-          <h2 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100">
-            Real structure, not random lessons
-          </h2>
-          <div className="mt-4 space-y-3 text-sm text-zinc-600 dark:text-zinc-400">
-            <div className="flex items-center justify-between rounded-xl bg-zinc-50 px-4 py-3 dark:bg-zinc-900">
-              <span>Topics in this track</span>
-              <strong className="text-zinc-900 dark:text-zinc-100">{tutorials.length}</strong>
+      {firstTutorial && (
+        <div className="mb-10 rounded-2xl border border-indigo-100 bg-indigo-50/70 p-6 shadow-sm dark:border-indigo-900/40 dark:bg-indigo-950/30">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <p className="mb-1 text-xs font-bold uppercase tracking-widest text-indigo-600 dark:text-indigo-400">
+                Start here
+              </p>
+              <h2 className="text-xl font-bold text-zinc-900 dark:text-zinc-100">
+                {firstTutorial.title}
+              </h2>
+              <p className="mt-1 text-sm leading-6 text-zinc-600 dark:text-zinc-400">
+                {firstTutorial.description}
+              </p>
+              <div className="mt-3 flex flex-wrap gap-2 text-xs text-zinc-600 dark:text-zinc-300">
+                <span className="rounded-full bg-white px-2.5 py-1 font-medium dark:bg-zinc-900">
+                  {stepCountBySlug[firstTutorial.slug] ?? 0} lessons
+                </span>
+                <span className="rounded-full bg-white px-2.5 py-1 font-medium dark:bg-zinc-900">
+                  ~{firstTutorial.estimatedMinutes} min
+                </span>
+                <span className="rounded-full bg-white px-2.5 py-1 font-medium capitalize dark:bg-zinc-900">
+                  {firstTutorial.difficulty}
+                </span>
+              </div>
             </div>
-            <div className="flex items-center justify-between rounded-xl bg-zinc-50 px-4 py-3 dark:bg-zinc-900">
-              <span>Total hands-on lessons</span>
-              <strong className="text-zinc-900 dark:text-zinc-100">{totalLessons}</strong>
-            </div>
-            <div className="flex items-center justify-between rounded-xl bg-zinc-50 px-4 py-3 dark:bg-zinc-900">
-              <span>Estimated time</span>
-              <strong className="text-zinc-900 dark:text-zinc-100">{estimatedHours}h</strong>
-            </div>
-            <div className="flex items-center justify-between rounded-xl bg-zinc-50 px-4 py-3 dark:bg-zinc-900">
-              <span>Access</span>
-              <strong className="text-zinc-900 dark:text-zinc-100">Free lessons</strong>
-            </div>
+            <Link
+              href={tutorialUrl(lang, firstTutorial.slug)}
+              className="inline-flex shrink-0 items-center gap-2 rounded-xl bg-indigo-600 px-5 py-3 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-indigo-700"
+            >
+              Start this lesson →
+            </Link>
           </div>
         </div>
-      </section>
+      )}
 
       {tutorials.length > 0 ? (
         <>
