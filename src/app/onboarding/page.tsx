@@ -41,25 +41,6 @@ export default function OnboardingPage() {
 
   const firstName = useMemo(() => user?.name?.split(" ")[0] ?? "there", [user?.name]);
 
-  async function handleContinue() {
-    if (saving) return;
-    setSaving(true);
-    try {
-      await apiFetch("/api/onboarding/goal", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ goal: "learn-language", lang: selectedLang }),
-      });
-    } catch {
-      // Non-fatal. The tutorial redirect below still gives the user a working path.
-    } finally {
-      setSaving(false);
-    }
-
-    const destination = nextPath ?? `/tutorial/${selectedLang}/getting-started`;
-    router.replace(destination);
-  }
-
   if (!user) return null;
 
   return (
@@ -81,8 +62,19 @@ export default function OnboardingPage() {
                 <button
                   key={lang.id}
                   type="button"
-                  onClick={() => setSelectedLangOverride(lang.id)}
-                  className={`relative rounded-2xl border p-5 text-left transition-all ${
+                  onClick={() => {
+                    setSelectedLangOverride(lang.id);
+                    if (saving) return;
+                    setSaving(true);
+                    apiFetch("/api/onboarding/goal", {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ goal: "learn-language", lang: lang.id }),
+                    }).catch(() => {});
+                    const destination = nextPath ?? `/tutorial/${lang.id}/getting-started`;
+                    router.replace(destination);
+                  }}
+                  className={`group relative rounded-2xl border p-5 text-left transition-all ${
                     selected
                       ? "border-indigo-500 bg-indigo-50/80 ring-2 ring-indigo-500 dark:border-indigo-400 dark:bg-indigo-950/40 dark:ring-indigo-400"
                       : "border-zinc-200 bg-white hover:border-indigo-300 hover:shadow-sm dark:border-zinc-700 dark:bg-zinc-900 dark:hover:border-indigo-600"
@@ -106,14 +98,6 @@ export default function OnboardingPage() {
           </div>
 
           <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
-            <button
-              type="button"
-              onClick={handleContinue}
-              disabled={saving}
-              className="rounded-xl bg-indigo-600 px-6 py-3 text-sm font-bold text-white shadow-md shadow-indigo-500/20 transition-all hover:-translate-y-0.5 hover:bg-indigo-500 disabled:opacity-60"
-            >
-              {saving ? "Starting…" : `Start ${LANGUAGES.find((lang) => lang.id === selectedLang)?.name} →`}
-            </button>
             <Link
               href="/tutorial"
               className="text-sm font-medium text-zinc-500 transition-colors hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-200"
