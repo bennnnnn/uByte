@@ -327,7 +327,25 @@ function DashboardPage() {
   };
 
   // ── Render guards ────────────────────────────────────────────────────
-  if (loading || (!profile && !error)) return <DashboardSkeleton />;
+  if (loading) return <DashboardSkeleton />;
+
+  if (!user) {
+    return (
+      <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-4 px-4 py-20">
+        <div className="text-5xl">🔒</div>
+        <h1 className="text-xl font-bold text-zinc-900 dark:text-zinc-100">Sign in to view your dashboard</h1>
+        <p className="max-w-sm text-center text-sm text-zinc-500 dark:text-zinc-400">
+          Track your progress, manage bookmarks, and customize your profile.
+        </p>
+        <Link
+          href="/login?next=/dashboard"
+          className="rounded-xl bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-indigo-700"
+        >
+          Sign in
+        </Link>
+      </div>
+    );
+  }
 
   if (error) {
     return (
