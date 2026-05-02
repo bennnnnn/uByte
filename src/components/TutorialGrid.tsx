@@ -127,7 +127,7 @@ export default function TutorialGrid({
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
                       </svg>
                     ) : (
-                      (query ? originalIndex : i) + 1
+                      i + 1
                     )}
                   </span>
                   <h3 className="text-base font-semibold text-zinc-900 group-hover:text-indigo-700 dark:text-zinc-100 dark:group-hover:text-indigo-400">
