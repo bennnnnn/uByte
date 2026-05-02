@@ -49,15 +49,10 @@ export default function TutorialGrid({
 
   const computedTotal = Object.values(stepCountBySlug).reduce((s, n) => s + n, 0);
   const totalCount = totalLessons ?? (computedTotal > 0 ? computedTotal : tutorials.length);
-  const [query, setQuery] = useState("");
   const [diffFilter, setDiffFilter] = useState<DifficultyFilter>("all");
 
   const filtered = tutorials.filter((t) => {
     if (diffFilter !== "all" && t.difficulty !== diffFilter) return false;
-    if (query.trim()) {
-      const q = query.toLowerCase();
-      return t.title.toLowerCase().includes(q) || t.description.toLowerCase().includes(q);
-    }
     return true;
   });
 
@@ -99,32 +94,9 @@ export default function TutorialGrid({
         ))}
       </div>
 
-      {/* Search */}
-      <div className="mb-6 relative">
-        <svg
-          className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-4.35-4.35M17 11A6 6 0 105 11a6 6 0 0012 0z" />
-        </svg>
-        <input
-          id="tutorial-grid-search"
-          name="search"
-          type="search"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search tutorials..."
-          className="w-full rounded-xl border border-zinc-200 bg-white py-2.5 pl-10 pr-4 text-sm text-zinc-900 placeholder-zinc-400 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:placeholder-zinc-500"
-        />
-      </div>
-
       {filtered.length === 0 ? (
         <div className="py-16 text-center text-zinc-500 dark:text-zinc-400">
-          <div className="mb-2 text-4xl">🔍</div>
-          <p className="font-medium">No tutorials found for &quot;{query}&quot;</p>
-          <p className="mt-1 text-sm">Try a different keyword.</p>
+          <p className="font-medium">No tutorials match this filter.</p>
         </div>
       ) : (
         <div className="grid gap-4 sm:grid-cols-2">
