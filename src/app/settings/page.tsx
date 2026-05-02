@@ -5,11 +5,10 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/components/AuthProvider";
 import { useToast } from "@/components/Toast";
 import { apiFetch } from "@/lib/api-client";
-import { applyTheme } from "@/lib/theme";
+import type { Profile } from "@/components/profile/types";
 import SettingsTab from "@/components/profile/SettingsTab";
 import DangerZoneSection from "@/components/profile/settings/DangerZoneSection";
 import AccountShell from "@/components/profile/AccountShell";
-import type { Profile } from "@/components/profile/types";
 
 /* ── Skeleton ──────────────────────────────────────────────────────────── */
 function SettingsSkeleton() {
@@ -73,7 +72,7 @@ function SettingsPage() {
     if (user) startTransition(() => { void fetchProfile(); });
   }, [user, loading, router, fetchProfile]);
 
-  const saveProfile = async (data: { name: string; bio: string; theme: string }): Promise<boolean> => {
+  const saveProfile = async (data: { name: string; bio: string }): Promise<boolean> => {
     const res = await apiFetch("/api/profile", {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
@@ -82,7 +81,6 @@ function SettingsPage() {
     if (res.ok) {
       const json = await res.json() as { profile?: Profile };
       if (json.profile) setProfile(json.profile);
-      applyTheme(data.theme);
       return true;
     }
     return false;

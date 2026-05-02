@@ -6,7 +6,6 @@ import Link from "next/link";
 import { useAuth } from "@/components/AuthProvider";
 import { useToast } from "@/components/Toast";
 import { apiFetch } from "@/lib/api-client";
-import { applyTheme } from "@/lib/theme";
 import Avatar from "@/components/Avatar";
 import StatsRow from "@/components/profile/StatsRow";
 import OverviewTab from "@/components/profile/OverviewTab";
@@ -281,7 +280,7 @@ function DashboardPage() {
   };
 
   // ── Settings helpers ─────────────────────────────────────────────────
-  const saveProfile = async (data: { name: string; bio: string; theme: string }): Promise<boolean> => {
+  const saveProfile = async (data: { name: string; bio: string }): Promise<boolean> => {
     const res = await apiFetch("/api/profile", {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
@@ -290,7 +289,6 @@ function DashboardPage() {
     if (res.ok) {
       const json = await res.json() as { profile?: Profile };
       if (json.profile) setProfile(json.profile);
-      applyTheme(data.theme);
       return true;
     }
     return false;
