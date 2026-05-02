@@ -358,60 +358,26 @@ export default async function TutorialLangLandingPage({
         </div>
       )}
 
-      {/* Server-rendered SEO content — crawlable text for search engines */}
+      {/* Server-rendered SEO content — crawlable text for search engines, hidden from users */}
       {intro && tutorials.length > 0 && (
-        <article className="mt-16 space-y-10 border-t border-zinc-200 pt-12 dark:border-zinc-800">
+        <div className="sr-only">
           <section>
-            <h2 className="mb-3 text-2xl font-bold text-zinc-900 dark:text-zinc-100">
-              Why learn {config.name}?
-            </h2>
-            <p className="text-base leading-relaxed text-zinc-600 dark:text-zinc-400">
-              {intro.whyLearn}
-            </p>
+            <h2>Why learn {config.name}?</h2>
+            <p>{intro.whyLearn}</p>
           </section>
-
           <section>
-            <h2 className="mb-3 text-2xl font-bold text-zinc-900 dark:text-zinc-100">
-              What you&apos;ll learn in this {config.name} tutorial
-            </h2>
-            <p className="mb-4 text-base leading-relaxed text-zinc-600 dark:text-zinc-400">
-              {intro.whatYoullLearn}
-            </p>
-            <p className="text-sm font-medium text-zinc-500 dark:text-zinc-400">
-              {tutorials.length} topics · {totalLessons} hands-on lessons · all levels
-            </p>
+            <h2>What you&apos;ll learn in this {config.name} tutorial</h2>
+            <p>{intro.whatYoullLearn}</p>
           </section>
-
           <section>
-            <h2 className="mb-4 text-2xl font-bold text-zinc-900 dark:text-zinc-100">
-              {config.name} tutorial topics
-            </h2>
-            <p className="text-sm text-zinc-500 dark:text-zinc-400">
-              {tutorials.length} topics · {totalLessons} hands-on lessons · all levels
-            </p>
+            <h2>{config.name} tutorial topics</h2>
+            <p>{tutorials.length} topics · {totalLessons} hands-on lessons · all levels</p>
           </section>
-
           <section>
-            <h2 className="mb-3 text-2xl font-bold text-zinc-900 dark:text-zinc-100">
-              Who is this {config.name} course for?
-            </h2>
-            <p className="text-base leading-relaxed text-zinc-600 dark:text-zinc-400">
-              {intro.whoIsItFor}
-            </p>
+            <h2>Who is this {config.name} course for?</h2>
+            <p>{intro.whoIsItFor}</p>
           </section>
-
-          <nav className="flex flex-wrap gap-3 border-t border-zinc-200 pt-6 dark:border-zinc-800" aria-label="Related resources">
-            <Link href={tutorials[0] ? tutorialUrl(lang, tutorials[0].slug) : "/tutorial"} className="rounded-lg bg-zinc-100 px-4 py-2 text-sm font-medium text-zinc-700 transition-colors hover:bg-indigo-100 hover:text-indigo-700 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-indigo-950 dark:hover:text-indigo-300">
-              Start the first {config.name} lesson →
-            </Link>
-            <Link href="/pricing" className="rounded-lg bg-zinc-100 px-4 py-2 text-sm font-medium text-zinc-700 transition-colors hover:bg-indigo-100 hover:text-indigo-700 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-indigo-950 dark:hover:text-indigo-300">
-              Get detailed hints when needed →
-            </Link>
-            <Link href="/leaderboard" className="rounded-lg bg-zinc-100 px-4 py-2 text-sm font-medium text-zinc-700 transition-colors hover:bg-indigo-100 hover:text-indigo-700 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-indigo-950 dark:hover:text-indigo-300">
-              See top learners →
-            </Link>
-          </nav>
-        </article>
+        </div>
       )}
     </div>
   );
