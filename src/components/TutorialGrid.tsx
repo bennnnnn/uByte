@@ -197,11 +197,6 @@ export default function TutorialGrid({
                     );
                   })()}
                 </div>
-                <p className="mt-4 text-xs font-semibold uppercase tracking-widest text-zinc-400 dark:text-zinc-500">
-                  {tutorial.slug === tutorials[0]?.slug
-                    ? "Best first lesson in this track"
-                    : "Structured lesson in the track"}
-                </p>
               </Link>
             );
           })}
