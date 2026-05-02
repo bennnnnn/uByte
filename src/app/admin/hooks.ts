@@ -131,16 +131,6 @@ export function useAdminData() {
 
         const pulls: Promise<void>[] = [];
 
-        if (perm("users")) {
-          pulls.push(
-            fetch("/api/admin/users", { credentials: "same-origin" }).then(async (r) => {
-              if (cancelled || !r.ok) return;
-              const data = (await r.json()) as { users?: AdminUser[] };
-              setUsers(data.users ?? []);
-            }),
-          );
-        }
-
         if (perm("analytics")) {
           pulls.push(
             fetch("/api/admin/users?view=analytics", { credentials: "same-origin" }).then(async (r) => {
@@ -157,7 +147,7 @@ export function useAdminData() {
               if (cancelled || !r.ok) return;
               const data = await r.json();
               setRevenue(data);
-              setRevenueSeries(data.revenueByPeriod ?? data.revenueByDay ?? []);
+              setRevenueSeries(data.revenueByPeriod ?? []);
             }),
           );
           pulls.push(

@@ -71,7 +71,7 @@ export async function generateAndInsertAiBlogPost(
   const system = `You are the lead technical writer for uByte (uByte.dev), an interactive programming tutorial site.
 Write ONE original, accurate, educational blog article. Tone: clear, friendly, expert — no hype, no "revolutionary", no unfounded claims.
 Output rules (strict):
-- Respond with a single JSON object only. No markdown fence around the JSON. No prose before or after.
+- Respond with a single JSON object wrapped in triple-backtick json fences, with no prose before or after.
 - Keys: "title", "description", "category", "tags", "content".
 - "category" must be exactly one of: "Learning Guide", "Language Deep Dive", "Comparison".
 - "tags": 3–8 short tags; include the primary language name when relevant (e.g. "Go", "Python", "Rust", "TypeScript", "Java", "C++", "C#", "SQL", "JavaScript").
