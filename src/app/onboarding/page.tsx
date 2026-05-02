@@ -64,14 +64,6 @@ export default function OnboardingPage() {
 
   return (
     <div className="flex min-h-[100svh] flex-col bg-white dark:bg-zinc-950">
-      <header className="flex items-center justify-between border-b border-zinc-100 px-6 py-4 dark:border-zinc-800">
-        <Link href="/" className="flex items-center gap-2">
-          <span className="flex h-7 w-7 items-center justify-center rounded-md bg-indigo-600 text-xs font-bold text-white">U</span>
-          <span className="text-base font-bold tracking-tight text-zinc-900 dark:text-zinc-100">uByte</span>
-        </Link>
-        <span className="text-xs font-medium text-zinc-400 dark:text-zinc-500">Getting started</span>
-      </header>
-
       <div className="flex flex-1 items-start justify-center px-4 py-10 sm:py-14">
         <div className="w-full max-w-3xl">
           <p className="mb-1 text-sm font-semibold text-indigo-600 dark:text-indigo-400">Welcome, {firstName} 👋</p>
