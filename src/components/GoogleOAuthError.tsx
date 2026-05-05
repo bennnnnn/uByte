@@ -12,6 +12,8 @@ const MESSAGES: Record<string, string> = {
   oauth_email_not_verified: "Your Google account email must be verified before you can sign in.",
   account_locked: "This account is temporarily locked. Please try again later.",
   oauth_failed: "Google sign-in failed. Please try again.",
+  google_account_link_conflict:
+    "This Google account is already linked to another uByte profile, or your profile is linked to a different Google account. Contact support if you need help.",
 };
 
 export default function GoogleOAuthError() {

@@ -80,10 +80,21 @@ export const POST = withErrorHandling("POST /api/auth/google-id-token", async (r
   if (!user) {
     const existing = await getUserByEmail(email);
     if (existing) {
-      await linkGoogleId(existing.id, googleId);
+      const link = await linkGoogleId(existing.id, googleId);
+      if (link === "conflict") {
+        return NextResponse.json(
+          {
+            error:
+              "This Google account is already linked to another uByte profile, or your profile is linked to a different Google account. Contact support if you need help.",
+          },
+          { status: 409 },
+        );
+      }
       user = existing;
       try {
-        await sendGoogleLinkedEmail(user.email, user.name);
+        if (link === "linked") {
+          await sendGoogleLinkedEmail(user.email, user.name);
+        }
       } catch {
         /* non-critical */
       }

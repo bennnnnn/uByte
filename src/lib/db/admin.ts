@@ -281,7 +281,9 @@ export async function setAdminStatus(
   const sql = getSql();
   if (isAdmin) {
     const permsJson = permissions ? JSON.stringify(permissions) : null;
+    const [prior] = await sql`SELECT COALESCE(is_admin, 0) AS ia FROM users WHERE id = ${userId}`;
     await sql`UPDATE users SET is_admin = 1, admin_role = ${role}, admin_permissions = ${permsJson} WHERE id = ${userId}`;
+    if (prior && prior.ia !== 1) await incrementTokenVersion(userId);
   } else {
     await sql`UPDATE users SET is_admin = 0, admin_role = NULL, admin_permissions = NULL WHERE id = ${userId}`;
     await incrementTokenVersion(userId);

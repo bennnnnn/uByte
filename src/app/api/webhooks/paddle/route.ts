@@ -59,6 +59,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { timingSafeEqual } from "crypto";
+import { z } from "zod";
 import {
   updateUserPlan,
   cancelUserPlanGracefully,
@@ -84,6 +85,26 @@ const CLIENT_TOKEN = process.env.NEXT_PUBLIC_PADDLE_CLIENT_TOKEN ?? "";
 // No code change needed when going live — just update NEXT_PUBLIC_PADDLE_CLIENT_TOKEN.
 const isSandbox = CLIENT_TOKEN.startsWith("test_");
 const PADDLE_BASE = isSandbox ? "https://sandbox-api.paddle.com" : "https://api.paddle.com";
+
+const paddleWebhookEventSchema = z.object({
+  event_id: z.string().optional(),
+  event_type: z.string().min(1),
+  data: z.record(z.string(), z.unknown()),
+});
+
+function customDataFromWebhook(data: Record<string, unknown>): Record<string, string> | null {
+  const raw = data["custom_data"];
+  if (raw === null || raw === undefined) return null;
+  if (typeof raw !== "object" || Array.isArray(raw)) return null;
+  const out: Record<string, string> = {};
+  for (const [k, v] of Object.entries(raw as Record<string, unknown>)) {
+    if (typeof v === "string") out[k] = v;
+    else if (typeof v === "number" && Number.isFinite(v)) out[k] = String(v);
+    else if (typeof v === "boolean") out[k] = v ? "true" : "false";
+    else return null;
+  }
+  return out;
+}
 
 /**
  * Verifies the Paddle-Signature header using HMAC-SHA256.
@@ -266,14 +287,21 @@ export const POST = withErrorHandling("POST /api/webhooks/paddle", async (reques
     return NextResponse.json({ error: "Invalid signature" }, { status: 400 });
   }
 
-  let event: { event_type: string; data: Record<string, unknown> };
+  let raw: unknown;
   try {
-    event = JSON.parse(body);
+    raw = JSON.parse(body);
   } catch {
     return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
   }
 
-  const eventId = (event as Record<string, unknown>).event_id as string | undefined;
+  const parsed = paddleWebhookEventSchema.safeParse(raw);
+  if (!parsed.success) {
+    console.error("[paddle-webhook] Invalid payload shape:", parsed.error.flatten());
+    return NextResponse.json({ error: "Invalid webhook payload" }, { status: 400 });
+  }
+
+  const event = parsed.data;
+  const eventId = event.event_id;
 
   if (eventId) {
     const duplicate = await isDuplicateEvent(eventId, event.event_type);
@@ -281,13 +309,13 @@ export const POST = withErrorHandling("POST /api/webhooks/paddle", async (reques
   }
 
   const data = event.data;
-  const customData = data["custom_data"] as Record<string, string> | null;
-  const paddleCustomerId = data["customer_id"] as string | undefined;
-  const status = data["status"] as string | undefined;
+  const customData = customDataFromWebhook(data);
+  const paddleCustomerId = typeof data["customer_id"] === "string" ? data["customer_id"] : undefined;
+  const status = typeof data["status"] === "string" ? data["status"] : undefined;
 
   // Determine which plan to activate based on the price ID in the transaction/subscription
   const yearlyPriceId = process.env.NEXT_PUBLIC_PADDLE_YEARLY_PRICE_ID;
-  const items = data["items"] as { price?: { id?: string } }[] | undefined;
+  const items = Array.isArray(data["items"]) ? (data["items"] as { price?: { id?: string } }[]) : undefined;
   const purchasedPriceId = items?.[0]?.price?.id;
   const activatedPlan = yearlyPriceId && purchasedPriceId === yearlyPriceId ? "yearly" : "monthly";
 

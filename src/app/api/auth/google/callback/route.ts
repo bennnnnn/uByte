@@ -84,10 +84,15 @@ export const GET = withErrorHandling("GET /api/auth/google/callback", async (req
     if (!user) {
       const existing = await getUserByEmail(email);
       if (existing) {
-        await linkGoogleId(existing.id, googleId);
+        const link = await linkGoogleId(existing.id, googleId);
+        if (link === "conflict") {
+          return createAuthRedirect(origin, authMode, nextPath, "google_account_link_conflict");
+        }
         user = existing;
         try {
-          await sendGoogleLinkedEmail(user.email, user.name);
+          if (link === "linked") {
+            await sendGoogleLinkedEmail(user.email, user.name);
+          }
         } catch {
           /* non-critical */
         }

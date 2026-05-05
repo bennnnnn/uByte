@@ -84,9 +84,24 @@ export async function getUserByGoogleId(googleId: string): Promise<User | undefi
   return row as User | undefined;
 }
 
-export async function linkGoogleId(userId: number, googleId: string): Promise<void> {
+export type LinkGoogleIdResult = "linked" | "unchanged" | "conflict";
+
+/**
+ * Attach a Google `sub` to a password (or legacy) account after Google proves email ownership.
+ * Refuses to clobber another user's google_id or replace an existing different link on this row.
+ */
+export async function linkGoogleId(userId: number, googleId: string): Promise<LinkGoogleIdResult> {
   const sql = getSql();
+  const owner = await getUserByGoogleId(googleId);
+  if (owner && owner.id !== userId) return "conflict";
+
+  const me = await getUserById(userId);
+  if (!me) return "conflict";
+  if (me.google_id === googleId) return "unchanged";
+  if (me.google_id) return "conflict";
+
   await sql`UPDATE users SET google_id = ${googleId} WHERE id = ${userId}`;
+  return "linked";
 }
 
 export async function getUserByEmail(email: string): Promise<User | undefined> {
