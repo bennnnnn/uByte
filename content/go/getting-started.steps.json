@@ -2,7 +2,7 @@
   {
     "title": "Your first Go program 🐹",
     "instruction": "Every Go program has a `func main()` — that's where it starts running. Click **Run & check** to see it in action.",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tfmt.Println(\"Hello, Library!\")\n}",
+    "starter": "package main\n// This file is a runnable program (not a library).\n\nimport \"fmt\"\n// fmt is the format package — Println sends text to the output you see below.\n\nfunc main() {\n\t// main is the entry point: Go runs whatever is inside this block first.\n\tfmt.Println(\"Hello, Library!\")\n}",
     "expectedOutput": ["Hello, Library!"],
     "successMessage": "Boom — you just ran a Go program. No setup, no config files, no drama.",
     "carryForward": true
@@ -11,7 +11,7 @@
     "title": "Announce Your Library",
     "instruction": "Change the message to `\"Welcome to my library!\"` and add a second Println for the hours: `\"Open daily from 9 AM to 8 PM\"`.",
     "hint": "Change the first Println and add a second one below it.",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tfmt.Println(\"Hello, Library!\")\n}",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\t// Each Println prints one line, in order from top to bottom.\n\tfmt.Println(\"Hello, Library!\")\n}",
     "expectedOutput": ["Welcome to my library!", "Open daily from 9 AM to 8 PM"],
     "successMessage": "Your library has a name and hours. The computer reads your code top-to-bottom, like a recipe."
   },
@@ -19,7 +19,7 @@
     "title": "Print the Book Count",
     "instruction": "Use `:=` to create a variable named `books` with value `1200`, then print a sentence using that variable.",
     "hint": "books := 1200 — then fmt.Println(\"We have\", books, \"books!\")",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\t// TODO: create a variable books := 1200\n\t// TODO: print a sentence that includes the book count\n}",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\t// books will hold how many books the library has (a whole number).\n\t// TODO: create a variable books := 1200\n\t// TODO: print a sentence that includes the book count\n}",
     "expectedOutput": ["1200"],
     "codeChecks": [
       { "pattern": "books\\s*:=\\s*1200", "required": true, "message": "Create books: books := 1200" },
@@ -31,7 +31,7 @@
     "title": "Meet the Librarian",
     "instruction": "Create `name := \"Alice\"` and `books := 5000`, then print each on its own line.",
     "hint": "name := \"Alice\" — books := 5000 — fmt.Println(name) — fmt.Println(books)",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\t// TODO: create variables for name and books\n\t// TODO: print them on separate lines\n}",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\t// name: the librarian's name (text, so it uses double quotes).\n\t// books: how many books this branch holds (a number — no quotes).\n\t// TODO: create variables for name and books\n\t// TODO: print them on separate lines\n}",
     "expectedOutput": ["Alice", "5000"],
     "codeChecks": [
       { "pattern": "name\\s*:=\\s*\"Alice\"", "required": true, "message": "Create name := \"Alice\"" },
@@ -46,7 +46,7 @@
     "title": "Comments are for humans 🤯",
     "instruction": "Lines starting with `//` are comments — Go ignores them. Add a `//` comment above the Println, then change the message to print `\"Tomorrow at 9 AM\"`.",
     "hint": "Add a // comment on its own line, then change the message.",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tfmt.Println(\"PLACEHOLDER\")\n}",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\t// Replace PLACEHOLDER with your real message on the next line.\n\tfmt.Println(\"PLACEHOLDER\")\n}",
     "expectedOutput": ["Tomorrow at 9 AM"],
     "codeChecks": [
       { "pattern": "^\\s*//(?!\\s*TODO)", "flags": "m", "required": true, "message": "Add a // comment on its own line above the fmt.Println call." }

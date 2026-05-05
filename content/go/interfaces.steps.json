@@ -23,7 +23,7 @@
     "successMessage": "Two different types, one interface. Go doesn't care about inheritance or class trees — just \"do you have the method?\""
   },
   {
-    "title": "ahha — a slice of interfaces treats everything the same",
+    "title": "aha — a slice of interfaces treats everything the same",
     "instruction": "Because all three media types satisfy `Media`, you can store them in a `[]Media` and treat them uniformly.\\nAdd an `Audiobook` to the media slice, then loop through and call `describe` on each.",
     "hint": "items := []Media{Book{...}, Magazine{...}, Audiobook{...}}",
     "starter": "package main\n\nimport \"fmt\"\n\ntype Media interface {\n\tTitle() string\n\tDuration() string\n}\n\ntype Book struct{ TitleName string }\ntype Magazine struct{ TitleName string }\ntype Audiobook struct{ TitleName string }\n\nfunc (b Book) Title() string     { return b.TitleName }\nfunc (m Magazine) Title() string  { return m.TitleName }\nfunc (a Audiobook) Title() string { return a.TitleName }\n\nfunc (b Book) Duration() string     { return \"6h read\" }\nfunc (m Magazine) Duration() string  { return \"30m read\" }\nfunc (a Audiobook) Duration() string { return \"4h listen\" }\n\nfunc describe(m Media) {\n\tfmt.Printf(\"%s — %s\\n\", m.Title(), m.Duration())\n}\n\nfunc main() {\n\titems := []Media{\n\t\tBook{TitleName: \"Go in Action\"},\n\t\tMagazine{TitleName: \"Nature\"},\n\t\t// TODO: add Audiobook{TitleName: \"Atomic Habits\"}\n\t}\n\tfor _, m := range items {\n\t\tdescribe(m)\n\t}\n}",

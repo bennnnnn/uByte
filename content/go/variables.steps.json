@@ -2,7 +2,7 @@
   {
     "title": "What is a variable",
     "instruction": "A variable is a labeled slot that holds a value — like a shelf slot labeled with a book title. Run this to see one in action.",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\ttitle := \"The Hobbit\"\n\tfmt.Println(title)\n}",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\t// title holds the book name; := creates the variable and assigns in one step.\n\ttitle := \"The Hobbit\"\n\tfmt.Println(title)\n}",
     "expectedOutput": ["The Hobbit"],
     "successMessage": "You stored a book title and retrieved it. That's what every variable in every library system does.",
     "carryForward": true
@@ -11,7 +11,7 @@
     "title": "Create your own with :=",
     "instruction": "`:=` creates a variable and gives it a value in one shot. Change the title to your favorite book and run it.",
     "hint": "Replace \"The Hobbit\" with your favorite book title. Keep the quotes.",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\ttitle := \"The Hobbit\"\n\tfmt.Println(title)\n}",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\t// title is your string variable — change the text in quotes to any book you like.\n\ttitle := \"The Hobbit\"\n\tfmt.Println(title)\n}",
     "expectedOutput": [],
     "codeChecks": [
       { "pattern": "title\\s*:=\\s*\"The Hobbit\"", "required": false, "message": "Change the value from \"The Hobbit\" to your own favorite book title." }
@@ -21,7 +21,7 @@
   {
     "title": "Declare first, assign later",
     "instruction": "`var title string` creates an empty slot. `title = \"The Hobbit\"` puts a book in it. Note: filling later uses `=`, not `:=`. Run this.",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tvar title string\n\ttitle = \"The Hobbit\"\n\tfmt.Println(title)\n}",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tvar title string // reserves a string variable (starts as \"\" until you assign)\n\ttitle = \"The Hobbit\"\n\tfmt.Println(title)\n}",
     "expectedOutput": ["The Hobbit"],
     "successMessage": "Two separate steps: create the shelf slot, then put the book on it."
   },
@@ -29,7 +29,7 @@
     "title": "Update a variable — the aha 🤯",
     "instruction": "Variables can change. `:=` creates, `=` updates. The count starts at 60. A shipment arrives — update it to 95 and print both values.",
     "hint": "After the first Println, write: copies = 95 then fmt.Println(copies) again.",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tcopies := 60\n\tfmt.Println(copies)\n\t// TODO: update copies to 95 using =\n\t// TODO: print copies again\n}",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\t// copies tracks how many book copies are on the shelf right now.\n\tcopies := 60\n\tfmt.Println(copies)\n\t// TODO: update copies to 95 using =\n\t// TODO: print copies again\n}",
     "expectedOutput": ["60", "95"],
     "codeChecks": [
       { "pattern": "copies\\s*=\\s*95", "required": true, "message": "Update copies using a single = : copies = 95" },
@@ -41,7 +41,7 @@
     "title": "Two variables in one line",
     "instruction": "Go lets you declare multiple variables at once: `title, author := \"The Hobbit\", \"Tolkien\"`. Change the book and author to your own.",
     "hint": "Replace the values with your own book title and author.",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\ttitle, author := \"The Hobbit\", \"Tolkien\"\n\tfmt.Println(title)\n\tfmt.Println(author)\n}",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\t// title and author are declared together: first value goes to title, second to author.\n\ttitle, author := \"The Hobbit\", \"Tolkien\"\n\tfmt.Println(title)\n\tfmt.Println(author)\n}",
     "expectedOutput": [],
     "codeChecks": [
       { "pattern": "title,\\s*author\\s*:=", "required": true, "message": "Keep the multi-assignment format: title, author := ..." },
@@ -52,7 +52,7 @@
   {
     "title": "Zero values",
     "instruction": "What happens if you create a shelf slot but never put a book in? Go gives it a default called a zero value. Run this to see them.",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tvar title string\n\tvar copies int\n\tvar available bool\n\tfmt.Println(title)\n\tfmt.Println(copies)\n\tfmt.Println(available)\n}",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\tvar title string   // zero value for string is \"\" (empty text)\n\tvar copies int     // zero value for int is 0\n\tvar available bool // zero value for bool is false\n\tfmt.Println(title)\n\tfmt.Println(copies)\n\tfmt.Println(available)\n}",
     "expectedOutput": ["", "0", "false"],
     "successMessage": "No surprises in Go. Every variable always has a value, even before you catalog a single book."
   },
@@ -60,7 +60,7 @@
     "title": "Build a library profile",
     "instruction": "Use everything you learned: create `title` and `copies` with `:=`, declare `section` with `var` and assign it separately, then print all three.",
     "hint": "title := \"...\", copies := 10, var section string then section = \"...\". Then print them.",
-    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\t// TODO: Build your library profile here\n}",
+    "starter": "package main\n\nimport \"fmt\"\n\nfunc main() {\n\t// title: book or shelf label (string, use :=)\n\t// copies: how many copies (int, use :=)\n\t// section: area of the library (string, use var then assign with =)\n\t// TODO: Build your library profile here\n}",
     "expectedOutput": [],
     "codeChecks": [
       { "pattern": "title\\s*:=", "required": true, "message": "Declare title using :=" },
