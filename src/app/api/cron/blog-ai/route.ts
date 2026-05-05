@@ -47,7 +47,7 @@ export const GET = withErrorHandling("GET /api/cron/blog-ai", async (request: Ne
       skipped: true,
       reason: "BLOG_AI_CRON_ENABLED not set",
       hint:
-        "Set env BLOG_AI_CRON_ENABLED=1 (or true) on Vercel to run daily AI posts. Requires CRON_SECRET, AI gateway keys (e.g. GEMINI_API_KEY), and DATABASE_URL. To test without cron: Admin → Blog → “Generate AI post”.",
+        "Set env BLOG_AI_CRON_ENABLED=1 (or true) on Vercel to run daily AI posts. Requires CRON_SECRET, GOOGLE_GENERATIVE_AI_API_KEY (or GEMINI_API_KEY), and DATABASE_URL. To test without cron: Admin → Blog → “Generate AI post”.",
     });
   }
 

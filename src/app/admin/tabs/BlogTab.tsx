@@ -763,8 +763,9 @@ export default function BlogTab() {
         <p className="mb-4 text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
           If nothing new appears on the public blog, the daily job is probably skipped: set{" "}
           <code className="rounded bg-zinc-100 px-1 py-0.5 font-mono text-xs dark:bg-zinc-800">BLOG_AI_CRON_ENABLED=1</code>{" "}
-          (or <code className="rounded bg-zinc-100 px-1 py-0.5 font-mono text-xs dark:bg-zinc-800">true</code>) in production, with AI keys
-          (e.g. <code className="rounded bg-zinc-100 px-1 py-0.5 font-mono text-xs dark:bg-zinc-800">GEMINI_API_KEY</code> / gateway) and{" "}
+          (or <code className="rounded bg-zinc-100 px-1 py-0.5 font-mono text-xs dark:bg-zinc-800">true</code>) in production,           with AI keys (
+          <code className="rounded bg-zinc-100 px-1 py-0.5 font-mono text-xs dark:bg-zinc-800">GOOGLE_GENERATIVE_AI_API_KEY</code>{" "}
+          or <code className="rounded bg-zinc-100 px-1 py-0.5 font-mono text-xs dark:bg-zinc-800">GEMINI_API_KEY</code>) and{" "}
           <code className="rounded bg-zinc-100 px-1 py-0.5 font-mono text-xs dark:bg-zinc-800">CRON_SECRET</code>. Use the buttons to test without waiting for cron.
         </p>
         {aiNote && (
