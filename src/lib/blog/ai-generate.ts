@@ -62,7 +62,8 @@ function ensureUniqueSlug(base: string, taken: Set<string>): string {
  */
 export async function generateAndInsertAiBlogPost(
   topicBrief: string,
-  takenSlugs: Set<string>
+  takenSlugs: Set<string>,
+  options?: { published?: boolean }
 ): Promise<BlogAiGenerateResult> {
   const origin = siteOrigin();
   const model = process.env.BLOG_AI_MODEL?.trim() || "gemini-2.5-flash";
@@ -125,7 +126,9 @@ Output rules (strict):
   takenSlugs.add(slug);
 
   const published =
-    process.env.BLOG_AI_PUBLISHED !== "false" && process.env.BLOG_AI_PUBLISHED !== "0";
+    options?.published !== undefined
+      ? options.published
+      : process.env.BLOG_AI_PUBLISHED !== "false" && process.env.BLOG_AI_PUBLISHED !== "0";
 
   try {
     await createDbBlogPost({

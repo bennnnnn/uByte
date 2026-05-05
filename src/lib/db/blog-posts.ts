@@ -2,7 +2,7 @@
  * DB-backed blog posts — allows admins to create and edit posts without
  * touching the filesystem (which is read-only on Vercel at runtime).
  *
- * MDX files in content/blog/ remain the primary source for pre-existing posts.
+ * MDX files in src/content/blog/ remain the primary source for pre-existing posts.
  * DB posts take precedence when slugs collide (enables editing MDX content via admin).
  */
 import { getSql } from "./client";

@@ -1,6 +1,6 @@
 /**
  * Blog utilities — merges two sources:
- *  1. MDX files from content/blog/ (static, in-repo)
+ *  1. MDX files from src/content/blog/ (static, in-repo)
  *  2. DB posts from the blog_posts table (admin-created, editable at runtime)
  *
  * DB posts take precedence when slugs collide, allowing admins to override

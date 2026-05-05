@@ -245,6 +245,8 @@ export default function BlogTab() {
   const [viewMode, setViewMode]   = useState<"write" | "split" | "preview">("write");
   const [tagInput, setTagInput]   = useState("");
   const [langPicker, setLangPicker] = useState(false);
+  const [aiBusy, setAiBusy]       = useState(false);
+  const [aiNote, setAiNote]       = useState<string | null>(null);
   const textareaRef               = useRef<HTMLTextAreaElement>(null);
   const langPickerRef             = useRef<HTMLDivElement>(null);
 
@@ -317,6 +319,39 @@ export default function BlogTab() {
     if (!confirm(`Delete "${post.title}"? This cannot be undone.`)) return;
     const res = await apiFetch(`/api/admin/blog/${post.id}`, { method: "DELETE" });
     if (res.ok) { setPosts((p) => p.filter((x) => x.id !== post.id)); if (editing?.id === post.id) closeEditor(); }
+  }
+
+  async function generateAiPosts(opts: { count: number; published: boolean }) {
+    setAiBusy(true);
+    setAiNote(null);
+    try {
+      const res = await apiFetch("/api/admin/blog/ai-generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ count: opts.count, published: opts.published }),
+      });
+      const data = (await res.json()) as {
+        ok?: boolean;
+        error?: string;
+        created?: number;
+        failed?: number;
+        results?: { slug?: string; title?: string; error?: string; topic?: string }[];
+      };
+      if (!res.ok) {
+        setAiNote(data.error ?? `Request failed (${res.status})`);
+        return;
+      }
+      const ok = data.ok !== false;
+      const parts: string[] = [];
+      if (typeof data.created === "number") parts.push(`${data.created} created`);
+      if (typeof data.failed === "number" && data.failed > 0) parts.push(`${data.failed} failed`);
+      setAiNote(`${ok ? "Done" : "Partial"}: ${parts.join(", ")}. Check list below — drafts use Preview.`);
+      await load();
+    } catch (e) {
+      setAiNote(e instanceof Error ? e.message : "Generation failed");
+    } finally {
+      setAiBusy(false);
+    }
   }
 
   function addTag() {
@@ -720,8 +755,54 @@ export default function BlogTab() {
         </SectionCard>
       )}
 
+      {/* ── AI generation (same engine as Vercel cron /api/cron/blog-ai) ───── */}
+      <SectionCard
+        title="AI-generated posts"
+        description="Git-based articles live in src/content/blog/ (not listed here). AI posts are stored in the database. Scheduled runs need Vercel Cron + CRON_SECRET + BLOG_AI_CRON_ENABLED=1."
+      >
+        <p className="mb-4 text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
+          If nothing new appears on the public blog, the daily job is probably skipped: set{" "}
+          <code className="rounded bg-zinc-100 px-1 py-0.5 font-mono text-xs dark:bg-zinc-800">BLOG_AI_CRON_ENABLED=1</code>{" "}
+          (or <code className="rounded bg-zinc-100 px-1 py-0.5 font-mono text-xs dark:bg-zinc-800">true</code>) in production, with AI keys
+          (e.g. <code className="rounded bg-zinc-100 px-1 py-0.5 font-mono text-xs dark:bg-zinc-800">GEMINI_API_KEY</code> / gateway) and{" "}
+          <code className="rounded bg-zinc-100 px-1 py-0.5 font-mono text-xs dark:bg-zinc-800">CRON_SECRET</code>. Use the buttons to test without waiting for cron.
+        </p>
+        {aiNote && (
+          <p className="mb-4 text-sm font-medium text-zinc-800 dark:text-zinc-200">{aiNote}</p>
+        )}
+        <div className="flex flex-wrap gap-2">
+          <button
+            type="button"
+            disabled={aiBusy}
+            onClick={() => generateAiPosts({ count: 1, published: false })}
+            className="rounded-xl bg-indigo-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-indigo-500 disabled:opacity-50"
+          >
+            {aiBusy ? "Generating…" : "Generate 1 AI draft"}
+          </button>
+          <button
+            type="button"
+            disabled={aiBusy}
+            onClick={() => generateAiPosts({ count: 3, published: false })}
+            className="rounded-xl border border-zinc-200 bg-white px-4 py-2 text-sm font-semibold text-zinc-700 transition-colors hover:border-indigo-200 hover:text-indigo-600 disabled:opacity-50 dark:border-zinc-700 dark:bg-transparent dark:text-zinc-300"
+          >
+            Generate 3 AI drafts
+          </button>
+          <button
+            type="button"
+            disabled={aiBusy}
+            onClick={() => {
+              if (!confirm("Publish immediately to /blog for all readers?")) return;
+              void generateAiPosts({ count: 1, published: true });
+            }}
+            className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-2 text-sm font-semibold text-amber-800 transition-colors hover:bg-amber-100 disabled:opacity-50 dark:border-amber-900/40 dark:bg-amber-950/30 dark:text-amber-200"
+          >
+            Generate 1 &amp; publish
+          </button>
+        </div>
+      </SectionCard>
+
       {/* ── Post list ──────────────────────────────────────────────────── */}
-      <SectionCard title={`DB posts (${posts.length})`} description="MDX files in content/blog/ are not listed here.">
+      <SectionCard title={`DB posts (${posts.length})`} description="Only database-backed posts; MDX files in src/content/blog/ are not listed here.">
         {loading ? (
           <p className="text-sm text-zinc-400">Loading…</p>
         ) : posts.length === 0 ? (
