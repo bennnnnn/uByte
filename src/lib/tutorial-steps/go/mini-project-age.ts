@@ -1,61 +1,60 @@
 import type { TutorialStep } from "../types";
 
 /**
- * Final Capstone: Mini Library CLI App
- *
- * After 20 lessons, put it all together into a real CLI app.
- * Both steps use `carryForward` so you build incrementally.
+ * Fallback when content/go/mini-project-age.steps.json is absent.
+ * Keep in sync with that file: two-step age mini-project with carryForward.
  */
 export const steps: TutorialStep[] = [
   {
-    title: "Set up the library state",
+    title: "Set an age",
     instruction:
-      "This is it — the final stretch. Create two variables: `borrowed := 3` (books currently borrowed out) and `daysOverdue := 2`. Print them both, each on its own line. This is where your real CLI app starts.",
-    successMessage:
-      "The library state is set up. Click **Next step** — I'll keep your code right here so we can build on it.",
+      "Create a variable `age` with `:=` and pick any whole number (for example `28`). Print **one** line that includes that number and the word `years` so it reads like a real sentence.",
+    hint: 'age := 28 — then fmt.Println("I am", age, "years old") or similar.',
     starter: `package main
 
 import "fmt"
 
 func main() {
-\t// I need to know the library's current state.
-\t// Tell me: how many books are borrowed? How many days overdue?
-\t// Create both variables, then print them each on their own line.
-\t// TODO: borrowed := 3 and daysOverdue := 2
-\t// TODO: print both, each on its own line
+\t// age will hold how many years old someone is (you choose the number).
+\t// TODO: use := to create age with a number you like
+\t// TODO: fmt.Println a single sentence that includes age and "years"
 }`,
-    expectedOutput: ["3", "2"],
-    hint: "borrowed := 3 — daysOverdue := 2 — fmt.Println(borrowed) — fmt.Println(daysOverdue)",
+    expectedOutput: [],
+    successMessage:
+      "You stored a number in \`age\` and showed it in a sentence — same idea as every profile or score in an app.",
+    carryForward: true,
     codeChecks: [
-      { pattern: "\\b3\\b", message: "Set `borrowed` to the value 3." },
-      { pattern: "\\b2\\b", message: "Set `daysOverdue` to the value 2." },
+      { pattern: "age\\s*:=\\s*\\d+", message: "Create age with := and a number, e.g. age := 28" },
+      { pattern: "Println\\(", message: "Print a line with fmt.Println" },
+      { pattern: "years", flags: "i", message: 'Include the word "years" in your output string(s).' },
+      { pattern: "TODO", required: false, message: "Replace the TODO lines with real code." },
     ],
   },
   {
-    title: "Check and display status",
-    carryForward: true,
+    title: "Jump ten years ahead",
     instruction:
-      "Now add an `if` statement: if `daysOverdue > 0`, print a warning like `\"Overdue by 2 days!\"`. The output should show the original numbers plus the warning.",
-    successMessage:
-      "That's it! You built a real CLI app from scratch. Declaring variables, checking conditions, printing output — you're writing real Go programs now.",
+      "Keep your `age` value as-is. Add a **new** variable `futureAge` with `:=` set to `age + 10`. Print `age` on one line and `futureAge` on the next (or two clear lines so both numbers appear).",
+    hint: "futureAge := age + 10 — then two Println calls.",
     starter: `package main
 
 import "fmt"
 
 func main() {
-\tborrowed := 3
-\tdaysOverdue := 2
-\tfmt.Println(borrowed)
-\tfmt.Println(daysOverdue)
-\t// TODO: if daysOverdue > 0, print a warning like "Overdue by 2 days!"
+\tage := 28 // your age from the last step (change the number if you like)
+\tfmt.Println("Current age:", age)
+
+\t// futureAge will be age plus 10 — a second variable so both values stay visible.
+\t// TODO: futureAge := age + 10
+\t// TODO: print futureAge on its own line
 }`,
-    expectedOutput: ["3", "2", "overdue"],
-    hint: 'Add: if daysOverdue > 0 { fmt.Println("Overdue by", daysOverdue, "days!") }',
+    expectedOutput: [],
+    successMessage:
+      "Same program, more story: you reused `age` and expressed a new value without throwing away the old one. That is how small programs grow.",
     codeChecks: [
-      {
-        pattern: "if\\s+",
-        message: "Use an if statement to check if daysOverdue > 0.",
-      },
+      { pattern: "futureAge\\s*:=\\s*age\\s*\\+\\s*10", message: "Add futureAge := age + 10" },
+      { pattern: "Println\\(.*\\bage\\s*\\)", message: "Print the current age" },
+      { pattern: "Println\\(.*futureAge", message: "Print futureAge on another line" },
+      { pattern: "TODO", required: false, message: "Replace the TODO lines with real code." },
     ],
   },
 ];
