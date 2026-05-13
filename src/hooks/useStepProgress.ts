@@ -135,7 +135,7 @@ export function useStepProgress(
   setCode: (c: string) => void,
   userId?: number
 ): StepProgressState {
-  const { toggleProgress, incrementStepCount, profile } = useAuth();
+  const { toggleProgress, incrementStepCount, profile, refreshProfile } = useAuth();
   const isPro = hasPaidAccess(profile?.plan);
   const { toast } = useToast();
 
@@ -265,11 +265,11 @@ export function useStepProgress(
     if (completedSteps.size === steps.length && steps.length > 0 && !markedRef.current) {
       markedRef.current = true;
       setTutorialDone(true);
-      toggleProgress(tutorialSlug, lang);
+      toggleProgress(tutorialSlug, lang).then(() => refreshProfile());
       // Fire analytics only when the tutorial is genuinely finished, not on DB restore.
       trackConversion("completed_tutorial", { lang, slug: tutorialSlug });
     }
-  }, [completedSteps, steps.length, tutorialSlug, toggleProgress, lang]);
+  }, [completedSteps, steps.length, tutorialSlug, toggleProgress, lang, refreshProfile]);
 
   // ── Confetti when tutorial is complete ──
   useEffect(() => {
@@ -491,7 +491,7 @@ export function useStepProgress(
         setStatus("passed");
         setFailureKind(null);
         celebrate(stepIndex === 0); // First step gets a bigger burst
-        toast("+10 XP", "success");
+        toast("Step passed!", "success");
         setFailCount(0);
         setAiFeedback(null);          // Step done — clear hint so the next step starts fresh.
         setAiFeedbackUpgrade(false);

@@ -234,7 +234,7 @@ function MobileCodePreview() {
       {/* Success badge */}
       <div className="absolute -right-2 -top-3 z-10 flex items-center gap-1.5 rounded-xl border border-emerald-200 bg-white px-3 py-1.5 text-xs font-semibold text-emerald-700 shadow-md dark:border-emerald-800/60 dark:bg-zinc-900 dark:text-emerald-400">
         <span className="flex h-4 w-4 items-center justify-center rounded-full bg-emerald-100 text-[9px] dark:bg-emerald-900/50">✓</span>
-        Step passed! +10 XP
+        Step passed! ✓
       </div>
       {/* Streak badge */}
       <div className="absolute -bottom-3 -left-2 z-10 flex items-center gap-1.5 rounded-xl border border-amber-200 bg-white px-3 py-1.5 text-xs font-semibold text-amber-700 shadow-md dark:border-amber-800/60 dark:bg-zinc-900 dark:text-amber-400">
@@ -376,10 +376,6 @@ function GuestHero({
                 Browse all tutorials
               </Link>
             </div>
-
-            <p className="mt-4 text-xs text-zinc-400">
-              No credit card required · Free lessons in every language · Save progress later when you want it
-            </p>
 
             {/* Stats */}
             <div className="mt-10 grid grid-cols-4 gap-x-3 gap-y-4 border-t border-zinc-100 pt-8 dark:border-zinc-800">
