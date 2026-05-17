@@ -25,30 +25,8 @@ export interface DbBlogPost {
 
 export type DbBlogPostInput = Omit<DbBlogPost, "id" | "created_at" | "updated_at">;
 
-let _ready = false;
 async function ensureTable(): Promise<void> {
-  if (_ready) return;
-  const sql = getSql();
-  await sql`
-    CREATE TABLE IF NOT EXISTS blog_posts (
-      id          SERIAL PRIMARY KEY,
-      slug        TEXT    UNIQUE NOT NULL,
-      title       TEXT    NOT NULL,
-      description TEXT    NOT NULL DEFAULT '',
-      content     TEXT    NOT NULL DEFAULT '',
-      category    TEXT    NOT NULL DEFAULT '',
-      tags        TEXT    NOT NULL DEFAULT '[]',
-      read_time   TEXT    NOT NULL DEFAULT '5 min read',
-      author      TEXT    NOT NULL DEFAULT 'uByte Team',
-      published   BOOLEAN NOT NULL DEFAULT true,
-      og_image    TEXT    NOT NULL DEFAULT '',
-      created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-      updated_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
-    )
-  `;
-  // Add og_image column to existing tables (safe migration)
-  await sql`ALTER TABLE blog_posts ADD COLUMN IF NOT EXISTS og_image TEXT NOT NULL DEFAULT ''`.catch(() => {});
-  _ready = true;
+  /* schema via npm run migrate */
 }
 
 function parse(row: Record<string, unknown>): DbBlogPost {

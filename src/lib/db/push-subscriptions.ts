@@ -6,21 +6,8 @@
  */
 import { getSql } from "./client";
 
-let _ready = false;
 async function ensureTable(): Promise<void> {
-  if (_ready) return;
-  const sql = getSql();
-  await sql`
-    CREATE TABLE IF NOT EXISTS push_subscriptions (
-      id         SERIAL PRIMARY KEY,
-      user_id    INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-      endpoint   TEXT    NOT NULL,
-      keys_json  TEXT    NOT NULL,
-      created_at TEXT    DEFAULT (NOW()::text),
-      UNIQUE (user_id, endpoint)
-    )
-  `;
-  _ready = true;
+  /* schema via npm run migrate */
 }
 
 export async function savePushSubscription(

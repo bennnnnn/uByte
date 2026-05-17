@@ -16,6 +16,7 @@
     "lint": "eslint",
     "test": "vitest run",
     "migrate": "node scripts/run-migrate.mjs",
+    "export-steps": "tsx scripts/export-ts-steps-to-json.mjs",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
     "test:e2e:report": "playwright show-report"

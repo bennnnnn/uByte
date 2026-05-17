@@ -3,22 +3,7 @@ import { getSql } from "./client";
 const TABLE_MISSING = "42P01";
 
 async function ensureAiFeedbackTable(): Promise<void> {
-  const sql = getSql();
-  await sql`
-    CREATE TABLE IF NOT EXISTS ai_feedback_responses (
-      id                SERIAL PRIMARY KEY,
-      problem_id        TEXT NOT NULL,
-      language          TEXT NOT NULL,
-      code_hash         TEXT NOT NULL,
-      verdict           TEXT NOT NULL,
-      failure_signature TEXT NOT NULL,
-      hint_level        INTEGER NOT NULL,
-      model_name        TEXT NOT NULL,
-      response_json     JSONB NOT NULL,
-      created_at        TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-      UNIQUE (problem_id, language, code_hash, verdict, failure_signature, hint_level, model_name)
-    )
-  `;
+  /* schema via npm run migrate */
 }
 
 export interface AiFeedbackCacheKey {

@@ -1,21 +1,7 @@
 import { getSql } from "./client";
 
-let _notesReady = false;
 async function ensureNotesTable(): Promise<void> {
-  if (_notesReady) return;
-  const sql = getSql();
-  await sql`
-    CREATE TABLE IF NOT EXISTS step_notes (
-      id            SERIAL PRIMARY KEY,
-      user_id       INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-      tutorial_slug TEXT NOT NULL,
-      step_index    INTEGER NOT NULL,
-      note          TEXT NOT NULL DEFAULT '',
-      updated_at    TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-      UNIQUE(user_id, tutorial_slug, step_index)
-    )
-  `;
-  _notesReady = true;
+  /* schema via npm run migrate */
 }
 
 export async function getStepNote(

@@ -4,20 +4,7 @@ import type { ActivityLog } from "./types";
 const TABLE_MISSING = "42P01"; // PostgreSQL: relation does not exist
 
 async function ensureActivityTable(): Promise<void> {
-  const sql = getSql();
-  await sql`
-    CREATE TABLE IF NOT EXISTS activity_log (
-      id         SERIAL PRIMARY KEY,
-      user_id    INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-      action     TEXT NOT NULL,
-      detail     TEXT NOT NULL DEFAULT '',
-      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-    )
-  `;
-  await sql`
-    CREATE INDEX IF NOT EXISTS idx_activity_log_user
-    ON activity_log(user_id, created_at DESC)
-  `;
+  /* schema via npm run migrate */
 }
 
 export async function logActivity(

@@ -11,34 +11,14 @@
  */
 import { getSql } from "./client";
 
-let _ready = false;
 
 /** Creates referral_codes / referral_conversions if missing (safe to call anytime). */
 export async function ensureReferralTables(): Promise<void> {
-  await ensureTables();
+  /* schema via npm run migrate */
 }
 
 async function ensureTables(): Promise<void> {
-  if (_ready) return;
-  const sql = getSql();
-  await sql`
-    CREATE TABLE IF NOT EXISTS referral_codes (
-      id         SERIAL PRIMARY KEY,
-      user_id    INTEGER NOT NULL UNIQUE REFERENCES users(id) ON DELETE CASCADE,
-      code       TEXT    NOT NULL UNIQUE,
-      created_at TEXT    DEFAULT (NOW()::text)
-    )
-  `;
-  await sql`
-    CREATE TABLE IF NOT EXISTS referral_conversions (
-      id               SERIAL PRIMARY KEY,
-      referrer_id      INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-      referred_user_id INTEGER NOT NULL UNIQUE REFERENCES users(id) ON DELETE CASCADE,
-      signed_up_at     TEXT    DEFAULT (NOW()::text),
-      subscribed_at    TEXT
-    )
-  `;
-  _ready = true;
+  /* schema via npm run migrate */
 }
 
 /** Returns the existing invite code for userId, or creates one. */

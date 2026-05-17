@@ -9,21 +9,9 @@
  */
 import { getSql } from "./client";
 
-let _ready = false;
 
 async function ensureTable(): Promise<void> {
-  if (_ready) return;
-  const sql = getSql();
-  await sql`
-    CREATE TABLE IF NOT EXISTS onboarding_email_log (
-      id         SERIAL PRIMARY KEY,
-      user_id    INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-      email_type TEXT    NOT NULL,
-      sent_at    TEXT    DEFAULT (NOW()::text),
-      UNIQUE(user_id, email_type)
-    )
-  `;
-  _ready = true;
+  /* schema via npm run migrate */
 }
 
 export type DripEmailType = "day1" | "day3" | "day7" | "day14" | "day30" | "trial_ending_2d" | "trial_ending_1d";

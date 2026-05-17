@@ -2,23 +2,8 @@ import { getSql } from "./client";
 
 const DEFAULT_LANG = "go";
 
-let _codeDraftsReady = false;
 async function ensureCodeDraftsTable(): Promise<void> {
-  if (_codeDraftsReady) return;
-  const sql = getSql();
-  await sql`
-    CREATE TABLE IF NOT EXISTS code_drafts (
-      id         SERIAL PRIMARY KEY,
-      user_id    INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-      language   TEXT NOT NULL DEFAULT 'go',
-      slug       TEXT NOT NULL,
-      editor_key TEXT NOT NULL,
-      code       TEXT NOT NULL,
-      updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-      UNIQUE(user_id, language, slug, editor_key)
-    )
-  `;
-  _codeDraftsReady = true;
+  /* schema via npm run migrate */
 }
 
 export async function getCodeDraft(

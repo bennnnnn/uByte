@@ -1,0 +1,47 @@
+[
+  {
+    "title": "Namespaces",
+    "instruction": "A class is in namespace `MyApp.Models`. Use a `using` directive to bring it into scope and print `user.Name` where `Name = \"Alice\"`.",
+    "starter": "using System;\n\nnamespace MyApp.Models {\n    public class User {\n        public string Name { get; set; } = \"\";\n    }\n}\n\n// TODO: add using MyApp.Models;\n// then create User { Name = \"Alice\" } and print user.Name\n\nclass Program {\n    static void Main() {\n        // your code here\n    }\n}",
+    "expectedOutput": [
+      "Alice"
+    ],
+    "hint": "using MyApp.Models; ... var user = new User { Name = \"Alice\" }; Console.WriteLine(user.Name);"
+  },
+  {
+    "title": "static using",
+    "instruction": "Use `using static System.Math` to import `Math` methods statically, then call `Sqrt(16)` without the `Math.` prefix and print the result.",
+    "starter": "using System;\n// TODO: add using static System.Math\n\nclass Program {\n    static void Main() {\n        // TODO: call Sqrt(16) and print result\n    }\n}",
+    "expectedOutput": [
+      "4"
+    ],
+    "hint": "using static System.Math; ... Console.WriteLine(Sqrt(16));"
+  },
+  {
+    "title": "using Alias",
+    "instruction": "Create an alias `using Env = System.Environment`. Use `Env.NewLine` ... actually, use `using Now = System.DateTime` and print `Now.Now.Year > 2000` as `True`.",
+    "starter": "using System;\nusing Now = System.DateTime;\n\nclass Program {\n    static void Main() {\n        // TODO: print whether Now.Now.Year > 2000\n    }\n}",
+    "expectedOutput": [
+      "True"
+    ],
+    "hint": "Console.WriteLine(Now.Now.Year > 2000);"
+  },
+  {
+    "title": "Partial Class",
+    "instruction": "Two `partial class Customer` definitions combine into one. The result should print `\"Hi, Alice\"` when `Greet()` is called.",
+    "starter": "using System;\n\npartial class Customer {\n    public string Name { get; set; } = \"\";\n}\n\npartial class Customer {\n    // TODO: add Greet() that prints \"Hi, {Name}\"\n}\n\nclass Program {\n    static void Main() {\n        var c = new Customer { Name = \"Alice\" };\n        c.Greet();\n    }\n}",
+    "expectedOutput": [
+      "Hi, Alice"
+    ],
+    "hint": "public void Greet() => Console.WriteLine($\"Hi, {Name}\");"
+  },
+  {
+    "title": "Nested Namespaces",
+    "instruction": "Define `namespace Company.HR` with a `Employee` class. In `Main`, create `Employee { Name = \"Bob\" }` and print the name.",
+    "starter": "using System;\n\nnamespace Company.HR {\n    public class Employee {\n        public string Name { get; set; } = \"\";\n    }\n}\n\nclass Program {\n    static void Main() {\n        // TODO: create Employee in Company.HR and print Name\n    }\n}",
+    "expectedOutput": [
+      "Bob"
+    ],
+    "hint": "var e = new Company.HR.Employee { Name = \"Bob\" }; Console.WriteLine(e.Name);"
+  }
+]

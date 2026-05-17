@@ -2,19 +2,8 @@ import { getSql } from "./client";
 
 const CACHE_TTL_DAYS = 30;
 
-let _tableReady = false;
 async function ensureTable(): Promise<void> {
-  if (_tableReady) return;
-  const sql = getSql();
-  await sql`
-    CREATE TABLE IF NOT EXISTS ai_feedback_cache (
-      cache_key   TEXT PRIMARY KEY,
-      feedback    TEXT NOT NULL,
-      created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
-    )
-  `;
-  await sql`CREATE INDEX IF NOT EXISTS idx_ai_feedback_cache_created ON ai_feedback_cache(created_at)`;
-  _tableReady = true;
+  /* schema via npm run migrate */
 }
 
 export async function getCachedFeedback(cacheKey: string): Promise<string | null> {

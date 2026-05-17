@@ -1,14 +1,8 @@
 import { getSql } from "./client";
 import type { Bookmark } from "./types";
 
-let _languageColumnReady = false;
 async function ensureLanguageColumn(): Promise<void> {
-  if (_languageColumnReady) return;
-  const sql = getSql();
-  try {
-    await sql`ALTER TABLE bookmarks ADD COLUMN IF NOT EXISTS language TEXT DEFAULT 'go'`;
-  } catch { /* ignore if table missing or column exists */ }
-  _languageColumnReady = true;
+  /* schema via npm run migrate */
 }
 
 /**

@@ -4,16 +4,8 @@ import { hashToken } from "@/lib/token-security";
 
 const EMAIL_VERIFY_TOKEN_TTL_MS = 24 * 60 * 60 * 1000;
 
-let _onboardingGoalReady = false;
 async function ensureOnboardingGoalColumn(): Promise<void> {
-  if (_onboardingGoalReady) return;
-  const sql = getSql();
-  try {
-    await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS onboarding_goal TEXT`;
-  } catch {
-    // Ignore — column may already exist.
-  }
-  _onboardingGoalReady = true;
+  /* schema via npm run migrate */
 }
 
 export async function setOnboardingGoal(userId: number, goal: string): Promise<void> {
@@ -22,14 +14,8 @@ export async function setOnboardingGoal(userId: number, goal: string): Promise<v
   await sql`UPDATE users SET onboarding_goal = ${goal} WHERE id = ${userId}`;
 }
 
-let _onboardingLangReady = false;
 async function ensureOnboardingLangColumn(): Promise<void> {
-  if (_onboardingLangReady) return;
-  const sql = getSql();
-  try {
-    await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS onboarding_lang TEXT`;
-  } catch { /* ignore */ }
-  _onboardingLangReady = true;
+  /* schema via npm run migrate */
 }
 
 export async function setOnboardingLang(userId: number, lang: string): Promise<void> {
@@ -38,16 +24,8 @@ export async function setOnboardingLang(userId: number, lang: string): Promise<v
   await sql`UPDATE users SET onboarding_lang = ${lang} WHERE id = ${userId}`;
 }
 
-let _emailVerifyExpiryReady = false;
 async function ensureEmailVerificationExpiryColumn(): Promise<void> {
-  if (_emailVerifyExpiryReady) return;
-  const sql = getSql();
-  try {
-    await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS email_verification_expires_at TEXT`;
-  } catch {
-    // Ignore migration races and continue.
-  }
-  _emailVerifyExpiryReady = true;
+  /* schema via npm run migrate */
 }
 
 /** Stored in `password_hash` for Google-only signups until the user sets a local password. */
@@ -256,8 +234,7 @@ export async function updateUserPlan(
 
 /** Ensure the subscription_expires_at column exists. Called lazily from cancellation paths only. */
 async function ensureSubscriptionExpiresAtColumn(): Promise<void> {
-  const sql = getSql();
-  await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS subscription_expires_at TEXT`;
+  /* schema via npm run migrate */
 }
 
 /**

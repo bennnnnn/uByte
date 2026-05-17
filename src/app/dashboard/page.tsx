@@ -566,9 +566,19 @@ function DashboardPage() {
   );
 }
 
+type LeaderboardEntry = {
+  id: number;
+  name: string;
+  avatar: string;
+  xp: number;
+  streak_days: number;
+  completed_count: number;
+  country: string | null;
+};
+
 /* ── Leaderboard tab (fetches data client-side) ──────────────────────── */
 function LeaderboardTab() {
-  const [users, setUsers] = useState<any[] | null>(null);
+  const [users, setUsers] = useState<LeaderboardEntry[] | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {

@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import type { TutorialStep } from "@/lib/tutorial-steps";
 import type { AiFeedbackSchema } from "@/lib/ai/feedback-client";
-import { checkOutput, runCodeChecks, todoNotCompleted } from "@/lib/code-checks";
+import { validateTutorialStep } from "@/lib/step-validation";
 import { useAuth } from "@/components/AuthProvider";
 import { hasPaidAccess } from "@/lib/plans";
 import { parseErrorLines } from "./useCodeEditor";
@@ -397,63 +397,61 @@ export function useStepProgress(
         }).catch(() => {});
         return;
       }
-      if (checkOutput(out, step.expectedOutput)) {
-        // Layer 1: per-step code pattern checks (e.g. must contain a comment, must use a loop)
-        const codeCheckMsg = runCodeChecks(code, step.codeChecks);
-        // Layer 2: universal starter-diff check (catches "just deleted the TODO" attempts)
-        const notDoneMsg = !codeCheckMsg && todoNotCompleted(code, step.starter)
-          ? "Output is correct, but you haven't completed the task yet.\nAdd your solution where the placeholder comment points."
-          : null;
-        const failMsg = codeCheckMsg ?? notDoneMsg;
-        if (failMsg) {
-          setOutputIsError(false);
-          setFailureKind("task");
-          setOutput(failMsg);
-          setStatus("failed");
-          pendingAutoHintRef.current = { code, output: failMsg, isError: false, stepIndex, failureKind: "task" };
-          setFailCount((n) => n + 1);
-          apiFetch("/api/step-check", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ lang, tutorialSlug, stepIndex, passed: false }),
-          }).catch(() => {});
-          return;
-        }
-        setStatus("passed");
-        setFailureKind(null);
-        celebrate(stepIndex === 0); // First step gets a bigger burst
-        toast("Step passed!", "success");
-        setFailCount(0);
-        setAiFeedback(null);          // Step done — clear hint so the next step starts fresh.
-        setAiFeedbackUpgrade(false);
-        setAiFeedbackLoginRequired(false);
-        hintInflightRef.current = false;
-        pendingAutoHintRef.current = null;
-        setCompletedSteps((prev) => new Set([...prev, stepIndex]));
-        // Increment the in-memory step count so the progress bar updates immediately
-        // without waiting for a DB refetch. The DB write happens via /api/progress/steps.
-        if (userId != null) incrementStepCount(lang);
-        apiFetch("/api/step-check", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ lang, tutorialSlug, stepIndex, passed: true }),
-        }).catch(() => {});
-        if (userId != null) {
-          apiFetch("/api/progress/steps", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ slug: tutorialSlug, stepIndex, lang }),
-          }).catch(() => {});
-        }
-      } else {
-        setFailureKind("output");
+      const validation = validateTutorialStep({
+        code,
+        step,
+        runOutput: out,
+        hasCompileError: false,
+      });
+      if (!validation.passed) {
+        const failMsg =
+          validation.failureKind === "task" && validation.message
+            ? validation.message
+            : validation.failureKind === "output"
+              ? null
+              : validation.message;
+        setOutputIsError(false);
+        setFailureKind(validation.failureKind ?? "output");
+        if (failMsg) setOutput(failMsg);
         setStatus("failed");
-        pendingAutoHintRef.current = { code, output: out, isError: false, stepIndex, failureKind: "output" };
+        pendingAutoHintRef.current = {
+          code,
+          output: failMsg ?? out,
+          isError: false,
+          stepIndex,
+          failureKind: validation.failureKind ?? "output",
+        };
         setFailCount((n) => n + 1);
         apiFetch("/api/step-check", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ lang, tutorialSlug, stepIndex, passed: false }),
+        }).catch(() => {});
+        return;
+      }
+
+      setStatus("passed");
+      setFailureKind(null);
+      celebrate(stepIndex === 0);
+      toast("Step passed!", "success");
+      setFailCount(0);
+      setAiFeedback(null);
+      setAiFeedbackUpgrade(false);
+      setAiFeedbackLoginRequired(false);
+      hintInflightRef.current = false;
+      pendingAutoHintRef.current = null;
+      setCompletedSteps((prev) => new Set([...prev, stepIndex]));
+      if (userId != null) incrementStepCount(lang);
+      apiFetch("/api/step-check", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ lang, tutorialSlug, stepIndex, passed: true }),
+      }).catch(() => {});
+      if (userId != null) {
+        apiFetch("/api/progress/steps", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ slug: tutorialSlug, stepIndex, lang }),
         }).catch(() => {});
       }
     } catch {

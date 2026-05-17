@@ -1,4 +1,5 @@
 import type { LanguageConfig, SupportedLanguage } from "./types";
+import { TUTORIAL_LANG_IDS } from "./tutorial-lang-ids";
 import { highlightGo } from "@/lib/highlight-go";
 import { highlightPython } from "@/lib/highlight-python";
 import { highlightJavaScript } from "@/lib/highlight-javascript";
@@ -317,7 +318,7 @@ export function resolveLanguage(lang: unknown): SupportedLanguage {
 }
 
 /** Ordered list of all supported language keys. Use this instead of hardcoding arrays. */
-export const ALL_LANGUAGE_KEYS: SupportedLanguage[] = Object.keys(LANGUAGES) as SupportedLanguage[];
+export const ALL_LANGUAGE_KEYS: SupportedLanguage[] = [...TUTORIAL_LANG_IDS];
 
 export function getAllLanguageSlugs(): string[] {
   return Object.values(LANGUAGES).map((l) => l.slug);

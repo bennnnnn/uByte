@@ -3,21 +3,7 @@ import { getSql } from "./client";
 const TABLE_MISSING = "42P01";
 
 async function ensureAiUsageTables(): Promise<void> {
-  const sql = getSql();
-  await sql`
-    CREATE TABLE IF NOT EXISTS ai_usage_daily (
-      user_id    INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-      day        DATE NOT NULL DEFAULT CURRENT_DATE,
-      count      INTEGER NOT NULL DEFAULT 0,
-      PRIMARY KEY (user_id, day)
-    )
-  `;
-  await sql`
-    CREATE TABLE IF NOT EXISTS ai_cooldown (
-      user_id        INTEGER PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
-      last_called_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-    )
-  `;
+  /* schema via npm run migrate */
 }
 
 const MAX_AI_CALLS_PER_DAY = 200;

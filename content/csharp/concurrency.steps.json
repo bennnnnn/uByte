@@ -1,0 +1,49 @@
+[
+  {
+    "title": "async / await Basics",
+    "instruction": "Write an `async Task<string>` method `GetMessageAsync()` that awaits `Task.Delay(0)` and returns `\"Hello async!\"`. Await it in `Main` and print the result.",
+    "starter": "using System;\nusing System.Threading.Tasks;\n\nclass Program {\n    static async Task<string> GetMessageAsync() {\n        // TODO: await Task.Delay(0), return \"Hello async!\"\n        throw new NotImplementedException();\n    }\n\n    static async Task Main() {\n        string msg = await GetMessageAsync();\n        Console.WriteLine(msg);\n    }\n}",
+    "expectedOutput": [
+      "Hello async!"
+    ],
+    "hint": "await Task.Delay(0); return \"Hello async!\";"
+  },
+  {
+    "title": "Task.Run",
+    "instruction": "Use `Task.Run` to compute `6 * 7` on a background thread, await the result, and print it.",
+    "starter": "using System;\nusing System.Threading.Tasks;\n\nclass Program {\n    static async Task Main() {\n        // TODO: Task.Run to compute 6*7, await, print\n    }\n}",
+    "expectedOutput": [
+      "42"
+    ],
+    "hint": "int result = await Task.Run(() => 6 * 7); Console.WriteLine(result);"
+  },
+  {
+    "title": "Task.WhenAll",
+    "instruction": "Create two tasks that each return a string (`\"A\"` and `\"B\"`). Use `Task.WhenAll` to run them in parallel and print the count of results (should be `2`).",
+    "starter": "using System;\nusing System.Threading.Tasks;\n\nclass Program {\n    static async Task Main() {\n        var t1 = Task.Run(() => \"A\");\n        var t2 = Task.Run(() => \"B\");\n        // TODO: await Task.WhenAll, print results.Length\n    }\n}",
+    "expectedOutput": [
+      "2"
+    ],
+    "hint": "var results = await Task.WhenAll(t1, t2); Console.WriteLine(results.Length);"
+  },
+  {
+    "title": "Task.Delay (Non-blocking Sleep)",
+    "instruction": "Print `\"Start\"`, await `Task.Delay(0)` (instant in tests), then print `\"End\"`. Both lines should appear.",
+    "starter": "using System;\nusing System.Threading.Tasks;\n\nclass Program {\n    static async Task Main() {\n        Console.WriteLine(\"Start\");\n        // TODO: await Task.Delay(0)\n        Console.WriteLine(\"End\");\n    }\n}",
+    "expectedOutput": [
+      "Start",
+      "End"
+    ],
+    "hint": "await Task.Delay(0);"
+  },
+  {
+    "title": "Returning Multiple Tasks",
+    "instruction": "Create a method `async Task<int> SquareAsync(int n)` that awaits `Task.Delay(0)` and returns `n * n`. Await calls for `3` and `4` and print their results on separate lines.",
+    "starter": "using System;\nusing System.Threading.Tasks;\n\nclass Program {\n    static async Task<int> SquareAsync(int n) {\n        // TODO: await Task.Delay(0), return n*n\n        throw new NotImplementedException();\n    }\n\n    static async Task Main() {\n        // TODO: print SquareAsync(3) and SquareAsync(4)\n    }\n}",
+    "expectedOutput": [
+      "9",
+      "16"
+    ],
+    "hint": "await Task.Delay(0); return n*n; ... Console.WriteLine(await SquareAsync(3)); Console.WriteLine(await SquareAsync(4));"
+  }
+]

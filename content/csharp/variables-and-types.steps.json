@@ -1,0 +1,50 @@
+[
+  {
+    "title": "Value Types",
+    "instruction": "Declare an `int` named `age` with value `25`, a `double` named `price` with value `9.99`, and a `bool` named `isActive` with value `true`. Print them on separate lines.",
+    "starter": "using System;\n\nclass Program {\n    static void Main() {\n        // TODO: declare age (int=25), price (double=9.99), isActive (bool=true)\n        // Then print each on its own line\n    }\n}",
+    "expectedOutput": [
+      "25",
+      "9.99",
+      "True"
+    ],
+    "hint": "int age = 25; double price = 9.99; bool isActive = true; then Console.WriteLine each."
+  },
+  {
+    "title": "var Inference",
+    "instruction": "C# can infer types with `var`. Declare `var greeting = \"Hello\"` and `var count = 42`. Print them on separate lines.",
+    "starter": "using System;\n\nclass Program {\n    static void Main() {\n        // TODO: use var for greeting (\"Hello\") and count (42)\n        // then print each\n    }\n}",
+    "expectedOutput": [
+      "Hello",
+      "42"
+    ],
+    "hint": "var greeting = \"Hello\"; var count = 42; Console.WriteLine(greeting); Console.WriteLine(count);"
+  },
+  {
+    "title": "Constants",
+    "instruction": "Declare a `const double Pi = 3.14159` and print `\"Pi is 3.14159\"`.",
+    "starter": "using System;\n\nclass Program {\n    static void Main() {\n        // TODO: declare const Pi and print \"Pi is 3.14159\"\n    }\n}",
+    "expectedOutput": [
+      "Pi is 3.14159"
+    ],
+    "hint": "const double Pi = 3.14159; Console.WriteLine($\"Pi is {Pi}\");"
+  },
+  {
+    "title": "Explicit Type Conversion",
+    "instruction": "Declare `double pi = 3.99` and cast it to `int` using `(int)pi`. Print the result (it should be `3` — truncated, not rounded).",
+    "starter": "using System;\n\nclass Program {\n    static void Main() {\n        double pi = 3.99;\n        // TODO: cast pi to int and print it\n    }\n}",
+    "expectedOutput": [
+      "3"
+    ],
+    "hint": "int truncated = (int)pi; Console.WriteLine(truncated);"
+  },
+  {
+    "title": "Nullable Types",
+    "instruction": "Declare `int? score = null`. Use the null-coalescing operator `??` to print `0` when `score` is null.",
+    "starter": "using System;\n\nclass Program {\n    static void Main() {\n        int? score = null;\n        // TODO: print score ?? 0\n    }\n}",
+    "expectedOutput": [
+      "0"
+    ],
+    "hint": "Console.WriteLine(score ?? 0);"
+  }
+]

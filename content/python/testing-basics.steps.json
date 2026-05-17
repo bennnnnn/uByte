@@ -1,0 +1,38 @@
+[
+  {
+    "title": "assert Statement",
+    "instruction": "The simplest Python test is an `assert`. Assert that `2 + 2 == 4` and then assert that `add(3, 5)` returns `8`. If both pass, print `\"All checks passed\"`.",
+    "starter": "def add(a, b):\n    return a + b\n\n# TODO: assert 2 + 2 == 4\n# TODO: assert add(3, 5) == 8\nprint(\"All checks passed\")",
+    "expectedOutput": [
+      "All checks passed"
+    ],
+    "hint": "assert 2 + 2 == 4\nassert add(3, 5) == 8"
+  },
+  {
+    "title": "unittest TestCase",
+    "instruction": "Python's built-in `unittest` uses classes. Define a `TestAdd` class that inherits from `unittest.TestCase` with a method `test_add` that asserts `add(3, 5) == 8`. Run it with `unittest.main()`.",
+    "starter": "import unittest\n\ndef add(a, b):\n    return a + b\n\nclass TestAdd(unittest.TestCase):\n    # TODO: def test_add(self): assert add(3, 5) == 8\n    pass\n\nunittest.main(argv=[\"\"], exit=False, verbosity=0)\nprint(\"Tests passed\")",
+    "expectedOutput": [
+      "Tests passed"
+    ],
+    "hint": "def test_add(self):\n    self.assertEqual(add(3, 5), 8)"
+  },
+  {
+    "title": "assertEqual and assertRaises",
+    "instruction": "`assertRaises` verifies that code raises a specific exception. Add a second test method `test_divide_by_zero` that asserts `divide(10, 0)` raises `ValueError`. (Assume `divide` raises it.)",
+    "starter": "import unittest\n\ndef divide(a, b):\n    if b == 0:\n        raise ValueError(\"Cannot divide by zero\")\n    return a / b\n\nclass TestDivide(unittest.TestCase):\n    def test_divide(self):\n        self.assertEqual(divide(10, 2), 5.0)\n\n    # TODO: def test_divide_by_zero(self): assertRaises ValueError\n\nunittest.main(argv=[\"\"], exit=False, verbosity=0)\nprint(\"Tests passed\")",
+    "expectedOutput": [
+      "Tests passed"
+    ],
+    "hint": "def test_divide_by_zero(self):\n    with self.assertRaises(ValueError):\n        divide(10, 0)"
+  },
+  {
+    "title": "Test Setup with setUp",
+    "instruction": "`setUp` runs before each test. Define a `TestCounter` class with `setUp` that creates `self.count = Counter(0)` and a `test_increment` that asserts the count after one increment is 1.",
+    "starter": "import unittest\n\nclass Counter:\n    def __init__(self, n):\n        self.n = n\n    def increment(self):\n        self.n += 1\n\nclass TestCounter(unittest.TestCase):\n    def setUp(self):\n        # TODO: self.count = Counter(0)\n        pass\n\n    def test_increment(self):\n        self.count.increment()\n        self.assertEqual(self.count.n, 1)\n\nunittest.main(argv=[\"\"], exit=False, verbosity=0)\nprint(\"Tests passed\")",
+    "expectedOutput": [
+      "Tests passed"
+    ],
+    "hint": "self.count = Counter(0)"
+  }
+]

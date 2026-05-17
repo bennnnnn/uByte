@@ -12,24 +12,9 @@ export interface UserStruggleHint {
   pass_count: number;
 }
 
-let _ready = false;
 
 async function ensureTable(): Promise<void> {
-  if (_ready) return;
-  const sql = getSql();
-  await sql`
-    CREATE TABLE IF NOT EXISTS user_step_attempts (
-      id              SERIAL PRIMARY KEY,
-      user_id         INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-      language        TEXT NOT NULL,
-      tutorial_slug   TEXT NOT NULL,
-      step_index      INTEGER NOT NULL,
-      passed          BOOLEAN NOT NULL,
-      created_at      TIMESTAMPTZ NOT NULL DEFAULT NOW()
-    )
-  `;
-  await sql`CREATE INDEX IF NOT EXISTS idx_user_step_attempts_user_time ON user_step_attempts(user_id, created_at DESC)`;
-  _ready = true;
+  /* schema via npm run migrate */
 }
 
 export async function recordUserStepAttempt(

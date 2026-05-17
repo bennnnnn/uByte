@@ -1,0 +1,48 @@
+[
+  {
+    "title": "try / catch",
+    "instruction": "Wrap `int result = 10 / 0` in a try/catch that catches `DivideByZeroException` and prints `\"Division by zero\"`.",
+    "starter": "using System;\n\nclass Program {\n    static void Main() {\n        // TODO: try { 10/0 } catch (DivideByZeroException) { print \"Division by zero\" }\n    }\n}",
+    "expectedOutput": [
+      "Division by zero"
+    ],
+    "hint": "try { int r = 10 / 0; } catch (DivideByZeroException) { Console.WriteLine(\"Division by zero\"); }"
+  },
+  {
+    "title": "finally Block",
+    "instruction": "Write a try/catch/finally. In `try`, print `\"Trying\"`. In `catch`, print `\"Error\"`. In `finally`, print `\"Done\"`. Trigger no exception — both `\"Trying\"` and `\"Done\"` should print.",
+    "starter": "using System;\n\nclass Program {\n    static void Main() {\n        // TODO: try { print \"Trying\" } catch { print \"Error\" } finally { print \"Done\" }\n    }\n}",
+    "expectedOutput": [
+      "Trying",
+      "Done"
+    ],
+    "hint": "try { Console.WriteLine(\"Trying\"); } catch { Console.WriteLine(\"Error\"); } finally { Console.WriteLine(\"Done\"); }"
+  },
+  {
+    "title": "Custom Exception",
+    "instruction": "Define `class AgeException : Exception` with a message. Throw it when age < 0. Catch it and print `\"Invalid age\"`.",
+    "starter": "using System;\n\nclass AgeException : Exception {\n    public AgeException(string msg) : base(msg) {}\n}\n\nclass Program {\n    static void Validate(int age) {\n        // TODO: throw AgeException if age < 0\n    }\n\n    static void Main() {\n        try {\n            Validate(-1);\n        } catch (AgeException) {\n            Console.WriteLine(\"Invalid age\");\n        }\n    }\n}",
+    "expectedOutput": [
+      "Invalid age"
+    ],
+    "hint": "if (age < 0) throw new AgeException(\"Age cannot be negative\");"
+  },
+  {
+    "title": "TryParse Pattern",
+    "instruction": "Use `int.TryParse(\"abc\", out int n)` to safely attempt parsing. Print `\"Not a number\"` if it fails.",
+    "starter": "using System;\n\nclass Program {\n    static void Main() {\n        string input = \"abc\";\n        // TODO: TryParse and print \"Not a number\" if it fails\n    }\n}",
+    "expectedOutput": [
+      "Not a number"
+    ],
+    "hint": "if (!int.TryParse(input, out _)) Console.WriteLine(\"Not a number\");"
+  },
+  {
+    "title": "Exception Filters",
+    "instruction": "Throw a generic `Exception` with message `\"timeout\"`. Use `catch (Exception ex) when (ex.Message == \"timeout\")` to print `\"Request timed out\"`.",
+    "starter": "using System;\n\nclass Program {\n    static void Main() {\n        try {\n            throw new Exception(\"timeout\");\n        } catch (Exception ex) when (/* TODO: filter condition */) {\n            Console.WriteLine(\"Request timed out\");\n        }\n    }\n}",
+    "expectedOutput": [
+      "Request timed out"
+    ],
+    "hint": "when (ex.Message == \"timeout\")"
+  }
+]

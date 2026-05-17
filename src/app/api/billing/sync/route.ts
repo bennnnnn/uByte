@@ -8,8 +8,9 @@
  *
  * Returns { plan, expiresAt } so the client can update its UI optimistically.
  */
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { withErrorHandling, requireAuth } from "@/lib/api-utils";
+import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 import { getUserById, cancelUserPlanGracefully, updateUserPlan } from "@/lib/db";
 
 const PADDLE_API_KEY = process.env.PADDLE_API_KEY ?? "";
@@ -25,9 +26,22 @@ type PaddleSub = {
   items?: { price?: { id?: string } }[];
 };
 
-export const GET = withErrorHandling("GET /api/billing/sync", async () => {
+export const GET = withErrorHandling("GET /api/billing/sync", async (request: NextRequest) => {
   const { user, response } = await requireAuth();
   if (!user) return response;
+
+  const ip = getClientIp(request.headers);
+  const { limited, retryAfter } = await checkRateLimit(
+    `billing-sync:${ip}:${user.userId}`,
+    10,
+    60_000,
+  );
+  if (limited) {
+    return NextResponse.json(
+      { error: "Too many requests" },
+      { status: 429, headers: { "Retry-After": String(retryAfter) } },
+    );
+  }
 
   if (!PADDLE_API_KEY) {
     return NextResponse.json({ synced: false, reason: "not_configured" });

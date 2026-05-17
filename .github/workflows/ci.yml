@@ -35,10 +35,54 @@ jobs:
       - name: Build
         run: npm run build
         env:
-          # Provide stub values so Next.js env-validation doesn't abort the build.
-          # The build itself doesn't need live credentials — this just proves the
-          # code compiles and all imports resolve correctly.
           DATABASE_URL: postgresql://ci:ci@localhost:5432/ci
           JWT_SECRET: ci-secret-at-least-32-characters-long
           NEXT_PUBLIC_GOOGLE_CLIENT_ID: 000000000000-ci.apps.googleusercontent.com
           NEXT_PUBLIC_BASE_URL: https://www.ubyte.dev
+          PADDLE_WEBHOOK_SECRET: ci-paddle-webhook-secret-min-32-chars
+          PADDLE_API_KEY: ci-paddle-api-key
+          NEXT_PUBLIC_PADDLE_CLIENT_TOKEN: test_ci_token
+          NEXT_PUBLIC_PADDLE_PRO_PRICE_ID: pri_ci_monthly
+          NEXT_PUBLIC_PADDLE_YEARLY_PRICE_ID: pri_ci_yearly
+          GOOGLE_CLIENT_ID: 000000000000-ci.apps.googleusercontent.com
+          GOOGLE_CLIENT_SECRET: ci-google-secret
+
+  e2e:
+    name: Playwright E2E
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright browsers
+        run: npx playwright install chromium --with-deps
+
+      - name: Build
+        run: npm run build
+        env:
+          DATABASE_URL: postgresql://ci:ci@localhost:5432/ci
+          JWT_SECRET: ci-secret-at-least-32-characters-long
+          NEXT_PUBLIC_GOOGLE_CLIENT_ID: 000000000000-ci.apps.googleusercontent.com
+          NEXT_PUBLIC_BASE_URL: http://127.0.0.1:3000
+          PADDLE_WEBHOOK_SECRET: ci-paddle-webhook-secret-min-32-chars
+          PADDLE_API_KEY: ci-paddle-api-key
+          NEXT_PUBLIC_PADDLE_CLIENT_TOKEN: test_ci_token
+          NEXT_PUBLIC_PADDLE_PRO_PRICE_ID: pri_ci_monthly
+          NEXT_PUBLIC_PADDLE_YEARLY_PRICE_ID: pri_ci_yearly
+          GOOGLE_CLIENT_ID: 000000000000-ci.apps.googleusercontent.com
+          GOOGLE_CLIENT_SECRET: ci-google-secret
+
+      - name: Run E2E tests
+        run: npm run test:e2e -- --project=chromium
+        env:
+          CI: true

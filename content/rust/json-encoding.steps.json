@@ -1,0 +1,11 @@
+[
+  {
+    "title": "Build JSON String",
+    "instruction": "Build a JSON string for an object with \"name\": \"Alice\" and \"age\": 30. Use format! and print it (e.g. {\"name\":\"Alice\",\"age\":30}).",
+    "starter": "fn main() {\n    let name = \"Alice\";\n    let age = 30;\n    let json = format!(r#\"{{\"name\":\"{}\",\"age\":{}}}\"#, name, age);\n    println!(\"{}\", json);\n}",
+    "expectedOutput": [
+      "{\"name\":\"Alice\",\"age\":30}"
+    ],
+    "hint": "Code is complete — run it."
+  }
+]

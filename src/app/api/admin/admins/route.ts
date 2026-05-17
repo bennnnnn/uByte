@@ -14,6 +14,7 @@ import {
   logAdminAction,
 } from "@/lib/db";
 import { verifyCsrf } from "@/lib/csrf";
+import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 import { withErrorHandling, requireSuperAdmin } from "@/lib/api-utils";
 import { ALL_PERMISSIONS } from "@/app/admin/permission-constants";
 import type { AdminRole } from "@/lib/db/admin";
@@ -32,6 +33,19 @@ export const POST = withErrorHandling("POST /api/admin/admins", async (req: Next
 
   const { admin, response } = await requireSuperAdmin();
   if (!admin) return response;
+
+  const ip = getClientIp(req.headers);
+  const { limited, retryAfter } = await checkRateLimit(
+    `admin-admins-post:${ip}:${admin.id}`,
+    20,
+    60_000,
+  );
+  if (limited) {
+    return NextResponse.json(
+      { error: "Too many requests" },
+      { status: 429, headers: { "Retry-After": String(retryAfter) } },
+    );
+  }
 
   const body = (await req.json()) as {
     action: "promote" | "demote" | "set_role" | "set_permissions";

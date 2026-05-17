@@ -1,0 +1,21 @@
+[
+  {
+    "title": "insert and get",
+    "instruction": "Create a HashMap with &str keys and i32 values. Insert \"Alice\" -> 30 and \"Bob\" -> 25. Print the value for \"Alice\" (use .get().unwrap() or .get().copied().unwrap_or(0)).",
+    "starter": "use std::collections::HashMap;\n\nfn main() {\n    let mut map: HashMap<&str, i32> = HashMap::new();\n    map.insert(\"Alice\", 30);\n    map.insert(\"Bob\", 25);\n    // TODO: print map.get(\"Alice\")\n}",
+    "expectedOutput": [
+      "30"
+    ],
+    "hint": "println!(\"{}\", map.get(\"Alice\").unwrap());"
+  },
+  {
+    "title": "contains_key and entry",
+    "instruction": "Given a map with \"go\" -> 2009 and \"python\" -> 1991, check if \"go\" exists and print \"found\" or \"not found\". Then use .entry(\"java\").or_insert(0) and print the value for \"java\".",
+    "starter": "use std::collections::HashMap;\n\nfn main() {\n    let mut langs: HashMap<&str, i32> = HashMap::new();\n    langs.insert(\"go\", 2009);\n    langs.insert(\"python\", 1991);\n    // TODO: if langs.contains_key(\"go\") print \"found\" else \"not found\"\n    langs.entry(\"java\").or_insert(0);\n    // TODO: print langs.get(\"java\").unwrap()\n}",
+    "expectedOutput": [
+      "found",
+      "0"
+    ],
+    "hint": "if langs.contains_key(\"go\") { println!(\"found\"); } else { println!(\"not found\"); }"
+  }
+]

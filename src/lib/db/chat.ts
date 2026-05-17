@@ -1,23 +1,8 @@
 import { getSql } from "./client";
 import type { TutorialMessage } from "./types";
 
-let _chatReady = false;
 async function ensureChatTable(): Promise<void> {
-  if (_chatReady) return;
-  const sql = getSql();
-  await sql`
-    CREATE TABLE IF NOT EXISTS tutorial_messages (
-      id            SERIAL PRIMARY KEY,
-      tutorial_slug TEXT NOT NULL,
-      user_id       INTEGER REFERENCES users(id) ON DELETE SET NULL,
-      user_name     TEXT NOT NULL,
-      is_ai         BOOLEAN NOT NULL DEFAULT FALSE,
-      content       TEXT NOT NULL,
-      created_at    TIMESTAMPTZ NOT NULL DEFAULT NOW()
-    )
-  `;
-  await sql`CREATE INDEX IF NOT EXISTS idx_tutorial_messages_slug ON tutorial_messages(tutorial_slug, created_at)`;
-  _chatReady = true;
+  /* schema via npm run migrate */
 }
 
 export async function getChatMessages(tutorialSlug: string, limit = 50): Promise<TutorialMessage[]> {

@@ -88,8 +88,11 @@ export const GET = withErrorHandling("GET /api/admin/users", async (request: Nex
   if (!perms.includes("users")) {
     return NextResponse.json({ error: "Forbidden — users management permission required" }, { status: 403 });
   }
-  const users = await getAdminUsers();
-  return NextResponse.json({ users });
+  // Full-table load removed — use ?page=1&limit=25 (or export=csv for super admins).
+  return NextResponse.json(
+    { error: "Use paginated query: ?page=1&limit=25&search= optional" },
+    { status: 400 },
+  );
 });
 
 export const POST = withErrorHandling("POST /api/admin/users", async (request: NextRequest) => {

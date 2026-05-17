@@ -8,44 +8,18 @@ import { ensureTutorialRatingsTable } from "./tutorial-ratings";
 export type AdminRole = "super" | "limited";
 
 // Ensure admin_role column exists (idempotent migration)
-let _adminRoleReady = false;
 async function ensureAdminRoleColumn(): Promise<void> {
-  if (_adminRoleReady) return;
-  const sql = getSql();
-  await sql`
-    ALTER TABLE users
-    ADD COLUMN IF NOT EXISTS admin_role TEXT DEFAULT NULL
-      CHECK (admin_role IS NULL OR admin_role IN ('super', 'limited'))
-  `;
-  // Backfill existing super admins with 'super' role
-  await sql`
-    UPDATE users SET admin_role = 'super'
-    WHERE is_admin = 1 AND admin_role IS NULL
-  `;
-  _adminRoleReady = true;
+  /* schema via npm run migrate */
 }
 
 // Ensure admin_permissions column exists
-let _adminPermsReady = false;
 async function ensureAdminPermissionsColumn(): Promise<void> {
-  if (_adminPermsReady) return;
-  const sql = getSql();
-  await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS admin_permissions TEXT DEFAULT NULL`;
-  _adminPermsReady = true;
+  /* schema via npm run migrate */
 }
 
 // Ensure admin_slug column exists (unique personal admin URL slug)
-let _adminSlugReady = false;
 async function ensureAdminSlugColumn(): Promise<void> {
-  if (_adminSlugReady) return;
-  const sql = getSql();
-  await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS admin_slug TEXT DEFAULT NULL`;
-  // Add unique index if it doesn't exist
-  await sql`
-    CREATE UNIQUE INDEX IF NOT EXISTS users_admin_slug_unique
-    ON users (admin_slug) WHERE admin_slug IS NOT NULL
-  `;
-  _adminSlugReady = true;
+  /* schema via npm run migrate */
 }
 
 /** Get an admin user by their personal URL slug. Returns null if not found. */
@@ -98,9 +72,15 @@ export async function getAdminUsers(): Promise<AdminUserRow[]> {
       u.is_admin, u.admin_role, u.locked_until, COALESCE(u.plan, 'free') AS plan,
       COALESCE(u.email_verified, 0) AS email_verified,
       u.admin_slug,
-      (SELECT COUNT(*)::int FROM progress WHERE user_id = u.id) AS completed_count,
-      (SELECT COUNT(*)::int FROM bookmarks WHERE user_id = u.id) AS bookmark_count
+      COALESCE(prog.cnt, 0) AS completed_count,
+      COALESCE(bm.cnt, 0) AS bookmark_count
     FROM users u
+    LEFT JOIN (
+      SELECT user_id, COUNT(*)::int AS cnt FROM progress GROUP BY user_id
+    ) prog ON prog.user_id = u.id
+    LEFT JOIN (
+      SELECT user_id, COUNT(*)::int AS cnt FROM bookmarks GROUP BY user_id
+    ) bm ON bm.user_id = u.id
     ORDER BY u.created_at DESC
   `;
   const now = new Date();
@@ -136,20 +116,20 @@ export async function getAdminUsersPaginated(
   // 8 explicit parameterized variants covering all filter combinations
   const [rows, countRows] = (await Promise.all([
     hasSearch && hasPlan && hasVerified
-      ? sql`SELECT u.id,u.name,u.email,u.xp,u.streak_days,u.created_at,u.last_active_at,u.is_admin,u.admin_role,u.locked_until,COALESCE(u.plan,'free')AS plan,COALESCE(u.email_verified,0)AS email_verified,u.admin_slug,(SELECT COUNT(*)::int FROM progress WHERE user_id=u.id)AS completed_count,(SELECT COUNT(*)::int FROM bookmarks WHERE user_id=u.id)AS bookmark_count FROM users u WHERE(LOWER(u.email)LIKE ${pattern} OR LOWER(u.name)LIKE ${pattern})AND COALESCE(u.plan,'free')=${plan} AND COALESCE(u.email_verified,0)=${verifiedVal} ORDER BY u.created_at DESC LIMIT ${limit} OFFSET ${offset}`
+      ? sql`SELECT u.id,u.name,u.email,u.xp,u.streak_days,u.created_at,u.last_active_at,u.is_admin,u.admin_role,u.locked_until,COALESCE(u.plan,'free')AS plan,COALESCE(u.email_verified,0)AS email_verified,u.admin_slug,COALESCE(prog.cnt,0)AS completed_count,COALESCE(bm.cnt,0)AS bookmark_count FROM users u LEFT JOIN (SELECT user_id,COUNT(*)::int AS cnt FROM progress GROUP BY user_id) prog ON prog.user_id=u.id LEFT JOIN (SELECT user_id,COUNT(*)::int AS cnt FROM bookmarks GROUP BY user_id) bm ON bm.user_id=u.id WHERE(LOWER(u.email)LIKE ${pattern} OR LOWER(u.name)LIKE ${pattern})AND COALESCE(u.plan,'free')=${plan} AND COALESCE(u.email_verified,0)=${verifiedVal} ORDER BY u.created_at DESC LIMIT ${limit} OFFSET ${offset}`
     : hasSearch && hasPlan
-      ? sql`SELECT u.id,u.name,u.email,u.xp,u.streak_days,u.created_at,u.last_active_at,u.is_admin,u.admin_role,u.locked_until,COALESCE(u.plan,'free')AS plan,COALESCE(u.email_verified,0)AS email_verified,u.admin_slug,(SELECT COUNT(*)::int FROM progress WHERE user_id=u.id)AS completed_count,(SELECT COUNT(*)::int FROM bookmarks WHERE user_id=u.id)AS bookmark_count FROM users u WHERE(LOWER(u.email)LIKE ${pattern} OR LOWER(u.name)LIKE ${pattern})AND COALESCE(u.plan,'free')=${plan} ORDER BY u.created_at DESC LIMIT ${limit} OFFSET ${offset}`
+      ? sql`SELECT u.id,u.name,u.email,u.xp,u.streak_days,u.created_at,u.last_active_at,u.is_admin,u.admin_role,u.locked_until,COALESCE(u.plan,'free')AS plan,COALESCE(u.email_verified,0)AS email_verified,u.admin_slug,COALESCE(prog.cnt,0)AS completed_count,COALESCE(bm.cnt,0)AS bookmark_count FROM users u LEFT JOIN (SELECT user_id,COUNT(*)::int AS cnt FROM progress GROUP BY user_id) prog ON prog.user_id=u.id LEFT JOIN (SELECT user_id,COUNT(*)::int AS cnt FROM bookmarks GROUP BY user_id) bm ON bm.user_id=u.id WHERE(LOWER(u.email)LIKE ${pattern} OR LOWER(u.name)LIKE ${pattern})AND COALESCE(u.plan,'free')=${plan} ORDER BY u.created_at DESC LIMIT ${limit} OFFSET ${offset}`
     : hasSearch && hasVerified
-      ? sql`SELECT u.id,u.name,u.email,u.xp,u.streak_days,u.created_at,u.last_active_at,u.is_admin,u.admin_role,u.locked_until,COALESCE(u.plan,'free')AS plan,COALESCE(u.email_verified,0)AS email_verified,u.admin_slug,(SELECT COUNT(*)::int FROM progress WHERE user_id=u.id)AS completed_count,(SELECT COUNT(*)::int FROM bookmarks WHERE user_id=u.id)AS bookmark_count FROM users u WHERE(LOWER(u.email)LIKE ${pattern} OR LOWER(u.name)LIKE ${pattern})AND COALESCE(u.email_verified,0)=${verifiedVal} ORDER BY u.created_at DESC LIMIT ${limit} OFFSET ${offset}`
+      ? sql`SELECT u.id,u.name,u.email,u.xp,u.streak_days,u.created_at,u.last_active_at,u.is_admin,u.admin_role,u.locked_until,COALESCE(u.plan,'free')AS plan,COALESCE(u.email_verified,0)AS email_verified,u.admin_slug,COALESCE(prog.cnt,0)AS completed_count,COALESCE(bm.cnt,0)AS bookmark_count FROM users u LEFT JOIN (SELECT user_id,COUNT(*)::int AS cnt FROM progress GROUP BY user_id) prog ON prog.user_id=u.id LEFT JOIN (SELECT user_id,COUNT(*)::int AS cnt FROM bookmarks GROUP BY user_id) bm ON bm.user_id=u.id WHERE(LOWER(u.email)LIKE ${pattern} OR LOWER(u.name)LIKE ${pattern})AND COALESCE(u.email_verified,0)=${verifiedVal} ORDER BY u.created_at DESC LIMIT ${limit} OFFSET ${offset}`
     : hasPlan && hasVerified
-      ? sql`SELECT u.id,u.name,u.email,u.xp,u.streak_days,u.created_at,u.last_active_at,u.is_admin,u.admin_role,u.locked_until,COALESCE(u.plan,'free')AS plan,COALESCE(u.email_verified,0)AS email_verified,u.admin_slug,(SELECT COUNT(*)::int FROM progress WHERE user_id=u.id)AS completed_count,(SELECT COUNT(*)::int FROM bookmarks WHERE user_id=u.id)AS bookmark_count FROM users u WHERE COALESCE(u.plan,'free')=${plan} AND COALESCE(u.email_verified,0)=${verifiedVal} ORDER BY u.created_at DESC LIMIT ${limit} OFFSET ${offset}`
+      ? sql`SELECT u.id,u.name,u.email,u.xp,u.streak_days,u.created_at,u.last_active_at,u.is_admin,u.admin_role,u.locked_until,COALESCE(u.plan,'free')AS plan,COALESCE(u.email_verified,0)AS email_verified,u.admin_slug,COALESCE(prog.cnt,0)AS completed_count,COALESCE(bm.cnt,0)AS bookmark_count FROM users u LEFT JOIN (SELECT user_id,COUNT(*)::int AS cnt FROM progress GROUP BY user_id) prog ON prog.user_id=u.id LEFT JOIN (SELECT user_id,COUNT(*)::int AS cnt FROM bookmarks GROUP BY user_id) bm ON bm.user_id=u.id WHERE COALESCE(u.plan,'free')=${plan} AND COALESCE(u.email_verified,0)=${verifiedVal} ORDER BY u.created_at DESC LIMIT ${limit} OFFSET ${offset}`
     : hasSearch
-      ? sql`SELECT u.id,u.name,u.email,u.xp,u.streak_days,u.created_at,u.last_active_at,u.is_admin,u.admin_role,u.locked_until,COALESCE(u.plan,'free')AS plan,COALESCE(u.email_verified,0)AS email_verified,u.admin_slug,(SELECT COUNT(*)::int FROM progress WHERE user_id=u.id)AS completed_count,(SELECT COUNT(*)::int FROM bookmarks WHERE user_id=u.id)AS bookmark_count FROM users u WHERE LOWER(u.email)LIKE ${pattern} OR LOWER(u.name)LIKE ${pattern} ORDER BY u.created_at DESC LIMIT ${limit} OFFSET ${offset}`
+      ? sql`SELECT u.id,u.name,u.email,u.xp,u.streak_days,u.created_at,u.last_active_at,u.is_admin,u.admin_role,u.locked_until,COALESCE(u.plan,'free')AS plan,COALESCE(u.email_verified,0)AS email_verified,u.admin_slug,COALESCE(prog.cnt,0)AS completed_count,COALESCE(bm.cnt,0)AS bookmark_count FROM users u LEFT JOIN (SELECT user_id,COUNT(*)::int AS cnt FROM progress GROUP BY user_id) prog ON prog.user_id=u.id LEFT JOIN (SELECT user_id,COUNT(*)::int AS cnt FROM bookmarks GROUP BY user_id) bm ON bm.user_id=u.id WHERE LOWER(u.email)LIKE ${pattern} OR LOWER(u.name)LIKE ${pattern} ORDER BY u.created_at DESC LIMIT ${limit} OFFSET ${offset}`
     : hasPlan
-      ? sql`SELECT u.id,u.name,u.email,u.xp,u.streak_days,u.created_at,u.last_active_at,u.is_admin,u.admin_role,u.locked_until,COALESCE(u.plan,'free')AS plan,COALESCE(u.email_verified,0)AS email_verified,u.admin_slug,(SELECT COUNT(*)::int FROM progress WHERE user_id=u.id)AS completed_count,(SELECT COUNT(*)::int FROM bookmarks WHERE user_id=u.id)AS bookmark_count FROM users u WHERE COALESCE(u.plan,'free')=${plan} ORDER BY u.created_at DESC LIMIT ${limit} OFFSET ${offset}`
+      ? sql`SELECT u.id,u.name,u.email,u.xp,u.streak_days,u.created_at,u.last_active_at,u.is_admin,u.admin_role,u.locked_until,COALESCE(u.plan,'free')AS plan,COALESCE(u.email_verified,0)AS email_verified,u.admin_slug,COALESCE(prog.cnt,0)AS completed_count,COALESCE(bm.cnt,0)AS bookmark_count FROM users u LEFT JOIN (SELECT user_id,COUNT(*)::int AS cnt FROM progress GROUP BY user_id) prog ON prog.user_id=u.id LEFT JOIN (SELECT user_id,COUNT(*)::int AS cnt FROM bookmarks GROUP BY user_id) bm ON bm.user_id=u.id WHERE COALESCE(u.plan,'free')=${plan} ORDER BY u.created_at DESC LIMIT ${limit} OFFSET ${offset}`
     : hasVerified
-      ? sql`SELECT u.id,u.name,u.email,u.xp,u.streak_days,u.created_at,u.last_active_at,u.is_admin,u.admin_role,u.locked_until,COALESCE(u.plan,'free')AS plan,COALESCE(u.email_verified,0)AS email_verified,u.admin_slug,(SELECT COUNT(*)::int FROM progress WHERE user_id=u.id)AS completed_count,(SELECT COUNT(*)::int FROM bookmarks WHERE user_id=u.id)AS bookmark_count FROM users u WHERE COALESCE(u.email_verified,0)=${verifiedVal} ORDER BY u.created_at DESC LIMIT ${limit} OFFSET ${offset}`
-      : sql`SELECT u.id,u.name,u.email,u.xp,u.streak_days,u.created_at,u.last_active_at,u.is_admin,u.admin_role,u.locked_until,COALESCE(u.plan,'free')AS plan,COALESCE(u.email_verified,0)AS email_verified,u.admin_slug,(SELECT COUNT(*)::int FROM progress WHERE user_id=u.id)AS completed_count,(SELECT COUNT(*)::int FROM bookmarks WHERE user_id=u.id)AS bookmark_count FROM users u ORDER BY u.created_at DESC LIMIT ${limit} OFFSET ${offset}`,
+      ? sql`SELECT u.id,u.name,u.email,u.xp,u.streak_days,u.created_at,u.last_active_at,u.is_admin,u.admin_role,u.locked_until,COALESCE(u.plan,'free')AS plan,COALESCE(u.email_verified,0)AS email_verified,u.admin_slug,COALESCE(prog.cnt,0)AS completed_count,COALESCE(bm.cnt,0)AS bookmark_count FROM users u LEFT JOIN (SELECT user_id,COUNT(*)::int AS cnt FROM progress GROUP BY user_id) prog ON prog.user_id=u.id LEFT JOIN (SELECT user_id,COUNT(*)::int AS cnt FROM bookmarks GROUP BY user_id) bm ON bm.user_id=u.id WHERE COALESCE(u.email_verified,0)=${verifiedVal} ORDER BY u.created_at DESC LIMIT ${limit} OFFSET ${offset}`
+      : sql`SELECT u.id,u.name,u.email,u.xp,u.streak_days,u.created_at,u.last_active_at,u.is_admin,u.admin_role,u.locked_until,COALESCE(u.plan,'free')AS plan,COALESCE(u.email_verified,0)AS email_verified,u.admin_slug,COALESCE(prog.cnt,0)AS completed_count,COALESCE(bm.cnt,0)AS bookmark_count FROM users u LEFT JOIN (SELECT user_id,COUNT(*)::int AS cnt FROM progress GROUP BY user_id) prog ON prog.user_id=u.id LEFT JOIN (SELECT user_id,COUNT(*)::int AS cnt FROM bookmarks GROUP BY user_id) bm ON bm.user_id=u.id ORDER BY u.created_at DESC LIMIT ${limit} OFFSET ${offset}`,
 
     hasSearch && hasPlan && hasVerified
       ? sql`SELECT COUNT(*)::int AS total FROM users WHERE(LOWER(email)LIKE ${pattern} OR LOWER(name)LIKE ${pattern})AND COALESCE(plan,'free')=${plan} AND COALESCE(email_verified,0)=${verifiedVal}`
@@ -188,9 +168,15 @@ export async function getAdminList(): Promise<AdminUserRow[]> {
       u.id, u.name, u.email, u.xp, u.streak_days, u.created_at, u.last_active_at,
       u.is_admin, u.admin_role, u.admin_permissions, u.locked_until, COALESCE(u.plan, 'free') AS plan,
       COALESCE(u.email_verified, 0) AS email_verified, u.admin_slug,
-      (SELECT COUNT(*)::int FROM progress WHERE user_id = u.id) AS completed_count,
-      (SELECT COUNT(*)::int FROM bookmarks WHERE user_id = u.id) AS bookmark_count
+      COALESCE(prog.cnt, 0) AS completed_count,
+      COALESCE(bm.cnt, 0) AS bookmark_count
     FROM users u
+    LEFT JOIN (
+      SELECT user_id, COUNT(*)::int AS cnt FROM progress GROUP BY user_id
+    ) prog ON prog.user_id = u.id
+    LEFT JOIN (
+      SELECT user_id, COUNT(*)::int AS cnt FROM bookmarks GROUP BY user_id
+    ) bm ON bm.user_id = u.id
     WHERE u.is_admin = 1
     ORDER BY u.admin_role ASC, u.created_at ASC
   `;
@@ -305,21 +291,8 @@ export async function setAdminRole(userId: number, role: AdminRole, permissions?
 
 // ─── Step Checks (pass/fail heatmap) ──────────────────
 
-let _stepChecksReady = false;
 async function ensureStepChecksTable(): Promise<void> {
-  if (_stepChecksReady) return;
-  const sql = getSql();
-  await sql`
-    CREATE TABLE IF NOT EXISTS step_checks (
-      id            SERIAL PRIMARY KEY,
-      tutorial_slug TEXT NOT NULL,
-      step_index    INTEGER NOT NULL,
-      passed        BOOLEAN NOT NULL,
-      created_at    TIMESTAMPTZ NOT NULL DEFAULT NOW()
-    )
-  `;
-  await sql`CREATE INDEX IF NOT EXISTS idx_step_checks_slug ON step_checks(tutorial_slug)`;
-  _stepChecksReady = true;
+  /* schema via npm run migrate */
 }
 
 export async function recordStepCheck(
@@ -436,21 +409,8 @@ export async function getAdminGrowthSnapshot(): Promise<AdminGrowthSnapshot> {
 
 // ─── Admin Audit Log ──────────────────────────────────
 
-let _auditLogReady = false;
 async function ensureAuditLogTable(): Promise<void> {
-  if (_auditLogReady) return;
-  const sql = getSql();
-  await sql`
-    CREATE TABLE IF NOT EXISTS admin_audit_log (
-      id             SERIAL PRIMARY KEY,
-      admin_id       INTEGER REFERENCES users(id) ON DELETE SET NULL,
-      action         TEXT NOT NULL,
-      target_user_id INTEGER REFERENCES users(id) ON DELETE SET NULL,
-      created_at     TIMESTAMPTZ NOT NULL DEFAULT NOW()
-    )
-  `;
-  await sql`CREATE INDEX IF NOT EXISTS idx_audit_log_created ON admin_audit_log(created_at DESC)`;
-  _auditLogReady = true;
+  /* schema via npm run migrate */
 }
 
 export async function getAdminAuditLog(
@@ -489,22 +449,8 @@ export async function logAdminAction(
 
 // ─── Subscription Events ──────────────────────────────
 
-let _subscriptionEventsReady = false;
 async function ensureSubscriptionEventsTable(): Promise<void> {
-  if (_subscriptionEventsReady) return;
-  const sql = getSql();
-  await sql`
-    CREATE TABLE IF NOT EXISTS subscription_events (
-      id           SERIAL PRIMARY KEY,
-      user_id      INTEGER REFERENCES users(id) ON DELETE SET NULL,
-      plan         TEXT NOT NULL,
-      amount_cents INTEGER NOT NULL,
-      event_type   TEXT NOT NULL,
-      created_at   TIMESTAMPTZ NOT NULL DEFAULT NOW()
-    )
-  `;
-  await sql`CREATE INDEX IF NOT EXISTS idx_sub_events_created ON subscription_events(created_at DESC)`;
-  _subscriptionEventsReady = true;
+  /* schema via npm run migrate */
 }
 
 export async function recordSubscriptionEvent(

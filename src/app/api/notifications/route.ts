@@ -15,7 +15,7 @@ export const GET = withErrorHandling("GET /api/notifications", async () => {
 });
 
 export const PATCH = withErrorHandling("PATCH /api/notifications",
-  protectedRoute({}, async (_request, user) => {
+  protectedRoute({ rateLimitKey: "notifications-patch", rateLimitMax: 60 }, async (_request, user) => {
     await markNotificationsRead(user.userId);
     return NextResponse.json({ ok: true });
   })

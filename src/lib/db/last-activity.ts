@@ -10,17 +10,7 @@ export interface LastActivity {
 }
 
 export async function ensureLastActivityTable(): Promise<void> {
-  const sql = getSql();
-  await sql`
-    CREATE TABLE IF NOT EXISTS user_last_activity (
-      user_id       INTEGER      PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
-      activity_type TEXT         NOT NULL DEFAULT 'tutorial' CHECK (activity_type = 'tutorial'),
-      lang          TEXT         NOT NULL,
-      slug          TEXT,
-      step          INTEGER,
-      updated_at    TIMESTAMPTZ  NOT NULL DEFAULT NOW()
-    )
-  `;
+  /* schema via npm run migrate */
 }
 
 export interface SaveLastActivityInput {

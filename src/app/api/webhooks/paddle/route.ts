@@ -301,14 +301,19 @@ export const POST = withErrorHandling("POST /api/webhooks/paddle", async (reques
   }
 
   const event = parsed.data;
-  const eventId = event.event_id;
+  const data = event.data;
+  const eventId =
+    event.event_id ??
+    (typeof data["id"] === "string" ? data["id"] : undefined) ??
+    (typeof data["transaction_id"] === "string" ? data["transaction_id"] : undefined);
 
-  if (eventId) {
-    const duplicate = await isDuplicateEvent(eventId, event.event_type);
-    if (duplicate) return NextResponse.json({ received: true, duplicate: true });
+  if (!eventId) {
+    console.error("[paddle-webhook] Missing event_id — rejecting to prevent duplicate processing");
+    return NextResponse.json({ error: "Missing event_id" }, { status: 400 });
   }
 
-  const data = event.data;
+  const duplicate = await isDuplicateEvent(eventId, event.event_type);
+  if (duplicate) return NextResponse.json({ received: true, duplicate: true });
   const customData = customDataFromWebhook(data);
   const paddleCustomerId = typeof data["customer_id"] === "string" ? data["customer_id"] : undefined;
   const status = typeof data["status"] === "string" ? data["status"] : undefined;

@@ -1,0 +1,11 @@
+[
+  {
+    "title": "Simulated Status",
+    "instruction": "In a real Rust project you would use reqwest::blocking::get() and print response.status(). For the runner, create a struct with status: 200 and print it so the output is 200.",
+    "starter": "fn main() {\n    let status = 200u16;\n    println!(\"{}\", status);\n}",
+    "expectedOutput": [
+      "200"
+    ],
+    "hint": "Run the program."
+  }
+]

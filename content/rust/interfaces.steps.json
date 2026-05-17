@@ -1,0 +1,21 @@
+[
+  {
+    "title": "Implement a Trait",
+    "instruction": "Define a trait Greet with one method fn greet(&self) -> String. Create a struct EnglishGreeter and impl Greet for it returning \"Hello!\". In main, create an EnglishGreeter and print greet().",
+    "starter": "trait Greet {\n    fn greet(&self) -> String;\n}\n\nstruct EnglishGreeter;\n\nimpl Greet for EnglishGreeter {\n    fn greet(&self) -> String {\n        // TODO: \"Hello!\".to_string()\n    }\n}\n\nfn main() {\n    let g = EnglishGreeter;\n    println!(\"{}\", g.greet());\n}",
+    "expectedOutput": [
+      "Hello!"
+    ],
+    "hint": "return \"Hello!\".to_string();"
+  },
+  {
+    "title": "Trait and Polymorphism",
+    "instruction": "Have a trait Sound with fn make_sound(&self) -> &str. Dog returns \"Woof\", Cat returns \"Meow\". In main, put a Dog and Cat in a vec of &dyn Sound, loop and print each make_sound().",
+    "starter": "trait Sound {\n    fn make_sound(&self) -> &str;\n}\n\nstruct Dog;\nimpl Sound for Dog {\n    fn make_sound(&self) -> &str {\n        \"Woof\"\n    }\n}\n\nstruct Cat;\nimpl Sound for Cat {\n    fn make_sound(&self) -> &str {\n        \"Meow\"\n    }\n}\n\nfn main() {\n    let animals: Vec<&dyn Sound> = vec![&Dog {}, &Cat {}];\n    for a in animals {\n        println!(\"{}\", a.make_sound());\n    }\n}",
+    "expectedOutput": [
+      "Woof",
+      "Meow"
+    ],
+    "hint": "Code is complete — run it."
+  }
+]

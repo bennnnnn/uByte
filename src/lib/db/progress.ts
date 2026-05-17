@@ -26,29 +26,8 @@ const DEFAULT_LANG = "go";
  * Lazy migration — called only before WRITES, never before reads.
  * Non-throwing so a DDL hiccup never blocks inserts; the write has its own fallback.
  */
-let _migrated = false;
 async function ensureLanguageColumn(): Promise<void> {
-  if (_migrated) return;
-  const sql = getSql();
-  try {
-    // Add language column with default 'go' (no-op if already present)
-    await sql`ALTER TABLE progress ADD COLUMN IF NOT EXISTS language TEXT NOT NULL DEFAULT 'go'`;
-    // Backfill any pre-migration NULLs
-    await sql`UPDATE progress SET language = 'go' WHERE language IS NULL OR language = ''`;
-    // Add 3-column unique constraint; ignore 42P07 (already exists)
-    await sql`
-      ALTER TABLE progress
-      ADD CONSTRAINT progress_user_id_language_tutorial_slug_key
-      UNIQUE (user_id, language, tutorial_slug)
-    `.catch((e: unknown) => {
-      if ((e as { code?: string })?.code !== "42P07") throw e;
-    });
-    // Drop old 2-column constraint (IF EXISTS = no-op once gone)
-    await sql`ALTER TABLE progress DROP CONSTRAINT IF EXISTS progress_user_id_tutorial_slug_key`;
-    _migrated = true;
-  } catch (err) {
-    console.warn("[progress] ensureLanguageColumn warning:", err);
-  }
+  /* schema via npm run migrate */
 }
 
 /**

@@ -82,18 +82,7 @@ export async function isFeatureEnabled(key: string): Promise<boolean> {
   return v === "1";
 }
 
-/**
- * Check maintenance mode by querying the DB directly (no in-memory cache).
- * This ensures the flag takes effect immediately across all serverless instances
- * rather than waiting up to 60 s for the per-instance cache to expire.
- */
+/** Maintenance flag — uses the same 60s in-memory cache as other site settings (edge-friendly). */
 export async function getMaintenanceModeStatus(): Promise<boolean> {
-  try {
-    const sql = getSql();
-    const [row] = await sql`SELECT value FROM site_settings WHERE key = 'maintenance_mode'`;
-    return (row as { value: string } | undefined)?.value === "1";
-  } catch {
-    // DB unavailable — fall back to cached value so we don't break the site
-    return _cache?.["maintenance_mode"] === "1";
-  }
+  return isFeatureEnabled("maintenance_mode");
 }

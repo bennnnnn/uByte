@@ -1,20 +1,7 @@
 import { getSql } from "./client";
 
-let _ready = false;
 export async function ensureTutorialRatingsTable(): Promise<void> {
-  if (_ready) return;
-  const sql = getSql();
-  await sql`
-    CREATE TABLE IF NOT EXISTS tutorial_ratings (
-      user_id       TEXT NOT NULL,
-      lang          TEXT NOT NULL,
-      tutorial_slug TEXT NOT NULL,
-      rating        SMALLINT NOT NULL,
-      created_at    TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-      PRIMARY KEY (user_id, lang, tutorial_slug)
-    )
-  `;
-  _ready = true;
+  /* schema via npm run migrate */
 }
 
 /** Submit or update a thumbs rating. 1 = up, -1 = down. */

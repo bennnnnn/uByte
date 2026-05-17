@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getUsersAtRiskOfLosingStreak, getPushSubscriptionsForUsers, deletePushSubscription } from "@/lib/db";
+import { filterUsersNotRemindedToday, markStreakRemindersSent } from "@/lib/db/streak-reminder-log";
 import { sendStreakReminderEmail } from "@/lib/email";
 import { sendPushNotification } from "@/lib/web-push";
 import { withErrorHandling } from "@/lib/api-utils";
@@ -14,7 +15,9 @@ export const GET = withErrorHandling("GET /api/cron/streak-reminder", async (req
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const users = await getUsersAtRiskOfLosingStreak();
+  const atRisk = await getUsersAtRiskOfLosingStreak();
+  const eligibleIds = await filterUsersNotRemindedToday(atRisk.map((u) => u.id));
+  const users = atRisk.filter((u) => eligibleIds.includes(u.id));
   const userIds = users.map((u) => u.id);
 
   // Fetch push subscriptions for at-risk users (multi-device support)
@@ -54,5 +57,9 @@ export const GET = withErrorHandling("GET /api/cron/streak-reminder", async (req
     }
   }
 
-  return NextResponse.json({ emailsSent, pushSent });
+  if (userIds.length > 0) {
+    await markStreakRemindersSent(userIds);
+  }
+
+  return NextResponse.json({ emailsSent, pushSent, usersNotified: userIds.length });
 });

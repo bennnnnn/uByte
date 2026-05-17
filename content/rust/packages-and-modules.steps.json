@@ -1,0 +1,21 @@
+[
+  {
+    "title": "use and Vec",
+    "instruction": "Use std::collections (or just Vec from prelude is already there). Create a Vec with vec![\"one\", \"two\"], then print its len() and the first element (v[0]).",
+    "starter": "fn main() {\n    let v = vec![\"one\", \"two\"];\n    println!(\"{}\", v.len());\n    println!(\"{}\", v[0]);\n}",
+    "expectedOutput": [
+      "2",
+      "one"
+    ],
+    "hint": "Code is complete — run it."
+  },
+  {
+    "title": "HashMap from std",
+    "instruction": "Add use std::collections::HashMap. Create a HashMap, insert \"a\" -> 1 and \"b\" -> 2, then print the value for \"a\".",
+    "starter": "use std::collections::HashMap;\n\nfn main() {\n    let mut map = HashMap::new();\n    map.insert(\"a\", 1);\n    map.insert(\"b\", 2);\n    println!(\"{}\", map.get(\"a\").unwrap());\n}",
+    "expectedOutput": [
+      "1"
+    ],
+    "hint": "Run the program."
+  }
+]

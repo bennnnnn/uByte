@@ -10,19 +10,8 @@
  */
 import { getSql } from "./client";
 
-let _ready = false;
 async function ensureTable(): Promise<void> {
-  if (_ready) return;
-  const sql = getSql();
-  await sql`
-    CREATE TABLE IF NOT EXISTS checkout_sessions (
-      nonce      TEXT    PRIMARY KEY,
-      user_id    INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-      plan       TEXT    NOT NULL,
-      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-    )
-  `;
-  _ready = true;
+  /* schema via npm run migrate */
 }
 
 /** Creates a new checkout session and returns the opaque nonce. */

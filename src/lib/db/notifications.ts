@@ -1,26 +1,8 @@
 import { getSql } from "./client";
 import type { Notification } from "./types";
 
-let _notificationsReady = false;
 async function ensureNotificationsTable(): Promise<void> {
-  if (_notificationsReady) return;
-  const sql = getSql();
-  await sql`
-    CREATE TABLE IF NOT EXISTS notifications (
-      id         SERIAL PRIMARY KEY,
-      user_id    INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-      type       TEXT NOT NULL DEFAULT 'info',
-      title      TEXT NOT NULL,
-      message    TEXT NOT NULL DEFAULT '',
-      link       TEXT,
-      read       BOOLEAN NOT NULL DEFAULT FALSE,
-      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-    )
-  `;
-  await sql`CREATE INDEX IF NOT EXISTS idx_notifications_user ON notifications(user_id, created_at DESC)`;
-  // Idempotent migration: add link column if this table already exists without it
-  await sql`ALTER TABLE notifications ADD COLUMN IF NOT EXISTS link TEXT`;
-  _notificationsReady = true;
+  /* schema via npm run migrate */
 }
 
 export async function getNotifications(userId: number, limit = 20): Promise<Notification[]> {
