@@ -13,7 +13,9 @@ import {
   updateUserPlan,
 } from "@/lib/db";
 import { verifyCsrf } from "@/lib/csrf";
+import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 import { withErrorHandling, requireAdmin, requireAdminUsersManagement } from "@/lib/api-utils";
+import { adminUserActionSchema, parseUserId } from "@/lib/api-schemas";
 import { getEffectiveAdminPermissions } from "@/app/admin/permission-constants";
 
 function isSuperAdminUser(admin: { admin_role: string | null }): boolean {
@@ -97,14 +99,25 @@ export const POST = withErrorHandling("POST /api/admin/users", async (request: N
   const { admin, response } = await requireAdminUsersManagement();
   if (!admin) return response;
 
-  const body = (await request.json()) as { action: string; userId: number | string; plan?: string };
-  const { action, plan } = body;
-  const userId =
-    typeof body.userId === "string" ? parseInt(body.userId, 10) : body.userId;
-
-  if (!action || typeof action !== "string") {
-    return NextResponse.json({ error: "Action is required" }, { status: 400 });
+  const ip = getClientIp(request.headers);
+  const { limited, retryAfter } = await checkRateLimit(
+    `admin-users-post:${ip}:${admin.id}`,
+    20,
+    60_000,
+  );
+  if (limited) {
+    return NextResponse.json(
+      { error: "Too many requests" },
+      { status: 429, headers: { "Retry-After": String(retryAfter) } },
+    );
   }
+
+  const parsed = adminUserActionSchema.safeParse(await request.json());
+  if (!parsed.success) {
+    return NextResponse.json({ error: "Invalid action or user ID" }, { status: 400 });
+  }
+  const { action, plan } = parsed.data;
+  const userId = parseUserId(parsed.data.userId);
   if (!Number.isInteger(userId) || userId <= 0) {
     return NextResponse.json({ error: "Invalid user ID" }, { status: 400 });
   }

@@ -1,18 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { jwtVerify } from "jose";
 import { getMaintenanceModeStatus } from "@/lib/db/site-settings";
-
-const TUTORIAL_LANGS = new Set([
-  "go",
-  "python",
-  "javascript",
-  "typescript",
-  "java",
-  "rust",
-  "cpp",
-  "csharp",
-  "sql",
-]);
+import { TUTORIAL_LANG_SET } from "@/lib/languages/tutorial-lang-ids";
 
 function getSecret(): Uint8Array {
   const secret = process.env.JWT_SECRET;
@@ -31,13 +20,13 @@ function redirectLegacyProductRoute(request: NextRequest): NextResponse | null {
 
   if (pathname === "/practice" || pathname.startsWith("/practice/")) {
     const lang = segments[1];
-    const destination = lang && TUTORIAL_LANGS.has(lang) ? `/tutorial/${lang}` : "/tutorial";
+    const destination = lang && TUTORIAL_LANG_SET.has(lang) ? `/tutorial/${lang}` : "/tutorial";
     return NextResponse.redirect(new URL(destination, request.url), 308);
   }
 
   if (pathname === "/certifications" || pathname.startsWith("/certifications/")) {
     const lang = segments[1];
-    const destination = lang && TUTORIAL_LANGS.has(lang) ? `/tutorial/${lang}` : "/tutorial";
+    const destination = lang && TUTORIAL_LANG_SET.has(lang) ? `/tutorial/${lang}` : "/tutorial";
     return NextResponse.redirect(new URL(destination, request.url), 308);
   }
 

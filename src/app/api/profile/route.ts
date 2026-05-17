@@ -12,7 +12,7 @@ import {
 } from "@/lib/db";
 import { verifyCsrf } from "@/lib/csrf";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
-import { withErrorHandling, requireAuth } from "@/lib/api-utils";
+import { withErrorHandling, requireAuth, protectedRoute } from "@/lib/api-utils";
 import { isValidPassword, PASSWORD_POLICY_MESSAGE, MIN_PASSWORD_LENGTH } from "@/lib/password-policy";
 
 const VALID_AVATARS = ["gopher", "cool", "ninja", "party", "robot", "wizard", "astro", "pirate"];
@@ -163,16 +163,11 @@ export const PUT = withErrorHandling("PUT /api/profile", async (request: NextReq
 });
 
 // DELETE — delete account
-export const DELETE = withErrorHandling("DELETE /api/profile", async (request: NextRequest) => {
-  const { user: tokenUser, response } = await requireAuth();
-  if (!tokenUser) return response;
-
-  const csrfError = verifyCsrf(request);
-  if (csrfError) {
-    return NextResponse.json({ error: csrfError }, { status: 403 });
-  }
-
-  await deleteUser(tokenUser.userId);
-  await clearAuthCookie();
-  return NextResponse.json({ ok: true });
-});
+export const DELETE = withErrorHandling(
+  "DELETE /api/profile",
+  protectedRoute({ rateLimitKey: "profile-delete", rateLimitMax: 3, rateLimitWindowMs: 3_600_000 }, async (_request, user) => {
+    await deleteUser(user.userId);
+    await clearAuthCookie();
+    return NextResponse.json({ ok: true });
+  }),
+);

@@ -7,24 +7,11 @@ import { NextRequest, NextResponse } from "next/server";
 import { withErrorHandling } from "@/lib/api-utils";
 import { getCurrentUser } from "@/lib/auth";
 import { verifyCsrf } from "@/lib/csrf";
+import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 import { getSql } from "@/lib/db/client";
 
 const VALID_REASONS = ["spam", "harassment", "inappropriate", "other"] as const;
 type Reason = (typeof VALID_REASONS)[number];
-
-async function ensureTable() {
-  const sql = getSql();
-  await sql`
-    CREATE TABLE IF NOT EXISTS discussion_reports (
-      id          SERIAL PRIMARY KEY,
-      post_id     INTEGER NOT NULL REFERENCES discussion_posts(id) ON DELETE CASCADE,
-      reporter_id INTEGER REFERENCES users(id) ON DELETE SET NULL,
-      reason      TEXT NOT NULL,
-      created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-      UNIQUE (post_id, reporter_id)
-    )
-  `;
-}
 
 export const POST = withErrorHandling(
   "POST /api/discussion/post/[id]/report",
@@ -47,7 +34,19 @@ export const POST = withErrorHandling(
       return NextResponse.json({ error: "Invalid reason." }, { status: 400 });
     }
 
-    await ensureTable();
+    const ip = getClientIp(req.headers);
+    const { limited, retryAfter } = await checkRateLimit(
+      `discussion-report:${ip}:${user.userId}`,
+      15,
+      60_000,
+    );
+    if (limited) {
+      return NextResponse.json(
+        { error: "Too many reports. Please wait before reporting again." },
+        { status: 429, headers: { "Retry-After": String(retryAfter) } },
+      );
+    }
+
     const sql = getSql();
 
     // Check the post exists

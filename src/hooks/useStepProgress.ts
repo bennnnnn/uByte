@@ -2,8 +2,8 @@
 
 import { useState, useEffect, useRef } from "react";
 import type { TutorialStep } from "@/lib/tutorial-steps";
-import type { CodeCheck } from "@/lib/tutorial-steps/types";
 import type { AiFeedbackSchema } from "@/lib/ai/feedback-client";
+import { checkOutput, runCodeChecks, todoNotCompleted } from "@/lib/code-checks";
 import { useAuth } from "@/components/AuthProvider";
 import { hasPaidAccess } from "@/lib/plans";
 import { parseErrorLines } from "./useCodeEditor";
@@ -14,75 +14,6 @@ import { useToast } from "@/components/Toast";
 
 export type Status = "idle" | "running" | "passed" | "failed";
 export type FailureKind = "output" | "task" | "compile" | null;
-
-function checkOutput(output: string, expected: string[]): boolean {
-  if (!output.trim()) return false;
-  if (expected.length === 0) return true;
-  const lower = output.toLowerCase();
-  return expected.every((s) => lower.includes(s.toLowerCase()));
-}
-
-/**
- * TODO comment pattern — matches all common single-line comment styles:
- *   // TODO   (C-family, Go, Java, Rust, JS/TS, Swift, Kotlin, C#)
- *   #  TODO   (Python, Ruby, Shell, YAML)
- *   -- TODO   (SQL, Lua, Haskell)
- *   /* TODO   (block comment opener used as a line comment)
- */
-const TODO_LINE_RE = /^\s*(\/\/|#|--|\/\*)\s*TODO\b/;
-
-/** Strip TODO comment lines and collapse whitespace — used for meaningful-change detection. */
-function normCode(code: string): string {
-  return code
-    .split("\n")
-    .filter((line) => !TODO_LINE_RE.test(line))
-    .join("\n")
-    .replace(/\s+/g, " ")
-    .trim();
-}
-
-/**
- * Returns true when the starter had TODO comments and the user's code
- * is functionally identical to the starter after stripping those lines.
- * Catches both "left the TODO in" and "just deleted the TODO line" cases.
- */
-function todoNotCompleted(code: string, starter: string): boolean {
-  // Check all supported comment styles in the starter
-  if (!TODO_LINE_RE.test(starter)) return false;
-  return normCode(code) === normCode(starter);
-}
-
-/**
- * Run a single regex against user code with a hard character limit to prevent
- * ReDoS attacks from pathological patterns on large inputs.
- */
-const MAX_CHECK_INPUT = 8_000; // chars — beyond this, truncate before testing
-
-function safeRegexTest(pattern: string, flags: string, input: string): boolean {
-  try {
-    const safeInput = input.length > MAX_CHECK_INPUT ? input.slice(0, MAX_CHECK_INPUT) : input;
-    return new RegExp(pattern, flags).test(safeInput);
-  } catch {
-    // Invalid regex in steps.json — treat as not matching
-    return false;
-  }
-}
-
-function isPlaceholderRemovalCheck(check: CodeCheck): boolean {
-  return check.required === false && check.pattern.trim() === "TODO";
-}
-
-/** Validate per-step code rules. Returns the first failing message, or null. */
-function runCodeChecks(code: string, checks: CodeCheck[] | undefined): string | null {
-  if (!checks?.length) return null;
-  for (const { pattern, flags = "im", required = true, message } of checks) {
-    if (isPlaceholderRemovalCheck({ pattern, flags, required, message })) continue;
-    const matches = safeRegexTest(pattern, flags, code);
-    if (required && !matches) return message;
-    if (!required && matches) return message;
-  }
-  return null;
-}
 
 async function runCodeRequest(
   currentCode: string,

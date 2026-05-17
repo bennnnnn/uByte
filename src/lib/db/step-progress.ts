@@ -25,47 +25,9 @@ import { getSql } from "./client";
 
 const DEFAULT_LANG = "go";
 
-let _ready = false;
+/** Schema is defined in scripts/migrations (018+). Run `npm run migrate` before deploy. */
 async function ensureTable(): Promise<void> {
-  if (_ready) return;
-  const sql = getSql();
-
-  // Create table with the correct 4-column PK (language included).
-  // For existing deployments this is a no-op; the ALTER steps below handle migration.
-  await sql`
-    CREATE TABLE IF NOT EXISTS step_progress (
-      user_id       INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-      tutorial_slug TEXT NOT NULL,
-      step_index    INTEGER NOT NULL,
-      language      TEXT NOT NULL DEFAULT 'go',
-      completed_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-      skipped       BOOLEAN NOT NULL DEFAULT FALSE,
-      PRIMARY KEY (user_id, tutorial_slug, step_index, language)
-    )
-  `;
-
-  // Add columns that may be missing from older table versions
-  await sql`ALTER TABLE step_progress ADD COLUMN IF NOT EXISTS skipped  BOOLEAN NOT NULL DEFAULT FALSE`;
-  await sql`ALTER TABLE step_progress ADD COLUMN IF NOT EXISTS language TEXT    NOT NULL DEFAULT 'go'`;
-
-  // Migrate the primary key to include language.
-  // Old PK was (user_id, tutorial_slug, step_index) — this caused non-Go step
-  // progress to be silently dropped because different-language rows for the same
-  // (user_id, slug, stepIndex) conflicted and the DO UPDATE never changed language.
-  //
-  // Drop the old 3-column PK (IF EXISTS is safe if migration already ran).
-  await sql`ALTER TABLE step_progress DROP CONSTRAINT IF EXISTS step_progress_pkey`;
-
-  // Add the new 4-column PK. Error 42P07 = already exists (e.g. fresh CREATE TABLE above).
-  await sql`
-    ALTER TABLE step_progress
-    ADD CONSTRAINT step_progress_pkey
-    PRIMARY KEY (user_id, tutorial_slug, step_index, language)
-  `.catch((e: unknown) => {
-    if ((e as { code?: string })?.code !== "42P07") throw e;
-  });
-
-  _ready = true;
+  /* no-op — avoid runtime DDL on the hot progress path */
 }
 
 /** Get step indices for a user in a tutorial, split into completed and skipped. */

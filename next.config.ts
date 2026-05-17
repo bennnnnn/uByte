@@ -1,6 +1,7 @@
 import type { NextConfig } from "next";
 import { withSentryConfig } from "@sentry/nextjs";
 import path from "path";
+import { TUTORIAL_LANG_IDS } from "./src/lib/languages/tutorial-lang-ids";
 
 const securityHeaders = [
   // Prevent the page from being embedded in iframes on other domains (clickjacking).
@@ -97,20 +98,7 @@ const nextConfig: NextConfig = {
     removeConsole: process.env.NODE_ENV === "production" ? { exclude: ["error", "warn"] } : false,
   },
   async redirects() {
-    // Keep in sync with src/lib/languages/types.ts SupportedLanguage union.
-    // next.config runs before app source is compiled, so we cannot import the registry here.
-    const tutorialLangs = [
-      "go",
-      "python",
-      "cpp",
-      "javascript",
-      "java",
-      "rust",
-      "csharp",
-      "typescript",
-      "sql",
-    ];
-    const langRedirects = tutorialLangs.flatMap((lang) => [
+    const langRedirects = [...TUTORIAL_LANG_IDS].flatMap((lang) => [
       { source: `/${lang}`, destination: `/tutorial/${lang}`, permanent: true },
       { source: `/${lang}/:path*`, destination: `/tutorial/${lang}/:path*`, permanent: true },
     ]);

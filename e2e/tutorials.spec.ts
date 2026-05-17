@@ -1,6 +1,7 @@
 import { test, expect } from "@playwright/test";
+import { TUTORIAL_LANG_IDS } from "../src/lib/languages/tutorial-lang-ids";
 
-const LANGUAGES = ["go", "python", "javascript", "java", "cpp", "rust", "csharp", "typescript", "sql"];
+const LANGUAGES = [...TUTORIAL_LANG_IDS];
 
 test.describe("Tutorial pages", () => {
   for (const lang of LANGUAGES) {

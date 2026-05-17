@@ -14,18 +14,6 @@ export const GET = withErrorHandling("GET /api/admin/reports", async () => {
 
   const sql = getSql();
 
-  // Create table if it doesn't exist yet (same guard as the report route)
-  await sql`
-    CREATE TABLE IF NOT EXISTS discussion_reports (
-      id          SERIAL PRIMARY KEY,
-      post_id     INTEGER NOT NULL REFERENCES discussion_posts(id) ON DELETE CASCADE,
-      reporter_id INTEGER REFERENCES users(id) ON DELETE SET NULL,
-      reason      TEXT NOT NULL,
-      created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-      UNIQUE (post_id, reporter_id)
-    )
-  `;
-
   const rows = await sql`
     SELECT
       dp.id          AS post_id,

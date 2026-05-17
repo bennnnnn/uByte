@@ -60,7 +60,12 @@ export function loadStepsFromContent(
       // codeChecks must be explicitly mapped — omitting this caused all
       // pattern-based validations in steps.json to be silently ignored.
       codeChecks: Array.isArray(item.codeChecks)
-        ? (item.codeChecks as import("./types").CodeCheck[])
+        ? (item.codeChecks as Record<string, unknown>[]).map((c) => ({
+            pattern: typeof c.pattern === "string" ? c.pattern : "",
+            flags: typeof c.flags === "string" ? c.flags : undefined,
+            required: c.required === false ? false : true,
+            message: typeof c.message === "string" ? c.message : "",
+          }))
         : undefined,
       carryForward: item.carryForward === true ? true : undefined,
     }));
