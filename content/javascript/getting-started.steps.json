@@ -68,7 +68,7 @@
     "starter": "Console.log(\"Hello!\");\nconsole.Log(\"World!\");",
     "expectedOutput": ["Hello!", "World!"],
     "codeChecks": [
-      { "pattern": "Console\\.log|console\\.Log", "required": false, "message": "Use lowercase: console.log — JavaScript is case-sensitive!" }
+      { "pattern": "Console\\.log|console\\.Log", "flags": "m", "required": false, "message": "Use lowercase: console.log — JavaScript is case-sensitive!" }
     ],
     "successMessage": "console.log — always lowercase. After a few hundred calls your fingers type it automatically. Promise."
   },

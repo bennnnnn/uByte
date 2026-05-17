@@ -80,7 +80,7 @@
     "starter": "Print(\"Hello from Python!\")\nPrint(\"Case matters here.\")",
     "expectedOutput": ["Hello from Python!", "Case matters here."],
     "codeChecks": [
-      { "pattern": "Print\\(", "required": false, "message": "Change Print to print — lowercase p. Python is case-sensitive!" }
+      { "pattern": "Print\\(", "flags": "m", "required": false, "message": "Change Print to print — lowercase p. Python is case-sensitive!" }
     ],
     "successMessage": "print not Print. Always lowercase. After writing a few hundred print() calls, your fingers will do this automatically. Promise."
   },
