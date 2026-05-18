@@ -101,7 +101,6 @@ export default async function Home() {
         totalLessons={totalLessonCount}
         leftOff={leftOff}
         continueLang={continueLang}
-        continueTutorials={continueTutorialList}
         isLoggedInServer={!!user}
       />
 

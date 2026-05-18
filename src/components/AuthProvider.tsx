@@ -83,7 +83,7 @@ interface AppDataContextType {
   /** Call when a step is passed (not skipped) to update the progress bar instantly. */
   incrementStepCount: (lang: string) => void;
   setNotificationUnreadCount: (count: number) => void;
-  refreshProfile: () => Promise<void>;
+  refreshProfile: () => Promise<Record<string, unknown> | null>;
 }
 
 const AppDataContext = createContext<AppDataContextType>({
@@ -98,7 +98,7 @@ const AppDataContext = createContext<AppDataContextType>({
   toggleProgress: async (slug: string, lang?: string) => { void slug; void lang; },
   incrementStepCount: () => {},
   setNotificationUnreadCount: () => {},
-  refreshProfile: async () => {},
+  refreshProfile: async () => null,
 });
 
 // ─── Hooks ───────────────────────────────────────────
@@ -365,14 +365,17 @@ export default function AuthProvider({ children }: { children: React.ReactNode }
     setStepCountByLang((prev) => ({ ...prev, [lang]: (prev[lang] ?? 0) + 1 }));
   }, []);
 
-  const refreshProfile = useCallback(async () => {
+  const refreshProfile = useCallback(async (): Promise<Record<string, unknown> | null> => {
     try {
       const res = await fetch("/api/profile", { credentials: "same-origin" });
-      if (!res.ok) return;
+      if (!res.ok) return null;
       const data = await res.json();
       const prof = extractProfile(data);
       if (prof) setProfile(prof);
-    } catch { /* ignore */ }
+      return (data.profile as Record<string, unknown>) ?? null;
+    } catch {
+      return null;
+    }
   }, []);
 
   const userCtx = useMemo(

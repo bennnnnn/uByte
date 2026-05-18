@@ -1,6 +1,7 @@
 import { getSql } from "./client";
 import type { User } from "./types";
 import { hashToken } from "@/lib/token-security";
+import { invalidateCachedUserAuth } from "@/lib/auth-session-cache";
 
 const EMAIL_VERIFY_TOKEN_TTL_MS = 24 * 60 * 60 * 1000;
 
@@ -209,6 +210,7 @@ export async function isUserLocked(userId: number): Promise<boolean> {
 export async function incrementTokenVersion(userId: number): Promise<number> {
   const sql = getSql();
   const [row] = await sql`UPDATE users SET token_version = token_version + 1 WHERE id = ${userId} RETURNING token_version`;
+  invalidateCachedUserAuth(userId);
   return (row?.token_version as number) ?? 0;
 }
 

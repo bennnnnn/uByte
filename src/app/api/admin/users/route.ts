@@ -12,9 +12,7 @@ import {
   getStepCheckStats,
   updateUserPlan,
 } from "@/lib/db";
-import { verifyCsrf } from "@/lib/csrf";
-import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
-import { withErrorHandling, requireAdmin, requireAdminUsersManagement } from "@/lib/api-utils";
+import { withErrorHandling, requireAdmin, adminRoute, parseJsonBody } from "@/lib/api-utils";
 import { adminUserActionSchema, parseUserId } from "@/lib/api-schemas";
 import { getEffectiveAdminPermissions } from "@/app/admin/permission-constants";
 
@@ -95,30 +93,12 @@ export const GET = withErrorHandling("GET /api/admin/users", async (request: Nex
   );
 });
 
-export const POST = withErrorHandling("POST /api/admin/users", async (request: NextRequest) => {
-  const csrfError = verifyCsrf(request);
-  if (csrfError) return NextResponse.json({ error: csrfError }, { status: 403 });
+export const POST = withErrorHandling(
+  "POST /api/admin/users",
+  adminRoute({ permission: "users", rateLimitKey: "admin-users-post", rateLimitMax: 20 }, async (request, admin) => {
+  const parsed = await parseJsonBody(request, adminUserActionSchema);
+  if (parsed.error) return parsed.error;
 
-  const { admin, response } = await requireAdminUsersManagement();
-  if (!admin) return response;
-
-  const ip = getClientIp(request.headers);
-  const { limited, retryAfter } = await checkRateLimit(
-    `admin-users-post:${ip}:${admin.id}`,
-    20,
-    60_000,
-  );
-  if (limited) {
-    return NextResponse.json(
-      { error: "Too many requests" },
-      { status: 429, headers: { "Retry-After": String(retryAfter) } },
-    );
-  }
-
-  const parsed = adminUserActionSchema.safeParse(await request.json());
-  if (!parsed.success) {
-    return NextResponse.json({ error: "Invalid action or user ID" }, { status: 400 });
-  }
   const { action, plan } = parsed.data;
   const userId = parseUserId(parsed.data.userId);
   if (!Number.isInteger(userId) || userId <= 0) {
@@ -183,4 +163,5 @@ export const POST = withErrorHandling("POST /api/admin/users", async (request: N
   }
 
   return NextResponse.json({ error: "Unknown action" }, { status: 400 });
-});
+  }),
+);

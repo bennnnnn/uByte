@@ -1,6 +1,7 @@
 import { SignJWT, jwtVerify } from "jose";
 import { cookies } from "next/headers";
 import { getUserById } from "@/lib/db";
+import { getCachedUserAuth, setCachedUserAuth } from "@/lib/auth-session-cache";
 
 function getSecret(): Uint8Array {
   const secret = process.env.JWT_SECRET;
@@ -70,10 +71,18 @@ export async function getCurrentUser(): Promise<TokenPayload | null> {
   const payload = await verifyToken(token);
   if (!payload) return null;
 
-  // Verify token version matches DB — invalidates all sessions on logout-all
+  const cached = getCachedUserAuth(payload.userId);
+  if (cached) {
+    if (cached.tokenVersion !== (payload.tokenVersion ?? 0)) return null;
+    if (cached.lockedUntil && new Date(cached.lockedUntil) > new Date()) return null;
+    return payload;
+  }
+
   const user = await getUserById(payload.userId);
   if (!user) return null;
-  if ((user.token_version ?? 0) !== (payload.tokenVersion ?? 0)) return null;
+  const tv = user.token_version ?? 0;
+  setCachedUserAuth(payload.userId, tv, user.locked_until ?? null);
+  if (tv !== (payload.tokenVersion ?? 0)) return null;
   if (user.locked_until && new Date(user.locked_until) > new Date()) return null;
 
   return payload;

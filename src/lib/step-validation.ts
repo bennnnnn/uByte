@@ -2,6 +2,7 @@ import type { TutorialStep } from "@/lib/tutorial-steps/types";
 import { checkOutput, runCodeChecks, todoNotCompleted } from "@/lib/code-checks";
 
 export type StepFailureKind = "output" | "task" | "compile" | null;
+export type FailureKind = StepFailureKind;
 
 export interface StepValidationInput {
   code: string;

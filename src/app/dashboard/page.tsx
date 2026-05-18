@@ -158,7 +158,7 @@ function SectionDivider({ label }: { label: string }) {
 
 /* ── Main page ─────────────────────────────────────────────────────────── */
 function DashboardPage() {
-  const { user, loading, logout, logoutAll, setNotificationUnreadCount } = useAuth();
+  const { user, loading, logout, logoutAll, setNotificationUnreadCount, refreshProfile } = useAuth();
   const { toast } = useToast();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -201,20 +201,19 @@ function DashboardPage() {
   // ── Fetch core profile/stats/bookmarks ────────────────────────────────
   const fetchData = useCallback(async () => {
     try {
-      const [profRes, statsRes, bmRes] = await Promise.all([
-        fetch("/api/profile",       { credentials: "same-origin" }),
+      const [fullProfile, statsRes, bmRes] = await Promise.all([
+        refreshProfile(),
         fetch("/api/profile/stats", { credentials: "same-origin" }),
         fetch("/api/bookmarks",     { credentials: "same-origin" }),
       ]);
-      if (profRes.status === 401 || statsRes.status === 401) { router.push("/"); return; }
-      if (!profRes.ok || !statsRes.ok) { setError("Failed to load dashboard."); return; }
-      const [profData, statsData, bmData] = await Promise.all([
-        profRes.json().catch(() => ({})),
+      if (statsRes.status === 401) { router.push("/"); return; }
+      if (!statsRes.ok) { setError("Failed to load dashboard."); return; }
+      const [statsData, bmData] = await Promise.all([
         statsRes.json().catch(() => ({})),
         bmRes.ok ? bmRes.json().catch(() => ({ bookmarks: [], hasMore: false, total: 0 })) : { bookmarks: [], hasMore: false, total: 0 },
       ]);
       setError("");
-      if (profData.profile) setProfile(profData.profile);
+      if (fullProfile) setProfile(fullProfile as unknown as Profile);
       // Always set stats (even as empty object) so the skeleton doesn't get stuck
       setStats(statsData.stats ?? {});
       setBadges(statsData.all_badges ?? []);
@@ -227,7 +226,7 @@ function DashboardPage() {
     } catch {
       setError("Failed to load dashboard.");
     }
-  }, [router]);
+  }, [router, refreshProfile]);
 
   useEffect(() => {
     if (!loading && !user) { router.push("/"); return; }

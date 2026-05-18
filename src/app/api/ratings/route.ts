@@ -1,9 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
 import { rateTutorial, getTutorialRating } from "@/lib/db";
-import { verifyCsrf } from "@/lib/csrf";
-import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
-import { withErrorHandling, requireAuth } from "@/lib/api-utils";
+import { withErrorHandling, protectedRoute, parseJsonBody } from "@/lib/api-utils";
+import { ratingsBodySchema } from "@/lib/api-schemas";
 
 export const GET = withErrorHandling("GET /api/ratings", async (request: NextRequest) => {
   const slug = request.nextUrl.searchParams.get("slug");
@@ -16,23 +15,14 @@ export const GET = withErrorHandling("GET /api/ratings", async (request: NextReq
   return NextResponse.json(rating);
 });
 
-export const POST = withErrorHandling("POST /api/ratings", async (request: NextRequest) => {
-  const csrfError = await verifyCsrf(request);
-  if (csrfError) return NextResponse.json({ error: "Invalid CSRF token" }, { status: 403 });
-
-  const { user, response } = await requireAuth();
-  if (!user) return response;
-
-  const ip = getClientIp(request.headers);
-  const { limited } = await checkRateLimit(`ratings:${ip}:${user.userId}`, 30, 60_000);
-  if (limited) return NextResponse.json({ error: "Too many requests" }, { status: 429 });
-
-  const body = (await request.json()) as { slug?: string; value?: number; lang?: string };
-  if (!body.slug || (body.value !== 1 && body.value !== -1)) {
-    return NextResponse.json({ error: "slug and value (1 or -1) are required" }, { status: 400 });
-  }
-  const lang = body.lang ?? "go";
-  await rateTutorial(user.userId, body.slug, body.value as 1 | -1, lang);
-  const rating = await getTutorialRating(body.slug, user.userId, lang);
-  return NextResponse.json(rating);
-});
+export const POST = withErrorHandling(
+  "POST /api/ratings",
+  protectedRoute({ rateLimitKey: "ratings", rateLimitMax: 30 }, async (request, user) => {
+    const parsed = await parseJsonBody(request, ratingsBodySchema);
+    if (parsed.error) return parsed.error;
+    const { slug, value, lang = "go" } = parsed.data;
+    await rateTutorial(user.userId, slug, value, lang ?? "go");
+    const rating = await getTutorialRating(slug, user.userId, lang ?? "go");
+    return NextResponse.json(rating);
+  }),
+);

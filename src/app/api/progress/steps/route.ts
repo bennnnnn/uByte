@@ -1,10 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getCompletedStepIndices, markStepComplete } from "@/lib/db";
-import { verifyCsrf } from "@/lib/csrf";
-import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
-import { withErrorHandling, requireAuth } from "@/lib/api-utils";
+import { withErrorHandling, requireAuth, protectedRoute, parseJsonBody } from "@/lib/api-utils";
+import { progressStepBodySchema } from "@/lib/api-schemas";
 
-/** GET — return completed and skipped step indices for the given tutorial. */
 export const GET = withErrorHandling("GET /api/progress/steps", async (request: NextRequest) => {
   const { user, response } = await requireAuth();
   if (!user) return response;
@@ -17,25 +15,13 @@ export const GET = withErrorHandling("GET /api/progress/steps", async (request: 
   return NextResponse.json({ steps: completed, skippedSteps: skipped });
 });
 
-/** POST — mark a step as completed (when user passes the check). */
-export const POST = withErrorHandling("POST /api/progress/steps", async (request: NextRequest) => {
-  const { user, response } = await requireAuth();
-  if (!user) return response;
-
-  const csrfError = verifyCsrf(request);
-  if (csrfError) return NextResponse.json({ error: csrfError }, { status: 403 });
-
-  const ip = getClientIp(request.headers);
-  const { limited } = await checkRateLimit(`progress:steps:${ip}:${user.userId}`, 120, 60_000);
-  if (limited) return NextResponse.json({ error: "Too many requests" }, { status: 429 });
-
-  const body = await request.json();
-  const { slug, stepIndex, lang = "go", skipped = false } = body;
-  if (!slug || typeof stepIndex !== "number" || stepIndex < 0) {
-    return NextResponse.json({ error: "slug and stepIndex (number >= 0) required" }, { status: 400 });
-  }
-
-  const language = typeof lang === "string" ? lang : "go";
-  await markStepComplete(user.userId, slug, stepIndex, language, Boolean(skipped));
-  return NextResponse.json({ ok: true });
-});
+export const POST = withErrorHandling(
+  "POST /api/progress/steps",
+  protectedRoute({ rateLimitKey: "progress:steps", rateLimitMax: 120 }, async (request, user) => {
+    const parsed = await parseJsonBody(request, progressStepBodySchema);
+    if (parsed.error) return parsed.error;
+    const { slug, stepIndex, lang = "go", skipped = false } = parsed.data;
+    await markStepComplete(user.userId, slug, stepIndex, lang ?? "go", skipped);
+    return NextResponse.json({ ok: true });
+  }),
+);

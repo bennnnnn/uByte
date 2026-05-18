@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef, Suspense } from "react";
+import { useState, useEffect, useRef, Suspense, startTransition } from "react";
 import Link from "next/link";
 import type { TutorialStep } from "@/lib/tutorial-steps";
 import { useAuth } from "@/components/AuthProvider";
@@ -22,7 +22,7 @@ import TutorialGate from "@/components/TutorialGate";
 import { CodeEditor } from "@/components/editor/CodeEditor";
 import { EditorToolbar } from "@/components/editor/EditorToolbar";
 import { useEditorKeyDown } from "@/hooks/useEditorKeyDown";
-import { tryDecodeShareCode } from "@/lib/share-code";
+import { useTutorialDrafts } from "@/hooks/tutorial/useTutorialDrafts";
 import DiscussionThread from "@/components/discussion/DiscussionThread";
 import { apiFetch } from "@/lib/api-client";
 import CongratsModal from "@/components/tutorial/CongratsModal";
@@ -66,24 +66,22 @@ export default function InteractiveTutorial({
 
   // Notes (per-tutorial, persisted in localStorage)
   const [notesOpen, setNotesOpen] = useState(false);
-  const [notes, setNotes] = useState<string>("");
   const notesKey = `tutorial-notes-${lang}-${tutorialSlug}`;
-
-  useEffect(() => {
-    try { setNotes(localStorage.getItem(notesKey) ?? ""); } catch { /* ignore */ }
-  }, [notesKey]);
+  const [notes, setNotes] = useState<string>(() => {
+    try { return localStorage.getItem(notesKey) ?? ""; } catch { return ""; }
+  });
 
   function saveNotesNow() {
     try { localStorage.setItem(notesKey, notes); } catch { /* ignore */ }
   }
-  const [fontSize, setFontSize] = useState<14 | 16 | 18>(14);
-  useEffect(() => {
+  const [fontSize, setFontSize] = useState<14 | 16 | 18>(() => {
     try {
       const s = localStorage.getItem("ide-font-size");
-      if (s === "16") setFontSize(16);
-      else if (s === "18") setFontSize(18);
+      if (s === "16") return 16;
+      if (s === "18") return 18;
     } catch { /* ignore */ }
-  }, []);
+    return 14;
+  });
   const [mobileTab, setMobileTab] = useState<"instructions" | "ask" | "code">("instructions");
   const [leftTab, setLeftTab] = useState<"instructions" | "ask" | "outline">("instructions");
   const isMobile = useIsMobile();
@@ -93,10 +91,10 @@ export default function InteractiveTutorial({
   // Fetch steps when user selects a different language in the IDE
   useEffect(() => {
     if (ideLang === lang) {
-      setStepsForLang(null);
+      startTransition(() => setStepsForLang(null));
       return;
     }
-    setStepsLoading(true);
+    startTransition(() => setStepsLoading(true));
     fetch(`/api/tutorial-steps?lang=${encodeURIComponent(ideLang)}&slug=${encodeURIComponent(tutorialSlug)}`, { credentials: "same-origin" })
       .then((r) => r.json())
       .then((d) => setStepsForLang(Array.isArray(d?.steps) ? d.steps : []))
@@ -104,124 +102,31 @@ export default function InteractiveTutorial({
       .finally(() => setStepsLoading(false));
   }, [ideLang, lang, tutorialSlug]);
 
-  const stepIndexRef = useRef(stepProgress.stepIndex);
-  stepIndexRef.current = stepProgress.stepIndex;
-
-  // True while an async draft-load is in flight — prevents the debounce-save from
-  // firing before the real draft arrives and accidentally overwriting it with starter code.
-  const draftLoadingRef = useRef(false);
-  /** After "Next step" with `carryForward`, skip one draft fetch so we do not overwrite carried code. */
-  const skipDraftLoadOnceRef = useRef(false);
-  const saveDraftTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const [resetDone, setResetDone] = useState(false);
-  const resetTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  /**
-   * Load the saved draft for (tutorialSlug, stepIndex, lang) from the DB.
-   * Falls back to the step's starter code if no draft exists.
-   *
-   * Called when: language changes, new language steps finish loading, or
-   * the user navigates to a different step.
-   */
-  function loadDraft(stepIndex: number, langOverride?: SupportedLanguage) {
-    if (currentSteps.length === 0) return;
-    if (skipDraftLoadOnceRef.current) {
-      skipDraftLoadOnceRef.current = false;
-      return;
-    }
-    const targetLang = langOverride ?? ideLang;
-    const safeIndex  = Math.min(stepIndex, currentSteps.length - 1);
-    const starter    = currentSteps[safeIndex]?.starter ?? "";
-
-    if (!user) {
-      editor.setCode(starter);
-      return;
-    }
-
-    draftLoadingRef.current = true;
-    apiFetch(
-      `/api/code-drafts?slug=${encodeURIComponent(tutorialSlug)}` +
-      `&key=${encodeURIComponent(`step-${safeIndex}`)}` +
-      `&lang=${encodeURIComponent(targetLang)}`
-    )
-      .then((r) => r.json())
-      .then((d: { code?: string }) => {
-        editor.setCode(typeof d?.code === "string" && d.code ? d.code : starter);
-      })
-      .catch(() => { editor.setCode(starter); })
-      .finally(() => { draftLoadingRef.current = false; });
-  }
-
-  // When IDE language or its steps change, load the draft (or starter) for the current step.
-  // loadDraft is excluded: it's defined inline (not useCallback) so its reference changes
-  // every render — including it would cause an infinite loop. stepIndexRef is a ref, not state.
-  useEffect(() => {
-    loadDraft(stepIndexRef.current);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ideLang, stepsForLang]);
-
-  // When the user navigates to a different step, load the draft for that step.
-  // loadDraft excluded for the same reason as above — inline function, not useCallback.
-  useEffect(() => {
-    loadDraft(stepProgress.stepIndex);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [stepProgress.stepIndex]);
-
-  // Debounce-save code to DB on every change (1 s idle, logged-in only)
-  useEffect(() => {
-    if (saveDraftTimerRef.current) clearTimeout(saveDraftTimerRef.current);
-    saveDraftTimerRef.current = setTimeout(() => {
-      if (!user || draftLoadingRef.current) return;
-      const safeIndex = Math.min(stepProgress.stepIndex, currentSteps.length - 1);
-      apiFetch("/api/code-drafts", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          slug: tutorialSlug,
-          key: `step-${safeIndex}`,
-          code: editor.code,
-          lang: ideLang,
-        }),
-      }).catch(() => {});
-    }, 1000);
-    return () => { if (saveDraftTimerRef.current) clearTimeout(saveDraftTimerRef.current); };
-    // Only editor.code triggers the debounce. All other deps (user, slug, lang, stepIndex)
-    // are accessed via refs inside the timeout callback so they never go stale.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [editor.code]);
+  const drafts = useTutorialDrafts({
+    user,
+    tutorialSlug,
+    pageLang: lang,
+    ideLang,
+    currentSteps,
+    stepIndex: stepProgress.stepIndex,
+    code: editor.code,
+    setCode: editor.setCode,
+  });
 
   // Auto-switch mobile tab on pass/fail
   useEffect(() => {
-    if (stepProgress.status === "passed") setMobileTab("instructions");
-    if (stepProgress.status === "failed" && isMobile) setMobileTab("code");
+    startTransition(() => {
+      if (stepProgress.status === "passed") setMobileTab("instructions");
+      if (stepProgress.status === "failed" && isMobile) setMobileTab("code");
+    });
   }, [stepProgress.status, isMobile]);
-
-  // Load shared code from ?share= URL param on mount (client-side — page is statically generated).
-  // Intentionally mount-only: the share param is a one-time initial load from the URL bar.
-  useEffect(() => {
-    const encoded = new URLSearchParams(window.location.search).get("share");
-    if (encoded) {
-      const decoded = tryDecodeShareCode(encoded);
-      if (decoded) editor.setCode(decoded);
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   /** Reset to starter immediately and show brief confirmation. */
   function handleReset() {
-    if (saveDraftTimerRef.current) clearTimeout(saveDraftTimerRef.current);
-    if (user) {
-      const safeIndex = Math.min(stepProgress.stepIndex, currentSteps.length - 1);
-      apiFetch("/api/code-drafts", {
-        method: "DELETE",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ slug: tutorialSlug, key: `step-${safeIndex}`, lang: ideLang }),
-      }).catch(() => {});
-    }
+    drafts.cancelPendingSave();
+    drafts.deleteDraftForStep(stepProgress.stepIndex);
     stepProgress.handleReset(currentStep, editor.setCode, editor.setErrorLines);
-    setResetDone(true);
-    if (resetTimerRef.current) clearTimeout(resetTimerRef.current);
-    resetTimerRef.current = setTimeout(() => setResetDone(false), 2000);
+    drafts.flashResetDone();
   }
 
   const handleKeyDown = useEditorKeyDown({
@@ -237,19 +142,8 @@ export default function InteractiveTutorial({
     const nextStep = currentSteps[next];
     const code = editor.code;
     if (next > 0 && nextStep?.carryForward) {
-      skipDraftLoadOnceRef.current = true;
-      if (user) {
-        apiFetch("/api/code-drafts", {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            slug: tutorialSlug,
-            key: `step-${next}`,
-            code,
-            lang: ideLang,
-          }),
-        }).catch(() => {});
-      }
+      drafts.skipNextDraftLoad();
+      drafts.saveDraftNow(next, code);
       stepProgress.goToStep(next, { editorCode: code });
     } else {
       stepProgress.goToStep(next);
@@ -441,12 +335,12 @@ export default function InteractiveTutorial({
               onClick={handleReset}
               title="Restore the original starter code"
               className={`rounded-md border px-3 py-1.5 text-sm transition-colors ${
-                resetDone
+                drafts.resetDone
                   ? "border-emerald-400 text-emerald-600  "
                   : "border-zinc-300 text-zinc-500 hover:border-red-300 hover:text-red-600   :border-red-700 :text-red-400"
               }`}
             >
-              {resetDone ? "✓ Reset" : "↺ Reset"}
+              {drafts.resetDone ? "✓ Reset" : "↺ Reset"}
             </button>
             {/* Notes button — ml-auto pushes it to the right, where Share was */}
             <button
@@ -592,12 +486,12 @@ export default function InteractiveTutorial({
             aria-label="Reset to starter code"
             title="Reset to starter code"
             className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border transition-colors ${
-              resetDone
+              drafts.resetDone
                 ? "border-emerald-400 bg-emerald-50 text-emerald-600   "
                 : "border-zinc-300 bg-white text-zinc-500 hover:border-zinc-400 hover:text-zinc-700    :border-zinc-500"
             }`}
           >
-            {resetDone ? (
+            {drafts.resetDone ? (
               <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
               </svg>

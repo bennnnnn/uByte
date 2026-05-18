@@ -1,33 +1,22 @@
-import { NextRequest, NextResponse } from "next/server";
-import { getCurrentUser } from "@/lib/auth";
+import { NextResponse } from "next/server";
 import { setOnboardingGoal, setOnboardingLang } from "@/lib/db";
-import { withErrorHandling } from "@/lib/api-utils";
-import { verifyCsrf } from "@/lib/csrf";
-import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
+import { withErrorHandling, protectedRoute, parseJsonBody } from "@/lib/api-utils";
+import { onboardingGoalBodySchema } from "@/lib/api-schemas";
 import { isSupportedLanguage } from "@/lib/languages/registry";
 
-const VALID_GOALS = new Set(["learn-language"]);
+export const POST = withErrorHandling(
+  "POST /api/onboarding/goal",
+  protectedRoute({ rateLimitKey: "onboarding-goal", rateLimitMax: 10 }, async (request, user) => {
+    const parsed = await parseJsonBody(request, onboardingGoalBodySchema);
+    if (parsed.error) return parsed.error;
 
-export const POST = withErrorHandling("POST /api/onboarding/goal", async (req: NextRequest) => {
-  const user = await getCurrentUser();
-  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const { goal, lang } = parsed.data;
+    await setOnboardingGoal(user.userId, goal);
 
-  const csrfError = verifyCsrf(req);
-  if (csrfError) return NextResponse.json({ error: csrfError }, { status: 403 });
+    if (lang && isSupportedLanguage(lang)) {
+      await setOnboardingLang(user.userId, lang);
+    }
 
-  const { limited } = await checkRateLimit(`onboarding-goal:${getClientIp(req.headers)}:${user.userId}`, 10, 60_000);
-  if (limited) return NextResponse.json({ error: "Too many requests" }, { status: 429 });
-
-  const { goal, lang } = (await req.json()) as { goal?: string; lang?: string };
-  if (!goal || !VALID_GOALS.has(goal)) {
-    return NextResponse.json({ error: "Invalid goal" }, { status: 400 });
-  }
-
-  await setOnboardingGoal(user.userId, goal);
-
-  if (lang && isSupportedLanguage(lang)) {
-    await setOnboardingLang(user.userId, lang);
-  }
-
-  return NextResponse.json({ ok: true });
-});
+    return NextResponse.json({ ok: true });
+  }),
+);

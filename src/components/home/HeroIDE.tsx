@@ -4,6 +4,12 @@ import { useState } from "react";
 import { Card } from "@/components/ui";
 import { ALL_LANGUAGE_KEYS } from "@/lib/languages/registry";
 import type { SupportedLanguage } from "@/lib/languages/types";
+import {
+  HeroIDEFloatingBadges,
+  HeroIDEOutputPanel,
+  HeroIDEStepBanner,
+  HeroIDEWindowChrome,
+} from "./HeroIDEShell";
 
 type Lang = SupportedLanguage;
 
@@ -129,61 +135,32 @@ export default function HeroIDE() {
   const lines = CODE[lang];
 
   return (
-    <div className="relative pb-6 sm:pb-8">
-      {/* Floating success badge */}
-      <div className="absolute right-2 top-0 z-10 flex -translate-y-1/2 items-center gap-2 rounded-xl border border-emerald-200 bg-surface-card px-3.5 py-2 text-xs font-semibold text-emerald-700 shadow-lg shadow-zinc-200/60 dark:border-emerald-800 dark:text-emerald-400 dark:shadow-zinc-900/80 sm:-right-3 sm:-top-5 sm:translate-y-0">
-        <span className="flex h-5 w-5 items-center justify-center rounded-full bg-emerald-100 text-[11px] text-emerald-800 dark:bg-emerald-900/50 dark:text-emerald-300">✓</span>
-        Step passed! ✓
-      </div>
-
-      {/* Floating streak badge */}
-      <div className="absolute bottom-0 left-2 z-10 flex translate-y-1/2 items-center gap-2 rounded-xl border border-amber-200 bg-surface-card px-3.5 py-2 text-xs font-semibold text-amber-700 shadow-lg shadow-zinc-200/60 dark:border-amber-800 dark:text-amber-400 dark:shadow-zinc-900/80 sm:-bottom-4 sm:-left-3 sm:translate-y-0">
-        <span className="text-base">🔥</span>
-        3-day streak
-      </div>
-
+    <HeroIDEFloatingBadges>
       <Card className="overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.10)] dark:shadow-[0_20px_60px_rgba(0,0,0,0.4)]">
-        {/* Window chrome + language tabs */}
-        <div className="flex items-center gap-3 border-b border-zinc-100 bg-surface-card px-4 py-3 dark:border-zinc-700">
-          <div className="flex gap-1.5">
-            <span className="h-3 w-3 rounded-full bg-red-400/80" />
-            <span className="h-3 w-3 rounded-full bg-yellow-400/80" />
-            <span className="h-3 w-3 rounded-full bg-emerald-400/80" />
-          </div>
-          <div className="flex flex-1 gap-0.5 overflow-x-auto">
-            {ALL_LANGUAGE_KEYS.map((l) => (
-              <button
-                key={l}
-                type="button"
-                onClick={() => setLang(l)}
-                aria-current={l === lang ? "true" : undefined}
-                className={`shrink-0 rounded-md px-3 py-1 text-[11px] font-semibold transition-all ${
-                  l === lang
-                    ? "bg-indigo-600 text-white"
-                    : "text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-300"
-                }`}
-              >
-                {LANG_META[l].label}
-              </button>
-            ))}
-          </div>
-          <span className="shrink-0 rounded bg-zinc-100 px-2 py-0.5 font-mono text-[10px] text-zinc-400 dark:bg-zinc-700 dark:text-zinc-500">
-            hello.{meta.ext}
-          </span>
-        </div>
-
-        {/* Step instruction banner */}
-        <div className="border-b border-zinc-100 bg-indigo-50/60 px-4 py-3 dark:border-zinc-700 dark:bg-indigo-950/40">
-          <div className="mb-1.5 flex items-center gap-2">
-            <span className="rounded-full bg-indigo-100 px-2.5 py-0.5 text-[9px] font-bold uppercase tracking-widest text-indigo-600 dark:bg-indigo-900/60 dark:text-indigo-400">
-              Step 1 / 5
-            </span>
-            <span className="text-[10px] text-zinc-400 dark:text-zinc-500">Getting Started</span>
-          </div>
-          <p className="text-[11px] leading-relaxed text-zinc-500 dark:text-zinc-400">
-            {STEP_TEXT[lang]}
-          </p>
-        </div>
+        <HeroIDEWindowChrome
+          filename={`hello.${meta.ext}`}
+          headerExtra={
+            <div className="flex flex-1 gap-0.5 overflow-x-auto" role="tablist" aria-label="Preview language">
+              {ALL_LANGUAGE_KEYS.map((l) => (
+                <button
+                  key={l}
+                  type="button"
+                  role="tab"
+                  aria-selected={l === lang}
+                  onClick={() => setLang(l)}
+                  className={`shrink-0 rounded-md px-3 py-1 text-[11px] font-semibold transition-all ${
+                    l === lang
+                      ? "bg-indigo-600 text-white"
+                      : "text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-300"
+                  }`}
+                >
+                  {LANG_META[l].label}
+                </button>
+              ))}
+            </div>
+          }
+        />
+        <HeroIDEStepBanner instruction={STEP_TEXT[lang]} />
 
         {/* Code block */}
         <div className="bg-surface-card p-4 font-mono text-[12.5px] leading-[1.7]">
@@ -218,20 +195,8 @@ Run
           <span className="ml-auto text-[10px] text-zinc-300 dark:text-zinc-500">◉ Format</span>
         </div>
 
-        {/* Output */}
-        <div className="border-t border-zinc-100 bg-surface-card px-4 py-3 dark:border-zinc-700">
-          <p className="mb-1.5 text-[9px] font-bold uppercase tracking-[0.15em] text-zinc-300 dark:text-zinc-500">
-            Output
-          </p>
-          <div className="flex items-center justify-between">
-            <span className="font-mono text-xs text-emerald-600 dark:text-emerald-400">Hello, World!</span>
-            <span className="flex items-center gap-1.5 text-[11px] font-bold text-emerald-600 dark:text-emerald-400">
-              <span className="flex h-4 w-4 items-center justify-center rounded-full bg-emerald-100 text-[9px] dark:bg-emerald-900/50">✓</span>
-              Correct!
-            </span>
-          </div>
-        </div>
+        <HeroIDEOutputPanel />
       </Card>
-    </div>
+    </HeroIDEFloatingBadges>
   );
 }

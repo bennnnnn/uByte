@@ -1,47 +1,40 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { createHash } from "crypto";
-import { getCurrentUser } from "@/lib/auth";
 import { getCachedAiResponse, setCachedAiResponse } from "@/lib/db/ai-feedback-responses";
 import { canMakeAiCall, getLifetimeAiHintCount, incrementTodayAiUsage, isInCooldown, setLastAiCallAt, AI_COOLDOWN_SECONDS, FREE_HINT_LIMIT } from "@/lib/db/ai-usage";
 import { getUserById } from "@/lib/db";
 import { hasPaidAccess } from "@/lib/plans";
 import { isFeatureEnabled } from "@/lib/db/site-settings";
 import { callAiFeedback } from "@/lib/ai/feedback-client";
-import { withErrorHandling } from "@/lib/api-utils";
-import { verifyCsrf } from "@/lib/csrf";
-import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
+import { withErrorHandling, protectedRoute, parseJsonBody } from "@/lib/api-utils";
+import { tutorialHintBodySchema } from "@/lib/api-schemas";
 import { getSteps } from "@/lib/tutorial-steps";
+import { isSupportedLanguage } from "@/lib/languages/registry";
 import type { SupportedLanguage } from "@/lib/languages/types";
 
 const MODEL_NAME = "gemini-2.5-flash";
 
 /** POST /api/tutorial-hint — returns structured AI hint for a failing tutorial step. */
-export const POST = withErrorHandling("POST /api/tutorial-hint", async (request: NextRequest) => {
-  const user = await getCurrentUser();
-  if (!user) {
-    return NextResponse.json({ error: "Sign in to use AI hints" }, { status: 401 });
-  }
-
-  const csrfError = verifyCsrf(request);
-  if (csrfError) return NextResponse.json({ error: csrfError }, { status: 403 });
-
-  // Hard burst limit — prevents hammering before the per-user AI quota check
-  const ip = getClientIp(request.headers);
-  const { limited, retryAfter } = await checkRateLimit(`tutorial-hint:${ip}:${user.userId}`, 20, 60_000);
-  if (limited) {
-    return NextResponse.json({ error: "Too many requests" }, { status: 429, headers: { "Retry-After": String(retryAfter) } });
-  }
-
+export const POST = withErrorHandling(
+  "POST /api/tutorial-hint",
+  protectedRoute({ rateLimitKey: "tutorial-hint", rateLimitMax: 20 }, async (request, user) => {
   if (!await isFeatureEnabled("ai_enabled")) {
     return NextResponse.json({ error: "AI features are currently unavailable" }, { status: 503 });
   }
 
-  const body = await request.json();
-  const { tutorialSlug, stepIndex, lang, code, actualOutput, isError, failureKind } = body ?? {};
+  const parsed = await parseJsonBody(request, tutorialHintBodySchema);
+  if (parsed.error) return parsed.error;
 
-  if (!tutorialSlug || !lang || typeof code !== "string" || typeof stepIndex !== "number") {
-    return NextResponse.json({ error: "tutorialSlug, stepIndex, lang, and code required" }, { status: 400 });
-  }
+  const {
+    tutorialSlug,
+    stepIndex,
+    lang: rawLang = "go",
+    code = "",
+    actualOutput,
+    isError,
+    failureKind,
+  } = parsed.data;
+  const lang = isSupportedLanguage(rawLang) ? rawLang : "go";
 
   // Look up the step server-side so the client never needs to send step content
   const steps = getSteps(lang as SupportedLanguage, tutorialSlug);
@@ -154,4 +147,5 @@ export const POST = withErrorHandling("POST /api/tutorial-hint", async (request:
   }
 
   return NextResponse.json(response);
-});
+  }),
+);

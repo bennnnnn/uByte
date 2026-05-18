@@ -14,7 +14,7 @@
  * The isSandbox flag switches the API base URL automatically.
  */
 import { NextResponse } from "next/server";
-import { withErrorHandling, requireAuth } from "@/lib/api-utils";
+import { withErrorHandling, protectedRoute } from "@/lib/api-utils";
 import { getUserById, savePaddleCustomerId } from "@/lib/db";
 
 const PADDLE_API_KEY = process.env.PADDLE_API_KEY ?? "";
@@ -25,10 +25,11 @@ const isSandbox = PADDLE_CLIENT_TOKEN.startsWith("test_");
 const PADDLE_BASE = isSandbox ? "https://sandbox-api.paddle.com" : "https://api.paddle.com";
 
 /** GET: return authenticated Paddle customer portal URL (and optional cancel URL) for the current user. */
-export const GET = withErrorHandling("GET /api/billing/portal", async () => {
-  const { user, response } = await requireAuth();
-  if (!user) return response;
-
+export const GET = withErrorHandling(
+  "GET /api/billing/portal",
+  protectedRoute(
+    { skipCsrf: true, rateLimitKey: "billing-portal", rateLimitMax: 15 },
+    async (_request, user) => {
   const dbUser = await getUserById(user.userId);
   let customerId = dbUser?.paddle_customer_id ?? null;
 
@@ -148,4 +149,5 @@ export const GET = withErrorHandling("GET /api/billing/portal", async () => {
       { status: 500 }
     );
   }
-});
+  }),
+);

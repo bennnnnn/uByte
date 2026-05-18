@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import type { z } from "zod";
 import { getCurrentUser, type TokenPayload } from "@/lib/auth";
 import { getUserById } from "@/lib/db";
 import type { User } from "@/lib/db";
@@ -137,6 +138,105 @@ type ProtectedHandler = (
  *     protectedRoute({ rateLimitKey: "foo", rateLimitMax: 10 }, async (req, user) => { ... })
  *   );
  */
+export async function parseJsonBody<T extends z.ZodType>(
+  request: NextRequest,
+  schema: T,
+): Promise<
+  | { data: z.infer<T>; error: null }
+  | { data: null; error: NextResponse }
+> {
+  let raw: unknown;
+  try {
+    raw = await request.json();
+  } catch {
+    return { data: null, error: NextResponse.json({ error: "Invalid JSON body" }, { status: 400 }) };
+  }
+  const parsed = schema.safeParse(raw);
+  if (!parsed.success) {
+    return {
+      data: null,
+      error: NextResponse.json(
+        { error: "Invalid request body", details: parsed.error.flatten() },
+        { status: 400 },
+      ),
+    };
+  }
+  return { data: parsed.data, error: null };
+}
+
+type AdminHandler = (request: NextRequest, admin: User) => Promise<NextResponse>;
+
+export interface AdminRouteOptions extends ProtectedRouteOptions {
+  permission?: AdminPermission;
+  superOnly?: boolean;
+}
+
+/** CSRF + admin auth (+ optional permission) + rate limit. */
+export function adminRoute(opts: AdminRouteOptions, handler: AdminHandler): Handler {
+  return async (request: NextRequest, context?: unknown) => {
+    void context;
+
+    const csrfError = verifyCsrf(request);
+    if (csrfError) {
+      return NextResponse.json({ error: csrfError }, { status: 403 });
+    }
+
+    const gate = opts.superOnly
+      ? await requireSuperAdmin()
+      : opts.permission
+        ? await requireAdminPermission(opts.permission)
+        : await requireAdmin();
+    if (!gate.admin) return gate.response!;
+
+    if (opts.rateLimitKey) {
+      const ip = getClientIp(request.headers);
+      const key = `${opts.rateLimitKey}:${ip}:${gate.admin.id}`;
+      const { limited, retryAfter } = await checkRateLimit(
+        key,
+        opts.rateLimitMax ?? 30,
+        opts.rateLimitWindowMs ?? 60_000,
+      );
+      if (limited) {
+        return NextResponse.json(
+          { error: "Too many requests" },
+          { status: 429, headers: { "Retry-After": String(retryAfter) } },
+        );
+      }
+    }
+
+    return handler(request, gate.admin);
+  };
+}
+
+type PublicMutationHandler = (request: NextRequest) => Promise<NextResponse>;
+
+/** CSRF + IP rate limit for unauthenticated mutations (run-code, step-check). */
+export function publicMutationRoute(
+  opts: { rateLimitKey: string; rateLimitMax: number; rateLimitWindowMs?: number },
+  handler: PublicMutationHandler,
+): Handler {
+  return async (request: NextRequest, context?: unknown) => {
+    void context;
+    const csrfError = verifyCsrf(request);
+    if (csrfError) {
+      return NextResponse.json({ error: "Invalid CSRF token" }, { status: 403 });
+    }
+    const ip = getClientIp(request.headers);
+    const { limited, retryAfter } = await checkRateLimit(
+      `${opts.rateLimitKey}:${ip}`,
+      opts.rateLimitMax,
+      opts.rateLimitWindowMs ?? 60_000,
+    );
+    if (limited) {
+      return NextResponse.json(
+        { error: "Too many requests" },
+        { status: 429, headers: { "Retry-After": String(retryAfter) } },
+      );
+    }
+    return handler(request);
+  };
+}
+
 export function protectedRoute(
   opts: ProtectedRouteOptions,
   handler: ProtectedHandler

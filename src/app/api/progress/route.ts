@@ -3,9 +3,8 @@ import { getCurrentUser } from "@/lib/auth";
 import { getProgress, markComplete, markIncomplete, addXp, logActivity, updateStreak, getUserById, addStreakFreeze } from "@/lib/db";
 import { createNotification } from "@/lib/db/notifications";
 import { checkBadges, BADGE_MAP } from "@/lib/badges";
-import { verifyCsrf } from "@/lib/csrf";
-import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
-import { withErrorHandling, requireAuth } from "@/lib/api-utils";
+import { withErrorHandling, protectedRoute, parseJsonBody } from "@/lib/api-utils";
+import { progressBodySchema } from "@/lib/api-schemas";
 import { getAllTutorials } from "@/lib/tutorials";
 import { getAllStepsForLanguage } from "@/lib/tutorial-steps";
 import { resolveLanguage } from "@/lib/languages/registry";
@@ -37,26 +36,13 @@ export const GET = withErrorHandling("GET /api/progress", async (request: NextRe
   return NextResponse.json({ progress });
 });
 
-export const POST = withErrorHandling("POST /api/progress", async (request: NextRequest) => {
-  const { user, response } = await requireAuth();
-  if (!user) return response;
+export const POST = withErrorHandling(
+  "POST /api/progress",
+  protectedRoute({ rateLimitKey: "progress:post", rateLimitMax: 60 }, async (request, user) => {
+  const parsed = await parseJsonBody(request, progressBodySchema);
+  if (parsed.error) return parsed.error;
 
-  const csrfError = verifyCsrf(request);
-  if (csrfError) {
-    return NextResponse.json({ error: csrfError }, { status: 403 });
-  }
-
-  const ip = getClientIp(request.headers);
-  const { limited } = await checkRateLimit(`progress:post:${ip}:${user.userId}`, 60, 60_000);
-  if (limited) {
-    return NextResponse.json({ error: "Too many requests" }, { status: 429 });
-  }
-
-  const body = await request.json();
-  const { slug, completed, lang = "go" } = body;
-  if (!slug || typeof slug !== "string" || slug.length > 200) {
-    return NextResponse.json({ error: "Slug is required" }, { status: 400 });
-  }
+  const { slug, completed, lang = "go" } = parsed.data;
   const language = resolveLanguage(lang);
 
   // Validate that the slug corresponds to a real tutorial.
@@ -114,4 +100,5 @@ export const POST = withErrorHandling("POST /api/progress", async (request: Next
 
   const progress = await getProgress(user.userId, language);
   return NextResponse.json({ progress, events });
-});
+  }),
+);
