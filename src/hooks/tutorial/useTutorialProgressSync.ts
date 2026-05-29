@@ -88,14 +88,12 @@ export function useTutorialProgressSync(opts: {
         opts.setCompletedSteps((prev) => new Set([...prev, ...completed, ...skipped]));
         opts.setSkippedSteps((prev) => new Set([...prev, ...skipped]));
 
+        // Only move the step index — useTutorialDrafts.loadDraft loads code for that step.
         if (!urlHasStepRef.current && opts.steps.length > 0) {
           const doneSet = new Set([...completed, ...skipped]);
           for (let i = 0; i < opts.steps.length; i++) {
             if (!doneSet.has(i)) {
-              if (i > 0) {
-                opts.setStepIndex(i);
-                opts.setCode(opts.steps[i].starter);
-              }
+              if (i > 0) opts.setStepIndex(i);
               break;
             }
           }

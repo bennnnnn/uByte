@@ -17,6 +17,10 @@ export function useTutorialDrafts(opts: {
   setCode: (c: string) => void;
 }) {
   const draftLoadingRef = useRef(false);
+  /** Bumped on every loadDraft call so stale HTTP responses cannot overwrite the editor. */
+  const draftLoadSeqRef = useRef(0);
+  /** Last (lang, step) applied for guests — avoids re-resetting on duplicate effect runs. */
+  const lastGuestDraftKeyRef = useRef<string | null>(null);
   const skipDraftLoadOnceRef = useRef(false);
   const saveDraftTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const stepIndexRef = useRef(opts.stepIndex);
@@ -37,10 +41,14 @@ export function useTutorialDrafts(opts: {
       const starter = opts.currentSteps[safeIndex]?.starter ?? "";
 
       if (!opts.user) {
+        const guestKey = `${targetLang}:${safeIndex}`;
+        if (lastGuestDraftKeyRef.current === guestKey) return;
+        lastGuestDraftKeyRef.current = guestKey;
         opts.setCode(starter);
         return;
       }
 
+      const seq = ++draftLoadSeqRef.current;
       draftLoadingRef.current = true;
       apiFetch(
         `/api/code-drafts?slug=${encodeURIComponent(opts.tutorialSlug)}` +
@@ -49,13 +57,15 @@ export function useTutorialDrafts(opts: {
       )
         .then((r) => r.json())
         .then((d: { code?: string }) => {
+          if (seq !== draftLoadSeqRef.current) return;
           opts.setCode(typeof d?.code === "string" && d.code ? d.code : starter);
         })
         .catch(() => {
+          if (seq !== draftLoadSeqRef.current) return;
           opts.setCode(starter);
         })
         .finally(() => {
-          draftLoadingRef.current = false;
+          if (seq === draftLoadSeqRef.current) draftLoadingRef.current = false;
         });
     },
     [
