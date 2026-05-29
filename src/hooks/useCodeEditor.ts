@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useMemo, useEffect } from "react";
+import { useState, useRef, useMemo, useEffect, useCallback } from "react";
 import { getHighlighter } from "@/lib/languages/registry";
 import type { SupportedLanguage } from "@/lib/languages/types";
 
@@ -112,19 +112,14 @@ export function useCodeEditor(
   // so re-running on highlightFn or initialCode changes would double-write.
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  function setCode(newCode: string) {
+  // Stable identity — useTutorialDrafts must not re-fetch on every keystroke.
+  const setCode = useCallback((newCode: string) => {
     // ── 1. Update <pre> imperatively (instant, no React involvement) ─────
-    // React never reconciles the pre's innerHTML after mount, so this is the
-    // only writer — no stale-render overwrite, no race with the timer.
     if (preRef.current) {
       preRef.current.innerHTML = highlightFnRef.current(newCode) + "\n";
     }
 
     // ── 2. Update <textarea> only for external calls ──────────────────────
-    // When called from onChange the browser already has the new value
-    // (ta.value === newCode), so we skip this block — cursor is never touched.
-    // For external calls (draft load, reset, format, language switch) we write
-    // directly and clamp the cursor so it stays in a valid position.
     const ta = textareaRef.current;
     if (ta && ta.value !== newCode) {
       const selStart = Math.min(ta.selectionStart ?? 0, newCode.length);
@@ -136,7 +131,7 @@ export function useCodeEditor(
 
     // ── 3. Keep React state in sync (for line numbers, API bodies, etc.) ─
     setCodeState(newCode);
-  }
+  }, []);
 
   function syncScroll() {
     const ta = textareaRef.current;

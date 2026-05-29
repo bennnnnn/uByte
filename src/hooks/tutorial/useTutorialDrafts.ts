@@ -23,81 +23,79 @@ export function useTutorialDrafts(opts: {
   const lastGuestDraftKeyRef = useRef<string | null>(null);
   const skipDraftLoadOnceRef = useRef(false);
   const saveDraftTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const stepIndexRef = useRef(opts.stepIndex);
-  stepIndexRef.current = opts.stepIndex;
+
+  const optsRef = useRef(opts);
+  optsRef.current = opts;
+
+  const codeRef = useRef(opts.code);
+  codeRef.current = opts.code;
 
   const [resetDone, setResetDone] = useState(false);
   const resetTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const loadDraft = useCallback(
-    (stepIndex: number, langOverride?: SupportedLanguage) => {
-      if (opts.currentSteps.length === 0) return;
-      if (skipDraftLoadOnceRef.current) {
-        skipDraftLoadOnceRef.current = false;
-        return;
-      }
-      const targetLang = langOverride ?? opts.ideLang;
-      const safeIndex = Math.min(stepIndex, opts.currentSteps.length - 1);
-      const starter = opts.currentSteps[safeIndex]?.starter ?? "";
+  const loadDraft = useCallback((stepIndex: number, langOverride?: SupportedLanguage) => {
+    const o = optsRef.current;
+    if (o.currentSteps.length === 0) return;
+    if (skipDraftLoadOnceRef.current) {
+      skipDraftLoadOnceRef.current = false;
+      return;
+    }
+    const targetLang = langOverride ?? o.ideLang;
+    const safeIndex = Math.min(stepIndex, o.currentSteps.length - 1);
+    const starter = o.currentSteps[safeIndex]?.starter ?? "";
 
-      if (!opts.user) {
-        const guestKey = `${targetLang}:${safeIndex}`;
-        if (lastGuestDraftKeyRef.current === guestKey) return;
-        lastGuestDraftKeyRef.current = guestKey;
-        opts.setCode(starter);
-        return;
-      }
+    if (!o.user) {
+      const guestKey = `${targetLang}:${safeIndex}`;
+      if (lastGuestDraftKeyRef.current === guestKey) return;
+      lastGuestDraftKeyRef.current = guestKey;
+      o.setCode(starter);
+      return;
+    }
 
-      const seq = ++draftLoadSeqRef.current;
-      draftLoadingRef.current = true;
-      apiFetch(
-        `/api/code-drafts?slug=${encodeURIComponent(opts.tutorialSlug)}` +
-          `&key=${encodeURIComponent(`step-${safeIndex}`)}` +
-          `&lang=${encodeURIComponent(targetLang)}`,
-      )
-        .then((r) => r.json())
-        .then((d: { code?: string }) => {
-          if (seq !== draftLoadSeqRef.current) return;
-          opts.setCode(typeof d?.code === "string" && d.code ? d.code : starter);
-        })
-        .catch(() => {
-          if (seq !== draftLoadSeqRef.current) return;
-          opts.setCode(starter);
-        })
-        .finally(() => {
-          if (seq === draftLoadSeqRef.current) draftLoadingRef.current = false;
-        });
-    },
-    [
-      opts.user,
-      opts.tutorialSlug,
-      opts.ideLang,
-      opts.currentSteps,
-      opts.setCode,
-    ],
-  );
+    const codeBeforeFetch = codeRef.current;
+    const seq = ++draftLoadSeqRef.current;
+    draftLoadingRef.current = true;
+    apiFetch(
+      `/api/code-drafts?slug=${encodeURIComponent(o.tutorialSlug)}` +
+        `&key=${encodeURIComponent(`step-${safeIndex}`)}` +
+        `&lang=${encodeURIComponent(targetLang)}`,
+    )
+      .then((r) => r.json())
+      .then((d: { code?: string }) => {
+        if (seq !== draftLoadSeqRef.current) return;
+        // User typed while the fetch was in flight — do not overwrite with stale DB code.
+        if (codeRef.current !== codeBeforeFetch) return;
+        o.setCode(typeof d?.code === "string" && d.code ? d.code : starter);
+      })
+      .catch(() => {
+        if (seq !== draftLoadSeqRef.current) return;
+        if (codeRef.current !== codeBeforeFetch) return;
+        o.setCode(starter);
+      })
+      .finally(() => {
+        if (seq === draftLoadSeqRef.current) draftLoadingRef.current = false;
+      });
+  }, []);
 
-  useEffect(() => {
-    loadDraft(stepIndexRef.current);
-  }, [opts.ideLang, opts.currentSteps, loadDraft]);
-
+  // Load draft only when step, IDE language, or step list changes — NOT on every keystroke.
   useEffect(() => {
     loadDraft(opts.stepIndex);
-  }, [opts.stepIndex, loadDraft]);
+  }, [opts.ideLang, opts.stepIndex, opts.tutorialSlug, opts.currentSteps.length, loadDraft]);
 
   useEffect(() => {
     if (saveDraftTimerRef.current) clearTimeout(saveDraftTimerRef.current);
     saveDraftTimerRef.current = setTimeout(() => {
-      if (!opts.user || draftLoadingRef.current) return;
-      const safeIndex = Math.min(opts.stepIndex, opts.currentSteps.length - 1);
+      const o = optsRef.current;
+      if (!o.user || draftLoadingRef.current) return;
+      const safeIndex = Math.min(o.stepIndex, o.currentSteps.length - 1);
       apiFetch("/api/code-drafts", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          slug: opts.tutorialSlug,
+          slug: o.tutorialSlug,
           key: `step-${safeIndex}`,
-          code: opts.code,
-          lang: opts.ideLang,
+          code: codeRef.current,
+          lang: o.ideLang,
         }),
       }).catch(() => {});
     }, 1000);
@@ -110,9 +108,8 @@ export function useTutorialDrafts(opts: {
     const encoded = new URLSearchParams(window.location.search).get("share");
     if (encoded) {
       const decoded = tryDecodeShareCode(encoded);
-      if (decoded) opts.setCode(decoded);
+      if (decoded) optsRef.current.setCode(decoded);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   function skipNextDraftLoad() {
@@ -120,29 +117,31 @@ export function useTutorialDrafts(opts: {
   }
 
   function deleteDraftForStep(stepIndex: number) {
-    if (!opts.user) return;
-    const safeIndex = Math.min(stepIndex, opts.currentSteps.length - 1);
+    const o = optsRef.current;
+    if (!o.user) return;
+    const safeIndex = Math.min(stepIndex, o.currentSteps.length - 1);
     apiFetch("/api/code-drafts", {
       method: "DELETE",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        slug: opts.tutorialSlug,
+        slug: o.tutorialSlug,
         key: `step-${safeIndex}`,
-        lang: opts.ideLang,
+        lang: o.ideLang,
       }),
     }).catch(() => {});
   }
 
   function saveDraftNow(stepIndex: number, code: string) {
-    if (!opts.user) return;
+    const o = optsRef.current;
+    if (!o.user) return;
     apiFetch("/api/code-drafts", {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        slug: opts.tutorialSlug,
+        slug: o.tutorialSlug,
         key: `step-${stepIndex}`,
         code,
-        lang: opts.ideLang,
+        lang: o.ideLang,
       }),
     }).catch(() => {});
   }
