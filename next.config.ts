@@ -19,18 +19,18 @@ const securityHeaders = [
     value: [
       "default-src 'self'",
       // 'unsafe-inline' required by Next.js runtime styles and inline event handlers.
-      "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://cdn.paddle.com https://sandbox-cdn.paddle.com https://accounts.google.com",
+      "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://accounts.google.com",
       // accounts.google.com required for Google One Tap / GSI stylesheet (gsi/style).
-      "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.paddle.com https://sandbox-cdn.paddle.com https://accounts.google.com",
+      "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com",
       "font-src 'self' https://fonts.gstatic.com",
       // Go Playground, Sentry, Vercel Analytics/Vitals, Paddle API, Google OAuth.
       // Fixed: vitals.vercel-insights.com was missing the https:// scheme.
-      "connect-src 'self' https://go.dev https://*.sentry.io https://va.vercel-scripts.com https://vitals.vercel-insights.com https://paddle.com https://*.paddle.com https://oauth2.googleapis.com https://www.googleapis.com https://accounts.google.com",
+      "connect-src 'self' https://go.dev https://*.sentry.io https://va.vercel-scripts.com https://vitals.vercel-insights.com https://oauth2.googleapis.com https://www.googleapis.com https://accounts.google.com",
       // Restrict where forms may be submitted (prevents open-redirect via <form action>).
       "form-action 'self' https://accounts.google.com",
       "img-src 'self' data: https:",
       // Paddle checkout overlay + Google One Tap run in iframes.
-      "frame-src https://paddle.com https://*.paddle.com https://accounts.google.com",
+      "frame-src https://accounts.google.com",
       // Prevent <base> tag injection (could redirect all relative URLs to an attacker's origin).
       "base-uri 'self'",
       // Code editor (CodeMirror/Monaco) creates web workers from blob URLs for syntax parsing.
@@ -116,6 +116,10 @@ const nextConfig: NextConfig = {
       // Legacy: /practice-exams → tutorials (exams/certifications product removed)
       { source: "/practice-exams", destination: "/tutorial", permanent: true },
       { source: "/practice-exams/:path*", destination: "/tutorial/:path*", permanent: true },
+      // Pricing/billing pages removed — everything is free
+      { source: "/pricing", destination: "/tutorial", permanent: true },
+      { source: "/billing", destination: "/tutorial", permanent: true },
+      { source: "/referral", destination: "/tutorial", permanent: true },
     ];
   },
   async headers() {

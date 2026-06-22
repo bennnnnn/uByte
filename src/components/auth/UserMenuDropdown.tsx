@@ -4,7 +4,6 @@ import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { useAuth } from "@/components/AuthProvider";
 import Avatar from "@/components/Avatar";
-import { hasPaidAccess } from "@/lib/plans";
 
 interface MenuItemProps {
   href: string;
@@ -58,7 +57,6 @@ export default function UserMenuDropdown() {
   if (!user) return null;
 
   const close = () => setOpen(false);
-  const isPro = hasPaidAccess(profile?.plan);
 
   return (
     <div className="relative z-10" ref={ref}>
@@ -87,12 +85,8 @@ export default function UserMenuDropdown() {
                 <p className="truncate text-sm font-semibold text-zinc-900 dark:text-zinc-100">{user.name}</p>
                 <p className="truncate text-xs text-zinc-500 dark:text-zinc-400">{user.email}</p>
               </div>
-              <span className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase ${
-                isPro
-                  ? "bg-indigo-100 text-indigo-700 dark:bg-indigo-950 dark:text-indigo-300"
-                  : "bg-zinc-100 text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400"
-              }`}>
-                {profile?.plan === "yearly" ? "Yearly" : isPro ? "Pro" : "Free"}
+              <span className="shrink-0 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase bg-zinc-100 text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400">
+                Free
               </span>
             </div>
             {profile && (
@@ -112,8 +106,6 @@ export default function UserMenuDropdown() {
 
             {/* Account */}
             <SectionLabel>Account</SectionLabel>
-            <MenuItem href="/referral" icon={<ReferralIcon />} label="Refer & Earn 🎁" accent onClick={close} />
-            <MenuItem href="/billing" icon={<PlanIcon />} label="Plan & Billing" onClick={close} />
             <MenuItem href="/settings" icon={<SettingsIcon />} label="Settings" onClick={close} />
             <MenuItem href={`/u/${user.id}`} icon={<ExternalProfileIcon />} label="Public profile ↗" onClick={close} />
 
@@ -173,15 +165,6 @@ function ExternalProfileIcon() {
   );
 }
 
-function PlanIcon() {
-  return (
-    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-      <path strokeLinecap="round" strokeLinejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
-    </svg>
-  );
-}
-
-
 function SettingsIcon() {
   return (
     <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -195,14 +178,6 @@ function AdminIcon() {
   return (
     <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
       <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-    </svg>
-  );
-}
-
-function ReferralIcon() {
-  return (
-    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-      <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
     </svg>
   );
 }

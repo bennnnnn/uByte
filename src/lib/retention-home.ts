@@ -6,6 +6,7 @@ import {
   getLastTouchedTutorial,
   getSuggestedResumeStepIndex,
 } from "@/lib/db/step-progress";
+import { getProgress } from "@/lib/db/progress";
 import { getUserStruggleHints } from "@/lib/db/user-step-attempts";
 import { getAllTutorials } from "@/lib/tutorials";
 import { getSteps } from "@/lib/tutorial-steps";
@@ -51,7 +52,25 @@ export async function resolveHomeContinue(userId: number): Promise<HomeContinueR
   let base: Omit<HomeContinueResolved, "struggleCards"> | null = null;
 
   if (last?.activity_type === "tutorial" && last.slug) {
-    base = build(last.lang, last.slug, last.step);
+    // If the last-touched tutorial is fully complete, point to the next
+    // uncompleted tutorial instead of the last step of a finished one.
+    if (isSupportedLanguage(last.lang)) {
+      const progress = await getProgress(userId, last.lang);
+      if (progress.includes(last.slug)) {
+        const tutorials = getAllTutorials(last.lang);
+        const currentIdx = tutorials.findIndex((t) => t.slug === last.slug);
+        if (currentIdx >= 0 && currentIdx < tutorials.length - 1) {
+          base = build(last.lang, tutorials[currentIdx + 1].slug, 0);
+        } else {
+          // All tutorials in this language done — fall through to no-leftOff
+          base = null;
+        }
+      } else {
+        base = build(last.lang, last.slug, last.step);
+      }
+    } else {
+      base = build(last.lang, last.slug, last.step);
+    }
   }
 
   if (!base) {

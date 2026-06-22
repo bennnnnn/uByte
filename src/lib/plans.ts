@@ -38,13 +38,8 @@ export type BillingPlan = "monthly" | "yearly";
  * Returns true for any plan that grants paid feature access.
  * "canceling" — user has cancelled but is still within their billing period.
  */
-export function hasPaidAccess(plan?: string | null): boolean {
-  return (
-    plan === "yearly" ||
-    plan === "pro" ||
-    plan === "monthly" ||
-    plan === "canceling"
-  );
+export function hasPaidAccess(_plan?: string | null): boolean {
+  return true;
 }
 
 /**

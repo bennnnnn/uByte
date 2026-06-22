@@ -121,7 +121,6 @@ export default function HelpPage() {
           {[
             { href: "/tutorial", label: "Tutorials", hint: "Interactive lessons in 9 languages" },
             { href: "/dashboard", label: "Dashboard", hint: "Progress, bookmarks, and streaks" },
-            { href: "/pricing", label: "Pricing", hint: "Free tutorials with optional Pro help" },
           ].map((item) => (
             <Link
               key={item.href}

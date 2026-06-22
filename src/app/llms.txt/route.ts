@@ -7,7 +7,7 @@ export function GET() {
 
   const body = `# ${APP_NAME}
 
-> ${APP_NAME} is a free interactive coding tutorial platform. Every lesson is free. Users only pay when they want detailed hints and extra help inside lessons. Supports ${allLangs.map((l) => l.name).join(", ")}.
+> ${APP_NAME} is a free interactive coding tutorial platform. Every lesson is free — no paywalls, no subscriptions. Supports ${allLangs.map((l) => l.name).join(", ")}.
 
 ## Site
 
@@ -21,16 +21,9 @@ Step-by-step interactive tutorials with live code execution and instant feedback
 
 ${allLangs.map((l) => `- [${l.name} Tutorials](${BASE_URL}/tutorial/${l.slug})`).join("\n")}
 
-## Pro Features (paid)
-
-- Detailed hints when you get stuck in a lesson
-- Extra in-context help without leaving the tutorial
-- Faster support for learners who want more guidance
-
 ## Other
 
 - [Leaderboard](${BASE_URL}/leaderboard)
-- [Pricing](${BASE_URL}/pricing)
 - [About](${BASE_URL}/about)
 - [Contact](${BASE_URL}/contact)
 `;

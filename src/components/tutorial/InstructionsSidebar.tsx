@@ -6,7 +6,6 @@ import TutorialRating from "@/components/TutorialRating";
 import InlineRatingNudge from "@/components/tutorial/InlineRatingNudge";
 import TutorialHintPanel from "@/components/tutorial/TutorialHintPanel";
 import { useAuth } from "@/components/AuthProvider";
-import { hasPaidAccess } from "@/lib/plans";
 import { tutorialUrl } from "@/lib/urls";
 import type { TutorialStep } from "@/lib/tutorial-steps";
 import type { StepProgressState } from "@/hooks/useStepProgress";
@@ -55,7 +54,6 @@ export default function InstructionsSidebar({
 }: Props) {
   const { stepIndex, status, completedSteps, skippedSteps, tutorialDone, aiFeedback, aiFeedbackLoading, aiFeedbackUpgrade, aiFeedbackLoginRequired, failCount } = progress;
   const { profile } = useAuth();
-  const isPro = hasPaidAccess(profile?.plan);
   const isGuest = !profile;
   const aiHintActive = aiFeedbackLoading || !!aiFeedback || aiFeedbackUpgrade || aiFeedbackLoginRequired;
   const dotsRef = useRef<HTMLDivElement>(null);
@@ -161,22 +159,10 @@ export default function InstructionsSidebar({
 
         {status === "failed" && failCount >= 3 && !isGuest && !aiHintActive && (
           <div className="mt-6 rounded-lg border border-indigo-200 bg-indigo-50 p-4  ">
-            <p className="text-sm font-semibold text-indigo-800 ">Want a step-by-step walkthrough?</p>
+            <p className="text-sm font-semibold text-indigo-800 ">Need help?</p>
             <p className="mt-1 text-xs text-indigo-700 ">
-              Pro gives you a detailed breakdown of exactly where you went wrong and how to fix it — no more switching to ChatGPT.
+              Use the <strong>Get hint</strong> section above for a step-by-step walkthrough.
             </p>
-            {isPro ? (
-              <p className="mt-3 text-xs font-medium text-indigo-600 ">
-                💡 Use the <strong>Get hint</strong> section above.
-              </p>
-            ) : (
-              <Link
-                href="/pricing"
-                className="mt-3 inline-block rounded-md bg-indigo-600 px-3 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-indigo-500"
-              >
-                Get Pro for instant hints →
-              </Link>
-            )}
           </div>
         )}
       </div>

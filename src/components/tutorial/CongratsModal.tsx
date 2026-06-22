@@ -191,23 +191,7 @@ export default function CongratsModal({
           )}
         </div>
 
-        {/* Hint upsell */}
-        {!isPro && (
-          <div className="mt-4 rounded-xl border border-indigo-100 bg-indigo-50/60 p-4 text-left  ">
-            <p className="text-sm font-semibold text-indigo-800 ">
-              Want extra help on the next lesson?
-            </p>
-            <p className="mt-1 text-xs text-indigo-700/80 ">
-              Lessons stay free. Upgrade only if you want detailed hints and extra guidance without leaving the tutorial.
-            </p>
-            <Link
-              href="/pricing"
-              className="mt-3 inline-flex items-center gap-1.5 rounded-lg bg-indigo-600 px-3 py-1.5 text-xs font-bold text-white transition-colors hover:bg-indigo-500"
-            >
-              See hint pricing →
-            </Link>
-          </div>
-        )}
+        {/* Rating */}
       </div>
     </div>
   );

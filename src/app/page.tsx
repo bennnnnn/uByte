@@ -15,7 +15,6 @@ import ValuePropBanner from "@/components/home/ValuePropBanner";
 import ContinueBanner from "@/components/ContinueBanner";
 import StrugglePracticeSection from "@/components/home/StrugglePracticeSection";
 import GoogleOAuthError from "@/components/GoogleOAuthError";
-import ReferralPromptBanner from "@/components/ReferralPromptBanner";
 import FadeInSection from "@/components/home/FadeInSection";
 
 export const metadata: Metadata = {
@@ -106,8 +105,6 @@ export default async function Home() {
 
       {user ? (
         <div className="mx-auto max-w-6xl space-y-14 px-4 py-12 sm:px-6 lg:px-8">
-          <ReferralPromptBanner />
-
           {struggleCards.length > 0 && <StrugglePracticeSection cards={struggleCards} />}
 
           {leftOff && continueTutorialList.length > 0 && (

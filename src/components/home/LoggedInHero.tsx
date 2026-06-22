@@ -2,7 +2,6 @@ import Link from "next/link";
 import type { SupportedLanguage } from "@/lib/languages/types";
 import { LANG_ICONS } from "@/lib/languages/icons";
 import { LANGUAGES } from "@/lib/languages/registry";
-import { hasPaidAccess } from "@/lib/plans";
 import { getTimeGreeting, xpLevel } from "./hero-helpers";
 
 export interface LoggedInHeroProps {
@@ -30,7 +29,6 @@ export default function LoggedInHero({
   const xpPct = Math.min(100, Math.round((xp / nextXp) * 100));
   const langIcon = LANG_ICONS[continueLang] ?? "📝";
   const langName = LANGUAGES[continueLang]?.name ?? continueLang;
-  const isPro = hasPaidAccess(plan);
 
   return (
     <section className="border-b border-zinc-100 bg-white dark:border-zinc-800 dark:bg-zinc-950" aria-labelledby="logged-in-hero-heading">
@@ -44,11 +42,6 @@ export default function LoggedInHero({
               {leftOff ? "Pick up where you left off" : "Ready to level up today?"}
             </h1>
           </div>
-          {isPro && (
-            <span className="shrink-0 rounded-full bg-indigo-100 px-3 py-1 text-xs font-bold text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-300">
-              PRO
-            </span>
-          )}
         </div>
 
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
