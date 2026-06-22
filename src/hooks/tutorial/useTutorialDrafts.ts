@@ -25,10 +25,13 @@ export function useTutorialDrafts(opts: {
   const saveDraftTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const optsRef = useRef(opts);
-  optsRef.current = opts;
-
   const codeRef = useRef(opts.code);
-  codeRef.current = opts.code;
+
+  // Update refs in effect to comply with React hooks rules
+  useEffect(() => {
+    optsRef.current = opts;
+    codeRef.current = opts.code;
+  });
 
   const [resetDone, setResetDone] = useState(false);
   const resetTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
