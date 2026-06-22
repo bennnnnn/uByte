@@ -292,7 +292,7 @@ export async function sendDay1Email(to: string, name: string): Promise<void> {
                 <span style="color:#9ca3af;font-size:13px;display:block">A beginner-friendly way to experience the editor and lesson flow</span>
               </td></tr>
               <tr><td style="padding:8px 0">
-                <a href="${BASE_URL}/pricing" style="color:#4f46e5;font-weight:600;text-decoration:none">💡 See how hints work</a>
+                <a href="${BASE_URL}/tutorial" style="color:#4f46e5;font-weight:600;text-decoration:none">💡 See how hints work</a>
                 <span style="color:#9ca3af;font-size:13px;display:block">Lessons are free. Upgrade only if you want detailed hints later on.</span>
               </td></tr>
             </table>
@@ -332,7 +332,7 @@ export async function sendDay3Email(to: string, name: string): Promise<void> {
             <a href="${BASE_URL}/tutorial/go" style="display:inline-block;padding:12px 24px;background:#4f46e5;color:#fff;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px">Open tutorials →</a>
           </div>
           <p style="color:#6b7280;font-size:14px">Every lesson is free, and if you ever get stuck you can unlock detailed hints later without leaving the lesson.</p>
-          <a href="${BASE_URL}/pricing" style="color:#4f46e5;font-size:14px">See how hints work →</a>
+          <a href="${BASE_URL}/tutorial" style="color:#4f46e5;font-size:14px">See how hints work →</a>
           <hr style="border:none;border-top:1px solid #e5e7eb;margin:24px 0">
           ${unsubFooter(to)}
         </div>
@@ -367,7 +367,7 @@ export async function sendDay7Email(to: string, name: string): Promise<void> {
           <div style="background:#fff;border:1px solid #e5e7eb;border-radius:10px;padding:20px;margin:16px 0">
             <p style="margin:0 0 4px;font-weight:700">💡 Want extra help?</p>
             <p style="color:#6b7280;margin:0 0 16px;font-size:14px">Lessons stay free. Pro is only for learners who want detailed hints and extra guidance without switching tabs.</p>
-            <a href="${BASE_URL}/pricing" style="color:#4f46e5;font-size:14px;font-weight:600">See hint pricing →</a>
+            <a href="${BASE_URL}/tutorial" style="color:#4f46e5;font-size:14px;font-weight:600">See hint pricing →</a>
           </div>
           <hr style="border:none;border-top:1px solid #e5e7eb;margin:24px 0">
           ${unsubFooter(to)}
@@ -444,7 +444,7 @@ export async function sendWeeklyDigestEmail(opts: {
                 <td style="padding:4px 0"><a href="${BASE_URL}/leaderboard" style="color:#4f46e5;text-decoration:none">🏆 See the leaderboard</a></td>
               </tr>
               <tr>
-                <td style="padding:4px 0"><a href="${BASE_URL}/pricing" style="color:#4f46e5;text-decoration:none">💡 Learn how paid hints work</a></td>
+                <td style="padding:4px 0"><a href="${BASE_URL}/tutorial" style="color:#4f46e5;text-decoration:none">💡 Learn how paid hints work</a></td>
               </tr>
             </table>
           </div>
@@ -531,7 +531,7 @@ export async function sendDay14WinBackEmail(to: string, name: string): Promise<v
             <a href="${BASE_URL}/tutorial/go" style="display:inline-block;padding:12px 24px;background:#4f46e5;color:#fff;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px">Resume my journey →</a>
           </div>
           <p style="color:#6b7280;font-size:14px">Need a little help once you're back? Lessons stay free, and detailed hints are there if you want them.</p>
-          <a href="${BASE_URL}/pricing" style="color:#4f46e5;font-size:14px;font-weight:600">See hint pricing →</a>
+          <a href="${BASE_URL}/tutorial" style="color:#4f46e5;font-size:14px;font-weight:600">See hint pricing →</a>
           <hr style="border:none;border-top:1px solid #e5e7eb;margin:24px 0">
           ${unsubFooter(to)}
         </div>
@@ -620,7 +620,7 @@ export async function sendTrialEndingEmail(
               <tr><td style="padding:6px 0;border-bottom:1px solid #f3f4f6">💡 Detailed hints when you're stuck in a lesson</td></tr>
               <tr><td style="padding:6px 0">🧭 Extra help that keeps you moving without leaving the editor</td></tr>
             </table>
-            <a href="${BASE_URL}/pricing" style="display:inline-block;padding:12px 24px;background:${isUrgent ? "#b45309" : "#4f46e5"};color:#fff;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px">
+            <a href="${BASE_URL}/tutorial" style="display:inline-block;padding:12px 24px;background:${isUrgent ? "#b45309" : "#4f46e5"};color:#fff;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px">
               Subscribe to ${planType} Pro →
             </a>
           </div>

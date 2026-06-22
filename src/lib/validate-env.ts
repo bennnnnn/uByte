@@ -22,13 +22,6 @@ const ENV_VARS: EnvVar[] = [
   { key: "DATABASE_URL",          required: true,  description: "Neon PostgreSQL connection string" },
   { key: "JWT_SECRET",            required: true,  description: "JWT signing secret (min 32 chars)" },
 
-  // ── Billing — needed for paid features ──────────────────────────────────────
-  { key: "PADDLE_WEBHOOK_SECRET", required: true,  description: "Paddle webhook HMAC secret" },
-  { key: "PADDLE_API_KEY",        required: true,  description: "Paddle server-side API key" },
-  { key: "NEXT_PUBLIC_PADDLE_CLIENT_TOKEN",    required: true,  description: "Paddle client token" },
-  { key: "NEXT_PUBLIC_PADDLE_PRO_PRICE_ID",    required: true,  description: "Paddle monthly price ID" },
-  { key: "NEXT_PUBLIC_PADDLE_YEARLY_PRICE_ID", required: true,  description: "Paddle yearly price ID" },
-
   // ── Auth — Google OAuth ──────────────────────────────────────────────────────
   { key: "GOOGLE_CLIENT_ID",      required: true,  description: "Google OAuth client ID" },
   { key: "GOOGLE_CLIENT_SECRET",  required: true,  description: "Google OAuth client secret" },

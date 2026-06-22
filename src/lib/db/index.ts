@@ -20,8 +20,6 @@ export * from "./ai-feedback-responses";
 export * from "./ai-usage";
 export * from "./last-activity";
 export * from "./user-step-attempts";
-export * from "./onboarding-drip";
-export * from "./referrals";
 export * from "./push-subscriptions";
 export * from "./weekly-digest";
 export * from "./notification-digest";

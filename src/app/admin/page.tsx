@@ -15,13 +15,12 @@ import { Spinner, TabIcon } from "./components";
 import { TAB_LABELS } from "./types";
 import type { Tab } from "./types";
 import { TAB_PERMISSION } from "./permission-constants";
-import { UsersTab, AnalyticsTab, RevenueTab, GrowthTab, BannerTab, AuditTab, BlogTab, MessagesTab, ReportsTab, AdminsTab, SiteSettingsTab } from "./tabs";
+import { UsersTab, AnalyticsTab, GrowthTab, BannerTab, AuditTab, BlogTab, MessagesTab, ReportsTab, AdminsTab, SiteSettingsTab } from "./tabs";
 
 /* ── Tab header subtitles (concise one-liners per tab) ───────────────────── */
 const TAB_SUBTITLES: Record<Tab, string> = {
   users:           "Search, filters, and account actions (ban, plan, delete)",
   analytics:       "Tutorial performance and step heatmap",
-  revenue:         "Income, subscribers & billing events",
   growth:          "Conversion funnel, signup trend & churn signals",
   audit:           "Admin action history",
   banner:          "Site-wide announcement banner",
@@ -34,7 +33,7 @@ const TAB_SUBTITLES: Record<Tab, string> = {
 
 /* ── Full sidebar section definitions (super admin sees all) ─────────────── */
 const ALL_SIDEBAR_SECTIONS: { label: string; tabs: Tab[] }[] = [
-  { label: "Overview", tabs: ["users", "analytics", "revenue", "growth"] },
+  { label: "Overview", tabs: ["users", "analytics", "growth"] },
   { label: "Manage",   tabs: ["banner", "blog"] },
   { label: "Inbox",    tabs: ["messages", "reports"] },
   { label: "History",  tabs: ["audit"] },
@@ -47,7 +46,7 @@ const defaultCls = "text-zinc-600 hover:bg-zinc-50 hover:text-zinc-900 dark:text
 
 export default function AdminPage() {
   const data = useAdminData();
-  const { user, loading, fetching, error, router, tab, setTab, revenue, revenuePeriod, setRevenuePeriod, exportRevenueCSV, printRevenuePDF, exportUsersCSV, printRef, isSuperAdmin, hasPermission } = data;
+  const { user, loading, fetching, error, router, tab, setTab, exportUsersCSV, printRef, isSuperAdmin, hasPermission } = data;
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   // Filter sidebar sections to tabs the current admin has permission for
@@ -210,17 +209,6 @@ export default function AdminPage() {
               </div>
             )}
 
-            {tab === "revenue" && revenue && (
-              <div className="flex shrink-0 items-center gap-2">
-                <select id="revenue-period" name="period" value={revenuePeriod} onChange={(e) => setRevenuePeriod(e.target.value as typeof revenuePeriod)} className="rounded-lg border border-zinc-200 bg-white px-2 py-1.5 text-xs text-zinc-700 focus:border-indigo-300 focus:outline-none dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">
-                  <option value="7days">7d</option>
-                  <option value="month">1m</option>
-                  <option value="year">1y</option>
-                </select>
-                <HeaderButton onClick={exportRevenueCSV}>CSV</HeaderButton>
-                <HeaderButton onClick={printRevenuePDF} className="hidden sm:inline-flex">Print</HeaderButton>
-              </div>
-            )}
           </div>
 
         </header>
@@ -229,7 +217,6 @@ export default function AdminPage() {
         <div className="flex-1 overflow-y-auto p-3 sm:p-6">
           {tab === "users"          && <UsersTab        data={data} />}
           {tab === "analytics"      && <AnalyticsTab    data={data} />}
-          {tab === "revenue"        && <RevenueTab      data={data} />}
           {tab === "growth"         && <GrowthTab       data={data} />}
           {tab === "banner"         && <BannerTab       data={data} />}
           {tab === "audit"          && <AuditTab        data={data} />}

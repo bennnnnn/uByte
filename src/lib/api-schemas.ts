@@ -18,10 +18,8 @@ export const adminUserActionSchema = z.object({
     "reset_progress",
     "set_admin",
     "remove_admin",
-    "set_plan",
   ]),
   userId: z.union([z.number().int().positive(), z.string().regex(/^\d+$/)]),
-  plan: z.enum(["free", "pro", "monthly", "yearly"]).optional(),
 });
 
 export const progressStepBodySchema = z.object({

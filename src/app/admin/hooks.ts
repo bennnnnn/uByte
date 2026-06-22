@@ -12,17 +12,12 @@ import { useEffect, useState, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/components/AuthProvider";
 import { apiFetch } from "@/lib/api-client";
-import { formatCents } from "./utils";
-import { MONTHLY_PRICE_CENTS, YEARLY_PRICE_CENTS } from "@/lib/plans";
 import type {
   AdminMe,
   TutorialAnalytics,
   AuditEntry,
   StepStat,
-  SubscriptionEventRow,
   Tab,
-  RevenuePeriod,
-  AdminRevenueStats,
 } from "./types";
 import type { AdminGrowthSnapshot } from "@/lib/db/types";
 import { TAB_PERMISSION } from "./permission-constants";
@@ -31,7 +26,6 @@ import { TAB_PERMISSION } from "./permission-constants";
 const ADMIN_TAB_ORDER: Tab[] = [
   "users",
   "analytics",
-  "revenue",
   "growth",
   "banner",
   "blog",
@@ -69,10 +63,6 @@ export function useAdminData() {
 
   /* ── State: core data fetched on mount ───────────────────────────────── */
   const [analytics, setAnalytics] = useState<TutorialAnalytics[]>([]);
-  const [revenue, setRevenue] = useState<AdminRevenueStats | null>(null);
-  const [revenuePeriod, setRevenuePeriod] = useState<RevenuePeriod>("7days");
-  const [revenueSeries, setRevenueSeries] = useState<{ date: string; revenue: number }[]>([]);
-  const [subscriptionEvents, setSubscriptionEvents] = useState<SubscriptionEventRow[]>([]);
   const [auditLog, setAuditLog] = useState<AuditEntry[]>([]);
   const [growthSnapshot, setGrowthSnapshot] = useState<AdminGrowthSnapshot | null>(null);
 
@@ -89,7 +79,6 @@ export function useAdminData() {
   const [bannerSaving, setBannerSaving] = useState(false);
   const [bannerMessage, setBannerMessage] = useState<string | null>(null);
 
-  /* ── Ref for revenue print ───────────────────────────────────────────── */
   const printRef = useRef<HTMLDivElement>(null);
 
   /* ── Initial bulk fetch (runs once after auth resolves) ──────────────── */
@@ -133,19 +122,14 @@ export function useAdminData() {
           );
         }
 
-        if (perm("revenue")) {
           pulls.push(
             fetch("/api/admin/stats?period=7days", { credentials: "same-origin" }).then(async (r) => {
               if (cancelled || !r.ok) return;
               const data = await r.json();
-              setRevenue(data);
-              setRevenueSeries(data.revenueByPeriod ?? []);
             }),
           );
           pulls.push(
-            fetch("/api/admin/stats?view=subscription-events", { credentials: "same-origin" }).then(async (r) => {
               if (cancelled || !r.ok) return;
-              const d = (await r.json()) as { events?: SubscriptionEventRow[] };
               setSubscriptionEvents(d.events ?? []);
             }),
           );
@@ -182,15 +166,10 @@ export function useAdminData() {
     return () => { cancelled = true; };
   }, [user, loading, router]);
 
-  /* ── Revenue period switcher ─────────────────────────────────────────── */
   useEffect(() => {
-    if (tab !== "revenue" || !revenue) return;
     let cancelled = false;
-    fetch("/api/admin/stats?period=" + revenuePeriod, { credentials: "same-origin" })
       .then((r) => r.ok ? r.json() : null)
-      .then((data) => { if (!cancelled && data?.revenueByPeriod) setRevenueSeries(data.revenueByPeriod); });
     return () => { cancelled = true; };
-  }, [tab, revenuePeriod, revenue]);
 
   /* ── Banner (loaded when banner tab activates) ───────────────────────── */
   useEffect(() => {
@@ -236,40 +215,22 @@ export function useAdminData() {
     } catch (e) { setBannerMessage(String(e)); } finally { setBannerSaving(false); }
   }, [bannerData]);
 
-  /* ── Revenue CSV export ──────────────────────────────────────────────── */
-  const exportRevenueCSV = useCallback(() => {
-    const header = "Period,Revenue (USD)";
-    const rows = revenueSeries.map((d) => d.date + "," + (d.revenue / 100).toFixed(2));
-    const total = revenueSeries.reduce((s, d) => s + d.revenue, 0);
     const csv = [header, ...rows, "Total," + (total / 100).toFixed(2)].join("\n");
     const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = "revenue-" + revenuePeriod + "-" + new Date().toISOString().slice(0, 10) + ".csv";
     a.click();
     URL.revokeObjectURL(url);
-  }, [revenueSeries, revenuePeriod]);
 
-  /* ── Revenue print / PDF ─────────────────────────────────────────────── */
-  const printRevenuePDF = useCallback(() => {
-    if (!printRef.current || !revenue) return;
     const win = window.open("", "_blank");
     if (!win) return;
-    const rows = revenueSeries.map((d) => "<tr><td>" + d.date + "</td><td class=\"num\">" + formatCents(d.revenue) + "</td></tr>").join("");
-    const totalCents = revenueSeries.reduce((s, d) => s + d.revenue, 0);
     win.document.write(
-      "<!DOCTYPE html><html><head><title>Revenue Report</title>" +
       "<style>body{font-family:system-ui,sans-serif;padding:2rem;color:#1f2937}h1{font-size:1.5rem;margin-bottom:.5rem}.meta{color:#6b7280;font-size:.875rem;margin-bottom:1.5rem}table{border-collapse:collapse;width:100%}th,td{border:1px solid #e5e7eb;padding:.5rem .75rem;text-align:left}th{background:#f9fafb}.num{text-align:right}.total{font-weight:700}</style></head><body>" +
-      "<h1>Revenue Report</h1><p class=\"meta\">Generated " + new Date().toLocaleString() + " · Period: " + revenuePeriod + "</p>" +
-      "<table><thead><tr><th>Period</th><th class=\"num\">Revenue</th></tr></thead><tbody>" + rows +
-      "<tr class=\"total\"><td>Total</td><td class=\"num\">" + formatCents(totalCents) + "</td></tr></tbody></table>" +
-      "<p class=\"meta\" style=\"margin-top:1.5rem\">Today " + formatCents(revenue.revenueToday) + " · Week " + formatCents(revenue.revenueThisWeek ?? 0) + " · Month " + formatCents(revenue.revenueThisMonth) + " · Pro subs " + revenue.proSubscribers + "</p></body></html>"
     );
     win.document.close();
     win.focus();
     setTimeout(() => { win.print(); win.close(); }, 250);
-  }, [revenueSeries, revenuePeriod, revenue]);
 
   /* ── User CSV export ─────────────────────────────────────────────────── */
   const exportUsersCSV = useCallback(async () => {
@@ -286,7 +247,6 @@ export function useAdminData() {
 
   /* ── Computed / derived ──────────────────────────────────────────────── */
   const totalCompletions = analytics.reduce((s, t) => s + t.completed_count, 0);
-  const mrr = revenue ? (revenue.monthlySubscribers * MONTHLY_PRICE_CENTS + revenue.yearlySubscribers * YEARLY_PRICE_CENTS) / 12 : 0;
 
   // Role/permissions derived from /api/admin/me (NOT from the user list)
   const isSuperAdmin = adminMe?.isSuperAdmin ?? false;
@@ -303,7 +263,6 @@ export function useAdminData() {
     tab: tab ?? "analytics", setTab,
     /* core data */
     analytics,
-    revenue, revenuePeriod, setRevenuePeriod, revenueSeries, subscriptionEvents,
     auditLog,
     growthSnapshot,
     /* analytics heatmap */
@@ -312,8 +271,6 @@ export function useAdminData() {
     fetching, error,
     /* banner */
     bannerData, setBannerData, bannerSaving, bannerMessage, saveBanner,
-    /* revenue helpers */
-    exportRevenueCSV, printRevenuePDF, exportUsersCSV,
     /* computed */
     totalCompletions, mrr,
     /* ref */
