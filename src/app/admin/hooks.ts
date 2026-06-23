@@ -153,11 +153,6 @@ export function useAdminData() {
     return () => { cancelled = true; };
   }, [user, loading, router]);
 
-  useEffect(() => {
-    let cancelled = false;
-      .then((r) => r.ok ? r.json() : null)
-    return () => { cancelled = true; };
-
   /* ── Banner (loaded when banner tab activates) ───────────────────────── */
   useEffect(() => {
     if (tab !== "banner") return;
@@ -201,23 +196,6 @@ export function useAdminData() {
       else setBannerMessage(data.error ?? "Save failed");
     } catch (e) { setBannerMessage(String(e)); } finally { setBannerSaving(false); }
   }, [bannerData]);
-
-    const csv = [header, ...rows, "Total," + (total / 100).toFixed(2)].join("\n");
-    const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.click();
-    URL.revokeObjectURL(url);
-
-    const win = window.open("", "_blank");
-    if (!win) return;
-    win.document.write(
-      "<style>body{font-family:system-ui,sans-serif;padding:2rem;color:#1f2937}h1{font-size:1.5rem;margin-bottom:.5rem}.meta{color:#6b7280;font-size:.875rem;margin-bottom:1.5rem}table{border-collapse:collapse;width:100%}th,td{border:1px solid #e5e7eb;padding:.5rem .75rem;text-align:left}th{background:#f9fafb}.num{text-align:right}.total{font-weight:700}</style></head><body>" +
-    );
-    win.document.close();
-    win.focus();
-    setTimeout(() => { win.print(); win.close(); }, 250);
 
   /* ── User CSV export ─────────────────────────────────────────────────── */
   const exportUsersCSV = useCallback(async () => {
