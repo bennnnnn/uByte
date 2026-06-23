@@ -2,7 +2,6 @@ import { getSql } from "./client";
 import type { AdminUserRow, AdminTutorialRow, AdminRevenueStats, AdminGrowthSnapshot } from "./types";
 import { resetAllProgress } from "./progress";
 import { incrementTokenVersion } from "./users";
-import { ensureReferralTables } from "./referrals";
 import { ensureTutorialRatingsTable } from "./tutorial-ratings";
 
 export type AdminRole = "super" | "limited";
@@ -188,7 +187,6 @@ export async function getAdminList(): Promise<AdminUserRow[]> {
 }
 
 export async function adminDeleteUser(userId: number): Promise<void> {
-  await ensureReferralTables();
   const sql = getSql();
   // referral_conversions.referrer_id historically had no ON DELETE action — removing those
   // rows first keeps deletes working on DBs that have not run migration 025 yet.

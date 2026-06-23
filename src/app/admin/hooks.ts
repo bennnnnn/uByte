@@ -122,19 +122,6 @@ export function useAdminData() {
           );
         }
 
-          pulls.push(
-            fetch("/api/admin/stats?period=7days", { credentials: "same-origin" }).then(async (r) => {
-              if (cancelled || !r.ok) return;
-              const data = await r.json();
-            }),
-          );
-          pulls.push(
-              if (cancelled || !r.ok) return;
-              setSubscriptionEvents(d.events ?? []);
-            }),
-          );
-        }
-
         if (perm("audit")) {
           pulls.push(
             fetch("/api/admin/audit-log", { credentials: "same-origin" }).then(async (r) => {
@@ -272,7 +259,7 @@ export function useAdminData() {
     /* banner */
     bannerData, setBannerData, bannerSaving, bannerMessage, saveBanner,
     /* computed */
-    totalCompletions, mrr,
+    totalCompletions,
     /* ref */
     printRef,
   };

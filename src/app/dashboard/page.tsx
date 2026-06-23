@@ -13,8 +13,6 @@ import ProgressTab from "@/components/profile/ProgressTab";
 import AchievementsTab from "@/components/profile/AchievementsTab";
 import LeaderboardClient from "@/app/leaderboard/LeaderboardClient";
 import NotificationsTab from "@/components/profile/NotificationsTab";
-import PlanTab from "@/components/profile/PlanTab";
-import ReferralSection from "@/components/profile/ReferralSection";
 import SettingsTab from "@/components/profile/SettingsTab";
 import DangerZoneSection from "@/components/profile/settings/DangerZoneSection";
 import { hasPaidAccess } from "@/lib/plans";
@@ -533,10 +531,6 @@ function DashboardPage() {
                 onMarkRead={markAllNotifsRead}
               />
             )}
-            {tab === "billing" && (
-              <PlanTab plan={profile.plan} expiresAtProp={profile.subscription_expires_at} />
-            )}
-            {tab === "referral" && <ReferralSection />}
             {tab === "settings" && (
               <div>
                 <SettingsTab
