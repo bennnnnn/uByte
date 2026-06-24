@@ -99,7 +99,6 @@ export const POST = withErrorHandling("POST /api/auth/google-id-token", async (r
       user = await createUserWithGoogle(name, email, googleId);
       isNewUser = true;
     }
-  }
 
   if (isNewUser) {
     try {

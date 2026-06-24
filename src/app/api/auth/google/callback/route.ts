@@ -103,7 +103,6 @@ export const GET = withErrorHandling("GET /api/auth/google/callback", async (req
         );
         isNewUser = true;
       }
-    }
 
     if (isNewUser) {
       try {
@@ -119,10 +118,6 @@ export const GET = withErrorHandling("GET /api/auth/google/callback", async (req
         "Your account is ready. Start with a tutorial and use paid hints only when you want extra help.",
         "/tutorial/go"
       ).catch(() => {});
-            }
-          })
-          .catch(() => {});
-      }
     }
 
     if (user.locked_until && new Date(user.locked_until) > new Date()) {
