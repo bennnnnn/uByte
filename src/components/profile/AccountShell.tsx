@@ -12,20 +12,6 @@ function BellIcon() {
     </svg>
   );
 }
-function CreditCardIcon() {
-  return (
-    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
-      <path strokeLinecap="round" strokeLinejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
-    </svg>
-  );
-}
-function GiftIcon() {
-  return (
-    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
-      <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" />
-    </svg>
-  );
-}
 function CogIcon() {
   return (
     <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
@@ -44,10 +30,8 @@ function ChevronLeftIcon() {
 
 /* ── Nav items ───────────────────────────────────────────────────────── */
 const NAV_ITEMS = [
-  { href: "/notifications", label: "Notifications",  Icon: BellIcon },
-  { href: "/billing",       label: "Plan & Billing", Icon: CreditCardIcon },
-  { href: "/referral",      label: "Refer & Earn",   Icon: GiftIcon },
-  { href: "/settings",      label: "Settings",       Icon: CogIcon },
+  { href: "/notifications", label: "Notifications", Icon: BellIcon },
+  { href: "/settings",      label: "Settings",      Icon: CogIcon },
 ] as const;
 
 /* ── Shared nav link component ───────────────────────────────────────── */

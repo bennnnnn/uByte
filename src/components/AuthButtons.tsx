@@ -94,9 +94,6 @@ export default function AuthButtons() {
       </div>
 
       <div className="hidden items-center gap-2 md:flex">
-        <Link href="/pricing" className={linkBase}>
-          Pricing
-        </Link>
         <Link
           href={loginHref}
           className="rounded-lg px-4 py-2 text-sm font-medium text-zinc-600 transition-colors hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-200"

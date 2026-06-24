@@ -20,8 +20,6 @@ export default function robots(): MetadataRoute.Robots {
           "/reset-password",
           "/verify-email",
           "/onboarding",
-          "/billing",
-          "/referral",
           "/maintenance",
           "/unsubscribed",
           "/u/",

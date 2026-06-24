@@ -367,7 +367,7 @@ export async function sendDay7Email(to: string, name: string): Promise<void> {
           <div style="background:#fff;border:1px solid #e5e7eb;border-radius:10px;padding:20px;margin:16px 0">
             <p style="margin:0 0 4px;font-weight:700">💡 Want extra help?</p>
             <p style="color:#6b7280;margin:0 0 16px;font-size:14px">Lessons stay free. Pro is only for learners who want detailed hints and extra guidance without switching tabs.</p>
-            <a href="${BASE_URL}/tutorial" style="color:#4f46e5;font-size:14px;font-weight:600">See hint pricing →</a>
+            <a href="${BASE_URL}/tutorial" style="color:#4f46e5;font-size:14px;font-weight:600">Continue learning →</a>
           </div>
           <hr style="border:none;border-top:1px solid #e5e7eb;margin:24px 0">
           ${unsubFooter(to)}

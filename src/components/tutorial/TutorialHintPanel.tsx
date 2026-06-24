@@ -58,22 +58,6 @@ export default function TutorialHintPanel({ progress, onRequestHint }: Props) {
         </div>
       )}
 
-      {!aiFeedbackLoading && aiFeedbackUpgrade && (
-        <div className="space-y-2">
-          <p className="text-sm font-semibold text-indigo-800 ">
-            Hints are a Pro feature
-          </p>
-          <p className="text-xs text-zinc-700 ">
-            Upgrade to Pro for detailed, step-by-step guidance in every lesson.
-          </p>
-          <Link
-            href="/pricing"
-            className="inline-block rounded-lg bg-indigo-600 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-indigo-500"
-          >
-            Upgrade to Pro
-          </Link>
-        </div>
-      )}
 
       {!aiFeedbackLoading && !aiFeedback && !aiFeedbackUpgrade && !aiFeedbackLoginRequired && (
         <button

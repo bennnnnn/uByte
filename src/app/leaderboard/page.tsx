@@ -85,7 +85,7 @@ export default async function LeaderboardPage() {
             <li><Link href="/tutorial/go">Go Tutorials</Link></li>
             <li><Link href="/tutorial/python">Python Tutorials</Link></li>
             <li><Link href="/tutorial/typescript">TypeScript Tutorials</Link></li>
-            <li><Link href="/pricing">Hint Pricing</Link></li>
+
           </ul>
         </nav>
       </article>

@@ -16,7 +16,6 @@ const PRODUCT_LINKS = [
   { href: "/tutorial", label: "All Tutorials" },
   { href: "/search", label: "Search" },
   { href: "/leaderboard", label: "Leaderboard" },
-  { href: "/pricing", label: "Pricing" },
   { href: "/help", label: "Help Center" },
 ];
 

@@ -6,9 +6,9 @@ import { usePathname } from "next/navigation";
 import AuthButtons from "@/components/AuthButtons";
 import { LANGUAGES, getAllLanguageSlugs } from "@/lib/languages/registry";
 import { useAuth } from "@/components/AuthProvider";
-import { hasPaidAccess } from "@/lib/plans";
 
-const STANDALONE_PREFIXES = ["/", "/tutorial", "/search", "/pricing", "/privacy", "/terms", "/leaderboard", "/profile", "/dashboard", "/billing", "/referral", "/notifications", "/settings", "/reset-password", "/verify-email", "/admin", "/u", "/help", "/blog"];
+
+const STANDALONE_PREFIXES = ["/", "/tutorial", "/search", "/privacy", "/terms", "/leaderboard", "/profile", "/dashboard", "/notifications", "/settings", "/reset-password", "/verify-email", "/admin", "/u", "/help", "/blog"];
 
 function isStandalonePath(pathname: string): boolean {
   if (pathname === "/") return true;
@@ -95,8 +95,7 @@ function MobileNavLink({
 
 export default function MobileStandaloneHeader() {
   const pathname = usePathname();
-  const { user, profile } = useAuth();
-  const isPro = hasPaidAccess(profile?.plan);
+  const { user } = useAuth();
   const [open, setOpen] = useState(false);
   const [expandedSection, setExpandedSection] = useState<string | null>(null);
 
@@ -188,16 +187,6 @@ export default function MobileStandaloneHeader() {
             />
           )}
 
-          {/* Standalone links — hide Pricing for Pro users */}
-          {!(user && isPro) && (
-            <Link
-              href="/pricing"
-              onClick={close}
-              className="flex items-center rounded-xl border border-zinc-100 bg-white px-4 py-3 text-sm font-bold text-zinc-700 transition-colors hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:bg-zinc-800"
-            >
-              Pricing
-            </Link>
-          )}
         </nav>
       )}
     </div>
