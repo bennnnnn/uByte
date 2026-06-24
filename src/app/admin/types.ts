@@ -60,13 +60,12 @@ export interface SubscriptionEventRow {
   created_at: string;
 }
 
-export type Tab = "users" | "analytics" | "revenue" | "growth" | "audit" | "banner" | "blog" | "messages" | "reports" | "admins" | "site-settings";
+export type Tab = "users" | "analytics" | "growth" | "audit" | "banner" | "blog" | "messages" | "reports" | "admins" | "site-settings";
 export type RevenuePeriod = "7days" | "month" | "year";
 
 export const TAB_LABELS: Record<Tab, string> = {
   users:           "Users",
   analytics:       "Analytics",
-  revenue:         "Revenue",
   growth:          "Growth",
   audit:           "Audit log",
   banner:          "Site banner",

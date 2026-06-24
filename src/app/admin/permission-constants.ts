@@ -5,7 +5,6 @@
 
 export const ALL_PERMISSIONS = [
   "users",        // View and manage users (ban, delete, change plan)
-  "revenue",      // View revenue, billing, subscription events
   "growth",       // View growth metrics and funnel
   "audit",        // View admin audit log
   "admins",       // Manage admin access and permissions
@@ -56,7 +55,6 @@ export const DEFAULT_LIMITED_PERMISSIONS: AdminPermission[] = [
 /** Human-readable labels for each permission. */
 export const PERMISSION_LABELS: Record<AdminPermission, string> = {
   users:       "Users — view, ban, delete, change plan",
-  revenue:     "Revenue & billing",
   growth:      "Growth metrics & funnel",
   audit:       "Audit log",
   admins:      "Admin management",
@@ -72,7 +70,6 @@ export const PERMISSION_LABELS: Record<AdminPermission, string> = {
 export const TAB_PERMISSION: Record<string, AdminPermission> = {
   users:           "users",
   analytics:       "analytics",
-  revenue:         "revenue",
   growth:          "growth",
   audit:           "audit",
   banner:          "banner",
@@ -101,9 +98,7 @@ export const PERMISSION_PRESETS: { id: string; label: string; permissions: Admin
     permissions: ["reports", "messages"],
   },
   {
-    id: "analyst",
     label: "Analyst",
-    permissions: ["analytics", "revenue", "growth", "users"],
   },
   {
     id: "all",

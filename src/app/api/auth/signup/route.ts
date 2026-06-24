@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
-import { createUser, getUserByEmail, createEmailVerificationToken, getReferrerByCode, recordReferralSignup } from "@/lib/db";
+import { createUser, getUserByEmail, createEmailVerificationToken } from "@/lib/db";
 import { createNotification } from "@/lib/db/notifications";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 import { setCsrfCookie, verifyCsrf } from "@/lib/csrf";
@@ -27,7 +27,7 @@ export const POST = withErrorHandling("POST /api/auth/signup", async (request: N
     return NextResponse.json({ error: "Registration is currently closed" }, { status: 503 });
   }
 
-  const { name, email: rawEmail, password, referralCode } = await request.json();
+  const { name, email: rawEmail, password } = await request.json();
   if (!name || !rawEmail || !password) {
     return NextResponse.json({ error: "All fields are required" }, { status: 400 });
   }
@@ -75,17 +75,6 @@ export const POST = withErrorHandling("POST /api/auth/signup", async (request: N
     "Your account is ready. Pick a language, start your first tutorial, and save your progress as you learn.",
     "/dashboard"
   ).catch(() => {});
-
-  // Attribute referral if the new user came via an invite link
-  if (typeof referralCode === "string" && /^[a-z0-9]{6,16}$/i.test(referralCode)) {
-    getReferrerByCode(referralCode)
-      .then((referrerId) => {
-        if (referrerId && referrerId !== user.id) {
-          return recordReferralSignup(referrerId, user.id);
-        }
-      })
-      .catch(() => {}); // non-critical — never fail signup
-  }
 
   // Do not set a session cookie — the client shows a success step and the user signs in explicitly.
   const res = NextResponse.json({ ok: true as const, email: user.email, name: user.name });

@@ -12,7 +12,6 @@ import { setCsrfCookie } from "@/lib/csrf";
 import { withErrorHandling } from "@/lib/api-utils";
 import { sendGoogleLinkedEmail, sendWelcomeEmail } from "@/lib/email";
 import { createNotification } from "@/lib/db/notifications";
-import { getReferrerByCode, recordReferralSignup } from "@/lib/db";
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
@@ -32,7 +31,6 @@ export const POST = withErrorHandling("POST /api/auth/google-id-token", async (r
     return NextResponse.json({ error: "Google sign-in is not configured" }, { status: 503 });
   }
 
-  let body: { credential?: string; referralCode?: string };
   try {
     body = await request.json();
   } catch {
@@ -40,7 +38,6 @@ export const POST = withErrorHandling("POST /api/auth/google-id-token", async (r
   }
 
   const credential = body.credential?.trim();
-  const referralCode = typeof body.referralCode === "string" ? body.referralCode.trim() : "";
   if (!credential) {
     return NextResponse.json({ error: "Missing credential" }, { status: 400 });
   }
@@ -117,15 +114,6 @@ export const POST = withErrorHandling("POST /api/auth/google-id-token", async (r
       "Your account is ready. Start with a tutorial and use paid hints only when you want extra help.",
       "/tutorial/go"
     ).catch(() => {});
-    if (referralCode && /^[a-z0-9]{6,16}$/i.test(referralCode)) {
-      getReferrerByCode(referralCode)
-        .then((referrerId) => {
-          if (referrerId && referrerId !== user!.id) {
-            return recordReferralSignup(referrerId, user!.id);
-          }
-        })
-        .catch(() => {});
-    }
   }
 
   if (user.locked_until && new Date(user.locked_until) > new Date()) {
