@@ -103,6 +103,7 @@ export const GET = withErrorHandling("GET /api/auth/google/callback", async (req
         );
         isNewUser = true;
       }
+    }
 
     if (isNewUser) {
       try {

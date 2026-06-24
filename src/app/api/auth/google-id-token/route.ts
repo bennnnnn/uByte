@@ -31,6 +31,7 @@ export const POST = withErrorHandling("POST /api/auth/google-id-token", async (r
     return NextResponse.json({ error: "Google sign-in is not configured" }, { status: 503 });
   }
 
+  let body: { credential?: string };
   try {
     body = await request.json();
   } catch {
@@ -99,6 +100,7 @@ export const POST = withErrorHandling("POST /api/auth/google-id-token", async (r
       user = await createUserWithGoogle(name, email, googleId);
       isNewUser = true;
     }
+  }
 
   if (isNewUser) {
     try {

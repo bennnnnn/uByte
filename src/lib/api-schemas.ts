@@ -20,6 +20,7 @@ export const adminUserActionSchema = z.object({
     "remove_admin",
   ]),
   userId: z.union([z.number().int().positive(), z.string().regex(/^\d+$/)]),
+  plan: z.string().optional(),
 });
 
 export const progressStepBodySchema = z.object({

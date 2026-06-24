@@ -21,7 +21,7 @@ export const GET = withErrorHandling("GET /api/admin/stats", async (request: Nex
     return NextResponse.json(snapshot);
   }
 
-  const { admin, response } = await requireAdminPermission("revenue");
+  const { admin, response } = await requireAdminPermission("growth");
   if (!admin) return response;
 
   if (view === "subscription-events") {

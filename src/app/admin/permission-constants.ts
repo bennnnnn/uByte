@@ -98,7 +98,9 @@ export const PERMISSION_PRESETS: { id: string; label: string; permissions: Admin
     permissions: ["reports", "messages"],
   },
   {
+    id: "analyst",
     label: "Analyst",
+    permissions: ["analytics", "growth"],
   },
   {
     id: "all",

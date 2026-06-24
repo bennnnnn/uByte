@@ -240,6 +240,8 @@ export function useAdminData() {
     totalCompletions,
     /* ref */
     printRef,
+    /* csv export */
+    exportUsersCSV,
   };
 }
 

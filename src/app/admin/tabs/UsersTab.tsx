@@ -39,7 +39,7 @@ const VERIFIED_FILTERS = [
 
 /* ── Main component ───────────────────────────────────────────────────────── */
 export default function UsersTab({ data }: Props) {
-  const { user: adminUser, revenue, totalCompletions, exportUsersCSV, isSuperAdmin } = data;
+  const { user: adminUser, totalCompletions, exportUsersCSV, isSuperAdmin } = data;
 
   /* ── Local state ─────────────────────────────────────────────────────── */
   const [users,       setUsers]       = useState<AdminUser[]>([]);
@@ -151,7 +151,7 @@ export default function UsersTab({ data }: Props) {
   }, []);
 
   /* ── Summary stats ────────────────────────────────────────────────────── */
-  const proCount = revenue?.proSubscribers ?? "—";
+  const proCount = "—";
 
   return (
     <div className="space-y-5">
